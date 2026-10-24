@@ -1,0 +1,318 @@
+% PACKAGE
+
+
+
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+\usepackage{siunitx}
+\usepackage{varioref}
+\usepackage{xurl}
+\usepackage{hyperref}
+
+\usepackage{enumitem}
+
+%\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue,bookmarksopen=true,bookmarksnumbered=true,pdfpagemode=FullScreen,pdfstartview=FitH}
+\hypersetup{colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=blue}
+\usepackage{cleveref}
+\usepackage{fancyhdr}
+% \usepackage{theorem}
+\usepackage{booktabs}
+\usepackage[export]{adjustbox}
+
+\usepackage{multicol}
+\usepackage{changepage}
+\usepackage{subfigure}
+\usepackage{pifont}
+\usepackage{bbm}
+\usepackage{mfirstuc}
+
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{tikz-3dplot}
+
+\usepgflibrary{patterns}
+\usetikzlibrary{patterns}
+\usetikzlibrary{patterns.meta}
+
+
+
+% GEOMETRY
+% \addtolength{\parskip}{\baselineskip}
+\setlength{\parskip}{0.5em}
+\pagestyle{myheadings}
+% \oddsidemargin=1.24mm
+% \evensidemargin=-5.4mm
+\topmargin=-23pt
+\headheight=13.59999pt
+\headsep=25pt
+\textheight=674pt
+\textwidth=426pt
+%\textwidth=452pt
+\marginparsep=10pt
+\marginparwidth=50pt
+\marginparpush=5pt
+\voffset=0pt
+\paperheight=845pt
+\footskip=30pt
+%\hoffset=0pt
+\hoffset=13pt % to adjust the concent in the middle of the page
+\paperwidth=597pt
+\brokenpenalty=10000
+% FANCY STYLE
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\lhead[\fancyplain{}{\nouppercase{\thepage}}]{\fancyplain{}{\nouppercase{\rightmark}}}
+\rhead[\fancyplain{}{\nouppercase{\leftmark}}]{\fancyplain{}{\nouppercase{\thepage}}}
+\cfoot{}
+%%%%
+\newcommand{\prefrontmatter}{\thispagestyle{empty}
+   \begin{center}
+        \vspace*{\fill}
+        \huge\projecttitle\\
+        \vspace*{\fill}
+        \Large{\projectauthor}\\
+        \vspace*{\fill}
+        \large{\projectmonth}\\
+        \vspace*{\fill}
+        \large{\projectdepartment}\\
+        \vspace{1.5cm}
+        \footnotesize{本书选自自然语言处理入门资源中的相关章节}\\ \footnotesize{资源地址： \url{https://github.com/NiuTrans/NLPBook}}\\
+   \end{center}
+   \clearpage
+   \thispagestyle{empty}
+}
+%% CHAPTER STYLE
+\def\@makechapterhead#1{
+  {\parindent \z@ \raggedright \normalfont
+   \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter
+        \Large\upshape\bfseries 第\thechapter 章
+        \par\nobreak
+        \vskip 20\p@
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \flushleft\parbox{\textwidth}{\raggedright\huge #1}
+     \par\nobreak
+     \vskip 15pt
+     \hrule height 0.4pt
+  }}
+\def\@makeschapterhead#1{
+  {\parindent \z@ \raggedright \normalfont
+    \interlinepenalty\@M
+      \huge  #1
+     \par\nobreak
+     \vskip 15pt
+     \hrule height 0.4pt
+  }}
+
+% copy from my project
+
+ % Required for including letters with accents
+ % Use 8-bit encoding that has 256 glyphs
+\usepackage{tikz-qtree}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usetikzlibrary {arrows.meta,bending,positioning}
+\usetikzlibrary{angles,quotes}
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{shadows}
+\usepackage{pgfplots}
+\usepackage{soul}
+\usepackage{xcolor}
+\usepackage{makecell}
+\usepackage[normalem]{ulem}
+\usepackage{ulem}
+\usepackage{multirow}
+\usepackage{setspace}
+\usetikzlibrary{shadows}
+\definecolor{ocrebase}{RGB}{243,102,25}
+\definecolor{ocre}{RGB}{0,0,0}
+\definecolor{amber}{rgb}{1.0, 0.75, 0.0}
+\definecolor{ublue}{rgb}{0.152,0.250,0.545}
+\definecolor{ugreen}{rgb}{0,0.5,0}
+\definecolor{lgreen}{rgb}{0.9,1,0.8}
+\definecolor{lightgreen}{rgb}{0.56, 0.93, 0.56}
+\definecolor{kellygreen}{rgb}{0.3, 0.73, 0.09}
+\definecolor{xtgreen}{rgb}{0.914,0.945,0.902}
+\definecolor{lightgray}{gray}{0.85}
+\definecolor{darkblue}{rgb}{0, 0, 0.5}
+\definecolor{shadecolor}{rgb}{0.96,0.96,0.93}
+
+\definecolor{lightcyan}{RGB}{194,232,247}
+\definecolor{lightorange}{RGB}{255,226,187}
+\definecolor{lightpink}{RGB}{252,224,225}
+\definecolor{lightgreen}{RGB}{204,231,207}
+
+% colors (872) from https://www.webdesignrankings.com/resources/lolcolors/
+\definecolor{lolgreen}{RGB}{103,213,181}
+\definecolor{lolred}{RGB}{238,119,133}
+\definecolor{lolpurple}{RGB}{200,158,196}
+\definecolor{lolblue}{RGB}{132,177,237}
+\definecolor{lolorange}{RGB}{246,179,82}
+\definecolor{lightsalmon}{RGB}{255,160,122}
+\definecolor{lightskyblue}{RGB}{135,206,250}
+
+\newcommand{\ctext}[3][RGB]{%
+  \begingroup
+  \definecolor{hlcolor}{#1}{#2}%
+  \colorbox{hlcolor}{#3}%
+  \endgroup
+}
+\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
+\newcolumntype{C}[1]{>{\PreserveBackslash\centering}p{#1}}
+\newcolumntype{R}[1]{>{\PreserveBackslash\raggedleft}p{#1}}
+\newcolumntype{L}[1]{>{\PreserveBackslash\raggedright}p{#1}}
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY AND INDEX
+%----------------------------------------------------------------------------------------
+
+%\usepackage[style=numeric,citestyle=numeric,sorting=none,sortcites=true,maxbibnames=40,minbibnames=30,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber,autocite=plain]{biblatex}
+%\addbibresource{bibliography.bib} % BibTeX bibliography file
+%\defbibheading{bibempty}{}
+\usepackage{natbib} %\usepackage{natbib}
+\setlength{\bibsep}{5pt}
+%\renewcommand{\bibfont}{\fontsize{10pt}{\baselineskip}\selectfont}
+\renewcommand{\bibfont}{\fontsize{10pt}{12pt}\selectfont}
+
+\setcitestyle{square,aysep={,},yysep={;}}
+\renewcommand\cite{\citep}	% to get "(Author Year)" with natbib
+\newcommand\shortcite{\citeyearpar}% to get "(Year)" with natbib
+\newcommand\newcite{\citet}	% to get "Author (Year)" with natbib
+
+\usepackage{calc} % For simpler calculation - used for spacing the index letter headings correctly
+\usepackage{makeidx} % Required to make an index
+\makeindex % Tells LaTeX to create the files required for indexing
+\newcommand{\upcite}[1]{\textsuperscript{\textsuperscript{\cite{#1}}}}
+
+%\newcommand{\mindex}[1]{\textbf{#1}\index{#1}}
+\newcommand{\mindex}[1]{\textbf{#1}\index{#1}}
+\newcommand{\mindexraw}[1]{\textbf{#1}\index{#1}}
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER HEADINGS
+%----------------------------------------------------------------------------------------
+
+\fancypagestyle{chapterurl}{
+\fancyhf{}% clear all header and footer fields
+\fancyhead[R]{\footnotesize{\url{https://github.com/NiuTrans/NLPBook}}\\[2pt] \footnotesize{\url{https://niutrans.github.io/NLPBook}}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+}
+
+%----------------------------------------------------------------------------------------
+%	THEOREM STYLES
+%----------------------------------------------------------------------------------------
+
+\usepackage{amsthm} % For math equations, theorems, symbols, etc
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\DeclareSymbolFont{EulerExtension}{U}{euex}{m}{n}%将积分号修改为正体
+\DeclareMathSymbol{\euintop}{\mathop} {EulerExtension}{"52}
+%\DeclareMathSymbol{\euointop}{\mathop} {EulerExtension}{"48}
+\let\intop\euintop
+%\let\ointop\euointop
+
+\newcommand{\intoo}[2]{\mathopen{]}#1\,;#2\mathclose{[}}
+\newcommand{\ud}{\mathop{\mathrm{{}d}}\mathopen{}}
+\newcommand{\intff}[2]{\mathopen{[}#1\,;#2\mathclose{]}}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+\newtheorem{notation}{符号说明}[chapter]
+
+% Boxed/framed environments
+\newtheoremstyle{ocrenumbox}% Theorem style name
+{0pt}% Space above
+{0pt}% Space below
+{\normalfont}% Body font
+{}% Indent amount
+{\small\bf\sffamily\color{ocre}}% Theorem head font
+{\;}% Punctuation after theorem head
+{0.25em}% Space after theorem head
+{\small\sffamily\color{ocre}\thmname{#1}\nobreakspace\thmnumber{\@ifnotempty{#1}{}\@upn{#2}}% Theorem text (e.g. Theorem 2.1)
+\thmnote{\nobreakspace\the\thm@notefont\sffamily\bfseries\color{black}---\nobreakspace#3.}} % Optional theorem note
+
+\newtheoremstyle{blacknumex}% Theorem style name
+{5pt}% Space above
+{5pt}% Space below
+{\normalfont}% Body font
+{} % Indent amount
+{\small\bf\sffamily}% Theorem head font
+{\;}% Punctuation after theorem head
+{0.25em}% Space after theorem head
+{\small\sffamily{\tiny\ensuremath{}}\nobreakspace\thmname{#1}\nobreakspace\thmnumber{\@ifnotempty{#1}{}\@upn{#2}}% Theorem text (e.g. Theorem 2.1)\blacksquare去除
+\thmnote{\nobreakspace\the\thm@notefont\sffamily\bfseries---\nobreakspace#3.}}% Optional theorem note
+
+\newtheoremstyle{blacknumbox} % Theorem style name
+{0pt}% Space above
+{0pt}% Space below
+{\normalfont}% Body font
+{}% Indent amount
+{\small\bf\sffamily}% Theorem head font
+{\;}% Punctuation after theorem head
+{0.25em}% Space after theorem head
+{\small\sffamily\thmname{#1}\nobreakspace\thmnumber{\@ifnotempty{#1}{}\@upn{#2}}% Theorem text (e.g. Theorem 2.1)
+\thmnote{\nobreakspace\the\thm@notefont\sffamily\bfseries---\nobreakspace#3.}}% Optional theorem note
+
+% Non-boxed/non-framed environments
+\newtheoremstyle{ocrenum}% Theorem style name
+{5pt}% Space above
+{5pt}% Space below
+{\normalfont}% Body font
+{}% Indent amount
+{\small\bf\sffamily\color{ocre}}% Theorem head font
+{\;}% Punctuation after theorem head
+{0.25em}% Space after theorem head
+{\small\sffamily\color{ocre}\thmname{#1}\nobreakspace\thmnumber{\@ifnotempty{#1}{}\@upn{#2}}% Theorem text (e.g. Theorem 2.1)
+\thmnote{\nobreakspace\the\thm@notefont\sffamily\bfseries\color{black}---\nobreakspace#3.}} % Optional theorem note
+\makeatother
+
+
+
+\newcommand{\ChapterPretraining}{1}
+\newcommand{\ChapterLLM}{2}
+\newcommand{\ChapterLLMPrompting}{3}
+\newcommand{\ChapterLLMTuning}{4}
+\newcommand{\ChapterLLMInference}{5}
+\newcommand{\ChapterLLMReasoning}{6}
+
+% Chinese edition: the original mathematical/figure macros are retained above.
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Consolas}
+\geometry{a4paper,margin=2.6cm,headheight=16pt,headsep=20pt,footskip=28pt}
+\hoffset=0pt
+\linespread{1.25}
+\setlength{\parindent}{2em}
+\emergencystretch=1.2em
+\tolerance=2000
+\pgfplotsset{compat=1.18}
+\renewcommand{\bibname}{参考文献}
+\renewcommand{\indexname}{索引}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\contentsname}{目录}
+\hypersetup{pdftitle={大语言模型基础},pdfauthor={Tong Xiao and Jingbo Zhu},bookmarksnumbered=true}
+\crefname{chapter}{章}{章}
+\crefname{section}{节}{节}
+\crefname{figure}{图}{图}
+\crefname{table}{表}{表}
+\crefname{equation}{式}{式}
+
+\newenvironment{CJK*}[2]{}{}
+\newenvironment{CJK}[2]{}{}
+
+% Breakable CJK highlights retain the source emphasis on long prompt examples.
+\usepackage{xeCJKfntef}
+\renewcommand{\ctext}[3][RGB]{%
+  \begingroup
+  \definecolor{hlcolor}{#1}{#2}%
+  \CJKunderanyline{0pt}{\color{hlcolor}\rule[-0.2em]{0.2em}{1.2em}}{#3}%
+  \endgroup
+}
+\let\uline\CJKunderline

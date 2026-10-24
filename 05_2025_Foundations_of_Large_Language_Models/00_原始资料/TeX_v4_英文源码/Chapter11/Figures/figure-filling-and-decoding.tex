@@ -1,0 +1,266 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.6cm}
+
+\tikzstyle{lnode} = [minimum width=1.2cm,minimum height=0.3cm,inner sep=0pt,draw,fill=white,rounded corners=0pt];
+\tikzstyle{snode} = [circle,minimum size=0.17cm,inner sep=0,draw=white,line width=0.02cm,fill=black];
+
+%%% prefilling
+\begin{scope}
+
+\node [lnode,anchor=west,draw=blue] (key0) at (0,0) {\tiny{$\mathbf{k}_0$}};
+\node [lnode,anchor=north,draw=blue] (value0) at ([yshift=-1pt]key0.south) {\tiny{$\mathbf{v}_0$}};
+\node [lnode,anchor=west,draw=blue] (key1) at ([xshift=1pt]key0.east) {\tiny{$\mathbf{k}_1$}};
+\node [lnode,anchor=north,draw=blue] (value1) at ([yshift=-1pt]key1.south) {\tiny{$\mathbf{v}_1$}};
+\node [lnode,anchor=west,draw=blue] (key2) at ([xshift=1pt]key1.east) {\tiny{$\cdots$}};
+\node [lnode,anchor=north,draw=blue] (value2) at ([yshift=-1pt]key2.south) {\tiny{$\cdots$}};
+\node [lnode,anchor=west,draw=blue] (key3) at ([xshift=1pt]key2.east) {\tiny{$\mathbf{k}_{m-1}$}};
+\node [lnode,anchor=north,draw=blue] (value3) at ([yshift=-1pt]key3.south) {\tiny{$\mathbf{v}_{m-1}$}};
+%\node [lnode,anchor=west,draw=blue] (keyy1) at ([xshift=1pt]key3.east) {\tiny{$\mathbf{k}_{m}$}};
+%\node [lnode,anchor=north,draw=blue] (valuey1) at ([yshift=-1pt]keyy1.south) {\tiny{$\mathbf{v}_{m}$}};
+%\node [lnode,anchor=west,draw=blue] (keyy2) at ([xshift=1pt]keyy1.east) {\tiny{$\mathbf{k}_{m+1}$}};
+%\node [lnode,anchor=north,draw=blue] (valuey2) at ([yshift=-1pt]keyy2.south) {\tiny{$\mathbf{v}_{m+1}$}};
+%\node [lnode,anchor=west,draw=blue] (keyy3) at ([xshift=1pt]keyy2.east) {\tiny{$\cdots$}};
+%\node [lnode,anchor=north,draw=blue] (valuey3) at ([yshift=-1pt]keyy3.south) {\tiny{$\cdots$}};
+%\node [lnode,anchor=west,draw=blue] (keyy4) at ([xshift=1pt]keyy3.east) {\tiny{$\mathbf{k}_{m+n}$}};
+%\node [lnode,anchor=north,draw=blue] (valuey4) at ([yshift=-1pt]keyy4.south) {\tiny{$\mathbf{v}_{m+n}$}};
+
+\node [lnode,anchor=south] (query0) at ([yshift=1.3*\ssep]key0.north) {\tiny{$\mathbf{q}_0$}};
+\node [lnode,anchor=south] (query1) at ([yshift=1.3*\ssep]key1.north) {\tiny{$\mathbf{q}_1$}};
+\node [lnode,anchor=south] (query2) at ([yshift=1.3*\ssep]key2.north) {\tiny{$\cdots$}};
+\node [lnode,anchor=south] (query3) at ([yshift=1.3*\ssep]key3.north) {\tiny{$\mathbf{q}_{m-1}$}};
+
+\node [snode,anchor=center] (layerin0) at ([yshift=-1.0*\ssep]value0.south) {};
+\node [snode,anchor=center] (layerin1) at ([yshift=-1.0*\ssep]value1.south) {};
+\node [anchor=center] (layerin2) at ([yshift=-1.0*\ssep]value2.south) {\tiny{$\cdots$}};
+\node [snode,anchor=center] (layerin3) at ([yshift=-1.0*\ssep]value3.south) {};
+
+\node [snode,anchor=center] (layerout0) at ([yshift=1.0*\ssep]query0.north) {};
+\node [snode,anchor=center] (layerout1) at ([yshift=1.0*\ssep]query1.north) {};
+\node [anchor=center] (layerout2) at ([yshift=1.0*\ssep]query2.north) {\tiny{$\cdots$}};
+\node [snode,anchor=center] (layerout3) at ([yshift=1.0*\ssep]query3.north) {};
+
+\node [anchor=east] (querylabel) at ([xshift=-0.1cm]query0.west) {\scriptsize{queries}};
+\node [anchor=east] (keylabel) at ([xshift=-0.1cm]key0.west) {\scriptsize{keys}};
+\node [anchor=east] (valuelabel) at ([xshift=-0.1cm]value0.west) {\scriptsize{values}};
+
+\begin{pgfonlayer}{background}
+\node [anchor=south west,draw,thick,dotted,minimum height=3.6cm,minimum width=11.8cm] (selfattentionbox) at ([yshift=-0.9cm,xshift=-1.4cm]value0.south west) {};
+\node [anchor=south west,draw,thick,minimum height=5.5cm,minimum width=13cm] (decoderbox) at ([yshift=-0.8cm,xshift=-0.6cm]selfattentionbox.south west) {};
+\end{pgfonlayer}
+
+\node [anchor=west,rotate=90] (layerlabel) at ([xshift=-0.2cm,yshift=-1.5cm]selfattentionbox.west) {\scriptsize{Self-attention in a Layer}};
+
+\node [anchor=north] (inputdots) at ([yshift=-0.6*\ssep]selfattentionbox.south) {\footnotesize{$\cdots$}};
+\draw [->] (inputdots.north) -- ([yshift=0.6*\ssep-2pt]inputdots.north);
+\node [anchor=south] (outputdots) at ([yshift=0.6*\ssep]selfattentionbox.north) {\footnotesize{$\cdots$}};
+\draw [<-] (outputdots.south) -- ([yshift=-0.6*\ssep+2pt]outputdots.south);
+
+\node [anchor=north west,draw,minimum height=0.5cm,minimum width=5cm] (embeddinglayer) at ([yshift=-2.2cm]value0.south west) {\footnotesize{Embedding Layer}};
+
+\node [anchor=center] (x0) at ([yshift=-3.3cm]value0.south) {\footnotesize{$x_0$}};
+\node [anchor=center] (x1) at ([yshift=-3.3cm]value1.south) {\footnotesize{$x_1$}};
+\node [anchor=center] (x2) at ([yshift=-3.3cm]value2.south) {\footnotesize{$\cdots$}};
+\node [anchor=center] (x3) at ([yshift=-3.3cm]value3.south) {\footnotesize{$x_{m-1}$}};
+
+\draw [->] (x0.north) -- ([yshift=0.25cm]x0.north);
+\draw [->] (x1.north) -- ([yshift=0.25cm]x1.north);
+\draw [->] (x3.north) -- ([yshift=0.25cm]x3.north);
+
+\draw [->] ([yshift=0.95cm]x0.north) -- ([yshift=1.25cm]x0.north);
+\draw [->] ([yshift=0.95cm]x1.north) -- ([yshift=1.25cm]x1.north);
+\draw [->] ([yshift=0.95cm]x3.north) -- ([yshift=1.25cm]x3.north);
+\node [anchor=center] (x2dots) at ([yshift=1.35cm]x2.center) {\footnotesize{$\cdots$}};
+
+\draw [->] ([yshift=2pt]query0.north) -- ([yshift=-2pt]layerout0.south);
+\draw [->] ([yshift=2pt]query1.north) -- ([yshift=-2pt]layerout1.south);
+\draw [->] ([yshift=2pt]query3.north) -- ([yshift=-2pt]layerout3.south);
+
+\draw [-{Stealth[length=4pt]}] ([yshift=1pt]key3.north) -- ([yshift=-1pt]query3.south);
+\draw [-{Stealth[length=4pt]}] ([yshift=1pt]key1.north) -- ([yshift=-2pt,xshift=-0.05cm]query3.south);
+\draw [-{Stealth[length=4pt]}] ([yshift=1pt]key0.north) -- ([yshift=-2pt,xshift=-0.25cm]query3.south);
+
+\draw [-{Stealth[length=4pt]}] ([yshift=1pt]key1.north) -- ([yshift=-1pt]query1.south);
+\draw [-{Stealth[length=4pt]}] ([yshift=1pt]key0.north) -- ([yshift=-2pt,xshift=-0.05cm]query1.south);
+
+\draw [-{Stealth[length=4pt]}] ([yshift=1pt]key0.north) -- ([yshift=-1pt]query0.south);
+
+\node [anchor=north west] (decoderlabel) at ([xshift=0.1cm,yshift=-0.1cm]decoderbox.north west) {\small{Transformer Decoder}};
+
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin0.60) .. controls +(35:0.5cm) and +(-35:0.5cm) .. ([yshift=-0.1cm,xshift=2pt]query0.center);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin0.90) -- ([yshift=0.1cm]value0.south);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin0.120) .. controls +(135:0.5cm) and +(-90:0.5cm) .. ([xshift=-0.4cm,yshift=0.1cm]key0.south);
+
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin1.60) .. controls +(35:0.5cm) and +(-35:0.5cm) .. ([yshift=-0.1cm,xshift=2pt]query1.center);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin1.90) -- ([yshift=0.1cm]value1.south);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin1.120) .. controls +(135:0.5cm) and +(-90:0.5cm) .. ([xshift=-0.4cm,yshift=0.1cm]key1.south);
+
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin3.60) .. controls +(35:0.5cm) and +(-35:0.5cm) .. ([yshift=-0.1cm,xshift=2pt]query3.center);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin3.90) -- ([yshift=0.1cm]value3.south);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layerin3.120) .. controls +(135:0.5cm) and +(-90:0.5cm) .. ([xshift=-0.4cm,yshift=0.1cm]key3.south);
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.0cm,xshift=0.1cm]x3.south east) -- ([yshift=-0.0cm,xshift=-0.2cm]x0.south west) node [pos=0.5,below,yshift=-0.1cm] {\footnotesize{Processed all at once}};
+
+\node [anchor=north] (caption) at ([yshift=-2.5cm]decoderbox.south) {\small{(a) Prefilling}};
+
+\end{scope}
+
+%%% decoding
+\begin{scope}[yshift=-11cm]
+
+\node [lnode,anchor=west,draw=blue] (key0) at (0,0) {\tiny{$\mathbf{k}_0$}};
+\node [lnode,anchor=north,draw=blue] (value0) at ([yshift=-1pt]key0.south) {\tiny{$\mathbf{v}_0$}};
+\node [lnode,anchor=west,draw=blue] (key1) at ([xshift=1pt]key0.east) {\tiny{$\mathbf{k}_1$}};
+\node [lnode,anchor=north,draw=blue] (value1) at ([yshift=-1pt]key1.south) {\tiny{$\mathbf{v}_1$}};
+\node [lnode,anchor=west,draw=blue] (key2) at ([xshift=1pt]key1.east) {\tiny{$\cdots$}};
+\node [lnode,anchor=north,draw=blue] (value2) at ([yshift=-1pt]key2.south) {\tiny{$\cdots$}};
+\node [lnode,anchor=west,draw=blue] (key3) at ([xshift=1pt]key2.east) {\tiny{$\mathbf{k}_{m-1}$}};
+\node [lnode,anchor=north,draw=blue] (value3) at ([yshift=-1pt]key3.south) {\tiny{$\mathbf{v}_{m-1}$}};
+\node [lnode,anchor=west,draw=blue] (keyy1) at ([xshift=1pt]key3.east) {\tiny{$\mathbf{k}_{m}$}};
+\node [lnode,anchor=north,draw=blue] (valuey1) at ([yshift=-1pt]keyy1.south) {\tiny{$\mathbf{v}_{m}$}};
+\node [lnode,anchor=west,draw=blue] (keyy2) at ([xshift=1pt]keyy1.east) {\tiny{$\mathbf{k}_{m+1}$}};
+\node [lnode,anchor=north,draw=blue] (valuey2) at ([yshift=-1pt]keyy2.south) {\tiny{$\mathbf{v}_{m+1}$}};
+\node [lnode,anchor=west,draw=blue] (keyy3) at ([xshift=1pt]keyy2.east) {\tiny{$\cdots$}};
+\node [lnode,anchor=north,draw=blue] (valuey3) at ([yshift=-1pt]keyy3.south) {\tiny{$\cdots$}};
+\node [lnode,anchor=west,draw=blue] (keyy4) at ([xshift=1pt]keyy3.east) {\tiny{$\mathbf{k}_{m+n}$}};
+\node [lnode,anchor=north,draw=blue] (valuey4) at ([yshift=-1pt]keyy4.south) {\tiny{$\mathbf{v}_{m+n}$}};
+
+
+%\node [lnode,anchor=south] (query0) at ([yshift=1.3*\ssep]key0.north) {\tiny{$\mathbf{q}_0$}};
+%\node [lnode,anchor=south] (query1) at ([yshift=1.3*\ssep]key1.north) {\tiny{$\mathbf{q}_1$}};
+%\node [lnode,anchor=south] (query2) at ([yshift=1.3*\ssep]key2.north) {\tiny{$\cdots$}};
+%\node [lnode,anchor=south] (query3) at ([yshift=1.3*\ssep]key3.north) {\tiny{$\mathbf{q}_{m-1}$}};
+\node [lnode,anchor=south,draw=gray!30] (queryy1) at ([yshift=1.3*\ssep]keyy1.north) {\color{gray!30} \tiny{$\mathbf{q}_{m}$}};
+\node [lnode,anchor=south,draw=gray!30] (queryy2) at ([yshift=1.3*\ssep]keyy2.north) {\color{gray!30} \tiny{$\mathbf{q}_{m+1}$}};
+\node [lnode,anchor=south,draw=gray!30] (queryy3) at ([yshift=1.3*\ssep]keyy3.north) {\color{gray!30} \tiny{$\cdots$}};
+\node [lnode,anchor=south] (queryy4) at ([yshift=1.3*\ssep]keyy4.north) {\tiny{$\mathbf{q}_{m+n}$}};
+
+%\node [snode,anchor=center] (layerin0) at ([yshift=-1.0*\ssep]value0.south) {};
+%\node [snode,anchor=center] (layerin1) at ([yshift=-1.0*\ssep]value1.south) {};
+%\node [anchor=center] (layerin2) at ([yshift=-1.0*\ssep]value2.south) {\tiny{$\cdots$}};
+%\node [snode,anchor=center] (layerin3) at ([yshift=-1.0*\ssep]value3.south) {};
+\node [snode,anchor=center,fill=gray!30] (layeriny1) at ([yshift=-1.0*\ssep]valuey1.south) {};
+\node [snode,anchor=center,fill=gray!30] (layeriny2) at ([yshift=-1.0*\ssep]valuey2.south) {};
+\node [anchor=center] (layeriny3) at ([yshift=-1.0*\ssep]valuey3.south) {\color{gray!30} \tiny{$\cdots$}};
+\node [snode,anchor=center] (layeriny4) at ([yshift=-1.0*\ssep]valuey4.south) {};
+
+%\node [snode,anchor=center] (layerout0) at ([yshift=1.0*\ssep]query0.north) {};
+%\node [snode,anchor=center] (layerout1) at ([yshift=1.0*\ssep]query1.north) {};
+%\node [anchor=center] (layerout2) at ([yshift=1.0*\ssep]query2.north) {\tiny{$\cdots$}};
+%\node [snode,anchor=center] (layerout3) at ([yshift=1.0*\ssep]query3.north) {};
+\node [snode,anchor=center,fill=gray!30] (layerouty1) at ([yshift=1.0*\ssep]queryy1.north) {};
+\node [snode,anchor=center,fill=gray!30] (layerouty2) at ([yshift=1.0*\ssep]queryy2.north) {};
+\node [anchor=center] (layerouty3) at ([yshift=1.0*\ssep]queryy3.north) {\color{gray!30} \tiny{$\cdots$}};
+\node [snode,anchor=center] (layerouty4) at ([yshift=1.0*\ssep]queryy4.north) {};
+
+\node [anchor=east] (querylabel) at ([xshift=-0.1cm]queryy1.west) {\scriptsize{queries}};
+\node [anchor=east] (keylabel) at ([xshift=-0.1cm]key0.west) {\scriptsize{keys}};
+\node [anchor=east] (valuelabel) at ([xshift=-0.1cm]value0.west) {\scriptsize{values}};
+
+\begin{pgfonlayer}{background}
+\node [anchor=south west,draw,thick,dotted,minimum height=3.6cm,minimum width=11.8cm] (selfattentionbox) at ([yshift=-0.9cm,xshift=-1.4cm]value0.south west) {};
+\node [anchor=south west,draw,thick,minimum height=5.5cm,minimum width=13cm] (decoderbox) at ([yshift=-0.8cm,xshift=-0.6cm]selfattentionbox.south west) {};
+\end{pgfonlayer}
+
+\node [anchor=west,rotate=90] (layerlabel) at ([xshift=-0.2cm,yshift=-1.5cm]selfattentionbox.west) {\scriptsize{Self-attention in a Layer}};
+
+\node [anchor=north] (inputdots) at ([yshift=-0.6*\ssep]selfattentionbox.south) {\footnotesize{$\cdots$}};
+\draw [->] (inputdots.north) -- ([yshift=0.6*\ssep-2pt]inputdots.north);
+\node [anchor=south] (outputdots) at ([yshift=0.6*\ssep]selfattentionbox.north) {\footnotesize{$\cdots$}};
+\draw [<-] (outputdots.south) -- ([yshift=-0.6*\ssep+2pt]outputdots.south);
+
+%\node [anchor=north west,draw,minimum height=0.5cm,minimum width=5cm] (embeddinglayer) at ([yshift=-2.2cm]value0.south west) {\footnotesize{Embedding Layer}};
+\node [anchor=north west,draw,minimum height=0.5cm,minimum width=5cm] (embeddinglayer) at ([yshift=-2.2cm]valuey1.south west) {\footnotesize{Embedding Layer}};
+
+%\node [anchor=center] (x0) at ([yshift=-3.3cm]value0.south) {\footnotesize{$x_0$}};
+%\node [anchor=center] (x1) at ([yshift=-3.3cm]value1.south) {\footnotesize{$x_1$}};
+%\node [anchor=center] (x2) at ([yshift=-3.3cm]value2.south) {\footnotesize{$\cdots$}};
+%\node [anchor=center] (x3) at ([yshift=-3.3cm]value3.south) {\footnotesize{$x_{m-1}$}};
+\node [anchor=center] (y1) at ([yshift=-3.3cm]valuey1.south) {\footnotesize{$x_m$}};
+\node [anchor=center] (y2) at ([yshift=-3.3cm]valuey2.south) {\footnotesize{$y_1$}};
+\node [anchor=center] (y3) at ([yshift=-3.3cm]valuey3.south) {\footnotesize{$\cdots$}};
+\node [anchor=center] (y4) at ([yshift=-3.3cm]valuey4.south) {\footnotesize{$y_{n-1}$}};
+
+%\draw [->] (x0.north) -- ([yshift=0.25cm]x0.north);
+%\draw [->] (x1.north) -- ([yshift=0.25cm]x1.north);
+%\draw [->] (x3.north) -- ([yshift=0.25cm]x3.north);
+\draw [->] (y1.north) -- ([yshift=0.25cm]y1.north);
+\draw [->] (y2.north) -- ([yshift=0.25cm]y2.north);
+\draw [->] (y4.north) -- ([yshift=0.25cm]y4.north);
+
+%\draw [->] ([yshift=0.95cm]x0.north) -- ([yshift=1.25cm]x0.north);
+%\draw [->] ([yshift=0.95cm]x1.north) -- ([yshift=1.25cm]x1.north);
+%\draw [->] ([yshift=0.95cm]x3.north) -- ([yshift=1.25cm]x3.north);
+%\node [anchor=center] (x2dots) at ([yshift=1.35cm]x2.center) {\footnotesize{$\cdots$}};
+\draw [->] ([yshift=0.95cm]y1.north) -- ([yshift=1.25cm]y1.north);
+\draw [->] ([yshift=0.95cm]y2.north) -- ([yshift=1.25cm]y2.north);
+\draw [->] ([yshift=0.95cm]y4.north) -- ([yshift=1.25cm]y4.north);
+\node [anchor=center] (y3dots) at ([yshift=1.35cm]y3.center) {\footnotesize{$\cdots$}};
+
+%\draw [->] ([yshift=2pt]query0.north) -- ([yshift=-2pt]layerout0.south);
+%\draw [->] ([yshift=2pt]query1.north) -- ([yshift=-2pt]layerout1.south);
+%\draw [->] ([yshift=2pt]query3.north) -- ([yshift=-2pt]layerout3.south);
+\draw [->,gray!30] ([yshift=2pt]queryy1.north) -- ([yshift=-2pt]layerouty1.south);
+\draw [->,gray!30] ([yshift=2pt]queryy2.north) -- ([yshift=-2pt]layerouty2.south);
+\draw [->] ([yshift=2pt]queryy4.north) -- ([yshift=-2pt]layerouty4.south);
+
+\node [anchor=south west,draw,minimum height=0.5cm,minimum width=5cm] (softmaxlayer) at ([yshift=2.6cm]queryy1.north west) {\footnotesize{Softmax Layer}};
+
+\node [anchor=center] (outy1) at ([yshift=3.8cm]queryy1.north) {\color{gray!30} \scriptsize{$\Pr(y_1|\mathbf{x})$}};
+\node [anchor=center] (outy2) at ([yshift=3.8cm]queryy2.north) {\color{gray!30} \scriptsize{\ \ \ $\Pr(y_2|\mathbf{x},y_1)$}};
+\node [anchor=center] (outy3) at ([yshift=3.8cm]queryy3.north) {\color{gray!30} \scriptsize{$\cdots$}};
+\node [anchor=center] (outy4) at ([yshift=3.8cm]queryy4.north) {\scriptsize{$\Pr(y_n|\mathbf{x},\mathbf{y}_{<n})$}};
+
+\draw [<-,gray!30] ([yshift=0.05cm]outy1.south) -- ([yshift=-0.25cm]outy1.south);
+\draw [<-,gray!30] ([yshift=0.05cm]outy2.south) -- ([yshift=-0.25cm]outy2.south);
+\draw [<-] ([yshift=0.05cm]outy4.south) -- ([yshift=-0.25cm]outy4.south);
+
+\draw [<-,gray!30] ([yshift=-1.05cm]outy1.south) -- ([yshift=-1.35cm]outy1.south);
+\draw [<-,gray!30] ([yshift=-1.05cm]outy2.south) -- ([yshift=-1.35cm]outy2.south);
+\draw [<-] ([yshift=-1.05cm]outy4.south) -- ([yshift=-1.35cm]outy4.south);
+
+\draw [-{Stealth[length=4pt]},dashed,thin,gray!30] (layeriny1.60) .. controls +(35:0.5cm) and +(-35:0.5cm) .. ([yshift=-0.1cm,xshift=2pt]queryy1.center);
+\draw [-{Stealth[length=4pt]},dashed,thin,gray!30] (layeriny1.90) -- ([yshift=0.1cm]valuey1.south);
+\draw [-{Stealth[length=4pt]},dashed,thin,gray!30] (layeriny1.120) .. controls +(135:0.5cm) and +(-90:0.5cm) .. ([xshift=-0.4cm,yshift=0.1cm]keyy1.south);
+
+\draw [-{Stealth[length=4pt]},dashed,thin,gray!30] (layeriny2.60) .. controls +(35:0.5cm) and +(-35:0.5cm) .. ([yshift=-0.1cm,xshift=2pt]queryy2.center);
+\draw [-{Stealth[length=4pt]},dashed,thin,gray!30] (layeriny2.90) -- ([yshift=0.1cm]valuey2.south);
+\draw [-{Stealth[length=4pt]},dashed,thin,gray!30] (layeriny2.120) .. controls +(135:0.5cm) and +(-90:0.5cm) .. ([xshift=-0.4cm,yshift=0.1cm]keyy2.south);
+
+\draw [-{Stealth[length=4pt]},dashed,thin] (layeriny4.60) .. controls +(35:0.5cm) and +(-35:0.5cm) .. ([yshift=-0.1cm,xshift=2pt]queryy4.center);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layeriny4.90) -- ([yshift=0.1cm]valuey4.south);
+\draw [-{Stealth[length=4pt]},dashed,thin] (layeriny4.120) .. controls +(135:0.5cm) and +(-90:0.5cm) .. ([xshift=-0.4cm,yshift=0.1cm]keyy4.south);
+
+
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=0.05cm]keyy2.north) -- ([yshift=-1pt,xshift=0.05cm]queryy2.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=0.1cm]keyy1.north) .. controls +(north:0.35cm) and +(south:0.7cm) ..  ([yshift=-1pt,xshift=0.00cm]queryy2.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=0.1cm]key3.north) .. controls +(north:0.45cm) and +(south:0.6cm) ..  ([yshift=-1pt,xshift=-0.05cm]queryy2.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=0.1cm]key1.north) .. controls +(north:0.55cm) and +(south:0.5cm) ..  ([yshift=-1pt,xshift=-0.10cm]queryy2.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=0.1cm]key0.north) .. controls +(north:0.65cm) and +(south:0.4cm) ..  ([yshift=-1pt,xshift=-0.20cm]queryy2.south);
+
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=0.05cm]keyy1.north) -- ([yshift=-1pt,xshift=0.05cm]queryy1.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=-0.1cm]key3.north) .. controls +(north:0.4cm) and +(south:0.6cm) ..  ([yshift=-1pt,xshift=0.00cm]queryy1.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=-0.1cm]key1.north) .. controls +(north:0.5cm) and +(south:0.5cm) ..  ([yshift=-1pt,xshift=-0.05cm]queryy1.south);
+\draw [-{Stealth[length=3pt]},color=gray!30] ([yshift=1pt,xshift=-0.1cm]key0.north) .. controls +(north:0.6cm) and +(south:0.4cm) ..  ([yshift=-1pt,xshift=-0.10cm]queryy1.south);
+
+\draw [-{Stealth[length=3pt]}] ([yshift=1pt,xshift=0.05cm]keyy4.north) -- ([yshift=-1pt,xshift=0.05cm]queryy4.south);
+\draw [-{Stealth[length=3pt]}] ([yshift=1pt,xshift=0.3cm]keyy2.north) .. controls +(north:0.3cm) and +(south:0.7cm) ..  ([yshift=-1pt,xshift=0.00cm]queryy4.south);
+\draw [-{Stealth[length=3pt]}] ([yshift=1pt,xshift=0.3cm]keyy1.north) .. controls +(north:0.4cm) and +(south:0.6cm) ..  ([yshift=-1pt,xshift=-0.05cm]queryy4.south);
+\draw [-{Stealth[length=3pt]}] ([yshift=1pt,xshift=0.3cm]key3.north) .. controls +(north:0.5cm) and +(south:0.5cm) ..  ([yshift=-1pt,xshift=-0.10cm]queryy4.south);
+\draw [-{Stealth[length=3pt]}] ([yshift=1pt,xshift=0.3cm]key1.north) .. controls +(north:0.6cm) and +(south:0.4cm) ..   ([yshift=-1pt,xshift=-0.20cm]queryy4.south);
+\draw [-{Stealth[length=3pt]}] ([yshift=1pt,xshift=0.3cm]key0.north) .. controls +(north:0.7cm) and +(south:0.3cm) ..   ([yshift=-1pt,xshift=-0.30cm]queryy4.south);
+
+\node [anchor=north west] (decoderlabel) at ([xshift=0.1cm,yshift=-0.1cm]decoderbox.north west) {\small{Transformer Decoder}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.0cm,xshift=0.1cm]y4.south east) -- ([yshift=-0.0cm,xshift=-0.2cm]y1.south west) node [pos=0.5,below,yshift=-0.1cm] {\footnotesize{Processed step by step ($n$ steps)}};
+
+\node [anchor=north] (caption) at ([yshift=-2.5cm]decoderbox.south) {\small{(b) Decoding (at the $n$-th step)}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

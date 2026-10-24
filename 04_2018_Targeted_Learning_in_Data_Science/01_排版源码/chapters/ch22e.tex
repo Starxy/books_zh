@@ -1,0 +1,157 @@
+% 原书分章 PDF 第 14—17 页：第 22.5 节全部实际证明。
+\section{证明}
+
+\begin{proof}[定理 22.1 的证明]
+令 $V_d=(V(0),V_d(1))$。对于 $\mathcal D$ 中的一个规则，有
+% 原书两个 I(a(0)=...) 的末尾均缺少一个可见右圆括号；不补入。
+\[
+\begin{aligned}
+ \E_{P_d}Y_d
+ &=\E_{P_d}\E_{P_d}(Y_d\mid V_d)\\
+ &=\E_{V_d}\bigl(\E(Y_{a(0),a(1)}\mid V_{a(0)})
+ I(a(1)=d_{A(1)}(a(0),V_{a(0)}(1)))\\
+ &\hspace{3.5cm}I(a(0)=d_{A(0)}(V(0))\bigr).
+\end{aligned}
+\]
+固定 $a(0)$ 和 $d_{A(0)}(V(0))$ 的取值，再固定 $V_{a(0)}=(V(0),V_{a(0)}(1))$ 的任一取值。内部的条件期望在 $d_{A(1)}(a(0),V_{a(0)}(1))$ 上由定理给出的 $d_{0,A(1)}$ 达到最大；这里用到了 $V(1)$ 包含 $V(0)$。这就证明了 $d_{0,A(1)}$ 确实是分配 $A(1)$ 的最优规则。现在假定 $V(1)$ 不包含 $V(0)$，但所述假设成立。那么，限制为 $(V(0),V(1),A(0))$ 的函数的最优规则 $d_{0,A(1)}$，由 $I(\bar Q_{b,20}(A(0),V(0),V(1))>0)$ 给出，其中
+\[
+\begin{aligned}
+ &\bar Q_{b,20}(a(0),v(0),v(1))\\
+ &\quad=\E_0(Y_{a(0),A(1)=(1,1)}-Y_{a(0),A(1)=(0,1)}
+ \mid V_{a(0)}(1)=v(1),V(0)=v(0)).
+\end{aligned}
+\]
+然而，根据假设，以 $(a(0),v(0),v(1))$ 为自变量的后一个函数，只通过 $(a(0),v(1))$ 依赖这些取值，并且等于 $\bar Q_{b,20}(a(0),v(1))$。因此，我们仍有
+$d_{0,A(1)}(V)=\bigl(I(\bar Q_{b,20}(A(0),V(1))>0),1\bigr)$；事实上，在允许同时使用 $V(0)$ 的更大规则类中，它也仍是最优规则。
+
+既然已经找到 $d_{0,A(1)}$，剩下只需确定使下式最大的规则 $d_{0,A(0)}$：
+\[
+\begin{aligned}
+ &\E_{V_d}\bigl(\E_P(Y_{a(0),d_{0,A(1)}}\mid V_{a(0)})
+ I(a(0)=d_{A(0)}(V(0))\bigr)\\
+ &\quad=\E_0\E(Y_{a(0),d_{0,A(1)}}\mid V(0))
+ I(a(0)=d_{A(0)}(V(0)),
+\end{aligned}
+\]
+这里利用了迭代条件期望法则，对给定 $V(0)$ 时的 $V_{a(0)}$ 取条件期望。最后这个表达式在 $d_{A(0)}$ 上由定理给出的 $d_{0,A(0)}$ 达到最大。证明完毕。
+\end{proof}
+
+\begin{proof}[定理 22.3 的证明]
+根据 $R_{1d}$ 的定义，有
+\[
+\begin{aligned}
+ P_0D^*(Q,g)
+ &=P_0D^*(d_Q,Q,g)\\
+ &=\Psi_{d_Q}(Q_0^{d_Q})-\Psi_{d_Q}(Q^{d_Q})
+ +R_{1d_Q}(Q^{d_Q},Q_0^{d_Q},g,g_0)\\
+ &=\Psi_{d_0}(Q_0^{d_0})-\Psi_{d_Q}(Q^{d_Q})\\
+ &\quad+\{\Psi_{d_Q}(Q_0^{d_Q})-\Psi_{d_0}(Q_0^{d_0})\}
+ +R_{1d_Q}(Q^{d_Q},Q_0^{d_Q},g,g_0)\\
+ &=\Psi(Q_0)-\Psi(Q)+R_2(Q,Q_0)
+ +R_{1d_Q}(Q^{d_Q},Q_0^{d_Q},g,g_0).
+\end{aligned}
+\]
+\end{proof}
+
+\begin{proof}[定理 22.4 的证明]
+对于所有 $j=1,\ldots,J$，有
+\[
+\begin{aligned}
+ \Psi_{d_{nj}}(Q_{nj}^{d_{nj}*})-\Psi_{d_{nj}}(Q_0^{d_{nj}*})
+ &=-P_0D^*(d_{nj},Q_{nj}^{d_{nj}*},g_{nj})\\
+ &\quad+R_{1d_{nj}}(Q_{nj}^{d_{nj}*},Q_0^{d_{nj}*},g_{nj},g_0).
+\end{aligned}
+\]
+对 $j$ 求和并使用式 (22.6)，得到
+\[
+\begin{aligned}
+ \tilde\psi_n^*-\tilde\psi_{0n}
+ =\frac1J\sum_{j=1}^J\Bigl(
+ &(P_{n,j}^1-P_0)D^*(d_{nj},Q_{nj}^{d_{nj}*},g_{nj})\\
+ &+R_{1d_{nj}}(Q_{nj}^{d_{nj}*},Q_0^{d_{nj}*},g_{nj},g_0)\Bigr).
+\end{aligned}
+\]
+又有
+\[
+\begin{aligned}
+ \frac1J\sum_{j=1}^J(P_{n,j}^1-P_0)\Bigl(
+ &D^*(d_{nj},Q_{nj}^{d_{nj}*},g_{nj})\\
+ &-D^*(d_1,Q^{d_1},g)\Bigr)=o_{P_0}(n^{-1/2}).
+\end{aligned}
+\]
+为从第一个等式得到上述结果，先以训练样本为条件应用全期望法则。然后注意，每个 $\hat Q^*(P_{n,B_n}^0,\epsilon_n)$ 仅通过有限维参数 $\epsilon_n$ 依赖 $P_{n,B_n}^0$。由于基于广义线性模型（GLM）的参数类很容易满足熵积分条件（van der Vaart 和 Wellner，1996），对 $D^*(d_{nj},Q_{nj}^{d_{nj}*},g_{nj})$ 的一致性假设表明，上式是二阶量。关于上述结果在一般交叉验证方案（包括 $J$ 折交叉验证）下的详细证明，参见 Zheng 和 van der Laan（2010）。由此可得
+\[
+\begin{aligned}
+ \tilde\psi_n^*-\tilde\psi_{0n}
+ &=(P_n-P_0)D^*(d_1,Q^{d_1},g)\\
+ &\quad+\frac1J\sum_{j=1}^JR_{1d_{nj}}(Q_{nj}^{d_{nj}*},Q_0^{d_{nj}*},g_{nj},g_0)
+ +o_{P_0}(n^{-1/2}).
+\end{aligned}
+\]
+最后，根据定理的最后一个假设，$J^{-1}\sum_{j=1}^JR_{1d_{nj}}(Q_{nj}^{d_{nj}*},Q_0^{d_{nj}*},g_{nj},g_0)$ 为 $o_P(n^{-1/2})$。
+\end{proof}
+
+\begin{proof}[引理 22.1 的证明]
+对于单时点处理数据结构 $O=(L(0),A(0),Y)$ 和二元处理 $A(0)$，给定规则 $V\mapsto d(V)$，有 $\E_0Y_d=\E_0Y_0+\E_0d(V)\bar Q_0(V))$，其中 $\bar Q_0(V)=\E_0[Y_1-Y_0\mid V]$。在下列推导中，两次应用这一恒等式：
+\[
+\begin{aligned}
+ \Psi(P_0)
+ &=\E_0Y_{(0,1),d_{0,A(1)}}
+ +\E_0d_{0,A(0)}(V(0))\bar Q_{b,10}(V(0))\\
+ &=\E_0\E_0[Y_{(0,1),d_{0,A(1)}}\mid V_{(0,1)}(1)]
+ +\E_0d_{0,A(0)}(V(0))\bar Q_{b,10}(V(0))\\
+ &=\E_0\E_0[Y_{(0,1),(0,1)}\mid V_{(0,1)}(1)]\\
+ &\quad+\E_0I(\bar Q_{b,20}((0,1),V_{(0,1)}(1))>0)
+ \bar Q_{b,20}(0,V_{(0,1)}(1))\\
+ &\quad+\E_0d_{0,A(0)}(V(0))\bar Q_{b,10}(V(0))\\
+ &=\E_0\E_0[Y_{(0,1),(0,1)}\mid V_{(0,1)}(1)]\\
+ &\quad+\E_0d_{0,A(1)}((0,1),V_{(0,1)}(1))
+ \bar Q_{b,20}(0,V_{(0,1)}(1))\\
+ &\quad+\E_0d_{0,A(0)}(V(0))\bar Q_{b,10}(V(0))\\
+ &=\E_0Y_{(0,1),(0,1)}
+ +\E_0d_{0,A(1)}((0,1),V_{(0,1)}(1))\bar Q_{b,20}(0,V_{(0,1)}(1))\\
+ &\quad+\E_0d_{0,A(0)}(V(0))\bar Q_{b,10}(V(0)).
+\end{aligned}
+\]
+\end{proof}
+
+\begin{proof}[定理 22.5 的证明]
+本证明的记号中省略 $d_{0,A(0)}$、$d_{Q,A(0)}$、$\bar Q_{b,10}$ 和 $\bar Q_{b,1}$ 对 $V(0)$ 的依赖。这部分证明仿照 Audibert 和 Tsybakov（2007）中引理 5.2 的证明。对任意 $t>0$，
+\[
+\begin{aligned}
+ |R_{2,A(0)}(Q,Q_0)|
+ &=\E_0[|\bar Q_{b,10}|I(d_{0,A(0)}\ne d_{Q,A(0)})]\\
+ &=\E_0[|\bar Q_{b,10}|I(d_{0,A(0)}\ne d_{Q,A(0)})I(0<|\bar Q_{b,10}|\leq t)]\\
+ &\quad+\E_0[|\bar Q_{b,10}|I(d_{0,A(0)}\ne d_{Q,A(0)})I(|\bar Q_{b,10}|>t)]\\
+ &\leq\E_0[|\bar Q_{b,1}-\bar Q_{b,10}|I(0<|\bar Q_{b,10}|\leq t)]\\
+ &\quad+\E_0[|\bar Q_{b,1}-\bar Q_{b,10}|I(|\bar Q_{b,1}-\bar Q_{b,10}|>t)]\\
+ &\leq\|\bar Q_{b,1}-\bar Q_{b,10}\|_{2,P_0}
+ \Pr(0<|\bar Q_{b,10}|\leq t)^{1/2}
+ +\frac{\|\bar Q_{b,1}-\bar Q_{b,10}\|_{2,P_0}^2}{t}\\
+ &\leq\|\bar Q_{b,1}-\bar Q_{b,10}\|_{2,P_0}C_0^{1/2}t^{\beta_1/2}
+ +\frac{\|\bar Q_{b,1}-\bar Q_{b,10}\|_{2,P_0}^2}{t},
+\end{aligned}
+\]
+其中，第一个不等式成立，是因为 $d_{0,A(0)}\ne d_{Q,A(0)}$ 意味着
+$|\bar Q_{b,1}-\bar Q_{b,10}|>|\bar Q_{b,10}|$；第二个不等式由 Cauchy--Schwarz 不等式和 Markov 不等式得到；第三个不等式由 (MA1) 得到。对 $t$ 优化可得，当
+$t=C'\|\bar Q_{b,1}-\bar Q_{b,10}\|_{2,P_0}^{2(1+\beta_1)/(2+\beta_1)}$
+时，上界达到最小，其中常数 $C'$ 依赖 $C_0$ 和 $\beta_1$。由此得到第一个结果。
+
+现在证明上确界范数的结果。注意，
+\[
+\begin{aligned}
+ |R_{2,A(0)}(Q,Q_0)|
+ &=\E_0\left|I(d_{Q,A(0)}\ne d_{0,A(0)})\bar Q_{b,10}\right|\\
+ &\leq\E_0\bigl[I(0<|\bar Q_{b,10}|\leq|\bar Q_{b,1}-\bar Q_{b,10}|)
+ |\bar Q_{b,10}|\bigr]\\
+ &\leq\E_0\bigl[I\bigl(0<|\bar Q_{b,10}|\leq
+ \|\bar Q_{b,1}-\bar Q_{b,10}\|_{\infty,P_0}\bigr)|\bar Q_{b,10}|\bigr]\\
+ &\leq\|\bar Q_{b,1}-\bar Q_{b,10}\|_{\infty,P_0}
+ \Pr\bigl(0<|\bar Q_{b,10}|\leq\|\bar Q_{b,1}-\bar Q_{b,10}\|_{\infty,P_0}\bigr).
+\end{aligned}
+\]
+由 (MA1)，
+$|\Psi_{d_{Q,A(0)}}(P_0)-\Psi_{d_{0,A(0)}}(P_0)|
+\leq C_1\|\bar Q_{b,1}-\bar Q_{b,10}\|_{\infty,P_0}^{1+\beta_1}$。
+结合两个结果即得式 (22.9)。式 (22.10) 的证明类似，因此略去。
+\end{proof}

@@ -1,0 +1,14 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,every node/.style={font=\small,inner sep=2pt}]
+\node (c06x) at (0,3) {$X$};
+\node (c06b) at (0,2) {$B$};
+\node (c06d) at (0,1) {$D$};
+\node (c06y) at (0,0) {$Y$};
+\draw[->,blue!65!black] (c06x) -- node[right] {$b$} (c06b);
+\draw[->,blue!65!black] (c06b) -- node[right] {$d$} (c06d);
+\draw[->,blue!65!black] (c06d) -- node[right] {$h$} (c06y);
+\end{tikzpicture}
+\origfig{6}{间接效应。}
+\label{fig:ch01c-06}
+\end{figure}

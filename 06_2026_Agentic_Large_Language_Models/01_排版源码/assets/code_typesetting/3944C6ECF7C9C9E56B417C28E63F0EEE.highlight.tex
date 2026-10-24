@@ -1,0 +1,30 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{PIL}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{Image}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{clip}\PYG{o}{,}\PYG{+w}{ }\PYG{n+nn}{torch}
+
+\PYG{n}{model}\PYG{p}{,} \PYG{n}{preprocess} \PYG{o}{=} \PYG{n}{clip}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}ViT\PYGZhy{}B/32\PYGZdq{}}\PYG{p}{)}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{embed\PYGZus{}image}\PYG{p}{(}\PYG{n}{path}\PYG{p}{):}
+    \PYG{n}{image} \PYG{o}{=} \PYG{n}{preprocess}\PYG{p}{(}\PYG{n}{Image}\PYG{o}{.}\PYG{n}{open}\PYG{p}{(}\PYG{n}{path}\PYG{p}{))}\PYG{o}{.}\PYG{n}{unsqueeze}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{k}{return} \PYG{n}{model}\PYG{o}{.}\PYG{n}{encode\PYGZus{}image}\PYG{p}{(}\PYG{n}{image}\PYG{p}{)}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{embed\PYGZus{}text}\PYG{p}{(}\PYG{n}{text}\PYG{p}{):}
+    \PYG{n}{text\PYGZus{}tokens} \PYG{o}{=} \PYG{n}{clip}\PYG{o}{.}\PYG{n}{tokenize}\PYG{p}{([}\PYG{n}{text}\PYG{p}{])}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{k}{return} \PYG{n}{model}\PYG{o}{.}\PYG{n}{encode\PYGZus{}text}\PYG{p}{(}\PYG{n}{text\PYGZus{}tokens}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Build an index of image embeddings}
+\PYG{n}{image\PYGZus{}paths} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}cat.jpg\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}dog.png\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}city.png\PYGZdq{}}\PYG{p}{]}
+\PYG{n}{image\PYGZus{}embs} \PYG{o}{=} \PYG{p}{[}\PYG{n}{embed\PYGZus{}image}\PYG{p}{(}\PYG{n}{p}\PYG{p}{)} \PYG{k}{for} \PYG{n}{p} \PYG{o+ow}{in} \PYG{n}{image\PYGZus{}paths}\PYG{p}{]}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{search\PYGZus{}images}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{k}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{):}
+    \PYG{n}{query\PYGZus{}emb} \PYG{o}{=} \PYG{n}{embed\PYGZus{}text}\PYG{p}{(}\PYG{n}{query}\PYG{p}{)}
+    \PYG{n}{scores} \PYG{o}{=} \PYG{p}{[}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{functional}\PYG{o}{.}\PYG{n}{cosine\PYGZus{}similarity}\PYG{p}{(}\PYG{n}{query\PYGZus{}emb}\PYG{p}{,} \PYG{n}{emb}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{k}{for} \PYG{n}{emb} \PYG{o+ow}{in} \PYG{n}{image\PYGZus{}embs}\PYG{p}{]}
+    \PYG{n}{topk} \PYG{o}{=} \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n+nb}{zip}\PYG{p}{(}\PYG{n}{scores}\PYG{p}{,} \PYG{n}{image\PYGZus{}paths}\PYG{p}{),} \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{reverse}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)[:}\PYG{n}{k}\PYG{p}{]}
+    \PYG{k}{return} \PYG{n}{topk}
+
+\PYG{c+c1}{\PYGZsh{} Example usage: search for a picture of a city}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{search\PYGZus{}images}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}a skyline of a large European city\PYGZdq{}}\PYG{p}{))}
+\end{MintedVerbatim}

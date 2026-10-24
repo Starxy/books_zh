@@ -1,0 +1,28 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,font=\small,
+ modelbox/.style={draw,rounded corners=2mm,align=center,minimum width=2.6cm,minimum height=.8cm,inner sep=3mm}]
+ \node[modelbox] (f11causal) at (1.4,3.1) {因果模型};
+ \node[modelbox,minimum width=3.5cm,minimum height=1.4cm] (f11causalobs) at (11.2,3.1)
+   {观测与结果，\\包括变化与干预};
+ \node[modelbox] (f11prob) at (1.4,0) {概率模型};
+ \node[modelbox,minimum width=3.5cm,minimum height=1.0cm] (f11probobs) at (11.2,0)
+   {观测与结果};
+ \draw[ed] ([yshift=2mm]f11causalobs.west)
+   to[bend right=11] node[above=2mm] {因果学习}
+   ([yshift=2mm]f11causal.east);
+ \draw[ed] ([yshift=-2mm]f11causal.east)
+   to[bend right=11] node[below=2mm] {因果推理}
+   ([yshift=-2mm]f11causalobs.west);
+ \draw[ed] ([yshift=2mm]f11probobs.west)
+   to[bend right=11] node[above=2mm] {统计学习}
+   ([yshift=2mm]f11prob.east);
+ \draw[ed] ([yshift=-2mm]f11prob.east)
+   to[bend right=11] node[below=2mm] {概率推理}
+   ([yshift=-2mm]f11probobs.west);
+ \draw[->,dashed,gray] (f11causal.south) -- node[left=2mm,text=black] {包含} (f11prob.north);
+ \draw[->,dashed,gray] (f11causalobs.south) -- node[right=2mm,text=black] {包含} (f11probobs.north);
+\end{tikzpicture}
+\caption{本书描述各类概率推断问题（下方）与因果推断问题（上方）时所使用的术语，见第 1.3 节。注意，本书所说的“推断”同时包括学习和推理。}
+\label{fig:1.1}
+\end{figure}

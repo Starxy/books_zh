@@ -1,0 +1,27 @@
+% 图 2.2；保留源图 U_{A_1} -> A_1，不据式 (2.2) 擅改节点。
+\begin{tikzpicture}[causal,x=1.7cm,y=1.3cm,
+ ch02n/.style={inner sep=2pt,fill=white,font=\normalsize}]
+\node[ch02n] (ch02bL0) at (0,0) {$L_0$};
+\node[ch02n] (ch02bA0) at (1,1) {$A_0$};
+\node[ch02n] (ch02bL1) at (2,0) {$L_1$};
+\node[ch02n] (ch02bA1) at (3,1) {$A_1$};
+\node[ch02n] (ch02bY) at (4,0) {$Y$};
+\node[ch02n] (ch02bUL0) at (0,-1) {$U_{L_0}$};
+\node[ch02n] (ch02bUA0) at (1,2) {$U_{A_0}$};
+\node[ch02n] (ch02bUL1) at (2,-1) {$U_{L_1}$};
+\node[ch02n] (ch02bUA1) at (3,2) {$U_{A_1}$};
+\node[ch02n] (ch02bUY) at (4,-1) {$U_Y$};
+\begin{scope}[on background layer]
+\draw[ed] (ch02bUL0) -- (ch02bL0);
+\draw[ed] (ch02bUA0) -- (ch02bA0);
+\draw[ed] (ch02bUL1) -- (ch02bL1);
+\draw[ed] (ch02bUA1) -- (ch02bA1);
+\draw[ed] (ch02bUY) -- (ch02bY);
+\draw[ed] (ch02bL0) -- (ch02bL1);
+\draw[ed] (ch02bA0) -- (ch02bL1);
+\draw[ed] (ch02bA0) -- (ch02bA1);
+\draw[ed] (ch02bA0) -- (ch02bY);
+\draw[ed] (ch02bL1) -- (ch02bY);
+\draw[ed] (ch02bA1) -- (ch02bY);
+\end{scope}
+\end{tikzpicture}

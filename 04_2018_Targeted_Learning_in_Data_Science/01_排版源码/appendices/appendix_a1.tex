@@ -1,0 +1,169 @@
+
+% 原书附录 PDF 第 1—4 页，原书第 585—588 页。
+\providecommand{\appAd}{\widehat d(P_{n,v^c})}
+\chapter{基础}
+\label{app:foundations}
+\section{数据自适应目标参数}
+
+本节证明数据自适应目标参数的交叉验证靶向最小损失估计量（cross-validated targeted minimum loss-based estimator，CV-TMLE）具有渐近线性。证明过程中会出现若干必须满足的关键假设。完成推导后，我们将这些假设汇集起来，给出正式定理。以下沿用数据自适应目标参数一章的符号。
+
+\subsection{基于 CV-TMLE 的统计推断}
+
+现在分析用于估计 $\psi_{0n}$ 的 CV-TMLE $\psi_n^*$，其中
+\[
+\begin{aligned}
+\psi_n^*&=\frac1V\sum_{v=1}^V\Psi_{\appAd}(Q_{n,v^c}(\epsilon_n)),\\
+\psi_{0n}&=\frac1V\sum_{v=1}^V\Psi_{\appAd}(Q_0).
+\end{aligned}
+\]
+对于目标参数 $\Psi_d$ 及其典范梯度 $D_d^*(Q,G)$，恒等式
+$\Psi_d(Q)-\Psi_d(Q_0)=-P_0D_d^*(Q,G)+R_{0,d}(Q,G,Q_0,G_0)$
+立即给出 CV-TMLE 的下列关键恒等式：
+\[
+\begin{aligned}
+&\frac1V\sum_{v=1}^V P_0D^*_{\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),g_{n,v^c}\bigr)\\
+&\qquad=\frac1V\sum_{v=1}^V\Psi_{\appAd}(P_0)-\psi_n^*
+ +\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),Q_0,g_{n,v^c},g_0\bigr).
+\end{aligned}
+\]
+结合有效影响曲线方程的交叉验证经验均值条件
+$V^{-1}\sum_vP_{n,v}D^*_{\appAd}(Q_{n,v^c}(\epsilon_n),g_{n,v^c})=0$，可得
+\[
+\begin{aligned}
+\psi_n^*-\psi_{0,n}
+={}&\frac1V\sum_{v=1}^V(P_{n,v}-P_0)
+ D^*_{\appAd}\bigl(Q_{n,v^c}(\epsilon_n),g_{n,v^c}\bigr)\\
+&+\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),Q_0,g_{n,v^c},g_0\bigr).
+\end{aligned}
+\]
+对于其中的经验过程项，有如下引理。
+
+\begin{bookresult}{引理}{A.1}
+假设以趋于 1 的概率，$D^*_{\appAd}(Q_{n,v^c}(\epsilon_n),g_{n,v^c})$ 的上确界范数被某个 $M<\infty$ 所界定，并且
+\[
+P_0\left\{D^*_{\appAd}\bigl(Q_{n,v^c}(\epsilon_n),g_{n,v^c}\bigr)
+ -D^*_{d_0}(Q^{d_0},g^{d_0})\right\}^2
+ \xrightarrow{P}0.
+\]
+则
+\[
+\begin{aligned}
+&\frac1V\sum_{v=1}^V(P_{n,v}-P_0)
+ D^*_{\appAd}\bigl(Q_{n,v^c}(\epsilon_n),g_{n,v^c}\bigr)\\
+&\qquad=(P_n-P_0)D^*_{d_0}(Q^{d_0},g^{d_0})+o_P(1/\sqrt n).
+\end{aligned}
+\]
+\end{bookresult}
+
+因此，在这一非常弱的一致性条件下，
+\[
+\begin{aligned}
+\psi_n^*-\psi_{0n}
+={}&(P_n-P_0)D^*_{d_0}(Q^{d_0},g^{d_0})+o_P(1/\sqrt n)\\
+&+\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),Q_0,g_{n,v^c},g_0\bigr).
+\end{aligned}
+\]
+现在进一步假设 $Q^{d_0}=Q_0^{d_0}$、$g^{d_0}=g_0^{d_0}$，且
+\[
+\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),Q_0,g_{n,v^c},g_0\bigr)
+ =o_P(1/\sqrt n).
+\]
+于是
+\[
+\psi_n^*-\psi_{0n}
+ =(P_n-P_0)D^*_{d_0}(Q_0^{d_0},g_0^{d_0})+o_P(1/\sqrt n),
+\]
+证明至此完成。一般地，我们假设 $g=g_0$，并且
+\[
+\begin{aligned}
+&\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),Q_0,g_{n,v^c},g_0\bigr)\\
+&\qquad-\frac1V\sum_{v=1}^V R_{0,\appAd}(Q,Q_0,g_{n,v^c},g_0)
+ =o_P(1/\sqrt n).
+\end{aligned}
+\]
+在许多应用中，由于映射 $(Q-Q_0)\mapsto R_{0,d}(Q,Q_0,g,g_0)$ 具有线性，上述差可以表示为一个积分，其中包含两个差值的乘积：$Q_{n,v^c}(\epsilon_n)-Q$ 与 $\widehat g(P_{n,v^c})-g_0$。在这种情形下，这一假设要求一个二阶项为 $o_P(1/\sqrt n)$。通常可以用 $Q_{n,v^c}^*$ 与 $Q$ 之差的 $L^2$ 范数，乘以 $\widehat g(P_{n,v^c})$ 与 $g_0$ 之差的 $L^2$ 范数，来给该二阶项提供上界。此外，在只假设 $g=g_0$ 的这一情形下，还需要对 $\widehat g$ 作如下渐近线性假设：
+\[
+\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q,Q_0,\widehat g(P_{n,v^c}),g_0\bigr)
+ =(P_n-P_0)D_g(P_0)+o_P(1/\sqrt n).
+\]
+这样就可以得出
+\[
+\psi_n^*-\psi_{0n}
+ =(P_n-P_0)\{D^*_{d_0}(Q,g_0)+D_g(P_0)\}+o_P(1/\sqrt n).
+\]
+上述推导证明了下面的定理。
+
+\begin{bookresult}{定理}{A.1}
+设 $\mathcal D$ 是一族目标参数的指标集，对每个 $d\in\mathcal D$，都有一个统计目标参数 $\Psi_d:\mathcal M\to\mathbb R$。设 $\widehat d:\mathcal M_{\mathrm{NP}}\to\mathcal D$ 是一个估计量，它把经验分布映射为所需指标 $d_0\in\mathcal D$ 的估计，从而选择目标参数。考虑一个样本划分随机向量 $V$；对于划分 $V=v$，令 $P_{n,v^c}$ 表示参数生成样本的经验分布，$P_{n,v}$ 表示验证／估计样本的经验分布。数据自适应目标参数定义为
+\[
+\psi_{0,n}=\frac1V\sum_{v=1}^V\Psi_{\appAd}(P_0).
+\]
+对于每个目标参数 $\Psi_d$，令 $D_d^*(P_0)$ 为其在 $P_0$ 处的有效影响曲线。假设 $\Psi_d(P_0)=\Psi_d(Q_0^d)$ 仅通过参数 $Q_0^d$ 依赖于 $P_0$，并假设 $D_d^*(P_0)=D_d^*(Q_0^d,g_0^d)$ 仅通过 $Q_0^d$ 及干扰参数 $g_0^d$ 依赖于 $P_0$。二阶项 $R_{0,d}()$ 定义如下：
+\[
+P_0D_d^*(Q^d,g^d)
+ =\Psi_d(P_0)-\Psi_d(Q^d)+R_{0,d}(Q^d,Q_0^d,g^d,g_0^d).
+\]
+令 $(Q^d,O)\mapsto L^d(Q^d)(O)$ 为 $Q_0^d$ 的一个有效损失函数，使得
+\[
+Q_0^d=\argmin_{Q^d}P_0L^d(Q^d),
+\]
+并令 $\{Q^d(\epsilon):\epsilon\}$ 为在 $\epsilon=0$ 处穿过 $Q$ 的子模型，其中 $\epsilon$ 为一维或多维参数，且广义得分的线性张成空间包含有效影响曲线：
+\[
+D_d^*(Q^d,g^d)\in
+\left\langle\left.\frac{\mathrm d}{\mathrm d\epsilon}
+ L^d(Q^d(\epsilon))\right|_{\epsilon=0}\right\rangle.
+\]
+令 $\{\widehat Q^d(\epsilon):\epsilon\}$ 表示使用 $\widehat g^d$、穿过 $\widehat Q^d$ 的上述子模型。为简化记号，记 $\widehat Q(P_{n,v^c})=\widehat Q^{\appAd}(P_{n,v^c})$；类似地，定义 $\widehat g(P_{n,v^c})=\widehat g^{\appAd}(P_{n,v^c})$。对每个划分 $V=v$，定义相应更新 $Q_{n,v^c}^*\equiv\widehat Q(P_{n,v^c})(\epsilon_n)$。计算 $\epsilon_n$，使其求解／满足下列方程：
+\begin{equation}
+\frac1V\sum_{v=1}^V P_{n,v}D^*_{\appAd}
+ \bigl(Q_{n,v^c}(\epsilon_n),\widehat g(P_{n,v^c})\bigr)
+ =o_P(1/\sqrt n).
+\tag{A.1}
+\end{equation}
+所提出的 $\psi_{0,n}$ 的估计量为
+\[
+\psi_n^*\equiv\frac1V\sum_{v=1}^V\Psi_{\appAd}(Q_{n,v^c}^*).
+\]
+假设以趋于 1 的概率，$D^*_{\appAd}(Q_{n,v^c}^*,\widehat g(P_{n,v^c}))$ 的上确界范数被某个 $M<\infty$ 所界定，并且
+\[
+P_0\left\{D^*_{\appAd}\bigl(Q_{n,v^c}^*,\widehat g(P_{n,v^c})\bigr)
+ -D^*_{d_0}(Q^{d_0},g^{d_0})\right\}^2\xrightarrow{P}0.
+\]
+则
+\[
+\begin{aligned}
+\psi_n^*-\psi_{0n}
+={}&(P_n-P_0)D^*_{d_0}(Q^{d_0},g^{d_0})+o_P(1/\sqrt n)\\
+&+\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}^*,Q_0,\widehat g(P_{n,v^c}),g_0\bigr).
+\end{aligned}
+\]
+我们假设 $g=g_0$，
+\[
+\begin{aligned}
+&\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q_{n,v^c}^*,Q_0,\widehat g(P_{n,v^c}),g_0\bigr)\\
+&\qquad-\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q,Q_0,\widehat g(P_{n,v^c}),g_0\bigr)
+ =o_P(1/\sqrt n),
+\end{aligned}
+\]
+并对 $\widehat g$ 假设下列渐近线性条件：
+\[
+\frac1V\sum_{v=1}^V R_{0,\appAd}
+ \bigl(Q,Q_0,\widehat g(P_{n,v^c}),g_0\bigr)
+ =(P_n-P_0)D_g(P_0)+o_P(1/\sqrt n).
+\]
+则
+\[
+\psi_n^*-\psi_{0,n}
+ =(P_n-P_0)\{D^*_{d_0}(Q,g_0)+D_g(P_0)\}+o_P(1/\sqrt n).
+\]
+\end{bookresult}

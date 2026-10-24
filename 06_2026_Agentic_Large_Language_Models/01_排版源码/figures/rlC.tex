@@ -1,0 +1,14 @@
+
+\begin{tikzpicture}[>=triangle 45,
+  desc/.style={rectangle,rounded corners,draw=black,minimum height=.7cm,align=center}]
+\node[desc,text width=4.7cm,minimum height=1.4cm] (aprompt) at (0,2.6) {问题 +\\步骤1、步骤2、步骤3\\= 示例1};
+\node[desc] (aagent) at (4,2.6) {LLM};
+\node[desc] (aanswer) at (6,2.6) {回答};
+\draw[->] (aprompt.east) -- (aagent.west);
+\draw[->] (aagent.east) -- (aanswer.west);
+\node[desc,text width=4.7cm,minimum height=1.4cm] (bprompt) at (0,0) {问题 +\\“让我们一步一步思考”\\= 示例1};
+\node[desc] (bagent) at (4,0) {LLM};
+\node[desc] (banswer) at (6,0) {回答};
+\draw[->] (bprompt.east) -- (bagent.west);
+\draw[->] (bagent.east) -- (banswer.west);
+\end{tikzpicture}

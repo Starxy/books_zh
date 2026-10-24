@@ -1,0 +1,135 @@
+% 原书分章 PDF 第 5—7 页：第 25.2 节。
+\section{用路径可微目标参数族逼近目标参数}
+
+我们将在 $x_0$ 的一个邻域内，以带宽 $h$ 对 $\Psi(P)(x)$ 关于 $x$ 作核平滑，用以逼近 $\Psi(P)$。具体地，令
+\[
+ \Psi_h(P)=\int K_{h,x_0}(x)\Psi(P)(x)\,dx,
+\]
+其中 $K_{h,x_0}(x)=h^{-d}K((x-x_0)/h)$，核
+$K(x)=K(x_1,\ldots,x_d)$ 满足 $\int K(x)\,dx=1$。
+为简便起见，我们对所有分量使用相同带宽 $h$，使这个参数族由一个标量索引；并假定
+$K(x)=\prod_{j=1}^{d}K^*(x_j)$ 是由一元核 $K^*$ 定义的乘积核。
+若 $\int K^*(s)\,ds=1$ 且
+$\int K^*(s)s^j\,ds=0$，$j=1,\ldots,J$，则称核 $K$ 为 $J$ 阶正交核（$J$-orthogonal kernel）。如果 $K$ 是 $J$ 阶正交核，那么它与次数小于或等于 $J$ 的任意多项式都正交：
+\[
+ \int K(x)\prod_{j=1}^{d}x_j^{s_j}\,dx=0
+ \quad\text{若 }s_j\in\{0,\ldots,J\},\ j=1,\ldots,d.
+\]
+有时把 $\Psi_h(P)$ 记为 $\Psi_{h,J}(P)$，以表明它使用了 $(J-1)$ 阶正交核。注意，
+\[
+ \Psi_h(P)=\int_z K(z)\Psi(P)(x_0+hz)\,dz.
+\]
+我们至少假定 $x\mapsto\Psi(P)(x)$ 在 $x_0$ 处连续，从而
+\[
+ \Psi(P)=\lim_{h\to0}\Psi_h(P).
+\]
+令
+\[
+ \mathcal M(J)=
+ \{P\in\mathcal M:x\mapsto\Psi(P)(x)\text{ 在 }x_0\text{ 处 }J\text{ 次连续可微}\}.
+\]
+下面的引理证明，若 $P_0\in\mathcal M(J)$，则
+$\Psi_{h,J}(P_0)-\Psi(P_0)=O(h^J)$。
+
+\begin{bookresult}{引理}{25.1}
+假定对某个整数 $J_0\geq1$，有 $P_0\in\mathcal M(J_0)$。令
+\[
+ \Psi_{h,J}(P)=\int_x K_{h,x_0}(x)\Psi(P)(x)\,dx
+\]
+为使用以 $x_0$ 为中心、带宽为 $h$ 的 $J-1$ 阶正交核得到的
+$\Psi(P)=\Psi(P)(x_0)$ 的参数逼近。令 $J_0^*=\min(J_0,J)$，并令
+\[
+ B_0(J_0^*)\equiv
+ \sum_{\{m\in\{0,\ldots,J_0^*\}^d:\,\sum_lm_l=J_0^*\}}
+ \psi_0^m(x_0)\int_y K(y)
+ \frac{\prod_l y_l^{m_l}}{\prod_l m_l!}\,dy.
+\]
+则在 $h\to0$ 时，
+\[
+ h^{-J_0^*}\bigl(\Psi_{h,J_0^*}(P_0)-\Psi(P_0)\bigr)
+ \longrightarrow B_0(J_0^*).
+\]
+\end{bookresult}
+
+\begin{proof}
+为简化记号，在本证明中用 $J$ 表示 $J_0^*$。我们有
+\[
+\begin{aligned}
+ \Psi_{h,J}(P_0)-\Psi(P_0)
+ &=\int_x K_{h,x_0}(x)
+   \{\Psi(P_0)(x)-\Psi(P_0)(x_0)\}\,dx\\
+ &=\int_x h^{-d}K((x-x_0)/h)
+   \{\psi_0(x)-\psi_0(x_0)\}\,dx\\
+ &=\int_y K(y)\{\psi_0(x_0+hy)-\psi_0(x_0)\}\,dy\\
+ &=\int_y K(y)\sum_{j=1}^{J-1}
+   \sum_{m,\,\sum_lm_l=j}
+   \frac{h^j\prod_l y_l^{m_l}}{\prod_lm_l!}\psi_0^m(x_0)\,dy\\
+ &\quad+h^J\int_y K(y)\sum_{m,\,\sum_lm_l=J}
+   \frac{\prod_l y_l^{m_l}}{\prod_lm_l!}\psi_0^m(x_0)\,dy+o(h^J)\\
+ &=h^J\int_y K(y)\sum_{m,\,\sum_lm_l=J}
+   \frac{\prod_l y_l^{m_l}}{\prod_lm_l!}\psi_0^m(x_0)\,dy+o(h^J)\\
+ &\equiv h^JB_0(J)+o(h^J).
+\end{aligned}
+\]
+因此，
+\[
+ h^{-J}(\Psi_{h,J}(P_0)-\Psi(P_0)=B_0(J)+o(1).
+\]
+证毕。
+\end{proof}
+
+\noindent\textbf{有效影响曲线。}\enspace
+令 $D_h^*(P)$ 为 $\Psi_h$ 在 $P\in\mathcal M$ 处的典范梯度。假定
+\[
+ D_h^*(P)=D(K_{h,x_0},P),
+ \qquad K\mapsto D(K,P)\text{ 为线性映射}.
+\]
+在我们的例子中，$O=(X,O_1)$，且对于某些
+$D_1(P),D_2(P)\in L^2(P)$，有
+\[
+ D_h^*(P)(O)=K_{h,x_0}(X)D_1(P)(O)
+   +\int_x K_{h,x_0}(x)D_2(P)(x,O_1)\,dx,
+\]
+其中
+\[
+ \int K_{h,x_0}(x)D_2(P)(x,O_1)\,dx
+ =\int K(y)D_2(P)(x_0+hy,O_1)\,dy.
+\]
+此外，假定对某个有限常数 $C<\infty$，有
+\begin{equation}
+ \sup_{P\in\mathcal M,o}|D_h^*(P)|(o)<Ch^{-d},
+\tag{25.1}
+\end{equation}
+其中关于 $o$ 的上确界取遍 $P_0$ 的一个支撑集。可将后一假设称为正值性假设。
+
+\noindent\textbf{$\Psi_h(P)$ 的二阶 Taylor 展开。}\enspace
+由于 $\Psi_h$ 路径可微，
+\[
+ \Psi_h(P)-\Psi_h(P_0)=(P-P_0)D_h^*(P)+R_h(P,P_0),
+\]
+其中 $R_h(P,P_0)$ 为二阶余项，并且可以利用 $PD_h^*(P)=0$。
+我们假定该二阶余项 $R_h(P,P_0)$ 具有如下结构：
+\begin{equation}
+ R_h(P,P_0)=\int_x K_{h,x_0}(x)R_x(P,P_0)\,dx,
+\tag{25.2}
+\end{equation}
+其中 $R_x(P,P_0)$ 为某个二阶余项。这一结构基本上由 $\Psi_h(P)$ 是 $\Psi(P)(x)$ 在 $x_0$ 周围的核平均这一事实所蕴含。事实上，我们所有的例子都满足这一假设。
+
+二阶余项 $R_x(P,P_0)$ 的一种典型形式为
+\[
+\begin{aligned}
+ R_x(P,P_0)=\int_y
+ &(H_1(P)-H_1(P_0))(x,y)\\
+ &\quad(H_2(P)-H_2(P_0))(x,y)H_3(P,P_0)(x,y)\,d\mu(y),
+\end{aligned}
+\]
+其中 $H_1(P),H_2(P)$ 是通过 $X$ 和另一个子向量 $Y$ 成为 $O$ 的函数的统计参数。
+若 $H_1(P)\ne H_2(P)$，且这两个参数变异独立，那么它就具有所谓的双重稳健结构，因为只要
+$H_1(P)=H_1(P_0)$ 或 $H_2(P)=H_2(P_0)$ 之一成立，就有
+$R_x(P,P_0)=0$。
+注意，$R_x(P,P_0)$ 通常涉及 $P$ 与 $P_0$ 的密度或回归函数在单点 $x$ 处的差异，而其他变量（即 $Y$）都被积分消去。对于路径可微参数，二阶余项总涉及对所有变量积分，因此可以用
+$H_1(P)-H_1(P_0)$ 与 $H_2(P)-H_2(P_0)$ 的 $L^2$ 范数控制二阶余项。
+对 $R_x(P,P_0)$ 无法作这样的控制，但对 $R_h(P,P_0)$ 可以。
+可将 $R_x(P,P_0)$ 看成不具路径可微性的参数 $\Psi(P)(x)$ 的二阶 Taylor 展开所对应的二阶余项。
+
+我们的一般方法，除了要求 $\Psi_h(P)$ 逼近 $\Psi(P)$ 并且路径可微之外，并不依赖 $\Psi_h(P)$ 的任何特定结构；不过，上述结构使我们能够充分理解有效影响曲线与二阶余项如何依赖调节参数 $h$。由此，我们可以在具体假设下建立所提议的 $\psi_0$ 估计量的渐近正态性。

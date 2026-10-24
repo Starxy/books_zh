@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.4cm,y=1.1cm]
+ \node[vtx] (ch09f7-x) at (1.5,2) {$X$};
+ \node[vtx] (ch09f7-y) at (0,0) {$Y$};
+ \node[vtx] (ch09f7-z) at (3,0) {$Z$};
+ \node[latent] (ch09f7-w) at (.75,1) {$W$};
+ \node[latent] (ch09f7-v) at (2.25,1) {$V$};
+ \node[latent] (ch09f7-u) at (1.5,0) {$U$};
+ \draw[ed] (ch09f7-w)--(ch09f7-x);
+ \draw[ed] (ch09f7-w)--(ch09f7-y);
+ \draw[ed] (ch09f7-v)--(ch09f7-x);
+ \draw[ed] (ch09f7-v)--(ch09f7-z);
+ \draw[ed] (ch09f7-u)--(ch09f7-y);
+ \draw[ed] (ch09f7-u)--(ch09f7-z);
+\end{tikzpicture}
+\caption{该DAG无法生成这样的$X,Y,Z$联合分布：三个观测变量以各$1/2$的概率同时取$0$或同时取$1$。}
+\end{figure}

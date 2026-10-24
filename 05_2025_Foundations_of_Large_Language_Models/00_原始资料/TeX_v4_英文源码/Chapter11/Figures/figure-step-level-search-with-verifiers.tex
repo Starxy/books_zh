@@ -1,0 +1,108 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1cm}
+\def\vsep{1.5cm}
+
+\tikzstyle{snode} = [minimum width=0.28cm,minimum height=0.28cm,inner sep=0pt];
+\tikzstyle{rnode} = [minimum width=1.2cm,minimum height=0.7cm,inner sep=2pt,draw];
+
+% step-level verification
+\begin{scope}
+
+\node [rnode,anchor=west,thick,red] (root) at (0,0) {\footnotesize{$\mathbf{x}$}};
+
+\node [rnode,anchor=north] (s13) at ([yshift=-\vsep]root.south) {{\footnotesize{$a_{1}^{(3)}$}}};
+\node [rnode,anchor=east] (s12) at ([xshift=-0.5*\ssep]s13.west) {{\footnotesize{$a_{1}^{(2)}$}}};
+\node [rnode,anchor=east] (s11) at ([xshift=-0.5*\ssep]s12.west) {{\footnotesize{$a_{1}^{(1)}$}}};
+\node [rnode,anchor=west,thick,red] (s14) at ([xshift=0.5*\ssep]s13.east) {{\footnotesize{$a_{1}^{(4)}$}}};
+\node [rnode,anchor=west] (s15) at ([xshift=0.5*\ssep]s14.east) {{\footnotesize{$a_{1}^{(5)}$}}};
+
+\node [snode,anchor=center,fill=white] (l11) at ([xshift=-1pt,yshift=1pt]s11.south east) {\color{blue} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l12) at ([xshift=-1pt,yshift=1pt]s12.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l13) at ([xshift=-1pt,yshift=1pt]s13.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l15) at ([xshift=-1pt,yshift=1pt]s15.south east) {\color{blue} \small{$\boxtimes$}};
+
+\draw [-latex] ([xshift=-0.2cm,yshift=-2pt]root.south) -- ([xshift=0.4cm,yshift=2pt]s11.north);
+\draw [-latex] ([xshift=-0.1cm,yshift=-2pt]root.south) -- ([xshift=0.2cm,yshift=2pt]s12.north);
+\draw [-latex] ([xshift=0.0cm,yshift=-2pt]root.south) -- ([xshift=0.0cm,yshift=2pt]s13.north);
+\draw [-latex,thick,red] ([xshift=0.1cm,yshift=-2pt]root.south) -- ([xshift=-0.2cm,yshift=2pt]s14.north);
+\draw [-latex] ([xshift=0.2cm,yshift=-2pt]root.south) -- ([xshift=-0.4cm,yshift=2pt]s15.north);
+
+\node [rnode,anchor=north,thick,red] (s23) at ([yshift=-\vsep]s14.south) {{\footnotesize{$a_{2}^{(3)}$}}};
+\node [rnode,anchor=east] (s22) at ([xshift=-0.5*\ssep]s23.west) {{\footnotesize{$a_{2}^{(2)}$}}};
+\node [rnode,anchor=east] (s21) at ([xshift=-0.5*\ssep]s22.west) {{\footnotesize{$a_{2}^{(1)}$}}};
+\node [rnode,anchor=west] (s24) at ([xshift=0.5*\ssep]s23.east) {{\footnotesize{$a_{2}^{(4)}$}}};
+\node [rnode,anchor=west] (s25) at ([xshift=0.5*\ssep]s24.east) {{\footnotesize{$a_{2}^{(5)}$}}};
+
+\node [snode,anchor=center,fill=white] (l21) at ([xshift=-1pt,yshift=1pt]s21.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l22) at ([xshift=-1pt,yshift=1pt]s22.south east) {\color{blue} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l24) at ([xshift=-1pt,yshift=1pt]s24.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l25) at ([xshift=-1pt,yshift=1pt]s25.south east) {\color{ugreen} \small{$\boxtimes$}};
+
+\draw [-latex] ([xshift=-0.2cm,yshift=-2pt]s14.south) -- ([xshift=0.4cm,yshift=2pt]s21.north);
+\draw [-latex] ([xshift=-0.1cm,yshift=-2pt]s14.south) -- ([xshift=0.2cm,yshift=2pt]s22.north);
+\draw [-latex,thick,red] ([xshift=0.0cm,yshift=-2pt]s14.south) -- ([xshift=0.0cm,yshift=2pt]s23.north);
+\draw [-latex] ([xshift=0.1cm,yshift=-2pt]s14.south) -- ([xshift=-0.2cm,yshift=2pt]s24.north);
+\draw [-latex] ([xshift=0.2cm,yshift=-2pt]s14.south) -- ([xshift=-0.4cm,yshift=2pt]s25.north);
+
+\node [rnode,anchor=north] (s33) at ([yshift=-\vsep]s23.south) {{\footnotesize{$a_{3}^{(3)}$}}};
+\node [rnode,anchor=east] (s32) at ([xshift=-0.5*\ssep]s33.west) {{\footnotesize{$a_{3}^{(2)}$}}};
+\node [rnode,anchor=east,thick,red] (s31) at ([xshift=-0.5*\ssep]s32.west) {{\footnotesize{$a_{3}^{(1)}$}}};
+\node [rnode,anchor=west] (s34) at ([xshift=0.5*\ssep]s33.east) {{\footnotesize{$a_{3}^{(4)}$}}};
+\node [rnode,anchor=west] (s35) at ([xshift=0.5*\ssep]s34.east) {{\footnotesize{$a_{3}^{(5)}$}}};
+
+\node [snode,anchor=center,fill=white] (l32) at ([xshift=-1pt,yshift=1pt]s32.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l33) at ([xshift=-1pt,yshift=1pt]s33.south east) {\color{blue} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l34) at ([xshift=-1pt,yshift=1pt]s34.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l35) at ([xshift=-1pt,yshift=1pt]s35.south east) {\color{blue} \small{$\boxtimes$}};
+
+\draw [-latex,thick,red] ([xshift=-0.2cm,yshift=-2pt]s23.south) -- ([xshift=0.4cm,yshift=2pt]s31.north);
+\draw [-latex] ([xshift=-0.1cm,yshift=-2pt]s23.south) -- ([xshift=0.2cm,yshift=2pt]s32.north);
+\draw [-latex] ([xshift=0.0cm,yshift=-2pt]s23.south) -- ([xshift=0.0cm,yshift=2pt]s33.north);
+\draw [-latex] ([xshift=0.1cm,yshift=-2pt]s23.south) -- ([xshift=-0.2cm,yshift=2pt]s34.north);
+\draw [-latex] ([xshift=0.2cm,yshift=-2pt]s23.south) -- ([xshift=-0.4cm,yshift=2pt]s35.north);
+
+\node [rnode,anchor=north,thick,red] (s43) at ([yshift=-\vsep]s31.south) {{\footnotesize{$a_{4}^{(3)}$}}};
+\node [rnode,anchor=east] (s42) at ([xshift=-0.5*\ssep]s43.west) {{\footnotesize{$a_{4}^{(2)}$}}};
+\node [rnode,anchor=east] (s41) at ([xshift=-0.5*\ssep]s42.west) {{\footnotesize{$a_{4}^{(1)}$}}};
+\node [rnode,anchor=west] (s44) at ([xshift=0.5*\ssep]s43.east) {{\footnotesize{$a_{4}^{(4)}$}}};
+\node [rnode,anchor=west] (s45) at ([xshift=0.5*\ssep]s44.east) {{\footnotesize{$a_{4}^{(5)}$}}};
+
+\node [snode,anchor=center,fill=white] (l41) at ([xshift=-1pt,yshift=1pt]s41.south east) {\color{ugreen} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l42) at ([xshift=-1pt,yshift=1pt]s42.south east) {\color{blue} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l44) at ([xshift=-1pt,yshift=1pt]s44.south east) {\color{blue} \small{$\boxtimes$}};
+\node [snode,anchor=center,fill=white] (l45) at ([xshift=-1pt,yshift=1pt]s45.south east) {\color{blue} \small{$\boxtimes$}};
+
+\draw [-latex] ([xshift=-0.2cm,yshift=-2pt]s31.south) -- ([xshift=0.4cm,yshift=2pt]s41.north);
+\draw [-latex] ([xshift=-0.1cm,yshift=-2pt]s31.south) -- ([xshift=0.2cm,yshift=2pt]s42.north);
+\draw [-latex,thick,red] ([xshift=0.0cm,yshift=-2pt]s31.south) -- ([xshift=0.0cm,yshift=2pt]s43.north);
+\draw [-latex] ([xshift=0.1cm,yshift=-2pt]s31.south) -- ([xshift=-0.2cm,yshift=2pt]s44.north);
+\draw [-latex] ([xshift=0.2cm,yshift=-2pt]s31.south) -- ([xshift=-0.4cm,yshift=2pt]s45.north);
+
+\begin{pgfonlayer}{background}
+\node [draw,dashed,inner sep=2pt]  [fit = (root)] (rootbox) {};
+\node [anchor=south west] (xlabel) at ([yshift=0.2cm,xshift=0.3cm]rootbox.north east) {\scriptsize{Input Problem (Root)}};
+\draw [->] ([xshift=0.2cm,yshift=0.1cm]xlabel.south west) -- ([yshift=-0.1cm,xshift=2pt]rootbox.north east);
+
+\node [draw,dashed,inner sep=2pt]  [fit = (s11) (l11)] (s11box) {};
+\node [anchor=south] (s11label) at ([yshift=0.2cm,xshift=-1cm]s11box.north) {\scriptsize{Pruned by Likelihood}};
+\draw [->] ([xshift=0.5cm,yshift=0.1cm]s11label.south) -- ([yshift=2pt,xshift=-0.3cm]s11box.north);
+
+\node [draw,dashed,inner sep=2pt]  [fit = (s21) (l21)] (s21box) {};
+\node [anchor=south] (s21label) at ([yshift=0.2cm,xshift=-1cm]s21box.north) {\scriptsize{Pruned by Verification}};
+\draw [->] ([xshift=0.5cm,yshift=0.1cm]s21label.south) -- ([yshift=2pt,xshift=-0.3cm]s21box.north);
+
+\node [draw,dashed,inner sep=2pt]  [fit = (s31)] (s31box) {};
+\node [anchor=south] (s31label) at ([yshift=0.2cm,xshift=-1cm]s31box.north) {\scriptsize{Selected Reasoning Step}};
+\draw [->] ([xshift=0.5cm,yshift=0.1cm]s31label.south) -- ([yshift=2pt,xshift=-0.3cm]s31box.north);
+
+\end{pgfonlayer}
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

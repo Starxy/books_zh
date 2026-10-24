@@ -1,0 +1,123 @@
+% 原书分章PDF第5—8页：18.2及三个小节，全部选择器/风险/差异度/在线权重递推。
+\section{相依实验有序序列的交叉验证}
+
+本节为离散的候选估计量集合定义一个在线交叉验证选择器，它类似于时间序列数据通常使用的交叉验证方法。我们还将定义相应的预言选择器。最后，我们为连续的候选估计量族定义一个在线交叉验证选择器。
+
+\subsection{在线交叉验证选择器}
+
+设 $\widehat\Psi_k$ 为候选估计量，它们可以应用于由 $(Z(i),O(i))$（$i=1,\ldots,m$，$m\le n$）组成的数据集，$k=1,\ldots,K$。对于给定的时点 $t_0\in\{n_l+1,\ldots,n\}$，我们定义训练样本为 $T(t_0)=\{i:i<t_0\}$，验证样本为单个观测 $O(t_0)$。注意，特定于 $t_0$ 的训练样本定义为时点 $t_0$ 之前的过去数据，而特定于 $t_0$ 的验证样本则定义为下一个观测。这里，$n_l$ 是训练样本所要求的最小样本量。对于每个大于最小训练样本量 $n_l$ 的时点 $t_0$，我们都考虑这样的划分：划分的总数为 $n-n_l+1$。这一交叉验证方案衡量的是，一个在过去数据上训练的算法，能够多好地预测下一个时点的结局。对每个 $t_0$，令 $P_{t_0-1}$ 为训练样本 $\{(Z(i),O(i)):i=1,\ldots,t_0-1\}$ 的经验分布。
+
+给定候选估计量 $\widehat\Psi_k$，将其在线交叉验证风险定义为
+\[
+ R_{CV,n}(\widehat\Psi_k)
+ \equiv\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ L(\widehat\Psi_k(P_{t_0-1}))(Z(t_0),O(t_0)).
+\]
+注意，若 $\widehat\Psi_k$ 是在线估计量，则在线交叉验证风险本身也是在线估计量。也就是说，新的观测 $O(n+1)$ 到来时，我们生成新的观测 $(Z(n+1),O(n+1))$，将在线估计量 $\widehat\Psi_k(P_n)$ 更新为 $\widehat\Psi_k(P_{n+1})$，计算其损失 $L(\widehat\Psi_k(P_{n+1})(Z(n+1),O(n+1))$，再将其加到当前的在线交叉验证风险 $R_{CV,n}(\widehat\Psi_k)$ 中，得到 $R_{CV,n+1}(\widehat\Psi_k)$。
+
+相应的在线交叉验证选择器定义为
+\[
+ \begin{aligned}
+ k_n&=\argmin_k R_{CV,n}(\widehat\Psi_k)\\
+ &=\argmin_k\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ L(\widehat\Psi_k(P_{t_0-1}))(Z(t_0),O(t_0)).
+ \end{aligned}
+\]
+在回归例中，若使用平方误差损失，则有
+\[
+ k_n=\argmin_k\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ \bigl(Y_{t_0}-\widehat\Psi_k(P_{t_0-1})(Z(t_0),W_{t_0})\bigr)^2;
+\]
+类似地，也可以为对数似然损失定义交叉验证选择器。
+
+在线超级学习器定义为
+\[
+ \widehat\Psi(P_t)=\widehat\Psi_{k_t}(P_t),\qquad t=1,\ldots,.
+\]
+因此，在已有 $t$ 个观测时，它使用下标为 $k=k_t$ 的估计量 $\widehat\Psi_k$。这样的在线超级学习器可以随时间从一个估计量切换到另一个估计量。如果所有候选估计量都是在线估计量，则选择器 $k_t$ 也是在线选择器。因此，这个超级学习器与任一候选估计量一样具有可扩展性。当然，只需让每个在线学习器在各自的计算机或处理器核心上运行，就很容易实现超级学习器的并行化。
+
+\subsection{在线预言选择器}
+
+注意，在线交叉验证风险估计的是如下在线交叉验证真实风险：
+\[
+ \widetilde R_{CV,n}(\widehat\Psi_k)
+ =\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ P_{\theta_0,t_0,Z(t_0)}L(\widehat\Psi_k(P_{t_0-1})),
+\]
+它在 $\psi_0$ 处取到最小值。$\widetilde R_{CV,n}(\widehat\Psi_k)$ 与 $\widetilde R_{CV,n}(\psi_0)$ 的差定义了候选估计量 $\widehat\Psi_k$ 与真实目标 $\psi_0$ 之间基于损失的差异度：
+\[
+ d_{0n}(\widehat\Psi_k,\psi_0)
+ =\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ P_{\theta_0,t_0,Z(t_0)}\{L(\widehat\Psi_k(P_{t_0-1}))-L(\psi_0)\}.
+\]
+
+在线预言选择器定义为使这一基于损失的差异度最小的选择：
+\[
+ \widetilde k_n=\argmin_k\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ P_{\theta_0,t_0,Z(t_0)}\{L(\widehat\Psi_k(P_{t_0-1}))-L(\psi_0)\}.
+\]
+
+在回归例中，使用平方误差损失时，基于损失的差异度 $d_{0n}(\widehat\Psi_k,\psi_0)$ 等于
+\[
+ d_{0n}(\widehat\Psi_k,\psi_0)
+ =\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ \int_w(\widehat\Psi_k(P_{t_0-1})-\psi_0)^2(w,Z(t_0))
+ \,d\bar P_{0,Z(t_0)}(w\mid Z(t_0)).
+\]
+考虑从给定 $Z(t_0)=z$ 时 $(W(t_0),Y(t_0))$ 的条件概率分布 $\bar P_{0,z}$ 抽样时，平方误差损失所对应的基于损失的差异度：
+\[
+ d_{L2,z}(\psi,\psi_0)
+ =\int\{(y-\psi(w,z))^2-(y-\psi_0(w,z))^2\}
+ \,d\bar P_{0,z}(w,y).
+\]
+于是，可以把上面的基于损失的差异度写成
+\[
+ d_{0n}(\widehat\Psi_k,\psi_0)
+ =\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ d_{L2,Z(t_0)}(\widehat\Psi_k(P_{t_0-1}),\psi_0).
+\]
+类似地，对于二元 $Y$ 和对数似然损失，有
+\[
+ d_{0n}(\widehat\Psi_k,\psi_0)
+ =\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ d_{KL,Z(t_0)}(\widehat\Psi_k(P_{t_0-1}),\psi_0),
+\]
+其中
+\[
+ d_{KL,z}(\psi,\psi_0)=\bar P_{0,z}\log f_{\psi_0,z}/f_{\psi,z},
+\]
+而
+\[
+ f_{\psi,z}(y\mid w)=\psi(w,z)^y(1-\psi(w,z))^{1-y}
+\]
+是由 $\psi$ 所蕴含的、给定 $W,Z=z$ 时 $Y$ 的条件概率分布。换言之，$d_{KL,z}(\psi,\psi_0)$ 是在概率分布为 $\bar P_{0,z}$ 的特定 $z$ 实验下，$\widehat\Psi_k(\cdot,z)$ 与 $\psi_0(\cdot,z)$ 的 Kullback–Leibler 散度；$d_{0n}(\widehat\Psi_k,\psi_0)$ 则是 $d_{KL,z}(\widehat\Psi_k,\psi_0)$ 在一组 $z$ 值 $\{Z(t_0):t_0=n_l+1,\ldots,n\}$ 上的平均。
+
+\subsection{连续有限维候选估计量族的在线超级学习器}
+
+考虑给定的 $K$ 个候选估计量 $\widehat\Psi_k$，$k=1,\ldots,K$。令 $\widehat\Psi_\alpha$ 为这 $K$ 个估计量的某种组合，以有限维系数向量 $\alpha$ 为索引。例如，若参数空间是凸的，则可以定义凸线性组合 $\widehat\Psi_\alpha=\sum_{k=1}^K\alpha(k)\widehat\Psi_k$，其中 $\alpha\in\{x\in\RR^K:x(k)\ge0,\sum_kx(k)=1\}$。令 $R_{CV,n}(\widehat\Psi_\alpha)$ 为前面定义的在线交叉验证风险：
+\[
+ R_{CV,n}(\widehat\Psi_\alpha)
+ \equiv\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ L(\widehat\Psi_\alpha(P_{t_0-1}))(Z(t_0),O(t_0)).
+\]
+令 $\alpha_n$ 为交叉验证选择器：
+\[
+ \alpha_n=\argmin_\alpha R_{CV,n}(\widehat\Psi_\alpha).
+\]
+跟踪所有 $\alpha$ 对应的在线估计量 $\widehat\Psi_\alpha$，只需要跟踪这 $K$ 个在线估计量 $\widehat\Psi_k$；但是 $\alpha_n$ 本身并非在线估计量，因为每个 $n$ 都需要重新计算最小值。因此，我们提出，利用例如二阶随机梯度下降算法来近似极小点 $\alpha_n$，正如可以利用在线随机梯度下降算法（stochastic gradient descent，SGD）来近似极大似然估计量（MLE）一样。
+
+为此，假设 $L(\widehat\Psi_\alpha)$ 二阶可微。令
+\[
+ S_{n,\alpha}=\frac{d}{d\alpha}L(\widehat\Psi_\alpha(P_{n-1}))
+\]
+为向量得分，$S^1_{n,\alpha}=\frac{d}{d\alpha}S_{n,\alpha}$ 为二阶导数矩阵。给定在线估计量 $\alpha_t$，$t=n_l+1,\ldots$，令
+\[
+ c_n=-\frac{1}{n-n_l+1}\sum_{t_0=n_l+1}^{n}
+ S^1_{n,\alpha_{t_0-1}}(Z(t_0),O(t_0)).
+\]
+令 $S^*_{n,\alpha}=c_n^{-1}S_{n,\alpha}$。用于近似 $\alpha_n$ 的二阶 SGD 在线估计量定义为
+\[
+ \alpha^*_{n+1}=\alpha^*_n+\frac{1}{n+1}
+ S^*_{n,\alpha_n^*}(Z(n+1),O(n+1)).
+\]
+还可以进一步细化这一步：检查是否有 $R_{CV,n+1}(\alpha^*_{n+1})\ge R_{CV,n+1}(\alpha^*_n)$；若不满足，则用 $\alpha^*_n$ 与这一候选值 $\alpha^*_{n+1}$ 的某个凸线性组合替代 $\alpha^*_{n+1}$，使在线交叉验证风险确实下降。根据前述二阶 SGD 文献中的理论结果，可以预期这一在线估计量 $\alpha^*_n$ 对 $\alpha_n$ 的逼近误差为 $o_P(n^{-1/2})$。当然，若 $\alpha$ 为高维向量，可能会希望用一阶 SGD 代替二阶 SGD。

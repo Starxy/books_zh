@@ -1,0 +1,69 @@
+% 原书第208—210页；10.3.4—10.3.5。
+\subsection{采用受限函数类的模型}
+为处理Granger因果性的局限，Hyvärinen et al.［2008］描述了一类线性非高斯自回归模型，使存在即时效应时的因果结构也具有可识别性。Peters et al.［2013］说明，如何在式(10.1)中采用限制更少的函数类$f^j$来解决这一任务。一个例子是，将加性噪声模型（ANM）推广到时间序列，即采用结构因果模型
+\[
+ X_t^j:=f^j\bigl((\PA_q^j)_{t-q},\ldots,(\PA_1^j)_{t-1},(\PA_0^j)_t\bigr)+N_t^j,
+ \qquad j\in\{1,\ldots,d\}.
+\]
+除了使马尔可夫等价类内部的因果结构可识别，采用受限函数类还有第二个动机：Peters et al.［2013］利用模拟时间序列提供了一些经验证据，支持这样的看法——能够由某个受限函数类中的模型描述的时间序列，较不容易受到混杂。
+
+\subsection{谱独立性准则}
+\textbf{谱独立性准则（spectral independence criterion，SIC）}是一种基于原因与机制独立思想的方法，由Shajarisales et al.［2015］加以阐述。假设给定\textbf{弱平稳（weakly stationary）}二元时间序列$(X_t,Y_t)_{t\in\mathbb Z}$，其中或者$X$通过\textbf{线性时不变滤波器（linear time invariant filter）}影响$Y$，或者$Y$通过这样的滤波器影响$X$。更明确地说，在$X$影响$Y$的情况下，$Y$由$X$与函数$h$卷积得到：
+\begin{equation}
+ Y_t=\sum_{k=1}^{\infty}h(k)X_{t-k}.
+ \tag{10.10}
+\end{equation}
+关于技术细节，例如保证式(10.10)及以下表达式具有良好定义所需的$h$的衰减条件，可参见Shajarisales et al.［2015］。为了将$X$与$h$之间的独立性条件形式化，我们考察滤波器在频域中的作用。对所有$\nu\in[-1/2,1/2]$，用$S_{XX}(\nu)$表示频率$\nu$处的\textbf{功率谱密度（power spectral density）}；它明确由\textbf{自协方差函数（auto-covariance function）}
+\[
+ C_{XX}(\tau):=\EE[X_tX_{t+\tau}],\qquad\tau\in\mathbb Z
+\]
+的Fourier变换给出。
+\chtennote{原文将$\EE[X_tX_{t+\tau}]$称为自协方差，隐含了零均值条件。若均值为$\mu=\EE[X_t]\ne0$，自协方差应为$\EE[(X_t-\mu)(X_{t+\tau}-\mu)]$。此处保留原式。}
+
+于是，式(10.10)给出
+\begin{equation}
+ S_{YY}(\nu)=|\widetilde h(\nu)|^2\cdot S_{XX}(\nu),
+ \tag{10.11}
+\end{equation}
+其中$\widetilde h(\nu)=\sum_{k\in\mathbb Z}e^{-\mathrm i2\pi k\nu}h(k)$表示$h$的Fourier变换。换言之，将输入时间序列的功率谱乘以滤波器传递函数模的平方，就得到输出的功率谱。只要$\widetilde h$可逆，除式(10.11)外，还有
+\begin{equation}
+ S_{XX}(\nu)=\left|\frac{1}{\widetilde h(\nu)}\right|^2\cdot S_{YY}(\nu).
+ \tag{10.12}
+\end{equation}
+虽然式(10.11)和式(10.12)都成立，但哪一个描述了因果模型？基本思想是，在因果方向上，输入时间序列的功率谱不包含有关滤波器传递函数的信息。为将这一点形式化，Shajarisales et al.［2015］提出如下独立性条件。
+
+\begin{definition}[SIC]
+如果$S_{XX}$与$\widetilde h$不相关，即
+\begin{equation}
+ \langle S_{XX}\cdot|\widetilde h|^2\rangle
+ =\langle S_{XX}\rangle\cdot\langle|\widetilde h|^2\rangle,
+ \tag{10.13}
+\end{equation}
+则称时间序列$X$与滤波器$h$满足SIC。其中
+\[
+ \langle f\rangle:=\int_{-1/2}^{1/2}f(\nu)\,\mathrm d\nu
+\]
+表示任意函数在频率区间$[-1/2,1/2]$上的平均值。
+\end{definition}
+
+Shajarisales et al.［2015］证明，式(10.13)蕴含反向的对应独立性条件不成立，除非处于这样一种非一般情形：$|\widetilde h|$在整个频率区间上为常数。
+\begin{theorem}[基于SIC的可识别性]
+若式(10.13)成立，且$|\widehat h|$不随$\nu$保持常数，则$S_{YY}$与$1/|\widetilde h|$负相关，即
+\begin{equation}
+ \langle S_{YY}\cdot1/|\widetilde h|^2\rangle
+ <\langle S_{YY}\rangle\cdot\langle1/|\widetilde h|^2\rangle.
+ \tag{10.14}
+\end{equation}
+\end{theorem}
+\begin{proof}
+式(10.13)与式(10.14)的左侧分别为$\langle S_{YY}\rangle$与$\langle S_{XX}\rangle$。Jensen不等式给出
+\[
+ \frac{1}{\langle|\widetilde h|^2\rangle}
+ <\left\langle\frac{1}{|\widetilde h|^2}\right\rangle,
+\]
+由此即可得出结论。
+\end{proof}
+\chtennote{定义10.6中“不相关”的两个量，按式(10.13)应为$S_{XX}$与平方增益$|\widetilde h|^2$；定理10.7中的对应量按式(10.14)应为$S_{YY}$与$1/|\widetilde h|^2$。定理假设中出现的$\widehat h$与前文$\widetilde h$也应指同一个Fourier变换。这里保留原书文字、记号与公式，并以编号公式明确其数学含义。}
+
+Shajarisales et al.［2015］提出了一个简单的因果推断算法，检查哪个方向更接近满足SIC。他们在多种模拟数据集和真实数据集上开展实验，并报告了一些令人鼓舞的结果。
+\FloatBarrier

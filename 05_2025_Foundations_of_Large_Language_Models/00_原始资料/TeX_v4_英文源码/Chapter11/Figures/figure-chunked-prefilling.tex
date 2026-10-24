@@ -1,0 +1,111 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.1cm}
+\def\bsep{2.5cm}
+
+\tikzstyle{snode} = [minimum width=0.8cm,minimum height=0.5cm,inner sep=1pt,draw,thin];
+
+
+% basic iteration-based scheduling
+\begin{scope}
+
+\node [snode,anchor=west,minimum width=2.5cm,fill=red!30] (p21) at (0,0) {\footnotesize{$P_{21}$}};
+\node [snode,anchor=south west,minimum width=3.5cm,fill=red!30] (p11) at ([xshift=\ssep,yshift=\ssep]p21.north east) {\footnotesize{$P_{11}$}};
+
+\node [snode,anchor=west,fill=blue!30] (d21) at ([xshift=\ssep]p21.east) {\footnotesize{$D_{21}$}};
+
+\node [snode,anchor=west,minimum width=1.1cm,fill=blue!30] (d11) at ([xshift=\ssep]p11.east) {\footnotesize{$D_{11}$}};
+\node [snode,anchor=north west,minimum width=0.9cm,fill=ugreen!30] (d22) at ([yshift=-\ssep]d11.south west) {\footnotesize{$D_{22}$}};
+
+\node [snode,anchor=west,minimum width=1.2cm,fill=blue!30] (d12) at ([xshift=\ssep]d11.east) {\footnotesize{$D_{12}$}};
+\node [snode,anchor=north west,minimum width=1.0cm,fill=blue!30] (d23) at ([yshift=-\ssep]d12.south west) {\footnotesize{$D_{23}$}};
+
+\node [snode,anchor=west,minimum width=1.2cm,fill=blue!30] (d13) at ([xshift=\ssep]d12.east) {\footnotesize{$D_{13}$}};
+\node [snode,anchor=north west,minimum width=1.0cm,fill=blue!30] (d24) at ([yshift=-\ssep]d13.south west) {\footnotesize{$D_{24}$}};
+
+\node [anchor=west] (d1dots) at ([xshift=\ssep]d13.east) {\footnotesize{$\cdots$}};
+\node [anchor=north west] (d2dots) at ([yshift=-0.2cm]d1dots.south west) {\footnotesize{$\cdots$}};
+
+\node [anchor=east] (seq2label) at ([xshift=-0.2cm]p21.west) {\footnotesize{Sequence 2}};
+\node [anchor=south east] (seq1label) at ([yshift=\ssep]seq2label.north east) {\footnotesize{Sequence 1}};
+
+\draw [-,dashed] ([xshift=-0.5*\ssep,yshift=0.3cm]p11.north west) -- ([xshift=-0.5*\ssep,yshift=-1.6cm]p11.north west);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]p11.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]p11.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]d11.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]d11.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]d12.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]d12.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]d13.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]d13.north east);
+
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0cm]d21.north east) -- ([xshift=0.5*\ssep,yshift=-0.9cm]d21.north east);
+\draw [<->] ([xshift=0.5*\ssep+2pt,yshift=-0.2cm]d21.south east) -- ([xshift=-0.5*\ssep-2pt,yshift=-0.2cm]d22.south west) node [pos=0.5,above] {\tiny{Idle Time}};
+
+\node [anchor=south] (iter1) at ([yshift=2pt,xshift=-1.5cm]p11.north west) {\scriptsize{Iter. 1}};
+\node [anchor=south] (iter2) at ([yshift=2pt]p11.north) {\scriptsize{Iter. 2}};
+\node [anchor=south] (iter3) at ([yshift=2pt]d11.north) {\scriptsize{Iter. 3}};
+\node [anchor=south] (iter4) at ([yshift=2pt]d12.north) {\scriptsize{Iter. 4}};
+\node [anchor=south] (iter5) at ([yshift=2pt]d13.north) {\scriptsize{Iter. 5}};
+\node [anchor=south] (iter2top) at ([yshift=-0.1cm]iter2.north) {\scriptsize{Prefilling in One Go}};
+
+\node [anchor=north,align=left] (problemlabel) at ([yshift=-0.6cm,xshift=0.3cm]d22.south) {\tiny{The prediction of the}\\[-0.3cm] \tiny{second output token}\\[-0.3cm] \tiny{is delayed.}};
+\draw [<-,thin] ([yshift=-2pt]d22.south) .. controls +(south:0.5cm) and +(north:0.6cm) .. ([yshift=-0.7cm,xshift=0.4cm]d22.south);
+
+\node [anchor=north] (caption) at ([xshift=2cm,yshift=-1.7cm]p21.south east) {\small{(a) Simple Iteration-level Scheduling}};
+
+\end{scope}
+
+% chucked prefilling
+\begin{scope}[yshift=-4.8cm]
+
+\node [snode,anchor=west,minimum width=2.5cm,fill=red!30] (p21) at (0,0) {\footnotesize{$P_{21}$}};
+\node [snode,anchor=south west,minimum width=1.3cm,fill=red!30] (p11) at ([xshift=\ssep,yshift=\ssep]p21.north east) {\footnotesize{$P_{11}$}};
+
+\node [snode,anchor=west,fill=blue!30] (d21) at ([xshift=\ssep]p21.east) {\footnotesize{$D_{21}$}};
+
+\node [snode,anchor=west,minimum width=1.3cm,fill=red!30] (p12) at ([xshift=\ssep]p11.east) {\footnotesize{$P_{12}$}};
+\node [snode,anchor=north west,minimum width=0.9cm,fill=ugreen!30] (d22) at ([yshift=-\ssep]p12.south west) {\footnotesize{$D_{22}$}};
+
+\node [snode,anchor=west,minimum width=1.3cm,fill=red!30] (p13) at ([xshift=\ssep]p12.east) {\footnotesize{$P_{13}$}};
+\node [snode,anchor=north west,minimum width=1.0cm,fill=blue!30] (d23) at ([yshift=-\ssep]p13.south west) {\footnotesize{$D_{23}$}};
+
+\node [snode,anchor=west,minimum width=1.2cm,fill=blue!30] (d11) at ([xshift=\ssep]p13.east) {\footnotesize{$D_{11}$}};
+\node [snode,anchor=north west,minimum width=1.0cm,fill=blue!30] (d24) at ([yshift=-\ssep]d11.south west) {\footnotesize{$D_{24}$}};
+
+\node [snode,anchor=west,minimum width=1.3cm,fill=blue!30] (d12) at ([xshift=\ssep]d11.east) {\footnotesize{$D_{12}$}};
+\node [snode,anchor=north west,minimum width=1.1cm,fill=blue!30] (d25) at ([yshift=-\ssep]d12.south west) {\footnotesize{$D_{25}$}};
+
+\node [anchor=west] (d1dots) at ([xshift=\ssep]d12.east) {\footnotesize{$\cdots$}};
+\node [anchor=north west] (d2dots) at ([yshift=-0.2cm]d1dots.south west) {\footnotesize{$\cdots$}};
+
+\node [anchor=east] (seq2label) at ([xshift=-0.2cm]p21.west) {\footnotesize{Sequence 2}};
+\node [anchor=south east] (seq1label) at ([yshift=\ssep]seq2label.north east) {\footnotesize{Sequence 1}};
+
+\draw [-,dashed] ([xshift=-0.5*\ssep,yshift=0.3cm]p11.north west) -- ([xshift=-0.5*\ssep,yshift=-1.6cm]p11.north west);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]p11.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]p11.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]p12.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]p12.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]p13.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]p13.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]d11.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]d11.north east);
+\draw [-,dashed] ([xshift=0.5*\ssep,yshift=0.3cm]d12.north east) -- ([xshift=0.5*\ssep,yshift=-1.6cm]d12.north east);
+
+\node [anchor=south] (iter1) at ([yshift=2pt,xshift=-1.5cm]p11.north west) {\scriptsize{Iter. 1}};
+\node [anchor=south] (iter2) at ([yshift=2pt]p11.north) {\scriptsize{Iter. 2}};
+\node [anchor=south] (iter3) at ([yshift=2pt]p12.north) {\scriptsize{Iter. 3}};
+\node [anchor=south] (iter4) at ([yshift=2pt]p13.north) {\scriptsize{Iter. 4}};
+\node [anchor=south] (iter5) at ([yshift=2pt]d11.north) {\scriptsize{Iter. 5}};
+\node [anchor=south] (iter6) at ([yshift=2pt]d12.north) {\scriptsize{Iter. 6}};
+\node [anchor=south] (iter2top) at ([yshift=-0.1cm]iter2.north) {\scriptsize{Chunk 1}};
+\node [anchor=south] (iter3top) at ([yshift=-0.1cm]iter3.north) {\scriptsize{Chunk 2}};
+\node [anchor=south] (iter4top) at ([yshift=-0.1cm]iter4.north) {\scriptsize{Chunk 3}};
+
+\node [anchor=north,align=left] (problemlabel) at ([yshift=-0.6cm,xshift=0.3cm]d22.south) {\tiny{The second output token}\\[-0.3cm] \tiny{can be predicted during}\\[-0.3cm] \tiny{prefilling for sequence 1.}};
+\draw [<-,thin] ([yshift=-2pt]d22.south) .. controls +(south:0.5cm) and +(north:0.6cm) .. ([yshift=-0.7cm,xshift=0.4cm]d22.south);
+
+
+\node [anchor=north] (caption) at ([xshift=2cm,yshift=-1.7cm]p21.south east) {\small{(b) Chunked Prefilling}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

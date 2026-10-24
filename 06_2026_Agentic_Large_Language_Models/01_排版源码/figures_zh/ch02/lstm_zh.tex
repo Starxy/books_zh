@@ -1,0 +1,58 @@
+% 三个连续时间步；中间模块展开，与原图的门、运算和两条状态通路一致。
+\begingroup
+\def\LSTMmodule#1#2#3{%
+\begin{scope}[xshift=#1cm,opacity=#2]
+\draw[rounded corners=8pt,draw=green!35!black,fill=green!12,line width=.8pt] (0,0) rectangle (4.5,3.25);
+\node[op] (f#3) at (.65,2.5) {$\times$};
+\node[op] (c#3) at (2.1,2.5) {$+$};
+\node[op] (i#3) at (2.1,1.7) {$\times$};
+\node[op] (o#3) at (3.65,1.7) {$\times$};
+\node[gate] (fg#3) at (.65,.9) {$\sigma$};
+\node[gate] (ig#3) at (1.4,.9) {$\sigma$};
+\node[gate,minimum width=.65cm] (gg#3) at (2.1,.9) {$\tanh$};
+\node[gate] (og#3) at (2.9,.9) {$\sigma$};
+\node[draw,ellipse,fill=red!15,inner sep=1.5pt,font=\scriptsize] (t#3) at (3.65,2.1) {$\tanh$};
+\draw[flow] (-.1,2.5) -- (f#3);
+\draw[flow] (f#3) -- (c#3);
+\draw[line width=.9pt] (c#3) -- (4.5,2.5);
+\draw[line width=.9pt,rounded corners=3pt] (-.1,.35) -- (2.9,.35) -- (og#3.south);
+\draw[line width=.9pt] (.65,.35) -- (fg#3.south);
+\draw[line width=.9pt] (1.4,.35) -- (ig#3.south);
+\draw[line width=.9pt] (2.1,.35) -- (gg#3.south);
+\draw[flow] (fg#3.north) -- (f#3.south);
+\draw[flow,rounded corners=3pt] (ig#3.north) |- (i#3.west);
+\draw[flow] (gg#3.north) -- (i#3.south);
+\draw[flow] (i#3.north) -- (c#3.south);
+\draw[line width=.9pt] (3.65,2.5) -- (t#3.north);
+\draw[flow] (t#3.south) -- (o#3.north);
+\draw[flow,rounded corners=3pt] (og#3.north) |- (o#3.west);
+\draw[line width=.9pt,rounded corners=3pt] (o#3.south) -- (3.65,.35) -- (4.5,.35);
+\end{scope}%
+}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    font=\normalsize,
+    gate/.style={draw,fill=yellow!35,minimum width=.46cm,minimum height=.34cm,inner sep=1pt},
+    op/.style={circle,draw,fill=red!15,minimum size=.28cm,inner sep=0pt},
+    state/.style={circle,draw,line width=.9pt,minimum size=.65cm,inner sep=1pt},
+    flow/.style={-{Stealth[length=2mm]},line width=.9pt}
+]
+\LSTMmodule{0}{.22}{a}
+\LSTMmodule{5.1}{1}{b}
+\LSTMmodule{10.2}{.22}{c}
+\node[font=\Huge] at (2.25,1.65) {$A$};
+\node[font=\Huge] at (12.45,1.65) {$A$};
+\foreach \id/\xx/\tt in {a/0/t-1,b/5.1/t,c/10.2/t+1}{
+  \node[state,fill=blue!25] (x\id) at (\xx+.35,-.9) {$x_{\tt}$};
+  \draw[flow,rounded corners=3pt] (x\id.north) -- (\xx+.35,.05) -- (\xx+.35,.35);
+  \node[state,fill=violet!30] (h\id) at (\xx+4.25,4.05) {$h_{\tt}$};
+  \draw[flow] (\xx+4.25,.35) -- (h\id.south);
+}
+\foreach \yy in {.35,2.5}{
+  \draw[flow] (4.5,\yy) -- (5.1,\yy);
+  \draw[flow] (9.6,\yy) -- (10.2,\yy);
+  \draw[flow] (14.7,\yy) -- (15.2,\yy);
+}
+\end{tikzpicture}%
+}
+\endgroup

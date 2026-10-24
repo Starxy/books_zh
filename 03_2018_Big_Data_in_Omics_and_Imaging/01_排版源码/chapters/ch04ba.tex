@@ -1,0 +1,290 @@
+% 第4章B段：分章页88下部4.6标题起—94至4.6.2标题前，印刷页334—340。
+\section{动态贝叶斯网络与纵向表达数据分析}
+
+动态贝叶斯网络（dynamic Bayesian network）是利用时程数据和纵向表达数据建立基因调控网络的概率框架（Nemati S and Adams 2014）。考虑两类动态贝叶斯网络：平稳动态贝叶斯网络与非平稳动态贝叶斯网络。平稳动态贝叶斯网络假设网络的结构和参数不随时间改变；非平稳动态贝叶斯网络则假设网络结构和参数随时间变化。先研究非平稳动态贝叶斯网络，再研究平稳贝叶斯网络。
+
+一般而言，细胞中的基因调控和信号转导过程，会响应环境刺激与生长而改变，例如免疫应答、发育过程及疾病进展。可以使用非平稳动态贝叶斯网络建立非平稳基因表达数据的模型。考虑 $n$ 个样本，对每个样本，在 $T$ 个时间点观测 $M$ 个基因的表达。令 $y_{ij}^t$ 为第 $i$ 个样本中第 $j$ 个基因在时间点 $t$ 的表达值。另考虑包括基因型在内的 $K$ 个外生变量，令 $x_{ik}$ 为第 $i$ 个样本的第 $k$ 个外生变量。用于建立基因型—表达网络模型的动态贝叶斯网络示意图见图4.26。图中既有从表达基因指向其他表达基因的边，也有从基因型指向表达基因的边。网络中的方向包括两部分：固定时间点 $t$ 内节点之间的有向连接，以及从前一时间点 $t-1$ 的节点指向当前时间点 $t$ 节点的有向连接。
+
+\begin{figure}[htbp]
+\centering
+\resizebox{.98\linewidth}{!}{\input{figures/ch04b_fig26.tex}}
+\origfig{26}{动态贝叶斯网络示意图。}
+\end{figure}
+
+这里将动态结构方程模型与整数规划算法结合，用两步建立动态贝叶斯网络。第一步的动态结构方程模型有两个作用：生成初始动态有向图，以及计算每个节点的评分函数。第二步使用整数线性规划，搜索评分最优的动态贝叶斯网络。
+
+\subsection{结构与参数随时间变化的动态结构方程模型}
+
+用 $M$ 个方程构成动态结构方程模型，将联合的 $M$ 个基因时程表达作为内生变量，将基因型、药物、环境及其他预定变量作为 $K$ 个外生变量，并加入随机误差，以表示它们之间的因果关系：
+\begin{equation}
+\begin{aligned}
+&y_1^t\gamma_{11}^t+\cdots+y_M^t\gamma_{M1}^t
+ +y_1^{t-1}\alpha_{11}^t+\cdots+y_M^{t-1}\alpha_{M1}^t\\
+&\qquad+x_1\beta_{11}^t+\cdots+x_M\beta_{K1}^t+e_1^t=0,\\
+&y_1^t\gamma_{12}^t+\cdots+y_M^t\gamma_{M2}^t
+ +y_1^{t-1}\alpha_{12}^t+\cdots+y_M^{t-1}\alpha_{M2}^t\\
+&\qquad+x_1\beta_{12}^t+\cdots+x_M\beta_{K2}^t+e_2^t=0,\\
+&\hspace{13em}\vdots\\
+&y_1^t\gamma_{1M}^t+\cdots+y_M^t\gamma_{MM}^t
+ +y_1^{t-1}\alpha_{1M}^t+\cdots+y_M^{t-1}\alpha_{MM}^t\\
+&\qquad+x_1\beta_{1M}^t+\cdots+x_M\beta_{KM}^t+e_M^t=0,
+\qquad t=1,2,\ldots,T.
+\end{aligned}\tag{4.172}
+\end{equation}
+采用矩阵记号，动态结构方程模型（4.172）可简洁地写成
+\begin{equation}
+Y^t\Gamma^t+Y^{t-1}A^t+XB^t+E^t=0,\tag{4.173}
+\end{equation}
+其中 $0$ 是 $n\times M$ 零矩阵，
+\begin{equation}
+Y^t=\begin{bmatrix}
+y_{11}^t&y_{12}^t&\cdots&y_{1M}^t\\
+y_{21}^t&y_{22}^t&\cdots&y_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+y_{n1}^t&y_{n2}^t&\cdots&y_{nM}^t
+\end{bmatrix}
+=\begin{bmatrix}y_1^t&y_2^t&\cdots&y_M^t\end{bmatrix}\tag{4.174}
+\end{equation}
+以及
+\begin{equation}
+Y^{t-1}=\begin{bmatrix}
+y_{11}^{t-1}&y_{12}^{t-1}&\cdots&y_{1M}^{t-1}\\
+y_{21}^{t-1}&y_{22}^{t-1}&\cdots&y_{2M}^{t-1}\\
+\vdots&\vdots&\vdots&\vdots\\
+y_{n1}^{t-1}&y_{n2}^{t-1}&\cdots&y_{nM}^{t-1}
+\end{bmatrix}
+=\begin{bmatrix}y_1^{t-1}&y_2^{t-1}&\cdots&y_M^{t-1}\end{bmatrix}\tag{4.175}
+\end{equation}
+分别是 $M$ 个基因、$n$ 个样本在时间点 $t$ 与 $t-1$ 的表达水平观测值所构成的 $n\times M$ 矩阵。矩阵
+\begin{equation}
+X=\begin{bmatrix}
+x_{11}&x_{12}&\cdots&x_{1K}\\
+x_{21}&x_{22}&\cdots&x_{2K}\\
+\vdots&\vdots&\vdots&\vdots\\
+x_{n1}&x_{n2}&\cdots&x_{nK}
+\end{bmatrix}
+=\begin{bmatrix}x_1&x_2&\cdots&x_K\end{bmatrix}\tag{4.176}
+\end{equation}
+包含预定变量，而
+\begin{equation}
+E^t=\begin{bmatrix}
+e_{11}^t&e_{12}^t&\cdots&e_{1M}^t\\
+e_{21}^t&e_{22}^t&\cdots&e_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+e_{n1}^t&e_{n2}^t&\cdots&e_{nM}^t
+\end{bmatrix}
+=\begin{bmatrix}e_1^t&e_2^t&\cdots&e_M^t\end{bmatrix}\tag{4.177}
+\end{equation}
+是时间点 $t$ 的随机变量未观测值矩阵。矩阵
+\begin{equation}
+\Gamma^t=\begin{bmatrix}
+\gamma_{11}^t&\gamma_{12}^t&\cdots&\gamma_{1M}^t\\
+\gamma_{21}^t&\gamma_{22}^t&\cdots&\gamma_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+\gamma_{M1}^t&\gamma_{M2}^t&\cdots&\gamma_{MM}^t
+\end{bmatrix}
+=\begin{bmatrix}\Gamma_1^t&\Gamma_2^t&\cdots&\Gamma_M^t\end{bmatrix}\tag{4.178}
+\end{equation}
+是时间点 $t$ 的 $M\times M$ 基因调控系数矩阵。矩阵
+\begin{equation}
+A^t=\begin{bmatrix}
+\alpha_{11}^t&\alpha_{12}^t&\cdots&\alpha_{1M}^t\\
+\alpha_{21}^t&\alpha_{22}^t&\cdots&\alpha_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+\alpha_{M1}^t&\alpha_{M2}^t&\cdots&\alpha_{MM}^t
+\end{bmatrix}
+=\begin{bmatrix}A_1^t&A_2^t&\cdots&A_M^t\end{bmatrix}\tag{4.179}
+\end{equation}
+是 $M\times M$ 系数矩阵，描述时间点 $t-1$ 的基因表达对时间点 $t$ 基因表达的调控。矩阵
+\begin{equation}
+B^t=\begin{bmatrix}
+\beta_{11}^t&\beta_{12}^t&\cdots&\beta_{1M}^t\\
+\beta_{21}^t&\beta_{22}^t&\cdots&\beta_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+\beta_{K1}^t&\beta_{K2}^t&\cdots&\beta_{KM}^t
+\end{bmatrix}
+=\begin{bmatrix}B_1^t&B_2^t&\cdots&B_M^t\end{bmatrix}\tag{4.180}
+\end{equation}
+是 $K\times M$ 系数矩阵，表示外生变量对时间点 $t$ 基因表达的贡献。
+
+对动态结构方程模型作如下假设。假设随机误差由非平稳过程生成，并满足
+\begin{equation}
+\begin{aligned}
+\E[e_i^t]&=0,\qquad i=1,\ldots,M,\\
+\E[e_i^t(e_j^t)']&=\sigma_{ij}^tI_n,
+\qquad i,j=1,\ldots,M,\quad t=1,\ldots,T,
+\end{aligned}\tag{4.181}
+\end{equation}
+以及
+\begin{equation}
+\E[e_i^{t_1}(e_j^{t_2})']
+ =\sigma_{ij}^{t_1t_2}I_n,\quad
+i,j=1,\ldots,M,\quad t_1,t_2=1,\ldots,T.\tag{4.182}
+\end{equation}
+上述假设可写为矩阵形式：
+\begin{equation}
+\E\left[\vecop(E^{t_1})\bigl(\vecop(E^{t_2})\bigr)'\right]
+=\begin{cases}
+\Sigma_{tt}\otimes I_n&t_1=t_2,\\
+\Sigma_{t_1t_2}\otimes I_n&t_1\ne t_2,
+\end{cases}\tag{4.183}
+\end{equation}
+其中，$\vecop(\cdot)$ 是矩阵的向量化算子，$\otimes$ 表示 Kronecker 积，$I_n$ 是 $n$ 维单位矩阵，并且
+\[
+\Sigma_{tt}=\begin{bmatrix}
+\sigma_{11}^t&\cdots&\sigma_{1M}^t\\
+\vdots&\vdots&\vdots\\
+\sigma_{M1}^t&\cdots&\sigma_{MM}^t
+\end{bmatrix},
+\]
+\begin{equation}
+\Sigma_{t_1t_2}=\begin{bmatrix}
+\sigma_{11}^{t_1t_2}&\cdots&\sigma_{1M}^{t_1t_2}\\
+\vdots&\vdots&\vdots\\
+\sigma_{M1}^{t_1t_2}&\cdots&\sigma_{MM}^{t_1t_2}
+\end{bmatrix}.\tag{4.184}
+\end{equation}
+此外，假设随机误差与外生变量不相关。式（4.171）的第 $i$ 个方程可以写成矩阵形式
+\begin{equation}
+Y^t\Gamma_i^t+Y^{t-1}A_i^t+XB_i^t+E_i^t=0.\tag{4.185}
+\end{equation}
+通常，将某个内生变量单独放在等号左侧。具体而言，第 $i$ 个方程为
+\begin{equation}
+\begin{aligned}
+&y_1^t\gamma_{1i}^t+\cdots+y_M^t\gamma_{Mi}^t
+ +y_1^{t-1}\alpha_{1i}^t+\cdots+y_M^{t-1}\alpha_{Mi}^t\\
+&\qquad+x_1\beta_{1i}^t+\cdots+x_M\beta_{Ki}^t+e_i^t=0.
+\end{aligned}\tag{4.186}
+\end{equation}
+将两边除以 $-\gamma_{ii}^t$，分别用 $\gamma_{ji}^t,\alpha_{li}^t,\beta_{ji}^t$ 代替 $-\gamma_{ji}^t/\gamma_{ii}^t$、$\alpha_{li}^t/\gamma_{ii}^t$ 和 $-\beta_{ji}^t/\gamma_{ii}^t$，得到
+\begin{equation}
+\begin{aligned}
+y_i^t={}&y_1^t\gamma_{1i}^t+\cdots
+ +y_{i-1,i}^t\gamma_{i-1i}^t+y_{i+1i}^t\gamma_{i+1}^t
+ +\cdots+y_M^t\gamma_{Mi}^t\\
+&{}+y_1^{t-1}\alpha_{1i}^t+\cdots+y_M^{t-1}\alpha_{Mi}^t
+ +x_1\beta_{1i}^t+\cdots+x_M\beta_{Ki}^t+e_i^t.
+\end{aligned}\tag{4.187}
+\end{equation}
+令 $(Y_i^t)^*$、$(Y_{li}^{t-1})^*$ 和 $(X_i)^*$ 分别为由第 $i$ 个方程中未出现的时间点 $t$ 和 $t-1$ 的内生变量，以及未出现的外生变量所构成的矩阵。令 $(\gamma_i^t)^*$、$(\alpha_i^t)^*$ 和 $(\beta_i^t)^*$ 为其相应系数。于是，向量 $\Gamma_i^t,A_i^t,B_i^t$ 可以分解为
+\[
+\Gamma_i^t=\begin{bmatrix}-1\\\gamma_i^t\\(\gamma_i^t)^*\end{bmatrix}
+ =\begin{bmatrix}-1\\\gamma_i^t\\0\end{bmatrix},
+\qquad
+A_i^t=\begin{bmatrix}\alpha_i^t\\(\alpha_i^t)^*\end{bmatrix}
+ =\begin{bmatrix}\alpha_i^t\\0\end{bmatrix},
+\]
+\[
+B_i^t=\begin{bmatrix}\beta_i^t\\(\beta_i^t)^*\end{bmatrix}
+ =\begin{bmatrix}\beta_i^t\\0\end{bmatrix}.
+\]
+式（4.187）化为
+\begin{equation}
+\begin{aligned}
+y_i^t={}&Y_i^t\gamma_i^t+(Y_i^t)^*(\gamma_i^t)^*
+ +Y_{li}^{t-1}\alpha_i^t+(Y_{li}^{t-1})^*(\alpha_i^t)^*\\
+&{}+X_i\beta_i^t+X_i^*(\beta_i^t)^*+e_i^t\\
+={}&Y_i^t\gamma_i^t+Y_{li}^{t-1}\alpha_i^t+X_i\beta_i^t+e_i^t\\
+={}&\begin{bmatrix}Y_i^t&Y_{li}^{t-1}&X_i\end{bmatrix}
+ \begin{bmatrix}\gamma_i^t\\\alpha_i^t\\\beta_i^t\end{bmatrix}+e_i^t\\
+={}&Z_i^t\delta_i^t+e_i^t,\qquad t=1,\ldots,T,
+\end{aligned}\tag{4.188}
+\end{equation}
+其中
+\[
+Z_i^t=\begin{bmatrix}Y_i^t&Y_{li}^{t-1}&X_i\end{bmatrix},
+\qquad
+\delta_i^t=\begin{bmatrix}\gamma_i^t\\\alpha_i^t\\\beta_i^t\end{bmatrix}.
+\]
+定义
+\[
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},
+\qquad
+Z_i=\begin{bmatrix}
+Z_i^1&0&\cdots&0\\
+0&Z_i^2&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\
+0&0&\cdots&Z_i^T
+\end{bmatrix},
+\]
+\[
+\delta_i=\begin{bmatrix}\delta_i^1\\\delta_i^2\\\vdots\\\delta_i^T\end{bmatrix},
+\qquad
+e_i=\begin{bmatrix}e_i^1\\e_i^2\\\vdots\\e_i^T\end{bmatrix}.
+\]
+将式（4.188）合并重写为
+\begin{equation}
+y_i=Z_i\delta_i+e_i.\tag{4.189}
+\end{equation}
+由前述假设，有 $\E[e_i]=0$，并且
+\begin{equation}
+V_i=\operatorname{cov}(e_i,e_i)=\Sigma_{ii}\otimes I_n,\tag{4.190}
+\end{equation}
+\[
+\Sigma_{ii}=\begin{bmatrix}
+\sigma_{ii}^{11}&\cdots&\sigma_{ii}^{1T}\\
+\vdots&\vdots&\vdots\\
+\sigma_{ii}^{T1}&\cdots&\sigma_{ii}^{TT}
+\end{bmatrix}.
+\]
+还假设协方差矩阵 $\Sigma_{ii}$ 非奇异。式（4.189）中 $\delta_i$ 的加权最小二乘估计量为
+\begin{equation}
+\widehat\delta_i=(Z_i^TV_i^{-1}Z_i)^{-1}Z_i^TV_i^{-1}y_i.\tag{4.191}
+\end{equation}
+为考察该估计是否无偏，取其期望：
+\begin{equation}
+\begin{aligned}
+\E[\widehat\delta_i]
+ &=\E\left[(Z_i^TV_i^{-1}Z_i)^{-1}Z_i^TV_i^{-1}y_i\right]\\
+ &=\E\left[(Z_i^TV_i^{-1}Z_i)^{-1}Z_i^TV_i^{-1}(Z_i\delta_i+e_i)\right]\\
+ &=\delta_i+\E\left[(Z_i^TV_i^{-1}Z_i)^{-1}Z_i^TV_i^{-1}e_i\right].
+\end{aligned}\tag{4.192}
+\end{equation}
+由于矩阵 $Z_i^t$ 中的 $e_i^t$ 与 $Y_i^t$ 相关，式（4.192）的最后一项不为零。当 $e_i^{t_1}$ 与 $e_i^{t_2}$（$t_1\ne t_2$）相互独立时，式（4.191）化为
+\begin{equation}
+\widehat\delta_i^t=
+ \bigl((Z_i^t)'Z_i^t\bigr)^{-1}(Z_i^t)'y_i^t,
+\qquad t=1,\ldots,T,\tag{4.193}
+\end{equation}
+其中，当 $t=1$ 时，矩阵 $Z_i^t$ 不含涉及 $Y_i^{t-1}$ 的项。式（4.193）表明，若 $e_i^{t_1}$ 与 $e_i^{t_2}$（$t_1\ne t_2$）相互独立，则可以分别估计参数 $\delta_i^t$。
+
+利用式（4.171），并假设矩阵 $\Gamma^t$ 非奇异，可以将时间点 $t$ 的基因表达写成时间点 $t-1$ 的基因表达与外生变量的函数：
+\begin{equation}
+\begin{aligned}
+Y^t&=-Y_l^{t-1}A^t(\Gamma^t)^{-1}
+     -XB^t(\Gamma^t)^{-1}-E^t(\Gamma^t)^{-1}\\
+ &=\begin{bmatrix}Y_l^{t-1}&X\end{bmatrix}
+   \begin{bmatrix}-A^t\\-B^t\end{bmatrix}
+   (\Gamma^t)^{-1}-E^t(\Gamma^t)^{-1}\\
+ &=W^t\Pi^t+\Psi^t,
+\end{aligned}\tag{4.194}
+\end{equation}
+其中
+\begin{equation}
+W^t=\begin{bmatrix}Y_l^{t-1}&X\end{bmatrix},\tag{4.195}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\Pi^t&=-\begin{bmatrix}A^t\\B^t\end{bmatrix}(\Gamma^t)^{-1}\\
+ &=\begin{bmatrix}
+\pi_{11}^t&\pi_{12}^t&\cdots&\pi_{1M}^t\\
+\pi_{21}^t&\pi_{22}^t&\cdots&\pi_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+\pi_{(K+M)1}^t&\pi_{(K+M)2}^t&\cdots&\pi_{(K+M)M}^t
+\end{bmatrix}
+=\begin{bmatrix}\pi_1^t&\pi_2^t&\cdots&\pi_M^t\end{bmatrix},
+\end{aligned}\tag{4.196}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+\Psi^t&=-E^t(\Gamma^t)^{-1}\\
+ &=\begin{bmatrix}
+\psi_{11}^t&\psi_{12}^t&\cdots&\psi_{1M}^t\\
+\psi_{21}^t&\psi_{22}^t&\cdots&\psi_{2M}^t\\
+\vdots&\vdots&\vdots&\vdots\\
+\psi_{n1}^t&\psi_{n2}^t&\cdots&\psi_{nM}^t
+\end{bmatrix}
+=\begin{bmatrix}\psi_1^t&\psi_2^t&\cdots&\psi_M^t\end{bmatrix}.
+\end{aligned}\tag{4.197}
+\end{equation}

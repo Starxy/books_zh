@@ -1,0 +1,32 @@
+\begin{figure}[htbp]
+\centering
+\begingroup
+\definecolor{ch05blue}{rgb}{.18155,.18994,.57328}
+\definecolor{ch05green}{rgb}{.29407,.42391,.35215}
+\definecolor{ch05red}{rgb}{.93042,.11090,.14145}
+\begin{tikzpicture}[x=.43cm,y=.045cm]
+\draw[line width=.4pt] (0,-78) rectangle (27,66);
+\draw[gray,line width=.35pt] (0,0)--(27,0);
+\foreach \v in {-60,-40,-20,0,20,40,60}{
+ \draw (0,\v)--(-.25,\v) node[left,font=\scriptsize]{$\v$};}
+\foreach \i/\name in {1/ba-sc,2/br-c,3/br-w,4/col,5/col.O,6/cr-a,7/cr-g,8/diab,9/he-c,10/he-h,11/he-s,12/hep,13/ion,14/iris,15/kr-kp,16/lab,17/lett,18/mush,19/seg,20/sick,21/son,22/splic,23/vehi,24/vote,25/vow,26/wave}{
+ \draw (\i,-78)--(\i,-81);
+ \node[rotate=90,anchor=east,font=\scriptsize] at (\i,-85){\name};}
+\node[rotate=90,align=center,font=\small,text width=6.5cm] at (-3.25,-5)
+ {使用自训练而非基础分类器时\\误差的相对降幅（\%）};
+\begin{scope}
+\clip (0,-77.852) rectangle (27,65.975);
+\input{data/ch05_fig52_markers}
+\end{scope}
+\filldraw[fill=white,draw=black,line width=.35pt] (17.6,63)--(26.7,63)--(26.7,30)--(17.6,30)--cycle;
+\fill[ch05blue] (18.3,56) circle[x radius=.16,y radius=1.55];
+\node[anchor=west,font=\scriptsize] at (19,56){反因果／存在混杂};
+\node[ch05red,font=\small] at (18.3,46.5){$\ast$};
+\node[anchor=west,font=\scriptsize] at (19,46.5){因果};
+\node[ch05green,font=\small] at (18.3,37){$\times$};
+\node[anchor=west,font=\scriptsize] at (19,37){不明确};
+\end{tikzpicture}
+\endgroup
+\caption{半监督学习的收益取决于因果结构。每一列点对应 UCI 数据仓库中的一个基准数据集，展示六种不同的基础分类器（base classifier）加入自训练（self-training）后的表现。自训练是一种通用的半监督学习方法。表现以误差相对于基础分类器的百分比降幅衡量，即 $(\operatorname{error}(\mathrm{base})-\operatorname{error}(\mathrm{self\text{-}train}))/\operatorname{error}(\mathrm{base})$。总体而言，自训练无助于因果数据集，但对部分反因果或存在混杂的数据集有所帮助［引自 Schölkopf et al., 2012］。}
+\label{fig:ch05-ssl-benchmarks}
+\end{figure}

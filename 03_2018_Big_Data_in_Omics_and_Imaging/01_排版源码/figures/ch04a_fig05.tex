@@ -1,0 +1,27 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+
+\draw[red,very thick] (1.5,5)--(4.5,5);
+\draw[inkblue,very thick] (6,5)--(9,5);
+\draw[orange,very thick] (11.5,5)--(14.5,5);
+\node at (3,4.5) {外显子1};\node at (7.5,4.5) {外显子2};\node at (13,4.5) {外显子3};
+\foreach \x/\y in {1.5/5.15,2/5.35,2.7/5.55,6/5.3,6.7/5.6,7.5/5.9}
+ \draw[green!65!black,thick] (\x,\y)--++(1.5,0);
+\node at (2.1,5.9) {读段1};\node at (3.7,5.9) {读段2};\node at (6.5,6.2) {读段3};
+\draw[magenta,|<->|] (8.25,6)--(9.3,6);\node at (8.78,6.2) {$L$};
+\node[anchor=east] at (1.3,3.4) {转录本1};
+\draw[red,very thick] (1.5,3.4)--(4.5,3.4);\draw[inkblue,very thick] (4.5,3.4)--(7.5,3.4);
+\node[anchor=east] at (1.3,2.6) {转录本2};
+\draw[red,very thick] (1.5,2.6)--(4.5,2.6);\draw[orange,very thick] (4.5,2.6)--(7.5,2.6);
+\node[anchor=east] at (1.3,1.8) {转录本3};
+\draw[inkblue,very thick] (1.5,1.8)--(4.5,1.8);\draw[orange,very thick] (4.5,1.8)--(7.5,1.8);
+\draw[red,very thick] (1.5,.8)--(4.5,.8);
+\draw[inkblue,very thick] (4.5,.8)--(7.5,.8);
+\draw[orange,very thick] (7.5,.8)--(10.5,.8);
+\node[anchor=west] at (10.8,.8) {附加转录本};
+
+\end{tikzpicture}
+\origfig{5}{基因结构及异构体示例。}
+\label{fig:ch04a-05}
+\end{figure}

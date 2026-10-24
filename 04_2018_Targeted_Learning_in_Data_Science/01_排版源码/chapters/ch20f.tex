@@ -1,0 +1,38 @@
+% 原书分章 PDF 第 16—18 页；第 20.6 节。
+\section{极大似然估计、交叉验证与超级学习}
+
+可以用在 $(W_i:i=1,\ldots,N)$ 上放置概率质量 1 的经验分布，估计 $\mathbf W$ 的分布。这一选择也对应于对 $\mathbf W$ 条件化的特定干预平均结局 $E(\bar Y_{\mathbf g^*}\mid\mathbf W)$ 的 TMLE；在后面讨论单时间点数据结构的各节中，将对此作正式说明。如果假设 $(W_i:i=1,\ldots,N)$ 相互独立，则用非参数极大似然估计量（nonparametric maximum likelihood estimator，NPMLE）估计 $\mathbf W$ 的分布，即在统计模型 $\mathcal M$ 允许的所有 $\mathbf W$ 的分布上，最大化对数似然 $\sum_i\log q_{W_i}(W_i)$。特别地，如果已知 $W_i$ 独立同分布，则用在每个 $W_i$，$i=1,\ldots,N$，上放置概率质量 $1/N$ 的经验分布，估计其共同分布。
+
+对于 $(\bar q_{t,0}:t=1,\ldots,\tau)$ 的估计，考虑每个 $\bar q_t$ 的对数似然损失函数：
+\[
+ L_t(\bar q_t)\equiv-\sum_{i=1}^N\log\bar q_t(Y_i(t)\mid C_{Y(t),i}).
+\]
+注意，$E_0L_t(\bar q_t)$ 关于 $\bar q_t$ 在真实的 $\bar q_{t,0}$ 处取得最小值，因为给定 $(\mathbf W,\mathbf A,\bar{\mathbf Y}(t-1))$ 时，$Y_i(t)$ 的真实密度为 $\bar q_{t,0}(\cdot\mid C_{Y(t),i})$，$i=1,\ldots,N$。此外，$\frac1N\sum_{i=1}^N\log\bar q_t(Y_i(t)\mid C_{Y(t),i})$ 很好地近似了期望 $E_0L_t(\bar q_t)$，因为给定 $(\mathbf W,\mathbf A,\bar{\mathbf Y}(t-1))$ 时，这是关于独立随机变量 $Y_i(t)$，$i=1,\ldots,N$，的和。借助后一点，可采用与 van der Laan (2014a) 附录类似的技术，基于 van der Vaart and Wellner (1996) 中的弱收敛理论，证明经验均值过程在 $\bar q_t$ 的大参数空间上一致收敛于真实均值过程。因此，可以为 $\bar q_{0,t}$ 设定一个参数模型，例如 $\{\bar q_{t,\theta}:\theta\}$，并使用标准极大似然估计
+\[
+ \theta_N=\operatorname*{arg\,min}_{\theta}L_t(q_{t,\theta}),
+\]
+就如同观测 $(Y_i(t),C_{Y(t),i})$，$i=1,\ldots,N$，独立同分布，且我们以给定 $C_{Y(t),i}$ 时 $Y_i(t)$ 的共同条件密度为估计目标。更重要的是，可以使用基于损失的交叉验证和超级学习，拟合这个关于 $(y(t),c_{Y(t)})$ 的函数 $\bar q_{t,0}$，从而自适应地估计 $\bar q_t$。
+
+具体而言，考虑一组候选估计器 $\widehat{\bar q}_{t,k}$，它们将数据集 $\{(Y_i(t),C_{Y(t),i}):i\}$ 映射为估计值，$k=1,\ldots,K$。令 $P_N^t$ 表示在每个 $(Y_i(t),C_{Y(t),i})$ 上放置概率质量 $1/N$ 的经验分布。给定随机切分向量 $B_N\in\{0,1\}^N$，分别用 $P_{N,B_N}^{t,1}$ 和 $P_{N,B_N}^{t,0}$ 表示验证样本 $\{i:B_n(i)=1\}$ 与训练样本 $\{i:B_N(i)=0\}$ 的经验分布。将 $k$ 的交叉验证选择器 $k_n$ 定义为
+\[
+\begin{aligned}
+ k_n&=\operatorname*{arg\,min}_kE_{B_N}P_{N,B_N}^{t,1}
+       L_t(\widehat{\bar q}_{t,k}(P_{N,B_N}^{t,0})\\
+ &=\operatorname*{arg\,min}_kE_{B_N}\sum_{i:B_N(i)=1}
+       \log\widehat{\bar q}_{t,k}(P_{N,B_N}^{t,0})(Y_i(t)\mid C_{Y(t),i}).
+\end{aligned}
+\]
+
+如果 $Y_i(t)$ 连续，可以针对 $Y_i(t)$ 的不同水平 $l$，用二元变量 $I(Y_i(t)=l)$ 编码 $Y_i(t)$，并将给定 $Y_i(t)\ge l$ 与 $(\mathbf W,\mathbf A,\bar{\mathbf Y}(t-1))$ 时 $I(Y_i(t)=l)$ 的条件分布／风险函数，建模为 $C_{Y(t),i}$ 与 $l$ 的函数，参见 van der Laan (2010a,b)。可以利用机器学习文献中的二元变量预测估计器，构造这种条件风险函数的候选估计器，并可对水平 $l$ 作平滑；其中包括使用标准逻辑回归软件拟合参数模型。类似地，先将 $Y_i(t)$ 的条件分布分解为一元条件分布，即可将这种方法推广到多元 $Y_i(t)$。这样，就可基于文献中的多种算法，得到 $\bar q_{t,0}$ 的候选估计器。
+
+可以对 $t=1,\ldots,\tau$ 分别拟合每个 $\bar q_{t,0}$，也可以构造跨 $t$ 合并的估计器，并基于以下损失和函数使用交叉验证：
+\[
+ L(\bar q)=\sum_tL_t(\bar q_t).
+\]
+类似地，可以对 $\bar g$ 使用对数似然损失函数
+\[
+ L(\bar g)=-\sum_{i=1}^N\log\bar g(A_i\mid C_{A,i}),
+\]
+并通过基于损失的交叉验证和超级学习拟合 $\bar g$。
+
+给定由此得到的 $q_{\mathbf W,0}$ 的估计量 $q_{\mathbf W,N}$，以及 $\bar q_0=(\bar q_{t,0}:t=1,\ldots,\tau)$ 的估计量 $\bar q_N=(\bar q_t:t=1,\ldots,\tau)$，可利用前面介绍的蒙特卡洛积分程序，计算 $\Psi(q_{\mathbf W,N},\bar q_N)$，作为 $\psi_0=\Psi(q_{\mathbf W,0},\bar q_0)$ 的估计量。由于 $\bar q_N$ 按照拟合 $\bar q_0$ 的偏差与方差权衡进行优化，而非针对 $\psi_0$ 进行优化，即使这一数据自适应代入估计量继承了 $\bar q_N$ 收敛于 $\bar q_0$ 的收敛速度，它对 $\Psi(q_{\mathbf W,0},\bar q_0)$ 而言仍有过大的偏差。也就是说，$\Psi(q_{\mathbf W,N},\bar q_N)$ 通常不会以 $1/\sqrt N$ 的速度收敛于 $\Psi(q_{\mathbf W,0},\bar q_0)$。所得平滑／正则化极大似然代入估计量 $\Psi(q_{\mathbf W,N},\bar q_N)$ 未经靶向处理，对于目标参数 $\Psi(q_{\mathbf W,0},\bar q_0)$ 而言偏差过大。因此，统计目标参数的估计量不会服从渐近正态分布。由此，需要靶向学习，即使拟合针对 $\psi_0$，来替代 MLE。

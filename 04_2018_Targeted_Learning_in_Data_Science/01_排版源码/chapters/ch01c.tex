@@ -1,0 +1,35 @@
+% 原书第 11—14 页；第 1.5—1.6 节。
+\section{靶向学习路线图}
+\label{sec:ch01-roadmap}
+
+本书前四章介绍纵向数据靶向学习的关键基础知识，包括靶向学习路线图，以及预测和因果推断中的估计问题（图 1.1）。这几章围绕数据结构 $O=(L_0,A_0,L_1,A_1,L_2)\sim P_0$、非参数统计模型 $\mathcal M$ 和因果参数 $\Psi^d(P)$，循序渐进地引导读者理解主要概念。本章说明了为什么需要新的方法来处理复杂的纵向数据科学问题，并介绍了数据、模型和目标参数。第 2—4 章将进一步阐释靶向学习路线图。
+
+\begin{description}[leftmargin=0em,labelindent=0em,itemindent=0em,style=nextline,itemsep=.6em]
+ \item[定义模型和目标参数。]
+ 结构因果模型（structural causal model，SCM）是对底层反事实结局数据建立的模型，表示在理想实验中本会生成的数据。它将关于数据生成过程的知识转化为因果假设。SCM 也生成观测数据 $O$，使我们能够确定：为了从观测数据中识别因果效应，还需要哪些额外假设。
+ \item[用于预测的超级学习。]
+ 我们需要能够从复杂数据中学习的灵活估计量，并将介绍适用于纵向结构的集成超级学习。超级学习既可以融入效应估计，也可以作为处理预测问题的独立工具。预先掌握一些交叉验证和机器学习知识将有所帮助，例如第一部《靶向学习》第 3 章介绍的内容。
+ \item[TMLE。]
+ 通过 TMLE，我们能够针对感兴趣的参数，而非整个概率分布 $P_0$，进行最优的偏差—方差权衡，从而将估计靶向于（因果）效应参数。这些估计量具有许多理想的统计性质；在某些情形下，对于一些复杂参数，它们还是唯一可用的估计量。
+\end{description}
+
+这段简短的预告旨在为后续章节提供指引，让读者预先了解我们将走向何处、路线图的各个环节如何衔接，以及为什么按照这样的先后顺序安排内容。
+
+\begin{figure}[p]
+ \centering
+ \input{figures/ch01_roadmap}
+ \caption{靶向学习路线图}
+ \label{fig:ch01-roadmap}
+\end{figure}
+\FloatBarrier
+
+\section{注记与延伸阅读}
+\label{sec:ch01-notes}
+
+本章开篇以 Google Flu Trends 和 Netflix Prize 为例，介绍现实数据科学所面临的挑战。关于 Google Flu Trends 的历史，可参阅《Wired》杂志的文章（Lazer and Kennedy，2015）；Netflix Prize 的背景则见《Forbes》的报道（Holiday，2012）。七年前出版的第一部《靶向学习》提供了这一领域至关重要的基础知识（van der Laan and Rose，2011）。
+
+第 1.1 节讨论了靶向学习方法为现有问题提供新解决方法的诸多领域。各领域的具体参考文献如下：随机对照试验（Rubin and van der Laan，2008；Moore and van der Laan，2009a,b,c；Rosenblum and van der Laan，2009）；由边际结构模型定义的参数（Rosenblum and van der Laan，2010a）；病例对照研究（van der Laan，2008a；Rose and van der Laan，2008，2009，2014a,b）；协同 TMLE（van der Laan and Gruber，2010；Gruber and van der Laan，2010a；Stitelman and van der Laan，2010）；缺失和删失数据（Stitelman and van der Laan，2010；Rose and van der Laan，2011）；效应修饰（Polley and van der Laan，2009；Stitelman and van der Laan，2011）；纵向数据（van der Laan，2010a；van der Laan and Gruber，2012）；网络（van der Laan，2014a）；基于社区的干预（van der Laan，2010c）；比较效果研究（Neugebauer et al.，2014a；Kunz et al.，2017）；生物标志物与基因组学中的变量重要性（Bembom et al.，2009；Wang et al.，2011a,b，2014；Tuglus and van der Laan，2011；Wang and van der Laan，2011）；衰老（Bembom and van der Laan，2007；Rose，2013）；癌症（Polley and van der Laan，2009）；职业暴露（Chambaz et al.，2014）；卫生经济学（Rose，2016；Rose et al.，2017；Shrestha et al.，2018）；以及 HIV（Rosenblum et al.，2009）。Rose et al.（2017）的论文，也是将靶向学习框架应用于算法公平性、问责性和透明度的一个例子。他们表明，即使已有针对既往疾病的保护措施，保险机构仍可能借助药品理赔数据和集成机器学习，识别“无利可图”的参保人，然后针对这些人促使其退保。算法在社会中的应用日益广泛，也带来广泛的风险，例如数据中通常就内含偏差。关于刑事司法改革中算法公平性的简要介绍，可参阅 Lum（2017）。
+
+第 1.3 节概述的计算卫生经济学项目，在其他文献中有详细讨论（Rose，2018）。该节介绍的研究论文包括 Peoples（2014）、Pirracchio et al.（2015）和 Kessler et al.（2014）。面向公共卫生应用读者的另一篇教程，介绍了单时点处理且结局为连续变量时的 TMLE（Schuler and Rose，2017）。对于二值结局，可参阅《靶向学习》（2011）第 4 章。
+
+第 1.2 节讨论了机器学习情境下的推断问题，以及靶向学习如何克服这些不足。这里再补充一些背景，特别说明为什么用自助法对机器学习进行推断时可能失效。非参数自助法利用从经验分布（empirical distribution）中抽样时估计量的抽样分布，来估计原估计量的抽样分布。也就是说，我们用经验分布估计数据分布，并希望经验分布向真实数据分布的收敛，能够转化为估计量抽样分布的收敛。如果估计量的抽样分布仅依赖于数据分布的光滑函数，那么，这种方法应当能够很好地发挥作用；但如果它在本质上依赖于数据分布的密度，就可能失效，因为离散的经验分布对该密度的估计很差。事实上，如果估计量是经验概率分布的一个具有良好可微性（即所谓 Hadamard 可微性或紧可微性）的泛函，那么，非参数自助法就是估计其抽样分布的有效且一致的方法（Gill，1989；van der Vaart and Wellner，1996）。另一方面，依赖平滑、模型选择、交叉验证或其他形式机器学习的估计量，根本不是数据的 Hadamard 可微泛函，因此可以预期，非参数自助法会不一致。

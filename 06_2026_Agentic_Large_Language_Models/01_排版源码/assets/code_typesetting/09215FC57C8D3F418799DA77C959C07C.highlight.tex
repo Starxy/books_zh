@@ -1,0 +1,39 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{transformers}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{AutoTokenizer}\PYG{p}{,} \PYG{n}{AutoModel}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{torch}\PYG{o}{,}\PYG{+w}{ }\PYG{n+nn}{ast}\PYG{o}{,}\PYG{+w}{ }\PYG{n+nn}{inspect}
+
+\PYG{n}{tokenizer} \PYG{o}{=} \PYG{n}{AutoTokenizer}\PYG{o}{.}\PYG{n}{from\PYGZus{}pretrained}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}microsoft/codebert\PYGZhy{}base\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{model} \PYG{o}{=} \PYG{n}{AutoModel}\PYG{o}{.}\PYG{n}{from\PYGZus{}pretrained}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}microsoft/codebert\PYGZhy{}base\PYGZdq{}}\PYG{p}{)}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{encode\PYGZus{}code}\PYG{p}{(}\PYG{n}{code\PYGZus{}str}\PYG{p}{):}
+    \PYG{n}{inputs} \PYG{o}{=} \PYG{n}{tokenizer}\PYG{p}{(}\PYG{n}{code\PYGZus{}str}\PYG{p}{,} \PYG{n}{return\PYGZus{}tensors}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}pt\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+        \PYG{n}{embeddings} \PYG{o}{=} \PYG{n}{model}\PYG{p}{(}\PYG{o}{**}\PYG{n}{inputs}\PYG{p}{)}\PYG{o}{.}\PYG{n}{last\PYGZus{}hidden\PYGZus{}state}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{dim}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{embeddings}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{extract\PYGZus{}functions}\PYG{p}{(}\PYG{n}{module}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Return a list of (name, source, docstring) tuples.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{functions} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{k}{for} \PYG{n}{name}\PYG{p}{,} \PYG{n}{obj} \PYG{o+ow}{in} \PYG{n}{inspect}\PYG{o}{.}\PYG{n}{getmembers}\PYG{p}{(}\PYG{n}{module}\PYG{p}{,} \PYG{n}{inspect}\PYG{o}{.}\PYG{n}{isfunction}\PYG{p}{):}
+        \PYG{n}{source} \PYG{o}{=} \PYG{n}{inspect}\PYG{o}{.}\PYG{n}{getsource}\PYG{p}{(}\PYG{n}{obj}\PYG{p}{)}
+        \PYG{n}{doc} \PYG{o}{=} \PYG{n}{inspect}\PYG{o}{.}\PYG{n}{getdoc}\PYG{p}{(}\PYG{n}{obj}\PYG{p}{)} \PYG{o+ow}{or} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}}
+        \PYG{n}{functions}\PYG{o}{.}\PYG{n}{append}\PYG{p}{((}\PYG{n}{name}\PYG{p}{,} \PYG{n}{source}\PYG{p}{,} \PYG{n}{doc}\PYG{p}{))}
+    \PYG{k}{return} \PYG{n}{functions}
+
+\PYG{c+c1}{\PYGZsh{} Index a module\PYGZsq{}s functions}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{example\PYGZus{}module}  \PYG{c+c1}{\PYGZsh{} your codebase}
+\PYG{n}{functions} \PYG{o}{=} \PYG{n}{extract\PYGZus{}functions}\PYG{p}{(}\PYG{n}{example\PYGZus{}module}\PYG{p}{)}
+\PYG{n}{embeddings} \PYG{o}{=} \PYG{p}{[}\PYG{n}{encode\PYGZus{}code}\PYG{p}{(}\PYG{n}{src}\PYG{p}{)} \PYG{k}{for} \PYG{p}{(}\PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{src}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{)} \PYG{o+ow}{in} \PYG{n}{functions}\PYG{p}{]}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{search\PYGZus{}code}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{k}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{):}
+    \PYG{n}{query\PYGZus{}emb} \PYG{o}{=} \PYG{n}{encode\PYGZus{}code}\PYG{p}{(}\PYG{n}{query}\PYG{p}{)}
+    \PYG{n}{scores} \PYG{o}{=} \PYG{p}{[}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{functional}\PYG{o}{.}\PYG{n}{cosine\PYGZus{}similarity}\PYG{p}{(}\PYG{n}{query\PYGZus{}emb}\PYG{p}{,} \PYG{n}{emb}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{k}{for} \PYG{n}{emb} \PYG{o+ow}{in} \PYG{n}{embeddings}\PYG{p}{]}
+    \PYG{c+c1}{\PYGZsh{} Return the top\PYGZhy{}k functions with highest similarity}
+    \PYG{n}{topk} \PYG{o}{=} \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n+nb}{zip}\PYG{p}{(}\PYG{n}{scores}\PYG{p}{,} \PYG{n}{functions}\PYG{p}{),} \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{reverse}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)[:}\PYG{n}{k}\PYG{p}{]}
+    \PYG{k}{for} \PYG{n}{score}\PYG{p}{,} \PYG{p}{(}\PYG{n}{name}\PYG{p}{,} \PYG{n}{src}\PYG{p}{,} \PYG{n}{doc}\PYG{p}{)} \PYG{o+ow}{in} \PYG{n}{topk}\PYG{p}{:}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{name}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}(score:\PYGZdq{}}\PYG{p}{,} \PYG{n}{score}\PYG{o}{.}\PYG{n}{item}\PYG{p}{(),} \PYG{l+s+s2}{\PYGZdq{})}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{doc}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Example usage: search for a sorting function}
+\PYG{n}{search\PYGZus{}code}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sort a list of numbers\PYGZdq{}}\PYG{p}{)}
+\end{MintedVerbatim}

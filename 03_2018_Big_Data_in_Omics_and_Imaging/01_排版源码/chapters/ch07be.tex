@@ -1,0 +1,120 @@
+% 原章第72页7.3.3标题—第75页7.3.3.3标题前。
+\subsection{加性噪声模型中的混杂因子}
+\subsubsection{模型}
+
+前面各节在没有混杂因子的假设下，考虑加性噪声模型
+\[
+Y=f(X)+N_X\qquad\text{或}\qquad X=g(Y)+N_Y,
+\]
+以推断 $X\to Y$ 还是 $Y\to X$。现在考虑存在混杂因子时的第三类因果模型：$X\leftarrow Z\to Y$。Janzing et al.（2009）提出了以下带混杂因子的加性噪声模型（additive noise models for confounders，ANMC）：
+\begin{equation}
+\begin{aligned}
+X&=f(Z)+N_X,\\
+Y&=g(Z)+N_Y,
+\end{aligned}
+\tag{7.349}
+\end{equation}
+其中，$X,Y,Z$ 是取实数值的随机变量，$f,g$ 为连续可微函数，$N_X,N_Y$ 是实值随机变量，且 $N_X,N_Y,Z$ 相互独立。
+
+现在考虑 ANMC（式 (7.349)）的几个特殊情形。
+
+\noindent\textbf{情形1：}假设 $N_X=0$，且函数 $f$ 可逆。此时有
+\begin{equation}
+Z=f^{-1}(X)=h(x).
+\tag{7.350}
+\end{equation}
+将式 (7.350) 代入式 (7.349) 的第二个方程，得
+\begin{equation}
+\begin{aligned}
+Y&=g(h(X))+N_Y\\
+&=r(X)+N_Y.
+\end{aligned}
+\tag{7.351}
+\end{equation}
+在 ANMC 中，假设 $X$ 和 $Y$ 独立，因此推断 $X\to Y$。
+
+\noindent\textbf{情形2：}假设 $N_Y=0$，且函数 $g$ 可逆。采用类似论证，可以推断 $Y\to X$。
+
+接下来介绍 Janzing et al.（2009）提出的算法，用于使 ANMC 拟合数据并识别混杂因子。ANMC 的数据拟合算法包括两个部分。第一部分假设函数 $f,g$ 已知，寻找共同混杂因子 $T$，使 $N_X$ 与 $N_Y$、$N_X$ 与 $Z$、$N_Y$ 与 $Z$ 尽可能独立。第二部分分别通过 $X$ 对 $Z$、$Y$ 对 $Z$ 的非线性回归，求出函数 $f,g$。
+
+\subsubsection{共同混杂因子的搜索方法}
+
+令 DEP 为相依性度量，$f,g$ 为已知函数。对于共同混杂因子 $\widehat Z$，残差为
+\begin{equation}
+\widehat N_{X,k}=X_k-\widehat f(Z),
+\tag{7.352}
+\end{equation}
+\begin{equation}
+\widehat N_{Y,k}=Y_k-\widehat g(Z).
+\tag{7.353}
+\end{equation}
+寻找共同混杂因子 $\widehat Z$ 的第一部分，可表述为求解以下优化问题：
+\begin{equation}
+\min_Z\quad \operatorname{Dep}(\widehat N_X,\widehat N_Y)
++\operatorname{Dep}(\widehat N_X,Z)+\operatorname{Dep}(\widehat N_Y,Z).
+\tag{7.354}
+\end{equation}
+有多种相依性度量可用于求解问题 (7.354)。与 ANM 类似，可以将 Hilbert–Schmidt 独立性准则（HSIC）作为相依性度量（Janzing et al. 2009），把问题 (7.354) 转化为
+\begin{equation}
+\min_Z\quad \operatorname{HSIC}(\widehat N_X,\widehat N_Y)
++\operatorname{HSIC}(\widehat N_X,\widehat Z)
++\operatorname{HSIC}(\widehat N_Y,\widehat Z).
+\tag{7.355}
+\end{equation}
+可以使用 HSIC 的有偏估计量（详见第5.3.2.3节），计算问题 (7.355) 中的 HSIC。
+
+为 $\widehat N_X,\widehat N_Y,\widehat Z$ 定义高斯径向基函数核：
+\begin{equation}
+K_{\widehat N_X}(\widehat N_{X,k},\widehat N_{X,l})
+=\exp\left(-\frac{\|\widehat N_{X,k}-\widehat N_{X,l}\|_2^2}{2\sigma_{N_X}^2}\right),
+\tag{7.356}
+\end{equation}
+\begin{equation}
+K_{\widehat N_Y}(\widehat N_{Y,k},\widehat N_{Y,l})
+=\exp\left(-\frac{\left|\widehat N_{Y,k}-\widehat N_{Y,l}\right\|_2^2}{2\sigma_{N_Y}^2}\right),
+\tag{7.357}
+\end{equation}
+\begin{equation}
+K_{\widehat Z}(\widehat Z_K,\widehat Z_L)
+=\exp\left(-\frac{\|\widehat Z_k-\widehat Z_l\|_2^2}{2\sigma_Z^2}\right).
+\tag{7.358}
+\end{equation}
+核矩阵为
+\begin{equation}
+K_{\widehat N_X}=\bigl(K_{\widehat N_X}(\widehat N_{X,k},\widehat N_{X,l})\bigr)_{n\times n},
+\tag{7.359}
+\end{equation}
+\begin{equation}
+K_{\widehat N_Y}=\bigl(K_{\widehat N_Y}(\widehat N_{Y,k},\widehat N_{Y,l})\bigr)_{n\times n},
+\tag{7.360}
+\end{equation}
+\begin{equation}
+K_{\widehat Z}=\bigl(K_{\widehat Z}(\widehat Z_K,\widehat Z_l)\bigr)_{n\times n}.
+\tag{7.361}
+\end{equation}
+令 $H=I_n-\frac1n\mathbf1\mathbf1^T$ 为对行或列进行中心化的中心化矩阵，其中 $\mathbf1$ 为全1向量。
+
+定义
+\begin{equation}
+\operatorname{HSIC}(\widehat N_X,\widehat N_Y)
+=\frac1{n^2}\operatorname{tr}(K_{\widehat N_X}HK_{\widehat N_Y}H),
+\tag{7.362}
+\end{equation}
+\begin{equation}
+\operatorname{HSIC}(\widehat N_X,\widehat Z)
+=\frac1{n^2}\operatorname{tr}(K_{\widehat N_X}HK_{\widehat Z}H),
+\tag{7.363}
+\end{equation}
+\begin{equation}
+\operatorname{HSIC}(\widehat N_Y,\widehat Z)
+=\frac1{n^2}\operatorname{tr}(K_{\widehat N_Y}HK_{\widehat Z}H).
+\tag{7.364}
+\end{equation}
+将式 (7.362)—(7.364) 代入式 (7.355)，得到优化问题
+\begin{equation}
+\min_Z\quad \frac1{n^2}\operatorname{tr}\bigl(
+K_{\widehat N_X}HK_{\widehat N_Y}H
++K_{\widehat N_X}HK_{\widehat Z}H
++K_{\widehat N_Y}HK_{\widehat Z}H\bigr).
+\tag{7.365}
+\end{equation}

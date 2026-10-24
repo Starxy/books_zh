@@ -1,0 +1,137 @@
+% 原书分章PDF第7—10页：第15.2节，完整译文。
+\section{g 公式的两种参数化}
+
+如果将所有研究对象视为独立同分布，就可以直接用上述 g 公式 (15.1) 估计 $\psi_0^{\bar a}$。具体而言，利用个体层面的数据估计公式中的每个量，为每名研究对象生成潜在结局的预测值，再在所有研究对象之间取平均，以估计期望。这就是 g 计算（g-computation）方法（Robins，1986）。当时变变量为二元变量时，g 公式可以简化为
+\begin{equation}
+\begin{aligned}
+ \psi_0^{\bar a}={}&\int_{L_0}\sum_{l_1=\{0,1\}}\cdots\sum_{l_{K-1}=\{0,1\}}
+ \EE(Y\mid C_K=0,\bar A_{K-1}=\bar a,\bar L_{K-1}=\bar l_{K-1})\\
+ &\quad\times\Pr(L_{K-1}=l_{K-1}\mid\bar C_{K-1}=0,
+ \bar A_{K-2}=\bar a_{K-2},\bar L_{K-2}=\bar l_{K-2})\\
+ &\quad\times\cdots\Pr(L_1=l_1\mid C_1=0)Q_{0,L_0}(L_0)\,dL_0.
+\end{aligned}
+\tag{15.2}
+\end{equation}
+使用 g 计算进行估计时，必须估计 $Y$ 的条件均值，以及 $L_t=1$（$l=1,\ldots,K$）的条件概率，不过并没有为这些量预先规定某种估计方法。随后，对每名研究对象 $i$，计算式 (15.2) 中每个条件期望和条件概率的预测值。$Q_{0,L_0}$ 可以用经验密度估计，因此，对于基线变量为 $L_{0i}$ 的每名研究对象，有 $Q_{n,L_0}(L_{0i})=1/n$。然后按照式 (15.2) 组合条件期望与条件概率的预测值，并将其中的积分替换为对所有研究对象 $i$ 的求和。
+
+\subsection{PROBIT 的 g 计算}
+
+当目标结局是纵向计数结局时，需要略微修改 g 计算算法。这是因为，给定此前各时点的信息后，结局的一部分是确定性的，而非随机的。具体地，由于 $Y=L_6+\sum_{t=1}^{5}L_t$，给定 $\bar L_5$ 后，只有 $L_6$ 仍是随机的。因此，
+\[
+ \EE(Y\mid\bar C_6=0,\bar A_5=\bar a_5,\bar L_5)
+ =\EE(L_6\mid\bar C_6=0,\bar A_5=\bar a_5,\bar L_5)+\sum_{t=1}^{5}L_t.
+\]
+所以，只需对 $L_6$ 建模，就可以得到 g 计算算法所需的结局条件期望预测值。
+
+需要注意，随着 $L_t$ 维数增加，或者 $L_t$ 包含非分类变量，g 公式 (15.1) 的分解会越来越复杂。此时，估计可能需要抽样方法，计算负担也会随时点数呈指数增长。下一小节将介绍另一种因子分解；其计算时间随时点数线性增长，而且可以处理更高维的 $L_t$，无需增加额外的复杂性。
+
+\subsection{序贯 g 计算}
+
+Bang 和 Robins（2005）提出了反事实数据分布的另一种分解，从而得到另一种 g 公式，本书第3和第4章也对此作了讨论。为理解这种分解，先注意由迭代期望法则，有
+$\EE(Y^{\bar a})=\EE(\EE(Y^{\bar a}\mid\bar L_{K-1}^{\bar a}))$。
+反复应用这一原理，便有
+\[
+ \EE(Y^{\bar a})=
+ \EE\left(\EE\left(\cdots\EE\left(\EE(Y^{\bar a}\mid\bar L_{K-1}^{\bar a})
+ \mid\bar L_{K-2}^{\bar a}\right)\mid\cdots\mid L_0\right)\right).
+\]
+再由 $A_K$ 和 $C_K$ 的序贯可交换性，也可以写为
+\[
+ \EE(Y^{\bar a})=\EE\{\EE(Y^{\bar a}\mid C_K=0,
+ \bar A_{K-1}=\bar a_{K-1},\bar L_{K-1}^{\bar a})\}.
+\]
+根据一致性，当 $C_K=0$ 且 $\bar A_{K-1}=\bar a_{K-1}$ 时，观察到 $Y=Y^{\bar a}$；当 $\bar A_{t-1}=\bar a_{t-1}$ 时，有 $L_t=L_t^{\bar a}$，所以
+\[
+ \EE(Y^{\bar a})=\EE\{\EE(Y\mid C_K=0,
+ \bar A_{K-1}=\bar a_{K-1},\bar L_{K-1})\},
+\]
+这一量可以从数据中估计。如果在嵌套期望的每个时点上都同样应用序贯可交换性和一致性，就可以看到，目标参数能够表示为 van der Laan 和 Gruber（2012）给出的一系列可估计期望：
+\begin{equation}
+ \bar Q_t(\bar L_{t-1})=\EE(Y\mid C_t=0,
+ \bar A_{t-1}=\bar a_{t-1},\bar L_{t-1}),
+ \qquad t=K,\ldots,2,
+ \tag{15.3}
+\end{equation}
+以及 $\bar Q_1(L_0)=\EE(\bar Q_2\mid L_0)$。$\bar Q_t(\bar L_{t-1})$ 上的横线表示均值。下文通常简写为 $\bar Q_t=\bar Q_t(\bar L_{t-1})$。关键的观察是
+\[
+ \bar Q_t=\EE(\bar Q_{t+1}\mid C_t=0,
+ \bar A_{t-1}=\bar a_{t-1},\bar L_{t-1}).
+\]
+这一点也是所有感兴趣读者都应完成的重要练习。如果定义 $\bar Q_K=Y$，并规定始终有 $\bar A_0=\bar a_0=1$，上式就适用于所有 $t=1,\ldots,K$。
+
+g 计算也可以应用于这个 g 公式。算法如下。对 $t=K,\ldots,1$：
+\begin{enumerate}
+\item 将前一步估计的 $\bar Q_{n,t+1}$ 作为回归的结局，拟合
+\[
+ \bar Q_t=\EE(\bar Q_{t+1}\mid C_t=0,
+ \bar A_{t-1}=\bar a_{t-1},\bar L_{t-1})
+\]
+的模型。拟合时可以使用所有未删失（$C_t=0$）、且截至时点 $t-1$ 的处理均符合目标方案（$\bar A_{t-1}=\bar a_{t-1}$）的研究对象。
+\item 利用上述拟合模型，为所有满足 $C_{t-1}=0$ 的研究对象估计 $\bar Q_{n,t}$。
+\end{enumerate}
+在全部研究对象中对 $\bar Q_{n,1}$ 取经验均值，即得到 $\EE(Y^{\bar a})$ 的序贯 g 计算估计。
+
+\subsection{PROBIT 的序贯 g 计算}
+
+序贯 g 计算估计量也可以作修改，以考虑所关注的纵向计数结局，不过修改过程没有那么直接。
+\begin{itemize}
+\item 第一步（$t=6$）估计
+\[
+\begin{aligned}
+ \bar Q_6&=\EE(Y\mid C_6=0,\bar A_5=\bar a_5,\bar L_5)\\
+ &=\EE(L_6\mid C_6=0,\bar A_5=\bar a_5,\bar L_5)+\sum_{t=1}^{5}L_t.
+\end{aligned}
+\]
+因此，只需对随机部分建模；将其定义为
+$\bar Q_{L_6 1}=\EE(L_6\mid C_K=0,\bar A_5=\bar a_5,\bar L_5)$。
+对每名满足 $C_5=0$ 的研究对象，得到 $\bar Q_{L_6 1}$ 的预测值。
+\item 下一步（$t=5$）使用前一步 $\bar Q_{0,L_6 1}$ 的预测值，估计
+\[
+\begin{aligned}
+ \bar Q_5&=\EE(\bar Q_6\mid C_5=0,\bar A_4=\bar a_4,\bar L_4)\\
+ &=\EE(\bar Q_{L_6 1}\mid C_5=0,\bar A_4=\bar a_4,\bar L_4)\\
+ &\quad+\EE(L_5\mid C_5=0,\bar A_4=\bar a_4,\bar L_4)
+ +\sum_{t=1}^{4}L_t.
+\end{aligned}
+\]
+记 $\bar Q_{L_6 2}=\EE(\bar Q_{L_6 1}\mid C_5=0,\bar A_4=\bar a_4,\bar L_4)$，
+$\bar Q_{L_5 1}=\EE(L_5\mid C_5=0,\bar A_4=\bar a_4,\bar L_4)$。
+为每名满足 $C_4=0$ 的研究对象，得到 $\bar Q_{L_6 2}$ 和 $\bar Q_{L_5 1}$ 的预测值。
+\end{itemize}
+
+对 $t=4,3,2,1$ 重复这一过程，每一步均需拟合 $7-t$ 个模型。一般而言，定义 $\bar Q_{L_t 0}=L_t$ 后，对所有 $t=6,\ldots,1$ 及 $k=1,\ldots,t$，估计
+\[
+ \bar Q_{L_t k}=\EE(\bar Q_{L_t k-1}\mid C_{t-k+1}=0,
+ \bar A_{t-k}=\bar a_{t-k},\bar L_{t-k}).
+\]
+对于任意时点数，都可以用归纳法证明这一结果。最后一步，为每名研究对象计算
+$\bar Q_{n,1}=\sum_{t=1}^{6}\bar Q_{n,L_t t}$，
+再在所有研究对象中对这个量取经验均值，即得到 $\EE(Y^{\bar a})$ 的序贯 g 计算估计。表15.3汇总了这一分解。
+
+\begin{table}[htbp]
+\centering
+\caption{对 PROBIT 纵向计数结局进行 g 计算时 $\bar Q_t$ 的分解}
+\label{tab:ch15-decomposition}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{cclc}
+\toprule
+\shortstack{$Y$ 的嵌套\\期望} & &
+\multicolumn{1}{c}{\shortstack{分解（提取确定性计数\\并分别建模）}} & 条件\\
+\midrule
+$\bar Q_6$ & $=$ & $\bar Q_{L_6 1}+L_5+L_4+L_3+L_2+L_1$ & $\mathit{Pa}(Y)$\\
+$\bar Q_5$ & $=$ & $\bar Q_{L_6 2}+\bar Q_{L_5 1}+L_4+L_3+L_2+L_1$ & $\mathit{Pa}(L_5)$\\
+$\bar Q_4$ & $=$ & $\bar Q_{L_6 3}+\bar Q_{L_5 2}+\bar Q_{L_4 1}+L_3+L_2+L_1$ & $\mathit{Pa}(L_4)$\\
+$\bar Q_3$ & $=$ & $\bar Q_{L_6 4}+\bar Q_{L_5 3}+\bar Q_{L_4 2}+\bar Q_{L_3 1}+L_2+L_1$ & $\mathit{Pa}(L_3)$\\
+$\bar Q_2$ & $=$ & $\bar Q_{L_6 5}+\bar Q_{L_5 4}+\bar Q_{L_4 3}+\bar Q_{L_3 2}+\bar Q_{L_2 1}+L_1$ & $\mathit{Pa}(L_2)$\\
+$\bar Q_1$ & $=$ & $\bar Q_{L_6 6}+\bar Q_{L_5 5}+\bar Q_{L_4 4}+\bar Q_{L_3 3}+\bar Q_{L_2 2}+\bar Q_{L_1 1}$ & $\mathit{Pa}(L_1)$\\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+\subsection{g 计算的假设}
+
+除因果假设外，所有版本的 g 计算都要求：给定满足序贯可交换性的协变量集合，能够一致地估计 $Q_0$ 的相关组成部分。如果这些组成部分的估计不一致，就可能使 $\EE(Y^{\bar a})$ 的估计在有限样本和渐近情形下均出现偏差。这些算法并未预先规定用来估计 $Q_0$ 各组成部分的模型，因此不可避免地要由使用者自行决定。
+
+对于纵向计数结局，将各个 $Q_0$ 函数分解为随机部分和确定性部分，可以改进估计。不过，这也会增加计算复杂性：需拟合 $K\times(K+1)/2$ 个模型，而非 $K$ 个模型。Schnitzer 等（2014）的模拟研究比较发现，当模型中纳入所有混杂因素时，标准的序贯 g 计算估计量产生12\%的估计偏差，其95\%置信区间的覆盖率为43\%；对于同一批模拟数据，第15.2.3节介绍的改进序贯 g 计算方法，估计偏差为0\%，覆盖率为93\%。

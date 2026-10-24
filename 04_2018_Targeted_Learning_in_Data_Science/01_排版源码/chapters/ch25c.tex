@@ -1,0 +1,57 @@
+% 原书分章 PDF 第 8 页：第 25.3 节导言与第 25.3.1 节。
+\section{给定 \texorpdfstring{$h$}{h} 的目标参数逼近的 CV-TMLE}
+
+令 $\{P_{\epsilon,h}:\epsilon\}$ 为经过 $P$ 的局部最不利参数子模型，使其得分
+$\left.\frac{d}{d\epsilon}\log(dP_{\epsilon,h}/dP)\right|_{\epsilon=0}$
+的线性张成空间包含 $D_h^*(P)$。令
+$p_{\epsilon,h}=dP_{\epsilon,h}/dP$。
+例如，它可以是一维通用最不利子模型
+\[
+ p_{\epsilon,h}=p\exp\left(\int_0^\epsilon D_h^*(P_e)\,de\right),
+\]
+此时甚至对所有 $\epsilon$ 都有
+$\frac{d}{d\epsilon}\log(dP_{\epsilon,h}/dP)=D_h^*(P_{\epsilon,h})$。
+我们也可以为多元目标参数的靶向更新，选择一维通用最不利子模型
+$\{P_{\epsilon,h}:\epsilon\geq0\}$；更一般地，这可用于求解所需的多元向量方程
+$P_n\bar D_h(P)=0$。该子模型定义为
+\[
+ \frac{dP_{\epsilon,h}}{dP}
+ =\exp\left(
+ \int_0^\epsilon
+ \frac{\{P_n\bar D_h(P_{e,h})\}^{\top}}
+      {\|P_n\bar D_h(P_{e,h})\|}
+ \bar D_h(P_{e,h})\,de\right),
+\]
+其中 $\bar D_h(P)$ 应以 $D_h^*(P)$ 为其中一个分量，
+$\|\cdot\|$ 为标准欧几里得范数（Euclidean norm）。此时有
+$\frac{d}{d\epsilon}P_n\log p_{\epsilon,h}
+=\|P_n\bar D_h(P_{\epsilon,h})\|$。
+
+\subsection{\texorpdfstring{$\Psi_h(P_0)$}{Ψh(P0)} 的 CV-TMLE}
+
+令 $\mathbf P_n=\hat P(P_n)$ 为 $P_0$ 的初始估计量。
+沿用交叉验证的记号，令 $P^1_{n,B_n},P^0_{n,B_n}$ 分别为随机划分
+$B_n\in\{0,1\}^n$ 所确定的验证样本 $\{i:B_n(i)=1\}$ 和训练样本
+$\{i:B_n(i)=0\}$ 的经验概率分布。
+令 $\mathbf P_{n,B_n}=\hat P(P^0_{n,B_n})$ 为将初始估计量应用于训练样本后得到的 $P_0$ 估计。令
+$\{\mathbf P_{n,B_n,\epsilon,h}:\epsilon\}$ 为经过 $\mathbf P_{n,B_n}$ 的最不利子模型。
+令 $\epsilon_n$ 为极大似然估计：
+\[
+ \epsilon_n=\argmax_\epsilon E_{B_n}P^1_{n,B_n}
+ \log\mathbf p_{n,B_n,\epsilon,h}.
+\]
+这为 $B_n$ 的每个可能实现定义了 TMLE 更新
+$\mathbf P^*_{n,B_n,h}=\mathbf P_{n,B_n,\epsilon_n,h}$。
+$\Psi_h(P_0)$ 的 CV-TMLE 定义为
+\[
+ \psi^*_{n,h}\equiv E_{B_n}\Psi_h(\mathbf P^*_{n,B_n,h}).
+\]
+如果选择上面定义的两个通用最不利子模型之一，则有
+\[
+ E_{B_n}P^1_{n,B_n}D_h^*(\mathbf P^*_{n,B_n,h})=0.
+\]
+为分析 CV-TMLE，只需要左端为 $o_P(r_{n,h_n})$，其中速率
+$r_{n,h_n}$ 趋于零的速度，快于采用我们所提议带宽 $h_n$ 时
+$\psi^*_{n,h_n}$ 的收敛速率，从而使它成为二阶项。
+例如，如果采用局部最不利子模型，且初始估计量 $\hat P(P_n)$ 以足够快的速度收敛到 $P_0$，通常就满足这一要求。
+也可以采用局部最不利子模型，反复迭代 TMLE 更新步骤，直到 $r_{n,h}$ 足够小。

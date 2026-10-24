@@ -1,0 +1,74 @@
+% 源分章 PDF 第 11—13 页；第 12.3.2 小节。
+\subsection{样本效应的 TMLE}
+
+对于随机试验，Neyman（1923）提出用未调整估计量估计 SATE：
+\[
+\Psi_{n,\mathrm{unadj}}(P_n)
+=\frac{\sum_{i=1}^n\mathbb I(A_i=1)Y_i}{\sum_{i=1}^n\mathbb I(A_i=1)}
+-\frac{\sum_{i=1}^n\mathbb I(A_i=0)Y_i}{\sum_{i=1}^n\mathbb I(A_i=0)}.
+\]
+给定反事实结局向量 $\mathbf Y_a=\{Y_{a,i}:i=1,\ldots,n,\ a=0,1\}$，均值差估计量无偏，但并非有效估计量。据我们所知，Imbens（2004）最早讨论了样本效应的有效估计量，即影响曲线等于有效影响曲线的正则渐近线性估计量。他证明，给定基线协变量向量 $\mathbf W=(W_1,\ldots,W_n)$ 和反事实结局集合 $\mathbf Y_a$，PATE 的有效估计量对 SATE 无偏。现在，我们将这些结果扩展到 TMLE。具体而言，我们允许结局回归 $\bar Q_0(A,W)$ 的估计量收敛到一个可能误设的极限，纳入对已知倾向评分的估计，并提出另一种方差估计方法。在第 12.4 节中，我们还将这些结果进一步扩展到配对匹配试验。
+
+第 12.3.1 节给出的总体参数 $\Psi^{\mathcal P}(P_0)$ 的 TMLE，也可用作 SATE 的估计量，其实现方式完全相同。在通常的正则条件下，TMLE 减去样本效应，表现为一个依赖于不可识别量的影响曲线的经验均值，加上一个依概率趋于零的二阶项：
+\[
+\Psi_n(P_n)-\mathrm{SATE}
+=\frac1n\sum_{i=1}^nD^{\mathcal S}(U_i,O_i)+o_P(1/\sqrt n),
+\]
+其中
+\[
+D^{\mathcal S}(U_i,O_i)=D^{\mathcal C}(O_i)-D^{\mathcal F}(U_i,O_i),
+\]
+\begin{equation}
+D^{\mathcal C}(O_i)=D_Y(O_i)-\EE_0[D_Y(O_i)\mid\mathbf W],
+\tag{12.2}
+\end{equation}
+\begin{equation}
+D^{\mathcal F}(U_i,O_i)=Y_{1,i}-Y_{0,i}-[\bar Q_0(1,W_i)-\bar Q_0(0,W_i)]
+\tag{12.3}
+\end{equation}
+（参见 Balzer 等，2016c，定理 1）。第一分量 $D^{\mathcal C}$ 是条件参数 $\Psi^{\mathcal C}(P_0)=\frac1n\sum_{i=1}^n[\bar Q_0(1,W_i)-\bar Q_0(0,W_i)]$ 的 TMLE 的影响曲线；在必要的可识别性假设下，该参数对应于条件平均处理效应 CATE（Balzer 等，2015）。这一项依赖于真实结局回归 $\bar Q_0(A,W)$。具体而言，给定基线协变量，$D_Y$ 分量的条件期望，等于真实条件均值之差与所估计条件均值之差的极限之间的偏差：
+\[
+\begin{aligned}
+\EE_0[D_Y(O)\mid\mathbf W]
+={}&[\bar Q_0(1,W)-\bar Q_0(0,W)]\\
+&-[\bar Q_\infty(1,W)-\bar Q_\infty(0,W)].
+\end{aligned}
+\]
+在结局回归被一致估计时，即 $\bar Q_\infty(A,W)=\bar Q_0(A,W)$ 时，该项为零。第二分量 $D^{\mathcal F}$ 是未观测因素 $U=(U_W,U_A,U_Y)$ 和观测数据 $O=(W,A,Y)$ 的函数。这一不可识别项刻画单位特定处理效应与协变量分层内的预期效应之间的偏差：
+\[
+\begin{aligned}
+D^{\mathcal F}(U_i,O_i)
+&=Y_{1,i}-Y_{0,i}-[\bar Q_0(1,W_i)-\bar Q_0(0,W_i)]\\
+&=Y_{1,i}-Y_{0,i}-[\EE(Y_{1,i}\mid W_i)-\EE(Y_{0,i}\mid W_i)]\\
+&=Y_{1,i}-Y_{0,i}-\EE[Y_{1,i}-Y_{0,i}\mid W_i].
+\end{aligned}
+\]
+最后一行中的期望，是对决定反事实结局的未测量因素 $U_Y$ 取的。如果具有相同测量协变量取值的单位之间，处理效应没有变异，这一项就为零。还需注意，协变量分布被视为固定，因此对它的估计不会对影响曲线 $D^{\mathcal S}$ 作出贡献。换言之，影响曲线中没有 $D_W$ 分量。
+
+因此，SATE 的标准化估计量是一致且渐近正态的，其均值为零，方差由下式的极限给出：
+\[
+\begin{aligned}
+\Var[D^{\mathcal S}(U,O)]
+={}&\Var[D^{\mathcal C}(O)]+\Var[D^{\mathcal F}(U,O)]\\
+&-2\Cov[D^{\mathcal C}(O),D^{\mathcal F}(U,O)]\\
+={}&\Var[D^{\mathcal C}(O)]-\Var[D^{\mathcal F}(U,O)]
+\end{aligned}
+\]
+（参见 Balzer 等，2016c，定理 2）。由于不可识别分量 $D^{\mathcal F}$ 的方差必然大于或等于零，TMLE 作为样本效应估计量时的渐近方差，总是小于或等于同一个估计量用于条件效应时的渐近方差。只有在测量协变量的分层内，单位层面的处理效应没有变异，即 $\Var[D^{\mathcal F}(U,O)]=0$ 时，两者才具有相同精度。但在许多情形下，效应存在异质性，SATE 的 TMLE 将更精确。即使处理效应在协变量分层内保持不变，样本效应（或条件效应）的 TMLE 的精度，也总是至少与同一个总体效应 TMLE 一样高。只有在以下条件同时成立时，它们才具有相同的效率界：(1) 结局回归被一致估计；(2) 处理效应在测量协变量的不同分层\emph{之间}没有变异，即 $\Var[D_W(O)]=0$；(3) 处理效应在测量协变量的各分层\emph{内部}没有变异。在许多情形中，存在效应修饰，专注于估计 SATE 将获得最高的精度和功效。
+
+可以用下式保守地近似样本效应 TMLE 的影响曲线：
+\begin{equation}
+\begin{aligned}
+D_n^{\mathcal S}(O_i)=D_{Y,n}(O_i)
+={}&\left(\frac{\mathbb I(A_i=1)}{g_n(1\mid W_i)}
+-\frac{\mathbb I(A_i=0)}{g_n(=0\mid W_i)}\right)\\
+&\qquad\times\{Y_i-\bar Q_n^*(A_i,W_i)\}.
+\end{aligned}
+\tag{12.4}
+\end{equation}
+由此，用加权残差的样本方差除以样本量 $n$，得到一个渐近保守的方差估计量：
+\[
+\sigma_n^{2,\mathcal S}
+=\frac{\frac1n\sum_{i=1}^n[D_n^{\mathcal S}(O_i)]^2}{n}.
+\]
+与 PATE 一样，对具有预测作用的基线协变量进行调整，可以通过降低估计量的变异，显著提高 SATE 的功效。但不同于 PATE，这种调整还可以使 SATE 的方差估计量不那么保守，从而带来额外的功效提升。此外，该方差估计量很容易实现，因为相关组成部分已知或已被估计。因此，相比 Abadie 和 Imbens（2002）提出并由 Imbens（2004）讨论的匹配方差估计量，它可能是一个有吸引力的替代选择。需要注意，自助法在这里并不适当，因为 SATE 随每次抽样而改变。Fisher 的置换分布也不适当，因为它检验的是无处理效应的强原假设 $Y_{1,i}=Y_{0,i},\ \forall i$（Fisher，1935），而我们关注的是平均处理效应为零的弱原假设。

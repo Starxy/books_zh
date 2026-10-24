@@ -1,0 +1,259 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.50cm}
+
+\tikzstyle{snode} = [minimum width=1*\ssep,minimum height=1*\ssep,inner sep=0pt,draw=blue,thick,fill=blue!30];
+\tikzstyle{mnode} = [snode,draw=ugreen,fill=ugreen!30];
+
+%%% sub-figure 1: window-based caching
+\begin{scope}
+
+\node [snode,anchor=east] (k1) at (0,0) {};
+\node [snode,anchor=east] (k2) at ([xshift=-1*\ssep]k1.west) {};
+\node [snode,anchor=east] (k3) at ([xshift=-1*\ssep]k2.west) {};
+\node [snode,anchor=east] (k4) at ([xshift=-1*\ssep]k3.west) {};
+\node [snode,anchor=east] (k5) at ([xshift=-1*\ssep]k4.west) {};
+\node [snode,anchor=east] (k6) at ([xshift=-1*\ssep]k5.west) {};
+\node [snode,anchor=east] (k7) at ([xshift=-1*\ssep]k6.west) {};
+\node [snode,anchor=east] (k8) at ([xshift=-1*\ssep]k7.west) {};
+\node [anchor=east] (kdots) at ([xshift=-1*\ssep]k8.west) {\small{$\cdots$}};
+
+\node [snode,anchor=north] (v1) at ([yshift=-0.1cm]k1.south) {};
+\node [snode,anchor=north] (v2) at ([yshift=-0.1cm]k2.south) {};
+\node [snode,anchor=north] (v3) at ([yshift=-0.1cm]k3.south) {};
+\node [snode,anchor=north] (v4) at ([yshift=-0.1cm]k4.south) {};
+\node [snode,anchor=north] (v5) at ([yshift=-0.1cm]k5.south) {};
+\node [snode,anchor=north] (v6) at ([yshift=-0.1cm]k6.south) {};
+\node [snode,anchor=north] (v7) at ([yshift=-0.1cm]k7.south) {};
+\node [snode,anchor=north] (v8) at ([yshift=-0.1cm]k8.south) {};
+\node [anchor=east] (vdots) at ([xshift=-1*\ssep]v8.west) {\small{$\cdots$}};
+
+\node [anchor=north] (p1) at ([yshift=-0.1cm]v1.south) {\scriptsize{$i$}};
+\node [anchor=north] (p2) at ([yshift=-0.1cm]v2.south) {\scriptsize{$i-1$}};
+\node [anchor=north] (p3) at ([yshift=-0.1cm]v3.south) {\scriptsize{$i-2$}};
+\node [anchor=north] (p4) at ([yshift=-0.1cm]v4.south) {\scriptsize{$i-3$}};
+\node [anchor=north] (p5) at ([yshift=-0.1cm]v5.south) {\scriptsize{$i-4$}};
+\node [anchor=north] (p6) at ([yshift=-0.1cm]v6.south) {\scriptsize{$i-5$}};
+\node [anchor=north] (p7) at ([yshift=-0.1cm]v7.south) {\scriptsize{$i-6$}};
+\node [anchor=north] (p8) at ([yshift=-0.1cm]v8.south) {\scriptsize{$i-7$}};
+
+\node [anchor=west] (keylabel) at ([xshift=0.3cm]k1.east) {\footnotesize{Keys}};
+\node [anchor=west] (valuelabel) at ([xshift=0.3cm]v1.east) {\footnotesize{Values}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm]k4.north west) --  ([yshift=0.1cm]k1.north east);
+
+\node [mnode,anchor=south] (cv1) at ([yshift=0.6cm]k1.north) {};
+\node [mnode,anchor=south] (cv2) at ([yshift=0.6cm]k2.north) {};
+\node [mnode,anchor=south] (cv3) at ([yshift=0.6cm]k3.north) {};
+\node [mnode,anchor=south] (cv4) at ([yshift=0.6cm]k4.north) {};
+
+\node [mnode,anchor=south] (ck1) at ([yshift=0.1cm]cv1.north) {};
+\node [mnode,anchor=south] (ck2) at ([yshift=0.1cm]cv2.north) {};
+\node [mnode,anchor=south] (ck3) at ([yshift=0.1cm]cv3.north) {};
+\node [mnode,anchor=south] (ck4) at ([yshift=0.1cm]cv4.north) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,thick] [fit = (cv1) (ck4)] (membox) {};
+\end{pgfonlayer}
+
+\node [anchor=west] (sizelabel) at ([xshift=0.2cm]membox.east) {\small{$\textrm{Size} = 4 \times 2$}};
+\node [anchor=south west] (memlabel) at ([yshift=-0.1cm]sizelabel.north west) {\small{Memory}};
+
+\node [anchor=north] (caption) at ([yshift=-0.6cm]v4.south east) {\small{(a) Window-based Cache}};
+
+\end{scope}
+
+%%% sub-figure 2: moving average-based caching
+\begin{scope}[yshift=-4.5cm]
+
+\node [snode,anchor=east] (k1) at (0,0) {};
+\node [snode,anchor=east] (k2) at ([xshift=-1*\ssep]k1.west) {};
+\node [snode,anchor=east] (k3) at ([xshift=-1*\ssep]k2.west) {};
+\node [snode,anchor=east] (k4) at ([xshift=-1*\ssep]k3.west) {};
+\node [snode,anchor=east] (k5) at ([xshift=-1*\ssep]k4.west) {};
+\node [snode,anchor=east] (k6) at ([xshift=-1*\ssep]k5.west) {};
+\node [snode,anchor=east] (k7) at ([xshift=-1*\ssep]k6.west) {};
+\node [snode,anchor=east] (k8) at ([xshift=-1*\ssep]k7.west) {};
+\node [anchor=east] (kdots) at ([xshift=-1*\ssep]k8.west) {\small{$\cdots$}};
+
+\node [snode,anchor=north] (v1) at ([yshift=-0.1cm]k1.south) {};
+\node [snode,anchor=north] (v2) at ([yshift=-0.1cm]k2.south) {};
+\node [snode,anchor=north] (v3) at ([yshift=-0.1cm]k3.south) {};
+\node [snode,anchor=north] (v4) at ([yshift=-0.1cm]k4.south) {};
+\node [snode,anchor=north] (v5) at ([yshift=-0.1cm]k5.south) {};
+\node [snode,anchor=north] (v6) at ([yshift=-0.1cm]k6.south) {};
+\node [snode,anchor=north] (v7) at ([yshift=-0.1cm]k7.south) {};
+\node [snode,anchor=north] (v8) at ([yshift=-0.1cm]k8.south) {};
+\node [anchor=east] (vdots) at ([xshift=-1*\ssep]v8.west) {\small{$\cdots$}};
+
+\node [anchor=north] (p1) at ([yshift=-0.1cm]v1.south) {\scriptsize{$i$}};
+\node [anchor=north] (p2) at ([yshift=-0.1cm]v2.south) {\scriptsize{$i-1$}};
+\node [anchor=north] (p3) at ([yshift=-0.1cm]v3.south) {\scriptsize{$i-2$}};
+\node [anchor=north] (p4) at ([yshift=-0.1cm]v4.south) {\scriptsize{$i-3$}};
+\node [anchor=north] (p5) at ([yshift=-0.1cm]v5.south) {\scriptsize{$i-4$}};
+\node [anchor=north] (p6) at ([yshift=-0.1cm]v6.south) {\scriptsize{$i-5$}};
+\node [anchor=north] (p7) at ([yshift=-0.1cm]v7.south) {\scriptsize{$i-6$}};
+\node [anchor=north] (p8) at ([yshift=-0.1cm]v8.south) {\scriptsize{$i-7$}};
+
+\node [anchor=west] (keylabel) at ([xshift=0.3cm]k1.east) {\footnotesize{Keys}};
+\node [anchor=west] (valuelabel) at ([xshift=0.3cm]v1.east) {\footnotesize{Values}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm]k4.north west) --  ([yshift=0.1cm]k1.north east);
+
+\node [mnode,anchor=south] (cv1) at ([yshift=0.6cm,xshift=1*\ssep]k3.north) {};
+
+\node [mnode,anchor=south] (ck1) at ([yshift=0.1cm]cv1.north) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,thick] [fit = (cv1) (ck1)] (membox) {};
+\end{pgfonlayer}
+
+\node [anchor=west] (sizelabel) at ([xshift=0.2cm]membox.east) {\small{$\textrm{Size} = 1 \times 2$}};
+\node [anchor=south west] (memlabel) at ([yshift=-0.1cm]sizelabel.north west) {\small{Memory}};
+
+\node [anchor=east] (keysaverage) at ([xshift=-0.4cm]ck1.west) {\footnotesize{$\frac{\mathbf{k}_{i-3} + \mathbf{k}_{i-2} + \mathbf{k}_{i-1} + \mathbf{k}_{i}}{4}\ \ \ \Rightarrow$}};
+\node [anchor=east] (valuesaverage) at ([xshift=-0.4cm]cv1.west) {\footnotesize{$\frac{\mathbf{v}_{i-3} + \mathbf{v}_{i-2} + \mathbf{v}_{i-1} + \mathbf{v}_{i}}{4}\ \ \ \Rightarrow$}};
+
+\node [anchor=north] (caption) at ([yshift=-0.6cm]v4.south east) {\small{(b) Moving Average-based Cache}};
+
+\end{scope}
+
+%%% sub-figure 3: recurrent networks as caches
+\begin{scope}[yshift=-9cm]
+
+\node [snode,anchor=east,fill=red!20,draw=red] (k1) at (0,0) {};
+\node [snode,anchor=east] (k2) at ([xshift=-1*\ssep]k1.west) {};
+\node [snode,anchor=east] (k3) at ([xshift=-1*\ssep]k2.west) {};
+\node [snode,anchor=east] (k4) at ([xshift=-1*\ssep]k3.west) {};
+\node [snode,anchor=east] (k5) at ([xshift=-1*\ssep]k4.west) {};
+\node [snode,anchor=east] (k6) at ([xshift=-1*\ssep]k5.west) {};
+\node [snode,anchor=east] (k7) at ([xshift=-1*\ssep]k6.west) {};
+\node [snode,anchor=east] (k8) at ([xshift=-1*\ssep]k7.west) {};
+\node [anchor=east] (kdots) at ([xshift=-1*\ssep]k8.west) {\small{$\cdots$}};
+
+\node [snode,anchor=north,fill=red!20,draw=red] (v1) at ([yshift=-0.1cm]k1.south) {};
+\node [snode,anchor=north] (v2) at ([yshift=-0.1cm]k2.south) {};
+\node [snode,anchor=north] (v3) at ([yshift=-0.1cm]k3.south) {};
+\node [snode,anchor=north] (v4) at ([yshift=-0.1cm]k4.south) {};
+\node [snode,anchor=north] (v5) at ([yshift=-0.1cm]k5.south) {};
+\node [snode,anchor=north] (v6) at ([yshift=-0.1cm]k6.south) {};
+\node [snode,anchor=north] (v7) at ([yshift=-0.1cm]k7.south) {};
+\node [snode,anchor=north] (v8) at ([yshift=-0.1cm]k8.south) {};
+\node [anchor=east] (vdots) at ([xshift=-1*\ssep]v8.west) {\small{$\cdots$}};
+
+\node [anchor=north] (p1) at ([yshift=-0.1cm]v1.south) {\scriptsize{$i$}};
+\node [anchor=north] (p2) at ([yshift=-0.1cm]v2.south) {\scriptsize{$i-1$}};
+\node [anchor=north] (p3) at ([yshift=-0.1cm]v3.south) {\scriptsize{$i-2$}};
+\node [anchor=north] (p4) at ([yshift=-0.1cm]v4.south) {\scriptsize{$i-3$}};
+\node [anchor=north] (p5) at ([yshift=-0.1cm]v5.south) {\scriptsize{$i-4$}};
+\node [anchor=north] (p6) at ([yshift=-0.1cm]v6.south) {\scriptsize{$i-5$}};
+\node [anchor=north] (p7) at ([yshift=-0.1cm]v7.south) {\scriptsize{$i-6$}};
+\node [anchor=north] (p8) at ([yshift=-0.1cm]v8.south) {\scriptsize{$i-7$}};
+
+\node [anchor=west] (keylabel) at ([xshift=0.3cm]k1.east) {\footnotesize{Keys}};
+\node [anchor=west] (valuelabel) at ([xshift=0.3cm]v1.east) {\footnotesize{Values}};
+
+\node [mnode,anchor=south] (cv1) at ([yshift=0.6cm]k1.north) {};
+
+\node [mnode,anchor=south] (ck1) at ([yshift=0.1cm]cv1.north) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,thick] [fit = (cv1) (ck1)] (membox) {};
+\node [draw,dotted,thick] [fit = (v1) (k1)] (statebox) {};
+\end{pgfonlayer}
+
+\node [anchor=west] (sizelabel) at ([xshift=0.2cm]membox.east) {\small{$\textrm{Size} = 1 \times 2$}};
+\node [anchor=south west] (memlabel) at ([yshift=-0.1cm]sizelabel.north west) {\small{Memory}};
+
+\node [anchor=east] (eq) at ([xshift=-0.5cm]ck1.west) {\small{$\mathrm{Mem} = \mathrm{Update}($\colorbox{red!20}{$S_{\mathrm{kv}}$}$, \mathrm{Mem}_{\mathrm{pre}})\ \ \ \Rightarrow$}};
+
+\draw [->] ([xshift=-0.0cm,yshift=-0.1em]statebox.north west) .. controls +(west:1cm) and +(south:1cm) .. ([yshift=0.1cm,xshift=0.1cm]eq.south);
+
+\node [anchor=north] (caption) at ([yshift=-0.6cm]v4.south east) {\small{(c) Recurrent Network as Cache}};
+
+\end{scope}
+
+%%% sub-figure 4: hybrid cache
+\begin{scope}[yshift=-14cm]
+
+\node [snode,anchor=east] (k1) at (0,0) {};
+\node [snode,anchor=east] (k2) at ([xshift=-1*\ssep]k1.west) {};
+\node [snode,anchor=east] (k3) at ([xshift=-1*\ssep]k2.west) {};
+\node [snode,anchor=east] (k4) at ([xshift=-1*\ssep]k3.west) {};
+\node [snode,anchor=east] (k5) at ([xshift=-1*\ssep]k4.west) {};
+\node [snode,anchor=east] (k6) at ([xshift=-1*\ssep]k5.west) {};
+\node [snode,anchor=east] (k7) at ([xshift=-1*\ssep]k6.west) {};
+\node [snode,anchor=east] (k8) at ([xshift=-1*\ssep]k7.west) {};
+\node [anchor=east] (kdots) at ([xshift=-1*\ssep]k8.west) {\small{$\cdots$}};
+
+\node [snode,anchor=north] (v1) at ([yshift=-0.1cm]k1.south) {};
+\node [snode,anchor=north] (v2) at ([yshift=-0.1cm]k2.south) {};
+\node [snode,anchor=north] (v3) at ([yshift=-0.1cm]k3.south) {};
+\node [snode,anchor=north] (v4) at ([yshift=-0.1cm]k4.south) {};
+\node [snode,anchor=north] (v5) at ([yshift=-0.1cm]k5.south) {};
+\node [snode,anchor=north] (v6) at ([yshift=-0.1cm]k6.south) {};
+\node [snode,anchor=north] (v7) at ([yshift=-0.1cm]k7.south) {};
+\node [snode,anchor=north] (v8) at ([yshift=-0.1cm]k8.south) {};
+\node [anchor=east] (vdots) at ([xshift=-1*\ssep]v8.west) {\small{$\cdots$}};
+
+\node [anchor=north] (p1) at ([yshift=-0.1cm]v1.south) {\scriptsize{$i$}};
+\node [anchor=north] (p2) at ([yshift=-0.1cm]v2.south) {\scriptsize{$i-1$}};
+\node [anchor=north] (p3) at ([yshift=-0.1cm]v3.south) {\scriptsize{$i-2$}};
+\node [anchor=north] (p4) at ([yshift=-0.1cm]v4.south) {\scriptsize{$i-3$}};
+\node [anchor=north] (p5) at ([yshift=-0.1cm]v5.south) {\scriptsize{$i-4$}};
+\node [anchor=north] (p6) at ([yshift=-0.1cm]v6.south) {\scriptsize{$i-5$}};
+\node [anchor=north] (p7) at ([yshift=-0.1cm]v7.south) {\scriptsize{$i-6$}};
+\node [anchor=north] (p8) at ([yshift=-0.1cm]v8.south) {\scriptsize{$i-7$}};
+
+\node [anchor=west] (keylabel) at ([xshift=0.3cm]k1.east) {\footnotesize{Keys}};
+\node [anchor=west] (valuelabel) at ([xshift=0.3cm]v1.east) {\footnotesize{Values}};
+
+\node [mnode,anchor=south] (cv1) at ([yshift=0.6cm]k1.north) {};
+\node [mnode,anchor=south] (cv2) at ([yshift=0.6cm]k2.north) {};
+\node [mnode,anchor=south] (cv3) at ([yshift=0.6cm]k3.north) {};
+\node [mnode,anchor=south] (cv4) at ([yshift=0.6cm]k4.north) {};
+
+\node [mnode,anchor=south] (ck1) at ([yshift=0.1cm]cv1.north) {};
+\node [mnode,anchor=south] (ck2) at ([yshift=0.1cm]cv2.north) {};
+\node [mnode,anchor=south] (ck3) at ([yshift=0.1cm]cv3.north) {};
+\node [mnode,anchor=south] (ck4) at ([yshift=0.1cm]cv4.north) {};
+
+\begin{pgfonlayer}{background}
+\node [fill=gray!30] [fit = (k1) (v2)] (updatebox) {};
+\node [fill=gray!30] [fit = (ck1) (cv2)] (updateboxinmem) {};
+\node [fill=green!20] [fit = (ck3) (cv4)] (popboxinmem) {};
+\node [draw,dotted,thick] [fit = (cv1) (ck4) (updateboxinmem) (popboxinmem)] (membox) {};
+\end{pgfonlayer}
+
+\draw [->] ([yshift=1pt]updatebox.north) -- ([yshift=-1pt]updateboxinmem.south);
+
+\node [anchor=west] (sizelabel) at ([xshift=0.2cm]membox.east) {\small{$\textrm{Size} = 4 \times 2$}};
+\node [anchor=south west] (memlabel) at ([yshift=-0.1cm]sizelabel.north west) {\small{Memory}};
+
+\node [mnode,anchor=south,draw=orange,fill=orange!20] (ov1) at ([yshift=0.6cm]k6.north) {};
+\node [mnode,anchor=south,draw=orange,fill=orange!20] (ov2) at ([yshift=0.6cm]k7.north) {};
+
+\node [mnode,anchor=south,draw=orange,fill=orange!20] (ok1) at ([yshift=0.1cm]ov1.north) {};
+\node [mnode,anchor=south,draw=orange,fill=orange!20] (ok2) at ([yshift=0.1cm]ov2.north) {};
+
+\begin{pgfonlayer}{background}
+\node [fill=green!20] [fit = (ok1) (ov1)] (popboxincommem) {};
+\node [draw,dotted,thick] [fit = (ov1) (ok2) (popboxincommem)] (commembox) {};
+\end{pgfonlayer}
+
+\draw [->,thick] ([xshift=-1pt,yshift=0.3cm]popboxinmem.west) .. controls +(150:0.3cm) and +(30:0.3cm) .. ([xshift=1pt,yshift=0.3cm]popboxincommem.east);
+
+\node [anchor=east] (comsizelabel) at ([xshift=-0.2cm]commembox.west) {\small{$\textrm{Size} = 2 \times 2$}};
+\node [anchor=south east] (commemlabel) at ([yshift=-0.1cm]comsizelabel.north east) {\small{Memory}};
+\node [anchor=south east] (commemlabel2) at ([yshift=-0.1cm]commemlabel.north east) {\small{Compressed}};
+
+\node [anchor=north] (caption) at ([yshift=-0.6cm]v4.south east) {\small{(d) Hybrid Cache (Compressed Memory + Local Memory)}};
+
+\end{scope}
+	
+\end{tikzpicture}
+\end{center}

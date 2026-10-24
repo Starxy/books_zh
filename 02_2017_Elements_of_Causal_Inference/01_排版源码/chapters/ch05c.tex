@@ -1,0 +1,37 @@
+% 原书第 77—79 页；第 5.2—5.3 节。
+\section{协变量偏移}
+\label{sec:ch05-covariate-shift}
+
+如第 2.1 节所述，$P_{\mathrm{cause}}$ 与 $P_{\mathrm{effect}\mid\mathrm{cause}}$ 之间的独立性，即原理 2.1，可以从两种不同的角度理解。在上面的第 5.1 节中，我们说明，对于固定的联合分布，这两个对象不包含关于彼此的信息，见图 2.2 中间的方框。另一种理解是：假设联合分布 $P_{\mathrm{cause},\mathrm{effect}}$ 在不同数据集之间发生变化，那么 $P_{\mathrm{cause}}$ 的变化，并不会告诉我们 $P_{\mathrm{effect}\mid\mathrm{cause}}$ 如何变化，这对应于图 2.2 左侧的方框。因此，在根据 $X$ 预测 $Y$ 的情景中，知道 $X$ 是原因、$Y$ 是结果，会产生重要影响。
+
+假设我们利用一个数据集中的样本，已经学到了 $X$ 与 $Y$ 之间的统计关系，现在要用这些知识，在第二个数据集中根据 $X$ 预测 $Y$。进一步假设，我们发现第二个数据集中的 $x$ 值服从分布 $P'_X$，与第一个数据集的分布 $P_X$ 不同。应当如何利用这一信息？根据机制独立性，$P'_X$ 不同于 $P_X$，并不能告诉我们，$P_{Y\mid X}$ 在两个数据集之间是否也发生了变化。因此，条件分布 $P_{Y\mid X}$ 仍可能适用于第二个数据集。其次，即使条件分布确实发生了变化，即 $P'_{Y\mid X}\neq P_{Y\mid X}$，继续用 $P_{Y\mid X}$ 预测，仍然是自然的做法。毕竟，机制独立原理指出，边缘分布由 $P_X$ 变成 $P'_X$，并不能告诉我们条件分布是如何变化的。因此，在没有更好选择的情况下，我们仍使用 $P_{Y\mid X}$。尽管 $P_X$ 已发生变化，却继续使用相同的条件分布 $P_{Y\mid X}$，通常称为\textbf{协变量偏移}。目前，机器学习领域已对这一假设作了广泛研究［Sugiyama and Kawanabe, 2012］。Schölkopf et al.［2012］指出，这种做法只有在沿因果方向预测时，即 $X$ 是原因、$Y$ 是结果时，才具有依据。
+
+\Needspace{6\baselineskip}
+为了进一步说明这一点，考虑一个沿反因果方向预测的简化例子，其中 $X$ 是结果。设 $Y$ 是一个二元变量，以加性的方式影响实值变量 $X$：
+\begin{equation}
+ X=Y+N_X,
+ \tag{5.4}
+\end{equation}
+其中，假定 $N_X$ 是独立于 $Y$ 的高斯噪声。图 5.4 左图展示了相应的概率密度 $p_X$。
+
+\input{figures/ch05_figure_5_4}
+
+只要噪声的宽度足够小，分布 $P_X$ 就具有双峰。即使完全不了解生成模型，也可以看出，$P_X$ 是两个宽度相同的高斯分布的混合。因此，在这种情况下，仅凭 $P_X$ 就能够猜测联合分布 $P_{X,Y}$，因为一个自然的假设是：$Y$ 的影响只是平移 $X$ 的均值。在这一假设下，不需要任何 $(x,y)$ 对，就能学到 $X$ 与 $Y$ 的关系。现在假设，在第二个数据集中，我们观测到的仍是这两个高斯分布的混合，但其权重不同，见图 5.4 右图。此时，最自然的结论是：同一个式 (5.4) 仍然成立，只是 $P_Y$ 改变了，因而混合权重发生了变化。相应地，我们就不会再使用相同的 $P_{Y\mid X}$ 进行预测，而会根据 $P'_X$ 重建 $P'_{Y\mid X}$。这个例子说明，在反因果情景中，$P_X$ 与 $P_{Y\mid X}$ 的变化可能相互关联，而这种关联可能源于 $P_Y$ 发生变化、$P_{X\mid Y}$ 保持不变。换言之，正因为 $P_{\mathrm{cause}}$ 与 $P_{\mathrm{effect}\mid\mathrm{cause}}$ 独立变化，$P_{\mathrm{effect}}$ 与 $P_{\mathrm{cause}\mid\mathrm{effect}}$ 往往会以相依的方式变化。
+
+上述例子展示了一种特定情景。要构想一般的方法，利用 $P_{\mathrm{effect}}$ 与 $P_{\mathrm{cause}\mid\mathrm{effect}}$ 相依变化这一事实，仍是一个困难问题。这可能是值得进一步探索的研究方向。我们认为，因果性能够在\textbf{领域适应（domain adaptation）}和迁移问题中发挥重要作用，亦见 Bareinboim and Pearl［2016］、Rojas-Carulla et al.［2016］、Zhang et al.［2013］和 Zhang et al.［2015］。
+
+\input{figures/ch05_figure_5_5}
+\FloatBarrier
+\section{习题}
+\label{sec:ch05-problems}
+
+% 本章没有先行的定理类结果，原书习题从 5.1 开始。
+\setcounter{problem}{0}
+\begin{problem}[机制独立性]
+设 $P_X$ 是由 $k$ 个尖锐高斯峰组成的混合分布，峰的位置为 $s_1,\ldots,s_k$，如图 5.5 左图所示。向 $X$ 加上均值为零、宽度为 $\sigma_N$ 的高斯噪声 $N$，得到 $Y$。噪声的宽度应使各个峰仍然清晰可辨，如图 5.5 右图所示。
+\begin{enumerate}[label=\alph*)]
+ \item 从直观上说明，为什么 $P_{X\mid Y}$ 也包含峰位置 $s_1,\ldots,s_k$ 的信息，因而 $P_{X\mid Y}$ 与 $P_Y$ 共享这些信息。
+ \item $P_X$ 与 $P_Y$ 之间的转换，可以用卷积（从 $P_X$ 到 $P_Y$）和反卷积（deconvolution；从 $P_Y$ 到 $P_X$）描述。如果将 $P_{Y\mid X}$ 视为把输入 $P_X$ 转换为输出 $P_Y$ 的线性映射，那么 $P_{Y\mid X}$ 就是卷积映射。说明为什么 $P_{X\mid Y}$ 并不是人们乍看之下可能以为的反卷积映射。
+\end{enumerate}
+\end{problem}
+\FloatBarrier

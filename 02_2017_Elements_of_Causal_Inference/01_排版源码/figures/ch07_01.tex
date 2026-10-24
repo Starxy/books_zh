@@ -1,0 +1,52 @@
+% 原图7.1：逐节点、逐箭头核对原书第144页后以中文TikZ重排。
+\usetikzlibrary{shapes.symbols}
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,font=\small,
+ chsevenbox/.style={draw,rounded corners=2mm,align=left,inner sep=7pt},
+ chsevenflow/.style={->,semithick}]
+ \node[cloud,draw,cloud puffs=9,cloud puff arc=110,aspect=1.8,
+       fill=gray!12,align=center,inner sep=3pt,minimum width=2.5cm,
+       minimum height=1.2cm] (ch07f1sample) at (1.2,3.7)
+       {来自 $P_{X_1,\ldots,X_4}$ 的\\独立同分布样本};
+ \node[chsevenbox] (ch07f1indep) at (6.25,5.85)
+       {$X_2\indep(X_1,X_3)$\\[3pt]
+        $X_1\indep X_4\mid X_3$\\[3pt]
+        $X_1\indep X_2\mid X_3$\\[3pt]
+        $X_2\indep X_3\mid X_1$\\[2pt]
+        \hspace{1cm}$\cdots$};
+ \node[chsevenbox] (ch07f1scm) at (6.25,1.35)
+       {$X_1:=f_1(N_1)$\\[3pt]
+        $X_2:=f_2(N_2)$\\[3pt]
+        $X_3:=f_3(X_1,N_3)$\\[3pt]
+        $X_4:=f_4(X_2,X_3,N_4)$\\[3pt]
+        $N_1,\ldots,N_4$ 相互独立};
+ \draw[rounded corners=2mm,fill=gray!12]
+       (10.0,2.35) rectangle (13.8,5.05);
+ \node (ch07f1glabel) at (10.65,4.55) {$\mathcal G$};
+ \node[vtx,fill=white] (ch07f1x1) at (11.8,4.55) {$X_1$};
+ \node[vtx,fill=white] (ch07f1x2) at (10.7,3.65) {$X_2$};
+ \node[vtx,fill=white] (ch07f1x3) at (13.0,3.65) {$X_3$};
+ \node[vtx,fill=white] (ch07f1x4) at (11.8,2.85) {$X_4$};
+ \draw[ed] (ch07f1x1)--(ch07f1x3);
+ \draw[ed] (ch07f1x2)--(ch07f1x4);
+ \draw[ed] (ch07f1x3)--(ch07f1x4);
+ \draw[chsevenflow] (ch07f1sample.north)
+       .. controls (1.2,5.9) and (3.1,5.85) .. (ch07f1indep.west);
+ \node[align=center] (ch07f1testlabel) at (3.1,6.3) {独立性检验};
+ \draw[chsevenflow] (ch07f1indep.east)--(13.2,5.85);
+ \node (ch07f1gprime) at (13.65,5.85) {$\mathcal G'$};
+ \draw[chsevenflow] (10.9,5.85)
+       .. controls (11.4,5.85) and (11.8,5.5) .. (11.9,5.15);
+ \node[align=center] (ch07f1assumptions) at (10.55,6.35)
+       {忠实性与\\马尔可夫条件};
+ \draw[chsevenflow] (ch07f1sample.south)
+       .. controls (1.2,1.35) and (3.1,1.35) .. (ch07f1scm.west);
+ \node[align=center] (ch07f1fitlabel) at (2.9,0.9) {拟合受限\\模型类};
+ \draw[chsevenflow] (ch07f1scm.east)
+       .. controls (10.2,1.35) and (11.2,1.45) .. (11.9,2.23);
+ \node (ch07f1readlabel) at (10.15,0.9) {读取图结构};
+\end{tikzpicture}
+\caption{识别因果结构的两种途径。基于独立性的方法（上方）检验数据中的条件独立关系，再通过马尔可夫条件和忠实性将这些性质与图结构联系起来。图往往不能唯一识别，因此，方法可能输出不同的图 $\mathcal G,\mathcal G'$。另一种途径是限制模型类，直接拟合结构因果模型（下方）。}
+\label{fig:ch07-identification}
+\end{figure}

@@ -1,0 +1,61 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.1cm}
+\def\bsep{2.5cm}
+
+\tikzstyle{snode} = [minimum width=0.8cm,minimum height=0.5cm,inner sep=1pt,draw,thin];
+\tikzstyle{rnode} = [minimum width=2cm,minimum height=0.5cm,inner sep=2pt,draw];
+
+% parallel scaling
+\begin{scope}
+
+\node [rnode,anchor=west] (x) at (0,0) {\footnotesize{Problem}};
+
+\node [rnode,anchor=west,draw=blue] (s2) at ([xshift=7.6cm]x.east) {\footnotesize{Solution 2}};
+\node [rnode,anchor=south west,draw=blue] (s1) at ([yshift=0.8cm]s2.north west) {\footnotesize{Solution 1}};
+\node [rnode,anchor=north west,draw=blue] (s3) at ([yshift=-0.8cm]s2.south west) {\footnotesize{Solution 3}};
+
+\node [anchor=north] (xlabel) at (x.south) {\footnotesize{$\mathbf{x}$}};
+\node [anchor=north] (s1label) at (s1.south) {\footnotesize{$\mathbf{y}_1$}};
+\node [anchor=north] (s2label) at (s2.south) {\footnotesize{$\mathbf{y}_2$}};
+\node [anchor=north] (s3label) at (s3.south) {\footnotesize{$\mathbf{y}_3$}};
+
+\draw [->] ([xshift=2pt,yshift=0.1cm]x.east) -- ([xshift=-2pt]s1.west) node [pos=0.5,above,rotate=9] {\scriptsize{Sampling}};
+\draw [->] ([xshift=2pt,yshift=0.0cm]x.east) -- ([xshift=-2pt]s2.west);
+\draw [->] ([xshift=2pt,yshift=-0.1cm]x.east) -- ([xshift=-2pt]s3.west);
+
+\node [anchor=north west] (caption) at ([yshift=-1.7cm,xshift=2.5cm]x.south east) {\small{(a) Parallel Scaling}};
+
+\end{scope}
+
+% sequential scaling
+\begin{scope}[yshift=-4.8cm]
+
+\node [rnode,anchor=west] (x) at (0,0) {\footnotesize{Problem}};
+
+\node [rnode,anchor=west,draw=blue] (s1) at ([xshift=1.2cm]x.east) {\footnotesize{Solution 1}};
+\node [rnode,anchor=west,draw=blue] (s2) at ([xshift=1.2cm]s1.east) {\footnotesize{Solution 2}};
+\node [rnode,anchor=west,draw=blue] (s3) at ([xshift=1.2cm]s2.east) {\footnotesize{Solution 3}};
+
+\node [anchor=north] (xlabel) at (x.south) {\footnotesize{$\mathbf{x}$}};
+\node [anchor=north] (s1label) at (s1.south) {\footnotesize{$\mathbf{y}_1$}};
+\node [anchor=north] (s2label) at (s2.south) {\footnotesize{$\mathbf{y}_2$}};
+\node [anchor=north] (s3label) at (s3.south) {\footnotesize{$\mathbf{y}_3$}};
+
+\draw [->] ([xshift=2pt]x.east) -- ([xshift=-2pt]s1.west);
+\draw [->] ([xshift=2pt]s1.east) -- ([xshift=-2pt]s2.west);
+\draw [->] ([xshift=2pt]s2.east) -- ([xshift=-2pt]s3.west);
+
+\node [anchor=south] (selflabel) at ([xshift=0.6cm,yshift=0.3cm]s1.north east) {\scriptsize{Self-refinement}};
+\draw [->,thin] (selflabel.south) -- ([yshift=-0.3cm]selflabel.south);
+
+\node [anchor=north west] (caption) at ([yshift=-0.8cm,xshift=2.3cm]x.south east) {\small{(b) Sequential Scaling}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

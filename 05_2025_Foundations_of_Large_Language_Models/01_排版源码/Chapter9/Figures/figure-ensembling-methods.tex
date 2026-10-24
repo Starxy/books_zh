@@ -1,0 +1,113 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.50cm}
+
+\tikzstyle{lmnode} = [minimum width=2.5cm,minimum height=0.5cm,inner sep=2pt,draw,thick]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% General model ensembling
+
+\begin{scope}
+
+\node [lmnode,anchor=south west,draw=blue] (llmbase) at (0,0) {\small{LLM2}};
+\node [lmnode,anchor=north west,draw=red] (llm2) at ([yshift=-\ssep]llmbase.south west) {\small{LLM1}};
+\node [lmnode,anchor=south west,draw=ugreen] (llm3) at ([yshift=\ssep]llmbase.north west) {\small{LLM3}};
+
+\node [lmnode,anchor=east] (promptbase) at ([xshift=-2*\ssep]llmbase.west) {\small{提示}};
+
+\node [lmnode,anchor=west,draw=blue] (predictionbase) at ([xshift=2*\ssep]llmbase.east) {\small{预测2}};
+\node [lmnode,anchor=north west,draw=red] (prediction2) at ([yshift=-\ssep]predictionbase.south west) {\small{预测1}};
+\node [lmnode,anchor=south west,draw=ugreen] (prediction3) at ([yshift=\ssep]predictionbase.north west) {\small{预测3}};
+
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([xshift=0.5cm]prediction3.north east) --  ([xshift=0.5cm]prediction2.south east);
+
+\node [anchor=south,fill=gray!30] (combination) at ([xshift=0.5cm,yshift=0.3cm]prediction3.north east) {\small{组合/选择}};
+
+\node [anchor=west] (final) at ([xshift=0.9cm]predictionbase.east) {\small{最终}};
+\node [anchor=north west] (final2) at ([yshift=0.1cm]final.south west) {\small{预测}};
+
+\draw [->,thick] ([xshift=2pt]promptbase.east) -- ([xshift=-2pt]llmbase.west);
+\draw [->,thick] ([xshift=2pt,yshift=-0.2cm]promptbase.east) -- ([xshift=-2pt]llm2.west);
+\draw [->,thick] ([xshift=2pt,yshift=0.2cm]promptbase.east) -- ([xshift=-2pt]llm3.west);
+
+\draw [->,thick] ([xshift=2pt]llmbase.east) -- ([xshift=-2pt]predictionbase.west);
+\draw [->,thick] ([xshift=2pt]llm2.east) -- ([xshift=-2pt]prediction2.west);
+\draw [->,thick] ([xshift=2pt]llm3.east) -- ([xshift=-2pt]prediction3.west);
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm]llmbase.south east) {\small{(a) 模型集成}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Prompt ensembling
+
+\begin{scope}[yshift=-5cm]
+
+\node [lmnode,anchor=south west] (llmbase) at (0,0) {\small{LLM}};
+
+
+\node [lmnode,anchor=east,draw=blue] (promptbase) at ([xshift=-2*\ssep]llmbase.west) {\small{提示2}};
+\node [lmnode,anchor=north west,draw=red] (prompt2) at ([yshift=-\ssep]promptbase.south west) {\small{提示1}};
+\node [lmnode,anchor=south west,draw=ugreen] (prompt3) at ([yshift=\ssep]promptbase.north west) {\small{提示3}};
+
+\node [lmnode,anchor=west,draw=blue] (predictionbase) at ([xshift=2*\ssep]llmbase.east) {\small{预测2}};
+\node [lmnode,anchor=north west,draw=red] (prediction2) at ([yshift=-\ssep]predictionbase.south west) {\small{预测1}};
+\node [lmnode,anchor=south west,draw=ugreen] (prediction3) at ([yshift=\ssep]predictionbase.north west) {\small{预测3}};
+
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([xshift=0.5cm]prediction3.north east) --  ([xshift=0.5cm]prediction2.south east);
+
+\node [anchor=south,fill=gray!30] (combination) at ([xshift=0.5cm,yshift=0.3cm]prediction3.north east) {\small{组合/选择}};
+
+\node [anchor=west] (final) at ([xshift=0.9cm]predictionbase.east) {\small{最终}};
+\node [anchor=north west] (final2) at ([yshift=0.1cm]final.south west) {\small{预测}};
+
+\draw [->,thick] ([xshift=2pt]promptbase.east) -- ([xshift=-2pt]llmbase.west);
+\draw [->,thick] ([xshift=2pt]prompt2.east) -- ([xshift=-2pt,yshift=-0.2cm]llmbase.west);
+\draw [->,thick] ([xshift=2pt]prompt3.east) -- ([xshift=-2pt,yshift=0.2cm]llmbase.west);
+
+\draw [->,thick] ([xshift=2pt]llmbase.east) -- ([xshift=-2pt]predictionbase.west);
+\draw [->,thick] ([xshift=2pt,yshift=-0.2cm]llmbase.east) -- ([xshift=-2pt]prediction2.west);
+\draw [->,thick] ([xshift=2pt,yshift=0.2cm]llmbase.east) -- ([xshift=-2pt]prediction3.west);
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm]llmbase.south east) {\small{(b) 提示集成}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Output ensembling
+
+\begin{scope}[yshift=-10cm]
+
+\node [lmnode,anchor=south west] (llmbase) at (0,0) {\small{LLM}};
+
+
+\node [lmnode,anchor=east] (promptbase) at ([xshift=-2*\ssep]llmbase.west) {\small{提示}};
+
+\node [lmnode,anchor=west,draw=blue] (predictionbase) at ([xshift=2*\ssep]llmbase.east) {\small{预测2}};
+\node [lmnode,anchor=north west,draw=red] (prediction2) at ([yshift=-\ssep]predictionbase.south west) {\small{预测1}};
+\node [lmnode,anchor=south west,draw=ugreen] (prediction3) at ([yshift=\ssep]predictionbase.north west) {\small{预测3}};
+
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([xshift=0.5cm]prediction3.north east) --  ([xshift=0.5cm]prediction2.south east);
+
+\node [anchor=south,fill=gray!30] (combination) at ([xshift=0.5cm,yshift=0.3cm]prediction3.north east) {\small{组合/选择}};
+
+\node [anchor=west] (final) at ([xshift=0.9cm]predictionbase.east) {\small{最终}};
+\node [anchor=north west] (final2) at ([yshift=0.1cm]final.south west) {\small{预测}};
+
+\draw [->,thick] ([xshift=2pt]promptbase.east) -- ([xshift=-2pt]llmbase.west);
+
+\draw [->,thick] ([xshift=2pt]llmbase.east) -- ([xshift=-2pt]predictionbase.west);
+\draw [->,thick] ([xshift=2pt,yshift=-0.2cm]llmbase.east) -- ([xshift=-2pt]prediction2.west);
+\draw [->,thick] ([xshift=2pt,yshift=0.2cm]llmbase.east) -- ([xshift=-2pt]prediction3.west) node [pos=0.5,left,rotate=44,yshift=0.3cm,xshift=0.5cm,inner sep=2pt,fill=gray!30] {\scriptsize{采样}};
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm]llmbase.south east) {\small{(c) 输出集成}};
+
+\end{scope}
+
+
+\end{tikzpicture}
+\end{center}

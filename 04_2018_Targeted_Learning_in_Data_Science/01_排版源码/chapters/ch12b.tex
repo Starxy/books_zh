@@ -1,0 +1,35 @@
+% 源分章 PDF 第 6—8 页；第 12.2 节与第 12.3 节引导。
+\section{可识别性}
+
+为识别上述因果效应，必须将其写成观测数据分布 $P_0$ 的某个函数（Imbens，2004；van der Laan 和 Rose，2011）。在随机化假设和正值性假设下，可以识别协变量各分层内的反事实结局均值（Rosenbaum 和 Rubin，1983b；Robins，1986）：
+\[
+\EE[Y_a\mid W]=\EE[Y_a\mid A=a,W]=\EE_0[Y\mid A=a,W],
+\]
+其中，最右边的表达式已经用观测数据分布 $P_0$ 表示。简言之，第一个等式基于随机化假设成立，该假设指出，给定测量协变量，反事实结局独立于暴露：$A\indep Y_a\mid W$。这等价于无未测量混杂假设（Rosenbaum 和 Rubin，1983b）。正值性假设指出，在协变量所有可能分层内，暴露水平 $a$ 都以正概率出现。在随机试验中，设计本身就保证这两个假设成立。一个众所周知的结果是，PATE 被识别为
+\[
+\begin{aligned}
+\Psi^{\mathcal P}(P_0)
+&=\EE_0\bigl[\EE_0(Y\mid A=1,W)-\EE_0(Y\mid A=0,W)\bigr]\\
+&=\EE_0[\bar Q_0(1,W)-\bar Q_0(0,W)],
+\end{aligned}
+\]
+其中，$\bar Q_0(Y\mid A,W)\equiv\EE_0(Y\mid A,W)$ 表示给定暴露和协变量的条件结局均值。这一统计估计目标也被称为 g 计算可识别性结果（Robins，1986）。在我们的例子中，$\Psi^{\mathcal P}(P_0)$ 是给定处理和测量协变量时的 HIV 累积发生率期望，与给定对照和测量协变量时的 HIV 累积发生率期望之差，再对假想目标总体中的协变量分布取平均，即进行标准化。与因果参数一样，总体存在唯一的真值 $\Psi^{\mathcal P}(P_0)$。在随机试验中，识别并不需要以协变量 $W$ 为条件，但在估计时进行这样的条件化，往往能够提高效率（例如 Fisher，1932；Cochran，1957；Cox 和 McCullagh，1982；Tsiatis 等，2008；Moore 和 van der Laan，2009b；Rosenblum 和 van der Laan，2010b；European Medicines Agency，2015）。
+
+相比之下，SATE 不可识别：在有限样本中，无法严格地将这一因果参数写成观测数据分布 $P_0$ 的函数。（在渐近意义下，SATE 是可识别的，因为经验均值收敛于期望，样本效应由此收敛于总体效应。）具体而言，可以利用结构因果模型（式 (12.1)）将样本效应重写为
+\[
+\begin{aligned}
+\mathrm{SATE}
+&=\frac1n\sum_{i=1}^n[Y_{1,i}-Y_{0,i}]\\
+&=\frac1n\sum_{i=1}^n f_Y(W_i,1,U_{Y_i})-f_Y(W_i,0,U_{Y_i})\\
+&=\frac1n\sum_{i=1}^n\EE[Y_{1,i}-Y_{0,i}\mid W_i,U_{Y_i}].
+\end{aligned}
+\]
+第二个等式来自将反事实定义为对因果模型的干预。最后一个等式是在给定测量基线协变量及未测量因素时的条件平均处理效应（conditional average treatment effect，CATE）。条件效应最早由 Abadie 和 Imbens（2002）提出，是将研究单位的测量协变量视为固定值时，反事实结局期望之差的平均：$\mathrm{CATE}=\frac1n\sum_{i=1}^n\EE[Y_{1,i}-Y_{0,i}\mid W_i]$。SATE 的这一表示表明，若能获取所有影响结局的干预前协变量，即 $\{W,U_Y\}$，就可以应用条件参数的估计和推断结果，详见 Balzer 等（2015）。实际上，我们只测量了这些协变量的一个子集，即 $W$，也只能将这一子集用于估计和推断。因此，SATE 在有限样本中并不具备形式上的可识别性。不过，如下文详述，总体效应的 TMLE 对样本效应仍将是一致且渐近线性的，相应的方差估计量将渐近保守。
+
+\section{估计与推断}
+
+估计总体参数 $\Psi^{\mathcal P}(P_0)$ 已有许多成熟算法。例如，逆概率加权（inverse probability weighting，IPW）、简单代入估计量、增广逆概率加权（augmented inverse probability weighting，A-IPW）和 TMLE（例如 Horvitz 和 Thompson，1952；Rosenbaum 和 Rubin，1983b；Shen 等，2014；Robins，1986；Snowden 等，2011；Robins 等，1994；van der Laan 和 Robins，2003；van der Laan 和 Rubin，2006；van der Laan 和 Rose，2011）。在随机试验中，处理单位的结局均值与对照单位的结局均值之间未经调整的差，便提供了一个简单且无偏的 PATE 估计。但是，调整测量协变量通常能够提高效率和研究功效（例如 Fisher，1932；Cochran，1957；Cox 和 McCullagh，1982；Tsiatis 等，2008；Moore 和 van der Laan，2009b；Rosenblum 和 van der Laan，2010b；Shen 等，2014；European Medicines Agency，2015）。
+
+例如，可以通过以下步骤获得更精确的 PATE 估计量：(1) 将结局 $Y$ 对暴露 $A$ 和协变量 $W$ 回归；(2) 利用估计的系数，得到所有单位在暴露和对照条件下的预测结局；(3) 对预测结局之差取平均。对于一大类一般线性模型，即使结局回归的“工作”模型误设，也不会产生偏差风险（Rosenblum 和 van der Laan，2010b）。在观察性研究中，这一算法称为参数 g 计算（Robins，1986）；在连续结局、采用无交互项线性模型这一特殊情形中，它也称为协方差分析（analysis of covariance，ANCOVA；Cochran，1957）。另一种得到更精确的 $\Psi^{\mathcal P}(P_0)$ 估计量的方法，是估计已知的暴露机制，以捕捉处理组之间协变量分布的偶然不平衡（例如 van der Laan 和 Robins，2003；Moore 和 van der Laan，2009b；Shen 等，2014）。在我们的例子中，被分配至检测并治疗干预的真实条件概率为 $P_0(A=1\mid W)=0.5$。但是，当簇的数量有限时，各处理组的基线协变量很可能存在差异。
+
+我们的讨论着重于 TMLE，它同时纳入结局回归（给定暴露和协变量的条件结局均值）与倾向评分（给定协变量后接受暴露的条件概率；Rosenbaum 和 Rubin，1983b）的估计。一般而言，TMLE 是双重稳健估计量：只要结局回归或倾向评分中任意一个被一致估计，它就具有一致性。如果两个函数均以足够快的速度被一致估计，且倾向评分有充分的变异，估计量还渐近有效，即在一大类正则渐近线性估计量中达到可能的最小方差。TMLE 还是一个代入估计量，在数据稀疏时具有稳定性（Gruber 和 van der Laan，2010b；Balzer 等，2016a）。最后，TMLE 利用先进的机器学习方法，因而避免了其他算法通常作出的参数假设。换言之，TMLE 不对数据结构施加缺乏依据的假设，而是遵守半参数统计模型。

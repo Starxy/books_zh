@@ -1,0 +1,122 @@
+% 原书分章PDF第11—14页：第15.3节，全部算法及展示式。
+\section{饱和边际结构模型的 LTMLE}
+
+尽管序贯 g 计算在计算上高效，也适用于时点和时变混杂因素数量较多的情形，它仍然依赖对大量模型作出正确的参数设定。将其扩展为 LTMLE 后，就可以进行半参数有效估计，使用非参数方法估计所需模型组成部分时也有良好表现（Porter 等，2011），并具有双重稳健性（double robustness）。在纵向情形中，双重稳健性意味着：只要 $\bar Q_t$（$t=K,\ldots,1$）的模型设定正确，或者处理模型（见第15.3.1节）设定正确，就能获得一致性。
+
+\subsection{权重的构造}
+
+令 $\bar g_t(\bar L_{t-1})$（$t=2,\ldots,K$）表示给定观测历史 $\bar L_{t-1}$ 后，截至时点 $t-1$ 具有指定母乳喂养历史 $\bar a$，并且截至时点 $t$ 未删失的概率。具体地，对 $t=2,\ldots,K$，令
+\[
+\begin{aligned}
+ \bar g_t(\bar L_{t-1})={}&\Pr(C_1=0\mid L_0)
+ \times\prod_{k=2}^{t}\bigl\{
+ \Pr(C_k=0\mid\bar A_{k-1}=\bar a_{k-1},C_{k-1}=0,\bar L_{k-1})\\
+ &\hspace{3.1cm}\times\Pr(A_{k-1}=a_{k-1}\mid
+ \bar A_{k-2}=\bar a_{k-2},C_{k-1}=0,\bar L_{k-1})\bigr\}.
+\end{aligned}
+\]
+进一步，令 $\bar g_1(L_0)=\Pr(C_1=0\mid L_0)$，表示给定基线协变量 $L_0$ 后第一个时点未删失的概率。
+
+可以直接把这些暴露和删失概率用作权重，通过逆概率加权（inverse probability weighting，IPW）估计 $\EE(Y^{\bar a})$。以 $\bar g_{n,K}(\bar L_{K-1})$ 表示每个个体的 $\bar g_K(\bar L_{K-1})$ 估计值，$I(\cdot)$ 表示某个逻辑陈述的指示函数，则 IPW 估计量可以定义为估计方程 $P_nD_{\mathrm{IPW}}=0$ 关于 $\psi_{n,\mathrm{IPW}}^{\bar a}$ 的经验解，其中
+\[
+ D_{\mathrm{IPW}}(O)=
+ (Y-\psi_{n,\mathrm{IPW}}^{\bar a})
+ \frac{I(\bar A_{K-1}=\bar a,C_K=0)}{\bar g_{n,K}(\bar L_{K-1})}.
+\]
+
+\subsection{有效影响函数}
+
+van der Laan 和 Gruber（2012）展示了如何将 IPW 影响函数投影到非参数切空间，以得到 LTMLE 使用的有效影响函数（efficient influence function，EIF）$D^*(O)$。EIF 可以写为以下各组成部分之和：
+\[
+ D_t^*(O)=\frac{I(\bar A_{t-1}=\bar a_{t-1},C_t=0)}{\bar g_t(\bar L_{t-1})}
+ \bigl(\bar Q_{t+1}(\bar L_t)-\bar Q_t(\bar L_{t-1})\bigr),
+ \qquad t=K,\ldots,2,
+\]
+\[
+ D_1^*(O)=\frac{I(C_1=0)}{\bar g_1(L_0)}
+ \bigl(\bar Q_2(\bar L_1)-\bar Q_1(L_0)\bigr),
+\]
+以及
+\[
+ D_0^*(O)=\bigl(\bar Q_1(L_0)-\psi_0^{\bar a}\bigr).
+\]
+采用忽略数据聚集结构的 LTMLE 程序，将得到求解有效估计方程 $P_nD_n^*=0$ 的估计值。第15.4节将重新考察 EIF，并说明聚集性如何改变方差估计。
+
+\subsection{LTMLE}
+
+为构造以 $D^*(O)$ 为影响函数的 LTMLE，需要依次更新序贯 g 计算所用的每个 $\bar Q_{n,t}$（$t=K,\ldots,2$）。第4章以及 van der Laan 和 Gruber（2012）更深入地说明了这些更新的推导。按照 Schnitzer 等（2014），给定固定方案 $\bar a$ 后，一般步骤如下。
+\begin{itemize}
+\item 使用删失模型和暴露模型，按第15.3.1节的方法，为每名研究对象计算遵循该方案的概率 $\bar g_{n,t}(\bar L_{t-1})$。
+\item 设 $\bar Q_{n,7}=Y$。如果 $Y$ 不是二元变量，应根据其真实上下界，将其重新缩放到 $[0,1]$（Gruber 和 van der Laan，2010b）。
+\end{itemize}
+随后，对 $t=6,\ldots,1$：
+\begin{itemize}[label=--]
+\item 拟合 $\EE(\bar Q_{n,t+1}\mid C_t=0,\bar A_{t-1}=\bar a_{t-1},\bar L_{t-1})$ 的模型。利用此模型，为所有满足 $C_{t-1}=0$ 的研究对象预测条件结局，将所得向量记为 $\bar Q_{n,t}$。
+\item 构造协变量
+\[
+ H_t(C_t,\bar A_{t-1},\bar L_{t-1})=
+ \frac{I(C_t=0,\bar A_{t-1}=\bar a_{t-1})}{\bar g_{n,t}(\bar L_{t-1})}.
+\]
+\item 进行无截距的逻辑回归来更新期望：以 $\bar Q_{n,t+1}$ 为结局，将拟合值 $\logit(\bar Q_{n,t})$ 作为偏移项（offset），以 $H_t$ 为唯一协变量。以 $\hat\epsilon_t$ 表示 $H_t$ 的估计系数。
+\item 通过设置
+\[
+ \bar Q_{n,t}^{1}(O)=\expit\left\{\logit(\bar Q_{n,t})+
+ \frac{\hat\epsilon_t}{\bar g_{n,t}(\bar L_{t-1})}\right\},
+\]
+更新 $\bar Q_t$ 的拟合，从而为所有满足 $C_{t-1}=0$ 的研究对象获得 $\bar Q_{n,t}^{1}$ 的预测值。
+
+由于更新时对结局 $\bar Q_{n,t+1}^{1}$ 使用以 $H_t$ 为协变量的逻辑回归，这一步使 $P_nD_{n,t}^*=0$，其中
+\[
+ D_{n,t}^*(O)=\frac{I(\bar A_{t-1}=\bar a_{t-1},C_t=0)}{\bar g_{n,t}(\bar L_{t-1})}
+ \bigl(\bar Q_{n,t+1}^{1}(O)-\bar Q_{n,t}^{1}(O)\bigr),
+\]
+它对应于 EIF 的组成部分 $D_t^*(O)$。
+
+在最后一步，注意 $\bar Q_1$ 的模型只用 $C_1=0$ 的研究对象拟合。所得拟合 $\bar Q_{n,1}$ 仅以 $L_0$ 为条件，并为全部研究对象进行估计。
+\end{itemize}
+\begin{itemize}
+\item 在所有研究对象中对 $\bar Q_{n,1}^{1}$ 取均值；如果有必要，再将均值变换回原来的尺度。这就是估计 $\psi_0^{\bar a}$ 的 LTMLE。
+\end{itemize}
+总的来说，这一算法有效地求解了估计方程 $P_nD_n^*=0$，其中 $D_n^*(O)$ 是将估计的处理概率 $\bar g_{n,t}(\bar L_{t-1})$ 和更新后的结局期望 $\bar Q_{n,t}^{1}(O)$ 代入 EIF 所得的函数。
+
+\subsection{PROBIT 的 LTMLE}
+
+通过重新参数化序贯 g 公式，也可以将纵向计数结局的特点纳入 LTMLE 程序。在估计 $\bar Q_6$ 的第一步（$t=6$），注意
+\[
+\begin{aligned}
+ Y-\bar Q_6={}&\left(Y-\sum_{r\leq6}L_r\right)
+ -\EE\left(Y-\sum_{r\leq6}L_r\mid C_6=0,\bar A_5=\bar a_5,\bar L_5\right)\\
+ ={}&L_6-\EE(L_6\mid C_6=0,\bar A_5=\bar a_5,\bar L_5).
+\end{aligned}
+\]
+给定 $\EE(L_6\mid C_6=0,\bar A_5=\bar a_5,\bar L_5)$ 的初始拟合后，以 $L_6$ 为结局，使用协变量 $H_6$ 更新这一拟合。与前一算法相同，这会使 $P_nD_{n,6}^*=0$，其中
+\[
+ D_{n,6}^*(O)=\frac{I(\bar A_5=\bar a_5,C_6=0)}{\bar g_{n,6}(\bar L_5)}
+ \bigl(Y-\bar Q_{n,6}^{1}(O)\bigr).
+\]
+对 $t=5,\ldots,2$，定义
+\[
+ \tilde Q_t=\EE\left(Y-\sum_{r\leq t-1}L_r\mid
+ C_{t-1}=0,\bar A_{t-2}=\bar a_{t-2},\bar L_{t-2}\right).
+\]
+对 $t=1$，定义 $\tilde Q_1=\bar Q_1=\EE(Y\mid L_0)$。如果取 $\tilde Q_6=Y-L_6$，则对所有 $t=6,\ldots,1$，均有
+$\bar Q_{t+1}-\bar Q_t=\tilde Q_{t+1}-\tilde Q_t$。
+因此，如果已有 $\tilde Q_t$ 的初始拟合，就可以使用协变量 $H_t$ 对它进行更新；所用结局是上一次 LTMLE 迭代得到的 $\tilde Q_{t+1}$ 拟合。此程序将求解经验 EIF 方程 $P_nD_{n,t}^*=0$。
+
+完整算法如下。
+\begin{itemize}
+\item 对 $t=6$，拟合 $\tilde Q_6=\EE(L_6\mid C_6=0,\bar A_5=\bar a_5,\bar L_5)$ 的模型。为所有满足 $C_5=0$ 的研究对象生成预测值，将这些拟合记为 $\tilde Q_{n,6}$。
+\item 以 $L_6$ 为结局，使用协变量为 $H_6$ 的逻辑回归更新 $\tilde Q_{n,6}$。将更新后的拟合记为 $\tilde Q_{n,6}^{1}$。
+\end{itemize}
+对 $t=5,\ldots,1$：
+\begin{itemize}[label=--]
+\item 以上一步的 $\tilde Q_{n,t+1}^{1}$ 为结局，拟合
+$\EE(\tilde Q_{t+1}\mid C_t=0,\bar A_{t-1}=\bar a_{t-1},\bar L_{t-1})$
+的模型，并为所有满足 $C_{t-1}=0$ 的研究对象进行预测。再拟合第二个模型
+$\EE(L_t\mid C_t=0,\bar A_{t-1}=\bar a_{t-1},\bar L_{t-1})$，
+同样为所有满足 $C_{t-1}=0$ 的研究对象进行预测。这两个预测值之和记为 $\tilde Q_{n,t}$。
+\item 将 $\tilde Q_{n,t}$ 除以最大可能值 $7-t$，缩放到 $(0,1)$。使用以 $H_t$ 为协变量的逻辑回归更新 $\tilde Q_{n,t}$。为所有满足 $C_{t-1}=0$ 的研究对象生成更新拟合的预测值，再乘以 $7-t$ 恢复原来的尺度，记为 $\tilde Q_{n,t}^{1}$。
+\end{itemize}
+\begin{itemize}
+\item 最后一步为所有研究对象得到 $\tilde Q_{n,1}^{1}$ 的估计。其均值就是使用修改后的序贯分解来估计 $\psi_0^{\bar a}$ 的 LTMLE。
+\end{itemize}

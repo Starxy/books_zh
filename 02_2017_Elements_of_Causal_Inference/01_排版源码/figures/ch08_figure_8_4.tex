@@ -1,0 +1,23 @@
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.8cm,y=1.3cm]
+ \foreach \j in {1,2,3,4}{
+  \node[vtx] (ch08f84S\j) at (\j,1.7) {$S_{\j}$};
+  \node[vtx] (ch08f84F\j) at (\j,.5) {$F_{\j}$};
+  \node[vtx] (ch08f84R\j) at (\j,-.7) {$R_{\j}$};
+  \draw[ed] (ch08f84S\j)--(ch08f84F\j);
+  \draw[ed] (ch08f84F\j)--(ch08f84R\j);
+ }
+ \foreach \j in {1,2,3}{\pgfmathtruncatemacro{\next}{\j+1}
+  \node[vtx] (ch08f84A\j) at (\next,3) {$A_{\j}$};
+  \draw[ed] (ch08f84S\j)--(ch08f84S\next);
+  \draw[ed] (ch08f84A\j)--(ch08f84S\next);
+  \draw[ed,color=red,line width=1.1pt] (ch08f84F\j)--(ch08f84A\j);
+  \draw[ed,color=red,line width=1.1pt,dashed] (ch08f84S\j)--(ch08f84A\j);
+ }
+ \node[vtx] (ch08f84Y) at (4,-1.9) {$Y$};
+ \foreach \j in {1,2,3,4}{\draw[ed] (ch08f84R\j)--(ch08f84Y);}
+\end{tikzpicture}
+\caption{存在变量 $F_1,\ldots,F_4$，包含状态 $S_1,\ldots,S_4$ 中全部相关信息，其含义是式 (8.5) 和 (8.6) 成立；其中，式 (8.6) 未在图中表示。因此，只需让动作 $A_j$ 依赖 $F_{j-1}$（红色实线），而非 $S_{j-1}$（红色虚线）。在二十一点的例子中，$S_j$ 编码庄家与玩家手中纸牌的全部信息，包括花色；$F_j$ 编码相同信息，但不包含花色，因为花色不影响输赢。由于 $F_j$ 的可能取值比 $S_j$ 少，最优策略更容易学得。}
+\label{fig:ch08-state-simplification}
+\end{figure}

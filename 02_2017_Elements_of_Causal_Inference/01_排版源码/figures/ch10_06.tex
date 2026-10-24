@@ -1,0 +1,48 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.45cm,y=1.6cm]
+\node[ch10node] (ch10f6-X-0) at (0,1) {$X_{t-6}$};
+\node[ch10node] (ch10f6-X-1) at (1,1) {$X_{t-5}$};
+\node[ch10node] (ch10f6-X-2) at (2,1) {$X_{t-4}$};
+\node[ch10node] (ch10f6-X-3) at (3,1) {$X_{t-3}$};
+\node[ch10node] (ch10f6-X-4) at (4,1) {$X_{t-2}$};
+\node[ch10node] (ch10f6-X-5) at (5,1) {$X_{t-1}$};
+\node[ch10node] (ch10f6-X-6) at (6,1) {$X_{t}$};
+\draw[ed] (ch10f6-X-0)--(ch10f6-X-1);
+\draw[ed] (ch10f6-X-1)--(ch10f6-X-2);
+\draw[ed] (ch10f6-X-2)--(ch10f6-X-3);
+\draw[ed] (ch10f6-X-3)--(ch10f6-X-4);
+\draw[ed] (ch10f6-X-4)--(ch10f6-X-5);
+\draw[ed] (ch10f6-X-5)--(ch10f6-X-6);
+\node[ch10node] (ch10f6-Y-0) at (0,0) {$Y_{t-6}$};
+\node[ch10node] (ch10f6-Y-1) at (1,0) {$Y_{t-5}$};
+\node[ch10node] (ch10f6-Y-2) at (2,0) {$Y_{t-4}$};
+\node[ch10node] (ch10f6-Y-3) at (3,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f6-Y-4) at (4,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f6-Y-5) at (5,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f6-Y-6) at (6,0) {$Y_{t}$};
+\draw[ed] (ch10f6-Y-0)--(ch10f6-Y-1);
+\draw[ed] (ch10f6-Y-1)--(ch10f6-Y-2);
+\draw[ed] (ch10f6-Y-2)--(ch10f6-Y-3);
+\draw[ed] (ch10f6-Y-3)--(ch10f6-Y-4);
+\draw[ed] (ch10f6-Y-4)--(ch10f6-Y-5);
+\draw[ed] (ch10f6-Y-5)--(ch10f6-Y-6);
+\draw[ed] (ch10f6-X-0)--(ch10f6-Y-1);
+\draw[ed] (ch10f6-X-1)--(ch10f6-Y-2);
+\draw[ed] (ch10f6-X-2)--(ch10f6-Y-3);
+\draw[ed] (ch10f6-X-3)--(ch10f6-Y-4);
+\draw[ed] (ch10f6-X-4)--(ch10f6-Y-5);
+\draw[ed] (ch10f6-X-5)--(ch10f6-Y-6);
+\draw[ed] (ch10f6-X-0)--(ch10f6-Y-2);
+\draw[ed] (ch10f6-X-1)--(ch10f6-Y-3);
+\draw[ed] (ch10f6-X-2)--(ch10f6-Y-4);
+\draw[ed] (ch10f6-X-3)--(ch10f6-Y-5);
+\draw[ed] (ch10f6-X-4)--(ch10f6-Y-6);
+\draw[ed] (ch10f6-Y-0)--(ch10f6-X-2);
+\draw[ed] (ch10f6-Y-1)--(ch10f6-X-3);
+\draw[ed] (ch10f6-Y-2)--(ch10f6-X-4);
+\draw[ed] (ch10f6-Y-3)--(ch10f6-X-5);
+\draw[ed] (ch10f6-Y-4)--(ch10f6-X-6);
+\end{tikzpicture}
+\caption{Granger因果性能够奏效的典型情形：如果删除所有从$X$到$Y$的箭头，给定$Y$自身过去后，$Y_t$将与$X$的过去条件独立。这里，给定自身过去后，$Y_t$仍依赖$X$的过去。因此，条件(10.4)证明了从$X$到$Y$的影响存在。}
+\end{figure}

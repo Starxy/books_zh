@@ -1,0 +1,889 @@
+{
+  "chapter": 2,
+  "status": "complete",
+  "title_en": "Defining the Model and Parameter",
+  "title_zh": "定义模型与参数",
+  "authors": [
+    "Sherri Rose",
+    "Mark J. van der Laan"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/03_CH02_Defining_the_Model_and_Parameter.pdf",
+    "split_pdf_pages": 11,
+    "chapter_split_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "chapter_printed_pages": "15–25",
+    "source_rendered_and_visually_checked_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "annotations_removed_in_memory_before_rendering": true,
+    "english_words_approx": 4158
+  },
+  "pages": 9,
+  "han_characters_pdf_including_running_heads": 5123,
+  "han_characters_tex_without_comment_lines": 5046,
+  "page_count_note": "按统一 A4 体例完整重排；不以原书与译稿页数比增删内容。",
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch02.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch02a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch02b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch02c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch02d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch02_causal_21.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch02_causal_22.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch02_causal_23.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第02章_中文译稿.pdf",
+  "sha256": "dd6361cc3aa468f4a7edd3d927ac08b1aa8b4a683d330d21743774fe9e0a3610",
+  "chapter_parts": [
+    {
+      "file": "chapters/ch02a.tex",
+      "coverage": "章首导言、作者机构邮箱及 DOI、关键定义框、第 2.1 节全文及式 (2.1)/(2.2)"
+    },
+    {
+      "file": "chapters/ch02b.tex",
+      "coverage": "第 2.2 节全文及图 2.1—2.3"
+    },
+    {
+      "file": "chapters/ch02c.tex",
+      "coverage": "第 2.3 节导言、第 2.3.1—2.3.2 小节"
+    },
+    {
+      "file": "chapters/ch02d.tex",
+      "coverage": "第 2.3.3—2.3.5 小节及第 2.4 节全部注记与延伸阅读"
+    }
+  ],
+  "sections": [
+    {
+      "number": "2.1",
+      "title": "定义结构因果模型",
+      "source_split_pages": [
+        2,
+        3,
+        4
+      ],
+      "chinese_pages": [
+        2,
+        3,
+        4
+      ],
+      "complete": true,
+      "content": "内生/外生变量、父节点、结构方程一般形式、SCM 统计模型框、IVF 与 HIV 两例、时间顺序、式 (2.1)、六个生成步骤、观测数据模型、随机化式 (2.2) 与第三编指引。"
+    },
+    {
+      "number": "2.2",
+      "title": "因果图",
+      "source_split_pages": [
+        5,
+        6
+      ],
+      "chinese_pages": [
+        4,
+        5
+      ],
+      "complete": true,
+      "content": "DAG 定义与复杂结构局限、父节点与误差箭头、缺边解释、图 2.1/2.2 的随机化差异、U 的联合独立性、图 2.3 的全部虚线双向关系与后门路径。"
+    },
+    {
+      "number": "2.3",
+      "title": "定义因果目标参数",
+      "source_split_pages": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "chinese_pages": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "complete": true,
+      "content": "完整数据模型、参数映射及五个小节全部内容；未合并或省略小节。"
+    },
+    {
+      "number": "2.4",
+      "title": "注记与延伸阅读",
+      "source_split_pages": [
+        11
+      ],
+      "chinese_pages": [
+        9
+      ],
+      "complete": true,
+      "content": "Pearl (2009a)、Targeted Learning (2011) 第 2/24 章、重用许可说明、Robins (1986) 的 g 公式来源。"
+    }
+  ],
+  "subsections": [
+    {
+      "number": "2.3.1",
+      "title": "干预",
+      "source_split_pages": [
+        7,
+        8
+      ],
+      "chinese_pages": [
+        6
+      ],
+      "complete": true,
+      "content": "干预节点设值、暴露取值集、非干预结构方程保持不变、两次 IVF 干预的完整五行系统、干预后分布。"
+    },
+    {
+      "number": "2.3.2",
+      "title": "反事实",
+      "source_split_pages": [
+        8
+      ],
+      "chinese_pages": [
+        7
+      ],
+      "complete": true,
+      "content": "理想实验不可实现、每人只观测一个 Y、按个体 u 生成反事实、Y_(1,1)(u) 与 U 的随机性。"
+    },
+    {
+      "number": "2.3.3",
+      "title": "建立可识别性",
+      "source_split_pages": [
+        8,
+        9,
+        10
+      ],
+      "chinese_pages": [
+        7,
+        8
+      ],
+      "complete": true,
+      "content": "所有分布上的参数恒等关系、真实知识模型与额外受限模型 M^F/M^(F*)、g 公式、序贯随机化及后门路径准则、独立结构的并集、混杂因素定义及 IVF 例。"
+    },
+    {
+      "number": "2.3.4",
+      "title": "选定统计模型与目标参数",
+      "source_split_pages": [
+        10
+      ],
+      "chinese_pages": [
+        8
+      ],
+      "complete": true,
+      "content": "完整数据模型诱导观测数据统计模型、参数扩展到更大模型、IVF 识别等式、序贯随机化与序贯正值性、支撑集条件。"
+    },
+    {
+      "number": "2.3.5",
+      "title": "目标参数的解释",
+      "source_split_pages": [
+        11
+      ],
+      "chinese_pages": [
+        8,
+        9
+      ],
+      "complete": true,
+      "content": "仅时间顺序下的变量重要性解释、原书无标题强调框中两种解释及因果效应偏离界。"
+    }
+  ],
+  "figures": [
+    {
+      "number": "2.1",
+      "source_split_page": 5,
+      "source_printed_page": 19,
+      "chinese_page": 4,
+      "method": "TikZ 重绘；保留原数学节点标签，图注为中文",
+      "file": "figures/ch02_causal_21.tex",
+      "nodes": [
+        "L0",
+        "A0",
+        "L1",
+        "A1",
+        "Y",
+        "U_L0",
+        "U_A0",
+        "U_L1",
+        "U_A1",
+        "U_Y"
+      ],
+      "directed_edge_count": 13,
+      "directed_edges": [
+        [
+          "U_L0",
+          "L0"
+        ],
+        [
+          "U_A0",
+          "A0"
+        ],
+        [
+          "U_L1",
+          "L1"
+        ],
+        [
+          "U_A1",
+          "A1"
+        ],
+        [
+          "U_Y",
+          "Y"
+        ],
+        [
+          "L0",
+          "A0"
+        ],
+        [
+          "L0",
+          "L1"
+        ],
+        [
+          "A0",
+          "L1"
+        ],
+        [
+          "A0",
+          "A1"
+        ],
+        [
+          "A0",
+          "Y"
+        ],
+        [
+          "L1",
+          "A1"
+        ],
+        [
+          "L1",
+          "Y"
+        ],
+        [
+          "A1",
+          "Y"
+        ]
+      ],
+      "dashed_bidirected_edge_count": 0,
+      "dashed_bidirected_edges": [],
+      "source_topology_visually_checked": true,
+      "output_visually_checked": true
+    },
+    {
+      "number": "2.2",
+      "source_split_page": 5,
+      "source_printed_page": 19,
+      "chinese_page": 5,
+      "method": "TikZ 重绘；保留原数学节点标签，图注为中文",
+      "file": "figures/ch02_causal_22.tex",
+      "nodes": [
+        "L0",
+        "A0",
+        "L1",
+        "A1",
+        "Y",
+        "U_L0",
+        "U_A0",
+        "U_L1",
+        "U_A1",
+        "U_Y"
+      ],
+      "directed_edge_count": 11,
+      "directed_edges": [
+        [
+          "U_L0",
+          "L0"
+        ],
+        [
+          "U_A0",
+          "A0"
+        ],
+        [
+          "U_L1",
+          "L1"
+        ],
+        [
+          "U_A1",
+          "A1"
+        ],
+        [
+          "U_Y",
+          "Y"
+        ],
+        [
+          "L0",
+          "L1"
+        ],
+        [
+          "A0",
+          "L1"
+        ],
+        [
+          "A0",
+          "A1"
+        ],
+        [
+          "A0",
+          "Y"
+        ],
+        [
+          "L1",
+          "Y"
+        ],
+        [
+          "A1",
+          "Y"
+        ]
+      ],
+      "dashed_bidirected_edge_count": 0,
+      "dashed_bidirected_edges": [],
+      "source_topology_visually_checked": true,
+      "output_visually_checked": true
+    },
+    {
+      "number": "2.3",
+      "source_split_page": 6,
+      "source_printed_page": 20,
+      "chinese_page": 5,
+      "method": "TikZ 重绘；保留原数学节点标签，图注为中文",
+      "file": "figures/ch02_causal_23.tex",
+      "nodes": [
+        "L0",
+        "A0",
+        "L1",
+        "A1",
+        "Y",
+        "U_L0",
+        "U_A0",
+        "U_L1",
+        "U_A1",
+        "U_Y"
+      ],
+      "directed_edge_count": 13,
+      "directed_edges": [
+        [
+          "U_L0",
+          "L0"
+        ],
+        [
+          "U_A0",
+          "A0"
+        ],
+        [
+          "U_L1",
+          "L1"
+        ],
+        [
+          "U_A1",
+          "A1"
+        ],
+        [
+          "U_Y",
+          "Y"
+        ],
+        [
+          "L0",
+          "A0"
+        ],
+        [
+          "L0",
+          "L1"
+        ],
+        [
+          "A0",
+          "L1"
+        ],
+        [
+          "A0",
+          "A1"
+        ],
+        [
+          "A0",
+          "Y"
+        ],
+        [
+          "L1",
+          "A1"
+        ],
+        [
+          "L1",
+          "Y"
+        ],
+        [
+          "A1",
+          "Y"
+        ]
+      ],
+      "dashed_bidirected_edge_count": 10,
+      "dashed_bidirected_edges": [
+        [
+          "U_L0",
+          "U_A0"
+        ],
+        [
+          "U_L0",
+          "U_L1"
+        ],
+        [
+          "U_L0",
+          "U_A1"
+        ],
+        [
+          "U_L0",
+          "U_Y"
+        ],
+        [
+          "U_A0",
+          "U_L1"
+        ],
+        [
+          "U_A0",
+          "U_A1"
+        ],
+        [
+          "U_A0",
+          "U_Y"
+        ],
+        [
+          "U_L1",
+          "U_A1"
+        ],
+        [
+          "U_L1",
+          "U_Y"
+        ],
+        [
+          "U_A1",
+          "U_Y"
+        ]
+      ],
+      "source_topology_visually_checked": true,
+      "output_visually_checked": true
+    }
+  ],
+  "tables": [],
+  "formulas": [
+    {
+      "id": "ch02-display-1",
+      "number": null,
+      "source_split_page": 2,
+      "source_printed_page": 16,
+      "chinese_page": 2,
+      "identity": "O=(L0,A0,L1,A1,L2=Y)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch02-display-2",
+      "number": null,
+      "source_split_page": 2,
+      "source_printed_page": 16,
+      "chinese_page": 2,
+      "identity": "Xj=f_Xj(Pa(Xj),U_Xj), j=1...J",
+      "visually_verified": true
+    },
+    {
+      "id": "ch02-display-3",
+      "number": null,
+      "source_split_page": 3,
+      "source_printed_page": 17,
+      "chinese_page": 2,
+      "identity": "L0 -> A0 -> L1 -> A1 -> Y",
+      "visually_verified": true
+    },
+    {
+      "id": "ch02-display-4",
+      "number": "2.1",
+      "source_split_page": 3,
+      "source_printed_page": 17,
+      "chinese_page": 3,
+      "identity": "观察性 IVF 的五行结构方程",
+      "visually_verified": true,
+      "source_issue_preserved": "A1=f_A1(L0,A0,L1,U_A0)，未改为 U_A1。"
+    },
+    {
+      "id": "ch02-display-5",
+      "number": "2.2",
+      "source_split_page": 4,
+      "source_printed_page": 18,
+      "chinese_page": 4,
+      "identity": "随机化 IVF 的五行结构方程",
+      "visually_verified": true,
+      "source_issue_preserved": "A1=f_A1(A0,U_A0)，与紧随正文一致；图 2.2 另按原图保留 U_A1 -> A1。"
+    },
+    {
+      "id": "ch02-display-6",
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 21,
+      "chinese_page": 6,
+      "identity": "P_UX(Y_a0:1=y)=P_UX(f_Y(L0,a0,L1,a1,U_Y)=y)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch02-display-7",
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 21,
+      "chinese_page": 6,
+      "identity": "重述第 1 章 Psi(P0) 公式",
+      "visually_verified": true,
+      "source_issue_preserved": "无下标求和号及第二因子 L1=1 均照录。"
+    },
+    {
+      "id": "ch02-display-8",
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 21,
+      "chinese_page": 6,
+      "identity": "Psi^F(P_UX)=P_UX(Y_(1,1)=1)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch02-display-9",
+      "number": null,
+      "source_split_page": 8,
+      "source_printed_page": 22,
+      "chinese_page": 6,
+      "identity": "A0=A1=1 干预后的五行结构方程",
+      "visually_verified": true
+    },
+    {
+      "id": "ch02-display-10",
+      "number": null,
+      "source_split_page": 9,
+      "source_printed_page": 23,
+      "chinese_page": 7,
+      "identity": "P(L_d=l) 的乘积 g 公式",
+      "visually_verified": true,
+      "source_issue_preserved": "印为 P(Lt=lt | Pa_d(Lt))=Pa_d(lt))，条件式右括号位置异常，原样保留。"
+    },
+    {
+      "id": "ch02-display-11",
+      "number": null,
+      "source_split_page": 10,
+      "source_printed_page": 24,
+      "chinese_page": 8,
+      "identity": "Psi^F(P_UX,0)=P(Y_(1,1)=1)=E_P0(sum...)≡Psi(P0)",
+      "visually_verified": true,
+      "source_issue_preserved": "无下标求和号及第二因子 L1=1 均照录。"
+    },
+    {
+      "id": "ch02-display-12",
+      "number": null,
+      "source_split_page": 11,
+      "source_printed_page": 25,
+      "chinese_page": 8,
+      "identity": "重复的 L0 -> A0 -> L1 -> A1 -> Y 时间顺序",
+      "visually_verified": true
+    }
+  ],
+  "inline_math_coverage": [
+    "关键定义框：M、P、P0、Psi:M→R^d、psi0=Psi(P0) 及 O1,...,On。",
+    "结构因果模型：X=(Xj:j)、U=(U_Xj:j)、Pa(Xj)、全部五个 X 与 L/A/Y 的对应、函数 f 与误差向量 U。",
+    "生成步骤：给定 L0:1 时 U_A0:1 与 U_Y 独立，及所有逐步函数自变量。",
+    "完整数据与观测数据：P_UX、P(P_UX)、M={P(P_UX):P_UX}、M^F、M^(F*)、Psi^F:M^F→R^d。",
+    "干预与反事实：a0:1∈A、Y_a0:1、Y_a0:1(U)、Y_(1,1)(u)=f_Y(L0,1,L1,1,u_Y)。",
+    "识别关系：Psi^F(P_UX)=Psi(P(P_UX))、O=X 或 O⊂X、P=P(P_XU)、M^(F*)⊂M^F、L_d(u) 与 Pa_d(Lt)。",
+    "统计模型与解释：M={P(P_XU):P_XU∈M^(F*)}、P0=P(P_UX,0)、Psi:M→R^d，及两种解释框中的全部参数记号。"
+  ],
+  "emphasis_boxes": {
+    "original_boxes": 3,
+    "source_printed_pages": [
+      16,
+      17,
+      25
+    ],
+    "environment": "sourcebox",
+    "titles_or_contents": [
+      "关键定义与记号",
+      "SCM 是随机变量 (U,X) 的一个统计模型",
+      "观测数据参数的两种解释"
+    ],
+    "fine_point_or_technical_point_boxes_added": 0
+  },
+  "new_terms_for_glossary_review": [
+    {
+      "en": "endogenous variable",
+      "zh": "内生变量"
+    },
+    {
+      "en": "exogenous variable",
+      "zh": "外生变量"
+    },
+    {
+      "en": "exogenous error",
+      "zh": "外生误差"
+    },
+    {
+      "en": "structural equation",
+      "zh": "结构方程"
+    },
+    {
+      "en": "parent",
+      "zh": "父节点"
+    },
+    {
+      "en": "deterministic function",
+      "zh": "确定性函数"
+    },
+    {
+      "en": "realization",
+      "zh": "实现值"
+    },
+    {
+      "en": "error distribution",
+      "zh": "误差分布"
+    },
+    {
+      "en": "causal graph",
+      "zh": "因果图"
+    },
+    {
+      "en": "directed acyclic graph",
+      "zh": "有向无环图",
+      "abbreviation": "DAG"
+    },
+    {
+      "en": "direct effect",
+      "zh": "直接效应"
+    },
+    {
+      "en": "backdoor path",
+      "zh": "后门路径"
+    },
+    {
+      "en": "backdoor path criterion",
+      "zh": "后门路径准则"
+    },
+    {
+      "en": "full data",
+      "zh": "完整数据"
+    },
+    {
+      "en": "full-data model",
+      "zh": "完整数据模型"
+    },
+    {
+      "en": "statistical observed-data model",
+      "zh": "观测数据统计模型"
+    },
+    {
+      "en": "postintervention distribution",
+      "zh": "干预后分布"
+    },
+    {
+      "en": "sequential positivity",
+      "zh": "序贯正值性"
+    },
+    {
+      "en": "support",
+      "zh": "支撑集"
+    },
+    {
+      "en": "variable importance measure",
+      "zh": "变量重要性度量"
+    },
+    {
+      "en": "point treatment",
+      "zh": "单时点处理"
+    },
+    {
+      "en": "robust semiparametric efficient estimation",
+      "zh": "稳健的半参数有效估计"
+    },
+    {
+      "en": "nonstatistical assumption",
+      "zh": "非统计假设"
+    }
+  ],
+  "terminology_checks": {
+    "targeted_learning": "靶向学习",
+    "bias_convention": "偏差；本章未出现需要译为 bias 的正文词项",
+    "non_testable_causal_assumption": "不可检验的因果假设",
+    "counterfactual_outcome": "反事实结局",
+    "sequential_randomization_assumption": "序贯随机化假设",
+    "identifiability": "可识别性"
+  },
+  "completeness_evidence": {
+    "chapter_count": 1,
+    "section_count_matches_outline": [
+      4,
+      4
+    ],
+    "subsection_count_matches_outline": [
+      5,
+      5
+    ],
+    "numbered_display_formula_tags": [
+      "2.1",
+      "2.2"
+    ],
+    "unnumbered_display_formula_count": 10,
+    "numbered_figure_count": 3,
+    "table_count": 0,
+    "source_year_and_suffix_occurrences": 6,
+    "translation_year_and_suffix_occurrences": 6,
+    "year_and_suffix_multisets_identical": true,
+    "year_counts": {
+      "2009a": 2,
+      "2011": 3,
+      "1986": 1
+    },
+    "author_affiliations_emails_and_doi_preserved": true,
+    "chapter_intro_and_all_notes_further_reading_translated": true,
+    "all_three_source_boxes_preserved": true,
+    "all_six_data_generation_steps_preserved": true,
+    "paragraphs_reviewed_against_entire_english_text": true
+  },
+  "unresolved_items": [],
+  "numbering_oddities": [
+    "原书仅式 (2.1)、式 (2.2) 有编号；其余 10 个展示式不补造编号。",
+    "图 2.1—2.3 正常连续；本章无表格，也无编号定义、定理或引理条目。",
+    "正文出现一般性的“已有一些定理”，不是正式定理环境，不额外编号。"
+  ],
+  "source_wording_notes": [
+    "源文交替使用 P_UX 与 P_XU，译稿保留原有变量顺序，不强行统一。",
+    "第 2.3.4 节原句 our target parameter would still estimate the target parameter 表述不严谨，译为“我们的目标参数仍然对应所要估计的目标参数”；未改变任何公式。",
+    "图中数学节点保持原变量标签；汉化图注，无需将变量符号译成汉字。"
+  ],
+  "deliberate_content_deviations": [],
+  "build_checks": {
+    "engine": "xelatex",
+    "helper": "work/targeted_learning/compile_chapter.py",
+    "passes": [
+      0,
+      0
+    ],
+    "build_directory": "work/targeted_learning/ch02_work/build_144544",
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "chapter_part_or_counter_commands": [],
+    "control_characters": [],
+    "all_nine_pages_rendered": true,
+    "visual_qa_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "final_visual_qa_after_last_build": [
+      3,
+      9
+    ],
+    "all_three_figures_and_all_formula_pages_checked": true,
+    "shipped_file_reopened": true,
+    "shipped_page_count": 9,
+    "last_bookmark": [
+      2,
+      "2.4 注记与延伸阅读",
+      9
+    ],
+    "shipped_sha256_matches_build_record": true,
+    "self_test_driver_removed": true
+  },
+  "qa_artifacts": {
+    "source_images": "work/targeted_learning/render/ch02",
+    "output_images": "work/targeted_learning/ch02_work/qa_ch02_all_NNN.png",
+    "extracted_chinese_pdf_text": "work/targeted_learning/ch02_work/ch02_built_text.txt",
+    "structure_audit": "work/targeted_learning/ch02_work/qa_ch02_structure.json"
+  },
+  "shared_files_edited": [],
+  "source_anomalies": [
+    {
+      "id": "source-2.1-error-subscript",
+      "type": "原书方程与生成步骤不一致",
+      "source_split_pages": [
+        3,
+        4
+      ],
+      "source_printed_pages": [
+        17,
+        18
+      ],
+      "reason": "式 (2.1) 的 A1 方程写 U_A0，后续第 5 个生成步骤写 U_A1，图 2.1 也画 U_A1→A1。",
+      "action": "方程、生成步骤及图分别按印刷原文保留，未替换下标。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-2.2-error-subscript",
+      "type": "原书方程与图不一致",
+      "source_split_pages": [
+        4,
+        5
+      ],
+      "source_printed_pages": [
+        18,
+        19
+      ],
+      "reason": "式 (2.2) 及紧随正文均以 A0、U_A0 决定 A1，图 2.2 却画 U_A1→A1。",
+      "action": "分别保留原方程和原图。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-ivf-parameter-formula",
+      "type": "原书公式疑点",
+      "source_split_pages": [
+        7,
+        10
+      ],
+      "source_printed_pages": [
+        21,
+        24
+      ],
+      "reason": "与第 1 章相同：Psi(P0) 公式求和号无指标，第二因子写 L1=1 而非 l1。",
+      "action": "两处均按原印刷式照录，不推定求和域，不改写第二因子。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-g-formula-parentheses",
+      "type": "原书公式括号疑点",
+      "source_split_pages": [
+        9
+      ],
+      "source_printed_pages": [
+        23
+      ],
+      "reason": "乘积 g 公式印为 P(Lt=lt | Pa_d(Lt))=Pa_d(lt))，在等号前提前关闭了条件概率括号。",
+      "action": "以普通括号逐符号照录印刷形式，未移除或移动右括号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-endogenous-exogenous-wording",
+      "type": "原书术语自相矛盾",
+      "source_split_pages": [
+        2,
+        6
+      ],
+      "source_printed_pages": [
+        16,
+        20
+      ],
+      "reason": "第 2.1 节明确将 U 定义为 exogenous variables；第 2.2 节却称 U 为 endogenous errors/endogenous variables。",
+      "action": "第 2.1 节译为外生变量，第 2.2 节相应句按原文译为内生误差/内生变量，报告中明示原书矛盾。",
+      "blocks_delivery": false
+    }
+  ],
+  "report_schema_note": "早期报告将已确认并照录的原书疑点放在unresolved_items。现移至source_anomalies，所有疑点、源页和处理说明完整保留；未修改正文、公式、图表或PDF。"
+}

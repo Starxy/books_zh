@@ -1,0 +1,42 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+
+\node[ellipse,draw=inkblue,minimum width=3cm,minimum height=1.6cm] (ch04agG) at (2,1.9) {};
+\node at (2,1.4) {$G_n$};\node[text=red] at (.85,2.2) {$M$};
+\draw[magenta] (1.2,2.5)--(2.1,2.5);\draw[green!65!black] (2.1,2.5)--(2.8,2.5);
+\draw[magenta] (1.2,2.25)--(2.1,2.25);\draw[inkblue] (2.1,2.25)--(2.5,2.25);
+\draw[magenta] (1.2,2)--(2.1,2);\draw[inkblue] (2.1,2)--(3.15,2);
+\node at (-.65,1.9) {$\theta$};\draw[green!65!black,->] (-.35,1.9)--(ch04agG.west);
+\node[ellipse,draw=inkblue,minimum width=3cm,minimum height=1.65cm] (ch04agS) at (3.5,4.9) {};
+\node at (3.5,4.52) {$S_n$};
+\draw[inkblue] (2.5,5.2)--(4.5,5.2);
+\foreach \x in {2.5,2.95,3.4,3.85,4.3}{\fill[red] (\x,5.2) circle(.06);}
+\draw[orange,->] (2.85,4.75)--(2.95,5.15);
+\node[ellipse,draw=inkblue,minimum width=2.7cm,minimum height=1.4cm] (ch04agO) at (5.3,.6) {$O_n$};
+\node[ellipse,draw=inkblue,minimum width=3.4cm,minimum height=1.9cm] (ch04agR) at (10,2.1) {};
+\node at (10,1.55) {$R_n$};\draw[inkblue] (8.95,2.25)--(11.05,2.4);
+\foreach \x in {9,9.45,9.9,10.35,10.8}{\fill[red] (\x,2.45) circle(.06);}
+\node at (10.65,4.05) {读段序列};\draw[green!65!black,->,thin] (9.9,2.45)--(10.6,3.8);
+\node at (1.2,4.7) {$N$};
+\draw[green!65!black,->] (ch04agG)--(ch04agS);
+\draw[green!65!black,->] (ch04agG)--(ch04agO);
+\draw[green!65!black,->] (ch04agG)--(ch04agR);
+\draw[green!65!black,->] (ch04agS)--(ch04agR);
+\draw[green!65!black,->] (ch04agO)--(ch04agR);
+
+\node[ellipse,draw=inkblue,minimum width=3cm,minimum height=1.7cm] (ch04agA) at (7.4,5.5) {};
+\node[text=red,font=\ttfamily\small] at (7.4,5.85) {T C A - T G};
+\node[text=green!60!black,font=\ttfamily\small] at (7.4,5.45) {T C A T T G};
+\node at (7.4,5.05) {$A_n$};
+\node[ellipse,draw=inkblue,minimum width=2.8cm,minimum height=1cm] (ch04agQ) at (10,.1) {$Q_n$};
+\draw[green!65!black,->] (ch04agG)--(ch04agA);
+\draw[green!65!black,->] (ch04agS)--(ch04agA);
+\draw[green!65!black,->] (ch04agO)--(ch04agA);
+\draw[green!65!black,->] (ch04agA)--(ch04agR);
+\draw[green!65!black,->] (ch04agQ)--(ch04agR);
+
+\end{tikzpicture}
+\origfig{8}{允许有缺口比对的 RNA-seq 数据图形生成模型。}
+\label{fig:ch04a-08}
+\end{figure}

@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.1cm]
+ \node[vtx] (ch09f5-a) at (0,0) {$A$};
+ \node[vtx] (ch09f5-b) at (1,0) {$B$};
+ \node[vtx] (ch09f5-c) at (2,0) {$C$};
+ \node[vtx] (ch09f5-d) at (3,0) {$D$};
+ \node[latent] (ch09f5-h) at (2,1) {$H$};
+ \draw[ed] (ch09f5-a)--(ch09f5-b);
+ \draw[ed] (ch09f5-b)--(ch09f5-c);
+ \draw[ed] (ch09f5-c)--(ch09f5-d);
+ \draw[ed] (ch09f5-h)--(ch09f5-b);
+ \draw[ed] (ch09f5-h)--(ch09f5-d);
+\end{tikzpicture}
+\caption{相对于该图满足马尔可夫性的任意分布，都满足Verma约束(9.3)。这是出现在$A,B,C,D$的边缘分布中的一种非独立性约束；虚线变量$H$未被观测［Verma and Pearl, 1991］。}
+\end{figure}

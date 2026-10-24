@@ -1,0 +1,68 @@
+% 原书第69—70页：4.3习题。题号沿用原书4.15、4.16。
+\FloatBarrier
+\section{习题}
+\setcounter{problem}{14}
+\begin{problem}[加性噪声模型]
+\begin{enumerate}[label=\alph*)]
+ \item 考虑结构因果模型
+ \[
+  \begin{aligned}
+   X&:=N_X,\\
+   Y&:=2X+N_Y,
+  \end{aligned}
+ \]
+ 其中，$N_X$ 在1到3之间均匀分布，$N_Y$ 在 $-0.5$ 到 $0.5$ 之间均匀分布，并且与 $N_X$ 独立。分布 $P_{X,Y}$ 容许从 $X$ 到 $Y$ 的加性噪声模型。画出 $X,Y$ 联合分布的支撑集，并说明为什么 $P_{X,Y}$ 不容许从 $Y$ 到 $X$ 的加性噪声模型。也就是说，不存在函数 $g$ 及相互独立的噪声变量 $M_X,M_Y$，使得
+ \[
+  \begin{aligned}
+   X&=g(Y)+M_X,\\
+   Y&=M_Y,
+  \end{aligned}
+ \]
+ 其中，$M_X$ 与 $M_Y$ 独立。
+ \item 与 a）类似，考虑结构因果模型
+ \[
+  \begin{aligned}
+   X&:=N_X,\\
+   Y&:=X^2+N_Y,
+  \end{aligned}
+ \]
+ 其中，$N_X$ 在1到3之间均匀分布，$N_Y$ 在 $-0.5$ 到 $0.5$ 之间均匀分布，并且与 $N_X$ 独立。同样，画出 $P_{X,Y}$ 的支撑集，并说明为什么不存在从 $Y$ 到 $X$ 的加性噪声模型。
+\end{enumerate}
+\end{problem}
+
+\begin{problem}[最大似然]
+假设给定来自下列模型的独立同分布数据集 $(X_1,Y_1),\ldots,(X_n,Y_n)$：
+\[
+ \begin{gathered}
+ Y=f(X)+N_Y,\\
+ X\sim\mathcal N(\mu_X,\sigma_X^2),\qquad
+ N_Y\sim\mathcal N(\mu_{N_Y},\sigma_{N_Y}^2),\qquad X\indep N_Y,
+ \end{gathered}
+\]
+其中，函数 $f$ 已知。
+\begin{enumerate}[label=\alph*)]
+ \item 证明 $f(x)=\EE[Y\mid X=x]$。\chfourtnote{原题允许噪声均值为 $\mu_{N_Y}$。按独立性，条件期望实际为 $\EE[Y\mid X=x]=f(x)+\mu_{N_Y}$；要得到题述等式，需要再假设 $\mu_{N_Y}=0$，或将噪声均值吸收到 $f$ 中。}
+ % 原书未设噪声均值为零；保留原题，问题详见报告。
+ \item 记 $x:=(x_1,\ldots,x_n)$、$y:=(y_1,\ldots,y_n)$，考虑对数似然函数
+ \[
+  \ell_\theta(x,y)
+  =\ell_\theta((x_1,y_1),\ldots,(x_n,y_n))
+  =\sum_{i=1}^n\log p_\theta(x_i,y_i),
+ \]
+ 其中，$p_\theta$ 是 $(X,Y)$ 的联合密度，$\theta:=(\mu_X,\mu_{N_Y},\sigma_X^2,\sigma_{N_Y}^2)$。证明存在 $c_1,c_2\in\RR$，且 $c_2>0$，使得
+ \begin{equation}
+  \max_\theta\ell_\theta(x,y)
+  =c_2\left(c_1-\log\widehat{\operatorname{var}}[x]
+    -\log\widehat{\operatorname{var}}[y-f(x)]\right),
+  \tag{4.20}
+ \end{equation}
+ 其中，$\widehat{\operatorname{var}}[z]$ 是方差的估计量，
+ \[
+  \widehat{\operatorname{var}}[z]
+  :=\frac{1}{n}\sum_{i=1}^n
+  \left(z_i-\frac{1}{n}\sum_{k=1}^nz_k\right)^2.
+ \]
+\end{enumerate}
+\end{problem}
+
+式 (4.20) 为比较式 (4.18) 与式 (4.19) 提供了依据。主要区别在于，这道习题使用的是条件均值，而不是回归方法的输出。可以证明，渐近地说，采用后者仍然能够得到正确结果［Bühlmann et al., 2014］。

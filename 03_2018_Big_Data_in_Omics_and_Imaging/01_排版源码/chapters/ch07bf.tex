@@ -1,0 +1,252 @@
+% 原章第75页7.3.3.3标题—第80页结论7.27之前。
+\subsubsection{高斯过程回归}
+
+ANMC 的一个关键问题，是学习非线性回归中的未知函数（Rasmussen and Williams 2006；Janzing et al. 2009）。高斯过程回归（Gaussian process regression）是非线性回归的有力工具。高斯过程是函数上的分布，定义为一族随机变量，其中任意有限个变量均服从联合高斯分布。我们先回顾线性回归模型的贝叶斯分析，再介绍高斯过程回归。考虑带高斯噪声的线性回归模型（Rasmussen and Williams 2006）：
+\begin{equation}
+\begin{aligned}
+y&=f(x)+e,\\
+f(x)&=x^Tw,
+\end{aligned}
+\tag{7.366}
+\end{equation}
+其中，$x$ 为 $q$ 维输入向量，$w$ 为 $q$ 维权重向量，$f$ 是函数值，$y$ 是观测到的标量响应值；噪声 $e$ 独立同分布，服从高斯分布 $N(0,\sigma_n^2)$。考虑训练数据集 $D=\{(x_i,y_i),i=1,\ldots,n\}$。
+
+数据集 $D$ 的似然函数为
+\begin{equation}
+l(y\mid X,w)=\frac1{(2\pi\sigma_n^2)^{n/2}}
+\exp\left\{-\frac1{2\sigma_n^2}(y-X^Tw)^T(y-X^Tw)\right\},
+\tag{7.367}
+\end{equation}
+其中，$y=[y_1,\ldots,y_n]^T$，$X=[x_1,\ldots,x_n]$，$w=[w_1,\ldots,w_q]$。假设权重的先验是均值为零、协方差矩阵为 $\Sigma_q$ 的高斯分布，即
+\begin{equation}
+w\sim N(0,\Sigma_q).
+\tag{7.368}
+\end{equation}
+权重的后验分布正比于似然与先验之积：
+\begin{equation}
+\begin{aligned}
+p(w\mid X,y)&\propto l(y\mid X,w)p(w)\\
+&\propto\exp\left\{-\frac1{2\sigma_n^2}(y-X^Tw)^T(y-X^Tw)-\frac12w^T\Sigma_q^{-1}w\right\}\\
+&\propto\exp\Biggl\{-\frac12\Biggl[w^T\left(\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}\right)w\\
+&\hspace{5em}-\frac1{\sigma_n^2}(y^TX^Tw+w^TXy)+\frac{y^Ty}{\sigma_n^2}\Biggr]\Biggr\}.
+\end{aligned}
+\tag{7.369}
+\end{equation}
+考虑方程
+\begin{equation}
+\begin{aligned}
+&(w-\mu)^T\left(\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}\right)(w-\mu)\\
+&\quad=w^T\left(\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}\right)w
+-\frac1{\sigma_n^2}(y^TX^Tw+w^TXy)\\
+&\qquad+\mu^T\left(\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}\right)\mu.
+\end{aligned}
+\tag{7.370}
+\end{equation}
+由式 (7.370) 解出 $\mu$，得
+\begin{equation}
+\mu=\frac1{\sigma_n^2}\left(\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}\right)^{-1}Xy.
+\tag{7.371}
+\end{equation}
+将式 (7.371) 代入式 (7.369)，得到后验分布
+\begin{equation}
+p(w\mid X,y)\propto\exp\left\{-\frac12(w-\mu)^T
+\left(\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}\right)(w-\mu)\right\}.
+\tag{7.372}
+\end{equation}
+式 (7.372) 可以写为
+\begin{equation}
+p(w\mid X,y)\sim N(\mu,\Lambda^{-1}),
+\tag{7.373}
+\end{equation}
+其中
+\begin{equation}
+\Lambda=\frac{XX^T}{\sigma_n^2}+\Sigma_q^{-1}.
+\tag{7.374}
+\end{equation}
+
+现在研究预测的分布。设 $x_{new}$ 是一个新的输入数据集。利用式 (7.367)、(7.373)，在高斯后验分布上对线性模型所有可能的输出值求平均，可得预测值 $y_{new}$ 的分布（附录7.J）：
+\begin{equation}
+\begin{aligned}
+p(y_{new}\mid x_{new},X,y)
+&=\int p(y_{new}\mid x_{new},w)p(w\mid X,y)\,dw\\
+&=N\left(\frac1{\sigma_n^2}x_{new}^T\Lambda^{-1}Xy,\ x_{new}^T\Lambda^{-1}x_{new}\right).
+\end{aligned}
+\tag{7.375}
+\end{equation}
+为扩展输入空间，可以把数据映射到高维特征空间。令 $\phi(x)$ 为从 $q$ 维输入空间到 $D$ 维特征空间的特征映射，令 $\Phi(x)=[\varphi(x_1),\ldots,\varphi(x_n)]$。特征空间中的线性模型为
+\begin{equation}
+f(x)=\varphi(x)^Tw.
+\tag{7.376}
+\end{equation}
+在特征空间中，与式 (7.375) 类似，预测的分布为
+\begin{equation}
+\begin{aligned}
+&p(y_{new}\mid x_{new},X,y)\\
+&\quad=N\left(\frac1{\sigma_n^2}\varphi(x_{new})^T\Lambda^{-1}\Phi(x)y,\
+\varphi(x_{new})^T\Lambda^{-1}\varphi(x_{new})\right),
+\end{aligned}
+\tag{7.377}
+\end{equation}
+其中
+\begin{equation}
+\Lambda=\frac{\Phi(x)\Phi(x)^T}{\sigma_n^2}+\Sigma_q^{-1}.
+\tag{7.378}
+\end{equation}
+将式 (7.378) 两边右乘 $\Sigma_q$，得
+\begin{equation}
+\Lambda\Sigma_q=\frac{\Phi(x)\Phi(x)^T\Sigma_q}{\sigma_n^2}+I.
+\tag{7.379}
+\end{equation}
+令 $K=\Phi(x)^T\Sigma_q\Phi(x)$。再次将式 (7.379) 两边右乘 $\Phi(x)$，得
+\begin{equation}
+\begin{aligned}
+\Lambda\Sigma_q\Phi(x)&=\frac{\Phi(x)\Phi(x)^T\Sigma_q\Phi(x)}{\sigma_n^2}+\Phi(x)\\
+&=\frac1{\sigma_n^2}\Phi(x)(K+\sigma_n^2I).
+\end{aligned}
+\tag{7.380}
+\end{equation}
+将式 (7.381) 两边右乘 $(K+\sigma_n^2I)^{-1}$，得
+\begin{equation}
+\Lambda\Sigma_q\Phi(x)(K+\sigma_n^2I)^{-1}=\frac1{\sigma_n^2}\Phi(x).
+\tag{7.381}
+\end{equation}
+最后，将式 (7.381) 两边左乘 $\Lambda^{-1}$，得
+\begin{equation}
+\Sigma_q\Phi(x)(K+\sigma_n^2I)^{-1}=\frac1{\sigma_n^2}\Lambda^{-1}\Phi(x).
+\tag{7.382}
+\end{equation}
+将式 (7.382) 代入式 (7.377)，得到精度分布均值的新表达式：
+\begin{equation}
+\frac1{\sigma_n^2}\varphi(x_{new})^T\Lambda^{-1}\Phi(x)y
+=\varphi(x_{new})^T\Sigma_q(K+\sigma_n^2I)^{-1}y.
+\tag{7.383}
+\end{equation}
+矩阵 $\Lambda$ 的逆为
+\begin{equation}
+\Lambda^{-1}=\Sigma_q-\Sigma_q\Phi(x)\left(\sigma_n^2I+\Phi(x)^T\Sigma_q\Phi(x)\right)^{-1}\Phi(x)^T\Sigma_q.
+\tag{7.384}
+\end{equation}
+将式 (7.384) 代入式 (7.377)，得到预测分布协方差的新表达式：
+\begin{equation}
+\begin{aligned}
+&\varphi(x_{new})^T\Lambda^{-1}\varphi(x_{new})\\
+&\quad=\varphi(x_{new})^T\Sigma_q\varphi(x_{new})\\
+&\qquad-\varphi(x_{new})^T\Sigma_q\Phi(x)(K+\sigma_n^2I)\Phi(x)^T\Sigma_q\varphi(x_{new}).
+\end{aligned}
+\tag{7.385}
+\end{equation}
+汇总式 (7.383) 和 (7.385)，可将预测的分布重写为
+\begin{equation}
+\begin{aligned}
+&p(y_{new}\mid x_{new},X,y)\\
+&=N\Bigl(\varphi(x_{new})^T\Sigma_q(K+\sigma_n^2I)^{-1}y,\\
+&\qquad\varphi(x_{new})^T\Sigma_q\varphi(x_{new})\\
+&\qquad-\varphi(x_{new})^T\Sigma_q\Phi(x)(K+\sigma_n^2I)\Phi(x)^T\Sigma_q\varphi(x_{new})\Bigr).
+\end{aligned}
+\tag{7.386}
+\end{equation}
+
+众所周知，特征空间中的内积常用核函数计算。定义核矩阵
+\begin{equation}
+K(X,X)=\Phi(x)^T\Sigma_q\Phi(x),
+\tag{7.387}
+\end{equation}
+\begin{equation}
+K(X,X_{new})=\Phi(x)^T\Sigma_q\Phi(x_{new}),
+\tag{7.388}
+\end{equation}
+\begin{equation}
+K(X_{new},X)=\Phi(x_{new})^T\Sigma_q\Phi(x),
+\tag{7.389}
+\end{equation}
+\begin{equation}
+K(X_{new},X_{new})=\Phi(x_{new})^T\Sigma_q\Phi(x_{new}),
+\tag{7.390}
+\end{equation}
+其中，$\Phi(x_{new})=[\varphi(x_{new1}),\ldots,\varphi(x_{newl})]$。
+
+现在建立贝叶斯线性模型与高斯过程之间的关系（Rasmussen and Williams 2006）。考虑贝叶斯线性回归模型 $f(x)=\varphi(x)^Tw$，其先验为 $w\sim N(0,\Sigma_q)$。函数值定义了一个高斯过程，均值和协方差为
+\begin{equation}
+\begin{aligned}
+E[f(x)]&=\varphi^Te[w]=0,\\
+\operatorname{cov}(f(x),f(x')]&=E[f(x)f(x')]=\varphi(x)^TE[ww^T]\varphi(x')\\
+&=\varphi(x)^T\Sigma_q\varphi(x')=k(x,x').
+\end{aligned}
+\tag{7.391}
+\end{equation}
+考虑训练数据集 $(X,f(X))$ 和 $(X_{new},f(X_{new}))$。假设观测不含噪声，则在先验下，训练输出和测试输出的联合分布为
+\begin{equation}
+\begin{bmatrix}f(X)\\f(X_{new})\end{bmatrix}
+\sim N\left(0,\begin{bmatrix}
+K(X,X)&K(X,X_{new})\\
+K(X_{new},X)&K(X_{new},X_{new})
+\end{bmatrix}\right).
+\tag{7.392}
+\end{equation}
+预测 $f(X_{new})$ 的分布，可以看作给定训练和测试数据集后 $f(X_{new})$ 的条件分布：
+\begin{equation}
+\begin{aligned}
+&p(f(X_{new})\mid X_{new},X,f(X))\\
+&=N\Bigl(K(X_{new},X)K(X,X)^{-1}f(X),\\
+&\qquad K(X_{new},X_{new})-K(X_{new},X)K(X,X)^{-1}K(X,X_{new})\Bigr).
+\end{aligned}
+\tag{7.393}
+\end{equation}
+现在考虑带噪声的观测，其模型为 $y=f(x)+\varepsilon$，其中 $\varepsilon\sim N(0,\sigma_n^2I)$。于是
+\begin{equation}
+\operatorname{cov}(y,y)=K(X,X)+\sigma_n^2I.
+\tag{7.394}
+\end{equation}
+式 (7.392) 给出的先验下训练输出与测试输出的联合分布，改为
+\begin{equation}
+\begin{bmatrix}f(X)\\f(X_{new})\end{bmatrix}
+\sim N\left(0,\begin{bmatrix}
+K(X,X)+\sigma_n^2I&K(X,X_{new})\\
+K(X_{new},X)&K(X_{new},X_{new})
+\end{bmatrix}\right).
+\tag{7.395}
+\end{equation}
+同理，给定带噪声的训练和测试数据集后，预测 $f(X_{new})$ 的条件分布改为
+\begin{equation}
+\begin{aligned}
+&p(f(X_{new})\mid X_{new},X,f(X))\\
+&=N\Bigl(K(X_{new},X)[K(X,X)+\sigma_n^2I]^{-1}f(X),\\
+&\qquad K(X_{new},X_{new})-K(X_{new},X)K(X,X)^{-1}K(X,X_{new})\Bigr).
+\end{aligned}
+\tag{7.396}
+\end{equation}
+核函数定义见式 (7.387)—(7.390)。给定 $x_{new}$ 后，预测估计量的均值和方差分别为
+\begin{equation}
+\overline y_{new}=k(x_{new},X)^T[K(X,X)+\sigma_n^2I]^{-1}y,
+\tag{7.397}
+\end{equation}
+以及
+\begin{equation}
+\operatorname{var}(\overline y_{new})=k(x_{new},x_{new})
+-k(x_{new},X)^T[K(X,X)+\sigma_n^2I]^{-1}k(x_{new},X).
+\tag{7.398}
+\end{equation}
+令 $\alpha=[K(X,X)+\sigma_n^2I]^{-1}y$，则式 (7.397) 可重写为
+\begin{equation}
+\overline y_{new}=k(x_{new},X)^T\alpha=\sum_{i=1}^{n}\alpha_i k(x_{new},x_i),
+\tag{7.399}
+\end{equation}
+其中，$\alpha_i$ 可视为高斯过程回归的参数，$k(x_{new},x_i)$ 则视为设计矩阵的元素。回顾模型
+\begin{equation}
+y=f(X)+\varepsilon.
+\tag{7.400}
+\end{equation}
+由式 (7.392)、(7.395)，得到 $f\mid X$ 和 $y\mid X$ 的边际似然函数：
+\begin{equation}
+p(f\mid X)=\frac1{(2\pi)^{n/2}|K(X,X)|^{1/2}}
+\exp\left\{-\frac12f^TK(X,X)^{-1}f\right\},
+\tag{7.401}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+p(y\mid X)={}&\frac1{(2\pi)^{n/2}|K(X,X)+\sigma_n^2I|^{1/2}}\\
+&\quad\times\exp\left\{-\frac12f^T[K(X,X)+\sigma_n^2I]^{-1}f\right\}.
+\end{aligned}
+\tag{7.402}
+\end{equation}
+汇总式 (7.399) 和 (7.402)，得到以下结论。

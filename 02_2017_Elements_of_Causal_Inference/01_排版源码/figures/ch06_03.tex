@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.4cm,y=1.1cm]
+ \node[vtx] (ch06e-t) at (0,0) {$T$};
+ \node[vtx] (ch06e-b) at (1,1) {$B$};
+ \node[vtx] (ch06e-p) at (1,-1) {$P$};
+ \node[vtx] (ch06e-r) at (2,0) {$R$};
+ \draw[ed] (ch06e-t) to[bend left=25] (ch06e-b);
+ \draw[ed] (ch06e-b) to[bend left=25] (ch06e-r);
+ \draw[ed] (ch06e-t) to[bend right=25] (ch06e-p);
+ \draw[ed] (ch06e-p) to[bend right=25] (ch06e-r);
+ \node[font=\small] at (1,1.65) {生物化学效应};
+ \node[font=\small] at (1,-1.65) {安慰剂效应};
+ \draw[->,dotted] (-1.2,.6)--(ch06e-t);
+ \draw[->,dotted] (-1.2,0)--(ch06e-t);
+ \draw[->,dotted] (-1.2,-.6)--(ch06e-t);
+ \draw (-1.05,-.8)--(-.45,.8);
+ \draw (-1.05,.8)--(-.45,-.8);
+\end{tikzpicture}
+\caption{随机化研究的简化描述。$T$ 表示治疗，$P$ 和 $B$ 分别表示患者的心理状态与某种生物化学状态，$R$ 表示患者是否康复。对 $T$ 的随机化移除了其他变量对 $T$ 的影响，因此 $T$ 与 $R$ 之间不可能存在潜在共同原因。这里区分两种不同效应：经由 $P$ 的安慰剂效应与经由 $B$ 的生物化学效应。}
+\end{figure}

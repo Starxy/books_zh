@@ -1,0 +1,122 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.3cm}
+\def\bsep{2.0cm}
+
+\tikzstyle{tnode} = [minimum width=0.3cm,minimum height=0.3cm,inner sep=2pt]
+\tikzstyle{lnode} = [minimum width=8.2cm,minimum height=1.7cm,inner sep=2pt,draw]
+
+\begin{scope}
+
+% hidden states at depth l
+\node [tnode,anchor=west] (h1) at (0,0) {\small{\color{red} $\mathbf{p}_0^l\hspace{1em}$}};
+\node [tnode,anchor=west] (h2) at ([xshift=\ssep]h1.east) {\small{\color{red} $\mathbf{p}_1^l\hspace{1em}$}};
+\node [tnode,anchor=west] (h3) at ([xshift=\ssep]h2.east) {\small{$\mathbf{h}_0^l\hspace{1em}$}};
+\node [tnode,anchor=west] (h4) at ([xshift=\ssep]h3.east) {\small{$\mathbf{h}_1^l\hspace{1em}$}};
+\node [tnode,anchor=west] (h5) at ([xshift=\ssep]h4.east) {\small{$\mathbf{h}_2^l\hspace{1em}$}};
+\node [tnode,anchor=west] (h6) at ([xshift=\ssep]h5.east) {\small{$\mathbf{h}_3^l\hspace{1em}$}};
+\node [tnode,anchor=west] (h7) at ([xshift=\ssep]h6.east) {\small{$\mathbf{h}_4^l\hspace{1em}$}};
+\node [anchor=south] (hlabel) at ([yshift=0.1cm]h4.north) {\large{第 $l$ 层}};
+
+\draw [<-,thin] ([yshift=-1pt]h3.south) -- ([yshift=-0.35*\bsep]h3.south);
+\draw [<-,thin] ([yshift=-1pt]h4.south) -- ([yshift=-0.35*\bsep]h4.south);
+\draw [<-,thin] ([yshift=-1pt]h5.south) -- ([yshift=-0.35*\bsep]h5.south);
+\draw [<-,thin] ([yshift=-1pt]h6.south) -- ([yshift=-0.35*\bsep]h6.south);
+\draw [<-,thin] ([yshift=-1pt]h7.south) -- ([yshift=-0.35*\bsep]h7.south);
+
+% hidden states at depth l - 1
+\node [tnode,anchor=center] (h1b) at ([yshift=-\bsep]h1.center) {\small{\color{red} $\mathbf{p}_0^{l-1}$}};
+\node [tnode,anchor=center] (h2b) at ([yshift=-\bsep]h2.center) {\small{\color{red} $\mathbf{p}_1^{l-1}$}};
+\node [tnode,anchor=center] (h3b) at ([yshift=-\bsep]h3.center) {\small{$\mathbf{h}_0^{l-1}$}};
+\node [tnode,anchor=center] (h4b) at ([yshift=-\bsep]h4.center) {\small{$\mathbf{h}_1^{l-1}$}};
+\node [tnode,anchor=center] (h5b) at ([yshift=-\bsep]h5.center) {\small{$\mathbf{h}_3^{l-1}$}};
+\node [tnode,anchor=center] (h6b) at ([yshift=-\bsep]h6.center) {\small{$\mathbf{h}_4^{l-1}$}};
+\node [tnode,anchor=center] (h7b) at ([yshift=-\bsep]h7.center) {\small{$\mathbf{h}_5^{l-1}$}};
+\node [anchor=south] (hblabel) at ([yshift=0.1cm]h4b.north) {\large{第 $l-1$ 层}};
+
+\draw [<-,thin] ([yshift=-1pt]h3b.south) -- ([yshift=-0.25*\bsep]h3b.south);
+\draw [<-,thin] ([yshift=-1pt]h4b.south) -- ([yshift=-0.25*\bsep]h4b.south);
+\draw [<-,thin] ([yshift=-1pt]h5b.south) -- ([yshift=-0.25*\bsep]h5b.south);
+\draw [<-,thin] ([yshift=-1pt]h6b.south) -- ([yshift=-0.25*\bsep]h6b.south);
+\draw [<-,thin] ([yshift=-1pt]h7b.south) -- ([yshift=-0.25*\bsep]h7b.south);
+
+% hidden states at depth l + 1
+\node [tnode,anchor=center] (h1a) at ([yshift=\bsep]h1.center) {\color{red} \small{$\mathbf{p}_0^{l+1}$}};
+\node [tnode,anchor=center] (h2a) at ([yshift=\bsep]h2.center) {\color{red} \small{$\mathbf{p}_1^{l+1}$}};
+\node [tnode,anchor=center] (h3a) at ([yshift=\bsep]h3.center) {\small{$\mathbf{h}_0^{l+1}$}};
+\node [tnode,anchor=center] (h4a) at ([yshift=\bsep]h4.center) {\small{$\mathbf{h}_1^{l+1}$}};
+\node [tnode,anchor=center] (h5a) at ([yshift=\bsep]h5.center) {\small{$\mathbf{h}_3^{l+1}$}};
+\node [tnode,anchor=center] (h6a) at ([yshift=\bsep]h6.center) {\small{$\mathbf{h}_4^{l+1}$}};
+\node [tnode,anchor=center] (h7a) at ([yshift=\bsep]h7.center) {\small{$\mathbf{h}_5^{l+1}$}};
+\node [anchor=south] (halabel) at ([yshift=0.1cm]h4a.north) {\large{第 $l+1$ 层}};
+
+\draw [<-,thin] ([yshift=-1pt]h3a.south) -- ([yshift=-0.35*\bsep]h3a.south);
+\draw [<-,thin] ([yshift=-1pt]h4a.south) -- ([yshift=-0.35*\bsep]h4a.south);
+\draw [<-,thin] ([yshift=-1pt]h5a.south) -- ([yshift=-0.35*\bsep]h5a.south);
+\draw [<-,thin] ([yshift=-1pt]h6a.south) -- ([yshift=-0.35*\bsep]h6a.south);
+\draw [<-,thin] ([yshift=-1pt]h7a.south) -- ([yshift=-0.35*\bsep]h7a.south);
+
+% outputs
+\node [tnode,anchor=center] (o3) at ([yshift=0.9*\bsep]h3a.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (o4) at ([yshift=0.9*\bsep]h4a.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (o5) at ([yshift=0.9*\bsep]h5a.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (o6) at ([yshift=0.9*\bsep]h6a.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (o7) at ([yshift=0.9*\bsep]h7a.center) {\small{$\cdots$}};
+
+\draw [<-,thin] ([yshift=-1pt]o3.south) -- ([yshift=-0.30*\bsep]o3.south);
+\draw [<-,thin] ([yshift=-1pt]o4.south) -- ([yshift=-0.30*\bsep]o4.south);
+\draw [<-,thin] ([yshift=-1pt]o5.south) -- ([yshift=-0.30*\bsep]o5.south);
+\draw [<-,thin] ([yshift=-1pt]o6.south) -- ([yshift=-0.30*\bsep]o6.south);
+\draw [<-,thin] ([yshift=-1pt]o7.south) -- ([yshift=-0.30*\bsep]o7.south);
+
+\node [tnode,anchor=center] (l6) at ([yshift=0.4*\bsep]o6.center) {\small{\color{blue} 损失}};
+\node [tnode,anchor=center] (l7) at ([yshift=0.4*\bsep]o7.center) {\small{\color{blue} 损失}};
+
+\draw [<-,thin] ([yshift=-1pt]l6.south) -- ([yshift=-0.23*\bsep]l6.south);
+\draw [<-,thin] ([yshift=-1pt]l7.south) -- ([yshift=-0.23*\bsep]l7.south);
+
+% embeddings
+
+\node [tnode,anchor=center] (e3) at ([yshift=-0.55*\bsep]h3b.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (e4) at ([yshift=-0.55*\bsep]h4b.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (e5) at ([yshift=-0.55*\bsep]h5b.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (e6) at ([yshift=-0.55*\bsep]h6b.center) {\small{$\cdots$}};
+\node [tnode,anchor=center] (e7) at ([yshift=-0.55*\bsep]h7b.center) {\small{$\cdots$}};
+
+\draw [<-,thin] ([yshift=-3pt]e3.south) -- ([yshift=-0.25*\bsep]e3.south);
+\draw [<-,thin] ([yshift=-3pt]e4.south) -- ([yshift=-0.25*\bsep]e4.south);
+\draw [<-,thin] ([yshift=-3pt]e5.south) -- ([yshift=-0.25*\bsep]e5.south);
+\draw [<-,thin] ([yshift=-3pt]e6.south) -- ([yshift=-0.25*\bsep]e6.south);
+\draw [<-,thin] ([yshift=-3pt]e7.south) -- ([yshift=-0.25*\bsep]e7.south);
+
+% tokens
+\node [tnode,anchor=center] (t3) at ([yshift=-0.5*\bsep]e3.center) {\small{Look}};
+\node [tnode,anchor=center] (t4) at ([yshift=-0.5*\bsep]e4.center) {\small{out}};
+\node [tnode,anchor=center] (t5) at ([yshift=-0.5*\bsep]e5.center) {\small{!}};
+\node [tnode,anchor=center] (t6) at ([yshift=-0.5*\bsep]e6.center) {\small{\begin{CJK*}{UTF8}{gbsn} 小心 \end{CJK*}}};
+\node [tnode,anchor=center] (t7) at ([yshift=-0.5*\bsep]e7.center) {\small{!}};
+
+\begin{pgfonlayer}{background}
+\node [lnode,anchor=south west,fill=gray!20] (layerl) at ([xshift=-0.2cm,yshift=-0.2cm]h1.south west) {};
+\node [lnode,anchor=south west,fill=gray!20] (layerlm1) at ([xshift=-0.2cm,yshift=-0.2cm-\bsep]h1.south west) {};
+\node [lnode,anchor=south west,fill=gray!20] (layerla1) at ([xshift=-0.2cm,yshift=-0.2cm+\bsep]h1.south west) {};
+\node [draw,dotted,inner sep=2pt,fill=red!10] [fit = (h1) (h2)] (pbox) {};
+\end{pgfonlayer}
+
+\node [anchor=east] (plabel) at ([xshift=-0.5cm]pbox.west) {\small{可训练前缀}};
+\draw [->] ([xshift=2pt]plabel.east) -- ([xshift=0.5cm]plabel.east);
+
+% caption
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([yshift=-0.5cm]t5.east) --  ([yshift=-0.5cm]t3.west) node [pos=0.5,below,yshift=-0.2cm] (inputlabel) {\small{用户输入}};
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([yshift=-0.5cm]t7.east) --  ([yshift=-0.5cm]t6.west) node [pos=0.5,below,yshift=-0.2cm] (inputlabel) {\small{模型预测}};
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([yshift=-0.5cm,xshift=-0.4cm]t3.west) --  ([yshift=-0.5cm,xshift=-2.5cm]t3.west) node [pos=0.5,below,yshift=-0.2cm] (inputlabel) {\small{软提示}};
+
+\end{scope}
+
+
+\end{tikzpicture}
+\end{center}

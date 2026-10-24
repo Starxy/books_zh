@@ -1,0 +1,35 @@
+
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage[UTF8,fontset=windows]{ctex}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning}
+\begin{document}
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  base/.style={rectangle,text width=2.7cm,minimum height=1.3cm,align=center,text=white,font=\sffamily\small\bfseries,rounded corners=4pt,draw=none},
+  data/.style={base,fill={rgb,255:red,74;green,85;blue,104}},
+  process/.style={base,fill={rgb,255:red,56;green,161;blue,105}},
+  model/.style={base,ellipse,minimum width=3.1cm,fill={rgb,255:red,221;green,107;blue,32}},
+  final/.style={base,fill={rgb,255:red,104;green,83;blue,203}},
+  side/.style={base,draw=black!40,dashed,fill=black!5,text=black!70,font=\sffamily\small},
+  arrow/.style={-Latex,thick,draw=black!50}]
+\node[data] (corpus) at (0,0) {获取大规模\\无标注文本语料库};
+\node[process] (pretrain) at (3.7,0) {预训练 Transformer\\（自监督）};
+\node[model] (base_model) at (7.4,0) {通用基础模型};
+\node[process] (sft) at (11.1,0) {（监督）微调\\（SFT）};
+\node[model] (tuned_model) at (11.1,-2.8) {微调后模型};
+\node[process] (align) at (7.4,-2.8) {偏好对齐};
+\node[model] (final_model) at (3.7,-2.8) {最终对齐的\\大语言模型};
+\node[final] (inference) at (0,-2.8) {推理（提示）};
+\node[data] (labeled_data) at (11.1,2.6) {有标注数据集\\（提示—回答对）};
+\node[side] (icl) at (0,-5.3) {上下文学习\\（推理阶段）};
+\draw[arrow] (corpus) -- (pretrain);
+\draw[arrow] (pretrain) -- (base_model);
+\draw[arrow] (base_model) -- (sft);
+\draw[arrow] (sft) -- (tuned_model);
+\draw[arrow] (tuned_model) -- (align);
+\draw[arrow] (align) -- (final_model);
+\draw[arrow] (final_model) -- (inference);
+\draw[arrow] (labeled_data.south) -- (sft.north);
+\draw[arrow,dashed] (icl.north) -- (inference.south);
+\end{tikzpicture}
+\end{document}

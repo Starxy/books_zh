@@ -1,0 +1,21 @@
+% 图15.1：按原图时间轴、括号、实心向下箭头及无箭头头的虚线连接重绘。
+\begin{tikzpicture}[x=.55mm,y=-.55mm,>={Stealth[length=2.4mm,width=1.8mm]},font=\small]
+ \draw (19.08,11.90) rectangle (131.04,29.57);
+ \filldraw[fill=gray!22] (19.08,11.90) rectangle (36.75,29.57);
+ \filldraw[fill=gray!22] (119.25,11.90) rectangle (131.04,29.57);
+ \node at (27.92,20.73) {$t-1$};
+ \node at (125.14,20.73) {$t$};
+ \filldraw[fill=gray!22] (152.64,11.90) rectangle (228.67,29.57);
+ \node at (190.66,20.73) {适用 $t=1,2,3,4,5$};
+ \draw (36.75,32.52) .. controls (36.75,37.40) and (39.83,41.36) .. (43.63,41.36)
+  -- (71.13,41.36) .. controls (74.92,41.36) and (78.00,45.31) .. (78.00,50.20)
+  .. controls (78.00,45.31) and (81.08,41.36) .. (84.88,41.36)
+  -- (112.37,41.36) .. controls (116.17,41.36) and (119.25,37.40) .. (119.25,32.52);
+ \node[align=center,text width=44mm] at (78,72) {两次访视间隔内的住院：\\$L_t$};
+ \draw[line width=1.0pt,->] (125.24,32.52) -- (125.24,91.45);
+ \node[align=center,text width=45mm] at (130,113) {时点 $t$ 仍在母乳喂养\\（二元变量）：$A_t$};
+ \draw[line width=1.0pt,dash pattern=on 1.0pt off 1.0pt]
+  (39.00,25.29) .. controls (14.04,46.17) and (22.58,97.49) .. (58.07,139.93);
+ \node[draw,line width=.6pt,densely dotted,anchor=north,minimum height=22.7mm,align=center,text width=45mm,inner sep=4pt]
+  at (58,141) {时点 $t$ 的删失：$C_t$。\\错过时点 $t$ 的访视，\\意味着未测量 $L_t$ 和 $A_t$。};
+\end{tikzpicture}

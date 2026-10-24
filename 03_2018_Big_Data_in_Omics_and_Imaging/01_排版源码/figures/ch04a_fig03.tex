@@ -1,0 +1,30 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+\fill[red!90] (1.6,2.3) rectangle (3.3,3.9);
+\filldraw[fill=inkblue!70,draw=blue] (4.65,2.3) rectangle (5.7,3.9);
+\fill[green!65!black] (7.15,2.3) rectangle (9.25,3.9);
+\node[text=white] at (2.45,3.1) {CTAG};
+\node[text=white] at (5.18,3.1) {GA};
+\node[text=white] at (8.2,3.1) {GAT};
+\node[text=red] at (2.35,1.95) {外显子1};
+\node[text=inkblue] at (5.18,4.3) {外显子2};
+\node[text=green!65!black] at (8.35,1.95) {外显子3};
+\draw[magenta,<->] (2.45,3.95)--(2.45,4.9)--(7.95,4.9)--(7.95,3.95);
+\draw[inkblue,<->] (2.95,2.3)--(2.95,1.7)--(4.65,1.7)--(4.65,2.3);
+\draw[inkblue,<->] (5.55,2.3)--(5.55,1.7)--(7.45,1.7)--(7.45,2.3);
+\node[anchor=east] at (1.85,.75) {转录本};
+\node[text=red,font=\bfseries] at (2.6,.75) {CTAG};
+\draw[orange] (3.35,.75)--(7.45,.75);
+\node[text=green!65!black,font=\bfseries] at (8.15,.75) {GAT};
+\node[anchor=west] at (9.1,.75) {mRNA1};
+\node[text=red,font=\bfseries] at (2.6,-.15) {CTAG};
+\draw[orange] (3.35,-.15)--(4.7,-.15);
+\node[text=inkblue,font=\bfseries] at (5.18,-.15) {GA};
+\draw[orange] (5.7,-.15)--(7.45,-.15);
+\node[text=green!65!black,font=\bfseries] at (8.15,-.15) {GAT};
+\node[anchor=west] at (9.1,-.15) {mRNA2};
+\end{tikzpicture}
+\origfig{3}{剪接。}
+\label{fig:ch04a-03}
+\end{figure}

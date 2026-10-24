@@ -1,0 +1,223 @@
+% 原书PDF第29页7.1.4.5.3至第33页7.1.4.5.4标题前。
+\bookdeepheading{paragraph}{7.1.4.5.3}{各向同性高斯参考测度与迹方法}
+假设 $X$、$Y$ 分别为 $n$ 维和 $m$ 维多元正态向量，均值为零，协方差矩阵分别为 $\Sigma_X$ 和 $\Sigma_Y$（Janzing et al. 2010）。进一步假定 $Y$ 是 $X$ 的线性变换：
+\begin{equation}
+Y=AX,
+\tag{7.111}
+\end{equation}
+其中 $A$ 为 $m\times n$ 矩阵。归一化迹（renormalized trace）定义为
+\begin{equation}
+\tau_n(\cdot)=\frac{\Tr(\cdot)}n.
+\tag{7.112}
+\end{equation}
+令 $O(n)$ 表示 $n\times n$ 实正交矩阵组成的群。附录7.E证明迹方法的以下基本结果（Janzing et al. 2010，定理1）。
+
+\par\medskip\Needspace{6\baselineskip}\noindent\textbf{结论7.15：迹的乘法性}\par
+设 $\Sigma$ 为 $n\times n$ 对称正定矩阵，$A$ 为 $m\times n$ 矩阵。令 $U$ 为按照Haar测度，从 $n\times n$ 实正交矩阵群 $O(n)$ 中随机选取的正交矩阵。则
+\begin{equation}
+\left|\tau_m(AU\Sigma U^TA^T)-\tau_n(\Sigma)\tau_m(AA^T)\right|
+\le2\varepsilon\lVert\Sigma\rVert\lVert AA^T\rVert
+\tag{7.113}
+\end{equation}
+以至少 $q=1-\exp(-\kappa(n-1)\varepsilon^2)$ 的概率成立。其中常数 $\kappa$ 独立于 $\Sigma,A,n,m,\varepsilon$，$\lVert\cdot\rVert$ 表示矩阵范数。结论7.15蕴含，矩阵对 $(A,\Sigma_X)$ 满足
+\begin{equation}
+\tau_n(A\Sigma_XA^T)\approx\tau_n(\Sigma)\tau_m(AA^T).
+\tag{7.114}
+\end{equation}
+式 (7.99) 可用于推断因果关系。定义
+\begin{equation}
+\Delta_{X\to Y}=\log\tau_n(A\Sigma A^T)-\log\tau_n(\Sigma)-\log\tau_m(AA^T).
+\tag{7.115}
+\end{equation}
+习题6表明，一维情形下 $\Delta$ 等于零，意味着迹方法不能用于两个一维变量。
+
+下面证明：若假设 $n\le m$，且 $A$ 的秩为 $n$，则 $\Delta_{X\to Y}=0$，$\Delta_{Y\to X}\le0$。考虑确定性线性模型
+\[
+Y=AX,\qquad X=A^-Y,
+\]
+其中 $A^-$ 表示矩阵 $A$ 的伪逆。定义
+\begin{equation}
+\Delta_{Y\to X}=\log\tau_n(A^-\Sigma_{YY}A^{-T})
+-\log\tau_m(\Sigma_{YY})-\log\tau_n(A^-A^{-T}).
+\tag{7.116}
+\end{equation}
+假设实值随机变量 $Z$ 服从 $AA^T$ 的特征值经验分布，即对所有 $k\in\mathbb Z$，均有 $\tau_m((AA^T)^k)=E(Z^k)$。可以证明（习题7），
+\begin{equation}
+\Delta_{X\to Y}+\Delta_{Y\to X}
+=-\log(1-\operatorname{cov}(Z,1/Z))+\log\frac nm.
+\tag{7.117}
+\end{equation}
+粗略而言，由于 $E[Z]\ge0$、$E[1/Z]\ge0$、$E[Z]E[1/Z]\ge1$，可得
+\[
+\Cov(Z,1/Z)\le0,\qquad-\log(1-\Cov(Z,1/Z))\le0.
+\]
+当 $n=m$ 时，
+\begin{equation}
+\Delta_{X\to Y}+\Delta_{Y\to X}\le0.
+\tag{7.118}
+\end{equation}
+
+下面以各向同性高斯分布作为参考测度，考虑原因 $X$ 的协方差矩阵的各向异性。先定义协方差矩阵的各向异性（Janzing et al. 2010）。
+
+\begin{bookdefinition}{7.9}
+\textbf{协方差矩阵的各向异性。}协方差矩阵 $\Sigma_1$ 的各向异性，定义为高斯分布 $\Sigma_1$ 与协方差 $\Sigma_0=\lambda I$ 的各向同性高斯分布之间的最小K–L距离：
+\begin{equation}
+D(\Sigma_1)=\min_\lambda D(P_{\Sigma_1}\Vert P_{\Sigma_0}).
+\tag{7.119}
+\end{equation}
+\end{bookdefinition}
+附录7.F证明，
+\begin{equation}
+D(\Sigma_1)=\frac12\bigl(n\log\tau_n(\Sigma_1)-\log|\Sigma_1|\bigr).
+\tag{7.120}
+\end{equation}
+假设 $\varepsilon_X$、$\varepsilon_Y$ 都是各向同性高斯分布的流形，$\varepsilon_X^*$、$\varepsilon_Y^*$ 分别是 $P_X$、$P_Y$ 的投影。附录7.F还证明结论7.16（Janzing et al. 2010）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.16：输出协方差矩阵的各向异性与K–L距离}\par
+假设 $P_X$ 与 $P_Y$ 的协方差矩阵分别为 $\Sigma_X$ 与 $\Sigma_Y=A\Sigma_XA^T$，则
+\begin{equation}
+D(\Sigma_X)=D(P_X\Vert\varepsilon_X^*)
+=\frac12\bigl(n\log\tau_n(\Sigma_X)-\log|\Sigma_X|\bigr),
+\tag{7.121}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+D(A\Sigma_XA^T)&=D(P_Y\Vert\varepsilon_Y^*)
+=\frac12\bigl(n\log\tau_n(\Sigma_Y)-\log|\Sigma_Y|\bigr)\\
+&=\frac n2\Delta_{X\to Y}+D(\Sigma_X)+D(AA^T).
+\end{aligned}
+\tag{7.122}
+\end{equation}
+附录7.F还证明关于独立性的结论7.17（Janzing et al. 2012；Zscheischler et al. 2011）。
+
+\par\medskip\Needspace{4\baselineskip}\noindent\textbf{结论7.17：原因与线性变换矩阵的独立性}\par
+若 $X\to Y$ 且 $Y=AX$，则
+\begin{equation}
+\tau_n(A\Sigma_XA^T)=\tau_n(\Sigma_X)\tau_n(AA^T).
+\tag{7.123}
+\end{equation}
+
+现在将 $X$、$Y$ 之间的确定性关系扩展为随机关系。考虑一般线性模型（Janzing et al. 2010）：
+\begin{equation}
+Y=AX+e,
+\tag{7.124}
+\end{equation}
+其中 $A$ 为 $m\times n$ 矩阵，$e$ 为均值零、协方差矩阵 $\Sigma_e$ 的噪声向量，在统计上独立于 $X$。容易证明，
+\begin{equation}
+\Sigma_Y=A\Sigma_XA^T+\Sigma_e,
+\tag{7.125}
+\end{equation}
+\begin{equation}
+\widehat A=\Sigma_{YX}\Sigma_X^{-1}.
+\tag{7.126}
+\end{equation}
+反向模型为
+\begin{equation}
+X=\widetilde AY+\widetilde e,
+\tag{7.127}
+\end{equation}
+其中
+\begin{equation}
+\widetilde A=\Sigma_{XY}\Sigma_Y^{-1}.
+\tag{7.128}
+\end{equation}
+若假设 $A$ 为正交变换，$e$ 为各向同性，即 $\Sigma_e=\lambda I$，则可证明结论7.18（Janzing et al. 2010；附录7.G）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.18：含噪声线性模型的迹方法}\par
+考虑 $Y=AX+e$，其中 $A$ 为正交矩阵，噪声向量 $e$ 的协方差为 $\Sigma_e=\lambda I$，$\lambda>0$。则
+\begin{equation}
+\begin{aligned}
+\Delta_{Y\to X}
+&=\log\frac{\tau_n(\widetilde A\Sigma_Y\widetilde A^T)}
+{\tau_n(\Sigma_Y)\tau_n(\widetilde A\widetilde A^T)}\\
+&=\log\frac1n\sum_{i=1}^n\frac{\mu_i^2}{\mu_i+\lambda}
+-\log\frac1n\sum_{i=1}^n(\mu_i+\lambda)\\
+&\hspace{2em}-\log\frac1n\sum_{i=1}^n\frac{\mu_i^2}{(\mu_i+\lambda)^2}>0,
+\end{aligned}
+\tag{7.129}
+\end{equation}
+其中 $\mu_1\ge\mu_2\ge\cdots\ge\mu_n\ge0$ 为协方差矩阵 $\Sigma_X$ 的特征值，且 $n>1$。
+
+若假设 $X$ 与 $Y$ 之间的关联可由
+\[
+r=\frac1n\sum_{i=1}^n\lambda_i^2=\frac1n\Tr(R^2)
+\]
+度量，则在同一模型下，可证明刻画关联的结论7.19（附录7.H）。显然，同一模型下有
+\[
+\begin{aligned}
+\Delta_{X\to Y}&=\log\tau_n(A\Sigma_XA^T)-\log\tau_n(\Sigma_X)-\log\tau_n(AA^T)\\
+&=\log\tau_n(\Sigma_X)-\log\tau_n(\Sigma_X)-\log(1)=0.
+\end{aligned}
+\]
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.19：关联的刻画}\par
+假设模型为
+\[
+Y=AX+e,
+\]
+其中 $A$ 为可逆矩阵，噪声向量 $e$ 满足 $\Sigma_e=\lambda I$，$\lambda>0$。则 $X$ 与 $Y$ 之间的关联度量为
+\begin{equation}
+r=\frac1n\sum_{i=1}^n\frac{\mu_i}{\mu_i+\lambda},
+\tag{7.130}
+\end{equation}
+且 $r<1$、$\log r<0$。
+
+不假设 $A$ 正交时，因果与关联度量计算为
+\begin{equation}
+\begin{aligned}
+\Delta_{X\to Y}
+&=\log\tau_m(\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY})-\log\tau_n(\Sigma_X)\\
+&\hspace{2em}-\log\tau_m(\Sigma_{YX}\Sigma_X^{-2}\Sigma_{XY}),
+\end{aligned}
+\tag{7.131}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\Delta_{Y\to X}
+&=\log\tau_n\bigl(\Sigma_{XY}(\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}+\lambda I)^{-1}\Sigma_{YX}\bigr)\\
+&\hspace{2em}-\log\tau_m(\Sigma_{YX}\Sigma_Y^{-1}\Sigma_{XY}+\lambda I)\\
+&\hspace{2em}-\log(\tau_n(\Sigma_{XY}(\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}+\lambda I)^{-2}\Sigma_{YX},
+\end{aligned}
+\tag{7.132}
+\end{equation}
+以及
+\begin{equation}
+r=\log\tau_n(\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1}).
+\tag{7.133}
+\end{equation}
+综上，若 $X\to Y$，则 $\Delta_{X\to Y}=0$、$\Delta_{Y\to X}>0$；若 $Y\to X$，则 $\Delta_{X\to Y}>0$、$\Delta_{Y\to X}=0$；若 $X$ 与 $Y$ 关联，则 $r<0$。线性因果模型检验的统计过程，可汇总为结论7.20（Janzing et al. 2010）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.20：线性因果检验的迹算法}\par
+迹算法如下。
+
+\noindent\textbf{步骤1：}估计 $\Sigma_X$、$\Sigma_Y$、$\Sigma_{XY}$ 和 $\Sigma_{YX}$。
+
+\noindent\textbf{步骤2：}计算 $A=\Sigma_{YX}\Sigma_{XX}^{-1}$。
+
+\noindent\textbf{步骤3：}计算 $\widetilde A=\Sigma_{XY}\Sigma_{YY}^{-1}$。
+
+\noindent\textbf{步骤4：}计算
+\[
+\Delta_{X\to Y}=\log\frac{\tau_m(A\Sigma_XA^T)}{\tau_n(\Sigma_X)\tau_m(AA^T)}
+\]
+与
+\[
+\Delta_{Y\to X}=\log\frac{\tau_n(\widetilde A\Sigma_Y\widetilde A^T)}
+{\tau_m(\Sigma_Y)\tau_n(\widetilde A\widetilde A^T)}.
+\]
+\noindent\textbf{步骤5：}若 $|\Delta_{Y\to X}|>(1+\varepsilon)|\Delta_{X\to Y}|$，则
+\[
+X\to Y.
+\]
+否则：
+\begin{quote}
+若 $|\Delta_{X\to Y}|>(1+\varepsilon)|\Delta_{Y\to X}|$，则
+\[
+Y\to X.
+\]
+否则：没有因果关系，然后检验关联。
+
+结束条件判断。
+\end{quote}
+结束条件判断。

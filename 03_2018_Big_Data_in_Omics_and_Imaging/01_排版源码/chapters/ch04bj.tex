@@ -1,0 +1,503 @@
+% 原PDF148页附录4.D标题—158页附录4.E标题前。
+\section*{附录4.D\quad 低秩表示诱导的稀疏结构方程模型}
+\addcontentsline{toc}{section}{附录4.D 低秩表示诱导的稀疏结构方程模型}
+\markright{附录4.D 低秩表示诱导的稀疏结构方程模型}
+
+低秩表示诱导的线性结构方程模型可表述为
+\begin{equation}
+G\alpha+XB+E=0,\tag{4.D.1}
+\end{equation}
+其中
+\[
+\begin{aligned}
+G&=\begin{bmatrix}G^1&G^2&\cdots&G^K\end{bmatrix}_{n\times r}\\
+&=\begin{bmatrix}
+g_{11}^1&\cdots&g_{1r_1}^1&g_{11}^2&\cdots&g_{1r_2}^2&\cdots&g_{11}^K&\cdots&g_{1r_K}^K\\
+g_{21}^1&\cdots&g_{2r_1}^1&g_{21}^2&\cdots&g_{2r_2}^2&\cdots&g_{21}^K&\cdots&g_{2r_k}^K\\
+\vdots&\vdots&\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+g_{n1}^1&\cdots&g_{nr_1}^1&g_{n1}^2&\cdots&g_{nr_2}^2&\cdots&g_{n1}^K&\cdots&g_{nr_K}^K
+\end{bmatrix}_{n\times r},
+\end{aligned}
+\]
+\[
+\alpha=\begin{bmatrix}
+\alpha^{11}&\alpha^{12}&\cdots&\alpha^{1K}\\
+\alpha^{21}&\alpha^{22}&\cdots&\alpha^{2K}\\
+\vdots&\vdots&\vdots&\vdots\\
+\alpha^{K1}&\alpha^{K2}&\cdots&\alpha^{KK}
+\end{bmatrix}_{r\times r}
+\]
+\begingroup\small\setlength{\arraycolsep}{2pt}
+\[
+\begin{aligned}
+&=\begin{bmatrix}
+\alpha11&\cdots&\alpha_{1r_1}^{11}&\alpha_{11}^{12}&\cdots&\alpha_{1r_2}^{12}&\cdots&\alpha_{11}^{1K}&\cdots&\alpha_{1r_K}^{1K}\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+\alpha_{r_11}^{11}&\cdots&\alpha_{r_1r_1}^{11}&\alpha_{r_11}^{12}&\cdots&\alpha_{r_1r_2}^{12}&\cdots&\alpha_{r_11}^{1K}&\cdots&\alpha_{r_1r_K}^{1K}\\
+\alpha_{11}^{21}&\cdots&\alpha_{1r_1}^{21}&\alpha_{11}^{22}&\cdots&\alpha_{1r_2}^{22}&\cdots&\alpha_{11}^{2K}&\cdots&\alpha_{1r_K}^{2K}\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+\alpha_{r_21}^{21}&\cdots&\alpha_{r_2r_1}^{21}&\alpha_{r_21}^{22}&\cdots&\alpha_{r_2r_2}^{22}&\cdots&\alpha_{r_21}^{2K}&\cdots&\alpha_{r_2r_K}^{2K}\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+\alpha_{11}^{K1}&\cdots&\alpha_{1r_1}^{K1}&\alpha_{11}^{K2}&\cdots&\alpha_{1r_2}^{K2}&\cdots&\alpha_{11}^{KK}&\cdots&\alpha_{1r_K}^{KK}\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+\alpha_{r_K1}^{K1}&\cdots&\alpha_{r_Kr_1}^{K1}&\alpha_{r_K1}^{K2}&\cdots&\alpha_{r_Kr_2}^{K2}&\cdots&\alpha_{r_K1}^{KK}&\cdots&\alpha_{r_Kr_K}^{KK}
+\end{bmatrix}\\
+&=\begin{bmatrix}\alpha^1&\alpha^2&\cdots&\alpha^K\end{bmatrix},
+\end{aligned}
+\]
+\endgroup
+\[
+\alpha^i=\begin{bmatrix}\alpha^{1i}\\\alpha^{2i}\\\vdots\\\alpha^{Ki}\end{bmatrix},\quad
+\alpha^{ii}=\begin{bmatrix}
+\alpha_{11}^{ii}&\cdots&\alpha_{1r_i}^{ii}\\
+\vdots&\vdots&\vdots\\\alpha_{r_i1}^{ii}&\cdots&\alpha_{r_ir_i}^{ii}
+\end{bmatrix},
+\]
+\[
+X=\begin{bmatrix}X^1&X^2&\cdots&X^L\end{bmatrix}
+=\begin{bmatrix}
+x_{11}&x_{12}&\cdots&x_{1L}\\
+x_{21}&x_{22}&\cdots&x_{2L}\\
+\vdots&\vdots&\ddots&\vdots\\
+x_{n1}&x_{n2}&\cdots&x_{nL}
+\end{bmatrix},
+\]
+\[
+\begin{aligned}
+B&=\begin{bmatrix}
+\beta_{11}^1&\cdots&\beta_{1r_1}^1&\beta_{11}^2&\cdots&\beta_{1r_2}^2&\cdots&\beta_{11}^K&\cdots&\beta_{1r_K}^K\\
+\beta_{21}^1&\cdots&\beta_{2r_1}^1&\beta_{21}^2&\cdots&\beta_{2r_2}^2&\cdots&\beta_{21}^K&\cdots&\beta_{2r_K}^K\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+\beta_{L1}^1&\cdots&\beta_{Lr_1}^1&\beta_{L1}^2&\cdots&\beta_{Lr_2}^2&\cdots&\beta_{L1}^K&\cdots&\beta_{Lr_K}^K
+\end{bmatrix},\\
+&=\begin{bmatrix}B^1&B^2&\cdots&B^K\end{bmatrix},
+\end{aligned}
+\]
+\[
+B^i=\begin{bmatrix}
+\beta_{11}^i&\beta_{12}^i&\cdots&\beta_{1r_i}^i\\
+\beta_{21}^i&\beta_{22}^i&\cdots&\beta_{2r_i}^i\\
+\vdots&\vdots&\vdots&\vdots\\
+\beta_{L1}^i&\beta_{L2}^i&\cdots&\beta_{Lr_i}^i
+\end{bmatrix}
+=\begin{bmatrix}\beta_1^i\\\beta_2^i\\\vdots\\\beta_L^i\end{bmatrix},\quad
+\beta_l^i=\begin{bmatrix}\beta_{l1}^i&\beta_{l2}^i&\cdots&\beta_{lr_i}^i\end{bmatrix},
+\]
+或
+\[
+B^i=\begin{bmatrix}b_1^i&b_2^i&\cdots&b_{r_i}^i\end{bmatrix},\qquad
+b_j^i=\begin{bmatrix}\beta_{1j}^i\\\beta_{2j}^i\\\vdots\\\beta_{Lj}^i\end{bmatrix},
+\]
+以及
+\[
+\begin{aligned}
+E&=\begin{bmatrix}
+e_{11}^1&\cdots&e_{1r_1}^1&e_{11}^2&\cdots&e_{1r_2}^2&\cdots&e_{11}^K&\cdots&e_{1r_K}^K\\
+e_{21}^1&\cdots&e_{2r_1}^1&e_{21}^2&\cdots&e_{2r_2}^2&\cdots&e_{21}^K&\cdots&e_{2r_K}^K\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots\\
+e_{n1}^1&\cdots&e_{nr_1}^1&e_{n1}^2&\cdots&e_{nr_2}^2&\cdots&e_{n1}^K&\cdots&e_{nr_K}^K
+\end{bmatrix},\\
+&=\begin{bmatrix}E^1&E^2&\cdots&E^K\end{bmatrix},
+\end{aligned}
+\]
+\[
+E^i=\begin{bmatrix}
+e_{11}^i&e_{12}^i&\cdots&e_{1r_i}^i\\
+e_{21}^i&e_{22}^i&\cdots&e_{2r_i}^i\\
+\vdots&\vdots&\vdots&\vdots\\
+e_{n1}^i&e_{n2}^i&\cdots&e_{nr_i}^i
+\end{bmatrix}.
+\]
+低秩表示诱导的线性结构方程模型与经典标量线性结构方程模型的区别在于：标量模型中的每个节点表示一个随机变量，而低秩表示诱导模型中的每个节点表示一个随机变量向量。因此，节点 $i$ 对应的矩阵方程为
+\begin{equation}
+G\alpha^i+XB^i+E^i=0\tag{4.D.2}
+\end{equation}
+或
+\begin{equation}
+\begin{aligned}
+G^1\alpha^{1i}+\cdots+G^{i-1}\alpha^{i-1i}
++G^i\alpha^{ii}+G^{i+1}\alpha^{i+1i}
++\cdots G^K\alpha^{Ki}+XB^i+E^i=0.
+\end{aligned}\tag{4.D.3}
+\end{equation}
+与第1章式（1.52）类似，式（4.D.3）可重写为
+\begin{equation}
+G^i=G^1\alpha^{1i}+\cdots+G^{i-1}\alpha^{i-1i}
++G^{i+1}\alpha^{i+1i}+\cdots G^K\alpha^{Ki}+XB^i+E^i,\tag{4.D.4}
+\end{equation}
+其中，$\alpha^{-i}$ 为其他所有节点连接至节点 $i$ 的路径系数矩阵。
+矩阵 $\alpha^{ji}$ 度量从向量 $G^j$ 到 $G^i$、即从节点 $j$ 到节点 $i$ 的因果关系强度。
+$\beta_l^i$ 是外生变量到内生变量的路径系数，度量外生变量 $x_l$ 对低秩表示得分向量 $G^i$ 的因果效应。
+$\|\alpha^{ji}\|_{2,1}=0$ 与 $\|\beta_l^i\|_{2,1}=0$，分别表示 $G^i$ 和 $x_l$ 对 $G^i$ 没有直接影响，通常从方程中略去。
+
+对式（4.B4）两侧作向量化运算，得到
+\begin{equation}
+\begin{aligned}
+\operatorname{vec}(G^i)
+={}&(I_{r_i}\otimes G^1)\operatorname{vec}(\alpha^{1i})
++\cdots+(I_{r_i}\otimes G^{i-1})\operatorname{vec}(\alpha^{i-1i})\\
+&{}+(I_{r_i}\otimes G^{i+1})\operatorname{vec}(\alpha^{i+1i})
++\cdots+(I_{r_i}\otimes G^K)\operatorname{vec}(\alpha^{Ki})\\
+&{}+(I_{r_i}\otimes X)\operatorname{vec}(B^i)+\operatorname{vec}(E^i)\\
+={}&W_i\Delta_i+\operatorname{vec}(E^i),
+\end{aligned}\tag{4.D.5}
+\end{equation}
+其中
+\[
+g^i=\operatorname{vec}(G^i)=
+\begin{bmatrix}(g_1^i)^T&(g_2^i)^T&\cdots&(g_{r_i}^i)^T\end{bmatrix}^T,
+\quad g_j^i=\begin{bmatrix}g_{1j}^i&g_{2j}^i&\cdots&g_{nj}^i\end{bmatrix}^T,
+\]
+\[
+W_i=\begin{bmatrix}
+(I_{r_i}\otimes G^1)&\cdots&(I_{r_i}\otimes G^{i-1})&
+(I_{r_i}\otimes G^{i+1})&\cdots&(I_{r_i}\otimes G^K)
+\end{bmatrix},
+\]
+\[
+H_i=(I_{r_i}\otimes X),
+\]
+\[
+\delta_i=\begin{bmatrix}
+(\operatorname{vec}(\alpha^{1i}))^T&\cdots&
+(\operatorname{vec}(\alpha^{i-1i}))^T&
+(\operatorname{vec}(\alpha^{i+1i}))^T&\cdots&
+(\operatorname{vec}(\alpha^{Ki}))^T
+\end{bmatrix}^T,
+\]
+\[
+b^i=\operatorname{vec}(B^i).
+\]
+令 $g^i=\operatorname{vec}(G^i)$ 为节点（通路）$i$ 的基因表达低秩表示得分的 $nr_i$ 维向量，
+$e_i=\operatorname{vec}(E^i)$ 为与该节点相关的 $nr_i$ 维随机误差向量；
+$\delta_{ji}=\operatorname{vec}(\alpha^{ji})$（$j=1,\ldots,i-1,i+1,\ldots,K$）为节点 $j$ 连接至节点 $i$ 的 $r_jr_i$ 维路径系数向量；
+$\delta_i=[\delta_{1i}^T\ \cdots\ \delta_{i-1i}^T\ \delta_{i+1i}^T\ \cdots\ \delta_{Ki}^T]^T$
+为其他所有节点连接至节点 $i$ 的 $J_i=(r_1+\cdots+r_{i-1}+r_{i+1}+\cdots+r_K)r_i$ 维路径系数向量；
+$b^i=\operatorname{vec}(B^i)=[(b_1^i)^T\ (b_2^i)^T\ \cdots\ (b_{r_i}^i)^T]^T$
+为全部外生节点（基因型与环境节点）连接至节点 $i$ 的 $r_iL$ 维路径系数向量，且
+\[
+\Delta_i=\begin{bmatrix}\delta_i\\b_i\end{bmatrix}.
+\]
+于是式（4.D.5）可写为
+\begin{equation}
+g^i=W_i\delta_i+H_ib^i+e_i,\tag{4.D.6}
+\end{equation}
+其中，$e_i$ 为 $r_in$ 维随机向量，均值为零，协方差矩阵为 $\sigma_{ii}I_{r_in}$。
+
+在式（4.D.6）两侧左乘 $(I_{r_i}\otimes X)^T$，得到
+\begin{equation}
+(I_{r_i}\otimes X)^Tg^i
+=(I_{r_i}\otimes X)^T(W_i\delta_i+H_ib^i)+(I_{r_i}\otimes X)^Te_i,\tag{4.D.7}
+\end{equation}
+其中
+\[
+\operatorname{cov}\bigl((I_{r_i}\otimes X)^Te_i,(I_{r_i}\otimes X)^Te_i\bigr)
+=\sigma_{ii}(I_{r_i}\otimes X^TX).
+\]
+对式（4.D.7）采用加权最小二乘和 $l_2$ 范数惩罚，构造优化问题
+\begin{equation}
+\begin{aligned}
+\min_{\delta_i,b^i}\quad f(\delta_i,b^i)
++\lambda_1\left(\sum_{j=1}^{i-1}\|\delta_{ji}\|_2
++\sum_{j=i+1}^{K}\|\delta_{ji}\|_2\right)
++\lambda_2\sum_{l=1}^{r_i}\|b_l^i\|_2,
+\end{aligned}\tag{4.D.8}
+\end{equation}
+其中
+\[
+\begin{aligned}
+f(\delta_i,b^i)={}&
+[(I_{r_i}\otimes X)^Tg^i-(I_{r_i}\otimes X)^T(W_i\delta_i+H_ib^i)]^T\\
+&{}\times(I_{r_i}\otimes X^TX)^{-1}
+[(I_{r_i}\otimes X)^Tg^i-(I_{r_i}\otimes X)^T(W_i\delta_i+H_ib^i)],
+\end{aligned}
+\]
+\[
+\|\alpha^{-i}\|_{2,1}=\sum_{j=1}^{i-1}\|\delta_{ji}\|_2
++\sum_{j=i+1}^{K}\|\delta_{ji}\|_2,\qquad
+\|B^i\|_{2,1}=\sum_{l=1}^{r_i}\|b_l^i\|_2.
+\]
+矩阵 $M$ 的范数定义为 $\|M\|_{2,1}=\sum_j\|[M]_{:,j}\|_2$，$[M]_{.,j}$ 为第 $j$ 列向量。
+
+为将光滑优化 $\min f(\delta_i,b^i)$ 与非光滑优化 $\|\alpha^{-i}\|_{2,1},\|B^i\|_{2,1}$ 分离，引入约束 $\delta_{ji}-Z_j^1=0$、$b_l^i-Z_l^2=0$，将问题（4.D.8）转为约束优化问题：
+\begin{equation}
+\begin{aligned}
+\min_{\delta_i,b^i}\quad f(\delta_i,b^i)
++\lambda_1\left(\sum_{j=1}^{i-1}\|Z_j^1\|_2
++\sum_{j=i+1}^{K}\|Z_j^1\|_2\right)
++\lambda_2\sum_{l=1}^{r_i}\|Z_l^2\|_2
+\end{aligned}\tag{4.D.9}
+\end{equation}
+约束为
+\[
+\delta_{ji}-Z_j^1=0,\quad j=1,\ldots,i-1,i+1,\ldots,K,
+\qquad b_l^i-Z_l^2=0,\quad l=1,\ldots,r_i.
+\]
+为求解问题（4.D.9），构造增广拉格朗日函数
+\begin{equation}
+\begin{aligned}
+L(\delta_i,b^i,Z)={}&\frac12f(\delta_i,b^i)
++\lambda_1\left(\sum_{j=1}^{i-1}\|Z_j^1\|_2+\sum_{j=i+1}^{K}\|Z_j^1\|_2\right)
++\lambda_2\sum_{l=1}^{r_i}\|Z_l^2\|_2\\
+&{}+\sum_{j=1}^{i-1}\mu_j^T(\delta_{ji}-Z_j^1)
++\sum_{j=i+1}^{K}\mu_j^T(\delta_{ji}-Z_j^1)\\
+&{}+\frac{\rho_1}{2}\left(\sum_{j=1}^{i-1}\|\delta_{ji}-Z_j^1\|_2^2
++\sum_{j=i+1}^{K}\|\delta_{ji}-Z_j^1\|_2^2\right)\\
+&{}+\sum_{l=1}^{r_i}\pi_l^T(b_l^i-Z_l^2)
++\frac{\rho_2}{2}\sum_{l=1}^{r_i}\|b_l^i-Z_l^2\|_2^2.
+\end{aligned}\tag{4.D.10}
+\end{equation}
+经过代数变换，得到
+\begin{equation}
+\begin{aligned}
+L(\delta_i,b^i,Z)={}&\frac12f(\delta_i,b^i)
++\lambda_1\left(\sum_{j=1}^{i-1}\|Z_j^1\|_2+\sum_{j=i+1}^{K}\|Z_j^1\|_2\right)
++\lambda_2\sum_{l=1}^{r_i}\|Z_l^2\|_2\\
+&{}+\frac{\rho_1}{2}\left(\sum_{j=1}^{i-1}\|\delta_{ji}-Z_j^1+u_j\|_2^2
++\sum_{j=i+1}^{K}\|\delta_{ji}-Z_j^1+u_j\|_2^2\right)\\
+&{}+\frac{\rho_2}{2}\sum_{l=1}^{r_i}\|b_l^i-Z_l^2+v_l\|_2^2.
+\end{aligned}\tag{4.D.11}
+\end{equation}
+求解问题（4.D.11）的交替方向乘子法（ADMM）包含以下迭代：
+\begin{equation}
+\begin{aligned}
+\delta_{ji}^{(k+1)}:=\arg\min_{\delta_{ji}}\quad
+&\frac12f(\delta_i,b^i)
++\frac{\rho_1}{2}\biggl(
+\sum_{j=1}^{i-1}\|\delta_{ji}-(Z_j^1)^k+u_j^{(k)}\|_2^2\\
+&\hspace{4em}{}+\sum_{j=i+1}^{K}\|\delta_{ji}-(Z_j^1)^{(k)}+u_j^{(k)}\|_2^2\biggr),\\
+&j=1,\ldots,i-1,i+1,\ldots,K,
+\end{aligned}\tag{4.D.12}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+(b_l^i)^{(k+1)}:=\arg\min_{b_l^i}\quad
+\frac12f(\delta_i,b^i)+\frac{\rho_2}{2}\sum_{l=1}^{r_i}
+\|b_l^i-(Z_l^2)^{(k)}+v_l^{(k)}\|_2^2,
+\quad l=1,\ldots,r_i,
+\end{aligned}\tag{4.D.13}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+(Z_j^1)^{(k+1)}:=\arg\min_{Z_j^1}\quad
+&\lambda_1\left(\sum_{j=1}^{i-1}\|Z_j^1\|_2+\sum_{j=i+1}^{K}\|Z_j^1\|_2\right)\\
+&{}+\frac{\rho_1}{2}\biggl(\sum_{j=1}^{i-1}
+\|\delta_{ji}^{(k+1)}-Z_j^1+u_j^{(k)}\|_2^2\\
+&\hspace{5em}{}+\sum_{j=i+1}^{K}
+\|\delta_{ji}^{(k+1)}-Z_j^1+u_j^{(k)}\|_2^2\biggr),\\
+&j=1,\ldots,i-1,i+1,\ldots,K,
+\end{aligned}\tag{4.D.14}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+(Z_l^2)^{(k+1)}:=\arg\min_{Z_l^2}\quad
+\lambda_2\sum_{l=1}^{r_i}\|Z_l^2\|_2
++\frac{\rho_2}{2}\sum_{l=1}^{r_i}\|b_l^i-Z_l^2+v_l\|_2^2,
+\quad l=1,\ldots,r_i,
+\end{aligned}\tag{4.D.15}
+\end{equation}
+\begin{equation}
+u_j^{(k+1)}:==u_j^{(k+1)}+
+\bigl(\delta_{ji}^{(k+1)}-(Z_j^1)^{(k+1)}\bigr).\tag{4.D.16}
+\end{equation}
+\begin{equation}
+v_l^{(k+1)}:==v_l^{(k)}+
+\bigl((b_l^i)^{(k+1)}-(Z_l^2)^{(k+1)}\bigr).\tag{4.D.17}
+\end{equation}
+对于 $f(\Delta_i)$ 的某些特殊形式，问题（9.90）具有闭式解。为了求解最小化问题（4.D.4），首先计算
+\[
+\begin{aligned}
+\frac{\partial f}{\partial\delta_i}
+={}&-2W_i^T(I_{r_i}\otimes X)(I_{r_i}\otimes X^TX)^{-1}\\
+&{}\times[(I_{r_i}\otimes X)^Tg^i-(I_{r_i}\otimes X)^T(W_i\delta_i+H_ib^i)]
+\end{aligned}
+\]
+以及
+\begin{equation}
+\frac{\partial\|\delta_i-Z^1+u\|_2^2}{\partial\delta_i}
+=2(\delta_i-Z^1+u),\tag{4.D.18}
+\end{equation}
+其中
+\[
+Z^1=\begin{bmatrix}Z_1^1\\\vdots\\Z_{i-1}^1\\Z_{i+1}^1\\\vdots\\Z_K^1\end{bmatrix},\qquad
+u=\begin{bmatrix}u_1\\\vdots\\u_{i-1}\\u_{i+1}\\\vdots\\u_K\end{bmatrix}.
+\]
+令 $\partial l/\partial\delta_i=0$，利用式（4.D.18），得到
+\[
+\begin{aligned}
+&-W_i^T(I_{r_i}\otimes X)(I_{r_i}\otimes X^TX)^{-1}\\
+&\quad{}\times[(I_{r_i}\otimes X)^Tg^i-(I_{r_i}\otimes X)^T(W_i\delta_i+H_ib^i)]
++\rho_1(\delta_i-Z^1+u)=0,
+\end{aligned}
+\]
+从而
+\begin{equation}
+\begin{aligned}
+&-W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]
+ [g^i-(W_i\delta_i+H_i(b^i)^{(k)})]\\
+&\qquad{}+\rho_1(\delta_i-(Z^1)^{(k)}+u^{(k)})=0.
+\end{aligned}\tag{4.D.19}
+\end{equation}
+求解得到
+\begin{equation}
+\begin{aligned}
+\delta_i^{(k+1)}={}&
+\{W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]W_i+\rho_1I\}^{-1}\\
+&{}\times\{W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]g^i
++\rho_1((Z^1)^{(k)}-u^{(k)})\}.
+\end{aligned}\tag{4.D.20}
+\end{equation}
+类似地，
+\[
+\begin{aligned}
+\frac{\partial f}{\partial b^i}
+={}&-2H_i^T(I_{r_i}\otimes X)(I_{r_i}\otimes X^TX)^{-1}\\
+&{}\times[(I_{r_i}\otimes X)^Tg^i-(I_{r_i}\otimes X)^T(W_i\delta_i+H_ib^i)]
+\end{aligned}
+\]
+以及
+\[
+\frac{\partial\|b^i-Z^2+v\|_2^2}{\partial b^i}=2(b^i-Z^2+v).
+\]
+令 $\partial l/\partial b^i=0$，得到
+\begin{equation}
+\begin{aligned}
+&-H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]
+ [g^i-(W_i\delta_i^{(k+1)}+H_ib^i)]\\
+&\qquad{}+\rho_2(\delta_i^{(k+1)}-(Z^2)^{(k)}+v^{(k)})=0.
+\end{aligned}\tag{4.D.21}
+\end{equation}
+对 $b_i$ 求解，得到
+\begin{equation}
+\begin{aligned}
+(b^i)^{k+1}={}&
+\{H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]H_i+\rho_2I\}^{-1}\\
+&{}\times\{H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]g^i
++\rho_2((Z^2)^{(k)}-v^{(k)})\},
+\end{aligned}\tag{4.D.22}
+\end{equation}
+其中
+\[
+b^i=\begin{bmatrix}b_1^i\\b_2^i\\\vdots\\b_{r_i}^i\end{bmatrix},\quad
+Z^2=\begin{bmatrix}Z_1^2\\Z_2^2\\\vdots\\Z_{r_i}^2\end{bmatrix},\quad
+v=\begin{bmatrix}v_1\\v_2\\\vdots\\v_{r_i}\end{bmatrix}.
+\]
+优化问题（4.D.14）不可微。尽管其前两项不可微，仍可使用第1章的次微分运算得到简单闭式解。
+当 $\|Z_j^1\|_2\ne0$ 时，对目标函数关于 $Z_j^1$ 求导，得到
+\[
+\lambda_1\frac{Z_j^1}{\|Z_j^1\|_2}
+-\rho_1(\delta_{ji}^{(k+1)}-Z_j^1+u_j^{(k)})=0,
+\]
+从而
+\begin{equation}
+\left(\frac{\lambda_1}{\rho_1\|Z_j^1\|_2}+1\right)Z_j^1
+=\delta_{ji}^{(k+1)}+u_j^{(k)}.\tag{4.D.23}
+\end{equation}
+取式（4.D.23）两侧的 $l_2$ 范数，得到
+\begin{equation}
+\left(\frac{\lambda_1}{\rho_1\|Z_j^1\|_2}+1\right)\|Z_j^1\|_2
+=\|\delta_{ji}^{(k+1)}+u_j^{(k)}\|_2.\tag{4.D.24}
+\end{equation}
+对 $\|Z_j^1\|_2$ 求解，得到
+\begin{equation}
+\|Z_j^1\|_2=\left(\|\delta_{ji}^{(k+1)}+u_j^{(k)}\|_2-
+\frac{\lambda_1}{\rho_1}\right)_+,
+\quad j=1,\ldots,i-1,i+1,\ldots,K,\tag{4.D.25}
+\end{equation}
+其中 $(a)_+=\max(a,0)$。将式（4.D.25）代入式（4.D.23），得到
+\begin{equation}
+\begin{aligned}
+(Z_j^1)^{(k+1)}&=
+\frac{(\|\delta_{ji}^{(k+1)}+u_j^{(k)}\|_2-\lambda_1/\rho_1)_+}{
+\|\delta_{ji}^{(k+1)}+u_j^{(k)}\|_2}
+(\delta_{ji}^{(k+1)}+u_j^{(k)}),\\
+&\hspace{4em}j=1,\ldots,i-1,i+1,\ldots,K.
+\end{aligned}\tag{4.D.26}
+\end{equation}
+类似地，问题（4.D.15）的解为
+\begin{equation}
+\begin{aligned}
+(Z_l^2)^{(k+1)}&=
+\frac{(\|(b_l^i)^{(k+1)}+v_l^{(k)}\|_2-\lambda_2/\rho_2)_+}{
+\|(b_l^i)^{(k+1)}+v_l^{(k)}\|_2}
+((b_l^i)^{(k+1)}+v_l^{(k)}),\\
+&\hspace{4em}l=1,\ldots,r_i.
+\end{aligned}\tag{4.D.27}
+\end{equation}
+算法概括如下。
+
+\par\medskip\noindent\textbf{求解低秩表示诱导SEM的ADMM算法}
+
+对 $i=1,\ldots,K$，执行以下步骤。
+
+\noindent\textbf{步骤1：初始化。}
+\[
+u^0:=0,\qquad v^0:=0,
+\]
+\[
+\begin{aligned}
+\delta_i^{(0)}={}&
+\{W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]W_i+\rho_1I\}^{-1}\\
+&{}\times W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]g^i,
+\end{aligned}
+\]
+\[
+\begin{aligned}
+(b^i)^{(0)}={}&
+\{H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]H_i+\rho_2I\}^{-1}\\
+&{}\times H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]g^i,
+\end{aligned}
+\]
+\[
+(Z_j^1)^{(0)}=\frac{(\|\delta_{ji}^{(0)}\|_2-\lambda_1/\rho_1)_+}{
+\|\delta_{ji}^{(0)}\|_2}\delta_{ji}^{(0)},\quad j=1,\ldots,i-1,i+1,\ldots,K,
+\]
+\[
+(Z_l^2)^{(0)}=\frac{(\|(b_l^i)^{(0)}\|_2-\lambda_2/\rho_2)_+}{
+\|(b_l^i)^{(0)}\|_2}(b_l^i)^{(0)},\quad l=1,\ldots,r_i.
+\]
+重复步骤2、3、4，直至收敛。
+
+\noindent\textbf{步骤2：}
+\[
+\begin{aligned}
+\delta_i^{(k+1)}={}&
+\{W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]W_i+\rho_1I\}^{-1}\\
+&{}\times\{W_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]g^i
++\rho_1((Z^1)^{(k)}-u^{(k)})\},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+(b^i)^{k+1}={}&
+\{H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]H_i+\rho_2I\}^{-1}\\
+&{}\times\{H_i^T[I_{r_i}\otimes X(X^TX)^{-1}X^T]g^i
++\rho_2((Z^2)^{(k)}-v^{(k)})\}.
+\end{aligned}
+\]
+\noindent\textbf{步骤3：}
+\[
+\begin{aligned}
+(Z_j^1)^{(k+1)}&=
+\frac{(\|\delta_{ji}^{(k+1)}+u_j^{(k)}\|_2-\lambda_1/\rho_1)_+}{
+\|\delta_{ji}^{(k+1)}+u_j^{(k)}\|_2}
+(\delta_{ji}^{(k+1)}+u_j^{(k)}),\\
+&\hspace{4em}j=1,\ldots,i-1,i+1,\ldots,K,
+\end{aligned}
+\]
+\[
+(Z_l^2)^{(k+1)}=
+\frac{(\|(b_l^i)^{(k+1)}+v_l^{(k)}\|_2-\lambda_2/\rho_2)_+}{
+\|(b_l^i)^{(k+1)}+v_l^{(k)}\|_2}
+((b_l^i)^{(k+1)}+v_l^{(k)}),\quad l=1,\ldots,r_i.
+\]
+\noindent\textbf{步骤4：}
+\[
+u_j^{(k+1)}:==u_j^{(k+1)}+
+\bigl(\delta_{ji}^{(k+1)}-(Z_j^1)^{(k+1)}\bigr),\quad
+j=1,\ldots,i-1,i+1,\ldots,K,
+\]
+\[
+v_l^{(k+1)}:==v_l^{(k)}+
+\bigl((b_l^i)^{(k+1)}-(Z_l^2)^{(k+1)}\bigr),\quad l=1,\ldots,r_i.
+\]

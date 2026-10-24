@@ -1,0 +1,117 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.8cm}
+\def\nodew{10cm}
+
+\tikzstyle{lnode} = [minimum width=3cm,minimum height=1.0cm,inner sep=2pt,draw,thick,fill=white,rounded corners=1pt]
+\tikzstyle{snode} = [circle,minimum size=0.2cm,inner sep=0,draw=white,line width=0.02cm,fill=black]
+
+\begin{scope}
+
+\node [anchor=west] (x0) at (0,0) {\footnotesize{$x_0$}};
+\node [anchor=west] (x1) at ([xshift=\ssep]x0.east) {\footnotesize{$x_1$}};
+\node [anchor=west] (x2) at ([xshift=\ssep]x1.east) {\footnotesize{$\cdots$}};
+\node [anchor=west] (x3) at ([xshift=\ssep]x2.east) {\footnotesize{$x_m$}};
+\node [anchor=west] (y1) at ([xshift=\ssep]x3.east) {\footnotesize{$y_1$}};
+\node [anchor=west] (y2) at ([xshift=\ssep]y1.east) {\footnotesize{$\cdots$}};
+\node [anchor=west] (y3) at ([xshift=\ssep]y2.east) {\footnotesize{$y_{i-1}$}};
+
+\node [anchor=south west,draw,minimum width=\nodew,minimum height=0.7cm] (embeddinglayer) at ([xshift=-0.3cm,yshift=0.4cm]x0.north west) {\small{嵌入层}};
+
+\draw [->] ([yshift=0.2cm]x0.center) -- ([yshift=0.5cm]x0.center);
+\draw [->] ([yshift=0.2cm]x1.center) -- ([yshift=0.5cm]x1.center);
+%\draw [->] ([yshift=0.2cm]x2.center) -- ([yshift=0.5cm]x2.center);
+\draw [->] ([yshift=0.2cm]x3.center) -- ([yshift=0.5cm]x3.center);
+\draw [->] ([yshift=0.2cm]y1.center) -- ([yshift=0.5cm]y1.center);
+%\draw [->] ([yshift=0.2cm]y2.center) -- ([yshift=0.5cm]y2.center);
+\draw [->] ([yshift=0.2cm]y3.center) -- ([yshift=0.5cm]y3.center);
+
+\node [anchor=south west,draw,minimum width=\nodew,minimum height=3.8cm] (transformer) at ([xshift=-0.3cm,yshift=1.6cm]x0.north west) {};
+\node [anchor=south east] (decoderlable) at (transformer.north west) {\footnotesize{解码器输出}};
+
+\draw [->] ([yshift=1.42cm]x0.center) -- ([yshift=1.72cm]x0.center);
+\draw [->] ([yshift=1.42cm]x1.center) -- ([yshift=1.72cm]x1.center);
+%\draw [->] ([yshift=1.42cm]x2.center) -- ([yshift=1.72cm]x2.center);
+\draw [->] ([yshift=1.42cm]x3.center) -- ([yshift=1.72cm]x3.center);
+\draw [->] ([yshift=1.42cm]y1.center) -- ([yshift=1.72cm]y1.center);
+%\draw [->] ([yshift=1.42cm]y2.center) -- ([yshift=1.72cm]y2.center);
+\draw [->] ([yshift=1.42cm]y3.center) -- ([yshift=1.72cm]y3.center);
+
+\node [anchor=south] (embeddingoutputx2) at ([yshift=1.15cm]x2.north) {\footnotesize{$\cdots$}};
+\node [anchor=south] (embeddingoutputy2) at ([yshift=1.15cm]y2.north) {\footnotesize{$\cdots$}};
+
+\node [anchor=south] (linearmap) at ([yshift=1.7cm]x3.north) {\footnotesize{线性映射}};
+\draw [->,dotted] (linearmap.north) -- ([yshift=0.3cm]linearmap.north);
+
+\node [anchor=center,snode] (inx0) at ([yshift=3.2cm]x0.center) {};
+\node [anchor=center,snode] (inx1) at ([yshift=3.2cm]x1.center) {};
+\node [anchor=center] (inx2) at ([yshift=3.2cm]x2.center) {\footnotesize{$\cdots$}};
+\node [anchor=center,snode] (inx3) at ([yshift=3.2cm]x3.center) {};
+\node [anchor=center,snode] (iny1) at ([yshift=3.2cm]y1.center) {};
+\node [anchor=center] (iny2) at ([yshift=3.2cm]y2.center) {\footnotesize{$\cdots$}};
+\node [anchor=center,snode] (iny3) at ([yshift=3.2cm]y3.center) {};
+
+\node [anchor=center,snode,fill=gray!30] (outx0) at ([yshift=4.3cm]x0.center) {};
+\node [anchor=center,snode,fill=gray!30] (outx1) at ([yshift=4.3cm]x1.center) {};
+\node [anchor=center] (outx2) at ([yshift=4.3cm]x2.center) {\color{gray!30} \footnotesize{$\cdots$}};
+\node [anchor=center,snode,fill=gray!30] (outx3) at ([yshift=4.3cm]x3.center) {};
+\node [anchor=center,snode,fill=gray!30] (outy1) at ([yshift=4.3cm]y1.center) {};
+\node [anchor=center] (outy2) at ([yshift=4.3cm]y2.center) {\color{gray!30} \footnotesize{$\cdots$}};
+\node [anchor=center,snode,fill=blue] (outy3) at ([yshift=4.3cm]y3.center) {};
+
+\node [anchor=south] (FFN) at ([yshift=4.8cm]x3.north) {\small{FFN}};
+\draw [<-,dotted] (FFN.south) -- ([yshift=-0.3cm]FFN.south);
+
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx0.90) -- (outx0.-90);
+
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx0.70) -- (outx1.-120);
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx1.90) -- (outx1.-90);
+
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx0.50) -- (outx3.-150);
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx1.70) -- (outx3.-120);
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx3.90) -- (outx3.-90);
+
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx0.30) -- (outy1.-180);
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx1.50) -- (outy1.-150);
+\draw [-{Stealth[length=1.3mm]},gray!30] (inx3.70) -- (outy1.-120);
+\draw [-{Stealth[length=1.3mm]},gray!30] (iny1.90) -- (outy1.-90);
+
+\draw [-{Stealth[length=1.3mm]}] (inx0.0) -- (outy3.160);
+\draw [-{Stealth[length=1.3mm]}] (inx1.20) -- (outy3.190);
+\draw [-{Stealth[length=1.3mm]}] (inx3.40) -- (outy3.220);
+\draw [-{Stealth[length=1.3mm]}] (iny1.60) -- (outy3.250);
+\draw [-{Stealth[length=1.3mm]}] (iny3.90) -- (outy3.270);
+
+\node [anchor=south west,minimum width=0.94*\nodew,minimum height=1.65cm,draw,dotted] (selfatttenionbox) at ([xshift=-0.25cm,yshift=-0.25cm]inx0.south west) {};
+\node [anchor=east] (selfattentionlabel) at ([xshift=-0.4cm]selfatttenionbox.west) {\footnotesize{自注意力}};
+\draw [->] (selfattentionlabel.east) -- ([xshift=-0.1cm]selfatttenionbox.west);
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([xshift=0.2cm]transformer.north east) -- ([xshift=0.2cm]transformer.south east) node [pos=0.5,right,xshift=0.1cm] {\footnotesize{$L$ 层}};
+
+\node [anchor=south west,draw,minimum width=\nodew,minimum height=0.7cm] (softmaxlayer) at ([yshift=0.55cm]transformer.north west) {\small{Softmax 层}};
+
+\draw [->,gray!30] ([yshift=1.45cm]outx0.center) -- ([yshift=1.75cm]outx0.center);
+\draw [->,gray!30] ([yshift=1.45cm]outx1.center) -- ([yshift=1.75cm]outx1.center);
+\draw [->,gray!30] ([yshift=1.45cm]outx3.center) -- ([yshift=1.75cm]outx3.center);
+\draw [->,gray!30] ([yshift=1.45cm]outy1.center) -- ([yshift=1.75cm]outy1.center);
+\draw [->,thick,blue] ([yshift=1.45cm]outy3.center) -- ([yshift=1.75cm]outy3.center);
+
+\node [anchor=south] (decoderoutputx2) at ([yshift=1.2cm]outx2.north) {\color{gray!30} \footnotesize{$\cdots$}};
+\node [anchor=south] (decoderoutputy2) at ([yshift=1.2cm]outy2.north) {\color{gray!30} \footnotesize{$\cdots$}};
+
+\node [anchor=center] (outputx3) at ([yshift=3.2cm]outx3.north) {\color{gray!30} \scriptsize{$\Pr(\cdot|\mathbf{x})$}};
+\node [anchor=center] (outputy1) at ([yshift=3.2cm]outy1.north) {\color{gray!30} \scriptsize{$\Pr(\cdot|\mathbf{x},y_1)$}};
+\node [anchor=center] (outputy2) at ([yshift=3.1cm]outy2.north) {\color{gray!30} \footnotesize{$\cdots$}};
+\node [anchor=center] (outputy3) at ([yshift=3.2cm]outy3.north) {\scriptsize{$\Pr(\cdot|\mathbf{x},\mathbf{y}_{<i})$}};
+\draw [<-,gray!30] (outputx3.south) -- ([yshift=-0.3cm]outputx3.south);
+\draw [<-,gray!30] (outputy1.south) -- ([yshift=-0.3cm]outputy1.south);
+\draw [<-,thick,blue] (outputy3.south) -- ([yshift=-0.3cm]outputy3.south);
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

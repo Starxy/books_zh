@@ -1,0 +1,209 @@
+% 分章页90附录2.B起—94，印刷页162—166。
+\section*{附录2.B\quad 观测数据与干预数据联合分析的惩罚似然函数}
+\addcontentsline{toc}{section}{附录2.B 观测数据与干预数据联合分析的惩罚似然函数}
+\markright{附录2.B 观测数据与干预数据联合分析的惩罚似然函数}
+
+本附录将 Hauser and Buhlmann（2012）用于干预数据与观测数据的结构方程模型推广到包含外生变量的情形。令 $K^{(i)}=(\Sigma_Y^{(i)})^{-1}$，$\xi^{(i)}=K^{(i)}\mu_Y^{(i)}$。注意，
+\begin{equation}
+\begin{aligned}
+&(Y^{(i)}-\mu_Y^{(i)})^T(\Sigma_Y^{(i)})^{-1}(Y^{(i)}-\mu_Y^{(i)})\\
+&\quad=(Y^{(i)}-\mu_Y^{(i)})^TK^{(i)}(Y^{(i)}-\mu_Y^{(i)})\\
+&\quad=\Tr\bigl((Y^{(1)})^TK^{(i)}Y^{(i)}\bigr)
+ -2(Y^{(i)})^TK^{(i)}\mu_Y^{(i)}
+ +(\mu_Y^{(i)})^TK^{(i)}\mu_Y^{(i)}\\
+&\quad=\Tr\bigl(K^{(i)}Y^{(i)}(Y^{(i)})^T\bigr)
+ -2(Y^{(i)})^T\xi^{(i)}
+ +(\xi^{(i)})^T(K^{(i)})^{-1}\xi^{(i)}.
+\end{aligned}\tag{2.B.1}
+\end{equation}
+利用式（2.B.1），并忽略常数项，式（2.124）可以化为
+\begin{equation}
+\begin{aligned}
+-l_D(A,B,T,\Sigma_\varepsilon)
+ \approx{}&\frac12\sum_{i=1}^n
+ \Bigl[\Tr\bigl(K^{(i)}Y^{(i)}(Y^{(i)})^T\bigr)
+       -2(Y^{(i)})^T\xi^{(i)}\\
+ &\qquad+(\xi^{(i)})^T(K^{(i)})^{-1}\xi^{(i)}
+       -\log|K_Y^{(2)}|\Bigr].
+\end{aligned}\tag{2.B.2}
+\end{equation}
+似然函数用于估计模型中的参数。下面说明，$(Y^{(i)})^T\xi^{(i)}$ 和 $(\xi^{(i)})^T(K^{(i)})^{-1}\xi^{(i)}$ 两项不涉及模型参数 $A,B,\Sigma_\varepsilon$。首先证明
+\begin{equation}
+\begin{aligned}
+&\left[R^{(I)}\Sigma_\varepsilon^{(i)}R^{(I)}
+ +(Q^{(I)})^T\Sigma_U^{(i)}Q^{(I)}\right]^{-1}\\
+&\qquad=R^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}
+ +(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}Q^{(I)}.
+\end{aligned}\tag{2.B.3}
+\end{equation}
+考虑图2.8的例子。矩阵 $R^{(I)}$ 与 $Q^{(I)}$ 分别为
+\[
+R^{(I)}=\begin{bmatrix}
+1&0&0&0&0\\
+0&1&0&0&0\\
+0&0&0&0&0\\
+0&0&0&1&0\\
+0&0&0&0&0
+\end{bmatrix},
+\qquad
+Q^{(I)}=\begin{bmatrix}
+0&0&1&0&0\\
+0&0&0&0&1
+\end{bmatrix}.
+\]
+显然，在本例中，$R^{(I)}\Sigma_\varepsilon^{(i)}R^{(I)}$ 的运算保留对角矩阵 $\Sigma_\varepsilon$ 中未被干预节点的方差；$(Q^{(I)})^T\Sigma_U^{(i)}Q^{(I)}$ 的运算保留矩阵 $\Sigma_U^{(i)}$ 对角线上被干预变量的方差。在本例中，
+\[
+R^{(I)}\Sigma_\varepsilon^{(i)}R^{(I)}
+ +(Q^{(I)})^T\Sigma_U^{(i)}Q^{(I)}
+ =\diag(\sigma_1^2,\sigma_2^2,\tau_1^2,\sigma_4^2,\tau_2^2),
+\]
+从而
+\[
+\begin{aligned}
+&\left[R^{(I)}\Sigma_\varepsilon^{(i)}R^{(I)}
+ +(Q^{(I)})^T\Sigma_U^{(i)}Q^{(I)}\right]^{-1}\\
+&\quad=\diag(\sigma_1^{-2},\sigma_2^{-2},\tau_1^{-2},
+            \sigma_4^{-2},\tau_2^{-2})\\
+&\quad=R^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}
+ +(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}Q^{(I)}.
+\end{aligned}
+\]
+利用图2.8中的 $R^{(I)}$ 与 $Q^{(I)}$，容易检验以下等式：
+\[
+Q^{(I)}(Q^{(I)})^T=I,\qquad Q^{(I)}R^{(I)}=0,\qquad
+R^{(I)}R^{(I)}=R^{(I)}.
+\]
+利用这些等式与式（2.B.3），得到
+\begin{equation}
+\begin{aligned}
+K^{(i)}
+ &=(I-R^{(I)}B)^T
+ \left[R^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}
+ +(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}Q^{(I)}\right](I-R^{(I)}B)\\
+ &=(I-R^{(I)}B)^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+    R^{(I)}(I-R^{(I)}B)\\
+ &\quad+(I-R^{(I)}B)^T(Q^{(I)})^T
+       (\Sigma_U^{(i)})^{-1}Q^{(I)}(I-R^{(I)}B)\\
+ &=(I-B)^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}(I-B)
+ +(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}Q^{(I)}.
+\end{aligned}\tag{2.B.4}
+\end{equation}
+现在计算 $\xi^{(i)}=K^{(i)}\mu_Y^{(i)}$。由式（2.B.4）与（2.121）得到
+\begin{equation}
+\begin{aligned}
+\xi^{(i)}
+ &=(I-R^{(I)}B)^T
+ \left[R^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}
+ +(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}Q^{(I)}\right](I-R^{(I)}B)\\
+ &\quad{}\ast
+ \left[(I-R^{(I)}B)^{-1}R^{(I)}AX^{(i)}
+ +(I-R^{(I)}B)^{-1}(Q^{(I)})^T\mu_U^{(i)}\right]\\
+ &=(I-R^{(I)}B)^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+    R^{(I)}AX^{(i)}\\
+ &\quad+(I-R^{(I)}B)^T(Q^{(I)})^T
+    (\Sigma_U^{(i)})^{-1}\mu_U^{(i)}\\
+ &=(I-B)^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}
+ +(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}.
+\end{aligned}\tag{2.B.5}
+\end{equation}
+现在计算 $(\xi^{(i)})^T(K^{(i)})^{-1}\xi^{(i)}$。利用 $\xi^{(i)}=K^{(i)}\mu_Y^{(i)}$，得到
+\begin{equation}
+(\xi^{(i)})^T(K^{(i)})^{-1}\xi^{(i)}
+ =(\mu_Y^{(i)})^T\xi^{(i)}.\tag{2.B.6}
+\end{equation}
+回顾
+\begin{equation}
+(I-R^{(I)}B)^{-1}
+ =I+R^{(I)}B+\cdots+(R^{(I)}B)^{p-1}.\tag{2.B.7}
+\end{equation}
+将式（2.B.5）代入式（2.B.6），并利用式（2.B.7），得到
+\begin{equation}
+\begin{aligned}
+(\mu_Y^{(i)})^T\xi^{(i)}
+ &=(\mu_Y^{(i)})^T(I-R^{(I)}B)^TR^{(I)}
+   (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+ &\quad+(\mu_Y^{(i)})^T(Q^{(I)})^T
+   (\Sigma_U^{(i)})^{-1}\mu_U^{(i)}.
+\end{aligned}\tag{2.B.8}
+\end{equation}
+利用展开式、$Q^{(I)}R^{(I)}=0$ 及 $R^{(I)}R^{(I)}=R^{(I)}$，得到
+\begin{equation}
+\begin{aligned}
+&(\mu_Y^{(i)})^T(I-R^{(I)}B)^TR^{(I)}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+&\quad=\left[(I-R^{(I)}B)^{-1}R^{(I)}AX^{(i)}
+ +(I-R^{(I)}B)^{-1}(Q^{(I)})^T\mu_U^{(i)}\right]^T\\
+&\qquad\qquad{}\ast(I-R^{(I)}B)^TR^{(I)}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+&\quad=(X^{(i)})^TA^TR^{(I)}(I-R^{(I)}B)^{-T}
+ (I-R^{(I)}B)^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+&\qquad+(\mu_U^{(i)})^TQ^{(I)}(I-R^{(I)}B)^{-T}
+ (I-R^{(I)}B)^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+&\quad=(X^{(i)})^TA^TR^{(I)}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}.
+\end{aligned}\tag{2.B.9}
+\end{equation}
+利用式（2.121），有
+\begin{equation}
+\begin{aligned}
+&(\mu_Y^{(i)})^T(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}\\
+&\quad=\left[(I-R^{(I)}B)^{-1}R^{(I)}AX^{(i)}
+ +(I-R^{(I)}B)^{-1}(Q^{(I)})^T\mu_U^{(i)}\right]^T\\
+&\qquad\qquad{}\times(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}\\
+&\quad=(X^{(i)})^TA^TR^{(I)}(I-R^{(I)}B)^{-T}
+ (Q^{(I)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}\\
+&\qquad+(\mu_U^{(i)})^TQ^{(I)}(I-R^{(I)}B)^{-T}
+ {}\ast(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}.
+\end{aligned}\tag{2.B.10}
+\end{equation}
+利用式（2.B.7）、$Q^{(I)}R^{(I)}=0$ 和 $Q^{(I)}(Q^{(I)})^T=I$，得到
+\begin{equation}
+\begin{aligned}
+R^{(I)}(I-R^{(I)}B)^{-T}(Q^{(I)})^T&=0,\\
+Q^{(I)}(I-R^{(I)}B)^{-T}(Q^{(I)})^T&=I.
+\end{aligned}\tag{2.B.11}
+\end{equation}
+将式（2.B.11）代入式（2.B.10），得到
+\begin{equation}
+(\mu_Y^{(i)})^T(Q^{(I)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}
+ =(\mu_U^{(i)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}.\tag{2.B.12}
+\end{equation}
+结合式（2.B.6）、（2.B.9）与（2.B.12），有
+\begin{equation}
+\begin{aligned}
+&(\xi^{(i)})^T(K^{(i)})^{-1}\xi^{(i)}\\
+&\quad=(X^{(i)})^TA^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+ R^{(I)}AX^{(i)}
+ +(\mu_U^{(i)})^T(\Sigma_U^{(i)})^{-1}\mu_U^{(i)}.
+\end{aligned}\tag{2.B.13}
+\end{equation}
+现在计算 $K^{(i)}$ 的行列式。考虑图2.8的例子，矩阵 $K^{(i)}$ 为
+\[
+K^{(i)}=\begin{bmatrix}
+\sigma_1^{-2}&0&0&0&0\\
+0&\sigma_2^{-2}&0&0&0\\
+-\dfrac{\beta_{31}}{\sigma_1^2}&-\dfrac{\beta_{32}}{\sigma_2^2}
+ &\tau_1^{-2}&-\dfrac{\beta_{34}}{\sigma_4^2}&0\\
+0&-\dfrac{\beta_{42}}{\sigma_2^2}&0&\sigma_4^{-2}&0\\
+0&0&0&0&\tau_2^{-2}
+\end{bmatrix}.
+\]
+其行列式为 $|K^{(i)}|=\sigma_1^{-2}\sigma_2^{-2}\sigma_4^{-2}\tau_1^{-2}\tau_2^{-2}$。一般地，可以证明
+\begin{equation}
+|K^{(i)}|=\prod_{j\in I}\sigma_j^{-2}
+ \left|(\Sigma_U^{(i)})^{-1}\right|.\tag{2.B.14}
+\end{equation}
+结合式（2.B.2）、（2.B.5）、（2.B.13）与（2.B.14），得到不涉及模型参数的负似然：
+\begin{equation}
+\begin{aligned}
+-l_D(A,B,T,\Sigma_\varepsilon)
+ \approx{}&\frac12\sum_{i=1}^n
+ \Bigl[\Tr\bigl(K^{(i)}Y^{(i)}(Y^{(i)})^T\bigr)\\
+ &\quad-(Y^{(i)})^T(I-B)^TR^{(I)}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+ &\quad+\Tr\bigl(A^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+ R^{(I)}AX^{(i)}(X^{(i)})^T\\
+ &\quad-\sum_{j\notin I}\log\sigma_j^{-2}\Bigr].
+\end{aligned}\tag{2.B.15}
+\end{equation}
+去掉矩阵 $K^{(I)}$ 中不含模型参数的项，式（2.125）可以进一步化为

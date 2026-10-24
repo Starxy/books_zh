@@ -1,0 +1,43 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1.1cm,y=1.1cm,line width=.6pt,font=\small]
+\begin{scope}
+\coordinate (ch05f1al) at (-.65,.4);
+\coordinate (ch05f1at) at (0,.78);
+\coordinate (ch05f1ar) at (.65,.4);
+\coordinate (ch05f1abr) at (.65,-.4);
+\coordinate (ch05f1abl) at (-.65,-.4);
+\draw (ch05f1al)--(ch05f1at)--(ch05f1ar)--(ch05f1abr)--(.25,-.57);
+\draw (ch05f1al)--(ch05f1abl)--(-.25,-.63);
+\draw (-.53,.29)--(-.53,-.29) (.1,.6)--(.5,.36);
+\draw (ch05f1at)--(0,1.25);
+\draw (ch05f1abr)--(1.13,-.55) (.65,-.27)--(1.13,-.42);
+\node at (1.39,-.52) {O};
+\node at (0,-.68) {N};
+\draw (0,-.95)--(0,-1.3);
+\node at (0,-1.62) {糖};
+\node at (0,-2.18) {胞嘧啶};
+\end{scope}
+\begin{scope}[xshift=5.2cm]
+\coordinate (ch05f1bl) at (-.65,.4);
+\coordinate (ch05f1bt) at (0,.78);
+\coordinate (ch05f1br) at (.65,.4);
+\coordinate (ch05f1bbr) at (.65,-.4);
+\coordinate (ch05f1bbl) at (-.65,-.4);
+\draw (ch05f1bl)--(ch05f1bt)--(ch05f1br)--(ch05f1bbr)--(.25,-.57);
+\draw (ch05f1bl)--(ch05f1bbl)--(-.25,-.63);
+\draw (-.53,.29)--(-.53,-.29) (.1,.6)--(.5,.36);
+\draw (ch05f1bt)--(0,1.25);
+\draw (ch05f1bl)--(-1.38,.56);
+\node[anchor=east] at (-1.5,.57) {$\mathrm{H_3C}$};
+\draw (ch05f1bbr)--(1.13,-.55) (.65,-.27)--(1.13,-.42);
+\node at (1.39,-.52) {O};
+\node at (0,-.68) {N};
+\draw (0,-.95)--(0,-1.3);
+\node at (0,-1.62) {糖};
+\node at (0,-2.18) {甲基化胞嘧啶};
+\end{scope}
+\end{tikzpicture}
+\origfig{1}{DNA 甲基化。}
+\label{fig:ch05-dna-methylation}
+\end{figure}

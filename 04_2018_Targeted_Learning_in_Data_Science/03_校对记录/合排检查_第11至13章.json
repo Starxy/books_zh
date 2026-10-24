@@ -1,0 +1,1021 @@
+{
+  "chapters": [
+    11,
+    12,
+    13
+  ],
+  "validation": {
+    "pages": 194,
+    "sha256": "3b09684dd444385ce279defab3c48765b48a2a26990e795b575894b0b93bfec6",
+    "checked_merged_pages": [
+      14,
+      156,
+      162,
+      164,
+      174,
+      176,
+      177,
+      190,
+      191,
+      192,
+      193
+    ],
+    "shipped_file_reopened": true,
+    "delivered_last_bookmark": [
+      [
+        3,
+        "13.7 讨论",
+        194
+      ]
+    ],
+    "quality_checks_passed": true,
+    "recorded_at": "2026-10-23T17:32:46",
+    "numbering_ledger_review_flags": []
+  },
+  "build": {
+    "chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "full": false,
+    "build": "work/targeted_learning/build/20261023_172756",
+    "return_codes": [
+      0,
+      0,
+      0
+    ],
+    "pagination_stable": true,
+    "compile_stability": [
+      {
+        "pass": 1,
+        "files": 16,
+        "changed_files": [
+          "chapters/ch01.aux",
+          "chapters/ch02.aux",
+          "chapters/ch03.aux",
+          "chapters/ch04.aux",
+          "chapters/ch05.aux",
+          "chapters/ch06.aux",
+          "chapters/ch07.aux",
+          "chapters/ch08.aux",
+          "chapters/ch09.aux",
+          "chapters/ch10.aux",
+          "chapters/ch11.aux",
+          "chapters/ch12.aux",
+          "chapters/ch13.aux",
+          "main.aux",
+          "main.out",
+          "main.toc"
+        ]
+      },
+      {
+        "pass": 2,
+        "files": 16,
+        "changed_files": [
+          "main.aux",
+          "main.toc"
+        ]
+      },
+      {
+        "pass": 3,
+        "files": 16,
+        "changed_files": []
+      }
+    ],
+    "errors": [],
+    "missing_glyphs": [],
+    "overfull": [],
+    "undefined_references": [],
+    "pages": 194,
+    "bookmarks": [
+      [
+        1,
+        "序",
+        4
+      ],
+      [
+        1,
+        "前言",
+        7
+      ],
+      [
+        1,
+        "撰稿人",
+        19
+      ],
+      [
+        1,
+        "缩略语与符号",
+        22
+      ],
+      [
+        1,
+        "第一部分 数据科学中的靶向学习：导论",
+        27
+      ],
+      [
+        2,
+        "第一章  数据科学中的研究问题",
+        28
+      ],
+      [
+        3,
+        "1.1 从（大）数据中学习",
+        28
+      ],
+      [
+        3,
+        "1.2 传统估计方法的失效",
+        29
+      ],
+      [
+        3,
+        "1.3 靶向学习的实际应用",
+        30
+      ],
+      [
+        3,
+        "1.4 统计估计问题",
+        31
+      ],
+      [
+        4,
+        "1.4.1 数据",
+        31
+      ],
+      [
+        4,
+        "1.4.2 模型与参数",
+        32
+      ],
+      [
+        4,
+        "1.4.3 靶向最小损失估计量",
+        32
+      ],
+      [
+        4,
+        "1.4.4 其他常见的估计问题",
+        33
+      ],
+      [
+        3,
+        "1.5 靶向学习路线图",
+        34
+      ],
+      [
+        3,
+        "1.6 注记与延伸阅读",
+        36
+      ],
+      [
+        2,
+        "第二章  定义模型与参数",
+        37
+      ],
+      [
+        3,
+        "2.1 定义结构因果模型",
+        38
+      ],
+      [
+        3,
+        "2.2 因果图",
+        40
+      ],
+      [
+        3,
+        "2.3 定义因果目标参数",
+        41
+      ],
+      [
+        4,
+        "2.3.1 干预",
+        42
+      ],
+      [
+        4,
+        "2.3.2 反事实",
+        43
+      ],
+      [
+        4,
+        "2.3.3 建立可识别性",
+        43
+      ],
+      [
+        4,
+        "2.3.4 选定统计模型与目标参数",
+        44
+      ],
+      [
+        4,
+        "2.3.5 目标参数的解释",
+        44
+      ],
+      [
+        3,
+        "2.4 注记与延伸阅读",
+        45
+      ],
+      [
+        2,
+        "第三章  序贯超级学习",
+        46
+      ],
+      [
+        3,
+        "3.1 背景：集成学习",
+        47
+      ],
+      [
+        3,
+        "3.2 定义估计问题",
+        49
+      ],
+      [
+        3,
+        "3.3 序贯超级（机器）学习",
+        50
+      ],
+      [
+        3,
+        "3.4 计算",
+        51
+      ],
+      [
+        3,
+        "3.5 注记与延伸阅读",
+        52
+      ],
+      [
+        2,
+        "第四章  LTMLE",
+        53
+      ],
+      [
+        3,
+        "4.1 LTMLE 的实际应用：何时开始 HIV 治疗",
+        53
+      ],
+      [
+        3,
+        "4.2 定义估计问题",
+        54
+      ],
+      [
+        3,
+        "4.3 遵循一条规则意味着什么？",
+        55
+      ],
+      [
+        3,
+        "4.4 用于确定何时开始治疗的 LTMLE",
+        57
+      ],
+      [
+        4,
+        "4.4.1 确定有效影响曲线",
+        57
+      ],
+      [
+        4,
+        "4.4.2 确定损失函数与扰动子模型",
+        58
+      ],
+      [
+        4,
+        "4.4.3 LTMLE 算法",
+        59
+      ],
+      [
+        3,
+        "4.5 TMLE 的分析与推断",
+        60
+      ],
+      [
+        4,
+        "4.5.1 TMLE 求解有效影响曲线方程",
+        60
+      ],
+      [
+        4,
+        "4.5.2 TMLE 的二阶余项",
+        60
+      ],
+      [
+        4,
+        "4.5.3 渐近有效性",
+        61
+      ],
+      [
+        4,
+        "4.5.4 推断",
+        62
+      ],
+      [
+        3,
+        "4.6 注记与延伸阅读",
+        63
+      ],
+      [
+        1,
+        "第二部分 核心专题的进一步讨论",
+        64
+      ],
+      [
+        2,
+        "第五章  一步 TMLE",
+        65
+      ],
+      [
+        3,
+        "5.1 局部最不利子模型与通用最不利子模型",
+        65
+      ],
+      [
+        3,
+        "5.2 用于靶向极大似然估计的通用最不利子模型",
+        67
+      ],
+      [
+        4,
+        "5.2.1 解析公式",
+        67
+      ],
+      [
+        4,
+        "5.2.2 用局部最不利子模型表示通用最不利子模型",
+        68
+      ],
+      [
+        3,
+        "5.3 例：ATT 的一步 TMLE",
+        69
+      ],
+      [
+        3,
+        "5.4 用于靶向最小损失估计的通用最不利模型",
+        74
+      ],
+      [
+        3,
+        "5.5 多维目标参数的通用典范一维子模型",
+        76
+      ],
+      [
+        4,
+        "5.5.1 实用构造",
+        77
+      ],
+      [
+        4,
+        "5.5.2 MLE 或近似 MLE εn 的存在性",
+        78
+      ],
+      [
+        4,
+        "5.5.3 通用的特定得分一维子模型",
+        78
+      ],
+      [
+        3,
+        "5.6 例：基于通用典范一维子模型的无限维目标参数的一步 TMLE",
+        78
+      ],
+      [
+        3,
+        "5.7 多维目标参数靶向最小损失估计的通用典范一维子模型",
+        83
+      ],
+      [
+        2,
+        "第六章  高度自适应 Lasso（HAL）",
+        85
+      ],
+      [
+        3,
+        "6.1 估计问题的统计表述",
+        86
+      ],
+      [
+        3,
+        "6.2 càdlàg 函数的基函数线性组合表示",
+        87
+      ],
+      [
+        3,
+        "6.3 在变差范数小于 λ 的全部函数上最小化的最小损失估计量（MLE）",
+        88
+      ],
+      [
+        3,
+        "6.4 HAL 估计量",
+        90
+      ],
+      [
+        3,
+        "6.5 关于进一步降维的考虑",
+        91
+      ],
+      [
+        3,
+        "6.6 应用",
+        92
+      ],
+      [
+        4,
+        "6.6.1 高度自适应 Lasso 的构造",
+        92
+      ],
+      [
+        4,
+        "6.6.2 预测模拟",
+        94
+      ],
+      [
+        4,
+        "6.6.3 预测数据分析",
+        97
+      ],
+      [
+        4,
+        "6.6.4 缺失数据模拟",
+        98
+      ],
+      [
+        4,
+        "6.6.5 结论",
+        101
+      ],
+      [
+        2,
+        "第七章  普遍有效的 HAL-TMLE",
+        102
+      ],
+      [
+        3,
+        "7.1 特定处理下的均值",
+        102
+      ],
+      [
+        4,
+        "7.1.1 HAL-TMLE",
+        103
+      ],
+      [
+        4,
+        "7.1.2 渐近有效性",
+        104
+      ],
+      [
+        3,
+        "7.2 一般 HAL-TMLE 及其渐近有效性",
+        105
+      ],
+      [
+        3,
+        "7.3 讨论",
+        107
+      ],
+      [
+        2,
+        "第八章  有效影响曲线的 HAL 估计量",
+        108
+      ],
+      [
+        3,
+        "8.1 有效影响曲线的 HAL 最小二乘线性回归估计量的构造",
+        109
+      ],
+      [
+        3,
+        "8.2 有效影响曲线的 HAL 估计量的收敛速率",
+        111
+      ],
+      [
+        4,
+        "8.2.1 用于估计初始梯度在子切空间上的投影",
+        112
+      ],
+      [
+        4,
+        "8.2.2 使用来自真实数据分布的实际数据集",
+        113
+      ],
+      [
+        3,
+        "8.3 基于现状数据的截断均值",
+        113
+      ],
+      [
+        3,
+        "8.4 基于区间删失数据的截断均值",
+        114
+      ],
+      [
+        3,
+        "8.5 二值处理对区间删失事件发生时间的因果效应",
+        116
+      ],
+      [
+        3,
+        "8.6 基于双变量右删失数据的双变量生存函数",
+        120
+      ],
+      [
+        3,
+        "8.7 基于双变量右删失数据的二值处理对双变量生存概率的因果效应",
+        123
+      ],
+      [
+        3,
+        "8.8 讨论",
+        125
+      ],
+      [
+        2,
+        "第九章  数据自适应目标参数",
+        126
+      ],
+      [
+        3,
+        "9.1 示例：定义处理或暴露水平",
+        127
+      ],
+      [
+        3,
+        "9.2 数据自适应参数的方法",
+        128
+      ],
+      [
+        3,
+        "9.3 特定于 v 的数据自适应参数的 TMLE",
+        129
+      ],
+      [
+        3,
+        "9.4 跨估计样本合并特定于 v 的 TMLE",
+        130
+      ],
+      [
+        3,
+        "9.5 CV-TMLE",
+        131
+      ],
+      [
+        3,
+        "9.6 数据自适应参数的 CV-TMLE",
+        131
+      ],
+      [
+        3,
+        "9.7 变量重要性度量的 CV-TMLE",
+        133
+      ],
+      [
+        3,
+        "9.8 数据自适应 VIM 的软件：varImpact",
+        134
+      ],
+      [
+        3,
+        "9.9 数据分析：弗雷明汉心脏研究",
+        136
+      ],
+      [
+        4,
+        "9.9.1 超级学习器候选库",
+        136
+      ],
+      [
+        4,
+        "9.9.2 结果",
+        137
+      ],
+      [
+        3,
+        "9.10 讨论",
+        139
+      ],
+      [
+        2,
+        "第十章  用于连续调参的 C-TMLE",
+        140
+      ],
+      [
+        3,
+        "10.1 TMLE 中对干扰参数估计量进行靶向调参的理论动机",
+        141
+      ],
+      [
+        4,
+        "10.1.1 离散调节参数与连续调节参数的比较",
+        145
+      ],
+      [
+        4,
+        "10.1.2 所提 C-TMLE 渐近优于标准 TMLE 的关键理论性质与依据",
+        146
+      ],
+      [
+        4,
+        "10.1.3 隐式定义的调节参数",
+        147
+      ],
+      [
+        3,
+        "10.2 一般 C-TMLE 算法",
+        147
+      ],
+      [
+        3,
+        "10.3 验证 C-TMLE 求解关键方程 (10.4)",
+        148
+      ],
+      [
+        4,
+        "10.3.1 C-TMLE 求解关键方程 (10.4) 的条件",
+        148
+      ],
+      [
+        4,
+        "10.3.2 精确求解方程 (10.3) 的 TMLE 与 C-TMLE",
+        150
+      ],
+      [
+        3,
+        "10.4 C-TMLE 渐近线性的一般定理",
+        151
+      ],
+      [
+        3,
+        "10.5 讨论",
+        154
+      ],
+      [
+        1,
+        "第三部分 随机试验",
+        156
+      ],
+      [
+        2,
+        "第十一章  累积疫苗筛选效应的靶向估计",
+        157
+      ],
+      [
+        3,
+        "11.1 观测数据",
+        158
+      ],
+      [
+        3,
+        "11.2 因果模型与感兴趣的参数",
+        159
+      ],
+      [
+        3,
+        "11.3 识别",
+        160
+      ],
+      [
+        3,
+        "11.4 有效影响函数",
+        160
+      ],
+      [
+        3,
+        "11.5 初始估计",
+        161
+      ],
+      [
+        3,
+        "11.6 子模型与损失函数",
+        161
+      ],
+      [
+        3,
+        "11.7 TMLE 算法",
+        162
+      ],
+      [
+        3,
+        "11.8 TMLE 的统计性质",
+        162
+      ],
+      [
+        3,
+        "11.9 HVTN 505 HIV 疫苗筛选分析",
+        163
+      ],
+      [
+        3,
+        "11.10 讨论",
+        164
+      ],
+      [
+        2,
+        "第十二章  样本平均处理效应",
+        165
+      ],
+      [
+        3,
+        "12.1 因果模型与因果参数",
+        166
+      ],
+      [
+        3,
+        "12.2 可识别性",
+        168
+      ],
+      [
+        3,
+        "12.3 估计与推断",
+        169
+      ],
+      [
+        4,
+        "12.3.1 总体效应的 TMLE",
+        170
+      ],
+      [
+        4,
+        "12.3.2 样本效应的 TMLE",
+        172
+      ],
+      [
+        3,
+        "12.4 向配对匹配试验的扩展",
+        174
+      ],
+      [
+        3,
+        "12.5 模拟",
+        175
+      ],
+      [
+        3,
+        "12.6 讨论",
+        178
+      ],
+      [
+        2,
+        "第十三章  整群随机试验中的数据自适应估计",
+        179
+      ],
+      [
+        3,
+        "13.1 研究实例与因果参数",
+        181
+      ],
+      [
+        3,
+        "13.2 无匹配随机试验中的靶向估计",
+        181
+      ],
+      [
+        3,
+        "13.3 有匹配随机试验中的靶向估计",
+        185
+      ],
+      [
+        3,
+        "13.4 暴露机制的协同估计",
+        187
+      ],
+      [
+        3,
+        "13.5 统计推断",
+        189
+      ],
+      [
+        3,
+        "13.6 小样本模拟",
+        189
+      ],
+      [
+        4,
+        "13.6.1 研究 1",
+        190
+      ],
+      [
+        4,
+        "13.6.2 研究 2",
+        191
+      ],
+      [
+        3,
+        "13.7 讨论",
+        194
+      ]
+    ],
+    "han_characters": 105262,
+    "render_dir": "work/targeted_learning/render/book_20261023_172756",
+    "navigation_audit": {
+      "front_toc_entries": [
+        {
+          "title": "序",
+          "pdf_page": 4,
+          "printed_toc_label": "iv",
+          "actual_pdf_page_label": "iv",
+          "match": true
+        },
+        {
+          "title": "前言",
+          "pdf_page": 7,
+          "printed_toc_label": "vii",
+          "actual_pdf_page_label": "vii",
+          "match": true
+        },
+        {
+          "title": "撰稿人",
+          "pdf_page": 19,
+          "printed_toc_label": "xix",
+          "actual_pdf_page_label": "xix",
+          "match": true
+        },
+        {
+          "title": "缩略语与符号",
+          "pdf_page": 22,
+          "printed_toc_label": "xxii",
+          "actual_pdf_page_label": "xxii",
+          "match": true
+        }
+      ],
+      "footer_labels_checked": 190,
+      "footer_label_mismatches": [],
+      "rotated_pages_skipped_for_footer_geometry": [
+        96
+      ],
+      "passed": true
+    },
+    "source_structure_audit": [
+      {
+        "key": "ch01",
+        "expected_sections": 6,
+        "actual_sections": 6,
+        "expected_subsections": 4,
+        "actual_subsections": 4,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch02",
+        "expected_sections": 4,
+        "actual_sections": 4,
+        "expected_subsections": 5,
+        "actual_subsections": 5,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch03",
+        "expected_sections": 5,
+        "actual_sections": 5,
+        "expected_subsections": 0,
+        "actual_subsections": 0,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch04",
+        "expected_sections": 6,
+        "actual_sections": 6,
+        "expected_subsections": 7,
+        "actual_subsections": 7,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch05",
+        "expected_sections": 7,
+        "actual_sections": 7,
+        "expected_subsections": 5,
+        "actual_subsections": 5,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch06",
+        "expected_sections": 6,
+        "actual_sections": 6,
+        "expected_subsections": 5,
+        "actual_subsections": 5,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch07",
+        "expected_sections": 3,
+        "actual_sections": 3,
+        "expected_subsections": 2,
+        "actual_subsections": 2,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch08",
+        "expected_sections": 8,
+        "actual_sections": 8,
+        "expected_subsections": 2,
+        "actual_subsections": 2,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch09",
+        "expected_sections": 10,
+        "actual_sections": 10,
+        "expected_subsections": 2,
+        "actual_subsections": 2,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch10",
+        "expected_sections": 5,
+        "actual_sections": 5,
+        "expected_subsections": 5,
+        "actual_subsections": 5,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch11",
+        "expected_sections": 10,
+        "actual_sections": 10,
+        "expected_subsections": 0,
+        "actual_subsections": 0,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch12",
+        "expected_sections": 6,
+        "actual_sections": 6,
+        "expected_subsections": 2,
+        "actual_subsections": 2,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      },
+      {
+        "key": "ch13",
+        "expected_sections": 7,
+        "actual_sections": 7,
+        "expected_subsections": 2,
+        "actual_subsections": 2,
+        "chapter_commands": 1,
+        "forbidden_residue": [],
+        "control_characters": [],
+        "sections_match": true
+      }
+    ],
+    "quality_checks_passed": true,
+    "delivered_pdf": "outputs/Targeted_Learning_in_Data_Science_中文阶段稿.pdf",
+    "local_pdf": "outputs/Targeted_Learning_in_Data_Science_中文阶段稿.pdf",
+    "delivered_pages": 194,
+    "delivered_last_bookmark": [
+      [
+        3,
+        "13.7 讨论",
+        194
+      ]
+    ],
+    "delivered_sha256": "3b09684dd444385ce279defab3c48765b48a2a26990e795b575894b0b93bfec6"
+  }
+}

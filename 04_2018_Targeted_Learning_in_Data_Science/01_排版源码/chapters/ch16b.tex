@@ -1,0 +1,196 @@
+% 原书分章 PDF 第 6—13 页：第 16.3 节与第 16.4.1 节。
+\section{因果模型与统计估计目标}
+
+我们假设反事实协变量存在。它们可以由一个（非参数）结构方程模型定义，并假设该模型也生成了观测数据 $O$（图 16.1；结构建模框架，Pearl，1995、2009a）；也可以将它们作为原始概念（Pearl，2010），再通过称为一致性假设的可识别性假设与观测数据联系起来（缺失数据框架，Neyman，1923；Rubin，1974；Robins，1998）。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/ch16_dag}
+\caption{对观测数据过程 $O$ 中全部变量的时间顺序进行编码的有向无环图模板。对 $t=0,\ldots,\widetilde T$ 及 $1\leq j\leq t$，依次绘制此模板所蕴含的节点和弧，即可得到完整图。}
+\label{fig:ch16-dag}
+\end{figure}
+
+具体而言，对于给定的感兴趣时间区间 $t_0\leq K$，我们假设存在由下述个体化行动规则（Murphy 等，2001）定义的反事实结局：$d_\theta=(d_\theta(0),\ldots,d_\theta(t_0))$。其中，每个函数 $d_\theta(t)$，$t=0,\ldots,t_0$，都是确定患者在时点 $t$ 所应接受行动方案的决策规则，即确定处理及右删失干预。更具体地，决策规则 $d_\theta(t)$ 将截至给定时点 $t$ 测量的行动与协变量历史映射为时点 $t$ 的行动方案：
+\[
+ d_\theta(t):(\bar L(t),\bar A(t-1))\mapsto d_\theta(t)(a_1(t),a_2(t)).
+\]
+在本项糖尿病研究中，四个感兴趣的决策规则由 $\theta=7,7.5,8,8.5$ 定义，使得 $d_\theta(t)(\bar L(t),\bar A(t-1))$ 等于：
+\begin{itemize}
+\item 当且仅当患者先前未接受强化治疗，即 $\bar A(t-1)=0$，且时点 $t$ 的 A1c 水平（$L(t)$ 的一个分量）小于或等于阈值 $\theta\%$ 时，取 $(a_1(t),a_2(t))=(0,0)$，即不使用强化治疗，且不发生右删失。
+\item 其余情形取 $(a_1(t),a_2(t))=(1,0)$，即使用强化治疗，且不发生右删失。
+\end{itemize}
+为简化记号，对于给定的截至时点 $t$ 的观测协变量历史 $\bar L(t)$，将截至时点 $t$ 的行动方案
+\[
+\begin{aligned}
+(&a(0)=d_\theta(0)(L(0)),\quad
+ a(1)=d_\theta(1)(\bar L(1),a(0)),\ldots,\\
+ &a(t)=d_\theta(t)(\bar L(t),\bar a(t-1)))
+\end{aligned}
+\]
+记为 $d_\theta(\bar L(t))$。
+
+感兴趣的因果估计目标记为 $\psi^{\theta_1,\theta_2}$，定义为任意两种不同动态处理策略 $d_{\theta_1}$ 与 $d_{\theta_2}$ 在给定时点 $t_0$ 的累积风险之差：
+\[
+ \psi^{\theta_1,\theta_2}
+ =P(Y_{d_{\theta_1}}(t_0+1)=1)-P(Y_{d_{\theta_2}}(t_0+1)=1).
+\]
+这里，$Y_{d_{\theta_j}}(t_0+1)$ 表示患者若接受动态干预 $d_{\theta_j}$，其在时点 $t_0+1$ 的潜在结局；这一干预可能与事实相反，$\theta_j=7,7.5,8$ 或 $8.5$。与本研究数据的原始分析不同，我们不再对定义因果估计目标 $\psi^{\theta_1,\theta_2}$ 的反事实累积风险假设一个参数动态边际结构模型（dynamic marginal structural model，MSM），也不采用工作 MSM（Neugebauer 和 van der Laan，2007）来近似这些因果估计目标。在本研究中采用非参数 MSM 方法，有两方面理由。首先，本研究的大样本量缓解了对维数灾难的担忧；否则，维数灾难会使这种方法的应用徒劳无功。这里的维数灾难指：如果不通过建模假设或工作模型来降低感兴趣因果估计目标的维数，就无法精确估计这些目标。其次，我们并不了解定义参数 $\psi^{\theta_1,\theta_2}$ 的四条反事实生存曲线的真实函数形式，因此指定一个参数动态 MSM 本质上成为任意的选择，预期会在实践中导致有偏估计。
+
+为识别因果估计目标 $\psi^{\theta_1,\theta_2}$，我们再作两个假设（Robins，1999），分别是序贯随机化假设（sequential randomization assumption，SRA）：
+\[
+ A(j)\perp Y_{d_\theta}(t_0+1)\mid\bar L(j),\bar A(j-1),
+ \qquad j=0,\ldots,\check T(t_0),
+\]
+以及正值性假设：
+\begin{equation}
+\begin{aligned}
+ &g_0\Bigl(A(j)=d_\theta(j)(\bar L(j),\bar A(j-1))\Bigm|\\
+ &\hspace{2.6em}\bar Y(j)=0,\bar L(j),
+ \bar A(j-1)=d_\theta(\bar L(j-1))\Bigr)>0,
+ \qquad j=0,\ldots,t_0.
+\end{aligned}
+\tag{16.2}
+\end{equation}
+其中，$g_0$ 由观测数据分布 $P_0$ 定义，对每个 $j$，它表示给定既往协变量和行动时，时点 $j$ 行动的条件概率。SRA 又称不存在未测量混杂因素和选择偏差来源的假设，是不可检验的。本研究中，患者 EHR 提供了关于结局风险因素与治疗决策决定因素的详细信息，这为该假设提供了依据；其成立还依赖于对分析数据集所纳入协变量的专家选择。我们通过检查式 (16.2) 中估计概率的分布，评价正值性假设在实践中是否遭到违反。对这一假设实际违反的担忧，也是本研究评价动态 TI 方案而非静态方案的原因；静态方案可能要求在一个固定时段内不接受强化治疗，而在临床中，多数 A1c 检测水平很高的 T2DM 患者预期都会加强降糖治疗，即维持基线治疗者很少。
+
+上述可识别性假设意味着（Bang 和 Robins，2005），累积反事实风险 $P(Y_{d_\theta}(t_0+1)=1)$，进而因果估计目标 $\psi^{\theta_1,\theta_2}$，可以表示为统计参数，即观测数据分布的参数，而非反事实数据分布的参数；后者在下式中记为 $P$：
+\begin{equation}
+\begin{aligned}
+ &P(Y_{d_\theta}(t_0+1)=1)\\
+ &\quad=E_{P_0}\Bigl(E_{P_0}\bigl[\cdots E_{P_0}\bigl(
+ E_{P_0}\bigl[E_{P_0}(Y(t_0+1)\mid\mathcal F(t_0))\\
+ &\hspace{7.8em}\bigm|\mathcal F(t_0-1)\bigr]
+ \bigm|\mathcal F(t_0-2)\bigr)\cdots\bigm|\mathcal F(0)\bigr]\Bigr).
+\end{aligned}
+\tag{16.3}
+\end{equation}
+这里，$\mathcal F(t)=(\bar A(\check T(t))=d_\theta(\bar L(\check T(t))),\bar L(t))$，$E_{P_0}$ 表示观测数据 $O$ 的分布 $P_0$ 下的期望。上述等式右端的统计估计目标记为 $\gamma^\theta$。
+
+\section{估计}
+
+目标参数 $\gamma^\theta$ 的任何估计量，都依赖于干扰参数，即行动机制和结局回归的估计量选择。因此，本节既详细介绍目标参数的一种 TMLE，也介绍估计干扰参数的不同方法。Neugebauer 等（2016）还介绍了本章 TMLE 的三种常见替代估计量：标准的无界 IPW 估计量（Horvitz--Thompson 估计量）、相应的有界 IPW 估计量，以及基于风险函数的有界 IPW 估计量；其中第二种保证反事实生存概率估计值被限制在 $(0,1)$ 之内。本节不再重复这些介绍，但本章报告的数据分析包含这些 IPW 估计量的结果，所用行动机制估计量从较强的参数形式到高度非参数形式不等。我们用 $I(\cdot)$ 表示给定事件 $\cdot$ 已经发生的指示函数。
+
+\subsection{TMLE}
+
+早期对 TMLE 的评价（Neugebauer 等，2011）将其用于大型医疗数据库纵向数据的比较效果研究，揭示了最初为时变干预的靶向学习提出的算法在实践中的复杂性。随后提出的另一种算法，大大简化了 TMLE 在具有时变干预和少量时变协变量的问题中的应用（Stitelman 等，2012）。不过，这种替代算法在基于 EHR 的比较效果研究中的应用仍可能受到限制，因为这类研究——包括本章的研究——往往需要控制中高维时变协变量。更近一些，van der Laan 和 Gruber（2012）将一般的靶向学习估计路线图与 Bang 和 Robins（2005）提出的关键可识别性结果 (16.3) 相结合，推导出另一种评价时变干预效应的 TMLE 算法。相较于此前的 TMLE 算法，这一新算法进一步简化了靶向学习在时变干预比较效果研究中的实现，尤其适用于需要控制中高维时变协变量的情况。下面的 TMLE 算法依据 van der Laan 和 Gruber（2012）的新方法改写，供强化治疗研究使用。给定一个 $\theta$，依次执行以下各步，得到累积风险 $\gamma^\theta$ 的 TMLE。
+
+\begin{enumerate}
+\item 估计干扰参数 $g_0^\theta$。对于给定的 $t=0,\ldots,t_0$，将概率
+\[
+ g_0\bigl(A(t)=d_\theta(t)(\bar L(t),\bar A(t-1))\mid
+ \bar L(t),\bar Y(t)=0,\bar A(t-1)=d_\theta(\bar L(t-1))\bigr)
+\]
+的估计量记为 $g^\theta_{A(t),n}$。
+
+\item 构造干扰参数
+\[
+ E_{P_0}\bigl[Y(t_0+1)\mid
+ \bar A(\check T(t_0))=d_\theta(\bar L(\check T(t_0))),\bar L(t_0)\bigr]
+\]
+的初始估计量；该干扰参数记为 $Q^\theta_{L(t_0+1)}(\bar L(t_0))$。注意，在延伸的观测数据结构 (16.1) 中，当 $\bar A(\check T(t_0))=d_\theta(\bar L(\check T(t_0)))$ 时，$\bar L(t_0+1)$ 总有定义。因为这一行动历史条件意味着：（i）$\check T(t_0)=t_0$ 且 $\check T(t_0)<\widetilde T$；或（ii）$\check T(t_0)=\widetilde T=T$ 且 $\check T(t_0)\leq t_0$。这里不可能有 $\check T(t_0)=\widetilde T=C$。因此，条件期望 $Q^\theta_{L(t_0+1)}(\bar L(t_0))$ 定义良好，且
+\begin{equation}
+\begin{aligned}
+ &Q^\theta_{L(t_0+1)}(\bar L(t_0))\\
+ &\quad=1+I(\bar Y(t_0)=0)\Bigl(
+ E_{P_0}\bigl[Y(t_0+1)\mid\bar A(t_0)=d_\theta(\bar L(t_0)),\\
+ &\hspace{12em}\bar L(t_0),\bar Y(t_0)=0\bigr]-1\Bigr).
+\end{aligned}
+\tag{16.4}
+\end{equation}
+于是，本步归结为估计
+\[
+ E_{P_0}\bigl[Y(t_0+1)\mid\bar A(t_0)=d_\theta(\bar L(t_0)),
+ \bar L(t_0),\bar Y(t_0)=0\bigr],
+\]
+即患者在时点 $t_0$ 发生失效事件的条件概率，条件为：（i）此前尚未发生此类事件，且在 $t_0$ 之前及 $t_0$ 时均未发生删失；（ii）截至 $t_0$ 始终按策略 $d_\theta$ 接受治疗；（iii）其截至 $t_0$ 的协变量为 $\bar L(t_0)$。干扰参数 $Q^\theta_{L(t_0+1)}(\bar L(t_0))$ 的初始估计量记为 $Q^\theta_{L(t_0+1),n}(\bar L(t_0))$，定义如下：（i）对于在 $t_0$ 之前未失效、且截至 $t_0$ 遵循规则 $d_\theta$ 的患者，该估计量是上述条件概率的估计，可能取值限制在 $[0,1]$ 内；（ii）对于在 $t_0$ 之前已经失效、且失效前一直遵循规则 $d_\theta$ 的患者，依据式 (16.4)，将该估计量设为 1。
+
+\item 更新 $Q^\theta_{L(t_0+1)}(\bar L(t_0))$ 的初始估计量。更新通过 logistic 回归实现：以 $Y(t_0+1)$ 为预测对象，采用带偏移变量的仅截距模型，加权拟合；只使用在 $t_0$ 之前未失效，即 $\bar Y(t_0)=0$，并且截至 $t_0$ 遵循规则 $d_\theta$，即 $\bar A(t_0)=d_\theta(\bar L(t_0))$ 的患者数据。任一参与这次 logistic 回归的患者，其结局 $Y(t_0+1)$ 所对应的权重和偏移项分别为
+\[
+ \frac{1}{\prod_{t=0}^{t_0}g^\theta_{A(t),n}}
+ \quad\text{和}\quad
+ \logit\bigl(Q^\theta_{L(t_0+1),n}(\bar L(t_0))\bigr).
+\]
+该加权 logistic 回归得到的截距估计记为 $\epsilon_n$。更新后的估计量记为 $Q^{\theta,*}_{L(t_0+1),n}(\bar L(t_0))$，定义如下：（i）对于在 $t_0$ 之前未失效、且截至 $t_0$ 遵循规则 $d_\theta$ 的患者，取
+\[
+ Q^{\theta,*}_{L(t_0+1),n}(\bar L(t_0))
+ =\expit\bigl[\logit\{Q^\theta_{L(t_0+1),n}(\bar L(t_0))\}+\epsilon_n\bigr],
+\]
+其中 $\expit(t)=1/(1+\exp(-t))$；（ii）对于在 $t_0$ 之前已经失效、且失效前一直遵循规则 $d_\theta$ 的患者，依据式 (16.4)，仍将 $Q^{\theta,*}_{L(t_0+1),n}(\bar L(t_0))$ 设为 1。
+
+\item 对 $k=t_0-1,\ldots,0$，重复以下两步。
+\begin{enumerate}[label=(\alph*)]
+\item 构造条件期望
+\[
+ E_{P_0}\bigl[Q^\theta_{L(k+2)}(\bar L(k+1))\mid
+ \bar A(\check T(k))=d_\theta(\bar L(\check T(k))),\bar L(k)\bigr]
+\]
+的初始估计量；该条件期望记为 $Q^\theta_{L(k+1)}(\bar L(k))$。同样，当 $\bar A(\check T(k))=d_\theta(\bar L(\check T(k)))$ 时，延伸的观测数据结构中的 $\bar L(k+1)$ 总有定义，因为这一条件意味着：（i）$\check T(k)=k$ 且 $\check T(k)<\widetilde T$；或（ii）$\check T(k)=\widetilde T=T$ 且 $\check T\leq k$。因此，条件期望 $Q^\theta_{L(k+1)}(\bar L(k))$ 定义良好，并有
+\begin{equation}
+\begin{aligned}
+ &Q^\theta_{L(k+1)}(\bar L(k))\\
+ &\quad=1+I(\bar Y(k)=0)\Bigl(
+ E_{P_0}\bigl[Q^\theta_{L(k+2)}(\bar L(k+1))\mid
+ \bar A(k)=d_\theta(\bar L(k)),\\
+ &\hspace{15em}\bar L(k),\bar Y(k)=0\bigr]-1\Bigr).
+\end{aligned}
+\tag{16.5}
+\end{equation}
+本步因而归结为估计
+\begin{equation}
+\begin{aligned}
+ E_{P_0}\bigl[Q^\theta_{L(k+2)}(\bar L(k+1))\mid
+ \bar A(k)=d_\theta(\bar L(k)),\bar L(k),\bar Y(k)=0\bigr],
+\end{aligned}
+\tag{16.6}
+\end{equation}
+即表征患者时点 $k+1$ 状态的连续量 $Q^\theta_{L(k+2)}(\bar L(k+1))$ 的条件期望；这个量本身也是 0 与 1 之间的条件期望。其条件为：（i）患者在 $k$ 之前未失效，且在 $k$ 之前及 $k$ 时均未发生删失；（ii）截至 $k$ 始终按策略 $d_\theta$ 接受治疗；（iii）其截至 $k$ 的基线和既往时变协变量为 $\bar L(k)$。要构造这一条件期望的估计量，需要对每位在 $k$ 之前未失效且截至 $k$ 遵循规则 $d_\theta$ 的患者，即 $\bar Y(k)=0$ 且 $\bar A(k)=d_\theta(\bar L(k))$ 的患者，定义一个估计值 $Q^{\theta,*}_{L(k+2),n}(\bar L(k+1))$。这些患者中，有些截至 $k+1$ 仍遵循规则 $d_\theta$，有些则仅遵循至 $k$。对第一组患者，最近一次“更新步骤”已经定义了 $Q^{\theta,*}_{L(k+2),n}(\bar L(k+1))$。对第二组患者，这里通过外推定义该估计值，即采用最近一次“更新步骤”中的同一估计量，仿佛这些患者在时点 $k+1$ 也遵循规则 $d_\theta$。
+
+干扰参数 $Q^\theta_{L(k+1)}(\bar L(k))$ 的初始估计量记为 $Q^\theta_{L(k+1),n}(\bar L(k))$，定义如下：（i）对于在 $k$ 之前未失效、且截至 $k$ 遵循规则 $d_\theta$ 的患者，它是上述条件期望 (16.6) 的估计量，可能取值限制在 $[0,1]$ 内；（ii）对于在 $k$ 之前已经失效、且失效前一直遵循规则 $d_\theta$ 的患者，依据式 (16.5)，将 $Q^\theta_{L(k+1),n}(\bar L(k))$ 设为 1。
+
+\item 更新 $Q^\theta_{L(k+1)}(\bar L(k))$ 的初始估计量。这一更新通过预测 $Q^\theta_{L(k+2)}(\bar L(k+1))$ 的 logistic 回归实现：采用带偏移变量的仅截距模型并加权拟合，只使用在 $k$ 之前未失效，即 $\bar Y(k)=0$，并且截至 $k$ 遵循规则 $d_\theta$，即 $\bar A(k)=d_\theta(\bar L(k))$ 的患者数据。任一参与该回归的患者，其结局 $Q^{\theta,*}_{L(k+2),n}(\bar L(k+1))$ 对应的权重和偏移项分别为
+\[
+ \frac{1}{\prod_{t=0}^{k}g^\theta_{A(t),n}}
+ \quad\text{和}\quad\logit\bigl(Q^\theta_{L(k+1),n}(\bar L(k))\bigr).
+\]
+该加权 logistic 回归得到的截距估计记为 $\epsilon_n$。更新后的估计量记为 $Q^{\theta,*}_{L(k+1),n}(\bar L(k))$，定义如下：（i）对在 $k$ 之前未失效、且截至 $k$ 遵循规则 $d_\theta$ 的患者，取
+\[
+ Q^{\theta,*}_{L(k+1),n}(\bar L(k))
+ =\expit\bigl[\logit\{Q^\theta_{L(k+1),n}(\bar L(k))\}+\epsilon_n\bigr];
+\]
+（ii）对在 $k$ 之前已经失效、且失效前一直遵循规则 $d_\theta$ 的患者，依据式 (16.5)，将 $Q^{\theta,*}_{L(k+1),n}(\bar L(k))$ 设为 1。
+\end{enumerate}
+
+\item 构造 $E_{P_0}[Q^\theta_{L(1)}(L(0))]$ 的估计量；该期望记为 $Q^\theta_{L(0)}$。对于在时点 0 遵循规则 $d_\theta$ 的患者，最近一次“更新步骤”已经计算出 $Q^{\theta,*}_{L(1),n}(L(0))$。对其余所有患者，这里通过外推定义 $Q^{\theta,*}_{L(1),n}(L(0))$：使用最近一次“更新步骤”中的同一估计量，仿佛这些患者在时点 0 也遵循规则 $d_\theta$。于是，队列中全部 $n$ 名患者都有了估计值 $Q^{\theta,*}_{L(1),n}(L(0))$。这些估计值的平均数是 $Q^\theta_{L(0)}$ 的估计量，记为 $Q^{\theta,*}_{L(0),n}$：
+\[
+ Q^{\theta,*}_{L(0),n}=\frac1n\sum_{i=1}^n Q^{\theta,*}_{L(1),n}(L_i(0)).
+\]
+这个估计量 $Q^{\theta,*}_{L(0),n}$ 就是感兴趣反事实累积风险 $\gamma^\theta$ 的 TMLE，也记为 $\gamma^{\theta,*}_n$。
+\end{enumerate}
+
+将上述干扰参数 $Q^\theta_{L(t+1)}(\bar L(t))$，$t=0,\ldots,t_0$，组成的向量记为 $Q_0^\theta$，其初始估计量的渐近极限记为
+\[
+ Q_0^{\theta,\infty}=\bigl(Q^{\theta,\infty}_{L(t+1)}(\bar L(t))\bigr)_{t=0,\ldots,t_0}.
+\]
+因此，若干扰参数 $Q_0^\theta$ 得到一致估计，例如在正确指定的参数模型下采用极大似然估计，则 $Q_0^{\theta,\infty}=Q_0^\theta$。
+
+在正则性条件下，当不估计干扰参数 $g_0^\theta$ 时，即跳过上文步骤 1，并将后续步骤引用的所有 $g^\theta_{A(t),n}$ 替换为已知值时，TMLE 估计量 $\gamma^{\theta,*}_n$ 渐近线性，其影响曲线为
+\begin{equation}
+\begin{aligned}
+ IC_\theta^*(O\mid g_0^\theta,Q_0^{\theta,\infty})
+ &=\sum_{t=0}^{t_0+1}D_{\theta,t}^*(O\mid g_0^\theta,Q_0^{\theta,\infty}),\\
+ D_{\theta,t}^*(O\mid g_0^\theta,Q_0^{\theta,\infty})
+ &=\frac{I\{\bar A(\check T(t-1))=d_\theta(\bar L(\check T(t-1)))\}}
+ {\displaystyle\prod_{j=0}^{\check T(t-1)}g_0(A(t)\mid\bar L(t),\bar A(t-1))}\\
+ &\quad\times\bigl[Q^{\theta,\infty}_{L(t+1)}(\bar L(t))
+ -Q^{\theta,\infty}_{L(t)}(\bar L(t-1))\bigr].
+\end{aligned}
+\tag{16.7}
+\end{equation}
+其中，$Q^{\theta,\infty}_{L(t_0+2)}(\bar L(t_0+1))\equiv Y(t_0+1)$，并且
+\[
+ \frac{I\{\bar A(\check T(t-1))=d_\theta(\bar L(\check T(t-1)))\}}
+ {\prod_{j=0}^{\check T(t-1)}g_0(A(t)\mid\bar L(t),\bar A(t-1))}
+\]
+在 $t=0$ 时为零。注意，对以下任一种情形中的所有 $t$，都有 $D_{\theta,t}^*(O\mid g_0^\theta,Q_0^\theta)=0$：（i）$\widetilde T=C$ 且 $C+1\leq t\leq t_0+1$，因为此时 $I\{\bar A(\check T(t-1))=d_\theta(\bar L(\check T(t-1)))\}=0$；（ii）$\widetilde T=T$ 且 $T+1<t\leq t_0+1$，因为此时 $Q^\theta_{L(t+1)}(\bar L(t))-Q^\theta_{L(t)}(\bar L(t-1))=0$。
+
+TMLE 估计量 $\gamma^{\theta,*}_{n,h}$ 具有双重稳健性：只要干扰参数 $g_0^\theta$ 的估计量一致，或者干扰参数 $Q_0^\theta$ 的初始估计量一致，它就是 $\gamma^\theta$ 的一致估计量。此外，若两个干扰参数估计量均一致，$\gamma^{\theta,*}_n$ 则渐近线性且有效；也就是说，在至多只对 $g_0^\theta$ 施加约束的统计模型中，它达到半参数效率界。在这种模型中，$\gamma^\theta$ 的任何正则渐近线性估计量，例如三种 IPW 估计量 $\gamma^\theta_{n,\mathrm{HT}}$、$\gamma^\theta_{n,\mathrm{bd}}$ 或 $\gamma^\theta_{n,h}$，其方差均大于或等于 TMLE $\gamma^{\theta,*}_n$ 的方差。只有当概率向量 $g_0^\theta$ 得到一致估计，并且渐近线性得到保持时，基于影响曲线（influence curve，IC）的 $\gamma^{\theta,*}_n$ 方差估计量才是保守的。注意，若 $g_0^\theta$ 的估计量不一致，即使干扰参数 $Q_0^\theta$ 的初始估计量一致，基于 IC 的 $\gamma^{\theta,*}_n$ 方差估计量也可能不是 TMLE 方差的一致估计量。

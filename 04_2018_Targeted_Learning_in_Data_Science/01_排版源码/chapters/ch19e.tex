@@ -1,0 +1,195 @@
+% 原书分章 PDF 第 25—30 页：第 19.7—19.8 节。
+\section{独立同分布数据的在线靶向学习}
+
+下一小节定义基于独立同分布的 $(W(t),A(t),Y(t))$，$t=1,\ldots,N$，估计平均因果效应的估计问题，并定义相关的量。第 19.7.2 节给出在线一步估计量，以及确立其渐近有效性的相应定理。第 19.7.3 节定义在线 TMLE。
+
+\subsection{平均因果效应的在线靶向学习}
+
+我们观测 $N$ 个独立同分布观测 $O(t)=(W(t),A(t),Y(t))$，$t=1,\ldots,N$，令 $P_0$ 为 $O(t)$ 的共同概率分布。假设 $Y(t)$ 为二元变量，或取值于 $(0,1)$ 的连续变量。令 $\bar q_w$、$\bar g$、$\bar q_y$ 分别为 $P$ 下 $W(t)$ 的共同边际密度、给定 $W(t)$ 时 $A(t)$ 的条件密度，以及给定 $W(t),A(t)$ 时 $Y(t)$ 的条件密度。令 $\theta(P)=(\bar q_w,\bar g,\bar q_y)$。令 $\bar Q_w$、$\bar Q_y$、$\bar G$ 为相应的条件概率分布。令 $\mathcal M$ 为仅对 $\bar g_0$ 作出假设的 $P_0$ 的统计模型，考虑由 $\Psi(P)=E_PE_P(Y\mid A=1,W)$ 定义的目标参数 $\Psi:\mathcal M\to\RR$。令 $\bar Q(W)=E_P(Y\mid A=1,W)$，注意 $\Psi(P)=\bar Q_w\bar Q=\int\bar Q(w)\,d\bar Q_w(w)$。我们也使用记号 $\Psi(\bar Q_w,\bar Q)$ 或 $\Psi(\theta)$。$\Psi:\mathcal M\to\RR$ 的有效影响曲线为
+\[
+ \bar D(\theta)(O(t))
+ =\frac{A(t)}{\bar g(A(t)\mid W(t))}(Y(t)-\bar Q(W(t)))
+ +\bar Q(W(t))-\Psi(\bar Q_w,\bar Q).
+\]
+它满足恒等式
+\[
+ -P_0\bar D(\theta)=\Psi(\theta)-\Psi(\theta_0)+R_{20}(\theta,\theta_0),
+\]
+其中
+\[
+ R_{20}(\theta,\theta_0)
+ =E_{P_0}(\bar g-\bar g_0)/\bar g(1\mid W)(\bar Q-\bar Q_0)(W).
+\]
+
+\subsection{在线一步估计量}
+
+令 $(\bar Q_i:i)$ 和 $(\bar g_i:i)$ 分别为 $\bar Q_0$ 和 $\bar g_0$ 的在线估计量。这也定义了 $\psi_0$ 的在线估计量 $(\psi_i:i)$：
+\[
+ \psi_i=\frac1i\sum_{j=1}^i\bar Q_{j-1}(W_j).
+\]
+注意，可以写成 $\bar D(\theta)=\bar D_1(\theta)-\Psi(\theta)$，其中
+\[
+ \bar D_1(\theta)=A(t)/\bar g(A(t)\mid W(t))(Y(t)-\bar Q(W(t)))+\bar Q(W(t)).
+\]
+现在将在线一步估计量定义为
+\[
+\begin{aligned}
+ \psi_N&=\frac1N\sum_{i=1}^N\psi_{i-1}
+ +\frac1N\sum_{i=1}^N\bar D(\theta_{i-1},\psi_{i-1})(O(i))\\
+ &=\frac1N\sum_{i=1}^N\bar D_1(\theta_{i-1})(O(i)).
+\end{aligned}
+\]
+因此，
+\begin{equation}
+\begin{aligned}
+ \psi_N-\psi_0
+ &=\frac1N\sum_{i=1}^N\{\bar D(\theta_{i-1})(O(i))-P_0\bar D(\theta_{i-1})\}\\
+ &\quad+\frac1N\sum_{i=1}^N R_{20}(\theta_{i-1},\theta_0).
+\end{aligned}
+ \tag{19.8}
+\end{equation}
+下面的定理是一般定理 19.4 的应用。
+
+\begin{bookresult}{定理}{19.7}
+假设
+\[
+ \bar R_N=\frac1N\sum_{i=1}^N R_{20}(\theta_{i-1},\theta_0)=o_P(N^{-1/2});
+\]
+存在某个 $\delta>0$，使 $\bar g(1\mid W)>\delta>0$ 几乎处处成立；
+\[
+ \frac1N\sum_{i=1}^N P_0\{\bar D(\theta_{i-1})-\bar D(\theta_0)\}^2=o_P(1);
+\]
+当 $N\to\infty$ 时，$N^{-1}\sum_{i=1}^N P_0\{\bar D(\theta_{i-1})\}^2\xrightarrow{p}\sigma_0^2$，其中 $\sigma_0^2=P_0\bar D(\theta_0)^2$。则
+\[
+ \sqrt N(\psi_N-\Psi(\theta_0))
+ =\frac1{\sqrt N}\sum_{i=1}^N\bar D(\theta_0)(O(i))+o_P(1),
+\]
+且右侧依分布收敛到 $N(0,\sigma_0^2)$。
+\end{bookresult}
+
+\subsection{在线 TMLE}
+
+考虑局部最不利扰动模型
+\[
+ \operatorname{Logit}\bar Q_{N,\epsilon}
+ =\operatorname{Logit}\bar Q_N+\epsilon H(\bar g_N),
+\]
+其中 $H(\bar g)(W)=1/\bar g(1\mid W)$。对任意给定 $\epsilon$，在线估计量 $(\bar Q_i:i)$ 及其扰动，给出一个 $\epsilon$ 特定的在线估计量 $(\bar Q_{i,\epsilon}:i)$。考虑以下两个用于估计其相对于 $W$ 的均值的在线估计量：
+\[
+\begin{aligned}
+ \psi_{N,\epsilon}^1&\equiv\frac1N\sum_{i=1}^N\bar Q_{i-1,\epsilon}(W_i),\\
+ \psi_{N,\epsilon}^2&\equiv\frac1N\sum_{i=1}^N\bar Q_{N,\epsilon}(W_i).
+\end{aligned}
+\]
+第二个估计量使用 $\bar Q_{N,\epsilon}$ 相对于 $W$ 的分布的经验均值，它不是在线型估计量；第一个估计量则使用完全在线的估计量来估计这一经验均值。令 $\theta=(\bar Q,\psi)$ 表示结局回归及相应目标参数值，后者还依赖于 $W$ 的分布。于是，$\theta_{N,\epsilon}^j=(\bar Q_{N,\epsilon},\psi_{N,\epsilon}^j)$，$j=1,2$，是其 $\epsilon$ 特定的在线估计量。下面给出两个在线一步估计量 $\epsilon_N^{*j}$，$j=1,2$，从而得到相应的在线 TMLE $\psi_N^{*j}=\psi_{N,\epsilon_N^{*j}}^j$，$j=1,2$。
+
+令 $\epsilon_N^{0j}$ 为 $\epsilon_{0N}^j$ 的初始估计量，其中 $\epsilon_{0N}^j$ 定义为下式的解：
+\[
+ f_N^j(\epsilon)\equiv\psi_{N,\epsilon}^j=\Psi(\theta_0),
+\]
+或等价地，
+\[
+ \frac1N\sum_{i=1}^N\bar Q_{i-1,\epsilon_{0N}^1}(W_i)=\psi_0,
+ \qquad\frac1N\sum_{i=1}^N\bar Q_{N,\epsilon_{0N}^2}(W_i)=\psi_0.
+\]
+如果 $\theta_N$ 是 $\theta_0$ 的一致估计量——这是下文有效性定理的一项要求——则可以选择 $\epsilon_N^{0j}=0$。
+
+利用 $\epsilon_{0N}^j$ 的这一初始估计量 $\epsilon_N^{0j}$，在 $\epsilon_{0N}^j$ 的一个邻域内，构造 $f_N^j(\epsilon)$ 的一阶 Taylor 展开 $\tilde f_N^j(\epsilon)$：
+\[
+ \tilde f_N^j(\epsilon)=f_N^j(\epsilon_N^{0j})
+ +\frac d{d\epsilon_N^{0j}}f_N^j(\epsilon_N^{0j})(\epsilon-\epsilon_N^{0j}).
+\]
+使用简记 $c_N^j\equiv({d}/{d\epsilon_N^{0j}})f_N^j(\epsilon_N^{0j})$，$j=1,2$。换言之，
+\[
+\begin{aligned}
+ &\frac1N\sum_{i=1}^N\bar Q_{i-1,\tilde f_N^1(\epsilon)}(W(i))\\
+ &\quad=\frac1N\sum_{i=1}^N\bar Q_{i-1,\epsilon_N^{01}}(W(i))
+ +\frac1N\sum_{i=1}^N\frac d{d\epsilon_N^{01}}
+ \bar Q_{i-1,\epsilon_N^{01}}(W(i))(\epsilon-\epsilon_N^{01})\\
+ &\quad=\frac1N\sum_{i=1}^N\bar Q_{i-1,\epsilon_N^{01}}(W(i))
+ +c_N^1(\epsilon-\epsilon_N^{01}),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+ &\frac1N\sum_{i=1}^N\bar Q_{N,\tilde f_N^2(\epsilon)}(W(i))\\
+ &\quad=\frac1N\sum_{i=1}^N\bar Q_{N,\epsilon_N^{02}}(W(i))
+ +\frac1N\sum_{i=1}^N\frac d{d\epsilon_N^{02}}
+ \bar Q_{N,\epsilon_N^{02}}(W(i))(\epsilon-\epsilon_N^{02})\\
+ &\quad=\frac1N\sum_{i=1}^N\bar Q_{N,\epsilon}(W(i))+c_N^2(\epsilon-\epsilon_N^{02}).
+\end{aligned}
+\]
+因为 $\bar Q_{i,\epsilon}$ 关于 $\epsilon$ 可微，且导数有界（因为 $\bar g_0(W)>\delta>0$ 几乎处处成立），所以
+\[
+ f_N^j(\epsilon)-\tilde f_N^j(\epsilon)=O_P(\|\epsilon-\epsilon_N^{0j}\|^2).
+\]
+令 $f_N^{j,-1}$ 为 $f_N^j$ 的逆函数，同样令 $\tilde f_N^{j,-1}$ 为 $\tilde f_N^j$ 的逆函数：
+\[
+ \tilde f_N^{j,-1}(\psi)=\epsilon_N^{0j}
+ +c_N^{j,-1}(\psi-f_N^j(\epsilon_N^{0j})).
+\]
+与一般表示一样，有
+\[
+\begin{aligned}
+ &\tilde f_N^{j,-1}(\psi_0)-f_N^{j,-1}(\psi_0)\\
+ &\quad=-\{\tilde f_N^{j,-1}\tilde f_N^j f_N^{j,-1}(\psi_0)
+ -\tilde f_N^{j,-1}f_N^j f_N^{j,-1}(\psi_0)\}\\
+ &\quad=-\{\epsilon_N^{0j}+c_N^{j,-1}
+ \{\tilde f_N^j(\epsilon_{0N}^j)-f_N^j(\epsilon_N^{0j})\}
+ -\epsilon_N^{0j}-c_N^{j,-1}\{\psi_0-f_N^j(\epsilon_N^{0j})\}\}\\
+ &\quad=-c_N^{j,-1}\{\tilde f_N^j(\epsilon_{0N}^j)-f_N^j(\epsilon_N^{0j})\}
+ -\psi_0+f_N^j(\epsilon_N^{0j})\rbrace\\
+ &\quad=-c_N^{j,-1}\{\tilde f_N^j(\epsilon_{0N}^j)-f_N^j(\epsilon_{0N}^j)\}\\
+ &\quad=-c_N^{j,-1}O_P(\|\epsilon_{0N}^j-\epsilon_N^{0j}\|^2)\\
+ &\quad=O_P(\|\epsilon_{0N}^j-\epsilon_N^{0j}\|^2),
+\end{aligned}
+\]
+其中使用了 $c_N^{j,-1}$ 的有界性。假设 $\|\epsilon_{0N}^j-\epsilon_N^{0j}\|^2=o_P(N^{-1/2})$。这对应于假设：相对于基于损失的差异度，$\theta_N^{0j}$ 以快于 $N^{-1/4}$ 的速率收敛。因此，对在线 TMLE 的两种定义，均可得
+\[
+ R_{0N}(\epsilon_N^{0j},\epsilon_{0N}^j)
+ \equiv\tilde f_N^{j,-1}(\psi_0)-f_N^{j,-1}(\psi_0)=o_P(N^{-1/2}).
+\]
+现在定义如下 $\epsilon_{0N}^j$ 的在线一步估计量 $\epsilon_N^{*j}$：
+\[
+ \epsilon_N^{*j}=\frac1N\sum_{i=1}^N c_N^{j,-1}\psi_{i-1}
+ +\frac1N\sum_{i=1}^N\tilde f_N^{j,-1}\bar D(\theta_{i-1})(\bar O(i)).
+\]
+注意，这里可以采用上面 $j=1$ 估计量中的 $\psi_{i-1}$ 在线定义。这就定义了 $\psi_0$ 的在线 TMLE $\psi_N^{*j}=\psi_{N,\epsilon_N^{*j}}^j$。先给出关于这一在线估计量 $\epsilon_N^{*j}$ 的定理。
+
+\begin{bookresult}{定理}{19.8}
+令 $M_N=N^{-1/2}\sum_{i=1}^N\{\bar D(\theta_{i-1})(O(i))-P_0\bar D(\theta_{i-1})\}$，以及二阶余项
+\[
+ \bar R(N)=\frac1N\sum_{i=1}^N R_{20}(\theta_{i-1},\theta_0).
+\]
+给定 $j\in\{1,2\}$。回顾上面对 $f_N^j$、$\tilde f_N^j$、$c_N^j$、$R_{0N}(\epsilon_N^{0j},\epsilon_{0N}^j)\equiv\tilde f_N^{j,-1}(\psi_0)-f_N^{j,-1}(\psi_0)$ 的定义，以及由 $\psi_{N,\epsilon}^j=\psi_0$ 定义的 $\epsilon_{0N}^j$。令 $c_{0N}^j\equiv({d}/{d\epsilon_{0N}^j})\psi_{N,\epsilon_{0N}^j}$。有如下展开：
+\[
+ \epsilon_N^{*j}-\epsilon_{0N}^j
+ =c_N^{j,-1}M_N/\sqrt N+c_N^{j,-1}\bar R(N)
+ +R_{0N}(\epsilon_N^{0j},\epsilon_{0N}^j).
+\]
+
+\textbf{假设。}假设 $\bar R(N)=o_P(N^{-1/2})$；$R_{0N}(\epsilon_N^{0j},\epsilon_{0N}^j)=o_P(N^{-1/2})$；存在某个 $\delta>0$，使 $\bar g_0>\delta>0$ 几乎处处成立；当 $N\to\infty$ 时，$N^{-1}\sum_{i=1}^N P_0\bar D(\theta_{i-1})^2-P_0\bar D(\theta_0)^2\to0$ 依概率成立。
+
+\textbf{结论。}则 $c_{0N}^j\sqrt N(\epsilon_N^{*j}-\epsilon_{0N})\xrightarrow{d}Z$ 依概率成立，其中 $Z\sim N(0,\sigma_0^2)$，且 $\sigma_0^2=P_0\bar D(\theta_0)^2$。
+\end{bookresult}
+
+通过简单的 Delta 方法论证，定理 19.5 确立了 $\psi_0$ 的在线 TMLE $\Psi(\theta_{N,\epsilon_N^*})$ 的渐近有效性。
+
+\begin{bookresult}{定理}{19.9}
+给定 $j\in\{1,2\}$。在与定理 19.5 相同的条件下，
+\[
+ \psi_N^{*j}-\Psi(\theta_0)=\frac{M_N}{\sqrt N}+o_P(1/\sqrt N),
+\]
+从而 $\sqrt N(\psi_N^{j*}-\Psi(\theta_0))\xrightarrow{d}Z$，其中 $Z\sim N(0,\sigma_0^2)$。因此，$\psi_N^{j*}$ 是 $\psi_0$ 的渐近有效估计量。
+\end{bookresult}
+
+\paragraph{第一个在线 TMLE 的实际计算。}
+注意，对每个 $\epsilon$，$\psi_{N+1,\epsilon}^1$ 都是在线估计量：只需用第 $N+1$ 个观测更新初始估计量 $\bar Q_N$ 和 $\bar g_N$，再更新 $\psi_{N,\epsilon}^1$，从而完全控制计算速度和内存。这提示我们采用以下方法，以高度可扩展的方式计算在线 TMLE $\psi_N^{1*}=\psi_{N+1,\epsilon_N^{*1}}^1$。预先选定一个精细的 $\epsilon$ 值网格；对这一有限集中的每个 $\epsilon$ 值，跟踪在线估计量 $\psi_{N+1,\epsilon}$，同时运行在线估计量 $\epsilon_N^{*1}$。这样，每一步也都有 $\psi_{N+1,\epsilon_N^{*1}}$，无需针对这个新的 $\epsilon$ 值，重新计算 $i\leq N$ 的 $\bar Q_{i,\epsilon}$。此外，还可决定对网格中的每个 $\epsilon$ 值，跟踪若干阶导数 $({d^k}/{d\epsilon})\psi_{N,\epsilon}^1$，$k=1,\ldots,K$。由此便能利用 $\psi_{N,\epsilon}^1$ 的 $K$ 阶 Taylor 展开，得到不在网格中的 $\epsilon$ 处的值。这样就能使用规模更小的网格，同时对可能作为 $\epsilon_N^{1*}$ 实现值出现的全部 $\epsilon$，仍保持所需的 $\psi_{N,\epsilon}^1$ 逼近精度。
+
+\section{讨论}
+
+我们为按时间排序的相依数据提出了一般统计模型类，提出了一类特定因果量，并发展了其相应估计目标的在线一步估计量和在线 TMLE。我们证明了一些定理，给出这些在线估计量渐近有效的充分条件。要使二阶余项可忽略，初始在线估计量的随机行为至关重要；而二阶余项可忽略，是渐近有效性最为根本的条件。
+
+类似于独立同分布数据的 HAL 估计量，我们可以定义一个以快于临界速率 $N^{-1/4}$ 的速率收敛到真值的 HAL 估计量，只是这里要依赖鞅过程的基本指数尾概率。我们将在今后的工作中给出该 HAL 估计量及其 HAL 超级学习器的正式结果。这将证明，在这种高度非参数的时间序列数据统计模型类中，渐近有效估计是可能的。
+
+我们还强调了一个基本条件，它控制着本章结果所容许的相依程度。我们以独立同分布数据的平均因果效应估计，展示了所提出的在线估计量。一类非常重要的应用，是分析单个单位上的一条时间序列；特别是在涉及患者追踪数据的精准医学中，这类分析具有应用价值。本章结果表明，通过观测对某一处理或暴露变量开展实验的时间序列，可以评估单名患者的因果效应。把独立同分布数据下最优动态处理的工作，推广为学习单条时间序列的最优处理规则，将是有趣的方向。今后的研究将实现这些估计量，在模拟中评估它们，进一步了解其计算速度和统计性能。我们也计划将它们应用于真实数据。

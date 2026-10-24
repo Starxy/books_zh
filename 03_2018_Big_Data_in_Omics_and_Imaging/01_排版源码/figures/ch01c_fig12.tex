@@ -1,0 +1,48 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ n/.style={draw=blue!55!black,fill=white,minimum width=9mm,minimum height=6mm,inner sep=2pt,font=\small}]
+\node[n] (c12aa) at (1.4,4.4) {$A$};
+\node[n] (c12af) at (0,3.1) {$F$};
+\node[n] (c12ac) at (1.1,1.8) {$C$};
+\node[n] (c12ab) at (2.7,3.1) {$B$};
+\node[n] (c12ae) at (4.2,3.1) {$E$};
+\draw[->,green!55!black] (c12af) -- (c12ac);
+\draw[->,green!55!black] (c12aa) -- (c12ac);
+\draw[->,green!55!black] (c12ab) -- (c12ac);
+\draw[->,green!55!black] (c12aa) -- (c12ae);
+\draw[->,green!55!black] (c12ab) -- (c12ae);
+\node[anchor=west,font=\small] at (-.6,1.2) {(a)};
+\node[n] (c12ba) at (7.6,4.4) {$A$};
+\node[n] (c12bf) at (6.2,3.1) {$F$};
+\node[n] (c12bc) at (7.3,1.8) {$C$};
+\node[n] (c12bb) at (8.9,3.1) {$B$};
+\node[n] (c12be) at (10.4,3.1) {$E$};
+\draw[->,green!55!black] (c12bf) -- (c12bc);
+\draw[->,green!55!black] (c12ba) -- (c12bc);
+\draw[->,green!55!black] (c12bb) -- (c12bc);
+\draw[->,green!55!black] (c12ba) -- (c12be);
+\draw[->,green!55!black] (c12bb) -- (c12be);
+\draw[red!75!black] (c12bf) -- (c12ba);
+\node[anchor=west,font=\small] at (5.6,1.2) {(b)};
+\node[n,fill=purple!45] (c12ca) at (1.4,-.3) {$A$};
+\node[n] (c12cf) at (0,-1.6) {$F$};
+\node[n,fill=purple!45] (c12cc) at (1.1,-2.9) {$C$};
+\node[n] (c12cb) at (2.7,-1.6) {$B$};
+\node[n] (c12ce) at (4.2,-1.6) {$E$};
+\draw[dashed,green!55!black] (c12cf) -- (c12cc);
+\draw[dashed,green!55!black] (c12ca) -- (c12cc);
+\draw[dashed,green!55!black] (c12cb) -- (c12cc);
+\draw[dashed,green!55!black] (c12ca) -- (c12ce);
+\draw[green!55!black] (c12cb) -- (c12ce);
+\draw[dashed,red!75!black] (c12cf) -- (c12ca);
+\node[anchor=west,font=\small] at (-.6,-3.5) {(c)};
+\node[n] (c12df) at (6.2,-1.6) {$F$};
+\node[n] (c12db) at (8.9,-1.6) {$B$};
+\node[n] (c12de) at (10.4,-1.6) {$E$};
+\draw[green!55!black] (c12db) -- (c12de);
+\node[anchor=west,font=\small] at (5.6,-3.5) {(d)};
+\end{tikzpicture}
+\origfig{12}{判断 d-分离的步骤示意。(a) 例 1.5 的祖先图；(b) 将祖先图道德化；(c) 将所有有向边替换为无向边；(d) 从图 (c) 中删除条件节点集合 $A,C$ 以及与它们相连的边后，得到的最终图。}
+\label{fig:ch01c-12}
+\end{figure}

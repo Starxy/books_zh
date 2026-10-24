@@ -1,0 +1,41 @@
+% 原书第 152—153 页；第 10.2 节。
+\section{一般 C-TMLE 算法}
+\label{sec:ch10-general-algorithm}
+
+C-TMLE 算法的目标，是构造一个有序的 TMLE 序列 $(G_{n,h},Q_{n,h}^*)$，使 $P_nL_1(G_{n,h})$ 和 $P_nL(Q_{n,h}^*)$ 都随 $h$ 增大而增大；也就是说，希望两个估计量的经验拟合程度都随着 $h$ 趋近于零而提高。然后，使用基于 $L(Q)$ 的交叉验证来选择 $h$。给定初始估计量 $Q_n$ 和有序序列 $\{G_{n,h}:h\}$，即使 $P_nL_1(G_{n,h}$ 随 $h\to0$ 而减小，仅仅将 $Q_{n,h}^*$ 定义为以 $Q_n$ 为初始估计量、在靶向步骤中使用 $G_{n,h}$ 的 TMLE，也不能保证 $P_nL(Q_{n,h}^*)$ 随 $h\to0$ 而减小。因此，C-TMLE 算法还必须构造相应的初始估计量序列 $Q_{n,h}$，供 TMLE $Q_{n,h}^*$ 使用，以实现所需的经验拟合改善。van der Laan and Gruber（2010）给出了一般的 C-TMLE 模板，提供了构造 C-TMLE 算法的方法。他们的一般模板还包括同时构造估计量序列 $G_{n,h}$。在这里，这个序列已经给定，因此，我们的情形是 van der Laan and Gruber（2010）中一般模板的一个特例。下述算法作了一项小修改：用交叉验证选择器 $\bar h_n$ 邻域中的一个局部最优选择 $\tilde h_{\bar h_n}(P_n)$ 替代 $\bar h_n$，从而保证 C-TMLE 求解所需的得分方程 (10.8)，为其渐近理论奠定基础。
+
+\noindent\textbf{一般算法。}
+选择 $h_n^1=\argmin_hP_nL(Q_{n,h}^*)$。对于任意 $h>h_n^1$，定义 $Q_{n,h}=Q_n$，并将 $Q_{n,h}^*$ 定义为以 $Q_n$ 为初始估计量、在靶向步骤中使用 $G_{n,h}$ 的 TMLE。注意，我们预期，$P_nL(Q_{n,h}^*)$ 从 $h=1$ 到 $h=h_n^1$ 的过程中确实递减。对于任意 $h\in[h_n^1,1]$，还定义 $\tilde h_h(P_n)=h_n^1$。现在，将初始估计量更新为 $Q_n^1=Q_{n,h_n^1}^*$；对于任意 $h<h_n^1$，将 $Q_{n,h}^*$ 定义为以 $Q_n^1$ 为初始估计量、在靶向步骤中使用 $G_{n,h}$ 的 TMLE。接着，定义
+$h_n^2=\argmin_{h<h_n^1}P_nL(Q_{n,h}^*)$。
+对于任意 $h\in(h_n^2,h_n^1)$，定义 $Q_{n,h}=Q_n^1$，将 $Q_{n,h}^*$ 定义为以 $Q_n^1$ 为初始估计量、在靶向步骤中使用 $G_{n,h}$ 的这个 TMLE，并令 $\tilde h_h(P_n)=h_n^2$。这样，就对 $h\in[h_n^2,1]$ 定义了一个有序估计量序列 $(G_{n,h},Q_{n,h},Q_{n,h}^*)$，其中，$P_nL(Q_{n,h}^*)$ 大体上随 $h$ 的减小而增大；同时，相应的 $\tilde h_h(P_n)$ 将任意 $h\in[h_n^2,1]$ 映射到下一个更小的 $h$，它对应于 $Q_{n,h}^*$ 风险的一个极小值点。不断迭代这一过程，直到最后一个值 $h=0$。由此得到完整的序列 $(G_{n,h},Q_{n,h},Q_{n,h}^*)$ 及相应的 $\tilde h_h(P_n)$，$h\in[0,1]$；其中，$P_nL_1(G_{n,h})$ 和 $P_nL(Q_{n,h}^*)$ 都随着 $h$ 趋近于零而减小。
+% 上文“大体上随 h 减小而增大”与本段末句的“减小”均来自原文，未静默统一方向。
+
+注意，上述算法描述为每个 $h\in[0,1]$ 定义了映射
+$(\tilde h_h,\widehat G_h,\widehat Q_h,\widehat Q_h^*)$，
+将数据 $P_n$ 映射为调节参数 $\tilde h_h(P_n)$、干扰参数 $G_0$ 的估计值 $G_{n,h}$、$Q_0$ 的初始估计值 $Q_{n,h}$，以及由 $(Q_{n,h},G_{n,h})$ 定义的 TMLE $Q_{n,h}^*$。特别地，它定义了一个以 $h$ 为索引的候选估计量集合 $\widehat Q_h$。我们用交叉验证选择器 $\bar h_n$ 来选择 $h$：
+% 原书式 (10.7) 使用 P_n 而非验证分布 P^1_{n,B_n}，照录。
+\begin{equation}
+ \bar h_n
+ =\argmin_h E_{B_n}P_nL\bigl(\widehat Q_h^*(P_{n,B_n}^0)\bigr).
+ \tag{10.7}
+\end{equation}
+在通常的 C-TMLE 算法中，我们会选择
+$(G_{n,\bar h_n},Q_{n,\bar h_n},Q_{n,\bar h_n}^*)$，
+从而使用 $\Psi(Q_{n,\bar h_n}^*)$ 作为 TMLE。然而，我们希望保证所用的 $h$ 选择器求解以下关键得分方程：
+\begin{equation}
+ \frac{d}{dh}P_nL(Q_{n,G_{n,h}}^*)=0,
+ \tag{10.8}
+\end{equation}
+其中，在求导时，不将初始的 $Q=Q_{n,h}$ 视为 $h$ 的函数。例如，如果使用一步 TMLE，则这个方程写成
+\[
+ \frac{d}{dh}P_nL(Q_{n,\epsilon_n(h),G_{n,h}})=0.
+\]
+注意，这评价的是：在固定初始估计量的情况下，由靶向步骤中 $G_{n,h}$ 的变化所引起的 TMLE 经验风险变化。为了求解式 (10.8)，我们用 C-TMLE 算法中紧邻 $\bar h_n$ 之前的实际极小值点 $h_n<\bar h_n$ 替代 $\bar h_n$：
+\begin{equation}
+ h_n\equiv\tilde h_{\bar h_n}(P_n).
+ \tag{10.9}
+\end{equation}
+由于 $h_n$ 在一个 $h$ 值区间内最小化 $h\mapsto P_nL(Q_{n,G_{n,h}}^*)$，假设极小值位于区间内部，那么，这个选择 $h_n$ 确实求解式 (10.8)。现在，所提出的 C-TMLE 由
+$(h_n,G_n=G_{n,h_n},Q_n=Q_{n,h_n},Q_n^*=Q_{n,h_n}^*)$
+定义，由此得到 $\psi_0$ 的 C-TMLE $\Psi(Q_n^*)$。
+

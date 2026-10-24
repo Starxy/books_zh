@@ -1,0 +1,73 @@
+% 原书分章 PDF 第 1—5 页；章首、第 17.1 节导言与第 17.1.1 小节。
+\chapter{时变中介变量与暴露的中介分析}
+\label{ch:time-varying-mediation}
+\chapterauthors{Wenjing Zheng 与 Mark J. van der Laan}
+\chapteraffiliations{%
+W. Zheng：美国 Netflix 公司，100 Winchester Circle, Los Gastos, CA 95032, USA；电子邮箱：\href{mailto:wzheng@netflix.com}{wzheng@netflix.com}。\\
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_17}。}
+
+暴露往往会直接作用于感兴趣的结局，或者通过某些中间变量的中介而间接作用于结局。识别并量化这两类效应，有助于进一步理解背后的因果机制。形式化非参数因果推断的现代发展，推动了非纵向情形下因果中介分析（causal mediation analysis）的许多进展，例如 Robins 和 Greenland（1992）、Pearl（2001）、van der Laan 和 Petersen（2008）、VanderWeele（2009）、Hafeman 和 VanderWeele（2010）、Imai 等（2010b,a）、Pearl（2011）、Tchetgen Tchetgen 和 Shpitser（2011a,b）、Zheng 和 van der Laan（2012b）、Lendle 和 van der Laan（2011）。
+
+相比之下，纵向情形中的因果中介问题受到的关注相对较少。一种选择是受控直接效应（controlled direct effect；例如 Pearl，2001）：将中介变量固定为某些共同的预定取值，然后比较不同暴露方案下的结局。相应分析与非中介情形下时变暴露的分析十分相近，读者可参阅该主题的既有文献，例如 Robins 和 Ritov（1997）、Hernan 等（2000）、Stitelman 等（2011）以及 Petersen 等（2014）。如果某个特定中介取值下的暴露效应构成有意义的科学问题，受控直接效应就值得研究。否则，我们可以提出另一种直接效应问题：若中介变量取其在没有暴露时本来会取得的值，那么暴露对结局的效应是什么？Robins 和 Greenland（1992）以及 Pearl（2001）在非纵向情形下，使用所谓的自然直接效应（natural direct effect）参数将这一问题形式化。自然直接效应有一个与之互补的自然间接效应（natural indirect effect）；二者共同分解了暴露对结局的总体效应。Avin 等（2005）研究了将上述中介表述推广到纵向情形所面临的挑战，并证明：若存在受暴露影响的中介—结局关系的混杂因素，则相应的自然直接效应和间接效应参数不可识别。然而，这类混杂因素在纵向应用中十分普遍。
+
+Didelez 等（2006）提出了另一种因果中介表述，它基于随机干预（random interventions，RI，也称 stochastic interventions）。在这一表述下，中介变量被视为一个被强制赋予给定分布的干预变量，而非反事实变量。相应的自然直接效应和间接效应参数，与 Robins 和 Greenland（1992）及 Pearl（2001）表述下的解释有所不同；但即使存在暴露诱导的中介—结局混杂因素（exposure-induced mediator-outcome confounder），这些参数仍可以识别，例如 VanderWeele 等（2014a）。Zheng 和 van der Laan（2012a）在具有单时点暴露、时变中介变量和混杂因素的生存情形中，通过条件中介分布提出了一种因果中介的 RI 表述。VanderWeele 和 Tchetgen Tchetgen（2017）则在暴露和中介变量均随时间变化的情形中，通过边际中介分布提出了一种 RI 表述。本章推广 Zheng 和 van der Laan（2012a）的工作，在具有生存或非生存结局的一般时变暴露与中介情形中，通过条件中介分布表述因果中介。VanderWeele 和 Tchetgen Tchetgen（2017）的边际分布干预，与这里提出的条件分布干预，所捕捉的效应及相应的可识别性条件各不相同，体现了纵向中介分析的挑战。我们将通过例子和进一步讨论说明这些差异。本章经许可收录了 Zheng 和 van der Laan（2017）的部分内容。
+
+\begin{sourcebox}
+这里提出的自然直接效应和间接效应，都可以用相应版本的中介泛函（mediation functional）来定义。我们为这一条件中介泛函（conditional mediation functional）建立一个一般的半参数推断框架。具体而言，我们推导局部饱和的半参数模型（locally saturated semiparametric model）下的有效影响曲线，确立其稳健性质，提出条件中介泛函的三种估计量，并通过模拟研究考察它们的经验表现。这三种估计量分别为：采用识别表达式的回归表示的嵌套非靶向代入估计量、逆概率加权（inverse probability weighting，IPW）估计量，以及具有有效性和多重稳健性的靶向最小损失估计量（targeted minimum loss-based estimator，TMLE）。
+\end{sourcebox}
+
+\section{中介公式、自然直接效应与自然间接效应}
+
+考虑数据结构
+\[
+\begin{aligned}
+ O=&\,(L_0,A_1,R_1,Z_1,L_1,\ldots,A_t,R_t,Z_t,L_t,\ldots,\\
+ &\hspace{8em}A_\tau,R_\tau,Z_\tau,L_\tau\supset Y_\tau)\sim P_0,
+\end{aligned}
+\]
+其中，$L_0$ 编码基线协变量。对 $t\geq1$，$A_t$ 编码时变暴露，此外还可包含删失指示变量；$Z_t$ 表示时变中介变量（mediator），$R_t$ 和 $L_t$ 表示时变协变量。在每个时点 $t$，$R_t$ 编码受 $A_t$ 影响、又可能影响 $Z_t$ 和 $L_t$ 的协变量；$L_t$ 则是受 $A_t$、$R_t$、$Z_t$ 影响的协变量。$L_t$ 可以包含结局过程 $Y_t\subset L_t$；特别地，$L_\tau$ 将包含最终感兴趣的结局 $Y_\tau$。这一数据结构允许存在同一时点内以及跨时点的暴露—结局关系混杂因素，也允许存在暴露诱导的中介—结局关系混杂因素。在具有右删失的生存情形中，结局指示变量 $Y_t$ 表示个体是否在时点 $t$ 之前死亡，即 $Y_t=I(\tilde T\mathrel{<=}t,T\leq C)$，其中 $T$ 为生存时间，$C$ 为删失时间，$\tilde T=\min(T,C)$。我们将干预变量编码为 $A_t=(A_t^C,A_t^E)$，其中 $A_t^C$ 表示截至时点 $t$ 仍未删失，$A_t^E$ 是时点 $t$ 感兴趣的暴露。若结局为生存结局或存在删失，则在删失或死亡后，将 $Z_t$、$R_t$、$L_t$ 编码为默认值。经过线性变换，可以假定 $Y_t$ 的取值界于 0 和 1 之间。数据由 $O$ 的 $n$ 个独立同分布副本组成。
+
+考虑一个糖尿病照护的例子。假设在一个大型基层医疗网络中，所有糖尿病患者除了接受家庭医生提供的常规照护外，还须持续参加健康教育课程，定期接受营养咨询，即与咨询师会面；出现并发症的患者则转诊至更高层级的专科医生。考虑一项试点项目，它整合了简化的转诊程序、改进的健康教育课程，以及运作更顺畅的营养咨询服务，例如缩短等待时间、简化预约。患者每年都可选择加入或退出这一项目。假设我们希望评估：项目对2型糖尿病长期控制的效应，有多少是通过营养咨询出席情况的变化而产生的。最终感兴趣的结局，是确诊 5 年后的血糖水平 $Y_\tau$。每年进行一次观测。感兴趣的暴露 $A_t$ 为患者在第 $t$ 年是否参与项目；感兴趣的中介变量 $Z_t$ 为患者在当年是否完成最低次数的营养咨询会面。时变协变量 $R_t$ 表示健康教育课程的出席情况，以及通过问卷评估的患者对疾病与自我照护的知识。时变协变量 $L_t$ 表示健康相关协变量，如营养状况、疾病进展、合并症、血糖检测结果等。协变量 $R_t$ 受到项目参与的影响，又可能影响营养咨询的利用情况：健康教育程度较高的患者可能更多地利用营养咨询；它还可能影响此后的疾病进展和营养状况。协变量 $L_t$ 受到当前及既往项目参与和患者参与度的影响，其中一部分由 $R_t$ 和 $Z_t$ 捕捉；它又会影响此后的项目参与和患者参与度。因此，这里既存在暴露—结局关系的时变混杂因素，也存在中介—结局关系中由暴露诱导的时变混杂因素。
+
+以下，对任意 $1\leq t\leq\tau$ 和时变变量 $V$，我们用粗体 $\mathbf V_t$ 表示向量 $(V_1,\ldots,V_t)$，用 $\mathbf V_{s,t}$ 表示向量 $(V_s,\ldots,V_t)$。在指代整个向量 $\mathbf V_\tau$ 时，也使用简写 $\mathbf V$。$\mathbf V_{-1}$ 等退化指标表示空集。我们用以下结构因果模型（structural causal model，SCM）编码变量的时间顺序（Pearl，2009a）：
+\[
+\begin{aligned}
+ L_0&=f(U_{L_0}),\\
+ A_t&=f_{A_t}(\mathbf A_{t-1},\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1},U_{A_t}),\\
+ R_t&=f_{R_t}(\mathbf A_t,\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1},U_{R_t}),\\
+ Z_t&=f_{Z_t}(\mathbf A_t,\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1},U_{Z_t}),\\
+ L_t&=f_{L_t}(\mathbf A_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1},U_{L_t}).
+\end{aligned}
+\]
+换言之，在每个时点内，我们假定测量变量的时间关系为：先是暴露，再是协变量 $R_t$，然后是中介变量、协变量 $L_t$，最后是结局。对每个变量 $V$，模型假定它是所有先于它的变量及某些未测量外生因素的一个未知确定性函数。需要注意的是，我们的表述、识别表达式和所提出的估计量，都可以调整以适用于其他时间排序。
+
+观测数据结构是在未施加任何干预时由上述结构方程模型生成的。按照这一时间顺序，$O\sim P_0$ 的似然可以分解为下列条件概率：
+\begin{equation}
+\begin{aligned}
+ p_0(O)&=p_{0,L_0}(L_0)\\
+ &\quad{}\times\prod_{t=1}^\tau\Bigl(
+ p_{0,A}(A_t\mid\mathbf A_{t-1},\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\qquad{}\times p_{0,R}(R_t\mid\mathbf A_t,\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\qquad{}\times p_{0,Z}(Z_t\mid\mathbf A_t,\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})
+ p_{0,L}(L_t\mid\mathbf A_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1}\Bigr).
+\end{aligned}
+\tag{17.1}
+\end{equation}
+$A_t$、$R_t$、$Z_t$、$L_t$ 的条件密度可以依赖 $t$，尽管上述记号省略了这一依赖。若结局为生存结局或存在删失，则在删失或死亡后，以概率 1 将此后的 $A_t$、$Z_t$、$R_t$、$L_t$ 赋为默认值，因此它们不再对似然作出贡献。
+
+\subsection{条件中介分布下的反事实结局}
+
+令 $\mathbf a$ 和 $\mathbf a'$ 为两个可能的暴露方案。令
+\[
+\begin{aligned}
+ &\Gamma_t^{\mathbf a'}(z_t\mid\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})\\
+ &\quad\equiv p\bigl(Z_t(\mathbf a')=z_t\mid\mathbf R_t(\mathbf a')=\mathbf r_t,
+ \mathbf Z_{t-1}(\mathbf a')=\mathbf z_{t-1},\mathbf L_{t-1}(\mathbf a')=\mathbf l_{t-1}\bigr)
+\end{aligned}
+\]
+表示：若在人群中将暴露设为 $\mathbf A=\mathbf a'$，则时点 $t\geq1$ 的中介变量的条件概率。在每个时点 $t$ 和每个分层 $(\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})$ 内，这一分布给出一次随机抽取 $Z_t\sim\Gamma_t^{\mathbf a'}$。为方便起见，记 $\bar\Gamma^{\mathbf a'}=(\Gamma_1^{\mathbf a'},\ldots,\Gamma_\tau^{\mathbf a'})$。
+
+考虑对结构方程模型施加一项干预：静态地设定 $A_t=a_t$，并随机抽取 $Z_t\sim\Gamma_t^{\mathbf a'}$。对 $X_t\in\{R_t,L_t\}$、$t\geq1$，我们用 $X_t(\mathbf a,\bar\Gamma^{\mathbf a'})$ 表示这一干预产生的相应协变量。在一个理想实验中，数据将按以下方式生成。首先，在基线测量协变量 $L_0$，设测得 $L_0=l_0$。在 $t=1$，干预使 $A_1=a_1$，再测量由此产生的协变量 $R_1(\mathbf a,\bar\Gamma^{\mathbf a'})$，设测得值为 $r_1$。随后，干预使 $Z_1$ 按 $\Gamma_1^{\mathbf a'}(\cdot\mid l_0,r_1)$ 抽取。假定抽得 $z_1$，再测量所产生的协变量 $L_1(\mathbf a,\bar\Gamma^{\mathbf a'})$，设测得值为 $l_1$。在 $t=2$，干预使 $A_2=a_2$；测量所产生的协变量 $R_2(\mathbf a,\bar\Gamma^{\mathbf a'})$，设测得值为 $r_2$；干预使 $Z_2$ 按 $\Gamma_2^{\mathbf a'}(\cdot\mid l_0,r_1,z_1,l_1,r_2)$ 抽取；再测量所产生的协变量 $L_2(\mathbf a,\bar\Gamma^{\mathbf a'})$。依此类推。在实验结束时，将最终结局记为 $Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})$：它表示将暴露设为固定值 $\mathbf a$、将中介变量设为具有条件分布 $\Gamma_t^{\mathbf a'}$ 时的结局。与传统的非随机干预表述不同，$\Gamma_t^{\mathbf a'}$ 并不表示同一个体在另一种暴露下本来会有的中介变量，而只是一个随机变量；其分布由给定条件概率函数 $\Gamma_t^{\mathbf a'}$ 和该个体逐步累积的历史共同指定。
+
+下面用引出问题的例子说明这一理想实验。假定 $\mathbf a=1$ 表示在整个研究期间持续参与项目，$\mathbf a'=0$ 表示不参与。按照上述实验的干预，在 $t=1$，将基线为 $L_0=l_0$ 的个体分配为第 1 年参与项目，即 $A_1=1$。其健康教育课程出席情况与知识掌握水平 $R_1(\mathbf a,\bar\Gamma^{\mathbf a'})$ 是参与项目的结果，例如，项目可能使 $R_1$ 表现为较高的出席率和知识掌握水平。他的营养咨询利用情况 $Z_1\sim\Gamma_1^0$，则与一名具有相同基线特征 $l_0$ 和同样较高糖尿病健康教育水平、但未参加项目的个体相同。其疾病进展、营养状况和合并症 $L_1(\mathbf a,\bar\Gamma^{\mathbf a'})$，由基线 $l_0$、项目参与 $A_1=1$、较高的糖尿病健康教育水平，以及这一咨询利用模式 $\Gamma_1^0$ 共同产生。因此，最终反事实 $Y_\tau(1,\bar\Gamma^0)$ 是一名参加项目者的结局，但其营养咨询利用模式却与这样一名个体相同：后者具有相同的基线特征、疾病进展和合并症发展情况，以及相同的糖尿病健康教育水平，却没有参加项目。

@@ -1,0 +1,49 @@
+% 原书第197—201页；章首、10.1—10.2。
+\chapter{时间序列}
+\label{chap:time-series}
+\tikzset{ch10node/.style={circle,draw,inner sep=1pt,minimum size=9mm,font=\small}}
+\newcounter{chtentransnote}
+\newcommand{\chtennote}[1]{\refstepcounter{chtentransnote}\begin{quote}\begin{minipage}{\linewidth}\small\textbf{译注\arabic{chtentransnote}：}#1\end{minipage}\end{quote}}
+
+对不同时刻的变量之间的因果关系进行推理，比没有时间结构时的因果推理更容易。因果结构必须与时间顺序一致。第7.2.4节已经说明，若已知节点的因果排序，并假设不存在潜变量，那么只需马尔可夫条件与极小性，就能找出因果DAG；不必再作更有争议的假设，例如忠实性或对函数类的限制。不过，即使给定时间顺序，仍有三个主要问题。第一，所考虑的变量集可能不满足因果充分性。第二，某些变量可能对应同一时刻——在给定测量精度下如此——因而无法事先确定它们的因果顺序。第三，实践中往往只得到时间序列的一次重复观测；这不同于通常的独立同分布情形，后者会对每个变量观测多次。因此，这些问题都对时间序列中的因果推理至关重要。
+
+\section{预备知识与术语}
+此前，我们考虑的是从联合分布$P_{X_1,\ldots,X_d}$中抽取独立同分布样本的情形。本章讨论时间序列中的因果推断。设有$d$元时间序列$(\mathbf X_t)_{t\in\mathbb Z}$，对每个固定时刻$t$，$\mathbf X_t$都是向量$(X_t^1,\ldots,X_t^d)$。我们假设它描述一个\textbf{严平稳随机过程（strictly stationary stochastic process）}［例如Brockwell and Davis, 1991］。每个变量$X_t^j$表示在时刻$t$对某个系统第$j$个可观测量的测量。由于因果影响不可能从未来指向过去，我们区分多元时间序列中的两类因果关系。
+
+第一，节点为$X_t^j$、$(j,t)\in\{1,\ldots,d\}\times\mathbb Z$的因果图，\footnote{严格地说，此前我们只对有限个节点引入了因果DAG。这里需要无穷图；我们略去这一技术细节［例如见Peters et al., 2013］。}只包含满足$t<s$的$X_t^j\to X_s^k$，而不包含$t=s$的情形，见图10.1。这时称不存在\textbf{即时效应（instantaneous effect）}。第二，因果图除了包含某些$m,\ell$及$t<s$对应的$X_t^m\to X_s^\ell$，还包含某些$j,k$对应的$X_t^j\to X_t^k$，即存在即时效应，见图10.2。若对任意$j\ne k$和$h>0$，变量$X_t^j$可以影响$X_t^k$与$X_{t+h}^j$，却不能影响$X_{t+h}^k$，则称这一因果结构为\textbf{纯即时的（purely instantaneous）}，见图10.5(a)、(b)。若每个$X_t^j$都不受任何此前变量的影响，包括不受自身过去的影响，就无须将其描述为时间序列，因此可以略去这一情形。此时，指标$t$可以只用来标记统计样本中的相互独立实例，从而回到前几章的独立同分布情形。
+
+\input{figures/ch10_01}
+\input{figures/ch10_02}
+
+我们将以$X_t^i$为节点的DAG称为\textbf{完整时间图（full time graph）}，如图10.1和图10.2所示。与前几章不同，完整时间图包含无穷多个节点。\textbf{汇总图（summary graph）}是以$X^1,\ldots,X^d$为节点的有向图：对$j\ne k$，只要存在某些$t\le s$、$t,s\in\mathbb Z$使$X_t^j\to X_s^k$成立，就包含箭头$X^j\to X^k$。注意，虽然我们假设完整时间图无环，汇总图仍可能含有环。图10.3给出图10.1和图10.2中完整时间图对应的汇总图。对任意$t\in\mathbb Z$，我们用$\mathbf X_{\mathrm{past}(t)}$表示所有$s<t$对应的$\mathbf X_s$组成的集合，用$X_{\mathrm{past}(t)}^j$表示某个分量$X^j$的过去。当参照时刻$t$固定时，也写作$X_{\mathrm{past}}^j$。此外，$(\mathbf X_t^{-j})_{t\in\mathbb Z}$表示所有$k\ne j$对应的时间序列$(X_t^k)_{t\in\mathbb Z}$的集合。
+\input{figures/ch10_03}
+\FloatBarrier
+
+\section{结构因果模型与干预}
+假设随机过程$(\mathbf X_t)_{t\in\mathbb Z}$可以用结构因果模型描述，其中最多涉及各变量过去$q$个时刻的取值，$q$为某个有限值：
+\begin{equation}
+ X_t^j:=f^j\bigl((\PA_q^j)_{t-q},\ldots,(\PA_1^j)_{t-1},(\PA_0^j)_t,N_t^j\bigr),
+ \tag{10.1}
+\end{equation}
+其中
+\[
+ \ldots,N_{t-1}^1,\ldots,N_{t-1}^d,N_t^1,\ldots,N_t^d,N_{t+1}^1,\ldots,N_{t+1}^d,\ldots
+\]
+是相互独立的噪声项。对每个$s\in\mathbb Z$，符号$(\PA_s^j)_{t-s}$表示影响$X_t^j$的变量$X_{t-s}^k$、$k=1,\ldots,d$组成的集合。注意，当$s>0$时，$\PA_{t-s}^j$可以包含$X_{t-s}^j$，但$s=0$时不可以。我们假设对应的完整时间图无环。
+\chtennote{本段原文最后一句将父节点集合简写为$\PA_{t-s}^j$，与前一句的$(\PA_s^j)_{t-s}$不一致；二者均指滞后$s$时刻的父节点集合。这里保留原记号。}
+
+式(10.1)的一个常见特例，是\textbf{向量自回归模型（vector autoregressive model，VAR）}类［Lütkepohl, 2007］：
+\begin{equation}
+ X_t^j:=\sum_{i=1}^q A_i^j\mathbf X_{t-i}+N_t^j,
+ \tag{10.2}
+\end{equation}
+其中每个$A_i^j$均为$1\times d$矩阵；另见关于线性有环模型的注6.5，尤其是式(6.4)。
+
+与独立同分布情形一样，结构因果模型将干预的效应形式化。更准确地说，一次干预对应于替换某些结构赋值。例如，可以将某个$j$对应的全部取值$\{X_t^j\}_{t\in\mathbb Z}$设为指定值；也可以只在某个特定时刻$t$干预$X_t^j$。
+
+\subsection{降采样}
+在许多应用中，采样过程可能慢于因果过程的时间尺度。图10.4给出一个例子：每隔一个时刻才进行一次观测。原完整系统的汇总图包含边$X^1\to X^2\to X^3$。现在，我们可能希望为观测到的降采样过程构建因果模型，因此必须明确允许哪些干预。第一，若仅允许干预已观测的时刻，那么$X^1$对$X^2$就不应有因果影响。干预$X^1$的一个已观测实例，不会影响$X^2$的可观测部分；注意，时间序列$X^1$只有滞后两期的效应$X_t^1\to X_{t+2}^1$。此外，在这种设定下，如果原本不存在即时效应，降采样也不会制造出伪即时效应。对于结构因果模型，Bongers et al.［2016，第3章］描述了一种将模型边缘化的形式过程：把未观测时间步的因果机制代入其他机制。只要干预限于已观测时刻，所得模型就能正确描述干预的效应。第二，若还考虑干预潜变量，我们可能希望恢复原始汇总图；例如Danks and Plis［2013］与Hyttinen et al.［2016］研究了这一问题。
+\input{figures/ch10_04}
+
+某些情况下，降采样并不是数据生成过程的恰当模型。例如，对许多物理测量，更合理的做法可能是将观测建模为连续若干时刻的平均值，而非这些时刻的稀疏子集。前者是一项有用、但也复杂的建模假设：取平均可能改变模型类，而且在对干预建模时也需要谨慎。
+\FloatBarrier

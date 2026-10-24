@@ -1,0 +1,89 @@
+% 依照随附 part1/visuals/moe.png 重绘。路由权重逐项保留；不重新归一化。
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+    every node/.style={font=\small,align=center,inner sep=2pt},
+    flow/.style={-{Stealth[length=2mm,width=1.5mm]},line width=.7pt},
+    residual/.style={-{Stealth[length=2mm,width=1.5mm]},line width=.7pt,rounded corners=2mm},
+    norm/.style={draw=red!65!black,fill=red!18,rounded corners=1mm,minimum height=.4cm},
+    attention/.style={draw=black!70,fill=yellow!30,rounded corners=1mm,minimum height=.4cm},
+    expert/.style={draw=black,fill=violet!30,rounded corners=.6mm,minimum width=.5cm,minimum height=.3cm,font=\fontsize{6.8pt}{8pt}\selectfont,inner sep=1pt},
+    router/.style={draw=green!55!black,fill=green!15,rounded corners=1mm,minimum height=.4cm},
+    weight/.style={font=\scriptsize,fill=blue!5,inner sep=1pt}]
+
+% 左：仅解码器 Transformer 中的 MoE 层。
+\node[font=\bfseries\small,text=blue!65!black] at (1.6,7.9) {仅解码器 Transformer\\上的 MoE 架构};
+\node[font=\large] (xin) at (1.6,2.3) {$x$};
+\node[attention,minimum width=2.9cm] (sa) at (1.6,3.0) {自注意力};
+\node[norm,minimum width=2.9cm] (n1) at (1.6,3.85) {相加与归一化};
+\node[draw=blue!65!black,fill=blue!15,rounded corners=1mm,minimum width=2.9cm,minimum height=.4cm] (moe) at (1.6,4.7) {MoE 层};
+\node[norm,minimum width=2.9cm] (n2) at (1.6,5.55) {相加与归一化};
+\node[font=\large] (yout) at (1.6,6.4) {$y$};
+\draw[flow] (xin) -- (sa);
+\draw[flow] (sa) -- (n1);
+\draw[flow] (n1) -- (moe);
+\draw[flow] (moe) -- (n2);
+\draw[flow] (n2) -- (yout);
+\draw[dashed] (3.05,3.0) -- (4.55,1.5);
+\draw[dashed] (3.05,5.55) -- (4.55,7.3);
+
+% 右：四个词元各自路由至得分最高的两个专家。
+\filldraw[draw=blue!55!black,fill=blue!5,rounded corners=4mm,line width=1.2pt] (4.85,2.65) rectangle (17.45,6.65);
+\node[attention,minimum width=10.8cm] (fullsa) at (11.15,1.25) {自注意力};
+\node[norm,minimum width=10.8cm] (fulln1) at (11.15,2.1) {相加与归一化};
+\node[norm,minimum width=10.8cm] (fulln2) at (11.15,7.1) {相加与归一化};
+
+\foreach \i/\xx/\c in {1/6.6/red,2/9.7/yellow,3/12.8/green,4/15.9/blue}{
+    \foreach \j in {0,1,2,3,4}{
+        \pgfmathtruncatemacro{\tone}{20+13*\j}
+        \filldraw[fill=\c!\tone,draw=\c!60!black,line width=.3pt] (\xx-.45+.18*\j,-.25) rectangle ++(.18,.2);
+        \filldraw[fill=\c!\tone,draw=\c!60!black,line width=.3pt] (\xx-.45+.18*\j,7.88) rectangle ++(.18,.2);
+    }
+    \node[font=\large] (pos\i) at (\xx,.45) {$\oplus$};
+    \draw[flow] (\xx,-.03) -- (pos\i.south);
+    \draw[flow] (pos\i.north) -- (\xx,1.05);
+    \draw[flow] (\xx,1.45) -- (\xx,1.9);
+    \draw[flow] (\xx,2.3) -- (\xx,3.25);
+    \draw[flow] (\xx,7.3) -- (\xx,7.86);
+    \foreach \j/\dx in {1/-.9,2/-.3,3/.3,4/.9}{
+        \node[expert] (e\i\j) at (\xx+\dx,5.4) {FFN\j};
+    }
+    \node[font=\large] (sum\i) at (\xx,6.1) {$\otimes$};
+    \draw[flow] (sum\i.north) -- (\xx,6.9);
+}
+\node[anchor=east,font=\scriptsize\bfseries] at (6.0,-.15) {词元嵌入};
+\node[anchor=east,font=\scriptsize] at (6.05,.45) {位置嵌入};
+\node[router,minimum width=1.7cm,minimum height=1.0cm,font=\fontsize{8pt}{9pt}\selectfont] (r1) at (6.6,3.28) {路由器：带 softmax\\的前馈网络\\$k=2$};
+\node[router,minimum width=1.2cm] (r2) at (9.7,3.45) {路由器};
+\node[router,minimum width=1.2cm] (r3) at (12.8,3.45) {路由器};
+\node[router,minimum width=1.2cm] (r4) at (15.9,3.45) {路由器};
+
+% 路由得分的小柱状示意逐列对应原图，仅表达原有概率权重。
+\foreach \xx/\ha/\hb/\hc/\hd in {6.6/.63/.14/.22/.07,9.7/.28/.12/.58/.24,12.8/.08/.59/.24/.30,15.9/.26/.12/.61/.34}{
+    \draw[draw=blue!55!black,fill=blue!15] (\xx-.28,3.93) rectangle ++(.12,\ha);
+    \draw[draw=blue!55!black,fill=blue!15] (\xx-.14,3.93) rectangle ++(.12,\hb);
+    \draw[draw=blue!55!black,fill=blue!15] (\xx,3.93) rectangle ++(.12,\hc);
+    \draw[draw=blue!55!black,fill=blue!15] (\xx+.14,3.93) rectangle ++(.12,\hd);
+}
+\node[anchor=west,font=\scriptsize\bfseries] at (5.7,6.45) {汇总};
+\draw[flow] (6.4,4.35) to[out=150,in=-90] node[weight,pos=.55,left] {$0.7$} (e11.south);
+\draw[flow] (6.7,4.2) to[out=85,in=-90] node[weight,pos=.45,right] {$0.2$} (e13.south);
+\draw[flow] (9.55,4.35) to[out=150,in=-90] node[weight,pos=.55,left] {$0.22$} (e21.south);
+\draw[flow] (9.8,4.2) to[out=85,in=-90] node[weight,pos=.45,right] {$0.6$} (e23.south);
+\draw[flow] (12.65,4.35) to[out=95,in=-90] node[weight,pos=.5,left] {$0.55$} (e32.south);
+\draw[flow] (12.95,4.2) to[out=30,in=-90] node[weight,pos=.55,right] {$0.2$} (e34.south);
+\draw[flow] (15.75,4.35) to[out=95,in=-90] node[weight,pos=.5,left] {$0.2$} (e43.south);
+\draw[flow] (16.05,4.2) to[out=30,in=-90] node[weight,pos=.55,right] {$0.5$} (e44.south);
+\foreach \i/\a/\b in {1/1/3,2/1/3,3/2/4,4/3/4}{
+    \draw[flow] (e\i\a.north) -- (sum\i.south west);
+    \draw[flow] (e\i\b.north) -- (sum\i.south east);
+}
+\draw[flow,dashed] (r1.west) to[out=180,in=180,looseness=1.5] (sum1.west);
+\draw[flow,dashed] (r2.west) to[out=180,in=180,looseness=1.5] (sum2.west);
+\draw[flow,dashed] (r3.west) to[out=180,in=180,looseness=1.5] (sum3.west);
+\draw[flow,dashed] (r4.east) to[out=0,in=0,looseness=1.5] (sum4.east);
+
+% 两条残差支路与原图一致。
+\draw[residual] (15.9,.7) -- (5.15,.7) -- (5.15,2.1) -- (5.75,2.1);
+\draw[residual] (15.9,2.5) -- (4.5,2.5) -- (4.5,7.1) -- (5.75,7.1);
+\end{tikzpicture}%
+}

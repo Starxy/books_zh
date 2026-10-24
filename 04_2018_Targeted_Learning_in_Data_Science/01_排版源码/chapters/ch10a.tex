@@ -1,0 +1,282 @@
+% 原书第 143—152 页；章首导言及第 10.1 节。
+\chapter{用于连续调参的 C-TMLE}
+\label{ch:ctmle-continuous-tuning}
+\chapterauthors{Mark J. van der Laan、Antoine Chambaz 与 Cheng Ju}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+A. Chambaz：法国巴黎笛卡尔大学 MAP5（UMR CNRS 8145），45 rue des Saints-Péres, 75270 Paris cedex 06, France；电子邮箱：\href{mailto:antoine.chambaz@parisdescartes.fr}{antoine.chambaz@parisdescartes.fr}。\\
+C. Ju：美国加利福尼亚大学伯克利分校生物统计学部，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:cju@berkeley.edu}{cju@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_10}。}
+
+对于感兴趣的因果量，靶向最小损失估计量（targeted minimum loss-based estimator，TMLE）首先构造数据似然中相关部分的初始估计量，再沿一个最不利参数模型更新这一初始估计量，并将它作为模型中的偏移项（offset）。最不利参数模型通常依赖于某个正交干扰参数（orthogonal nuisance parameter），例如处理机制和删失机制。计算目标参数时并不需要这个干扰参数。事实上，它与目标参数正交：极大似然估计量会完全忽略这个干扰参数，或者至少，它的得分与似然中相关部分的得分正交。
+
+然而，正交干扰参数对于确定如何最优地更新初始估计量起着关键作用；更新方向由路径导数的典范梯度（canonical gradient），即有效影响曲线（efficient influence curve）来指导。标准 TMLE 会采用一个力求使干扰参数本身达到最优估计表现的估计量。例如，可以根据这个干扰参数的对数似然损失函数，使用超级学习器（super learner）来估计它。
+
+\begin{sourcebox}
+当初始估计量和干扰参数估计量表现良好时，TMLE 虽然具有渐近有效性，但我们仍可能想问：评价干扰参数的拟合时，是否更应关注所得 TMLE 在靶向步骤中，能够多大程度地降低目标参数的均方误差（mean squared error，MSE）？
+\end{sourcebox}
+
+在因果推断中，当数据对目标参数的支持较弱，即缺乏正值性时，这个问题具有重大的实际意义。此时，有效影响曲线可能取到很大的值，使得沿最不利子模型的极大似然估计量表现不佳，进而损害初始估计量对目标参数的估计；这里，最不利子模型的得分张成空间包含有效影响曲线。例如，一个影响处理决策的潜在混杂因素，如果实际上是一个对结局没有影响的工具变量，那么，将其纳入处理机制的拟合，在有限样本中只会损害 TMLE。基于这一认识，文献中出现了多种方案：根据协变量对结局可能存在的影响进行预筛选，剔除影响较弱的协变量，再使用某一种现有估计量。
+
+不过，在采用这种方法之前，我们应当认识到它所伴随的巨大风险；这种方法显然忽略了似然原理。考虑一个对感兴趣结局的影响为 $n^{-1/2}$ 阶的协变量。评价这一协变量对结局影响的 $t$ 统计量，将为 $1$ 阶。也就是说，它确实携带信号，但信号处于噪声水平之内，因此预筛选方法很容易剔除这个协变量。然而，在 TMLE 或任何其他估计量中不纳入这一协变量，都会使估计量产生 $n^{-1/2}$ 阶的偏差。由此，即使有效影响曲线的方差完全表现良好，这样的 TMLE 也不再具有渐近线性。有人可能反驳说，只要随着样本量增大，让这些预筛选方法更加保守即可。然而，这些筛选方法基于边际回归，在存在其他混杂因素时，很容易误判协变量的影响。
+
+\begin{sourcebox}
+因此，基本结论是：在存在稀疏性时，试图改进估计量的做法，很容易破坏估计量良好的渐近性质；这里，稀疏性以有效影响曲线的方差来衡量。协同 TMLE（collaborative TMLE，C-TMLE）以理论为基础，迎接这一重大挑战。
+\end{sourcebox}
+
+C-TMLE 经过专门设计：随着样本量增大，它将选定的正交干扰参数估计量推向非参数程度最高的估计量，从而不影响 TMLE 的渐近表现。同时，它通过逐步构造估计量，从参数方法逐步走向非参数方法，可能大幅改善实际表现。每一步都选择这样的改动：相应最不利子模型的极大似然估计量，相对于偏移项，使对应 TMLE 的拟合得到最大改善。此外，这一做法完全得到有效影响曲线的协同双重稳健性（collaborative double robustness）的支持。这种性质表明，正交干扰参数只需调整那些协变量，而这些协变量是拟合初始估计量相对于其真值所剩余偏差所必需的。这样，C-TMLE 就能保证，只有样本量足够大，以至于在更新步骤中利用该协变量进行参数极大似然扩展，能够带来具有统计显著性的拟合改善时，工具变量才会被纳入处理机制的拟合。事实上，模拟研究表明，这样的 C-TMLE 很少劣于标准 TMLE，而在数据稀疏时可能好得多。
+
+以往关于 C-TMLE 的文献，例如 van der Laan and Gruber（2010）、Gruber and van der Laan（2010b）、Wang et al.（2011a）、Schnitzer et al.（2016）以及 van der Laan and Rose（2011），主要关注离散步骤的调参，例如评价是否在处理机制中加入一个协变量。本章关注对正交干扰参数拟合中的连续值调节参数（tuning parameter）进行调参的 C-TMLE，例如选择处理机制 Lasso 回归中的 $L_1$ 惩罚，或核回归平滑器的带宽。我们将说明，这会从根本上改变 C-TMLE 与 TMLE 之间的比较。C-TMLE 不再只是保持 TMLE 的渐近线性；我们将证明，它能够降低 TMLE 的 Taylor 展开中的二阶余项，使 C-TMLE 具有渐近线性，而 TMLE 却不具有这一性质。例如，强正值性假设可能成立，但干扰参数向其真值收敛的速率过慢。此外，在非稀疏情形下，我们也在实践中观察到了这种 C-TMLE 的显著改善。
+
+\section{TMLE 中对干扰参数估计量进行靶向调参的理论动机}
+\label{sec:ch10-motivation}
+
+\noindent\textbf{定义估计问题。}
+假设我们观测到随机变量 $O$ 的 $n$ 个独立同分布副本，其概率分布为 $P_0$，且已知它属于统计模型 $\mathcal M$，即 $P_0\in\mathcal M$。令 $\Psi:\mathcal M\to\mathbb R^d$ 是感兴趣的目标参数，在任意 $P\in\mathcal M$ 处均路径可微，其有效影响曲线为 $D^*(P)$。假设 $\Psi(P)$ 只通过参数 $Q=Q(P)$ 依赖于 $P$；为方便记号，我们也将 $\Psi(P)$ 写为 $\Psi(Q(P))$。有效影响曲线 $D^*(P)$ 通过 $Q(P)$ 和一个额外的干扰参数依赖于 $P$，后者记为 $G(P)$。我们也将 $D^*(P)$ 记为 $D^*(Q(P),G(P))$。令 $R_{20}(P,P_0)$ 为目标参数一阶 Taylor 展开中的二阶余项，定义如下：
+\[
+ \Psi(P)-\Psi(P_0)=-P_0D^*(P)+R_2(P,P_0).
+\]
+为强调它涉及 $(Q,G)$ 与 $(Q_0,G_0)$ 之间的二阶差值，我们也将 $R_2(P,P_0)$ 记为 $R_{20}(Q,G,Q_0,G_0)$。因此，可以写成
+\[
+ \Psi(Q)-\Psi(Q_0)
+ =-P_0D^*(Q,G)+R_{20}(Q,G,Q_0,G_0).
+\]
+% 原书第二个条件只有 R20(Q0,G,Q0,G0)，未印 =0；照录。
+如果对所有 $Q$，有 $R_{20}(Q,G_0,Q_0,G_0)=0$，并且对所有 $G$，有 $R_{20}(Q_0,G,Q_0,G_0)$，则称由统计模型 $\mathcal M$ 及其目标参数 $\Psi:\mathcal M\to\mathbb R^d$ 定义的估计问题具有所谓的双重稳健结构。其本质是，二阶余项由若干积分之和构成，每个积分的被积函数都可以表示为两个差值的乘积：一个是 $Q$ 的某个参数与其真值之差，另一个是 $G$ 的某个参数与其真值之差。例如，对于某些泛函 $H_1,H_2$ 和 $f$，
+\[
+ \begin{aligned}
+ R_{20}(Q,G,Q_0,G_0)
+ =\int &(H_1(G)-H_1(G_0))(H_2(Q)-H_2(Q_0))\\
+ &{}\times f(Q,G,Q_0,G_0)\,dP_0.
+ \end{aligned}
+\]
+
+\begin{bookresult}{例}{10.1}
+考虑一个例子来说明这些量。令 $O=(W,A,Y)$，其中，$W$ 是基线协变量向量，$A$ 是二值处理，$Y$ 是二值结局。考虑如下统计模型：不规定 $W$ 的分布 $Q_{W,0}$，也不规定给定 $A,W$ 时 $Y$ 的条件分布；但我们可能知道，给定 $W$ 时 $A$ 的条件分布 $G_0$ 属于集合 $\mathcal G$。将这个统计模型记为 $\mathcal M$，则已知 $P_0\in\mathcal M$。令 $\bar Q_0(W)=E_0(Y\mid A=1,W)$，$\bar G_0(W)=E_0(A\mid W)$，并令
+$\Psi(P)=E_PE_P(Y\mid A=1,W)=Q_{W,0}\bar Q_0$
+为感兴趣的目标参数。令 $Q=(Q_W,\bar Q)$，于是也可以将 $\Psi(P_0)$ 记为 $\Psi(Q_0)$。在这个例子中，$\Psi:\mathcal M\to\mathbb R$ 在任意 $P\in\mathcal M$ 处的有效影响曲线 $D^*(P)$ 为
+\[
+ D^*(P)=\frac{A}{\bar G(W)}(Y-\bar Q(W))+\bar Q(W)-\Psi(P),
+\]
+并且
+\[
+ \Psi(P)-\Psi(P_0)=-P_0D^*(P)+R_{20}(P,P_0),
+\]
+其中，
+\[
+ R_{20}(P,P_0)
+ =P_0\frac{\bar G-\bar G_0}{\bar G}(\bar Q-\bar Q_0).
+\]
+我们也将这个余项记为 $R_{20}(Q,G,Q_0,G_0)$。
+\end{bookresult}
+
+\noindent\textbf{以连续调节参数 $h$ 为索引的候选干扰参数估计量族。}
+令 $L_1(G)$ 是 $G_0$ 的损失函数，使得
+$P_0L_1(G_0)=\min_{G\in\mathcal G(\mathcal M)}P_0L_1(G)$。
+令 $\{\widehat G_h:h\in[0,1]\}$ 是 $G_0$ 的一个候选估计量族，其中
+$\widehat G_h:\mathcal M_{\mathrm{NP}}\to\mathcal G$，
+以连续值指标 $h\in[0,1]$ 为索引；估计值
+$\{G_{n,h}=\widehat G_h(P_n):h\}$
+按非参数程度排序，从 $h=0$ 时的非参数程度最高，排到 $h=1$ 时的参数程度最高。为便于理解我们的理论结果，建议将指标参数 $h$ 理解为与 $G_{n,h}$ 的偏差 $b_n(h)$ 近似相等，即 $h\approx b_n(h)$。例如，可以用基于损失的差异度（loss-based dissimilarity）
+$b_n(h)^2=P_0L_1(G_{n,h})-P_0L_1(G_0)$
+定义这种偏差。只要偏差函数 $b_n(h)$ 关于 $h$ 单调递增，就存在这种索引方式，并且可以通过它来构造：定义
+$\widehat G_{1,b}=\widehat G_{b_n^{-1}(b)}$，
+并用 $b$ 将候选估计量族重新索引为
+$\{\widehat G_{1,b}:b\}=\{\widehat G_h:h\}$。
+具体而言，我们假设经验风险 $h\mapsto P_nL(G_{n,h})$ 随 $h$ 增大而增大。例如，对于某个足够大的 $M<\infty$，可以定义依赖于 $h$ 的极大似然估计量
+\begin{equation}
+ G_{n,h}
+ =\argmin_{\substack{G\in\mathcal G\\\|G\|_v\leq(1-h)M}}P_nL_1(G),
+ \tag{10.1}
+\end{equation}
+其中，$\|G\|_v$ 是第 6 章介绍高度自适应 Lasso（highly adaptive lasso，HAL）时定义的变差范数。第 6 章表明，将 $G$ 表示为指示基函数的线性组合后，可以把 $G_{n,h}$ 实现为 Lasso 估计量：在所有线性组合中求极大似然估计，并要求系数绝对值之和小于 $(1-h)M$。
+
+\noindent\textbf{依赖于干扰参数估计量选择的 TMLE。}
+令 $L(Q)$ 是 $Q_0$ 的损失函数，使得
+$P_0L(Q_0)=\min_{Q\in\mathcal Q(\mathcal M)}P_0L(Q)$。
+考虑一个在 $\epsilon=0$ 时通过 $Q$ 的最不利子模型
+$\{Q_\epsilon:\epsilon\}\subset\mathcal Q(\mathcal M)$，
+使广义得分
+$\left.\frac{d}{d\epsilon}L(Q_\epsilon)\right|_{\epsilon=0}$
+各分量的线性张成空间包含 $D^*(Q,G)$。注意，这个子模型也依赖于 $G$，因此，我们还使用记号 $Q_{\epsilon,G}$ 来强调这种依赖。令
+$\widehat Q:\mathcal M_{\mathrm{NP}}\to\mathcal Q(\mathcal M)$
+为 $Q_0$ 的初始估计量。给定这一子模型以及 $(Q_0,G_0)$ 的初始估计量
+$(Q_n=\widehat Q(P_n),G_{n,h})$，
+就可以构造一步或迭代 TMLE $Q_{n,h}^*$。例如，使用通用最不利子模型时，可以采用一步 TMLE
+$Q_{n,h}^*=Q_{n,\epsilon_n,G_{n,h}}$，
+其中
+$\epsilon_n=\argmin_\epsilon P_nL(Q_{n,\epsilon,G_{n,h}})$。
+因此，给定 $G_0$ 的候选估计量序列 $\{G_{n,h}:h\}$，便定义了 $Q_0$ 的候选 TMLE 序列 $\{Q_{n,h}^*:h\}$；它们都求解有效影响曲线方程
+$0=P_nD^*(Q_{n,h}^*,G_{n,h})=0$。
+
+\noindent\textbf{使用 $h$ 的交叉验证选择器的 TMLE。}
+选择指标 $h$ 的一种自然方法，是使用基于 $L_1$ 损失的交叉验证。此时，定义一个随机划分 $B_n\in\{0,1\}^n$，将样本分为训练样本 $\{i:B_n(i)=0\}$ 与验证样本 $\{i:B_n(i)=1\}$；其经验概率分布分别为 $P_{n,B_n}^0$ 和 $P_{n,B_n}^1$。然后，用交叉验证选择器选择 $h$：
+\[
+ h_{n,\mathrm{CV}}
+ =\argmin_h E_{B_n}P_{n,B_n}^1L_1\bigl(\widehat G_h(P_{n,B_n}^0)\bigr).
+\]
+在式 (10.1) 的例子中，$G_{n,h_{n,\mathrm{CV}}}$ 就是第 6 章提出的 HAL 估计量。我们已经证明，对于每个固定的 $h$，基于损失的差异度
+$d_{01}(G_{n,h},G_{0,h})=P_0L_1(G_{n,h})-P_0L_1(G_{0,h})$
+至少以 $n^{-(0.5+\alpha(d)/4)}$ 的速率收敛，其中
+$\alpha(d)=1/(d+1)$，并且
+% 原书 G0,h 的约束为 hM，而非式 (10.1) 中的 (1-h)M。
+$G_{0,h}=\argmin_{G\in\mathcal G,\|G\|_v<hM}P_0L_1(G)$。
+此外，在这种情况下，我们知道 $G_n=G_{n,h_{n,\mathrm{CV}}}$ 至少以这一速率收敛。
+
+\begin{bookresult}{例}{10.2}
+在我们的例子中，选择
+\[
+ L_1(G)(O)
+ =-\{A\log\bar G(W)+(1-A)\log(1-\bar G(W))\}
+\]
+作为对数似然损失函数。可以如式 (10.1) 那样，把 $G_{n,h}$ 定义为 $L_1$ 约束为 $(1-h)M$ 的 Lasso logistic 线性回归；$G_{n,h_{n,\mathrm{CV}}}$ 则是通过内部交叉验证来选择这一约束的 Lasso 估计量。
+\end{bookresult}
+
+在通常的 TMLE 框架中，我们用 $h_{n,\mathrm{CV}}$ 选择 $h$，并采用 TMLE
+$Q_n^*=Q_{n,h_{n,\mathrm{CV}}}^*$，
+由此得到 $\Psi(Q_0)$ 的 TMLE $\Psi(Q_n^*)$。如果 $Q_n$ 以某个特定速率达到一致性，那么，使用 $G_0$ 的最优估计量 $G_{n,h_{n,\mathrm{CV}}}$ 的 TMLE
+$\Psi(Q_{n,h_{n,\mathrm{CV}}}^*)$
+可能已经渐近有效；此时，这样选择 $h_{n,\mathrm{CV}}$ 在渐近意义下就是恰当的。例如，第 7 章提出的 HAL-TMLE 依赖于一个以快于 $n^{-1/4}$ 的速率收敛到 $Q_0$ 的 HAL 估计量 $Q_n$。因此，在很弱的正则条件下，基于 $G_0$ 的 HAL 估计量 $G_{n,h_{n,\mathrm{CV}}}$ 的 TMLE 就具有渐近有效性。
+
+\noindent\textbf{C-TMLE 对 TMLE 的潜在改进。}
+不过，在有限样本中，HAL-TMLE 的二阶余项可能仍然很大。应当记得，当 $O$ 的维数较高时，二阶余项乘以 $n^{1/2}$ 后，会以非常缓慢的速率收敛到零。因此，本章讨论的 C-TMLE 对改进有限样本表现仍然十分重要。在 van der Laan（2014b）中，我们提出了一种 TMLE，将初始估计量 $(Q_n,G_{n,h})$ 映射为联合靶向的估计量 $(Q_{n,h}^*,G_{n,h}^*)$，使得当 $Q_n$ 或 $G_n$ 中任意一个存在设定错误，但不是两者都存在设定错误时，TMLE $\Psi(Q_{n,h}^*)$ 仍保持渐近线性；所需条件是，两个估计量都以快于 $n^{-1/4}$ 的速率收敛到各自可能设定错误的极限。一般建议采用这类 TMLE，以保护其渐近线性，使之不因其中一个估计量的设定错误而失效。此时，从渐近角度看，不需要采用使估计欠平滑（undersmoothing）的 $h_n$，而可以使用 $h_{n,\mathrm{CV}}$。然而，正如前面对 HAL-TMLE 所作的说明，我们认为，C-TMLE 算法仍可能改善有限样本表现，尤其是在数据对感兴趣参数而言较为稀疏时。总体而言，即使不需要借助 C-TMLE 改善渐近表现，它在实际的有限样本分析中仍是一项重要进展。
+
+交叉验证选择器 $h_{n,\mathrm{CV}}$ 优化的是 $h$ 对 $G_0$ 估计的选择，而真正的目标应当是，使 $h\mapsto\Psi(Q_{n,h}^*)$ 相对于 $\psi_0$ 的均方误差最小。应当认识到，由于 $\Psi(P_0)$ 是 $P_0$ 的一个光滑的、路径可微的泛函，通常，对所有 $h$ 值，$\Psi(Q_{n,h}^*)$ 的方差在渐近意义下都表现为 $1/n$。因此，当样本量 $n$ 较大时，$\Psi(Q_{n,h}^*)$ 的偏差平方将主导其方差，所以需要在所有 $h$ 中选择一个使 $\Psi(Q_{n,h}^*)$ 的偏差最小的值。协同靶向极大似然（最小损失）估计（collaborative targeted maximum likelihood (minimum loss) estimation，C-TMLE）旨在通过以下两步间接达到这一目标：（1）构造 TMLE 序列 $(Q_{n,h}^*,G_{n,h})$，使其经验拟合程度随着 $h$ 趋近于零而提高；在 C-TMLE 算法中，$Q_{n,h}^*$ 使用此前某个 $h'>h$ 对应的 $Q_{n,h'}$ 作为初始估计量，因此所有拟合都是嵌套的；（2）根据 $Q_{n,h}^*$ 相对于 $Q_0$ 的 $L$ 拟合，评价 $h$ 的选择。对于每个 $h$，$\Psi(Q_{n,h}^*)$ 都是 $\psi_0$ 的一个靶向估计量，而这些依赖于 $h$ 的 TMLE $Q_{n,h}^*$，区别只在于对同一个初始估计量 $Q_n$ 应用 C-TMLE 靶向步骤的深度 $h$。因此，$Q_{n,h}^*$ 的 $L$ 拟合是一个合理的准则，可以据此选择仍体现出统计显著信号的最大靶向程度，即最小的 $h$。
+
+\begin{bookresult}{例}{10.3}
+令 $\bar Q_n$ 是 $\bar Q_0$ 的初始估计量。考虑在 $\epsilon=0$ 时通过 $\bar Q_n$ 的最不利子模型
+\[
+ \operatorname{Logit}\bar Q_{n,\epsilon,G_{n,h}}
+ =\operatorname{Logit}\bar Q_n+\epsilon C(\bar G_{n,h}),
+\]
+其中扰动参数 $\epsilon$ 为一维，
+$C(\bar G)(A,W)=A/\bar G(W)$ 通常称为巧妙协变量（clever covariate）。令
+$\epsilon_{n,h}=\argmin_\epsilon P_nL(\bar Q_{n,\epsilon,G_{n,h}})$
+为极大似然估计值，其中
+\[
+ L(\bar Q)
+ =-\{Y\log\bar Q(A,W)+(1-Y)\log(1-\bar Q(A,W))\}
+\]
+是 $\bar Q_0$ 的对数似然损失。令
+$\operatorname{Logit}\bar Q_{n,h}^*
+ =\operatorname{Logit}\bar Q_n+\epsilon_{n,h}C(\bar G_{n,h})$，
+则 $\bar Q_{n,h}^*$ 就是以 $\bar Q_n$ 为初始估计量、在靶向步骤中使用 $\bar G_{n,h}$ 的 TMLE。
+
+这些 $Q_0$ 的 TMLE $Q_{n,h}^*=(Q_{W,n},\bar Q_{n,h}^*)$ 求解
+\[
+ P_nD^*(Q_{n,h}^*,G_{n,h})=0,
+\]
+具体而言，还求解
+\[
+ P_nD_1^*(\bar Q_{n,h}^*,G_{n,h})=0,
+\]
+其中，$D_1^*(\bar Q,\bar G)=A/\bar G(Y-\bar Q(W))$ 是有效影响曲线的一个分量，位于给定 $A,W$ 时 $Y$ 的条件分布的切空间中。$\Psi(Q_0)$ 的 TMLE $\Psi(Q_{n,h}^*)$ 满足
+% 原书 R20 后多印一个左圆括号，按可见原式保留。
+\[
+ \begin{aligned}
+ \Psi(Q_{n,h}^*)-\Psi(Q_0)
+ ={}&(P_n-P_0)D^*(Q_{n,h}^*,\bar G_{n,h})\\
+ &{}+R_{20}((Q_{n,h}^*,G_{n,h},Q_0,G_0).
+ \end{aligned}
+\]
+
+假设初始估计量 $\bar Q_n\to\bar Q\neq\bar Q_0$ 不一致。那么，$\Psi(Q_{n,h})$ 的渐近线性依赖于二阶余项
+\begin{equation}
+ P_0(\bar G_{n,h}-\bar G_0)/\bar G_{n,h}(\bar Q-\bar Q_0)
+ \tag{10.2}
+\end{equation}
+具有渐近线性。考虑基于似然的交叉验证选择器
+$h_{n,\mathrm{CV}}
+ =\argmin_h E_{B_n}P_{n,B_n}^1
+ L_1\bigl(\widehat{\bar G}_h(P_{n,B_n}^0)\bigr)$。
+由于 $\bar G_{n,h_{n,\mathrm{CV}}}$ 的偏差大于 $1/\sqrt n$，式 (10.2) 这一项不会具有渐近线性。也就是说，$h_{n,\mathrm{CV}}$ 对 $\bar G_{n,h}$ 作为 $G_0$ 的估计量的偏差和方差作出权衡，而我们真正希望权衡的，是这一偏差与 $\Psi(Q_{n,h}^*)$ 的方差。显然，实值光滑泛函 $\Psi(Q_{n,h}^*)$ 的方差表现为 $1/n$，显著小于无限维对象 $G_{n,h}$ 的方差。
+
+不过，可能存在一个速率 $h_n$，使 $G_{n,h}$ 足够欠平滑，从而使其光滑函数 (10.2) 具有渐近线性。我们想知道，在这种情况下，C-TMLE 选择器 $h_n$ 能否恰当地进行欠平滑，使式 (10.2) 具有渐近线性。更一般地，我们想知道，C-TMLE $\Psi(Q_{n,h_n}^*)$ 的偏差趋于零的速率，是否显著快于 TMLE $\Psi(Q_{n,h_{n,\mathrm{CV}}})$ 的偏差趋于零的速率。换言之，C-TMLE 对 $h_n$ 的选择，能否恰当地使实际目标参数 $\psi_0$ 的均方误差最小？
+\end{bookresult}
+
+
+\subsection{离散调节参数与连续调节参数的比较}
+\label{subsec:ch10-discrete-continuous}
+
+已有研究针对候选估计量的离散序列 $\{G_{n,k}:k\}$ 考察了 C-TMLE（van der Laan and Gruber，2010；Gruber and van der Laan，2010b；Wang et al.，2011a；Schnitzer et al.，2016；van der Laan and Rose，2011）。在这种情况下，任何合理的选择器最终都会在渐近意义下，选中 $G_0$ 的非参数程度最高、也就是渐近最优的估计量。因此，C-TMLE 的渐近表现，与选择 $G_0$ 的非参数程度最高估计量的 TMLE，以及通过基于 $L_1$ 的交叉验证选择这一 $G_0$ 估计量的 TMLE 等价。正如多篇文章所展示的，在这种离散情形下，C-TMLE 可能显著改善有限样本表现，同时不影响标准 TMLE 的渐近表现。
+
+然而，当调节参数连续时，不同的数据自适应选择器会选择不同的 $h$，并对应于 TMLE $\Psi(Q_{n,h}^*)$ 的偏差 $b_n(h)$ 趋于零的不同速率，进而影响这些 TMLE 向 $\psi_0$ 收敛的速率。因此，研究连续调节参数 $h$ 的 C-TMLE，为发展相应的渐近理论创造了机会：有可能证明，与用基于 $L_1$ 损失的交叉验证选择器选择 $h$ 的 TMLE 相比，C-TMLE 在渐近意义下更优。如果 $Q_n$ 以某个特定速率达到一致性，那么，使用 $G_0$ 的最优估计量 $G_{n,h_{n,\mathrm{CV}}}$ 的 TMLE
+$\Psi(Q_{n,h_{n,\mathrm{CV}}}^*)$
+可能已经具有渐近有效性；此时，C-TMLE 无法相对于标准 TMLE 再带来渐近改进。另一方面，如果 $Q_n$ 收敛得很慢，甚至可能不一致，那么，$G_{n,h_{n,\mathrm{CV}}}$ 的偏差可能过大，以至于 $\Psi(Q_{n,h_{n,\mathrm{CV}}}^*)$ 甚至不具有 $\sqrt n$ 一致性。此时，关键问题是：C-TMLE 能否选择一个欠平滑的 $h_n$，使其偏差具有更小的阶；并且，如果可能，能否选出一个 $h_n$，使得偏差 $b_n(h_n)=o(n^{-1/2})$。
+
+下面进一步理解这一点。考虑二阶余项具有双重稳健结构的情形。假设 $Q_n$ 恰好是 $Q_0$ 的一个不一致估计量。由于二阶余项的双重稳健结构，对于所有 $Q$，都有 $R_{20}(Q,G_0,Q_0,G_0)=0$，因此，在靶向步骤中使用真实 $G_0$ 的 TMLE $Q_{n,G_0}^*$，在很弱的条件下仍会给出 $\psi_0$ 的一致且渐近线性的估计量。然而，如果使用估计量 $G_{n,h_{n,\mathrm{CV}}}$，且它相对于 $G_0$ 的偏差以慢于 $n^{-1/2}$ 的速率趋于零，那么，TMLE $\Psi(Q_{n,h_{n,\mathrm{CV}}}^*)$ 也会具有类似阶的偏差。因此，这个 TMLE 甚至不具有 $\sqrt n$ 一致性，自然也不具有渐近线性。另一方面，旨在使 $h\mapsto\Psi(Q_{n,h}^*)$ 相对于 $\psi_0$ 的均方误差最小的数据自适应选择器 $h_n$，会尝试选择一个偏差较小的估计量 $G_{n,h}$。因此，在这种情况下，只要候选估计量族 $\{G_{n,h}:h\}$ 中包含这类相对无偏的估计量，一个良好的选择器 $h_n$ 仍可能得到渐近线性的估计量 $\Psi(Q_{n,h_n}^*)$。在 Lasso 的例子中，我们预期，交叉验证选择器 $h_{n,\mathrm{CV}}$ 得到的 Lasso 拟合所包含的基函数，会少于 C-TMLE 选择器 $h_n$ 所得到的拟合。本文提出的这类 C-TMLE 选择器，在理论上优于交叉验证选择器 $h_{n,\mathrm{CV}}$。
+
+\subsection{所提 C-TMLE 渐近优于标准 TMLE 的关键理论性质与依据}
+\label{subsec:ch10-critical-equation-rationale}
+
+回顾前文，TMLE 求解 $P_nD^*(Q_{n,h}^*,G_{n,h})=0$。当 $Q_{n,h}$ 和 $G_{n,h}$ 都以足够快的速率收敛到各自真值时，这就是其渐近有效性的基础。若再让 TMLE 求解额外的关键估计方程，就可以得到由这些方程所驱动的其他理论性质。我们提出的 C-TMLE $Q_{n,h_n}^*$ 所求解的关键附加方程为
+\begin{equation}
+ 0=\left.P_n\frac{d}{dh}D^*(Q_{n,h_n}^*,G_{n,h})\right|_{h=h_n},
+ \tag{10.3}
+\end{equation}
+实际上，我们只需要
+\begin{equation}
+ \left.h_nP_n\frac{d}{dh}D^*(Q_{n,h_n}^*,G_{n,h})\right|_{h=h_n}
+ =o_P(n^{-1/2}).
+ \tag{10.4}
+\end{equation}
+注意，这里的导数只针对 $G_{n,h}$ 中的 $h$，而不针对 $Q_{n,h}$ 中的 $h$。令
+\[
+ D^+(Q,G_{n,h})=\frac{d}{dh}D^*(Q,G_{n,h}).
+\]
+因此，选择 $h_n$ 使得
+\begin{equation}
+ \begin{aligned}
+ &P_nD^+(Q_{n,h_n}^*,G_{n,h_n})=0\\
+ &\quad\text{或}\quad
+ h_nP_nD^+(Q_{n,h_n}^*,G_{n,h_n})=o_P(n^{-1/2}).
+ \end{aligned}
+ \tag{10.5}
+\end{equation}
+
+下面尝试理解求解这一方程的依据。注意，
+\[
+ \begin{aligned}
+ P_0D^*(Q,G_{h+\delta})
+  &=\Psi(Q_0)-\Psi(Q)+R_{20}(Q,G_{h+\delta},Q_0,G_0),\\
+ P_0D^*(Q,G_h)
+  &=\Psi(Q_0)-\Psi(Q)+R_{20}(Q,G_h,Q_0,G_0),\\
+ P_0D^*(Q,G_{h+\delta})-P_0D^*(Q,G_h)
+  &=R_{20}(Q,G_{h+\delta},Q_0,G_0)\\
+  &\quad{}-R_{20}(Q,G_h,Q_0,G_0).
+ \end{aligned}
+\]
+令 $h_{0,n}$ 是 $P_0D^+(Q_{n,h}^*,G_{n,h})=0$ 的一个解。于是，这个预言选择 $h_{0n}$ 在 TMLE $Q_n^*=Q_{n,h_n}^*$ 本身处，求解
+\[
+ \lim_{\delta\to0}
+ \frac{R_{20}(Q_n^*,G_{n,h+\delta},Q_0,G_0)
+       -R_{20}(Q_n^*,G_{n,h},Q_0,G_0)}{\delta}=0.
+\]
+因此，这个预言选择 $h_{0n}$ 对应于局部最小化
+\[
+ h\mapsto R_{20}(Q_n^*,G_{n,h},Q_0,G_0).
+\]
+现在注意，只需将 $P_0D^+(Q_{n,h}^*,G_{n,h})$ 替换为其经验版本 $P_nD^+(Q_{n,h}^*,G_{n,h})$，就得到预言选择 $h_{0n}$ 的经验对应量 $h_n$。这表明，我们的 C-TMLE 选择 $h_n$ 的确具有很强的靶向性，旨在降低所得 $\psi_0$ 的 TMLE 的二阶余项。下文的正式定理 10.1 将证明，与 $h_{n,\mathrm{CV}}$ 相比，$h_n$ 确实能够达到这个目标。
+
+\begin{bookresult}{例}{10.4}
+在贯穿本章的例子中，式 (10.3) 简化为选择 $h_n$ 来求解
+\begin{equation}
+ 0=\frac1n\sum_{i=1}^n
+ \frac{A_i\frac{d}{dh_n}\bar G_{n,h_n}}
+      {\bar G_{n,h_n}^2(W_i)}
+ \bigl(Y_i-\bar Q_{n,h_n}^*(W_i)\bigr).
+ \tag{10.6}
+\end{equation}
+\end{bookresult}
+
+\subsection{隐式定义的调节参数}
+\label{subsec:ch10-implicit-tuning}
+
+假设给定一个离散的候选估计量集合 $\widehat G_\lambda$，它可能以多元调节参数 $\lambda\in\mathcal S$ 为索引。如何应用 C-TMLE 方法？可以根据 $P_nL_1(\widehat G_\lambda)$ 的值对这些候选估计量排序，从而形成一个有序估计量序列。令
+$\mathcal H=\{P_nL_1(\widehat G_\lambda):\lambda\in\mathcal S\}$
+为经验风险值的集合。假设候选估计量集合在某个经验风险值区间上分布得足够稠密，使我们在实际使用中能够将 $\mathcal H$ 视为实数轴上的一个区间。对于任意给定的 $\lambda\in\mathcal S$，定义
+$h(\lambda)=P_nL_1(\widehat G_\lambda)$，
+这就定义了一个一一对应的函数 $h:\mathcal S\to\mathcal H$。对于任意 $h\in\mathcal H$，可将 $\lambda(h)$ 定义为 $\lambda\mapsto h(\lambda)$ 的逆映射：即给定 $h$，选择满足 $P_nL_1(\widehat G_\lambda)=h$ 的 $\lambda$。由此，定义出按照 $P_nL_1(\widehat G_{1h})$ 的值排序的候选估计量集合
+$\{\widehat G_{1h}=\widehat G_{\lambda(h)}:h\in\mathcal H\}$。
+最后，可以将 $h$ 缩放到 $[0,1]$ 区间。现在，可以把所提出的方法应用于这一候选估计量序列，得到 $h$ 的选择器 $h_n$，进而得到选择器 $\lambda_n=\lambda(h_n)$。$D^+(Q,G_h)$ 中关于 $h$ 的解析导数，可以用数值导数来近似，因此不需要 $h\mapsto G_{n,h}$ 的解析表达式。
+

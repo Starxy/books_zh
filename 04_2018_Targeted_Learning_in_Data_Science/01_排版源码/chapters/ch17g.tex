@@ -1,0 +1,76 @@
+% 原书分章 PDF 第 20—23 页；第 17.4—17.5 节。
+\section{模拟}
+
+我们开展一项模拟，评估这三种估计量在估计生存结局 $Y_\tau$ 的中介公式 (17.5) 时的相对表现。考虑数据结构 $O=(L_0,A_1,R_1,Z_1,L_1,\ldots,A_\tau,R_\tau,Z_\tau,L_\tau)$，其中 $\tau=2$。$L_0$ 编码两个基线协变量 $L_{01}$ 和 $L_{02}$；$A_t$ 编码一个删失指示变量 $A_t^C$，表示患者截至时点 $t$ 是否仍留在研究中，以及一个二元暴露 $A_t^E$；$R_t$ 编码时点 $t$ 的协变量，它们直接受到 $A_t$ 的影响，又可能影响 $Z_t$ 和 $L_t$；$Z_t$ 为感兴趣的二元中介变量；$L_t$ 包含时变协变量 $L_t^1$，以及表示患者截至时点 $t$ 是否已经死亡的死亡指示变量 $Y_t$。这些变量服从以下数据生成分布：
+\[
+ L_{01}\sim\operatorname{Bern}(0.4);\qquad
+ L_{02}\sim\operatorname{Bern}(0.6);
+\]
+\[
+\begin{aligned}
+ A_t^C\sim\operatorname{Bern}\biggl(\expit\biggl(&1.5-0.8L_{02}
+ -0.4\bigl(I(t>1)\times L_{t-1}^1+I(t=1)L_{01}\bigr)\\
+ &+0.5I(t>1)A_{t-1}^E\biggr)\biggr),\\
+ A_t^E\sim\operatorname{Bern}\biggl(\expit\biggl(&-0.1+1.2L_{02}
+ +0.7\bigl(I(t>1)\times L_{t-1}^1+I(t=1)L_{01}\bigr)\\
+ &-0.1I(t>1)A_{t-1}^E\biggr)\biggr),\\
+ R_t\sim\operatorname{Bern}\biggl(\expit\biggl(&-0.8+A_t^E
+ +0.1\bigl(I(t>1)\times L_{t-1}^1+I(t=1)L_{01}\bigr)\\
+ &+0.3\bigl(I(t>1)\times R_{t-1}+I(t=1)L_{02}\bigr)\biggr)\biggr),\\
+ Z_t\sim\operatorname{Bern}\bigl(\expit(&-0.5+0.8L_{02}+0.8A_t^E+R_t)\bigr),\\
+ L_t^1\sim\operatorname{Bern}\bigl(\expit(&-1+0.3L_{02}+A_t^E+0.7Z_t-0.2I(t>1)L_{t-1}^1)\bigr),\\
+ Y_t\sim\operatorname{Bern}\biggl(\expit\biggl(&0.2+1.5L_{02}+R_t+0.2L_t^1-0.3A_t^E-0.3Z_t\\
+ &-0.2A_t^E\times Z_t-0.1I(t>1)R_{t-1}\biggr)\biggr).
+\end{aligned}
+\]
+
+\FloatBarrier
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{1000 次模拟的偏差、方差与均方误差}
+\label{tab:ch17-simulation}
+\begin{tabular}{llrrrr}
+\toprule
+ &&\multicolumn{2}{c}{偏差（Bias）}&\multicolumn{2}{c}{方差（Var）}\\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+ &$n$&500&5000&500&5000\\
+\midrule
+全部正确&TMLE&$6.57\mathrm{e}{-04}$&$1.87\mathrm{e}{-05}$&$1.32\mathrm{e}{-03}$&$1.01\mathrm{e}{-04}$\\
+ &IPW&$1.12\mathrm{e}{-03}$&$4.63\mathrm{e}{-05}$&$1.24\mathrm{e}{-03}$&$1.05\mathrm{e}{-04}$\\
+ &NTsub&$8.42\mathrm{e}{-04}$&$7.53\mathrm{e}{-04}$&$9.81\mathrm{e}{-04}$&$7.93\mathrm{e}{-05}$\\
+\midrule
+$\bar Q^{\mathbf a,\mathbf a'}$ 正确&TMLE&$1.02\mathrm{e}{-03}$&$2.61\mathrm{e}{-04}$&$1.35\mathrm{e}{-03}$&$1.15\mathrm{e}{-04}$\\
+ &IPW&$4.20\mathrm{e}{-03}$&$6.33\mathrm{e}{-03}$&$1.86\mathrm{e}{-03}$&$1.78\mathrm{e}{-04}$\\
+\midrule
+$L$ 误设&TMLE&$4.63\mathrm{e}{-04}$&$3.11\mathrm{e}{-05}$&$1.22\mathrm{e}{-03}$&$1.02\mathrm{e}{-04}$\\
+ &IPW&$1.12\mathrm{e}{-03}$&$4.63\mathrm{e}{-05}$&$1.24\mathrm{e}{-03}$&$1.05\mathrm{e}{-04}$\\
+ &NTsub&$5.28\mathrm{e}{-03}$&$5.85\mathrm{e}{-03}$&$6.64\mathrm{e}{-04}$&$6.30\mathrm{e}{-05}$\\
+\midrule
+$Z$ 误设&TMLE&$1.41\mathrm{e}{-02}$&$5.61\mathrm{e}{-03}$&$3.02\mathrm{e}{-03}$&$2.51\mathrm{e}{-04}$\\
+ &IPW&$1.22\mathrm{e}{-02}$&$1.46\mathrm{e}{-02}$&$2.37\mathrm{e}{-03}$&$2.12\mathrm{e}{-04}$\\
+ &NTsub&$7.66\mathrm{e}{-02}$&$7.73\mathrm{e}{-02}$&$3.53\mathrm{e}{-03}$&$2.93\mathrm{e}{-04}$\\
+\midrule
+$\bar Q^{\mathbf a,\mathbf a'}$ 误设&TMLE&$1.90\mathrm{e}{-04}$&$7.73\mathrm{e}{-05}$&$1.25\mathrm{e}{-03}$&$1.02\mathrm{e}{-04}$\\
+ &NTsub&$6.86\mathrm{e}{-03}$&$6.95\mathrm{e}{-03}$&$7.33\mathrm{e}{-04}$&$7.05\mathrm{e}{-05}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+一旦删失或死亡，所有后续变量均取默认值。感兴趣的目标参数为 $\Psi^{1,0}(P_0)\approx0.912$。为获得这一近似值，我们首先按照上述分布生成一个大样本，共 1,000,000 个观测；在 $Z_t$ 的方程中令 $A_t^E=0$，在其余位置令 $A_t^E=1$，同时赋值 $A_t^C=1$，即所有人都留在研究中。然后，取这一大样本中结局 $Y_\tau$ 的样本均值。
+
+正确设定的条件概率 $\bar p=(p_A,p_Z,p_R,p_L)$，通过按照数据生成分布指定的 logistic 回归获得。我们用基于回归的方法估计 $\bar Q_{L_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{Z_t}^{\mathbf a,\mathbf a'}$ 和 $\bar Q_{R_t}^{\mathbf a,\mathbf a'}$：所谓正确设定的估计量，是按照第 17.3.1 节与第 17.3.3 节的步骤，采用超级学习器，将被求期望的量对截至时点 $t$ 的所有父节点暴露、中介变量和协变量历史回归得到的。对于 $\bar p$ 和 $\bar Q^{\mathbf a,\mathbf a'}$ 的误设版本，与 $Z_t$ 和 $R_t$ 相关的干扰参数仅对 $\mathbf A_t$ 回归，与 $L_t$ 相关的干扰参数仅对 $\mathbf A_t$ 和 $\mathbf Z_t$ 回归，而 $p_A$ 则使用边际分布。这里需要指出，由于嵌套回归的性质，所谓“正确”的 $\bar Q^{\mathbf a,\mathbf a'}$ 实际上并没有指定这些期望的函数形式，只是调整了所有相关项；这里宽泛地使用这一术语，是为了与遗漏重要协变量的估计量相区别。超级学习器使用一个非常有限的默认候选算法库，包括 \texttt{glm}、\texttt{stepAIC}、\texttt{bayesglm}；每个算法既搭配基于相关性的变量筛选方法，也使用不作变量筛选的版本。这些算法高度依赖主效应项的函数形式，因此灵活性不足，不能很好地估计真实函数形式。我们采用这些干扰参数设定，实现非靶向代入估计量（NTsub）、IPW 估计量和 TMLE。考虑的样本量为 $n=400$ 和 $n=4000$。各样本量下的偏差、方差及均方误差（mean squared error，MSE），用 1000 个数据集估计，结果见表 17.1。
+
+正如推论 17.2 的一般稳健性条件所预测的，当嵌套回归 $\bar Q^{\mathbf a,\mathbf a'}$ 正确、而条件概率误设时，即“$\bar Q^{\mathbf a,\mathbf a'}$ 正确”情形，TMLE 相比误设的 IPW 降低了偏差。类似地，当仅有与协变量相关的干扰参数 $p_R$、$p_L$ 以及 $\bar Q_{R_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{L_t}^{\mathbf a,\mathbf a'}$ 误设，即“$L$ 误设”时，TMLE 相比误设的 IPW 或 NTsub 估计量，也显著降低了偏差。当仅有与 $Z_t$ 相关的干扰参数 $p_Z$ 和 $\bar Q_{Z_t}^{\mathbf a,\mathbf a'}$ 误设，即“$Z$ 误设”时，在不同样本量下，TMLE 均比误设的 NTsub 估计量偏差更小，但相对于 IPW 的偏差降低，只有在大样本量下才明显。当 $\bar Q^{\mathbf a,\mathbf a'}$ 全部误设，但 TMLE 更新步骤的权重 $H_{\cdot}^{\mathbf a,\mathbf a'}$ 使用正确的条件概率 $p_A$、$p_Z$、$p_L$、$p_R$ 时，在这一例子中仍可看到 TMLE 相比 NTsub 降低了偏差。
+
+回顾前文，本实现中正确设定的 $\bar Q^{\mathbf a,\mathbf a'}$，只是在关键主效应项的设定上正确，函数形式却未必正确。采用序贯回归方法很难实现正确的函数形式；我们可以通过估计似然中的实际条件密度来实现，或者采用依赖高度数据自适应估计量、计算量大得多的超级学习器，而这正是单次数据分析中应当采用的做法。这可能使 TMLE 在“全部正确”设定下损失了一部分有限样本增益，因为本来预期它比 IPW 更有效，而这一效率增益直到样本量较大时才显现。按同样的道理，这也可能影响了相应 NTsub 估计量的收敛速度。
+
+\section{讨论}
+
+本章提出一种随机干预方法，用于表述中介变量与暴露随时间变化的纵向中介分析中的感兴趣参数。具体而言，我们基于中介变量的条件分布定义随机干预。与另一种基于中介变量边际分布的随机干预表述（VanderWeele 和 Tchetgen Tchetgen，2017）相比，这一表述捕捉了不同的中介效应路径，并允许应用于生存情形；其代价是需要更强的序贯随机化假设。
+
+在 RI 表述下，感兴趣的处理以及中介变量都被视为干预变量。在这里提出的表述下，可以得到总体效应分解，进而定义与 Pearl（2001）类似的自然直接效应和自然间接效应。该表述下的自然直接效应，内在地可以解释为受控直接效应的加权平均，因为受控直接效应可看作对处理和中介变量的确定性干预。由于将中介变量视为干预变量，RI 表述需要从外部指定一个反事实中介分布。需要注意，无论采用 RI 方法还是非 RI 方法，因果中介都预先假定感兴趣的中介变量可接受外部操纵。在无法设想这种操纵的应用中，应谨慎认识到，因果中介所能回答的，只是假想实验下定义的纯机制问题。
+
+本文的第二项贡献，是为所得效应参数建立一般的半参数推断框架。更具体地，我们推导了局部饱和的半参数模型下的有效影响曲线，并确立了其稳健性质。在许多难以估计中介密度的应用中，基于回归的迭代期望估计量，是依赖中介密度一致估计的代入估计量的一种可行替代。我们还为中介泛函构造了非靶向代入估计量、IPW 估计量和 TMLE。

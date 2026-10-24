@@ -1,0 +1,184 @@
+% 原书PDF第42页7.1.5至第46页7.1.5.3标题前。
+\subsection{离散数据的因果推断}
+在复杂疾病的遗传研究中，疾病状态是离散变量，基因型也是离散变量。因此，有必要将因果推断从连续变量推广到离散变量。本节介绍基于距离相关的离散变量因果推断方法（Liu and Chan 2016）。
+
+前面各节介绍了判断因果关系 $X\to Y$ 的基本原理：原因 $X$ 的分布 $P(X)$，独立于给定原因 $X$ 时效应 $Y$ 的因果机制或条件分布 $P(Y\mid X)$。现在的问题是如何评估二者的独立性。近年来，人们提出用距离相关度量随机向量之间的依赖性，该方法同时允许线性和非线性依赖（Székely et al. 2007；Székely and Rizzo 2009）。距离相关在两个显著的方向上推广了传统Pearson相关：
+\begin{enumerate}
+\item 将定义在两个随机变量之间的Pearson相关，推广到变量数任意的两组变量之间的相关；
+\item 距离相关为零表明两个随机向量独立。
+\end{enumerate}
+将分布 $P(X)$、$P(Y\mid X)$ 离散化，并将离散后的分布视为两个向量 $P(X)$、$P(Y\mid X)$，便可利用二者之间的距离相关评估 $X$ 与 $Y$ 之间的因果关系。
+
+\subsubsection{距离相关}
+考虑两个随机变量向量：$p$ 维向量 $X$ 与 $q$ 维向量 $Y$。令 $P(x)$、$P(y)$ 分别为向量 $X$、$Y$ 的密度函数，$P(x,y)$ 为二者的联合密度函数。两个变量向量之间的独立性可通过两种方式定义：（1）密度定义；（2）特征函数定义。换言之，若 $X$ 与 $Y$ 独立，则有以下任一条件：
+\begin{enumerate}
+\item $P(x,y)=P(x)P(y)$；或
+\item $f_{X,Y}(t,s)=f_X(t)f_Y(s)$，
+\end{enumerate}
+其中
+\[
+f_{X,Y}(t,s)=E[e^{i(t^Tx+s^Ty)}],\quad
+f_X(t)=E[e^{it^Tx}],\quad f_Y(s)=E[e^{is^Ty}]
+\]
+分别为 $(X,Y)$、$X$、$Y$ 的特征函数。因此，距离 $\lVert P(x,y)-P(x)P(y)\rVert$ 与 $\lVert f_{X,Y}(t,s)-f_X(t)f_Y(s)\rVert$ 均可用于度量向量 $X$、$Y$ 之间的依赖性。距离相关（Székely et al. 2007）利用特征函数之间的距离定义依赖性度量。首先将两个向量之间的距离协方差的平方定义为
+\begin{equation}
+\begin{aligned}
+V^2(X,Y)&=\lVert f_{X,Y}(t,s)-f_X(t)f_Y(s)\rVert_w^2\\
+&=\int_{\mathbb R^{p+q}}|f_{X,Y}(t,s)-f_X(t)f_Y(s)|^2w(t,s)\,dt\,ds,
+\end{aligned}
+\tag{7.168}
+\end{equation}
+其中
+\[
+\begin{gathered}
+w(t,s)=\frac1{c_pc_q\lVert t\rVert_p^{1+p}\lVert s\rVert_q^{1+q}},\\
+c_p=\frac{\pi^{(1+p)/2}}{\Gamma((1+p)/2)},\qquad
+c_q=\frac{\pi^{(1+q)/2}}{\Gamma((1+q)/2)},
+\end{gathered}
+\]
+$\lVert\cdot\rVert_p$ 表示 $p$ 维向量的欧氏范数。由于 $t$ 与 $s$ 表示概率密度函数Fourier展开的频率，因此对于特征函数的高频分量，权函数较小（Cowley and Vinci 2014）。
+
+类似地，将距离方差的平方定义为
+\begin{equation}
+V^2(X)=V^2(X,X)=\int_{\mathbb R^{2p}}
+\frac{|f_{X,X}(t,s)-f_X(t)f_X(s)|^2}
+{c_p^2\lVert t\rVert_p^{1+p}\lVert s\rVert_p^{1+p}}\,dt\,ds.
+\tag{1.769}
+\end{equation}
+于是，随机向量之间的距离相关可定义为
+\begin{equation}
+R^2(X,Y)=\begin{cases}
+\dfrac{V^2(X,Y)}{\sqrt{V^2(X)V^2(Y)}},&V^2(X)V^2(Y)>0,\\[1ex]
+0,&V^2(X)V^2(Y)=0.
+\end{cases}
+\tag{7.170}
+\end{equation}
+Székely et al. (2007) 一文的定理3指出，$0\le R\le1$，且 $R(X,Y)=0$ 当且仅当 $X$ 与 $Y$ 独立。
+
+现在介绍计算距离相关的样本公式（Székely et al. 2007；Székely and Rizzo 2009）。假设抽取了配对样本 $(X_k,Y_K)$，$k=1,\ldots,n$。计算欧氏距离
+\[
+a_{kl}=\lVert X_K-X_l\rVert_p,\qquad b_{kl}=\lVert Y_k-Y_l\rVert_q,
+\quad k,l=1,\ldots,n.
+\]
+定义
+\[
+\begin{aligned}
+\bar a_{k.}&=\frac1n\sum_{l=1}^na_{kl},&
+\bar a_{.l}&=\frac1n\sum_{k=1}^na_{kl},&
+\bar a_{..}&=\frac1{n^2}\sum_{k=1}^n\sum_{l=1}^na_{kl},\\
+\bar b_{k.}&=\frac1n\sum_{l=1}^nb_{kl},&
+\bar b_{.l}&=\frac1n\sum_{k=1}^nb_{kl},&
+\bar b_{..}&=\frac1{n^2}\sum_{k=1}^n\sum_{l=1}^nb_{kl}.
+\end{aligned}
+\]
+定义两个矩阵
+\[
+A=(A_{kl})_{n\times n},\qquad B=(B_{kl})_{n\times n},
+\]
+其中
+\begin{equation}
+A_{kl}=a_{kl}-\bar a_{k.}-\bar a_{.l}+\bar a_{..},
+\tag{7.171}
+\end{equation}
+\begin{equation}
+B_{kl}=b_{kl}-\bar b_{k.}-\bar b_{.l}+\bar b_{..},\qquad k,l=1,\ldots,n.
+\tag{7.172}
+\end{equation}
+最后，样本距离协方差 $V_n(X,Y)$、方差 $V_n(X)$ 与相关 $R_n(X,Y)$ 分别定义为
+\begin{equation}
+V_n^2(X,Y)=\frac1{n^2}\sum_{k=1}^n\sum_{l=1}^nA_{kl}B_{kl},
+\tag{7.173}
+\end{equation}
+\begin{equation}
+\begin{gathered}
+V_n^2(X)=V_n^2(X,X)=\frac1{n^2}\sum_{k=1}^n\sum_{l=1}^nA_{kl}^2,\\
+V_n^2(Y)=\sum_{k=1}^n\sum_{l=1}^nB_{kl}^2,
+\end{gathered}
+\tag{7.174}
+\end{equation}
+\begin{equation}
+R_n^2(X,Y)=\begin{cases}
+\dfrac{V_n^2(X,Y)}{\sqrt{V_n^2(X)V_n^2(Y)}},&V_n^2(X)V_n^2(Y)>0,\\[1ex]
+0,&V_n^2(X)V_n^2(Y)=0.
+\end{cases}
+\tag{7.175}
+\end{equation}
+
+\subsubsection{距离相关的性质与检验统计量}
+关于距离协方差与距离相关，已有的研究性质（Székely et al. 2007；Székely and Rizzo 2009）汇总于结论7.23。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.23：距离协方差与距离相关的性质}\par
+\begin{enumerate}
+\item \textbf{几乎必然收敛。}样本距离协方差几乎必然收敛于距离协方差：
+\[
+V_n(X,Y)\xrightarrow{a.s.}V(X,Y),
+\]
+样本距离相关几乎必然收敛于距离相关：
+\[
+R_n^2(X,Y)\xrightarrow{a.s.}R^2(X,Y).
+\]
+\Needspace{4\baselineskip}
+\item \textbf{距离相关与独立性。}
+\begin{enumerate}[label=\alph*.]
+\item $0\le R(X,Y)\le1$，且 $R(X,Y)=0$ 当且仅当 $X$ 与 $Y$ 独立。
+\item 考虑两个随机向量 $X=(X_1,X_2)$ 与 $Y=(Y_1,Y_2)$。若 $X$ 与 $Y$ 独立，则
+\[
+V(X_1+Y_1,X_2+Y_2)\le V(X_1,X_2)+V(Y_1,Y_2),
+\]
+当 $X_1,X_2,Y_1,Y_2$ 相互独立时取等号。
+\item 令 $a\in\mathbb R^p$ 为常向量，$b$ 为标量，$C$ 为 $p\times p$ 维正交归一矩阵，则
+\[
+V(a+bCX)=|b|V(X).
+\]
+\item $V(X)=0$ 表明 $X=E[X]$。
+\item 假设 $X$ 与 $Y$ 独立，则有
+\[
+V(X+Y)\le V(X)+V(Y).
+\]
+\end{enumerate}
+\item \textbf{分布。}
+\begin{enumerate}[label=\alph*.]
+\item 若 $X$ 与 $Y$ 独立，且 $E(\lVert X\rVert_p+\lVert Y\rVert_P)<\infty$，则
+\begin{equation}
+nV_n^2\xrightarrow D\lVert\zeta(t,s)\rVert^2,
+\tag{7.176}
+\end{equation}
+其中 $\zeta(\cdot)$ 是复值零均值高斯随机过程，其协方差函数为
+\[
+\begin{aligned}
+R(u,u_0)={}&\bigl(f_X(t-t_0)-f_X(t)\overline{f_X(t_0)}\bigr)\\
+&\cdot\bigl(f_Y(s-s_0)-f_Y(s)\overline{f_Y(s_0)}\bigr),\\
+u={}&(t,s),\qquad u_0=(t_0,s_0).
+\end{aligned}
+\]
+\item 若 $X$ 与 $Y$ 独立，且 $E(\lVert X\rVert_p+\lVert Y\rVert_P)<\infty$，则
+\begin{equation}
+n\frac{V_n^2}{\bar a_{..}\bar b_{..}}\xrightarrow D Q,
+\tag{7.177}
+\end{equation}
+其中
+\begin{equation}
+Q=\sum_{j=1}^\infty\lambda_jZ_j^2,
+\tag{7.178}
+\end{equation}
+$Z_j$ 为独立正态随机变量，$\lambda_j$ 为由 $(X,Y)$ 的分布决定的非负常数，且 $E[Q]=1$。
+\item 若 $X$ 与 $Y$ 存在依赖，则
+\begin{equation}
+nV_n^2\xrightarrow P\infty,\qquad
+n\frac{V_n^2}{\bar a_{..}\bar b_{..}}\xrightarrow P\infty.
+\tag{7.179}
+\end{equation}
+独立性可以进行正式检验。零假设定义为 $H_0$：$X$ 与 $Y$ 独立。
+
+可以利用式 (7.177) 定义检验统计量
+\begin{equation}
+T_{IND}=n\frac{V_n^2}{\bar a_{..}\bar b_{..}}.
+\tag{7.180}
+\end{equation}
+虽然式 (7.178) 可用于计算渐近分布，但 $\lambda_j$ 难以计算。通常采用置换计算 $P$ 值。具体而言，可以对 $X$ 与 $Y$ 进行数百万次置换，每次置换都计算检验统计量 $T_{IND}$。因此，通过置换可以计算 $T_{IND}$ 的经验分布，再由经验分布计算 $P$ 值：
+\[
+P\text{-value}=P(T_{IND}>T_{IND0}),
+\]
+其中 $T_{IND0}$ 为实际数据中 $T_{IND}$ 的观测值。
+\end{enumerate}
+\end{enumerate}

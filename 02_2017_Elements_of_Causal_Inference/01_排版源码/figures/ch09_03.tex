@@ -1,0 +1,33 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1.1cm]
+ \node[vtxs] (ch09f3aa) at (0,0) {$A$};
+ \node[vtxs] (ch09f3ab) at (1.05,0) {$B$};
+ \node[vtxs] (ch09f3ac) at (2.1,0) {$C$};
+ \node[latent,minimum size=5.5mm,font=\footnotesize] (ch09f3ah) at (1.55,.95) {$H$};
+ \draw[ed] (ch09f3aa)--(ch09f3ab);
+ \draw[ed] (ch09f3ah)--(ch09f3ab);
+ \draw[ed] (ch09f3ah)--(ch09f3ac);
+ \node[align=center,font=\small] at (1.05,-.7) {真实DAG};
+ \node[vtxs] (ch09f3ba) at (3.05,0) {$A$};
+ \node[vtxs] (ch09f3bb) at (4.1,0) {$B$};
+ \node[vtxs] (ch09f3bc) at (5.15,0) {$C$};
+ \draw[ed] (ch09f3ba)--(ch09f3bb);
+ \draw[ed] (ch09f3bc)--(ch09f3bb);
+ \node[align=center,font=\small] at (4.1,-.7) {DAG\\（PC输出）};
+ \node[vtxs] (ch09f3ca) at (6.1,0) {$A$};
+ \node[vtxs] (ch09f3cb) at (7.15,0) {$B$};
+ \node[vtxs] (ch09f3cc) at (8.2,0) {$C$};
+ \draw[ed] (ch09f3ca)--(ch09f3cb);
+ \draw[bid] (ch09f3cb)--(ch09f3cc);
+ \node[align=center,font=\small] at (7.15,-.7) {MAG};
+ \node[vtxs] (ch09f3da) at (9.15,0) {$A$};
+ \node[vtxs] (ch09f3db) at (10.2,0) {$B$};
+ \node[vtxs] (ch09f3dc) at (11.25,0) {$C$};
+ \draw[{Circle[open,length=1.5mm]}-{Stealth[length=2.1mm,width=1.5mm]}] (ch09f3da)--(ch09f3db);
+ \draw[{Circle[open,length=1.5mm]}-{Stealth[length=2.1mm,width=1.5mm]}] (ch09f3dc)--(ch09f3db);
+ \node[align=center,font=\small] at (10.2,-.7) {PAG\\（修改后PC或FCI输出）};
+\end{tikzpicture}
+\caption{从左侧的结构因果模型出发，右侧三个图都编码了条件独立关系集合 $A\indep C$。由于会导致错误的因果解释，DAG不宜作为这里因果学习方法的输出。在这个例子中，IPG与潜在投影所得的ADMG均与MAG相同。}
+\label{fig:ch09-3}
+\end{figure}

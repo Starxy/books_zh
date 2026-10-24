@@ -1,0 +1,85 @@
+% 原书分章PDF第15—17页：第29.6节导言及29.6.1—29.6.2完整证明。
+\FloatBarrier
+\section{证明要点}
+
+对每个 $f\in\mathcal F$，令 $\bar f$ 和 $\overline{f^2}$ 由 $\bar f(V)\equiv\mathbb E_{P_0}[f(O)\mid V]$、$\overline{f^2}(V)\equiv\mathbb E_{P_0}[f^2(O)\mid V]$ 给出。注意，$\overline{f^2}(V)-\bar f^2(V)=\operatorname{Var}_{P_0}[f(O)\mid V]$。对每个 $1\le v\le\nu$，令 $\ell_1,\ldots,\ell_\nu$ 和 $I_1,\ldots,I_\nu$ 由 $\ell_v(V)\equiv I\{V=v\}$ 及 $I_v\equiv\{1\le i\le N:V_i=v\}$ 给出。
+
+\subsection{命题29.1的证明}
+
+结合式 (29.3) 与\textbf{A3}，得到
+\[
+\begin{aligned}
+\sqrt n(\psi_n^*-\psi_0)
+&=\sqrt n(P_n^{\mathrm{HT}}-P_0)D(P_n^*)+o_P(1)\\
+&=\sqrt n(P_n^{\mathrm{HT}}-P_0)f_1
++\sqrt n(P_n^{\mathrm{HT}}-P_0)(D(P_n^*)-f_1)+o_P(1),
+\end{aligned}
+\]
+其中 $f_1\in\mathcal F$ 在\textbf{A2}中引入。由\textbf{A1}，上式右侧第一项依分布收敛于均值为零、方差为 $\sigma_1^2$ 的高斯分布。此外，由经验过程理论的一个经典论证（van der Vaart，1998，引理19.24），\textbf{A1}以及\textbf{A2}中 $D(P_n^*)$ 向 $f_1$ 的收敛，意味着右侧第二项依概率收敛于0。这就完成了证明概要。
+
+\subsection{式 (29.8) 与 (29.9) 的证明}
+
+根据 $P^{s\Pi}$ 的构造，从每个 $V$ 层抽取的观测数量是确定的。换言之，对每个 $1\le v\le\nu$，都有 $\operatorname{Var}_{P^{s\Pi}}[P_n^{\mathrm{HT}}\ell_v]=0$。根据式 (29.2)，这等价于：对每个 $1\le v\le\nu$，
+\begin{equation}
+\sum_{i\in I_v}\left(\frac1{\Pi_{ii}}-1\right)
+=\sum_{i\ne j\in I_v}\frac{|\Pi_{ij}|^2}{\Pi_{ii}\Pi_{jj}}.
+\tag{29.15}
+\end{equation}
+现在，由于按照构造，$V_i\ne V_j$ 蕴含 $\Pi_{ij}=0$，式 (29.2) 可以改写为
+\[
+\begin{aligned}
+N^2\operatorname{Var}_{P^{s\Pi}}\!\left[P_n^{\mathrm{HT}}f\right]
+&=\sum_{i=1}^N\left(\frac1{\Pi_{ii}}-1\right)f^2(O_i)
+-\sum_{1\le i\ne j\le N}|\Pi_{ij}|^2\frac{f(O_i)}{\Pi_{ii}}\frac{f(O_j)}{\Pi_{jj}}\\
+&=\sum_{v=1}^\nu\sum_{i\in I_v}\left(\frac1{\Pi_{ii}}-1\right)f^2(O_i)\\
+&\quad-\sum_{v=1}^\nu\sum_{i\ne j\in I_v}
+\frac{|\Pi_{ij}|^2}{\Pi_{ii}\Pi_{jj}}f(O_i)f(O_j).
+\end{aligned}
+\]
+由于给定 $(V_1,\ldots,V_N)$ 时，$O_1,\ldots,O_N$ 条件独立，并且给定 $i,j\in I_v$ 时，每个因子 $|\Pi_{ij}|^2/\Pi_{ii}\Pi_{jj}$ 都是确定的，前述等式与式 (29.15) 因而意味着
+\begin{equation}
+\begin{aligned}
+&N^2\mathbb E_{P_0}\!\left[\operatorname{Var}_{P^{s\Pi}}\!\left[P_n^{\mathrm{HT}}f\right]\right]\\
+&\quad=\mathbb E_{P_0}\!\left[
+\sum_{v=1}^\nu\overline{f^2}(v)\sum_{i\in I_v}\left(\frac1{\Pi_{ii}}-1\right)
+-\sum_{v=1}^\nu\bar f^2(v)\sum_{i\ne j\in I_v}\frac{|\Pi_{ij}|^2}{\Pi_{ii}\Pi_{jj}}
+\right]\\
+&\quad=\sum_{v=1}^\nu\left(\overline{f^2}(v)-\bar f^2(v)\right)
+\mathbb E_{P_0}\!\left[\sum_{i\in I_v}\left(\frac1{\Pi_{ii}}-1\right)\right].
+\end{aligned}
+\tag{29.16}
+\end{equation}
+对每个 $1\le v\le\nu$，
+\[
+\begin{aligned}
+\mathbb E_{P_0}\!\left[\sum_{i\in I_v}\left(\frac1{\Pi_{ii}}-1\right)\right]
+&=\left(\frac N{nh(v)}-1\right)\mathbb E_{P_0}[\operatorname{card}(I_v)]\\
+&=\left(\frac N{nh(v)}-1\right)NP_0(V=v).
+\end{aligned}
+\]
+因此，式 (29.16) 给出
+\[
+\begin{aligned}
+&\mathbb E_{P_0}\!\left[\operatorname{Var}_{P^{s\Pi}}\!\left[P_n^{\mathrm{HT}}f\right]\right]\\
+&\quad=\frac1n\sum_{v=1}^\nu
+\left(\overline{f^2}(v)-\bar f^2(v)\right)h^{-1}(v)P_0(V=v)\\
+&\qquad-\frac1N\sum_{v=1}^\nu
+\left(\overline{f^2}(v)-\bar f^2(v)\right)P_0(V=v)\\
+&\quad=\frac1n\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]h^{-1}(V)\right]
+-\frac1N\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]\right],
+\end{aligned}
+\]
+这就是式 (29.8)。下面转向式 (29.9)。由于 $\mathbb E_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]=P_Nf$，有
+\[
+\begin{aligned}
+&\operatorname{Var}_{P_0P^{s\Pi}}\!\left[\sqrt n(P_n^{\mathrm{HT}}-P_0)f\right]\\
+&\quad=n\mathbb E_{P_0}\!\left[\mathbb E_{P^{s\Pi}}\!\left[(P_n^{\mathrm{HT}}f)^2\right]\right]
+-n\left(\mathbb E_{P_0P^{s\Pi}}\!\left[P_n^{\mathrm{HT}}f\right]\right)^2\\
+&\quad=n\mathbb E_{P_0}\!\left[\operatorname{Var}_{P^{s\Pi}}\!\left[P_n^{\mathrm{HT}}f\right]\right]
++n\operatorname{Var}_{P_0}[P_Nf]\\
+&\quad=n\Sigma_h^\Pi(f,f)
++\frac nN\left(\operatorname{Var}_{P_0}[f(O)]
+-\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]\right]\right),
+\end{aligned}
+\]
+其中，最后一个等式由式 (29.8) 得到。证明完毕。

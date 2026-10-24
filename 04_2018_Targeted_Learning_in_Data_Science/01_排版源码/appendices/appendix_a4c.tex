@@ -1,0 +1,85 @@
+
+% 附录源 PDF 第 24—26 页；A.4.3。
+\subsection{余项 \texorpdfstring{$R_{22,g^*,N}$}{R22,g*,N} 的讨论：有限记忆假设}
+
+$R_{22,x(s),g^*,N}(\theta,\theta_0)$ 的方差为
+\[
+\begin{aligned}
+\sigma^2(N)=\frac2{N^2}\sum_{i\le j}E_{P_0^N}\Bigl\{
+&f^0_{x(s),g^*}(\theta,\theta_0)(C_x(i))\\
+&\times f^0_{x(s),g^*}(\theta,\theta_0)(C_x(j))\Bigr\}.
+\end{aligned}
+\]
+假设在一个收敛到 $P_0$ 的固定（非随机）序列 $P=P_N$ 上，有
+$P_0^Nf_i^2\le r(N)^2$。则 $X_N$，即
+$R_{22,x(s),g^*,N}(P_N,P_0)$，的方差可以由下式界定：
+\[
+\sigma^2(N)\le r^2(N)\frac2{N^2}\sum_{i\le j}\rho_N(f_i,f_j),
+\]
+其中 $\rho_N(f_i,f_j)$ 是 $P_0^N$ 下 $f_i$ 与 $f_j$ 的相关系数。因此，为使
+$X_N=o_P(N^{-1/2})$，需要
+\[
+\frac2{N^2}\sum_{i\le j}\rho_N(f_i,f_j)
+ =o\left(\frac1{Nr^2(N)}\right).
+\]
+因此，要使满足 $P_0^Nf_{x(s),g^*}(P_N^*,P_0)^2=O_P(r(N)^2)$ 的估计量 $P_N^*$ 有
+$R_{21,x(s),g^*,N}(P_N^*,P_0)=o_P(N^{-1/2})$，后一条件就是必要假设。
+
+如果存在对所有 $i,j$ 通用的 $K(N)$，使得当 $|j-i|>K(N)$ 时
+$\rho_N(f_{N,i},f_{N,j})=0$，则
+\[
+\sigma^2(N)\sim\rho r^2(N)\frac2{N^2}
+ \sum_{i\le j,\,j-i<K(N)}
+ \sim r^2(N)\frac{K(N)}N.
+\]
+于是，此时 $X_N(f_N)=O_P(r(N)\sqrt{K(N)/N})$。
+这允许 $K(N)$ 以足够缓慢的任意速率趋于无穷，只要
+$K(N)/N=o(N^{-0.5})$，即 $K(N)$ 的增长慢于 $N^{0.5}$ 即可。
+
+现在，不再要求 $f_{N,i}$ 与 $f_{N,j}$ 的相关系数在 $|j-i|$ 足够大时等于零，而是假设存在 $\delta>0$，使得
+$\rho_N(f_i,f_j)=O(|j-i|^{-\delta})$。则
+\[
+\sigma^2(N)\sim r^2(N)\frac2{N^2}\sum_{i\le j}|j-i|^{-\delta}
+ \sim r^2(N)N^{-\delta}.
+\]
+因此，在这种情形下，$X_N(f)=O_P(r(N)N^{-\delta/2})$。
+希望有 $\delta>0.5$，这样 $r(N)=o(N^{-1/4})$ 就足够了。
+
+再考虑 $C_x(i)$ 是 $\bar O(i-1)$ 的某个汇总量，并在 $i\to\infty$ 时收敛到常数的情况。
+这对应于即使固定 $N$，$f_N(C_x(i))$ 仍在 $i\to\infty$ 时收敛到常数 0；回顾其均值为零。
+具体地，假设存在某个 $\delta>0$，使得以 $r_1(i)=i^{-\delta}$ 为速率，有
+$P_0^Nf_{i,N}^2=O(r^2(N)r_1^2(i))$。则
+\[
+\begin{aligned}
+\sigma^2(N)
+&\sim\frac2{N^2}\sum_{i\le j}
+ \sqrt{P_0^Nf_{i,N}^2P_0^Nf_{j,N}^2}\\
+&\sim\frac1{N^2}\sum_{i\le j}r(N)^2r_1(i)r_1(j)\\
+&=O(r^2(N)N^{-2\delta}).
+\end{aligned}
+\]
+因此，此时 $X_N(f_N)=O_P(r(N)N^{-\delta})$，希望有 $\delta>0.25$。
+如果 $C_x(i)$ 是 $\bar O(i)$ 的分布中某个参数的估计量，例如基于极大似然的估计量，便可能预期其收敛速率为 $i^{-0.5}$，从而容易满足这一假设。
+
+现在考虑一个时间序列依赖过强，以致不满足条件的例子。具体地，假设
+$C_x(i)=O(i-1)$，于是 $P_0^Nf_{N,i}f_{N,j}$ 涉及 $f_N(O_{i-1})$ 与 $f_N(O_{j-1})$ 的相关性。
+进一步假设 $f_N(O(i))=\sum_{l=1}^iZ(l)$，其中 $Z(l)$（$l=1,\ldots,N$）是相互独立、均值为零、方差为 $\sigma^2(l)$ 的随机变量。
+也就是说，时间序列通过在前一取值上加上独立增量而演进。
+此时，对于 $i<j$，有
+\[
+\rho(f_{N,i},f_{N,j})
+ =\sqrt{\frac{\sum_{l=1}^i\sigma^2(l)}{\sum_{l=1}^j\sigma^2(l)}}.
+\]
+为使讨论具体，假设 $Z(l)$ 的方差不随 $l\to\infty$ 而趋于零，于是可以将相关系数界定为
+$\rho(f_{N,i},f_{N,j})=O(\sqrt{i/j})$。在这种情况下，
+\[
+\begin{aligned}
+\sigma_f^2(N)
+&\sim\frac2{N^2}\sum_{i\le j}^{N}\sqrt{i/j}\,r^2(N)\\
+&\sim r^2(N)\frac2{N^2}\sum_{j=1}^Nj
+ =O(r^2(N)).
+\end{aligned}
+\]
+因此，这种相关结构还不够弱，无法使方差以快于 $1/N$ 的速率趋于零。
+在这一例子中，过去的每个观测都按比例作用于 $O(i)$ 的实现值，而这里并不允许这样的长期依赖。
+我们认为，上述讨论表明，$R_{22,g^*,N}(P_N^*,P_0)=o_P(N^{-1/2})$ 不仅要求 $P_N^*$ 足够快地收敛到 $P_0$，还对时间序列的依赖结构施加了内在限制。

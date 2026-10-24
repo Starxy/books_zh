@@ -1,0 +1,456 @@
+% 原章第44—54页：5.5.3、软件包；式5.110—5.138及结论5.10。
+\subsection{内生变量与外生变量均为函数的函数型结构方程模型（FSEMF）}
+\subsubsection{模型}
+
+现在考虑 meth-seq 与下一代测序（NGS）基因型数据。基因型—甲基化网络既连接甲基化基因与甲基化基因，也将含有密集分布 SNP 的基因连接到甲基化基因。假定有 $M$ 个甲基化基因、$K$ 个经过测序且包含罕见变异或同时包含常见与罕见变异的基因，并抽取了 $T$ 名个体。令 $y_m(s_m)$（$m=1,\ldots,M$）为表示基因组位置 $s_m$ 处 CpG 位点甲基化水平的变量，$y_{im}(s_m)$ 为第 $i$ 名个体所取的值。将 $y_m(s_m)$ 定义为甲基化函数。令 $x_k(t)$ 为位于基因组位置 $t$ 处 SNP 基因型的指示变量。假定全部 $M$ 个甲基化函数与 $K$ 个基因型函数都映射到 $[0,1]$ 区间。
+
+定义 FSEMF：
+\begin{equation}
+\begin{aligned}
+&y_1(s)r_{11}+\cdots+y_M(s)r_{M1}\\
+&\quad+\int_Tx_1(t)\beta_{11}(s,t)\,dt+\cdots
++\int_Tx_K(t)\beta_{K1}(s,t)\,dt+e_1(s)=0,\\
+&\hspace{14em}\vdots\\
+&y_1(s)r_{1M}+\cdots+y_M(s)r_{MM}\\
+&\quad+\int_Tx_1(t)\beta_{1M}(s,t)\,dt+\cdots
++\int_Tx_K(t)\beta_{KM}(s,t)\,dt+e_M(s)=0,
+\end{aligned}
+\tag{5.110}
+\end{equation}
+其中，$s\in[0,1]$ 为映射后的基因组位置；$\beta_{km}(s,t)$ 表示第 $k$ 个基因中位于基因组位置 $t$ 处的 SNP，对第 $m$ 个基因中位于位置 $s$ 处 CpG 位点甲基化水平变异的贡献。
+
+为将 FSEMF 转化为经典结构方程模型，首先汇集全部映射到 $[0,1]$ 区间的基因型函数，并进行 FPCA。随后，用正交归一特征函数 $\psi_l(t)$ 展开 $x_k(t)$，得到
+\begin{equation}
+x_k(t)=\sum_{l=1}^L\xi_{kl}\psi_l(t).
+\tag{5.111}
+\end{equation}
+将展开式 (5.111) 代入模型 (5.110)，得到
+\begin{equation}
+\begin{aligned}
+&y_1(s)\gamma_{11}+\cdots+y_M(s)\gamma_{M1}
++\sum_{l=1}^L\xi_{1l}b_{l1}^{(1)}(s)\\
+&\hspace{12em}+\cdots+\sum_{l=1}^L\xi_{Kl}b_{lK}^{(1)}(s)+e_1(s)=0,\\
+&\hspace{14em}\vdots\\
+&y_1(s)\gamma_{1M}+\cdots+y_M(s)\gamma_{MM}
++\sum_{l=1}^L\xi_{1l}b_{l1}^{(M)}(s)\\
+&\hspace{12em}+\cdots+\sum_{l=1}^L\xi_{Kl}b_{lK}^{(M)}(s)+e_M(s)=0,
+\end{aligned}
+\tag{5.112}
+\end{equation}
+其中
+\begin{equation}
+b_{lk}^{(m)}(s)=\int_T\beta_{km}(s,t)\psi_l(t)\,dt,
+\quad m=1,\ldots,M,\quad l=1,\ldots,L,\quad k=1,\ldots,K.
+\tag{5.113}
+\end{equation}
+
+接着，汇集全部甲基化函数并进行 FPCA，得到一组特征函数 $\phi_j(s)$（$j=1,\ldots,J$）。然后，按特征函数或其他基函数 $\phi_j(s)$ 展开 $y_i(s)$、$b_{lk}^{(m)}(s)$ 和 $e_i(s)$：
+\begin{equation}
+\begin{aligned}
+y_i(s)&=\sum_{j=1}^Jy_{ij}\phi_j(s),\\
+b_{lk}^{(m)}(s)&=\sum_{j=1}^J\eta_{lkm}^{(j)}\phi_j(s),\\
+e_i(s)&=\sum_{j=1}^J\varepsilon_{ij}\phi_j(s).
+\end{aligned}
+\tag{5.114}
+\end{equation}
+将展开式 (5.114) 代入式 (5.112)，得到
+\begin{equation}
+\begin{aligned}
+&y_{1j}\gamma_{11}+\cdots+y_{Mj}\gamma_{M1}
++\sum_{l=1}^L\xi_{1l}\eta_{l11}^{(j)}
++\cdots+\sum_{l=1}^L\xi_{Kl}\eta_{lK1}^{(j)}+\varepsilon_{1j}=0,\\
+&\hspace{14em}\vdots\\
+&y_{1j}\gamma_{1M}+\cdots+y_{Mj}\gamma_{MM}
++\sum_{l=1}^L\xi_{1l}\eta_{l1M}^{(j)}
++\cdots+\sum_{l=1}^L\xi_{Kl}\eta_{lKM}^{(j)}+\varepsilon_{Mj}=0,\\
+&\hfill j=1,\ldots,J.
+\end{aligned}
+\tag{5.115}
+\end{equation}
+
+对于第 $i$ 名个体，按特征函数 $\phi_j(s)$ 和 $\psi_l(t)$ 展开 $y_{ni}(s)$ 与 $x_{nk}(t)$（$n=1,\ldots,T$）：
+\[
+y_{ni}(s)=\sum_{j=1}^Ly_{nij}\phi_j(s),\qquad
+x_{nk}(t)=\sum_{l=1}^L\xi_{nkl}\psi_l(t),\quad n=1,\ldots,T.
+\]
+定义甲基化函数的第 $j$ 个分量展开系数矩阵 $Y^{(j)}$、基因型函数的展开系数矩阵 $X$、连接甲基化基因的结构参数矩阵 $\Gamma$、连接基因与甲基化基因的结构参数矩阵 $B^{(j)}$，以及误差矩阵 $E^{(j)}$，如下：
+\[
+Y^{(j)}=\begin{bmatrix}y_{11j}&y_{12j}&\cdots&y_{1Mj}\\\vdots&\vdots&&\vdots\\y_{T1j}&y_{T2j}&\cdots&y_{TMj}\end{bmatrix}
+=[y_1^{(j)},y_2^{(j)},\ldots,y_M^{(j)}],
+\]
+\[
+X=\begin{bmatrix}
+\xi_{111}&\cdots&\xi_{11L}&\cdots&\xi_{1K1}&\cdots&\xi_{1KL}\\
+\vdots&\ddots&\vdots&\reflectbox{$\ddots$}&\vdots&\ddots&\vdots\\
+\xi_{T11}&\cdots&\xi_{T1L}&\cdots&\xi_{TK1}&\cdots&\xi_{TKL}
+\end{bmatrix}=[\xi_1,\ldots,\xi_K],
+\]
+\[
+\xi_k=\begin{bmatrix}\xi_{1k1}&\cdots&\xi_{1kL}\\\vdots&\vdots&\vdots\\\xi_{TK1}&\cdots&\xi_{TkL}\end{bmatrix},
+\]
+\[
+E^{(j)}-\begin{bmatrix}\varepsilon_{11j}&\varepsilon_{12j}&\cdots&\varepsilon_{1Mj}\\\vdots&\vdots&&\vdots\\\varepsilon_{T1j}&\varepsilon_{T2j}&\cdots&\varepsilon_{TMj}\end{bmatrix}
+=[\varepsilon_1^{(j)},\varepsilon_2^{(j)},\ldots,\varepsilon_M^{(j)}],
+\]
+\[
+\Gamma=\begin{bmatrix}r_{11}&r_{12}&\cdots&r_{1M}\\\vdots&\vdots&&\vdots\\r_{M1}&r_{M2}&\cdots&r_{MM}\end{bmatrix}
+=[\Gamma_1,\Gamma_2,\ldots,\Gamma_M],
+\]
+\[
+B^{(j)}=\begin{bmatrix}
+\eta_{111}^{(j)}&\cdots&\eta_{11M}^{(j)}\\
+\vdots&\cdots&\vdots\\
+\eta_{L11}^{(j)}&\cdots&\eta_{L1M}^{(j)}\\
+\vdots&\cdots&\vdots\\
+\eta_{1K1}^{(j)}&\cdots&\eta_{1KM}^{(j)}\\
+\vdots&\cdots&\vdots\\
+\eta_{LK1}^{(j)}&\cdots&\eta_{LKM}^{(j)}
+\end{bmatrix}=[\eta_1^{(j)},\ldots,\eta_M^{(j)}].
+\]
+式 (5.115) 中的结构方程可写为矩阵形式：
+\begin{equation}
+Y^{(j)}\Gamma+XB^{(j)}+E^{(j)}=0,\qquad j=1,\ldots,J.
+\tag{5.116}
+\end{equation}
+式 (5.116) 中由第 $j$ 个分量构成的第 $i$ 个方程为
+\begin{equation}
+y_i^{(j)}=Y_{-i}^{(j)}\gamma_i+\sum_{l=1}^L\xi_{1l}\eta_{l1i}^{(j)}
++\cdots+\sum_{l=1}^L\xi_{Kl}\eta_{lKi}^{(j)}+e_i^{(j)}.
+\tag{5.117}
+\end{equation}
+令
+\[
+\eta_i^{(j)}=\begin{bmatrix}\eta_{1i}^{(j)}\\\vdots\\\eta_{Ki}^{(j)}\end{bmatrix},\qquad
+\eta_{ki}^{(j)}=\begin{bmatrix}\eta_{1ki}^{(j)}\\\vdots\\\eta_{Lki}^{(ij}\end{bmatrix},\qquad
+\Delta_i=\begin{bmatrix}\gamma_i\\\eta_i^{(1)}\\\vdots\\\eta_i^{(J)}\end{bmatrix}.
+\]
+于是，式 (5.117) 可化为
+\begin{equation}
+y_i^{(j)}=Y_{-i}^{(j)}\gamma_i+X\eta_i^{(j)}+e_i^{(j)},\qquad j=1,\ldots,J,
+\tag{5.118}
+\end{equation}
+其中，$\gamma_i=[\gamma_{1i},\ldots,\gamma_{Mi}]^T$。
+
+在式 (5.118) 两边同乘 $X^T$，得到
+\begin{equation}
+X^Ty_i^{(j)}=X^TY_{-i}^{(j)}\gamma_i+X^TX\eta_i^{(j)}+X^Te_i^{(j)},\quad j=1,\ldots,J.
+\tag{5.119}
+\end{equation}
+
+\subsubsection{用测序数据估计基因型—甲基化网络的稀疏 FSEMF}
+
+与第 5.5.2.3 节类似，为建立稀疏 FSEMF，首先定义用于拟合式 (5.119) 的目标函数：
+\begin{equation}
+\begin{aligned}
+f(\Delta_i)=\frac12\sum_{j=1}^J
+&\left(X^Ty_i^{(j)}-X^TY_{-i}^{(j)}\gamma_i-X^TX\eta_i^{(j)}\right)^T
+\left[\sigma_{ii}^{(j)}X^TX\right]^{-1}\\
+&\left(X^Ty_i^{(j)}-X^TY_{-i}^{(j)}\gamma_i-X^TX\eta_i^{(j)}\right).
+\end{aligned}
+\tag{5.120}
+\end{equation}
+我们用 $l_1$ 惩罚连接甲基化基因的参数 $\gamma_i$，用组套索惩罚连接基因与甲基化基因的参数 $\eta_i^{(j)}$。为此，建立稀疏 FSEMF：
+\begin{equation}
+\min\quad f(\Delta_i)+\lambda\left[\lVert Z_{\gamma i}\rVert_1
++\sqrt{JL}\sum_{k=1}^K\lVert Z_{ki}\rVert_2\right]
+\tag{5.121}
+\end{equation}
+约束为 $\Delta_i-Z_i=0$，其中
+\[
+\widetilde\Delta_i=\begin{bmatrix}\widetilde\Delta_{\gamma i}\\\widetilde\Delta_{1i}\\\vdots\\\widetilde\Delta_{Ki}\end{bmatrix},\quad
+\widetilde\Delta_{\gamma i}=\gamma_i,\quad
+\widetilde\Delta_{ki}=\begin{bmatrix}\widetilde\Delta_{1ki}\\\vdots\\\widetilde\Delta_{Lki}\end{bmatrix},
+\]
+\[
+\widetilde\Delta_{lki}=\begin{bmatrix}\widetilde\Delta_{lki}^{(1)}\\\vdots\\\widetilde\Delta_{lki}^{(J)}\end{bmatrix},\qquad
+\widetilde\Delta_{lki}^{(j)}=\eta_{lki}^{(j)},\qquad Z_{lki}^{(j)}=\eta_{lki}^{(j)},
+\]
+\[
+Z_i^{(j)}=\begin{bmatrix}Z_{1i}^{(j)}\\\vdots\\Z_{Ki}^{(j)}\end{bmatrix},\quad
+Z_{ki}=\begin{bmatrix}Z_{1ki}\\\vdots\\Z_{Lki}\end{bmatrix},\quad
+Z_{lki}=\begin{bmatrix}Z_{lki}^{(1)}\\\vdots\\Z_{lki}^{(J)}\end{bmatrix},\quad
+Z_i=\begin{bmatrix}Z_{\gamma i}\\Z_{1i}\\\vdots\\Z_{Ki}\end{bmatrix},
+\]
+且 $Z_{\gamma i}=\gamma_i$。
+
+为求解优化问题 (5.121)，构造增广拉格朗日函数
+\begin{equation}
+\begin{aligned}
+L_\rho(\Delta_i,Z_i,\mu)={}&f(\Delta_i)+\lambda\lVert Z_{\gamma i}\rVert_1
++\lambda\sum_{k=1}^K\sqrt J\lVert Z_{ki}\rVert_2\\
+&+\frac\rho2\lVert\Delta_i-Z_i+\mu\rVert_2^2-\frac\rho2\lVert\mu\rVert_2^2.
+\end{aligned}
+\tag{5.122}
+\end{equation}
+求解该优化问题的交替方向乘子法（ADMM）包含以下迭代：
+\begin{equation}
+\Delta_i^{(l+1)}:=\argmin_{\Delta_i}L_\rho(\Delta_i,Z_i^{(l)},\mu^{(l)}),
+\tag{5.123}
+\end{equation}
+\begin{equation}
+Z_i^{(l+1)}:=\argmin_{Z_i}L_\rho(\Delta_i^{(l+1)},Z_i,\mu^{(l)}),
+\tag{5.124}
+\end{equation}
+\begin{equation}
+\mu^{(l+1)}:=\mu^{(l)}+\Delta_i^{(l+1)}-Z_i^{(l+1)}.
+\tag{5.125}
+\end{equation}
+或者写为
+\begin{equation}
+\Delta_i^{(l+1)}:=\argmin_{\Delta_i}\left(f(\Delta_i)
++\frac\rho2\lVert\Delta_i-Z_i^{(l)}+u^{(l)}\rVert_2^2\right),
+\tag{5.126}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+Z_i^{(l+1)}:=\argmin_{Z_i}\Biggl(&\lambda\lVert Z_{\gamma i}\rVert_1+\lambda
++\sum_{k=1}^K\sqrt J\lVert Z_{ki}\rVert_2\\
+&+\frac\rho2\lVert\Delta_i^{(l+1)}-Z_i+\mu^{(l)}\rVert_2^2\Biggr),
+\end{aligned}
+\tag{5.127}
+\end{equation}
+\begin{equation}
+\mu^{(l+1)}:=\mu^{(l)}+\Delta_i^{(l+1)}-Z_i^{(l+1)}.
+\tag{5.128}
+\end{equation}
+
+现在求解极小化问题 (5.126)。该问题仅涉及可微函数，直接运用微积分即可求解。令
+\[
+\mu=\begin{bmatrix}\mu_\gamma\\\mu_1\\\vdots\\\mu_J\end{bmatrix}
+\qquad\text{或}\qquad
+\mu=\begin{bmatrix}\mu_\gamma\\\mu_{1i}\\\vdots\\\mu_{Ki}\end{bmatrix}.
+\]
+令 $L_\rho$ 的偏导数为零，得到
+\begin{equation}
+\begin{aligned}
+\frac{\partial L_\rho}{\partial r_i}
+={}&-\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}\\
+&\quad\cdot(X^Ty_i^{(j)}-X^TY_{-i}^{(j)}\gamma_i-X^TX\eta_i^{(j)})
++\rho(\gamma_i-Z_{\gamma i}^{(l)}+\mu_\gamma^{(l)})=0,\\
+\frac{\partial L_\rho}{\partial\eta_i^{(j)}}
+={}&-X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}
+(X^Ty_i^{(j)}-X^TY_{-i}^{(j)}\gamma_i-X^TX\eta_i^{(j)})\\
+&+\rho(\eta_i^{(j)}-Z_i^{(j)(l)}+\mu_j^{(l)})=0,\quad j=1,\ldots,J.
+\end{aligned}
+\tag{5.129}
+\end{equation}
+式 (5.129) 可转化为
+\begin{equation}
+\begin{aligned}
+(A_1+\rho I)\gamma_i+\sum_{j=1}^JB_1(j)\eta_i^{(j)}&=D_1,\\
+A_2(j)\gamma_i+[B_2(j)+\rho I]\eta_i^{(j)}&=D_2(j),\quad j=1,\ldots,J,
+\end{aligned}
+\tag{5.130}
+\end{equation}
+其中
+\[
+\begin{aligned}
+A_1&=\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TY_{-i}^{(j)},\\
+A_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TY_{-i}^{(j)},\\
+B_1(j)&=(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+B_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+D_1&=\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}
++\rho(Z_{i\gamma}^{(l)}-\mu_\gamma^{(l)}),\\
+D_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}
++\rho(Z_i^{(j)(l)}-\mu_j^{(l)}).
+\end{aligned}
+\]
+式 (5.130) 的解为
+\begin{equation}
+\begin{aligned}
+\widehat\gamma_i&=\left[A_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}A_2(j)\right]^{-1}D,\\
+D&=D_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}D_2(j),\\
+\eta_i^{(j)}&=[B_2(j)+\rho I]^{-1}[D_2(j)-A_2(j)\widehat\gamma_i],\quad j=1,\ldots,J.
+\end{aligned}
+\tag{5.131}
+\end{equation}
+
+优化问题 (5.127) 不可微。尽管式中前两项不可微，仍可利用次微分运算，得到简单的闭式解。先考虑 $\lVert Z_{\gamma i}\rVert_1$ 的广义梯度。令 $\Phi_i^{(m)}$ 为向量 $Z_{\gamma i}$ 第 $m$ 个分量的广义导数：
+\[
+\Phi_i^{(m)}=\begin{cases}
+1,&Z_{\gamma i}^{(m)}=\gamma_i^{(m)}>0,\\
+[-1,1],&Z_{\gamma i}^{(m)}=\gamma_i^{(m)}=0,\\
+-1,&Z_{\gamma i}^{(m)}=\gamma_i^{(m)}<0.
+\end{cases}
+\]
+令 $\Phi_i=[\Phi_i^{(1)},\ldots,\Phi_i^{(M)}]^T$。于是
+\[
+\frac\lambda\rho\Phi_i+Z_{\gamma i}=\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)},
+\]
+从而有
+\begin{equation}
+Z_{\lambda i}^{(l+1)}=\sgn(\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)})
+\left(|\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}|-\frac\lambda\rho\right)_+,
+\tag{5.132}
+\end{equation}
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+接着考虑组套索。广义梯度 $\partial L_\rho/\partial Z_{ki}$ 为
+\begin{equation}
+\frac{\partial L_\rho}{\partial Z_{ki}}
+=\lambda\sqrt J\,s+\rho\left(Z_{ki}-(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)})\right)=0,
+\tag{5.133}
+\end{equation}
+其中
+\[
+s=\begin{cases}
+0,&\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2<\dfrac{\lambda\sqrt J}\rho,\\[4pt]
+\dfrac{Z}{\lVert Z_{ki}\rVert_2},&\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2\geq\dfrac{\lambda\sqrt J}\rho.
+\end{cases}
+\]
+式 (5.133) 可化为
+\begin{equation}
+\left(1+\frac{\lambda\sqrt J}{\rho\lVert Z_{ki}\rVert_2}\right)Z_{ki}
+=\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)},
+\tag{5.134}
+\end{equation}
+或者
+\begin{equation}
+\left(1+\frac{\lambda\sqrt J}{\rho\lVert Z_{ki}\rVert_2}\right)\lVert Z_{ki}\rVert_2
+=\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2.
+\tag{5.135}
+\end{equation}
+解式 (5.135)，得到
+\begin{equation}
+\lVert Z_{ki}\rVert_2=\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2
+-\frac{\lambda\sqrt J}\rho.
+\tag{5.136}
+\end{equation}
+将式 (5.136) 代入式 (5.135)，得到
+\begin{equation}
+\left(1+\frac{\lambda\sqrt J}{\rho\lVert Z_{ki}\rVert_2}\right)
+=\frac{1}{1-\dfrac{\lambda\sqrt J}{\rho\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2}}.
+\tag{5.137}
+\end{equation}
+结合式 (5.134)、(5.135) 和 (5.137)，得到
+\begin{equation}
+Z_{ki}^{(l+1)}=\left(-\frac{\lambda\sqrt J}{\rho\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2}\right)_+
+(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}),\quad k=1,\ldots,K.
+\tag{5.138}
+\end{equation}
+最后，汇总上述各式，得到结论 5.10。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论 5.10：将甲基化水平与基因型函数均作为函数值性状的基因型—甲基化因果网络构建算法}\par
+对于 $i=1,\ldots,M$：
+\begin{enumerate}[label=步骤 \arabic*：,leftmargin=4.8em]
+\item 初始化。
+\[
+\begin{aligned}
+B_1(j)&=(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+B_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+\widetilde D_1&=\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)},\\
+\widetilde D_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}.
+\end{aligned}
+\]
+\[
+\mu^0:=0,
+\]
+\[
+\begin{aligned}
+\gamma_i^{(0)}&=\left[A_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}A_2(j)\right]^{-1}\widetilde D,\\
+\widetilde D&=\widetilde D_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}\widetilde D_2(j),\\
+\eta_i^{(0)(j)}&=[B_2(j)+\rho I]^{-1}[D_2(j)-A_2(j)\widehat\gamma_i^{(0)}],\quad j=1,\ldots,J,
+\end{aligned}
+\]
+\[
+\Delta_i^{(0)}=\begin{bmatrix}\gamma_i^{(0)}\\\eta_i^{(0)(1)}\\\vdots\\\eta_i^{(0)(J)}\end{bmatrix},\qquad
+Z_i^{(0)}:==\Delta_i^{(0)},
+\]
+\[
+\widetilde\Delta_i^{(0)}=\begin{bmatrix}\widetilde\Delta_{\gamma i}^{(0)}\\\widetilde\Delta_{1i}^{(0)}\\\vdots\\\widetilde\Delta_{Ki}^{(0)}\end{bmatrix},\quad
+\widetilde\Delta_{\gamma i}^{(0)}=\widehat\gamma_i^{(0)},\quad
+\widetilde\Delta_{ki}^{(0)}=\begin{bmatrix}\widetilde\Delta_{ki}^{(0)(1)}\\\vdots\\\widetilde\Delta_{ki}^{(0)(J)}\end{bmatrix},
+\]
+\[
+\widetilde\Delta_{ki}^{(0)(j)}=\eta_{ki}^{(0)(j)},\qquad
+\mu^{(0)}=\begin{bmatrix}\mu_\gamma^{(0)}\\\mu_1^{(0)}\\\vdots\\\mu_J^{(0)}\end{bmatrix}.
+\]
+执行步骤 2、3 和 4，直至收敛。
+\item
+\[
+\begin{aligned}
+A_1&=\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TY_{-i}^{(j)},\\
+A_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TY_{-i}^{(j)},\\
+B_1(j)&=(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+B_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+D_1&=\sum_{j=1}^J(Y_{-1}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}
++\rho(Z_{\gamma i}^{(l)}-\mu_\gamma^{(l)}),\\
+D_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}
++\rho(Z_i^{(j)(l)}-\mu_j^{(l)}).
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\widehat\gamma_i^{(l+1)}&=\left[A_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}A_2(j)\right]^{-1}D,\\
+D&=D_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}D_2(j),\\
+\eta_i^{(j)(l+1)}&=[B_2(j)+\rho I]^{-1}[D_2(j)-A_2(j)\widehat\gamma_i^{(l+1)}],\quad j=1,\ldots,J,
+\end{aligned}
+\]
+\[
+\Delta_i^{(l+1)}=\begin{bmatrix}\widehat\gamma_i^{(l+1)}\\\eta_i^{(1)(l+1)}\\\vdots\\\eta_i^{(J)(l+1)}\end{bmatrix},
+\]
+\[
+\widetilde\Delta_i^{(l+1)}=\begin{bmatrix}\widetilde\Delta_{\gamma i}^{(l+1)}\\\widetilde\Delta_{1i}^{(l+1)}\\\vdots\\\widetilde\Delta_{Ki}^{(l+1)}\end{bmatrix},\quad
+\widetilde\Delta_{\gamma i}^{(l+1)}=\widehat\gamma_i^{(l+1)},\quad
+\widetilde\Delta_{ki}^{(l+1)}=\begin{bmatrix}\widetilde\Delta_{ki}^{(l+1)(1)}\\\vdots\\\widetilde\Delta_{ki}^{(l+1)(J)}\end{bmatrix},
+\]
+\[
+\widetilde\Delta_{ki}^{(l+1)(j)}=\eta_{ki}^{(j)(l+1)}.
+\]
+\item
+\[
+\widetilde Z_{\gamma i}^{(l+1)}=\sgn(\widetilde\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)})
+\left(|\widetilde\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}|-\frac\lambda\rho\right)_+,
+\]
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+\[
+\widetilde Z_{ki}^{(l+1)}=\left(-\frac{\lambda\sqrt J}{\rho\lVert\widetilde\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2}\right)_+
+(\widetilde\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}),\quad k=1,\ldots,K.
+\]
+\[
+\widetilde Z_i^{(l+1)}=\begin{bmatrix}\widetilde Z_{\gamma i}^{(l+1)}\\\widetilde Z_{1i}^{(l+1)}\\\vdots\\\widetilde Z_{Ki}^{(l+1)}\end{bmatrix},\qquad
+\widetilde Z_{ki}^{(l+1)}=\begin{bmatrix}\widetilde Z_{ki}^{(1)(l+1)}\\\vdots\\\widetilde Z_{ki}^{(J)(l+1)}\end{bmatrix}.
+\]
+更新 $Z^{(l+1)}$：
+\[
+Z_{ki}^{(j)(l+1)}=\widetilde Z_{ki}^{(j)(l+1)},\qquad
+Z_{\gamma i}^{(l+1)}=\widetilde Z_{\gamma i}^{(l+1)},
+\]
+\[
+Z_i^{(j)(l+1)}=\begin{bmatrix}Z_{1i}^{(j)(l+1)}\\\vdots\\Z_{Ki}^{(j)(l+1)}\end{bmatrix},\qquad
+Z_i^{(l+1)}=\begin{bmatrix}Z_{\gamma i}^{(l+1)}\\Z_i^{(1)(l+1)}\\\vdots\\Z_i^{(J)(l+1)}\end{bmatrix}.
+\]
+\item
+\[
+\widetilde\mu^{(l+1)}=\widetilde\mu_i^{(l)}+(\widetilde\Delta_i^{(l+1)}-\widetilde Z_i^{(l+1)}),
+\]
+其中
+\[
+\widetilde\mu^{(l+1)}=\begin{bmatrix}\widetilde\mu_\gamma^{(l+1)}\\\widetilde\mu_1^{(l+1)}\\\vdots\\\widetilde\mu_K^{(l+1)}\end{bmatrix},\qquad
+\widetilde\mu_k^{(l+1)}=\begin{bmatrix}\widetilde\mu_k^{(1)(l+1)}\\\vdots\\\widetilde\mu_k^{(J)(l+1)}\end{bmatrix},\quad k=1,\ldots,K.
+\]
+更新 $\mu^{(l+1)}$：
+\[
+\mu^{(l+1)}=\begin{bmatrix}\mu_\gamma^{(l+1)}\\\mu_1^{(l+1)}\\\vdots\\\mu_J^{(l+1)}\end{bmatrix},\qquad
+\mu_\gamma^{(l+1)}=\widetilde\mu_\gamma^{(l+1)},
+\]
+\[
+\mu_j^{(l+1)}=\begin{bmatrix}\mu_1^{(j)(l+1)}\\\vdots\\\mu_K^{(j)(l+1)}\end{bmatrix},\qquad
+\mu_k^{(j)(l+1)}=\widetilde\mu_k^{(j)(l+1)}.
+\]
+返回步骤 2。
+\end{enumerate}
+
+\section*{软件包}
+\phantomsection\addcontentsline{toc}{section}{软件包}
+\markright{软件包}
+
+软件包 minfi 用于分析 Human Methylation450（“450k”）和 EPIC 平台的 Illumina DNA 甲基化芯片数据，可从 \url{https://github.com/kasperdanielhansen/minfi} 下载。ChAMP 是一个集成分析流程，发表于 2014 年，并于 2017 年修订；下载地址为 \url{https://bioconductor.org/packages/release/bioc/vignettes/ChAMP/inst/doc/ChAMP.html}。
+
+Illumina 提供支持数据整合的数据分析软件，例如，将基因分型与基因表达数据结合进行 eQTL 分析，或与甲基化数据结合进行 mQTL 分析（技术说明：Illumina® 系统与软件——Illumina 数据的 QTL 分析软件工具）。“meQTL 定位分析实用指南”（meQTL mapping analysis cookbook）也提供了 meQTL 分析软件。

@@ -1,0 +1,410 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.2cm}
+
+\tikzstyle{lnode} = [minimum width=1.0cm,minimum height=0.4cm,inner sep=0pt,draw,fill=white,rounded corners=0pt]
+\tikzstyle{snode} = [minimum width=0.27cm,minimum height=0.18cm,inner sep=0pt,draw,fill=white]
+
+% greedy search
+\begin{scope}
+
+\node [lnode,anchor=west] (node0) at (0,0) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label0) at ([xshift=0.10cm,yshift=-0.03cm]node0.north west) {\tiny{$4$}};
+
+\node [lnode,anchor=west] (node13) at ([xshift=\ssep]node0.east) {\scriptsize{on}};
+\node [lnode,anchor=south west] (node12) at ([yshift=0.3cm]node13.north west) {\scriptsize{cute}};
+\node [lnode,anchor=south west] (node11) at ([yshift=0.3cm]node12.north west) {\scriptsize{.}};
+\node [lnode,anchor=north west] (node14) at ([yshift=-0.3cm]node13.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node15) at ([yshift=-0.3cm]node14.south west) {\scriptsize{sick}};
+
+\node [snode,anchor=center,fill=red!30] (label11) at ([xshift=0.10cm,yshift=-0.03cm]node11.north west) {\tiny{$5$}};
+\node [snode,anchor=center,fill=ugreen!30] (label12) at ([xshift=0.10cm,yshift=-0.03cm]node12.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label13) at ([xshift=0.10cm,yshift=-0.03cm]node13.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=orange!30] (label14) at ([xshift=0.10cm,yshift=-0.03cm]node14.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=purple!30] (label15) at ([xshift=0.10cm,yshift=-0.03cm]node15.north west) {\tiny{$9$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node0.east) -- ([xshift=-2pt]node11.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node0.east) -- ([xshift=-2pt]node12.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node0.east) -- ([xshift=-2pt]node13.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node0.east) -- ([xshift=-2pt]node14.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node0.east) -- ([xshift=-2pt]node15.west);
+
+\node [anchor=north] (step1label) at ([yshift=0.7cm,xshift=-0.5cm]node11.north west) {\footnotesize{\ding{172} 扩展}};
+
+\node [lnode,anchor=west] (node21) at ([xshift=1.3*\ssep]node11.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node22) at ([xshift=1.3*\ssep]node12.east) {\scriptsize{on}};
+\node [lnode,anchor=west] (node23) at ([xshift=1.3*\ssep]node13.east) {\scriptsize{sick}};
+\node [lnode,anchor=west] (node24) at ([xshift=1.3*\ssep]node14.east) {\scriptsize{are}};
+\node [lnode,anchor=west] (node25) at ([xshift=1.3*\ssep]node15.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label21) at ([xshift=0.10cm,yshift=-0.03cm]node21.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label22) at ([xshift=0.10cm,yshift=-0.03cm]node22.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=purple!30] (label23) at ([xshift=0.10cm,yshift=-0.03cm]node23.north west) {\tiny{$9$}};
+\node [snode,anchor=center,fill=orange!30] (label24) at ([xshift=0.10cm,yshift=-0.03cm]node24.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=red!30] (label25) at ([xshift=0.10cm,yshift=-0.03cm]node25.north west) {\tiny{$5$}};
+
+\node [anchor=west] (p21) at (node21.east) {\tiny{$\Pr=.34$}};
+\node [anchor=west] (p22) at (node22.east) {\tiny{$\Pr=.32$}};
+\node [anchor=west] (p23) at (node23.east) {\tiny{$\Pr=.21$}};
+\node [anchor=west] (p24) at (node24.east) {\tiny{$\Pr=.12$}};
+\node [anchor=west] (p25) at (node25.east) {\tiny{$\Pr=.01$}};
+
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p21label) at ([xshift=-0.05cm]p21.east) {\tiny{\underline{保留}}};
+\node [anchor=west,inner sep=3pt] (p22label) at ([xshift=-0.05cm]p22.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p23label) at ([xshift=-0.05cm]p23.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p24label) at ([xshift=-0.05cm]p24.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p25label) at ([xshift=-0.05cm]p25.east) {\tiny{\underline{剪去}}};
+
+\node [anchor=north west] (step2label) at ([yshift=0.7cm,xshift=-0.2cm]node21.north west) {\footnotesize{\ding{173} 排序}};
+
+\node [lnode,anchor=west] (node31) at ([xshift=2*\ssep]node21.east) {\scriptsize{cute}};
+%\node [lnode,anchor=west] (node32) at ([xshift=2*\ssep]node22.east) {\scriptsize{on}};
+%\node [lnode,anchor=west] (node33) at ([xshift=2*\ssep]node23.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node34) at ([xshift=2*\ssep]node24.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node35) at ([xshift=2*\ssep]node25.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label31) at ([xshift=0.10cm,yshift=-0.03cm]node31.north west) {\tiny{$6$}};
+%\node [snode,anchor=center,fill=blue!30] (label32) at ([xshift=0.10cm,yshift=-0.03cm]node32.north west) {\tiny{$7$}};
+%\node [snode,anchor=center,fill=purple!30] (label33) at ([xshift=0.10cm,yshift=-0.03cm]node33.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label34) at ([xshift=0.10cm,yshift=-0.03cm]node34.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label35) at ([xshift=0.10cm,yshift=-0.03cm]node35.north west) {\tiny{$5$}};
+
+\node [anchor=east] (selectionarrow) at (node31.west) {\small{$\Longrightarrow$}};
+
+%\node [anchor=west] (p31) at (node31.east) {\tiny{$\Pr=.34$}};
+%\node [anchor=west] (p32) at (node32.east) {\tiny{$\Pr=.32$}};
+%\node [anchor=west] (p33) at (node33.east) {\tiny{$\Pr=.21$}};
+%\node [anchor=west] (p34) at (node34.east) {\tiny{$\Pr=.12$}};
+%\node [anchor=west] (p35) at (node35.east) {\tiny{$\Pr=.01$}};
+
+\node [anchor=north west,align=left] (step3label) at ([yshift=0.7cm,xshift=-0.2cm]node31.north west) {\footnotesize{\ding{174} 输出（最佳 1 项）}};
+
+%\node [lnode,anchor=west] (node41) at ([xshift=2*\ssep]node31.east) {\scriptsize{cute}};
+%\node [lnode,anchor=west] (node42) at ([xshift=2*\ssep]node32.east) {\scriptsize{on}};
+%\node [lnode,anchor=west] (node43) at ([xshift=2*\ssep]node33.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node44) at ([xshift=2*\ssep]node34.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node45) at ([xshift=2*\ssep]node35.east) {\scriptsize{.}};
+
+%\node [snode,anchor=center,fill=ugreen!30] (label41) at ([xshift=0.10cm,yshift=-0.03cm]node41.north west) {\tiny{$6$}};
+%\node [snode,anchor=center,fill=blue!30] (label42) at ([xshift=0.10cm,yshift=-0.03cm]node42.north west) {\tiny{$7$}};
+%\node [snode,anchor=center,fill=purple!30] (label43) at ([xshift=0.10cm,yshift=-0.03cm]node43.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label44) at ([xshift=0.10cm,yshift=-0.03cm]node44.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label45) at ([xshift=0.10cm,yshift=-0.03cm]node45.north west) {\tiny{$5$}};
+
+%\node [anchor=north west] (step4label) at ([yshift=0.9cm,xshift=-0.2cm]node41.north west) {\footnotesize{\ding{175} Output}};
+
+\node [anchor=north] (caption) at ([yshift=-0.2cm,xshift=1cm]node25.south east) {\small{(a) 贪心搜索}};
+
+\end{scope}
+
+% beam search
+\begin{scope}[yshift=-5.0cm]
+
+\node [lnode,anchor=west] (node0) at (0,0) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label0) at ([xshift=0.10cm,yshift=-0.03cm]node0.north west) {\tiny{$4$}};
+
+\node [lnode,anchor=west] (node13) at ([xshift=\ssep]node0.east) {\scriptsize{on}};
+\node [lnode,anchor=south west] (node12) at ([yshift=0.3cm]node13.north west) {\scriptsize{cute}};
+\node [lnode,anchor=south west] (node11) at ([yshift=0.3cm]node12.north west) {\scriptsize{.}};
+\node [lnode,anchor=north west] (node14) at ([yshift=-0.3cm]node13.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node15) at ([yshift=-0.3cm]node14.south west) {\scriptsize{sick}};
+
+\node [snode,anchor=center,fill=red!30] (label11) at ([xshift=0.10cm,yshift=-0.03cm]node11.north west) {\tiny{$5$}};
+\node [snode,anchor=center,fill=ugreen!30] (label12) at ([xshift=0.10cm,yshift=-0.03cm]node12.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label13) at ([xshift=0.10cm,yshift=-0.03cm]node13.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=orange!30] (label14) at ([xshift=0.10cm,yshift=-0.03cm]node14.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=purple!30] (label15) at ([xshift=0.10cm,yshift=-0.03cm]node15.north west) {\tiny{$9$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node0.east) -- ([xshift=-2pt]node11.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node0.east) -- ([xshift=-2pt]node12.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node0.east) -- ([xshift=-2pt]node13.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node0.east) -- ([xshift=-2pt]node14.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node0.east) -- ([xshift=-2pt]node15.west);
+
+\node [anchor=north] (step1label) at ([yshift=0.7cm,xshift=-0.5cm]node11.north west) {\footnotesize{\ding{172} 扩展}};
+
+\node [lnode,anchor=west] (node21) at ([xshift=1.3*\ssep]node11.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node22) at ([xshift=1.3*\ssep]node12.east) {\scriptsize{on}};
+\node [lnode,anchor=west] (node23) at ([xshift=1.3*\ssep]node13.east) {\scriptsize{sick}};
+\node [lnode,anchor=west] (node24) at ([xshift=1.3*\ssep]node14.east) {\scriptsize{are}};
+\node [lnode,anchor=west] (node25) at ([xshift=1.3*\ssep]node15.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label21) at ([xshift=0.10cm,yshift=-0.03cm]node21.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label22) at ([xshift=0.10cm,yshift=-0.03cm]node22.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=purple!30] (label23) at ([xshift=0.10cm,yshift=-0.03cm]node23.north west) {\tiny{$9$}};
+\node [snode,anchor=center,fill=orange!30] (label24) at ([xshift=0.10cm,yshift=-0.03cm]node24.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=red!30] (label25) at ([xshift=0.10cm,yshift=-0.03cm]node25.north west) {\tiny{$5$}};
+
+\node [anchor=west] (p21) at (node21.east) {\tiny{$\Pr=.34$}};
+\node [anchor=west] (p22) at (node22.east) {\tiny{$\Pr=.32$}};
+\node [anchor=west] (p23) at (node23.east) {\tiny{$\Pr=.21$}};
+\node [anchor=west] (p24) at (node24.east) {\tiny{$\Pr=.12$}};
+\node [anchor=west] (p25) at (node25.east) {\tiny{$\Pr=.01$}};
+
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p21label) at ([xshift=-0.05cm]p21.east) {\tiny{\underline{保留}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p22label) at ([xshift=-0.05cm]p22.east) {\tiny{\underline{保留}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p23label) at ([xshift=-0.05cm]p23.east) {\tiny{\underline{保留}}};
+\node [anchor=west,inner sep=3pt] (p24label) at ([xshift=-0.05cm]p24.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p25label) at ([xshift=-0.05cm]p25.east) {\tiny{\underline{剪去}}};
+
+\node [anchor=north west] (step2label) at ([yshift=0.7cm,xshift=-0.2cm]node21.north west) {\footnotesize{\ding{173} 排序}};
+
+\node [lnode,anchor=west] (node31) at ([xshift=2*\ssep]node21.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node32) at ([xshift=2*\ssep]node22.east) {\scriptsize{on}};
+\node [lnode,anchor=west] (node33) at ([xshift=2*\ssep]node23.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node34) at ([xshift=2*\ssep]node24.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node35) at ([xshift=2*\ssep]node25.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label31) at ([xshift=0.10cm,yshift=-0.03cm]node31.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label32) at ([xshift=0.10cm,yshift=-0.03cm]node32.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=purple!30] (label33) at ([xshift=0.10cm,yshift=-0.03cm]node33.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label34) at ([xshift=0.10cm,yshift=-0.03cm]node34.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label35) at ([xshift=0.10cm,yshift=-0.03cm]node35.north west) {\tiny{$5$}};
+
+\node [anchor=east] (selectionarrow) at (node31.west) {\small{$\Longrightarrow$}};
+\node [anchor=east] (selectionarrow) at (node32.west) {\small{$\Longrightarrow$}};
+\node [anchor=east] (selectionarrow) at (node33.west) {\small{$\Longrightarrow$}};
+
+%\node [anchor=west] (p31) at (node31.east) {\tiny{$\Pr=.34$}};
+%\node [anchor=west] (p32) at (node32.east) {\tiny{$\Pr=.32$}};
+%\node [anchor=west] (p33) at (node33.east) {\tiny{$\Pr=.21$}};
+%\node [anchor=west] (p34) at (node34.east) {\tiny{$\Pr=.12$}};
+%\node [anchor=west] (p35) at (node35.east) {\tiny{$\Pr=.01$}};
+
+\node [anchor=north west,align=left] (step3label) at ([yshift=0.7cm,xshift=-0.2cm]node31.north west) {\footnotesize{\ding{174} 输出（最佳 $K$ 项）}};
+
+%\node [lnode,anchor=west] (node41) at ([xshift=2*\ssep]node31.east) {\scriptsize{cute}};
+%\node [lnode,anchor=west] (node42) at ([xshift=2*\ssep]node32.east) {\scriptsize{on}};
+%\node [lnode,anchor=west] (node43) at ([xshift=2*\ssep]node33.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node44) at ([xshift=2*\ssep]node34.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node45) at ([xshift=2*\ssep]node35.east) {\scriptsize{.}};
+
+%\node [snode,anchor=center,fill=ugreen!30] (label41) at ([xshift=0.10cm,yshift=-0.03cm]node41.north west) {\tiny{$6$}};
+%\node [snode,anchor=center,fill=blue!30] (label42) at ([xshift=0.10cm,yshift=-0.03cm]node42.north west) {\tiny{$7$}};
+%\node [snode,anchor=center,fill=purple!30] (label43) at ([xshift=0.10cm,yshift=-0.03cm]node43.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label44) at ([xshift=0.10cm,yshift=-0.03cm]node44.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label45) at ([xshift=0.10cm,yshift=-0.03cm]node45.north west) {\tiny{$5$}};
+
+%\node [anchor=north west] (step4label) at ([yshift=0.9cm,xshift=-0.2cm]node41.north west) {\footnotesize{\ding{175} Output}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([xshift=0.2cm]node31.north east) -- ([xshift=0.2cm]node33.south east) node [pos=0.5,right,xshift=0.1cm] {\footnotesize{束宽（$K$）= $3$}};
+
+\node [anchor=north] (caption) at ([yshift=-0.2cm,xshift=1cm]node25.south east) {\small{(b) 束搜索}};
+
+\end{scope}
+
+% top-k sampling
+\begin{scope}[yshift=-10.0cm]
+
+\node [lnode,anchor=west] (node0) at (0,0) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label0) at ([xshift=0.10cm,yshift=-0.03cm]node0.north west) {\tiny{$4$}};
+
+\node [lnode,anchor=west] (node13) at ([xshift=\ssep]node0.east) {\scriptsize{on}};
+\node [lnode,anchor=south west] (node12) at ([yshift=0.3cm]node13.north west) {\scriptsize{cute}};
+\node [lnode,anchor=south west] (node11) at ([yshift=0.3cm]node12.north west) {\scriptsize{.}};
+\node [lnode,anchor=north west] (node14) at ([yshift=-0.3cm]node13.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node15) at ([yshift=-0.3cm]node14.south west) {\scriptsize{sick}};
+
+\node [snode,anchor=center,fill=red!30] (label11) at ([xshift=0.10cm,yshift=-0.03cm]node11.north west) {\tiny{$5$}};
+\node [snode,anchor=center,fill=ugreen!30] (label12) at ([xshift=0.10cm,yshift=-0.03cm]node12.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label13) at ([xshift=0.10cm,yshift=-0.03cm]node13.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=orange!30] (label14) at ([xshift=0.10cm,yshift=-0.03cm]node14.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=purple!30] (label15) at ([xshift=0.10cm,yshift=-0.03cm]node15.north west) {\tiny{$9$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node0.east) -- ([xshift=-2pt]node11.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node0.east) -- ([xshift=-2pt]node12.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node0.east) -- ([xshift=-2pt]node13.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node0.east) -- ([xshift=-2pt]node14.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node0.east) -- ([xshift=-2pt]node15.west);
+
+\node [anchor=north] (step1label) at ([yshift=0.7cm,xshift=-0.5cm]node11.north west) {\footnotesize{\ding{172} 扩展}};
+
+\node [lnode,anchor=west] (node21) at ([xshift=1.3*\ssep]node11.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node22) at ([xshift=1.3*\ssep]node12.east) {\scriptsize{on}};
+\node [lnode,anchor=west] (node23) at ([xshift=1.3*\ssep]node13.east) {\scriptsize{sick}};
+\node [lnode,anchor=west] (node24) at ([xshift=1.3*\ssep]node14.east) {\scriptsize{are}};
+\node [lnode,anchor=west] (node25) at ([xshift=1.3*\ssep]node15.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label21) at ([xshift=0.10cm,yshift=-0.03cm]node21.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label22) at ([xshift=0.10cm,yshift=-0.03cm]node22.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=purple!30] (label23) at ([xshift=0.10cm,yshift=-0.03cm]node23.north west) {\tiny{$9$}};
+\node [snode,anchor=center,fill=orange!30] (label24) at ([xshift=0.10cm,yshift=-0.03cm]node24.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=red!30] (label25) at ([xshift=0.10cm,yshift=-0.03cm]node25.north west) {\tiny{$5$}};
+
+\node [anchor=west] (p21) at (node21.east) {\tiny{$\Pr=.34$}};
+\node [anchor=west] (p22) at (node22.east) {\tiny{$\Pr=.32$}};
+\node [anchor=west] (p23) at (node23.east) {\tiny{$\Pr=.21$}};
+\node [anchor=west] (p24) at (node24.east) {\tiny{$\Pr=.12$}};
+\node [anchor=west] (p25) at (node25.east) {\tiny{$\Pr=.01$}};
+
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p21label) at ([xshift=-0.05cm]p21.east) {\tiny{\underline{保留}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p22label) at ([xshift=-0.05cm]p22.east) {\tiny{\underline{保留}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p23label) at ([xshift=-0.05cm]p23.east) {\tiny{\underline{保留}}};
+\node [anchor=west,inner sep=3pt] (p24label) at ([xshift=-0.05cm]p24.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p25label) at ([xshift=-0.05cm]p25.east) {\tiny{\underline{剪去}}};
+
+\node [anchor=north west] (step2label) at ([yshift=0.7cm,xshift=-0.2cm]node21.north west) {\footnotesize{\ding{173} 排序}};
+
+\node [lnode,anchor=west] (node31) at ([xshift=2*\ssep]node21.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node32) at ([xshift=2*\ssep]node22.east) {\scriptsize{on}};
+\node [lnode,anchor=west] (node33) at ([xshift=2*\ssep]node23.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node34) at ([xshift=2*\ssep]node24.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node35) at ([xshift=2*\ssep]node25.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label31) at ([xshift=0.10cm,yshift=-0.03cm]node31.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label32) at ([xshift=0.10cm,yshift=-0.03cm]node32.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=purple!30] (label33) at ([xshift=0.10cm,yshift=-0.03cm]node33.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label34) at ([xshift=0.10cm,yshift=-0.03cm]node34.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label35) at ([xshift=0.10cm,yshift=-0.03cm]node35.north west) {\tiny{$5$}};
+
+\node [anchor=east] (selectionarrow31) at (node31.west) {\small{$\Longrightarrow$}};
+\node [anchor=east] (selectionarrow32) at (node32.west) {\small{$\Longrightarrow$}};
+\node [anchor=east] (selectionarrow33) at (node33.west) {\small{$\Longrightarrow$}};
+
+\node [anchor=west] (p31) at (node31.east) {\tiny{$\Pr=.39$}};
+\node [anchor=west] (p32) at (node32.east) {\tiny{$\Pr=.36$}};
+\node [anchor=west] (p33) at (node33.east) {\tiny{$\Pr=.25$}};
+%\node [anchor=west] (p34) at (node34.east) {\tiny{$\Pr=.12$}};
+%\node [anchor=west] (p35) at (node35.east) {\tiny{$\Pr=.01$}};
+
+
+\node [anchor=west,inner sep=3pt] (p31label) at ([xshift=-0.05cm]p31.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p32label) at ([xshift=-0.05cm]p32.east) {\tiny{\underline{保留}}};
+\node [anchor=west,inner sep=3pt] (p33label) at ([xshift=-0.05cm]p33.east) {\tiny{\underline{剪去}}};
+
+\node [anchor=north west,align=left] (step3label) at ([yshift=0.7cm,xshift=-0.2cm]node31.north west) {\footnotesize{\ding{174} 选择与采样}};
+
+\node [lnode,anchor=west,draw=white] (node41) at ([xshift=2*\ssep]node31.east) {};
+\node [lnode,anchor=west] (node42) at ([xshift=2*\ssep]node32.east) {\scriptsize{on}};
+%\node [lnode,anchor=west] (node43) at ([xshift=2*\ssep]node33.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node44) at ([xshift=2*\ssep]node34.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node45) at ([xshift=2*\ssep]node35.east) {\scriptsize{.}};
+
+%\node [snode,anchor=center,fill=ugreen!30] (label41) at ([xshift=0.10cm,yshift=-0.03cm]node41.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label42) at ([xshift=0.10cm,yshift=-0.03cm]node42.north west) {\tiny{$7$}};
+%\node [snode,anchor=center,fill=purple!30] (label43) at ([xshift=0.10cm,yshift=-0.03cm]node43.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label44) at ([xshift=0.10cm,yshift=-0.03cm]node44.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label45) at ([xshift=0.10cm,yshift=-0.03cm]node45.north west) {\tiny{$5$}};
+
+\node [anchor=east] (selectionarrow42) at (node42.west) {\small{$\Longrightarrow$}};
+
+\node [anchor=north west] (step4label) at ([yshift=0.7cm,xshift=-0.2cm]node41.north west) {\footnotesize{\ding{175} 输出}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.2cm,xshift=2.0cm]node33.south east) -- ([yshift=-0.2cm]node33.south west) node [pos=0.5,below,yshift=-0.2cm,xshift=0.3cm,align=left] {\scriptsize{选择前 $k$ 个假设（$k = 3$），}\\[-0.2cm] \scriptsize{重新归一化它们的概率，}\\[-0.2cm] \scriptsize{并通过采样选取一个。}};
+
+\node [anchor=north] (caption) at ([yshift=-0.2cm,xshift=1cm]node25.south east) {\small{(c) Top-$k$ 采样}};
+
+\end{scope}
+
+% top-k sampling
+\begin{scope}[yshift=-15.0cm]
+
+\node [lnode,anchor=west] (node0) at (0,0) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label0) at ([xshift=0.10cm,yshift=-0.03cm]node0.north west) {\tiny{$4$}};
+
+\node [lnode,anchor=west] (node13) at ([xshift=\ssep]node0.east) {\scriptsize{on}};
+\node [lnode,anchor=south west] (node12) at ([yshift=0.3cm]node13.north west) {\scriptsize{cute}};
+\node [lnode,anchor=south west] (node11) at ([yshift=0.3cm]node12.north west) {\scriptsize{.}};
+\node [lnode,anchor=north west] (node14) at ([yshift=-0.3cm]node13.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node15) at ([yshift=-0.3cm]node14.south west) {\scriptsize{sick}};
+
+\node [snode,anchor=center,fill=red!30] (label11) at ([xshift=0.10cm,yshift=-0.03cm]node11.north west) {\tiny{$5$}};
+\node [snode,anchor=center,fill=ugreen!30] (label12) at ([xshift=0.10cm,yshift=-0.03cm]node12.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label13) at ([xshift=0.10cm,yshift=-0.03cm]node13.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=orange!30] (label14) at ([xshift=0.10cm,yshift=-0.03cm]node14.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=purple!30] (label15) at ([xshift=0.10cm,yshift=-0.03cm]node15.north west) {\tiny{$9$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node0.east) -- ([xshift=-2pt]node11.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node0.east) -- ([xshift=-2pt]node12.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node0.east) -- ([xshift=-2pt]node13.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node0.east) -- ([xshift=-2pt]node14.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node0.east) -- ([xshift=-2pt]node15.west);
+
+\node [anchor=north] (step1label) at ([yshift=0.7cm,xshift=-0.5cm]node11.north west) {\footnotesize{\ding{172} 扩展}};
+
+\node [lnode,anchor=west] (node21) at ([xshift=1.3*\ssep]node11.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node22) at ([xshift=1.3*\ssep]node12.east) {\scriptsize{on}};
+\node [lnode,anchor=west] (node23) at ([xshift=1.3*\ssep]node13.east) {\scriptsize{sick}};
+\node [lnode,anchor=west] (node24) at ([xshift=1.3*\ssep]node14.east) {\scriptsize{are}};
+\node [lnode,anchor=west] (node25) at ([xshift=1.3*\ssep]node15.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label21) at ([xshift=0.10cm,yshift=-0.03cm]node21.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label22) at ([xshift=0.10cm,yshift=-0.03cm]node22.north west) {\tiny{$7$}};
+\node [snode,anchor=center,fill=purple!30] (label23) at ([xshift=0.10cm,yshift=-0.03cm]node23.north west) {\tiny{$9$}};
+\node [snode,anchor=center,fill=orange!30] (label24) at ([xshift=0.10cm,yshift=-0.03cm]node24.north west) {\tiny{$8$}};
+\node [snode,anchor=center,fill=red!30] (label25) at ([xshift=0.10cm,yshift=-0.03cm]node25.north west) {\tiny{$5$}};
+
+\node [anchor=west] (p21) at (node21.east) {\tiny{$\Pr=.34$}};
+\node [anchor=west] (p22) at (node22.east) {\tiny{$\Pr=.32$}};
+\node [anchor=west] (p23) at (node23.east) {\tiny{$\Pr=.21$}};
+\node [anchor=west] (p24) at (node24.east) {\tiny{$\Pr=.12$}};
+\node [anchor=west] (p25) at (node25.east) {\tiny{$\Pr=.01$}};
+
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p21label) at ([xshift=-0.05cm]p21.east) {\tiny{\underline{保留}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p22label) at ([xshift=-0.05cm]p22.east) {\tiny{\underline{保留}}};
+\node [anchor=west,inner sep=3pt] (p23label) at ([xshift=-0.05cm]p23.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p24label) at ([xshift=-0.05cm]p24.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,inner sep=3pt] (p25label) at ([xshift=-0.05cm]p25.east) {\tiny{\underline{剪去}}};
+
+\node [anchor=north west] (step2label) at ([yshift=0.7cm,xshift=-0.2cm]node21.north west) {\footnotesize{\ding{173} 排序}};
+
+\node [lnode,anchor=west] (node31) at ([xshift=2*\ssep]node21.east) {\scriptsize{cute}};
+\node [lnode,anchor=west] (node32) at ([xshift=2*\ssep]node22.east) {\scriptsize{on}};
+%\node [lnode,anchor=west] (node33) at ([xshift=2*\ssep]node23.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node34) at ([xshift=2*\ssep]node24.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node35) at ([xshift=2*\ssep]node25.east) {\scriptsize{.}};
+
+\node [snode,anchor=center,fill=ugreen!30] (label31) at ([xshift=0.10cm,yshift=-0.03cm]node31.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label32) at ([xshift=0.10cm,yshift=-0.03cm]node32.north west) {\tiny{$7$}};
+%\node [snode,anchor=center,fill=purple!30] (label33) at ([xshift=0.10cm,yshift=-0.03cm]node33.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label34) at ([xshift=0.10cm,yshift=-0.03cm]node34.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label35) at ([xshift=0.10cm,yshift=-0.03cm]node35.north west) {\tiny{$5$}};
+
+\node [anchor=east] (selectionarrow31) at (node31.west) {\small{$\Longrightarrow$}};
+\node [anchor=east] (selectionarrow32) at (node32.west) {\small{$\Longrightarrow$}};
+%\node [anchor=east] (selectionarrow33) at (node33.west) {\small{$\Longrightarrow$}};
+
+\node [anchor=west] (p31) at (node31.east) {\tiny{$\Pr=.51$}};
+\node [anchor=west] (p32) at (node32.east) {\tiny{$\Pr=.49$}};
+%\node [anchor=west] (p33) at (node33.east) {\tiny{$\Pr=.25$}};
+%\node [anchor=west] (p34) at (node34.east) {\tiny{$\Pr=.12$}};
+%\node [anchor=west] (p35) at (node35.east) {\tiny{$\Pr=.01$}};
+
+
+\node [anchor=west,inner sep=3pt] (p31label) at ([xshift=-0.05cm]p31.east) {\tiny{\underline{剪去}}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (p32label) at ([xshift=-0.05cm]p32.east) {\tiny{\underline{保留}}};
+
+\node [anchor=north west,align=left] (step3label) at ([yshift=0.7cm,xshift=-0.2cm]node31.north west) {\footnotesize{\ding{174} 选择与采样}};
+
+\node [lnode,anchor=west,draw=white] (node41) at ([xshift=2*\ssep]node31.east) {};
+\node [lnode,anchor=west] (node42) at ([xshift=2*\ssep]node32.east) {\scriptsize{on}};
+%\node [lnode,anchor=west] (node43) at ([xshift=2*\ssep]node33.east) {\scriptsize{sick}};
+%\node [lnode,anchor=west] (node44) at ([xshift=2*\ssep]node34.east) {\scriptsize{are}};
+%\node [lnode,anchor=west] (node45) at ([xshift=2*\ssep]node35.east) {\scriptsize{.}};
+
+%\node [snode,anchor=center,fill=ugreen!30] (label41) at ([xshift=0.10cm,yshift=-0.03cm]node41.north west) {\tiny{$6$}};
+\node [snode,anchor=center,fill=blue!30] (label42) at ([xshift=0.10cm,yshift=-0.03cm]node42.north west) {\tiny{$7$}};
+%\node [snode,anchor=center,fill=purple!30] (label43) at ([xshift=0.10cm,yshift=-0.03cm]node43.north west) {\tiny{$9$}};
+%\node [snode,anchor=center,fill=orange!30] (label44) at ([xshift=0.10cm,yshift=-0.03cm]node44.north west) {\tiny{$8$}};
+%\node [snode,anchor=center,fill=red!30] (label45) at ([xshift=0.10cm,yshift=-0.03cm]node45.north west) {\tiny{$5$}};
+
+\node [anchor=east] (selectionarrow42) at (node42.west) {\small{$\Longrightarrow$}};
+
+\node [anchor=north west] (step4label) at ([yshift=0.7cm,xshift=-0.2cm]node41.north west) {\footnotesize{\ding{175} 输出}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.2cm,xshift=2.0cm]node32.south east) -- ([yshift=-0.2cm]node32.south west) node [pos=0.5,below,yshift=-0.2cm,xshift=0.4cm,align=left] {\scriptsize{选择排名靠前的假设，}\\[-0.2cm] \scriptsize{使概率之和 $\ge p = 0.6$，}\\[-0.2cm] \scriptsize{重新归一化它们的概率，}\\[-0.2cm] \scriptsize{并通过采样选取一个。}};
+
+\node [anchor=north] (caption) at ([yshift=-0.2cm,xshift=1cm]node25.south east) {\small{(d) Top-$p$ 采样}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

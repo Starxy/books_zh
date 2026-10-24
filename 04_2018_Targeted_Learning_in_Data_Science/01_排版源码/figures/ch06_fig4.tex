@@ -1,0 +1,20 @@
+% 原始图中各数据点、参照线、刻度和顺序全部保留；仅替换文字标签。
+\resizebox{.88\textwidth}{!}{%
+\begin{tikzpicture}[x=1bp,y=-1bp]
+ \node[anchor=north west,inner sep=0pt] at (0,0) {\includegraphics[width=292bp,height=188bp]{figures/ch06_fig4_source.pdf}};
+ \fill[white] (0,0) rectangle (88,159);
+ \fill[white] (169,175) rectangle (230,188);
+ \node[font=\fontsize{8.2}{9}\selectfont] at (195.9,182.7) {相对均方误差};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,151.475) {径向 SVM};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,136.290) {回归树};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,122.014) {多项式 MARS};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,107.735) {逐步 GLM};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,94.169) {GBM};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,78.984) {核回归};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,65.468) {随机森林};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,51.189) {GAM};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont\bfseries] at (86.5,36.669) {HAL};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,21.774) {离散超级学习器};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (86.5,7.447) {超级学习器};
+\end{tikzpicture}%
+}

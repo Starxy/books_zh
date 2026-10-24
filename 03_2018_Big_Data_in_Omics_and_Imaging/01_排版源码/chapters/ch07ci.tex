@@ -1,0 +1,147 @@
+% 原分章PDF111页附录7.I标题—115页附录7.J标题之前，印刷页687—691。
+\section*{附录7.I\quad 稀疏迹方法的算法}
+\addcontentsline{toc}{section}{附录7.I 稀疏迹方法的算法}
+\markright{附录7.I 稀疏迹方法的算法}
+
+首先，利用传统组套索估计矩阵 $A$ 的初始值。实现传统组套索方法的优化问题可定义为
+\begin{equation}
+\min_{a_{.j}}\quad F=\operatorname{Tr}\bigl((Y-AX)^T(Y-AX)\bigr)
+ +\lambda\sum_{j=1}^nm\|a_{.j}\|_2.\tag{7.I.1}
+\end{equation}
+令
+\[
+\rho(A)=\operatorname{Tr}\bigl((Y-AX)^T(Y-AX)\bigr).
+\]
+利用矩阵微积分，得到
+\begin{equation}
+\frac{\partial\rho(A)}{\partial A}=-(Y-AX)X^T,\tag{7.I.2}
+\end{equation}
+进一步化为
+\begin{equation}
+\frac{\partial\rho(A)}{\partial A}
+ =-(Y-A^{(-j)}X)X^T+a_{.j}\|X_{j.}\|_2^2,\tag{7.I.3}
+\end{equation}
+其中
+\[
+A^{(-j)},X_{j.}
+\]
+定义于结论7.22。由式（7.I.3），有
+\begin{equation}
+\frac{\partial\rho(A)}{\partial a_{.j}}
+ =-(Y-A^{(-j)}X)X_{j.}^T+a_{.j}\|X_{j.}\|_2^2.\tag{7.I.4}
+\end{equation}
+众所周知，范数 $\|a_{.j}\|_2$ 的次梯度为
+\begin{equation}
+\partial\|a_{.j}\|_2=\begin{cases}
+\dfrac{a_{.j}}{\|a_{.j}\|_2}&\|a_{.j}\|_2\ne0,\\
+s,\ \|s\|_2\le1&\|a_{.j}\|_2=0.
+\end{cases}\tag{7.I.5}
+\end{equation}
+点 $a_{.j}^*$ 为式（7.I.1）中目标函数 $F$ 的极小点，当且仅当
+\begin{equation}
+0\in\partial F(a_{.j}^*)=\frac{\partial\rho(A)}{\partial a_{.j}}
+ +\lambda m\,\partial\|a_{.j}\|_2.\tag{7.I.6}
+\end{equation}
+由式（7.I.5）、（7.I.6），当 $\|a_{.j}\|_2\ne0$ 时，有
+\begin{equation}
+-(Y-A^{(-j)}X)X_{j.}^T+a_{.j}\|X_{j.}\|_2^2
+ +\frac{\lambda ma_{.j}}{\|a_{.j}\|_2}=0.\tag{7.I.7}
+\end{equation}
+令
+\begin{equation}
+S_j=(Y-A^{(-j)}X)X_{j.}^T.\tag{7.I.8}
+\end{equation}
+将式（7.I.8）代入式（7.I.7），得到
+\begin{equation}
+-S_j+a_{.j}\|X_j\|_2^2+\frac{\lambda ma_{.j}}{\|a_{.j}\|_2}=0,\tag{7.I.9}
+\end{equation}
+从而
+\begin{equation}
+\left(\|X_{j.}\|_2^2+\frac{\lambda m}{\|a_{.j}\|_2}\right)a_{.j}=S_j.\tag{7.I.10}
+\end{equation}
+对式（7.I.10）两边取范数 $\|\cdot\|_2$，得到
+\[
+\left(\|X_{j.}\|_2^2+\frac{\lambda m}{\|a_{.j}\|_2}\right)
+ \|a_{.j}\|_2=\|S_j\|_2,
+\]
+即
+\begin{equation}
+\|X_{j.}\|_2^2\|a_{j.}\|_2+\lambda m=\|S_j\|_2.\tag{7.I.11}
+\end{equation}
+由式（7.I.11）解出 $\|a_{j.}\|_2$，得到
+\begin{equation}
+\|a_{j.}\|_2=\frac{\|S_j\|_2-\lambda m}{\|X_{j.}\|_2^2}.\tag{7.I.12}
+\end{equation}
+将式（7.I.12）代入式（7.I.10），得到
+\begin{equation}
+a_{.j}=\left(1-\frac{\lambda m}{\|S_j\|_2}\right)
+ \frac{S_j}{\|X_{j.}\|_2^2}.\tag{7.I.13}
+\end{equation}
+现在考虑 $\|a_{.j}\|_2=0$ 的情形。此时式（7.I9）变为
+\begin{equation}
+-S_j+\lambda m\delta=0,\tag{7.I.14}
+\end{equation}
+其中 $\|\delta\|_2\le1$，即
+\[
+\|S_j\|_2=\lambda m\|\delta\|_2\le\lambda m,
+\]
+从而
+\begin{equation}
+\frac{\lambda m}{\|S_j\|_2}\ge1.\tag{7.I.15}
+\end{equation}
+换言之，若 $\lambda m/\|S_j\|_2\ge1$，则必有
+\begin{equation}
+a_{.j}=0,\qquad\text{当}\quad\frac{\lambda m}{\|S_j\|_2}\ge1.\tag{7.I.16}
+\end{equation}
+结合式（7.I.13）、（7.I.16），得到最终解：
+\begin{equation}
+a_{.j}=\left(1-\frac{\lambda m}{\|S_j\|_2}\right)_+
+ \frac{S_j}{\|X_{j.}\|_2^2},\tag{7.I.17}
+\end{equation}
+其中
+\[
+(b)_+=\begin{cases}b&b>0,\\0&b\le0.\end{cases}
+\]
+接下来研究算法中的主要步骤。类似于式（7.I.4），有
+\begin{equation}
+\frac{\partial\rho(A)}{\partial a_{kj}}
+ =-(Y_k-a_k^{-(kj)}X)X_j^T+a_{kj}\|X_j\|_2^2,\tag{7.I.18}
+\end{equation}
+其中
+\[
+Y_{k.}=\begin{bmatrix}y_{k1}&\cdots&y_{kL}\end{bmatrix},\qquad
+a_{k.}=\lfloor a_{k1}\quad\cdots\quad a_{kj}\quad\cdots a_{kn}\rfloor,
+\]
+而 $a_{k.}^{(kj)}$ 是将 $a_{k.}$ 中的第 $kj$ 个元素替换为零所得的向量。令 $S_{kj}=(Y_{k.}-a_{k.}^{-(kj)}X)X_{j.}^T$，式（7.I.18）可改写为
+\begin{equation}
+\frac{\partial\rho(A)}{\partial a_{kj}}=-S_{kj}+a_{kj}\|X_{j.}\|_2^2.\tag{7.I.19}
+\end{equation}
+同样，$\|a_{.j}\|_2$ 在点 $a_{kj}$ 处的次微分为
+\begin{equation}
+\frac{\partial\|a_{.j}\|_2}{\partial a_{kj}}
+ =\begin{cases}
+\dfrac{a_{kj}}{\|a_{.j}\|_2}&a_{kj}\ne0,\\
+|\alpha|\le1&a_{kj}=0.
+\end{cases}\tag{7.I.20}
+\end{equation}
+现在考虑 $a_{kj}\ne0$。此时，求解问题（7.144）的最优条件为
+\begin{equation}
+\frac{\partial F}{\partial a_{kj}}
+ =-S_{kj}+a_{kj}\|X_{j.}\|_2^2
+ +\lambda\left(\frac n{\|a_{k.}\|_2}+\frac m{\|a_{.j}\|_2}\right)a_{kj}=0.\tag{7.I.21}
+\end{equation}
+由式（7.I.21）解出 $a_{kj}$，得到
+\begin{equation}
+a_{kj}^{(t+1)}=\frac{S_{kj}^{(t)}}
+ {\|X_{j.}\|_2^2+\lambda\left(\dfrac n{\|a_{k.}^{(t)}\|_2}
+ +\dfrac m{\|a_{.j}^{(t)}\|_2}\right)},\tag{7.I.22}
+\end{equation}
+其中 $S_{kj}^{(t)},a_{k.}^{(t)},a_{.j}^{(t)}$ 均由矩阵 $A^{(t)}$ 计算。接下来考虑 $a_{kj}=0$。此时式（7.I.21）变为
+\begin{equation}
+\frac{\partial F}{\partial a_{kj}}=-S_{kj}+\lambda(m+n)\alpha=0,\tag{7.I.23}
+\end{equation}
+其中
+\[
+|\alpha|\le1.
+\]
+因此，若 $|S_{kj}|\le\lambda(m+n)$，则令 $a_{kj}=0$。

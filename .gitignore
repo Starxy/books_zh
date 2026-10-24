@@ -1,0 +1,69 @@
+# Local scratch, generated previews, backups and dependency bundles
+/work/
+/outputs/
+/tmp/
+/temp/
+/build/
+/dist/
+
+# PDF originals, deliverables and figure assets are tracked with Git LFS.
+# Keep build directories and archive bundles out of version control.
+**/01_排版源码/build/
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# Keep original source archives as provenance; only duplicate deliverable archives are excluded.
+!**/00_原始资料/**/*.zip
+!**/00_原始资料/**/*.tar
+!**/00_原始资料/**/*.tar.gz
+!**/00_原始资料/**/*.tgz
+!**/00_原始资料/**/*.7z
+!**/00_原始资料/**/*.rar
+
+# LaTeX intermediates. Do not blanket-ignore PDF figures, .bbl or .minted dependencies.
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.blg
+*.idx
+*.ind
+*.ilg
+*.brf
+*.nav
+*.snm
+
+# Runtime and editor state
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local credentials/configuration
+.env
+.env.*
+!.env.example
+*.local.json

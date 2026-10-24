@@ -1,0 +1,110 @@
+{
+  "status": "complete",
+  "request": "根总审仅授权两处O’Neil中U+2019改U+0027，消除XeCJK姓名内异常间隙。",
+  "previous_pdf": "work/targeted_learning/ch30_work/build_042131/ch30.pdf",
+  "previous_sha256": "592fa90d2c43f1be370a3905d7c19fb6ed408924f5c4d82be108f823d793503b",
+  "before_file_sha256": {
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30.tex": "426e2f9c2dbfd7ca74b5165220541943900c7fa0a36b887d585fca319a724512",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30a.tex": "ecb80698ddb99fc079b0c15287a7dd6647898c4fe4832060bc27bec0be93603f",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30b.tex": "7e333a5639d9f82f1f8c2f0b2486535ded331fb0d3a9680e6cba52737f7727c0",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30c.tex": "3f73f89ea7f71de2d1677f0fe976770d9f6181a577b75f380567422fd7cb36c0",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30d.tex": "123d4349ab884976bdd90281a352d7a09f439342ec64cdec261b1a91dc11cc1d",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30e.tex": "45242cba138fcec6074a1bc24962de38131fa7bf328bf3b70aa6724691894af7",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30f.tex": "97224ed50dac5ed68eb0c5674fe0115861552fe771ed5ada27e48f1c162820e3",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30g.tex": "b63675e90cce6b09f1542dd328ea92384d8ed7e3b063e1503b68bbc1cae48f5c",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30h.tex": "d8e4583858a2da69536d887be80f206012521757d183af35500c0c1b20a91331"
+  },
+  "before_target_file_texts": {
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30c.tex": "% 原书分章PDF第6—8页：第30.3节全部9段，长引文完整。\n\\section{遭到侵蚀的模型、冯·诺依曼与理论的终结}\n\n% S30.3.P01\n匈牙利物理学家约翰·冯·诺依曼不仅是计算机科学的先驱、博弈论的奠基者，而且与爱因斯坦（Einstein）、海森堡（Heisenberg）等同行一样，积极关注哲学与科学的关系。他对认识论的关切，可以从其文章“物理科学中的方法”（Method in the Physical Sciences）中得到印证；该文发表于1955年，并于2000年收入《诺依曼文集》（The Neumann Compendium）重印。在一段经常被引用的文字中，这位物理学家几乎没有给误解其立场留下余地：“科学并不试图解释，甚至几乎不试图阐释，它们主要是在构造模型。所谓模型，是一种数学构造；在附加某些言语阐释之后，它描述所观察到的现象。这样一种数学构造的证成，唯一而且恰恰在于，人们预期它能发挥作用——也就是，能够正确地描述相当广泛范围内的现象。”\n\n% S30.3.P02\n对于某些科学家来说，这段简短文字或许不会引起多少不安或困惑（Starmans，2011a）。其中呈现的观点，似乎至多与日常实践中的经验部分相容。任何物理学家、生物学家、社会科学家、经济学家、气候科学家或工程师，都会认同模型在科学中无处不在这一主张。此外，模型也明显存在于科学之外的专业实践和日常生活之中。然而，从认识论的角度看，冯·诺依曼的这段话在多个方面都存在问题。\n\n% S30.3.P03\n首先，他主张把科学几乎完全还原为模型构造。模型并非只是在理论化过程中提供解释框架，或附加的启发价值，而是整个科学事业的本质；两者似乎或多或少是等价的。这个命题在多大程度上构成问题，取决于所用模型概念的地位与范围。在这一点上，冯·诺依曼同样十分明确。首先，他主要把科学模型视为附有言语说明的数学构造。在今天，这一说法似乎很容易受到反驳，因为科学技术使用的不仅是符号化的数学模型，还包括大量有形的、物理的、类比的模型，以及图形模型或数字仿真模型。而且，冯·诺依曼完全以功利用途来证成模型的使用；说明某种（潜在的）实在，似乎不再是目标，追求真理也不再是目标。这既体现了极端的实用主义，也体现了一种几乎毫不掩饰、且必然随之而来的工具主义（instrumentalism）与反实在论（antirealism）。它还揭示了一种科学观：解释——无论是因果解释还是其他解释——不再是主要的研究功能，真理已经成为一个孤立、甚至无用的概念。这与前文引用过的统计学家乔治·博克斯的观点相近。\n\n% S30.3.P04\n更重要的是，大数据与数据科学近来的发展，使上述思考可以被看作一种前奏，或者使其更有理由（a fortiori）获得重要性；这些发展对科学哲学和方法论具有更加深远的后果。例如，可以想到科学记者克里斯·安德森（Chris Anderson）一篇声名狼藉却经常被引用的文章；他早在2008年就宣告了科学方法论与科学知识的终结。他的“理论的终结：数据洪流使科学方法过时”（The End of Theory: The Data Deluge Makes the Scientific Method Obsolete）（Anderson，2008），对于哲学家、方法论研究者和统计学家同样重要。略选几段安德森有时相当平实的评论，便足以说明问题。\n\n% S30.3.P05\n首先，这位作者声称，谷歌等公司实际上正在筛检文明诞生以来测量最充分的时代，“把这个庞大的资料总体视为人类处境的实验室”，建立一个由“拍字节时代的孩子们”（children of the Petabyte Age）组成的社会。显然，作者并不回避任何煽情的表达。他不是未来学家，而是毫不含糊地声称，所描绘的情形与其说是遥远的前景，不如说就是现状。按照安德森的说法，在数据科学时代，信息处理不再涉及简单的低维分类、自然规律和理论，而涉及他所谓“不问维数的统计学”（dimensionally agnostic statistics）。这要求一种本质上不同的方法论，最终充分尊重数据，使它成为可以“作为整体加以可视化”的东西。为此，我们必须“首先从数学角度看待数据，然后再为其建立语境”。\n\n% S30.3.P06\n这位作者表现得像新学说的一位真正辩护士。按照安德森的说法，谷歌的成功建立在这样一种信念之上：我们并不理解为什么这个网页比另一个网页更好，而且实际上也不必为此费心；完全依赖统计就够了，“不需要任何语义分析或因果分析”。在这位作者看来，这几乎涵盖了人类行动的任何方面或维度：“把从语言学到社会学的一切人类行为理论统统抛开。忘掉分类学、本体论和心理学。谁知道人们为什么做他们做的事？关键在于，他们做了，而我们能够以前所未有的保真程度追踪和测量这些行为。只要有足够的数据，数字就会自己说话。”确实，我们把科学理解为提出假设、建立模型与进行检验的整套观念，似乎正在迅速过时。\n\n% S30.3.P07\n安德森断言，物理学领域似乎就是一个很好的例子。首先，牛顿定律被证明是真理的粗糙近似；它们有用，但在原子层面是错的。随后，在20世纪初，量子力学又提供了另一个模型；这个模型诚然有所改进，却仍有缺陷，仍然是对现象背后更复杂实在的误表征或歪曲。此后，生物学也受到审判。高中教科书中基于孟德尔遗传学的“显性”与“隐性”基因的经典叙述，似乎比经典力学更加粗糙地过度简化了实在。事实上，“基因—蛋白质相互作用及表观遗传学其他方面的发现，已经挑战了把 DNA 视为命运的观点，甚至提供了环境能够影响可遗传性状的证据；而这曾被认为在遗传学上是不可能的”。更糟的是，关于生物现象的真实知识越多，提出能够解释这些现象的模型的可能性，反而必然越小。拍字节时代的孩子们将以一种全然不同的方式感知和理解世界。科学进步不再需要任何机制性解释，因果模型将被相关模式取代，大统一理论也不再被需要或成为追求的目标。\n\n% S30.3.P08\n一年后，谷歌研究者 Alon Havely、Peter Norvig 和 Fernando Pereira 发表了“数据不可思议的有效性”（The Unreasonable Effectiveness of Data）。这些作者表示，当研究对象是人而不是基本粒子时，简单的数学公式与优雅的理论作用有限；参数统计模型也同样如此。要理解和预测人的行为，更可以依靠许多拍字节的粗糙、未经编目、非结构化，必要时甚至失真的数据。这些数据先用高效的数据结构／架构表示出来，再由具有模式识别能力的智能算法锻造成知识。在 Starmans（2016b，2017b）中，我们曾试图更公允地呈现上述作者的观点；不过，对其思想的这一总体描述，已经足以说明统计学与“科学方法”目前的处境，以及它们背后的哲学如何显得承受着压力。\n\n% S30.3.P09\n此外，安德森与 Havely 等人的观点，在大数据与数据科学的大众及专业文献中几乎随处可见，尽管有时会以稍为缓和的形式出现。显然，这并不意味着不存在相反的、更加细致的立场。谷歌也不例外（Starmans，2015a），尤其是在当代关于人工智能风险，以及更一般地关于人工智能与数据科学道德维度的争论中。例如，数学家、后来转而怀疑数据科学的凯茜·奥尼尔（Cathy O’Neil）于2016年出版的《数学毁灭武器：大数据如何加剧不平等并威胁民主》（Weapons of Math Destruction; How Big Data Increases Inequality and Threatens Democracy）近来大获成功，就是一个说明。无论如何，本节所描绘的发展，暗示了一种反认识论与反统计学立场，似乎只给统计学和认识论留下了漏洞百出的前景；这或许会促使人们考虑双方联手的问题。然而，这显然远非易事。\n",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30h.tex": "% 原书分章PDF第22—24页：第30.8节全部5段结论，TMLE因果解释及两个完整括号说明。\n\\section{结论}\n\n% S30.8.P01\n本文试图具体呈现所说的真理困境。真理是“人是万物的尺度”的一部分，在认识论中具有关键地位，因为包括显然更为时髦的因果性在内，较不根本的概念都预设了它。我们突出讨论了真理的若干方面，尤其包括它在险恶的大世界中的脆弱性，以及它在统计学发展全程中与这门学科的问题关系：从十九世纪大众文化中的反弹，到如今几乎所有科学都发生概率转向之际的不信任与怀疑。我们还描绘了模型概念受到的侵蚀，以及当今统计实践的折衷主义——尽管教科书错误地让人以为这是一个统一的领域——还有同样重要的、正在兴起并于数据科学中日渐流行的反统计学立场。\n\n% S30.8.P02\n前文表明，TMLE 的某些方面确实以系统方式回应了这些问题。此外，我们概述了这种反统计学立场如何可能转变为反认识论立场；后者似乎比单纯的“理论终结”更为广泛。我们看到，认识论与研究方法论的调和在许多方面都存在问题，而且不大可能仅从科学哲学中找到解决方案。从古典怀疑论、不断变化的真理定义，到逻辑实证主义对发现语境与证成语境之区分的执着、外在主义历史研究、文化相对主义和社会建构主义，所有这些立场都挑战了科学的理性与客观性，或至少强化了真理概念的衰落，或宣告它是多余的。研究方法论有着不同的、主要偏重实用的优先事项，这并不令人意外。随后，我们说明，迄今试图通过弥合统计学与科学哲学之间的鸿沟，来抵制这种发展的努力，仍存在问题。我们把这一点推广为对追求真理中一幅令人遗憾的三联画的勾勒：层次I、II与III之间，往往存在不必要的界分。由于如今围绕真理概念的一组问题，常以间接方式显现，并持续出现在科学哲学的当代主题中，我们从历史与哲学视角聚焦于因果性概念。因果概念及其术语，仍在科学语言中发挥关键作用。它在层次I、II与III中都占据主导地位，但迅速增长的因果性文献，有力地显示了前面描绘的那种不幸的分隔。因果性在哲学中有着悠久传统，经历过许多概念变化，却始终依赖语境，与认识论或形而上学立场紧密相联。因此，它一次又一次地被重新发明，受到相关思想家的形而上学与认识论观点的影响，并与之紧密相连。由于哲学中的理论或观点很少被证伪和取代，许多相互冲突的思想延续下来，演变为当今关于因果性的多元观点，似乎不容许任何精细的统一化。\n\n% S30.8.P03\n这显然给认识论带来挑战；许多哲学问题在这里甚至尚未列出，更谈不上解决。事实是，许多古老的形而上学与认识论内涵仍在发挥作用。不过，正如 Starmans（2016a，2017a）所指出的，任何解决因果性周围的哲学与实践问题的尝试，都应该考虑其当前状态；而这一状态在很大程度上由思想史中的若干重要转变决定。这些转变包括卡尔·皮尔逊与罗纳德·费希尔的概率革命——没有它，因果性概念在研究方法论中根本不会有任何地位；还包括尼尔斯·玻尔对量子力学的哥本哈根诠释，它对因果性思考产生了决定性影响；此外，还有克劳德·香农的通信理论。他关于信息是在语境与流动中的数据的思想，以及由此带来的温和革命，超越了唯物主义，使信息不再是一种附带现象或派生概念；考虑到本文讨论的主题，这一点似乎尤其值得关注。与 Pearl 这样的有力倡导者相对，我们在整个历史中也看到一种消除这个术语的倾向，代表人物包括 Pearson、Mach、Russell、Churchland、Anderson 和 Havely。不过，Google 也采取过不同立场，例如在“自动统计学家”（automated statistician）项目中（Starmans，2015b）：恰恰是在由庞大而复杂的模型自动分析成千上万个变量时，人们只有在理解机制、论证——包括因果结构与原因—结果关系——的前提下，才能对统计结论以及基于这些结论的决策保有信心。由此再次表明，解释、因果性与（自然）规律这些经典主题，在这里不应被分开处理。此外还须注意，鉴于针对统计学的反弹、它与伦理学之间令人棘手的关系，以及对道德维度和“人是万物的尺度”的诉求，数据科学的“阴暗面”如今也迅速受到关注，例如前面提到的那本新著（O’Neil，2016）。\n\n% S30.8.P04\n正如 van der Laan 和 Rose（2011）所指出的，TMLE 以不同方式处理因果性问题。因果性服从于真理与推断，纯粹统计目标参数与因果效应之间有严格区分。要在 Neyman–Rubin 因果网络之下赋予统计参数以因果解释，需要若干假设，例如正值性（即在各分层内，每个实体接受任一种暴露的概率都应非零）、无混杂因素假设，以及所谓的稳定单元处理值假设（stable unit treatment value assumption；即一个实体的暴露状态不应影响其他实体的潜在结局，而且对于所有处于某一暴露水平的个体，该暴露水平都应相同）。其重点首先在于因果估计，明确表述所关心的因果问题，并估计定义良好的统计参数；以研究问题为引导，使用对函数形式作出尽可能少假设的灵活算法，从而能够恰当地调整混杂。\n\n% S30.8.P05\n许多微妙之处在这里仅略有涉及，或不得不完全搁置。例如，承认科学事业的社会方面与外部方面，并不意味着滑向相对主义或社会建构主义；即使在实验物理学中也是如此，物理学家 Peter Galison 已在许多场合指出这一点（Galison，1987；Starmans，2017c）。同样的道理也适用于哲学与统计学之间的问题关系、数据分析中整合且统一的进路的缺乏，以及反驳前述科学“新观念”的必要性。总的说来，可以认为，上面围绕真理、因果性、数据科学与知识三联画及其问题关系所提出的议题，不仅是认识论与统计学的重大挑战，也是迈向真正的数据科学哲学的第一步。\n"
+  },
+  "content_audits_preserved": true,
+  "changes": [
+    {
+      "file": "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30c.tex",
+      "before": "O’Neil",
+      "after": "O'Neil",
+      "unicode_before": "U+2019",
+      "unicode_after": "U+0027",
+      "changed_codepoints": 1,
+      "after_sha256": "44522c38c3f48f3cd5c11d708da34e0eeaef32b08d7ee0baafe8f3c3252d9305"
+    },
+    {
+      "file": "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30h.tex",
+      "before": "O’Neil",
+      "after": "O'Neil",
+      "unicode_before": "U+2019",
+      "unicode_after": "U+0027",
+      "changed_codepoints": 1,
+      "after_sha256": "ecfce89e4c960486f5d2e7b02379b6ecbb303760163cbac46671aba1b3debaee"
+    }
+  ],
+  "new_build": "work/targeted_learning/ch30_work/build_042955",
+  "new_pdf": "work/targeted_learning/ch30_work/build_042955/ch30.pdf",
+  "new_pdf_sha256": "030b8e25597b42a563f5bec31dd6d63c0e65964326b5e5a23932d5d72f2e3f4d",
+  "pages": 19,
+  "comparison_dpi": 150,
+  "pixel_identical_pages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    19
+  ],
+  "changed_pages_require_actual_view": [
+    7,
+    18
+  ],
+  "actually_viewed_changed_pages": [
+    7,
+    18
+  ],
+  "changed_page_observation": "两页姓名内部异常全宽间隙均消失，中文段落/英语引文/邻接内容清楚，未见新排版问题。",
+  "all_other_17_pages_pixel_identical_to_previously_reviewed_version": true,
+  "content_paragraphs_changed_typographically_only": [
+    "S30.3.P09",
+    "S30.8.P03"
+  ],
+  "all_77_paragraph_22_question_quote_citation_and_source_anomaly_audits_preserved": true,
+  "delivered_pdf_reopened": {
+    "path": "outputs/分章中文/Targeted_Learning_第30章_中文译稿.pdf",
+    "pages": 19,
+    "last_bookmark": [
+      2,
+      "30.8 结论",
+      17
+    ],
+    "sha256": "030b8e25597b42a563f5bec31dd6d63c0e65964326b5e5a23932d5d72f2e3f4d",
+    "matches_final_build": true,
+    "all_pages_match_final_rendered_build_by_sha": true,
+    "reopened_after_final_source_change": true,
+    "final_conclusion_present": true
+  },
+  "test_drivers_removed": [
+    "work/targeted_learning/ch30_work/test_ch30.tex"
+  ],
+  "after_file_sha256": {
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30.tex": "426e2f9c2dbfd7ca74b5165220541943900c7fa0a36b887d585fca319a724512",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30a.tex": "ecb80698ddb99fc079b0c15287a7dd6647898c4fe4832060bc27bec0be93603f",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30b.tex": "7e333a5639d9f82f1f8c2f0b2486535ded331fb0d3a9680e6cba52737f7727c0",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30c.tex": "44522c38c3f48f3cd5c11d708da34e0eeaef32b08d7ee0baafe8f3c3252d9305",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30d.tex": "123d4349ab884976bdd90281a352d7a09f439342ec64cdec261b1a91dc11cc1d",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30e.tex": "45242cba138fcec6074a1bc24962de38131fa7bf328bf3b70aa6724691894af7",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30f.tex": "97224ed50dac5ed68eb0c5674fe0115861552fe771ed5ada27e48f1c162820e3",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30g.tex": "b63675e90cce6b09f1542dd328ea92384d8ed7e3b063e1503b68bbc1cae48f5c",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch30h.tex": "ecfce89e4c960486f5d2e7b02379b6ecbb303760163cbac46671aba1b3debaee"
+  },
+  "frozen_again": true
+}

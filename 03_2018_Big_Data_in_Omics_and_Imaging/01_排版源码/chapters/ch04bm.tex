@@ -1,0 +1,312 @@
+% 原PDF165页附录4.G标题—171页附录4.H标题前。
+\section*{附录4.G\quad 动态结构方程模型的\texorpdfstring{$L_1$}{L1}惩罚最大似然估计的近端算法}
+\addcontentsline{toc}{section}{附录4.G 动态结构方程模型的L1惩罚最大似然估计的近端算法}
+\markright{附录4.G L1惩罚最大似然估计的近端算法}
+
+令
+\begin{equation}
+\begin{aligned}
+f(\Gamma,A,B)&=-l(\Gamma,A,B,\Sigma\mid Y)\\
+&=\frac{nTm}{2}\log(2\pi)+\frac n2\log|\Sigma|-n\log|\Gamma|
++\frac12\sum_{i=1}^{n}e_i'\Sigma^{-1}e_i,
+\end{aligned}\tag{4.G.1}
+\end{equation}
+其中
+\[
+\Gamma=\begin{bmatrix}\Gamma^1&0&\cdots&0\\0&\Gamma^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&\Gamma^T\end{bmatrix},\quad
+A=\begin{bmatrix}A^1&0&\cdots&0\\0&A^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&A^T\end{bmatrix},
+\]
+\[
+B=\begin{bmatrix}B^1&0&\cdots&0\\0&B^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&B^T\end{bmatrix},\quad
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},\quad
+y_i^t=\begin{bmatrix}y_{i1}^t\\y_{i2}^t\\\vdots\\y_{iM}^t\end{bmatrix},
+\]
+\[
+y_{li}=\begin{bmatrix}y_{li}^0\\y_{li}^1\\\vdots\\y_{li}^{T-1}\end{bmatrix},\quad
+y_{li}^{t-1}=\begin{bmatrix}y_{li1}^{t-1}\\y_{li2}^{t-1}\\\vdots\\y_{liM}^{t-1}\end{bmatrix},\quad
+X_i=\begin{bmatrix}X_i\\X_i\\\vdots\\X_i\end{bmatrix},\quad
+x_i=\begin{bmatrix}x_{i1}\\x_{i2}\\\vdots\\x_{iK}\end{bmatrix},
+\]
+\[
+e_i=\begin{bmatrix}e_i^1\\e_i^2\\\vdots\\e_i^T\end{bmatrix},\quad
+e_i^t=\begin{bmatrix}e_{i1}^t\\\vdots\\e_{iM}^t\end{bmatrix},\qquad
+e_i=-(\Gamma'y_i+A'y_{li}+B'X_i).
+\]
+目标是最小化
+\begin{equation}
+\begin{aligned}
+\min_{\Gamma^t,A^t,B^t}\quad
+f(\Gamma,A,B)+\lambda_1\sum_{t=1}^{T}\|\Gamma^t\|_1
++\lambda_2\sum_{t=1}^{T}\|A^t\|_1
++\lambda_3\sum_{t=1}^{T}\|B^t\|_1.
+\end{aligned}\tag{4.G.2}
+\end{equation}
+问题（4.G.2）的目标函数由凸可微函数和非光滑函数组成。传统牛顿法可以高效求解无约束光滑优化问题，但不适于大型非光滑凸问题。近端方法可视为牛顿法由光滑优化向非光滑优化的扩展。
+
+将近端方法用于问题（4.G.2）的第一步，是对 $f(\Gamma,A,B)$ 关于 $\Gamma,A,B$ 求偏导。应用第1.4节的矩阵微积分，得到
+\begin{equation}
+\frac{\partial f}{\partial\Gamma'}=-n\Gamma^{-1}
+-\sum_{i=1}^{n}(\Sigma^{-1})e_iy_i'.\tag{4.G.3}
+\end{equation}
+两侧取转置，得到
+\begin{equation}
+\frac{\partial f}{\partial\Gamma}=-n(\Gamma')^{-1}
+-\sum_{i=1}^{n}y_ie_i'(\Sigma^{-1}).\tag{4.G.4}
+\end{equation}
+类似地，
+\begin{equation}
+\frac{\partial f}{\partial A}=-\sum_{i=1}^{n}y_{li}e_i'\Sigma^{-1}\tag{4.G.5}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial f}{\partial B}=-\sum_{i=1}^{n}X_ie_i'\Sigma^{-1},\tag{4.G.6}
+\end{equation}
+其中
+\begin{equation}
+e_i'=-(y_i'\Gamma+y_{li}'A+X_i'B).\tag{4.G.7}
+\end{equation}
+如果不同时间点的误差独立，则 $\Sigma=\operatorname{diag}(\Sigma_{11},\Sigma_{22},\ldots,\Sigma_{TT})$ 为分块对角矩阵。式（4.G.4）—（4.G.7）重写为
+\begin{equation}
+\frac{\partial f}{\partial\Gamma^t}=-n((\Gamma^t)')^{-1}
+-\sum_{i=1}^{n}y_i^t(e_i^t)'\Sigma_{tt}^{-1},\tag{4.G.8}
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial A^t}=-\sum_{i=1}^{n}y_{li}^t(e_i^t)'\Sigma_{tt}^{-1},\tag{4.G.9}
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial B^t}=-\sum_{i=1}^{n}x_i(e_i^t)'\Sigma_{tt}^{-1},\tag{4.G.10}
+\end{equation}
+以及
+\begin{equation}
+(e_i^t)'=-((y_i^t)'\Gamma^t+(y_{li}^t)'A^t+x_i'B^t).\tag{4.G.11}
+\end{equation}
+令
+\[
+W_\Gamma=\operatorname{vec}(\Gamma),\quad
+W_A=\operatorname{vec}(A),\quad W_B=\operatorname{vec}(B),
+\]
+\[
+\frac{\partial f}{\partial W_\Gamma}=\operatorname{vec}\left(\frac{\partial f}{\partial\Gamma}\right),\quad
+\frac{\partial f}{\partial W_A}=\operatorname{vec}\left(\frac{\partial f}{\partial A}\right),\quad
+\frac{\partial f}{\partial W_B}=\operatorname{vec}\left(\frac{\partial f}{\partial B}\right),
+\]
+\begin{equation}
+W=\begin{bmatrix}W_\Gamma\\W_A\\W_B\end{bmatrix},\qquad
+\frac{\partial f}{\partial W}=\begin{bmatrix}
+\dfrac{\partial f}{\partial W_\Gamma}\\
+\dfrac{\partial f}{\partial W_A}\\
+\dfrac{\partial f}{\partial W_B}
+\end{bmatrix}.\tag{4.G.12}
+\end{equation}
+令
+\[
+f(W)=f(\Gamma,A,B),\quad
+\Omega_\Gamma(W_\Gamma)=\|\Gamma\|_1,\quad
+\Omega_A=\|A\|_1,\quad\Omega_B=\|B\|,
+\]
+以及
+\[
+\Omega(W)=\lambda_1\Omega_\Gamma(W_\Gamma)
++\lambda_2\Omega_A(W_A)+\lambda_3\Omega_B(W_B).
+\]
+优化问题（4.G.2）可写为
+\begin{equation}
+\min_W\quad f(W)+\Omega(W).\tag{4.G.13}
+\end{equation}
+回顾函数 $\Omega(w)$ 的近端算子（式（1.42））定义：
+\begin{equation}
+\operatorname{Prox}_\Omega(u)=\arg\min_{w\in\mathbb R^p}
+\left(\Omega(W)+\frac12\|W-u\|_2^2\right).\tag{4.G.14}
+\end{equation}
+由近端算子的性质，
+\begin{equation}
+\operatorname{Prox}_\Omega(u)=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_\Gamma}(u_\Gamma)\\
+\operatorname{Prox}_{\lambda_2\Omega_A}(u_A)\\
+\operatorname{Prox}_{\lambda_3\Omega_B}(u_B)
+\end{bmatrix},\tag{4.G.15}
+\end{equation}
+其中
+\begin{equation}
+u_\Gamma=W_\Gamma-\frac1L\frac{\partial f}{\partial W_\Gamma},\quad
+u_A=W_A-\frac1L\frac{\partial f}{\partial W_A},\quad
+u_B=W_B-\frac1L\frac{\partial f}{\partial W_B}.\tag{4.G.16}
+\end{equation}
+令 $u_{\Gamma ij},u_{Aij},u_{Bij}$ 分别为矩阵 $u_\Gamma,u_A,u_B$ 的第 $(i,j)$ 个元素。定义
+\begin{equation}
+Z=\begin{bmatrix}Z_\Gamma\\Z_A\\Z_B\end{bmatrix}
+=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_\Gamma}(u_\Gamma)\\
+\operatorname{Prox}_{\lambda_2\Omega_A}(u_A)\\
+\operatorname{Prox}_{\lambda_3\Omega_B}(u_B)
+\end{bmatrix}.\tag{4.G.17}
+\end{equation}
+令
+\[
+\begin{aligned}
+u_{\Gamma ij}^k&=\gamma_{ij}^k-\lambda_1^k\left(\frac{\partial f}{\partial\Gamma}\right)_{ij},\\
+u_{Aij}^k&=\alpha_{ij}^k-\lambda_2^k\left(\frac{\partial f}{\partial A}\right)_{ij},\qquad
+u_{Bij}^k=\beta_{ij}^k-\lambda_3^k\left(\frac{\partial f}{\partial B}\right)_{ij}.
+\end{aligned}
+\]
+非光滑函数 $\Omega_\Gamma,\Omega_A,\Omega_B$ 为 $L_1$ 范数。利用式（1.137）（Xiong 2018），得到三个近端算子的元素：
+\begin{equation}
+\gamma_{ij}^z=\operatorname{sign}(u_{\Gamma ij}^k)(|u_{\Gamma ij}^k|-\lambda_1^k)_+,
+\quad i,j=1,\ldots,MT,\tag{4.G.18}
+\end{equation}
+\begin{equation}
+\alpha_{ij}^z=\operatorname{sign}(u_{Aij}^k)(|u_{Aij}^k|-\lambda_2^k)_+,
+\quad i,j=1,\ldots,MT,\tag{4.G.19}
+\end{equation}
+\begin{equation}
+\beta_{ij}^z=\operatorname{sign}(u_{Bij}^k)(|u_{Bij}^k|-\lambda_3^k)_+,
+\quad i=1,\ldots,KT,\ j=1,\ldots,MT,\tag{4.G.20}
+\end{equation}
+其中
+\[
+\Gamma_z=(\gamma_{ij}^z)_{MT\times MT},\quad
+A_z=(\alpha_{ij}^z)_{MT\times MT},\quad B_z=(\beta_{ij})_{KT\times MT}.
+\]
+结合式（4.G.17）—（4.G.20），
+\begin{equation}
+Z_\Gamma=\operatorname{vec}(\Gamma_z),\quad
+Z_A=\operatorname{vec}(A_z),\quad Z_B=\operatorname{vec}(B_z).\tag{4.G.21}
+\end{equation}
+令
+\[
+G_\Gamma^k=\operatorname{vec}(\Gamma^k),\quad
+G_A^k=\operatorname{vec}(A^k),\quad G_B^k=\operatorname{vec}(B^k),\quad
+G^k=\begin{bmatrix}G_\Gamma^k\\G_A^k\\G_B^k\end{bmatrix},
+\]
+其中
+\[
+\Gamma^k=(\gamma_{ij}^k)_{MT\times MT},\quad
+A^k=(\alpha_{ij}^k)_{MT\times MT},\quad B^k=(\beta_{ij}^k)_{KT\times KT}.
+\]
+定义辅助函数
+\begin{equation}
+\begin{aligned}
+f_\lambda(Z,G^k)={}&f(Z)
++\left(\frac{\partial f}{\partial Z}\right)^T(G^k-Z)
++\frac1{2\lambda_1}\|G_\Gamma^k-Z_\Gamma\|_2^2\\
+&{}+\frac1{2\lambda_2}\|G_A^k-Z_A\|_2^2
++\frac1{2\lambda_3}\|G_B^k-Z_B\|_2^2.
+\end{aligned}\tag{4.G.22}
+\end{equation}
+
+\begin{bookalgorithm}{4.G.1：近端梯度算法}
+\textbf{步骤1：}给定 $W_\Gamma^k,W_A^k,W_B^k,G^k,G_\Gamma^k,G_A^k,G_B^k$、
+$\lambda_1^{k-1},\lambda_2^{k-1},\lambda_3^{k-1}$，以及参数 $\alpha_1,\alpha_2,\alpha_3\in(0,1)$。
+令 $\lambda_1=\lambda_1^{k-1}$、$\lambda_2=\lambda_2^{k-1}$、$\lambda_3=\lambda_3^{k-1}$。
+
+\textbf{步骤2：}重复以下过程。
+\begin{enumerate}
+\item 令
+\[
+Z=\begin{bmatrix}Z_\Gamma\\Z_A\\Z_B\end{bmatrix}
+=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_\Gamma}(u_\Gamma^k)\\
+\operatorname{Prox}_{\lambda_2\Omega_A}(u_A^k)\\
+\operatorname{Prox}_{\lambda_3\Omega_B}(u_B^k)
+\end{bmatrix}.
+\]
+逐元素计算近端算子：
+\[
+\begin{aligned}
+u_\Gamma^k&=W_\Gamma^k-\lambda_1\left.\frac{\partial f}{\partial W_\Gamma}\right|_{W^k},\\
+u_A^k&=W_A^k-\lambda_2\left.\frac{\partial f}{\partial W_A}\right|_{W^k},\qquad
+u_B^k=W_B^k-\lambda_3\left.\frac{\partial f}{\partial W_B}\right|_{W^k},
+\end{aligned}
+\]
+\[
+\begin{gathered}
+W_\Gamma^k=(\gamma_{ij}^k)_{MT\times MT},\quad
+W_A^k=(\alpha_{ij}^k)_{MT\times MT},\quad W_B^k=(\beta_{ij}^k)_{KT\times MT},\\
+u_\Gamma^k=(u_{\Gamma ij}^k)_{MT\times MT},\quad
+u_A^k=(u_{Aij}^k)_{MT\times MT},\quad u_B^k=(u_{Bij})_{KT\times MT},
+\end{gathered}
+\]
+\begin{equation}
+\gamma_{ij}^z=\operatorname{sign}(u_{\Gamma ij}^k)(|u_{\Gamma ij}^k|-\lambda_1^k)_+,
+\quad i,j=1,\ldots,MT,\tag{4.G.23}
+\end{equation}
+\begin{equation}
+\alpha_{ij}^z=\operatorname{sign}(u_{Aij}^k)(|u_{Aij}^k|-\lambda_2^k)_+,
+\quad i,j=1,\ldots,MT,\tag{4.G.24}
+\end{equation}
+\begin{equation}
+\beta_{ij}^z=\operatorname{sign}(u_{Bij}^k)(|u_{Bij}^k|-\lambda_3^k)_+,
+\quad i=1,\ldots,KT,\ j=1,\ldots,MT,\tag{4.G.25}
+\end{equation}
+\begin{equation}
+\Gamma_z=(\gamma_{ij}^z)_{MT\times MT},\quad
+A_z=(\alpha_{ij}^z)_{MT\times MT},\quad B_z=(\beta_{ij})_{KT\times MT}.\tag{4.G.26}
+\end{equation}
+\[
+Z_\Gamma=\operatorname{vec}(\Gamma_z),\quad
+Z_A=\operatorname{vec}(A_z),\quad Z_B=\operatorname{vec}(B_z).
+\]
+\item 计算辅助函数：
+\[
+\begin{aligned}
+f_\lambda(Z,G^k)={}&f(Z)
++\left(\frac{\partial f}{\partial Z}\right)^T(G^k-Z)
++\frac1{2\lambda_1}\|G_\Gamma^k-Z_\Gamma\|_2^2\\
+&{}+\frac1{2\lambda_2}\|G_A^k-Z_A\|_2^2
++\frac1{2\lambda_3}\|G_B^k-Z_B\|_2^2.
+\end{aligned}
+\]
+\item 若 $f(Z)\le\widehat f_\lambda(Z,G^k)$，则退出循环，转至步骤3。
+\item 更新 $\lambda_1=\alpha_1\lambda_1$、$\lambda_2=\alpha_2\lambda_2$、$\lambda_3=\alpha_3\lambda_3$。
+\end{enumerate}
+\textbf{步骤3：}令 $\lambda_1^k=\lambda_1$、$\lambda_2^k=\lambda_2$、$\lambda_3^k=\lambda_3$，
+$G^{k+1}=Z$，以及
+\begin{equation}
+W_\Gamma^{k+1}=\Gamma_Z,\quad W_A^{k+1}=A_Z,\quad
+W_B^{k+1}=B_Z,\quad k=k+1.\tag{4.G.27}
+\end{equation}
+\end{bookalgorithm}
+
+最后，矩阵初值可由最小二乘估计得到。令
+\[
+\begin{gathered}
+W^t=\begin{bmatrix}Y_l^{t-1}&X\end{bmatrix},\quad
+W=\begin{bmatrix}W^1&\cdots&W^T\end{bmatrix},\quad
+Z_i^t=\begin{bmatrix}Y_i^t&Y_{li}^{t-1}&X_i\end{bmatrix},\quad
+\Lambda_i=W'W;
+\end{gathered}
+\]
+\[
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},\quad
+Z_i=\begin{bmatrix}Z_i^1&0&\cdots&0\\0&Z_i^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&Z_i^T\end{bmatrix},\quad
+\delta_i=\begin{bmatrix}\delta_i^1\\\delta_i^2\\\vdots\\\delta_i^T\end{bmatrix},\quad
+\delta_i^t=\begin{bmatrix}\gamma_i^t\\\alpha_i^t\\\beta_i^t\end{bmatrix}.
+\]
+参数 $\delta_i$ 的最小二乘估计量为
+\begin{equation}
+\widehat\delta_i=[(W'Z_i)'\Lambda_i^{-1}W'Z_i]^{-1}
+(W'Z_i)'\Lambda_i^{-1}W'y_i,\quad i=1,\ldots,M.\tag{4.G.28}
+\end{equation}
+从 $\widehat\delta_i$ 提取 $\gamma_i^t,\alpha_i^t,\beta_i^t$，并组装为
+\[
+\Gamma^t=\begin{bmatrix}\gamma_1^t&\cdots&\gamma_M^t\end{bmatrix},\quad
+A^t=\begin{bmatrix}\alpha_1^t&\cdots&\alpha_M^t\end{bmatrix},\quad
+B^t=\begin{bmatrix}\beta_1^t&\cdots&\beta_M^t\end{bmatrix}.
+\]
+定义
+\[
+\Gamma_0=\begin{bmatrix}\Gamma^1&0&\cdots&0\\0&\Gamma^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&\Gamma^T\end{bmatrix},\quad
+A_0=\begin{bmatrix}A^1&0&\cdots&0\\0&A^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&A^T\end{bmatrix},
+\]
+\[
+B_0=\begin{bmatrix}B^1&0&\cdots&0\\0&B^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&B^T\end{bmatrix}.
+\]
+设置矩阵 $W^0$ 与向量 $G^0$ 的初值：
+\[
+W_\Gamma^0=\Gamma_0,\qquad W_A^{01}=A_0,\qquad W_B^0=B_0,
+\]
+\[
+G_\Gamma^0=\operatorname{vec}(\Gamma_0),\quad
+G_A^0=\operatorname{vec}(A_0),\quad G_B^0=\operatorname{vec}(B_0),\qquad
+G^0\begin{bmatrix}G_\Gamma^0\\G_A^0\\G_B^0\end{bmatrix}.
+\]

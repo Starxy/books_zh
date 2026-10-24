@@ -1,0 +1,438 @@
+% 原章分章页22—32，第2.5节开头及2.5.1。
+\section{用于量化节点评分函数的其他统计模型}
+\label{sec:ch02-other-score-models}
+\subsection{非线性结构方程模型}
+
+结构方程模型常用于给定变量之间的因果网络建模，每个变量表示为若干其他变量（其原因）及某些噪声的函数（Nowzohour and Bühlmann 2016）。模型包含三个基本部分：（1）因果结构；（2）原因变量与结果变量之间的函数相依关系；（3）噪声的联合分布。通常假设：（1）不存在未观测变量，因此噪声项相互独立；（2）结果变量减去某个噪声项后，是原因变量的一个确定性函数。经典方法对模型进行参数化，并假设函数相依关系是线性的、噪声服从高斯分布。第1章研究了线性结构方程模型。然而，正如 Nowzohour and Bühlmann（2016）所指出的，当去掉模型中的线性假设或高斯性假设时，模型就变得完全可识别。为克服这一限制，本节介绍因果推断的非参数方法：用函数型因果模型将结果表示为直接原因和某些未测量噪声的函数（Zhang et al. 2016），并建立基于评分的参数估计方法。
+
+\subsubsection{用于二元因果发现的非线性加性噪声模型}
+
+本节讨论二元因果发现（bivariate causal discovery）（Mooij et al. 2016）。众所周知，线性回归分析不能区分两个变量之间的因果关系。只有非线性函数模型，才能帮助我们从观测数据中识别两个变量之间的因果关系。
+
+假设两个变量 $X,Y$ 的联合分布为 $P_{X,Y}$。如果外部干预改变了系统的某个方面，也会改变联合分布 $P_{X,Y}$。假设不存在混杂、选择偏倚和反馈。我们的任务是仅用纯粹的观测数据区分原因与结果，即判断是 $X$ 导致 $Y$，还是 $Y$ 导致 $X$。
+
+考虑二元加性噪声模型（additive noise model）$X\to Y$，其中 $Y$ 是 $X$ 的一个非线性函数与独立加性噪声 $E_Y$ 之和：
+\begin{equation}
+\begin{aligned}
+Y&=f_Y(X)+E_Y,\\
+X&\sim P_X,\qquad E_Y\sim P_{E_Y},
+\end{aligned}\tag{2.76}
+\end{equation}
+其中 $X$ 与 $E_Y$ 独立。称密度 $P_{XY}$ 由加性噪声模型 $X\to Y$ 诱导（图2.6a）。如果密度 $P_{XY}$ 可由加性噪声模型 $X\to Y$ 诱导，却不能由加性噪声模型 $Y\to X$ 诱导，则该加性噪声模型可识别。
+
+$X$ 与 $Y$ 之间的另一种加性噪声模型是 $Y\to X$：
+\begin{equation}
+\begin{aligned}
+X&=f_X(Y)+E_X,\\
+Y&\sim P_Y,\qquad E_X\sim P_{E_X},
+\end{aligned}\tag{2.77}
+\end{equation}
+其中 $Y$ 与 $E_X$ 独立。
+
+现在讨论如何确定因果方向。回顾：如果对某些 $x,x'$，有 $P_{Y\mid\doop(x)}\ne P_{Y\mid\doop(x')}$，则 $X$ 导致 $Y$。这里，$P_{Y\mid\doop(x)}$ 是将变量 $X$ 强制设为 $x$，即施加 $\dox{X=x}$ 后 $Y$ 的分布。图2.6展示了两种因果结构：$X$ 导致 $Y$（图2.6a），以及 $Y$ 导致 $X$。当 $X$ 导致 $Y$ 时，改变 $X$ 会使 $Y$ 的分布改变；干预分布 $P_{Y\mid\doop(x)}$ 等于条件分布 $P_{Y\mid X}$，但不等于边际分布 $P_Y$。此外，当 $X$ 导致 $Y$ 时，强制 $Y$ 取某个指定值 $y$ 不会影响 $X$ 的分布。因此，干预分布 $P_{X\mid\doop(Y)}$ 等于边际分布 $P_X$，但不等于条件分布 $P_{X\mid y}$。同样的论证适用于 $Y$ 导致 $X$ 的情形（图2.6b）。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig06.tex}
+\origfig{6}{与两种因果结构对应的两个加性噪声模型。（a）加性噪声模型 $X\to Y$。（b）加性噪声模型 $Y\to X$。}
+\end{figure}
+
+在经验上，如果加性噪声模型 $X\to Y$ 拟合数据，就推断 $X$ 导致 $Y$；如果模型 $Y\to X$ 拟合数据，就推断 $Y$ 导致 $X$。尽管这一说法无法得到严格证明，在实践中，它为二元因果发现提供了基础（Mooij et al. 2016）。要应用这一原则，需要建立统计方法，评估加性噪声模型是否拟合数据。下面的结论通过检验残差与原因变量之间的独立性，为评估模型拟合提供了严格的统计方法（Mooij et al. 2016）。
+
+\par\medskip\noindent\textbf{结论 2.2}\quad
+令 $P(x,y)$ 为两个随机变量 $X,Y$ 的联合密度。假设条件期望 $\E(Y\mid X)$ 存在，则 $P(x,y)$ 由二元加性噪声模型 $X\to Y$ 诱导，当且仅当残差 $E_Y=Y-\E(Y\mid X)$ 有有限均值，且与 $X$ 独立。
+
+结论2.2容易证明。为使本书自成体系，这里重述 Mooij et al.（2016）的证明。事实上，如果密度 $P(x,y)$ 由模型（2.76）诱导，就有
+\begin{equation}
+Y=f(x)+e,
+\tag{2.78}
+\end{equation}
+其中 $e\indep X$。在式（2.78）两边取条件期望，得到
+\begin{equation}
+\E(Y\mid X)=f(x)+\E(e).
+\tag{2.79}
+\end{equation}
+因此，$Y-\E(Y\mid X)=e-\E(e)=E_Y$。由于 $e\indep X$，所以 $e-\E(e)\indep X$，从而 $E_Y\indep X$。
+
+反过来，记 $f_Y(x)=\E(Y\mid X)$，就有
+\begin{equation}
+Y=f_Y(x)+E_Y,
+\tag{2.80}
+\end{equation}
+其中 $E_Y\indep X$。模型（2.80）正是模型（2.76）。密度 $P(x,y)=P(x)p(E_Y)$ 由二元加性噪声模型 $X\to Y$ 诱导。
+
+结论2.2给出了二元因果发现的一般过程。可以用非参数回归逼近条件期望 $f_Y(x)=\E(Y\mid X)$，再用 Hilbert--Schmidt 独立性准则（Hilbert--Schmidt independence criterion，HSIC）检验残差与原因变量之间的独立性。
+
+将数据集分为用于拟合模型的训练集 $D_{\mathrm{train}}=\{Y_n,X_n\}$，其中 $Y_n=[y_1,\ldots,y_n]^T$、$X_n=[x_1,\ldots,x_n]^T$；以及用于检验独立性的测试集 $D_{\mathrm{test}}=\{\widetilde Y_m,\widetilde X_m\}$，其中 $\widetilde Y_m=[\widetilde y_1,\ldots,\widetilde y_m]^T$、$\widetilde X_m=[\widetilde x_1,\ldots,\widetilde x_m]^T$。这里 $n$ 不必等于 $m$。有许多非参数方法可用于将 $Y$ 对 $X$ 回归，或将 $X$ 对 $Y$ 回归。本节主要介绍平滑样条回归（smoothing spline regression，见附录2.A），并考虑模型（2.76）；模型（2.77）可以类似处理。令 $L$ 为定义在再生核希尔伯特空间（reproducing kernel Hilbert space，RKHS）上的连续线性泛函。例如，$L$ 可以是求值泛函 $L_x$，定义为
+\[
+L_xf=f(x).
+\]
+考虑一般的平滑样条回归模型：
+\begin{equation}
+y_i=L_if+\varepsilon_i,\qquad i=1,2,\ldots,n,
+\tag{2.81}
+\end{equation}
+其中，$y_i$ 为第 $i$ 个个体的变量 $Y$ 的观测值，$L_i$ 为定义在 $H$ 上的连续泛函，$f$ 代表一般未知函数 $f_Y$，$\varepsilon_i$ 代表 $E_Y$，是均值为零、共同方差为 $\sigma_e^2$ 的独立随机误差。如果 $L_i$ 为求值泛函，式（2.81）就简化为
+\[
+y_i=f(x_i)+\varepsilon_i,\qquad i=1,2,\ldots,n.
+\]
+平滑样条回归算法如下。
+
+\noindent\textbf{步骤 1：}选择惩罚参数 $\lambda$。
+
+\noindent\textbf{步骤 2：}计算矩阵
+\[
+T=\begin{bmatrix}
+L_{1(x)}\varphi_1(x)&\cdots&L_{1(x)}\varphi_p(x)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}\varphi_1(x)&\cdots&L_{n(x)}\varphi_p(x)
+\end{bmatrix}
+\]
+和
+\[
+\Sigma=\begin{bmatrix}
+L_{1(x)}L_{1(z)}R_1(x,z)&\cdots&L_{1(x)}L_{n(z)}R_1(x,z)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}L_{1(z)}R_1(x,z)&\cdots&L_{n(x)}L_{n(z)}R_1(x,z)
+\end{bmatrix}.
+\]
+如果该泛函为求值泛函，则矩阵 $T,\Sigma$ 为
+\[
+T=\begin{bmatrix}
+\varphi_1(x_1)&\cdots&\varphi_p(x_1)\\\vdots&\vdots&\vdots\\
+\varphi_1(x_n)&\cdots&\varphi_p(x_n)
+\end{bmatrix},
+\qquad
+\Sigma=\begin{bmatrix}
+R_1(x_1,z_1)&\cdots&R_1(x_1,z_n)\\\vdots&\vdots&\vdots\\
+R_1(x_n,z_1)&\cdots&R_1(x_n,z_n)
+\end{bmatrix},
+\]
+其中 $\{z_n\}=\{x_n\}$ 为 $X$ 的观测值。
+
+\noindent\textbf{步骤 3：}对矩阵 $T$ 作 QR 分解：
+\[
+T=[Q_1\ Q_2]\begin{bmatrix}R\\0\end{bmatrix}.
+\]
+
+\noindent\textbf{步骤 4：}计算平滑样条回归系数
+\[
+\begin{aligned}
+\widehat a&=R^{-1}Q_1^T
+\left[I-MQ_2(Q_2^TMQ_2)^{-1}Q_2^T\right]Y,\\
+\widehat b&=Q_2(Q_2^TMQ_2)^{-1}Q_2^TY,
+\end{aligned}
+\]
+其中 $M=\Sigma+n\lambda I$。
+
+\noindent\textbf{步骤 5：}计算平滑样条回归函数
+\[
+\widehat f(x)=\sum_{j=1}^{p}\widehat a_j\varphi_j(x)
++\sum_{i=1}^{n}\widehat b_i\xi_i(x),
+\]
+其中 $\xi_i(x)=L_{i(z)}R_1(x,z)$。
+
+\noindent\textbf{步骤 6：}计算拟合值
+\[
+\widehat f=H(\lambda)Y,
+\]
+其中 $H(\lambda)=I-n\lambda Q_2(Q_2^TMQ_2)^{-1}Q_2^T$。
+
+基于经典多项式的三次样条，其基函数和再生核（reproducing kernel，RK）$R_1(x,z)$ 为
+\[
+\phi_1(x)=1,\quad\phi_2(x)=x,
+\qquad
+(x\wedge z)^2\frac{3(x\vee z)-x\wedge z}{6},
+\]
+其中 $x\wedge z=\min(x,z)$，$x\vee z=\max(x,z)$。
+
+基于 Bernoulli 多项式的三次样条，其基函数和再生核 $R_1(x,z)$ 分别为
+\[
+\phi_1(x)=1,\qquad\phi_2(x)=k_1(x),
+\qquad
+R_1(x,z)=k_2(x)k_2(z)-k_4(|x-z|),
+\]
+其中
+\[
+\begin{aligned}
+k_0(x)&=1,\\
+k_1(x)&=x-\frac12,\\
+k_2(x)&=\frac12\left\{k_1^2(x)-\frac1{12}\right\},\\
+k_4(x)&=\frac1{24}\left\{k_1^4(x)-\frac12k_1^2(x)+\frac7{240}\right\}.
+\end{aligned}
+\]
+
+第5.3.2节讨论协方差算子和相依性度量。协方差算子可以度量相依程度，是评估变量之间相依关系的有用工具。具体地，将用互协方差算子的 Hilbert--Schmidt 范数的范数，或其近似——Hilbert--Schmidt 独立性准则，度量残差与潜在原因变量之间的相依程度。
+
+HSIC 的计算包含以下步骤。
+
+\noindent\textbf{步骤 1：}使用测试集进行如下计算。计算平滑样条回归函数
+\[
+\widehat f(x_i)=\sum_{j=1}^{p}\widehat a_j\varphi_j(x_i)
++\sum_{i=1}^{n}\widehat b_i\xi_i(x_i),
+\qquad i=1,\ldots,m,
+\]
+其中 $\xi_i(x)=L_{i(z)}R_1(x,z)$。
+
+\noindent\textbf{步骤 2：}计算残差。计算残差：
+\begin{equation}
+\varepsilon=E_Y=Y-\widehat f,
+\tag{2.82}
+\end{equation}
+其中 $\varepsilon_i=E_Y(i)=y_i-\widehat f_i$，$i=1,\ldots,m$。
+
+\noindent\textbf{步骤 3：}选择两个核函数 $k_E(\varepsilon_i,\varepsilon_j)$ 和 $k_x(x_1,x_2)$，计算核矩阵
+\[
+K_{E_Y}=
+\begin{bmatrix}
+k_E(\varepsilon_1,\varepsilon_1)&\cdots&K_E(\varepsilon_1,\varepsilon_m)\\
+\vdots&\vdots&\vdots\\
+K_E(\varepsilon_m,\varepsilon_1)&\cdots&K_E(\varepsilon_m,\varepsilon_m)
+\end{bmatrix},
+\]
+\[
+K_X=
+\begin{bmatrix}
+k_x(x_1,x_1)&\cdots&k_x(x_1,x_m)\\
+\vdots&\vdots&\vdots\\
+k_x(x_m,x_1)&\cdots&k_x(x_m,x_m)
+\end{bmatrix}.
+\]
+
+\noindent\textbf{步骤 4：}计算用于度量残差与潜在原因变量之间相依性的 Hilbert--Schmidt 独立性准则：
+\[
+\operatorname{HSIC}^{2}(E_Y,X)=\frac1{m^2}\Tr(K_{E_Y}HK_XH),
+\]
+其中，$H=I-\frac1m\mathbf1_m\mathbf1_m^T$，$\mathbf1_m=[1,1,\ldots,1]^T$，$\Tr$ 表示矩阵的迹。
+
+二元因果发现的一般过程为：
+\begin{enumerate}
+\item 将数据集分为训练集和测试集；
+\item 用训练集估计两个方向的回归函数，即 $X\to Y$ 和 $Y\to X$；
+\item 计算相应残差；
+\item 估计相依性度量 $\operatorname{HSIC}^2(E_Y,X)$ 和 $\operatorname{HSIC}^2(E_X,Y)$；
+\item 将相依性度量较小的方向推断为因果方向。
+\end{enumerate}
+二元因果发现的具体算法总结如下（Mooij et al. 2016）。
+
+\noindent\textbf{步骤 1：}将数据集分为拟合模型所用的训练集 $D_{\mathrm{train}}=\{Y_n,X_n\}$ 和检验独立性所用的测试集 $D_{\mathrm{test}}=\{\widetilde Y_m,\widetilde X_m\}$。
+
+\noindent\textbf{步骤 2：}使用训练集和平滑样条：
+\begin{enumerate}[label=(\alph*)]
+\item 将 $Y$ 对 $X$ 回归：$Y=f_Y(x)+E_Y$；
+\item 将 $X$ 对 $Y$ 回归：$X=f_X(y)+E_X$。
+\end{enumerate}
+
+\noindent\textbf{步骤 3：}使用测试集和估计的平滑样条回归预测残差：
+\[
+\begin{aligned}
+\text{（a）}\quad\widehat E_{YX}&=\widetilde Y-\widehat f_Y(\widetilde X),\\
+\text{（b）}\quad\widehat E_{XY}&=\widetilde X-\widehat f_X(\widetilde Y).
+\end{aligned}
+\]
+
+\noindent\textbf{步骤 4：}计算相依性度量 $\operatorname{HSIC}^2(E_Y,X)$ 和 $\operatorname{HSIC}^2(E_X,Y)$。
+
+\noindent\textbf{步骤 5：}推断因果方向：
+\[
+\begin{aligned}
+X\to Y&\quad\text{若 }\operatorname{HSIC}^2(E_Y,X)<\operatorname{HSIC}^2(E_X,Y);\\
+Y\to X&\quad\text{若 }\operatorname{HSIC}^2(E_Y,X)>\operatorname{HSIC}^2(E_X,Y).
+\end{aligned}
+\]
+如果 $\operatorname{HSIC}^2(E_Y,X)=\operatorname{HSIC}^2(E_X,Y)$，则无法判定因果方向。
+
+\subsubsection{用于发现因果网络的非线性结构方程}
+
+第2.5.1.1节讨论的函数模型，也称结构因果模型或非参数结构方程模型（Mooij et al. 2016），可以推广到多变量情形（Nowzohour and Buhlman 2016）。考虑 $M$ 个连续内生变量 $Y_1,\ldots,Y_M$ 和 $K$ 个外生变量 $X_1,\ldots,X_K$。令 $\pa_D(d)$ 为节点 $d$ 的父节点集合，其中同时包含内生变量和外生变量。考虑非线性结构方程模型
+\begin{equation}
+Y_d=f_d(Y_i\in\pa_D(d),X_j\in\pa_D(d))+\varepsilon_d,
+\quad d=1,\ldots,M,
+\tag{2.83}
+\end{equation}
+其中，$f_d$ 是形式一般未知的非线性函数，误差 $\varepsilon_d$ 相互独立，服从分布 $P_{\varepsilon_d}$。模型（2.83）也称加性噪声模型（additive noise model，ANM）。
+
+相对于 DAG $D$，ANM（2.83）的联合密度或似然函数为
+\begin{equation}
+L=\prod_{d=1}^{M}
+P_{\varepsilon_d}\bigl(y_d-f_d(y_i\in\pa_D(d),x_j\in\pa_D(d))\bigr).
+\tag{2.84}
+\end{equation}
+似然函数 $L$ 依赖于节点的父节点集合，即 DAG 的结构。非线性函数可以是参数函数，也可以是非参数函数。为便于讨论，记 $W_l=(Y_i,X_j)\in\pa_D(d)$，即 $W_l$ 是节点 $d$ 的父节点集合，同时包含内生变量和外生变量。式（2.83）于是简化为
+\begin{equation}
+Y_d=f_d(W_l\in\pa_D(d))+\varepsilon_d.
+\tag{2.85}
+\end{equation}
+由于 $f_d$ 的函数形式通常未知，我们往往采用非参数方法。这里主要介绍用平滑样条逼近函数 $f_d$（Wang 2011）。
+
+多元函数 $f_d(W)$ 通过线性泛函间接定义（附录2.A）。考虑 RKHS $H$，令 $L$ 为定义在 $H$ 上的连续线性泛函。考虑一般的多元非线性函数模型：
+\begin{equation}
+Y_d^i=L_if_d+\varepsilon_i,\qquad i=1,\ldots,n,
+\tag{2.86}
+\end{equation}
+其中，$Y_d^i$ 为第 $i$ 个样本中 $Y_d$ 的观测值，$L_i$ 为连续泛函，$\varepsilon_i$ 为均值为零、共同方差为 $\sigma_e^2$ 的独立随机误差。
+
+考虑 $p$ 个变量 $\{w_1,\ldots,w_p\}$，以及定义在 $\chi=\chi_1\times\chi_2\times\cdots\times\chi_p$ 上的张量积 $M=H=H^{(1)}\otimes H^{(2)}\otimes\cdots\otimes H^{(p)}$。每个 $H^{(k)}$ 可分解为
+\[
+H^{(k)}=H_0^{(k)}\oplus H_1^{(k)}\oplus\cdots
+\oplus H_{r_k-1}^{(k)}\oplus H_{\ast1}^{(k)},
+\quad k=1,\ldots,p.
+\]
+现在将模型空间 $M$ 分为两个子空间：
+\[
+H_0^*=H^0,\qquad H_1^*=H^1\oplus\cdots\oplus H^q,
+\]
+其中
+\[
+H^0=\sum_{j_1=0}^{r_1-1}\cdots\sum_{j_p=0}^{r_p-1}
+H_{j_1}^{(1)}\otimes\cdots\otimes H_{j_p}^{(p)}.
+\]
+这是一个包含所有不受惩罚函数的有限维空间，而 $H^1,\ldots,H^q$ 是相互正交的 RKHS，其再生核分别为 $R^1,\ldots,R^q$。$H^0$ 上定义的内积和再生核用于 $H_0^*$。现在定义 RKHS $H_1^*$ 的内积与再生核。$H_1^*$ 的再生核定义为
+\[
+R_1^*=\sum_{j=1}^{q}\theta_jR^j,
+\]
+其中 $R^j$ 是 $H^j$ 的再生核。
+
+令 $\varphi_0^{(k)},\ldots,\varphi_{r_k-1}^{(k)}$ 为空间 $H_0^{(k)}$ 的一组基函数。考虑 $H^0$ 的基函数所有可能的组合：
+\begin{equation}
+\begin{aligned}
+&\{\varphi_1^{(1)}\oplus\cdots\oplus\varphi_{r_1}^{(1)}\}
+\cdots
+\{\varphi_1^{(p)}\oplus\cdots\oplus\varphi_{r_p}^{(p)}\}\\
+&\qquad=\sum_{j_1=0}^{r_1-1}\cdots\sum_{j_p=0}^{r_p-1}
+\varphi_{j_1}^{(1)}\cdots\varphi_{j_p}^{(p)}
+=\phi_1+\cdots+\phi_r.
+\end{aligned}\tag{2.87}
+\end{equation}
+其中 $r=r_1\cdots r_p$，$\phi_v$（$v=1,\ldots,r$）是 $\varphi_{j_1}^{(1)}\cdots\varphi_{j_p}^{(p)}$ 中的一个元素。如果 $r_1=\cdots=r_p=2$，则 $r=2^p$。
+
+为简化讨论，本节仅考虑三次样条。此时张量积空间为
+\[
+\begin{aligned}
+H={}&\{H_0^{(1)}\oplus H_1^{((1))}\oplus H_2^{(1)}\}
+\otimes\{H_0^{(2)}\oplus H_1^{((2))}\oplus H_2^{(2)}\}\otimes\cdots\\
+&{}\otimes\{H_0^{(p)}\oplus H_1^{((p))}\oplus H_2^{(p)}\}\\
+={}&\{H_0^{(1)}\otimes H_0^{(2)}\otimes\cdots\otimes H_0^{(p)}\}
+\oplus\{H_1^{(1)}\otimes H_0^{(2)}\otimes\cdots\otimes H_0^{(p)}\}
+\oplus\cdots\\
+&{}\oplus\{H_1^{(1)}\otimes H_1^{(2)}\otimes\cdots
+\otimes H_1^{(p-1)}\otimes H_0^{(p)}\}\\
+&{}\oplus\{H_2^{(1)}\otimes H_0^{(2)}\otimes\cdots\otimes H_0^{(p)}\}
+\oplus\cdots\oplus\{H_2^{(1)}\otimes H_2^{(2)}\otimes\cdots H_2^{(p)}\}\\
+={}&H^{(0)}\oplus H^{(1)}\oplus\cdots H^{(q)},
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+H^{(0)}
+={}&\{H_0^{(1)}\otimes H_0^{(2)}\otimes\cdots\otimes H_0^{(p)}\}
+\oplus\{H_1^{(1)}\otimes H_0^{(2)}\otimes\cdots\otimes H_0^{(p)}\}
+\oplus\cdots\\
+&{}\oplus\{H_1^{(1)}\otimes H_1^{(2)}\otimes\cdots
+\otimes H_1^{(p-1)}\otimes H_1^{(p)}\},\qquad q=3^p-2^p.
+\end{aligned}
+\]
+考虑 $p=3$、三次样条及 Bernoulli 多项式，基函数为
+\[
+\begin{aligned}
+\phi_1(x_1,x_2,x_3)&=1,&\phi_2(x_1,x_2,x_3)&=x_1-0.5,\\
+\phi_3(x_1,x_2,x_3)&=x_2-0.5,&\phi_4(x_1,x_2,x_3)&=x_3-0.5,\\
+\phi_5(x_1,x_2,x_3)&=(x_1-0.5)(x_2-0.5),\\
+\phi_6(x_1,x_2,x_3)&=(x_1-0.5)(x_3-0.5),\\
+\phi_7(x_1,x_2,x_3)&=(x_2-0.5)(x_3-0.5),\\
+\phi_3(x_1,x_2,x_3)&=(x_1-0.5)(x_2-0.5)(x_3-0.5).
+\end{aligned}
+\]
+再考虑再生核 $R^j$。$R^j$ 是 $H_{j_1}^{(1)},\ldots,H_{j_p}^{(p)}$ 各自再生核的乘积，其中
+\[
+R_0^{(l)}=1,\quad R_1^{(l)}=k_1(x_l)k_1(z_l),\quad
+R_2^{(l)}=k_2(x_l)k_2(z_l)-k_4(|x_l-z_l|)
+\]
+分别对应 RKHS $H_0^{(l)},H_1^{(l)},H_2^{(l)}$。例如，$H^1=H_2^{(1)}\otimes H_0^{(2)}\otimes H_0^{(3)}$ 的 $R^1$ 为 $K_2(x_1)k_2(z_1)-k_4(|x_1-z_1|)$；$H^4=H_2^{(1)}\otimes H_1^{(2)}\otimes H_0^{(3)}$ 的 $R^4$ 为
+\[
+(K_2(x_1)k_2(z_1)-k_4(|x_1-z_1|))k_1(x_2)k_1(z_2).
+\]
+为估计回归（2.86）中的平滑样条，极小化
+\begin{equation}
+\min_{f\in M}\quad
+\frac1n\sum_{i=1}^{n}(y_d^i-L_if)^2+\lambda\lVert P_1^*f\rVert_*^2,
+\tag{2.88}
+\end{equation}
+其中 $\lambda\lVert P_1^*f\rVert_*^2=\sum_{j=1}^{q}\lambda_j\lVert P_jf\rVert^2$，$\lambda_j=\lambda/\theta_j$，$P_j$ 是函数向 RKHS $H^j$ 的正交投影，$j=0,1,\ldots,q$。
+
+求解优化问题（2.88）的算法如下。
+
+\noindent\textbf{步骤 1：}选择惩罚参数 $\lambda$，定义 $Y_d=[Y_d^1,\ldots,Y_d^n]^T$。
+
+\noindent\textbf{步骤 2：}计算矩阵
+\[
+T=\begin{bmatrix}
+L_{1(x)}\phi_1(x)&\cdots&L_{1(x)}\phi_r(x)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}\phi_1(x)&\cdots&L_{n(x)}\phi_r(x)
+\end{bmatrix},
+\]
+\[
+\Sigma_j=\begin{bmatrix}
+L_{1(x)}L_{1(z)}R^j(x,z)&\cdots&L_{1(x)}L_{n(z)}R^j(x,z)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}L_{1(z)}R^j(x,z)&\cdots&L_{n(x)}L_{n(z)}R^j(x,z)
+\end{bmatrix},
+\]
+以及 $\Sigma_\theta=\theta_1\Sigma_1+\cdots+\theta_q\Sigma_q$，其中 $\theta_1,\ldots,\theta_q$ 为预定权重。对于求值泛函，$T$ 和 $\Sigma_j$ 可按下式计算：
+\[
+T=\begin{bmatrix}
+\phi_1(x_1)&\cdots&\phi_r(x_1)\\\vdots&\vdots&\vdots\\
+\phi_1(x_n)&\cdots&\phi_r(x_n)
+\end{bmatrix},
+\qquad
+\Sigma_j=\begin{bmatrix}
+R^j(x_1,z_1)&\cdots&R^j(x_1,z_n)\\
+n\ \vdots&\vdots&\vdots\\
+R^j(x_n,z_1)&\cdots&R^j(x_n,z_n)
+\end{bmatrix}.
+\]
+
+\noindent\textbf{步骤 3：}对矩阵 $T$ 作 QR 分解：
+\[
+T=[Q_1\ Q_2]\begin{bmatrix}R\\0\end{bmatrix}.
+\]
+
+\noindent\textbf{步骤 4：}计算平滑样条回归系数
+\[
+\begin{aligned}
+\widehat a&=R^{-1}Q_1^T[I-MQ_2(Q_2^TMQ_2)^{-1}Q_2^T]Y_d,\\
+\widehat b&=Q_2(Q_2^TMQ_2)^{-1}Q_2^TY_d,
+\end{aligned}
+\]
+其中 $M=\Sigma+n\lambda I$。
+
+\noindent\textbf{步骤 5：}计算平滑样条回归函数
+\[
+\widehat f(x)=\sum_{j=1}^{r}\widehat a_j\phi_j(x)
++\sum_{v=1}^{n}\widehat b_v\sum_{j=1}^{q}\theta_jL_{v(z)}R^j(x,z).
+\]
+
+\noindent\textbf{步骤 6：}计算拟合值：
+\[
+\widehat f=H(\lambda)Y_d,
+\]
+其中 $H(\lambda)=I-n\lambda Q_2(Q_2^TMQ_2)^{-1}Q_2^T$。
+
+\noindent\textbf{步骤 7：}计算节点 $d$ 的评分：
+\begin{equation}
+\operatorname{Score}_d=
+\frac1n\lVert Y_d-T\widehat a-\Sigma_\theta\widehat b\rVert^2
++\widehat b^T\Sigma_\theta\widehat b.
+\tag{2.89}
+\end{equation}
+包含 $M$ 个节点的因果网络，其节点总评分为
+\begin{equation}
+\operatorname{Score}(D)=\sum_{d=1}^{M}\operatorname{Score}_d.
+\tag{2.90}
+\end{equation}
+考虑 $N$ 个候选 GAG $D_1,\ldots,D_N$，通过极小化总评分寻找真实因果图 $D_*$：
+\begin{equation}
+D_*=\argmin_{D_1,\ldots,D_N}\operatorname{Score}(D_i),
+\tag{2.91}
+\end{equation}
+也可以使用第2.6节将讨论的整数规划。

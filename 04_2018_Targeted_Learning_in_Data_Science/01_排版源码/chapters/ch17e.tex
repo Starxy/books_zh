@@ -1,0 +1,70 @@
+% 原书分章 PDF 第 16—18 页；第 17.3.2 小节。
+\subsection{IPW 估计量}
+
+我们也可以不估计条件期望 $\bar Q^{\mathbf a,\mathbf a'}(P_0)$，而是利用研究者对处理分配和中介密度的知识。为此，考虑以下函数：
+\begin{equation}
+\begin{aligned}
+ &D^{\mathrm{IPW},\mathbf a,\mathbf a'}(p_A,p_Z)(O)\\
+ &\quad\equiv Y_\tau
+ \frac{I(\mathbf A_\tau=\mathbf a_\tau)}
+ {\prod_{j=1}^\tau p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\qquad{}\times\prod_{j=1}^\tau
+ \frac{p_Z(Z_j\mid\mathbf a'_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}
+ {p_Z(Z_j\mid\mathbf a_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}.
+\end{aligned}
+\tag{17.15}
+\end{equation}
+注意，
+\[
+\begin{aligned}
+ &E_{P_0}D^{\mathrm{IPW},\mathbf a,\mathbf a'}(P_0)\\
+ &=\sum_{\mathbf r,\mathbf z,\mathbf l}\biggl\{y_\tau
+ \frac1{\prod_{j=1}^\tau p_{0,A}(a_j\mid\mathbf a_{j-1},\mathbf r_{j-1},\mathbf z_{j-1},\mathbf l_{j-1})}\\
+ &\quad{}\times\prod_{j=1}^\tau
+ \frac{p_{0,Z}(z_j\mid\mathbf a'_j,\mathbf r_j,\mathbf z_{j-1},\mathbf l_{j-1})}
+ {p_{0,Z}(z_j\mid\mathbf a_j,\mathbf r_j,\mathbf z_{j-1},\mathbf l_{j-1})}\\
+ &\quad{}\times p_{0,L_0}(l_0)\prod_{t=1}^\tau
+ \bigl[p_{0,A}(a_t\mid\mathbf a_{t-1},\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})\\
+ &\qquad{}\times p_{0,R}(r_t\mid\mathbf a_t,\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})\\
+ &\qquad{}\times p_{0,Z}(z_t\mid\mathbf a_t,\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})
+ p_{0,L}(l_t\mid\mathbf a_t,\mathbf r_t,\mathbf z_t,\mathbf l_{t-1})\bigr]\biggr\}\\
+ &=\Psi^{\mathbf a,\mathbf a'}(P_0)=0.
+\end{aligned}
+\]
+因此，给定估计量 $p_{n,A}$ 和 $p_{n,Z}$，$\Psi^{\mathbf a,\mathbf a'}(P_0)$ 的 IPW 估计量为
+\begin{equation}
+ \psi_n^{\mathrm{IPW}}\equiv\frac1n\sum_{i=1}^n
+ D^{\mathrm{IPW},\mathbf a,\mathbf a'}(p_{n,A},p_{n,Z})(O_i).
+ \tag{17.16}
+\end{equation}
+
+在我们的例子中，对所有观测暴露水平为 $\mathbf A_\tau=\mathbf a_\tau$ 的个体，取其最终结局的加权平均，即可得到这一估计，所用权重为
+\[
+\begin{aligned}
+ &\frac1{\prod_{j=1}^\tau p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j=1}^\tau
+ \frac{p_Z(Z_j\mid\mathbf a'_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}
+ {p_Z(Z_j\mid\mathbf a_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}.
+\end{aligned}
+\]
+其中，因子 $p_A$ 是在个体的协变量（糖尿病教育与健康状况）及中介历史下，各时点的项目参与情况为 $A_j=a_j$ 的概率；因子 $p_Z$ 则是在给定个体观测到的协变量和服务利用历史，并分别取所考虑的两种项目暴露时，各时点营养服务利用情况的条件概率。
+
+$\psi_n^{\mathrm{IPW}}$ 的一致性依赖于 $p_A$ 和 $p_Z$ 的一致性。如第 17.2 节所述，若 $Z$ 为高维变量，可以估计条件概率 $\gamma^{\cdot,s,t}$，以替代密度 $p_Z$ 的估计。对每一对 $(s,t)$，将 $A_s$ 对相应的自变量回归，即可估计这些条件概率。这样，利用式 (17.10)，可改写为
+\begin{equation}
+\begin{aligned}
+ &D^{\mathrm{IPW},\mathbf a,\mathbf a'}(p_A,p_Z)
+ =D^{\mathrm{IPW},\mathbf a,\mathbf a'}(p_A,\gamma)\\
+ &=Y_\tau\frac{I(\mathbf A_\tau\equiv\mathbf a_\tau)}
+ {\prod_{j\equiv1}^\tau p_A\bigl(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1}\bigr)}\\
+ &\quad{}\times\prod_{j\equiv1}^\tau\prod_{s=1}^j
+ \frac{\gamma^{1,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ {\gamma^{1,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ \frac{\gamma^{2,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1}}
+ {\gamma^{2,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}.
+\end{aligned}
+\tag{17.17}
+\end{equation}
+
+若为 $p_A$ 和 $p_Z$ 指定正确的参数模型，则 IPW 估计量是渐近线性估计量；其影响曲线包含 $D^{\mathrm{IPW},\mathbf a.\mathbf a'}$，还包含由于估计参数定义中的 $p_A$ 和 $p_Z$ 而产生的一阶余项。此时，可用 Delta 方法推导该余项的影响曲线。在更合理的情形中，若采用 $p_A$ 和 $p_Z$ 的数据自适应估计量，则不能期待 IPW 估计量是渐近线性的。如 van der Laan（2014b）所示，有必要像 TMLE 那样对 $p_A$ 和 $p_Z$ 的估计量进行靶向；这一点虽很重要，却超出了本章的范围。我们将用样本方差 $\widehat{\Var}D^{\mathrm{IPW},\mathbf a.\mathbf a'}(p_{n,A},p_{n,Z})$，近似 $\sqrt n\bigl(\psi_n^{\mathrm{IPW}}-\Psi^{\mathbf a,\mathbf a'}(P_0)\bigr)$。
+
+由于这一估计量按处理概率和删失概率的倒数加权，它对近似正值性违背尤其敏感。特别地，若感兴趣的结局取值范围有界，当逆权重变大时，不能保证 IPW 估计量仍落在这一范围内。式 (17.14) 的非靶向代入估计量以及下述 TMLE 等代入估计量，通过纳入参数映射中的全局信息，可以在一定程度上缓解这一问题。不过，近似正值性违背在这些估计量中仍会表现为平滑效果不佳。

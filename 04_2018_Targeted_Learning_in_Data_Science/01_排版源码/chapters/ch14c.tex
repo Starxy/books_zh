@@ -1,0 +1,85 @@
+% 原书分章 PDF 第 9—11 页；第 14.3 节及第 14.3.1 小节。
+\section{靶向最小损失估计}
+
+上面给出的 EIF $D$ 在 TMLE 的定义中起着核心作用。首先考虑分解 $D=D_Y+D_{A,W}$，其中
+\[
+ D_Y(\bar Q,g)(O)=H(g)(A,W)(Y-\bar Q(A,W))
+\]
+表示 EIF $D$ 在模型 $\mathcal M$ 中与 $p_0(y\mid a,w)$ 对应的切空间上的投影。这里，$D_{A,W}$ 表示余项，它还可以进一步分解为 $D_A$ 和 $D_W$，分别对应于在 $g_0(a\mid w)$ 和 $q_{W,0}(w)$ 的切空间上的投影。
+
+按照 van der Laan 和 Rubin（2006）最初针对路径可微参数给出的定义，标准 TMLE 首先计算 $\bar Q_0$、$g_0$ 和 $q_{W,0}$ 的初始估计量，然后分别使用 $D_Y$、$D_A$ 和 $D_W$ 对其更新，使得 EIF 估计函数在更新后的估计值处等于零。在正则性假设下，求解 EIF 估计方程保证估计量具有双重稳健性、局部有效性等最优性质。按这种方式定义的 TML 估计量，通常需要针对观测数据似然迭代优化一个损失函数；这可能增加编程工作量，并需要更多计算时间和计算能力。对于如何构造例 14.1 中的标准 TML 估计量，有兴趣的读者可参阅 Díaz 和 van der Laan（2012）。
+
+本章采用另一种方法来定义目标参数 $\psi_0$ 的 TMLE：我们只着重求解 EIF 估计方程中与 $D_Y$ 对应的分量。我们将看到，由此得到的估计量无需迭代，却与 Díaz 和 van der Laan（2012）的标准 TMLE 具有相同的渐近最优性质。Haneuse 和 Rotnitzky（2013）以 $\bar Q_0$ 和 $g_0$ 的参数模型为重点，构造了一个类似的估计量。由于参数模型经常设定错误，这些估计量通常不具一致性，即使研究在其他方面经过精心设计和实施，它们也可能损害所得到结论的有效性。
+
+不失一般性，假定 $Y$ 的支撑集为 $\{0,1\}$ 或 $(0,1)$。按以下步骤计算 $\psi_0$ 的 TMLE。
+
+\begin{enumerate}
+ \item \textbf{初始估计量。}获得 $g_0$ 和 $\bar Q_0$ 的初始估计量 $g_n$ 和 $\bar Q_n$。通常，研究者不知道 $g_0$ 和 $\bar Q_0$ 的函数形式。由于对这些量进行一致估计，是使 $\psi_n$ 达到渐近有效性的关键，我们建议采用数据自适应预测方法，使这些函数形式的设定保持灵活。第 14.4 节将进一步讨论这一问题。
+
+ \item \textbf{计算辅助协变量。}对每名研究对象 $i$，计算辅助协变量
+ \[
+ H_n(A_i,W_i)=\sum_{j=1}^{J(W_i)}I\{A_i\in\mathcal I_j(W_i)\}
+ \frac{g_n(h_j(A_i,W_i)\mid W_i)}{g_n(A_i\mid W_i)}h'_j(A_i,W_i).
+ \]
+
+ \item \textbf{求解估计方程。}在 logistic 回归模型
+ \begin{equation}
+  \logit\bar Q_{\epsilon,n}(a,w)=\logit\bar Q_n(a,w)+\epsilon H_n(a,w)
+  \tag{14.7}
+ \end{equation}
+ 中估计参数 $\epsilon$。具体做法是，以 $Y_i$ 为结局、$H_n(A_i,W_i)$ 为协变量拟合标准 logistic 回归模型，不含截距，并以 $\logit\bar Q_n(A_i,W_i)$ 为偏移项。另一种做法是，使用权重 $H_n(A_i,W_i)$ 拟合模型
+ \[
+  \logit\bar Q_{\epsilon,n}(a,w)=\logit\bar Q_n(a,w)+\epsilon.
+ \]
+ 无论采用哪一种方法，均将 $\epsilon$ 的估计值记为 $\epsilon_n$。
+
+ \item \textbf{更新初始估计量并计算 1-TMLE。}将初始估计量更新为
+ $\bar Q_n^\star(a,w)=\bar Q_{n,\epsilon_n}(a,w)$，并将 \mbox{1-TMLE} 定义为
+ \[
+  \psi_n=\frac1n\sum_{i=1}^n\bar Q_n^\star(d(A_i,W_i),W_i).
+ \]
+\end{enumerate}
+
+\subsection{TMLE 的渐近分布}
+
+上述 TML 估计量的一项关键性质是：由于使用了 logistic 回归模型 (14.7)，TMLE 满足 $P_nD_Y(\bar Q_n^\star,g_n)=0$。为简化记号，令 $\bar Q_d(a,w)=\bar Q(d(a,w),w)$。简单的代数运算表明，对任意 $\bar Q_d$，都有
+\[
+ P_0\bar Q_d-\psi_0=-P_0D_Y(\bar Q,g)+R(P,P_0),
+\]
+其中
+\begin{equation}
+ R(P,P_0)=-\int\{H(g)-H(g_0)\}\{\bar Q-\bar Q_0\}\,dP_0.
+ \tag{14.8}
+\end{equation}
+将这一结果应用于 $\bar Q_n^\star$，并加上、减去 $\psi_n$，得到
+\[
+ \psi_n-\psi_0=(P_n-P_0)D_Y(\bar Q_n^\star,g_n)
+ -(P_n-P_0)\bar Q_{n,d}^\star+R(\hat P^\star,P_0),
+\]
+其中，$R(\hat P^\star,P_0)$ 表示在式 (14.8) 中以 $\bar Q_n^\star$ 替换 $\bar Q$、以 $g_n$ 替换 $g$。于是有
+\[
+ \psi_n-\psi_0=(P_n-P_0)D(\bar Q_n^\star,g_n)+R(\hat P^\star,P_0).
+\]
+若满足下列条件：
+\begin{enumerate}
+ \item $D(\bar Q_n^\star,g_n)$ 在 $L_2(P_0)$ 范数下收敛于 $D(P_0)$；
+ \item 用于估计 $\bar Q_n^\star$ 和 $g_n$ 的函数类大小有界。技术上说，存在一个由 $o$ 的函数组成的 Donsker 类 $\mathcal F$，使得 $D(\bar Q_n^\star,g_n)\in\mathcal F$ 的概率趋于 1，
+\end{enumerate}
+则经验过程理论的结果，例如 van der Vaart（1998）的定理 19.24，允许我们得出
+\[
+ \psi_n-\psi_0=(P_n-P_0)D(P_0)+R(\hat P^\star,P_0).
+\]
+此外，若
+\begin{equation}
+ R(\hat P^\star,P_0)=o_P(1/\sqrt n),
+ \tag{14.9}
+\end{equation}
+便有 $\psi_n-\psi_0=(P_n-P_0)D(P_0)+o_P(1/\sqrt n)$。因此，利用中心极限定理可得
+\[
+ \sqrt n(\psi_n-\psi)\longrightarrow N(0,V(D(P_0))).
+\]
+这特别意味着，$\psi_n$ 是 $\psi_0$ 的 $\sqrt n$ 一致估计量，具有渐近正态性，并且局部有效。现在可以用 $\psi_n\pm z_\alpha\sigma_n/\sqrt n$ 构造 Wald 型置信区间，其中
+\[
+ \sigma_n^2=\frac1n\sum_{i=1}^nD^2(\bar Q_n^\star,g_n)(O_i)
+\]
+是 $V(D(P_0))$ 的一个估计量。也可以使用自助法来获得估计量 $\sigma_n^2$。

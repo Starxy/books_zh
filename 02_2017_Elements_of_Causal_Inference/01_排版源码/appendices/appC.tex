@@ -1,0 +1,239 @@
+\chapter{证明}
+\label{app:proofs}
+\section{定理 4.2 的证明}
+先给出一个引理，其证明可参见 Peters [2008] 等文献。
+\begin{lemma}
+设 $X$ 与 $N$ 独立，且 $N$ 不是确定性的，则 $N\nindep(X+N)$。
+\end{lemma}
+\begin{proof}[定理 4.2 的证明]
+如果 $X$ 与 $N_Y$ 都服从正态分布，令
+\[\beta:=\frac{\mathrm{cov}[X,Y]}{\mathrm{cov}[Y,Y]}
+=\frac{\alpha\,\mathrm{var}[X]}{\alpha^2\mathrm{var}[X]+\mathrm{var}[N_Y]},\]
+并定义 $N_X:=X-\beta Y$。由构造可知 $N_X$ 与 $Y$ 不相关；由于它们联合服从高斯分布，二者也相互独立。
+
+为证明“只有当”的部分，假定
+\[\begin{aligned}Y&=\alpha X+N_Y,\\N_X&=(1-\alpha\beta)X-\beta N_Y\end{aligned}\]
+相互独立。分以下几种情形讨论。
+\begin{enumerate}[label=(\roman*)]
+\item $(1-\alpha\beta)\ne0$ 且 $\beta\ne0$。由定理 4.3 可知，$X,N_Y$ 都服从正态分布，因而 $Y,N_X$ 也服从正态分布。因此，$P_{X,Y}$ 为二元高斯分布。
+\item $\beta=0$。这意味着
+\[X\indep\alpha X+N_Y,\]
+与引理 C.1 矛盾。
+\item $(1-\alpha\beta)=0$。此时 $-\beta N_Y\indep\alpha X+N_Y$，从而
+\[N_Y\indep\alpha X+N_Y,\]
+同样与引理 C.1 矛盾。
+\end{enumerate}
+证明完毕。
+\end{proof}
+
+\Needspace{4.4cm}
+\section{命题 6.3 的证明}
+\begin{proof}
+回顾结构因果模型的定义，其中要求底层图无环。因此，可以将各结构赋值递归代入，进而将每个节点 $X_j$ 唯一地写为属于其祖先节点的所有噪声项 $(N_k)_{k\in\AN_j}$ 的函数，即
+\[X_j:=g_j\big((N_k)_{k\in\AN_j}\big).\]
+这里的函数未必依赖所有祖先节点的噪声项。\footnote{译注：第 6.1 节明确约定，一个节点不是它自身的祖先。因此，原书此处的噪声下标遗漏了节点自身；按结构赋值递归代入，应将 $(N_k)_{k\in\AN_j}$ 理解为 $(N_k)_{k\in\AN_j\cup\{j\}}$，即同时包含 $N_j$。上式保留原书印法。}
+\end{proof}
+
+\section{注 6.6 的证明}
+\begin{proof}
+我们将证明：只要一个变量能够从 $\PA_j$ 中删去，那么在约简模型中，它也能从 $\PA_j^*$ 中删去。
+
+考虑 $f_j$ 并不依赖的一个输入 $X_k\in\PA_j\cap\PA_j^*$。也就是说，对所有 $x_k,x_k',\mathbf{pa}_{j,-k}$ 以及满足 $p(n_j)>0$ 的 $n_j$，均有
+\[f_j(\mathbf{pa}_{j,-k},x_k,n_j)=f_j(\mathbf{pa}_{j,-k},x_k',n_j).\]
+这里，$\PA_{j,-k}:=\PA_j\setminus\{k\}$ 表示除 $k$ 以外的所有输入变量的集合。于是，$g$ 也不依赖变量 $x_k$，因为对所有 $x_k,\mathbf{pa}_{j,-k}^*$ 以及满足 $p(n_j)>0$ 的 $n_j$，都有
+\[g(\mathbf{pa}_{j,-k}^*,x_k,n_j)=f_j(\mathbf{pa}_j,x_k,n_j).\qedhere\]
+\end{proof}
+
+\section{命题 6.13 的证明}
+\begin{proof}
+为简化记号，用 $X_1$ 代替 $X$，用 $X_2$ 代替 $Y$。首先，由截断分解公式 (6.9) 得
+\begin{equation}
+\begin{aligned}
+p_{X_2}^{\mathfrak C;\dox{X_1:=x_1}}(x_2)
+&=\int\prod_{j\ne1}p_j(x_j\mid x_{\mathrm{pa}(j)})\,\mathrm dx_3\cdots\mathrm dx_d\\
+&=\int\prod_{j\ne1}p_j(x_j\mid x_{\mathrm{pa}(j)})\,
+\frac{\widetilde p(x_1)}{\widetilde p(x_1)}\,\mathrm dx_3\cdots\mathrm dx_d\\
+&=p_{X_2\mid X_1=x_1}^{\mathfrak C;\dox{X_1:=\widetilde N_1}}(x_2),
+\end{aligned}\tag{C.1}
+\end{equation}
+其中要求 $\widetilde N_1$ 在 $x_1$ 处赋予正质量，即 $\widetilde p(x_1)>0$。此外，我们要求，对任意具有密度 $q$ 的 $(X_1,X_2)$ 上的分布 $Q_{X_1,X_2}$，以下两个陈述均成立：
+\begin{equation}
+\begin{aligned}
+&X_2\nindep X_1\text{ 在 }Q\text{ 中成立}\\
+&\quad\Longleftrightarrow\quad
+\exists x_1^\triangle,x_1^\square\colon q(x_1^\triangle),q(x_1^\square)>0,\quad
+Q_{X_2\mid X_1=x_1^\triangle}\ne Q_{X_2\mid X_1=x_1^\square},
+\end{aligned}\tag{C.2}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+&X_2\nindep X_1\text{ 在 }Q\text{ 中成立}\\
+&\quad\Longleftrightarrow\quad
+\exists x_1^\triangle\colon q(x_1^\triangle)>0,\quad
+Q_{X_2\mid X_1=x_1^\triangle}\ne Q_{X_2}.
+\end{aligned}\tag{C.3}
+\end{equation}
+于是，对任意具有全支撑的 $\widehat N_1$，有以下推论链：
+\[\begin{aligned}
+\text{(i)}&\overset{\text{(C.2)}}{\Longrightarrow}
+\exists x_1^\triangle,x_1^\square\text{，它们在 }\widetilde N_1\text{ 下的密度为正，且}\\
+&\hspace{1.6cm}P_{X_2\mid X_1=x_1^\triangle}^{\mathfrak C;\dox{X_1:=\widetilde N_1}}
+\ne P_{X_2\mid X_1=x_1^\square}^{\mathfrak C;\dox{X_1:=\widetilde N_1}}\\
+&\overset{\text{(C.1)}}{\Longrightarrow}\text{(ii)}\\
+&\overset{\text{(C.1)}}{\Longrightarrow}
+\exists x_1^\triangle,x_1^\square\text{，它们在 }\widehat N_1\text{ 下的密度为正，且}\\
+&\hspace{1.6cm}P_{X_2\mid X_1=x_1^\triangle}^{\mathfrak C;\dox{X_1:=\widehat N_1}}
+\ne P_{X_2\mid X_1=x_1^\square}^{\mathfrak C;\dox{X_1:=\widehat N_1}}\\
+&\overset{\text{(C.2)}}{\Longrightarrow}\text{(iv)}
+\overset{\text{直接}}{\Longrightarrow}\text{(i)}.
+\end{aligned}\]
+另外，直接可得 (ii)$\Rightarrow$(iii)。若 $N_1^*$ 的分布为 $P_{X_1}^{\mathfrak C}$，则还有
+\[P_{X_2}^{\mathfrak C}=P_{X_2}^{\mathfrak C;\dox{X_1:=N_1^*}}.\]
+将后一等式与 $\neg$(i)$\Rightarrow\neg$(ii) 结合，得到
+\[\begin{aligned}
+\neg\text{(i)}&\Longrightarrow X_2\indep X_1
+\text{ 在 }P_{\mathbf X}^{\mathfrak C;\dox{X_1:=N_1^*}}\text{ 中成立}\\
+&\overset{\text{(C.3)}}{\Longrightarrow}
+P_{X_2\mid X_1=x^\triangle}^{\mathfrak C;\dox{X_1:=N_1^*}}
+=P_{X_2}^{\mathfrak C;\dox{X_1:=N_1^*}}\\
+&\hspace{2.3cm}\text{对所有满足 }p_1(x^\triangle)>0\text{ 的 }x^\triangle\\
+&\overset{\text{(C.1)}}{\Longrightarrow}
+P_{X_2}^{\mathfrak C;\dox{X_1:=x^\triangle}}=P_{X_2}^{\mathfrak C}
+\quad\text{对所有满足 }p_1(x^\triangle)>0\text{ 的 }x^\triangle\\
+&\overset{\neg\text{(ii)}}{\Longrightarrow}
+P_{X_2}^{\mathfrak C;\dox{X_1:=x^\triangle}}=P_{X_2}^{\mathfrak C}
+\quad\text{对所有 }x^\triangle\\
+&\Longrightarrow\neg\text{(iii)}.
+\end{aligned}\]
+这里，符号“$\neg$”表示对一个陈述取否定。
+\end{proof}
+
+\section{命题 6.14 的证明}
+\begin{proof}
+陈述 (i) 直接由干预后结构因果模型的马尔可夫性得到。干预会删去所有指向 $X$ 的边；如果原图中没有从 $X$ 到 $Y$ 的有向路径，则 $X$ 与 $Y$ 被 d-分离。
+
+陈述 (ii) 可用反例证明，例如见例 6.34。
+\end{proof}
+
+\section{命题 6.36 的证明}
+\begin{proof}
+“如果”：假定因果极小性不成立。那么存在 $X_j$ 和 $Y\in\PA_j^{\mathcal G}$，使得从 $\mathcal G$ 中删去边 $Y\to X_j$ 后，$P_{\mathbf X}$ 对所得图仍满足马尔可夫性。由局部马尔可夫性可得 $X_j\indep Y\mid\PA_j^{\mathcal G}\setminus\{Y\}$。
+
+“只有当”：如果 $P_{\mathbf X}$ 存在密度，则马尔可夫条件等价于马尔可夫分解 [Lauritzen, 1996，定理 3.27]。现假定 $Y\in\PA_j^{\mathcal G}$ 且 $X_j\indep Y\mid\PA_j^{\mathcal G}\setminus\{Y\}$，则
+\[p(x_j\mid\mathbf{pa}_j^{\mathcal G})=p(x_j\mid\mathbf{pa}_{j,-Y}^{\mathcal G}),\]
+其中 $\PA_{j,-Y}^{\mathcal G}:=\PA_j^{\mathcal G}\setminus\{Y\}$。于是
+\[p(\mathbf x)=p(x_j\mid\mathbf{pa}_{j,-Y}^{\mathcal G})\prod_{k\ne j}p(x_k\mid\mathbf{pa}_k^{\mathcal G}),\]
+这意味着，删去边 $Y\to X_j$ 后，$P_{\mathbf X}$ 对所得图仍满足马尔可夫性。
+\end{proof}
+
+\section{命题 6.48 的证明}
+\begin{proof}
+假定两个模型都满足因果极小性，其图分别为 $\mathcal G$ 和 $\mathcal H$。直观上，对节点 $X$ 施加干预后，其子节点会发生变化，因而可以据此识别这些子节点。但是，某些子节点的分布在干预后也可能不变，例如存在两条效应相互抵消的路径时。因此，先引入以下记号。给定 DAG $\mathcal G$，如果 $X\in\PA_Y$，且 $X$ 不是 $Y$ 的任何其他父节点的祖先，则称 $X$ 为 $Y$ 的最年轻父节点（youngest parent），记为 $X\in\mathrm{YPA}_Y$。一个节点 $Y$ 可以有多个最年轻父节点。证明需要以下两个论断。
+\begin{enumerate}[label=(\roman*)]
+\item 若 $X\in\mathrm{YPA}_Y^{\mathcal G}$，则从 $X$ 到 $Y$ 存在总因果效应，即存在 $x^\triangle$ 和 $x^\square$，使
+\[P_Y^{\dox{X:=x^\triangle}}\ne P_Y^{\dox{X:=x^\square}}.\]
+这由因果极小性得到。
+\item 若 $Z\in\AN_Y^{\mathcal G}$，则存在 $X_1,\ldots,X_k$，使得 $X_1=Z$、$X_k=Y$，并且对 $i\in\{1,\ldots,k-1\}$，有 $X_i\in\mathrm{YPA}_{X_{i+1}}^{\mathcal G}$。
+\end{enumerate}
+最后，结合这两个论断可知：若 $Z\in\AN_Y^{\mathcal G}$，则存在 $X_1,\ldots,X_k$，使每个 $X_i$ 对 $X_{i+1}$ 都具有总因果效应，其中 $i\in\{1,\ldots,k-1\}$。由命题 6.13，$\mathcal H$ 中也必须存在从 $X_i$ 到 $X_{i+1}$ 的有向因果路径。因此 $Z\in\AN_Y^{\mathcal H}$，由此可知 $\mathcal G$ 与 $\mathcal H$ 具有相同的祖先关系。由于二者都满足因果极小性，便有 $\mathcal G=\mathcal H$，所以这两个模型作为因果图模型是等价的。
+\end{proof}
+
+\section{命题 6.49 的证明}
+\begin{proof}
+根据命题 6.3 的证明，第一个结构因果模型可以写为 $\mathbf X=\mathbf g(\mathbf N)$。由于
+\[\mathbf g(\mathbf n)=\mathbf g^*(\mathbf n)\qquad\forall\mathbf n\text{，只要 }p(\mathbf n)>0,\]
+两个模型显然产生相同的观测分布；同样的论证也适用于干预分布。对于反事实，我们通过对满足 $P(\mathbf X\in A)>0$ 的事件 $\mathbf X\in A$ 条件化，同时涵盖离散与连续两种情形，见定义 6.17。噪声变量的新密度满足
+\[\begin{aligned}
+\widetilde p(n_1,\ldots,n_d)
+&=\begin{cases}\dfrac{p(n_1,\ldots,n_d)}{P(\mathbf X\in A)},&\mathbf g(n_1,\ldots,n_d)\in A,\\0,&\text{否则}\end{cases}\\[3pt]
+&=\begin{cases}\dfrac{p(n_1,\ldots,n_d)}{P(\mathbf g(\mathbf N)\in A)},&\mathbf g^*(n_1,\ldots,n_d)\in A,\\0,&\text{否则}\end{cases}\\[3pt]
+&=\begin{cases}\dfrac{p(n_1,\ldots,n_d)}{P(\mathbf g^*(\mathbf N)\in A)},&\mathbf g^*(n_1,\ldots,n_d)\in A,\\0,&\text{否则}\end{cases}\\[3pt]
+&=\widetilde p^*(n_1,\ldots,n_d).
+\end{aligned}\]
+仍有
+\[\mathbf g(\mathbf n)=\mathbf g^*(\mathbf n)\qquad\forall\mathbf n\text{，只要 }\widetilde p(\mathbf n)>0,\]
+因此，所有反事实陈述均一致。
+\end{proof}
+
+\section{命题 7.1 的证明}
+\begin{proof}
+令 $N_1,\ldots,N_d$ 相互独立，均服从 $0$ 到 $1$ 之间的均匀分布。定义 $X_j:=f_j(\mathbf X_{\PA_j},N_j)$，其中
+\begin{equation}
+f_j(\mathbf{pa}_j,n_j):=F_{X_j\mid\PA_j=\mathbf{pa}_j}^{-1}(n_j),
+\tag{C.4}
+\end{equation}
+$F_{X_j\mid\PA_j=\mathbf{pa}_j}^{-1}$ 是给定 $\PA_j=\mathbf{pa}_j$ 时 $X_j$ 的广义逆累积分布函数。随机变量 $Y$ 的广义逆累积分布函数定义为 $F_Y^{-1}(a):=\inf\{y\in\mathbb R\colon F_Y(y)\ge a\}$。式 (C.4) 保证，在所构造的结构因果模型中，条件分布 $X_j\mid\PA_j=\mathbf{pa}_j$ 具有所需的分布。再由定义 6.21(iii) 中的马尔可夫分解，即得结论。
+\end{proof}
+
+\section{命题 7.4 的证明}
+\begin{proof}
+假定因果极小性不成立。则可以找到节点 $j$ 和 $i\in\PA_j$，使得
+\[X_j=f_j(\PA_j\setminus\{i\},X_i)+N_j\]
+在给定其余所有父节点 $A:=\PA_j\setminus\{i\}$ 后，不再依赖 $X_i$，即 $X_j\indep X_i\mid\mathbf X_A$，见命题 6.36。这里，用 $\mathbf X_A$ 表示 $\PA_j\setminus\{X_i\}$。下面证明，对 $P_{\mathbf X_A,X_i}$ 几乎处处的 $(\mathbf x_A,x_i)$，函数 $f_j$ 都满足 $f_j(\mathbf x_A,x_i)=c_{\mathbf x_A}$。不失一般性，假定 $\mathbb E[N_j]=0$，则 $X_j\mid\PA_j=(\mathbf x_A,x_i)$ 的均值为 $f_j(\mathbf x_A,x_i)$。Dawid [1979] 的式 (2b) 指出，若 $X_j\indep X_i\mid\mathbf X_A$，则 $X_j\mid\mathbf X_A,X_i$ 的密度不依赖 $X_i$ 的取值。因此，条件均值 $f_j(\mathbf x_A,x_i)$ 也不依赖 $x_i$，即 $f_j(\mathbf x_A,x_i)=c_{\mathbf x_A}$。再由 $f_j$ 的连续性可知，$f_j$ 关于最后一个自变量为常数。
+
+反向结论同样由命题 6.36 得到。
+\end{proof}
+
+\section{命题 8.1 的证明}
+\begin{proof}
+利用 Bellman 最优性方程［例如 Sutton and Barto, 2015，第 3.8 节］。对所有满足 $f(s^\circ)=f(s)$ 的 $s^\circ$ 与 $s$，有
+\[\begin{aligned}
+Q^*(s,a)
+&=\sum_{s'}p(s'\mid s,a)\left(\mathbb E[R\mid s',a]+\max_{a'}Q^*(s',a')\right)\\
+&=\sum_{f'}\sum_{s'\colon f(s')=f'}p(s'\mid s,a)
+\left(\mathbb E[R\mid s',a]+\max_{a'}Q^*(s',a')\right)\\
+&=\sum_{f'}p(f'\mid s,a)\left(\mathbb E[R\mid f',a]+\max_{a'}Q^*(s',a')\right)\\
+&=\sum_{f'}p(f'\mid s^\circ,a)\left(\mathbb E[R\mid f',a]+\max_{a'}Q^*(s',a')\right)\\
+&=Q^*(s^\circ,a).
+\end{aligned}\]
+证明完毕。\footnote{译注：原书第三、四行在按 $f'$ 求和时，仍将价值函数写为 $Q^*(s',a')$，未在该式内显式绑定 $s'$。此处保留原式；应结合命题 8.1 所要求的状态表示及其条件理解。}
+\end{proof}
+
+\section{命题 8.2 的证明}
+\begin{proof}
+第一个等式由第 8.2.1 节的讨论得到。根据马尔可夫分解性质，
+\[p(\mathbf x)=p(a\mid s)\,p(s\mid h)\,p(h)\,p(y\mid f,h)\,p(f\mid a),\]
+见图 8.5。再由 $F\indep S\mid A$，得到
+\[\begin{aligned}
+&\int y\frac{\widetilde p(a\mid s)}{p(a\mid s)}p(\mathbf x)\,\mathrm d\mathbf x\\
+&=\int y\widetilde p(a\mid s)p(s\mid h)p(h)p(y\mid f,h)p(f\mid a,s)
+\,\mathrm da\,\mathrm df\,\mathrm dh\,\mathrm ds\,\mathrm dy\\
+&=\int y\widetilde p(f,a\mid s)p(s\mid h)p(h)p(y\mid f,h)
+\,\mathrm da\,\mathrm df\,\mathrm dh\,\mathrm ds\,\mathrm dy\\
+&=\int y\frac{\widetilde p(f\mid s)}{p(f\mid s)}p(s\mid h)p(h)p(y\mid f,h)p(f\mid s)
+\,\mathrm df\,\mathrm dh\,\mathrm ds\,\mathrm dy\\
+&=\int y\frac{\widetilde p(f\mid s)}{p(f\mid s)}p(s\mid h)p(h)p(y\mid f,h)p(f,a\mid s)
+\,\mathrm da\,\mathrm df\,\mathrm dh\,\mathrm ds\,\mathrm dy\\
+&=\int y\frac{\widetilde p(f\mid s)}{p(f\mid s)}p(\mathbf x)\,\mathrm d\mathbf x.
+\end{aligned}\]
+最后一个等式由 $p(f,a\mid s)=p(f\mid a,s)p(a\mid s)$ 得到。
+\end{proof}
+
+\section{命题 9.3 的证明}
+\begin{proof}
+先证明 (i)。从 $\mathbf X$ 上的结构因果模型 $\mathfrak C$ 及其产生的分布 $P_{\mathbf X}$ 出发，考虑每个 $O\in\mathbf O$ 的结构赋值。只要右侧出现 $X\in\mathbf X\setminus\mathbf O$，就反复代入该变量的结构赋值。这样得到一个新的结构因果模型，其中每个 $O\in\mathbf O$ 的结构赋值都含有一个多元误差变量 $\widetilde N_O$。这个较小的模型显然产生相同的观测分布 $P_{\mathbf O}$；对任意 $O\in\mathbf O$ 施加干预时，也产生相同的干预分布。由因果充分性，新噪声变量 $(\widetilde N_O)_{O\in\mathbf O}$ 相互独立。与一维噪声变量的情形相同，见命题 6.31，这同样意味着 $P_{\mathbf O}$ 对诱导出的图结构满足马尔可夫性。最后，利用与命题 7.1 相同的构造，可以将这一新模型转化为误差变量均为一维的结构因果模型，同时保持观测分布与干预分布不变，由此即得结论。关于这一过程更形式化的描述，以及上述论证的更多细节，见 Bongers et al. [2016]。
+
+陈述 (ii) 由例 9.2 得到。
+\end{proof}
+
+\section{定理 10.3 的证明}
+\begin{proof}
+若存在从 $X_{\mathrm{past}(t)}^j$ 到 $X_t^k$ 的箭头，则由忠实性立即得到式 (10.3) 的相依关系，因为两个直接相连的变量不可能被 d-分离。现假定不存在这样的边。那么，给定 $\mathbf X_{\mathrm{past}(t)}^{-j}$ 时，$X_t^k$ 与 $X_{\mathrm{past}(t)}^j$ 被 d-分离。任何沿出边离开 $X_t^k$ 的路径都会包含一个对撞节点，且时间索引大于或等于 $t$ 的后续节点均未被条件化，因此该路径被阻断。任何沿入边离开 $X_t^k$ 的路径也被阻断，因为路径上的下一个节点属于条件集 $\mathbf X_{\mathrm{past}(t)}^{-j}$。
+\end{proof}
+
+\section{定理 10.4 的证明}
+\begin{proof}
+为证明 (i)，考虑一个不存在从 $X$ 到 $Y$ 的箭头的完整时间图。那么，$Y_t$ 到 $X_{\mathrm{past}(t)}$ 的每条路径都被 $Y_{\mathrm{past}(t)}$ 阻断。任何从 $Y_t$ 的出边开始的路径，都必须包含一个不属于条件集的对撞节点，且该节点的后代也不在条件集中；任何从入边开始的路径，则因该路径上的第一个节点位于 $Y_{\mathrm{past}(t)}$ 中而被阻断。
+
+为证明 (ii)，假定 $Y_t$ 存在来自 $X$ 的父节点，其集合记为 $\PA_{Y_t}^X$。则式 (10.5) 蕴含
+\begin{equation}Y_t\indep\PA_{Y_t}^X\mid Y_{\mathrm{past}(t)}.\tag{C.5}\end{equation}
+对于任意 $X_s\in\PA_{Y_t}^X$，根据弱联合性，见第 A.1 节，由式 (C.5) 可得
+\begin{equation}
+Y_t\indep X_s\mid Y_{\mathrm{past}(t)}\cup\big(\PA_{Y_t}^X\setminus\{X_s\}\big).
+\tag{C.6}
+\end{equation}
+根据 Peters et al. [2014，引理 38]，极小性意味着：给定 $Y_t$ 的任意非后代节点集，只要该集合包含除 $A$ 外的其他所有父节点，$Y_t$ 就与其任意父节点 $A$ 相依。因此
+\[Y_t\nindep X_s\mid Y_{\mathrm{past}(t)}\cup\big(\PA_{Y_t}^X\setminus\{X_s\}\big),\]
+这与式 (C.6) 矛盾。
+\end{proof}

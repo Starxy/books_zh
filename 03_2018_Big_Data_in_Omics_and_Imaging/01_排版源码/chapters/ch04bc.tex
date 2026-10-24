@@ -1,0 +1,431 @@
+% 原PDF106页4.7标题—117页末。
+\section{单细胞RNA测序数据分析、基因表达解卷积与遗传筛选}
+
+单细胞RNA测序（single-cell RNA-seq）技术能够测定单个细胞的RNA序列，研究细胞群体内部转录组的异质性。用于群体细胞RNA测序数据分析的一些统计方法和计算算法，可以方便地用于单细胞RNA测序分析（Stegle et al. 2015）。不过，单细胞RNA测序数据也带来了新的计算与分析挑战，需要发展新的分析策略。本节主要讨论细胞类型的识别与表征、与复杂表型和疾病有关的细胞类型的发现、细胞类型特异性表达的估计、不同细胞类型间基因调控网络的推断，以及利用遗传筛选产生的干预数据进行因果推断。
+
+\subsection{细胞类型识别}
+
+传统基因表达分析假设表达量来自同质群体。但在生物学中，生物体具有层级结构，在器官、组织和细胞类型等多个层次上均存在异质性（Pettit et al. 2014）。利用单细胞转录组表征和识别细胞类型，是单细胞RNA测序分析的一个常见应用。无监督聚类方法是识别细胞类型的主要途径。
+
+Wang et al.（2017）提出利用基于多核的单细胞RNA测序分析方法进行数据降维和相似性学习，再利用学得的相似性进行谱聚类，识别细胞类型。
+
+考虑一个 $n\times k$ 维基因表达矩阵 $X$，其中有 $n$ 个细胞、$k$ 个基因。首先介绍谱聚类的相似图。考虑相似图 $G=(V,E)$。图中的每个节点表示一个数据点（细胞），每条边表示相连两个节点之间的相似性，边的权重取相似性度量。于是，细胞聚类问题可表述为：划分此图，使不同组间的边权较小，同一组内的边权较大。考虑细胞（节点）$i$ 和 $j$，记其相似性为 $S_{ij}$，并定义相似矩阵 $S=(S_{ij})_{n\times n}$。
+
+为寻找使细胞聚类最优的相似图，提出优化问题
+\begin{equation}
+\begin{aligned}
+\min_{S,L,W}\quad
+ &\sum_{i=1}^{n}\sum_{j=1}^{n}D(x_i,x_j)S_{ij}
+ +\beta\|S\|_F^2+\gamma\operatorname{Tr}\bigl(L^T(I_n-S)L\bigr)
+ +\rho\sum_lw_l\log w_l\\
+\text{约束为}\quad
+ &D(x_i,x_j)=\sum_lw_lD_l(x_i,x_j),\quad
+ \sum_lw_l=1,\quad w_l\ge0,\\
+ &L^TL=I_C,\qquad\sum_jS_{ij}=1,\quad S_{ij}\ge0,
+\end{aligned}\tag{4.230}
+\end{equation}
+其中，$x_i,x_j$ 为细胞 $i,j$ 的基因表达向量，即矩阵 $X$ 的第 $i,j$ 行；$D_l(x_i,x_j)$ 为这两个细胞之间的第 $l$ 种距离度量，$D(x_i,x_j)$ 是以 $w_l$ 为权重的距离加权和；$I_n,I_C$ 分别是 $n$ 维和 $C$ 维单位矩阵；$\|S\|_F$ 为矩阵 $S$ 的Frobenius范数；$\beta,\gamma$ 为非负惩罚参数。目标函数对向量 $w$ 与矩阵 $S,L$ 最小化。
+
+式（4.7A5）的目标函数第一项表示：两个细胞之间的距离小时，它们应当接近，相似性应当较大。第二个正则项鼓励稀疏相似图。第三项中的矩阵 $I_S-S$ 为图拉普拉斯矩阵，鼓励由相似性度量诱导的相邻节点具有接近的基因表达谱。因此，第三项与 $L$ 的约束一起，使 $S$ 具有低秩聚类结构，并使相似图约有 $C$ 个连通分量；其中节点表示细胞，边权表示两两相似性。第四项施加惩罚，以实现多个核的选择。
+
+将式（4.I.3）代入式（4.I.6），得到优化问题
+\begin{equation}
+\begin{aligned}
+\min_{S,L,W}\quad
+ &-2\sum_{i=1}^{n}\sum_{j=1}^{n}w_lK_l(c_i,c_j)S_{ij}
+ +\beta\|S\|_F^2\\
+ &\quad{}+\gamma\operatorname{Tr}\bigl(L^T(I_n-S)L\bigr)
+ +\rho\sum_lw_l\log w_l\\
+\text{约束为}\quad
+ &D(x_i,x_j)=\sum_lw_lD_l(x_i,x_j),\quad
+ \sum_lw_l=1,\quad w_l\ge0,\\
+ &L^TL=I_C,\qquad\sum_jS_{ij}=1,\quad S_{ij}\ge0.
+\end{aligned}\tag{4.231}
+\end{equation}
+实际中常用高斯核，其定义为
+\begin{equation}
+K(c_i,c_j)=\frac{1}{\sqrt{2\pi}\sigma_{ij}}
+\exp\left(-\frac{\|c_i,c_j\|_2^2}{2\sigma_{ij}^2}\right),\tag{4.232}
+\end{equation}
+其中，$c_i,c_j$ 分别是细胞 $c_i,c_j$ 的实测基因表达向量，$\|c_i-c_j\|_2$ 为欧氏距离。方差 $\sigma_{ij}$ 常按下式计算：
+\begin{equation}
+\sigma_{ij}=\frac{\sigma(\mu_i+\mu_j)}2,
+\qquad
+\mu_i=\frac{\sum_{j\in\operatorname{KNN}(c_i)}\|c_i-c_j\|_2}{k},\tag{4.233}
+\end{equation}
+其中，$\operatorname{KNN}(c_i)$ 表示细胞 $c_i$ 的前 $k$ 个近邻细胞，$k,\sigma$ 是用于生成多个核的参数。
+
+附录4.I给出了基于相似图求解优化问题（4.231）的算法，概括如下。
+
+\begin{bookalgorithm}{4.6：求解优化问题（4.231）的算法}
+\textbf{步骤1：}初始化 $S,w,L$。将多个核的权重初始化为均匀分布向量
+\[
+w^{(0)}=\left[\frac1G,\frac1G,\ldots,\frac1G\right],
+\]
+其中 $G$ 为核的数目。初始相似矩阵定义为
+\[
+S_{ij}=\sum_{l=1}^{G}w_lK_l(c_i,c_j),\qquad S=(S_{ij})_{C\times C}.
+\]
+将矩阵 $S$ 的前 $C$ 个特征向量作为初始矩阵 $L$。
+
+\textbf{步骤2：}固定 $L,w$，更新矩阵 $S$：
+\begin{equation}
+\begin{aligned}
+\min_S\quad
+ &-\sum_{i=1}^{n}\sum_{j=1}^{n}
+ \left[\sum_{l=1}^{G}w_lK_l(c_i,c_j)+\gamma(LL^T)_{ij}\right]S_{ij}
+ +\beta\|S\|_F^2\\
+\text{约束为}\quad&\sum_{j=1}^{n}S_{ij}=1,\qquad S_{ij}\ge0.
+\end{aligned}\tag{4.234}
+\end{equation}
+令 $s_i$ 为 $S$ 的第 $i$ 行，并令
+\[
+(v_i)_j=-\frac{1}{2\beta}
+\left[\gamma(LL^T)_{ij}-\sum_lw_lK_l(c_i,c_j)\right].
+\]
+问题（4.231）的解为
+\begin{equation}
+\begin{aligned}
+(s_i)_j&=\bigl((u_i)_j-\sigma^*\bigr)_+,\\
+\sigma_j&=\bigl(\sigma^*-(u_i)_j\bigr)_+,\\
+f(\sigma^*)&=\sigma^*-\frac1n\sum_{j=1}^{n}
+ \bigl(\sigma^*-(u_i)_j\bigr)_+=0.
+\end{aligned}\tag{4.235}
+\end{equation}
+可以用牛顿法求解式（4.235），得到 $\sigma^*$。
+
+\textbf{步骤3：}固定 $S,w$，更新 $L$。固定 $S,w$ 后，对式（4.I.7）中的隐矩阵 $L$ 最小化目标函数，等价于
+\begin{equation}
+\begin{aligned}
+\min_L\quad &\operatorname{Tr}\bigl(L^T(S-I_n)L\bigr)\\
+\text{约束为}\quad &L^TL=I_C.
+\end{aligned}\tag{4.236}
+\end{equation}
+解矩阵 $L^*$ 为矩阵 $S-I_n$ 最大的 $C$ 个特征值所对应的特征向量：
+\[
+(S-I_n)L=L\Lambda.
+\]
+\textbf{步骤4：}固定 $S,L$，更新 $w$。求解关于 $w$ 的优化问题
+\begin{equation}
+\begin{aligned}
+\min_w\quad
+ &-\sum_{l=1}^{G}w_l\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}
+ +\rho\sum_{l=1}^{G}w_l\log w_l\\
+\text{约束为}\quad&\sum_{l=1}^{G}w_l=1,\qquad w_l\ge0.
+\end{aligned}\tag{4.237}
+\end{equation}
+其解为
+\begin{equation}
+w_l=\frac{
+\exp\left(\frac1\rho\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}\right)}{
+\sum_{l=1}^{G}w_l\exp\left(\frac1\rho\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}\right)},
+\quad l=1,\ldots,G.\tag{4.238}
+\end{equation}
+\textbf{步骤5：}相似性增强。将细胞间的相似性看作可沿相似图传播的信息，用信息扩散理论建立相似性的模型，从而进一步增强相似性。给定相似矩阵 $S$，定义转移矩阵 $P=(P_{ij})_{n\times n}$，其中
+\[
+P_{ij}=\frac{S_{ij}I_{\{j\in N_K(i)\}}}{\sum_lS_{il}I_{\{l\in N_k(i)\}}}.
+\]
+$I_{\{\cdot\}}$ 为指示函数，$N_K(i)$ 表示按照学得的距离度量，细胞 $i$ 的前 $K$ 个近邻细胞的索引集合。利用此转移矩阵迭代更新相似矩阵：
+\[
+H^{(t+1)}=\tau H^{(t)}P+(1-\tau)I_n,
+\]
+其中 $H^{(0)}=S$，将最后一次迭代 $T$ 时的矩阵 $H$ 作为新的相似矩阵 $S$。
+
+\textbf{步骤6：}检查收敛性。设 $\lambda_1\le\lambda_2\le\cdots\le\lambda_n$ 为相似矩阵 $S$ 的特征值，$C$ 为聚类数，定义
+\[
+\operatorname{eigengap}(C)=\lambda_{C+1}-\lambda_C.
+\]
+实际中，当 $\operatorname{eigengap}(C)$ 停止下降时，算法收敛，停止迭代；否则返回步骤2。重复步骤2—6直至收敛。
+
+惩罚参数 $\gamma,\beta$ 由数据确定。令 $x_i$ 为第 $i$ 个细胞的基因表达数据，$x_i^j$ 为其第 $j$ 个最近邻，$m$ 为预定参数。小数据集通常取 $m=10$，大数据集取 $m=30$。参数选择为
+\[
+\gamma=\beta=\frac{1}{2n}\sum_{i=1}^{n}\sum_{j=1}^{m}
+\bigl(\|x_i-x_i^{m+1}\|_2^2-\|x_i-x_i^j\|_2^2\bigr).
+\]
+\end{bookalgorithm}
+上述算法将数据降至 $C$ 维隐空间。接着用谱聚类算法将每个细胞分配至各个聚类。
+
+\begin{bookalgorithm}{4.7：谱聚类算法}
+\textbf{步骤1：}计算对角矩阵 $D=\operatorname{diag}(d_1,d_2,\ldots,d_n)$，其中
+\[
+d_i=\sum_{j=1}^{n}S_{ij}.
+\]
+\textbf{步骤2：}计算拉普拉斯矩阵
+\[
+L=D-S.
+\]
+\textbf{步骤3：}设拉普拉斯矩阵 $L$ 的特征值为 $0=\lambda_1\le\lambda_2\le\cdots\le\lambda_n$。
+计算其前 $C$ 个特征向量 $u_1,\ldots,u_C$，并将它们作为列向量组成矩阵 $U\in\mathbb R^{n\times C}$。
+
+\textbf{步骤4：}令 $y_i\in\mathbb R^C$ 为矩阵 $U$ 第 $i$ 行的向量。利用 $k$ 均值算法，将点集 $\{y_1,\ldots,y_n\}$ 聚为 $A_1,\ldots,A_C$。
+\end{bookalgorithm}
+
+\subsection{基因表达解卷积与细胞类型特异性表达}
+
+生物样本的细胞组成高度异质（Shai et al. 2013）。测量细胞类型特异性基因表达，是理解细胞功能、生物过程和疾病机制的关键（Nelms et al. 2016）。但获取细胞特异性基因表达谱在技术上十分困难。一种解决办法是计算解卷积，直接从异质样本推断细胞类型特异性表达。细胞特异性表达控制细胞分化、决定细胞特异性表型，并提供识别细胞身份的基本特征。解卷积（deconvolution）或源分离，是从混合信号中估计单个信号成分的常用方法（Mohammadi et al. 2017）。基因表达解卷积的任务是：（1）识别组织中的组成细胞类型；（2）发现这些类型在组织中的相对比例；（3）精确估计每种细胞类型的基因表达水平。
+
+\subsubsection{基因表达解卷积的表述}
+
+常用基因表达解卷积模型假设，混合组织中某个基因的表达量，是其组成细胞类型表达量之和。
+
+令 $A\in\mathbb R^{n\times m}$ 为混合矩阵，其元素 $a_{ij}$ 表示异质样本 $j$ 中基因 $i$ 的原始表达量。每行表示一个基因在各组织样本中的表达，每列表示某个样本中全部待研究基因的表达向量。
+
+令 $X\in\mathbb R^{n\times K}$ 为参考表达矩阵，$K$ 为细胞类型数；每列表示一种细胞类型的平均基因表达向量，每行表示一个基因在各细胞类型中的表达。
+
+最后，令 $Y\in\mathbb R^{K\times m}$ 为细胞组成矩阵，$y_{kj}$ 为样本 $j$ 中细胞类型 $k$ 的比例。行对应细胞类型，列对应混合矩阵中的样本。我们用 $X,Y$ 近似 $A$，目标是寻找参考表达矩阵 $X$ 与细胞组成矩阵 $Y$，使其乘积尽可能接近混合矩阵 $A$。因此，表达解卷积可表述为（图4.27）
+\begin{equation}
+A=XY+E,\tag{4.239}
+\end{equation}
+其中
+\[
+A=\begin{bmatrix}a_{11}&\cdots&a_{1m}\\\vdots&\vdots&\vdots\\a_{n1}&\cdots&a_{am}\end{bmatrix},\quad
+X=\begin{bmatrix}x_{11}&\cdots&x_{1K}\\\vdots&\vdots&\vdots\\x_{n1}&\cdots&x_{iK}\end{bmatrix},
+\]
+\[
+Y=\begin{bmatrix}y_{11}&\cdots&y_{1m}\\\vdots&\vdots&\vdots\\y_{K1}&\cdots&y_{Km}\end{bmatrix},\quad
+E=\begin{bmatrix}e_{11}&\cdots&e_{1m}\\\vdots&\vdots&\vdots\\e_{n1}&\cdots&e_{nm}\end{bmatrix}.
+\]
+\begin{figure}[htbp]
+\centering
+\resizebox{.98\linewidth}{!}{\input{figures/ch04b_fig27.tex}}
+\origfig{27}{基因表达解卷积示意图。}
+\end{figure}
+假设 $y_{kj}$ 非负，并且 $\sum_{k=1}^{K}y_{kj}=1$。可将 $X$ 的列向量看作一组基，将 $Y$ 的列看作组织样本表达在这些基上的投影，或组织表达的基展开。因此，解卷积可以看作降维问题。
+
+当 $X,Y$ 均未知时，称为完全解卷积（full deconvolution）；当 $Y$ 或 $X$ 中的一个已知时，称为部分解卷积（partial deconvolution）。
+
+为了由模型（4.239）估计 $X,Y$，需要定义损失函数并施加约束。由于解卷积可看作降维问题，因此可以形式化为广义低秩模型（Udell et al. 2016）：
+\begin{equation}
+\operatorname{minimize}\quad
+\sum_{(i,j)\in\Omega}L_{ij}(x_iy_j,a_{ij})
++\sum_{i=1}^{n}r_i(x_i)+\sum_{j=1}^{m}\widetilde r_j(y_j),\tag{4.240}
+\end{equation}
+其中，$x_i\in\mathbb R^{1\times K}$ 是 $X$ 的第 $i$ 行，$y_j\in\mathbb R^K$ 是 $Y$ 的第 $j$ 列，$\Omega\subset\{1,\ldots,n\}\times\{1,\ldots,m\}$。
+对 $i=1,\ldots,n$、$j=1,\ldots,m$，$L_{ij}:\mathbb R\times\mathbb R\to\mathbb R_+$ 是给定损失函数；$\widetilde r_i:\mathbb R^K\to\mathbb R\cup\{\infty\}$ 和 $\widetilde r_j:\mathbb R^K\to\mathbb R\cup\{\infty\}$ 是正则项。
+
+基于回归的解卷积方法和非负矩阵分解方法，均可表述为广义低秩模型。
+
+\subsubsection{损失函数与正则化}
+
+\bookdeepheading{paragraph}{4.7.2.2.1}{损失函数}
+损失函数取决于数据。有些损失函数对给定噪声分布具有渐近最优性，另一些则在假定的噪声分布不成立时仍有良好表现。以下概括常用损失函数（Mohammadi et al. 2017; Udell et al. 2016）。
+
+\bookdeepheading{subparagraph}{4.7.2.2.1.1}{二次损失函数}
+假设噪声服从高斯分布，通常采用经典平方损失函数。平方损失函数记为 $l_2$，定义为
+\begin{equation}
+L_{ij}(x_iy_j,a_{ij})=(a_{ij}-x_iy_j)^2.\tag{4.241}
+\end{equation}
+\bookdeepheading{subparagraph}{4.7.2.2.1.2}{绝对偏差损失函数}
+绝对偏差损失函数对极端值较不敏感，因此常用于存在异常值的情形。该函数记为 $l_1$，定义为
+\begin{equation}
+L_{ij}(x_iy_j,a_{ij})=|a_{ij}-x_iy_j|.\tag{4.242}
+\end{equation}
+\bookdeepheading{subparagraph}{4.7.2.2.1.3}{Huber损失函数}
+Huber损失函数记为 $l_{\mathrm{Huber}}$，定义为
+\begin{equation}
+L_{ij}(x_iy_j,a_{ij})=
+\begin{cases}
+\frac12(a_{ij}-x_iy_j)^2,&|a_{ij}-x_iy_j|\le1,\\
+|a_{ij}-x_iy_j|-\frac12,&|a_{ij}-x_iy_j|>1.
+\end{cases}\tag{4.243}
+\end{equation}
+Huber损失函数结合了 $l_1$ 和 $l_2$ 损失函数。相对于 $l_1$，它对小误差较不敏感；相对于 $l_2$，它对异常值较不敏感。
+
+\bookdeepheading{subparagraph}{4.7.2.2.1.4}{泊松损失函数}
+假设表达数据为读段计数，泊松损失函数定义为
+\begin{equation}
+L_{ij}(x_iy_j,a_{ij})=\exp(x_iy_j)-a_{ij}x_iy_j+a_{ij}\log a_{ij}-a_{ij}.\tag{4.244}
+\end{equation}
+泊松损失函数可直接应用于RNA测序数据的解卷积。
+
+\bookdeepheading{subparagraph}{4.7.2.2.1.5}{支持向量机损失函数}
+$\varepsilon$ 不敏感损失函数可用于支持向量回归，常称为支持向量机（support vector machine，SVM）损失函数。它对大于阈值的误差施加惩罚，定义为
+\begin{equation}
+L_{ij}(x_iy_j,a_{ij})=\max(0,|a_{ij}-x_iy_j|-\varepsilon),\tag{4.245}
+\end{equation}
+其中，$\varepsilon$ 为预先指定的阈值。
+
+\bookdeepheading{subparagraph}{4.7.2.2.1.6}{合页损失函数}
+合页损失函数（hinge loss function）定义为
+\begin{equation}
+L_{ij}(x_iy_j,a_{ij})=\max(0,1-a_{ij}x_iy_j)=|1-a_{ij}x_iy_j|_+.\tag{4.246}
+\end{equation}
+合页损失函数的经验风险最小化等价于经典SVM表述。
+
+\bookdeepheading{paragraph}{4.7.2.2.2}{约束与正则化}
+参考表达谱中的某些细胞类型，可能并不存在于混合样本中。我们也常观察到某些组成细胞类型高度相关。为了识别特定样本中的细胞类型，并消除细胞类型之间的相关性，通常对分解进行正则化以获得稀疏解。常用正则项概括如下。
+
+\bookdeepheading{subparagraph}{4.7.2.2.2.1}{\texorpdfstring{$l_2$}{l2}正则项}
+在完全解卷积中，$l_2$ 或二次正则项定义为
+\begin{equation}
+\gamma\sum_{i=1}^{n}r_i(x_i)=\gamma\sum_{i=1}^{n}\|x_i\|_2^2,
+\qquad
+\gamma\sum_{j=1}^{m}\widetilde r_j(y_j)=\gamma\sum_{j=1}^{m}\|y_j\|_2^2.\tag{4.247}
+\end{equation}
+部分解卷积中，每种细胞类型的参考谱已知，只需对细胞比例变量正则化：
+\begin{equation}
+\gamma\sum_{j=1}^{m}\widetilde r_j(y_j)=\gamma\sum_{j=1}^{m}\|y_j\|_2^2.\tag{4.248}
+\end{equation}
+\bookdeepheading{subparagraph}{4.7.2.2.2.2}{\texorpdfstring{$l_1$}{l1}正则项}
+为了识别组织样本中的细胞类型，利用 $l_1$ 对细胞类型比例向量施加稀疏约束。其定义为
+\begin{equation}
+\gamma\|Y\|_1=\gamma\sum_{j=1}^{m}\widetilde r_j(y_j)
+=\gamma\sum_{j=1}^{m}\|y_j\|_1.\tag{4.249}
+\end{equation}
+通常，$l_1$ 正则项将某些细胞类型收缩至零，保留组织样本中存在的细胞类型。
+
+\bookdeepheading{subparagraph}{4.7.2.2.2.3}{非负正则项}
+可定义约束 $r=I_+$ 与 $\widetilde r=I_+$，其中 $I_+$ 为非负值的指示函数。这两个正则项称为非负正则项。
+
+广义低秩模型
+\begin{equation}
+\min_{X,Y}\quad
+\sum_{i=1}^{n}\sum_{j=1}^{m}(a_{ij}-x_iy_j)^2
++\lambda\sum_{i=1}^{n}r(x_i)+\lambda\sum_{j=1}^{m}\widetilde r(y_j),\tag{4.250}
+\end{equation}
+其中
+\[
+r(x_i)=\begin{cases}0,&0\le x_{ik},\quad\sum_{k=1}^{K}x_{ik}=1,\\
+\infty,&\text{其他情形},\end{cases}\qquad
+\widetilde r(y_j)=\begin{cases}0,&y_{kj}\ge0,\quad k=1,\ldots,K,\\
+\infty,&\text{其他情形},\end{cases}
+\]
+称为非负矩阵分解（nonnegative matrix factorization，NNMF）。
+
+\subsubsection{拟合广义低秩模型的算法}
+
+精确求解非负矩阵分解是NP难问题（Vavasis 2009）。通常，寻找广义低秩模型的全局最优解在计算上难以实现。在《Big Data in Omics and Imaging: Association Analysis》（Xiong 2018）第8.4.3节中，介绍了一种基于交替近端梯度算法的局部优化方法。这里给出一个简单例子。
+
+\begin{bookexample}{4.11}
+考虑用于基因表达解卷积的非负矩阵分解问题：
+\begin{equation}
+\begin{aligned}
+\min_{X,Y}\quad&\|A-XY\|_F^2+\lambda\|Y\|_1\\
+\text{约束为}\quad&x_{ij}\ge0,\quad y_{ij}\ge0.
+\end{aligned}\tag{4.251}
+\end{equation}
+可用指示函数表述非负约束。定义
+\[
+I_{\mathbb R_{nK}^{+}}(X)=\begin{cases}0,&\forall(i,j)\ x_{ik}\ge0,\\+\infty,&\text{其他情形},\end{cases}\quad
+I_{\mathbb R_{Km}^{+}}(Y)=\begin{cases}0,&\forall(i,j)\ y_{kj}\ge0,\\+\infty,&\text{其他情形}.\end{cases}
+\]
+将约束优化问题（4.251）重新表述为无约束问题（Rapin et al. 2012）：
+\begin{equation}
+\min_{X,Y}\quad\|A-XY\|_F^2+\lambda\|Y\|_1
++I_{\mathbb R_{nK}^{+}}(X)+I_{\mathbb R_{Km}^{+}}(Y).\tag{4.252}
+\end{equation}
+对问题（4.251）应用交替最小化算法，可得
+\begin{equation}
+\min_Y\quad\|A-X^{(t)}Y\|_F^2+\lambda\|Y\|_1+I_{\mathbb R_{Km}^{+}}(Y),\tag{4.253}
+\end{equation}
+以及
+\begin{equation}
+\min_X\quad\|A-XY^{(t+1)}\|_F^2+I_{\mathbb R_{nK}^{+}}(X).\tag{4.254}
+\end{equation}
+接下来证明
+\begin{equation}
+\operatorname{Prox}_{I_{\mathbb R_+}+\lambda|y_{ij}|_1}(v_{ij})
+=(v_{ij}-\lambda)_+.\tag{4.255}
+\end{equation}
+令 $f(y_{ij})=\lambda|y_{ij}|$，$r(y_{ij})=I_{\mathbb R_+}(y_{ij})$。
+由prox-prox方法（Xiong 2018，前述著作第8.4.3.3节），有
+\begin{equation}
+\operatorname{Prox}_{I_{\mathbb R_+}+\lambda|y_{ij}|_1}(v_{ij})
+=\operatorname{Prox}_r\bigl(\operatorname{Prox}_f(v_{ij})\bigr).\tag{4.256}
+\end{equation}
+由式（1.137）（Xiong 2018）可得
+\begin{equation}
+\operatorname{Prox}_{\lambda|y_{ij}|}(v_{ij})=
+\begin{cases}
+v_{ij}-\lambda,&v_{ij}>\lambda,\\
+0,&|v_{ij}|\le\lambda,\\
+v_{ij}+\lambda,&v_{ij}<-\lambda.
+\end{cases}\tag{4.257}
+\end{equation}
+回顾
+\begin{equation}
+\operatorname{Prox}_{I_{\mathbb R_+}}(w_{ij})=(w_{ij})_+.\tag{4.258}
+\end{equation}
+结合式（4.256）—（4.258），得到
+\begin{equation}
+\operatorname{Prox}_{I_{\mathbb R_+}+\lambda|y_{ij}|_1}(v_{ij})
+=(v_{ij}-\lambda)_+.\tag{4.259}
+\end{equation}
+因此，由式（1.45）（Xiong 2018）与式（4.259）可得
+\begin{equation}
+\operatorname{Prox}_{I_{\mathbb R_{Km}^{+}}+\lambda\|Y\|_1}(W)
+=(W-\lambda\mathbf1_{Km})_+,\tag{4.260}
+\end{equation}
+其中，$\mathbf1_{Km}$ 为元素全为1的 $K\times m$ 维矩阵。
+
+现在求解优化问题
+\begin{equation}
+\min_Y\quad F=\|A-X^{(t)}Y\|_F^2.\tag{4.261}
+\end{equation}
+令 $\partial F/\partial Y=0$，利用矩阵微积分，得到
+\begin{equation}
+-(X^{(t)})^T(A-X^{(t)}Y)=0.\tag{4.262}
+\end{equation}
+对矩阵 $Y$ 求解式（4.262），得到
+\begin{equation}
+Y^*=\bigl((X^{(t)})^T(X^{(t)})\bigr)^{-1}(X^{(t)})^TA.\tag{4.263}
+\end{equation}
+利用式（4.260）与式（4.263），求解式（4.253）的更新为
+\begin{equation}
+Y^{(t+1)}=\left(
+\bigl((X^{(t)})^T(X^{(t)})\bigr)^{-1}(X^{(t)})^TA-\lambda\mathbf1_{Km}
+\right)_+.\tag{4.264}
+\end{equation}
+类似地，得到 $X$ 的更新：
+\begin{equation}
+X^{(t+1)}=\left(
+A(Y^{(t+1)})^T\bigl(Y^{(t+1)}(Y^{(t+1)})^T\bigr)^{-1}
+\right)_+.\tag{4.265}
+\end{equation}
+\end{bookexample}
+
+算法概括如下。
+\begin{bookalgorithm}{4.8：用于完全表达卷积的稀疏非负矩阵分解算法}
+\textbf{步骤1：}初始化。假设有 $K$ 种细胞类型，对混合矩阵 $A$ 作奇异值分解：
+\begin{equation}
+A=U\Sigma V^T.\tag{4.266}
+\end{equation}
+定义 $U_K=[u_1,\ldots,u_K]$、$V_K=[v_1,\ldots,v_K]$、
+$\Sigma_K=\operatorname{diag}(\sigma_1,\ldots,\sigma_K)$，
+其中 $u_k,v_k,\sigma_k$ 分别是矩阵 $U,V,\Sigma$ 的组成部分。定义
+\begin{equation}
+X=U_K\Sigma_K^{1/2},\qquad Y=\Sigma_K^{1/2}V_K^T.\tag{4.267}
+\end{equation}
+选择初始惩罚参数 $\lambda^{(0)}$。
+
+\textbf{步骤2：}重复以下过程直至收敛。
+\begin{enumerate}[label=\alph*.]
+\item 计算
+\begin{equation}
+Y^{(t+1)}=\left(
+\bigl((X^{(t)})^T(X^{(t)})\bigr)^{-1}(X^{(t)})^TA-\lambda^{(t)}\mathbf1_{Km}
+\right)_+.\tag{4.268}
+\end{equation}
+\item 计算
+\begin{equation}
+X^{(t+1)}=\left(
+A(Y^{(t+1)})^T\bigl(Y^{(t+1)}(Y^{(t+1)})^T\bigr)^{-1}
+\right)_+.\tag{4.269}
+\end{equation}
+\end{enumerate}
+\textbf{步骤3：}检查收敛性。如果 $\|Y^{(t+1)}-Y^{(t)}\|_F<\varepsilon$ 且
+$\|X^{(t+1)}-X^{(t)}\|_F<\varepsilon$，其中 $\varepsilon$ 为预先指定的误差，
+则令 $Y:=Y^{(t+1)}$、$X:=X^{(t+1)}$，停止。否则：
+
+\noindent c. $t:=t+1$；$Y^{(t)}:=Y^{(t+1)}$；$X^{(t)}:=X^{(t+1)}$；$\lambda^{(t)}=\alpha\lambda^{(t)}$。
+
+返回步骤2。结束。
+\end{bookalgorithm}
+
+\begin{bookalgorithm}{4.9：用于部分表达卷积的稀疏非负矩阵分解算法}
+对于 $\lambda^1,\lambda^2,\ldots,\lambda^T$，计算
+\begin{equation}
+Y^{(t)}=(X^TX)^{-1}\bigl(X^TA-\lambda^{(t)}\mathbf1_{Km}\bigr)_+.\tag{4.270}
+\end{equation}
+结束。
+\end{bookalgorithm}

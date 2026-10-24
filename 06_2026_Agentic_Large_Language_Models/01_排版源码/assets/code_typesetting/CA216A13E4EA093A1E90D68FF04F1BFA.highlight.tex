@@ -1,0 +1,45 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{langchain.agents}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{initialize\PYGZus{}agent}\PYG{p}{,} \PYG{n}{AgentType}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{langchain\PYGZus{}google\PYGZus{}genai}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{ChatGoogleGenerativeAI}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{langchain.tools}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{tool}
+
+\PYG{c+c1}{\PYGZsh{} 1. Define a tool using the `@tool` decorator.}
+\PYG{c+c1}{\PYGZsh{}    This function is now a callable tool for the agent.}
+\PYG{c+c1}{\PYGZsh{}    The docstring is used as the tool\PYGZsq{}s description,}
+\PYG{c+c1}{\PYGZsh{}    which the LLM will read to decide when to use it.}
+\PYG{n+nd}{@tool}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{is\PYGZus{}prime}\PYG{p}{(}\PYG{n}{number}\PYG{p}{:} \PYG{n+nb}{int}\PYG{p}{)} \PYG{o}{\PYGZhy{}\PYGZgt{}} \PYG{n+nb}{str}\PYG{p}{:}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Checks if a given integer is a prime number.}
+\PYG{l+s+sd}{    The input should be a single integer.}
+
+\PYG{l+s+sd}{    Example: is\PYGZus{}prime(17) would return \PYGZsq{}True\PYGZsq{}.}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{k}{if} \PYG{n}{number} \PYG{o}{\PYGZlt{}=} \PYG{l+m+mi}{1}\PYG{p}{:}
+        \PYG{k}{return} \PYG{l+s+s1}{\PYGZsq{}False\PYGZsq{}}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{number}\PYG{o}{**}\PYG{l+m+mf}{0.5}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n}{number} \PYG{o}{\PYGZpc{}} \PYG{n}{i} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{k}{return} \PYG{l+s+s1}{\PYGZsq{}False\PYGZsq{}}
+    \PYG{k}{return} \PYG{l+s+s1}{\PYGZsq{}True\PYGZsq{}}
+
+\PYG{c+c1}{\PYGZsh{} 2. Initialize the LLM and the tools for the agent.}
+\PYG{c+c1}{\PYGZsh{}    We\PYGZsq{}ll use gemini\PYGZhy{}2.5\PYGZhy{}flash\PYGZhy{}preview\PYGZhy{}05\PYGZhy{}20 as the LLM.}
+\PYG{c+c1}{\PYGZsh{}    The API key is handled automatically in this environment.}
+\PYG{n}{llm} \PYG{o}{=} \PYG{n}{ChatGoogleGenerativeAI}\PYG{p}{(}\PYG{n}{model}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}gemini\PYGZhy{}2.5\PYGZhy{}flash\PYGZhy{}preview\PYGZhy{}05\PYGZhy{}20\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{tools} \PYG{o}{=} \PYG{p}{[}\PYG{n}{is\PYGZus{}prime}\PYG{p}{]}
+
+\PYG{c+c1}{\PYGZsh{} 3. Initialize the agent with the LLM, tools, and a type.}
+\PYG{n}{agent} \PYG{o}{=} \PYG{n}{initialize\PYGZus{}agent}\PYG{p}{(}
+    \PYG{n}{tools}\PYG{p}{,}
+    \PYG{n}{llm}\PYG{p}{,}
+    \PYG{n}{agent}\PYG{o}{=}\PYG{n}{AgentType}\PYG{o}{.}\PYG{n}{ZERO\PYGZus{}SHOT\PYGZus{}REACT\PYGZus{}DESCRIPTION}\PYG{p}{,}
+    \PYG{n}{verbose}\PYG{o}{=}\PYG{k+kc}{True}
+\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 4. Run the agent with a user prompt.}
+\PYG{c+c1}{\PYGZsh{}    The agent will reason, call the tool, and then formulate a final answer.}
+\PYG{n}{user\PYGZus{}prompt} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Is the number 97 a prime number? Please give a \PYGZsq{}Yes\PYGZsq{} or \PYGZsq{}No\PYGZsq{} answer.\PYGZdq{}}
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{agent}\PYG{o}{.}\PYG{n}{run}\PYG{p}{(}\PYG{n}{user\PYGZus{}prompt}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} The agent\PYGZsq{}s execution loop:}
+\PYG{c+c1}{\PYGZsh{} It will print the \PYGZsq{}Thought\PYGZsq{} and \PYGZsq{}Action\PYGZsq{} steps to the console.}
+\end{MintedVerbatim}

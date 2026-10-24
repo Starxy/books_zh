@@ -1,0 +1,145 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\vstep{1.3cm}
+\def\ssep{1.0cm}
+
+\tikzstyle{snode} = [minimum width=2.5*\ssep,minimum height=1.2*\ssep,inner sep=2pt,draw,thick]
+\tikzstyle{shadenode} = [minimum width=2.3*\ssep,minimum height=0.65*\ssep,inner sep=2pt,fill=gray!20]
+
+%%% step 1: pre-training + instruction tuning
+\begin{scope}
+
+\node [snode,anchor=west] (llm) at (0,0) {LLM};
+
+\node [snode,anchor=south,rounded corners=3pt] (pretraindata) at ([yshift=\ssep]llm.north) {};
+\node [anchor=north] (pretraindatalabel1) at (pretraindata.north) {\scriptsize{预训练数据}};
+\node [anchor=south west] (pretraindatalabel2) at ([xshift=0.2em,yshift=0.2em]pretraindata.south west) {\tiny{我喜欢这里的食物！…… }};
+\node [anchor=south west] (pretraindatalabel3) at ([yshift=-0.15cm]pretraindatalabel2.north west) {\tiny{我怎么才能到那里？……}};
+
+
+\node [snode,anchor=south,rounded corners=3pt] (finetuningdata) at ([yshift=0.1cm]pretraindata.north) {};
+\node [anchor=north] (finetuningdatalabel1) at (finetuningdata.north) {\scriptsize{SFT 数据}};
+\node [anchor=south west] (finetuningdatalabel2) at ([xshift=0.2em,yshift=0.2em]finetuningdata.south west) {\tiny{伦敦天气的诗。…… }};
+\node [anchor=south west] (finetuningdatalabel3) at ([yshift=-0.15cm]finetuningdatalabel2.north west) {\tiny{写一首关于}};
+
+\begin{pgfonlayer}{background}
+\node [shadenode,anchor=south,rounded corners=2pt] (pretraindatashade) at ([yshift=0.3em]pretraindata.south) {};
+\node [shadenode,anchor=south,rounded corners=2pt] (finetuningdatashade) at ([yshift=0.3em]finetuningdata.south) {};
+\end{pgfonlayer}
+
+\draw [-{Stealth[length=3mm]},thick,double,double distance=1pt] ([yshift=-2pt]pretraindata.south) --  ([yshift=2pt]llm.north);
+
+\node [anchor=west] (trainlabel) at ([yshift=0.6*\ssep,xshift=0.3em]llm.north) {\scriptsize{预训练与}};
+\node [anchor=north west] (trainlabel2) at ([yshift=0.5em]trainlabel.south west) {\scriptsize{监督微调}};
+
+\node [anchor=north] (caption) at ([yshift=-0.8em]llm.south) {\small{（a）学习初始 LLM}};
+
+\end{scope}
+
+%%% step 2: collecting comparison data
+\begin{scope} [xshift=6cm]
+
+\node [snode,anchor=west] (llm) at (0,0) {LLM};
+
+\node [snode,anchor=west,rounded corners=3pt] (userdata) at ([xshift=1.0*\ssep]llm.east) {};
+\node [anchor=north] (userdatalabel1) at (userdata.north) {\scriptsize{用户输入}};
+\node [anchor=south west] (userdatalabel2) at ([xshift=0.2em,yshift=0.2em]userdata.south west) {\tiny{过上更环保的生活？}};
+\node [anchor=south west] (userdatalabel3) at ([yshift=-0.15cm]userdatalabel2.north west) {\tiny{怎样才能}};
+
+\draw [->,thick] ([xshift=-0.1em]userdata.west) -- ([xshift=0.1em]llm.east);
+
+\node [snode,anchor=south,rounded corners=3pt] (predictdata) at ([yshift=1.0*\ssep]llm.north) {};
+\node [anchor=north] (predictdatalabel1) at (predictdata.north) {\scriptsize{模型输出}};
+\node [anchor=south west] (predictdatalabel2) at ([xshift=0.2em,yshift=0.2em]predictdata.south west) {\tiny{3. ............\ \ \ \ 4. ............}};
+\node [anchor=south west] (predictdatalabel3) at ([yshift=-0.15cm]predictdatalabel2.north west) {\tiny{1. ............\ \ \ \ 2. ............}};
+
+
+\draw [->,thick] ([yshift=0.1em]llm.north) -- ([yshift=-0.1em]predictdata.south);
+\node [anchor=west] (predictlabel) at ([yshift=0.5*\ssep,xshift=0.3em]llm.north) {\scriptsize{预测}};
+
+\node [snode,anchor=south,rounded corners=3pt] (compdata) at ([yshift=1.0*\ssep]predictdata.north) {};
+\node [anchor=north] (compdatalabel1) at (compdata.north) {\scriptsize{比较结果}};
+\node [anchor=south west] (compdatalabel2) at ([xshift=0.2em,yshift=0.6em]compdata.south west) {\tiny{$\mathbf{y}_1  \succ \mathbf{y}_4 \succ \mathbf{y}_2 \succ \mathbf{y}_3$}};
+
+\draw [->,thick] ([yshift=0.1em]predictdata.north) -- ([yshift=-0.1em]compdata.south);
+\node [anchor=west] (complabel) at ([yshift=0.5*\ssep,xshift=0.3em]predictdata.north) {\scriptsize{按人类偏好标注数据}};
+
+\begin{pgfonlayer}{background}
+\node [shadenode,minimum width=2.4*\ssep,anchor=south,rounded corners=2pt] (userdatashade) at ([yshift=0.3em]userdata.south) {};
+\node [shadenode,anchor=south,rounded corners=2pt] (predictdatashade) at ([yshift=0.3em]predictdata.south) {};
+\node [shadenode,anchor=south,rounded corners=2pt] (compdatashade) at ([yshift=0.3em]compdata.south) {};
+\end{pgfonlayer}
+
+\node [anchor=north] (caption) at ([yshift=-0.8em,xshift=0.5*\ssep]llm.south east) {\small{(b) 按人类偏好标注数据}};
+
+\end{scope}
+
+%%% step 3: training the reward model
+\begin{scope} [yshift=-10cm]
+
+\node [snode,anchor=west] (reward) at (0,0) {奖励模型};
+
+\node [snode,anchor=south,rounded corners=3pt] (compdata) at ([yshift=\ssep]reward.north) {};
+\node [anchor=north] (compdatalabel1) at (compdata.north) {\scriptsize{比较数据}};
+\node [anchor=south west] (compdatalabel2) at ([xshift=0.2em,yshift=0.5em]compdata.south west) {\hspace{0.0em} \tiny{$\{(\mathbf{x},\mathbf{y}_{k_1} \succ \mathbf{y}_{k_2})\}$}};
+
+\begin{pgfonlayer}{background}
+\node [shadenode,anchor=south,rounded corners=2pt] (compdatashade) at ([yshift=0.3em]compdata.south) {};
+\end{pgfonlayer}
+
+\draw [-{Stealth[length=3mm]},thick,double,double distance=1pt] ([yshift=-2pt]compdata.south) --  ([yshift=2pt]reward.north);
+
+\node [anchor=west] (trainlabel) at ([yshift=0.5*\ssep,xshift=0.3em]reward.north) {\scriptsize{训练}};
+
+\node [anchor=north] (caption) at ([yshift=-0.8em]reward.south) {\small{（c）训练奖励模型}};
+
+\end{scope}
+
+%%% step 4: training the policy
+\begin{scope} [yshift=-10cm,xshift=6cm]
+
+\node [snode,anchor=west] (llm) at (0,0) {LLM};
+\node [anchor=south] (llmlabel) at (llm.south) {\scriptsize{（策略）}};
+
+\node [snode,anchor=west,rounded corners=3pt] (userdata) at ([xshift=1.0*\ssep]llm.east) {};
+\node [anchor=north] (userdatalabel1) at (userdata.north) {\scriptsize{数据集 $\mathcal{D}$}};
+\node [anchor=south west] (userdatalabel2) at ([xshift=2em,yshift=0.5em]userdata.south west) {\scriptsize{$\mathbf{x} \sim \mathcal{D}$}};
+
+\draw [->,thick] ([xshift=-0.1em]userdata.west) -- ([xshift=0.1em]llm.east);
+
+\node [snode,anchor=south,rounded corners=3pt] (predictdata) at ([yshift=1.0*\ssep]llm.north) {};
+\node [anchor=north] (predictdatalabel1) at (predictdata.north) {\scriptsize{输入—输出对}};
+\node [anchor=south west] (predictdatalabel2) at ([xshift=2em,yshift=0.5em]predictdata.south west) {\scriptsize{$\{\mathbf{x},\mathbf{y}\}$}};
+
+
+\draw [->,thick] ([yshift=0.1em]llm.north) -- ([yshift=-0.1em]predictdata.south);
+\node [anchor=west] (predictlabel) at ([yshift=0.5*\ssep,xshift=0.3em]llm.north) {\scriptsize{按策略 $\Pr(\mathbf{y}|\mathbf{x})$ 采样 $\mathbf{y}$}};
+
+\node [snode,anchor=south] (rewardmodel) at ([yshift=1.0*\ssep]predictdata.north) {奖励模型};
+
+\draw [->,thick] ([yshift=0.1em]predictdata.north) -- ([yshift=-0.1em]rewardmodel.south);
+
+\node [snode,anchor=south,rounded corners=3pt] (rewarddata) at ([yshift=1.0*\ssep]rewardmodel.north) {};
+\node [anchor=north] (rewarddatalabel1) at (rewarddata.north) {\scriptsize{奖励分数}};
+\node [anchor=south west] (rewarddatalabel2) at ([xshift=1.5em,yshift=0.5em]rewarddata.south west) {\scriptsize{$\{r(\mathbf{x},\mathbf{y})\}$}};
+
+\draw [->,thick] ([yshift=0.1em]rewardmodel.north) -- ([yshift=-0.1em]rewarddata.south);
+\node [anchor=west] (rewardlabel) at ([yshift=0.5*\ssep,xshift=0.3em]rewardmodel.north) {\scriptsize{评估输入—输出对}};
+
+\begin{pgfonlayer}{background}
+\node [shadenode,anchor=south,rounded corners=2pt] (userdatashade) at ([yshift=0.3em]userdata.south) {};
+\node [shadenode,anchor=south,rounded corners=2pt] (predictdatashade) at ([yshift=0.3em]predictdata.south) {};
+\node [shadenode,anchor=south,rounded corners=2pt] (rewarddatashade) at ([yshift=0.3em]rewarddata.south) {};
+\end{pgfonlayer}
+
+\node [anchor=north] (caption) at ([yshift=-0.8em,xshift=0.5*\ssep]llm.south east) {\small{（d）训练/微调策略}};
+
+\draw [thick,double,double distance=1pt] ([xshift=-1pt]rewarddata.west) .. controls +(210:1.5cm) and +(150:1.5cm) .. ([xshift=-3pt]llm.west) node [pos=0.5,left,xshift=1.0em,yshift=2.5em,rotate=90] (rlfinetuning) {\scriptsize{强化学习微调}};
+\draw [-{Stealth[length=3mm]}] ([xshift=-0.35em,yshift=0.07em]llm.west) -- ([xshift=-1pt,yshift=-0.23em]llm.west);
+
+\end{scope}
+	
+\end{tikzpicture}

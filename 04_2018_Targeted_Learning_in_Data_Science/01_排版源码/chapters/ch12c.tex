@@ -1,0 +1,67 @@
+% 源分章 PDF 第 9—11 页；第 12.3.1 小节。
+\subsection{总体效应的 TMLE}
+
+对于总体参数 $\Psi^{\mathcal P}(P_0)$，可以按以下步骤实现 TMLE。
+
+\begin{itemize}
+\item \textbf{步骤 1：初始估计。}首先获得结局回归 $\bar Q_0(A,W)$ 的初始估计量。例如，可以依据某个参数“工作”模型，将结局 $Y$ 对暴露 $A$ 和协变量 $W$ 回归（Rosenblum 和 van der Laan，2010b）。也可以采用事先指定的数据自适应程序，例如超级学习器。初始估计量记为 $\bar Q_n(A,W)$。
+
+\item \textbf{步骤 2：靶向。}其次，纳入倾向评分 $g_0(A\mid W)\equiv P_0(A\mid W)$ 中的信息，更新结局回归的初始估计量 $\bar Q_n(A,W)$。直观而言，这一“靶向”步骤有助于消除处理组之间基线协变量分布的部分剩余不平衡。更正式地说，这一步旨在获得针对 $\Psi^{\mathcal P}(P_0)$ 的最优偏差—方差权衡，并求解有效得分方程（Hahn，1998）。简要实施方法如下。
+\begin{itemize}[label=--]
+\item 根据已知或估计的暴露机制 $g_n(A\mid W)\equiv P_n(A\mid W)$，计算巧妙协变量：
+\[
+H_n(A,W)=\left(\frac{\mathbb I(A=1)}{g_n(1\mid W)}
+-\frac{\mathbb I(A=0)}{g_n(0\mid W)}\right).
+\]
+为估计倾向评分，可以将暴露 $A$ 对协变量 $W$ 进行逻辑回归，也可以采用自适应程度更高的方法。
+
+\item 对于连续且无界的结局，将结局 $Y$ 对协变量 $H_n(A,W)$ 进行线性回归，并将初始估计量作为偏移项；也就是说，不设截距，并将初始估计量的系数固定为 1。代入估计的系数 $\epsilon_n$，得到靶向更新：
+\[
+\bar Q_n^*(A,W)=\bar Q_n(Y\mid A,W)+\epsilon_nH_n(A,W).
+\]
+
+\item 对于二元结局或有界连续结局，例如比例，\footnote{对有界于 $[a,b]$ 的连续结局，也可以先作变换 $Y^*=(Y-a)/(b-a)$，再使用逻辑扰动。数据稀疏和／或结局稀有时，相比线性回归，采用逻辑回归能够提高稳定性（例如 Gruber 和 van der Laan，2010b）。}将结局 $Y$ 对协变量 $H_n(A,W)$ 进行逻辑回归，并以初始估计量的 $\logit(\cdot)=\log[\cdot/(1-\cdot)]$ 为偏移项。代入估计的系数 $\epsilon_n$，得到靶向更新：
+\[
+\bar Q_n^*(A,W)=\logit^{-1}\bigl\{\logit[\bar Q_n(A,W)]+\epsilon_nH_n(A,W)\bigr\}.
+\]
+\end{itemize}
+
+\item \textbf{步骤 3：参数估计。}最后，将靶向估计代入参数映射，获得点估计：
+\[
+\Psi_n(P_n)=\frac1n\sum_{i=1}^n[\bar Q_n^*(1,W_i)-\bar Q_n^*(0,W_i)],
+\]
+其中，$P_n$ 表示经验分布，在每个观测 $O_i$ 上赋予质量 $1/n$；$\bar Q_n^*(A_i,W_i)$ 表示条件结局均值的靶向估计量。样本均值是基线协变量边际分布 $P_0(W)$ 的非参数极大似然估计量。
+\end{itemize}
+
+如果 $\bar Q_0(A,W)$ 的初始估计量基于含截距和暴露主项的工作参数回归，并且将暴露机制视为已知而不加估计，就可以跳过更新步骤（Moore 和 van der Laan，2009b；Rosenblum 和 van der Laan，2010b）。不过，使用数据自适应算法对结局回归 $\bar Q_0(A,W)$ 进行初始估计，和／或估计暴露机制 $g_0(A\mid W)$，还能进一步提高精度（van der Laan 和 Robins，2003）。有关 CRT 中数据自适应估计的更多细节，参见第 13 章。
+
+在标准正则条件下，这一 TMLE 是总体参数的一致且渐近线性估计量（van der Laan 和 Rubin，2006；van der Laan 和 Rose，2011）：
+\[
+\Psi_n(P_n)-\Psi^{\mathcal P}(P_0)
+=\frac1n\sum_{i=1}^nD^{\mathcal P}(O_i)+o_P(1/\sqrt n).
+\]
+换言之，估计量减去真值，可以写成影响曲线 $D^{\mathcal P}(O)$ 的经验均值，加上一个依概率趋于 0 的二阶项。影响曲线为
+\[
+\begin{aligned}
+D^{\mathcal P}(O)&=D_Y(O)+D_W(O),\\
+D_Y(O)&=\left(\frac{\mathbb I(A=1)}{g_0(1\mid W)}
+-\frac{\mathbb I(A=0)}{g_0(0\mid W)}\right)\{Y-\bar Q_\infty(A,W)\},\\
+D_W(O)&=\bar Q_\infty(1,W)-\bar Q_\infty(0,W)-\Psi^{\mathcal P}(P_0),
+\end{aligned}
+\]
+其中，$\bar Q_\infty(A,W)$ 表示 TMLE $\bar Q_n^*(A,W)$ 的极限。我们假设倾向评分已知，或被一致估计；处理 $A$ 随机分配时，这总能成立。影响曲线的第一项 $D_Y$ 是加权残差，即观测结局与预测结局极限之间的加权偏差。第二项 $D_W$ 是所估计分层特定关联的极限与边际关联之间的偏差。
+
+标准化后的估计量渐近正态，其方差等于影响曲线 $D^{\mathcal P}(O)$ 的方差除以样本量 $n$（van der Laan 和 Rubin，2006；van der Laan 和 Rose，2011）。在结局回归被一致估计时，即 $\bar Q_\infty(A,W)=\bar Q_0(A,W)$ 时，TMLE 将渐近有效，并在一大类总体效应估计量中达到可能的最小方差。换言之，它的影响曲线将等于有效影响曲线，TMLE 将达到 Hahn（1998）的效率界。因此，改进结局回归的估计，能够提高总体效应估计量的精度。在有限样本中，可用估计影响曲线的样本方差除以样本量，较好地近似 TMLE 的方差：
+\[
+\sigma_n^{2,\mathcal P}
+=\frac{\frac1n\sum_{i=1}^n[D_n^{\mathcal P}(O_i)]^2}{n},
+\]
+其中
+\[
+\begin{aligned}
+D_n^{\mathcal P}(O)
+={}&\left(\frac{\mathbb I(A=1)}{g_n(1\mid W)}
+-\frac{\mathbb I(A=0)}{g_n(0\mid W)}\right)\{Y-\bar Q_n^*(A,W)\}\\
+&+\bar Q_n^*(1,W)-\bar Q_n^*(0,W)-\Psi_n(P_n).
+\end{aligned}
+\]

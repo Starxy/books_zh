@@ -1,0 +1,89 @@
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[causal,x=1.05cm,y=.9cm,
+ ch02dot/.style={circle,fill=black,inner sep=1.8pt},
+ ch02coef/.style={font=\small,fill=white,inner sep=.6pt},
+ ch02pigbody/.pic={
+   \path[draw,fill=white,line width=.7pt]
+   (-.95,-.36) .. controls (-1.15,.1) and (-.75,.55) .. (-.3,.44)
+   .. controls (.1,.37) and (.33,.63) .. (.61,.45)
+   .. controls (.92,.2) and (1.13,.13) .. (.94,-.04)
+   --(.73,-.17)--(.77,-.34)--(.28,-.34)
+   .. controls (-.15,-.39) and (-.6,-.27) .. cycle;
+   \fill (.76,.21) circle (1pt);
+ }]
+% 原图中的四只豚鼠，及各个体遗传构成和生殖细胞遗传构成。
+\begin{scope}[shift={(3.65,2.25)}]
+\pic {ch02pigbody};
+\path[draw,pattern=north west lines] (-.3,.44) .. controls (-.77,.56) and (-1.03,.04) .. (-.95,-.25) .. controls (-.7,-.38) and (-.35,-.37) .. (-.23,-.26)--cycle;
+\path[draw,pattern=north west lines] (.5,.45) .. controls (.25,.22) and (.42,-.13) .. (.88,.02) .. controls (.88,.18) and (.64,.4) .. cycle;
+\end{scope}
+\node[font=\small] at (3.6,2.98){父本};
+\begin{scope}[shift={(3.65,-6.25)}]
+\pic {ch02pigbody};
+\path[draw,pattern=north west lines] (-.55,.38) .. controls (-.77,.42) and (-.81,-.12) .. (-.52,-.26) .. controls (-.2,-.4) and (.13,-.3) .. (.05,.31)--cycle;
+\path[draw,pattern=north west lines] (.82,.29)--(.72,.35)--(.77,-.12)--(.96,-.03)--cycle;
+\end{scope}
+\node[font=\small] at (3.6,-7.02){母本};
+\begin{scope}[shift={(10.25,0)}]
+\pic {ch02pigbody};
+\path[draw,pattern=north west lines] (-.55,.38) .. controls (-.77,.42) and (-.81,-.12) .. (-.52,-.26) .. controls (-.2,-.4) and (-.09,-.03) .. (-.19,.34)--cycle;
+\path[draw,pattern=north west lines] (.5,.45) .. controls (.25,.22) and (.42,-.13) .. (.88,.02) .. controls (.88,.18) and (.64,.4) .. cycle;
+\end{scope}
+\node[font=\small] at (10.25,.78){$O$};
+\begin{scope}[shift={(10.25,-4.3)}]
+\pic {ch02pigbody};
+\path[draw,pattern=north west lines] (-.08,.43) .. controls (-.37,.45) and (-.42,-.1) .. (-.12,-.16) .. controls (.25,-.23) and (.34,-.01) .. (.2,.45)--cycle;
+\end{scope}
+\node[font=\small] at (10.25,-3.52){$O'$};
+\node[ch02dot,label=above left:$H''$] (ch02hpp) at (1.45,0) {};
+\node[ch02dot,label=above left:$H'''$] (ch02hppp) at (1.45,-4.3) {};
+\node[ch02dot,label=above:$G$] (ch02g) at (4.5,0) {};
+\node[ch02dot,label=right:$G'$] (ch02gp) at (4.5,-1.08) {};
+\node[ch02dot,label=right:$G''$] (ch02gpp) at (4.5,-3.22) {};
+\node[ch02dot,label=below:$G'''$] (ch02gppp) at (4.5,-4.3) {};
+\draw (4.48,.06) .. controls (4.25,.14) and (4.46,.3) .. (4.25,.3) .. controls (4.10,.28) and (4.24,.44) .. (4.06,.45);
+\draw (4.48,-1.02) .. controls (4.25,-.94) and (4.46,-.78) .. (4.25,-.78) .. controls (4.10,-.8) and (4.24,-.64) .. (4.06,-.63);
+\node[ch02dot,label=above right:$H$] (ch02h) at (7.5,0) {};
+\node[ch02dot,label=above right:$H'$] (ch02hp) at (7.5,-4.3) {};
+\node[font=\small] (ch02chance) at (.6,-2.1){随机性};
+\node (ch02sd) at (.25,2.7){$D$};
+\node (ch02se) at (.25,1.65){$E$};
+\node (ch02me) at (.25,-5.83){$E$};
+\node (ch02md) at (.25,-6.88){$D$};
+\node (ch02od) at (8.8,2.15){$D$};
+\node (ch02opd) at (9.18,-6.45){$D$};
+\node (ch02oe) at (7.5,-6.45){$E$};
+\draw[ed] (ch02sd)--node[ch02coef,above]{$d$}(2.55,2.56);
+\draw[ed] (ch02se)--node[ch02coef,above]{$e$}(2.55,2.00);
+\draw[ed] (ch02hpp)--node[ch02coef,left]{$h$}(2.65,1.7);
+\draw[ed] (ch02me)--node[ch02coef,above]{$e$}(2.55,-6.00);
+\draw[ed] (ch02md)--node[ch02coef,above]{$d$}(2.55,-6.55);
+\draw[ed] (ch02hppp)--node[ch02coef,left]{$h$}(2.65,-5.70);
+\draw[ed] (ch02hpp)--node[ch02coef,above,pos=.7]{$b$}(ch02g);
+\draw[ed] (ch02hpp)--node[ch02coef,above,pos=.3]{$b$}(ch02gp);
+\draw[ed] (ch02hppp)--node[ch02coef,below,pos=.3]{$b$}(ch02gpp);
+\draw[ed] (ch02hppp)--node[ch02coef,above,pos=.7]{$b$}(ch02gppp);
+\draw[ed] (ch02chance.east)--node[ch02coef,above,pos=.55]{$c$}(ch02g);
+\draw[ed] (ch02chance.east)--node[ch02coef,below,pos=.7]{$c$}(ch02gp);
+\draw[ed] (ch02chance.east)--node[ch02coef,above,pos=.55]{$c$}(ch02gpp);
+\draw[ed] (ch02chance.east)--node[ch02coef,below,pos=.7]{$c$}(ch02gppp);
+\draw[ed] (ch02g)--node[ch02coef,above]{$a$}(ch02h);
+\draw[ed] (ch02gpp)--node[ch02coef,above,sloped,pos=.65]{$a$}(ch02h);
+\draw[ed] (ch02gp)--node[ch02coef,above,sloped,pos=.65]{$a$}(ch02hp);
+\draw[ed] (ch02gppp)--node[ch02coef,above]{$a$}(ch02hp);
+\draw[ed] (ch02h)--node[ch02coef,above]{$h$}(9.12,0);
+\draw[ed] (ch02hp)--node[ch02coef,above]{$h$}(9.12,-4.3);
+\draw[ed] (ch02od)--node[ch02coef,above left]{$d$}(9.65,.65);
+\draw[ed] (ch02opd)--node[ch02coef,above left]{$d$}(9.78,-4.83);
+\draw[ed] (ch02oe)--node[ch02coef,left,pos=.6]{$e$}(9.5,-.65);
+\draw[ed] (ch02oe)--node[ch02coef,below right,pos=.6]{$e$}(9.3,-4.85);
+\end{tikzpicture}
+\par\smallskip
+\begin{minipage}{.96\textwidth}
+\small
+\textbf{图内说明（原图 5）：}该图展示了同窝个体（$O,O'$）之间，以及它们各自与父母之间的因果关系。$H,H',H'',H'''$ 表示四个个体的遗传构成，$G,G',G'',G'''$ 表示四个生殖细胞的遗传构成。$E$ 表示同窝个体共有的环境因素。$D$ 表示其他因素，主要是个体发育中的不规则变异。小写字母表示各条路径的系数。
+\end{minipage}
+\caption{早期路径图。其中，母本（dam）和父本（sire）分别指豚鼠的雌性亲本和雄性亲本。路径系数刻画给定路径的重要程度，其定义如下：除所考察原因之外，其他所有原因均保持恒定，而所考察原因自身的变异程度保持不变，此时结果的变异程度与其总变异程度之比。依据 Wright［1920］原图重绘。}
+\label{fig:ch02-wright-path}
+\end{figure}

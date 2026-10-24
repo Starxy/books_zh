@@ -1,0 +1,262 @@
+% 原章第54—59页：附录5.A，式5.A.1—5.A.24。
+\section*{附录 5.A\quad HSIC 的有偏与无偏估计量}
+\phantomsection\addcontentsline{toc}{section}{附录 5.A：HSIC 的有偏与无偏估计量}
+\markright{附录 5.A}
+
+为使讨论完整，我们采用 Gretton（2015）的方法估计 HSIC。由式 (5.46) 得
+\begin{equation}
+\begin{aligned}
+\mathrm{HSIC}(X,Y)
+={}&\langle C_{XY}-\mu_x\otimes\mu_y,C_{XY}-\mu_x\otimes\mu_y\rangle\\
+={}&\langle C_{XY},C_{XY}\rangle-2\langle C_{XY},\mu_x\otimes\mu_y\rangle
++\langle\mu_x\otimes\mu_y,\mu_x\otimes\mu_y\rangle.
+\end{aligned}
+\tag{5.A.1}
+\end{equation}
+根据未中心化协方差算子的定义，得到
+\begin{equation}
+\begin{aligned}
+&\langle C_{XY},C_{XY}\rangle\\
+&=\left\langle E_{p(x,y)}[k_x(\cdot,X)\otimes k_y(\cdot,Y)],
+E_{p(x',y')}[k_x(\cdot,X')\otimes k_y(\cdot,Y')]\right\rangle\\
+&=E_{p(x,y)}E_{p(x',y')}
+\left[\langle k_x(\cdot,X)\otimes k_y(,Y),k_x(\cdot,X')\otimes k_y(\cdot,Y')\rangle\right]\\
+&=E_{p(x,y)}E_{p(x',y')}
+\left[\langle k_x(\cdot,X),k_x(,X')\rangle
+\langle k_y(\cdot,Y),k_y(\cdot,Y')\rangle\right]\\
+&=E_{p(x,y)}E_{p(x',y')}[k_x(X,X')k_y(Y,Y')].
+\end{aligned}
+\tag{5.A.2}
+\end{equation}
+利用期望的抽样公式，式 (5.A.2) 可化为
+\begin{equation}
+\begin{aligned}
+\langle C_{XY},C_{XY}\rangle
+&=\frac1{n^2}\sum_{i=1}^n\sum_{j=1}^nk_x(x_i,x_j)k_y(y_i,y_j)\\
+&=\frac1{n^2}\sum_{i=1}^n\sum_{j=1}^nk_x(x_i,x_j)k_y(y_j,y_i)\\
+&=\frac1{n^2}\tr(K_xK_y),
+\end{aligned}
+\tag{5.A.3}
+\end{equation}
+其中，$K_x=(k_x(x_i,x_j))_{n\times n}$，$K_y=(k_y(y_i,y_j))_{n\times n}$。
+
+类似地，有
+\begin{equation}
+\begin{aligned}
+&\langle C_{XY},\mu_x\otimes\mu_y\rangle\\
+&=\left\langle E_{p(x,y)}\left[k_x(\cdot,X)\otimes k_y(\cdot,Y),
+\left(E_{p(x)}[k_x(\cdot,X')]\right)\right.\right.\\
+&\hspace{12em}\left.\left.\otimes\left(E_{p(y)}[k_y(\cdot,Y')]\right)\right]\right\rangle\\
+&=E_{p(x,y)}\left[E_{p(x)}[k_x(X,X')]E_{p(y)}[k_y(Y,Y')]\right].
+\end{aligned}
+\tag{5.A.4}
+\end{equation}
+其抽样估计量为
+\begin{equation}
+\begin{aligned}
+\langle C_{XY},\mu_x\otimes\mu_y\rangle
+&=\frac1{n^2}E_{p(x,y)}\left[\sum_{j=1}^nk_x(X,x_j)\sum_{l=1}^nk_y(Y,y_l)\right]\\
+&=\frac1{n^3}\sum_{i=1}^n\sum_{j=1}^n\sum_{l=1}^nk_x(x_i,x_j)k_y(y_i,y_l)\\
+&=\frac1{n^3}\sum_{j=1}^n\sum_{i=1}^n\sum_{l=1}^nk_x(x_i,x_j)k_y(y_i,y_l)\\
+&=\frac1{n^3}1_n^TK_xK_y1_n\\
+&=\frac1{n^3}\tr(1_n1_n^TK_xK_y).
+\end{aligned}
+\tag{5.A.5}
+\end{equation}
+最后，可以证明
+\begin{equation}
+\begin{aligned}
+&\langle\mu_x\otimes\mu_y,\mu_x\otimes\mu_y\rangle\\
+&=\langle\mu_x,\mu_x\rangle\langle\mu_y,\mu_y\rangle\\
+&=\langle E_x[k_x(\cdot,X)],E_{x'}[k_x(\cdot,X')]\rangle
+\langle E_y[k_y(\cdot,Y)],E_{y'}[k_y(\cdot,Y')]\rangle\\
+&=E_x[E_{x'}[k_x(X,X')]]E_y[E_{y'}[k_y(Y,Y')]].
+\end{aligned}
+\tag{5.A.6}
+\end{equation}
+同样，其抽样估计量可计算为
+\begin{equation}
+\begin{aligned}
+&\langle\mu_x\otimes\mu_y,\mu_x\otimes\mu_y\rangle\\
+&=\frac1{n^2}\sum_{i=1}^n\sum_{j=1}^nk_x(x_i,x_j)
+\frac1{n^2}\sum_{q=1}^n\sum_{l=1}^nk_y(y_q,y_l)\\
+&=\frac1{n^4}1_n^TK_x1_n1_n^TK_y1_n\\
+&=\frac1{n^4}\tr(1_n1_n^TK_x1_n1_n^TK_y).
+\end{aligned}
+\tag{5.A.7}
+\end{equation}
+代入式 (5.A.3)、(5.A.5) 和 (5.A.7)，得到
+\begin{equation}
+\begin{aligned}
+\mathrm{HSIC}(X,Y)
+={}&\frac1{n^2}\Bigl[\tr(K_xK_y)-\frac2n\tr(1_n1_n^TK_xK_y)\\
+&\hspace{7em}+\frac1{n^2}\tr(1_n1_n^TK_x1_n1_n^TK_y)\Bigr]\\
+={}&\frac1{n^2}(K_xHK_yH),
+\end{aligned}
+\tag{5.A.8}
+\end{equation}
+其中，$H=I_n-\frac1n1_n1_n^T$。
+
+现在推导 HSIC 的无偏估计量。此前的计算没有关注 $(x,y)$ 与 $(x',y')$ 的实际抽样方式，而是完全将二者的抽样视为相互独立。然而，$(x,y)$ 与 $(x',y')$ 实际上应当采用不放回抽样（Gretton，2015）。因此，$\lVert C_{XY}\rVert_{\mathrm{HS}}^2$ 的无偏抽样估计量为
+\begin{equation}
+\begin{aligned}
+\langle C_{XY},C_{XY}\rangle
+&=E_{p(x,y)}E_{p(x',y'}[k_x(X,X')k_y(Y,Y')]\\
+&=\frac1{n(n-1)}\sum_{i=1}^n\sum_{j\ne i}^nk_x(x_i,x_j)k_y(y_i,y_j).
+\end{aligned}
+\tag{5.A.9}
+\end{equation}
+为简化记号，用 $\mathrm i_q^n$ 表示从 $\{1,\ldots,n\}$ 中抽取的全部 $q$ 元组构成的集合，并令 $(n)_q=n(n-1)\cdots(n-p+1)$。
+
+采用这些记号，式 (5.A.9) 可化为
+\begin{equation}
+\langle C_{XY},C_{XY}\rangle
+=\frac1{(n)_2}\sum_{(i,j)\in\mathrm i_2^n}k_x(x_i,x_j)k_y(y_i,y_j).
+\tag{5.A.10}
+\end{equation}
+类似地，得到
+\begin{equation}
+\begin{aligned}
+&\langle C_{XY},\mu_x\otimes\mu_y\rangle\\
+&=E_{p(x,y)}[E_{p(x)}[k_x(X,X')]E_{p(y)}[k_y(Y,Y')]]\\
+&=\frac1{n(n-1)}\sum_{j=1}^n\sum_{l\ne j}^nE_{p(x,y)}k_x(X,x_j)k_y(Y,y_l)\\
+&=\frac1{n(n-1)(n-2)}\sum_{i\ne j,l}^n\sum_{l\ne j}^n\sum_{j=1}^nk_x(x_i,x_j)k_y(y_i,y_l)\\
+&=\frac1{(n)_3}\sum_{(i,j,l)\in\mathrm i_3^n}k_x(x_i,x_j)k_y(y_i,y_l),
+\end{aligned}
+\tag{5.A.11}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+&\langle\mu_x\otimes\mu_y,\mu_x\otimes\mu_y\rangle\\
+&=E_x[E_{x'}[k_x(X,X')]]E_y[E_{y'}[k_y(Y,Y')]]\\
+&=\frac1{n(n-1)}\sum_{i=1}^n\sum_{j\ne i}^nE_x[k_x(X,x_i)]E_y[k_y(Y,y_j)]\\
+&=\frac1{n(n-1)(n-2)(n-3)}
+\sum_{i=1}^n\sum_{i\ne j}^n\sum_{q\ne i,j}^n\sum_{l\ne i,j,q}^nk_x(x_q,x_i)k_y(y_l,y_j)\\
+&=\frac1{(n)_4}\sum_{(i,j,q,l)\in\mathrm i_4^n}k_x(x_i,x_q)k_y(y_j,y_l).
+\end{aligned}
+\tag{5.A.12}
+\end{equation}
+
+尽管式 (5.A.10)—(5.A.12) 是无偏估计量，它们的计算时间却远大于有偏估计量。接下来，降低有偏估计量的计算时间。令 $\widehat K_x$ 与 $\widehat K_y$ 分别表示将 $K_x$ 与 $K_y$ 的对角元素替换为零后得到的矩阵。于是，式 (5.A.9) 可改写为
+\begin{equation}
+\begin{aligned}
+\langle C_{XY},C_{XY}\rangle
+&=\frac1{(n)_2}\sum_{i=1}^n\sum_{j\ne i}^nk_x(x_i,x_j)k_y(y_i,y_j)\\
+&=\frac1{(n)_2}\sum_{i=1}^n\sum_{j=1}^n\widehat k_x(x_i,x_j)\widehat k_y(y_j,y_i)\\
+&=\frac1{(n)_2}\tr(\widehat K_x\widehat K_y).
+\end{aligned}
+\tag{5.A.13}
+\end{equation}
+类似地，利用式 (5.A.11)，得到
+\begin{equation}
+\begin{aligned}
+&\langle C_{XY},\mu_x\otimes\mu_y\rangle\\
+&=\frac1{n(n-1)(n-2)}\sum_{i=1}^n\sum_{j\ne i}^n\sum_{l\ne j,i}^nk_x(x_i,x_j)k_y(y_i,y_l)\\
+&=\frac1{(n)_3}\sum_{j=1}^n\sum_{l\ne j}^n\sum_{i\ne j,l}^nk_x(x_i,x_j)k_y(y_i,y_l)\\
+&=\frac1{(n)_3}\sum_{j=1}^n\sum_{i\ne j}^n\sum_{l\ne j,i}^nk_x(x_j,x_i)k_y(y_i,y_l)\\
+&=\frac1{(n)_3}\sum_{j=1}^n\sum_{l\ne j}^n\sum_{i\ne j,l}^nk_x(x_j,x_i)k_y(y_i,y_l)\\
+&=\frac1{(n)_3}\Bigl[\sum_{j=1}^n\sum_{l=1}^n\sum_{i\ne j,l}^nk_x(x_j,x_i)k_y(y_i,y_l)\\
+&\hspace{9em}-\sum_{j=1}^n\sum_{i\ne j}k_x(x_j,x_i)k_y(y_i,y_j)\Bigr].
+\end{aligned}
+\tag{5.A.14}
+\end{equation}
+可以证明（习题 4）
+\begin{equation}
+\sum_{j=1}^n\sum_{l=1}^n\sum_{i\ne(j,l)}^nk_x(x_j,x_i)k_y(y_i,y_l)
+=1_n^T\widehat K_x\widehat K_y1_n,
+\tag{5.A.15}
+\end{equation}
+以及
+\begin{equation}
+\sum_{j=1}^n\sum_{i\ne j}k_x(x_j,x_i)k_y(y_i,y_j)
+=\tr(\widehat K_x\widehat K_y).
+\tag{5.A.16}
+\end{equation}
+代入式 (5.A.15) 和 (5.A.16)，得到
+\begin{equation}
+\langle C_{XY},\mu_x\otimes\mu_y\rangle
+=\frac1{(n)_3}\left[1_n^T\widehat K_x\widehat K_y1_n-\tr(\widehat K_x\widehat K_y)\right].
+\tag{5.A.17}
+\end{equation}
+再次利用式 (5.A.12)，得到
+\begin{equation}
+\langle\mu_x\otimes\mu_y,\mu_x\otimes\mu_y\rangle
+=\frac1{(n)_4}\sum_{(i,j,q,l)\in\mathrm i_4^n}k_x(x_i,x_q)k_y(y_j,y_l).
+\tag{5.A.18}
+\end{equation}
+注意，下式左侧乘积中的各项可展开如下（Gretton，2015；习题 5）：
+\begin{equation}
+\begin{aligned}
+&\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)\sum_{(j,l)\in\mathrm i_2^n}k_y(y_j,y_l)\\
+&=\sum_{(i,q,j)\in\mathrm i_3^n}k_x(x_i,x_q)k_y(y_j,y_i)\\
+&\quad+\sum_{(i,q,l)\in\mathrm i_3^n}k_x(x_i,x_q)k_y(y_q,y_l)\\
+&\quad+\sum_{(i,j,l)\in\mathrm i_3^n}k_x(x_i,x_j)k_y(y_j,y_l)\\
+&\quad+\sum_{(q,j,l)\in\mathrm i_3^n}k_x(x_l,x_q)k_y(y_j,y_l)\\
+&\quad+\sum_{(i,j,q,l)\in\mathrm i_4^n}k_x(x_i,x_q)k_y(y_j,y_l)\\
+&\quad+\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)k_y(y_i,y_q)\\
+&\quad+\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)k_y(y_i,y_q).
+\end{aligned}
+\tag{5.A.19}
+\end{equation}
+显然，
+\begin{equation}
+\begin{aligned}
+\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)&=1_n^T\widehat K_x1_n,\\
+\sum_{(j,l)\in\mathrm i_2^n}k_y(y_j,y_l)&=1_n^T\widehat K_y1_n.
+\end{aligned}
+\tag{5.A.20}
+\end{equation}
+经过简单的代数运算，得到
+\begin{equation}
+\begin{aligned}
+1_n^T\widehat K_x\widehat K_y1_n
+&=\sum_{i=1}^n\sum_{j\ne i}^n\sum_{l\ne j}^nk_x(x_i,x_j)k_y(y_j,y_l)\\
+&=\sum_{i=1}^n\sum_{j\ne i}^n\sum_{l\ne(i,j)}^nk_x(x_i,x_j)k_y(y_j,y_l)\\
+&\quad+\sum_{i=1}^n\sum_{j\ne i}^nk_x(x_i,x_j)k_y(y_j,y_i)\\
+&=\sum_{(i,j,l)\in\mathrm i_3^n}k_x(x_i,x_j)k_y(y_j,y_l)+\tr(\widehat K_x\widehat K_y).
+\end{aligned}
+\tag{5.A.21}
+\end{equation}
+采用类似论证，得到
+\begin{equation}
+\begin{aligned}
+1_n^T\widehat K_x\widehat K_y1_n
+&=\sum_{(i,q,j)\in\mathrm i_3^n}k_x(x_i,x_q)k_y(y_j,y_i)+\tr(\widehat K_x\widehat K_y),\\
+1_n^T\widehat K_x\widehat K_y1_n
+&=\sum_{(i,q,l)\in\mathrm i_3^n}k_x(x_i,x_q)k_y(y_q,y_l)+\tr(\widehat K_x\widehat K_y),\\
+1_n^T\widehat K_x\widehat K_y1_n
+&=\sum_{(q,j,l)\in\mathrm i_3^n}k_x(x_l,x_q)k_y(y_j,y_l)+\tr(\widehat K_x\widehat K_y).
+\end{aligned}
+\tag{5.A.22}
+\end{equation}
+将式 (5.A.20)—(5.A.22) 代入式 (5.A.19)，得到
+\begin{equation}
+\begin{aligned}
+&\langle\mu_x\otimes\mu_y,\mu_x\otimes\mu_y\rangle\\
+&=\frac1{(n)_4}\left[(1_n^T\widehat K_x1_n)(1_n^T\widehat K_y1_n)
+-4\,1_n^T\widehat K_x\widehat K_y1_n+2\tr(\widehat K_x\widehat K_y)\right].
+\end{aligned}
+\tag{5.A.23}
+\end{equation}
+最后，将式 (5.A.13)、(5.A.17) 和 (5.A.23) 代入式 (5.A.1)，得到 HSIC 的无偏估计量：
+\begin{equation}
+\begin{aligned}
+\mathrm{HSIC}_u(X,Y)
+={}&\frac1{(n)_2}\tr(\widehat K_x\widehat K_y)
+-\frac2{(n)_3}\left[1_n^T\widehat K_x\widehat K_y1_n-\tr(\widehat K_x\widehat K_y)\right]\\
+&+\frac1{(n)_4}\Bigl[(1_n^T\widehat K_y1_n)(1_n^T\widehat K_y1_n)
+-4\,1_n^T\widehat K_x\widehat K_y1_n\\
+&\hspace{20em}+2\tr(\widehat K_x\widehat K_y)\Bigr]\\
+={}&\left(\frac1{(n)_2}+\frac2{(n)_3}+\frac1{(n)_4}\right)\tr(\widehat K_x\widehat K_y)
+-\left(\frac2{(n)_3}+\frac1{(n)_4}\right)1_n^T\widehat K_x\widehat K_y1\\
+&+\frac1{(n)_4}(1_n^T\widehat K_x1_n)(1_n^T\widehat K_y1_n)\\
+={}&\frac1{n(n-3)}\tr(\widehat K_x\widehat K_y)
+-\frac2{n(n-2)(n-3)}1_n^T\widehat K_x\widehat K_y1\\
+&+\frac1{n(n-1)(n-2)(n-3)}(1_n^T\widehat K_x1_n)(1_n^T\widehat K_y1_n)\\
+={}&\frac1{n(n-3)}\Bigl[\tr(\widehat K_x\widehat K_y)
+-\frac2{n-2}1_n^T\widehat K_x\widehat K_y1\\
+&\hspace{4em}+\frac1{(n-1)(n-2)}(1_n^T\widehat K_x1_n)(1_n^T\widehat K_y1_n)\Bigr].
+\end{aligned}
+\tag{5.A.24}
+\end{equation}

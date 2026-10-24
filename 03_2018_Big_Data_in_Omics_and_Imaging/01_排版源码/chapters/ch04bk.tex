@@ -1,0 +1,134 @@
+% 原PDF158页附录4.E标题—160页末。
+\section*{附录4.E\quad 动态结构方程模型参数的最大似然估计}
+\addcontentsline{toc}{section}{附录4.E 动态结构方程模型参数的最大似然估计}
+\markright{附录4.E 动态结构方程模型参数的最大似然估计}
+
+令 $(y_i^t)'$、$(y_i^{(t-1)}(x_i)'$ 和 $(e_i^t)'$，分别为矩阵 $Y^t,Y^{t-1},X,E^{(t)}$ 的第 $i$ 行。换言之，定义
+\begin{equation}
+\begin{aligned}
+(y_i^t)'&=\begin{bmatrix}y_{i1}^t&y_{i2}^t&\cdots&y_{iM}^t\end{bmatrix},\\
+(y_{li}^{t-1})'&=\begin{bmatrix}y_{li1}^{t-1}&y_{li2}^{t-1}&\cdots&y_{liM}^{t-1}\end{bmatrix},\\
+x_i'&=\begin{bmatrix}x_{i1}&x_{i2}&\cdots&x_{iK}\end{bmatrix},\\
+(e_i^t)'&=\begin{bmatrix}e_{i1}^t&e_{i2}^t&\cdots&e_{iM}^t\end{bmatrix},
+\quad i=1,\ldots,n.
+\end{aligned}\tag{4.E.1}
+\end{equation}
+由式（4.173），
+\begin{equation}
+(y_i^t)'\Gamma^t+(y_{li}^{t-1})'A^t+x_i'B^t+(e_i^t)'=0.\tag{4.E.2}
+\end{equation}
+令
+\[
+e_i^t=\begin{bmatrix}e_{i1}^t\\\vdots\\e_{iM}^t\end{bmatrix},
+\quad t=1,\ldots,T,\qquad
+e_i=\begin{bmatrix}e_i^1\\\vdots\\e_i^T\end{bmatrix},\quad i=1,\ldots,n.
+\]
+误差变量之间的协方差为
+\begin{equation}
+\operatorname{cov}(e_i,e_i)=\Sigma=\begin{bmatrix}
+\Sigma_{11}&\Sigma_{12}&\cdots&\Sigma_{1T}\\
+\Sigma_{21}&\Sigma_{22}&\cdots&\Sigma_{2T}\\
+\vdots&\vdots&\vdots&\vdots\\
+\Sigma_{T1}&\Sigma_{T12}&\cdots&\Sigma_{TT}
+\end{bmatrix},\quad i=1,\ldots,n,\tag{4.E.3}
+\end{equation}
+其中
+\begin{equation}
+\Sigma_{tt}=\operatorname{cov}(e_i^t,e_i^t)=\begin{bmatrix}
+\sigma_{11}^{tt}&\cdots&\sigma_{1M}^{tt}\\
+\vdots&\vdots&\vdots\\\sigma_{M1}^{tt}&\cdots&\sigma_{MM}^{tt}
+\end{bmatrix}.\tag{4.E.4}
+\end{equation}
+假设 $\Gamma^t$ 非奇异。由式（4.E.2），向量 $(y_i^t)'$ 可以写成误差 $(e_i^t)'$ 的函数：
+\begin{equation}
+\begin{aligned}
+(y_i^t)'={}&-(e_i^t)'(\Gamma^t)^{-1}
+-(y_{li}^{t-1})'A^t(\Gamma^t)^{-1}
+-x_i'B^t(\Gamma^t)^{-1},\\
+&i=1,\ldots,n,\quad t=1,\ldots,T
+\end{aligned}\tag{4.E.5}
+\end{equation}
+或
+\begin{equation}
+\begin{aligned}
+y_i^t={}&-((\Gamma^t)')^{-1}e_i^t
+-((\Gamma^t)')^{-1}(A^t)'y_{li}^{t-1}
+-((\Gamma^t)')^{-1}(B^t)'x_i,\\
+&i=1,\ldots,n,\quad t=1,\ldots,T.
+\end{aligned}\tag{4.E.6}
+\end{equation}
+令
+\begin{equation}
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},\quad
+y_{li}=\begin{bmatrix}0\\y_{li}^1\\\vdots\\y_{li}^{T-1}\end{bmatrix},\quad
+e_i=\begin{bmatrix}e_i^1\\e_i^2\\\vdots\\e_i^T\end{bmatrix},\quad i=1,\ldots,n.\tag{4.E.7}
+\end{equation}
+假设误差向量服从均值为零、协方差矩阵为 $\Sigma$ 的多元正态分布，则
+\begin{equation}
+g(e_i)=(2\pi)^{-TM/2}|\Sigma|^{-1/2}
+\exp\left\{-\frac12e_i'\Sigma^{-1}e_i\right\}.\tag{4.E.8}
+\end{equation}
+基因表达向量 $y_i^t$ 是误差的函数（式（4.E.6）），其Jacobian矩阵为
+\begin{equation}
+\begin{aligned}
+J=\frac{\partial y_i}{\partial e_i'}
+&=\begin{bmatrix}
+\dfrac{\partial y_i^1}{\partial e_i'}\\
+\dfrac{\partial y_i^2}{\partial e_i'}\\\vdots\\
+\dfrac{\partial y_i^T}{\partial e_i'}
+\end{bmatrix}\\
+&=\begin{bmatrix}
+-((\Gamma^1)')^{-1}&0&\cdots&0\\
+0&-((\Gamma^2)')^{-1}&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\
+0&0&\cdots&-((\Gamma^T)')^{-1}
+\end{bmatrix},\quad i=1,\ldots,n.
+\end{aligned}\tag{4.E.9}
+\end{equation}
+于是，$y_i$ 的密度函数为
+\begin{equation}
+\begin{aligned}
+f(y_i)&=|J|^{-1}g(e_i)\\
+&=\prod_{t=1}^{T}|\Gamma^t|g(e_i)\\
+&=(2\pi)^{-TM/2}|\Sigma|^{-1/2}\prod_{t=1}^{T}|\Gamma^t|
+\exp\left\{-\frac12e_i'\Sigma^{-1}e_i\right\},
+\end{aligned}\tag{4.E.10}
+\end{equation}
+其中
+\[
+e_i^t=-(\Gamma^t)'y_i^t-(A^t)'y_{li}^{t-1}-(B^t)'X_i,
+\quad t=1,\ldots,T,\qquad
+e_i=\begin{bmatrix}e_i^1\\e_i^2\\\vdots\\e_i^T\end{bmatrix}.
+\]
+因此，基因表达的联合概率为
+\begin{equation}
+f(y_1,\ldots,y_n)=(2\pi)^{-nTM/2}|\Sigma|^{-n/2}
+\prod_{t=1}^{T}|\Gamma^t|^n
+\exp\left\{-\frac12\sum_{i=1}^{n}e_i'\Sigma^{-1}e_i\right\}.\tag{4.E.11}
+\end{equation}
+对数似然函数定义为
+\begin{equation}
+\begin{aligned}
+l(\Gamma,A,B,\Sigma\mid Y)
+={}&-\frac{nTM}{2}\log(2\pi)-\frac n2\log|\Sigma|
++n\sum_{t=1}^{T}\log|\Gamma^t|\\
+&{}-\frac12\sum_{i=1}^{n}e_i'\Sigma^{-1}e_i.
+\end{aligned}\tag{4.E.12}
+\end{equation}
+若假设误差 $e_i^t$ 与 $e_i^t$ 不相关，则 $\Sigma$ 变成分块对角矩阵：
+\[
+\Sigma=\begin{bmatrix}
+\Sigma_{11}&0&\cdots&0\\0&\Sigma_{22}&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&\Sigma_{TT}
+\end{bmatrix}.
+\]
+于是，似然函数化为
+\begin{equation}
+\begin{aligned}
+l(\Gamma,A,B,\Sigma\mid Y)
+={}&-\frac{nTM}{2}\log(2\pi)-\frac n2\sum_{t=1}^{T}\log|\Sigma_{tt}|
++n\sum_{t=1}^{T}\log|\Gamma^t|\\
+&{}-\frac12\sum_{i=1}^{n}\sum_{t=1}^{T}(e_i^t)'\Sigma_{tt}^{-1}e_i^t.
+\end{aligned}\tag{4.E.13}
+\end{equation}
+不同时间点误差相关时，极大化式（4.E.12）；不相关时，极大化式（4.E.13），即可得到结构方程参数的估计量 $\widehat\Gamma,\widehat A,\widehat B,\widehat\Sigma$。

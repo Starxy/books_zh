@@ -1,0 +1,20 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.6cm,y=1.4cm]
+ \node[vtx] (ch09f1az) at (1,1.2) {$Z$};
+ \node[vtx] (ch09f1ax) at (0,0) {$X$};
+ \node[vtx] (ch09f1ay) at (2,0) {$Y$};
+ \draw[ed] (ch09f1az)--(ch09f1ax);
+ \draw[ed] (ch09f1az)--(ch09f1ay);
+ \draw[ed] (ch09f1ax)--(ch09f1ay);
+ \node[vtx] (ch09f1bz1) at (4.0,1.2) {$Z_1$};
+ \node[vtx] (ch09f1bz2) at (5.0,1.2) {$Z_2$};
+ \node[vtx] (ch09f1bx) at (3.5,0) {$X$};
+ \node[vtx] (ch09f1by) at (5.5,0) {$Y$};
+ \draw[ed] (ch09f1bz1)--(ch09f1bx);
+ \draw[ed] (ch09f1bz2)--(ch09f1by);
+ \draw[ed] (ch09f1bx)--(ch09f1by);
+\end{tikzpicture}
+\caption{对于例9.2的模型，两个图表示干预等价的结构因果模型。虽然只有第二种表示使 $X,Y$ 满足因果充分性，但无论采用哪种表示，$X,Y$ 都满足干预充分性。}
+\label{fig:ch09-1}
+\end{figure}

@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.4cm,y=1cm]
+ \node[vtx] (ch09f10a-x) at (0,0) {$X$};
+ \node[latent] (ch09f10a-u) at (1,0) {$U$};
+ \node[vtx] (ch09f10a-y) at (2,0) {$Y$};
+ \node[vtx] (ch09f10b-x) at (4,0) {$X$};
+ \node[latent] (ch09f10b-u) at (5,0) {$U$};
+ \node[vtx] (ch09f10b-y) at (6,0) {$Y$};
+ \draw[ed] (ch09f10a-u)--(ch09f10a-x);
+ \draw[ed] (ch09f10a-u)--(ch09f10a-y);
+ \draw[ed] (ch09f10b-x)--(ch09f10b-u);
+ \draw[ed] (ch09f10b-u)--(ch09f10b-y);
+\end{tikzpicture}
+\caption{检测低复杂度中间变量：如果$X$与$Y$之间的路径被一个只取少量值的变量$U$阻断，$P_{Y\mid X}$往往会呈现一些典型性质，作为$U$的“指纹”。}
+\end{figure}

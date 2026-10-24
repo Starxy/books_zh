@@ -1,0 +1,110 @@
+% 原书分章 PDF 第 17—20 页：第 22.6—22.7 节。
+\section{数据自适应 $V$ 最优规则下平均结局的 CV-TMLE}
+
+令 $\hat d:\mathcal M\to\mathcal D$ 为 $V$ 最优规则 $d_0$ 的一个估计量。首先，不失一般性，可以假定 $Y\in[0,1]$。用 $j=1,\ldots,J$ 标记 $B_n$ 的各个实现值，并令 $d_{nj}\equiv\hat d(P_{n,j}^0)$ 表示训练样本 $j$ 上估计得到的规则。令
+\begin{equation}
+ (a(0),\bar l(1))\mapsto
+ \E_{nj}[Y\mid\bar A(1)=d_{nj}(a(0),v),\bar L(1)=\bar l(1)]
+\tag{22.11}
+\end{equation}
+表示基于训练样本 $j$ 对 $\E_0[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)]$ 的初始估计。类似地，令 $g_{nj}$ 表示基于该训练样本 $P_{n,j}^0$ 估计得到的干预机制，$j=1,\ldots,J$。考虑扰动子模型
+\[
+\begin{aligned}
+ &\logit\E_{nj}^{(\epsilon_2)}[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)]\\
+ &\quad=\logit\E_{nj}[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)]
+ +\epsilon_2H_2(g_{nj})(O),
+\end{aligned}
+\]
+其中
+\[
+ H_2(g_{nj})(O)=
+ \frac{I(\bar A(1)=d_{nj}(A(0),V(1)))}{\prod_{l=0}^1g_{nj,A(l)}(O)}.
+\]
+注意，扰动参数 $\epsilon_2$ 不依赖 $j$。令
+\[
+ \epsilon_{2n}=\argmin_{\epsilon_2}\frac1J\sum_{j=1}^JP_{n,j}^1
+ \tilde\phi(\E_{nj}^{(\epsilon_2)}),
+\]
+其中，$\E_{nj}^{(\epsilon_2)}$ 表示式 (22.11) 中经扰动的函数，并且对所有 $f:\mathcal O\to(0,1)$，
+\begin{equation}
+ -\tilde\phi(f)(o)=y\log f(o)+(1-y)\log(1-f(o)).
+\tag{22.12}
+\end{equation}
+对每个 $i=1,\ldots,n$，令 $j(i)\in\{1,\ldots,J\}$ 表示使元素 $i$ 位于验证集中的 $B_n$ 的取值。为得到扰动参数 $\epsilon_{2n}$，可以将 $(y_i:i=1,\ldots,n)$ 对 $(H_2(g_{nj(i)})(o_i):i=1,\ldots,n)$ 作一元 logistic 回归，并以下列量为偏移项：
+\[
+ \bigl(\logit\E_{nj(i)}[Y\mid\bar A(1)=d_{nj(i)}(a(0)_i,v_i),
+ \bar L(1)=\bar l(1)_i]:i=1,\ldots,n\bigr).
+\]
+这样，每个观测 $i$ 都与不包含该观测的训练样本上拟合得到的干扰参数配对。这就定义了 $\E_0[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)]$ 的一个靶向估计：
+\begin{equation}
+\begin{aligned}
+ &\E_{nj}^*[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)]\\
+ &\qquad\equiv\E_{nj}^{(\epsilon_{2n})}[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)].
+\end{aligned}
+\tag{22.13}
+\end{equation}
+注意，这个靶向估计仅通过训练样本 $P_{n,j}^0$ 和一维参数 $\epsilon_{2n}$ 依赖 $P_n$。
+
+现在要得到 $\E_0[Y_{d_{nj}}\mid L(0)]$ 的一个靶向估计。对训练样本 $j$ 中的所有观测 $i$，将
+$\E_{nj}[Y\mid\bar A(1)=d_{nj}(A(0)_i,V_i),\bar L(1)_i]$
+对 $A(0)_i,L(0)_i$ 回归，可以得到下列估计：
+\begin{equation}
+\begin{aligned}
+ &(a_1(0),l(0))\mapsto\\
+ &\quad\E_{nj}\Bigl[\E_{nj}[Y\mid\bar A(1)=d_{nj}(A(0),V),\bar L(1)]
+ \Bigm| A(0)=(a_1(0),1),L(0)=l(0)\Bigr].
+\end{aligned}
+\tag{22.14}
+\end{equation}
+为得到 $\E_0[Y_{d_{nj}}\mid L(0)]$ 的估计 $\E_{nj}[Y_{d_{nj}}\mid L(0)]$，可以使用上面的回归函数，但把 $a(0)$ 固定为 $d_{nj,A(0)}(v(0))$。
+
+考虑扰动子模型
+\[
+ \logit\E_{nj}^{(\epsilon_1)}[Y_{d_{nj}}\mid L(0)]
+ =\logit\E_{nj}[Y_{d_{nj}}\mid L(0)]+\epsilon H_1(g_{nj})(O),
+\]
+其中
+\[
+ H_1(g_{nj})(O)=\frac{I(A(0)=d_{nj,A(0)}(V(0)))}{g_{nj,A(0)}(O)}.
+\]
+扰动参数 $\epsilon_1$ 同样不依赖 $j$。令
+\[
+ \epsilon_{1n}=\argmin_{\epsilon_1}\frac1J\sum_{j=1}^JP_{n,j}^1
+ \tilde\phi(\E_{nj}^{(\epsilon_1)}),
+\]
+其中 $\tilde\phi$ 由式 (22.12) 定义。对每个 $i=1,\ldots,n$，仍令 $j(i)\in\{1,\ldots,J\}$ 表示使元素 $i$ 位于验证集中的 $B_n$ 的取值。为得到扰动参数 $\epsilon_{1n}$，可以将
+\[
+ \bigl(\E_{nj(i)}^*[Y\mid\bar A(1)=d_{nj(i)}(a(0)_i,v_i),
+ \bar l(1)_i]:i=1,\ldots,n\bigr)
+\]
+对 $(H_1(g_{nj(i)})(o_i):i=1,\ldots,n)$ 作一元 logistic 回归，并以下列量为偏移项：
+\[
+ \bigl(\logit\E_{nj(i)}[Y_{d_{nj(i)}}\mid L(0)=l(0)_i]:i=1,\ldots,n\bigr).
+\]
+这就定义了 $\E_0[Y_{d_{nj}}\mid L(0)]$ 的一个靶向估计：
+\begin{equation}
+ \E_{nj}^*[Y_{d_{nj}}\mid L(0)]
+ \equiv\E_{nj}^{(\epsilon_{1n})}[Y_{d_{nj}}\mid L(0)].
+\tag{22.15}
+\end{equation}
+注意，这个靶向估计仅通过训练样本 $P_{n,j}^0$ 和一维参数 $\epsilon_{1n}$ 依赖 $P_n$。
+
+令 $Q_{L(0),nj}$ 为验证样本 $P_{n,j}^1$ 中 $L(0)_i$ 的经验分布。对所有 $j=1,\ldots,J$，令 $Q_{nj}^{d_{nj}*}$ 为表示下列集合的参数映射：该集合包含 $Q_{L(0),nj}$，以及式 (22.13) 和式 (22.15) 中的靶向回归。这就对每个 $j=1,\ldots,J$ 定义了 $\psi_{d_{nj}0}=\Psi_{d_{nj}}(P_0)$ 的估计量
+$\psi_{nj}^*=P_{n,j}^1\bar Q_{b,1nj}^*$。
+现在把交叉验证 TMLE 定义为 $\psi_n^*=J^{-1}\sum_{j=1}^J\psi_{nj}^*$。这个 CV-TMLE 解出了交叉验证有效影响曲线方程：
+\[
+ \frac1J\sum_{j=1}^JP_{n,j}^1D^*(d_{nj},Q_{nj}^{d_{nj}*},g_{nj})=0.
+\]
+此外，每个 $Q_{nj}^{d_{nj}*}$ 仅通过一元参数 $\epsilon_{1n}$ 和 $\epsilon_{2n}$ 依赖 $P_{n,j}^1$。因此，我们可以使用 Zheng 和 van der Laan（2010）中的熵积分论证，说明不需要对式 (22.11) 和式 (22.14) 中的初始估计施加限制性的经验过程条件。
+
+相对于 Zheng 和 van der Laan（2010）最初提出的 CV-TMLE，这里的唯一修改是：在上述描述中，我们把每个训练样本上的目标，改成由该训练样本上拟合得到的 $\hat d(P_{n,B_n}^0)$ 所确定的、训练样本特定的目标参数；而原来的 CV-TMLE 表述仍以 $\Psi_{d_0}(P_0)$ 为目标。经过这一微小调整，现在用同一个 CV-TMLE 靶向估计训练样本特定目标参数的平均，即跨 $J$ 个训练样本的平均。
+
+\section{注记与延伸阅读}
+
+Lavori 和 Dawson（2000，2008）、Murphy（2005）、Rosthøj 等（2006）、Thall 等（2002）以及 Wagner 等（2001）给出了多个时间点的动态处理策略的例子。这些规则根据受试者的历史，调整药物剂量、改变或加强处理，或决定何时开始一种新的处理。关于动态处理的出色综述，参见 Chakraborty 和 Moodie（2013）。
+
+我们把最优多时间点动态处理策略定义为使动态处理下平均结局最大的规则，并把候选规则限制为只响应用户给定的基线与中间协变量子集。Q 学习（Q-learning）文献表明，可以用序贯方式描述所有动态处理中的最优动态处理（Murphy，2003；Robins，2004；Murphy，2005）。可以先拟合似然，再计算该似然拟合下的最优规则，以此学习最优规则。这种方法可以通过基于参数模型的极大似然估计来实现。已有研究指出（如 Robins，2004），在使用参数回归模型时，某个回归（第一个除外）的参数估计量，是前一个回归的参数估计量的一个非光滑函数；这会导致参数向量估计量的非正则性。即使假定这些参数回归模型设定正确，也很难获得统计推断。Chakraborty 和 Moodie（2013）讨论了旨在解决这一微妙问题的多种方法与进展，例如反演假设检验（Robins，2004）、建立估计量的非正态极限分布（Laber 等，2014a），或使用每次从 $n$ 个观测中抽取 $m$ 个观测的自助法（$m$ out of $n$ bootstrap）（Chakraborty 等，2014）。定理 22.5 给出的最优规则估计快速率的证明，与 Audibert 和 Tsybakov（2007）中分类快速率的证明类似。van der Laan 和 Luedtke（2015）已针对单时间点最优处理规则给出这一证明。
+
+Murphy（2003）和 Robins（2004）提出了专门用于最优动态处理的结构嵌套均值模型。这些模型为“处理增益函数”假定一个参数模型；该函数定义为：在未来处理均按最优方式分配的反事实世界中，给定已观测历史时，当前处理的一次改变对反事实结局产生的加性效应。据此，可以对处理增益函数的参数进行统计推断；但 Robins（2004）指出了估计量的非正则性，这导致了前述统计推断中的一些严峻挑战。结构嵌套均值模型还已推广到以过去的一个（反事实）子集为条件的处理增益函数，从而能够学习仅使用这一过去信息子集的最优规则（Robins，2004；van der Laan 和 Robins，2003，第 6.5 节）。
+
+上文引用的每一种既学习最优动态处理、又试图提供统计推断的方法，都依赖参数假设：基于参数模型的 Q 学习显然如此，结构嵌套均值模型也依赖处理增益函数的参数模型。因此，即使在 SMART 中，对最优动态处理的统计推断仍然高度依赖通常被认为不成立的假设，因而可以预期会存在偏差。为避免这些偏差，本章把模型定义为非参数模型，仅允许对处理机制和删失机制作出可能的限制。

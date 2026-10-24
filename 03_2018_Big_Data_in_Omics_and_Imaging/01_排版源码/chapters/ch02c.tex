@@ -1,0 +1,212 @@
+% 原章分章页17—22（至2.4末）。
+\section{同时包含离散变量和连续变量的贝叶斯网络}
+\label{sec:ch02-hybrid}
+
+许多遗传和表观遗传网络同时包含离散变量与连续变量。例如，表型—疾病网络包含离散的疾病变量和连续的表型网络。第2.2节与第2.3节分别讨论了离散变量和连续变量的评分度量计算。本节考虑同时包含离散变量与连续变量的混合因果网络（hybrid causal network）。遗憾的是，学习混合变量因果网络的统计方法和计算算法尚不完善。一种广泛使用的方法是将所有变量离散化（Kozlov 1997），但离散化方法无法保证估计准确、计算快速。本节将介绍用于学习混合因果网络的网络惩罚逻辑回归和变分近似方法。
+
+\subsection{用于学习混合贝叶斯网络的二分类网络惩罚逻辑回归}
+
+考虑一个二元离散节点的贝叶斯网络，其父节点既有连续变量，也有离散变量。假设父节点形成子网络，记为 $G=\{V,E\}$，其中 $V$ 为节点集合，$E$ 为有向边集合（图2.5）。假设图 $\mathcal G$ 包含三个子网络：连续节点子网络 $G_1=(V_1,E_1)$，同时包含连续节点和离散节点的子网络 $G_2=(V_2,E_2)$，以及连接网络 $G_2$ 与网络 $G_1$ 的子网络 $G_3=(V_3,E_3)$。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig05.tex}
+\origfig{5}{混合贝叶斯网络：具有混合父节点的离散节点。}
+\end{figure}
+假设 $|V_1|=K$、$|V_2|=L+K-1$、$|V_3|=m+K$。整个网络的结构由邻接矩阵（adjacency matrix）刻画。邻接矩阵的元素定义为
+\[
+\begin{aligned}
+s_{uv}&=\begin{cases}\bar s_{uv},&(u,v)\in E_1,\\0,&(u,v)\notin E_1,\end{cases}
+&
+s_{ul}&=\begin{cases}\bar s_{ul},&(u,l)\in E_2,\\0,&(u,l)\notin E_2,\end{cases}\\
+s_{uj}&=\begin{cases}\bar s_{uj},&(u,j)\in E_3,\\0,&(u,j)\in E_3.\end{cases}
+\end{aligned}
+\]
+于是邻接矩阵定义为
+\[
+\begin{aligned}
+S_{\delta\delta}
+&=\begin{bmatrix}
+0&s_{u_1u_2}&\cdots&s_{u_1u_K}\\
+\vdots&\vdots&\vdots&\vdots\\
+s_{u_Ku_1}&s_{u_Ku_2}&\cdots&0
+\end{bmatrix}_{K\times K},
+&
+S_{\delta\eta}
+&=\begin{bmatrix}
+s_{u_1l_1}&\cdots&s_{u_1l_L}\\
+\vdots&\vdots&\vdots\\
+s_{u_Kl_1}&\cdots&s_{u_Kl_L}
+\end{bmatrix}_{K\times L},\\
+S_{\delta\alpha}
+&=\begin{bmatrix}
+s_{u_1j_1}&\cdots&s_{u_1j_m}\\
+\vdots&\vdots&\vdots\\
+s_{u_kj_1}&\cdots&s_{u_kj_m}
+\end{bmatrix}_{K\times m},
+&
+S&=\begin{bmatrix}
+S_{\delta\delta}&S_{\delta\eta}&S_{\delta\alpha}\\
+S_{\delta\eta}^T&0&0\\
+S_{\delta\alpha}^T&0&0
+\end{bmatrix}_{(K+L+m)\times(K+L+m)}.
+\end{aligned}
+\]
+令 $\mathbf1$ 为各元素均等于 1 的 $(K+L+m)$ 维向量。定义 $(K+L+m)$ 维度向量 $d=S\mathbf1$ 和度矩阵 $D=\diag(d_1,d_2,\ldots,d_{(K+L+m)})$，则整个网络的拉普拉斯矩阵（Laplacian matrix）为 $D-S$。
+
+对每个离散节点建立逻辑回归模型。考虑某个离散节点，将第 $i$ 个个体的二元节点值记为 $y_i\in\{-1,1\}$。回顾逻辑回归模型
+\begin{equation}
+\pi_i=p(y_i=1\mid H_i,\beta)=\frac{e^{\xi_i}}{1+e^{\xi_i}},
+\tag{2.59}
+\end{equation}
+其中，$\xi_i=H_i\beta$，$H_i=[z_i\ w_i\ x_i]$，$\beta=[\delta^T\ \eta^T\ \alpha^T]^T$。具体而言，连续变量（表型）向量 $z$ 及其系数分别记为 $z_i=[z_{i1},\ldots,z_{iK}]$ 和 $\delta=[\delta_1,\delta_2,\ldots,\delta_K]^T$。离散变量（基因型指示变量）或连续变量（函数主成分得分）记为
+\[
+x_i=[x_i^{(1)},\ldots,x_i^{(G)}],\quad
+x_i^{(g)}=[x_{i1}^{(g)},\ldots,x_{ik_g}^{(g)}],
+\quad g=1,\ldots,G.
+\]
+相应的遗传效应记为
+\[
+\alpha=\begin{bmatrix}\alpha_1\\\vdots\\\alpha_G\end{bmatrix},
+\quad
+\alpha_g=\begin{bmatrix}\alpha_{g1}\\\vdots\\\alpha_{gk_g}\end{bmatrix},
+\quad g=1,\ldots,G,\qquad m=\sum_{g=1}^{G}k_g.
+\]
+也可以简单写为 $\alpha=[\alpha_1,\alpha_2,\ldots,\alpha_m]^T$。协变量 $w_i$ 及其逻辑回归系数向量 $\eta$ 是混合变量，即离散变量或连续变量。
+
+对于每个样本，可以观测到父节点中的变量向量（协变量和基因型 $H_i$）及一个类别 $y_i$。类别变量 $y_i$ 服从 Bernoulli 分布，其参数为条件概率 $p(Y_i\mid H_i,\beta)$。似然与对数似然分别为
+\begin{equation}
+L(\beta)=\prod_{i=1}^{n}
+p(y_i\mid H_i,\beta)^{y_i}
+(1-p(Y_i\mid H_i,\beta))^{1-y_i},
+\tag{2.60}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+l(\beta)
+&=\sum_{i=1}^{n}\left[
+y_i\log p(y_i\mid H_i,\beta)
++(1-y_i)\log(1-p(y_i\mid H_i,\beta))\right]\\
+&=\sum_{i=1}^{n}\left[
+y_i\log\frac{p(y_i\mid H_i,\beta)}{1-p(y_i\mid H_i,\beta)}
++\log(1-p(y_i\mid H_i,\beta))\right]\\
+&=\sum_{i=1}^{n}\left[y_i(H_i\beta)-\log(1+e^{H_i\beta})\right].
+\end{aligned}\tag{2.61}
+\end{equation}
+现在考虑第一类惩罚，作用于父节点中连续变量和离散变量对应的路径系数，即表型系数 $\delta$ 和协变量系数 $\eta$。对 $\delta$ 和 $\eta$ 的 $L_1$ 范数正则化定义为
+\begin{equation}
+J_1=\sum_{u=1}^{K}\lVert\delta_u\rVert_1+
+\sum_{l=2}^{L}\lVert\eta_l\rVert_1.
+\tag{2.62}
+\end{equation}
+第二类惩罚是针对父节点中基因型变量的组套索（group lasso），定义为
+\begin{equation}
+J_2(\alpha)=\sum_{g=1}^{G}\phi_g\lVert\alpha_g\rVert_2.
+\tag{2.63}
+\end{equation}
+第三类惩罚是施加图约束的网络惩罚。对于子网络，采用边惩罚，即惩罚相邻节点变量之间的差异。首先考虑表型子网络中的边，该网络可能包含连续变量。考虑节点 $u$ 和 $v$ 之间权重为 $s_{uv}$ 的边，对该边施加的约束为 $\bar s_{uv}\lVert\delta_u-\delta_v\rVert_2^2$。因此，表型子网络的惩罚为
+\begin{equation}
+\sum_{(u,v)\in E_1}\bar s_{uv}\lVert\delta_u-\delta_v\rVert_2^2.
+\tag{2.64}
+\end{equation}
+其次，考虑环境—表型子网络的惩罚。连接协变量 $\eta_l$ 和表型 $\delta_u$ 的边，其惩罚为 $\bar s_{ul}\lVert\eta_l-\delta_u\rVert_2^2$。该子网络的惩罚为
+\begin{equation}
+\sum_{(l,u)\in E_2}\bar s_{ul}\lVert\eta_l-\delta_u\rVert_2^2.
+\tag{2.65}
+\end{equation}
+最后，考虑同时包含离散变量和连续变量的基因型—表型连接子网络。连接 SNP $\alpha_j$ 和表型 $\delta_u$ 的边，其惩罚为 $\bar s_{uj}\lVert\alpha_j-\delta_u\rVert_2^2$。基因型—表型连接子网络的惩罚为
+\begin{equation}
+\sum_{(j,u)\in E_3}\bar s_{uj}\lVert\alpha_j-\delta_u\rVert_2^2.
+\tag{2.66}
+\end{equation}
+合并式（2.64）、（2.65）和（2.66），得到整个网络的惩罚：
+\begin{equation}
+\begin{aligned}
+J_3(\beta)={}&
+\sum_{(u,v)\in E_1}\bar s_{uv}\lVert\delta_u-\delta_v\rVert_2^2
++\sum_{(l,u)\in E_2}\bar s_{ul}\lVert\eta_l-\delta_u\rVert_2^2\\
+&{}+\sum_{(j,u)\in E_3}\bar s_{uj}\lVert\alpha_j-\delta_u\rVert_2^2.
+\end{aligned}\tag{2.67}
+\end{equation}
+令 $\mathbf1$ 为各元素均等于 1 的 $(K+L+m)$ 维向量，定义 $(K+L+m)$ 维度向量 $d=S\mathbf1$ 和度矩阵 $D=\diag(d_1,d_2,\ldots,d_{(K+L+m)})$。整个网络对应的拉普拉斯矩阵为 $D-S$。利用拉普拉斯矩阵，可以将上式改写成矩阵形式：
+\begin{equation}
+J_3(\beta)=\beta^T(D-S)\beta.
+\tag{2.68}
+\end{equation}
+因此，惩罚对数似然函数定义为
+\begin{equation}
+\begin{aligned}
+l_p(\beta)={}&-l(\beta)
++\lambda_1\sum_{u=1}^{K}\lVert\delta_u\rVert_1
++\lambda_2\sum_{l=2}^{L}\lVert\eta_l\rVert_1
++\lambda_3\sum_{g=1}^{G}\phi_g\lVert\alpha_g\rVert_2\\
+&{}+\lambda_4\beta^T(D-S)\beta,
+\end{aligned}\tag{2.69}
+\end{equation}
+其中，
+\[
+l(\beta)=\sum_{i=1}^{n}[y_i\xi_i-\log(1+e^{\xi_i})],
+\quad\xi_i=H_i\beta,\quad H_i=[z_i\ w_i\ x_i],
+\quad\beta=\begin{bmatrix}\delta\\\eta\\\alpha\end{bmatrix}.
+\]
+参数可以用近端方法估计。将惩罚对数似然的最小值定义为父节点包含连续变量的离散节点的评分度量。
+
+\subsection{用于 NGS 数据的多重网络惩罚函数型逻辑回归模型}
+
+下一代测序（next-generation sequencing，NGS）数据中的大多数变异都是罕见变异。多元逻辑回归难以直接应用于 NGS 数据，因此需要将多元网络惩罚逻辑回归模型扩展为网络惩罚函数型逻辑回归。令 $g_i=x_i\alpha$，用 $g_i=\sum_{j=1}^{J}\int_{\tau_j}x_i(\tau)\alpha(\tau)\,d\tau$ 替换 $g_i=x_i\alpha$，就把第2.4.1节的逻辑回归模型扩展为函数型逻辑回归。将基因型函数 $x_i(\tau)$ 按其特征函数 $\phi_m(\tau)$ 展开：
+\begin{equation}
+x_i(\tau)=\sum_{m=1}^{M_j}\xi_{ijm}\phi_m(\tau).
+\tag{2.70}
+\end{equation}
+利用展开式（2.70），得到
+\begin{equation}
+g_i=\sum_{j=1}^{J}\sum_{m=1}^{M_j}\xi_{ijm}b_{jm},
+\tag{2.71}
+\end{equation}
+其中 $b_{jm}=\int_{\tau_j}\alpha(\tau)\phi_m(\tau)\,d\tau$。
+
+这样，函数型逻辑回归就转化为多元逻辑回归，评分函数问题也归结为网络惩罚多元逻辑回归分析。
+
+\subsection{用于学习混合贝叶斯网络的多分类网络惩罚逻辑回归}
+
+当离散节点是可以取多个值的分类变量时，可以用多分类逻辑回归模型量化该离散节点的评分。第8.1.6节讨论了网络惩罚多分类逻辑回归。假设分类变量共有 $C$ 个类别。如第2.4.2节所述，预测变量由三部分构成：包含环境因素的协变量、基因型和表型（或基因表达）。假设有 $L$ 个协变量（含常数 1）、$G$ 个基因，以及 $K$ 个表型和环境变量。对数似然定义为
+\begin{equation}
+\begin{aligned}
+l_p(\beta)
+&=\sum_{i=1}^{n}\sum_{c=1}^{C-1}
+\left[I(y_i=c)\log
+\frac{e^{H_i\beta^{(c)}}}{1+\sum_{c=1}^{C-1}e^{H_i\beta^{(c)}}}\right]\\
+&=\sum_{i=1}^{n}\sum_{c=1}^{C-1}
+\left[I(y_i=c)\left(H_i\beta^{(c)}
+-\log\left(1+\sum_{c=1}^{C-1}e^{H_i\beta^{(c)}}\right)\right)\right],
+\end{aligned}\tag{2.72}
+\end{equation}
+其中
+\[
+I(y_i=c)=\begin{cases}1,&y_i=c,\\0,&y_i\ne c.\end{cases}
+\]
+数据向量 $H_i$ 和参数向量 $\beta^{(c)}$ 定义为 $H_i=[z_i\ w_i\ x_i]$，以及
+\begin{equation}
+\begin{gathered}
+\beta^{(c)}=\begin{bmatrix}\delta^{(c)}\\\eta^{(c)}\\\alpha^{(c)}\end{bmatrix},
+\quad
+\delta^{(c)}=\begin{bmatrix}\delta_1^{(c)}\\\vdots\\\delta_K^{(c)}\end{bmatrix},
+\quad
+\eta^{(c)}=\begin{bmatrix}\eta_1^{(c)}\\\vdots\\\eta_L^{(c)}\end{bmatrix},\\
+\alpha^{(c)}=\begin{bmatrix}\alpha_1^{(c)}\\\vdots\\\alpha_G^{(c)}\end{bmatrix},
+\quad
+\alpha_g^{(c)}=\begin{bmatrix}\alpha_{g1}^{(c)}\\\vdots\\\alpha_{gk_g}^{(c)}\end{bmatrix},
+\qquad c=1,\ldots,C-1.
+\end{gathered}\tag{2.73}
+\end{equation}
+目标是极小化
+\begin{equation}
+\min_\beta\quad l_k(\beta).
+\tag{2.74}
+\end{equation}
+《组学与影像大数据：关联分析》结论8.4汇总的近端算法，可以用于求解这一优化问题。多分类节点 $k$ 的评分函数定义为
+\begin{equation}
+\operatorname{Score}_D(k)=l_k(\widehat\beta).
+\tag{2.75}
+\end{equation}
+最后，使用第2.6节将讨论的整数规划估计因果基因型—表型网络。
+\FloatBarrier

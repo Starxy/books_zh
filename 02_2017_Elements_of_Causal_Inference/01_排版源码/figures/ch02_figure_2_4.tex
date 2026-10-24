@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,line cap=round]
+% 三条平行入射轨迹及散射后的三条不同方向轨迹，与原图对应。
+\fill (0,0) circle (.13);
+\fill (.1,-.55) circle (.13);
+\fill (.75,-.62) circle (.13);
+\draw[thick] (0,0)--(2.15,1.92);
+\draw[thick] (.1,-.55)--(2.25,1.37);
+\draw[thick] (.75,-.62)--(2.9,1.30);
+\draw[ed,thick] (2.15,1.92)--(.94,1.66);
+\draw[ed,thick] (2.25,1.37)--(1.5,.78);
+\draw[ed,thick] (2.9,1.30)--(2.31,.13);
+\path[draw=gray!70,fill=gray!35]
+ (2.78,2.72)--(2.98,2.02)--(3.72,2.02)--(3.13,1.59)
+ --(3.36,.88)--(2.78,1.33)--(2.19,.88)--(2.42,1.59)
+ --(1.83,2.02)--(2.57,2.02)--cycle;
+\end{tikzpicture}
+\caption{初始状态与动力学定律相互独立的简单例子：一束粒子被物体散射。出射粒子包含有关物体的信息，而入射粒子不包含这种信息。}
+\label{fig:ch02-scattering}
+\end{figure}

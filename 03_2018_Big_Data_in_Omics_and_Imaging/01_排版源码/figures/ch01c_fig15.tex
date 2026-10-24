@@ -1,0 +1,53 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ n/.style={draw=green!55!black,fill=white,minimum width=9mm,minimum height=6mm,inner sep=2pt,font=\small},
+ lab/.style={font=\small,inner sep=2pt}]
+\node[n] (c15az1) at (0,5) {$Z_1$};
+\node[n] (c15az2) at (.8,3.8) {$Z_2$};
+\node[n] (c15az3) at (4.2,4.8) {$Z_3$};
+\node[n] (c15ax1) at (-.3,2.5) {$X_1$};
+\node[n] (c15ax2) at (2,2.5) {$X_2$};
+\node[n] (c15ax3) at (4.2,2.5) {$X_3$};
+\node[n] (c15ay) at (2,1) {$Y$};
+\draw[->,green!55!black] (c15az1) -- node[lab,left] {$a$} (c15az2);
+\draw[->,green!55!black] (c15az2) -- node[lab,left] {$b$} (c15ax1);
+\draw[<->,green!55!black] (c15az2.east) to[bend left=35] node[lab,right] {$c$} (c15ax2.north);
+\draw[->,green!55!black] (c15az3) -- node[lab,left] {$d$} (c15ax3);
+\draw[->,green!55!black] (c15ax1) -- node[lab,below left] {$\alpha_1$} (c15ay);
+\draw[->,green!55!black] (c15ax2) -- node[lab,left] {$\alpha_2$} (c15ay);
+\draw[->,green!55!black] (c15ax3) -- node[lab,below right] {$\alpha_3$} (c15ay);
+\node[lab,anchor=west] at (-.8,.4) {(a)};
+\node[n,text=red!80!black] (c15bz) at (7.1,4.8) {$Z$};
+\node[n] (c15bu) at (8.7,3.6) {$U$};
+\node[n] (c15bx) at (6.8,2.2) {$X$};
+\node[n] (c15by) at (10,2) {$Y$};
+\node[n] (c15bw) at (11.4,4.6) {$W$};
+\draw[->,green!55!black] (c15bz) -- (c15bu);
+\draw[->,green!55!black] (c15bz) -- (c15bx);
+\draw[->,green!55!black] (c15bu) -- (c15by);
+\draw[->,green!55!black] (c15bx) -- (c15by);
+\draw[->,green!55!black] (c15by) -- (c15bw);
+\node[lab,anchor=west] at (6.3,.4) {(b)};
+\node[lab] (c15cx) at (0,-1.8) {$X$};
+\node[lab] (c15cp) at (2.5,-1.8) {$P$};
+\node[lab] (c15cy) at (5,-1.8) {$Y$};
+\node[lab,above=8mm of c15cx] {吸烟};
+\node[lab,above=13mm of c15cp] {身体锻炼};
+\node[lab,above=8mm of c15cy] {基因表达};
+\draw[->,green!55!black] (c15cx) -- node[lab,above] {$a=0.1$} (c15cp);
+\draw[->,green!55!black] (c15cp) -- node[lab,above] {$C=0.5$} (c15cy);
+\draw[->,green!55!black] (c15cx) to[bend right=25] node[lab,below] {$b=0.2$} (c15cy);
+\node[lab,anchor=west] at (-.8,-3) {(c)};
+\node[lab] (c15dx) at (7,-1.8) {$X$};
+\node[lab] (c15dp) at (9.5,-1.8) {$P=1.6$};
+\node[lab] (c15dy) at (12,-1.8) {$Y$};
+\node[lab,above=8mm of c15dx] {吸烟};
+\node[lab,above=13mm of c15dp] {身体锻炼};
+\draw[->,green!55!black] (c15dp) -- node[lab,above] {$C=0.5$} (c15dy);
+\draw[->,green!55!black] (c15dx) to[bend right=25] node[lab,below] {$b=0.2$} (c15dy);
+\node[lab,anchor=west] at (6.3,-3) {(d)};
+\end{tikzpicture}
+\origfig{15}{后门与反事实。(a) 例 9.5.7 的有向无环图；(b) 例 9.5.8 的后门条件；(c) 反事实与线性结构方程模型；(d) 修改后的模型。}
+\label{fig:ch01c-15}
+\end{figure}

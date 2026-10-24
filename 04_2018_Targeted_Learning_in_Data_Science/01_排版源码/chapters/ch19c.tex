@@ -1,0 +1,211 @@
+% 原书分章 PDF 第 14—19 页：第 19.3—19.4 节。
+\section{以有效影响曲线表示的目标参数一阶展开}
+
+对任何这些估计量的分析，都依赖于在代入的 $\theta_0=(\bar q_0,\bar g_0)$ 估计量 $\theta_N=(\bar q_N,\bar g_N)$ 处，对目标参数作一阶 Taylor 展开。本节给出两个这样的展开：一个用于标准 TMLE，其初始估计量可能采用在线超级学习器，但靶向步骤并非在线；另一个用于完全在线的一步估计量和在线 TMLE。本节的两个定理在第 A.4 节中证明。
+
+\subsection{标准 TMLE 的展开}
+
+令 $\theta=(\bar q,\bar g)$。下面的定理 19.2 给出如下形式的一阶展开：
+\[
+ \Psi_J(P^{N*})-\Psi_J(P_0^N)
+ =-\frac1N\sum_{i=1}^N P_{0,o(i)}\bar D(P^{N*})
+ +R_{2,N}(\theta_N^*,\theta_0),
+\]
+其中，$P_{0,o(i)}$ 表示给定 $\bar O(i-1)$ 时对 $O(i)$ 求条件期望，$R_{2,N}(\theta,\theta_0)$ 为二阶余项。为了说明该恒等式与 TMLE 分析的关系，注意：若 TMLE $P^{N*}$ 满足
+\[
+ \frac1N\sum_{i=1}^N\bar D(P^{N*})(\bar O(i))=o_P(N^{-1/2}),
+\]
+则结合该恒等式可得一阶展开
+\[
+\begin{aligned}
+ \Psi_J(P^{N*})-\Psi_J(P_0^N)
+ &=\frac1N\sum_{i=1}^N
+ \{\bar D(P^{N*})(\bar O(i))-P_{0,o(i)}\bar D(P^{N*})\}\\
+ &\quad+R_{2,N}(\theta_N^*,\theta_0)+o_P(N^{-1/2}).
+\end{aligned}
+\]
+右侧首项是一个鞅过程；因而在 $R_{2,N}(\theta_N^*,\theta_0)=o_P(N^{-1/2})$ 的条件下，可以证明 $\sqrt N(\Psi_J(P^{N*})-\Psi_J(P_0^N))$ 收敛到正态极限分布。
+
+\begin{bookresult}{定理}{19.2}
+令 $\Phi_{x(s)}(x,c_x)=E(Y_{g^*}(\tau)\mid X(s)=x,C_x(s)=c_x)$，$x\in\{w,a,y\}$。回顾 $\Psi_{g^*}:\mathcal M^N\to\RR$ 的有效影响曲线表示
+\[
+ D_{g^*}^N(\theta)=\frac1N\sum_{i=1}^N\bar D_{g^*}(\theta)(\bar O(i)).
+\]
+有
+\[
+ -\frac1N\sum_{i=1}^N P_{0,o(i)}\bar D_{g^*}(\theta)
+ =\Psi_{g^*}(\theta)-\Psi_{g^*}(\theta_0)+R_{2,g^*,N}(\theta,\theta_0),
+\]
+其中，$R_{2,g^*,N}(\theta,\theta_0)=R_{21,g^*}(\theta,\theta_0)+R_{22,g^*,N}(\theta,\theta_0)$，$R_{21,g^*}(\theta,\theta_0)$ 定义于定理 A.3 的式（A.12），并且
+\[
+ R_{22,g^*,N}(\theta,\theta_0)
+ \equiv\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)
+ [\bar D_{g^*}(\theta)-\bar D_{g^*}(\theta_0)].
+\]
+回顾 $\Psi_J(P)=J^{-1}\sum_{j=1}^J\Psi_{g_j^*}(P)$ 及其典范梯度
+\[
+ D^N(P)=\frac1J\sum_{j=1}^J D_{g_j^*}^N(P),
+ \qquad D^N(P)=\frac1N\sum_{i=1}^N\bar D(P)(\bar O(i)).
+\]
+因此，
+\[
+ -\frac1N\sum_{i=1}^N P_{0,o(i)}\bar D(\theta)
+ =\Psi_J(\theta)-\Psi_J(\theta_0)+R_{2N}(\theta,\theta_0),
+\]
+其中
+\[
+\begin{aligned}
+ R_{2N}(\theta,\theta_0)&=R_{21}(\theta,\theta_0)+R_{22,N}(\theta,\theta_0),\\
+ R_{21}(\theta,\theta_0)&=\frac1J\sum_{j=1}^J R_{21,g_j^*}(\theta,\theta_0),\\
+ R_{22,N}(\theta,\theta_0)&=\frac1J\sum_{j=1}^J R_{22,g_j^*,N}(\theta,\theta_0).
+\end{aligned}
+\]
+\end{bookresult}
+
+\paragraph{控制二阶余项所需的有限记忆条件。}
+余项 $R_{21,g^*}(\theta,\theta_0)$ 显然是由 $\theta$ 与 $\theta_0$ 的差构成的二阶项。注意，$R_{22,g^*,N}(\theta,\theta_0)$ 是均值为零的随机变量的经验均值，其中每个随机变量都在 $\theta$ 逼近 $\theta_0$ 时趋于零。具体地，
+\[
+ R_{22,g^*,N}(\theta,\theta_0)
+ =\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}
+ R_{22,x(s),g^*,N}(\theta,\theta_0),
+\]
+其中
+\[
+\begin{aligned}
+ R_{22,x(s),g^*,N}(\theta,\theta_0)
+ &=\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)
+ (\bar D_{g^*,x(s)}(\theta)-\bar D_{g^*,x(s)}(\theta_0))\\
+ &=\frac1N\sum_{i=1}^N f^0_{x(s),g^*}(\theta,\theta_0)(C_x(i)),
+\end{aligned}
+\]
+并且
+\[
+\begin{aligned}
+ f^0_{x(s),g^*}(\theta,\theta_0)(C_x(i))
+ &=\{f_{x(s),g^*}(\theta,\theta_0)(C_x(i))
+ -P_0^N f_{x(s),g^*}(\theta,\theta_0)\},\\
+ f_{x(s),g^*}(\theta,\theta_0)(C_x(i))
+ &\equiv\frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}
+ \int_x\Phi_{x(s)}(x,C_x(i))\\
+ &\qquad\times d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid C_x(i)).
+\end{aligned}
+\]
+因此，$R_{22,x(s),g^*,N}(\theta,\theta_0)$ 是 $N$ 个均值为零的随机变量 $f_i=f^0_{x(s),g^*}(\theta,\theta_0)(C_x(i))$ 的平均 $X_N=N^{-1}\sum_{i=1}^N f_i$；这些随机变量都是 $C_x(i)$ 的函数，且每个 $f_i$ 都在 $\theta$ 逼近 $\theta_0$ 时趋于零。由这一表示可知，只有当时间序列的记忆有界或快速衰减时，余项 $R_{22,g^*,N}(\theta,\theta_0)$ 才可能是二阶项。第 A.4 节对此有详细讨论。
+
+\subsection{在线一步估计量与在线 TMLE 的展开}
+
+在线一步估计量和在线 TMLE 需要下面的目标参数二阶展开。
+
+\begin{bookresult}{定理}{19.3}
+令 $(\theta_n:n=1,\ldots,N)$ 为 $\theta_0=(\bar q_0,\bar g_0)$ 的一个估计量序列。有
+\[
+ -\frac1N\sum_{i=1}^N P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})
+ =\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})
+ -\Psi_{g^*}(\theta_0)+\bar R_{2,g^*,N},
+\]
+其中，$\bar R_{2,g^*,N}=\bar R_{21,g^*,N}+\bar R_{22,g^*,N}$，$\bar R_{21,g^*,N}$ 定义于定理 A.5 的式（A.14），并且
+\[
+ \bar R_{22,g^*,N}
+ \equiv\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)
+ [\bar D_{g^*}(\theta_{i-1})-\bar D_{g^*}(\theta_0)].
+\]
+与前一定理一样，这也蕴含 $\Psi_J(P)$ 的相应二阶展开。
+\end{bookresult}
+
+第 A.4 节讨论余项 $\bar R_{21,g^*,N}$，并指出其形式不如 $R_{21,g^*}$ 理想，控制该余项可能需要额外的更强平稳性假设。
+
+\section{TMLE}
+
+本节定义一个 TMLE：它基于在 $\epsilon=0$ 处经过完整密度 $p^N_{\bar q,\bar g}$ 的最不利扰动模型 $\{p^N_{\bar q_\epsilon,\bar g_\epsilon}:\epsilon\}$，满足
+\begin{equation}
+ \left.\frac d{d\epsilon}\log p^N_{\bar q_\epsilon,\bar g_\epsilon}
+ \right|_{\epsilon=0}(O^N)=D^N(\bar q,\bar g)(O^N).
+ \tag{19.4}
+\end{equation}
+
+\subsection{局部最不利扰动模型}
+
+首先考虑 $A(t)$、$Y(t)$ 均为二元变量，且 $W(t)=(W_k(t):k=1,\ldots,K)$ 是 $K$ 个二元变量构成的向量的情形。此时可以使用有效影响曲线的二元表示：它由残差乘以先前定义的“巧妙”协变量 $H_y$（19.1）、$H_a$（19.2）、$H_{w_k}$（19.3），$k=1,\ldots,K$，再求和而成。这提示我们采用如下经过 $(\bar q,\bar g)$ 的 logistic 回归扰动模型：
+\[
+\begin{aligned}
+ \operatorname{Logit}\bar q_{y,\epsilon}(1\mid c_y)
+ &=\operatorname{Logit}\bar q_y(1\mid c_y)+\epsilon H_y(c_y),\\
+ \operatorname{Logit}\bar q_{w_k,\epsilon}(1\mid c_{w_k})
+ &=\operatorname{Logit}\bar q_{w_k}(1\mid c_{w_k})+\epsilon H_{w_k}(c_{w_k}),
+ \quad k=1,\ldots,K,\\
+ \operatorname{Logit}\bar g_{a,\epsilon}(1\mid c_a)
+ &=\operatorname{Logit}\bar g(1\mid c_a)+\epsilon H_a(c_a).
+\end{aligned}
+\]
+这定义了一个在 $\epsilon=0$ 处经过完整密度 $p_{\bar q,\bar g}$ 的一维扰动模型 $\{p_{\bar q_\epsilon,\bar g_\epsilon}:\epsilon\}$，并且满足
+\begin{equation}
+ \left.\frac d{d\epsilon}\log p_{\bar q_\epsilon,\bar g_\epsilon}
+ \right|_{\epsilon=0}(O^N)=D^N(\bar q,\bar g)(O^N).
+ \tag{19.5}
+\end{equation}
+也可以分别对 $\bar q_y$、$\bar q_w$、$\bar g$ 的扰动使用不同的 $\epsilon_1$、$\epsilon_2$、$\epsilon_3$，从而得到一个三维最不利子模型。
+
+一般地，可以使用任意在 $\epsilon=0$ 处的得分张成 $D^N(\bar q,\bar g)$ 的参数模型 $\{p_{\bar q_\epsilon,\bar g_\epsilon}:\epsilon\}$。例如，在 $\epsilon=0$ 的一个局部邻域内，可以使用
+\[
+\begin{aligned}
+ \bar q_{y,\epsilon}(y\mid c_y)
+ &=\{1+\epsilon\bar D_{\bar q_y}(\bar q,\bar g)(y\mid c_y)\}\bar q_y(y\mid c_y),\\
+ \bar q_{w,\epsilon}(w\mid c_w)
+ &=\{1+\epsilon\bar D_{\bar q_w}(\bar q,\bar g)(w\mid c_w)\}\bar q_w(w\mid c_w),\\
+ \bar g_\epsilon(a\mid c_a)
+ &=\{1+\epsilon\bar D_{\bar g}(\bar q,\bar g)(a\mid c_a)\}\bar g(a\mid c_a).
+\end{aligned}
+\]
+为避免细致限定 $\epsilon$ 的取值范围，可以使用通常的指数扰动 $c(\epsilon)\exp(\epsilon D)p$；它是在 $\epsilon=0$ 处经过 $p$、得分为 $D$ 的模型，其中 $c(\epsilon)$ 为归一化常数。
+
+\subsection{一步 TMLE}
+
+令 $(\bar q_N^0,\bar g_N^0)$ 为 $(\bar q_0,\bar g_0)$ 的初始估计量，令 $\{p_{\bar q^0_{N,\epsilon},\bar g^0_{N,\epsilon}}:\epsilon\}$ 为上述在 $\epsilon=0$ 处经过 $p_{\bar q_N^0,\bar g_N^0}$ 的局部最不利参数子模型。将 $\epsilon_N$ 定义为下式的一个解：
+\[
+ D^N(\bar q_{N,\epsilon},\bar g_{N,\epsilon})(O^N)
+ =\frac1N\sum_{i=1}^N\bar D(\bar q_{N,\epsilon},\bar g_{N,\epsilon})(\bar O(i))
+ =o_P(N^{-1.2}).
+\]
+可以从初始估计量 $\epsilon^0$ 出发，采用 Newton--Raphson 算法的第一步来求解这一方程：
+\[
+ \epsilon_N=\epsilon^0+\frac1N\sum_{i=1}^N
+ \gamma_N^{-1}\bar D(\bar q_{N,\epsilon^0},\bar g_{N,\epsilon^0})(\bar O(N)),
+\]
+其中
+\[
+ \gamma_N=-\frac d{d\epsilon^0}\frac1N\sum_{i=1}^N
+ \bar D(\bar q_{N,\epsilon^0},\bar g_{N,\epsilon^0}).
+\]
+这样，只需在一个拟合值 $(\bar q,\bar g)$ 处计算 $\bar D$。由于计算 $\bar D(\bar q,\bar g)$ 可能需要大量计算资源，这一点十分重要。
+
+\subsection{迭代 TMLE}
+
+令 $k=0$，定义 MLE
+\[
+ \epsilon_N^k=\arg\max_\epsilon
+ \log p_{\bar q^k_{N,\epsilon},\bar g^k_{N,\epsilon}}(O^N).
+\]
+于是得到第一步 TMLE $\bar q_N^{k+1}=\bar q^k_{N,\epsilon_N^k}$ 和 $\bar g_n^{k+1}=\bar g^k_{N,\epsilon_N^k}$。令 $k=k+1$ 并迭代这一更新过程，就定义了第 $k$ 步 TMLE $(\bar q_N^k,\bar g_n^k)$，$k=1,2,\ldots$。目标参数 $\Psi(\bar q_0,\bar g_0)$ 对应的第 $k$ 步 TMLE，由代入估计量 $\Psi(\bar q_N^k,\bar g_N^k)$，$k=1,\ldots$，给出。如果迭代更新直至某一步 $K$ 满足 $\epsilon_N^K\approx0$，则由式（19.5）可得
+\[
+ D^N(\bar q_N^*,\bar g_N^*)(O^N)
+ =\frac1N\sum_{i=1}^N\bar D(\bar q_N^*,\bar g_N^*)(O(i))\approx0,
+\]
+其中 $\bar q_N^*=\bar q_N^K$、$\bar g_N^*=\bar g_N^K$。
+
+\paragraph{一步 TMLE。}
+若 $(\bar q_N^1,\bar g_N^1)$ 随 $N$ 以足够快的速率（例如快于 $N^{-1/4}$）收敛到 $(\bar q_0,\bar g_0)$，则可证明，第一步 TMLE 已经在渐近可忽略的误差范围内求解了这一有效影响曲线方程：
+\[
+ D^N(\bar q_N^1,\bar g_N^1)(O^N)=o_P(N^{-1/2}).
+\]
+这一步 TMLE 在计算和实际操作上均可行，而 HAL 超级学习器估计量确实会以快于 $N^{-1/4}$ 的速率收敛（第 15 章）。
+
+一般地，从统计角度出发，我们建议迭代 TMLE 更新算法，直至有效影响曲线显著小于 $\sigma_N$，例如为 $\sigma_N/10$ 或 $\sigma_N/\sqrt N$；这里，$\sigma_N$ 是下文介绍的 $D^N$ 的标准误估计值。这样可以保证，未能精确求解有效影响曲线方程所留下的偏差，不会影响 $\psi_0$ 置信区间的覆盖率。
+
+\subsection{TMLE 的分析}
+
+对这一 TMLE 的分析，依赖于
+\[
+ M_N(\theta)=\frac1{\sqrt N}\sum_{i=1}^N
+ \{\bar D_{g^*}(\theta)(\bar O(i))-P_{0,o(i)}\bar D_{g^*}(\theta)\}
+\]
+是以 $\theta$ 为指标的鞅过程。在 $\theta$ 的参数空间 $\Theta$ 满足熵条件时，可以证明该鞅过程的渐近等度连续性，从而当 $\theta_N^*$ 是 $\theta_0$ 的一致估计量时，有 $M_N(\theta_N^*)-M_N(\theta_0)=o_P(1)$，由此开展标准 TMLE 分析。这将在今后的工作中正式给出。以下各节的在线估计量不依赖这类熵条件，因此其分析更为直接。

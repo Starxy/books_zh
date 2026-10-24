@@ -1,0 +1,173 @@
+% 原章第75—79页：附录6.A，式6.A.1—6.A.20。
+\section*{附录 6.A\quad 用于边缘分布预测的因子图与平均场方法}
+\addcontentsline{toc}{section}{附录 6.A：用于边缘分布预测的因子图与平均场方法}
+\markright{附录 6.A}
+
+因子图与平均场方法是估计边缘分布的有力工具。因子图是无向图模型，将大量随机变量上的分布分解为若干局部函数的乘积，每个局部函数只依赖少数变量（Nowozin and Lampert 2011；Sutton and McCallum 2011）。令 $V$ 为变量节点集，$F$ 为因子节点集，$E$ 为连接变量节点与因子节点的边集。因子图是二分图 $G=(V,F,E)$，包含变量节点集 $V=1,2,\ldots,|V|$、因子节点集 $F=1,2,\ldots,A$，以及边集 $E=1,2,\ldots,|E|$。通常用 $i$ 索引 $V$ 中的节点，用 $a$ 索引 $F$ 中的因子。索引为 $a\in F$ 的因子的邻居定义为
+\begin{equation}
+N(a)=(i\in V:(i,a)\in E).
+\tag{6.A.1}
+\end{equation}
+因子或局部函数是非负函数，记为 $\Psi_a$（$a\in F$）。分布 $P(y)$ 可按因子图 $G$ 分解：
+\begin{equation}
+P(y)=\frac1Z\prod_{a\in F}\Psi_a(y_{N(a)}),
+\tag{6.A.2}
+\end{equation}
+其中，$\psi_a(y_{N(a)})$ 为 $y_{N(a)}$ 的局部函数，$Z$ 为归一化常数：
+\begin{equation}
+Z=\sum_{y\in Y}\prod_{a\in F}\Psi_a(y_{N(a)}).
+\tag{6.A.3}
+\end{equation}
+在因子图中，变量节点通常画为 $\circ$，因子节点通常画为
+
+\Needspace{4\baselineskip}
+\noindent\textbf{例 6.A.1}
+
+图 6.12a 是一个具有三个变量的因子图。三个圆表示变量 $y_1,y_2,y_3$ 的节点，黑色方框表示因子节点 $\Psi_1,\Psi_2,\Psi_3$。因子 $\Psi_1$ 的邻居为 $N(1)=\{1,2\}$，因此 $y_{N(1)}=\{y_1,y_2\}$，且 $\Psi_1(y_1,y_2)=\Psi_1(y_1,y_2)$。类似地，有 $\Psi_2(y_{N(2)})=\Psi_2(y_2,y_3)$ 和 $\Psi_3(y_{(N)3})=\Psi_3(y_1,y_3)$。由式 (6.A.2)，分布 $p(y)$ 可分解为
+\[
+p(y)=p(y_1,y_2,y_3)\propto\Psi_1(y_1,y_2)\Psi_2(y_2,y_3)\Psi_3(y_1,y_3).
+\]
+
+\Needspace{4\baselineskip}
+\noindent\textbf{例 6.A.2}
+
+考虑图 6.12b 所示具有完全连接图的马尔可夫随机场。图 6.12c 给出一种可能的因子分解，其中包含四个变量节点与六个因子节点：
+\[
+V=\{y_1,y_2,y_3,y_4\},\qquad F=\{\Psi_1,\Psi_2,\Psi_3,\Psi_4,\Psi_5,\Psi_6\}.
+\]
+与例 6.A.1 类似，得到 $y_{N(1)}=\{y_1,y_2\}$，且 $\Psi_1(y_{N(1)})=\Psi_1(y_1,y_2)$。类似地，
+\[
+\begin{aligned}
+\Psi_2(y_{N(2)})&=\Psi_2(y_1,y_3),\qquad\Psi_3(y_{N(3)})=\Psi_3(y_2,y_3),\\
+\Psi_4(y_{N(4)})&=\Psi_4(y_3,y_4),\qquad\Psi_5(y_{N(5)})=\Psi_5(y_1,y_4),\\
+\Psi_6(y_{N(6)})&=\Psi_6(y_2,y_3).
+\end{aligned}
+\]
+分布 $p(y)$ 可分解为
+\[
+\begin{aligned}
+P(y)&=\frac1Z\prod_{a\in F}\Psi_a(y_{N(a)})\\
+&=\frac1Z\Psi_1(y_1,y_2)\Psi_2(y_1,y_3)\Psi_3(y_2,y_3)\Psi_4(y_3,y_4)\Psi_5(y_1,y_4)\Psi_6(y_2,y_3).
+\end{aligned}
+\]
+
+考虑局部函数 $\Psi_a(y_{N(a)})$，令 $E_a(y_{N(a)})$ 为能量函数，定义为
+\begin{equation}
+E_a(y_{N(a)})=-\log(\Psi_a(y_{N(a)})).
+\tag{6.A.4}
+\end{equation}
+因子分解式 (6.A.2) 可用能量函数改写为
+\begin{equation}
+\begin{aligned}
+P(y)&=-\frac1Z\prod_{a\in F}\Psi_a(y_{N(a)})\\
+&=\frac1Z\prod_{a\in F}\exp\{-E_a(y_{N(a)})\}\\
+&=\frac1Z\exp\left\{-\sum_{a\in F}E_a(y_{N(a)})\right\},
+\end{aligned}\tag{6.A.5}
+\end{equation}
+其中，归一化常数为
+\begin{equation}
+Z=\sum_{y\in Y}\exp\Bigl\{-\sum_{a\in F}E_a(y_{N(a)}).
+\tag{6.A.6}
+\end{equation}
+平均场方法通过极小化 K–L 距离，搜索最佳近似分布：
+\begin{equation}
+\min_{q\in\Omega}D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta)),
+\tag{6.A.7}
+\end{equation}
+其中，$\Omega$ 是一族可处理的分布。根据定义，K–L 距离可化为
+\begin{equation}
+\begin{aligned}
+D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta))&=\sum_{y\in Y}q(y)\log\frac{q(y)}{P(y\mid x,\theta)}\\
+&=\sum_{y\in Y}a(y)\log q(y)-\sum_{y\in Y}q(y)\log P(y\mid x,\theta)\\
+&=-H(q)-\sum_{y\in Y}q(y)\log P(y\mid x,\theta).
+\end{aligned}\tag{6.A.8}
+\end{equation}
+将式 (6.A.5) 代入式 (6.A.8)，得到
+\begin{equation}
+\begin{aligned}
+&D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta)\\
+&\quad=-H(q)+\sum_{y\in Y}q(y)\sum_{a\in F}E_a(y_{N(a)},x_{N(a)},\theta)+\log Z(x,\theta)\\
+&\quad=-H(q)+\sum_{a\in F}\sum_{y_{N(a)}\in Y_{N(a)}}\left[\sum_{(y\in Y)\setminus y_{N(a)}}q(y)\right]\\
+&\qquad\qquad E_a(y_{N(a)},x_{N(a)},\theta)+\log Z(x,\theta)\\
+&\quad=-H(q)+\sum_{a\in F}\sum_{y_{N(a)}\in Y_{N(a)}}q(y_{N(a)})E_a(y_{N(a)},x_{N(a)},\theta)+\log Z(x,\theta),
+\end{aligned}\tag{6.A.9}
+\end{equation}
+其中，$q(y_{N(a)})=\sum_{(y\in Y)\setminus y_{N(a)}}q(y)$ 为 $q(y)$ 在变量 $N(a)$ 上的边缘分布。
+
+为降低计算复杂度，假定集合 $\Omega$ 由所有因子化分布构成，即
+\begin{equation}
+q(y)=\prod_{i\in V}q_i(y_i).
+\tag{6.A.10}
+\end{equation}
+在所有因子化分布中搜索最佳近似分布的平均场，称为朴素平均场方法（Nowozin and Lampert 2011）。在因子化分布下，熵化为
+\begin{equation}
+\begin{aligned}
+H(q)&=-\sum_{y\in Y}\prod_{i\in V}q_i(y_i)\sum_{i\in V}\log(q_i(y_i))\\
+&=\sum_{i\in V}\left[-\sum_{y_i\in Y_i}q_i(y_i)\log(q_i(y_i))\right]\\
+&=\sum_{i\in V}H_i(q_i).
+\end{aligned}\tag{6.A.11}
+\end{equation}
+$q(y)$ 在变量 $N(a)$ 上的边缘分布也可化为
+\begin{equation}
+\begin{aligned}
+q(y_{N(a)})&=\sum_{(y\in Y)\setminus y_{N(a)}}q(y)\\
+&=\prod_{i\in N(a)}q_i(y_i).
+\end{aligned}\tag{6.A.12}
+\end{equation}
+将式 (6.A.11)、(6.A.12) 代入式 (6.A.9)，得到
+\begin{equation}
+\begin{aligned}
+D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta))&=\sum_{i\in V}\sum_{y_i\in Y_i}q_i(y_i)\log(q_i(y_i))\\
+&\quad+\sum_{a\in F}\sum_{y_{N(a)}\in Y_{(a)}}\prod_{i\in N(a)}q_i(y_i)E_a(y_{N(a)},x_{N(a)},\theta)\\
+&\quad+\log Z(x,\theta).
+\end{aligned}\tag{6.A.13}
+\end{equation}
+注意，概率分布 $q_i(y_i)$ 应满足以下约束：
+\begin{equation}
+\begin{aligned}
+\sum_{y_i\in Y_i}q_i(y_i)&=1,\\
+q_i(y_i)&\geq0,\quad i\in N(a).
+\end{aligned}\tag{6.A.14}
+\end{equation}
+式 (6.A.13) 第一项为熵，因此是凸的；第二项含有乘积 $\prod_{i\in N(a)}q_i(y_i)$，并非凸函数。为使第二项成为凸函数，只对特定项 $q_i(y_i)$ 优化，将其他变量 $q_j(y_j)$（$j\in N(a)\setminus\{i\}$）固定。令 $\widehat q_j(y_j)=q_j(y_j)$ 并保持不变，去掉不受 $q_i(y_i)$ 影响的全部常数项后，式 (6.A.13) 化为
+\begin{equation}
+\begin{aligned}
+D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta))&\approx\sum_{i\in V}\sum_{y_i\in Y_i}q_i(y_i)\log(q_i(y_i))\\
+&\quad+\sum_{a\in F}\sum_{y_{N(a)}\in Y_{N(a)}}\left(\prod_{j\in N(a)\setminus\{i\}}\widehat q_j(y_i)\right)\\
+&\qquad\qquad q_i(y_i)E_a(y_{N(a)},x_{N(a)},\theta).
+\end{aligned}\tag{6.A.15}
+\end{equation}
+现在，搜索最佳近似分布的优化问题化为
+\begin{equation}
+\begin{aligned}
+\min\quad&D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta))\\
+\text{s.t.}\quad&\sum_{y_i\in Y_i}q_i(y_i)=1.
+\end{aligned}\tag{6.A.16}
+\end{equation}
+利用拉格朗日乘子法，约束优化问题 (6.A.16) 可化为
+\begin{equation}
+\min\quad G(q_i(y_i))=D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta))+\lambda\left(1-\sum_{y_i\in Y_i}q_i(y_i)\right).
+\tag{6.A.17}
+\end{equation}
+对 $G(q_i(y_i))$ 关于 $q_i(y_i)$ 求偏导并令其为零，得到
+\begin{equation}
+\begin{aligned}
+&\log(q_i(y_i))+1+\sum_{a\in F}\sum_{y_{N(a)}\in Y_{N(a)}}\left(\prod_{j\in N(a)\setminus\{i\}}\widehat q_j(y_j)\right)\\
+&\qquad E_a(y_{N(a)},x_{N(a)},\theta)-\lambda)=0.
+\end{aligned}\tag{6.A.18}
+\end{equation}
+由式 (6.A.18) 解出 $q_i(y_i)$，得到
+\begin{equation}
+\begin{aligned}
+\widehat q_i(y_i)=\exp\Biggl(&\lambda-1-\sum_{a\in F,i\in N(a)}\sum_{\substack{y_{N(a)}\in Y_{N(a)},\\{}[y_{N(a)}]=y_i}}\\
+&\left(\prod_{j\in N(a)\setminus\{i\}}\widehat q_j(y_j)\right)E_a(y_{N(a)},x_{N(a)})\Biggr).
+\end{aligned}\tag{6.A.19}
+\end{equation}
+在式 (6.A.19) 中施加约束 $\sum_{y_i\in Y_i}\widehat q_i(y_i)=1$，得到
+\begin{equation}
+\begin{aligned}
+\lambda=-\log\Biggl(\sum_{y_i\in Y_i}\exp\Biggl(&-1-\sum_{a\in F,i\in N(a)}\sum_{\substack{y_{N(a)}\in Y_{N(a)},\\{}[y_{N(a)}]=y_i}}\\
+&\left(\prod_{j\in N(a)\setminus\{i\}}\widehat q_j(y_j)\right)E_a(y_{N(a)},x_{N(a)})\Biggr)\Biggr),
+\end{aligned}\tag{6.A.20}
+\end{equation}
+其中，空乘积定义为 1。

@@ -1,0 +1,153 @@
+% 原书第 100—105 页；6.5、6.5.1。
+\section{马尔可夫性、忠实性与因果极小性}
+\label{sec:ch06-markov-faithfulness}
+\subsection{马尔可夫性}
+
+\textbf{马尔可夫性（Markov property）}是一项常用假设，也是图模型的基础。如果一个分布相对于某个图满足马尔可夫性，这个图就编码了该分布中的某些独立关系，可供高效计算或数据存储使用。有向图与无向图都存在马尔可夫性，两类图所编码的独立关系集合不同［Koller and Friedman, 2009］。不过，在因果推断中，我们主要关心有向图。许多因果推断入门文献以直接假定马尔可夫性为出发点；本书则假定背后存在一个结构因果模型。命题 6.31 将说明，这已经足以证明马尔可夫性。先给出定义。
+
+\begin{definition}[马尔可夫性]
+给定 DAG $\mathcal G$ 和联合分布 $P_{\mathbf X}$。
+\begin{enumerate}[label=(\roman*)]
+ \item 若对所有两两不相交的节点集 $\mathbf A,\mathbf B,\mathbf C$，都有
+ \[
+ \mathbf A\indep_{\mathcal G}\mathbf B\mid\mathbf C
+ \quad\Longrightarrow\quad
+ \mathbf A\indep\mathbf B\mid\mathbf C,
+ \]
+ 则称该分布相对于 DAG $\mathcal G$ 满足\textbf{全局马尔可夫性（global Markov property）}。符号 $\indep_{\mathcal G}$ 表示 d-分离，见定义 6.1。
+ \item 若给定每个变量的父节点后，该变量与其非后代节点独立，则称该分布相对于 DAG $\mathcal G$ 满足\textbf{局部马尔可夫性（local Markov property）}。
+ \item 若
+ \[
+ p(\mathbf x)=p(x_1,\ldots,x_d)
+ =\prod_{j=1}^d p(x_j\mid\pa_j^{\mathcal G}),
+ \]
+ 则称该分布相对于 DAG $\mathcal G$ 满足\textbf{马尔可夫分解性质（Markov factorization property）}。对于这一性质，需要假定 $P_{\mathbf X}$ 存在密度 $p$。乘积中的各因子称为\textbf{因果马尔可夫核（causal Markov kernel）}，描述条件分布 $P_{X_j\mid\PA_j^{\mathcal G}}$。
+\end{enumerate}
+\end{definition}
+
+只要联合分布存在密度，\footnote{本书始终考察相对于乘积测度的密度。}这三种定义就是等价的。
+
+\begin{theorem}[马尔可夫性质的等价性]
+如果 $P_{\mathbf X}$ 存在密度 $p$，则定义 6.21 中的所有马尔可夫性质等价。
+\end{theorem}
+证明可参见 Lauritzen［1996］的定理 3.27。
+
+\begin{example}
+分布 $P_{X_1,X_2,X_3,X_4}$ 相对于图 6.1（原书第 84 页）中的图 $\mathcal G$ 满足马尔可夫性，是指根据 (i) 或 (ii)，有
+\[
+ X_2\indep X_3\mid X_1,
+ \qquad X_1\indep X_4\mid X_2,X_3,
+\]
+或者根据 (iii)，有
+\[
+ p(x_1,x_2,x_3,x_4)
+ =p(x_3)p(x_1\mid x_3)p(x_2\mid x_1)p(x_4\mid x_2,x_3).
+\]
+命题 6.31 将说明，结构因果模型导出的分布，相对于该模型的图满足马尔可夫性。因此，图 6.1 左侧的模型导出的分布 $P_{X_1,X_2,X_3,X_4}$，确实满足这些条件。直观地说，$X_2\indep X_3\mid X_1$ 是合理的：考虑路径 $X_2\leftarrow X_1\leftarrow X_3$，如果已经知道 $X_1$，那么 $X_3$ 就不会再提供有关 $X_2$ 的新信息。在这个意义上，结构因果模型的图结构，会在联合分布中留下某些“痕迹”。
+\end{example}
+
+马尔可夫条件将图上的分离陈述与条件独立关系联系起来。不过，不同图也可能编码完全相同的条件独立关系集合。
+
+\begin{definition}[图的马尔可夫等价性]
+用 $\mathcal M(\mathcal G)$ 表示相对于 $\mathcal G$ 满足马尔可夫性的所有分布组成的集合：
+\[
+ \mathcal M(\mathcal G)
+ :=\{P:P\text{ 相对于 }\mathcal G\text{ 满足全局或局部马尔可夫性}\}.
+\]
+若两个 DAG $\mathcal G_1$ 和 $\mathcal G_2$ 满足 $\mathcal M(\mathcal G_1)=\mathcal M(\mathcal G_2)$，就称二者\textbf{马尔可夫等价（Markov equivalent）}。这当且仅当 $\mathcal G_1$ 与 $\mathcal G_2$ 满足完全相同的 d-分离关系，也就是说，马尔可夫条件导出相同的（条件）独立条件集合。与某个 DAG $\mathcal G$ 马尔可夫等价的全部 DAG，组成 $\mathcal G$ 的\textbf{马尔可夫等价类（Markov equivalence class）}。它可以用一个\textbf{完整部分有向无环图（completed PDAG）}表示，记为 $\operatorname{CPDAG}(\mathcal G)=(\mathbf V,\mathcal E)$：当且仅当马尔可夫等价类中至少有一个成员包含（有向）边 $(i,j)$ 时，$(i,j)\in\mathcal E$；见图 6.4。
+\end{definition}
+
+按照这一定义，判断两个 DAG 是否马尔可夫等价，似乎并非平凡问题。幸运的是，Verma and Pearl［1991］给出了一项简洁刻画；另见 Frydenberg［1990］。
+
+\begin{lemma}[马尔可夫等价的图判据]
+两个 DAG $\mathcal G_1$ 与 $\mathcal G_2$ 马尔可夫等价，当且仅当它们具有相同的骨架和相同的非道德结构。
+\end{lemma}
+
+这里，DAG 中的三个节点 $A,B,C$ 构成非道德结构或 v 结构，是指 $A\to B\leftarrow C$，且 $A$ 与 $C$ 不直接相连（见第 6.1 节）。
+
+图 6.4 左侧与中间给出两个马尔可夫等价图。二者具有相同的骨架，而且都只有一个非道德结构：$X\to Z\leftarrow V$。在相应的 CPDAG（图 6.4 右侧）中，并非所有有向边都属于非道德结构。例如，$Z\to Y$ 这条边必须保留，以免出现 v 结构 $Y\to Z\leftarrow V$。此外，$X\to Y$ 防止了有向环的出现。
+
+\input{figures/ch06_04}
+
+下面介绍\textbf{马尔可夫毯（Markov blanket）}［Pearl, 1988］这一图论概念。当我们试图根据其他所有变量的观测值预测目标变量 $Y$ 时，它就十分重要。我们可能会问：最小的变量集合是什么，使得在知道该集合中变量的值后，其余变量对预测任务都不再重要？
+
+\begin{definition}[马尔可夫毯]
+考虑 DAG $\mathcal G=(\mathbf V,\mathcal E)$ 和目标节点 $Y$。$Y$ 的马尔可夫毯，是满足下式的最小集合 $M$：
+\[
+ Y\indep_{\mathcal G}\mathbf V\setminus(\{Y\}\cup M)\mid M.
+\]
+\end{definition}
+如果 $P_{\mathbf X}$ 相对于 $\mathcal G$ 满足马尔可夫性，则
+\[
+ Y\indep\mathbf V\setminus(\{Y\}\cup M)\mid M.
+\]
+换言之，给定 $M$，其他变量不会再提供关于 $Y$ 的额外信息。因此，在理想化回归情形下，预测 $Y$ 只需要纳入 $M$ 中的变量。这并不意味着，在有限样本情形下其他变量毫无用处。如果 $Y$ 与其马尔可夫毯 $M$ 之间的相依关系，与所用回归方法的先验或函数类并不匹配，那么加入 $M$ 之外的变量，也可能改善对 $Y$ 的预测。
+
+对于 DAG，马尔可夫毯的形式是已知的：它不仅包含父节点，还包含子节点及子节点的父节点［Pearl, 1988］。
+
+\begin{proposition}[马尔可夫毯]
+考虑 DAG $\mathcal G$ 与目标节点 $Y$。$Y$ 的马尔可夫毯 $M$ 包括它的父节点、子节点，以及子节点的父节点：
+\[
+ M=\PA_Y\cup\CH_Y\cup\PA_{\CH_Y}.
+\]
+\end{proposition}
+\begin{quote}\small
+\textbf{译注：}若 $\PA_{\CH_Y}$ 按通常含义表示 $Y$ 的所有子节点的父节点并集，其中会包含 $Y$ 自身；构成马尔可夫毯时应排除 $Y$。因此原式中的这部分应理解为子节点的\emph{其他}父节点，或在整个右侧再取 $\setminus\{Y\}$。此处保留原式。
+\end{quote}
+
+到目前为止，我们将马尔可夫性视为分布与图之间的关系。现在讨论它的一些因果含义。马尔可夫性可以用来论证 Reichenbach 的共同原因原理（原理 1.1）。回顾这一原理：当随机变量 $X$ 与 $Y$ 相依时，必定存在某种“因果解释”：
+\begin{enumerate}[label=(\roman*)]
+ \item $X$（可能间接地）导致 $Y$；或者
+ \item $Y$（可能间接地）导致 $X$；或者
+ \item 存在某个（可能未观测到的）共同原因 $Z$，（可能间接地）同时导致 $X$ 与 $Y$。
+\end{enumerate}
+这里并未进一步规定“导致”的含义。下面的命题，针对“导致”的一种较弱含义，即存在有向路径，论证 Reichenbach 原理。
+
+\begin{proposition}[Reichenbach 的共同原因原理]
+假设任意一对变量 $X,Y$ 都可以按以下意义嵌入更大的系统：存在一个正确的结构因果模型，定义在包含 $X,Y$ 的随机变量集合 $\mathbf X$ 上，其图为 $\mathcal G$。那么，Reichenbach 的共同原因原理可由马尔可夫性推出。如果 $X$ 与 $Y$（无条件地）相依，则：
+\begin{enumerate}[label=(\roman*)]
+ \item 或者存在从 $X$ 到 $Y$ 的有向路径；
+ \item 或者存在从 $Y$ 到 $X$ 的有向路径；
+ \item 或者存在节点 $Z$，使得从 $Z$ 到 $X$ 以及从 $Z$ 到 $Y$ 都存在有向路径。
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+由马尔可夫性，$X$ 与 $Y$ 的相依意味着 $\mathcal G$ 中存在一条未被阻断的路径。这条路径不能包含对撞节点，否则会被空集阻断。由于 $X$ 与 $Y$ 之间任意一条不含对撞节点的路径，必定具有 $X\to\cdots\to Y$、$X\leftarrow\cdots\leftarrow Y$ 或 $X\leftarrow\cdots\leftarrow Z\to\cdots\to Y$ 的形式，结论随即成立。
+\end{proof}
+
+\begin{remark}[选择偏倚]
+在 Reichenbach 原理中，我们从两个相依随机变量出发，得到一个有效陈述。然而，在实际应用中，可能已经隐含地对第三个变量进行了条件化，即发生了选择偏倚。例 6.30 将说明，即使上述三个条件均不成立，也可能因此在 $X$ 与 $Y$ 之间产生相依关系；另见第 1.3 节末段的讨论。
+\end{remark}
+
+\begin{example}[Berkson 悖论]
+下面这个“为什么帅哥往往那么不友善？”的例子引自 Ellenberg［2014］，是\textbf{Berkson 悖论（Berkson's paradox）}［Berkson, 1946］的一个实例。设男性是否处于恋爱关系中（$R=1$），只取决于他是否英俊（$H=1$）以及是否友善（$F=1$）。更准确地说，假设正确的结构因果模型为：
+\[
+ \begin{aligned}
+ H&:=N_H,\\
+ F&:=N_F,\\
+ R&:=\min(H,F)\oplus N_R,
+ \end{aligned}
+ \qquad
+ \begin{tikzpicture}[causal,baseline=-4pt,x=1cm,y=1cm]
+ \node[vtx] (ch06g-h) at (-1,1) {$H$};
+ \node[vtx] (ch06g-f) at (1,1) {$F$};
+ \node[vtx] (ch06g-r) at (0,0) {$R$};
+ \draw[ed] (ch06g-h)--(ch06g-r);
+ \draw[ed] (ch06g-f)--(ch06g-r);
+ \end{tikzpicture}
+\]
+其中 $N_H,N_F\overset{\mathrm{iid}}{\sim}\operatorname{Ber}(0.5)$，$N_R\sim\operatorname{Ber}(0.1)$；符号 $\oplus$ 表示模 $2$ 加法。在此模型中，如果一个男性既英俊又友善，他就很可能处于恋爱关系中；否则，很可能是单身。由结构因果模型可见，$H$ 与 $F$ 被假定相互独立。然而，如果只考察没有处于恋爱关系中的男性，即以 $R=0$ 为条件，那么友善与英俊这两种特征就会呈负相关。一个人若英俊，就更可能不友善，否则他很可能已处于恋爱关系中。我们有
+\[
+ F\nindep H\mid R=0,
+\]
+因此，给定 $R$，$F$ 与 $H$ 不独立。
+\end{example}
+
+如前所述，Pearl［2009］的定理 1.4.1 证明了：结构因果模型诱导出的分布 $P_{\mathbf X}$，相对于其图满足马尔可夫性［另见 Verma and Pearl, 1988］。
+
+\begin{proposition}[结构因果模型蕴含马尔可夫性]
+假设 $P_{\mathbf X}$ 由图为 $\mathcal G$ 的结构因果模型诱导，则 $P_{\mathbf X}$ 相对于 $\mathcal G$ 满足马尔可夫性。
+\end{proposition}
+
+“一个分布相对于因果图满足马尔可夫性”这一假设，有时称为\textbf{因果马尔可夫条件（causal Markov condition）}；这需要预先给出因果图的概念。在本书中，因果图由背后的结构因果模型诱导；因果图模型这一概念则将因果图作为因果推断的出发点。
+\FloatBarrier

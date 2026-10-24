@@ -1,0 +1,273 @@
+% 原PDF174页附录4.I标题—180页末。
+\section*{附录4.I\quad 用于细胞类型识别的多核学习与谱聚类}
+\addcontentsline{toc}{section}{附录4.I 用于细胞类型识别的多核学习与谱聚类}
+\markright{附录4.I 用于细胞类型识别的多核学习与谱聚类}
+
+Wang et al.（2017）提出基于多核的单细胞RNA测序分析方法，进行数据降维和相似性学习，再利用学得的相似性进行谱聚类，识别细胞类型。本附录据Wang et al.（2017）的材料改编，自洽地介绍多核学习。
+
+考虑含有 $n$ 个细胞、$k$ 个基因的 $n\times k$ 维基因表达矩阵 $X$。第 $i$ 个和第 $j$ 个细胞间的距离度量定义为
+\begin{equation}
+D(c_i,c_j)=\sum_lw_l\|\phi_l(c_i)-\phi_l(c_j)\|_2^2,\tag{4.I.1}
+\end{equation}
+其中，$\phi_l(c_i)$ 是将细胞 $c_i$ 从基因表达空间映射至更高维特征空间的第 $l$ 个特征映射。特征空间中两点间的距离，可通过核计算：
+\begin{equation}
+\begin{aligned}
+\|\phi_l(c_i)-\phi_l(c_j)\|_2^2
+&=\phi_l(c_i)^T\phi_l(c_i)+\phi_l(c_j)^T\phi_l(c_j)
+-2\phi_l(c_i)^T\phi_l(c_j)\\
+&=K_l(c_i,c_i)+K_l(c_j,c_j)-2K_l(c_i,c_j)\\
+&=2-2K_l(c_i,c_j),
+\end{aligned}\tag{4.I.2}
+\end{equation}
+其中按惯例假设 $K_l(c_i,c_i)=K_l(c_j,c_j)=1$。因此，细胞 $i,j$ 的距离定义为以下核函数：
+\begin{equation}
+D(c_i,c_j)=2-2K_l(c_i,c_j).\tag{4.I.3}
+\end{equation}
+实际中常使用高斯核，其定义为
+\begin{equation}
+K(c_i,c_j)=\frac1{\sqrt{2\pi}\sigma_{ij}}
+\exp\left(-\frac{\|c_i-c_j\|_2^2}{2\sigma_{ij}^2}\right),\tag{4.I.4}
+\end{equation}
+其中，$c_i,c_j$ 分别是细胞 $c_i,c_j$ 的实测基因表达向量，$\|c_i-c_j\|_2$ 为欧氏距离。方差 $\sigma_{ij}$ 常按下式计算：
+\begin{equation}
+\sigma_{ij}=\frac{\sigma(\mu_i+\mu_j)}2,\qquad
+\mu_i=\frac{\sum_{j\in\operatorname{KNN}(c_i)}\|c_i-c_j\|_2}{k},\tag{4.I.5}
+\end{equation}
+其中 $\operatorname{KNN}(c_i)$ 为细胞 $c_i$ 的前 $k$ 个近邻细胞，$k,\sigma$ 是生成多个核的参数。
+
+首先介绍谱聚类的相似图。考虑 $G=(V,E)$，其中每个节点表示一个数据点（细胞），每条边表示相连节点之间的相似性，其权重取相似性度量。于是，细胞聚类问题可表述为划分此图，使不同组间边的权重较小、组内边的权重较大。令 $S_{ij}$ 为细胞（节点）$i,j$ 的相似性，定义相似矩阵 $S=(S_{ij})_{n\times n}$。
+
+为了寻找使细胞聚类最优的相似图，提出优化问题
+\begin{equation}
+\begin{aligned}
+\min_{S,L,W}\quad
+ &\sum_{i=1}^{n}\sum_{j=1}^{n}D(x_i,x_j)S_{ij}
+ +\beta\|S\|_F^2+\gamma\operatorname{Tr}\bigl(L^T(I_n-S)L\bigr)
+ +\rho\sum_lw_l\log w_l\\
+\text{约束为}\quad
+ &D(x_i,x_j)=\sum_lw_lD_l(x_i,x_j),\quad
+ \sum_lw_l=1,\quad w_l\ge0,\\
+ &L^TL=I_C,\qquad\sum_jS_{ij}=1,\quad S_{ij}\ge0,
+\end{aligned}\tag{4.I.6}
+\end{equation}
+其中，$x_i,x_j$ 为细胞 $i,j$ 的基因表达向量，即矩阵 $X$ 的第 $i,j$ 行；$D_l(x_i,x_j)$ 为细胞间的第 $l$ 种距离度量，$D(x_i,x_j)$ 为以 $w_l$ 为权重的距离加权和。
+$I_n,I_C$ 分别为 $n$ 维与 $C$ 维单位矩阵，$\|S\|_F$ 为Frobenius范数，$\beta,\gamma$ 为非负惩罚参数。目标函数对向量 $w$ 及矩阵 $S,L$ 最小化。
+
+式（4.I.5）目标函数的第一项表示，两细胞距离较小时应当接近，其相似性应当较大。第二个正则项鼓励稀疏相似图。第三项的矩阵 $I_S-S$ 为图拉普拉斯矩阵，使相似性度量诱导的相邻节点具有接近的基因表达谱。因此，第三项与 $L$ 的约束共同使 $S$ 具有低秩聚类结构，并使相似图约有 $C$ 个连通分量。图中节点表示细胞，边权表示两两相似性。第四项施加惩罚，以实现多个核的选择。
+
+将式（4.I.3）代入式（4.I.6），得到
+\begin{equation}
+\begin{aligned}
+\min_{S,L,W}\quad
+ &-2\sum_{i=1}^{n}\sum_{j=1}^{n}w_lK_l(c_i,c_j)S_{ij}
+ +\beta\|S\|_F^2\\
+ &\quad{}+\gamma\operatorname{Tr}\bigl(L^T(I_n-S)L\bigr)
+ +\rho\sum_lw_l\log w_l\\
+\text{约束为}\quad
+ &D(x_i,x_j)=\sum_lw_lD_l(x_i,x_j),\quad
+ \sum_lw_l=1,\quad w_l\ge0,\\
+ &L^TL=I_C,\qquad\sum_jS_{ij}=1,\quad S_{ij}\ge0.
+\end{aligned}\tag{4.I.7}
+\end{equation}
+接下来研究该问题的求解。
+
+\begin{bookalgorithm}{4.I.1：求解优化问题（4.I.7）的算法}
+\textbf{步骤1：}初始化 $S,w,L$。将多个核的权重初始化为均匀分布向量
+\[
+w^{(0)}=\left[\frac1G,\frac1G,\ldots,\frac1G\right],
+\]
+其中 $G$ 为核的数目。初始相似矩阵定义为
+\[
+S_{ij}=\sum_{l=1}^{G}w_lK_l(c_i,c_j),\qquad S=(S_{ij})_{C\times C}.
+\]
+将 $S$ 的前 $C$ 个特征向量作为初始矩阵 $L$。
+
+关于全部变量的优化问题（4.A7）非凸。但对各子问题迭代采用交替凸优化，即每次固定其余变量，只优化 $S,w,L$ 中的一个，是一种高效算法。首先固定 $L,w$，更新 $S$。注意
+\begin{equation}
+-\gamma\operatorname{tr}(L^TSL)=-\gamma\operatorname{Tr}(SLL^T)
+=-\gamma\sum_{i=1}^{C}\sum_{j=1}^{C}S_{ij}(LL^T)_{ij}.\tag{4.I.8}
+\end{equation}
+将式（4.5A8）代入式（4.I.7），并将2吸收到 $w_l$ 中，得到以下步骤。
+
+\textbf{步骤2：}固定 $L,w$，更新矩阵 $S$：
+\begin{equation}
+\begin{aligned}
+\min_S\quad
+ &-\sum_{i=1}^{n}\sum_{j=1}^{n}
+ \left[\sum_{l=1}^{G}w_lK_l(c_i,c_j)+\gamma(LL^T)_{ij}\right]S_{ij}
+ +\beta\|S\|_F^2\\
+\text{约束为}\quad&\sum_{j=1}^{n}S_{ij}=1,\qquad S_{ij}\ge0.
+\end{aligned}\tag{4.I.9}
+\end{equation}
+令 $s_i$ 为 $S$ 的第 $i$ 行，并令
+\[
+(v_i)_j=-\frac1{2\beta}
+\left[\gamma(LL^T)_{ij}-\sum_lw_lK_l(c_i,c_j)\right].
+\]
+由于 $S$ 的每行独立，可将问题（4.I.9）分解为 $n$ 个独立优化问题：
+\begin{equation}
+\begin{aligned}
+\min_{S_i}\quad&\frac12\|s_i-v_i\|_2^2\\
+\text{约束为}\quad&s_i^T\mathbf1=1,\quad(s_i)_j\ge0,\quad j=1,\ldots,n.
+\end{aligned}\tag{4.I.10}
+\end{equation}
+利用拉格朗日乘子，将它转为无约束问题：
+\begin{equation}
+L(s_i,\delta,\sigma)=\frac12\|s_i-v_i\|_2^2
++\delta(s_i^T\mathbf1-1)-\sigma^Ts_i,\tag{4.I.11}
+\end{equation}
+其中 $\delta,\sigma$ 分别为标量和向量拉格朗日乘子。利用Karush—Kuhn—Tucker（KKT）条件（Xiong 2018，\textit{Big Data in Omics and Imaging: Association Analysis}第1章），得到
+\begin{equation}
+\begin{gathered}
+\frac{\partial L}{\partial s_i}=s_i-v_i+\delta\mathbf1-\sigma=0,\\
+s_i\ge0,\qquad\sigma\ge0,\qquad(s_i)_j\sigma_j=0,\qquad
+s_i^T\mathbf1-1=0.
+\end{gathered}\tag{4.I.12}
+\end{equation}
+于是
+\begin{equation}
+s_i=v_i+\sigma-\delta\mathbf1.\tag{4.I.13}
+\end{equation}
+两侧与 $\mathbf1$ 作内积，利用 $s_i^T\mathbf1=1$，得到
+\begin{equation}
+\mathbf1^Tv_i+\mathbf1^T\sigma-\delta\mathbf1^T\mathbf1=1.\tag{4.I.14}
+\end{equation}
+对 $\delta$ 求解，得到
+\begin{equation}
+\delta=\frac1n(\mathbf1^Tv_i+\mathbf1^T\sigma-1).\tag{4.I.15}
+\end{equation}
+将式（4.I.15）代入式（4.I.14），得到
+\begin{equation}
+\begin{aligned}
+s_i&=v_i+\sigma-\frac1n\mathbf1(\mathbf1^Tv_i+\mathbf1^T\sigma-1)\\
+&=\left(I_n-\frac1n\mathbf1\mathbf1^T\right)v_i
++\frac1n\mathbf1+\sigma-\frac1n\mathbf1\mathbf1^T\sigma\\
+&=u_i+\sigma-\sigma^*\mathbf1,
+\end{aligned}\tag{4.I.16}
+\end{equation}
+其中
+\[
+u_i=\left(I_n-\frac1n\mathbf1\mathbf1^T\right)v_i+\frac1n\mathbf1,
+\qquad\sigma^*=\frac1n\mathbf1^T\sigma.
+\]
+若 $(s_i)_j>0$，由KKT条件（4.5A4），得到
+\begin{equation}
+\sigma_j=0.\tag{4.I.17}
+\end{equation}
+将式（4.I.17）代入式（4.I.16），利用 $(s_i)_j>0$，得到
+\begin{equation}
+(s_i)_j=((u_i)_j-\sigma^*)_+.\tag{4.I.18}
+\end{equation}
+若 $\sigma_j>0$，KKT条件意味着
+\begin{equation}
+(s_i)_j=0.\tag{4.I.19}
+\end{equation}
+代入式（4.I.16），得到
+\begin{equation}
+\sigma_j=\sigma^*-(u_i)_j.\tag{4.I.20}
+\end{equation}
+结合 $\sigma_j>0$ 与式（4.I.20），得到
+\begin{equation}
+\sigma_j=(\sigma^*-(u_i)_j)_+.\tag{4.I.21}
+\end{equation}
+由 $\sigma^*=(1/n)\mathbf1^T\sigma$ 与式（4.I.21），得到
+\begin{equation}
+f(\sigma^*)=\sigma^*-\frac1n\sum_{j=1}^{n}
+(\sigma^*-(u_i)_j)_+=0.\tag{4.I.22}
+\end{equation}
+可用牛顿法求解 $\sigma^*$。接下来转至步骤3，更新 $L$。
+
+\textbf{步骤3：}固定 $S,w$，更新 $L$。对式（4.I.7）中的隐矩阵 $L$ 最小化目标函数，等价于
+\begin{equation}
+\begin{aligned}
+\min_L\quad&\operatorname{Tr}\bigl(L^T(S-I_n)L\bigr)\\
+\text{约束为}\quad&L^TL=I_C.
+\end{aligned}\tag{4.I.23}
+\end{equation}
+利用拉格朗日乘子法求解，得到
+\begin{equation}
+\min_L\quad F=\operatorname{Tr}\bigl(L^T(S-I_n)L\bigr)
++\operatorname{Tr}\bigl(\Lambda^T(I_C-L^TL)\bigr).\tag{4.I.24}
+\end{equation}
+利用矩阵微积分，令 $F$ 关于 $L$ 的偏导数为零，得到
+\[
+(S-I_n)L-L\Lambda=0,
+\]
+从而
+\begin{equation}
+(S-I_n)L=L\Lambda.\tag{4.I.25}
+\end{equation}
+这是一个特征方程，表明解矩阵 $L^*$ 是 $S-I_n$ 最大的 $C$ 个特征值对应的特征向量。
+
+\textbf{步骤4：}固定 $S,L$，更新 $w$。求解
+\begin{equation}
+\begin{aligned}
+\min_w\quad
+ &-\sum_{l=1}^{G}w_l\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}
+ +\rho\sum_{l=1}^{G}w_l\log w_l\\
+\text{约束为}\quad&\sum_{l=1}^{G}w_l=1,\qquad w_l\ge0.
+\end{aligned}\tag{4.I.26}
+\end{equation}
+利用拉格朗日乘子法，将约束问题（4.I.13）转为无约束问题：
+\begin{equation}
+\begin{aligned}
+\min_w\quad
+ &-\sum_{l=1}^{G}w_l\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}
+ +\rho\sum_{l=1}^{G}w_l\log w_l\\
+ &{}+\lambda\left(1-\sum_{l=1}^{G}w_l\right)-\sum_{l=1}^{G}\mu_lw_l.
+\end{aligned}\tag{4.I.27}
+\end{equation}
+其最优解的必要条件为
+\begin{equation}
+-\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}
++\rho(1+\log w_l)-\lambda-\mu_l=0.\tag{4.I.28}
+\end{equation}
+由KKT条件，
+\begin{equation}
+w_l\mu_l=0.\tag{4.I.29}
+\end{equation}
+因此，$w_l\ne0$ 时有 $\mu_l=0$，式（4.I.28）化为
+\begin{equation}
+-\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}
++\rho(1+\log w_l)-\lambda=0.\tag{4.I.30}
+\end{equation}
+对 $w_l$ 求解，得到
+\begin{equation}
+w_l=\exp\left(-\left(1-\frac\lambda\rho\right)\right)
+\exp\left(\frac1\rho\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}\right).\tag{4.I.31}
+\end{equation}
+在两侧对 $l$ 求和，得到
+\begin{equation}
+\exp\left(\left(1-\frac\lambda\rho\right)\right)
+=\sum_{l=1}^{G}w_l
+\exp\left(\frac1\rho\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}\right).\tag{4.I.32}
+\end{equation}
+将式（4.I.32）代入式（4.I.31），得到
+\[
+w_l=\frac{
+\exp\left(\frac1\rho\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}\right)}{
+\sum_{l=1}^{G}w_l\exp\left(\frac1\rho\sum_{i=1}^{n}\sum_{j=1}^{n}K_l(c_i,c_j)S_{ij}\right)}.
+\]
+\textbf{步骤5：}相似性增强。将细胞间的相似性看作能沿相似图传播的信息，利用信息扩散理论建立模型，以进一步增强相似性。给定相似矩阵 $S$，定义转移矩阵 $P=(P_{ij})_{n\times n}$，其中
+\begin{equation}
+P_{ij}=\frac{S_{ij}I_{\{j\in N_K(i)\}}}{\sum_lS_{il}I_{\{l\in N_k(i)\}}},\tag{4.I.33}
+\end{equation}
+$I_{\{\cdot\}}$ 为指示函数，$N_K(i)$ 为按学得距离度量得到的细胞 $i$ 的前 $K$ 个近邻细胞索引集合。
+利用转移矩阵迭代更新相似矩阵：
+\begin{equation}
+H^{(t+1)}=\tau H^{(t)}P+(1-\tau)I_n,\tag{4.I.34}
+\end{equation}
+其中 $H^{(0)}=S$，将最后一次迭代 $T$ 的矩阵 $H$ 作为新的 $S$。
+
+\textbf{步骤6：}检查收敛性。设 $\lambda_1\le\lambda_2\le\cdots\le\lambda_n$ 为相似矩阵 $S$ 的特征值，$C$ 为聚类数。定义
+\[
+\operatorname{eigengap}(C)=\lambda_{C+1}-\lambda_C.
+\]
+实际中，当 $\operatorname{eigengap}(C)$ 停止下降时，算法收敛并停止迭代；否则返回步骤2。重复步骤2—6，直至收敛。
+
+惩罚参数 $\gamma,\beta$ 由数据确定。令 $x_i$ 为第 $i$ 个细胞的基因表达数据，$x_i^j$ 为其第 $j$ 个最近邻，$m$ 为预先指定的参数。小数据集通常取 $m=10$，大数据集取 $m=30$。参数选为
+\begin{equation}
+\gamma=\beta=\frac1{2n}\sum_{i=1}^{n}\sum_{j=1}^{m}
+\bigl(\|x_i-x_i^{m+1}\|_2^2-\|x_i-x_i^j\|_2^2\bigr).\tag{4.I.35}
+\end{equation}
+\end{bookalgorithm}

@@ -1,0 +1,68 @@
+% 分章页99—100，印刷页171—172，全部19道习题。
+\section*{习题}
+\addcontentsline{toc}{section}{习题}
+\markright{习题}
+\begin{enumerate}[label=\textbf{习题 \arabic*.},leftmargin=4.6em,labelsep=.7em]
+\item 计算例2.1中网络的评分函数 $\operatorname{Score}_D(G)$。
+\item 对例2.1与图2.3，证明
+\[
+P(x_1=0,x_2=0,x_3=0)=\frac12\frac12\frac34=\frac3{16}.
+\]
+\item 推导图2.4的混合结构方程模型。
+\item 对图2.4，推导式（2.31）中方差 $\operatorname{var}(\widehat\delta_i)$ 的公式。
+\item 对图2.4的因果图，将内生变量 $Y_1,Y_2,Y_3,Y_4$ 用随机效应 $u_1,u_2,u_3,u_4$ 及误差 $\varepsilon_1,\varepsilon_2,\varepsilon_3,\varepsilon_4$ 表示。
+\item 考虑两个随机变量 $y_1$ 与 $y_2$，以及两个有向无环图：$y_1\to y_2$ 和 $y_2\to y_1$。为这两个有向无环图写出两个非线性加性结构方程模型。
+\item 假设 $H_0$ 为有限维空间，具有正交归一基函数 $\varphi_1(x),\ldots,\varphi_p(x)$。证明再生核 $R_0(x,z)$ 为
+\[
+R_0(x,z)=\sum_{j=1}^p\varphi_j(x)\varphi_j(z).
+\]
+\item 假设再生核希尔伯特空间 $H_0$ 与 $H_1$ 分别为
+\[
+H_0=\operatorname{span}\{1\},
+\qquad
+H_1=\left\{f:f=0,\ \int_a^b(f')^2dx<\infty\right\}.
+\]
+求相应的再生核 $R_0(x,z)$ 与 $R_1(x,z)$。
+\item 考虑一般的多变量非线性函数模型：
+\[
+Y_d^i=L_if_d+\varepsilon_i,\qquad i=1,\ldots,n,
+\]
+其中 $Y_d^i$ 为第 $i$ 个样本中观测到的 $Y_d$，$L_i$ 为连续泛函，$\varepsilon_i$ 为均值为零、方差均为 $\sigma_\epsilon^2$ 的独立随机误差。为上述非线性函数模型写出惩罚似然函数，以估计平滑样条。
+\item 考虑部分线性结构方程模型的平滑样条回归：
+\[
+y_j=\mu_j+\sum_{l=1}^{l_j}\alpha_{jl}w_l
+ +\sum_{i=1}^{i_j}L_{ji}f_{ji}+\varepsilon_j,
+\]
+其中 $L_{ji}$ 为定义在再生核希尔伯特空间 $H^i$ 上的连续泛函，$f_{ji}$ 表示一般的未知函数，$\varepsilon_i$ 是均值为零、方差均为 $\sigma_j^2$ 的独立随机误差。为上述模型中的回归系数估计量及函数 $f_{ji}$ 的平滑样条估计量写出目标函数。
+\item 考虑图2.8的例子。为同时具有观测数据与干预数据的有向无环图写出负对数似然。
+\item 为图2.8中有向无环图的节点4写出评分函数。
+\item 证明
+\[
+\bigl(R^{(T^{(i)})}(I-B)\bigr)_{(k)}=
+\begin{cases}
+(I-B)_{k:}&k\notin T^{(i)},\\
+0&k\in T^{(i)},
+\end{cases}
+\qquad k=1,\ldots,p.
+\]
+\item 证明，式（2.B.24）的对数似然对 $B_{k:}^T$ 的偏导数为
+\[
+\frac{\partial l}{\partial B_{k:}^T}
+ =-n^{(-k)}\sigma_k^{-2}S^{(-k)}((I-B)_{k:})^T,
+\]
+并对图2.8的有向无环图计算 $\partial l/\partial B_{k:}^T$。
+\item 求以下整数线性规划的可行整数点：
+\[
+\begin{array}{rl}
+\text{最小化}&x+2y\\
+&2x+y\le6,\\
+&-x+y\le2,\\
+&x\ge0,\ y\ge0.
+\end{array}
+\]
+\item 求图2.11中有向无环图的所有父节点集合。
+\item 为图2.11中的有向无环图计算目标函数。
+\item 证明图2.14a满足簇约束，而图2.14b违反簇约束。
+\item 写出图2.14a中图的所有凸性约束与簇约束。
+\end{enumerate}
+\FloatBarrier

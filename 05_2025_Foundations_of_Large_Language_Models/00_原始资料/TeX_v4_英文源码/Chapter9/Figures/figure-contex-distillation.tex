@@ -1,0 +1,52 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.9cm}
+\def\bsep{2.0cm}
+
+\tikzstyle{pnode} = [minimum width=2.5cm,minimum height=0.6cm,inner sep=2pt];
+\tikzstyle{tnode} = [minimum width=11cm,minimum height=3.6cm,inner sep=2pt,draw,thick];
+
+\begin{scope}
+
+\node [pnode,anchor=west,minimum width=5.0cm,fill=red!20] (inst) at (0,0) {\footnotesize{Full Context}};
+
+\node [pnode,anchor=west,fill=blue!20] (input) at ([xshift=6cm]inst.west) {\footnotesize{User Input}};
+\node [anchor=east] (plus) at ([xshift=-0.2cm]input.west) {$+$};
+
+\node [anchor=west] (y) at ([xshift=2cm]input.east) {$\Pr^t(\mathbf{y}|\mathbf{c},\mathbf{z})$};
+\draw [->,thick] ([xshift=0.5cm]input.east) -- ([xshift=-0.5cm]y.west);
+
+\node [anchor=north] (c) at ([yshift=-0.2cm]inst.south) {$\mathbf{c}$};
+\node [anchor=north] (z) at ([yshift=-0.2cm]input.south) {$\mathbf{z}$};
+\node [anchor=north] (yl) at ([yshift=-0.1cm]y.south) {$\mathbf{y}$};
+
+\node [anchor=south west] (modellabel) at ([yshift=0.2cm]inst.north west) {\small{Teacher Model:}};
+
+\end{scope}
+
+\begin{scope}[yshift=-3.5cm]
+
+\node [pnode,anchor=west,minimum width=4.0cm,fill=ugreen!20] (inst) at (0,0) {\footnotesize{Simplified Context}};
+
+\node [pnode,anchor=west,fill=blue!20] (input) at ([xshift=6cm]inst.west) {\footnotesize{User Input}};
+\node [anchor=east] (plus) at ([xshift=-0.2cm]input.west) {$+$};
+
+\node [anchor=west] (y) at ([xshift=2cm]input.east) {$\Pr^s(\mathbf{y}|\mathbf{c}',\mathbf{z})$};
+\draw [->,thick] ([xshift=0.5cm]input.east) -- ([xshift=-0.5cm]y.west);
+
+\node [anchor=north] (c) at ([yshift=-0.1cm]inst.south) {$\mathbf{c}'$};
+\node [anchor=north] (z) at ([yshift=-0.2cm]input.south) {$\mathbf{z}$};
+\node [anchor=north] (yl) at ([yshift=-0.1cm]y.south) {$\mathbf{y}$};
+
+\node [anchor=south west] (modellabel) at ([yshift=0.2cm]inst.north west) {\small{Student Model:}};
+
+\draw [<->,very thick] (y.north) -- ([yshift=2.1cm]y.north) node [pos=0.5,left,xshift=-0.2cm,yshift=0.2cm] {$\mathrm{Loss}$};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

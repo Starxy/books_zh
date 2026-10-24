@@ -1,0 +1,86 @@
+% 原章第60页6.5至第63页末，式6.206—6.214。
+\section{影像—基因组数据的因果分析}
+
+影像数据可作为更接近基因作用的内表型（endophenotype）；与疾病最终临床结局相比，它为发现风险基因提供高得多的功效（Medland et al. 2014）。新影像技术提供脑及其他组织结构连接的精细测量，以及细胞密度、代谢等丰富生理信息。脑及其他组织图像的复杂结构，强烈受到遗传变异与表达变异的塑造。尽管各种多元回归与数据降维方法在影像—基因组关联分析中取得了成功，它们仍有若干严重局限。第一，结果缺乏直接的生物学解释。第二，缺少明确考虑图像连接结构的影像—基因组数据分析方法。第三，这些方法都不能妥善处理基因组变异对影像度量的多效性效应。稀疏高斯图模型与结构方程模型（SEM），将有助于结构影像与基因组数据的整合因果分析。
+
+\subsection{用于结构影像与基因组数据联合因果分析的稀疏 SEM}
+
+SEM 可用于结构影像与基因组数据的整合因果分析。具体而言，利用 6.2 节讨论的超像素与深度学习技术，将整幅图像分割为若干同质区域。将每个影像区域的度量视为表型，由此把影像—基因组因果分析问题，转化为基因型与多个复杂表型的因果推断。前几章讨论的基因型—表型因果推断方法，可用于影像与基因组数据的联合因果分析。本节简要介绍相应 SEM，估计方法与检验统计量参见前几章。
+
+假定抽取 $n$ 个个体。考虑 $M$ 个影像区域的 $M$ 个影像汇总度量，将它们称为内生变量。用矩阵 $y=[y_1,\ldots,y_M]$ 表示 $M$ 个内生变量的 $n$ 次观测。协变量与遗传变异定义为外生变量或预定变量，记为 $X=[x_1,\ldots,x_K]$。类似地，随机误差记为 $E=[e_1,\ldots,e_M]$。建模表型与基因型之间关系的线性结构方程，可写为
+\begin{equation}
+\begin{aligned}
+y_1\gamma_{11}+y_2\gamma_{21}+\cdots+y_M\gamma_{M1}&+x_1\beta_{11}+x_2\beta_{21}+\cdots+x_K\beta_{K1}+e_1=0\\
+\vdots\qquad\qquad&\qquad\qquad\vdots\\
+y_1\gamma_{1M}+y_2\gamma_{2M}+\cdots+y_M\gamma_{MM}&+x_1\beta_{1M}+x_2\beta_{2M}+\cdots+x_K\beta_{KM}+e_M=0,
+\end{aligned}\tag{6.206}
+\end{equation}
+其中，$\gamma$ 与 $\beta$ 是系统中未知的结构参数。参数 $\gamma$ 刻画影像区域之间的关系，参数 $\beta$ 度量 SNP 对图像强度变异的遗传贡献。用矩阵记号，式 (6.206) 的 SEM 可改写为
+\begin{equation}
+\Upsilon\Gamma+XB+E=0,
+\tag{6.207}
+\end{equation}
+其中，$\Gamma,B,E$ 为对应矩阵。
+
+一般而言，基因型—影像网络是稀疏的，因此 $\Gamma$ 与 $B$ 为稀疏矩阵。为得到两者的稀疏估计，自然的方法是对式 (6.206) 作 $l_1$ 范数惩罚回归。令 $y_i$ 为变量 $i$ 的观测向量，$Y_{-i}$ 为观测矩阵 $Y$ 去掉 $y_i$ 后的矩阵，$\gamma_{-i}$ 为参数向量 $\Gamma_i$ 去掉参数 $\gamma_{ii}$ 后的向量。第 $i$ 个方程可写为
+\begin{equation}
+y_i=W_i\Delta_i+e_i,
+\tag{6.208}
+\end{equation}
+其中，$W_i=[Y_{-i},X]$、$\Delta_i=[\gamma_{-i},B_i]$。采用 $l_1$ 范数惩罚，建立以下优化问题：
+\begin{equation}
+\min f(\Delta_i)+\lambda\lVert\Delta_i\rVert_1,
+\tag{6.209}
+\end{equation}
+其中
+\[
+f(\Delta_i)=(X^Ty_i-X^TW_i\Delta_i)^T(X^TX)^{-1}(X^Ty_i-X^TW_i\Delta_i).
+\]
+基因型—影像网络可能很大。可用高效的交替方向乘子法（ADMM）（1.3.2 节；Boyd et al. 2011）求解优化问题 (6.209)。
+
+\subsection{用于表型与基因型网络的稀疏函数型结构方程模型}
+
+为利用多基因座遗传信息，提出以基因为单位，将一个基因内各基因座的基因型建模为基因组位置的函数。利用函数型数据分析技术降维，建立稀疏函数型结构方程模型（FSEM），推断影像与基因型（下一代测序数据）网络，并定义因果分析中的代价函数。令 $t$ 为基因组位置，$x_i(t)$ 为第 $i$ 个个体的基因型谱。假定关注 $G$ 个基因，其基因组区域为 $[a_j,b_j]$，记为 $T_j$（$j=1,\ldots,k$）。考虑 FSEM：
+\begin{equation}
+\begin{aligned}
+&y_1\gamma_{11}+y_2\gamma_{21}+\cdots+y_M\gamma_{M1}\\
+&\qquad+\int_{T_1}x_1(t)\beta_{11}(t)\,dt+\cdots+\int_{T_k}x_k(t)\beta_{k1}(t)\,dt+e_1=0\\
+&y_1\gamma_{12}+y_2\gamma_{22}+\cdots+y_M\gamma_{M2}\\
+&\qquad+\int_{T_1}x_1(t)\beta_{12}(t)\,dt+\cdots+\int_{T_k}x_k(t)\beta_{k2}(t)\,dt+e_2=0\\
+&\qquad\vdots\qquad\qquad\qquad\vdots\qquad\qquad\qquad\vdots\\
+&y_1\gamma_{1M}+y_2\gamma_{2M}+\cdots+y_M\gamma_{MM}\\
+&\qquad+\int_{T_1}x_1(t)\beta_{1M}(t)\,dt+\cdots+\int_{T_k}x_k(t)\beta_{kM}(t)\,dt+e_M=0,
+\end{aligned}\tag{6.210}
+\end{equation}
+其中，$\beta_{ij}(t)$ 为遗传效应函数。将各基因组区域中的 $x_{nj}(t)$（$n=1,\ldots,N$、$j=1,2,\ldots,k$）按正交主成分函数展开：
+\begin{equation}
+x_{nj}(t)=\sum_{l=1}^{L_j}\eta_{njl}\phi_{jl}(t),\quad j=1,\ldots,k,
+\tag{6.211}
+\end{equation}
+其中，$\phi_{jl}(t)$（$j=1,\ldots,k$、$l=1,\ldots,L_j$）为第 $j$ 个基因组区域或基因的第 $l$ 个主成分函数，$\eta_{njl}$ 为第 $n$ 个个体的函数主成分得分。
+
+利用 $x_{nj}(t)$ 的函数主成分展开，得到
+\begin{equation}
+\begin{aligned}
+\int_{T_j}x_{nj}(t)\beta_{ji}(t)\,dt&=\int_{T_j}\sum_{l=1}^{L_j}\eta_{njl}\phi_{jl}(t)\beta_{ji}(t)\,dt\\
+&=\sum_{l=1}^{L_j}\eta_{njl}b_{jl}^{(i)},\quad n=1,\ldots,N,\ j=1,\ldots,k,\ i=1,\ldots,M,
+\end{aligned}\tag{6.212}
+\end{equation}
+其中，$b_{jl}^{(i)}=\int_{T_j}\phi_{jl}(t)\beta_{ji}(t)\,dt$。令 $x_j(t)=[x_{1j}(t),\ldots,x_{nj}(t)]^T$，$\eta_{jl}=[\eta_{1jl},\ldots,\eta_{Njl}]^T$。将式 (6.212) 代入式 (6.210)，得到
+\begin{equation}
+\begin{aligned}
+&y_1r_{11}+y_2r_{21}+\cdots+y_Mr_{M1}+\sum_{l=1}^{L_1}\eta_{1l}b_{1l}^{(1)}+\cdots+\sum_{l=1}^{L_k}\eta_{kl}b_{kl}^{(1)}+e_1=0\\
+&\qquad\vdots\qquad\qquad\qquad\vdots\qquad\qquad\qquad\vdots\\
+&y_1r_{1M}+y_2r_{2M}+\cdots+y_Mr_{MM}+\sum_{l=1}^{L_1}\eta_{1l}b_{1l}^{(M)}+\cdots+\sum_{l=1}^{L_k}\eta_{kl}b_{kl}^{(M)}+e_M=0.
+\end{aligned}\tag{6.213}
+\end{equation}
+由此将 FSEM 转化为多元 SEM，再用前面各节建立的技术求解。
+
+\subsection{用于结构影像与基因组数据分析的条件高斯图模型（CGGM）}
+
+将图像分割为 $M$ 个子区域后，令 $y=[y_1,\ldots,y_M]^T$ 为 $M$ 个子区域的影像汇总度量向量，$x=[x_1,\ldots,x_K]^T$ 为基因组变量向量，例如常见 SNP 的指示变量、基因总体表达水平等。令 $\Sigma$ 为协方差矩阵，$\Theta=\Sigma^{-1}$ 为其逆矩阵。矩阵 $\Theta$ 中的元素表示网络中边（影像子区域间的连接）是否存在。为推断基因组—影像网络，极小化
+\begin{equation}
+\frac12\operatorname{Tr}\bigl(Y\Theta_{yy}Y^T+\operatorname{Tr}(X\Theta_{xy}Y^T)+\lambda_1\lVert\Theta_{xy}\rVert_1+\lambda_2\lVert\Theta_{yy}\rVert_1,
+\tag{6.214}
+\end{equation}
+其中，$Y$ 为影像汇总度量矩阵，$\Sigma_{yy}$ 为 $y$ 的协方差矩阵，$\Theta_{yy}=\Sigma_{yy}^{-1}$；$X$ 为基因组变量矩阵，$\Sigma_{xy}$ 为 $x,y$ 之间的协方差矩阵，$\lambda_1,\lambda_2$ 为惩罚参数。利用 ADMM 算法（Boyd et al. 2011）学习稀疏 CGGM（习题 8），最终得到基因组—影像网络。

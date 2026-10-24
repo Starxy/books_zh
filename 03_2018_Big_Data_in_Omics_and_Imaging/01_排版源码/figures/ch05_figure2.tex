@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>={Stealth[length=2mm]},font=\small]
+\node (ch05f2top) at (0,2.9) {$5'\ \cdots\ \mathrm{CCGGTA}\cdots\ 3'$};
+\node (ch05f2bottom) at (0,2.15) {$3'\ \cdots\ \mathrm{GGCCAT}\cdots\ 5'$};
+\node at (-.42,3.55) {$\mathrm{mC}$};
+\draw (-.42,3.35)--(-.42,3.09);
+\node at (-.05,1.5) {$\mathrm{mC}$};
+\draw (-.05,1.7)--(-.05,1.96);
+\node (ch05f2ts) at (-3,1.15) {上链};
+\node (ch05f2bs) at (3,1.15) {下链};
+\draw[->] (-1.75,2.87)--(-2.75,1.48);
+\draw[->] (1.75,2.05)--(2.75,1.48);
+\node at (-3,.38) {\textcolor{red}{U}\textcolor{green!60!black}{C}GGTA};
+\node at (3,.38) {GG\textcolor{green!60!black}{C}\textcolor{red}{U}AT};
+\node at (0,-.35) {PCR 扩增};
+\node at (-3,-1.15) {\textcolor{red}{T}\textcolor{green!60!black}{C}GGTA};
+\node at (3,-1.15) {GG\textcolor{green!60!black}{C}\textcolor{red}{T}AT};
+\end{tikzpicture}
+\origfig{2}{亚硫酸氢盐处理。}
+\label{fig:ch05-bisulfite}
+\end{figure}

@@ -1,0 +1,41 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+
+\node[anchor=east] at (2.6,8.6) {转录本1};
+\draw[red,thick] (2.8,8.6)--(5.8,8.6);\draw[inkblue,thick] (5.8,8.6)--(8,8.6);\node at (9.5,8.6) {$\theta_1$};
+\node[anchor=east] at (2.6,7.8) {转录本 $i$};
+\draw[red,thick] (2.8,7.8)--(5.8,7.8);\draw[orange,thick] (5.8,7.8)--(9,7.8);\node at (9.5,7.8) {$\theta_i$};
+\node[anchor=east] at (2.6,7) {转录本 $M$};
+\draw[inkblue,thick] (2.8,7)--(5.8,7);\draw[orange,thick] (5.8,7)--(9,7);\node at (9.5,7) {$\theta_M$};
+\foreach \y in {8.4,8.22,8.04,7.6,7.42,7.24}{\draw[inkblue!55,dashed,thin] (2.8,\y)--(9,\y);}
+\node[anchor=east] at (2.6,6.25) {附加转录本};
+\draw[red,thick] (2.8,6.25)--(5.8,6.25);\draw[inkblue,thick] (5.8,6.25)--(7.6,6.25);\draw[orange,thick] (7.6,6.25)--(10.5,6.25);
+\node at (11,6.25) {$\theta_0$};\node at (.6,6) {(a)};
+\draw[red,thick] (2.8,4.9)--(5.8,4.9);\draw[orange,thick] (5.8,4.9)--(9,4.9);
+\foreach \x in {2.8,3.8,4.8,5.8,6.7,7.6,8.3,9}{\draw[green!65!black] (\x,4.9)--(\x,5.35);}
+\draw[inkblue,thick,->] (4.8,4.9)--(4.8,5.35)--(5.6,5.35);
+\node at (9.6,5.05) {$l_i$};\node at (5.5,4.35) {$p=\dfrac1{l_i}$};
+\draw[red,thick] (2.8,3)--(5.8,3);\draw[orange,thick] (5.8,3)--(7.6,3);\draw[magenta,thick] (7.6,3)--(9,3);
+\foreach \x in {2.8,3.8,4.8,5.8,6.7,7.6,8.3,9}{\draw[green!65!black] (\x,3)--(\x,3.45);}
+\node at (7.95,3.22) {A};\node at (8.65,3.22) {A};
+\draw[inkblue,thick] (2.8,3)--(2.8,2.35);\draw[inkblue,thick] (7.6,3)--(7.6,2.35);
+\draw[red,dashdotted] (2.8,2.6)--(7.6,2.6);
+\node[fill=white,inner sep=1pt] at (5.2,2.6) {$L_i-L+1$};
+\node at (8.3,2.7) {$L$};\node at (11,2.95) {$p=\dfrac1{l_i-L+1}$};\node at (.6,2.2) {(b)};
+\node at (2,.8) {$G_n$};\draw[green!65!black,->] (2.3,.8)--(3,.8);
+\fill[red!90] (3,.6) rectangle (7.4,1);\fill[inkblue!70] (7.4,.6) rectangle (9.7,1);
+\node[text=white,font=\ttfamily\small,inner sep=0] at (5.2,.8) {CTGAGGTTCCCAAGGA};
+\node[text=white,font=\ttfamily\small,inner sep=0] at (8.55,.8) {AGGTTCA};
+\draw[green!65!black] (5.4,1.05)--(5.4,1.6);
+\node[anchor=west] at (5.5,1.5) {起始位置 $j$};
+\node[anchor=west] at (10,.9) {异构体 $i$};
+\node[anchor=west] at (10,.35) {$w_t(r_{nt},g_{j+t-1}^i)$};
+\node at (4.3,-.05) {$R_n$};\draw[green!65!black,->] (4.6,-.05)--(5.3,-.05);
+\fill[magenta!75] (5.3,-.3) rectangle (8,-.0);
+\node[text=white,font=\ttfamily\small] at (6.65,-.15) {CTGAGGTT};\node at (.6,-.35) {(c)};
+
+\end{tikzpicture}
+\origfig{7}{生成模型示意。(a) 选择第 $i$ 种异构体的概率；(b) 沿第 $i$ 个转录本从位置 $j$ 开始生成读段的概率；(c) 给定所选异构体与起始位置，观测到该读段序列的概率。}
+\label{fig:ch04a-07}
+\end{figure}

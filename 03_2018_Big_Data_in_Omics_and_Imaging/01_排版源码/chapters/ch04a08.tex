@@ -1,0 +1,210 @@
+% 原书PDF第54页4.3起至第63页4.4之前。
+\section{RNA-seq 数据的 eQTL 及 eQTL 上位性分析}
+
+RNA-seq 提供多层次的分辨率与转录组复杂性信息，包括外显子、SNP 和位置层面的表达，以及剪接、异构体和等位基因特异性表达。基因内的 RNA-seq 谱表现为每个基因组位置上的多个读段，因此它是基因组位置的函数，可视为函数值性状。第3章关于函数值性状的 QTL 与上位性分析方法，均可用于 RNA-seq 数据的表达数量性状基因座（expression quantitative trait locus，eQTL）及 eQTL 上位性分析。本节再介绍二次正则化函数型典型相关分析（quadratically regularized functional canonical correlation analysis，QRFCCA）。第8.4节介绍了低秩近似与广义正则化，其中讨论的原理（\textit{Big Data in Omics and Imaging: Association Analysis}，Xiong 2018）可用于 QRFCCA。分析流程见图4.18。
+\input{figures/ch04a_fig18}
+
+\subsection{矩阵分解}
+考虑由 $n$ 个样本与 $q$ 个特征（变量、FPCA 得分）组成的数据矩阵 $A\in\mathbb R^{n\times q}$。$A$ 可以表示基因型数据、FPC 得分或表型数据，其中表型既可连续也可离散。第 $i$ 行为第 $i$ 个样本的 $q$ 维特征向量，第 $j$ 列为全部 $n$ 个样本中第 $j$ 个特征的取值。矩阵分解提供一个通用框架，将遗传、RNA-seq 与表型数据嵌入低维向量空间，从而降低维数，并去除异常或噪声数据点（Udell et al. 2016）。为此，先将 $A$ 分解为两个低秩矩阵的乘积，寻找其最佳秩 $l$ 近似。
+
+设 $G\in\mathbb R^{n\times l}$、$H\in\mathbb R^{l\times q}$，$A$ 的秩为 $r$，因此 $r\le\min(n,q)$。矩阵分解试图最小化近似误差：
+\begin{equation}
+\min_{G,H}\quad\lVert A-GH\rVert_F^2,
+\tag{4.119}
+\end{equation}
+其中 $\lVert\cdot\rVert_F$ 为矩阵的 Frobenius 范数。设 $g_i\in\mathbb R^{1\times l}$ 为 $G$ 的第 $i$ 行，$h_j\in\mathbb R^l$ 为 $H$ 的第 $j$ 列，$A_{ij}$ 为第 $i$ 个样本第 $j$ 个特征的值，定义内积 $g_ih_j=(GH)_{ij}$。问题 (4.118) 的目标函数可写为
+\begin{equation}
+\sum_{i=1}^{n}\sum_{j=1}^{q}(A_{ij}-g_ih_j)^2.
+\tag{4.120}
+\end{equation}
+截断 $A_{ij}$ 的奇异值分解（singular value decomposition，SVD），可得到问题 (4.119) 的一个解（Udell et al. 2016）。设 $A$ 的 SVD 为
+\begin{equation}
+A=U\Lambda V^T,
+\tag{4.121}
+\end{equation}
+其中
+\[
+\begin{gathered}
+U=[u_1,\ldots,u_r]\in\mathbb R^{n\times r},\qquad
+V=[v_1,\ldots,v_r]\in\mathbb R^{q\times r},\\
+U^TU=I_{r\times r},\qquad V^TV=I_{r\times r},\\
+\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_r)\in\mathbb R^{r\times r},\qquad
+\lambda_1\ge\lambda_2\ge\cdots\ge\lambda_r>0.
+\end{gathered}
+\]
+$U$ 与 $V$ 的列分别称为 $A$ 的左奇异向量与右奇异向量，$\lambda_1,\ldots,\lambda_r$ 称为奇异值。
+
+令 $\Lambda_l=\operatorname{diag}(\lambda_1,\ldots,\lambda_l)$、$U_l=[u_1,\ldots,u_l]$、$V_l=[v_1,\ldots,v_l]$。定义 $G=U_l\Lambda_l^{1/2}$、$H=\Lambda_l^{1/2}V_l$，则 $A$ 的最佳秩 $l$ 近似，或秩 $l$ 矩阵分解为（Udell et al. 2016）
+\begin{equation}
+A\approx GH.
+\tag{4.122}
+\end{equation}
+矩阵分解将原数据的 $q$ 个特征压缩为 $l<q$ 个新特征，从而降低维数。
+
+\subsection{二次正则化矩阵分解与典型相关分析}
+CCA 检验统计量的功效取决于典型相关系数的平方，即矩阵 $R^2$ 的特征值。我们希望通过改变典型相关系数的分布和降低数据维数，提高检验功效。矩阵分解中，对于固定的秩 $l$，希望用因子矩阵 $G$ 与 $H$ 的乘积尽可能准确地近似 $A$，但两个因子矩阵的 Frobenius 范数可能很大。因此需要在近似精度与因子矩阵范数之间权衡。具体地，将因子矩阵的 Frobenius 范数加入式 (4.119) 的目标函数，得到二次正则化矩阵分解问题：
+\begin{equation}
+\min_{G,H}\quad F=\lVert A-GH\rVert_F^2+\mu\lVert G\rVert_F^2+\mu\lVert H\rVert_F^2.
+\tag{4.123}
+\end{equation}
+由式 (4.122)，$G$ 与 $H$ 具有形式
+\begin{equation}
+G=U_l\Lambda_l^{1/2},\qquad H=\Lambda_l^{1/2}V_l.
+\tag{4.124}
+\end{equation}
+代入式 (4.123)，得到
+\begin{equation}
+\min_{\Lambda_l}\quad F=\lVert\Lambda-\Lambda_l\rVert_F^2+2\mu\Tr(\Lambda_l),
+\tag{4.125}
+\end{equation}
+其中 $\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_k)$，$\Lambda_l=\operatorname{diag}(\tau_1,\ldots,\tau_l,0,\ldots,0)$。展开 Frobenius 范数，进一步得到
+\begin{equation}
+\min_{\tau}\quad F=\sum_{i=1}^{l}(\lambda_i-\tau_i)^2
++\sum_{i=l+1}^{r}\lambda_i^2+2\mu\sum_{i=1}^{l}\tau_i.
+\tag{4.126}
+\end{equation}
+为最小化 $F$，令
+\begin{equation}
+\frac{\partial F}{\partial\tau_j}=-2(\lambda_j-\tau_j)+2\mu=0,
+\tag{4.127}
+\end{equation}
+解得
+\begin{equation}
+\tau_j=\lambda_j-\mu.
+\tag{4.128}
+\end{equation}
+为保证因子矩阵非负，$\tau_j$ 必须非负，故解为
+\begin{equation}
+\tau_j=(\lambda_j-\mu)_+,
+\tag{4.129}
+\end{equation}
+其中 $(a)_+=\max(a,0)$。
+
+实际中选取某个奇异值作为惩罚参数 $\mu$，使从该奇异值到最小奇异值的总和，占全部奇异值总和的20\%。定义
+\[
+\Lambda_l=\operatorname{diag}((\lambda_1-\mu)_+,\ldots,(\lambda_l-\mu)_+).
+\]
+则 $G=U_l\Lambda_l^{1/2}$ 与 $H=\Lambda_l^{1/2}V_l$ 为最小化问题 (4.42) 的解。截断 SVD 只保留最大的 $l$ 个奇异值，再对奇异值作软阈值处理，改变其分布。当 $\mu$ 增大并超过某个奇异值 $\lambda_m$ 时，$GH$ 的 $l-m+1$ 个奇异值消失。
+
+\subsection{用于 RNA-seq 数据 eQTL 及 eQTL 上位性分析的 QRFCCA}
+\subsubsection{用于 eQTL 分析的 QRFCCA}
+RNA-seq 数据与 NGS 基因型数据均可视为函数型数据。先对两者分别进行 FPCA，得到基因表达与基因型的 FPC 得分，再对两组得分应用二次正则化矩阵分解，得到式 (4.123) 中 RNA-seq 数据的 $G$ 与基因型数据的 $H$。最后，将二者分别用作式 (4.123) 中的两个矩阵 $\widetilde G=H$ 与 $\widetilde Y=G$。
+
+\subsubsection{交互作用分析的数据结构}
+用 QRFCCA 分析 RNA-seq 的 eQTL 上位性之前，先定义数据结构。考虑两个基因组区域或两个基因，分别有 $p$ 个与 $q$ 个 FPC 得分。假设抽取 $n$ 名个体。第 $i$ 名个体两个区域的遗传变异数据（FPC 得分）分别记为 $\mathbf x_i=[x_{i1},\ldots,x_{ip}]$ 与 $\mathbf z_i=[z_{i1},\ldots,z_{iq}]$。令
+\[
+\boldsymbol\xi_i=[x_{i1}z_{i1},\ldots,x_{i1}z_{iq},\ldots,x_{ip}z_{i1},\ldots,x_{ip}z_{iq}].
+\]
+定义矩阵
+\[
+\boldsymbol\xi=\begin{bmatrix}\xi_{11}&\cdots&\xi_{1pq}\\\vdots&\vdots&\vdots\\\xi_{n1}&\cdots&\xi_{npq}\end{bmatrix}.
+\]
+对 RNA-seq 数据进行 FPCA。假设表达谱有 $K$ 个 FPC 得分，第 $i$ 名个体的得分为 $y_{i1},\ldots,y_{iK}$，定义 $\mathbf y_i=[y_{i1},\ldots,y_{iK}]^T$ 为其表达函数的 FPC 得分向量。
+
+\subsubsection{多元回归}
+将得分 $\mathbf y_i$ 对两个基因的得分 $\mathbf x_i$、$\mathbf z_i$ 作多元回归，以去除主效应。模型为
+\begin{equation}
+y_{ik}=\mu_k+\sum_{m=1}^{M}\tau_{im}\theta_{mk}
++\sum_{j=1}^{p}x_{ij}\alpha_{kj}+\sum_{l=1}^{q}z_{il}\beta_{kl}+\varepsilon_{ik},
+\quad k=1,\ldots,K,
+\tag{4.130}
+\end{equation}
+其中 $\mu_k$ 为第 $k$ 个 FPC 得分的总体均值，$\theta_{mk}$ 为协变量 $\tau_{im}$ 的回归系数；$\alpha_{kj}$ 为第一个基因第 $j$ 个 FPC 得分对 RNA-seq 表达函数第 $k$ 个 FPC 得分的主要遗传加性效应；$\beta_{kl}$ 则为第二个基因第 $l$ 个 FPC 得分的相应效应。拟合模型的预测值为
+\begin{equation}
+\hat y_{ik}=\hat\mu_k+\sum_{m=1}^{M}\tau_{im}\hat\theta_{mk}
++\sum_{j=1}^{p}x_{ij}\hat\alpha_{kj}+\sum_{l=1}^{q}z_{il}\hat\beta_{kl},
+\quad k=1,\ldots,K.
+\tag{4.131}
+\end{equation}
+残差定义为 $\eta_{ik}=y_{ik}-\hat y_{ik}$，$k=1,\ldots,K$，残差矩阵为
+\[
+\boldsymbol\eta=\begin{bmatrix}\eta_{11}&\cdots&\eta_{1K}\\\vdots&\vdots&\vdots\\\eta_{n1}&\cdots&\eta_{nK}\end{bmatrix}.
+\]
+数据矩阵 $\boldsymbol\xi$ 的定义同前。
+
+\subsubsection{用于上位性分析的 CCA}
+为方便起见，假设 $K\le pq$。定义上位性分析中向量 $\boldsymbol\xi$ 与 $\boldsymbol\eta$ 的协方差矩阵
+\[
+\Sigma=\begin{bmatrix}\Sigma_{\xi\xi}&\Sigma_{\xi\eta}\\\Sigma_{\eta\xi}&\Sigma_{\eta\eta}\end{bmatrix},
+\]
+其估计为
+\begin{equation}
+\hat\Sigma=\begin{bmatrix}\hat\Sigma_{\xi\xi}&\hat\Sigma_{\xi\eta}\\\hat\Sigma_{\eta\xi}&\hat\Sigma_{\eta\eta}\end{bmatrix}
+=\frac1n\begin{bmatrix}\boldsymbol\xi^T\boldsymbol\xi&\boldsymbol\xi^T\boldsymbol\eta\\\boldsymbol\eta^T\boldsymbol\xi&\boldsymbol\eta^T\boldsymbol\eta\end{bmatrix}.
+\tag{4.132}
+\end{equation}
+求解 CCA 时，先定义 $R^2$ 矩阵（Xiong 2018，式1.220）：
+\begin{equation}
+R^2=\hat\Sigma_{\eta\eta}^{-1/2}\hat\Sigma_{\eta\xi}
+\hat\Sigma_{\xi\xi}^{-1}\hat\Sigma_{\xi\eta}\hat\Sigma_{\eta\eta}^{-1/2}.
+\tag{4.133}
+\end{equation}
+令
+\begin{equation}
+W=\hat\Sigma_{\xi\xi}^{-1/2}\hat\Sigma_{\xi\eta}\hat\Sigma_{\eta\eta}^{-1/2}.
+\tag{4.134}
+\end{equation}
+假设其奇异值分解为
+\begin{equation}
+W=U\Lambda V^T,
+\tag{4.135}
+\end{equation}
+其中 $\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_d)$、$d=\min(K,pq)$。显然，
+\begin{equation}
+W^TW=R^2=V\Lambda^2V^T.
+\tag{4.136}
+\end{equation}
+典型协变量矩阵定义为
+\begin{equation}
+A=\Sigma_{\xi\xi}^{-1/2}U,\qquad
+B=\Sigma_{\eta\eta}^{-1/2}V.
+\tag{4.137}
+\end{equation}
+典型相关系数向量为
+\begin{equation}
+\operatorname{CC}=[\lambda_1,\ldots,\lambda_d]^T.
+\tag{4.138}
+\end{equation}
+交互项与 RNA-seq 表达函数 FPC 得分之间的典型相关，衡量交互作用的强度。CCA 产生多个典型相关系数，但我们希望用单个数值衡量交互作用，故用奇异值平方和进行定量：
+\begin{equation}
+r=\sum_{i=1}^{d}\lambda_i^2=\Tr(\Lambda^2)=\Tr(R^2).
+\tag{4.139}
+\end{equation}
+检验两个基因的交互作用，等价于检验 $\boldsymbol\xi$ 与 $\boldsymbol\eta$ 的独立性，或检验 $\boldsymbol\xi$ 集合中的每个变量与 $\boldsymbol\eta$ 集合中的每个变量均不相关。无交互作用的原假设为
+\[
+H_0:\Sigma_{\xi\eta}=0.
+\]
+其似然比为
+\begin{equation}
+\Lambda_r=\frac{|\Sigma|}{|\Sigma_{\xi\xi}|\,|\Sigma_{\eta\eta}|}
+=\prod_{i=1}^{d}(1-\lambda_i^2),
+\tag{4.140}
+\end{equation}
+等于 Wilks 的 lambda $\Lambda$。这表明，用多元线性回归检验交互作用可视为 CCA 的特例。通常将似然比检验统计量定义为
+\begin{equation}
+T_{\mathrm{CCA}}=-N\sum_{i=1}^{d}\log(1-\lambda_i^2).
+\tag{4.141}
+\end{equation}
+当 $\lambda_i^2$ 较小时，可用 $N\sum_{i=1}^{d}\lambda_i^2=Nr$ 近似，其中 $r$ 为两基因交互作用的度量。交互作用越强，检验功效越高。在原假设 $H_0:\Sigma_{\xi\eta}=0$ 下，$T_{\mathrm{CC}}$ 渐近服从中心 $\chi^2_{(Kpq)}$ 分布。样本量较大时，Bartlett（1939）建议用下列统计量检验：
+\begin{equation}
+T_{\mathrm{CCA}}=-\left[N-\frac{d+3}{2}\right]
+\sum_{i=1}^{d}\log(1-\lambda_i^2).
+\tag{4.142}
+\end{equation}
+
+\subsection{真实数据分析}
+为说明 RNA-seq 数据的上位性分析，下面给出1000基因组计划的结果，采用第3.3节研究的同时具有函数型响应和函数型预测变量的函数回归方法。
+
+\subsubsection{RNA-seq 数据与 NGS 数据}
+将同时具有函数型响应和函数型预测变量的函数回归模型（BFGM）应用于 GEUVADIS RNA 测序项目的 RNA-seq 数据（Lappalainen et al. 2013；Xu et al. 2017），以及1000基因组计划的全基因组测序数据。两个项目共有350个欧洲血统样本。分析纳入15656个基因的 RNA-seq 数据，以及18986个基因中的2566261个 SNP。用 DESeq（Anders and Huber 2010）对 RNA-seq 数据进行标准化。
+
+\subsubsection{顺式–反式交互作用}
+从15656个表达基因中选出的目标基因记为 gene1，从其余18985个基因型基因中选一个记为 gene2。用 BFGM 检验 gene1 与 gene2 对目标 gene1 表达的交互作用。包含常见与罕见变异的待检验基因对共297229160个。多重检验 Bonferroni 校正后的显著交互作用阈值为 $P=1.68\times10^{-10}$。
+
+作为比较，还将标量响应、函数型预测变量的函数回归模型（SFGM）用于同一数据集。用 RPKM 与 DESeq 计算 RNA-seq 的基因总体表达值，并对所有表达值作基于秩的逆正态变换。对常见和罕见变异，BFGM、以 RPKM 为响应的 SFGM、以 DESeq 为响应的 SFGM 分别识别出162361、260和51个调控基因表达的显著顺式–反式交互作用（Xu et al. 2017）。共9846个基因的表达受到16,2361个顺式–反式交互作用影响，平均每个基因受到16个上位性作用的影响。其中，3505个基因的表达受一个显著交互作用影响，169个基因的表达受超过100个交互作用影响。
+
+为考察交互作用模式，表4.10汇总了按 BFGM 排序的前20个基因间交互作用的 $P$ 值，同时列出 SFGM（RPKM、DESeq、RNAmin）与最小 $P$ 值。SFGM（RPKM）或 SFGM（DESeq）表示以 RPKM 或 DESeq 汇总统计量为标量响应、基因型函数为预测变量的交互作用分析模型。RNAmin 表示在 SFGM 中依次以基因各基因组位置的读段数为标量响应，取所得 $P$ 值的最小值。最小 $P$ 值则表示：以函数型响应和标量预测变量的回归模型，检验两个基因间所有可能的 SNP 对后，取全部 $P$ 值的最小值。
+\input{figures/ch04a_table10}
+
+表4.10有几个显著特征。第一，罕见与罕见变异之间（34.38\%）、罕见与常见变异之间（59.38\%）的成对交互作用较常见，常见与常见变异之间的显著交互作用较少（6.25\%）。第二，两个基因有显著交互作用，通常意味着至少可以观察到一对显著交互的 SNP（最小 $P$ 值较小）；但也存在各 SNP 对共同产生显著交互效应、单独每一对只作出较小贡献的情况。第三，BFGM 检出交互作用的 $P$ 值往往远小于其他检验。第四，有些基因甚至没有轻微的边缘关联，却有显著的交互作用证据；若只检验两个边缘显著基因之间的交互作用，就可能漏掉部分显著结果。第五，BFGM 大幅降低了计算负担。
+\FloatBarrier

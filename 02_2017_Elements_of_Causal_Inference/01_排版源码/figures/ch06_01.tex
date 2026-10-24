@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.25cm,y=1.1cm]
+ \draw (-3.6,-1.65) rectangle (-0.1,1.65);
+ \node[align=left,font=\small] at (-1.85,.45) {$X_1:=f_1(X_3,N_1)$\\$X_2:=f_2(X_1,N_2)$\\$X_3:=f_3(N_3)$\\$X_4:=f_4(X_2,X_3,N_4)$};
+ \node[align=left,font=\small] at (-1.85,-1.15) {$\bullet$ $N_1,\ldots,N_4$ 相互独立\\$\bullet$ $\mathcal G$ 无环};
+ \draw (0,-1.65) rectangle (3.5,1.65);
+ \node at (.7,1.15) {$\mathcal G$};
+ \node[vtx] (ch06a-x1) at (1.75,1.1) {$X_1$};
+ \node[vtx] (ch06a-x2) at (.8,0) {$X_2$};
+ \node[vtx] (ch06a-x3) at (2.7,0) {$X_3$};
+ \node[vtx] (ch06a-x4) at (1.75,-1.1) {$X_4$};
+ \draw[ed] (ch06a-x3)--(ch06a-x1);
+ \draw[ed] (ch06a-x1)--(ch06a-x2);
+ \draw[ed] (ch06a-x2)--(ch06a-x4);
+ \draw[ed] (ch06a-x3)--(ch06a-x4);
+\end{tikzpicture}
+\caption{结构因果模型的一个例子（左）及其对应图（右）。因果排序 $\pi$ 只有一种，即满足 $3\mapsto1$、$1\mapsto2$、$2\mapsto3$、$4\mapsto4$ 的排序。}
+\end{figure}

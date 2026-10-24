@@ -1,0 +1,454 @@
+{
+  "chapter": 21,
+  "status": "complete",
+  "title": "*LLM 智能体的机制可解释性",
+  "page_count": 17,
+  "pdf": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch21_96a3ea98/agenticbook.pdf",
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/part6/21_mechanistic.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/inductionhead_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/logitlens_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/MI_concepts_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/patching_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/polysemanticity_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/SAE_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/tunedlens_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/polysemanticity_graphics.pdf",
+    "06_2026_Agentic_Large_Language_Models/03_校对记录/第21章_译校报告.json"
+  ],
+  "source_file": "work/agentic/active/part6/21_mechanistic.tex",
+  "coverage": {
+    "effective_source_fully_read": true,
+    "all_active_prose_translated": true,
+    "paragraph_blocks": {
+      "source": 74,
+      "translation": 74,
+      "match": true
+    },
+    "headings": 26,
+    "learning_boxes": 1,
+    "list_items": 13,
+    "figures_and_captions": 7,
+    "footnotes": 2,
+    "displayed_equations": 10,
+    "math_segments": 72,
+    "tables": 0,
+    "program_code_blocks": 0,
+    "code_preservation": "源章无程序代码块；未执行任何教材程序。图中的词元示例、符号、数值与数据集合保留。",
+    "bibliography_commands_preserved": true,
+    "ordinary_numbered_chapter_and_literal_star_preserved": true,
+    "original_automatic_counters_preserved": true,
+    "inactive_author_comments_excluded": true,
+    "authoritative_source": "仅使用随附 TeX 源码及其图形资产；未读取旧英文成书 PDF，未浏览更新事实。",
+    "chinese_figure_files": 7,
+    "derived_vector_asset": "polysemanticity_graphics.pdf 仅透明移除英文说明文字，中文说明由 LaTeX 叠加。"
+  },
+  "structure_checks": {
+    "headings": {
+      "match": true,
+      "source_count": 26,
+      "translation_count": 26
+    },
+    "labels": {
+      "match": true,
+      "source_count": 9,
+      "translation_count": 9
+    },
+    "references": {
+      "match": true,
+      "source_count": 6,
+      "translation_count": 6
+    },
+    "citation_keys": {
+      "match": true,
+      "source_count": 41,
+      "translation_count": 41
+    },
+    "environments": {
+      "match": true,
+      "source_count": 25,
+      "translation_count": 25
+    },
+    "bibliography": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "structural_commands": {
+      "match": true,
+      "source_count": 22,
+      "translation_count": 22
+    },
+    "code_blocks": {
+      "match": true
+    },
+    "math_segments": {
+      "match": true,
+      "symbol_multiset_match": true,
+      "source_count": 72,
+      "translation_count": 72
+    },
+    "text": {
+      "source_english_words": 4786,
+      "translated_CJK": 7156,
+      "translation_characters": 15933,
+      "source_characters": 34638,
+      "source_paragraph_blocks": 74,
+      "translation_paragraph_blocks": 74
+    },
+    "stray_chapter_counter": false,
+    "stray_part": false
+  },
+  "figure_checks": {
+    "logitlens_zh.tex": {
+      "math_symbol_multiset_match": true,
+      "annotation_layout_coordinates_excluded_from_math": true,
+      "draw_statement_count_match": true,
+      "source_draw_statements": 14,
+      "target_draw_statements": 14,
+      "foreach_data_match": true,
+      "manual_endpoint_and_label_check": "All endpoints, panels, bar values, active/inactive units, and token examples visually checked."
+    },
+    "tunedlens_zh.tex": {
+      "math_symbol_multiset_match": true,
+      "annotation_layout_coordinates_excluded_from_math": true,
+      "draw_statement_count_match": true,
+      "source_draw_statements": 16,
+      "target_draw_statements": 16,
+      "foreach_data_match": true,
+      "manual_endpoint_and_label_check": "All endpoints, panels, bar values, active/inactive units, and token examples visually checked."
+    },
+    "inductionhead_zh.tex": {
+      "math_symbol_multiset_match": true,
+      "annotation_layout_coordinates_excluded_from_math": true,
+      "draw_statement_count_match": true,
+      "source_draw_statements": 3,
+      "target_draw_statements": 3,
+      "foreach_data_match": true,
+      "manual_endpoint_and_label_check": "All endpoints, panels, bar values, active/inactive units, and token examples visually checked."
+    },
+    "patching_zh.tex": {
+      "math_symbol_multiset_match": true,
+      "annotation_layout_coordinates_excluded_from_math": true,
+      "draw_statement_count_match": true,
+      "source_draw_statements": 9,
+      "target_draw_statements": 9,
+      "foreach_data_match": true,
+      "manual_endpoint_and_label_check": "All endpoints, panels, bar values, active/inactive units, and token examples visually checked."
+    },
+    "SAE_zh.tex": {
+      "math_symbol_multiset_match": true,
+      "annotation_layout_coordinates_excluded_from_math": true,
+      "draw_statement_count_match": true,
+      "source_draw_statements": 8,
+      "target_draw_statements": 8,
+      "foreach_data_match": true,
+      "manual_endpoint_and_label_check": "All endpoints, panels, bar values, active/inactive units, and token examples visually checked."
+    },
+    "polysemanticity_graphics.pdf": {
+      "reopened_vector_paths_exact_match": true,
+      "path_count": 45,
+      "numeric_ticks_exact_match": true,
+      "tick_count": 12,
+      "source_explanatory_text_removed": true
+    },
+    "MI_concepts_zh.tex": {
+      "original_image_bytes_match": true,
+      "translated_natural_language_labels": 5,
+      "all_four_panels_kept": true
+    }
+  },
+  "new_terms": {
+    "explainable artificial intelligence (XAI)": "可解释人工智能（XAI）",
+    "behavioral interpretability": "行为可解释性",
+    "attributional interpretability": "归因可解释性",
+    "concept-based interpretability": "基于概念的可解释性",
+    "causal gap": "因果鸿沟",
+    "neural lens": "神经透镜",
+    "knowledge retrieval": "知识检索",
+    "causal necessity": "因果必要性",
+    "unembedding matrix": "反嵌入矩阵",
+    "layer norm (LN)": "层归一化（LN）",
+    "sparse feature basis": "稀疏特征基底",
+    "attention composition": "注意力组合",
+    "V-Composition": "V 组合",
+    "Q-Composition": "Q 组合",
+    "K-Composition": "K 组合",
+    "previous token head": "前一词元头",
+    "prefix-matching algorithm": "前缀匹配算法",
+    "Sparse Feature Circuits": "稀疏特征回路",
+    "completeness": "完整性",
+    "minimality": "最小性",
+    "probability recovery": "概率恢复程度",
+    "feature splitting": "特征分裂",
+    "automated interpretability": "自动化可解释性",
+    "deceptive alignment": "欺骗性对齐",
+    "situational awareness": "情境感知",
+    "training dynamics": "训练动力学"
+  },
+  "source_anomalies": [
+    {
+      "id": "21-A1",
+      "location": "第21.5.1节／式(21.3)",
+      "source_file": "work/agentic/active/part6/21_mechanistic.tex",
+      "source_line": 97,
+      "source_evidence": "converted into logits y; y = Softmax(LN(h_L) W_U)",
+      "description": "原文将 y 称为 logits，但其定义式已包含 Softmax，所得通常是概率分布。",
+      "treatment": "正文及公式按有效 TeX 保留，未自行纠正或补写。"
+    },
+    {
+      "id": "21-A2",
+      "location": "第21.5.1节“Direct Logit Attribution”／式(21.5)",
+      "source_file": "work/agentic/active/part6/21_mechanistic.tex",
+      "source_line": 118,
+      "source_evidence": "the final logit y is a linear function of the cumulative sum; DLA(l) = LN(Delta h_l) W_U",
+      "description": "原文称最终 logit 是层输出累加和的线性函数，同时给出对单层输出单独施加 LN 的 DLA 公式；与前文含 LN／Softmax 的定义有表述张力。",
+      "treatment": "正文及公式按有效 TeX 保留，未自行纠正或补写。"
+    },
+    {
+      "id": "21-A3",
+      "location": "第21.6.1节首段与组合机制段／图21.5",
+      "source_file": "work/agentic/active/part6/21_mechanistic.tex",
+      "source_line": 154,
+      "source_evidence": "attends to the previous occurrence of [A]; later: attend to the correct historical token [B]",
+      "description": "首段表述为关注此前的 [A]，后文 K 组合说明及图示的实际注意力端点则是其后的 [B]／struction。两种说法均按原稿保留。",
+      "treatment": "正文及公式按有效 TeX 保留，未自行纠正或补写。"
+    },
+    {
+      "id": "21-A4",
+      "location": "第21.6.2节评估段",
+      "source_file": "work/agentic/active/part6/21_mechanistic.tex",
+      "source_line": 186,
+      "source_evidence": "Evaluation: Faithfulness, Completeness, and Minimality",
+      "description": "原文段标题列出忠实性、完整性与最小性，正文仅明确定义前两者；没有自行补写最小性的定义。",
+      "treatment": "正文及公式按有效 TeX 保留，未自行纠正或补写。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "command": "python build.py --chapter 21 --name ch21",
+    "engine": "xelatex",
+    "no_shell_escape": true,
+    "minted_frozen_cache": true,
+    "passes": 3,
+    "stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overflow_count": 0,
+    "undefined_references": false,
+    "undefined_citations": false,
+    "multiply_defined_labels": false,
+    "page_count": 17,
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch21_96a3ea98/build_report.json",
+    "log": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch21_96a3ea98/agenticbook.log",
+    "published_by_child": false
+  },
+  "visual_qa": {
+    "method": "PyMuPDF 110 dpi 渲染并实际逐页查看；对贴近连线的训练标签另作 300 dpi 局部检查。",
+    "pages_actually_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "all_page_review_render": "work/agentic/ch21_work/qa_ch21_21c858f1",
+    "final_pdf_render": "work/agentic/ch21_work/qa_ch21_96a3ea98",
+    "final_changed_pages_rechecked": [
+      2,
+      7
+    ],
+    "other_final_pages_pixel_identical_to_reviewed_pages": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "source_assets_actually_viewed": [
+      "work/agentic/en/figures/MI-concepts.png",
+      "work/agentic/en/figures/polysemanticity_concept_plot.pdf"
+    ],
+    "figure_pages": {
+      "21.1": 2,
+      "21.2": 4,
+      "21.3": 6,
+      "21.4": 7,
+      "21.5": 8,
+      "21.6": 9,
+      "21.7": 11
+    },
+    "equation_pages": {
+      "21.1": 3,
+      "21.2": 3,
+      "21.3": 5,
+      "21.4": 5,
+      "21.5": 5,
+      "21.6": 5,
+      "21.7": 10,
+      "21.8": 10,
+      "21.9": 10,
+      "21.10": 10
+    },
+    "prose_box_caption_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      12,
+      13
+    ],
+    "bibliography_pages_viewed": [
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "issues_found_and_fixed": [
+      "初稿长标题末尾单字孤行；使用源文已有 LLM 缩写后正常排为一行，保留编号与星号。",
+      "多义性图原文字遮罩曾覆盖一小段数据线；改为只移除说明文字的透明矢量底图，并核对全部45条路径及12个刻度。",
+      "Logit透镜标签、归纳头组标题、激活修补说明及SAE维度／损失标签与线条过近；调整标签位置，保留连线端点与数据。",
+      "调优透镜训练标签第二行与虚线贴近；最后右移0.45cm，复核第7页已完全分离。",
+      "缩小探针文字遮罩下边界，完整保留原放大镜柄。"
+    ],
+    "remaining_issues": []
+  },
+  "layout_notes": [
+    "五幅 TikZ 图按可读字号呈现，保持源图全部节点、箭头端点、数据及符号；只调整说明标签布局与对比度。",
+    "保留原图浮动参数；两幅大图在单章自测中形成独立浮动页。",
+    "页数含本章参考文献；全书合排后的页码、浮动位置由 root 统一检查。"
+  ],
+  "artifact_sha256": {
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/part6/21_mechanistic.tex": "b99ee8c62a890a48ad26a7bfb43deda9435ecd9e84d167ce432dc33ee145499c",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/inductionhead_zh.tex": "1c6ea9f4773c205b1d6a6906099cc986f5ac86adf51a387c4270faab158725e6",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/logitlens_zh.tex": "8aec50c97a603d428970314301f6ab5064451c90de453017f748f711c430799f",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/MI_concepts_zh.tex": "595e69b46b797d14989c59ca9304b268ff971bc9a286978853c1f3c5c7ecbc63",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/patching_zh.tex": "a24845339277d980ebf56c281188cf158853c47b05b2df5787a3b7b296f10f9d",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/polysemanticity_zh.tex": "979e06c00707316ca17c2589594da17f985946c3258eccdd6eafe8761fbfe3d2",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/SAE_zh.tex": "e7f727f21fe32f702abdf0fb893096199c42c68e0aeedf9785d3ebc7c627210f",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/tunedlens_zh.tex": "97f0de62472afdfb58ab4a591dbd98072eec8a1056f2646650ee8ef16113689a",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch21/polysemanticity_graphics.pdf": "912dc90ce5ba20dd487fa52af750150e7032e82538f5c813ae492a02868f0114"
+  },
+  "scratch_directory": "work/agentic/ch21_work",
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

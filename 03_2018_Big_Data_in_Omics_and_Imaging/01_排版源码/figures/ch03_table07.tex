@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\origtable{7}{四种不同交互作用模型中，第 $h$ 对 SNP 的风险参数 $r$。}
+\label{tab:ch03-07}
+\small
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{llcccc}
+\toprule
+第一位点 & 第二位点 & 显性或显性 & 显性且显性 & 隐性或隐性 & 阈值\\
+\midrule
+$Q_{h1}Q_{h1}$ & $Q_{h2}Q_{h2}$ & $r$ & $r$ & $r$ & $r$\\
+$Q_{h1}q_{h1}$ & $Q_{h2}Q_{h2}$ & $r$ & $r$ & $r$ & $r$\\
+$q_{h1}q_{h1}$ & $Q_{h2}Q_{h2}$ & $r$ & $0$ & $r$ & $0$\\
+$Q_{h1}Q_{h1}$ & $Q_{h2}q_{h2}$ & $r$ & $r$ & $r$ & $r$\\
+$Q_{h1}q_{h1}$ & $Q_{h2}q_{h2}$ & $r$ & $r$ & $0$ & $0$\\
+$q_{h1}q_{h1}$ & $Q_{h2}q_{h2}$ & $r$ & $0$ & $0$ & $0$\\
+$Q_{h1}Q_{h1}$ & $q_{h2}q_{h2}$ & $r$ & $0$ & $r$ & $0$\\
+$Q_{h1}q_{h1}$ & $q_{h2}q_{h2}$ & $r$ & $0$ & $0$ & $0$\\
+$q_{h1}q_{h1}$ & $q_{h2}q_{h2}$ & $0$ & $0$ & $0$ & $0$\\
+\bottomrule
+\end{tabular}
+\end{table}

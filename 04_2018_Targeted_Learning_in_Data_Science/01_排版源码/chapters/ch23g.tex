@@ -1,0 +1,54 @@
+% 原书分章 PDF 第 12 页：第 23.7 节及第 23.1 节的全部证明。
+\section{证明}
+
+\noindent\textbf{第 23.1 节的证明。}先陈述一个简单引理。
+
+\begin{bookresult}{引理}{23.2}
+对于分布 $P$ 和随机规则 $d$，$\Psi_d$ 有下列表示：
+\[
+ \Psi_d(P)\triangleq\E_{P_U\times P}[d(U,W)\bar Q_{b,P}(W)]+\E_P[\bar Q_P(0,W)].
+\]
+\end{bookresult}
+
+\begin{proof}[证明（引理 23.2）]
+有
+\[
+\begin{aligned}
+ \Psi_d(P)&=\E_{P_U\times P}[d(U,W)\bar Q_P(1,W)]\\
+ &\quad+\E_{P_U\times P}[(1-d(U,W))\bar Q_P(0,W)]\\
+ &=\E_{P_U\times P}[d(U,W)(\bar Q_P(1,W)-\bar Q_P(0,W))]\\
+ &\quad+\E_P[\bar Q_P(0,W)]\\
+ &=\E_{P_U\times P}[d(U,W)\bar Q_{b,P}(W)]+\E_P[\bar Q_P(0,W)].\qedhere
+\end{aligned}
+\]
+\end{proof}
+
+\begin{proof}[证明（定理 23.1）]
+该结果将由定理 23.2 推出。如果 $P(\bar Q_{b,0}(W)=\tau_P)=0$，那么 $d_P(U,W)$ 在 $P_U\times P$ 下几乎处处等于 $\tilde d_P(W)$，从而 $\Psi_{\tilde d_P}(P)=\Psi_{d_P}(P)$。因此，$(u,w)\mapsto\tilde d_P(w)$ 是一个最优随机策略。由于确定性策略类是随机策略类的一个子集，$\tilde d_P$ 就是一个最优确定性策略。
+\end{proof}
+
+\begin{proof}[证明（定理 23.2）]
+令 $d$ 为满足资源约束的某个随机处理规则。对于 $(b,c)\in\{0,1\}^2$，定义
+$B_{bc}\triangleq\{(u,w):d_P(u,w)=b,d(u,w)=c\}$。注意，
+\begin{equation}
+\begin{aligned}
+ \Psi_{d_P}(P)-\Psi_d(P)
+ &=\E_{P_U\times P}[(d_P(U,W)-d(U,W))\bar Q_{b,0}(W)]\\
+ &=\E_{P_U\times P}[\bar Q_{b,0}(W)I((U,W)\in B_{10})]\\
+ &\quad-\E_{P_U\times P}[\bar Q_{b,0}(W)I((U,W)\in B_{01})].
+\end{aligned}
+\tag{23.6}
+\end{equation}
+式 (23.6) 第一项中的 $\bar Q_{b,0}(W)$ 可由 $\tau_P$ 从上方界定，第二项中的 $\bar Q_{b,0}(W)$ 可由 $\tau_P$ 从下方界定。下面用 $\Pr_{P_U\times P}(\text{事件})$ 表示该事件在乘积分布 $P_U\times P$ 下的概率。因此，
+\[
+\begin{aligned}
+ \Psi_{d_P}(P)-\Psi_d(P)
+ &\geq\tau_P\bigl[\Pr_{P_U\times P}((U,W)\in B_{10})\\
+ &\hspace{5em}-\Pr_{P_U\times P}((U,W)\in B_{01})\bigr]\\
+ &=\tau_P\bigl[\Pr_{P_U\times P}((U,W)\in B_{10}\cup B_{11})\\
+ &\hspace{5em}-\Pr_{P_U\times P}((U,W)\in B_{01}\cup B_{11})\bigr]\\
+ &=\tau_P\{\E_{P_U\times P}[d_P(U,W)]-\E_{P_U\times P}[d(U,W)]\}.
+\end{aligned}
+\]
+如果 $\tau_P=0$，最后一行为零。否则，由式 (23.4)，$\E_{P_U\times P}[d_P(U,W)]=\kappa$。由于 $d$ 满足资源约束，$\E_{P_U\times P}[d(U,W)]\leq\kappa$，因此上式最后一行至少为零。于是，对所有 $\tau_P$，都有 $\Psi_{d_P}(P)-\Psi_d(P)\geq0$。由于 $d$ 是任意的，$d_P$ 是一个最优随机规则。
+\end{proof}

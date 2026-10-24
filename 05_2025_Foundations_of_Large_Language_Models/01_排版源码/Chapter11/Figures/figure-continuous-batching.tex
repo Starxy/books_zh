@@ -1,0 +1,332 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.08cm}
+\def\bsep{2.5cm}
+
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=0.6cm,inner sep=2pt,draw,fill=white,rounded corners=0pt]
+\tikzstyle{snode} = [minimum width=0.3cm,minimum height=0.3cm,inner sep=0pt,fill=red!30]
+
+
+% step 0
+\begin{scope}
+
+% prefilling (step 0)
+\node [snode,anchor=north] (x20) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {\scriptsize{1}};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {\scriptsize{1}};
+\node [snode,anchor=north,fill=ugreen!30] (x10) at ([yshift=-\ssep]x20.south) {};
+\node [snode,anchor=west] (x11) at ([xshift=\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {\scriptsize{2}};
+\node [snode,anchor=north,fill=white] (x00) at ([yshift=-\ssep]x10.south) {};
+\node [snode,anchor=west,fill=white] (x01) at ([xshift=\ssep]x00.east) {};
+\node [snode,anchor=west,fill=white] (x02) at ([xshift=\ssep]x01.east) {};
+
+\node [snode,anchor=west,fill=white] (y01) at ([xshift=\ssep]x02.east) {};
+\node [snode,anchor=west,fill=white] (y02) at ([xshift=\ssep]y01.east) {};
+\node [snode,anchor=west,fill=white] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=white] (y04) at ([xshift=\ssep]y03.east) {};
+\node [snode,anchor=west,fill=white] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=white] (y11) at ([xshift=\ssep]x12.east) {};
+\node [snode,anchor=west,fill=white] (y12) at ([xshift=\ssep]y11.east) {};
+\node [snode,anchor=west,fill=white] (y13) at ([xshift=\ssep]y12.east) {};
+\node [snode,anchor=west,fill=white] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=white] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=white] (y21) at ([xshift=\ssep]x22.east) {};
+\node [snode,anchor=west,fill=white] (y22) at ([xshift=\ssep]y21.east) {};
+\node [snode,anchor=west,fill=white] (y23) at ([xshift=\ssep]y22.east) {};
+\node [snode,anchor=west,fill=white] (y24) at ([xshift=\ssep]y23.east) {};
+\node [snode,anchor=west,fill=white] (y25) at ([xshift=\ssep]y24.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (y25)] (batchbox) {};
+\node [anchor=north] (batchlabel) at (batchbox.south) {\scriptsize{为 $\mathbf{x}_1$ 与 $\mathbf{x}_2$ 预填充。}};
+\end{pgfonlayer}
+
+\node [anchor=east,draw,minimum height=1.33cm,minimum width=1.7cm,inner sep=0,thick] (scheduler) at ([xshift=-0.5cm]batchbox.west) {\footnotesize{调度器}};
+\draw [->] ([yshift=0.2cm,xshift=1pt]scheduler.east) -- ([yshift=0.2cm,xshift=-1pt]batchbox.west);
+
+\node [anchor=south,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (input) at ([yshift=0.4cm]scheduler.north) {\scriptsize{$\mathbf{x}_1$, $\mathbf{x}_2$}\\[-0.08cm] \scriptsize{到达}};
+\node [anchor=north,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (output) at ([yshift=-0.4cm]scheduler.south) {\scriptsize{}};
+
+\draw [->] ([yshift=-1pt]input.south) -- ([yshift=1pt]scheduler.north);
+\draw [->] ([yshift=-1pt]scheduler.south) -- ([yshift=1pt]output.north);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm,xshift=0.5cm]batchbox.south west) {\small{(a) 迭代 1}};
+
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (inputlabel) at ([xshift=-0.1cm,yshift=0.1cm]input.north west) {\tiny{输入}};
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (outputlabel) at ([xshift=-0.1cm,yshift=0.1cm]output.north west) {\tiny{输出}};
+\node [anchor=north east,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (batchlabel) at ([xshift=0.1cm,yshift=0.15cm]batchbox.north east) {\tiny{批次}};
+
+\end{scope}
+
+
+% step 1
+\begin{scope}[xshift=7.5cm]
+
+\node [snode,anchor=north] (x20) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {\scriptsize{1}};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {\scriptsize{1}};
+\node [snode,anchor=north,fill=ugreen!30] (x10) at ([yshift=-\ssep]x20.south) {};
+\node [snode,anchor=west] (x11) at ([xshift=\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {\scriptsize{2}};
+\node [snode,anchor=north,fill=white] (x00) at ([yshift=-\ssep]x10.south) {};
+\node [snode,anchor=west,fill=white] (x01) at ([xshift=\ssep]x00.east) {};
+\node [snode,anchor=west,fill=white] (x02) at ([xshift=\ssep]x01.east) {};
+
+\node [snode,anchor=west,fill=white] (y01) at ([xshift=\ssep]x02.east) {};
+\node [snode,anchor=west,fill=white] (y02) at ([xshift=\ssep]y01.east) {};
+\node [snode,anchor=west,fill=white] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=white] (y04) at ([xshift=\ssep]y03.east) {};
+\node [snode,anchor=west,fill=white] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=\ssep]x12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=white] (y12) at ([xshift=\ssep]y11.east) {};
+\node [snode,anchor=west,fill=white] (y13) at ([xshift=\ssep]y12.east) {};
+\node [snode,anchor=west,fill=white] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=white] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=\ssep]x22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=white] (y22) at ([xshift=\ssep]y21.east) {};
+\node [snode,anchor=west,fill=white] (y23) at ([xshift=\ssep]y22.east) {};
+\node [snode,anchor=west,fill=white] (y24) at ([xshift=\ssep]y23.east) {};
+\node [snode,anchor=west,fill=white] (y25) at ([xshift=\ssep]y24.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (y25)] (batchbox) {};
+\node [anchor=north,align=left] (batchlabel) at (batchbox.south) {\scriptsize{执行一个解码步骤，处理}\\[-0.20cm] \scriptsize{$\mathbf{x}_1$ 与 $\mathbf{x}_2$。}};
+\end{pgfonlayer}
+
+\node [anchor=east,draw,minimum height=1.33cm,minimum width=1.7cm,inner sep=0,thick] (scheduler) at ([xshift=-0.5cm]batchbox.west) {\footnotesize{调度器}};
+%\draw [->] ([yshift=0.2cm,xshift=1pt]scheduler.east) -- ([yshift=0.2cm,xshift=-1pt]batchbox.west);
+
+\node [anchor=south,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (input) at ([yshift=0.4cm]scheduler.north) {\scriptsize{}};
+\node [anchor=north,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (output) at ([yshift=-0.4cm]scheduler.south) {\scriptsize{}};
+
+\draw [->] ([yshift=-1pt]input.south) -- ([yshift=1pt]scheduler.north);
+\draw [->] ([yshift=-1pt]scheduler.south) -- ([yshift=1pt]output.north);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm,xshift=0.5cm]batchbox.south west) {\small{(b) 迭代 2}};
+
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (inputlabel) at ([xshift=-0.1cm,yshift=0.1cm]input.north west) {\tiny{输入}};
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (outputlabel) at ([xshift=-0.1cm,yshift=0.1cm]output.north west) {\tiny{输出}};
+\node [anchor=north east,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (batchlabel) at ([xshift=0.1cm,yshift=0.15cm]batchbox.north east) {\tiny{批次}};
+
+\end{scope}
+
+% step 2
+\begin{scope}[yshift=-5.5cm]
+
+\node [snode,anchor=north] (x20) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {\scriptsize{1}};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {\scriptsize{1}};
+\node [snode,anchor=north,fill=ugreen!30] (x10) at ([yshift=-\ssep]x20.south) {};
+\node [snode,anchor=west] (x11) at ([xshift=\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {\scriptsize{2}};
+\node [snode,anchor=north,fill=white] (x00) at ([yshift=-\ssep]x10.south) {};
+\node [snode,anchor=west,fill=white] (x01) at ([xshift=\ssep]x00.east) {};
+\node [snode,anchor=west,fill=white] (x02) at ([xshift=\ssep]x01.east) {};
+
+\node [snode,anchor=west,fill=white] (y01) at ([xshift=\ssep]x02.east) {};
+\node [snode,anchor=west,fill=white] (y02) at ([xshift=\ssep]y01.east) {};
+\node [snode,anchor=west,fill=white] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=white] (y04) at ([xshift=\ssep]y03.east) {};
+\node [snode,anchor=west,fill=white] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=\ssep]x12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y12) at ([xshift=\ssep]y11.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=white] (y13) at ([xshift=\ssep]y12.east) {};
+\node [snode,anchor=west,fill=white] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=white] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=\ssep]x22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=white] (y23) at ([xshift=\ssep]y22.east) {};
+\node [snode,anchor=west,fill=white] (y24) at ([xshift=\ssep]y23.east) {};
+\node [snode,anchor=west,fill=white] (y25) at ([xshift=\ssep]y24.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (y25)] (batchbox) {};
+\node [anchor=north,align=left] (batchlabel) at (batchbox.south) {\scriptsize{执行一个解码步骤，处理}\\[-0.20cm] \scriptsize{$\mathbf{x}_1$ 与 $\mathbf{x}_2$。}};
+\end{pgfonlayer}
+
+\node [anchor=east,draw,minimum height=1.33cm,minimum width=1.7cm,inner sep=0,thick] (scheduler) at ([xshift=-0.5cm]batchbox.west) {\footnotesize{调度器}};
+%\draw [->] ([yshift=0.2cm,xshift=1pt]scheduler.east) -- ([yshift=0.2cm,xshift=-1pt]batchbox.west);
+
+\node [anchor=south,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (input) at ([yshift=0.4cm]scheduler.north) {\scriptsize{}};
+\node [anchor=north,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (output) at ([yshift=-0.4cm]scheduler.south) {\scriptsize{}};
+
+\draw [->] ([yshift=-1pt]input.south) -- ([yshift=1pt]scheduler.north);
+\draw [->] ([yshift=-1pt]scheduler.south) -- ([yshift=1pt]output.north);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm,xshift=0.5cm]batchbox.south west) {\small{(c) 迭代 3}};
+
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (inputlabel) at ([xshift=-0.1cm,yshift=0.1cm]input.north west) {\tiny{输入}};
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (outputlabel) at ([xshift=-0.1cm,yshift=0.1cm]output.north west) {\tiny{输出}};
+\node [anchor=north east,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (batchlabel) at ([xshift=0.1cm,yshift=0.15cm]batchbox.north east) {\tiny{批次}};
+
+\end{scope}
+
+% step 3
+\begin{scope}[yshift=-5.5cm,xshift=7.5cm]
+
+\node [snode,anchor=north] (x20) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {\scriptsize{1}};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {\scriptsize{1}};
+\node [snode,anchor=north,fill=ugreen!30] (x10) at ([yshift=-\ssep]x20.south) {};
+\node [snode,anchor=west] (x11) at ([xshift=\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {\scriptsize{2}};
+\node [snode,anchor=north,fill=white] (x00) at ([yshift=-\ssep]x10.south) {};
+\node [snode,anchor=west] (x01) at ([xshift=\ssep]x00.east) {\scriptsize{3}};
+\node [snode,anchor=west] (x02) at ([xshift=\ssep]x01.east) {\scriptsize{3}};
+
+\node [snode,anchor=west,fill=white] (y01) at ([xshift=\ssep]x02.east) {};
+\node [snode,anchor=west,fill=white] (y02) at ([xshift=\ssep]y01.east) {};
+\node [snode,anchor=west,fill=white] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=white] (y04) at ([xshift=\ssep]y03.east) {};
+\node [snode,anchor=west,fill=white] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=\ssep]x12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y12) at ([xshift=\ssep]y11.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y13) at ([xshift=\ssep]y12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=white] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=white] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=\ssep]x22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y23) at ([xshift=\ssep]y22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=white] (y24) at ([xshift=\ssep]y23.east) {};
+\node [snode,anchor=west,fill=white] (y25) at ([xshift=\ssep]y24.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (y25)] (batchbox) {};
+\node [anchor=north,align=left] (batchlabel) at (batchbox.south) {\scriptsize{执行一个解码步骤，处理}\\[-0.20cm] \scriptsize{$\mathbf{x}_1$ 与 $\mathbf{x}_2$，并为}\\[-0.2cm] \scriptsize{$\mathbf{x}_3$ 预填充。}};
+\end{pgfonlayer}
+
+\node [anchor=east,draw,minimum height=1.33cm,minimum width=1.7cm,inner sep=0,thick] (scheduler) at ([xshift=-0.5cm]batchbox.west) {\footnotesize{调度器}};
+\draw [->] ([yshift=0.2cm,xshift=1pt]scheduler.east) -- ([yshift=0.2cm,xshift=-1pt]batchbox.west);
+
+\node [anchor=south,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (input) at ([yshift=0.4cm]scheduler.north) {\scriptsize{$\mathbf{x}_3$ 到达}};
+\node [anchor=north,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (output) at ([yshift=-0.4cm]scheduler.south) {\scriptsize{}};
+
+\draw [->] ([yshift=-1pt]input.south) -- ([yshift=1pt]scheduler.north);
+\draw [->] ([yshift=-1pt]scheduler.south) -- ([yshift=1pt]output.north);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm,xshift=0.5cm]batchbox.south west) {\small{(d) 迭代 4}};
+
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (inputlabel) at ([xshift=-0.1cm,yshift=0.1cm]input.north west) {\tiny{输入}};
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (outputlabel) at ([xshift=-0.1cm,yshift=0.1cm]output.north west) {\tiny{输出}};
+\node [anchor=north east,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (batchlabel) at ([xshift=0.1cm,yshift=0.15cm]batchbox.north east) {\tiny{批次}};
+
+\end{scope}
+
+% step 4
+\begin{scope}[yshift=-11cm]
+
+\node [snode,anchor=north] (x20) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {\scriptsize{1}};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {\scriptsize{1}};
+\node [snode,anchor=north,fill=ugreen!30] (x10) at ([yshift=-\ssep]x20.south) {};
+\node [snode,anchor=west] (x11) at ([xshift=\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {\scriptsize{2}};
+\node [snode,anchor=north,fill=white] (x00) at ([yshift=-\ssep]x10.south) {};
+\node [snode,anchor=west] (x01) at ([xshift=\ssep]x00.east) {\scriptsize{3}};
+\node [snode,anchor=west] (x02) at ([xshift=\ssep]x01.east) {\scriptsize{3}};
+
+\node [snode,anchor=west,fill=blue!30] (y01) at ([xshift=\ssep]x02.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=white] (y02) at ([xshift=\ssep]y01.east) {};
+\node [snode,anchor=west,fill=white] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=white] (y04) at ([xshift=\ssep]y03.east) {};
+\node [snode,anchor=west,fill=white] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=\ssep]x12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y12) at ([xshift=\ssep]y11.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y13) at ([xshift=\ssep]y12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y14) at ([xshift=\ssep]y13.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=white] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=\ssep]x22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y23) at ([xshift=\ssep]y22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y24) at ([xshift=\ssep]y23.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=white] (y25) at ([xshift=\ssep]y24.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (y25)] (batchbox) {};
+\node [anchor=north,align=left] (batchlabel) at (batchbox.south) {\scriptsize{执行一个解码步骤，处理}\\[-0.20cm] \scriptsize{$\mathbf{x}_1$、$\mathbf{x}_2$ 与 $\mathbf{x}_3$。}\\[-0.2cm] \scriptsize{$\mathbf{x}_2$ 的预测完成。}};
+\node [draw,inner sep=1pt,very thin] [fit = (x10) (y14)] (completebox) {};
+\end{pgfonlayer}
+
+\node [anchor=south] (completelabel) at ([xshift=0.2cm,yshift=0.2cm]batchbox.north) {\tiny{完成}};
+\draw [->,very thin] ([xshift=-0.2cm]completebox.north) .. controls +(north:0.6cm) and +(south:0.6cm) .. (completelabel.south);
+
+\node [anchor=east,draw,minimum height=1.33cm,minimum width=1.7cm,inner sep=0,thick] (scheduler) at ([xshift=-0.5cm]batchbox.west) {\footnotesize{调度器}};
+%\draw [->] ([yshift=0.2cm,xshift=1pt]scheduler.east) -- ([yshift=0.2cm,xshift=-1pt]batchbox.west);
+\draw [<-] ([yshift=-0.2cm,xshift=1pt]scheduler.east) -- ([yshift=-0.2cm,xshift=-1pt]batchbox.west);
+
+\node [anchor=south,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (input) at ([yshift=0.4cm]scheduler.north) {\scriptsize{}};
+\node [anchor=north,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (output) at ([yshift=-0.4cm]scheduler.south) {\scriptsize{$\mathbf{y}_2$}};
+
+\draw [->] ([yshift=-1pt]input.south) -- ([yshift=1pt]scheduler.north);
+\draw [->] ([yshift=-1pt]scheduler.south) -- ([yshift=1pt]output.north);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm,xshift=0.5cm]batchbox.south west) {\small{(e) 迭代 5}};
+
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (inputlabel) at ([xshift=-0.1cm,yshift=0.1cm]input.north west) {\tiny{输入}};
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (outputlabel) at ([xshift=-0.1cm,yshift=0.1cm]output.north west) {\tiny{输出}};
+\node [anchor=north east,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (batchlabel) at ([xshift=0.1cm,yshift=0.15cm]batchbox.north east) {\tiny{批次}};
+
+\end{scope}
+
+% step 5
+\begin{scope}[yshift=-11cm,xshift=7.5cm]
+
+\node [snode,anchor=north] (x20) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {\scriptsize{1}};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {\scriptsize{1}};
+\node [snode,anchor=north] (x10) at ([yshift=-\ssep]x20.south) {\scriptsize{4}};
+\node [snode,anchor=west] (x11) at ([xshift=\ssep]x10.east) {\scriptsize{4}};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {\scriptsize{4}};
+\node [snode,anchor=north,fill=white] (x00) at ([yshift=-\ssep]x10.south) {};
+\node [snode,anchor=west] (x01) at ([xshift=\ssep]x00.east) {\scriptsize{3}};
+\node [snode,anchor=west] (x02) at ([xshift=\ssep]x01.east) {\scriptsize{3}};
+
+\node [snode,anchor=west,fill=blue!30] (y01) at ([xshift=\ssep]x02.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y02) at ([xshift=\ssep]y01.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=white] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=white] (y04) at ([xshift=\ssep]y03.east) {};
+\node [snode,anchor=west,fill=white] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=white] (y11) at ([xshift=\ssep]x12.east) {};
+\node [snode,anchor=west,fill=white] (y12) at ([xshift=\ssep]y11.east) {};
+\node [snode,anchor=west,fill=white] (y13) at ([xshift=\ssep]y12.east) {};
+\node [snode,anchor=west,fill=white] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=white] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=\ssep]x22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y23) at ([xshift=\ssep]y22.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y24) at ([xshift=\ssep]y23.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y25) at ([xshift=\ssep]y24.east) {\scriptsize{1}};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (y25)] (batchbox) {};
+\node [anchor=north,align=left] (batchlabel) at (batchbox.south) {\scriptsize{执行一个解码步骤，处理}\\[-0.20cm] \scriptsize{$\mathbf{x}_1$ 与 $\mathbf{x}_3$，并为}\\[-0.2cm] \scriptsize{$\mathbf{x}_4$ 预填充。}};
+\node [draw,inner sep=1pt,very thin] [fit = (x10) (x12)] (contbox) {};
+\end{pgfonlayer}
+
+\node [anchor=south,align=left] (contlabel) at ([xshift=0.2cm,yshift=0.2cm]batchbox.north) {\tiny{用 $\mathbf{x}_4$ 接替}\\[-0.2cm] \tiny{批次中的第二个序列}};
+\draw [->,very thin] ([xshift=-0.2cm]contbox.north) .. controls +(north:0.7cm) and +(south:0.6cm) .. ([xshift=-0.6cm]contlabel.south);
+
+\node [anchor=east,draw,minimum height=1.33cm,minimum width=1.7cm,inner sep=0,thick] (scheduler) at ([xshift=-0.5cm]batchbox.west) {\footnotesize{调度器}};
+\draw [->] ([yshift=0.2cm,xshift=1pt]scheduler.east) -- ([yshift=0.2cm,xshift=-1pt]batchbox.west);
+
+\node [anchor=south,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (input) at ([yshift=0.4cm]scheduler.north) {\scriptsize{$\mathbf{x}_4$, $\mathbf{x}_5$}\\[-0.08cm] \scriptsize{到达}};
+\node [anchor=north,draw,minimum height=0.8cm,minimum width=1.7cm,inner sep=2pt,align=left,rounded corners=2pt] (output) at ([yshift=-0.4cm]scheduler.south) {\scriptsize{}};
+
+\draw [->] ([yshift=-1pt]input.south) -- ([yshift=1pt]scheduler.north);
+\draw [->] ([yshift=-1pt]scheduler.south) -- ([yshift=1pt]output.north);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm,xshift=0.5cm]batchbox.south west) {\small{(f) 迭代 6}};
+
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (inputlabel) at ([xshift=-0.1cm,yshift=0.1cm]input.north west) {\tiny{输入}};
+\node [anchor=north west,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (outputlabel) at ([xshift=-0.1cm,yshift=0.1cm]output.north west) {\tiny{输出}};
+\node [anchor=north east,inner sep=1pt,draw,fill=white,minimum width=0.7cm] (batchlabel) at ([xshift=0.1cm,yshift=0.15cm]batchbox.north east) {\tiny{批次}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

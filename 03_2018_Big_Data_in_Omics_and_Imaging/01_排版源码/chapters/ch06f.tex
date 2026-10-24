@@ -1,0 +1,185 @@
+% 原章第36页6.2.2起至第44页6.3标题前，式6.129—6.151。
+\subsection{用于图像分割的监督深度学习方法}
+
+分割是影像数据分析流程中的重要步骤（Litjens et al. 2017）。图像分割试图识别具有特定结构、图像空间变异与特征的体素集合。图像分割包括像素分割、实例分割和基于局部成分的分割（Garcia-Garcia et al. 2017）。卷积神经网络（CNN）与循环神经网络（recurrent neural network，RNN）这两类深度神经网络，广泛用于医学图像分割（Ronneberger et al. 2015；Xie et al. 2016）。像素层面的分割方法是各种分割的基础，本书重点讨论像素层面的分割。
+
+\subsubsection{像素层面的图像分割}
+
+像素层面的图像分割，根据图像特征为每个像素分配类别标签。CNN 常用于学习适合图像分割问题的特征表示，并已取得巨大成功（Ciresan et al. 2012；Farabet et al. 2013）。全卷积神经网络（fully convolutional neural network，FCNN）是一类常用的 CNN，能够有效生成特征，并采用端到端训练（Lin et al. 2016；Long et al. 2015）。FCNN 用于语义分割的局限是分辨率低。上下文关系广泛存在，但经典 CNN 尚未利用这类关系进行语义分割。近来，研究将图像区域之间的语义相关性引入 FCNN，利用条件随机场（conditional random field，CRF）预测图像像素的标签（Lin et al. 2016）。
+
+\bookdeepheading{paragraph}{6.2.2.1.1}{用 CRF 建模语义成对关系}
+
+CRF 是一种判别式无向概率图模型。考虑图 $G=(V,E)$，其中 $V$ 表示节点集，$E$ 表示边集。令 $X$ 为一组观测特征变量，$Y$ 为一组输出变量；给定观测特征变量 $X$，预测 $Y$（Sutton and McCallum 2011）。在利用 CRF 建模语义成对关系之前，先应用 CNN，从影像数据生成特征图（图 6.11a）。
+\input{figures/ch06_figure11}
+
+特征图中的每个神经元（位置）由 CRF 图中的一个节点表示；它还与同一空间范围框（图 6.11b 中粉色虚线框）内的其他全部节点相连（Lin et al. 2016）。空间关系不同，就定义不同的空间范围框，并用不同的边建模不同的空间关系（图 6.11b 中黄色边与紫色边）。为降低模型中数据的维数，可定义与每个节点及每条边关联的特征向量。
+
+接着定义图上的分布，使其考虑输入—输出对的相容性（Lin et al. 2016）。给定输入图像记为 $x$，其逐像素标签记为 $y$。令 $X=\{x\}$ 为影像数据集，$Y=\{y\}$ 为标签集；它们对应 CRF 各节点的标签配置。令 $V=X\cup Y$。先定义给定 $x$ 时 $y$ 的条件分布 $P(y\mid x)$。令 $E(y,x,\theta)$ 为能量函数，度量输入—输出对的相容性。CRF 的全部参数记为 $\theta$。一幅图像的条件分布定义为
+\begin{equation}
+p(y\mid x)=\frac1{Z(x)}e^{-E(y,x)}.
+\tag{6.129}
+\end{equation}
+由于 $\sum_yp(y\mid x)=1$，要求 $Z(x)=\sum_ye^{-E(y,x)}$，函数 $Z(x)$ 称为配分函数（partition function）。
+
+下面定义能量函数。CRF 是一个因子图 $G$，因此条件分布应按 $G$ 分解：
+\begin{equation}
+p(y\mid x)=\frac1{Z(x)}\prod_{\alpha=1}^A\Psi_{\alpha}(y_{\alpha},x_{\alpha}),
+\tag{6.130}
+\end{equation}
+其中，$\Psi_{\alpha}(y_{\alpha},x_{\alpha})$ 通常称为势函数（potential function），具有指数形式：
+\begin{equation}
+\Psi_{\alpha}(y_{\alpha},x_{\alpha})=e^{-E(y_{\alpha},x_{\alpha})}.
+\tag{6.131}
+\end{equation}
+势函数集 $A$ 可分为一元势函数集与成对势函数集两个子集（Lin et al. 2016）。
+
+为计算一元势函数，先将特征图与一个浅层全连接网络堆叠起来。这个全连接网络也称为一元网络（unary-net），其输出可作为一元势函数。令 $K$ 为类别数，一元网络节点的输出是 $K$ 维向量。一元网络中第 $p$ 个节点、第 $y_p$ 类的一元势函数定义为
+\begin{equation}
+U(y_p,x_p;\theta_U)=-\beta_{p,y_p}(x;\theta_U),
+\tag{6.132}
+\end{equation}
+其中，$\beta_{p,y_p}$ 为一元网络第 $p$ 个节点、第 $y_p$ 类的输出值，$\theta_U$ 为一元网络 $U$ 中的参数集。令 $A_U$ 为全部一元势的集合，$N_U$ 为势 $U$ 的节点集，则一元势的能量函数定义为
+\begin{equation}
+E_U(y,x,\theta)=\sum_{U\in A_U}\sum_{p\in N_U}U(y_p,x_p;\theta_U).
+\tag{6.133}
+\end{equation}
+接着研究成对势函数。考虑 CRF 图中相连的两个节点 $p$ 与 $q$。令 $x_p,x_q$ 分别为节点 $p,q$ 的特征向量，均来自特征图。令 $x_{pq}=[x_p^T,x_q^T]^T$ 为边特征向量。随后将边特征向量 $x_{pg}$ 输入一个称为成对网络（pairwise-net）的全连接网络（图 6.11c）。类别总数为 $K\times K$，即一对节点所有可能的标签组合数。成对网络预测的类别记为 $(y_p,y_q)$。令 $\beta_{p,q,y_p,y_q}(x;\theta_V)$ 为成对网络中对应 $x_{pq}$ 的输出值，量化输入影像数据 $x$ 下类别 $(y_p,y_q)$ 的相容性。节点对 $p,q$ 的成对势函数定义为
+\begin{equation}
+V(y_p,y_q,x_{pq},\theta_V)=-\beta_{p,q,y_p,y_q}(x;\theta_V),
+\tag{6.134}
+\end{equation}
+其中，$\theta_V$ 为定义势 $V$ 的 CNN 参数。令 $A_V$ 为所有成对势类型的集合，$\varepsilon_V$ 为计算成对势 $V$ 所用的边集。一组成对势的能量函数定义为
+\begin{equation}
+E_V(y,x,\theta)=\sum_{V\in A_V}\sum_{(p,q)\in\varepsilon_V}V(y_p,y_q,x_{pq},\theta_V).
+\tag{6.135}
+\end{equation}
+总能量函数由一组一元势与成对势定义：
+\begin{equation}
+E(y,x,\theta)=E_U(y,x,\theta)+E_V(y,x,\theta).
+\tag{6.136}
+\end{equation}
+
+\bookdeepheading{paragraph}{6.2.2.1.2}{CRF 模型的参数估计}
+
+负对数似然可用于估计 CRF 模型参数。由式 (6.129)，一幅图像的负对数似然为
+\begin{equation}
+-\log p(y\mid x,\theta)=E(y,x,\theta)+\log Z(x,\theta).
+\tag{6.137}
+\end{equation}
+假定从训练集中抽取 $N$ 幅图像，令 $x_i,y_i$ 为第 $i$ 幅图像中像素的影像信号与标签，则 $N$ 幅图像的负对数似然为
+\begin{equation}
+-\sum_{i=1}^N\log P(y^{(i)}\mid x^{(i)},\theta)=\sum_{i=1}^N[E(y^{(i)},x^{(i)},\theta)+\log Z(x^{(i)},\theta)].
+\tag{6.138}
+\end{equation}
+为提高效率与预测精度，应减少模型参数。因此，在式 (6.137) 的负似然中加入参数惩罚项，最终将参数估计问题化为
+\begin{equation}
+\min_{\theta}l(y,x,\theta)=\sum_{i=1}^N[E(y^{(i)},x^{(i)},\theta)+\log Z(x^{(i)},\theta)]+\frac\lambda2\lVert\theta\rVert_2^2.
+\tag{6.139}
+\end{equation}
+精确的极大似然估计需要反复直接计算 $Z(x,\theta)$ 及其偏导数，计算代价很高，因此需要发展 CRF 的近似学习方法。常用方法包括伪似然学习（pseudo-likelihood learning）与分片学习（piecewise learning）（Besag 1977；Sutton and McCallum 2005；Lin et al. 2016）。本节重点介绍分片学习。其基本思想是，将整个模型（图）分为若干片段（子图），各自独立学习，最后在测试时组合各子模型学到的权重。假定定义一元势的节点集，以及定义成对势的边（节点）集，分别形成片段。为每个片段定义似然，并将这些似然视为相互独立。整个模型的条件似然可用这些片段独立似然的乘积近似（Lin et al. 2016）：
+\begin{equation}
+P(y\mid x)=\prod_{U\in A_U}\prod_{p\in N_U}P_U(y_p\mid x)\prod_{V\in A_V}\prod_{(p,q)\in\varepsilon_V}P_V(y_p,y_q\mid x),
+\tag{6.140}
+\end{equation}
+其中，似然 $P_U(y_p\mid x)$ 由一元势定义：
+\begin{equation}
+P_U(y_p\mid x)=\frac{\exp\{-U(y_p,x_p)\}}{\displaystyle\sum_{y_h}\exp\{-U(y_h,x_h)\}},
+\tag{6.141}
+\end{equation}
+似然 $P_V(y_p,y_q\mid x)$ 由成对势定义：
+\begin{equation}
+P_V(y_p,y_q\mid x)=\frac{\exp\{-V(y_p,y_q,x_{pq})\}}{\displaystyle\sum_{y_g,y_h}\exp\{-V(y_g,y_h,x_{gh})\}}.
+\tag{6.142}
+\end{equation}
+利用式 (6.140) 对似然作分片近似后，参数估计优化问题 (6.139) 化为（Lin et al. 2016）
+\begin{equation}
+\begin{aligned}
+\min_{\theta}l_a(y,x,\theta)&=-\sum_{i=1}^N\Biggl[\sum_{U\in A_U}\sum_{p\in N_U^{(i)}}\log P_U(y_p\mid x^{(i)},\theta_U)\\
+&\qquad+\sum_{V\in A_V}\sum_{(p,q)\in\varepsilon_V^{(i)}}\log P_V(y_p,y_q\mid x^{(i)},\theta_V)\Biggr]+\frac\lambda2\lVert\theta\rVert_2^2.
+\end{aligned}\tag{6.143}
+\end{equation}
+式 (6.143) 的目标函数是独立对数似然之和，因此优化问题 (6.143) 很容易并行求解。
+
+\bookdeepheading{paragraph}{6.2.2.1.3}{预测}
+
+可通过最大化后验分布 $y^*=\arg\max_yP(y\mid x)$，预测一个像素的类别标签；也可计算每个变量标签的边缘分布，即对所有 $p\in N$ 计算
+\begin{equation}
+P(y_p\mid x)=\sum_{y\setminus y_p}P(y\mid x),
+\tag{6.144}
+\end{equation}
+其中，$y\setminus y_p$ 表示除 $y_p$ 外的输出类别变量 $y$。直接计算边缘分布在计算上不可行，需要近似方法。常用的近似概率推断方法是平均场方法（mean field method）：在可处理的分布子集中，寻找最能近似分布 $P(y\mid x,\theta)$ 的分布（Nowozin and Lampert 2011）。
+
+Kullback–Leibler（K–L）散度是广泛使用的两分布间距离度量。令 $\Omega$ 为 $Y$ 上一族可处理的分布 $q\in\Omega$。定义分布 $q$ 与 $P(y\mid x,\theta)$ 之间的 K–L 散度 $D^{\mathrm{KL}}$ 为
+\begin{equation}
+D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta)=\sum_{y\in Y}q(y)\log\frac{q(y)}{P(y,x,\theta)}.
+\tag{6.145}
+\end{equation}
+我们的目标是求解以下优化问题，得到最佳近似分布 $q(y)$：
+\begin{equation}
+\min_{q\in\Omega}D_{\mathrm{KL}}(q(y)\Vert P(y\mid x,\theta)).
+\tag{6.146}
+\end{equation}
+回顾，边缘分布 $P(y\mid x,\theta)$ 可表示为
+\begin{equation}
+P(y\mid x,\theta)=\frac1{Z(x,\theta)}e^{-E(y,x,\theta)},
+\tag{6.147}
+\end{equation}
+其中，$E(y,x,\theta)$ 为能量函数。利用图模型，大量随机变量上的分布可表示为若干局部函数的乘积，每个局部函数只依赖少数变量。假定 $\Omega$ 由全部因子化分布构成，即
+\[
+q(y)=\prod_{i\in V}q_i(y_i).
+\]
+利用朴素平均场方法，可在分布集 $\Omega$ 中得到最佳近似分布（附录 6.A）：
+\begin{equation}
+\begin{aligned}
+\widehat q_i(y_i)=\exp\Biggl(&\lambda-1-\sum_{a\in F,i\in N(a)}\sum_{\substack{y_{N(a)}\in Y_{N(a)},\\{}[y_{N(a)}]=y_i}}\\
+&\left(\prod_{j\in N(a)\setminus\{i\}}\widehat q_j(y_j)\right)E_a(y_{N(a)},x_{N(a)})\Biggr),
+\end{aligned}\tag{6.148}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+\lambda=-\log\Biggl(\sum_{y_i\in Y_i}\exp\Biggl(&-1-\sum_{a\in F,i\in N(a)}\sum_{\substack{y_{N(a)}\in Y_{N(a)},\\{}[y_{N(a)}]=y_i}}\\
+&\left(\prod_{j\in N(a)\setminus\{i\}}\widehat q_j(y_j)\right)E_a(y_{N(a)},x_{N(a)})\Biggr)\Biggr).
+\end{aligned}\tag{6.149}
+\end{equation}
+对各个 $i\in V$ 更新 $q_i(y_i)$，将收敛到优化问题 (6.146) 的解。
+
+\subsubsection{用于语义分割的反卷积网络}
+
+用于语义分割的全卷积网络（fully convolutional network，FCN）有一些局限（Noh et al. 2015）。第一，即使对象较大，像素标签预测也仅使用位置信息，导致同一对象中像素的标签预测不一致。第二，反卷积过程过于简单，常会丢失对象的空间变异信息与语义分割结构。为克服这些局限，研究发展了反卷积网络（deconvolution network）（Noh et al. 2015；Zeiler et al. 2011）。反卷积网络由反卷积、反池化与修正构成。卷积网络通过前馈减小激活尺寸，而反卷积网络中反池化与反卷积的组合可增大激活尺寸（Zeiler et al. 2011）。反卷积网络的任务，是从卷积网络生成的特征产生语义分割。其最终输出为每个像素的标签概率图，大小与输入图像相同。
+
+\bookdeepheading{paragraph}{6.2.2.2.1}{反池化}
+
+卷积网络池化层的作用，是在感受野内取最大激活，用一个值滤除含噪激活，因而会丢失空间变异信息（Noh et al. 2015）。
+\input{figures/ch06_figure12}
+
+反池化（unpooling）是一种恢复丢失的空间变异信息的逆向运算。卷积生成特征图后（图 6.13a），对特征图执行池化，在感受野内取最大特征，得到池化图及位置（开关）；后者记录绝对特征最大值的位置（图 6.13b）。沿相反方向，给定池化运算的对应位置信息，反池化在池化开关记录的位置插入特征值，形成反池化特征图（图 6.13c）。然后，将反池化特征与核卷积（图 6.13d）。
+\input{figures/ch06_figure13}
+
+\bookdeepheading{paragraph}{6.2.2.2.2}{反卷积}
+
+反卷积层将反池化特征与多个已学习的核卷积，产生多个输出。令 $K_l$ 为第 $l$ 个反卷积层的核数目，$f_{k,m}^l$ 为第 $l$ 层中与前一层第 $m$ 个特征图卷积的第 $k$ 个核，$z_{k,l}$ 为第 $l-1$ 个反卷积层中的反池化特征与核 $f_{k,l}$ 卷积的输出，则
+\begin{equation}
+z_{k,l}=z_{m,l-1}*f_{k,m}^l,\quad k=1,2,\ldots,K_l,
+\tag{6.150}
+\end{equation}
+其中，$z_{l-1}$ 为第 $l-1$ 个反卷积层的反池化特征。因此，反卷积层的输出是尺寸增大的稠密激活图。
+
+\bookdeepheading{paragraph}{6.2.2.2.3}{模型与参数估计}
+
+为建立用于推断参数的代价函数，考虑第 $l$ 个反卷积网络层（Zeiler et al. 2010）。设图像集为 $y=\{y^1,\ldots,y^N\}$，其中 $N$ 为图像数目。考虑第 $i$ 幅图像 $y^i$，令 $z_{k,l}^i$ 为第 $l$ 个反卷积层的特征图，作为带核 $f_{k,m}^l$ 的第 $l-1$ 个反卷积层的输入；$z_{m,l-1}^i$ 为前一个即第 $l-1$ 个反卷积层的特征图。令 $K_{l-1}$ 与 $K_l$ 分别为第 $l$ 层和第 $l-1$ 层的特征图数目。定义第 $l$ 层的代价函数 $C_l(y)$ 为
+\begin{equation}
+\begin{aligned}
+C_l(y)&=\frac12\sum_{i=1}^N\sum_{m=1}^{K_{l-1}}\left\lVert\sum_{k=1}^{K_l}h_{k,m}^l(z_{k,l}^i*f_{k,m}^l)-z_{m,l-1}^i\right\rVert_2^2\\
+&\quad+\lambda\sum_{i=1}^N\sum_{k=1}^{K_l}\lVert z_{k,l}^1\rVert_1,
+\end{aligned}\tag{6.151}
+\end{equation}
+其中，$\lambda$ 为惩罚参数，$h_{k,m}^l$ 为指示矩阵元素，定义为
+\[
+h_{k,m}^l=\begin{cases}1,&\text{若 }z_{k,l}^i\text{ 与 }z_{m,l-1}^i\text{ 相连},\\0,&\text{其他情形}.\end{cases}
+\]
+在第一层，假定对所有 $k,m$ 均有 $h_{k,m}^l=1$。
+
+代价函数 $C_l(y)$ 包含两项：（1）重构误差；（2）正则化项。学习的目标是使重构误差尽可能小，正则化项则惩罚估计的特征值。这两个目标相互冲突，惩罚参数 $\lambda$ 用于平衡两者。
+
+通过对特征图中的激活量 $z_{k,m}^l$ 与核函数 $f_{k,m}^l$，极小化式 (6.150) 中的代价函数 $C_l(y)$，可估计反卷积网络参数。交替方向乘子法（ADMM）与近端方法（Boyd et al. 2011；Parikh and Boyd 2014）可用于求解该问题。

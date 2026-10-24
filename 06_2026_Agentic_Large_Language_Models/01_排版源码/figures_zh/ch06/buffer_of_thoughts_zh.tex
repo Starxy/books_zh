@@ -1,0 +1,74 @@
+% 依照 figures/bot.png 重绘三种结构和元缓冲区的三条关系，不改变原图的比较方向。
+\usetikzlibrary{shapes.geometric}
+\begingroup
+\definecolor{chSixBufferBlue}{RGB}{148,190,224}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+ every node/.style={font=\small,align=center,inner sep=3pt},
+ llm/.style={fill=black!15,rounded corners=1.5mm,minimum width=1.8cm,minimum height=.8cm},
+ think/.style={draw=blue!40,fill=yellow!18,rounded corners=1.5mm,minimum width=2.0cm,minimum height=.8cm},
+ bot/.style={fill=chSixBufferBlue,rounded corners=1.5mm,minimum width=2.0cm,minimum height=.8cm},
+ output/.style={ellipse,fill=black!15,minimum width=1.8cm,minimum height=.8cm},
+ flow/.style={-{Stealth[length=2mm,width=1.5mm]},line width=.6pt},
+ memoryflow/.style={-{Stealth[length=2.5mm,width=2mm]},draw=chSixBufferBlue,line width=1.4pt},
+ caption/.style={font=\small,align=center,text width=3.4cm},
+ effect/.style={font=\bfseries\small,align=center}]
+\foreach \yy/\i in {10.4/1,7.4/2,4.5/3}{
+ \node[anchor=east] at (1.6,\yy) {输入查询};
+ \node[font=\large] at (1.87,\yy) {$+$};
+ \node[llm] (llm\i) at (3.1,\yy) {LLM};
+ \node[output] (out\i) at (14.0,\yy) {输出};
+}
+
+\node[think] (reason1) at (10.1,10.4) {推理};
+\draw[flow] (llm1.east) -- (reason1.west);
+\draw[flow] (reason1.east) -- (out1.west);
+\node[font=\bfseries\small] at (6.55,10.78) {单次查询};
+\node[caption,text width=4.8cm] at (6.55,9.83) {针对具体任务的手工提示\\（如 CoT、少样本提示）};
+\node[effect] at (14.0,9.55) {准确率};
+\draw[-{Stealth[length=2.5mm]},line width=1.5pt] (14.95,9.95) -- (14.95,9.2);
+
+\node[think] (expand) at (6.8,7.4) {思维扩展};
+\node[think] (reason2) at (10.1,7.4) {推理};
+\draw[flow] (llm2.east) -- (expand.west);
+\draw[flow] (expand.east) -- (reason2.west);
+\draw[flow] (reason2.east) -- (out2.west);
+\node[font=\bfseries\small] at (4.95,7.8) {多次查询};
+\node[caption,text width=3cm] at (4.9,6.7) {预定义查询结构\\（如 ToT、GoT）};
+\draw[-{Stealth[length=3mm,width=2.4mm]},draw=blue!70!black,double=yellow!55,double distance=1.0pt,line width=.5pt] (reason2.north) to[out=105,in=75] (expand.north);
+\draw[-{Stealth[length=3mm,width=2.4mm]},draw=blue!70!black,double=yellow!55,double distance=1.0pt,line width=.5pt] (expand.south) to[out=-75,in=-105] (reason2.south);
+\node[font=\bfseries\small,fill=white,inner sep=2pt] at (8.45,8.95) {$N$ 跳迭代};
+\node[effect] at (14.0,6.55) {效率};
+\draw[-{Stealth[length=2.5mm]},line width=1.5pt] (14.95,6.95) -- (14.95,6.2);
+
+\draw[dashed,line width=.8pt] (0,5.6) -- (15.7,5.6);
+\node[bot] (distiller) at (6.45,4.5) {问题蒸馏器};
+\node[bot,font=\bfseries\small] (instance) at (10.1,4.5) {实例化推理};
+\node[bot,font=\bfseries\small,text=red!80!black,minimum width=2.4cm] (meta) at (10.1,1.0) {元缓冲区};
+\draw[flow] (llm3.east) -- (distiller.west);
+\draw[memoryflow] (distiller.east) -- (instance.west);
+\draw[memoryflow] (instance.east) -- (out3.west);
+\draw[memoryflow] (6.2,4.1) -- (9.0,.8);
+\draw[memoryflow] (8.9,1.25) -- (6.8,4.1);
+\draw[memoryflow,dashed] (14.0,4.1) -- (11.3,1.1);
+\node[caption,text width=1.8cm,fill=white,inner sep=1pt] at (7.1,1.9) {高层思维};
+\node[caption,text width=1.8cm,fill=white,inner sep=1pt] at (8.75,3.15) {思维检索};
+\node[caption,text width=1.9cm,fill=white,inner sep=1pt] at (11.65,2.85) {思维蒸馏\\与更新};
+\node[effect] at (14.0,2.95) {准确率\\与\\效率};
+\draw[-{Stealth[length=2.5mm]},draw=red!80!black,line width=1.5pt] (14.95,2.3) -- (14.95,3.6);
+\node[font=\bfseries\large] at (2.9,.55) {思维缓冲（BoT）};
+
+% 与原图一致的两张愁脸和一张笑脸。
+\foreach \yy in {8.9,5.95}{
+ \fill[black] (14.0,\yy) circle (.23);
+ \fill[white] (13.92,\yy+.07) circle (.026);
+ \fill[white] (14.08,\yy+.07) circle (.026);
+ \draw[white,line width=.7pt] (13.89,\yy-.10) .. controls (14.0,\yy+.05) .. (14.11,\yy-.10);
+}
+\fill[black] (14.0,1.8) circle (.23);
+\fill[white] (13.92,1.87) circle (.026);
+\fill[white] (14.08,1.87) circle (.026);
+\draw[white,line width=.7pt] (13.89,1.79) .. controls (14.0,1.59) .. (14.11,1.79);
+\end{tikzpicture}%
+}
+\endgroup

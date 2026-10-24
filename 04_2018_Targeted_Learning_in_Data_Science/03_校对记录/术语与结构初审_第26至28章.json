@@ -1,0 +1,197 @@
+{
+  "glossary_entries": 537,
+  "glossary_duplicate_keys": [],
+  "new_term_conflicts_between_chapters": [],
+  "local_macro_definitions": [],
+  "chapters": [
+    {
+      "chapter": 26,
+      "files": [
+        "ch26.tex",
+        "ch26a.tex",
+        "ch26b.tex",
+        "ch26c.tex",
+        "ch26d.tex",
+        "ch26e.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "strongly differentiable",
+          "zh": "强可微",
+          "note": "名词strong differentiability译为强可微性。"
+        },
+        {
+          "en": "second-order partial canonical gradient",
+          "zh": "二阶部分典范梯度",
+          "note": "坐标投影位于切空间的二阶梯度。"
+        },
+        {
+          "en": "uniform sectional variation norm",
+          "zh": "一致截面变差范数",
+          "note": "保留原书sup_xs定义的记号；原书疑点另记。"
+        },
+        {
+          "en": "V-statistic",
+          "zh": "V统计量",
+          "note": "本章二阶经验矩含对角项，按原V统计量方程表述。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 21,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    },
+    {
+      "chapter": 27,
+      "files": [
+        "ch27.tex",
+        "ch27a.tex",
+        "ch27b.tex",
+        "ch27c.tex",
+        "ch27d.tex",
+        "ch27e.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "Chagas disease",
+          "zh": "恰加斯病",
+          "note": "仅名称采用WHO中文主站核验；term_verification.json保留链接，未向正文或原书参考文献加入网络医学事实或文献。"
+        },
+        {
+          "en": "informative dropout",
+          "zh": "信息性退出",
+          "note": "例27.1中与未观测结局相关的退出。"
+        },
+        {
+          "en": "meta analysis",
+          "zh": "荟萃分析",
+          "note": "本章19项恰加斯病研究的汇总方法；常亦写meta-analysis。"
+        },
+        {
+          "en": "sensitivity parameter",
+          "zh": "敏感性参数",
+          "note": "可在非参数模型中解释的delta，与统计估计的不确定性区分。"
+        },
+        {
+          "en": "uncertainty interval",
+          "zh": "不确定性区间",
+          "note": "合并统计参数置信区间与识别偏差界得到的因果参数区间。"
+        },
+        {
+          "en": "uncertainty region",
+          "zh": "不确定性区域",
+          "note": "本章部分识别和同时覆盖上下界的区域；与单个参数覆盖目标区分。"
+        },
+        {
+          "en": "natural smoker",
+          "zh": "自然吸烟者",
+          "note": "观测人群中实际吸烟者；施加反事实干预后仍按原观测状态称呼。"
+        },
+        {
+          "en": "natural nonsmoker",
+          "zh": "自然不吸烟者",
+          "note": "观测人群中实际不吸烟者；用于区分反事实世界中的原群体。"
+        },
+        {
+          "en": "risk ratio",
+          "zh": "风险比",
+          "note": "原书本章简称RR；同章也使用relative risk表述。"
+        },
+        {
+          "en": "relative risk",
+          "zh": "相对风险",
+          "note": "本章用以解释反事实结局条件概率之比；原书四条>=公式与at most文字的矛盾另记源异常。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 15,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    },
+    {
+      "chapter": 28,
+      "files": [
+        "ch28.tex",
+        "ch28a.tex",
+        "ch28b.tex",
+        "ch28c.tex",
+        "ch28d.tex",
+        "ch28e.tex",
+        "ch28f.tex",
+        "ch28g.tex",
+        "ch28h.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "joint targeted bootstrap",
+          "zh": "联合靶向自助法",
+          "note": "同时靶向感兴趣参数与渐近方差。"
+        },
+        {
+          "en": "risk difference ratio",
+          "zh": "风险差比值",
+          "note": "28.1中两种风险超额之比，与风险比区分。"
+        },
+        {
+          "en": "resubstitution risk estimate",
+          "zh": "回代风险估计",
+          "note": "用训练学习器的同一数据估计其风险。"
+        },
+        {
+          "en": "ties",
+          "zh": "重复取值",
+          "note": "本章指自助样本中完全相同的观测，可使CV训练验证数据重复。"
+        },
+        {
+          "en": "clustered cross-validation",
+          "zh": "按簇交叉验证",
+          "note": "把相同自助观测组成簇，再按簇划分；原标记CVID保留。"
+        },
+        {
+          "en": "percentile interval",
+          "zh": "百分位区间",
+          "note": "直接使用经验自助分布分位数的区间。"
+        },
+        {
+          "en": "bootstrap-t interval",
+          "zh": "bootstrap-t区间",
+          "note": "基于学生化统计量的自助法区间；原端点加号保留。"
+        },
+        {
+          "en": "bias-corrected accelerated interval",
+          "zh": "偏差校正加速区间",
+          "note": "BCa；原文bias-corrected, accelerated。"
+        },
+        {
+          "en": "studentized",
+          "zh": "学生化",
+          "note": "对统计量按估计标准差进行标准化。"
+        },
+        {
+          "en": "acceleration constant",
+          "zh": "加速常数",
+          "note": "BCa区间中的a，本章用影响函数三阶矩估计。"
+        },
+        {
+          "en": "irreducible error",
+          "zh": "不可约误差",
+          "note": "真实风险最小化所能达到的风险值。"
+        },
+        {
+          "en": "tilted interval",
+          "zh": "倾斜区间",
+          "note": "28.6提出进一步研究的自助法区间类型。"
+        },
+        {
+          "en": "automatic percentile interval",
+          "zh": "自动百分位区间",
+          "note": "28.6提出进一步研究的区间类型。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 20,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    }
+  ]
+}

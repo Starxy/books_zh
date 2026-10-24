@@ -1,0 +1,19 @@
+
+\begin{tikzpicture}[
+ x=1cm,y=1cm,
+ chonebphen/.style={ellipse,draw=inkblue!70,fill=blue!55!cyan!65,
+   text=white,align=center,minimum width=28mm,minimum height=11mm,
+   inner sep=2pt,font=\footnotesize\linespread{1}\selectfont},
+ chonebpath/.style={-{Stealth[length=2mm,width=1.5mm]},draw=red!85,thin},
+ chonebcoef/.style={text=black,fill=white,inner sep=1pt,font=\small}
+]
+ \node[chonebphen] (chonebd1) at (0,4.0) {低密度脂蛋白\\胆固醇（LDL）\\$y_1$};
+ \node[chonebphen] (chonebd2) at (7.0,4.0) {甘油三酯\\（Trig）\\$y_2$};
+ \node[chonebphen] (chonebd4) at (2.6,1.8) {总胆固醇\\（TotChol）\\$y_4$};
+ \node[chonebphen] (chonebd3) at (1.8,-1.1) {高密度脂蛋白\\胆固醇（HDL）\\$y_3$};
+ \draw[chonebpath] (chonebd2) -- node[chonebcoef,above] {$r_{21}$} (chonebd1);
+ \draw[chonebpath] (chonebd4) -- node[chonebcoef,above] {$r_{41}$} (chonebd1);
+ \draw[chonebpath] (chonebd4) -- node[chonebcoef,above] {$r_{42}$} (chonebd2);
+ \draw[chonebpath] (chonebd3) -- node[chonebcoef,left] {$r_{31}$} (chonebd1);
+ \draw[chonebpath] (chonebd2) -- node[chonebcoef,right] {$r_{32}$} (chonebd3);
+\end{tikzpicture}

@@ -1,0 +1,166 @@
+% 原PDF144页附录4.C标题—148页附录4.D标题之前。
+\section*{附录4.C\quad ADMM算法的推导}
+\addcontentsline{toc}{section}{附录4.C ADMM算法的推导}
+\markright{附录4.C ADMM算法的推导}
+
+为求解优化问题（4.154），ADMM算法（Boyd et al. 2011）的第一步更新矩阵 $J$：
+\begin{equation}
+J=\arg\min_J\ \|J\|_*+\operatorname{Tr}(\Upsilon_2^T(Z-J)
++\frac\mu2\|Z-J\|_F^2.\tag{4.C.1}
+\end{equation}
+注意
+\begin{equation}
+\begin{aligned}
+&\operatorname{Tr}(\Upsilon_2^T(Z-J)+\frac\mu2\|Z-J\|_F^2\\
+&\quad=\frac\mu2\operatorname{Tr}\left[
+ (Z-J)^T(Z-J)+2\left(\frac{\Upsilon_2}{\mu}\right)^T(Z-J)\right]\\
+&\quad=\frac\mu2\operatorname{Tr}\left[
+ \left(Z-J+\frac{\Upsilon_2}{\mu}\right)^T
+ \left(Z-J+\frac{\Upsilon_2}{\mu}\right)-\frac{\Upsilon_2^T\Upsilon_2}{\mu^2}\right]\\
+&\quad=\frac\mu2\operatorname{Tr}
+ \left(Z-J+\frac{\Upsilon_2}{\mu}\right)^T
+ \left(Z-J+\frac{\Upsilon_2}{\mu}\right)-\frac{\Upsilon_2^T\Upsilon_2}{2\mu}.
+\end{aligned}\tag{4.C.2}
+\end{equation}
+将式（4.B.46）代入式（4.C.1），得到
+\begin{equation}
+J=\arg\min_J\ \frac1\mu\|J\|_*
++\frac12\left\|J-\left(Z+\frac{\Upsilon_2}{\mu}\right)\right\|_F^2.\tag{4.C.3}
+\end{equation}
+现在求解问题（4.C.3）。假设矩阵 $Z+\Upsilon_2/\mu$ 的奇异值分解为
+\begin{equation}
+Z+\frac{\Upsilon_2}{\mu}=U\Sigma V^T.\tag{4.C.4}
+\end{equation}
+定义矩阵
+\begin{equation}
+J=U\Lambda V^T.\tag{4.C.5}
+\end{equation}
+利用式（4.C.4）、（4.C.5），得到
+\begin{equation}
+\begin{aligned}
+&\frac1\mu\|J\|_*+\frac12\left\|J-\left(Z+\frac{\Upsilon_2}{\mu}\right)\right\|_F^2\\
+&\quad=\frac1\mu\operatorname{Tr}(\Lambda)+\frac12\|U\Lambda V^T-U\Sigma V^T\|_F^2\\
+&\quad=\frac1\mu\operatorname{Tr}(\Lambda)+\frac12\|U(\Lambda-\Sigma)V^T\|_F^2\\
+&\quad=\frac1\mu\operatorname{Tr}(\Lambda)+\frac12\|\Lambda-\Sigma\|_F^2\\
+&\quad=\operatorname{Tr}\left[\frac1\mu\Lambda+
+ \frac12(\Lambda-\Sigma)^T(\Lambda-\Sigma)\right]\\
+&\quad=\sum_{j=1}^{r}\left[\frac1\mu\lambda_j+
+ \frac12(\lambda_j-\sigma_j)^2\right],
+\end{aligned}\tag{4.C.6}
+\end{equation}
+其中，$\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_r)$，
+$\Sigma=\operatorname{diag}(\sigma_1,\ldots,\sigma_r)$。因此，优化问题（4.C.3）化为
+\begin{equation}
+\min_{\lambda_j}\quad F=\sum_{j=1}^{r}
+\left[\frac1\mu\lambda_j+\frac12(\lambda_j-\sigma_j)^2\right].\tag{4.C.7}
+\end{equation}
+对函数 $F$ 关于奇异值 $\lambda_j$ 求偏导并令其为零，得到问题（4.A118）最优解的必要条件：
+\begin{equation}
+\frac{\partial F}{\partial\lambda_j}=\frac1\mu+\lambda_j-\sigma_j=0,
+\quad j=1,\ldots,r.\tag{4.C.8}
+\end{equation}
+对 $\lambda_j$（$\lambda_j\ge0$）求解，得到
+\[
+\lambda_j=\max\left(\sigma_j-\frac1\mu,0\right).
+\]
+因此，优化问题（4.C.1）的解为
+\begin{equation}
+J^*=U\operatorname{diag}\left(
+\max\left(\sigma_1-\frac1\mu,0\right),\ldots,
+\max\left(\sigma_r^{(k+1)}-\frac1\mu,0\right)\right)V^T\tag{4.C.9}
+\end{equation}
+或
+\[
+\begin{aligned}
+J^{(k+1)}={}&U^{(k+1)}\operatorname{diag}\biggl(
+\max\left(\sigma_1^{(k+1)}-\frac1\mu,0\right),\ldots,\\
+&\hspace{9em}\max\left(\sigma_r^{(k+1)}-\frac1\mu,0\right)\biggr)(V^{(k+1)})^T.
+\end{aligned}
+\]
+接下来求解以下优化问题并更新 $Z$：
+\begin{equation}
+\begin{aligned}
+Z:\min_Z\ F={}&\operatorname{tr}(\Upsilon_1^T(X-AZ-E))
++\operatorname{tr}(\Upsilon_2^T(Z-J))++\frac\mu2\\
+&{}\times\bigl(\|X-AZ-E\|_F^2+\|Z-J\|_F^2\bigr).
+\end{aligned}\tag{4.C.10}
+\end{equation}
+利用第1章的矩阵微积分，对 $F$ 关于矩阵 $Z$ 求偏导并令其为零：
+\begin{equation}
+\frac{\partial F}{\partial Z}=-A^T\Upsilon_1+\Upsilon_2
+-\mu A^T(X-AZ-E)+\mu(Z-J)=0.\tag{4.C.11}
+\end{equation}
+对矩阵 $Z$ 求解式（4.C.9），得到
+\begin{equation}
+Z=(I+A^TA)^{-1}\left[A^T(X-E)+\frac1\mu(A^T\Upsilon_1-\Upsilon_2)+J\right],\tag{4.C.12}
+\end{equation}
+或写为更新公式
+\[
+Z^{(k+1)}=(I+A^TA)^{-1}\left[
+A^T(X-E^{(k)})+J^{(K+1)}+\frac1\mu(A^T\Upsilon_1^{(k)}-\Upsilon_2^{(k)})\right].
+\]
+然后求解以下最小化问题，更新矩阵 $E$：
+\begin{equation}
+\min_E\quad F=\lambda\|E\|_{2,1}
++\operatorname{Tr}(\Upsilon_1^T(X-AZ-E))
++\frac\mu2\|X-AZ-E\|_F^2.\tag{4.C.13}
+\end{equation}
+式（4.C.13）的函数 $F$ 可化为
+\begin{equation}
+\begin{aligned}
+F={}&\mu\biggl\{\frac\lambda\mu\|E\|_{2,1}
++\frac12\left[\frac2\mu\operatorname{Tr}(\Upsilon_1^T(X-AZ-E))
++\|X-AZ-E\|_F^2\right]\\
+\approx{}&\mu\left[\frac\lambda\mu\|E\|_{2,1}
++\frac12\left\|E-\left(X-AZ+\frac1\mu\Upsilon\right)_1\right\|_F^2\right].
+\end{aligned}\tag{4.C.14}
+\end{equation}
+令
+\begin{equation}
+Q=X-AZ+\frac1\mu\Upsilon.\tag{4.C.15}
+\end{equation}
+于是，优化问题（4.A1244）可重写为
+\begin{equation}
+\min_E\quad F=\alpha\|E\|_{2,1}+\frac12\|E-Q\|_F^2,\tag{4.C.16}
+\end{equation}
+其中
+\begin{equation}
+\alpha=\frac\lambda\mu.\tag{4.C.17}
+\end{equation}
+对 $F$ 关于列向量 $E_{.j}$ 求偏导，得到
+\begin{equation}
+\frac{\partial F}{\partial E_{.j}}
+=\alpha\frac{E_{.j}}{\|E_{.j}\|_2}+E_{.j}-Q_{.j}=0,\tag{4.C.18}
+\end{equation}
+即
+\begin{equation}
+\left(\frac\alpha{\|E_{.j}\|_2}+1\right)E_{.j}=Q_{.j}.\tag{4.C.19}
+\end{equation}
+取式（4.C.19）两侧的 $\|\cdot\|_2$ 范数，得到
+\begin{equation}
+\left(\frac\alpha{\|E_{.j}\|_2}+1\right)\|E_{.j}\|_2=\|Q_{.j}\|_2.\tag{4.C.20}
+\end{equation}
+对 $\|E_{.j}\|_2$ 求解，得到
+\begin{equation}
+\|E_{.j}\|_2=\|Q_{.j}\|_2-\alpha,\tag{4.C.21}
+\end{equation}
+从而 $\|Q_{.j}\|_2\ge\alpha$。将式（4.C.21）代入式（4.C.19），得到
+\begin{equation}
+E_{.j}=\frac{\|Q_{.j}\|_2-\alpha}{\|Q_{.j}\|_2}Q_{.j},
+\quad\text{当}\ \|Q_{.j}\|_2\ge\alpha.\tag{4.C.22}
+\end{equation}
+将式（4.C.17）代入式（4.C.22），得到
+\begin{equation}
+E_{.j}=\frac{(\|Q_{.j}\|_2-\lambda/\mu)_+}{\|Q_{.j}\|_2}Q_{.j}.\tag{4.C.23}
+\end{equation}
+$E_{.j}^{(k)}$ 的更新为
+\begin{equation}
+E_{.j}^{(k+1)}=\frac{(\|Q_{.j}\|_2-\lambda/\mu)_+}{\|Q_{.j}\|_2}Q_{.j}.\tag{4.C.24}
+\end{equation}
+ADMM（Boyd et al. 2011）给出乘子的更新：
+\begin{equation}
+\begin{aligned}
+\Upsilon_1^{(k+1)}&=\Upsilon_1^{(k)}+\mu(X-AZ^{(k+1)}-E^{(k+1)}),\\
+\Upsilon_2^{(k+1)}&=\Upsilon_2^{(k)}+\mu(Z^{(k+1)}-J^{(k+1)}).
+\end{aligned}\tag{4.C.25}
+\end{equation}

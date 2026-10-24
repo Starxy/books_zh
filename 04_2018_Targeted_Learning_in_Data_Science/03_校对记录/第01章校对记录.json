@@ -1,0 +1,568 @@
+{
+  "chapter": 1,
+  "status": "complete",
+  "title_en": "Research Questions in Data Science",
+  "title_zh": "数据科学中的研究问题",
+  "authors": [
+    "Sherri Rose",
+    "Mark J. van der Laan"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/02_CH01_Research_Questions_in_Data_Science.pdf",
+    "split_pdf_pages": 13,
+    "chapter_split_pages": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "chapter_printed_pages": "3–14",
+    "part_page_excluded_from_chapter": 1,
+    "source_rendered_and_visually_checked_pages": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "annotations_removed_in_memory_before_rendering": true,
+    "english_words_approx": 4378
+  },
+  "pages": 9,
+  "han_characters_pdf_including_running_heads": 6837,
+  "han_characters_tex_without_comment_lines": 6751,
+  "page_count_note": "按统一 A4 体例重排，正文开本比原书大；完整性依据逐段覆盖、书签、公式图表及引用核查，不以页数比补写或删减。",
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch01.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch01a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch01b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch01c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch01_roadmap.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch01_unnumbered_workflow.png"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第01章_中文译稿.pdf",
+  "sha256": "1c2cd8a5bcdb2d3ec7f0565d984e71f76166ffe22ff1593c6e770792f2034db6",
+  "chapter_parts": [
+    {
+      "file": "chapters/ch01a.tex",
+      "coverage": "章题、作者机构邮箱及 DOI、章首全部导言、第 1.1—1.2 节"
+    },
+    {
+      "file": "chapters/ch01b.tex",
+      "coverage": "第 1.3—1.4 节及其四个小节，含全部估计问题、公式与表 1.1"
+    },
+    {
+      "file": "chapters/ch01c.tex",
+      "coverage": "第 1.5—1.6 节，含完整路线图、全部注记与延伸阅读"
+    }
+  ],
+  "sections": [
+    {
+      "number": "1.1",
+      "title": "从（大）数据中学习",
+      "source_split_pages": [
+        3,
+        4
+      ],
+      "chinese_pages": [
+        1,
+        2
+      ],
+      "complete": true,
+      "content": "学习框架、TMLE 与超级学习、两段无标题强调框、未编号插图及全部应用领域。"
+    },
+    {
+      "number": "1.2",
+      "title": "传统估计方法的失效",
+      "source_split_pages": [
+        4,
+        5
+      ],
+      "chinese_pages": [
+        2,
+        3
+      ],
+      "complete": true,
+      "content": "全部五段：传统方法局限、集成学习的均值代入、参数极大似然及推断、机器学习偏差、靶向更新。"
+    },
+    {
+      "number": "1.3",
+      "title": "靶向学习的实际应用",
+      "source_split_pages": [
+        5,
+        6
+      ],
+      "chinese_pages": [
+        3,
+        4
+      ],
+      "complete": true,
+      "content": "Pandora 2.3%/2.7%、ICU 超级学习器、PTSD 96%/10%、医疗支出研究、表 1.1、保险选择激励。"
+    },
+    {
+      "number": "1.4",
+      "title": "统计估计问题",
+      "source_split_pages": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "chinese_pages": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "complete": true,
+      "content": "IVF 研究动机及 1.4.1—1.4.4 全部四个小节。"
+    },
+    {
+      "number": "1.5",
+      "title": "靶向学习路线图",
+      "source_split_pages": [
+        10,
+        11
+      ],
+      "chinese_pages": [
+        7,
+        8
+      ],
+      "complete": true,
+      "content": "导言、定义模型与参数、预测超级学习、TMLE 三项说明、衔接段及图 1.1。"
+    },
+    {
+      "number": "1.6",
+      "title": "注记与延伸阅读",
+      "source_split_pages": [
+        12,
+        13
+      ],
+      "chinese_pages": [
+        9
+      ],
+      "complete": true,
+      "content": "全部四段，包括完整领域参考文献清单、算法公平性实例、应用教程、非参数自助法和 Hadamard 可微性讨论。"
+    }
+  ],
+  "subsections": [
+    {
+      "number": "1.4.1",
+      "title": "数据",
+      "source_split_pages": [
+        7
+      ],
+      "complete": true,
+      "content": "Lt、Lbar、Abar、全部 IVF 协变量、两个结局约定、时间序列 O、独立同分布样本、时间分解。"
+    },
+    {
+      "number": "1.4.2",
+      "title": "模型与参数",
+      "source_split_pages": [
+        7,
+        8
+      ],
+      "complete": true,
+      "content": "非参数模型、IVF 成功概率的原印刷公式、可识别性说明及反事实参数。"
+    },
+    {
+      "number": "1.4.3",
+      "title": "靶向最小损失估计量",
+      "source_split_pages": [
+        8
+      ],
+      "complete": true,
+      "content": "TMLE 一般框架、五项构成要素、迭代停止规则、有效得分方程、双重稳健与有效性、通用最不利子模型。"
+    },
+    {
+      "number": "1.4.4",
+      "title": "其他常见的估计问题",
+      "source_split_pages": [
+        9,
+        10
+      ],
+      "complete": true,
+      "content": "特定规则下的均值、CD4 阈值例、规则与反事实定义、g 计算公式、社区随机试验、网络。"
+    }
+  ],
+  "figures": [
+    {
+      "number": "1.1",
+      "source_split_page": 11,
+      "source_printed_page": 12,
+      "method": "中文 TikZ 重绘",
+      "file": "figures/ch01_roadmap.tex",
+      "chinese_page": 8,
+      "nodes": [
+        "数据",
+        "模型",
+        "目标参数",
+        "超级学习器",
+        "靶向最小损失估计",
+        "推断",
+        "解释"
+      ],
+      "downward_arrows": 6,
+      "side_groups": [
+        "界定研究问题",
+        "估计",
+        "推断"
+      ],
+      "all_labels_and_statements_translated": true,
+      "output_visually_checked": true,
+      "source_data_node_n_verified_by_zoom": "The data are n observations of random variable O."
+    },
+    {
+      "number": null,
+      "source_split_page": 4,
+      "source_printed_page": 5,
+      "method": "无批注原始页面裁片；图标不改画，保留原图并附中文授权来源说明",
+      "file": "figures/ch01_unnumbered_workflow.png",
+      "chinese_page": 2,
+      "credit": "图片由 GoAnimate 提供，经授权使用。完整教学视频：",
+      "source_url": "https://bit.ly/2lMugBu",
+      "url_validation": "小写 l；HTTP 301 指向 https://www.youtube.com/watch?v=SOJ_cebOQ6A；易混的大写 I 链接为 404。",
+      "output_visually_checked": true
+    }
+  ],
+  "tables": [
+    {
+      "number": "1.1",
+      "source_split_page": 6,
+      "source_printed_page": 7,
+      "chinese_page": 4,
+      "title": "靶向学习效应估计值最高的五类病症及其参数回归估计值",
+      "rows": [
+        [
+          "多发性硬化",
+          "67,011",
+          "30,715"
+        ],
+        [
+          "充血性心力衰竭",
+          "19,904",
+          "4131"
+        ],
+        [
+          "肺癌、脑癌及重症癌症",
+          "19,233",
+          "24,528"
+        ],
+        [
+          "重性抑郁与双相障碍",
+          "15,398",
+          "3498"
+        ],
+        [
+          "慢性肝炎",
+          "10,530",
+          "5539"
+        ]
+      ],
+      "ten_numeric_cells_checked_against_render": true,
+      "data_rows_added": 0
+    }
+  ],
+  "formulas": [
+    {
+      "id": "ch01-display-1",
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 8,
+      "chinese_page": 5,
+      "identity": "O=(L0,A0,L1,A1,L2)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch01-display-2",
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 8,
+      "chinese_page": 5,
+      "identity": "p(O) 的五因子时间分解",
+      "visually_verified": true
+    },
+    {
+      "id": "ch01-display-3",
+      "number": null,
+      "source_split_page": 8,
+      "source_printed_page": 9,
+      "chinese_page": 5,
+      "identity": "IVF 的 Psi(P0) 公式",
+      "visually_verified": true,
+      "source_issue_preserved": "求和号无下标；第二因子印为 P0(L1=1 | A0=1,L0=l0)。"
+    },
+    {
+      "id": "ch01-display-4",
+      "number": null,
+      "source_split_page": 8,
+      "source_printed_page": 9,
+      "chinese_page": 5,
+      "identity": "P(Y_(1,1)=1)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch01-display-5",
+      "number": null,
+      "source_split_page": 9,
+      "source_printed_page": 10,
+      "chinese_page": 6,
+      "identity": "Psi^d(P) 的双重求和 g 计算公式",
+      "visually_verified": true
+    }
+  ],
+  "emphasis_boxes": {
+    "original_untitled_box_fragments": 2,
+    "environment": "sourcebox",
+    "continuation_fragment_in_kaishu": true,
+    "fine_point_or_technical_point_boxes_added": 0
+  },
+  "new_terms_for_glossary_review": [
+    {
+      "en": "collective intelligence",
+      "zh": "集体智慧"
+    },
+    {
+      "en": "overfitting",
+      "zh": "过拟合"
+    },
+    {
+      "en": "cross-sectional study",
+      "zh": "横断面研究"
+    },
+    {
+      "en": "effect modification",
+      "zh": "效应修饰"
+    },
+    {
+      "en": "comparative effectiveness research",
+      "zh": "比较效果研究"
+    },
+    {
+      "en": "plan payment risk adjustment",
+      "zh": "医保计划支付风险调整"
+    },
+    {
+      "en": "in vitro fertilization",
+      "zh": "体外受精",
+      "abbreviation": "IVF"
+    },
+    {
+      "en": "posttraumatic stress disorder",
+      "zh": "创伤后应激障碍",
+      "abbreviation": "PTSD"
+    },
+    {
+      "en": "baseline covariate",
+      "zh": "基线协变量"
+    },
+    {
+      "en": "time-dependent confounder",
+      "zh": "时变混杂因素"
+    },
+    {
+      "en": "sequential decision process",
+      "zh": "序贯决策过程"
+    },
+    {
+      "en": "sequential decision theory",
+      "zh": "序贯决策理论"
+    },
+    {
+      "en": "dynamic rule",
+      "zh": "动态处理规则",
+      "note": "与现有 dynamic treatment rule 统一译名"
+    },
+    {
+      "en": "biased sampling",
+      "zh": "有偏抽样"
+    },
+    {
+      "en": "incremental effect",
+      "zh": "增量效应"
+    },
+    {
+      "en": "confidence interval",
+      "zh": "置信区间"
+    },
+    {
+      "en": "sampling distribution",
+      "zh": "抽样分布"
+    },
+    {
+      "en": "standard error",
+      "zh": "标准误"
+    },
+    {
+      "en": "resampling",
+      "zh": "重抽样"
+    },
+    {
+      "en": "Hadamard differentiability",
+      "zh": "Hadamard 可微性"
+    },
+    {
+      "en": "compact differentiability",
+      "zh": "紧可微性"
+    },
+    {
+      "en": "algorithmic fairness",
+      "zh": "算法公平性"
+    },
+    {
+      "en": "accountability",
+      "zh": "问责性"
+    },
+    {
+      "en": "transparency",
+      "zh": "透明度"
+    },
+    {
+      "en": "targeted statistical learning machine",
+      "zh": "靶向统计学习机器"
+    }
+  ],
+  "terminology_checks": {
+    "targeted_learning": "靶向学习",
+    "targeted_minimum_loss_based_estimation": "靶向最小损失估计",
+    "targeted_maximum_likelihood_estimation": "靶向极大似然估计",
+    "maximum_likelihood_and_minimum_loss_based_not_conflated": true,
+    "bias": "偏差",
+    "bias_variance_tradeoff": "偏差—方差权衡",
+    "remaining_偏倚_occurrences": 0
+  },
+  "completeness_evidence": {
+    "chapter_count": 1,
+    "section_count_matches_outline": [
+      6,
+      6
+    ],
+    "subsection_count_matches_outline": [
+      4,
+      4
+    ],
+    "display_formula_count": 5,
+    "numbered_figure_count": 1,
+    "table_count": 1,
+    "source_year_and_suffix_occurrences": 48,
+    "translation_year_and_suffix_occurrences": 48,
+    "year_and_suffix_multisets_identical": true,
+    "year_counts": {
+      "1989": 1,
+      "1996": 1,
+      "2007": 1,
+      "2008": 2,
+      "2008a": 1,
+      "2009": 6,
+      "2009a,b,c": 1,
+      "2010": 4,
+      "2010a": 3,
+      "2010c": 1,
+      "2011": 6,
+      "2011a,b": 1,
+      "2012": 2,
+      "2013": 1,
+      "2014": 4,
+      "2014a": 2,
+      "2014a,b": 1,
+      "2015": 2,
+      "2016": 1,
+      "2017": 5,
+      "2018": 2
+    },
+    "author_affiliations_emails_and_doi_preserved": true,
+    "chapter_intro_and_all_notes_further_reading_translated": true,
+    "paragraphs_reviewed_against_entire_english_text": true
+  },
+  "unresolved_items": [],
+  "numbering_oddities": [
+    "本章五个展示公式在原书均无编号，译稿不补造公式号。",
+    "分章 PDF 第 1 页是第一编扉页；第 2 页起为原书第 3 页，分章 PDF 未含原书第 2 页。编扉页由总审处理，章内不含 part 命令。",
+    "图 1.1 与表 1.1 编号各自正常连续；无定义、定理或引理条目需要计数。"
+  ],
+  "source_wording_notes": [
+    "动态规则段原句 Each dynamic rule will be indexed by both a CD4 threshold 中 both 无对应的第二项；译为每个规则均由一个 CD4 阈值索引，未虚构第二项。",
+    "原书七年前、目前等时间表述保留出版时语境，不更新历史叙述。"
+  ],
+  "deliberate_content_deviations": [],
+  "build_checks": {
+    "engine": "xelatex",
+    "helper": "work/targeted_learning/compile_chapter.py",
+    "passes": [
+      0,
+      0
+    ],
+    "build_directory": "work/targeted_learning/ch01_work/build_142558",
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "chapter_part_or_counter_commands": [],
+    "control_characters": [],
+    "all_nine_pages_rendered": true,
+    "visual_qa_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "final_visual_qa_after_last_build": [
+      2,
+      5,
+      6,
+      8,
+      9
+    ],
+    "table_figure_formula_and_body_pages_checked": true,
+    "shipped_file_reopened": true,
+    "shipped_page_count": 9,
+    "last_bookmark": [
+      2,
+      "1.6 注记与延伸阅读",
+      9
+    ],
+    "shipped_sha256_matches_build_record": true,
+    "self_test_driver_removed": true
+  },
+  "qa_artifacts": {
+    "source_images": "work/targeted_learning/render/ch01",
+    "output_images": "work/targeted_learning/ch01_work/qa_ch01_all_NNN.png",
+    "extracted_chinese_pdf_text": "work/targeted_learning/ch01_work/ch01_built_text.txt",
+    "source_credit_zoom": "work/targeted_learning/ch01_work/source_credit_zoom.png",
+    "source_data_box_zoom": "work/targeted_learning/ch01_work/source_figure_data_zoom.png",
+    "structure_audit": "work/targeted_learning/ch01_work/qa_ch01_structure.json"
+  },
+  "shared_files_edited": [],
+  "source_anomalies": [
+    {
+      "id": "source-ivf-parameter-formula",
+      "type": "原书公式疑点",
+      "source_split_page": 8,
+      "source_printed_page": 9,
+      "reason": "原印刷 Psi(P0) 公式未给出求和指标，且第二因子写 L1=1 而非 l1，不能据上下文擅自改写。",
+      "action": "已逐字母照录原印刷公式，保留原式；总审如需勘误，可在校对记录另行说明。",
+      "blocks_delivery": false
+    }
+  ],
+  "report_schema_note": "早期报告将已确认并照录的原书疑点放在unresolved_items。现移至source_anomalies，所有疑点、源页和处理说明完整保留；未修改正文、公式、图表或PDF。"
+}

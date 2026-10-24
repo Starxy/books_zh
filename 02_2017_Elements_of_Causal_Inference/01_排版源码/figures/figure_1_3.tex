@@ -1,0 +1,29 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,font=\small]
+ \node[vtx] (f13aX) at (-5.4,0) {$X$};
+ \node[vtx] (f13aY) at (-2.2,0) {$Y$};
+ \draw[ed] (f13aY)-- node[above=2mm] {$X\coloneqq f(Y,N_X)$} (f13aX);
+ \node at (-2.2,-.85) {“2”};
+ \node[align=center] at (-3.8,-1.5) {模型（i）；$Y,N_X$ 相互独立};
+ \node[vtx] (f13bX) at (1.2,0) {$X$};
+ \node[vtx] (f13bY) at (5.2,0) {$Y$};
+ \node[latent] (f13bZ) at (3.2,1.8) {$Z$};
+ \node[above=2mm] at (f13bZ.north) {书写意图};
+ \draw[ed] (f13bZ)-- node[pos=.52,above left=-.5mm] {$X\coloneqq g(Z,M_X)$} (f13bX);
+ \draw[ed] (f13bZ)-- node[pos=.52,above right=-.5mm] {$Y\coloneqq h(Z,M_Y)$} (f13bY);
+ \node at (5.2,-.85) {“2”};
+ \node[align=center] at (3.2,-1.5) {模型（ii）；$Z,M_X,M_Y$ 相互独立};
+ % 用矢量笔迹表现原图的手写数字样例。
+ \foreach \digitx in {-5.4,1.2}{
+   \begin{scope}[shift={(\digitx,-.85)}]
+    \draw[line width=1.3pt,line cap=round,line join=round]
+      (-.13,.12) .. controls (-.09,.26) and (.14,.24) .. (.16,.10)
+      .. controls (.18,.02) and (-.11,-.04) .. (-.13,-.15)
+      .. controls (.00,-.12) and (.11,-.18) .. (.18,-.12);
+   \end{scope}
+ }
+\end{tikzpicture}
+\caption{手写数字数据集的两种结构因果模型。在左侧模型（i）中，书写者获得类别标签 $Y$，并据此生成图像 $X$；在右侧模型（ii）中，书写者自行决定要写哪一类数字（$Z$），再生成图像和类别标签。选择适当的函数 $f,g,h$ 以及噪声变量 $N_X,M_X,M_Y,Z$，就能使两个模型产生相同的可观测分布 $P_{X,Y}$，但它们在干预下仍有不同表现，见第 1.4.1 节。}
+\label{fig:1.3}
+\end{figure}

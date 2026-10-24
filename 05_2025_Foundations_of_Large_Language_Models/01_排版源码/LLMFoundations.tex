@@ -1,0 +1,100 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+%----------------------------------------------------------------------------------------
+% 大语言模型 基础
+%
+% 版权所有 2021-2026
+% Tong Xiao/肖桐 (xiaotong@mail.neu.edu.cn) and Jingbo Zhu/朱靖波 (zhujingbo@mail.neu.edu.cn)
+%----------------------------------------------------------------------------------------
+
+\documentclass[UTF8,11pt,openany,fontset=windows]{ctexbook}
+\usepackage[a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{project}
+
+\let\cleardoublepage\clearpage
+
+\setstretch{1.25}
+\renewcommand*{\lstlistlistingname}{程序清单}
+\def\projectauthor{肖桐（Tong Xiao）和朱靖波（Jingbo Zhu）}
+\def\projecttitle{{\fontsize{27pt}{32pt}\selectfont {\textbf{大语言模型}}}\\[0.3cm] {\fontsize{27pt}{32pt}\selectfont \textbf{基础}}}
+\def\projectmonth{\today}
+\def\projectdepartment{东北大学自然语言处理实验室 \& NiuTrans Research}
+% SECTION STYLE
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+% 固定本次交付的编译日期，以保持成品版面可复现。
+\year=2026 \month=10 \day=23
+\begin{document}
+\hypersetup{pageanchor=false}
+\prefrontmatter
+%\frontmatter
+
+\pagenumbering{roman}
+\hypersetup{pageanchor=true}
+%\newpage
+~\vfill
+
+\noindent 版权所有 \copyright\ 2021-2026 肖桐（Tong Xiao）和朱靖波（Jingbo Zhu）\\
+
+\noindent 东北大学自然语言处理实验室\\
+\noindent \textsc{\&}\\
+\noindent \textsc{NiuTrans Research}\\
+
+\begin{spacing}{1.2}
+\noindent 本文件依据知识共享署名—非商业性使用 4.0 许可协议（以下简称“许可协议”）授权。使用本文件须遵守该许可协议。协议文本见 \url{http://creativecommons.org/licenses/by-nc/4.0}。除非适用法律另有规定或另有书面约定，依据本许可协议提供的软件均按“原样”提供，不附带任何明示或默示的保证或条件。有关具体权限及限制，请参阅许可协议。
+\end{spacing}
+
+\noindent \textit{\today}
+%\cleardoublepage
+
+\input{preface}
+\markboth{前言}{}
+\cleardoublepage
+
+\input{notation}
+\markboth{符号说明}{}
+\cleardoublepage
+
+\pdfbookmark{\contentsname}{toc}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+% \addtolength{\parskip}{-\baselineskip}
+\addtocontents{toc}{\protect\markboth{目录}{目录}}
+\begin{spacing}{1.0}
+\tableofcontents
+\end{spacing}
+% \addtolength{\parskip}{\baselineskip}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+\mainmatter
+\include{Chapter7/chapter7}
+\include{Chapter8/chapter8}
+\include{Chapter9/chapter9}
+\include{Chapter10/chapter10}
+\include{Chapter11/chapter11}
+\include{Chapter12/chapter12}
+\cleardoublepage
+
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+
+\renewcommand{\bibsection}{\chapter*{\bibname}\addcontentsline{toc}{chapter}{\bibname}\markboth{\bibname}{\bibname}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE,LO]{参考文献}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\bibliographystyle{book-bib-style} % Give more information to each entry of the bib
+\bibliography{bibliography}
+\cleardoublepage
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE,LO]{索引}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\printindex % Show index
+
+\end{document}

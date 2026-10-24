@@ -1,0 +1,93 @@
+% 原书分章 PDF 第 5—7 页：第 8.2 节及其两小节。
+\section{有效影响曲线的 HAL 估计量的收敛速率}
+
+下面的定理说明，估计量 $D_n^*(P)$ 以快于 $n^{-1/4}$ 的速率，在 $L^2(P)$ 范数下收敛到 $D^*(P)$。
+
+\begin{bookresult}{定理}{8.1}
+设 $\Psi:\mathcal M\to\mathbb R$ 在 $P$ 处路径可微，典范梯度为 $D^*(P)$。设 $D(P)$ 是 $P$ 处的一个梯度，且为一致有界的函数。设
+$A_P:(H,\langle\cdot,\cdot\rangle_H)\to L_0^2(P)$
+是从底层 Hilbert 空间到 $L_0^2(P)$ 的线性得分算子，且 $P$ 处的切空间 $T(P)=\overline R(A_P)$ 为 $A_P$ 值域的闭包。假定对某个 $h^*=h^*(P)\in H$，有 $D^*(P)=A_P(h^*)$。假定 $H$ 由 $d$ 元实值函数组成，且 $h^*(P)$ 存在一个 càdlàg、具有有限变差范数的版本。设 $H_M\subset H$ 为其中变差范数小于 $M$ 的 càdlàg 函数的子集；当 $M>\|h^*\|_v$ 时，有 $h^*(P)\in H_M$。假定 $A_P(H_M)$ 为 $P$-Donsker 类。注意，若函数类
+$\{A_P(x\mapsto\phi_{x_S}(u_S)):u_S,S\}$
+是 $P$-Donsker 类，那么 $A_P(H_M)$ 也是 $P$-Donsker 类。
+
+设 $O_1,\ldots,O_n$ 为 $O\sim P$ 的 $n$ 个独立同分布副本组成的样本。定义子空间
+$\boldsymbol{\Psi}_M=A_P(H_M)=\{A_P(h):h\in H_M\}$，并定义
+\[
+ \psi_{n,M}=\argmin_{\psi\in\boldsymbol{\Psi}_M}P_n(D(P)-\psi)^2.
+\]
+上文已说明：在系数绝对值之和受 $M$ 约束时，这一估计量可定义为 Lasso 最小二乘线性回归估计量。其结局为 $D(P)(O_i)$，主项是
+$A_P(x\mapsto\phi_{x_S}(u_S))(O_i):u_S,S\}$
+的一个有限子集；对每个 $S\subset\{1,\ldots,d\}$，将 $u_S$ 限制在一个包含 $O(n)$ 个取值的有限集中，即可定义这一子集。
+
+设 $M_n$ 是在一个一致有界集合上选取的交叉验证选择器：
+\[
+ M_n=\argmin_M E_{B_n}P_{n,B_n}^1
+ \bigl(D(P)-\widehat\Psi_M(P_{n,B_n}^0)\bigr)^2.
+\]
+用 $\psi_n=\psi_{n,M_n}$ 作为 $D^*(P)$ 的估计量 $D_n^*(P)$。那么
+\[
+ \int\{D_n^*(P)-D^*(P)\}^2(o)\,dP(o)=o_P(n^{-1/2}).
+\]
+\end{bookresult}
+
+如 van der Laan（2017）所示，利用 van der Vaart 和 Wellner（2011）的有限样本经验过程结果，再假定 $A_P(H_M)$ 的熵与 $H_M$ 的熵同阶，稍作进一步推导，就能得到实际速率
+% 原书指数 -(1/2+alpha(d)/4 缺少闭括号，保留印刷排法。
+$o_P(n^{-(1/2+\alpha(d)/4})$，其中 $\alpha(d)=1/(d+1)$。
+
+\begin{proof}
+Donsker 类的结论来自如下事实：Donsker 类的凸包仍为 Donsker 类。因此，
+\[
+ \bigl\{\{D(P)-A_P(h)\}^2:h\in H_M\bigr\}
+\]
+也是 $P$-Donsker 类。还需证明 $o_P(n^{-1/2})$ 的一致性结论。令
+$L(\psi)=(D(P)-\psi)^2$ 为平方误差损失。注意
+\[
+ \psi_M=\Psi_M(P)=\argmin_{\psi\in\boldsymbol{\Psi}_M}PL(\psi),
+\]
+且
+\[
+ \psi_{n,M}=\argmin_{\psi\in\boldsymbol{\Psi}_M}P_nL(\psi).
+\]
+我们希望证明 $\int(\psi_{n,M}-\Psi_M(P))^2\,dP=o_P(n^{-1/2})$。交叉验证选择器的有限样本预言不等式，将进一步给出估计量 $\psi_n=\psi_{n,M_n}$ 所需满足的结论。
+
+有
+\[
+ \begin{aligned}
+ 0\leq d_P(\psi_{n,M},\psi_M)
+ &\equiv PL(\psi_{n,M})-PL(\psi_M)\\
+ &=(P-P_n)\{L(\psi_{n,M})-L(\psi_M)\}\\
+ &\quad+P_n\{L(\psi_{n,M})-L(\psi_M)\}\\
+ &\leq-(P_n-P)\{L(\psi_{n,M})-L(\psi_M)\}.
+ \end{aligned}
+\]
+根据假设，$\{L(\psi)-L(\psi_M):\psi\in\boldsymbol{\Psi}_M\}$ 为 $P$-Donsker 类。因此，根据经验过程理论，右端为 $O_P(n^{-1/2})$，从而
+$d_P(\psi_{n,M},\psi_M)=O_P(n^{-1/2})$。
+由于 $L(\psi)$ 是平方误差损失，可以用某个通用常数乘以
+$P\{L(\psi_{n,M})-L(\psi_M)\}$
+来控制
+$P\{L(\psi_{n,M})-L(\psi_M)\}^2$
+（例如见 van der Laan 和 Dudoit，2003）。因此，当 $n\to\infty$ 时，
+$P\{L(\psi_{n,M})-L(\psi_M)\}^2\to_p0$。
+根据经验过程理论，
+$(P_n-P)\{L(\psi_{n,M})-L(\psi_M)\}=o_P(n^{-1/2})$。
+于是证明了 $d_P(\psi_{n,M},\psi_M)=o_P(n^{-1/2})$。
+\end{proof}
+
+\subsection{用于估计初始梯度在子切空间上的投影}
+
+不一定要用 HAL 估计量来估计初始梯度在整个切空间上的投影。例如，假定切空间 $T(P)$ 允许正交分解 $\sum_{j=1}^K T_j(P)$，其中 $T_j(P)$ 是 $K$ 个干扰参数之一的切空间，如构成密度 $p$ 的各因子。在这种常见情况下，
+\[
+ \Pi(D(P)\mid T(P))
+ =\sum_{j=1}^K\Pi(D(P)\mid T_j(P)).
+\]
+因此，只需分别计算每个 $j$ 对应的 $D(P)$ 在 $T_j(P)$ 上的投影。对某些切空间，可以容易地解析求出投影；对其余切空间，则分别将上述 HAL 估计量应用于每个 $j$ 对应的投影，此时 $T_j(P)$ 是得分算子
+$A_j:(H_j,\langle\cdot,\cdot\rangle_{H_j})\to L_0^2(P)$
+的值域的闭包。我们将在某些例子中应用这一方法。
+
+\subsection{使用来自真实数据分布的实际数据集}
+
+若 $P$ 表示 $P_0$ 的一致估计量 $\widehat P_n$，即 $D^*(\widehat P_n)$ 收敛到 $D^*(P_0)$，那么我们猜测：在构造估计量时，可以使用来自 $P_0$ 的实际观测 $O_1,\ldots,O_n$，而无需从 $\widehat P_n$ 重新抽取样本。这时，把 HAL 估计量 $D_n^*(\widehat P_n)$ 视为 $D^*(P_0)$ 的估计量。当然，此时 $D^*(P_0)$ 的估计量是否有效，取决于 $n$ 趋向无穷时 $\widehat P_n$ 对 $P_0$ 的逼近。用这一方法估计 $D^*(P_0)$ 的优点，是无需从某个数据分布 $P$ 重新抽样。例如，在许多问题中，有效影响曲线 $D^*(P)$ 只通过某些参数（比如 $(Q,G)$）依赖 $P$。这些参数未必能确定一个实际的数据分布。因此，$(Q_0,G_0)$ 的估计量 $(Q_n,G_n)$，并不导出一个可供重新抽样的数据分布 $\widehat P_n$。这时，就得确定一个与估计值 $(Q_n,G_n)$ 相容的 $\widehat P_n$。这件事可能很容易，但在某些问题中也可能相当繁琐。
+
+\begin{sourcebox}
+使用来自 $P_0$ 的实际独立同分布样本，来构造 $D^*(P_0)$ 的 HAL 估计量，其依据如下。首先，可以在 $P=P_0$ 处应用定理，说明 Lasso 估计量在 $L^2(P_0)$ 中以快于 $n^{-1/4}$ 的速率收敛到 $D^*(P_0)$。不过，该 Lasso 估计量以未知的 $D(P_0)$ 为结局，线性回归模型中还使用了依赖 $P_0$ 的主项 $A_{P_0}(x\mapsto\phi_{x,S}(u_{S,j}))$。如果用一致的 $D(\widehat P_n)$ 替代 $D(P_0)$，那么，很容易证明 Lasso 估计量仍然一致；若 $D(\widehat P_n)$ 以相同或更快的速率收敛到 $D(P_0)$，则速率仍会快于 $n^{-1/4}$。最后，还要证明，用基于 $\widehat P_n$ 的估计版本替代线性回归模型中未知的主项后，一致性仍得以保持。我们相信，在一个相当弱的条件下，后一结论不难证明。其余各节将考察若干例子。
+\end{sourcebox}

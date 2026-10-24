@@ -1,0 +1,92 @@
+% 原书第 31—34 页；第 3.2—3.3 节。
+\section{定义估计问题}
+\label{sec:ch03-estimation-problem}
+
+回顾一下，我们在每个时点 $t$（$t=0,\ldots,T+1$）都有一个协变量向量 $L_t$。对于体外受精（in vitro fertilization，IVF）研究和 HIV 研究中的数据结构，各时点的协变量组成 $\bar L=(L_0,L_1,L_2)$，且 $T=1$。干预集合为 $\bar A=(A_0,A_1)$；一名随机抽取的研究对象的数据，可以表示为按时间排序的数据结构：
+\[
+ O=(L_0,A_0,L_1,A_1,L_2=Y),
+\]
+其中，假设 $L_t$ 发生在 $A_t$ 之前。我们将最终的二值测量 $L_2$ 记为 $Y$，表示感兴趣的结局。样本由随机变量 $O$ 的 $n$ 次独立同分布（independent and identically distributed，i.i.d.）抽样 $O_1,\ldots,O_n$ 构成。这些随机变量的实现值记为 $o_1,\ldots,o_n$。按照数据的时间顺序，$O$ 的概率分布可分解为
+\[
+ \begin{aligned}
+ p(O)={}&p(L_0)\times p(L_1\mid A_0,L_0)
+             \times p(Y\mid A_1,L_1,A_0,L_0)\\
+       &{}\times p(A_0\mid L_0)\times p(A_1\mid L_1,A_0,L_0).
+ \end{aligned}
+\]
+
+回顾一下，$\mathcal D=(d_1,\ldots,d_K)$ 是一组动态处理规则（dynamic rule），每个 $d_k$ 编码一个按时间排列的规则序列 $d_{k,t}$（$t=1,\ldots,T$）。此外，$Y^d$ 是假如令研究对象在所有时点都遵循规则 $d$，本会观测到的（反事实）取值。在第 1 章中，我们讨论了这样一个估计目标：对每个规则 $d\in\mathcal D$，估计假如所有人都遵循规则 $d$ 时，$Y$ 的总体均值，即 $E(Y^d)$。（对于本例这样的二值 $Y$，这也等于 $Y^d=1$ 的概率。）在一组较强的可识别性（identifiability）假设下，利用 g 计算公式（g-computation formula），可以将这一参数表示为观测数据生成分布 $P$ 的函数：
+\[
+ \begin{aligned}
+ \Psi^d(P)={}&\sum_{l_0}\sum_{l_1}
+ P\bigl(Y=1\mid A_1=d(\bar l_1),\bar L_1=\bar l_1,A_0=d(l_0)\bigr)\\
+ &{}\times P\bigl(L_1=l_1\mid A_0=d(l_0),L_0=l_0\bigr)P(L_0=l_0).
+ \end{aligned}
+\]
+
+以往，要使 $\Psi^d(P)$ 的估计量具有一致性，就需要正确设定 $p$ 的密度表示中所有的条件密度因子。当 $L_1$ 是一个包含不止几个连续变量的向量时，估计这类条件密度可能很困难。Robins（2000）的序贯回归方法避免了条件密度的估计，只需估计条件均值（例如，见 Robins and Ritov，1997）。这一方法基于下面这个条件均值的迭代序列 $Q^d=(Q^d_2,Q^d_1,Q^d_0)$。其定义如下，而且同样适用于非二值 $Y$：
+\[
+ \begin{aligned}
+ Q^d_2(L_1,L_0)
+   &=E\bigl(Y\mid A_1=d(L_1,L_0),L_1,A_0=d(L_0),L_0\bigr),\\
+ Q^d_1(L_0)
+   &=E\bigl(Q^d_2(L_1,L_0)\mid A_0=d(L_0),L_0\bigr),\\
+ Q^d_0&=E\bigl(Q^d_1(L_0)\bigr).
+ \end{aligned}
+\]
+由上面 $\Psi^d(P)$ 的表示可知，$Q^d_0$ 是 $\Psi^d(P)$ 的一种等价表示。
+
+本章关注预测。条件均值的估计是估计 $\Psi^d(P)$ 的一个组成部分，但条件均值本身也是一个值得单独研究的参数。因此，假设我们希望估计一个条件均值。这就构成了我们所说的反事实预测问题（counterfactual prediction problem）：
+\[
+ \begin{aligned}
+ \bar Q_{Y^d}
+   &=Q^d_1(L_0)\\
+   &=E\bigl(Q^d_2(L_1,L_0)\mid A_0=d(L_0),L_0\bigr)
+     =E(Y^d\mid L_0).
+ \end{aligned}
+\]
+
+第一个回归 $Q^d_2=E(Y\mid A_1=d(L_1,L_0),L_1,A_0=d(L_0),L_0)$，可以定义为期望损失的最小化解。由于 $Y\{0,1\}$ 或 $Y\in(0,1)$，对数似然损失（log-likelihood loss）是一个合理选择。下一个回归 $Q^d_1=E(Q^d_2(L_1,L_0)\mid A_0=d(L_0),L_0)$ 的损失函数，可以采用相同的对数似然损失，但将 $Y$ 替换为前一步的 $\bar Q^d_2$。因此，这时的损失函数依赖于一个未知的干扰参数（nuisance parameter）$Q^d_2$。尽管如此，在每一步中，我们仍然可以将前一步得到的超级学习器拟合结果代入，把损失函数视为已知，再用这个损失函数进行超级学习。下一节将介绍这一序贯估计过程。
+% 上段原书印为 Y{0,1}，缺属于号；保留原符号。bar Q_2 与 Q_2 的交替也按原书保留。
+
+\section{序贯超级（机器）学习}
+\label{sec:ch03-sequential-super-learning}
+
+借鉴前面介绍的序贯回归方法，我们可以通过嵌套一系列回归来估计参数 $\bar Q_{Y^d}$：从最后一个时点开始，沿时间向后回溯，直到 $L_0$。我们将它称为序贯超级学习，因为每一步都使用超级学习，并把前一步的超级学习器拟合结果作为下一次回归的结局。下文使用记号 $L_{t:0}=(L(j):j=t,\ldots,0)$。
+
+\begin{sourcebox}[算法：纵向数据序贯预测的超级学习]
+\noindent 对每个规则 $d$：
+\begin{itemize}[label=$\star$,leftmargin=1.8em,itemsep=.3em]
+ \item 用超级学习得到 $Q^d_{T+1}(L_{0:T})$ 的估计量 $Q^d_{T+1,n}$。
+\end{itemize}
+\noindent 从 $t=T+1$ 到 $t=1$：
+\begin{itemize}[label=$\star$,leftmargin=3.2em,itemsep=.3em]
+ \item 将 $Q^d_{t,n}(L_{0:t-1})$ 定义为下一次回归的结局，并用超级学习估计
+ \[
+ E\bigl(Q^d_t(L_{0:t-1})\mid A_{t-2:0}=d(L_{t-2:0}),L_{t-2:0}\bigr).
+ \]
+\end{itemize}
+\noindent 保存最终的估计量 $Q^d_{t=1,n}(L_0)$，作为 $\bar Q_{Y^d}=E(Y^d\mid L_0)$ 的估计量。
+\end{sourcebox}
+
+具体而言，$\bar Q_{Y^d}$ 的序贯超级学习器按以下步骤构造：
+\begin{enumerate}[itemsep=.5em]
+ \item 令 $Q^d_{T+2,n}=Y$。
+ \item 设 $t=T+1$。
+ \item 对时点 $t$，创建一个包含 $n$ 个观测的数据集，其中，每个观测的结局为 $Q^d_{t+1,n}(L_{t+1:0})$，协变量为 $A_{0:t},L_{0:t}$。在 $V$ 折交叉验证中拟合 $K$ 个候选回归算法。回顾一下，$B_n\in\{0,1\}^n$ 是一个随机变量，将数据划分为训练集 $\{i:B_n(i)=0\}$ 和验证集 $\{i:B_n(i)=1\}$。在 $V$ 折中的每一折里，数据集都分为包含 $\frac{V-1}{V}$ 数据的训练集，以及包含剩余 $\frac1V$ 数据的验证集。对于每个 $v=1,\ldots,V$ 和每个 $k=1,\ldots,K$，在训练集 $\mathcal T(v)$ 上训练第 $k$ 个算法，然后将验证集 $\mathcal V(v)$ 输入拟合好的算法，得到交叉验证预测值。这样，对于每个算法 $k$ 和每个研究对象 $i$（$i=1,\ldots,n$），都得到一个预测值 $Z^d_{k,t,i}$。
+
+ \begin{center}
+  \input{figures/ch03_crossvalidation}
+ \end{center}
+
+ \item 设定一族由 $\alpha$ 索引的 $K$ 个算法的加权组合，组合形式为凸组合（convex combination）；选择使损失函数的交叉验证经验均值最小的 $\alpha_n$。
+ \item 在完整数据集上运行全部 $K$ 个算法，并用向量 $\alpha_n$ 组合候选拟合结果，构建超级学习器函数，得到假如每个个体都遵循规则 $d$ 时的预测值。这些预测值表示 $Q^d_{t,n}(L_{0:t,i})$，$i=1,\ldots,n$。
+
+ \begin{center}
+  \input{figures/ch03_predictions}
+ \end{center}
+
+ \item 令 $t\to t-1$，重复上面的步骤 3、4 和 5。
+ \item 继续迭代这一序贯预测算法，直到 $t=1$，并保存所得对象 $Q^d_{t=1,n}$；它就是所需的 $\bar Q_{Y^d}=E(Y^d\mid L_0)$ 的估计量。
+\end{enumerate}
+% 算法中的 t-2:0、t+1:0、0:t 与终止下标按原书保留；见本章校对报告。

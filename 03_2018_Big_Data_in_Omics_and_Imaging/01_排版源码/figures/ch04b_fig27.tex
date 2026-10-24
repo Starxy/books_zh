@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+\fill[green!65!black] (0,0) rectangle (2,3);
+\fill[magenta!65] (2.6,0) rectangle (3.9,3);
+\fill[red!90] (4.25,2.05) rectangle (6.5,3);
+\fill[cyan!80!blue] (7.2,0) rectangle (8.95,3);
+\node at (2.3,1.5){$=$};\node at (6.85,1.5){$+$};
+\node[text=green!60!black]at(1,3.25){样本};
+\node[text=magenta!80!black]at(3.25,3.25){基};
+\node[text=green!60!black]at(5.375,3.25){样本};
+\node[text=red,align=center]at(6.8,2.62){细胞\\类型};
+\draw[red,decorate,decoration={brace,amplitude=4pt,mirror}](-.08,0)--(-.08,3)
+ node[midway,left=6pt,text=red]{基因};
+\node[text=green!60!black,align=center,anchor=north]at(1,-.2){混合表达\\$A$};
+\node[text=magenta!80!black,align=center,anchor=north]at(3.25,-.2){参考表达\\$X$};
+\node[text=red,align=center,anchor=north]at(5.375,-.2){细胞特异性表达\\$Y$};
+\node[text=cyan!70!blue,align=center,anchor=north]at(8.075,-.2){误差\\$E$};
+\end{tikzpicture}

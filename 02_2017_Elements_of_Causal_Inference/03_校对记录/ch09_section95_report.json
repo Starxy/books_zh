@@ -1,0 +1,360 @@
+{
+  "chapter": "ch09",
+  "section": "9.5",
+  "title": "超出条件独立性的约束",
+  "status": "complete",
+  "scope": "完整9.5节及图9.5—9.12；另制作表9.1，由第9.4.1节单次输入。",
+  "source_pdf": "work/elements_book/pdf_clean/ch09.pdf",
+  "source_pdf_pages": [
+    15,
+    25
+  ],
+  "source_book_pages": "185–195",
+  "table_source_book_page": 181,
+  "project_root": "02_2017_Elements_of_Causal_Inference/01_排版源码",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch09e.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch09e1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch09e2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch09e3.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_05.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_06.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_07.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_08.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_09.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_10.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_11.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_12.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch09_table_01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch09_09_printed_paths.json"
+  ],
+  "file_sha256": {
+    "chapters\\ch09e.tex": "8458748caf4708a08f6c22e6bb37558302e1aea9745dcea9106c58deee208f74",
+    "chapters\\ch09e1.tex": "f14d5cd7bc943ecc998b03ad8b5cc7c1140c3475c46109034f4d2336c84f6d3c",
+    "chapters\\ch09e2.tex": "af813dcf0c20ee9a60147a4059c31a244286ae158eea7d73ff17316d6358fee2",
+    "chapters\\ch09e3.tex": "88f8ef8863617ff231375be8b83ee0221c1006a32fd9c56662494053b1389897",
+    "figures\\ch09_05.tex": "514c16b5a9d907217c1a01728b5f466fbecdd01d2f485dfc38002f986f6072c4",
+    "figures\\ch09_06.tex": "9056ac5cf4f72bae8e2eeddeb38570dba7067677e3e581de065dbee6f92db69c",
+    "figures\\ch09_07.tex": "f5178a81a083ecef84fecf1eaf6959092235684419b4ce2f8c87efb53aaf03c7",
+    "figures\\ch09_08.tex": "915db8bfc7a84adf4cd8b7a8cbd34d9751a34b6d91b4f97770fee3c6f8258138",
+    "figures\\ch09_09.tex": "e195144798ab070bf2da1f8d4ba0f7a688a4eef48ae2ea7e712e1cf3c66b43ff",
+    "figures\\ch09_10.tex": "1205c5d5b9dfc620542ec719af71125a17b8b0cf23448416db225cf2d1e203de",
+    "figures\\ch09_11.tex": "a217f8d62739a2a3f8202f92a4630c55ae72c35f15a6ff56d4a36647b32d9f0e",
+    "figures\\ch09_12.tex": "a8bab6a691f33e35fada5ceb8d83e909685bd50aba83ad05158fb4fbc6221d74",
+    "figures\\ch09_table_01.tex": "b5c1d885af355815dfbc235be0e1b507209b845898db70eb5946da2e1083472b",
+    "data\\ch09_09_printed_paths.json": "3201cfdc62243cc8e760a6f4a49f5022c3d1344d4b6f463fb329dbaa77839253"
+  },
+  "test_pdf": "work/elements_book/ch09_section95/build/driver.pdf",
+  "translated_pages": 9,
+  "translated_hanzi": 4796,
+  "table_test_pdf": "work/elements_book/ch09_section95/table_build/driver.pdf",
+  "table_test_pages": 1,
+  "structure": {
+    "chapter_commands": 0,
+    "sections": 1,
+    "subsections": 6,
+    "subsection_titles": [
+      "Verma约束",
+      "不等式约束",
+      "基于协方差的约束",
+      "加性噪声模型",
+      "检测低复杂度混杂因子",
+      "不同环境"
+    ],
+    "equation_tags": [
+      "9.3",
+      "9.4",
+      "9.5",
+      "9.6",
+      "9.7",
+      "9.8",
+      "9.9",
+      "9.10",
+      "9.11",
+      "9.12",
+      "9.13",
+      "9.14",
+      "9.15",
+      "9.16",
+      "9.17",
+      "9.18",
+      "9.19",
+      "9.20"
+    ],
+    "equation_count": 18,
+    "equation_source_page_mentions": {
+      "9.3": [
+        185
+      ],
+      "9.4": [
+        186
+      ],
+      "9.5": [
+        187
+      ],
+      "9.6": [
+        188
+      ],
+      "9.7": [
+        188
+      ],
+      "9.8": [
+        188
+      ],
+      "9.9": [
+        188
+      ],
+      "9.10": [
+        188
+      ],
+      "9.11": [
+        188
+      ],
+      "9.12": [
+        189
+      ],
+      "9.13": [
+        189
+      ],
+      "9.14": [
+        189
+      ],
+      "9.15": [
+        190,
+        191
+      ],
+      "9.16": [
+        190
+      ],
+      "9.17": [
+        190,
+        191
+      ],
+      "9.18": [
+        190,
+        191
+      ],
+      "9.19": [
+        192
+      ],
+      "9.20": [
+        195
+      ]
+    },
+    "figures": [
+      "9.5",
+      "9.6",
+      "9.7",
+      "9.8",
+      "9.9",
+      "9.10",
+      "9.11",
+      "9.12"
+    ],
+    "figure_count": 8,
+    "tables": [
+      "9.1"
+    ],
+    "table_dimensions": {
+      "columns": 5,
+      "comparison_rows": 10
+    },
+    "results": [
+      "定义9.6（两两纯条件分布）",
+      "定理9.7（严格正的条件分布与非纯性）",
+      "定义9.8（条件分布的秩）",
+      "定理9.9（秩与U的值域）"
+    ],
+    "proofs": [
+      "定理9.7"
+    ],
+    "original_footnotes": [
+      3
+    ],
+    "translator_notes": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "code_blocks": 0,
+    "problems": 0,
+    "counter_resets": 0
+  },
+  "figure_methods": {
+    "9.5–9.8": "TikZ重绘拓扑与中文图注，潜变量保留虚线圆。",
+    "9.9": "TikZ精确转录原PDF印刷坐标：201个灰色点和200段红路径；非模拟数据。数据JSON随源码保留。",
+    "9.10–9.12": "TikZ重绘路径/单纯形/边界点，保留原数学标注与完整中文面板图注。"
+  },
+  "checks": {
+    "source_full_text_read": true,
+    "source_pages_rendered_and_viewed": [
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "all_source_displays_and_graphs_compared": true,
+    "final_section_two_xelatex_passes": true,
+    "final_table_two_xelatex_passes": true,
+    "all_output_pages_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "table_output_page_viewed": true,
+    "last_terminology_edit": "四元约束、四元差统一；命题改为定理。",
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "table_errors": [],
+    "table_overfull": [],
+    "table_missing_glyphs": 0,
+    "standalone_warning": "section-only test has an unused table caption setup; table-only test has unused figure setup. Neither occurs because of missing production content.",
+    "production_chapter_or_counter_commands": false,
+    "unresolved_references": []
+  },
+  "new_terms": [
+    [
+      "Verma constraint",
+      "Verma约束"
+    ],
+    [
+      "dormant independence",
+      "休眠独立性"
+    ],
+    [
+      "nested Markov model",
+      "嵌套马尔可夫模型"
+    ],
+    [
+      "CHSH inequality",
+      "CHSH不等式"
+    ],
+    [
+      "Bell inequality",
+      "Bell不等式"
+    ],
+    [
+      "elementary inequality",
+      "基本不等式"
+    ],
+    [
+      "polymatroid axiom",
+      "多拟阵公理"
+    ],
+    [
+      "Fourier-Motzkin elimination",
+      "Fourier-Motzkin消元法"
+    ],
+    [
+      "tetrad constraint",
+      "四元约束"
+    ],
+    [
+      "tetrad difference",
+      "四元差"
+    ],
+    [
+      "trek",
+      "无对撞路径"
+    ],
+    [
+      "choke point",
+      "瓶颈点"
+    ],
+    [
+      "overcomplete ICA",
+      "过完备独立成分分析"
+    ],
+    [
+      "manifold",
+      "流形"
+    ],
+    [
+      "pairwise purity",
+      "两两纯性"
+    ],
+    [
+      "rank of a conditional distribution",
+      "条件分布的秩"
+    ],
+    [
+      "shift variable",
+      "移位变量"
+    ],
+    [
+      "joint diagonalization",
+      "联合对角化"
+    ]
+  ],
+  "source_anomalies": [
+    {
+      "book_page": 186,
+      "location": "式(9.4)",
+      "issue": "原式不能由工具变量DAG一般推出；例如X=Z、Y=X使左侧为2。标准形式需固定同一个x。",
+      "handling": "编号式照原印，解释句末译注3说明。"
+    },
+    {
+      "book_page": 187,
+      "location": "式(9.5)",
+      "issue": "CHSH原印四项全部为加号；X=Y=1即给出4，标准CHSH需要一个负号。",
+      "handling": "保留原公式与编号，译注4给出可用的标准符号。"
+    },
+    {
+      "book_page": 188,
+      "location": "式(9.7)",
+      "issue": "右侧相较标准次模性少了-H(S)；所印不等式仍成立但较弱。",
+      "handling": "保留原式，译注5区分。"
+    },
+    {
+      "book_page": 189,
+      "location": "图9.8与式(9.13)、(9.14)",
+      "issue": "图含H与J两个潜在因子，后两条四元约束一般还需要额外条件；对应协方差差含Var(N_J)项。",
+      "handling": "原图和三式均保留，译注6显式说明额外条件。"
+    },
+    {
+      "book_pages": [
+        192,
+        193
+      ],
+      "location": "定义9.6、图9.12前解释及密度判据",
+      "issue": "两点应限制x1不等于x2；另原书“纯性强于各点在单纯形内部”的措辞与图9.12实际边界例子不吻合。",
+      "handling": "正文按原意转写；译注7合并澄清不同取值与边界例子。"
+    },
+    {
+      "book_page": 195,
+      "location": "定理9.9后多元推广",
+      "issue": "原印d个乘积分布；应为k个混合项，每项含d个因子。",
+      "handling": "主文保留原计数，句末译注8说明。"
+    },
+    {
+      "book_page": 181,
+      "location": "表9.1图注",
+      "issue": "潜变量定义为H但联合分布印作P_{O,V}。",
+      "handling": "表注保留V；主章负责代理已在9.4.1加统一译注。"
+    }
+  ],
+  "unresolved_items": [],
+  "integration_notes": [
+    "只需由主章wrapper输入chapters/ch09e；e独占输入e1/e2/e3。",
+    "表figures/ch09_table_01.tex已由主章9.4.1输入，本节不要重复输入。",
+    "复用ch09a中的chninenote；本节原脚注从3续接，译注从3到8；生产源码无计数器重置。",
+    "2026-10-23最终将e3的“虽然这一命题”改为“虽然这一定理”；e1的CHSH引导段前加Needspace{4cm}以防合排割裂姓名。其余已冻稿。"
+  ]
+}

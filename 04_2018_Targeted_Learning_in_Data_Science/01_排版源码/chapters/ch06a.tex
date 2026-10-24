@@ -1,0 +1,109 @@
+% 原书第 77—81 页；章首导言及第 6.1—6.2 节。
+\chapter{高度自适应 Lasso（HAL）}
+% 局部使用自然页底，避免浮动图与长公式之间的垂直胶被过度拉伸。
+\begingroup
+\raggedbottom
+\label{ch:highly-adaptive-lasso}
+\chapterauthors{Mark J. van der Laan 与 David Benkeser}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+D. Benkeser：美国埃默里大学罗林斯公共卫生学院生物统计学与生物信息学系，1518 Clifton Rd. NE, Atlanta, GA 30322, USA；电子邮箱：\href{mailto:benkeser@emory.edu}{benkeser@emory.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_6}。}
+
+本章为一个 $d$ 元函数值参数（function-valued parameter）$\psi_0$ 定义一种一般的非参数估计量。该参数定义为损失函数 $L(\psi)(O)$ 的期望的最小化解。对于任意维数 $d$，这一估计量都保证以快于 $n^{-1/4}$ 的速率收敛到真实的 $\psi_0$：
+\[
+ \sqrt{d_0(\psi_n,\psi_0)}
+   =O_P\bigl(n^{-1/4-\alpha(d)/8}\bigr),
+\]
+其中，$d_0(\psi,\psi_0)=P_0L(\psi)-P_0L(\psi_0)$ 是基于损失的差异度（loss-based dissimilarity）。这一结果十分引人注目，因为该速率不依赖于 $\psi_0$ 本身的光滑性。例如，$\psi_0$ 可以在许多点不连续，也可以不可微。我们只需假设 $\psi_0$ 右连续且有左极限，并具有有限的变差范数（variation norm），从而使 $\psi_0$ 生成一个测度，就像累积分布函数在欧氏空间上生成一个测度一样。
+
+\begin{sourcebox}
+我们把这一一般估计量称为高度自适应 Lasso（highly adaptive lasso，HAL）估计量。这个名称源于这样一个事实：它可以表示为在指示基函数的线性组合上，最小化损失的经验风险（empirical risk）所得的解，其约束是系数绝对值之和不超过一个由数据自适应确定的常数。例如，我们的结果证明：基于 $n$ 个独立同分布（independent and identically distributed，i.i.d.）观测 $O_i=(W_i,Y_i)$（$i=1,\ldots,n$），使用平方误差损失构造的、用于估计回归函数 $E_0(Y\mid W)$ 的高度数据自适应 Lasso 估计量，对于 $W$ 的任意维数 $d$，都以快于 $n^{-1/4}$ 的速率收敛到真值：
+% 原书函数值的 (w) 位于平方之后，按印刷原式保留。
+\[
+ \sqrt{\int(\psi_n(w)-\psi_0)^2(w)\,dP_0(w)}
+   =o_P(n^{-1/4}).
+\]
+这一速率似乎与非参数密度和回归估计文献中著名的极小极大收敛速率（minimax rate of convergence）相矛盾。然而，那些极小极大速率针对的是在单个点上估计真实函数的问题，而我们的结果是以基于损失的差异度来表述的；这种差异度通常对应于 $L^2$ 范数的平方。
+\end{sourcebox}
+
+HAL 估计量似乎比局部平滑器（local smoother）“聪明”得多，尽管这些局部平滑器达到了极小极大速率。例如，考虑直方图回归估计量：它对协变量空间进行划分，每个划分单元的直径都是 $O(h)$。这种直方图回归估计量在任意点 $w$ 的偏差（bias）为 $O(h)$，而方差为 $O(1/(nh^d))$。因此，使均方误差（mean squared error，MSE）最小的 $h$ 的最优速率，可以通过令方差等于偏差的平方得到，即 $h=O(n^{-1/(d+2)})$，相应的 MSE 也为 $O(n^{-1/(d+2)})$。当 $d=1$ 时，这一速率略优于 HAL 估计量的速率；但当 $d\geq2$ 时，这一直方图回归估计量的速率就比我们的速率慢，而且随着维数增加会越来越慢。这种现象通常称为维数灾难（curse of dimensionality）。
+
+对于核回归估计量，设所用核与 $W$ 的某个阶数 $k$ 的多项式正交，带宽为 $h$，并假设 $\psi_0$ 连续可微 $k$ 次，则偏差为 $O(h^k)$，方差为 $O(1/(nh^d))$。此时，带宽的最优速率为 $h=O(n^{-1/(2k+d)})$，所得收敛速率为 $O(n^{-k/(2k+d)})$。与 HAL 估计量不同，这种核回归估计量需要假设 $\psi_0$ 的光滑性；但即便假设的光滑阶数 $k$ 很高，当维数 $d$ 很大时，这一速率通常仍远慢于 $n^{-1/4}$。这说明，就逼近真实函数 $\psi_0$ 的能力而言，HAL 估计量在渐近意义下优于局部平滑器。
+
+幸运的是，靶向最小损失估计量（targeted minimum loss-based estimator，TMLE）中干扰参数（nuisance parameter）估计量的临界速率正是 $n^{-1/4}$。因此，如果使用超级学习器（super learner）来估计相关干扰参数，并在其算法库中纳入 HAL 估计量，就能在基本不附加条件的情况下，保证所得 TMLE 具有渐近有效性（asymptotic efficiency）。在 HAL 估计量问世之前，还没有任何估计量能在不要求较强光滑性条件的情况下，保证渐近有效性；当时普遍认为，这样的估计量根本不可能存在。
+
+\section{估计问题的统计表述}
+\label{sec:ch06-statistical-formulation}
+
+假设我们观测到一个多维随机变量 $O$ 的 $n$ 个独立同分布副本 $O_1,\ldots,O_n$，其概率分布为 $P_0$。设 $\mathcal M$ 是 $P_0$ 的统计模型（statistical model），并假设目标参数（target parameter）$\Psi:\mathcal M\to\boldsymbol{\Psi}=\Psi(\mathcal M)$ 是一个函数值参数，即 $\Psi(P_0)$ 是从 $\mathbb R^d$ 的一个子集到实数轴的函数。例如，$\Psi(P_0)$ 可以是回归函数 $w\mapsto E_0(Y\mid W=w)$，也可以是条件密度函数 $(w,y)\mapsto p_{Y,0}(y\mid w)$。我们将考虑如下情形：参数空间 $\Psi(\mathcal M)$ 包含所有多元实值函数 $f:[0,\tau]\subset\mathbb R^d\to\mathbb R$，至多再附加某些光滑性条件。
+
+具体而言，我们只假设 $\psi_0$ 是右连续且有左极限的函数（càdlàg function），并且其变差范数有限。这些条件使函数 $f$ 能够生成一个测度，从而使积分 $\int h(x)\,df(x)$ 定义良好。事实上，正是这些条件，使我们能够把函数 $f$ 表示为若干个指示函数对 $df$ 的积分之和，为我们的估计过程奠定基础。此外，假设 $\psi_0$ 对应一个损失函数（loss function）$(O,\psi)\mapsto L(\psi)(O)$，满足 $P_0L(\psi_0)=\min_{\psi\in\boldsymbol{\Psi}}P_0L(\psi)$。我们还假设损失函数一致有界，即 $\sup_{\psi\in\boldsymbol{\Psi},o}|L(\psi)(o)|<\infty$，其中，对 $o$ 的上确界遍及 $P_0$ 的一个支撑集。我们进一步假设，损失函数产生一个二次型差异度 $d_0(\psi,\psi_0)=P_0\{L(\psi)-L(\psi_0)\}$，其形式化表述对应于以下假设：
+\[
+ \sup_{\psi\in\boldsymbol{\Psi}}
+ \frac{\|L(\psi)-L(\psi_0)\|_{P_0}^2}{d_0(\psi,\psi_0)}<\infty.
+\]
+对于对数似然损失（log-likelihood loss）和平方误差损失等标准损失函数，只要损失函数一致有界，就已知它们具有后一项标准性质。要为交叉验证选择器（cross-validation selector）建立有限样本预言不等式（finite sample oracle inequality），关于损失函数只需要这两个假设。
+
+\begin{sourcebox}
+假设我们使用离散超级学习器（discrete super learner）来估计 $\psi_0$，它由一组候选估计量和 $V$ 折交叉验证（cross-validation）定义。根据交叉验证的预言不等式，超级学习器的渐近表现，与从候选估计量集合中选出最优估计量的预言选择器（oracle selector）一样好。然而，这本身并不能保证超级学习器具有一致性，也不能保证它以快于某个指定的最低速率，随样本量增加而收敛到真值 $\psi_0$。本章将介绍一种估计量，对于任意维数 $d$，都能保证其收敛速率快于 $n^{-1/4}$。只要将这一估计量纳入超级学习器的算法库，就同样能够保证离散或连续超级学习器的收敛速率快于 $n^{-1/4}$。下一章将在估计回归函数的情境中，详细研究这一估计量，并通过模拟展示其实现方法和出色的实际表现。
+\end{sourcebox}
+
+\section{càdlàg 函数的基函数线性组合表示}
+\label{sec:ch06-cadlag-representation}
+
+给定向量 $x\in\mathbb R^d$ 和指标子集 $S\subset\{1,\ldots,d\}$，定义 $x(S)=(x_j:j\in S)$ 和 $x(S^c)=(x_j:j\in S^c)$，其中，$S^c=\{j:j\notin S\}\subset\{1,\ldots,d\}$ 是 $S$ 的补指标集。给定 càdlàg 函数 $\psi:[0,\tau]\to\mathbb R$ 和子集 $S$，可以定义函数 $x\mapsto\psi(x(S),0(S^c))$，称为 $\psi$ 的 $S$ 截面（section），记作 $\psi_S$。由于 $\psi_S$ 是 càdlàg 函数且变差范数有限，它在 $[0(S),\tau(S)]$ 上生成一个有限测度。换言之，$\psi_S$ 可以看作多元累积分布函数的类似物，但不要求它只赋予正质量。我们也把 $\psi_S$ 称为测度，指的就是它生成的测度。事实上，$\psi_S$ 等于两个单调函数之差；这里的单调函数类似累积分布函数，但不要求其起点为 0、终点为 1。正如累积分布函数可以为矩形 $(a,b]$ 及任意可测集赋予一个测度，$\psi_S$ 也可以为这样的集合赋予测度。例如，对于一元函数 $\psi$，有 $\psi((a,b])=\psi(b)-\psi(a)$；对于二元函数 $\psi$，有
+% 二元矩形增量中的参数次序按原书照录。
+\[
+ \psi((a,b])=\psi(b_1,b_2)-\psi(a_1,b_2)-\psi(a_2,b_1)+\psi(a_1,a_2).
+\]
+因此，积分 $\int_{(a,b]}\psi(dx)$ 定义良好，表示 $\psi$ 赋予立方体 $(a,b]$ 的测度。
+
+$\psi$ 的变差范数通常定义为 $\int_{[0,\tau]}|\psi(dx)|$。本章则将 $\psi$ 的变差范数定义为其所有截面 $\psi_S$ 的变差范数之和：
+% 原书所有变差范数定义的原点项均未加绝对值；照录。
+\[
+ \|\psi\|_v=\psi(0)+\sum_{S\subset\{1,\ldots,d\}}
+       \int_{(0(S),\tau(S)]}|\psi_S(dx)|.
+\]
+用文字表述，一个 $d$ 元实值 càdlàg 函数的变差范数，就是遍及 $\{1,\ldots,d\}$ 所有子集求和：对于每个子集，将其余变量设为零，对该子集内的变量计算关于 $\psi$ 的绝对值积分。例如，二元实值函数的变差范数为
+\[
+ \begin{aligned}
+ \|\psi\|_v={}&\psi(0,0)+\int_0^{\tau_1}|\psi(dx_1,0)|
+                   +\int_0^{\tau_2}|\psi(0,dx_2)|\\
+             &{}+\int_0^{\tau_1}\int_0^{\tau_2}|\psi(dx_1,dx_2)|.
+ \end{aligned}
+\]
+对于三元实值函数，$\{1,2,3\}$ 的每个子集都对应一个积分，积分遍及该子集内的变量，而其余变量设为零。
+
+对于任意满足 $\|\psi\|_v<\infty$ 的 $d$ 元 càdlàg 函数 $\psi$，都有如下表示：
+\[
+ \psi(x)=\psi(0)+\sum_{S\subset\{1,\ldots,d\}}
+                 \int_{(0(S),x(S)]}\psi_S(dx').
+\]
+例如，对于二元实值函数 $\psi$，有
+\[
+ \begin{aligned}
+ \psi(x_1,x_2)={}&\psi(0,0)+\int_0^{x_1}\psi(dx'_1,0)
+                           +\int_0^{x_2}\psi(0,dx'_2)\\
+                 &{}+\int_0^{x_1}\int_0^{x_2}\psi(dx_1,dx_2).
+ \end{aligned}
+\]
+注意，也可以将其写为
+\[
+ \psi(x)=\psi(0)+\sum_{S\subset\{1,\ldots,d\}}
+        \int_{(0(S),\tau(S)]}I(x'\leq x(S))\psi_S(dx').
+\]
+
+假设用一个具有 $m$ 个支撑点的离散测度 $\psi_m$ 来逼近测度 $\psi$。等价地，就是将表示式 $\psi=\psi_1-\psi_2$ 中的两个累积分布函数 $\psi_1,\psi_2$，分别用两个离散累积函数 $\psi_{1m},\psi_{2m}$ 来逼近，即 $\psi_m=\psi_{1m}-\psi_{2m}$。对于每个子集 $S\subset\{1,\ldots,d\}$，都要保证 $\psi_{m,S}$ 是 $\psi_S$ 的离散逼近；也就是说，$\psi_m$ 不仅在 $d$ 维立方体 $(0,\tau]$ 上赋予质量，也在 $[0,\tau]$ 的所有低维边 $(0(S),\tau(S)]$ 上赋予质量。对于每个给定的子集 $S$，设 $\{s_j(S):j\}$ 是 $\psi_{m,S}$ 的支撑点，$d\psi_{m,S,j}$ 表示 $\psi_{m,S}$ 在该点赋予的点质量。
+
+对于这样的离散逼近 $\psi_m$，有
+\[
+ \psi_m(x)=\psi(0)+\sum_{S\subset\{1,\ldots,d\}}\sum_j
+                 I(s_j(S)\leq x(S))d\psi_{m,S,j}.
+\]
+也就是说，$\psi_m(\cdot)$ 是基函数 $x\mapsto\phi_{j,S}(x)=I(x(S)\geq s_j(S))$ 的线性组合，对应系数为 $d\psi_{m,S,j}$，其中遍及各子集 $S\subset\{1,\ldots,d\}$，以及由 $j$ 索引的支撑点 $s_j$。此外，注意 $\psi_m$ 的变差范数就是其系数绝对值之和：
+\[
+ \|\psi_m\|_v=\psi(0)+\sum_{S\subset\{1,\ldots,d\}}\sum_j|d\psi_{m,S,j}|.
+\]
+
+下面将定义 $\psi_0$ 的一个估计量 $\psi_{n,\lambda}$：对给定的一组支撑点，也就是一组基函数，在这些指示基函数的所有上述线性组合上，最小化经验风险 $\psi\mapsto P_nL(\psi)$，并要求系数绝对值之和不大于 $\lambda$。我们提出的 HAL 估计量随后定义为 $\psi_n=\psi_{n,\lambda_n}$，其中，$\lambda_n$ 是交叉验证选择器。求这个估计量 $\psi_{n,\lambda}$，等价于在变差范数不大于 $\lambda$ 的所有离散测度 $\psi_m$ 上最小化经验风险。为了理解应当如何选择支撑点，我们希望说明：在所有测度，包括连续测度和离散测度上最小化经验风险，等价于在具有某个特定支撑集的所有离散测度上最小化经验风险，而这个支撑集由实际的 $n$ 个观测 $O_1,\ldots,O_n$ 确定。因此，只要相应地定义支撑点，这个最小损失估计量 $\psi_{n,\lambda}$，实际上就等于在变差范数小于 $\lambda$ 的所有函数上最小化经验风险所得的解。下面将对后一估计量作理论分析，并证明它以快于 $n^{-1/4}$ 的速率收敛到其真实对应量 $\psi_0$。

@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.6cm,y=1.3cm]
+ \node[vtx] (ch09f4a) at (0,0) {$A$};
+ \node[vtx] (ch09f4b) at (1.5,0) {$B$};
+ \node[vtx] (ch09f4c) at (3,0) {$C$};
+ \node[vtx] (ch09f4d) at (4.5,0) {$D$};
+ \node[latent] (ch09f4h) at (2.5,1.2) {$H$};
+ \draw[ed] (ch09f4a)--(ch09f4b);
+ \draw[ed] (ch09f4c)--(ch09f4d);
+ \draw[ed] (ch09f4h)--(ch09f4b);
+ \draw[ed] (ch09f4h)--(ch09f4d);
+\end{tikzpicture}
+\caption{例子取自 Richardson and Spirtes［2002，图2（i）］，说明DAG对边缘化并不封闭。不存在一个节点集为 $\mathbf O=\{A,B,C,D\}$ 的DAG，能够编码含 $H$ 的原图中的全部条件独立关系。}
+\label{fig:ch09-4}
+\end{figure}

@@ -1,0 +1,17 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+\node at (2.5,7.9) {RNA-seq 数据};\node at (8.2,7.9) {NGS 数据};
+\fill[green!65!black] (4.1,7) rectangle (4.55,8.7);
+\fill[green!65!black] (6.3,7) rectangle (6.75,8.7);
+\node[draw=red!85!black,fill=red!85!black,rounded corners=4pt,text=white,minimum width=5.2cm,minimum height=1.1cm,font=\bfseries] (ch04a18fpca) at (5.4,6.6) {FPCA};
+\node[draw=red!85!black,fill=red!85!black,rounded corners=4pt,text=white,minimum width=5.2cm,minimum height=1.1cm,font=\bfseries] (ch04a18mf) at (5.4,4.65) {矩阵分解};
+\node[draw=red!85!black,fill=red!85!black,rounded corners=4pt,text=white,minimum width=5.2cm,minimum height=1.1cm,font=\bfseries] (ch04a18qr) at (5.4,2.7) {二次正则化};
+\node[draw=red!85!black,fill=red!85!black,rounded corners=4pt,text=white,minimum width=5.2cm,minimum height=1.1cm,font=\bfseries] (ch04a18cca) at (5.4,.75) {CCA};
+\draw[->,green!65!black,line width=2.5pt] (ch04a18fpca)--(ch04a18mf);
+\draw[->,green!65!black,line width=2.5pt] (ch04a18mf)--(ch04a18qr);
+\draw[->,green!65!black,line width=2.5pt] (ch04a18qr)--(ch04a18cca);
+\end{tikzpicture}
+\origfig{18}{QRFCCA 的分析流程。}
+\label{fig:ch04a-18}
+\end{figure}

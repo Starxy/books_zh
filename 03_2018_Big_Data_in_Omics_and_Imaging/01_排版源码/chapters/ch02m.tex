@@ -1,0 +1,218 @@
+% 分章页95—98，附录2.B末；印刷页167—170。
+\begin{equation}
+\begin{aligned}
+-l_D(A,B,T,\Sigma_\varepsilon)
+ \approx{}&\frac12\sum_{I\in T}\Biggl\{
+ n^{(I)}\Tr\left(S^{(I)}(I-B)^TR^{(I)}
+  (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}(I-B)\right)\\
+ &\quad-n^{(I)}\sum_{j\notin I}\log\sigma_j^{-2}\\
+ &\quad-2\sum_{i:T^{(i)}=I}\Bigl[
+ (Y^{(i)})^T(I-B)^TR^{(I)}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+ &\hspace{3.7cm}
+ -\Tr\bigl(A^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+ R^{(I)}AX^{(i)}(X^{(i)})^T\bigr)\Bigr]\Biggr\}.
+\end{aligned}\tag{2.B.16}
+\end{equation}
+定义 $n^{(-k)}=\sum_{I\in T:k\notin I}n^{(I)}$ 和
+\[
+S^{(-k)}=\sum_{I\in T:k\in I}\frac{n^{(I)}}{n^{(-k)}}S^{(I)},
+\]
+当 $n^{(-k)}=0$ 时，令 $S^{(-k)}=0$。现在分解式（2.B.16）中的各项。利用上述记号，有
+\begin{equation}
+\begin{aligned}
+&\sum_{I\in T}n^{(I)}\Tr\left(
+ S^{(I)}(I-B)^TR^{(I)}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}(I-B)\right)\\
+&\quad=\sum_{i=1}^n\Tr\left[
+ R^{(T^{(i)})}(\Sigma_\varepsilon^{(i)})^{-1}R^{(T^{(i)})}
+ (I-B)Y^{(i)}(Y^{(i)})^T(I-B)^T\right].
+\end{aligned}\tag{2.B.17}
+\end{equation}
+显然，
+\begin{equation}
+\bigl(R^{(T^{(i)})}(I-B)\bigr)_{(k)}=
+\begin{cases}
+(I-B)_{k:}&k\notin T^{(i)},\\
+0&k\in T^{(i)},\ k=1,\ldots,p,
+\end{cases}\tag{2.B.18}
+\end{equation}
+其中，$(I-B)_{k:}$ 表示矩阵 $I-B$ 的第 $k$ 行，仅由节点 $k$ 及其父节点对应的元素组成。将式（2.B.18）代入式（2.B.17），得到
+\begin{equation}
+\begin{aligned}
+&\sum_{i=1}^n\Tr\left[
+ R^{(T^{(i)})}(\Sigma_\varepsilon^{(i)})^{-1}R^{(T^{(i)})}
+ (I-B)Y^{(i)}(Y^{(i)})^T(I-B)^T\right]\\
+&\quad=\sum_{i=1}^n\sum_{k\notin T^{(i)}}\sigma_k^{-2}
+ (I-B)_{k:}Y^{(i)}(Y^{(i)})^T((I-B)_{k:})^T\\
+&\quad=\sum_{k\notin T^{(i)}}\sigma_k^{-2}(I-B)_{k:}
+ \left(\sum_{i=1}^nY^{(i)}(Y^{(i)})^T\right)((I-B)_{k:})^T\\
+&\quad=\sum_{k=1}^pn^{(-k)}\sigma_k^{-2}
+ (I-B)_{k:}S^{(-k)}((I-B)_{k:})^T.
+\end{aligned}\tag{2.B.19}
+\end{equation}
+接着计算式（2.B.16）的第二项。由类似的论证，有
+\begin{equation}
+\begin{aligned}
+\sum_{I\in T}n^{(I)}\sum_{k\notin I}\log\sigma_k^{-2}
+ &=\sum_{i=1}^n\sum_{k\notin T^{(i)}}\log\sigma_k^{-2}\\
+ &=\sum_{j=1}^p\sum_{i\text{“}k\in T^{(i)}}\log\sigma_k^{-2}\\
+ &=\sum_{j=1}^p\left(\sum_{I,k\notin I}n^{(I)}\right)\log\sigma_k^{-2}\\
+ &=\sum_{k=1}^pn^{(-k)}\log\sigma_k^{-2}.
+\end{aligned}\tag{2.B.20}
+\end{equation}
+现在计算式（2.B.16）的第三项。由式（2.B.16）有
+\begingroup
+\allowdisplaybreaks[2]
+\begin{align}
+&\sum_{i=1}^n\Bigl[(Y^{(i)})^T(I-B)^TR^{(T^{(i)})}
+ (\Sigma_\varepsilon^{(i)})^{-1}R^{(T^{(i)})}AX^{(i)}\notag\\
+&\qquad-\Tr\bigl(A^TR^{(T^{(i)})}(\Sigma_\varepsilon^{(i)})^{-1}
+ R^{(T^{(i)})}AX^{(i)}(X^{(i)})^T\bigr)\Bigr]\notag\\
+&=\sum_{i=1}^n\Tr\Bigl(
+  (\Sigma_\varepsilon^{(i)})^{-1}R^{(T^{(i)})}AX^{(i)}
+  (Y^{(i)})^T(I-B)^T(R^{(T^{(i)})})\notag\\
+&\qquad-\Tr\bigl(
+  (\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}
+  (X^{(i)})^TA^TR^{(T^{(i)})}\bigr)\Bigr]\notag\\
+&=\sum_{i=1}^n\sum_{(l\notin T^{(i)})\cap E_c}
+ \sigma_l^{-2}\Bigl[
+ A_{l:}X^{(i)}(Y^{(i)})^T((I-B)_{l:})^T\notag\\
+&\qquad-A_{l:}X^{(i)}(X^{(i)})^T(A_{l:})^T\Bigr]\notag\\
+&=\sum_{(l\notin T^{(i)}\cap E_c}\sigma_l^{-2}
+ \Bigl[A_{l:}\sum_{i=1}^nX^{(i)}(Y^{(i)})^T((I-B)_{l:})^T\notag\\
+&\qquad-A_{l:}\sum_{i=1}^nX^{(i)}(X^{(i)})^T(A_{l:})^T\Bigr]\notag\\
+&=\sum_{l=1}^pn^{(-l)}\sigma_l^{-2}
+ \left[A_{l:}S_{XY}^{(-l)}((I-B)_{l:})^T
+       -A_{l:}S_{XX}^{(-l)}(A_{l:})^T\right],
+\tag{2.B.21}
+\end{align}
+\endgroup
+其中，$E_c=\{i\mid\text{至少一个 }a_{ij}\ne0\}$ 为与外生变量相连的节点集合；
+\[
+n^{(-l)}=\sum_{I\in T:(l\in E_c)\cap(l\notin I)}n^{(I)}
+\]
+为与外生变量相连的节点 $l$ 未被干预时的样本数；
+\[
+S_{XY}^{(I)}=\frac1{n^{(I)}}\sum_{i:T^{(i)}=I}X^{(i)}(Y^{(i)})^T,
+\]
+\[
+S_{XX}^{(I)}=\frac1{n^{(I)}}\sum_{i:T^{(i)}=I}X^{(i)}(X^{(i)})^T,
+\]
+\[
+S_{XY}^{(-l)}
+ =\sum_{\substack{I\in T:(l\in E_c)\cap(l\notin I),,\\i:T^{(i)}=I}}
+   \frac{n^{(I)}}{n^{(-l)}}S_{XY}^{(I)},
+\]
+以及
+\[
+S_{XX}^{(-l)}
+ =\sum_{\substack{I\in T:(l\in E_c)\cap(l\notin I),,\\i:T^{(i)}=I}}
+   \frac{n^{(I)}}{n^{(-l)}}S_{XX}^{(I)}.
+\]
+综上，结合式（2.B.19）、（2.B.20）与（2.B.21），得到负似然的分解：
+\begin{equation}
+-l_D(A,B,T,\Sigma_\varepsilon)
+ =\sum_{k=1}^pl_k(A_{k:},B_{k:},\sigma_k^2,T,Y,X),\tag{2.B.22}
+\end{equation}
+其中，当节点与外生变量相连时，
+\begin{equation}
+\begin{aligned}
+l_k(A_{k:},B_{k:},\sigma_k^2,T,Y,X)
+ ={}&\frac12n^{(-k)}
+ \Bigl\{\sigma_k^{-2}(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T
+ -\log\sigma_k^{-2}\\
+ &\qquad-2\sigma_k^{-2}
+ \left[A_kS_{XY}^{(-k)}((I-B)_{k:})^T
+       -A_kS_{XX}^{(-k)}(A_k)^T\right]\Bigr\};
+\end{aligned}\tag{2.B.23}
+\end{equation}
+当节点不与任何外生变量相连时，
+\begin{equation}
+\begin{aligned}
+l_k(B_{k:},\sigma_k^2,T,Y,X)
+ ={}&\frac12n^{(-k)}
+ \left\{\sigma_k^{-2}(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T
+ -\log\sigma_k^{-2}\right\}.
+\end{aligned}\tag{2.B.24}
+\end{equation}
+由于负对数似然函数可以分解为各节点对数似然函数的和，可以逐节点分别估计参数 $A,B$ 及误差方差。先估计不含外生变量的系统参数。将式（2.B.24）的对数似然对 $B_{k:}^T$ 的偏导数设为零，得到
+\begin{equation}
+\frac{\partial l}{\partial B_{k:}^T}
+ =S^{(-k)}((I-B)_{k:})^T=0.\tag{2.B.25}
+\end{equation}
+注意，
+\begin{equation}
+((I-B)_{k:})^T
+ =\begin{bmatrix}0\\\vdots\\1\\\vdots\\0\end{bmatrix}
+  -\begin{bmatrix}\beta_{k1}\\\vdots\\\beta_{kk}\\\vdots\\\beta_{kp}\end{bmatrix}.
+\tag{2.B.26}
+\end{equation}
+将式（2.B.26）代入式（2.B.25），得到
+\[
+S_{:k}^{(-k)}-S^{(-k)}(B_{k:})^T=0.
+\]
+由式（2.B.26）解出参数向量 $B_{k:}^T$，得到
+\begin{equation}
+B_{k:}^T=(S^{(-k)})^{-1}S_{:k}^{(-1)}.\tag{2.B.27}
+\end{equation}
+由于矩阵 $B$ 稀疏，只需考虑节点及其父节点。令 $B_{k,\pa_D(k)}$ 为仅由参数矩阵 $B$ 中该节点及其父节点对应元素构成的行向量，式（2.B.27）可进一步化为
+\begin{equation}
+B_{k,\pa_D(k)}
+ =S_{k,\pa_D(k)}^{(-k)}
+  \left(S_{\pa_D(k),\pa_D(k)}^{(-k)}\right)^{-1}.\tag{2.B.28}
+\end{equation}
+类似地，
+\[
+\frac{\partial l_k}{\partial\sigma_k^{-2}}
+ =\frac12n^{(-k)}
+ \left\{(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T
+       -\frac1{\sigma_k^{-2}}\right\}=0,
+\]
+从而
+\begin{equation}
+\widehat\sigma_k^2=(I-\widehat B)_{k:}S^{(-k)}
+ \bigl((I-\widehat B)_{k:}\bigr)^T.\tag{2.B.29}
+\end{equation}
+将式（2.B.28）与（2.B.29）代入式（2.B.24），得到节点 $k$ 的评分：
+\begin{equation}
+\operatorname{Score}_D(k)=\frac12n^{(-k)}
+ (1+\log\widehat\sigma_k^2).\tag{2.B.30}
+\end{equation}
+接着考虑式（2.B.23）定义的对数似然。与式（2.B.25）类似，有
+\begin{equation}
+\frac{\partial l_k}{\partial B_{k:}}
+ =n^{(-k)}\sigma_k^{(-2)}
+ \left\{-(I-B)_{k:}S^{(-k)}+A_{k:}S_{XY}^{(-k)}\right\}=0.\tag{2.B.31}
+\end{equation}
+对负对数似然关于 $A_{k:}^T$ 求偏导数，并设为零，得到
+\begin{equation}
+\frac{\partial l_k}{\partial A_{k:}^T}
+ =-n^{(-k)}\sigma_k^{(-2)}
+ \left[S_{XY}^{(-k)}((I-B)_{k:})^T
+       -S_{XX}^{(-k)}(A_{k:})^T\right]=0.\tag{2.B.32}
+\end{equation}
+整理式（2.B.31）与（2.B.32），得到
+\begin{equation}
+\begin{bmatrix}
+S^{(-k)}&S_{YX}^{(-k)}\\
+S_{XY}^{(-k)}&S_{XX}^{(-k)}
+\end{bmatrix}
+\begin{bmatrix}(B_{k:})^T\\(A_{k:})^T\end{bmatrix}
+=\begin{bmatrix}
+(S_{k:}^{(-k)})^T\\
+(S_{XY}^{(-k)})_{:k}
+\end{bmatrix}.\tag{2.B.33}
+\end{equation}
+求解式（2.B.33），得到
+\begin{equation}
+\begin{bmatrix}(B_{k:})^T\\(A_{k:})^T\end{bmatrix}
+=\begin{bmatrix}
+S^{(-k)}&S_{YX}^{(-k)}\\
+S_{XY}^{(-k)}&S_{XX}^{(-k)}
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+(S_{k:}^{(-k)})^T\\
+(S_{XY}^{(-k)})_{:k}
+\end{bmatrix}.\tag{2.B.34}
+\end{equation}

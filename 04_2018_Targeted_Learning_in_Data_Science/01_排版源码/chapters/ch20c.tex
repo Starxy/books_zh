@@ -1,0 +1,61 @@
+% 原书分章 PDF 第 10—12 页；第 20.4.4—20.4.6 小节。
+\subsection{降维与可交换性假设}
+
+上述 $\psi^F$ 的可识别性并不是我们所需的结果，因为无法仅凭一次观测估计 $\mathbf O$ 的分布。因此，必须作出严格得多的假设，使我们能够从一次抽取中学习 $\mathbf O$ 的分布。可以直接对 $\mathbf O$ 的分布作这些假设，但下文将通过结构方程和外生误差的假设来表述。
+
+除前述假设外，我们还假定，对每个节点 $A_i$ 和 $Y_i$，能够定义已知函数
+\[
+ \operatorname{Pa}(A_i)\longrightarrow c_{A,i}(\operatorname{Pa}(A_i)),
+ \qquad
+ \operatorname{Pa}(Y_i(t))\longrightarrow c_{Y(t),i}(\operatorname{Pa}(Y_i(t))),
+\]
+它们映入维数不依赖于 $N$ 的欧氏集合；同时存在相应的、对所有 $i$ 共同适用的函数 $f_A$ 和 $f_{Y(t)}$，使得
+\begin{equation}
+\begin{aligned}
+ W_i&=f_{W_i}(U_{W_i}),&&i=1,\ldots,N,\\
+ A_i&=f_A(c_{A,i}(\operatorname{Pa}(A_i)),U_{A_i}),&&i=1,\ldots,N,\\
+ Y_i(t)&=f_{Y(t)}(c_{Y(t),i}(\operatorname{Pa}(Y_i(t))),U_{Y_i(t)}),
+ &&i=1,\ldots,N,\quad t=1,\ldots,\tau.
+\end{aligned}
+\tag{20.5}
+\end{equation}
+如上所述，这一结构因果模型的一种有趣变体，是将 $\mathbf W$ 视为给定，从而删除生成它的方程。这样的降维例子包括
+\[
+\begin{aligned}
+ &c_{Y(t),i}(\operatorname{Pa}(Y_i(t)))\\
+ &\quad=\bigl((\bar Y_i(t-1),A_i),(\bar Y_j(t-1),A_j:j\in F_i)\bigr),
+\end{aligned}
+\]
+即单位 $i$ 自身及其朋友的观测过去；类似地，可以定义
+\[
+ c_{A,i}(\operatorname{Pa}(A_i))=(W_i,(W_j:j\in F_i)).
+\]
+将这些降维表示扩充为至多 $K$ 位朋友的数据，并对朋友数少于 $K$ 的单位以缺失值填充空单元格后，降维表示便具有固定维数，同时包含朋友数量的信息。这一结构方程模型假定：对所有单位 $i$，该单位在下一个时点 $t$ 的数据，都是其自身过去与朋友过去的同一个函数。
+
+\subsection{外生误差的独立性假设}
+
+除序贯随机化假设 (20.4) 外，我们对外生误差作以下条件或非条件独立性假设。首先，对 $i=1,\ldots,N$，假定每个 $U_{W_i}$ 均与所有满足 $F_i\cap F_j=\varnothing$ 的 $U_{W_j}$ 独立。于是，对某个通用常数 $K$，每个 $W_i$ 至多依赖于其他 $K$ 个 $W_j$，即 $\mathbf W$ 的弱相依性（weak dependence）。还应注意，这一 $\mathbf W$ 的弱相依假设给出了一个统计模型，在该模型下，我们仍能证明所得估计量的渐近正态性。因此，对 $\mathbf W$ 分布采用的模型，至少应当作出这一假设。不过，也可以对 $\mathbf W$ 施加其他限制，例如采用假定 $\mathbf W$ 独立的更受限统计模型。
+
+此外，假定给定 $\mathbf W$，所有 $(U_{A_i}:i=1,\ldots,N)$ 独立同分布。类似地，对 $t=1,\ldots,\tau$，假定给定 $(\mathbf A,\bar{\mathbf Y}(t-1))$，所有 $(U_{Y_i(t)}:i=1,\ldots,N)$ 独立同分布。后一组假设的重要含义是：给定观测过去 $\operatorname{Pa}(\mathbf Y(t))$，对任意两个单位 $i$ 和 $j$，若作为 $\operatorname{Pa}(\mathbf Y(t))$ 的函数，它们的汇总量取相同值，即 $c_{Y(t),i}=c_{Y(t),j}$，则 $Y_i(t)$ 和 $Y_j(t)$ 独立同分布；对处理节点也有类似结论。这使我们能够按下文的方式分解观测数据的似然，并用共同条件分布 $\bar q_{0,t}$ 和 $\bar g_0$ 参数化；当 $N\to\infty$ 时，可以从单个但不断增长的 $\mathbf O$ 中，实际学习这些共同条件分布。
+
+\subsection{可识别性：随机干预的 g 计算公式}
+
+为方便记号，令 $C_{Y(t),i}=c_{Y(t),i}(\operatorname{Pa}(Y_i(t)))$；将 $(\mathbf A,\bar{\mathbf Y})$ 替换为 $(\mathbf A_*,\bar{\mathbf Y}_*)$，相应定义 $C_{Y(t),i}^*$。根据可交换性和降维假设，$\bar{\mathbf Y}_*=(\bar Y_{i,*}:i=1,\ldots,N)$ 的概率分布 $P_{\mathbf g^*}$ 现在简化为
+\begin{equation}
+\begin{aligned}
+ &p_{\mathbf g^*}(\mathbf W,\mathbf A_*,\bar{\mathbf Y}_*)\\
+ &\quad=q_{\mathbf W}(\mathbf W)\prod_{i=1}^N
+ \bar g_i^*(A_{i,*}\mid\operatorname{Pa}(A_{i,*})
+ \prod_{t=1}^\tau\prod_{i=1}^N
+ \bar q_t(Y_{i,*}(t)\mid C_{Y(t),i}^*)))\\
+ &\quad\equiv p^{\mathbf g^*}(\mathbf W,\mathbf A_*,\bar{\mathbf Y}_*),
+\end{aligned}
+\tag{20.6}
+\end{equation}
+其中，$q_{\mathbf W}$ 为 $\mathbf W$ 的联合边际概率密度，$\bar q_t$ 为给定 $\operatorname{Pa}(Y_i(t))$ 时 $Y_i(t)$ 的共同条件密度。根据假设，对 $t=1,\ldots,\tau$，将这些条件密度视为 $C_{Y(t),i}$ 的函数时，它们对 $i=1,\ldots,N$ 均相同。还引入记号 $q_{Y(t)}$，表示给定 $\operatorname{Pa}(\mathbf Y(t))$ 时 $\mathbf Y(t)$ 的联合条件密度，因而它由 $\bar q_t$ 参数化。类似地，引入记号 $\mathbf g$，表示给定 $\operatorname{Pa}(\mathbf A)$ 时 $\mathbf A$ 的联合条件密度，因而它由 $\bar g$ 参数化。我们将式 (20.6) 右端记为 $p^{\mathbf g^*}$；因此，它表示一个关于数据分布的表达式，前提是给定 $\operatorname{Pa}(Y_i(t))$ 时 $Y_i(t)$ 的条件密度，作为 $C_{Y(t),i}$ 的函数时对所有 $i$ 相同，并以选定的随机干预 $\mathbf g^*$ 为指标。还需指出，必须借助因果模型与随机化假设，才能确立该右端表达式确实刻画了反事实干预后分布 $P_{\mathbf g^*}$。这表明，$\psi_0^F=\Psi(P_0)$，其中 $\Psi$ 是将 $\mathbf O$ 的分布 $P_0$ 映射到实数轴的映射。
+
+严格地说，上述结果还没有建立所需的可识别性，因为我们无法仅凭一次抽取 $\mathbf O$ 学习 $P_0$。首先注意，$P_0$、$\psi_0^{F,N}$、$\psi_0^N$ 都以 $N$ 为指标，而我们只观察到从 $P_0$ 抽取的一个含 $N$ 个单位的实现。因此，还需证明，能否基于一次抽取 $\mathbf O$ 构造一个在 $N\to\infty$ 时对 $\psi_0^N$ 一致的估计量。为此，注意分布 $P_{\mathbf g^*}$ 由共同条件密度 $\bar q_{Y(t)}$，$t=1,\ldots,\tau$，以及 $q_{\mathbf W}$ 识别，其中 $\mathbf W=(W_i:i=1,\ldots,N)$。通过后文对估计量与理论的介绍，可以构造基于极大似然估计（maximum likelihood estimation，MLE）的共同条件分布 $\bar q_{0,t}$ 的估计量，使其在 $N\to\infty$ 时一致。这说明，当 $N\to\infty$ 时，$\bar q_{0,t}$ 是可识别的，$t=1,\ldots,\tau$。此外，目标参数涉及相对于 $\mathbf W$ 联合分布的平均值 $E_{\mathbf W}(\bar Q_{\mathbf g^*})$，其中 $\bar Q_{\mathbf g^*}(\mathbf W)$ 定义了反事实结局样本均值的条件期望，即
+\[
+ \bar Q_{\mathbf g^*}(\mathbf W):=E_{\mathbf g^*}(\bar Y_{\mathbf g^*}(\tau)\mid\mathbf W).
+\]
+如上讨论，在弱相依假设下，可用相应的经验量一致估计 $E_{\mathbf W}(\bar Q_{\mathbf g^*})$。至此，才最终说明，当 $N\to\infty$ 时，能够从观测数据识别所需的 $\psi_0^{F,N}$。

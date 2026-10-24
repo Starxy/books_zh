@@ -1,0 +1,77 @@
+% 原书分章PDF第4—7页：第27.2节四个步骤及例27.1的后续分析。
+\section{敏感性分析}
+
+如果必要的可识别性条件不成立，正如我们两个实例中可能出现的情形，就可以利用敏感性分析，估计可识别性假设受到不同程度违背时的因果效应。我们提出的敏感性分析可按以下步骤进行。
+
+\paragraph*{步骤1：定义感兴趣的统计参数。}
+因果参数的计算需要未观测反事实变量 $Y_a:a\in\{0,1\}$ 的分布；与此不同，统计参数的真值可以仅根据分布 $P_0$ 计算。用 $\psi_0$ 表示感兴趣的统计参数。这里，$\psi_0$ 可以取为这样一个参数：如果可识别性假设正确，它就能够识别 $\psi_{\mathrm{causal}}$。但这并非必要，例27.1将说明这一点。
+
+令 $\psi_n$ 表示 $\psi_0$ 的估计量，并记 $\psi_1=E(\psi_n)$，其中期望关于 $O_1,\ldots,O_n$ 的抽取计算。如果用 $\psi_n$ 估计 $\psi_{\mathrm{causal}}$，可将其偏差分解为统计偏差与识别偏差：
+\[
+ E(\psi_n)-\psi_{\mathrm{causal}}
+ =\underbrace{\psi_1-\psi_0}_{\text{统计偏差}}
+ +\underbrace{\psi_0-\psi_{\mathrm{causal}}}_{\text{识别偏差}}.
+\]
+统计偏差源于对统计参数 $\psi_0$ 的估计不正确，识别偏差则源于可识别性假设未得到满足。与识别偏差不同，统计偏差可以通过更好的估计方法或增大样本量来纠正。文献中对识别偏差还使用“混杂偏差”和“选择偏差”等名称。我们更倾向于使用“识别偏差”，因为它涵盖的问题范围更广。
+
+\paragraph*{步骤2：估计统计参数，消除统计偏差。}
+由于参数工作模型往往设定错误，通常不适合用来减小统计偏差。我们建议采用靶向学习。特别是，靶向最小损失估计（targeted minimum loss-based estimation，TMLE）可提供具有下述性质的估计量：
+\begin{equation}
+ \sqrt n(\psi_n-\psi_0)
+ =\frac1{\sqrt n}\sum_{i=1}^n\mathrm{IC}_{\hat\Psi}(O_i)+o_P(1),
+ \tag{27.2}
+\end{equation}
+其中 $\mathrm{IC}_{\hat\Psi}$ 是均值为零、方差有限的函数，称为影响函数。式 (27.2) 所述性质，称为 $\psi_n$ 的渐近线性。给定 $\mathrm{IC}_{\hat\Psi}(O)$ 方差的估计 $\hat\sigma^2$，$\psi_0$ 的渐近有效 $(1-\alpha)100\%$ Wald型置信区间为
+\begin{equation}
+ (L_n,U_n)\equiv\psi_n\pm z_{\alpha/2}\frac{\hat\sigma}{\sqrt n},
+ \tag{27.3}
+\end{equation}
+其中 $z_\alpha$ 是标准正态分布的 $1-\alpha$ 分位数。
+
+\paragraph*{步骤3：寻找识别偏差的界。}
+假定已知 $L_{\mathrm{causal}}(\delta)\leq\psi_{\mathrm{causal}}-\psi_0\leq U_{\mathrm{causal}}(\delta)$，其中这些界依赖于某个条件 $\delta$，也可能依赖于 $P_0$。此外，$\delta$ 必须在整个非参数模型中都可解释，这样才能利用专家知识和科学文献，提出其合理取值。在这一步，部分识别文献中发展的方法会很有帮助。下面将在例27.1和27.2中说明这些界的构造。
+
+\paragraph*{步骤4：计算因果参数的不确定性区间。}
+假定 $(L_n,U_n)$ 是 $\psi_0$ 的有效置信区间。如果不存在统计偏差、式 (27.2) 成立，而且 $\hat\sigma^2$ 是 $\mathrm{IC}_{\hat\Psi}$ 方差的一致估计量，就能实现这一点。给定识别偏差的已知界 $(L_{\mathrm{causal}}(\delta),U_{\mathrm{causal}}(\delta))$，我们知道，
+\begin{equation}
+ \bigl(L_n+L_{\mathrm{causal}}(\delta),U_n+U_{\mathrm{causal}}(\delta)\bigr)
+ \tag{27.4}
+\end{equation}
+是在条件 $\delta$ 下，$\psi_{\mathrm{causal}}$ 的渐近有效 $(1-\alpha)100\%$ 不确定性区间（uncertainty interval）。如果 $L_{\mathrm{causal}}(\delta)$ 或 $U_{\mathrm{causal}}(\delta)$ 依赖于 $P_0$，则必须估计它们，并相应修改不确定性区间。第27.3节将给出这一修改。
+
+现在在两个实例中说明这些步骤。
+
+\begin{bookresult}{例}{27.1（续）}
+在这个实例中，我们使用统计参数
+\[
+ \psi_0=E_0(\Delta Y\mid A=1)-E(Y\mid\Delta=1,A=0).
+\]
+注意，它并不等于式 (27.1)；后者是在可识别性条件成立时能够识别 $\psi_{\mathrm{causal}}$ 的参数。选择这个参数而非式 (27.1) 的原因很快就会清楚。采用下列非参数估计量，即可直接实现 $\psi_0$ 的一致且渐近线性估计：
+\[
+ \psi_n=\frac{\sum_i^nA_i\Delta_iY_i}{\sum_i^nA_i}
+ -\frac{\sum_i^n(1-A_i)\Delta_iY_i}{\sum_i^n(1-A_i)\Delta_i},
+\]
+它使用经验均值估计 $\psi_0$ 定义中涉及的期望。直接应用 Delta 方法即可得到式 (27.2)，其中
+\[
+ \begin{aligned}
+ \mathrm{IC}_{\hat\Psi}={}&\frac A{E(A)}\{\Delta Y-E(\Delta Y\mid A=1)\}\\
+ &-\frac{(1-A)\Delta}{E\{(1-A)\Delta\}}\{Y-E(Y\mid\Delta=1,A=0)\}.
+ \end{aligned}
+\]
+将 $\hat\sigma^2$ 取为 $\mathrm{IC}_{\hat\Psi,n}(O)$ 的经验方差，就可构造式 (27.3) 那样的 Wald型置信区间。这里，$\mathrm{IC}_{\hat\Psi,n}(O)$ 由 $\mathrm{IC}_{\hat\Psi}(O)$ 中的未知期望替换为对应的经验量得到。本研究的主要目标是确立治疗疗效。因此，我们关注 $L_{\mathrm{causal}}(\delta)$，并按以下方式求得。首先，注意 $E(\Delta Y\mid A=1)$ 是 $E(Y_1\mid A=1)$ 的一个保守估计。即：
+\[
+ E(\Delta Y\mid A=1)=E(\Delta Y_1\mid A=1)\leq E(Y_1\mid A=1).
+\]
+由此可得
+\[
+ \begin{aligned}
+ \psi_{\mathrm{causal}}-\psi_0
+ ={}&E(Y_1\mid A=1)-E(\Delta Y\mid A=1)\\
+ &+E(Y\mid\Delta=1,A=0)-E(Y_0\mid A=1)\\
+ \geq{}&E(Y\mid\Delta=1,A=0)-E(Y_0\mid A=1).
+ \end{aligned}
+\]
+因此，在条件 $\delta\leq E(Y_0\mid A=1)$ 下，下界等于 $L_{\mathrm{causal}}(\delta)=E(Y\mid\Delta=1,A=0)-\delta$。在本例中，可以按如下方式了解条件 $\delta\leq E(Y_0\mid A=1)$ 是否合理。参数 $E(Y_0\mid A=1)$ 是已处理人群假如未接受处理时的治愈概率，即“自发”治愈的概率。恰加斯病的文献提供了辅助信息：这一概率通常很低。这说明了以非参数方式定义条件 $\delta$ 的优势；参数化定义可能会产生无法解释的参数，因而不能从辅助知识中了解其取值。
+
+还应注意，$L_{\mathrm{causal}}(\delta)$ 中的量 $E(Y\mid\Delta=1,A=0)$ 是未知的。本例中，效应大小 $\psi_n=0.47$ 已足够大，允许我们保守地令 $E(Y\mid\Delta=1,A=0)=0$。在其他应用中，这一做法很可能使界过宽，以致无法提供有用信息。标准差估计为 $\hat\sigma=0.02$，在假定 $\delta\leq E(Y_0\mid A=1)$ 下，可得到 $\psi_{\mathrm{causal}}$ 的单侧 $95\%$ 不确定性区间 $(0.4384-\delta,\infty)$。因此，只要有辅助知识表明，已处理者自发治愈的概率 $E(Y_0\mid A=1)$ 小于 $0.4384$，就足以拒绝原假设 $H_0:\psi_{\mathrm{causal}}\leq0$（处理效应为负或无效应），而支持 $H_1:\psi_{\mathrm{causal}}>0$。
+\end{bookresult}

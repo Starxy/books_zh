@@ -1,0 +1,18 @@
+% 原书分章PDF第18—19页：第29.6.4节完整证明概要与末尾致谢。
+\subsection{命题29.4的证明}
+
+考虑 $f\in\mathcal F\setminus\mathcal F'$，它是从 $P_0$ 中抽取的 $O$ 的一个仅依赖 $V$ 的函数。有
+\[
+P_n^{\mathrm{HT}}f=\frac1n\sum_{v=1}^\nu f(v)h^{-1}(v)n_v,
+\]
+其中，对每个 $1\le v\le\nu$，$n_v=\sum_{i=1}^N\eta_i\ell_v(V_i)=nh(v)N_v/N$，$N_v\equiv\sum_{i=1}^N\ell_v(V_i)$。因此，上述展示式可以改写为 $P_n^{\mathrm{HT}}f=P_Nf$，从而 $\operatorname{Var}_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]=0$。此外，有界独立同分布观测的CLT意味着
+\[
+\sqrt n(P_n^{\mathrm{HT}}-P_0)f
+=\sqrt{n/N}\times\sqrt N(P_N-P_0)f
+=O_P(\sqrt{n/N})=o_P(1).
+\]
+
+现在考虑 $f\in\mathcal F'$。我们希望证明，$f$ 满足Soshnikov条件，并且 $n\operatorname{Var}_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]$ 依 $P_0$ 概率收敛于 $\Sigma_h^\Pi(f,f)$；由于 $f\in\mathcal F'$，后者为正。当采用 $P^{s\Pi}$ 时，式 (29.18) 左侧的表达式可以改写为 $\max_{1\le i\le N}Nf(O_i)/nh(V_i)$，其上界显然是某个常数乘以 $N/n$。至于式 (29.19) 的左侧，它等于 $\sum_{i=1}^N|f(O_i)|$，其上界显然是某个常数乘以 $N$。下面转向 $\operatorname{Var}_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]$。根据 $P^{s\Pi}$ 的构造，该方差可以分解为每个 $V$ 层内方差之和，其中每个方差，都是给定 $(V_1,\ldots,V_N)$ 时条件独立同分布的次高斯随机变量所组成的二次型。已知独立次高斯随机变量的二次型，会以指数速度集中于其期望附近，见 Rudelson 和 Vershynin（2013）中的Hanson--Wright集中不等式。因此，$\operatorname{Var}_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]$ 集中于其期望式 (29.8) 附近。从而，$N^2\operatorname{Var}_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]$ 的阶为 $N^2/n$。于是显然，只要对所有 $\epsilon>0$，都有 $N/n=o((N^2/n)^\epsilon)$，就能保证 $f$ 满足Soshnikov条件。例如，对某个 $a>0$，取 $n\equiv N/\log^a(N)$，这一点便成立。最后，$\operatorname{Var}_{P^s}[P_n^{\mathrm{HT}}f]$ 集中于其期望附近，也给出 $n\operatorname{Var}_{P^s}[P_n^{\mathrm{HT}}f]$ 依 $P_0$ 概率收敛于 $\Sigma_h^\Pi(f,f)$。至此，我们已经证明，$\sqrt n(P_n^{\mathrm{HT}}-P_0)f$ 依分布收敛于均值为零、方差为 $\Sigma_h^\Pi(f,f)$ 的高斯分布。证明的其余部分，与命题29.3证明的结尾相似。这就完成了证明概要。
+
+\paragraph{致谢。}
+作者感谢法国国家研究署（Agence Nationale de la Recherche，ANR）通过编号为ANR-13-BS01-0005的资助项目SPADRO给予支持；本研究也是Labex MME-DII项目（ANR11-LBX-0023-01）的一部分。

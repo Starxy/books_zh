@@ -1,0 +1,34 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+\node[font=\bfseries] at (6,5.5) {基因结构};
+\draw[red,thick] (.9,2.5)--(12.5,2.5);
+\foreach \x/\w in {2.9/2,5.7/1.6,9/2}{
+ \draw[magenta] (\x,2.95) rectangle ++(\w,.45);
+}
+\fill[green!60!black] (3.45,2.95) rectangle (4.9,3.4);
+\fill[green!60!black] (5.7,2.95) rectangle (7.3,3.4);
+\fill[green!60!black] (9,2.95) rectangle (10.45,3.4);
+\node[draw,align=center,font=\bfseries,inner sep=4pt] (ch04aprom) at (1.5,4.45) {启动子\\区域};
+\draw[magenta,->] (ch04aprom.south)--(1.5,2.6);
+\node[draw,font=\bfseries,inner sep=4pt] at (7.1,4.7) {外显子（填充与未填充的框区域）};
+\draw[magenta] (2.9,4.25)--(11,4.25);
+\foreach \x in {3.9,6.5,10}{\draw[magenta,->] (\x,4.25)--(\x,3.5);}
+\node[draw,inner sep=2pt] at (2.9,2.5) {$+1$};
+\node[text=orange!85!black] at (7.1,1.95) {内含子（位于外显子之间）};
+\draw[magenta,->] (5.25,1.95)--(5.25,3.05);
+\draw[magenta,->] (8.15,1.95)--(8.15,3.05);
+\draw[inkblue,<->,thick] (2.75,1.55)--(11,1.55);
+\node[draw,text=inkblue,fill=white,font=\bfseries] at (7,1.2) {转录区域};
+\node[font=\bfseries,anchor=west] at (.9,.3) {mRNA 结构};
+\draw (4.1,-.4) rectangle (10.2,0);
+\filldraw[fill=green!60!black] (4.7,-.4) rectangle (6.4,0);
+\filldraw[fill=green!60!black] (6.4,-.4) rectangle (7.95,0);
+\filldraw[fill=green!60!black] (7.95,-.4) rectangle (9,0);
+\node at (3.7,-.2) {$5'$};\node at (10.6,-.2) {$3'$};
+\draw[<->,thick] (4.7,-.75)--(9,-.75);
+\node[font=\bfseries] at (6.85,-1.1) {翻译区域};
+\end{tikzpicture}
+\origfig{2}{RNA 加工。}
+\label{fig:ch04a-02}
+\end{figure}

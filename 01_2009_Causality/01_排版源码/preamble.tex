@@ -1,0 +1,162 @@
+% !TeX program = xelatex
+% ============================================================
+%  Causality: Models, Reasoning, and Inference (2nd ed.)
+%  中文译稿 —— 共享导言区
+% ============================================================
+\usepackage{amsmath,amssymb,amsthm,mathrsfs,bm}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,shapes.geometric,decorations.pathreplacing}
+\usepackage{graphicx}
+\usepackage{booktabs,array,multirow,longtable}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{caption}
+\usepackage{ragged2e}
+\usepackage{fancyhdr}
+\usepackage{emptypage}
+
+% ---------- 颜色 ----------
+\definecolor{inkblue}{RGB}{28,62,110}
+\definecolor{boxbg}{RGB}{246,246,242}
+\definecolor{boxline}{RGB}{150,150,140}
+\definecolor{ptbg}{RGB}{240,244,250}
+
+% ---------- 页面 ----------
+\usepackage[a4paper,top=2.6cm,bottom=2.6cm,left=2.6cm,right=2.6cm,headsep=0.7cm,footskip=1.0cm]{geometry}
+\linespread{1.32}
+\setlength{\parskip}{0.25em}
+
+% ---------- 标题格式 ----------
+\ctexset{
+  chapter = {
+    format     = \centering\heiti\zihao{2},
+    name       = {第,章},
+    number     = \chinese{chapter},
+    beforeskip = 1.2cm,
+    afterskip  = 1.2cm,
+  },
+  section = {
+    format = \heiti\zihao{3},
+    beforeskip = 1.1ex plus .3ex minus .2ex,
+    afterskip  = .8ex plus .2ex,
+  },
+  subsection = {
+    format = \heiti\zihao{4},
+    beforeskip = 1.0ex plus .3ex minus .2ex,
+    afterskip  = .6ex plus .2ex,
+  },
+  subsubsection = {
+    format = \heiti\zihao{-4},
+  },
+  figurename = 图,
+  tablename  = 表,
+}
+
+\captionsetup{font=small,labelsep=quad}
+\captionsetup[figure]{justification=centering}
+
+% ---------- 页眉页脚 ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\kaishu\leftmark}
+\fancyhead[RO]{\small\kaishu\rightmark}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% 页眉不做全大写（默认 \MakeUppercase 会把“do 算子”变成“DO 算子”）
+\makeatletter
+\renewcommand{\chaptermark}[1]{\markboth{\CTEXthechapter\quad #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\quad #1}}
+\makeatother
+
+% ---------- 定理类环境（与原书一致：按节共享一个计数器）----------
+\newtheorem{thmshared}{}[section]
+\theoremstyle{definition}
+\newtheorem{definition}[thmshared]{定义}
+\newtheorem{example}[thmshared]{例}
+\newtheorem{assumption}[thmshared]{假设}
+\theoremstyle{plain}
+\newtheorem{theorem}[thmshared]{定理}
+\newtheorem{lemma}[thmshared]{引理}
+\newtheorem{corollary}[thmshared]{推论}
+\newtheorem{proposition}[thmshared]{命题}
+\newtheorem{conjecture}[thmshared]{猜想}
+\theoremstyle{remark}
+\newtheorem{remark}[thmshared]{注}
+\newenvironment{remarkenv}{\par\addvspace{0.6em}\noindent\heiti 注\quad\kaishu\ignorespaces}{\par\addvspace{0.4em}}
+
+\renewcommand{\proofname}{\heiti 证明}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+% ---------- 自定义盒子 ----------
+% 小结（章内小结，替代原书 Summary 段）
+\newtcolorbox{summarybox}[1][小结]{
+  enhanced, breakable, colback=boxbg, colframe=boxline,
+  boxrule=0.5pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\heiti\small, title={#1},
+  attach boxed title to top left={xshift=6pt,yshift*=-\tcboxedtitleheight/2},
+  boxed title style={colback=boxbg,colframe=boxline,boxrule=0.5pt},
+  before skip=10pt, after skip=10pt,
+}
+% 要点（对应原书的 fine point 式提示）
+\newtcolorbox{keypoint}[1][要点]{
+  enhanced, breakable, colback=white, colframe=inkblue,
+  boxrule=0.6pt, leftrule=2.4pt, left=8pt, right=8pt, top=5pt, bottom=5pt,
+  fonttitle=\heiti\small\color{inkblue}, title={#1},
+  attach title to upper={\ \ },
+  before skip=8pt, after skip=8pt,
+}
+% 技术注记
+\newtcolorbox{techpoint}[1][技术注记]{
+  enhanced, breakable, colback=ptbg, colframe=inkblue!45,
+  boxrule=0.4pt, left=8pt, right=8pt, top=5pt, bottom=5pt,
+  fonttitle=\heiti\small\color{inkblue}, title={#1},
+  attach title to upper={\ \ },
+  before skip=8pt, after skip=8pt,
+}
+
+% ---------- 数学算子 ----------
+\DeclareMathOperator{\doop}{do}
+\newcommand{\dox}[1]{\mathrm{do}(#1)}
+\def\doxp(#1){\mathrm{do}(#1)}
+\newcommand{\PA}{\mathrm{PA}}
+\newcommand{\pa}{\mathrm{pa}}
+\newcommand{\ND}{\mathrm{ND}}
+\newcommand{\pr}{\Pr}
+\newcommand{\given}{\,|\,}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\newcommand{\nindep}{\not\perp\!\!\!\perp}
+\newcommand{\deq}{\stackrel{\mathrm{def}}{=}}
+\newcommand{\X}{\mathsf{X}}
+
+% ---------- TikZ 统一风格 ----------
+\tikzset{
+  causal/.style={>={Stealth[length=2.1mm,width=1.5mm]},semithick},
+  vtx/.style={circle,draw,inner sep=1pt,minimum size=6.2mm,font=\small},
+  vtxb/.style={circle,draw,very thick,inner sep=1pt,minimum size=6.2mm,font=\small},
+  vtxs/.style={circle,draw,inner sep=1pt,minimum size=5.4mm,font=\footnotesize},
+  lat/.style={circle,draw,dashed,inner sep=1pt,minimum size=6.2mm,font=\small},
+  ed/.style={->,semithick},
+  edb/.style={->,very thick},
+  edd/.style={->,semithick,dashed},
+  bi/.style={<->,semithick},
+  bid/.style={<->,semithick,dashed},
+}
+
+% ---------- 杂项 ----------
+\newcommand{\en}[1]{\textup{#1}}
+\renewcommand{\arraystretch}{1.15}
+\setlist[itemize]{leftmargin=1.6em,itemsep=0.15em,topsep=0.3em}
+\setlist[enumerate]{leftmargin=1.9em,itemsep=0.15em,topsep=0.3em}
+
+% ---------- 超链接（最后加载）----------
+\usepackage{url}
+\usepackage[bookmarks=true,bookmarksnumbered=true,colorlinks=true,
+            linkcolor=inkblue,citecolor=inkblue,urlcolor=inkblue]{hyperref}
+
+% ---------- 断行宽容度（减少行溢出）----------
+\setlength{\emergencystretch}{1.2em}
+\tolerance=2000

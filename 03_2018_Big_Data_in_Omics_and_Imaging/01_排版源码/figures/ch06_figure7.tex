@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=.85cm,y=.8cm,>=Stealth,
+chSixFsevenN/.style={draw=blue!60!black,fill=blue!60,text=white,minimum width=5mm,minimum height=4mm,inner sep=1pt,font=\small}]
+\foreach \xx/\vv in {0/0,1/3,2/2,3/1,4/0,5/1,6/2,7/3,8/0}
+ \node[chSixFsevenN] (chSixF7i\xx) at (\xx,0) {$\vv$};
+\foreach \xx/\vv/\kk in {1/-2/0,3/2/2,5/-2/4,7/2/6} {
+ \node[chSixFsevenN,fill=cyan!70!blue] (chSixF7h\xx) at (\xx,2) {$\vv$};
+ \pgfmathtruncatemacro{\kp}{\kk+1}\pgfmathtruncatemacro{\kpp}{\kk+2}
+ \draw[->,red] (chSixF7h\xx)--(chSixF7i\kk);
+ \draw[->,green!70!black] (chSixF7h\xx)--(chSixF7i\kp);
+ \draw[->,violet] (chSixF7h\xx)--(chSixF7i\kpp);
+}
+\draw[red,dash dot] (-.15,1.65) rectangle (7.95,2.65);\node[red] at (4,2.4) {特征图};
+\node[font=\small] at (.45,1.15) {$1$};\node[font=\small] at (.82,.65) {$0$};\node[font=\small] at (1.5,1.35) {$-1$};
+\draw[blue!60!black] (4.5,3.5) rectangle (8.4,4.2);
+\foreach \xx/\vv in {5/1,6.5/0,8/-1} \node[chSixFsevenN] at (\xx,3.85) {$\vv$};
+\node at (6.5,3.2) {核};
+\end{tikzpicture}
+\origfig{7}{卷积层的空间排列。}
+\end{figure}

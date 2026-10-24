@@ -1,0 +1,56 @@
+% 源分章 PDF 第 13—15 页；第 12.4 节。
+\section{向配对匹配试验的扩展}
+
+现在考虑一项配对匹配的 CRT。在贯穿本章的例子中，假设识别出 $N$ 个满足研究纳入标准的候选社区。根据这些候选单位基线协变量的相似性，从中选择匹配最好的 $n/2$ 对。Balzer 等（2015）详述了这种“自适应配对匹配”（adaptive pair-matching）方案；在其他情境下，它也称为“非二分匹配”（nonbipartite matching）和“最优多变量匹配”（optimal multivariate matching；Greevy 等，2004；Zhang 和 Small，2009；Lu 等，2011）。据我们了解，这种配对匹配方案已用于若干 CRT，包括预防 HIV 的 Mwanza 试验（Grosskurth 等，1995）、预防产后抑郁的 PRISM 试验（Watson 等，2004）、促进身体活动的 SPACE 研究（Toftager 等，2011），以及 HIV 预防与治疗的 SEARCH 试验（Balzer 等，2015）。这种研究设计使数据产生相依性。具体而言，匹配对的构造是所有候选研究地点协变量的函数。因此，不能像现行实践中有时假定的那样，将观测数据视为 $n$ 个独立同分布观测，或 $n/2$ 个独立同分布的成对观测（例如 Hayes 和 Moulton，2009；Klar 和 Donner，1997；Freedman 等，1997；Campbell 等，2007）。但是，一旦将研究单位的基线协变量视为固定值，就重新得到 $n/2$ 个条件独立单位：
+\[
+\bar O_j=(O_{j1},O_{j2})
+=\bigl((W_{j1},A_{j1},Y_{j1}),(W_{j2},A_{j2},Y_{j2})\bigr),
+\]
+其中，指标 $j=1,\ldots,n/2$ 表示按照候选研究社区 $\{1,\ldots,N\}$ 的基线协变量 $(W_1,\ldots,W_N)$，将其划分为匹配对。
+
+此前，Imai（2008）将 Neyman 对未调整估计量的分析推广到配对匹配试验的样本效应。未调整估计量是各配对结局差的平均，无偏，但并非有效估计量。对于自适应配对匹配试验，van der Laan 等（2013a）详述了 TMLE 在总体效应中的应用，Balzer 等（2015）则详述了其在条件效应中的应用。据我们所知，Balzer 等（2016c）最早考虑将局部有效估计量用于配对匹配试验的样本效应。
+
+第 12.3.1 节介绍的总体效应 TMLE，也可以估计配对匹配试验中的样本效应。与前面一样，TMLE 减去 SATE，可以写成一个依赖于不可识别量的成对影响曲线的经验均值，加上一个依概率趋于零的二阶项：
+\[
+\Psi_n(P_n)-\mathrm{SATE}
+=\frac1{n/2}\sum_{j=1}^{n/2}\bar D^{\mathcal S}(\bar U_j,\bar O_j)
++o_P(1/\sqrt{n/2}),
+\]
+其中
+\[
+\begin{aligned}
+\bar D^{\mathcal S}(\bar U_j,\bar O_j)
+&=\bar D^{\mathcal C}(\bar O_j)-\bar D^{\mathcal F}(\bar U_j,\bar O_j),\\
+\bar D^{\mathcal C}(\bar O_j)
+&=\frac12[D^{\mathcal C}(O_{j1})+D^{\mathcal C}(O_{j2})],\\
+\bar D^{\mathcal F}(\bar U_j,\bar O_j)
+&=\frac12[D^{\mathcal F}(U_{j1},O_{j1})+D^{\mathcal F}(U_{j2},O_{j2})]
+\end{aligned}
+\]
+（Balzer 等，2016c，定理 3）。第一分量 $\bar D^{\mathcal C}(\bar O)$，是配对匹配试验中条件参数 $\Psi^{\mathcal C}(P_0)=\frac1n\sum_{i=1}^n\bar Q_0(1,W_i)-\bar Q_0(0,W_i)$ 的 TMLE 的影响曲线（Balzer 等，2015）。换言之，$\bar D^{\mathcal C}(\bar O_j)$ 是式 (12.2) 所定义、每个匹配对内两个 $D^{\mathcal C}(O_i)$ 分量的平均。第二分量 $\bar D^{\mathcal F}(\bar U,\bar O)$ 是该匹配对未观测因素 $\bar U=(U_{j1},U_{j2})$ 和观测因素 $\bar O_j=(O_{j1},O_{j2})$ 的不可识别函数。具体而言，$\bar D^{\mathcal F}(\bar U_j,\bar O_j)$ 是式 (12.3) 所定义、每个匹配对内两个 $D^{\mathcal F}(U_i,O_i)$ 分量的平均。与前面一样，协变量分布 $P_0(W)$ 被视为固定，因此对它的估计不作贡献。
+
+因此，配对匹配试验中 SATE 的标准化估计量是一致且渐近正态的，其均值为零，方差由下式的极限给出：
+\[
+\Var[\bar D^{\mathcal S}(\bar U_j,\bar O_j)]
+=\Var[\bar D^{\mathcal C}(\bar O_j)]
+-\Var[\bar D^{\mathcal F}(\bar U_j,\bar O_j)]
+\]
+（Balzer 等，2016c，定理 4）。同样，不可识别分量 $\bar D^{\mathcal F}$ 的方差必然大于或等于零。因此，在配对匹配试验中，TMLE 作为样本效应估计量时的渐近方差，总是小于或等于同一个估计量用于条件效应时的渐近方差。此外，将协变量分布视为固定后，配对匹配试验中样本效应（或条件效应）TMLE 的精度，总是与总体效应 TMLE 一样高或更高。还需简要指出，配对匹配本身往往带来额外的效率提升。当真实结局回归与估计结局回归之间的偏差在匹配对内正相关，和／或某个单位的处理效应与协变量分层内处理效应之间的偏差在匹配对内正相关时，配对匹配试验中的 SATE 将被更精确地估计。
+
+可以用下式保守地近似配对匹配试验中 SATE 的 TMLE 的影响曲线：
+\[
+\bar D_n^{\mathcal S}(\bar O_j)
+=\frac12[D_n^{\mathcal S}(O_{j1})+D_n^{\mathcal S}(O_{j2})],
+\]
+其中，$D_n^{\mathcal S}(O_i)$ 的定义见式 (12.4)。于是，用估计的成对影响曲线的样本方差除以样本量 $n/2$，得到渐近保守的方差估计量：
+\[
+\bar\sigma_n^{2,\mathcal S}
+=\frac{\frac1{n/2}\sum_{j=1}^{n/2}[\bar D_n^{\mathcal S}(\bar O_j)]^2}{n/2}.
+\]
+若将匹配对内的观测排序，使第一个单位对应于随机分配至干预者 $(A_{j1}=1)$，第二个对应于对照者 $(A_{j2}=0)$，并且不估计倾向评分 $P_0(A)=0.5$，则有
+\[
+\bar D_n^{\mathcal S}(\bar O_j)
+=\{Y_{j1}-\bar Q_n^*(1,W_{j1})\}
+-\{Y_{j2}-\bar Q_n^*(0,W_{j2})\}.
+\]
+此时，可以将方差估计量表示为匹配对内残差之差的样本方差，再除以 $n/2$。如果处理效应在测量协变量分层内不存在异质性，即 $\bar D^{\mathcal F}$ 分量的方差为零，并且结局回归 $\bar Q_0(A,W)$ 被一致估计，则这一方差估计量将具有一致性。在相同条件下，TMLE 将是有效的，即在一大类正则渐近线性估计量中达到可能的最小方差。否则，TMLE 将不具有效性，而方差估计量将保守，即具有向上偏差。与前面一样，对具有预测作用的基线协变量进行调整，可以通过两条途径显著提高功效：(1) 降低估计量的变异；(2) 使方差估计量不那么保守。

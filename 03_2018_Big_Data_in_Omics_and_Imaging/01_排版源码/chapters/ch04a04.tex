@@ -1,0 +1,295 @@
+% 原书PDF第25—32页，4.2导言及4.2.1.1全节。
+\section{RNA-seq 数据的差异表达分析}
+
+识别组间显著的差异表达，是 RNA-seq 数据分析的重要起点。微阵列基因表达数据用一个实数定量基因表达水平；RNA-seq 则具有带偏倚的离散测序读段这一独特特征，使差异表达分析更为复杂。主要挑战来自 NGS 技术本身的局限（Zhang et al. 2014）。一般而言，NGS 技术会在文库制备、序列质量与错误率，以及丰度测量中产生偏倚和误差，其中包括核苷酸组成，以及基因或转录本长度不同所带来的影响。此外，技术变异与生物学变异相互叠加，也会影响组间真实生物学差异的估计。
+
+为应对这些挑战，主要发展了两类方法。第一类，准确描述技术重复与生物学样本中测序读段计数的生成过程和分布，常用泊松分布、负二项分布及 Beta 二项分布建模（Huang et al. 2015）。第二类为非参数方法，将测序读段计数建模为基因组位置的函数（Xiong et al. 2014）。两类方法各有优势与局限，本节分别介绍。
+
+\subsection{基于分布的差异表达分析方法}
+\subsubsection{泊松分布}
+
+考虑基因组中的基因 $g$（红色）以及若干其他基因（绿色）（图4.11）。假设分配给同一基因的读段在图中用同一种颜色表示。从基因组中抽取的读段总数为 $n$，其中 $n_g$ 条测序读段独立抽自基因 $g$。设 $p_g$ 为一条读段来自基因 $g$ 的概率，则基因 $g$ 的读段数 $n_g$ 服从二项分布：
+\begin{equation}
+P(N_g=n_g)=\binom n{n_g}p_g^{n_g}(1-p_g)^{n-n_g}.
+\tag{4.55}
+\end{equation}
+记为 $n_g\sim\operatorname{Bin}(n,p_g)$。
+
+当测序读段总数 $n$ 很大时，可以用泊松分布近似二项分布。事实上，二项分布的均值为 $\lambda=np_g$，即 $p_g=\lambda/n$。由式 (4.55)，有
+\begin{equation}
+\begin{aligned}
+P(N_g=n_g)&=\binom n{n_g}p_g^{n_g}(1-p_g)^{n-n_g}\\
+&=\frac{n(n-1)\cdots(n-n_g+1)}{n_g!}
+\left(\frac\lambda n\right)^{n_g}\left(1-\frac\lambda n\right)^{n-n_g}\\
+&=\frac{n(n-1)\cdots(n-n_g+1)}{n_g!\,n^{n_g}}\lambda^{n_g}
+\left(1-\frac\lambda n\right)^{\frac n\lambda\lambda}
+\left(1-\frac\lambda n\right)^{-n_g}.
+\end{aligned}
+\tag{4.56}
+\end{equation}
+\input{figures/ch04a_fig11}
+
+注意，当 $n$ 很大时，
+\begin{equation}
+\frac{n(n-1)\cdots(n-n_g+1)}{n^{n_g}}\approx1,
+\tag{4.57}
+\end{equation}
+\begin{equation}
+\left(1-\frac\lambda n\right)^{-n_g}\approx1,
+\tag{4.58}
+\end{equation}
+以及
+\begin{equation}
+\left(1-\frac\lambda n\right)^{n/\lambda}\approx e^{-1}.
+\tag{4.59}
+\end{equation}
+将式 (4.57)、(4.58)、(4.59) 代入式 (4.56)，得到
+\begin{equation}
+P(N_g=n_g)\approx\frac{\lambda^{n_g}e^{-\lambda}}{n_g!}.
+\tag{4.60}
+\end{equation}
+这说明读段数服从泊松分布，因此
+\[
+E[N_g]=\lambda,\qquad\Var(N_g)=\lambda.
+\]
+
+可以用对数线性模型，检验基因与表型的关联或差异表达（Li et al. 2012）。先定义记号。考虑 $k$ 个基因和 $n$ 个样本，以 $N_{ig}$ 表示样本 $i$ 中基因 $g$ 的读段计数，并定义
+\[
+N_{i\cdot}=\sum_{g=1}^{k}N_{ig},\qquad
+N_{\cdot g}=\sum_{i=1}^{n}N_{ig},\qquad
+N_{\cdot\cdot}=\sum_{i=1}^{n}\sum_{g=1}^{k}N_{ig}.
+\]
+假设 $N_{ig}\sim\operatorname{Poisson}(\lambda_{ig})$。考虑两类结局变量：具有 $M$ 个类别 $\{C_1,\ldots,C_M\}$ 的分类变量，以及数量变量 $y_i$。假设 $y_i$ 已中心化，即 $\sum_{i=1}^{n}y_i=0$。对数线性模型定义如下。
+
+1. 对于分类变量，
+\begin{equation}
+\log\lambda_{ig}=\log d_i+\log\beta_g+\sum_{m=1}^{M}\alpha_{gm}I_{(i\in C_m)}.
+\tag{4.61}
+\end{equation}
+2. 对于数量变量 $y_i$，
+\begin{equation}
+\log\lambda_{ig}=\log d_i+\log\beta_g+\alpha_gy_i,
+\tag{4.62}
+\end{equation}
+其中 $d_i$ 表示样本 $i$ 的测序深度，满足 $\sum_{i=1}^{n}d_i=1$；$\beta_g$ 为基因 $g$ 的表达水平；$\alpha_g$ 为基因 $g$ 与表型的关联系数；$\alpha_{gm}$ 为基因 $g$ 与第 $m$ 类的关联系数。
+
+由于 $N_{ig}$ 服从泊松分布，对数似然为
+\begin{equation}
+l(\lambda_{ig})=\sum_{i=1}^{n}\sum_{g=1}^{k}
+\left[N_{ig}\log\lambda_{ig}-\lambda_{ig}-N_{ig}!\right].
+\tag{4.63}
+\end{equation}
+参数 $\lambda_{ig}$ 的极大似然估计量为
+\begin{equation}
+\hat\lambda_{ig}=\frac{N_{ig}}{N_{\ldots}}.
+\tag{4.64}
+\end{equation}
+利用似然函数，无法同时估计对数线性模型中的全部参数。Li et al.（2012）提出了两阶段参数估计过程。
+
+\par\medskip\noindent\textbf{阶段1。}
+先拟合无基因与结局关联时的零模型：
+\begin{equation}
+\log\lambda_{ig}=\log d_i+\log\beta_g,\quad i=1,\ldots,n,\quad g=1,\ldots,k.
+\tag{4.65}
+\end{equation}
+基于模型 (4.65) 的对数似然为
+\begin{equation}
+l(N_{ig}\mid d_i,\beta_g)=\sum_{i=1}^{n}\sum_{g=1}^{k}
+\left[N_{ig}(\log d_i+\log\beta_g)-d_i\beta_g-N_{ig}!\right].
+\tag{4.66}
+\end{equation}
+令 $\partial l/\partial d_i=0$、$\partial l/\partial\beta_g=0$，得到
+\begin{equation}
+\sum_{g=1}^{k}(N_{ig}-\beta_gd_i)=0,
+\tag{4.67}
+\end{equation}
+\begin{equation}
+\sum_{i=1}^{n}N_{ig}-\left(\sum_{i=1}^{n}d_i\right)\beta_g=0.
+\tag{4.68}
+\end{equation}
+由 $\sum_{i=1}^{n}d_i=1$，可知
+\begin{equation}
+\hat\beta_g=N_{\cdot g}.
+\tag{4.69}
+\end{equation}
+将式 (4.69) 代入式 (4.67)，得到
+\begin{equation}
+\hat d_i=\frac{N_{i\cdot}}{N_{\cdot\cdot}}.
+\tag{4.70}
+\end{equation}
+如果只对不具有差异表达的基因集合 $S$ 拟合零模型 (4.65)，则式 (4.67) 变为
+\[
+\sum_{g\in S}(N_{ig}-\beta_gd_i)=0,
+\]
+从而
+\begin{equation}
+\hat d_i=\frac{\sum_{g\in S}N_{ig}}{\sum_{g\in S}N_{\cdot g}}.
+\tag{4.71}
+\end{equation}
+下面用拟合优度统计量确定集合 $S$。
+
+\begin{bookalgorithm}{4.1：集合 $S$ 的选择算法}
+\par\noindent\textbf{步骤1：初始化。}
+设初值 $d^{(0)}=N_{i\cdot}/N_{\cdot\cdot}$。
+
+\noindent\textbf{步骤2：计算每个基因的拟合优度统计量。}
+\begin{equation}
+\operatorname{GOF}_g=\sum_{i=1}^{n}\frac{(N_{ig}-d_i^{(u)}N_{\cdot g})^2}{d_i^{(u)}N_{\cdot g}}.
+\tag{4.72}
+\end{equation}
+\noindent\textbf{步骤3：选择集合 $S$。}
+选择 $\operatorname{GOF}_g$ 值位于全部 $\operatorname{GOF}_g$ 的 $(\varepsilon,1-\varepsilon)$ 分位数区间内的基因，其中 $\varepsilon\in(0,0.5)$ 为固定常数。
+
+\noindent\textbf{步骤4：更新测序深度的估计。}
+\[
+d_i^{(u+1)}=\frac{\sum_{g\in S}N_{ig}}{\sum_{g\in S}N_{\cdot g}},\quad i=1,\ldots,n.
+\]
+\noindent\textbf{步骤5：检查收敛。}
+若 $\lVert d^{(u+1)}-d^{(u)}\rVert_2<\delta$，则停止；否则返回步骤2。这里 $d^{(u)}=[d_1^{(u)},\ldots,d_n^{(u)}]^T$，$\delta$ 为预先指定的误差。
+\end{bookalgorithm}
+
+\par\medskip\noindent\textbf{阶段2。}
+加入额外的一项，描述基因与结局的关联。对于数量型结局，模型为
+\begin{equation}
+\log\lambda_{ig}=\log d_i+\log\beta_g+\alpha_gy_i.
+\tag{4.73}
+\end{equation}
+对于分类结局，模型为
+\begin{equation}
+\log\lambda_{ig}=\log d_i+\log\beta_g+\sum_{m=1}^{M}\alpha_{gm}I_{(i\in C_m)}.
+\tag{4.74}
+\end{equation}
+阶段1已估计出 $\hat d_i$ 与 $\hat\beta_g$。定义
+\begin{equation}
+N_{ig}^{(0)}=\log\hat d_i+\log\hat\beta_g.
+\tag{4.75}
+\end{equation}
+模型 (4.73) 与 (4.74) 分别化为
+\begin{equation}
+\log\lambda_{ig}=\log\hat N_{ig}^{(0)}+\alpha_gy_i,
+\tag{4.76}
+\end{equation}
+以及
+\begin{equation}
+\log\lambda_{ig}=\log\hat N_{ig}^{(0)}+\sum_{m=1}^{M}\alpha_{gm}I_{(i\in C_m)}.
+\tag{4.77}
+\end{equation}
+模型 (4.76)、(4.77) 的对数似然分别为
+\begin{equation}
+l(N_{ig}\mid\alpha_g)=\sum_{i=1}^{n}\sum_{g=1}^{k}
+\left[N_{ig}(\log N_{ig}^{(0)}+\alpha_gy_i)-N_{ig}^{(0)}e^{\alpha_gy_i}-N_{ig}!\right],
+\tag{4.78}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+l(N_{ig}\mid\alpha_{gm})=\sum_{i=1}^{n}\sum_{g=1}^{k}\biggl[{}
+&N_{ig}\left(\log N_{ig}^{(0)}+\sum_{m=1}^{M}\alpha_{gm}I_{(i\in C_M)}\right)\\
+&-N_{ig}^{(0)}\exp\left(\sum_{m=1}^{M}\alpha_{gm}I_{(i\in C_M)}\right)-N_{ig}!\biggr].
+\end{aligned}
+\tag{4.79}
+\end{equation}
+可得（习题9）
+\begin{equation}
+\begin{aligned}
+\frac{\partial l(N_{ig}\mid\alpha_g)}{\partial\alpha_g}
+&=\sum_i\left[N_{ig}y_i-N_{ig}^{(0)}y_i\exp(y_i\alpha_g)\right]=0,\\
+\frac{\partial l(N_{ig}\mid\alpha_{gm})}{\partial\alpha_{gm}}
+&=\sum_i\biggl[N_{ig}I_{(i\in C_m)}\\
+&\qquad-N_{ig}^{(0)}I_{(i\in C_m)}\exp\left(\sum_m\alpha_{gm}I_{(i\in C_m)}\right)\biggr]=0.
+\end{aligned}
+\tag{4.80}
+\end{equation}
+
+式 (4.80) 为非线性方程，关联系数 $\alpha_g$、$\alpha_{gm}$（$m=1,\ldots,M$）的极大似然估计没有解析表达式。Li et al.（2012）提出用无需估计这些参数的得分统计量，检验关联或差异表达。设 $\theta$ 为参数。得分函数（score function）定义为对数似然关于 $\theta$ 的导数：
+\begin{equation}
+U(\theta)=\frac{\partial l(\theta)}{\partial\theta}.
+\tag{4.81}
+\end{equation}
+可以证明
+\begin{equation}
+E[U(\theta)]=0,
+\tag{4.82}
+\end{equation}
+并且
+\begin{equation}
+\Var(U(\theta))=-E\left[\frac{\partial^2U}{\partial\theta\,\partial\theta^T}\right]=I(\theta),
+\tag{4.83}
+\end{equation}
+其中 $I(\theta)$ 为 Fisher 信息矩阵。
+
+对于 $k$ 维受限参数 $\theta_0$，为检验 $H_0:\theta=\theta_0$ 对 $H_a:\theta\ne0$，定义得分检验：
+\begin{equation}
+S(\theta)=U^T(\theta)I^{-1}(\theta)U(\theta).
+\tag{4.84}
+\end{equation}
+在原假设下，得分统计量 $S(\theta)$ 服从中心 $\chi^2_{(k)}$ 分布。下面将其用于差异表达分析，先考虑数量型结局。可以证明
+\begin{equation}
+U(\alpha_g)=\left.\frac{\partial l(\alpha_g)}{\partial\alpha_g}\right|_{\alpha_g=0}
+=\sum_{i=1}^{n}(N_{ig}y_i-N_{ig}^{(0)}y_i),
+\tag{4.85}
+\end{equation}
+以及
+\begin{equation}
+I(\alpha_g)=\left.-E\left[\frac{\partial^2l(\alpha_g)}{\partial\alpha_g^2}\right]\right|_{\alpha_g=0}
+=\sum_{i=1}^{n}y_i^2N_{ig}^{(0)}.
+\tag{4.86}
+\end{equation}
+基因表达与数量性状关联的得分检验为
+\begin{equation}
+S_{qg}=\frac{U^2(\alpha_g)}{I(\alpha_g)}
+=\frac{\sum_{i=1}^{n}(N_{ig}y_i-N_{ig}^{(0)}y_i)^2}{\sum_{i=1}^{n}y_i^2N_{ig}^{(0)}}.
+\tag{4.87}
+\end{equation}
+接着考虑二分类或多分类结局。其得分函数为
+\begin{equation}
+\begin{aligned}
+U(\alpha_{GM})
+&=\left.\frac{\partial l(\alpha_{GM})}{\partial\alpha_{GM}}\right|_{\alpha_{GM}=0}
+=\left.\begin{bmatrix}
+\dfrac{\partial l(\alpha_{GM})}{\partial\alpha_{g1}}\\\vdots\\
+\dfrac{\partial l(\alpha_{GM})}{\partial\alpha_{gm}}
+\end{bmatrix}\right|_{\alpha_{GM}=0}\\
+&=\begin{bmatrix}
+\sum_{i\in C_1}(N_{ig}-N_{ig}^{(0)})\\\vdots\\
+\sum_{i\in C_M}(N_{ig}-N_{ig}^{(0)})
+\end{bmatrix}.
+\end{aligned}
+\tag{4.88}
+\end{equation}
+二分类或多分类结局的 Fisher 信息矩阵为对角矩阵
+\begin{equation}
+I(\alpha_{GM})=\begin{bmatrix}
+\sum_{i\in C_1}N_{ig}^{(0)}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\sum_{i\in C_M}N_{ig}^{(0)}
+\end{bmatrix}.
+\tag{4.89}
+\end{equation}
+因此，检验基因 $g$ 与二分类或多分类结局关联的得分统计量为（习题4.11）
+\begin{equation}
+\begin{aligned}
+S_{cg}&=U^T(\alpha_{GM})I^{-1}(\alpha_{GM})U(\alpha_{GM})\\
+&=\sum_{m=1}^{M}\frac{\left[\sum_{i\in C_m}(N_{ig}-N_{ig}^{(0)})\right]^2}{\sum_{i\in C_m}N_{ig}^{(0)}}.
+\end{aligned}
+\tag{4.90}
+\end{equation}
+综上，可用下列得分统计量检验差异表达。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论4.6：读段服从泊松分布时的差异表达得分检验}\par
+基因表达与数量性状关联的得分检验为
+\begin{equation}
+S_{qg}=\frac{U^2(\alpha_g)}{I(\alpha_g)}
+=\frac{\left[\sum_{i=1}^{n}(N_{ig}y_i-N_{ig}^{(0)}y_i)\right]^2}{\sum_{i=1}^{n}y_i^2N_{ig}^{(0)}}.
+\tag{4.91}
+\end{equation}
+在基因 $g$ 与数量性状无关联的原假设下，$S_{qg}$ 渐近服从中心 $\chi^2_{(1)}$ 分布。
+
+基因 $g$ 与二分类或多分类结局关联的得分统计量为
+\begin{equation}
+S_{cg}=\sum_{m=1}^{M}\frac{\left[\sum_{i\in C_m}(N_{ig}-N_{ig}^{(0)})\right]^2}{\sum_{i\in C_m}N_{ig}^{(0)}}.
+\tag{4.92}
+\end{equation}
+在不同条件之间无差异表达的原假设下，$S_{cg}$ 渐近服从中心 $\chi^2_{(M-1)}$ 分布，其中 $M$ 为类别数。
+\FloatBarrier

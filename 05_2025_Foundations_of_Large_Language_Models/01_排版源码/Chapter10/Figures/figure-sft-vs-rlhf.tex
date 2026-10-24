@@ -1,0 +1,96 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.9cm}
+
+\tikzstyle{snode} = [minimum width=1.7cm,minimum height=0.8cm,inner sep=2pt,draw,thick,fill=white]
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=1.5cm,inner sep=2pt,draw,thick,fill=white]
+\tikzstyle{cnode} = [minimum width=0.2cm,minimum height=0.2cm,inner sep=2pt,rounded corners=0.2mm]
+\tikzstyle{dnode} = [minimum width=2.5cm,minimum height=0.7cm,inner sep=2pt,draw]
+\tikzstyle{xnode} = [minimum width=1.4cm,minimum height=0.3cm,rounded corners=0.1mm,inner sep=1pt,draw,thin]
+
+%%% sft
+\begin{scope}
+
+\node [lnode,anchor=west] (llm) at (0,0) {\Large{LLM}};
+\node [xnode,anchor=north west] (inputx) at ([yshift=-0.2cm]llm.south west) {\tiny{$\mathbf{x}$}};
+\node [xnode,anchor=south east] (outputy) at ([yshift=0.2cm]llm.north east) {\tiny{$\mathbf{y}$}};
+
+\draw [->] ([yshift=0.01cm]inputx.north) -- ([yshift=0.17cm]inputx.north);
+\draw [<-] ([yshift=-0.01cm]outputy.south) -- ([yshift=-0.17cm]outputy.south);
+
+
+\node [anchor=west] (predicted) at ([xshift=0.8cm,yshift=-0.3cm]llm.east) {\footnotesize{预测词元分布}};
+\node [anchor=north west] (predictedlabel) at ([yshift=0.2cm]predicted.south west) {\tiny{（$n$ 个词元分布）}};
+
+\node [anchor=south west] (gold) at ([yshift=0.3cm]predicted.north west) {\footnotesize{标准预测}};
+\node [anchor=north west] (goldlabel) at ([yshift=0.2cm]gold.south west) {\tiny{（$n$ 个独热分布）}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([xshift=0.1cm,yshift=1.1cm]predicted.south east) -- ([xshift=0.1cm,yshift=-0.1cm]predicted.south east);
+
+\node [anchor=west] (objective) at ([xshift=1.3cm,yshift=0.3cm]gold.east) {\small{目标（MLE）}:};
+
+\node [anchor=north,fill=gray!50] (objectivemath) at (objective.south) {\small{$\max \Pr(\mathbf{y}|\mathbf{x})$}};
+
+\node [anchor=north west] (line1) at ([yshift=-0.7cm]objective.south west) {\scriptsize{其中}};
+
+\node [anchor=north west] (line2) at ([yshift=0.15cm,xshift=0.4cm]line1.south west) {\scriptsize{$\mathbf{x}$：输入}};
+\node [anchor=north west] (line3) at ([yshift=0.25cm]line2.south west) {\scriptsize{$\mathbf{y}$：标准输出}};
+
+\draw [->,dotted,thick] ([xshift=1pt]outputy.east) .. controls +(east:0.8cm) and +(west:0.8cm) .. (predicted.west);
+
+\node [anchor=north] (caption) at ([yshift=-1cm,xshift=3.3cm]llm.south east) {\small{(a) 监督微调（最大化给定输入时预测输出的概率）}};
+
+\end{scope}
+
+%%% rlhf
+\begin{scope}[yshift=-6cm]
+
+\node [lnode,anchor=west] (llm) at (0,0) {\Large{LLM}};
+\node [xnode,anchor=north west] (inputx) at ([yshift=-0.2cm]llm.south west) {\tiny{$\mathbf{x}$}};
+\node [xnode,anchor=south east,fill=white] (outputy2) at ([yshift=0.3cm,xshift=0.1cm]llm.north east) {\tiny{$\mathbf{y}_1$}};
+\node [xnode,anchor=south east,fill=white] (outputy) at ([yshift=0.2cm]llm.north east) {\tiny{$\mathbf{y}_2$}};
+\node [anchor=south,align=left] (samplinglabel) at (outputy2.north) {\scriptsize{通过采样}\\[-0.15cm] \scriptsize{生成多个输出}};
+
+\draw [->] ([yshift=0.01cm]inputx.north) -- ([yshift=0.17cm]inputx.north);
+\draw [<-] ([yshift=-0.01cm]outputy.south) -- ([yshift=-0.17cm]outputy.south);
+
+
+\node [anchor=west] (predicted) at ([xshift=0.8cm,yshift=-0.3cm]llm.east) {\footnotesize{预测 $\mathbf{y}_2$}};
+
+\node [anchor=south west] (gold) at ([yshift=0.1cm]predicted.north west) {\footnotesize{预测 $\mathbf{y}_1$}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([xshift=0.4cm,yshift=1.0cm]predicted.south east) -- ([xshift=0.4cm,yshift=0.1cm]predicted.south east);
+
+%\node [anchor=west] (comparison) at ([xshift=0.5cm]predicted.north east) {$\mathbf{y}_a  \succ \mathbf{y}_b$};
+
+\node [anchor=west] (objective) at ([xshift=1.2cm,yshift=0.4cm]gold.east) {\small{目标（最小化 RL 损失）}:};
+
+\node [anchor=north,fill=gray!50] (objectivemath) at (objective.south) {\small{$\min \mathcal{L}(\mathbf{x},\{\mathbf{y}_1,\mathbf{y}_2\},{\color{red} r})$}};
+%\node [anchor=east,fill=red!30,inner sep=2pt] (rsymbol) at ([xshift=-0.3cm]objectivemath.east) {\small{$r$}};
+%\draw [<-,dotted,red] ([yshift=1pt,xshift=-2pt]rsymbol.north) -- ([yshift=1.5cm-1pt,xshift=-2pt]rsymbol.north);
+
+\node [anchor=south,minimum height=0.7cm,draw=red,thick] (rewardmodel) at ([yshift=1.2cm,xshift=1cm]objectivemath.north) {\small{奖励模型}};
+\draw [->,dotted,red] ([xshift=-0.9cm,yshift=-1pt]rewardmodel.south east) -- ([xshift=-0.9cm,yshift=-1.4cm]rewardmodel.south east);
+
+\node [anchor=east] (data) at ([xshift=-2.0cm]rewardmodel.west) {\small{人类偏好数据}};
+
+\draw [->] ([xshift=1pt]data.east) -- ([xshift=-1pt]rewardmodel.west) node [pos=0.5,above] {\scriptsize{训练}};
+
+\node [anchor=north west] (line1) at ([yshift=-0.8cm]objective.south west) {\scriptsize{其中}};
+
+\node [anchor=north west] (line2) at ([yshift=0.10cm,xshift=0.4cm]line1.south west) {\scriptsize{$\mathcal{L}(\cdot)$：损失函数}};
+\node [anchor=north west] (line3) at ([yshift=0.15cm]line2.south west) {\scriptsize{$r(\cdot)$：奖励模型}};
+
+\draw [->,dotted,thick] ([xshift=1pt,yshift=-3pt]outputy.east) .. controls +(east:0.5cm) and +(west:1.0cm) .. (predicted.west);
+\draw [->,dotted,thick] ([xshift=1pt,yshift=-0pt]outputy2.east) .. controls +(east:0.7cm) and +(west:0.7cm) .. (gold.west);
+
+\node [anchor=north] (caption) at ([yshift=-1cm,xshift=3.3cm]llm.south east) {\small{(b) 基于人类反馈的强化学习}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

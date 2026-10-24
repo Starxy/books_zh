@@ -1,0 +1,161 @@
+% 原书第 81—88 页；章首、6.1—6.2。
+\chapter{多元因果模型}
+\label{ch:multivariate-models}
+\providecommand{\CH}{\mathrm{CH}}
+
+第 3 章讨论了两个变量的因果模型。一些基本概念在二元情形下更容易解释，但因果推断的许多结构性特征来自至少涉及三个变量的多元关系。现在，我们转向更一般的情形，考察包含 $d\ge2$ 个变量的因果模型。
+
+许多概念都可以直接推广。希望读者借助第 3 章建立的直觉，能够顺利理解结构因果模型（第 6.2 节）、干预（第 6.3 节）和反事实（第 6.4 节）的定义。不过，多元情形与二元情形也存在根本差异。第 6.5 节将说明，图结构蕴含某些条件独立陈述，而这些陈述在二元情形下是平凡的。在多元情形下，计算干预分布也需要更加仔细地分析；第 6.6 节将讨论调整公式与 do 演算［Pearl, 2009］。
+
+我们先介绍一些图论术语。这些定义大多不言自明，可参见 Spirtes et al.［2000］、Koller and Friedman［2009］以及 Lauritzen［1996］。已经熟悉图模型的读者可以跳过本节。本书最重要的术语是有向无环图（DAG）、v 结构与 d-分离。
+
+\section{图论术语}
+\label{sec:ch06-graphs}
+
+考虑有限个随机变量 $\mathbf X=(X_1,\ldots,X_d)$，其指标集为 $\mathbf V:=\{1,\ldots,d\}$，联合分布为 $P_{\mathbf X}$，密度为 $p(\mathbf x)$。图 $\mathcal G=(\mathbf V,\mathcal E)$ 由有限个\textbf{节点（node，或 vertex）}$\mathbf V$ 和\textbf{边（edge）}$\mathcal E\subseteq\mathbf V^2$ 构成，并且对任意 $v\in\mathbf V$，都有 $(v,v)\notin\mathcal E$。下面给出进一步的定义。
+
+设 $\mathcal G=(\mathbf V,\mathcal E)$ 是一个图，其中 $\mathbf V:=\{1,\ldots,d\}$，对应的随机变量为 $\mathbf X=(X_1,\ldots,X_d)$。若图 $\mathcal G_1=(\mathbf V_1,\mathcal E_1)$ 满足 $\mathbf V_1=\mathbf V$ 且 $\mathcal E_1\subseteq\mathcal E$，则称其为 $\mathcal G$ 的\textbf{子图（subgraph）}，记为 $\mathcal G_1\le\mathcal G$。如果还满足 $\mathcal E_1\ne\mathcal E$，则称 $\mathcal G_1$ 为 $\mathcal G$ 的\textbf{真子图（proper subgraph）}。
+
+如果 $(i,j)\in\mathcal E$ 且 $(j,i)\notin\mathcal E$，则称节点 $i$ 为 $j$ 的\textbf{父节点（parent）}；如果 $(j,i)\in\mathcal E$ 且 $(i,j)\notin\mathcal E$，则称 $i$ 为 $j$ 的\textbf{子节点（child）}。$j$ 的父节点集记为 $\PA_j^{\mathcal G}$，子节点集记为 $\CH_j^{\mathcal G}$。如果 $(i,j)\in\mathcal E$ 或 $(j,i)\in\mathcal E$，则称节点 $i$ 与 $j$ \textbf{相邻（adjacent）}。如果任意一对节点都相邻，则称 $\mathcal G$ 是\textbf{全连接的（fully connected）}。对于两个相邻节点 $i,j$，若 $(i,j)\in\mathcal E$ 且 $(j,i)\in\mathcal E$，则称它们之间的边为\textbf{无向边（undirected edge）}；不是无向边的相邻节点间的边，称为\textbf{有向边（directed edge）}。此时，当 $(i,j)\in\mathcal E$ 时写作 $i\to j$。若图中所有边都是有向边，则称 $\mathcal G$ 为\textbf{有向图（directed graph）}。\footnote{注意，这一定义排除了长度为 $2$ 的环，但不排除更长的环。}
+如果三个节点中，一个节点是另外两个节点的共同子节点，而后两个节点彼此不相邻，则称这三个节点构成一个\textbf{非道德结构（immorality）}或\textbf{v 结构（v-structure）}。$\mathcal G$ 的\textbf{骨架（skeleton）}忽略边的方向，即图 $(\mathbf V,\widetilde{\mathcal E})$，其中，只要 $(i,j)\in\mathcal E$ 或 $(j,i)\in\mathcal E$，就有 $(i,j)\in\widetilde{\mathcal E}$。
+
+图 $\mathcal G$ 中的一条\textbf{路径（path）}，是由至少两个互不相同的节点构成的序列 $i_1,\ldots,i_m$，使得对所有 $k=1,\ldots,m-1$，$i_k$ 与 $i_{k+1}$ 之间都有一条边。如果 $i_{k-1}\to i_k$ 且 $i_{k+1}\to i_k$，就称 $i_k$ 是\emph{相对于这条路径}的\textbf{对撞节点（collider）}。如果对所有 $k$ 都有 $i_k\to i_{k+1}$，则称这是一条从 $i_1$ 到 $i_m$ 的\textbf{有向路径（directed path）}，并称 $i_1$ 是 $i_m$ 的\textbf{祖先节点（ancestor）}、$i_m$ 是 $i_1$ 的\textbf{后代节点（descendant）}。本书将 $i$ 的所有祖先节点记为 $\AN_i^{\mathcal G}$，且 $i$ 不是自身的祖先节点。此外，$i$ 既不是自身的后代节点，也不是自身的非后代节点。$i$ 的所有后代节点记为 $\DE_i^{\mathcal G}$；排除 $i$ 自身后，其所有非后代节点记为 $\ND_i^{\mathcal G}$。本书约定，$\ND_i^{\mathcal G}$ 包含图 $\mathcal G$ 中 $i$ 的父节点。没有父节点的节点称为\textbf{源节点（source node）}，没有子节点的节点称为\textbf{汇节点（sink node）}。一个排列，即双射 $\pi:\{1,\ldots,d\}\to\{1,\ldots,d\}$，若满足：只要 $j\in\DE_i^{\mathcal G}$ 就有 $\pi(i)<\pi(j)$，则称其为\textbf{拓扑排序（topological ordering）}或\textbf{因果排序（causal ordering）}（另见附录 B）。
+
+若图 $\mathcal G$ 不包含有向环，也就是说，不存在一对节点 $(j,k)$，使得从 $j$ 到 $k$ 和从 $k$ 到 $j$ 都有有向路径，则称其为\textbf{部分有向无环图（partially directed acyclic graph，PDAG）}。如果 $\mathcal G$ 是 PDAG，且所有边均有向，则称其为\textbf{有向无环图（directed acyclic graph，DAG）}。
+
+由于后文将多次使用 d-分离［Pearl, 1985, 1988］这一图论概念，我们将其正式表述如下。
+
+\begin{definition}[Pearl 的 d-分离]
+在 DAG $\mathcal G$ 中，节点 $i_1$ 与 $i_m$ 之间的一条路径，被集合 $S$ \textbf{阻断（blocked）}（其中 $i_1,i_m\notin S$），是指存在节点 $i_k$，满足以下两种情形之一：
+\begin{enumerate}[label=(\roman*)]
+ \item $i_k\in S$，且
+ \[
+ \begin{aligned}
+ &i_{k-1}\to i_k\to i_{k+1},\\
+ \text{或 }&i_{k-1}\leftarrow i_k\leftarrow i_{k+1},\\
+ \text{或 }&i_{k-1}\leftarrow i_k\to i_{k+1}.
+ \end{aligned}
+ \]
+ \item $i_k$ 及其任何后代节点均不在 $S$ 中，且
+ \[
+ i_{k-1}\to i_k\leftarrow i_{k+1}.
+ \]
+\end{enumerate}
+进一步地，在 DAG $\mathcal G$ 中，若两个不相交节点子集 $\mathbf A$ 与 $\mathbf B$ 之间的每一条路径，都被第三个同样与二者不相交的节点子集 $\mathbf S$ 阻断，则称 $\mathbf A$ 与 $\mathbf B$ 被 $\mathbf S$ \textbf{d-分离（d-separated）}，记为
+\[
+ \mathbf A\indep_{\mathcal G}\mathbf B\mid\mathbf S.
+\]
+\end{definition}
+
+读者可以查看图 6.5，并验证：在该 DAG 中，$C\indep_{\mathcal G}G\mid X$，但 $C\nindep_{\mathcal G}G\mid(X,H)$。
+
+\section{结构因果模型}
+\label{sec:ch06-scm}
+
+结构因果模型在农业、社会科学和计量经济学等领域已经使用了很长时间［Wright, 1921；Haavelmo, 1944；Bollen, 1989］，另见第 2 章。例如，进行模型选择时，研究者会根据对系统的先验知识，拟合不同的、被认为合理的结构，再通过拟合优度检验比较这些候选结构。本章将介绍结构因果模型的语义，并学习如何利用它计算干预分布等。在本章始终假设结构因果模型已知，或至少其结构已知；识别结构的问题将在第 7 章讨论。
+
+\begin{definition}[结构因果模型]
+一个\textbf{结构因果模型（structural causal model，SCM）}$\mathfrak C:=(\mathbf S,P_{\mathbf N})$，由包含 $d$ 个（结构）赋值的集合 $\mathbf S$
+\begin{equation}
+ X_j:=f_j(\PA_j,N_j),\qquad j=1,\ldots,d,
+ \tag{6.1}
+\end{equation}
+以及噪声变量的联合分布 $P_{\mathbf N}=P_{N_1,\ldots,N_d}$ 构成。其中，$\PA_j\subseteq\{X_1,\ldots,X_d\}\setminus\{X_j\}$ 称为 $X_j$ 的父节点；我们要求噪声变量相互独立，也就是说，$P_{\mathbf N}$ 是一个乘积分布。
+
+结构因果模型的图 $\mathcal G$ 按如下方式构造：为每个 $X_j$ 建立一个节点，并从 $\PA_j$ 中的每个父节点向 $X_j$ 画一条有向边，也就是从式 (6.1) 右侧出现的每一个变量 $X_k$ 向 $X_j$ 画边（见图 6.1）。此后，我们假设该图无环。
+
+有时，除了父节点，我们也将 $\PA_j$ 的元素称为 $X_j$ 的直接原因，并称 $X_j$ 是每个直接原因的\textbf{直接结果（direct effect）}。结构因果模型也称为（非线性）结构方程模型（SEM）。
+\end{definition}
+
+\input{figures/ch06_01}
+
+虽然“直接原因”和“直接结果”等术语带有因果含义，但定义 6.2 是一个纯数学定义。第 6.8 节将讨论其作为现实系统模型的作用。
+
+结构因果模型是将因果推理与因果学习形式化的关键。首先，我们将说明，一个结构因果模型会导出一个观测分布。不过，与通常的概率模型不同，它还会导出干预分布（第 6.3 节）与反事实（第 6.4 节）；见图 6.2。
+
+\begin{proposition}[模型导出的分布]
+结构因果模型 $\mathfrak C$ 在变量 $\mathbf X=(X_1,\ldots,X_d)$ 上定义了唯一的分布，使得对于 $j=1,\ldots,d$，在分布意义下有 $X_j=f_j(\PA_j,N_j)$。我们将其称为模型\textbf{导出的分布（entailed distribution）}$P_{\mathbf X}^{\mathfrak C}$，有时简写为 $P_{\mathbf X}$。
+\end{proposition}
+
+证明见附录 C.2。该证明将从联合分布中抽取 $n$ 个数据点的过程，即“\textbf{祖先抽样（ancestral sampling）}”，形式化如下：首先生成独立同分布样本 $\mathbf N^1,\ldots,\mathbf N^n\sim P_{\mathbf N}$，再依次利用结构赋值——从源节点开始，然后处理至多只有一个父节点的节点，依此类推——生成独立同分布数据点 $\mathbf X^1,\ldots,\mathbf X^n\sim P_{\mathbf X}$。应当将结构赋值 (6.1) 理解为一组赋值或函数，而非一组数学等式；它们说明某些变量如何决定另一些变量。因此，我们倾向于避免使用文献中常见的“结构方程”这一说法。
+\begin{quote}\small
+\textbf{译注：}祖先抽样实际应按图的拓扑排序计算，确保计算每个节点时，其所有父节点均已取值。原文“按父节点数递增”的表述不能一般地保证这一点；此处保留原文，并明确其所指的有效计算顺序。
+\end{quote}
+
+\input{figures/ch06_02}
+
+\par\noindent\begin{minipage}{\linewidth}
+\begin{codesnippet}
+下面的代码从一个结构形式如图 6.1 所示的结构因果模型中，生成独立同分布样本。其中结构赋值为 $f_1(x_3,n)=2x_3+n$、$f_2(x_1,n)=(0.5x_1)^2+n$、$f_3(n)=n$ 和 $f_4(x_2,x_3,n)=x_2+2\sin(x_3+n)$；噪声变量相互独立，分别服从正态分布、卡方分布、均匀分布和正态分布。
+\begin{lstlisting}[language=R]
+# 从结构因果模型导出的分布中生成样本
+set.seed(1)
+X3 <- runif(100)-0.5
+X1 <- 2*X3 + rnorm(100)
+X2 <- (0.5*X1)^2 + rnorm(100)^2
+X4 <- X2 + 2*sin(X3 + rnorm(100))
+\end{lstlisting}
+\end{codesnippet}
+\end{minipage}\par
+
+\begin{remark}[线性有环赋值]
+本书主要关注无环结构。下面简要讨论赋值产生有环结构的线性结构因果模型。这类模型已得到充分研究［Lauritzen and Richardson, 2002；Lacerda et al., 2008；Hyttinen et al., 2012］。这里侧重直观解释，不作严格展开。线性情形的更多细节见 Hyttinen et al.［2012］；非线性情形见 Mooij et al.［2011］和 Bongers et al.［2016］。
+
+记 $\mathbf X=(X_1,\ldots,X_d)$，考虑赋值
+\[
+ \mathbf X:=B\mathbf X+\mathbf N,
+\]
+其中 $B$ 是一个允许有环结构的 $d\times d$ 矩阵，$\mathbf N=(N_1,\ldots,N_d)\sim P_{\mathbf N}$ 是某个噪声向量。从形式上说，如果 $I-B$ 可逆，那么对于 $\mathbf N$ 的每一个取值，上式都给出 $\mathbf X$ 的唯一解：
+\begin{equation}
+ \mathbf X=(I-B)^{-1}\mathbf N
+ \tag{6.2}
+\end{equation}
+（另见习题 3.8）。显然，式 (6.2) 定义了 $\mathbf X$ 的联合分布，但应当如何解释其因果含义？
+
+一种可能是将其理解为某个趋于平衡过程的结果。考虑随机变量序列 $\mathbf X^t$，其取值由以下迭代产生：
+\begin{equation}
+ \mathbf X^t:=B\mathbf X^{t-1}+\mathbf N,\qquad t=1,2,\ldots.
+ \tag{6.3}
+\end{equation}
+若 $t\to\infty$ 时 $B^t\to0$，则序列 $\mathbf X^t$ 收敛；这一条件等价于 $B$ 的特征值均位于单位圆内部。它严格强于 $I-B$ 可逆的条件（见习题 6.60）。当该条件成立时，极限的分布与式 (6.2) 导出的分布相同；见习题 6.61。
+
+式 (6.3) 在每个时间步都加上同一个噪声实现值。如果改为在每一步更新噪声，$\mathbf X^t$ 的极限分布就会改变：
+\begin{equation}
+ \mathbf X^t:=B\mathbf X^{t-1}+\mathbf N^{t-1},\qquad t=1,2,\ldots,
+ \tag{6.4}
+\end{equation}
+其中 $\mathbf N^1,\mathbf N^2,\ldots$ 是 $\mathbf N^t$ 的独立同分布副本。这可以视为一种时间序列情形，将在第 10.2 节讨论。
+\end{remark}
+
+命题 6.3 说明，每个结构因果模型都导出一个分布。反方向又如何？任意分布都能由结构因果模型导出吗？后文的命题 7.1 将说明，任意分布都可以由图结构为完全 DAG 的结构因果模型导出（若 DAG 的任意一对节点都相连，就称其为完全 DAG）。这意味着，结构因果模型的（观测）模型类，即结构因果模型能够诱导出的所有分布的集合，就是全部分布的集合。
+
+结构因果模型的定义允许某个变量出现在结构赋值的右侧，却不影响左侧的变量。虽然这种父子关系在某种意义上是“不起作用”的，它仍会在对应图中表现为一条边。下面通过一条注，正式排除这种情况。
+
+\begin{remark}[结构因果模型的结构极小性]
+按照定义 6.2 的一种解读，以下两个结构因果模型应当加以区分：
+\[
+ \begin{aligned}
+ \mathbf S_1:&\quad X:=N_X,\quad Y:=0\cdot X+N_Y,\\
+ \mathbf S_2:&\quad X:=N_X,\quad Y:=N_Y,
+ \end{aligned}
+\]
+尽管显然有 $0\cdot X=0$。这与我们的直觉相矛盾。因此，我们增加一项要求：函数 $f_j$ 必须依赖于它的所有输入。用数学语言来说，只要存在 $k\in\{1,\ldots,d\}$ 和函数 $g$，使得
+\begin{equation}
+ f_k(\pa_k,n_k)=g(\pa_k^*,n_k),\qquad
+ \forall\pa_k,\ \forall n_k\text{ 满足 }p(n_k)>0,
+ \tag{6.5}
+\end{equation}
+其中 $\PA_k^*\subsetneq\PA_k$，我们就采用后一种表示。因此，在上例中，我们选择 $\mathbf S_2$ 而不是 $\mathbf S_1$。后面将说明，这两个结构因果模型确实可以视为同一个模型，因为它们导出的观测分布、干预分布\footnote{我们不允许保持结构赋值中的函数不变、仅改变噪声分布的干预；见式 (6.5)。}以及反事实均相同（见第 6.8 节）。
+
+进一步地，存在唯一一种表示，使每个函数的输入数量均为最少。这一说法虽然看似显然，但我们仍将在附录 C.3 给出严格证明。我们称这样的（最小）结构因果模型满足\textbf{结构极小性（structural minimality）}。\footnote{这一术语不同于因果极小性（定义 6.33）。因果极小性蕴含结构极小性（命题 6.49），反之不成立；见习题 6.57。}
+从现在起，我们假设结构极小性成立。与忠实性（第 6.5 节）等不同，这不是关于现实世界的假设，而是一项避免冗余描述的约定。
+\end{remark}
+
+\begin{remark}[与常微分方程的关系]
+注 6.5 已经展示了结构因果模型与离散时间模型之间的联系，现在再谈谈连续时间模型。在物理系统中，我们通常预期因果关系由一组耦合微分方程支配。取较小的 $\Delta t>0$，微分方程组 $\dot{\mathbf X}=f(\mathbf X)$ 可以近似表示为赋值 $\mathbf X_{t+\Delta t}:=\mathbf X_t+\Delta t\cdot f(\mathbf X_t)$，因此它包含了精细时间尺度上的因果结构信息。干预可以通过一个将变量拉向目标值的强迫项在物理上实现。在某些稳定性假设下，可以通过分析平衡状态的行为，以不依赖时间的方式研究干预效应。这会导出一个结构因果模型，描述此类动力系统的平衡状态如何响应对可观测量的物理干预［Mooij et al., 2013］。
+
+在该结构因果模型中，变量不再描述特定时点的测量值。在这一现象学层面，原有的时间结构消失了。原则上，这一框架也适用于有环结构，但尚未处理随机情形；其理论仅限于确定性关系。这是一个重要局限，因为不确定性可能有多种来源，包括对微分方程参数或初始条件的了解不完整，以及始终需要考虑的混杂。这里不再详细讨论如何从微分方程导出现象学的结构方程，读者可参阅相关文献［例如 Dash, 2005；Hansen and Sokol, 2014］。
+
+作出这条说明，主要是为了避免一种常见误解。有时人们认为，只要精确指定变量对应的时间，因果推断的部分任务就不再需要了。这种观点尤其受到物理学实践的支持，因为物理测量通常可以唯一对应到实施测量的某个时空点。然而，上述论证说明，即便在物理学中，变量也不一定对应时间界定明确的观测，例如它们可能来自某种平衡情景。
+\end{remark}
+\FloatBarrier

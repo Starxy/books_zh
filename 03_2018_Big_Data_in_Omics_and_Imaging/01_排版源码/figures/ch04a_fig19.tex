@@ -1,0 +1,17 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+\node[rounded corners=4pt,fill=green!55!yellow!70,text=magenta!80!black,minimum width=4.8cm,minimum height=1.1cm,font=\bfseries] (ch04a19init) at (4.7,8.7) {初始网络};
+\node[rounded corners=4pt,fill=green!55!yellow!70,text=magenta!80!black,minimum width=4.8cm,minimum height=1.1cm,font=\bfseries] (ch04a19select) at (4.7,7.3) {为子网络选择节点};
+\node[rounded corners=4pt,fill=green!55!yellow!70,text=magenta!80!black,minimum width=4.8cm,minimum height=1.1cm,font=\bfseries] (ch04a19infer) at (4.7,5.9) {推断因果子网络};
+\node[rounded corners=4pt,fill=green!55!yellow!70,text=magenta!80!black,minimum width=4.8cm,minimum height=1.1cm,font=\bfseries] (ch04a19merge) at (4.7,4.5) {整合因果子网络};
+\node[rounded corners=4pt,fill=green!55!yellow!70,text=magenta!80!black,minimum width=4.8cm,minimum height=1.1cm,font=\bfseries] (ch04a19check) at (4.7,3.1) {检查结构是否收敛};
+\node[ellipse,fill=green!55!yellow!70,text=magenta!80!black,minimum width=3.6cm,minimum height=.8cm,font=\bfseries] (ch04a19stop) at (4.7,1.7) {停止};
+\draw[red,->] (ch04a19check.south)--node[right,text=black]{是}(ch04a19stop.north);
+\draw[red,->] (ch04a19check.west)--node[above,text=black]{否}(1,3.1)--(1,7.3)--(ch04a19select.west);
+\draw[red] (7.35,7.75)--(7.65,7.75)--(7.65,5.2)--(7.95,5.2)--(7.65,5.2)--(7.65,2.65)--(7.35,2.65);
+\node[anchor=west,align=left,font=\bfseries] at (8.1,5.2) {网络构建\\的迭代过程};
+\end{tikzpicture}
+\origfig{19}{构建大规模调控网络的一般过程。}
+\label{fig:ch04a-19}
+\end{figure}

@@ -1,0 +1,714 @@
+{
+  "chapter": "ch06",
+  "title": "多变量因果模型",
+  "status": "complete",
+  "source_pages": 54,
+  "source_nonblank_pages": 54,
+  "source_book_pages": "81–134",
+  "translated_pages": 38,
+  "translated_hanzi": 22867,
+  "project_root": "02_2017_Elements_of_Causal_Inference/01_排版源码",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06d.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06e.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06f.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06g.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06h.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06i.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06j.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06k.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06l.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch06m.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_02.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_03.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_04.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_05.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_counterfactual_notation.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_faithfulness.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_propensity.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_table01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch06_table02.tex"
+  ],
+  "test_pdf": "work/elements_book/build/ch06/driver.pdf",
+  "structure": {
+    "chapters": 1,
+    "sections": 12,
+    "subsections": 5,
+    "section_titles": [
+      "图论术语",
+      "结构因果模型",
+      "干预",
+      "反事实",
+      "马尔可夫性、忠实性与因果极小性",
+      "通过协变量调整计算干预分布",
+      "do 演算",
+      "因果模型的等价性与可否证性",
+      "潜在结局",
+      "联系单个对象的广义结构因果模型",
+      "条件分布的算法独立性",
+      "习题"
+    ],
+    "subsection_titles": [
+      "马尔可夫性",
+      "因果图模型",
+      "忠实性与因果极小性",
+      "定义与例子",
+      "潜在结局与结构因果模型的关系"
+    ],
+    "outline": [
+      [
+        1,
+        "第六章  多变量因果模型",
+        1
+      ],
+      [
+        2,
+        "6.1 图论术语",
+        1
+      ],
+      [
+        2,
+        "6.2 结构因果模型",
+        2
+      ],
+      [
+        2,
+        "6.3 干预",
+        6
+      ],
+      [
+        2,
+        "6.4 反事实",
+        11
+      ],
+      [
+        2,
+        "6.5 马尔可夫性、忠实性与因果极小性",
+        14
+      ],
+      [
+        3,
+        "6.5.1 马尔可夫性",
+        14
+      ],
+      [
+        3,
+        "6.5.2 因果图模型",
+        18
+      ],
+      [
+        3,
+        "6.5.3 忠实性与因果极小性",
+        18
+      ],
+      [
+        2,
+        "6.6 通过协变量调整计算干预分布",
+        20
+      ],
+      [
+        2,
+        "6.7 do 演算",
+        27
+      ],
+      [
+        2,
+        "6.8 因果模型的等价性与可否证性",
+        28
+      ],
+      [
+        2,
+        "6.9 潜在结局",
+        30
+      ],
+      [
+        3,
+        "6.9.1 定义与例子",
+        30
+      ],
+      [
+        3,
+        "6.9.2 潜在结局与结构因果模型的关系",
+        31
+      ],
+      [
+        2,
+        "6.10 联系单个对象的广义结构因果模型",
+        33
+      ],
+      [
+        2,
+        "6.11 条件分布的算法独立性",
+        34
+      ],
+      [
+        2,
+        "6.12 习题",
+        36
+      ]
+    ]
+  },
+  "counts": {
+    "numbered_equations": 34,
+    "equation_tags": [
+      "6.1",
+      "6.2",
+      "6.3",
+      "6.4",
+      "6.5",
+      "6.6",
+      "6.7",
+      "6.8",
+      "6.9",
+      "6.10",
+      "6.11",
+      "6.12",
+      "6.13",
+      "6.14",
+      "6.15",
+      "6.16",
+      "6.17",
+      "6.18",
+      "6.19",
+      "6.20",
+      "6.21",
+      "6.22",
+      "6.23",
+      "6.24",
+      "6.25",
+      "6.26",
+      "6.27",
+      "6.28",
+      "6.29",
+      "6.30",
+      "6.31",
+      "6.32",
+      "6.33",
+      "6.34"
+    ],
+    "figures": 5,
+    "figure_numbers": [
+      "6.1",
+      "6.2",
+      "6.3",
+      "6.4",
+      "6.5"
+    ],
+    "tables": 2,
+    "table_numbers": [
+      "6.1",
+      "6.2"
+    ],
+    "table_6_1_data_rows": 2,
+    "table_6_2_printed_unit_rows": 10,
+    "table_6_2_ellipsis_rows": 3,
+    "shared_result_environments": 53,
+    "shared_result_sequence": [
+      {
+        "number": "6.1",
+        "environment": "definition"
+      },
+      {
+        "number": "6.2",
+        "environment": "definition"
+      },
+      {
+        "number": "6.3",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.4",
+        "environment": "codesnippet"
+      },
+      {
+        "number": "6.5",
+        "environment": "remark"
+      },
+      {
+        "number": "6.6",
+        "environment": "remark"
+      },
+      {
+        "number": "6.7",
+        "environment": "remark"
+      },
+      {
+        "number": "6.8",
+        "environment": "definition"
+      },
+      {
+        "number": "6.9",
+        "environment": "codesnippet"
+      },
+      {
+        "number": "6.10",
+        "environment": "example"
+      },
+      {
+        "number": "6.11",
+        "environment": "example"
+      },
+      {
+        "number": "6.12",
+        "environment": "definition"
+      },
+      {
+        "number": "6.13",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.14",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.15",
+        "environment": "example"
+      },
+      {
+        "number": "6.16",
+        "environment": "example"
+      },
+      {
+        "number": "6.17",
+        "environment": "definition"
+      },
+      {
+        "number": "6.18",
+        "environment": "example"
+      },
+      {
+        "number": "6.19",
+        "environment": "example"
+      },
+      {
+        "number": "6.20",
+        "environment": "remark"
+      },
+      {
+        "number": "6.21",
+        "environment": "definition"
+      },
+      {
+        "number": "6.22",
+        "environment": "theorem"
+      },
+      {
+        "number": "6.23",
+        "environment": "example"
+      },
+      {
+        "number": "6.24",
+        "environment": "definition"
+      },
+      {
+        "number": "6.25",
+        "environment": "lemma"
+      },
+      {
+        "number": "6.26",
+        "environment": "definition"
+      },
+      {
+        "number": "6.27",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.28",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.29",
+        "environment": "remark"
+      },
+      {
+        "number": "6.30",
+        "environment": "example"
+      },
+      {
+        "number": "6.31",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.32",
+        "environment": "definition"
+      },
+      {
+        "number": "6.33",
+        "environment": "definition"
+      },
+      {
+        "number": "6.34",
+        "environment": "example"
+      },
+      {
+        "number": "6.35",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.36",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.37",
+        "environment": "example"
+      },
+      {
+        "number": "6.38",
+        "environment": "definition"
+      },
+      {
+        "number": "6.39",
+        "environment": "definition"
+      },
+      {
+        "number": "6.40",
+        "environment": "remark"
+      },
+      {
+        "number": "6.41",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.42",
+        "environment": "example"
+      },
+      {
+        "number": "6.43",
+        "environment": "codesnippet"
+      },
+      {
+        "number": "6.44",
+        "environment": "remark"
+      },
+      {
+        "number": "6.45",
+        "environment": "theorem"
+      },
+      {
+        "number": "6.46",
+        "environment": "example"
+      },
+      {
+        "number": "6.47",
+        "environment": "definition"
+      },
+      {
+        "number": "6.48",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.49",
+        "environment": "proposition"
+      },
+      {
+        "number": "6.50",
+        "environment": "principle"
+      },
+      {
+        "number": "6.51",
+        "environment": "principle"
+      },
+      {
+        "number": "6.52",
+        "environment": "theorem"
+      },
+      {
+        "number": "6.53",
+        "environment": "principle"
+      }
+    ],
+    "proof_environments": 3,
+    "source_footnotes": 18,
+    "translator_notes": 8,
+    "problems": 12,
+    "problem_numbers": [
+      "6.54",
+      "6.55",
+      "6.56",
+      "6.57",
+      "6.58",
+      "6.59",
+      "6.60",
+      "6.61",
+      "6.62",
+      "6.63",
+      "6.64",
+      "6.65"
+    ],
+    "code_snippets": 3,
+    "code_line_counts": [
+      6,
+      8,
+      23
+    ],
+    "code_lines_total": 37,
+    "inline_unnumbered_tikz_pictures": 5,
+    "external_unnumbered_tikz_pictures": 3
+  },
+  "figures": [
+    {
+      "number": "6.1",
+      "method": "中文TikZ重排结构赋值框与四节点DAG，X3->X1->X2->X4以及X3->X4逐边核对。"
+    },
+    {
+      "number": "6.2",
+      "method": "中文TikZ重排因果模型与图、观测分布、干预分布、反事实四种输出；保留4条流程箭头及分布上标。"
+    },
+    {
+      "number": "6.3",
+      "method": "中文TikZ重排随机化示意；保留治疗T的3条被切断入箭头及经B、P通往R的两条路径。"
+    },
+    {
+      "number": "6.4",
+      "method": "中文TikZ重排两个5节点DAG与其CPDAG；各面板独立节点前缀，保留V-U方向变化及CPDAG无向边。"
+    },
+    {
+      "number": "6.5",
+      "method": "中文TikZ重排9节点DAG，保留C->X、A->X、A->K、K->Y、X->D、D->Y、X->F、D->G、Y->H共9条箭头。"
+    }
+  ],
+  "new_terms_en_zh": {
+    "multivariate causal model": "多变量因果模型",
+    "graph terminology": "图论术语",
+    "subgraph": "子图",
+    "proper subgraph": "真子图",
+    "fully connected": "全连接的",
+    "immorality": "非道德结构",
+    "v-structure": "v 结构",
+    "collider": "对撞节点",
+    "ancestor": "祖先节点",
+    "descendant": "后代节点",
+    "source node": "源节点",
+    "sink node": "汇节点",
+    "topological ordering": "拓扑排序",
+    "partially directed acyclic graph": "部分有向无环图",
+    "d-separation": "d-分离",
+    "entailed distribution": "模型导出的分布",
+    "ancestral sampling": "祖先抽样",
+    "structural minimality": "结构极小性",
+    "intervention distribution": "干预分布",
+    "atomic intervention": "原子干预",
+    "imperfect intervention": "不完美干预",
+    "stochastic intervention": "随机干预",
+    "total causal effect": "总因果效应",
+    "placebo effect": "安慰剂效应",
+    "intervention variable": "干预变量",
+    "global Markov property": "全局马尔可夫性",
+    "local Markov property": "局部马尔可夫性",
+    "Markov factorization property": "马尔可夫分解性质",
+    "causal Markov kernel": "因果马尔可夫核",
+    "Markov equivalence class": "马尔可夫等价类",
+    "completed PDAG": "完整部分有向无环图",
+    "Markov blanket": "马尔可夫毯",
+    "selection bias": "选择偏倚",
+    "Berkson's paradox": "Berkson 悖论",
+    "causal Markov condition": "因果马尔可夫条件",
+    "causal graphical model": "因果图模型",
+    "triangle-faithfulness": "三角忠实性",
+    "autonomy": "自主性",
+    "truncated factorization": "截断分解",
+    "G-computation formula": "G 计算公式",
+    "manipulation theorem": "操纵定理",
+    "valid adjustment set": "有效调整集",
+    "parent adjustment": "父节点调整",
+    "backdoor criterion": "后门准则",
+    "propensity score matching": "倾向评分匹配",
+    "propensity score": "倾向评分",
+    "do-calculus": "do 演算",
+    "hedge": "篱结构",
+    "frontdoor adjustment": "前门调整",
+    "transportability": "可迁移性",
+    "probabilistic model": "概率模型",
+    "interventional model": "干预模型",
+    "counterfactual model": "反事实模型",
+    "probabilistically equivalent": "概率等价",
+    "interventionally equivalent": "干预等价",
+    "counterfactually equivalent": "反事实等价",
+    "falsifiability": "可否证性",
+    "Rubin causal model": "Rubin 因果模型",
+    "fundamental problem of causal inference": "因果推断的基本问题",
+    "stable unit treatment value assumption": "稳定单位治疗值假设",
+    "unit-level causal effect": "单位层面的因果效应",
+    "single world intervention graph": "单世界干预图",
+    "generalized conditional mutual information": "广义条件互信息",
+    "submodularity": "次模性",
+    "algorithmic Markov condition": "算法马尔可夫条件",
+    "multi-information": "多元信息",
+    "algorithmic independence of conditionals": "条件分布的算法独立性"
+  },
+  "source_anomalies": [
+    {
+      "source_pdf_pages": [
+        4
+      ],
+      "source_book_pages": [
+        84
+      ],
+      "location": "命题6.3之后的祖先抽样说明",
+      "original": "原文要求从源节点开始，按父节点个数递增计算。",
+      "suggested_reading": "计算顺序应为拓扑排序；仅按父节点数量排序不能保证所有父节点均先取得值。",
+      "treatment": "保留原文并附单独译注说明正确的计算顺序。"
+    },
+    {
+      "source_pdf_pages": [
+        10
+      ],
+      "source_book_pages": [
+        90
+      ],
+      "location": "例6.10干预后的Y分布",
+      "original": "原书对任意独立新噪声写出高斯分布。",
+      "suggested_reading": "只有新噪声也是高斯变量时，和变量Y才必然为高斯；一般应为N_Y加新噪声的分布。",
+      "treatment": "保留原式，独立译注指出隐含高斯假设。"
+    },
+    {
+      "source_pdf_pages": [
+        23
+      ],
+      "source_book_pages": [
+        103
+      ],
+      "location": "命题6.27的马尔可夫毯公式",
+      "original": "父节点、子节点与子节点的父节点并集未显式排除Y本身。",
+      "suggested_reading": "子节点的父节点应理解为其他父节点，或在右侧整体取去Y。",
+      "treatment": "保留原公式，独立译注阐明。"
+    },
+    {
+      "source_pdf_pages": [
+        35
+      ],
+      "source_book_pages": [
+        115
+      ],
+      "location": "命题6.41(iii)括号中的后代例外",
+      "original": "原文将X的后代作为不取有向路径节点后代的一项例外，容易被过宽理解。",
+      "suggested_reading": "仅某些旁支后代可以纳入；如图6.5中的F，但不能纳入D的后代G或Y的后代H。",
+      "treatment": "正文保留原限定，并以独立译注给出精确解读。"
+    },
+    {
+      "source_pdf_pages": [
+        36
+      ],
+      "source_book_pages": [
+        116
+      ],
+      "location": "式(6.19)的线性条件均值",
+      "original": "原式无截距，正文此处尚未明确假设零均值。",
+      "suggested_reading": "一般高斯变量需要常数截距，或先作中心化；导数公式(6.20)不受影响。",
+      "treatment": "保留原式，独立译注说明。"
+    },
+    {
+      "source_pdf_pages": [
+        44
+      ],
+      "source_book_pages": [
+        124
+      ],
+      "location": "式(6.26)潜在结局估计量",
+      "original": "已定义U0未治疗、U1治疗，却把治疗潜在结局求和于U0、未治疗潜在结局求和于U1；随后称只含观测量。",
+      "suggested_reading": "原印形式在随机分配下仍可无偏，但含未观测潜在结局，不可直接计算。可观测的差均值应将两组下标对换。",
+      "treatment": "编号公式完整保留；独立译注明确区分无偏性与可计算性，并列出正确的可观测差均值公式。"
+    },
+    {
+      "source_pdf_pages": [
+        45
+      ],
+      "source_book_pages": [
+        125
+      ],
+      "location": "6.9.2公理论证四步骤",
+      "original": "第1步左侧干预设为t波浪号而右侧为t；第3步称任意反事实陈述可由一条公理推出；第4步把(C0)—(C5)、(MP)称为三条公理。",
+      "suggested_reading": "第1步右侧按t波浪号理解；完备性只指在模型类中有效的陈述可由整个公理体系推出；三条公理是对前述体系的宽泛称呼。",
+      "treatment": "原式及原计数均保留，独立译注集中说明。"
+    },
+    {
+      "source_pdf_pages": [
+        52
+      ],
+      "source_book_pages": [
+        132
+      ],
+      "location": "6.11末段粗略算法互信息估计",
+      "original": "原书log[a/(a+c/b)]未取绝对值，某些参数符号使实对数无定义。",
+      "suggested_reading": "按由差异大小节省描述长度的解释，应取log|a/(a+c/b)|。",
+      "treatment": "主文保留原式，独立译注给出建议读法。"
+    }
+  ],
+  "intentional_layout_differences": [
+    "采用A4中文排版，54个原书内容页完整译为38页；未复制原书分页。",
+    "全部5幅编号图及8幅未编号的图论/记号示意用TikZ重排；节点和边、符号、面板与流程箭头按原图核对。",
+    "表6.1保留所有康复率、人数和粗体比较；表6.2只保留原书展示的10个单位与3行省略号，未虚构其余190行，灰底观测格与原书一致。",
+    "18条原书脚注保留1—18编号；8条译注以独立正文块明确标注“译注”，不占用原脚注编号。",
+    "3段代码保留6、8、23行结构、代码逻辑及所有输出数值；自然语言注释译成中文。",
+    "命题6.49前增加排版留白约束，避免标题和首行孤留在页末。"
+  ],
+  "unresolved_items": [],
+  "validation": {
+    "final_xelatex_passes": 2,
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "all_translated_pages_rendered_and_reviewed": true,
+    "translated_pages_reviewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38
+    ],
+    "source_pages_rendered": 54,
+    "numbered_and_unnumbered_displays_checked_against_rendered_source": true,
+    "diagram_nodes_and_edges_checked_against_source": true,
+    "equation_tags_complete": true,
+    "result_sequence_complete": true,
+    "source_footnotes_complete": true,
+    "problems_complete": true,
+    "forbidden_self_test_residue": [],
+    "control_characters": [],
+    "do_occurrences_in_extracted_pdf": 66,
+    "source_sha256": "40d72989675d60ddd39d99c1c1ad5b91712dc036b7cb6b2922010015e8cdfcf0",
+    "pdf_sha256": "c45da2f775c475c4dd88e1b35589c411b2ed0aaee6d9a14e08e6082b9f2dca1a"
+  },
+  "local_macros": [
+    "CH (providecommand: mathrm{CH})"
+  ],
+  "remarks": "仅编辑第6章独占章节与图表文件、自己的工作目录和报告。未修改共享文件、其他章或附录。第6章标题使用“多变量”；集成者可与第7章标题的“多元”按整书惯例统一。"
+}

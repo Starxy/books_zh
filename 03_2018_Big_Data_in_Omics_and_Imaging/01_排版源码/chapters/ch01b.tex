@@ -1,0 +1,868 @@
+
+% 原书第 16—33 页；第 1.2—1.3 节。仅本分段，不含 chapter 命令。
+% 数学符号、重复等号和疑似原书错误均按印刷式保留，详见独立校对记录。
+\section{网络的有向图与结构方程模型}
+\label{sec:ch01b-directed-sem}
+
+\subsection{有向无环图}
+\label{sec:ch01b-dags}
+
+数量性状的遗传分析大多集中于单性状关联分析，即分别对每个表型进行独立分析（Stephens 2013）。然而，多个表型之间往往存在相关性。例如，脂蛋白代谢涉及胆固醇、甘油三酯、极低密度脂蛋白（very low-density lipoprotein，VLDL）、低密度脂蛋白和高密度脂蛋白，这些性状相互依赖。对相关表型进行整合分析，通常能够提高发现遗传关联的统计功效（Aschard et al. 2014）。多表型关联分析有望在不久的将来得到普遍应用（Zhou and Stephens 2014）。检验遗传变异与多个相关表型之间的关联，通常有三类主要方法：多元回归方法、整合单变量分析的 $p$ 值的方法，以及降维方法。这些方法都只能估计遗传变异对表型的效应。然而，遗传效应可以分为三类：直接效应（direct effect）、间接效应（indirect effect）和总效应（total effect）。上述方法无法揭示多表型关联分析中遗传结构背后的因果机制。
+
+有向图模型和结构方程可以用来建立表型、风险因素与基因型之间复杂结构的模型，这类结构称为基因型—表型网络（Bollen 1981；Rosa et al. 2011；Mi et al. 2010）。
+
+图模型由节点和边构成。节点表示变量，边表示变量之间的相依结构。如果图中所有节点间的连接都有方向，并通过箭头表示这一方向，就称为有向图模型。没有环的有向图称为有向无环图（directed acyclic graph，DAG）。换言之，我们不可能从某个节点 $X$ 出发，沿着箭头的方向经过若干条边，最后又回到节点 $X$。图 1.3 给出了有向有环图和有向无环图的例子。
+
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch01b_fig03.tex}
+ \origfig{3}{（a）有向有环图。（b、c）有向无环图。}
+ \label{fig:ch01b-dag-examples}
+\end{figure}
+
+包含若干节点的 DAG 编码了变量 $Y_1,\ldots,Y_n$ 的条件相依结构。直接指向某个节点的节点，称为该节点的父节点（parent）。例如，节点 $Y_7$ 的父节点是 $Y_5$ 和 $Y_6$。父节点这一概念使我们能够方便地从 DAG 中读出条件独立关系。我们将“相关”与图中的“连通”相联系，将独立与“分离”相联系。给定其父节点，任意节点 $Y_i$ 都与其非后代节点条件独立。这一假设通常称为因果马尔可夫假设（causal Markov assumption）。例如，给定 $Y_5$ 和 $Y_6$，变量 $Y_7$ 与变量 $Y_1,Y_2,Y_3,Y_4$ 独立。利用这些条件独立关系，可以方便地分解联合分布。借助 DAG，联合概率分布可写为
+\begin{equation}
+ P(Y_1,\ldots,Y_n)
+ =\prod_{i=1}^{n}P(Y_i\mid\mathrm{parent}_i),
+ \tag{1.48}
+\end{equation}
+其中，$\mathrm{parent}_i$ 表示节点 $Y_i$ 的父节点。如果 $\mathrm{parent}_i$ 为空，则 $P(Y_i\mid\mathrm{parent}_i=\phi)=P(Y_i)$。
+
+例如，图 1.3c 的联合分布可以写为
+\[
+ \begin{aligned}
+ P(Y_1,\ldots,Y_7)
+  ={}&P(Y_1)P(Y_2)P(Y_6)P(Y_3\mid Y_1,Y_2)\\
+    &{}\times P(Y_4\mid Y_3,Y_5)P(Y_5\mid Y_6)P(Y_7\mid Y_5,Y_6).
+ \end{aligned}
+\]
+
+\subsection{线性结构方程模型}
+\label{sec:ch01b-linear-sem}
+
+传统回归描述变量之间的单向关系：方程左侧的变量是因变量，右侧的变量是解释变量或自变量。解释变量用来预测因变量的结果。然而，在许多情况下，变量之间存在双向关系或联立关系。在某些方程中充当响应变量的变量，在另一些方程中又会充当预测变量；方程中的变量可能相互影响，因而很难区分因变量和解释变量。表型数据由实际存在的生物系统产生，应当用随机表型变量之间的一组联立关系来描述。结构方程模型（structural equation model，SEM）是描述这类数据生成机制、推断变量间因果关系的有力数学工具（Chen and Pearl 2014）。
+
+结构方程模型将变量分为两类：内生变量（endogenous variable）和外生变量（exogenous variable）。在模型内共同决定、相互依赖的变量称为内生变量；在模型之外决定或预先确定的解释变量称为外生变量。在基因型—表型网络中，体重指数（BMI）、血压、高密度脂蛋白和低密度脂蛋白等表型变量属于内生变量，年龄、性别、种族、环境和基因型则属于外生变量。
+
+考虑 $M$ 个表型，将其称为内生变量。假设抽取了 $n$ 名个体，记这 $M$ 个内生变量的 $n$ 次观测构成的矩阵为 $Y=[y_1,y_2,\ldots,y_M]$，其中，$y_i=[y_{1i},\ldots,y_{ni}]^{T}$ 是内生变量 $i$ 的 $n$ 次观测组成的向量。作为外生变量或预定变量的协变量、遗传变异，记为 $X=[x_1,\ldots,x_K]$，其中 $x_i=[x_{1i},\ldots,x_{ni}]^{T}$。类似地，随机误差记为 $E=[e_1,\ldots,e_M]$，假设对 $i=1,\ldots,M$，有 $\E[e_i]=0$ 和 $\E[e_i e_i^{T}]=\sigma_i^2 I_n$。用于描述表型与基因型之间关系的线性结构方程可以写为（Judge et al. 1182）：
+\begin{equation}
+ \begin{gathered}
+ y_1\gamma_{11}+y_2\gamma_{21}+\cdots+y_M\gamma_{M1}
+   +x_1\beta_{11}+x_2\beta_{21}+\cdots+x_K\beta_{K1}+e_1=0\\
+ \vdots\hspace{5cm}\vdots\\
+ y_1\gamma_{1M}+y_2\gamma_{2M}+\cdots+y_M\gamma_{MM}
+   +x_1\beta_{1M}+x_2\beta_{2M}+\cdots+x_K\beta_{KM}+e_M=0,
+ \end{gathered}
+ \tag{1.49}
+\end{equation}
+其中，$\gamma$ 和 $\beta$ 是系统中未知的结构参数。结构方程模型中的变量可以分为两种基本类型：一类是能够测量的观测变量；另一类是无法测量的残差变量，代表影响该变量的其他所有未建模原因。大多数观测变量（例如表型）是随机的。有些观测变量则可能是非随机变量或控制变量（例如基因型、药物剂量），其取值在重复随机抽样中保持不变，或者可以由实验者操纵。观测变量还可以进一步分为处于模型之外的外生变量（例如基因型），以及取值通过系统内部各变量的共同作用来确定的内生变量（例如表型）。所有非随机变量都可以看作外生变量。表型被看作内生变量。“外生”和“内生”取决于具体模型；在一个模型中属于外生的变量，在另一个模型中可能是内生的。
+
+这些共同考虑的内生变量和外生变量的样本值，分别可以用一个 $n\times M$ 矩阵
+\[
+ Y=
+ \begin{bmatrix}
+  y_{11}&y_{12}&\cdots&y_{1M}\\
+  y_{21}&y_{22}&\cdots&y_{2M}\\
+  \vdots&\vdots&\ddots&\vdots\\
+  y_{n1}&y_{n2}&\cdots&y_{nM}
+ \end{bmatrix}
+ =[Y_1\ \cdots\ Y_M]
+\]
+和一个 $n\times K$ 矩阵
+\[
+ X=
+ \begin{bmatrix}
+  x_{11}&x_{12}&\cdots&x_{1K}\\
+  x_{21}&x_{22}&\cdots&x_{2K}\\
+  \vdots&\vdots&\ddots&\vdots\\
+  x_{n1}&x_{n2}&\cdots&x_{nK}
+ \end{bmatrix}
+ =[X_1\ \cdots\ X_K]
+\]
+表示。令
+\[
+ E=
+ \begin{bmatrix}
+  e_{11}&e_{12}&\cdots&e_{1M}\\
+  e_{21}&e_{22}&\cdots&e_{2M}\\
+  \vdots&\vdots&\ddots&\vdots\\
+  e_{n1}&e_{n2}&\cdots&e_{nM}
+ \end{bmatrix}
+ =[e_1\ \cdots\ e_M]
+\]
+为随机误差向量的不可观测值构成的 $n\times M$ 矩阵。定义内生变量的 $M\times M$ 系数矩阵为
+\[
+ \Gamma=
+ \begin{bmatrix}
+  \gamma_{11}&\gamma_{12}&\cdots&\gamma_{1M}\\
+  \gamma_{21}&\gamma_{22}&\cdots&\gamma_{2M}\\
+  \vdots&\vdots&\ddots&\vdots\\
+  \gamma_{M1}&\gamma_{M2}&\cdots&\gamma_{MM}
+ \end{bmatrix}
+ =[\Gamma_1\ \cdots\ \Gamma_M],
+\]
+外生变量的 $K\times M$ 系数矩阵为
+\[
+ B=
+ \begin{bmatrix}
+  \beta_{11}&\beta_{12}&\cdots&\beta_{1M}\\
+  \beta_{21}&\beta_{22}&\cdots&\beta_{2M}\\
+  \vdots&\vdots&\ddots&\vdots\\
+  \beta_{K1}&\beta_{K2}&\cdots&\beta_{KM}
+ \end{bmatrix}
+ =[B_1\ \cdots\ B_M].
+\]
+
+用矩阵记号，结构方程组 (1.49) 可以改写为
+\begin{equation}
+ Y\Gamma+XB+E=0.
+ \tag{1.50}
+\end{equation}
+式 (1.49) 中的第 $i$ 个方程可以写为矩阵形式
+\begin{equation}
+ Y\Gamma_i+XB_i+e_i=0.
+ \tag{1.51}
+\end{equation}
+按照通常的做法，我们往往选取一个内生变量放在方程左侧。具体地，第 $i$ 个方程为
+\[
+ \begin{aligned}
+ &y_1\gamma_{1i}+\cdots+y_{i-1}\gamma_{i-1\,i}+y_i\gamma_{ii}
+  +y_{i+1}\gamma_{i+1\,i}+\cdots+y_M\gamma_{Mi}\\
+ &\hspace{2cm}{}+x_{1i}\beta_{1i}+\cdots+x_{Ki}\beta_{Ki}+e_i=0.
+ \end{aligned}
+\]
+将上式两边除以 $-\gamma_{ii}$，再分别将 $-\gamma_{ji}/\gamma_{ii}$ 和 $-\beta_{ji}/\gamma_{ii}$ 记为 $\gamma_{ji}$ 和 $\beta_{ji}$，得到
+\begin{equation}
+ \begin{aligned}
+ y_i={}&y_1\gamma_{1i}+\cdots+y_{i-1}\gamma_{i-1\,i}
+        +y_{i+1}\gamma_{i+1\,i}+\cdots+y_M\gamma_{Mi}\\
+       &{}+x_{1i}\beta_{1i}+\cdots+x_{Ki}\beta_{Ki}+e_i,
+ \end{aligned}
+ \tag{1.52}
+\end{equation}
+其中，$\gamma_{ji}$ 是度量从 $y_j$ 到 $y_i$ 的因果关系强度的路径系数（path coefficient）；$\beta_{ki}$ 是从外生变量到内生变量的路径系数，度量外生变量 $x_{ki}$ 对内生变量 $y_i$ 的因果效应。$\gamma_{ji}=0$ 和 $\beta_{ki}=0$ 分别表示 $Y_j$ 和 $x_{ki}$ 对 $Y_i$ 没有直接影响，这些项通常从方程中省去。因此，式 (1.52) 简化为
+\begin{equation}
+ \begin{aligned}
+ y_i&=Y_{-i}\gamma_i+X_i\beta_i+{}+e_i\\
+    &=W_i\Delta_i+e_i,
+ \end{aligned}
+ \tag{1.53}
+\end{equation}
+其中，$Y_{-i}$ 是去掉变量 $y_i$ 后的内生变量向量，$\gamma_i$ 是与 $Y_{-i}$ 对应的路径系数向量，且
+\[
+ W_i=[Y_{-i}\ X_i],\qquad
+ \Delta_i=\begin{bmatrix}\gamma_i\\\beta_i\end{bmatrix}.
+\]
+
+通常有两种情形：（1）方程的结构已知；（2）方程的结构未知。当根据生物学知识已知结构时，我们需要做的是估计方程中的参数，并进行因果推断。当结构未知时，则需要同时估计结构和参数。现在先讨论结构已知的第一种情形。
+
+结构方程模型的结构可以用 DAG 描述。节点表示变量，直线单向箭头表示箭头所连接变量之间的因果关系。每个箭头或有向边都对应结构方程模型中的一个系数，通常称为路径系数。节点之间可能存在一些未知而被省略的中间步骤。弯曲的双向箭头或无向边表示两个变量之间存在关联。变量之间可能由于多种原因而关联：可能是两个变量都依赖于某些其他变量，也可能是两个变量之间存在因果关系，但并未明确指定；或者表示两个误差项相互独立。
+
+图 1.4 给出了一个 DAG，用于描述由四个表型组成的网络：高密度脂蛋白胆固醇（HDL）、低密度脂蛋白胆固醇（LDL）、甘油三酯（Trig）和总胆固醇（TotChol）。图 1.4 中 DAG 对应的结构方程模型为
+\begin{equation}
+ \begin{aligned}
+  y_1&=e_1,\\
+  y_2&=\gamma_{12}y_2+e_2,\\
+  y_3&=\gamma_{23}y_2+e_3,\\
+  y_4&=\gamma_{24}y_2+\gamma_{34}y_3+e_4.
+ \end{aligned}
+ \tag{1.54}
+\end{equation}
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch01b_fig04.tex}
+ \origfig{4}{表型网络。}
+ \label{fig:ch01b-phenotype-network}
+\end{figure}
+
+为了进一步描述 DAG 与结构方程模型之间的联系，我们引入几个术语。如果存在一串从 $y_j$ 指向 $y_i$、且方向一致的箭头，就称 $y_j$ 为 $y_i$ 的祖先（ancestor），或称 $y_i$ 为 $y_j$ 的后代（descendant）。通过无向边与 $y_i$ 相连的节点集合，称为 $y_i$ 的兄弟节点（sibling）。连接两个节点 $y_j$ 和 $y_i$ 的一串边，称为 $y_j$ 与 $y_i$ 之间的一条路径（path）。如果一条路径仅由从 $y_j$ 指向 $y_i$ 的箭头组成，就称为从 $y_j$ 到 $y_i$ 的有向路径（directed path）。
+
+\subsection{估计方法}
+\label{sec:ch01b-estimation}
+
+结构方程中的参数估计相当复杂，涉及许多具有不同统计性质的估计方法。本章介绍三种常用方法：极大似然法、两阶段最小二乘（two-stage least squares，2SLS）法和三阶段最小二乘（three-stage least squares，3SLS）法。
+
+\subsubsection{极大似然估计}
+
+全部 $M$ 个结构方程的一次观测可以写为（Judge et al. 1182）
+\begin{equation}
+ y_i^{T}\Gamma+x_i^{T}B+e_i^{T}=0,\qquad i=1,\ldots,n,
+ \tag{1.55}
+\end{equation}
+其中，$y_i^{T}$、$x_i^{T}$ 和 $e_i^{T}$ 分别为矩阵 $Y$、$X$ 和 $E$ 的第 $i$ 行。令
+\[
+ e_i=\begin{bmatrix}e_{i1}\\\vdots\\e_{iM}\end{bmatrix}.
+\]
+$e_i$ 的概率密度函数为
+\[
+ p(e_i)=(2\pi)^{-M/2}|\Sigma|^{-1/2}
+       \exp\left\{-\frac12 e_i^{T}\Sigma^{-1}e_i\right\}.
+\]
+为求出变量 $y_i$ 的概率密度，我们作变量变换。变换的雅可比矩阵为
+\[
+ \frac{\partial y_i}{\partial e_i^{T}}=-\Gamma^{-1}.
+\]
+$y$ 的联合概率密度函数为（Judge et al. 1982）
+\begin{equation}
+ \begin{aligned}
+ f(y)={}&(2\pi)^{-nM/2}|\Sigma|^{-n/2}\lVert\Gamma\rVert^{n}\\
+ &{}\times\exp\left\{-\frac12\sum_{i=1}^{n}
+ (y_i^{T}\Gamma+x_i^{T}B)\Sigma^{-1}
+ (\Gamma^{T}y_i+B^{T}x_i)\right\},
+ \end{aligned}
+ \tag{1.56}
+\end{equation}
+其中，$\lVert\Gamma\rVert$ 是矩阵 $\Gamma$ 的行列式的绝对值。
+
+对数似然函数定义为
+\begin{equation}
+ \begin{aligned}
+ \log l(\Delta,\Sigma\mid y,W)
+ \mathrel{==}{}&-\frac{nM}{2}\log(2\pi)
+       +\frac n2\log|\Sigma|^{-1}+n\log\lVert\Gamma\rVert\\
+ &{}-\frac12\sum_{i=1}^{n}(y_i^{T}\Gamma+x_i^{T}B)\Sigma^{-1}
+           (\Gamma^{T}y_i+B^{T}x_i).
+ \end{aligned}
+ \tag{1.57}
+\end{equation}
+将式 (1.57) 中的对数似然函数最大化，即可得到结构方程参数的估计量 $\widehat\Delta$ 和 $\widehat\Sigma$。
+
+\subsubsection{两阶段最小二乘法}
+
+前面的极大似然法需要假设内生变量服从正态分布。然而，在实际应用中，这些变量的正态性假设往往不成立。因此，需要建立不对内生变量和外生变量的分布作出假设的估计方法。理论分析表明，用普通最小二乘法估计结构方程参数，一般会得到不一致的估计量。不对内生变量和外生变量的分布作出假设的统计方法，可以分为两类：一类是应用于结构方程组中每一个方程的单方程方法；另一类是应用于全部结构方程的完整系统方法。这里介绍最重要且应用最广泛的单方程方法——两阶段最小二乘法。
+
+在式 (1.53) 两边左乘矩阵 $X^{T}$，得到
+\begin{equation}
+ X^{T}y_i=X^{T}W_i\Delta_i+X^{T}e_i.
+ \tag{1.58}
+\end{equation}
+已知
+\[
+ \operatorname{cov}(X^{T}e_i,X^{T}e_i)=X^{T}X\sigma_i^2.
+\]
+广义最小二乘估计 $\widehat\Delta_i$ 为
+\begin{equation}
+ \begin{aligned}
+ \widehat\Delta_i
+  ={}&\left[W_i^{T}X(\sigma_i^2 X^{T}X)^{-1}X^{T}W_i\right]^{-1}
+       W_i^{T}X(\sigma_i^2 X^{T}X)^{-1}X^{T}y_i\\
+  ={}&\left[W_i^{T}X(X^{T}X)^{-1}X^{T}W_i\right]^{-1}
+       W_i^{T}X(X^{T}X)^{-1}X^{T}y_i.
+ \end{aligned}
+ \tag{1.59}
+\end{equation}
+广义最小二乘估计 $\widehat\Delta_i$ 可以解释为两阶段最小二乘估计（Judge et al. 1182）。
+
+假设第一阶段将 $Y_{-i}$ 对 $X$ 回归，得到
+\begin{equation}
+ \widehat\Pi_i=(X^{T}X)^{-1}X^{T}Y_{-i},
+ \qquad
+ \widehat Y_{-i}=X\widehat\Pi_i.
+ \tag{1.60}
+\end{equation}
+于是，
+\begin{equation}
+ \begin{aligned}
+ \widehat W_i
+ &=\left[\widehat Y_{-i}\ X\right]\\
+ &=\left[X(X^{T}X)^{-1}X^{T}Y_{-i}\quad X\right]\\
+ &=\left[X(X^{T}X)^{-1}X^{T}Y_{-i}\quad X(X^{T}X)^{-1}X^{T}X\right]\\
+ &=X(X^{T}X)^{-1}X^{T}[Y_{-i}\ X]\\
+ &=X(X^{T}X)^{-1}X^{T}W_i.
+ \end{aligned}
+ \tag{1.61}
+\end{equation}
+将式 (1.61) 代入式 (1.59)，得到
+\begin{equation}
+ \widehat\Delta_i
+ =\left(\widehat W_i^{T}\widehat W_i\right)^{-1}
+   \widehat W_i^{T}y_i.
+ \tag{1.62}
+\end{equation}
+因此，如果将式 (1.53) 中的 $W_i$ 替换为 $\widehat W_i$，则式 (1.62) 可以解释为：在第二阶段，将 $y_i$ 对 $\widehat Y_i$ 和 $X$ 回归，以获得估计 $\widehat\Delta_i$。
+
+估计量 $\widehat\Delta_i$ 的方差—协方差矩阵为
+\begin{equation}
+ \Lambda_i=\operatorname{var}(\widehat\Delta_i)
+  =n\widehat\sigma_i^2
+    \left[W_i^{T}X(X^{T}X)^{-1}X^{T}W_i\right]^{-1},
+ \tag{1.63}
+\end{equation}
+其中，$\widehat\sigma_i^2$ 由下式估计：
+\begin{equation}
+ \widehat\sigma_i^2=
+ \frac{1}{n-m_i+1-k_i}
+ (y_i-W_i\Delta_i)^{T}(y_i-W_i\Delta_i),
+ \tag{1.64}
+\end{equation}
+$m_i$ 和 $k_i$ 分别为第 $i$ 个方程中出现的内生变量和外生变量的个数。
+
+在相当一般的条件下，$\sqrt n(\widehat\Delta_i-\Delta_i)$ 渐近服从正态分布 $N(0,\Lambda_i)$。
+
+可以检验有向边是否存在。假设要检验表型 $y_j$ 是否引起表型 $y_i$ 的变化，换言之，就是检验参数 $\gamma_{ji}$ 是否为零。令 $\Lambda_{ji}$ 为方差—协方差矩阵 $\Lambda_i$ 中与估计量 $\widehat\gamma_{ji}$ 的方差对应的元素。如果 $j<i$，则 $\Lambda_{ji}$ 是矩阵 $\Lambda_i$ 的第 $j$ 个对角元素；如果 $j>i$，则 $\Lambda_{ji}$ 是矩阵 $\Lambda_i$ 的第 $j-1$ 个对角元素。定义检验统计量
+\begin{equation}
+ T_\gamma=n\frac{\widehat\gamma_{ji}^{\,2}}{\Lambda_{ji}}.
+ \tag{1.65}
+\end{equation}
+在从 $y_j$ 到 $y_i$ 不存在有向连接的原假设下，统计量 $T_\gamma$ 渐近服从中心 $\chi^2_{(1)}$ 分布。
+
+\subsubsection{三阶段最小二乘法}
+
+为了充分利用结构方程中的信息，并联合估计全部结构方程，我们考虑由 $M$ 个结构方程组成的整个系统：
+\begin{equation}
+ \begin{bmatrix}X^{T}y_1\\X^{T}y_2\\\vdots\\X^{T}y_M\end{bmatrix}
+ =
+ \begin{bmatrix}
+  X^{T}W_1&&&\\
+  &X^{T}W_2&&\\
+  &&\ddots&\\
+  &&&X^{T}W_M
+ \end{bmatrix}
+ \begin{bmatrix}\Delta_1\\\Delta_2\\\vdots\\\Delta_M\end{bmatrix}
+ +\begin{bmatrix}X^{T}e_1\\X^{T}e_2\\\vdots\\X^{T}e_M\end{bmatrix}.
+ \tag{1.66}
+\end{equation}
+紧凑地写为
+\begin{equation}
+ [I\otimes X^{T}]\Upsilon=[I\otimes X^{T}]W\Delta+(I\otimes X^{T})e,
+ \tag{1.67}
+\end{equation}
+其中，
+\[
+ \begin{aligned}
+ W&=
+ \begin{bmatrix}
+  W_1&&&\\&W_2&&\\&&\ddots&\\&&&W_M
+ \end{bmatrix}_{TM\times([M(M-1)]},
+ &\quad
+ \Upsilon&=
+ \begin{bmatrix}y_1\\y_2\\\vdots\\y_M\end{bmatrix}_{TM},\\
+ \Delta&=
+ \begin{bmatrix}\Delta_1\\\Delta_2\\\vdots\\\Delta_M\end{bmatrix}_{M},
+ &
+ e&=
+ \begin{bmatrix}e_1\\e_2\\\vdots\\e_M\end{bmatrix}_{M}.
+ \end{aligned}
+\]
+注意，
+\begin{equation}
+ \begin{aligned}
+ \operatorname{cov}\bigl((I_M\otimes X^{T})e\bigr)
+  &=(I_M\otimes X^{T})(\Sigma\otimes I_n)(I_M\otimes X)\\
+  &=\Sigma\otimes X^{T}X.
+ \end{aligned}
+ \tag{1.68}
+\end{equation}
+由式 (1.67) 和式 (1.68) 可得，$\Delta$ 的广义最小二乘估计量为
+\begin{equation}
+ \begin{aligned}
+ \widehat\Delta
+ ={}&\left\{
+       [W^{T}(I_M\otimes X)]
+       [\Sigma^{-1}\otimes(X^{T}X)^{-1}]
+       [(I_M\otimes X^{T})W]\right\}^{-1}\\
+    &{}\times[W^{T}(I_M\otimes X)]
+       [\Sigma^{-1}\otimes(X^{T}X)^{-1}]
+       (I_M\otimes X^{T})\Upsilon\\
+ ={}&\left\{W^{T}
+       [\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}
+       W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]\Upsilon.
+ \end{aligned}
+ \tag{1.69}
+\end{equation}
+利用 2SLS 得到的估计量 $\widehat\Delta_i$，可以估计协方差矩阵 $\Sigma$：
+\begin{equation}
+ \widehat\sigma_{ij}
+  =\frac{(y_i-W_i\widehat\Delta_i)^{T}
+          (y_i-W_i\widehat\Delta_i)}{\tau_{ij}},
+ \tag{1.70}
+\end{equation}
+其中，$\tau_{ij}=\sqrt{(n-m_i+1-k_i)(n-m_j+1-k_j)}$。
+
+估计量 $\widehat\Delta$ 的方差—协方差矩阵为
+{\small
+\begin{equation}
+ \begin{aligned}
+ \Var(\widehat\Delta)
+ ={}&\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}
+       W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}][\Sigma\otimes I_N]\\
+ &{}\times[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W
+       \left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}\\
+ ={}&\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}\\
+ &{}\times W^{T}
+       [\Sigma^{-1}\Sigma\Sigma^{-1}\otimes
+          X(X^{T}X)^{-1}X^{T}X(X^{T}X)^{-1}X^{T}]W\\
+ &{}\times\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}\\
+ ={}&\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}
+       \left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}\\
+ &{}\times\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}\\
+ ={}&\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}.
+ \end{aligned}
+ \tag{1.71}
+\end{equation}
+}
+因此，$\widehat\Delta$ 渐近服从正态分布 $N(\Delta,\Lambda)$，其中
+\begin{equation}
+ \Lambda=
+ \left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W\right\}^{-1}.
+ \tag{1.72}
+\end{equation}
+所有路径系数都包含在向量 $\Delta$ 中。向量 $\Delta$ 的元素总数为
+\[
+ L=\sum_{i=1}^{M}(m_i+k_i-1).
+\]
+可以通过检验路径系数向量 $\Delta$ 中的元素来进行因果推断。令 $\Lambda_{ll}$ 表示协方差矩阵 $\Lambda$ 的第 $l$ 个对角元素，定义原假设为
+\[
+ H_0:\Delta_l=0.
+\]
+定义用于检验向量 $\Delta$ 中非零元素的统计量：
+\begin{equation}
+ T_l=\frac{\Delta_l^2}{\Lambda_{ll}}.
+ \tag{1.73}
+\end{equation}
+在原假设 $H_0:\Delta_l=0$ 下，统计量 $T_l$ 渐近服从自由度为 1 的中心 $\chi^2_{(1)}$ 分布。
+
+为了考察多效性因果效应（pleiotropic causal effect），或研究一组变量之间的因果关系，可以构造一个统计量来检验一组路径系数。具体地，考虑一组参数 $\Delta_S$，它们定义了变量集合 $S$ 中各变量之间的因果关系。令 $\Delta_S$ 为 $\Lambda$ 中与 $\Delta_S$ 对应的子矩阵。假设原假设为 $H_0:\Delta_S=0$，定义统计量
+\begin{equation}
+ T_S=\widehat\Delta_S^{T}\widehat\Lambda_S^{-1}\widehat\Delta_S.
+ \tag{1.74}
+\end{equation}
+在原假设 $H_0:\Delta_S=0$ 下，$T_S$ 渐近服从自由度为 $p$ 的中心 $\chi^2_{(p)}$ 分布，其中 $p$ 是集合 $\Delta_S$ 中被检验的参数个数。
+
+
+\section{稀疏线性结构方程}
+\label{sec:ch01b-sparse-sem}
+
+一般而言，基因型—表型网络是稀疏的，因此 $\Gamma$ 和 $B$ 都是稀疏矩阵。要获得 $\Gamma$ 和 $B$ 的稀疏估计，一种自然的方法是采用 $l_1$ 范数惩罚。
+
+\subsection{\texorpdfstring{$L_1$}{L1} 惩罚的极大似然估计}
+\label{sec:ch01b-l1-ml}
+
+为了获得 $\Gamma$ 和 $B$ 的稀疏估计，一种自然的方法是在对数似然中加入 $l_1$ 范数项 $\lVert\Gamma\rVert_1$ 和 $\lVert B\rVert_1$ 进行正则化，再将其最大化。所提出的 $l_1$ 惩罚极大似然估计方法，要最大化
+\begin{equation}
+ \begin{aligned}
+ \max_{\Gamma,B}\quad&
+ \frac n2\log|\Sigma|^{-1}+n\log\lVert\Gamma\rVert\\
+ &{}-\frac12\sum_{i=1}^{n}(y_i^{T}\Gamma+x_i^{T}B)\Sigma^{-1}
+       (\Gamma^{T}y_i+B^{T}x_i)
+       -\lambda_1\lVert\Gamma\rVert_1-\lambda_2\lVert B\rVert_1.
+ \end{aligned}
+ \tag{1.75}
+\end{equation}
+优化问题 (1.75) 可以用 ADMM 算法求解。为将光滑优化部分与非光滑优化部分分离，引入新的矩阵变量 $Z_1$ 和 $Z_2$，构造以下约束优化问题：
+\begin{equation}
+ \begin{aligned}
+ \min\quad&f(\Gamma,B)+\lambda_1\lVert Z_1\rVert_1
+                          +\lambda_2\lVert Z_2\rVert_1\\
+ \text{约束条件}\quad&\Gamma-Z_1=0,\\
+                     &B-Z_2=0,
+ \end{aligned}
+ \tag{1.76}
+\end{equation}
+其中，
+\[
+ f(\Gamma,B)=-n\log\lVert\Gamma\rVert
+ +\frac12\sum_{i=1}^{n}(y_i^{T}\Gamma+x_i^{T}B)\Sigma^{-1}
+       (\Gamma^{T}y_i+B^{T}x_i).
+\]
+为求解优化问题 (1.76)，构造增广拉格朗日函数
+\begin{equation}
+ \begin{aligned}
+ L_\rho(\Gamma,B,Z,\mu)
+ ={}&f(\Gamma,B)+\lambda_1\lVert Z_1\rVert_1
+                 +\lambda_2\lVert Z_2\rVert_1\\
+ &{}+\tr\bigl(\mu_1^{T}(\Gamma-Z_1)\bigr)
+       +\tr\bigl(\mu_2^{T}(B-Z_2)\bigr)\\
+ &{}+\frac\rho2\left(\lVert\Gamma-Z_1\rVert_F^2
+                       +\lVert B-Z_2\rVert_F^2\right),
+ \end{aligned}
+ \tag{1.77}
+\end{equation}
+其中，$\lVert\cdot\rVert_F$ 表示矩阵的 Frobenius 范数。注意，
+\begin{equation}
+ \begin{aligned}
+ &\frac\rho2\left(\lVert\Gamma-Z_1\rVert_2^2
+                       +\lVert B-Z_2\rVert_2^2\right)
+  +\tr\bigl(\mu_1^{T}(\Gamma-Z_1)\bigr)
+  +\tr\bigl(\mu_2^{T}(B-Z_2)\bigr)\\
+ &\quad=\frac\rho2\left\{
+     \left\lVert\Gamma-Z_1+\frac{\mu_1}\rho\right\rVert_F^2
+    +\left\lVert B-Z_2+\frac{\mu_2}\rho\right\rVert_F^2\right\}
+    -\frac{\lVert\mu_1\rVert_F^2}{2\rho}
+    -\frac{\lVert\mu_2\rVert_F^2}{2\rho}.
+ \end{aligned}
+ \tag{1.78}
+\end{equation}
+利用式 (1.78)，可将式 (1.77) 转化为
+\begin{equation}
+ \begin{aligned}
+ L_\rho(\Gamma,B,Z,\mu)
+ ={}&f(\Gamma,B)+\lambda_1\lVert Z_1\rVert_1+\lambda_2\lVert Z_2\rVert_1\\
+ &{}+\frac\rho2\left\{
+     \left\lVert\Gamma-Z_1+\frac{\mu_1}\rho\right\rVert_F^2
+    +\left\lVert B-Z_2+\frac{\mu_2}\rho\right\rVert_F^2\right\}\\
+ &{}-\frac{\lVert\mu_1\rVert_F^2}{2\rho}
+      -\frac{\lVert\mu_2\rVert_F^2}{2\rho}.
+ \end{aligned}
+ \tag{1.79}
+\end{equation}
+定义矩阵 $U_1=\mu_1/\rho$ 和 $U_2=\mu_2/\rho$，式 (1.79) 可进一步化为
+\begin{equation}
+ \begin{aligned}
+ L_\rho(\Gamma,B,Z,\mu)
+ ={}&f(\Gamma,B)+\lambda_1\lVert Z_1\rVert_1+\lambda_2\lVert Z_2\rVert_1\\
+ &{}+\frac\rho2\left\{\lVert\Gamma-Z_1+U_1\rVert_F^2
+                       +\lVert B-Z_2+U_2\rVert_F^2\right\}
+       -\lVert U_1\rVert_F^2-\lVert U_2\rVert_F^2.
+ \end{aligned}
+ \tag{1.80}
+\end{equation}
+交替方向乘子法（ADMM）由以下迭代构成：
+\begin{equation}
+ \Gamma^{(k+1)}\mathrel{==}\argmin_\Gamma
+ \left(f(\Gamma,B^{(k)})
+       +\frac\rho2\left\lVert\Gamma-Z_1^{(k)}+U_1^{(k)}\right\rVert_F^2\right)
+ \tag{1.81}
+\end{equation}
+\begin{equation}
+ B^{(k+1)}\mathrel{==}\argmin_B
+ \left(f(\Gamma^{(k+1)},B)
+       +\frac\rho2\left\lVert B-Z_2^{(k)}+U_2^{(k)}\right\rVert_F^2\right)
+ \tag{1.82}
+\end{equation}
+\begin{equation}
+ Z_1^{(k+1)}\mathrel{:==}\argmin_{Z_1}
+ \left(\lambda\lVert Z_1\rVert_1
+       +\frac\rho2\left\lVert\Gamma^{(k+1)}-Z_1+U_1^{(k)}\right\rVert_F^2\right)
+ \tag{1.83}
+\end{equation}
+\begin{equation}
+ Z_2^{(k+1)}\mathrel{:==}\argmin_{Z_2}
+ \left(\lambda\lVert Z_2\rVert_1
+       +\frac\rho2\left\lVert B^{(k+1)}-Z_2+U_2^{(k)}\right\rVert_F^2\right)
+ \tag{1.84}
+\end{equation}
+\begin{equation}
+ U_1^{(k+1)}\mathrel{:==}U_1^{(k)}
+       +\left(\Gamma^{(k+1)}-Z_1^{(k+1)}\right).
+ \tag{1.85}
+\end{equation}
+\begin{equation}
+ U_2^{(k+1)}\mathrel{:==}U_2^{(k)}
+       +\left(B^{(k+1)}-Z_2^{(k+1)}\right).
+ \tag{1.86}
+\end{equation}
+
+\subsection{\texorpdfstring{$L_1$}{L1} 惩罚的两阶段最小二乘估计}
+\label{sec:ch01b-l1-2sls}
+
+对式 (1.58) 采用加权最小二乘，并加入 $l_1$ 范数惩罚，可以构造以下优化问题：
+\begin{equation}
+ \begin{aligned}
+ &\min_{\Delta_i}\quad f(\Delta_i)+\lambda\lVert\Delta_i\rVert_1,\\
+ &\text{其中}\quad
+ f(\Delta_i)=(X^{T}y_i-X^{T}W_i\Delta_i)^{T}(X^{T}X)^{-1}
+                   (X^{T}y_i-X^{T}W_i\Delta_i).
+ \end{aligned}
+ \tag{1.87}
+\end{equation}
+为了将光滑优化部分 $\min f(\Delta_i)$ 与非光滑优化部分 $\lVert\Delta_i\rVert_1$ 分离，引入约束 $\Delta_i-Z_i=0$，将无约束优化问题 (1.87) 转化为约束优化问题：
+\begin{equation}
+ \begin{aligned}
+ \min_{\Delta_i}\quad&f(\Delta_i)+\lambda\lVert Z_i\rVert_1\\
+ \text{约束条件}\quad&\Delta_i-Z_i=0.
+ \end{aligned}
+ \tag{1.88}
+\end{equation}
+为求解优化问题 (1.88)，构造增广拉格朗日函数
+\begin{equation}
+ L_\rho(\Delta_i,Z_i,\mu)
+ =f(\Delta_i)/2+\lambda\lVert Z_i\rVert_1
+   +\mu^{T}(\Delta_i-Z_i)+\frac\rho2\lVert\Delta_i-Z_i\rVert_2^2.
+ \tag{1.89}
+\end{equation}
+注意，
+\[
+ \mu^{T}(\Delta_i-Z_i)+\frac\rho2\lVert\Delta_i-Z_i\rVert_2^2
+ =\frac\rho2\left\lVert\Delta_i-Z_i+\frac\mu\rho\right\rVert_2^2
+    -\frac{\lVert\mu\rVert_2^2}{2\rho}.
+\]
+式 (1.89) 可以转化为
+\begin{equation}
+ L_\rho(\Delta_i,Z_i,\mu)
+ =f(\Delta_i)/2+\lambda\lVert Z_i\rVert_1
+  +\frac\rho2\left\lVert\Delta_i-Z_i+\frac\mu\rho\right\rVert_2^2
+  -\frac{\lVert\mu\rVert_2^2}{2\rho}.
+ \tag{1.90}
+\end{equation}
+令 $u=\mu/\rho$，式 (1.90) 可进一步化为
+\begin{equation}
+ L_\rho(\Delta_i,Z_i,\mu)
+ =f(\Delta_i)/2+\lambda\lVert Z_i\rVert_1
+    +\frac\rho2\lVert\Delta_i-Z_i+u\rVert_2^2
+    -\frac12\lVert u\rVert_2^2.
+ \tag{1.91}
+\end{equation}
+交替方向乘子法（ADMM）由以下迭代构成：
+\begin{equation}
+ \Delta_i^{(k+1)}\mathrel{:==}\argmin_{\Delta_i}
+ \left(f(\Delta_i)/2+\frac\rho2
+       \left\lVert\Delta_i-Z_i^{(k)}+u^{(k)}\right\rVert_2^2\right)
+ \tag{1.92}
+\end{equation}
+\begin{equation}
+ Z_i^{(k+1)}\mathrel{:==}\argmin_{Z_i}
+ \left(\lambda\lVert Z_i\rVert_1+\frac\rho2
+       \left\lVert\Delta_i^{(k+1)}-Z_i+u^{(k)}\right\rVert_2^2\right)
+ \tag{1.93}
+\end{equation}
+\begin{equation}
+ u^{(k+)}\mathrel{:==}u^{(k)}
+       +\left(\Delta_i^{(k+1)}-Z_i^{(k+1)}\right).
+ \tag{1.94}
+\end{equation}
+对于某些特殊形式的函数 $f(\Delta_i)$，问题 (1.92) 可以获得闭式解。要解极小化问题 (1.92)，首先需要计算以下导数：
+\begin{equation}
+ \begin{aligned}
+ \frac{\partial f}{\partial\Delta_i}
+ &=-2W_i^{T}X(X^{T}X)^{-1}(X^{T}y_i-X^{T}W_i\Delta_i),\\
+ \frac{\partial\left[
+       \rho\left\lVert\Delta_i-Z_i^{(k)}+u^{(k)}\right\rVert_2^2/2
+       \right]}{\partial\Delta_i}
+ &=\rho\left(\Delta_i-Z_i^{(k)}+u^{(k)}\right).
+ \end{aligned}
+ \tag{1.95}
+\end{equation}
+令 $\partial L_\rho(\Delta_i,Z_i,u)/\partial\Delta_i=0$，并利用式 (1.14)，得到
+\begin{equation}
+ -W_i^{T}X(X^{T}X)^{-1}(X^{T}y_i-X^{T}W_i\Delta_i)
+ +\rho\left(\Delta_i-Z_i^{(k)}+u^{(k)}\right)=0.
+ \tag{1.96}
+\end{equation}
+求解式 (1.15)，得到
+\begin{equation}
+ \begin{aligned}
+ \Delta_i^{(k+1)}
+ ={}&\left[W_i^{T}X(X^{T}X)^{-1}X^{T}W_i+\rho I\right]^{-1}\\
+ &{}\times\left[W_i^{T}X(X^{T}X)^{-1}X^{T}y_i
+                          +\rho\left(Z_i^k-u^k\right)\right],
+ \end{aligned}
+ \tag{1.97}
+\end{equation}
+它可以化为
+\[
+ \begin{aligned}
+ \Delta_i^{(k+1)}
+ ={}&\left[\frac1\rho I-\frac1\rho W_i^{T}X
+         \left(\rho X^{T}X+X^{T}W_iW_i^{T}X\right)^{-1}X^{T}W_i\right]\\
+ &{}\times\left[W_i^{T}X(X^{T}X)^{-1}X^{T}y_i
+                        +\rho\left(Z_i^k-u^k\right)\right].
+ \end{aligned}
+\]
+优化问题 (1.11) 是不可微的。尽管式 (1.93) 中的第一项不可微，仍然可以利用次微分运算，得到问题 (1.93) 的简单闭式解（Boyd et al. 2011）。令 $\Gamma_j$ 为向量 $Z_i$ 的第 $j$ 个分量 $Z_i^j$ 的广义导数，且 $\Gamma=[\Gamma_1,\ldots,\Gamma_{M+K-1}]^{T}$，其中
+\[
+ \Gamma_j=
+ \begin{cases}
+  1,&Z_i^j>0,\\
+  [-1,1],&Z_i^j=0,\\
+  -1,&Z_i^j<0.
+ \end{cases}
+\]
+于是，
+\[
+ \frac\lambda\rho\Gamma+Z_i=\Delta_i^{k+1}+u^k,
+\]
+从而
+\begin{equation}
+ Z_i^{(k+1)}
+ =\sgn\left(\Delta_i^{k+1}+u^k\right)
+    \left(\left|\Delta_i^{k+1}+u^k\right|-\frac\lambda\rho\right)_+,
+ \tag{1.98}
+\end{equation}
+其中，
+\[
+ (x)_+=
+ \begin{cases}
+  x,&x\geq0,\\
+  0,&x<0.
+ \end{cases}
+\]
+综上，算法如下。
+
+\begin{bookalgorithm}{1.3}
+对 $i=1,\ldots,M$：
+
+\noindent\textbf{步骤 1：初始化。}
+\[
+ \begin{aligned}
+ u^0&:=0,\\
+ \Delta_i^0&:=
+ \left[W_i^{T}X(X^{T}X)^{-1}X^{T}W_i+\rho I\right]^{-1}
+ W_i^{T}X(X^{T}X)^{-1}X^{T}y_i,\\
+ Z_i^0&:=\Delta_i^0.
+ \end{aligned}
+\]
+重复执行步骤 2、3 和 4，直至收敛。
+
+\noindent\textbf{步骤 2。}
+\[
+ \begin{aligned}
+ \Delta_i^{(k+1)}
+ :={}&\left[\frac1\rho I-\frac1\rho W_i^{T}X
+       \left(\rho X^{T}X+X^{T}W_iW_i^{T}X\right)^{-1}X^{T}W_i\right]\\
+ &{}\times\left[W_i^{T}X(X^{T}X)^{-1}X^{T}y_i
+                       +\rho\left(Z_i^k-u^k\right)\right].
+ \end{aligned}
+\]
+
+\noindent\textbf{步骤 3。}
+\[
+ Z_i^{(k+1)}
+ :=\sgn\left(\Delta_i^{k+1}+u^k\right)
+    \left(\left|\Delta_i^{k+1}+u^k\right|-\frac\lambda\rho\right)_+,
+\]
+其中，
+\[
+ |x|_+=
+ \begin{cases}
+  x,&x\geq0,\\
+  0,&x<0.
+ \end{cases}
+\]
+
+\noindent\textbf{步骤 4。}
+\[
+ u^{(k+)}\mathrel{:==}u^{(k)}
+      +\left(\Delta_i^{(k+1)}-Z_i^{(k+1)}\right).
+\]
+\end{bookalgorithm}
+
+矩阵 $\Gamma$ 和 $B$ 的大多数元素等于零。两阶段最小二乘方法中的 $l_1$ 正则化套索，以及 ADMM 算法，有望将系数矩阵 $\Gamma$ 和 $B$ 的大多数元素收缩到零附近，从而得到稀疏的网络结构。控制稀疏程度的参数 $\lambda$ 可以通过交叉验证估计，也可以由用户设定，以获得合理的结果。
+
+\subsection{\texorpdfstring{$L_1$}{L1} 惩罚的三阶段最小二乘估计}
+\label{sec:ch01b-l1-3sls}
+
+回顾由 $M$ 个结构方程构成的整个系统：
+\begin{equation}
+ \begin{bmatrix}X^{T}y_1\\X^{T}y_2\\\vdots\\X^{T}y_M\end{bmatrix}
+ =
+ \begin{bmatrix}
+  X^{T}W_1&&&\\
+  &X^{T}W_2&&\\
+  &&\ddots&\\
+  &&&X^{T}W_M
+ \end{bmatrix}
+ \begin{bmatrix}\Delta_1\\\Delta_2\\\vdots\\\Delta_M\end{bmatrix}
+ +\begin{bmatrix}X^{T}e_1\\X^{T}e_2\\\vdots\\X^{T}e_M\end{bmatrix}.
+ \tag{1.99}
+\end{equation}
+紧凑地写为
+\begin{equation}
+ [I\otimes X^{T}]\Upsilon=[I\otimes X^{T}]W\Delta+(I\otimes X^{T})e,
+ \tag{1.100}
+\end{equation}
+其中，
+\[
+ W=
+ \begin{bmatrix}W_1&&&\\&W_2&&\\&&\ddots&\\&&&W_M\end{bmatrix},
+ \quad
+ \Upsilon=\begin{bmatrix}y_1\\y_2\\\vdots\\y_M\end{bmatrix},
+ \quad
+ \Delta=\begin{bmatrix}\Delta_1\\\Delta_2\\\vdots\\\Delta_M\end{bmatrix},
+ \quad
+ e=\begin{bmatrix}e_1\\e_2\\\vdots\\e_M\end{bmatrix}.
+\]
+回顾 $(I\otimes X^{T})e$ 的协方差矩阵为 $\Sigma\otimes X^{T}X$。于是，利用加权最小二乘法，可以定义目标函数
+\[
+ \begin{aligned}
+ f(\Delta)
+ ={}&[(I\otimes X^{T})\Upsilon-(I\otimes X^{T})W\Delta]^{T}
+       [\Sigma^{-1}\otimes(X^{T}X)^{-1}]\\
+ &{}\times[(I\otimes X^{T})\Upsilon-(I\otimes X^{T})W\Delta].
+ \end{aligned}
+\]
+协方差矩阵 $\Sigma$ 可以由下式估计：
+\begin{equation}
+ \widehat\sigma_{ij}
+ =\frac{(y_i-W_i\Delta_i)^{T}(y_i-W_i\Delta_i)}
+        {\sqrt{(n-m_i+1-k_i)(n-m_j+1-k_j)}}.
+ \tag{1.101}
+\end{equation}
+用于三阶段最小二乘估计的 ADMM 定义为
+\begin{equation}
+ \min_\Delta\quad f(\Delta)+\lambda\lVert\Delta\rVert_1.
+ \tag{1.102}
+\end{equation}
+为将能够获得闭式解的光滑优化问题与非光滑优化问题分离，将优化问题 (1.102) 写为
+\begin{equation}
+ \begin{aligned}
+ \min_{\Delta,Z}\quad&f(\Delta)+\lambda\lVert Z\rVert_1\\
+ \text{约束条件}\quad&\Delta-Z=0.
+ \end{aligned}
+ \tag{1.103}
+\end{equation}
+求解优化问题 (1.103) 的 ADMM 过程如下。
+
+\noindent\textbf{步骤 1：初始化。}
+\[
+ \begin{aligned}
+ u^0&=0,\\
+ \Delta^0&=
+ \left[W^{T}\bigl(\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}\bigr)W\right]^{-1}
+ W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]\Upsilon,\\
+ Z^0&=\Delta^0.
+ \end{aligned}
+\]
+
+\noindent\textbf{步骤 2。}
+\[
+ \Delta^{k+1}=\argmin_\Delta
+ \left(f(\Delta)+\frac\rho2\lVert\Delta-Z^k+u^k\rVert_2^2\right).
+\]
+求解后得到
+\[
+ \begin{aligned}
+ \Delta^{k+1}
+ ={}&\left\{W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]W+\rho I\right\}^{-1}\\
+ &{}\times\left\{
+ W^{T}[\Sigma^{-1}\otimes X(X^{T}X)^{-1}X^{T}]\Upsilon
+       +\rho\left(Z^k-u^k\right)\right].
+ \end{aligned}
+\]
+
+\noindent\textbf{步骤 3。}
+\[
+ Z^{k+1}=\argmin_Z
+ \left(\lambda\lVert Z\rVert_1
+       +\frac\rho2\left\lVert\Delta-Z^k+u^k\right\rVert_2^2\right).
+\]
+注意，由软阈值运算可得
+\[
+ x_i^+:=\argmin_{x_i}
+ \left(\lambda|x_i|+\frac\rho2(x_i-v_i)^2\right)
+ =S_{\lambda/\rho}(v_i),
+\]
+其中，
+\[
+ S_d(a)=
+ \begin{cases}
+  a-d,&a>d,\\
+  0,&|a|\leq d,\\
+  a+d,&a<-d.
+ \end{cases}
+\]
+对于向量 $Z$ 的第 $j$ 个分量，有
+\[
+ Z_j^{k+1}=S_{\lambda/\rho}
+ \left(\Delta_j^{k+1}+u_j^k\right),
+ \qquad j=1,2,\ldots,M(M-1).
+\]
+
+\noindent\textbf{步骤 4。}
+\[
+ u^{k+1}=u^k+\Delta^{k+1}-Z^{k+1}.
+\]
+重复更新步骤 2、3 和 4，直至收敛，即
+\[
+ \lVert\Delta^{k+1}-\Delta^k\rVert_2<\varepsilon.
+\]

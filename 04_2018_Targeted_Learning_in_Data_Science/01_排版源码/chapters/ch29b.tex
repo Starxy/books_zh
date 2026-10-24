@@ -1,0 +1,133 @@
+% 原书分章PDF第5—9页：第29.2—29.3节。
+\section{调查抽样设计与假设A1}
+
+本节介绍调查抽样设计的两个例子，并分别讨论其相应情形下的\textbf{A1}。
+
+\subsection{Sampford调查抽样设计}
+
+以 $\mathcal V$ 表示从 $P_0$ 中抽取的 $V$ 所在的取值空间，并令 $h$ 为从 $\mathcal V$ 映到 $\mathbb R_+$ 的一个可测函数。我们选择 $h$，使其远离0，并满足 $P_0h=1$。对每个 $1\le i\le N$，定义
+\[
+p_i\equiv\frac{nh(V_i)}N.
+\]
+令 $P^{s\mathrm P}$ 由下述性质刻画：在 $P^{s\mathrm P}$ 下，$\eta$ 服从给定 $\sum_{i=1}^N\varepsilon_i=n$ 时 $(\varepsilon_1,\ldots,\varepsilon_N)$ 的条件分布，其中 $\varepsilon_1,\ldots,\varepsilon_N$ 分别从参数为 $p_1,\ldots,p_N$ 的Bernoulli分布中独立抽取。提醒读者，这一陈述以 $O_1,\ldots,O_N$ 为条件。这一调查抽样设计是Sampford调查抽样设计的一个实例。它也称为基于不等包含概率Poisson抽样的拒绝抽样设计；$P^{s\mathrm P}$ 中的上标“$\mathrm P$”即源于Poisson，只要 $h$ 不是常数，包含概率就不相等。
+
+根据 Bertail 等（2016a）的定理2，而该定理建立在 Bertail 等（2017）的结果之上，当使用Sampford调查抽样设计 $P^{s\mathrm P}$ 时，只要第29.1.2节引入的类 $\mathcal F$ 不太复杂，假设\textbf{A1}就成立。这就是下面命题29.2所传达的内容。
+
+\begin{bookresult}{命题}{29.2}
+假定 $\mathcal F$ 可分，例如可数；它有一个包络函数，使相应的一致熵积分有限，见 van der Vaart 和 Wellner（1996）中的条件 (2.1.7)；并且对所有 $f\in\mathcal F$，$P_0f^2h^{-1}$ 都有限。那么，使用Sampford调查抽样设计 $P^{s\mathrm P}$ 时，\textbf{A1}成立，其协方差函数 $\Sigma_h^{\mathrm P}$ 由 $\Sigma_h^{\mathrm P}(f,g)\equiv P_0fgh^{-1}$ 给出。
+\end{bookresult}
+
+在相同条件下，若以
+\begin{equation}
+\frac1N\sum_{i=1}^N\frac{\eta_i}{p_i}\operatorname{Dirac}(O_i)
+=\frac1n\sum_{i=1}^N\frac{\eta_i}{h(V_i)}\operatorname{Dirac}(O_i)
+\tag{29.6}
+\end{equation}
+替代 $P_n^{\mathrm{HT}}$，命题29.2的结论仍然成立。因此，不必计算Sampford调查抽样设计的一阶包含概率；当 $h$ 不是常数时，这些概率与 $p_1,\ldots,p_N$ 不同。对 $\psi_0$ 靶向拟合 $P_n^*\in\mathcal M$，可以通过保证 $n^{-1}\sum_{i=1}^N\eta_iD(P_n^*)(O_i)h^{-1}(V_i)=o_P(1/\sqrt n)$ 来实现，以此替代式 (29.3)。
+
+\subsection{行列式调查抽样设计}
+
+\paragraph{极简介绍。}
+行列式调查抽样设计建立在行列式点过程之上。令 $K$ 为一个 $N\times N$ 厄米矩阵（Hermitian matrix），其特征值属于 $[0,1]$。事实上，以下一组等式：对所有 $I\subset\{1,\ldots,N\}$，
+\begin{equation}
+\sum_{I'\supset I}P^s(I')=\det(K_{|I}),
+\tag{29.7}
+\end{equation}
+唯一刻画了行列式调查抽样设计 $P^{sK}$，即 $\{1,\ldots,N\}$ 的幂集上的一个概率测度。这里，$K_{|I}$ 表示只保留 $K$ 中由 $I$ 的元素所索引的行与列，得到的厄米矩阵。
+
+式 (29.7) 刻画的 $P^{sK}$ 的一阶和二阶包含概率，可以直接由 $K$ 的元素求得：对所有 $1\le i\ne j\le N$，有 $\pi_i=\det(K_{|\{i\}})=K_{ii}$，以及 $\pi_{ij}=\det(K_{|\{i,j\}})=K_{ii}\times K_{jj}-|K_{ij}|^2$。此外，从 $P^{sK}$ 抽得的样本具有固定样本量，当且仅当 $K$ 的特征值属于 $\{0,1\}$；在这种情况下，$K$ 是一个投影矩阵，固定样本量等于 $K$ 的迹。下文重点讨论这一情形。
+
+若一阶包含概率全部为正，那么，对从 $P_0$ 中抽取的 $O$ 的任意有界函数 $f$，$P_n^{\mathrm{HT}}f-\mathbb E_{P^{sK}}[P_n^{\mathrm{HT}}f]$ 满足一个集中不等式（Pemantle 和 Peres，2014，定理3.1；另见本章第29.6.3节的式 (29.20)）。此外，若 $f$ 满足所谓的Soshnikov条件 (29.17)、(29.18) 和 (29.19)，则 $\sqrt n(P_n^{\mathrm{HT}}-P_N)f$ 满足CLT（Soshnikov，2000）。这两个出色性质，是下面命题29.3的构件。将 $\mathcal F$ 中那些仅通过 $V$ 依赖 $O$ 的元素去掉，所得函数类记为 $\mathcal F'$。
+
+\begin{bookresult}{命题}{29.3}
+假定 $\mathcal F'$ 可数、一致有界，且其关于上确界范数的括号熵（bracketing entropy）有限，见 van der Vaart 和 Wellner（1996）中条件 (2.1.7) 之前的条件。进一步假定，对每个 $f\in\mathcal F'$，$n\operatorname{Var}_{P^{sK}}[P_n^{\mathrm{HT}}f]>0$ 依 $P_0$ 概率收敛于一个正数，且 $f$ 以 $P_0$ 概率1满足Soshnikov条件 (29.17)、(29.18)、(29.19)。那么，使用任意固定样本量的行列式调查抽样设计 $P^{sK}$ 时，只要其一阶包含概率关于 $N$ 一致远离0，以 $\mathcal F'$ 替代 $\mathcal F$ 后，\textbf{A1}就成立。协方差函数以极限形式定义，一般没有闭式表达式。
+\end{bookresult}
+
+命题29.3所传达的内容如下：若 $\mathcal F'$ 不太复杂，且 $n/N$ 以足够慢的速度趋于0，那么，使用大多数行列式调查抽样设计 $P^{sK}$ 时，以 $\mathcal F'$ 替代 $\mathcal F$ 后，\textbf{A1}成立。命题29.3的证明概要见第29.6.3节。关于比值 $n/N$ 的条件，隐含在 $\mathcal F'$ 的元素以 $P_0$ 概率1满足Soshnikov条件这一假定之中。下面的命题29.4将进一步阐述这一问题。
+
+我们希望采用与第29.2.1节相同的策略，即定义可能不相等、且依赖 $V_1,\ldots,V_N$ 的一阶包含概率。已有算法可以构造具有给定一阶包含概率的固定样本量行列式调查抽样设计，并从该设计中抽样（Loonis 和 Mary，2015）。遗憾的是，一般而言，这两项任务的计算负担都相当大，尤其是在大型数据集，即 $N$ 很大的情形。此外，对所得行列式调查抽样设计来说，命题29.3中对 $\mathcal F'$ 而非 $\mathcal F$ 的第二组条件，通常要求很高。而且，使用该设计所得到的TMLE，其极限方差很难计算，推断通常需要使用非常保守的估计量。若将重点放在按 $V$ 分层、并在每个 $V$ 层内等权的行列式调查抽样设计上，就能够克服这些困难。
+
+\paragraph{按V分层且每个V层内等权的行列式抽样。}
+现在考虑从 $P_0$ 中抽取的 $V$ 只有有限个不同取值的情形。为简化记号，不失一般性，假定 $\mathcal V\equiv\{1,\ldots,\nu\}$，并且 $O_1,\ldots,O_N$ 已按 $V_1,\ldots,V_N$ 的取值排序。令 $h$ 为从 $\mathcal V$ 映到 $\mathbb R_+^*$ 的函数，使 $P_Nh=N^{-1}\sum_{i=1}^Nh(V_i)=1$。归一化 $P_Nh=1$ 使 $h$ 依赖 $V_1,\ldots,V_N$，但我们在记号中将隐藏并忽略这一依赖。在极限下，$h$ 不再依赖这些汇总度量：由强大数定律，$P_Nh$ 以 $P_0$ 概率1收敛于 $P_0h$，这表明条件 $P_Nh=1$ 与第29.2.1节中对应的条件 $P_0h=1$ 相似。对每个 $1\le i\le N$，定义
+\[
+\pi_i\equiv\frac{nh(V_i)}N.
+\]
+与第29.2.1节用于刻画Sampford调查抽样设计的比例 $p_1,\ldots,p_N$ 类似，$\pi_1,\ldots,\pi_N$ 是我们为行列式调查抽样设计选取的精确而非近似的一阶包含概率。现在，对该设计的完整刻画，归结为构造一个以 $\pi_1,\ldots,\pi_N$ 为对角元素、且特征值属于 $\{0,1\}$ 的 $N\times N$ 厄米矩阵 $\Pi$。由于 $\sum_{i=1}^N\pi_i=n$，所得行列式调查抽样设计将具有固定样本量 $n$。
+
+为简单起见，我们将 $\Pi$ 构造成一个非对角块为零矩阵的分块矩阵，并使它的 $\nu$ 个对角块分别为具有指定对角元素的投影矩阵。只要 $n_v\equiv\sum_{i=1}^N\pi_iI\{V_i=v\}$ 是一个能够整除 $N_v\equiv\sum_{i=1}^NI\{V_i=v\}$ 的整数，最后这一步就很容易实现。在这种情况下，投影矩阵可以是由 $n_v^2$ 个大小为 $N_v/n_v\times N_v/n_v$ 的方阵组成的分块矩阵，其中非对角块为零，对角块的所有元素都等于 $n_v^{-1}$。否则，可以借助算法得到所需的投影矩阵。
+
+由 $\Pi$ 编码的行列式调查抽样设计 $P^{s\Pi}$，其上标“$\Pi$”即由此而来，称为按 $V$ 分层且每个 $V$ 层内等权的设计。对每个 $1\le v\le\nu$，它从 $V=v$ 的层中，随机选取确定数量 $n_v$ 个观测。从该设计中抽样，可以推出下面的结果，其证明见第29.6.2节：对从 $P_0$ 中抽取的 $O$ 的任意函数 $f$，
+\begin{equation}
+\begin{aligned}
+\mathbb E_{P_0}\!\left[\operatorname{Var}_{P^{s\Pi}}\!\left[P_n^{\mathrm{HT}}f\right]\right]
+&=\frac1n\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]h^{-1}(V)\right]\\
+&\quad-\frac1N\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]\right].
+\end{aligned}
+\tag{29.8}
+\end{equation}
+等式 (29.8) 对推导下面这个命题29.3的推论至关重要，其证明概要见第29.6.3节。
+
+\begin{bookresult}{命题}{29.4}
+要求选择 $n$，使对所有 $\epsilon>0$ 都有 $N/n=o((N^2/n)^\epsilon)$。例如，对某个 $a>0$，取 $n\equiv N/\log^a(N)$，就属于这种情形。假定 $\mathcal F$ 可分，例如可数，且其关于上确界范数的括号熵有限，见 van der Vaart 和 Wellner（1996）中条件 (2.1.7) 之前的条件。那么，使用按 $V$ 分层且每个 $V$ 层内等权的行列式调查抽样设计 $P^{s\Pi}$ 时，\textbf{A1}成立，其协方差函数 $\Sigma_h^\Pi$ 为
+\[
+\Sigma_h^\Pi(f,g)=\mathbb E_{P_0}\!\left[\operatorname{Cov}_{P_0}[f(O)g(O)\mid V]h^{-1}(V)\right].
+\]
+\end{bookresult}
+
+注意，对每个仅通过 $V$ 依赖 $O$ 的 $f\in\mathcal F$，都有 $\Sigma_h^\Pi(f,f)=0$。事实上，对这样的函数，$\sqrt n(P_n^{\mathrm{HT}}-P_0)f=\sqrt n(P_N-P_0)f=O_P(\sqrt{n/N})=o_P(1)$。此外，对每个 $f\in\mathcal F$，结合式 (29.8) 与等式 $\mathbb E_{P^{s\Pi}}[P_n^{\mathrm{HT}}f]=P_Nf$，立即得到
+\begin{equation}
+\begin{aligned}
+\operatorname{Var}_{P_0P^{s\Pi}}\!\left[\sqrt n(P_n^{\mathrm{HT}}-P_0)f\right]
+&=\Sigma_h^\Pi(f,f)\\
+&\quad+\frac nN\left(\operatorname{Var}_{P_0}[f(O)]
+-\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]\right]\right).
+\end{aligned}
+\tag{29.9}
+\end{equation}
+式 (29.9) 的证明见第29.6.2节。它把 $\sqrt n(P_n^{\mathrm{HT}}-P_0)f$ 的精确方差与极限方差 $\Sigma_h^\Pi(f,f)$ 联系起来，表明两者之差的上界是一个 $O(n/N)=o(1)$ 的表达式。
+
+能否通过直接证明 $\sqrt n(P_n^{\mathrm{HT}}-P_0)$ 的泛函CLT，来放宽、甚至取消对 $n$ 如何依赖 $N$ 的额外条件，仍是一个开放问题。这里的“直接”，是指不建立在以观测为条件的泛函CLT之上，而设法绕开Soshnikov条件。Bertail 等（2016a）的定理2，就是沿这一路径证明的。
+
+已知Sobolev类关于上确界范数具有有限括号熵（van der Vaart，1998，例19.10）。不过，括号熵是相对于上确界范数而不是 $L^2(P_0)$ 范数而言，这一点略令人遗憾。事实上，若条件中的括号熵相对于后者定义，就能够允许更广泛的函数类。上确界范数来自集中不等式（Pemantle 和 Peres，2014，定理3.1）。或许，上面提到的直接证明，也能够允许用 $L^2(P_0)$ 范数替代它。
+
+命题29.2与命题29.4中的协方差函数 $\Sigma_h^{\mathrm P}$ 和 $\Sigma_h^\Pi$ 不同。特别地，对每个 $f\in\mathcal F$，
+\begin{equation}
+\begin{aligned}
+\Sigma_h^{\mathrm P}(f,f)
+&=\mathbb E_{P_0}\!\left[\mathbb E_{P_0}[f^2(O)\mid V]h^{-1}(V)\right]\\
+&\ge\mathbb E_{P_0}\!\left[\operatorname{Var}_{P_0}[f(O)\mid V]h^{-1}(V)\right]
+=\Sigma_h^\Pi(f,f).
+\end{aligned}
+\tag{29.10}
+\end{equation}
+式 (29.10) 两边可以使用同一个 $h$，因为在极限下，条件 $P_Nh=1$ 与条件 $P_0h=1$ 相似。因此，当 $\mathcal V$ 有限时，$P^{s\Pi}$ 比 $P^{s\mathrm P}$ 更有效，其含义是：无论用哪个函数 $h^{\mathrm P}$ 来定义 $P^{s\mathrm P}$，总能选择一个函数 $h^\Pi$ 来定义 $P^{s\Pi}$，使对每个 $f\in\mathcal F$，都有 $\Sigma_{h^{\mathrm P}}^{\mathrm P}(f,f)\ge\Sigma_{h^\Pi}^\Pi(f,f)$。
+
+\section{优化调查抽样设计}
+
+本节讨论如何优化用于定义调查抽样设计 $P^{s\mathrm P}$ 和 $P^{s\Pi}$ 一阶包含概率的函数 $h^{\mathrm P}$ 与 $h^\Pi$；这两种设计分别在第29.2.1节和第29.2.2节展开。优化针对的是TMLE的渐近方差，分别为 $\Sigma_h^{\mathrm P}(f_1,f_1)$ 或 $\Sigma_h^\Pi(f_1,f_1)$。根据式 (29.10)，令 $f_2^{\mathrm P}$ 和 $f_2^\Pi$ 为从 $\mathcal V$ 映到 $\mathbb R_+$ 的函数，定义为
+\begin{equation}
+f_2^{\mathrm P}(V)\equiv\sqrt{\mathbb E_{P_0}[f_1^2(O)\mid V]},
+\qquad
+f_2^\Pi(V)\equiv\sqrt{\operatorname{Var}_{P_0}[f_1(O)\mid V]}.
+\tag{29.11}
+\end{equation}
+于是，式 (29.10) 特别表明，$\Sigma_h^{\mathrm P}(f_1,f_1)=P_0(f_2^{\mathrm P})^2h^{-1}$ 总是大于 $\Sigma_h^\Pi(f_1,f_1)=P_0(f_2^\Pi)^2h^{-1}$。现在，无论令 $f_2$ 等于 $f_2^{\mathrm P}$ 还是 $f_2^\Pi$，Cauchy--Schwarz不等式都给出
+\[
+P_0(f_2)^2h^{-1}\times P_0h\ge(P_0f_2)^2,
+\]
+等号成立，当且仅当 $h$ 与 $f_2$ 成比例。
+
+对于 $P^{s\mathrm P}$，$h$ 满足 $P_0h=1$。因此，最优 $h$ 及对应的TMLE最优渐近方差为
+\begin{equation}
+h^{\mathrm P}\equiv f_2^{\mathrm P}/P_0f_2^{\mathrm P},
+\qquad
+\Sigma_{h^{\mathrm P}}^{\mathrm P}(f_1,f_1)=\left(P_0f_2^{\mathrm P}\right)^2.
+\tag{29.12}
+\end{equation}
+对于 $P^{s\Pi}$，$h$ 满足 $P_Nh=1$，并在极限下满足 $P_0h=1$。与式 (29.12) 类似，最优 $h$ 及对应的TMLE最优渐近方差为
+\begin{equation}
+h^\Pi\equiv f_2^\Pi/P_0f_2^\Pi,
+\qquad
+\Sigma_{h^\Pi}^\Pi(f_1,f_1)=\left(P_0f_2^\Pi\right)^2.
+\tag{29.13}
+\end{equation}

@@ -1,0 +1,26 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.4cm]
+\draw[ed,thin] (0,0)--(5.5,0) node[above]{$x$};
+\draw[ed,thin] (0,0)--(0,1.45) node[left]{$y$};
+\foreach \x in {1,2,3,4}{
+ \draw[thin] (\x,-.03)--(\x,.03);
+ \node[below] at (\x,-.04){$\x$};}
+\draw[thin] (-.04,1)--(.04,1);
+\node[left] at (-.03,1){$1$};
+\node[left] at (-.03,0){$0$};
+\foreach \x/\y in {1/0,2/0,3/1,4/0}{\fill (\x,\y) circle (1.4pt);}
+\node[below left] at (2.8,.95){$f_3$};
+\begin{scope}[yshift=-2.9cm]
+\draw[ed,thin] (0,0)--(5.5,0) node[above]{$x$};
+\node[left] at (0,.42){$P_X$};
+% 相对柱高取自原 PDF 矢量：31.8901、31.8901、10.6300、42.5202 点。
+\fill[plotgray] (.95,0) rectangle (1.05,.6);
+\fill[plotgray] (1.95,0) rectangle (2.05,.6);
+\fill[plotgray] (2.95,0) rectangle (3.05,.2);
+\fill[plotgray] (3.95,0) rectangle (4.05,.8);
+\end{scope}
+\end{tikzpicture}
+\caption{在这个例子中，即使沿因果方向预测，半监督学习也能降低损失。由于对每个 $x$，标签零的先验可能性都高于标签一，因此，选择一个仅在 $p(x)$ 最小的点 $x$ 处取值为一的函数，就能使错误数的期望最小。此处，该点为 $x=3$。}
+\label{fig:ch05-ssl-counterexample}
+\end{figure}

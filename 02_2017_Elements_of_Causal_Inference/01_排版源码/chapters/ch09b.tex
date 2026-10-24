@@ -1,0 +1,69 @@
+% 原书第174—177页：9.2与9.3。
+\section{Simpson悖论}
+
+例6.16的肾结石数据集之所以广为人知，是因为它具有下面的性质：
+\begin{equation}
+\begin{aligned}
+ P^{\mathfrak C}(R=1\mid T=A)&<P^{\mathfrak C}(R=1\mid T=B),\\
+ \text{但}\qquad
+ P^{\mathfrak C;\mathrm{do}(T:=A)}(R=1)&>P^{\mathfrak C;\mathrm{do}(T:=B)}(R=1),
+\end{aligned}\tag{9.1}
+\end{equation}
+见例6.37。假设我们没有测量变量 $Z$，即结石大小，而且根本不知道这个变量存在。那么，我们可能会假定 $T\to R$ 是正确的图。将这个错误的结构因果模型记作 $\widetilde{\mathfrak C}$，就可以把式 (9.1) 改写为
+\begin{equation}
+\begin{aligned}
+ P^{\widetilde{\mathfrak C};\mathrm{do}(T:=A)}(R=1)
+ &<P^{\widetilde{\mathfrak C};\mathrm{do}(T:=B)}(R=1),\\
+ \text{但}\qquad P^{\mathfrak C;\mathrm{do}(T:=A)}(R=1)
+ &>P^{\mathfrak C;\mathrm{do}(T:=B)}(R=1).
+\end{aligned}\tag{9.2}
+\end{equation}
+模型设定错误使因果结论发生了逆转：虽然药物 $A$ 更有效，我们却会建议使用 $B$。即使已知共同原因 $Z$，是否仍可能存在另一个尚未校正的混杂变量？如果不幸遇到这种情况，那么将这个变量纳入模型后，结论又会再次逆转。原则上，因果结论的这种逆转可以形成任意长的序列，见习题9.11。
+
+这个例子说明，在写出背后的因果图时，必须十分谨慎。有时，可以从描述数据采集过程的方案中推知DAG。例如，假如分配治疗的医生除了结石大小以外，对患者的其他情况一无所知，那么除结石大小外，就不可能再有其他混杂因子。
+
+因此，Simpson悖论更像是一种警示：因果推理对模型设定错误可能十分敏感。上面的例子以混杂为背景，但未经校正的选择偏倚，见例6.30，也可能产生同样的现象。
+
+\section{工具变量}
+
+工具变量（instrumental variables）的研究可以追溯到20世纪20年代［Wright, 1928］，如今已广泛用于实践［例如 Imbens and Angrist, 1994；Bowden and Turkington, 1990；Didelez et al., 2010］。这一领域存在许多推广和替代方法；这里仅介绍其基本思想。考虑图9.2左图所示的线性高斯结构因果模型。我们关心的是结构赋值
+\[
+ Y:=\alpha X+\delta H+N_Y
+\]
+中的系数 $\alpha$，见例6.42的式 (6.18)；它有时也称为平均因果效应（average causal effect，ACE）。但潜在共同原因 $H$ 的存在，使我们无法直接获得它。若直接将 $Y$ 对 $X$ 回归，并采用所得的回归系数，一般会得到 $\alpha$ 的有偏估计：
+\[
+ \frac{\Cov[X,Y]}{\Var[X]}
+ =\frac{\alpha\Var[X]+\delta\gamma\Var[H]}{\Var[X]}
+ =\alpha+\frac{\delta\gamma\Var[H]}{\Var[X]}.
+\]
+
+如果存在工具变量，我们就可以利用它。形式上，在结构因果模型中，如果变量 $Z$ 满足以下条件，就称它为 $(X,Y)$ 的工具变量：（a）$Z$ 与 $H$ 独立；（b）$Z$ 与 $X$ 不独立，即“相关性条件（relevance）”；（c）$Z$ 仅通过 $X$ 影响 $Y$，即“排除限制（exclusion restriction）”。对于这里的讨论，只需考虑满足全部条件的图9.2左图。不过，其他结构也可能满足这些条件，例如，可以允许 $Z$ 与 $X$ 之间存在潜在共同原因。在实际应用中，通常需要依靠领域知识论证条件（a）、（b）、（c）为何成立。
+
+在线性情形下，可按下面的方法利用 $Z$。由于 $(H,N_X)$ 与 $Z$ 独立，可以将
+\[
+ X:=\beta Z+\gamma H+N_X
+\]
+中的 $\gamma H+N_X$ 视为噪声。因此，可以一致估计系数 $\beta$，进而得到 $\beta Z$；在有限数据下，以拟合值 $\widehat\beta Z$ 近似。又因为
+\[
+ Y:=\alpha X+\delta H+N_Y
+   =\alpha(\beta Z)+(\alpha\gamma+\delta)H+N_Y,
+\]
+
+将 $Y$ 对 $\beta Z$ 回归，就能一致估计 $\alpha$。\chninenote{原书在最后一步代入 $X$ 的赋值时漏写了 $\alpha N_X$。完整展开应为 $Y=\alpha(\beta Z)+(\alpha\gamma+\delta)H+\alpha N_X+N_Y$。由于新增的噪声项仍与 $Z$ 独立，不影响随后两阶段回归的一致性论证。}也就是说，先将 $X$ 对 $Z$ 回归，再将 $Y$ 对第一阶段回归得到的预测值 $\widehat\beta Z$ 回归。在无限数据的极限下，平均因果效应 $\alpha$ 就是可识别的。这种方法通常称为\textbf{两阶段最小二乘法（two-stage least squares）}。它利用了结构因果模型的线性，以及前述三个假设：（a）$H$ 与 $Z$ 独立；（b）$\beta\ne0$，若 $\beta$ 很小或为零，则称 $Z$ 为“弱工具变量（weak instrument）”；（c）$Z$ 对 $Y$ 没有直接影响。
+
+\input{figures/ch09_02}
+
+不过，可识别性并不限于线性情形。相关结果有很多［例如 Hernán and Robins, 2006］，这里仅列出四项。
+\begin{enumerate}[label=(\roman*)]
+ \item 不难看出，如果 $X$ 对 $Z,H$ 的依赖是非线性的、但具有可加形式，两阶段最小二乘法仍然适用，见习题9.12。
+ \item 如果 $Z,X,Y$ 都是二值变量，则平均因果效应定义为
+ \[
+ P^{\mathfrak C;\mathrm{do}(X:=1)}(Y=1)
+ -P^{\mathfrak C;\mathrm{do}(X:=0)}(Y=1).
+ \]
+ 例如，无须进一步假设 $Y$ 与 $X,H$ 之间的关系，Balke and Pearl［1997］就给出了平均因果效应的紧下界和紧上界。这些界可能信息很少，也可能收缩为一个点。在后一种情况下，称平均因果效应是可识别的。
+ \item Wang and Tchetgen Tchetgen［2016，定理1］证明：仍然考虑二值治疗时，如果 $Y$ 的结构赋值对 $X,H$ 是可加的，则平均因果效应可识别。
+ \item 连续情形中的可识别性结果，见 Newey［2013］及其中的参考文献。
+\end{enumerate}
+
+大多数工具变量概念，包括前面讨论的线性情形，都能推广到存在观测协变量 $W$ 的情况，其中 $W$ 导致某些或全部相关变量。例如，在图9.2左图中，可以加入一个同时指向 $Z,X,Y$ 的变量 $W$。此时，假设（a）、（b）、（c）和相应方法都需要修改，并始终以 $W$ 为条件。Brito and Pearl［2002b］还将这一思想推广到多元的 $Z,X$，称为“广义工具变量（generalized instrumental variables）”。

@@ -1,0 +1,101 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\blockwidth{10.5cm}
+\def\nodewidth{2.7cm}
+\def\nodeheight{1.5cm}
+\def\ssep{0.9cm}
+
+\tikzstyle{lnode} = [minimum width=\nodewidth,minimum height=\nodeheight,inner sep=2pt,draw,very thick,fill=white,rounded corners=1pt];
+
+% reward model training
+\begin{scope}
+
+% four models
+\node [lnode,anchor=west,align=center] (rewardmodel) at (0,0) {Reward Model\\[-0.1cm] \small{$r_{\phi}(\mathbf{x},\mathbf{y})$}};
+\node [anchor=north west,draw,inner sep=3pt,fill=white] (rewardmodellabel) at ([xshift=-0.1cm,yshift=0.1cm]rewardmodel.north west) {\tiny{To Learn}};
+
+\node [lnode,anchor=north west,align=center] (policy) at ([yshift=-2.0cm]rewardmodel.south west) {LLM Policy\\[-0.1cm] \small{$\mathrm{Pr}_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t})$}};
+\node [anchor=north west,draw,inner sep=3pt,fill=white] (policylabel) at ([xshift=-0.1cm,yshift=0.1cm]policy.north west) {\tiny{To Learn}};
+
+\node [lnode,anchor=west,align=center] (valuenet) at ([xshift=2.5cm]policy.east) {Value Function\\[-0.1cm] \small{$V_{\omega}(\mathbf{x},\mathbf{y}_{<t})$}};
+\node [anchor=north west,draw,inner sep=3pt,fill=white] (valuenetlabel) at ([xshift=-0.1cm,yshift=0.1cm]valuenet.north west) {\tiny{To Learn}};
+
+\node [lnode,anchor=east,align=center] (refmodel) at ([xshift=-0.6cm]policy.west) {Ref Model\\[-0.1cm] \small{$\mathrm{Pr}_{\theta_{\mathrm{old}}}(y_t|\mathbf{x},\mathbf{y}_{<t})$}};
+\node [anchor=north west,draw,inner sep=3pt,fill=white] (refmodellabel) at ([xshift=-0.1cm,yshift=0.1cm]refmodel.north west) {\tiny{Fixed}};
+
+\draw [->,very thick] ([xshift=1pt]refmodel.east) -- ([xshift=-1pt]policy.west);
+\draw [->,very thick] ([xshift=-0.1cm,yshift=-1pt]rewardmodel.south) -- ([xshift=-0.1cm,yshift=1pt]policy.north);
+\draw [->,very thick] ([xshift=-1pt]valuenet.west) -- ([xshift=1pt]policy.east);
+\draw [->,very thick] ([xshift=0.3cm,yshift=-1pt]rewardmodel.south) .. controls +(south:2.0cm) and +(north:1.5cm) .. ([xshift=-0.0cm,yshift=1pt]valuenet.north);
+
+\node [anchor=north west,align=left] (rmline) at ([xshift=0.4cm]rewardmodel.north east) {\small{Minimizing the loss based on}\\[-0.05cm] \small{the Bradley-Terry model}};
+\node [anchor=north west] (rmline2) at ([yshift=-0.1cm,xshift=0.0cm]rmline.south west) {\scriptsize{$\min\limits_{\phi} -\frac{1}{|\mathcal{D}_r|} \sum\limits_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \in \mathcal{D}_r} \log \sigma(r_{\phi}(\mathbf{x},\mathbf{y}_a) - r_{\phi}(\mathbf{x},\mathbf{y}_b))$}};
+
+\begin{pgfonlayer}{background}
+\node [anchor=north west,minimum width=\blockwidth,minimum height=2.6cm,draw,fill=gray!20,rounded corners=3pt] (rmtrainingbox) at ([xshift=-0.3cm,yshift=0.3cm]rewardmodel.north west) {};
+\node [anchor=north west,minimum width=\blockwidth,minimum height=11.8cm,draw,fill=gray!20,rounded corners=3pt] (policytrainingbox) at ([xshift=-0.3cm,yshift=0.3cm]policy.north west) {};
+\node [anchor=east,align=right] (rmboxlabel) at ([xshift=-0.2cm]rmtrainingbox.west) {\small{Reward Model}\\[-0.1cm] \small{Training}};
+\node [anchor=east] (policyboxlabel) at ([xshift=-0.2cm]policytrainingbox.west) {\small{Policy Training}};
+\end{pgfonlayer}
+
+\node [anchor=south,draw,minimum width=\blockwidth,minimum height=0.7cm] (rmtrainingdata) at ([yshift=0.3cm]rmtrainingbox.north) {\small{Human preference data $\mathcal{D}_r = \{(\mathbf{x},\mathbf{y}_a, \mathbf{y}_b)\}$}};
+\node [anchor=north,draw,minimum width=\blockwidth,minimum height=0.7cm] (policytrainingdata) at ([yshift=-0.3cm]policytrainingbox.south) {\small{Input-only data $\mathcal{D} = \{\mathbf{x}\}$}};
+
+\draw [->] ([yshift=-1pt]rmtrainingdata.south) -- ([yshift=1pt]rmtrainingbox.north);
+\draw [->] ([yshift=1pt]policytrainingdata.north) -- ([yshift=-1pt]policytrainingbox.south);
+
+% token prediction
+\node [anchor=center] (x0) at ([yshift=-4cm,xshift=0.5cm]policy.south) {\scriptsize{$x_0$}};
+\node [anchor=center] (x1) at ([xshift=\ssep]x0) {\scriptsize{$x_1$}};
+\node [anchor=center] (x2) at ([xshift=\ssep]x1) {\scriptsize{$\cdots$}};
+\node [anchor=center] (x3) at ([xshift=\ssep]x2) {\scriptsize{$x_m$}};
+\node [anchor=center] (y1) at ([xshift=\ssep]x3) {\scriptsize{$y_1$}};
+\node [anchor=center] (y2) at ([xshift=\ssep]y1) {\scriptsize{$\cdots$}};
+\node [anchor=center] (y3) at ([xshift=\ssep]y2) {\scriptsize{$y_{t-1}$}};
+
+\draw [decoration={brace,amplitude=4pt},decorate,thin] ([xshift=0,yshift=-0.2cm]y3.east) -- ([xshift=0,yshift=-0.2cm]x0.west) node [pos=0.5,below,yshift=-0.1cm] {\tiny{State $(\mathbf{x},\mathbf{y}_{<t})$}};
+
+\draw [->] ([yshift=0.2cm]x0.center) --  ([yshift=0.4cm]x0.center);
+\draw [->] ([yshift=0.2cm]x1.center) --  ([yshift=0.4cm]x1.center);
+\draw [->] ([yshift=0.2cm]x3.center) --  ([yshift=0.4cm]x3.center);
+\draw [->] ([yshift=0.2cm]y1.center) --  ([yshift=0.4cm]y1.center);
+\draw [->] ([yshift=0.2cm]y3.center) --  ([yshift=0.4cm]y3.center);
+
+\node [anchor=center] (ox0) at ([yshift=1.85cm]x0) {\color{gray!50} \scriptsize{$x_1$}};
+\node [anchor=center] (ox1) at ([xshift=\ssep]ox0) {\color{gray!50} \scriptsize{$x_2$}};
+\node [anchor=center] (ox2) at ([xshift=\ssep]ox1) {\color{gray!50} \scriptsize{$\cdots$}};
+\node [anchor=center] (ox3) at ([xshift=\ssep]ox2) {\color{gray!50} \scriptsize{$y_1$}};
+\node [anchor=center] (oy1) at ([xshift=\ssep]ox3) {\color{gray!50} \scriptsize{$y_2$}};
+\node [anchor=center] (oy2) at ([xshift=\ssep]oy1) {\color{gray!50} \scriptsize{$\cdots$}};
+\node [anchor=center] (oy3) at ([xshift=\ssep]oy2) {\scriptsize{$y_t$}};
+
+\node [anchor=west,align=left] (action) at ([xshift=0.0cm,yshift=-0.15cm]oy3.east) {\tiny{Action $y_t$}\\[-0.25cm] \tiny{(sampled with $\mathrm{Pr}_{\theta_{\mathrm{old}}}$)}};
+\node [anchor=south,align=left] (evaluation) at ([yshift=0.3cm]oy2.north) {\scriptsize{Evaluate the state-action pair using the advantage}\\[-0.2cm] \scriptsize{function or the TD error (based on the reward}\\[-0.2cm] \scriptsize{model and the value function)}};
+
+\draw [->,thin,dotted] ([xshift=-0cm,yshift=0.1cm]evaluation.south) .. controls +(south:0.3cm) and +(north:0.5cm) .. ([yshift=-0.05cm]oy3.north);
+
+\draw [<-,gray!50] ([yshift=-0.2cm]ox0.center) --  ([yshift=-0.4cm]ox0.center);
+\draw [<-,gray!50] ([yshift=-0.2cm]ox1.center) --  ([yshift=-0.4cm]ox1.center);
+\draw [<-,gray!50] ([yshift=-0.2cm]ox3.center) --  ([yshift=-0.4cm]ox3.center);
+\draw [<-,gray!50] ([yshift=-0.2cm]oy1.center) --  ([yshift=-0.4cm]oy1.center);
+\draw [<-] ([yshift=-0.2cm]oy3.center) --  ([yshift=-0.4cm]oy3.center);
+
+\node [anchor=south,draw,minimum width=6.5cm,minimum height=0.8cm] (llm) at ([yshift=0.3cm]x3.north) {LLM Policy};
+
+% training details
+\node [anchor=north west,align=left] (policytrainingtext) at ([yshift=-4.8cm]policy.south west) {\footnotesize{\textbf{LLM Policy}} \\ \scriptsize{Minimizing the clipped PPO loss}\\[-0.15cm] \scriptsize{with the penalty}};
+\node [anchor=north west,align=left] (policytrainingtext2) at ([yshift=-0.3cm]policytrainingtext.south west) {\scriptsize{$\min\limits_{\theta} - \sum_{\mathbf{x} \in \mathcal{D}, \mathbf{y} \sim \Pr_{\theta_{\mathrm{old}}}(\cdot|\mathbf{x})} \sum_{t=1}^{T}$}\\[0.1cm] \scriptsize{$\Big[ \mathrm{Clip} \big(\frac{\mathrm{Pr}_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t})}{\mathrm{Pr}_{\theta_{\mathrm{old}}}(y_t|\mathbf{x},\mathbf{y}_{<t})}, A_t \big) - $}  \\[0.1cm] \hspace{0.2cm} \scriptsize{$ \beta \cdot \big( \log \mathrm{Pr}_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t}) - $}\\[-0.0cm] \scriptsize{\hspace{0.75cm} $\log \mathrm{Pr}_{\theta_{\mathrm{old}}}(y_t|\mathbf{x},\mathbf{y}_{<t}) \big) \Big]$}};
+
+\node [anchor=north west,align=left] (valuenettrainingtext) at ([yshift=-4.8cm]valuenet.south west) {\footnotesize{\textbf{Value Function}} \\ \scriptsize{Minimizing the MSE between the}\\[-0.15cm] \scriptsize{computed return and the predicted}\\[-0.15cm] \scriptsize{state value}};
+\node [anchor=north west,align=left] (valuenettrainingtext2) at (valuenettrainingtext.south west) {\scriptsize{$\min\limits_{\omega} \frac{1}{M} \sum_{\mathbf{x} \in \mathcal{D}} \sum_{t=1}^{T}$}\\[0.1cm] \scriptsize{$\big[r_t + \gamma V_{\omega}(\mathbf{x},\mathbf{y}_{< t+1}) - V_{\omega}(\mathbf{x},\mathbf{y}_{<t}) \big]^2$}};
+
+\node [anchor=north west,align=left] (notes) at ([yshift=0.1cm,xshift=-0.2cm]policytrainingtext2.south west) {\tiny{${\color{white}*}*$ $r_t = r(\mathbf{x},\mathbf{y}_{< t + 1})$ denotes the reward received as step $t$.}\\[-0.15cm] \tiny{$**$ $A_t$ denotes the advantage at step $t$, and can be defined as $r_t + \gamma V_{\omega}(\mathbf{x},\mathbf{y}_{<t+1}) - V_{\omega}(\mathbf{x},\mathbf{y}_{<t})$}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

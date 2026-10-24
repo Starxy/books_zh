@@ -1,0 +1,101 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+%----------------------------------------------------------------------------------------
+% Foundations of Large Language Models
+%
+% Copyright 2021-2026
+% Tong Xiao/肖桐 (xiaotong@mail.neu.edu.cn) and Jingbo Zhu/朱靖波 (zhujingbo@mail.neu.edu.cn)
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{book}
+\usepackage[a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{project}
+
+\let\cleardoublepage\clearpage
+
+\setstretch{1.05}
+\addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
+\renewcommand*{\lstlistlistingname}{List of Programs}
+\def\projectauthor{Tong Xiao and Jingbo Zhu}
+\def\projecttitle{{\fontsize{27pt}{32pt}\selectfont {\textbf{Foundations of}}}\\[0.3cm] {\fontsize{27pt}{32pt}\selectfont \textbf{Large Language Models}}}
+\def\projectmonth{\today}
+\def\projectdepartment{NLP Lab, Northeastern University \& NiuTrans Research}
+% SECTION STYLE
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+\begin{document}
+\prefrontmatter
+%\frontmatter
+
+\pagenumbering{roman}
+%\newpage
+~\vfill
+
+\noindent Copyright \copyright\ 2021-2026 Tong Xiao and Jingbo Zhu\\
+
+\noindent \textsc{Natural Language Processing Lab, Northeastern University}\\
+\noindent \textsc{\&}\\
+\noindent \textsc{NiuTrans Research}\\
+
+\begin{spacing}{1.2}
+\noindent Licensed under the Creative Commons Attribution-NonCommercial 4.0 Unported License (the ``License''). You may not use this file except in compliance with the License. You may obtain a copy of the License at \url{http://creativecommons.org/licenses/by-nc/4.0}. Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an \textsc{``as is'' basis, without warranties or conditions of any kind}, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+\end{spacing}
+
+\noindent \textit{\today}
+%\cleardoublepage
+
+\input{preface}
+\markboth{Preface}{}
+\cleardoublepage
+
+\input{notation}
+\markboth{Notation}{}
+\cleardoublepage
+
+\pdfbookmark{\contentsname}{toc}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+% \addtolength{\parskip}{-\baselineskip}
+\begin{spacing}{1.0}
+\tableofcontents
+\end{spacing}
+% \addtolength{\parskip}{\baselineskip}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+\mainmatter
+\include{Chapter7/chapter7}
+\include{Chapter8/chapter8}
+\include{Chapter9/chapter9}
+\include{Chapter10/chapter10}
+\include{Chapter11/chapter11}
+\include{Chapter12/chapter12}
+\cleardoublepage
+
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE,LO]{Bibliography}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\bibliographystyle{book-bib-style} % Give more information to each entry of the bib
+\bibliography{bibliography}
+\cleardoublepage
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE,LO]{Index}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\appendix
+\pretocmd{\chapter}{\pagenumbering{arabic}
+\renewcommand*{\thepage}{\thechapter.\arabic{page}}
+}{}{}
+
+\printindex % Show index
+
+\end{document}

@@ -1,0 +1,39 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.8cm,y=1.15cm]
+\filldraw[fill=gray!18,draw=gray,rounded corners=2pt] (0-.43,-.43) rectangle (0+.43,2.65);
+\filldraw[fill=gray!18,draw=gray,rounded corners=2pt] (2-.43,-.43) rectangle (2+.43,2.65);
+\filldraw[fill=gray!18,draw=gray,rounded corners=2pt] (4-.43,-.43) rectangle (4+.43,2.65);
+\node[ch10node,fill=white] (ch10f4-x1-0) at (0,2) {$X^{1}_{t}$};
+\node[ch10node,fill=white] (ch10f4-x1-1) at (1,2) {$X^{1}_{t+1}$};
+\node[ch10node,fill=white] (ch10f4-x1-2) at (2,2) {$X^{1}_{t+2}$};
+\node[ch10node,fill=white] (ch10f4-x1-3) at (3,2) {$X^{1}_{t+3}$};
+\node[ch10node,fill=white] (ch10f4-x1-4) at (4,2) {$X^{1}_{t+4}$};
+\node[ch10node,fill=white] (ch10f4-x2-0) at (0,1) {$X^{2}_{t}$};
+\node[ch10node,fill=white] (ch10f4-x2-1) at (1,1) {$X^{2}_{t+1}$};
+\node[ch10node,fill=white] (ch10f4-x2-2) at (2,1) {$X^{2}_{t+2}$};
+\node[ch10node,fill=white] (ch10f4-x2-3) at (3,1) {$X^{2}_{t+3}$};
+\node[ch10node,fill=white] (ch10f4-x2-4) at (4,1) {$X^{2}_{t+4}$};
+\node[ch10node,fill=white] (ch10f4-x3-0) at (0,0) {$X^{3}_{t}$};
+\node[ch10node,fill=white] (ch10f4-x3-1) at (1,0) {$X^{3}_{t+1}$};
+\node[ch10node,fill=white] (ch10f4-x3-2) at (2,0) {$X^{3}_{t+2}$};
+\node[ch10node,fill=white] (ch10f4-x3-3) at (3,0) {$X^{3}_{t+3}$};
+\node[ch10node,fill=white] (ch10f4-x3-4) at (4,0) {$X^{3}_{t+4}$};
+\draw[ed] (ch10f4-x1-0) to[bend left=35] (ch10f4-x1-2);
+\draw[ed] (ch10f4-x1-1) to[bend left=35] (ch10f4-x1-3);
+\draw[ed] (ch10f4-x1-2) to[bend left=35] (ch10f4-x1-4);
+\draw[ed] (ch10f4-x1-0)--(ch10f4-x2-1);
+\draw[ed] (ch10f4-x2-0)--(ch10f4-x3-1);
+\draw[ed] (ch10f4-x3-0)--(ch10f4-x3-1);
+\draw[ed] (ch10f4-x1-1)--(ch10f4-x2-2);
+\draw[ed] (ch10f4-x2-1)--(ch10f4-x3-2);
+\draw[ed] (ch10f4-x3-1)--(ch10f4-x3-2);
+\draw[ed] (ch10f4-x1-2)--(ch10f4-x2-3);
+\draw[ed] (ch10f4-x2-2)--(ch10f4-x3-3);
+\draw[ed] (ch10f4-x3-2)--(ch10f4-x3-3);
+\draw[ed] (ch10f4-x1-3)--(ch10f4-x2-4);
+\draw[ed] (ch10f4-x2-3)--(ch10f4-x3-4);
+\draw[ed] (ch10f4-x3-3)--(ch10f4-x3-4);
+\end{tikzpicture}
+\caption{降采样时间序列的示例：仅观测灰色区域中的变量。}
+\end{figure}

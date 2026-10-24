@@ -1,0 +1,14 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.8cm,y=.9cm,every node/.style={font=\small}]
+\draw[->,blue!60] (-.7,0)--(3.6,0) node[right,text=black] {$n$};
+\foreach \xx/\yy in {0/4,1/1,2/3,3/2}{
+ \draw[blue!60] (\xx,0)--(\xx,\yy);
+ \fill[blue!60] (\xx,\yy) circle (1.2pt);
+ \node[above] at (\xx,\yy) {$\yy$};
+ \node[below] at (\xx,0) {$\xx$};
+}
+\end{tikzpicture}
+\origfig{10}{信号分解示例。}
+\label{fig:ch03-10}
+\end{figure}

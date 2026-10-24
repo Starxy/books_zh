@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1.4cm,y=1cm,>=Stealth,
+ch02v/.style={ellipse,draw=inkblue,minimum width=9mm,minimum height=7mm,font=\small},
+ch02non/.style={->,red,semithick},
+ch02lin/.style={->,green!60!black,dashed,semithick}]
+\node[ch02v](ch0207n1)at(-1,3.5){1};
+\node[ch02v](ch0207n2)at(1,3.5){2};
+\node[ch02v](ch0207n3)at(3,3.5){3};
+\node[ch02v](ch0207n4)at(0,2){4};
+\node[ch02v](ch0207n5)at(2.7,2){5};
+\node[ch02v](ch0207n6)at(1.5,.5){6};
+\node[ch02v](ch0207n7)at(1.5,-1){7};
+\draw[ch02non](ch0207n1)--(ch0207n4);
+\draw[ch02lin](ch0207n2)--(ch0207n4);
+\draw[ch02lin](ch0207n3)--(ch0207n2);
+\draw[ch02non](ch0207n2)--(ch0207n5);
+\draw[ch02lin](ch0207n3)--(ch0207n5);
+\draw[ch02lin](ch0207n4)--(ch0207n6);
+\draw[ch02non](ch0207n5)--(ch0207n6);
+\draw[ch02non](ch0207n6)--(ch0207n7);
+\node[font=\small,anchor=east](ch0207txt1)at(-1.5,2.6){非线性边};
+\draw[->,blue!65](ch0207txt1.east)--(-.55,2.9);
+\node[font=\small,anchor=west](ch0207txt2)at(3.7,2.7){线性边};
+\draw[->,blue!65](ch0207txt2.west)--(2.9,2.8);
+\end{tikzpicture}

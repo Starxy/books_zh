@@ -1,0 +1,748 @@
+% ============================================================
+%  第五章  社会科学与经济学中的因果性与结构模型
+%  5.1—5.3
+% ============================================================
+\chapter{社会科学与经济学中的因果性与结构模型}
+
+\begin{flushright}
+\kaishu\small
+二人若不同心，岂能同行呢？\\[2pt]
+（Do two men travel together unless they have agreed?）\\[2pt]
+——《阿摩司书》3:3
+\end{flushright}
+
+\section*{序言}
+\addcontentsline{toc}{section}{序言}
+
+自 20 世纪 50 年代以来，结构方程建模（structural equation modeling，SEM）一直主导着经济学与社会科学中的因果分析；然而，今日对 SEM 的主流解读，与其创立者的本意相去甚远，也与本书所阐明的解读大不相同。结构方程本应是实质性因果信息的载体，如今却常被当作概率信息的载体：经济学家视之为密度函数的便捷表示，社会科学家视之为协方差矩阵的摘要。其结果，许多 SEM 研究者难以说清 SEM 的因果内容，而 SEM 最独特的那些能力，目前既未被充分理解，也未被充分利用。
+
+本章抱有一个雄心：恢复 SEM 的因果解释。我们将说明，图模型领域与干预逻辑的进展如何能够缓解当前的困难，从而使结构方程重新成为因果建模的首要语言。为此，我们把第三、四章的若干结果改写为参数形式（这是 SEM 研究者最熟悉的形式），并说明模型检验与参数识别中的实践问题与概念问题，如何可以通过图形方法得到澄清。随后我们再回到非参数分析，从中将演化出一套操作语义，为“结构方程究竟在说什么”提供一种自洽的解释（\S 5.4）。具体而言，我们将回答以下基本问题：结构方程对世界作出了什么断言？这些断言中哪一部分是可检验的？在什么条件下，我们可以通过回归分析估计结构参数？
+
+\S 5.1 回顾 SEM 的历史，并为它的因果解释何以日渐侵蚀提出一种解释。结构模型的可检验蕴含在 \S 5.2 中阐明。对于递归模型（本书称为马尔可夫模型），我们发现结构模型的统计内容可以完全由该模型所蕴含的一组零偏相关来刻画。这些零偏相关可以用 d-分离准则从图上读出；在线性模型中，该准则同样适用于含有环与相关误差的图（\S 5.2）。把这一准则用于模型检验的讨论见 \S 5.2.2，那里主张局部检验优于全局检验。\S 5.2.3 给出模型等价的简单图形检验，从而澄清结构模型中不可检验的部分。
+
+\S 5.3 处理在收集任何数据之前判定结构参数可识别性的问题。\S 5.3.1 为线性马尔可夫模型与半马尔可夫模型（即带相关误差的无环图）发展出简单的可识别性图形检验。这些检验归结为一个简单程序，用以判定何时一个路径系数可以等同于一个回归系数，更一般地说，何时结构参数可以通过回归分析估计。\S 5.3.2 讨论线性模型中的参数识别与非参数模型中的因果效应识别之间的联系，\S 5.3.3 则以后者作为前者的语义基础。
+
+最后，\S 5.4 讨论 SEM 的逻辑基础，解决若干过去被搁置的困难，其中包括结构方程、结构参数、误差项以及总效应与直接效应的操作定义，以及计量经济学中外生性的形式定义。
+
+\section{引论}
+
+\subsection{因果性在寻找一种语言}
+
+“原因”一词并不在标准概率论的词汇表里。概率论是许多经验科学的正式数学语言，却不允许我们说出“泥巴不会导致下雨”这样的句子——这是一个令人尴尬却又无法回避的事实；我们所能说的只是：这两个事件相互关联，或者说相依——意即若发现其一，便可预期遭遇其二。因此，为复杂现象寻求因果解释、或为政策决定寻求理据的科学家，不得不用一套关于因果性的词汇来补充概率的语言；在这套词汇中，“泥巴不导致下雨”的符号表示应当不同于“泥巴与雨独立”的符号表示。奇怪的是，这样的区分至今尚未被纳入标准的科学分析。\footnote{哲学家把因果性化归为概率的种种尝试，综述见第七章（\S 7.5）。}
+
+人们已经提出两种关于因果性的语言：路径分析或结构方程建模（SEM）（Wright 1921; Haavelmo 1943），以及 Neyman–Rubin 潜在结局模型（Neyman 1923; Rubin 1974）。前者为经济学家与社会科学研究者所采纳（Goldberger 1972; Duncan 1975），后者则由一批统计学家所倡导（Rubin 1974; Holland 1988; Rosenbaum 2002）。这两种语言在数学上等价（见第七章 \S 7.4.4），然而二者都未成为因果建模的标准——结构方程框架未能如此，是因为它被大量误用、且形式化不足（Freedman 1987）；潜在结局框架未能如此，则是因为它只被部分形式化，而且（更重要的是）它依托于一套玄奥、看似形而上的词汇——随机实验与反事实变量——这套词汇与人们对非实验情境中因果过程的日常理解毫无明显关联（见 \S 3.6.3）。
+
+目前，潜在结局模型理解者甚少，使用者更少。结构方程模型使用者甚众，但其因果解释普遍受到质疑或回避，即便其领军实践者亦然。在第三、四章中，我们描述了结构方程模型（以非参数形式）如何能够为干预理论提供语义基础。在 \S 1.4 与 \S 3.6.3 中，我们概述了这些模型如何同样为反事实理论提供语义基础。令人尴尬的是，这些独特之处在现代 SEM 文献中几乎不被承认，也极少被利用。当前占主导地位的哲学，把 SEM 仅仅当作编码密度函数（在经济学中）或协方差信息（在社会科学中）的一种便捷方式。具有讽刺意味的是，我们正目睹科学史上最奇特的循环之一：因果性在寻找一种语言，而与此同时，这种语言的使用者却在寻找它的意义。
+
+本章的目的是阐明 SEM 的因果解释、勾画其正确用法，从而恢复人们对 SEM 作为社会与行为科学中因果分析之首要形式语言的信心。不过，我们首先结合 SEM 的历史发展，对它当前的危机作一简要分析。
+
+\subsection{结构方程模型：其含义如何被遮蔽}
+
+结构方程建模由遗传学家（Wright 1921）与经济学家（Haavelmo 1943; Koopmans 1950, 1953）所发展，其宗旨是把定性的因果信息与统计数据结合起来，对相关变量之间的因果关系作出定量评估。因此，对于人们常问的那个问题——“在什么条件下，我们可以赋予结构系数以因果解释？”——Wright 与 Haavelmo 会回答：“在任何条件下！”按照 SEM 创立者的说法，使方程 $y=\beta x+\varepsilon$ 成为\emph{结构的}的那些条件，恰恰就是“$X$ 与 $Y$ 之间的因果联系为 $\beta$”这一断言本身；关于 $x$ 与 $\varepsilon$ 之间统计关系的一切，都永远不能改变对 $\beta$ 的这一解释。令人惊讶的是，这一对 SEM 的基本理解几乎已从文献中消失，使现代计量经济学家与社会科学研究者在 $\beta$ 面前束手无策。
+
+今日大多数 SEM 研究者认为，要使结构方程有资格承载因果断言，还需要额外的成分。在社会科学家当中，James、Mulaik 与 Brett（1982, p.~45）即指出，需要一个称为\emph{自足}（self-containment）的条件，才能把方程 $y=\beta x+\varepsilon$ 尊奉为具有因果地位；而自足指的是 $\mathrm{cov}(x,\varepsilon)=0$。据 James 等（1982）说，若自足不成立，“则方程与函数关系都不表示因果关系”。Bollen（1989, p.~44）重申了自足的必要性（冠以\emph{隔离}或\emph{伪隔离}之名）——这与如下理解相反：结构方程在其各成分之间的任何统计关系之先、并且独立于这些关系，便已获得其因果解释。自 20 世纪 80 年代初以来，公开赞同原初 SEM 逻辑的论述已极为罕见：即 $\beta$ 定义了 $E(Y)$ 对 $X$ 的实验操纵（或反事实变化）的敏感度；$\varepsilon$ 是用 $\beta$ 定义的，而不是相反；正交性条件 $\mathrm{cov}(x,\varepsilon)=0$ 对于 $\beta$ 的因果解释既非必要也非充分（见 \S 3.6.2 与 \S 5.4.1）。\footnote{事实上，一旦 $\beta$ 得到解释，这一条件甚至连 $\beta$ 的识别都不是必需的（参见图 5.7 与图 5.9 中 $\alpha$ 的识别）。}因此，许多 SEM 教科书干脆放弃因果解释，也就不足为奇了：“我们在研究文献中常常见到原因、效应、因果建模这些术语。我们不赞同这种做法，因此本书不使用这些术语”（Schumaker and Lomax 1996, p.~90）。
+
+计量经济学家在结构参数的因果解读上同样困难重重。Leamer（1985, p.~258）评论道：“我的结论令人惊讶：经济学家非常清楚他们使用‘外生的’‘结构的’‘因果的’这些词时是什么意思，然而没有一位教科书作者写出过恰当的定义。”自 Leamer 作出这些评论以来，情况几乎没有变化。计量经济学教科书总是把大部分篇幅用于估计结构参数，却很少讨论这些参数在政策评估中的作用。少数讨论政策分析的著作（如 Goldberger 1991; Intriligator et al. 1996, p.~28）假定政策变量按其本性即满足正交性条件，从而使结构信息成为多余。例如，Hendry（1995, p.~62）明确地把 $\beta$ 的解释与正交性条件绑在一起，他写道：
+
+\begin{quote}
+\kaishu
+在估计所设定模型所需的条件被明确之前，$\beta$ 的地位可能并不清楚。例如，在模型
+\[
+y_t=z_t\beta+u_t\quad\text{其中}\quad u_t\sim \mathrm{IN}[0,\sigma_u^2],
+\]
+中，只要 $z_t$ 与 $u_t$ 之间的关系未被明确，$\beta$ 的含义便不确定，因为根据已给的信息，$E[z_tu_t]$ 既可能为零，也可能不为零。
+\end{quote}
+
+LeRoy（1995, p.~211）走得更远：“经济学初等教学中的老生常谈是：内生变量一般不具有因果次序，这意味着‘$y_1$ 对 $y_2$ 的效应是什么’（其中 $y_1$ 与 $y_2$ 为内生变量）这一问题一般毫无意义。”按照 LeRoy 的看法，凡其诸原因对该效应变量各有独立影响的变量，都不能被赋予因果关系；这一立场否定了经济学家与社会科学研究者辛苦估计的多数结构参数的因果解读。
+
+著名科学哲学家 Cartwright（1995b, p.~49）在回应这些困难时，重新对那个折磨人的问题发起攻击：“为什么我们可以假定，能够从那些外生变量互不相关的方程的参数中读取出原因，包括因果次序？”与 SEM 的创立者一样，Cartwright 承认原因不能仅由统计关系或函数关系导出，并且因果假设是验证任何因果结论的前提。然而，与 Wright 和 Haavelmo 不同，她全力搜寻那些能使回归方程 $y=\beta x+\varepsilon$ 中的参数 $\beta$ 获得正当因果含义的假设，并力图证明她所提出的假设确实充分。Cartwright 分析中最能说明问题之处在于：她并未考虑 Haavelmo 本会给出的答案——即从参数得出因果结论所需的假设，是由那位宣布该方程为“结构的”的科学家传达给我们的；这些假设已经编码在方程的句法之中，可以像读一张购物清单那样容易地从相应的图上读出；\footnote{这些假设在 \S 5.4 中被阐明并操作化。简言之，若 $G$ 是与某个因果模型相联系的图、而该模型使某参数成为可识别的，则有两个假设足以担保对该参数的因果解读：(1) 每一条缺失的箭头——比如 $X$ 与 $Y$ 之间者——代表如下假设：一旦我们实施干预并固定 $Y$ 的父节点，$X$ 对 $Y$ 便无效应；(2) 每一条缺失的双向弧 $X\longleftrightarrow Y$ 代表如下假设：一切影响 $Y$ 的遗漏因子与影响 $X$ 的遗漏因子不相关。这两个假设在干预可行的实验情境中都是可检验的（\S 5.4.1）。}它们无需到他处搜寻，也不需要关于充分性的新证明。再者，Haavelmo 的答案适用于任何大小与形状的模型，包括含相关外生变量的模型。
+
+这些例子透露出经济学家与社会科学研究者中一种令人警觉的倾向：把结构方程看作一个代数对象，它承载函数假设与统计假设，却没有任何因果内容。一位著名社会学家的如下陈述颇具代表性：“如果有更多研究者放弃思考和使用原因、效应之类的术语，那将非常有益健康”（Muthen 1987, p.~180）。这一倾向最大胆的表达，也许出自 Holland（1995, p.~54）：“当然，我说的就是方程 $\{y=a+bx+e\}$。它是什么意思？对于这样一个方程，我迄今所能确定的唯一含义是：它是描述给定 $\{x\}$ 时 $\{y\}$ 之条件分布的一种简写。”\footnote{这一方程的结构解释（Haavelmo 1943）几乎已被彻底遗忘，而它对给定 $\{x\}$ 时 $\{y\}$ 的条件分布未作任何说明。用我们的词汇复述，它读作：“在一个理想实验中，我们控制 $X$ 取 $x$、并控制任一其他变量集 $Z$（不含 $X$ 或 $Y$）取 $z$，则 $Y$ 将取值 $y$，由 $a+bx+e$ 给出，其中 $e$ 是一个（逐点地）独立于设定 $x$ 与 $z$ 的随机变量”（见 \S 5.4.1）。这一陈述蕴含 $E[Y\mid \dox{x},\dox{z}]=a+bx+c$，但对 $E(Y\mid X=x)$ 未作任何说明。}
+
+SEM 的创立者对结构与模型有着全然不同的构想。Wright（1923, p.~240）宣称，在路径系数理论中“关于因果关系的先验知识是作为前提被假定的”；Haavelmo（1943）则明确把每一个结构方程解释为关于一个假想的受控实验的陈述。同样，Marschak（1950）、Koopmans（1953）与 Simon（1953）都指出，在概率分布背后设定一个结构，其目的正是为了应对政策可能带来的假想变化。因此人们不禁要问：过去 50 年间 SEM 究竟发生了什么？为什么 Wright、Haavelmo、Marschak、Koopmans 与 Simon 那些基本（且仍然有效）的教导竟被遗忘？
+
+一些经济学家把结构方程理解水平的下降归因于 Lucas（1976）的批评。按照这一批评，预期到政策干预的经济主体会倾向于采取与 SEM 预测相反的行动，而 SEM 的预测往往忽略这类预期。然而，这一批评只是把模型的不变量与结构建模的重担——从行为层面转移到涉及主体动机与预期的更深层面——并不能免除经济学家在某一话语层面上定义并表示结构方程之因果内容的责任。
+
+我认为，SEM 的因果内容之所以逐渐逃出了 SEM 实践者的意识，主要出于以下原因。
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item SEM 实践者一直试图通过让因果假设保持隐晦来为 SEM 赢得体面，因为统计学家——体面的仲裁者——厌恶那些不能直接检验的假设。
+\item 长期主导 SEM 的代数语言，缺乏把因果假设（有别于统计假设）明确表达出来所需的记号设施。由于未能为因果关系配备精确的数学记号，创立者们实际上把 SEM 的因果基础交给了遗忘。他们今日的弟子则到别处去寻找基础性的答案。
+\end{enumerate}
+
+让我对后一点略作申说。SEM 的创立者相当清楚：在结构模型中，等号传达的是“由……所决定”这一不对称关系，因而其行为更像编程语言中的赋值符号（:=），而不像代数等式。然而，也许出于数学纯粹性的考虑，他们克制着没有引入一个表示这种不对称性的符号。据 Epstein（1987）说，20 世纪 40 年代 Wright 曾向 Cowles 委员会（SEM 的滋生地）作过一次关于路径图的研讨报告，但双方都未看出对方方法有何特别可取之处。为什么？毕竟，一张图不过是一组非参数结构方程，只不过为了避免混淆，把等号换成了箭头。
+
+我的解释是：早期计量经济学家是极为审慎的数学家，他们认为可以把数学保持在纯然等式—统计的形式中，而只在头脑里推理结构。他们的确做得惊人地好，因为他们确实是能够在头脑中完成这件事的非凡人物。后果在 20 世纪 80 年代初浮现：他们的弟子开始把等号误认为代数等式。结果是，“所谓的扰动项”突然变得毫无意义（Richard 1980, p.~3）。我们正承受着这个故事的悲惨结局。由于未能用数学记号表达自己的洞见，SEM 的创立者造成了今日围绕结构方程解释的种种困难——正如 Holland 的“它是什么意思？”所概括的那样。
+
+\subsection{图作为一种数学语言}
+
+图形方法近来的进展，有望把因果性带回科学建模与分析的主流。这些进展一方面涉及对图与概率之间关系的更深入理解，另一方面涉及对图与因果性之间关系的更深入理解。但关键的转变在于：图已经成为一种数学语言。这种数学语言不只是展示代数关系的一种启发式助记装置，如同 Blalock（1962）与 Duncan（1975）的著作中那样。相反，图为那些不易用代数方程与概率演算等标准数学语言表达的概念与关系，提供了一套基本的记号系统。此外，图形方法如今提供了一套强大的符号机械，用以在因果假设与统计数据相结合时导出这些假设的推论。
+
+一个说明图形语言之力、并为 \S 5.2 与 \S 5.3 的讨论作铺垫的具体例子，是辛普森悖论（\S 3.3 中讨论过，\S 6.1 中将进一步分析）。这一悖论涉及两个变量之间（例如性别与入学）的关联在我们把总体划分为更细的组（例如系别）时发生逆转。自 1899 年被发现以来，辛普森的逆转一直是大量统计学研究的主题。这些研究关注的是逃避逆转的条件，而非逆转所提出的实践问题：“划分之前与划分之后，哪一种关联更有效？”在线性分析中，这一问题通过回归变量的选择而浮现——例如判定某个变量 $Z$ 能否被加入回归方程而不使结果产生偏倚。这样的加入很容易逆转其他回归变量系数的符号，此现象称为“抑制效应”（Darlington 1990）。
+
+尽管经过一个世纪的分析，回归变量的选择或协变量的调整问题，仍继续被逐案地非形式地决定，其决定依赖于民间传说与直觉，而不是过硬的数学。标准统计学文献对此问题出奇地沉默。除了指出不应对受所设原因影响的协变量作调整之外，\footnote{这一建议建立在“不受……影响”这一因果关系之上，据我所知，它是在统计学教科书中争得一席之地的唯一一个因果概念。这一建议既非必要也非充分，读者可从第三章的讨论中自行验证。}文献并未提供任何指南，说明哪些协变量可以容许用于调整、以及作出这种形式判定需要什么假设。这种沉默的原因很清楚：辛普森悖论与协变量选择问题的解答（如我们在 \S 3.3.1 与 \S 4.5.3 中所见）立足于因果假设，而这类假设无法用统计学的标准语言形式地表达。\footnote{辛普森的逆转与抑制效应，只有当我们对所涉关联赋予因果解读时才是悖论性的；见 \S 6.1。}
+
+相反，用图的语言表述协变量选择问题，立刻就能得到一个既自然又形式的一般解。研究者用路径图这一熟悉的定性术语表达因果知识（或假设）；一旦图完成，一个简单的程序便可判定：相对于所要评估的量，某个提议的调整（或回归）是否恰当。这一程序我们在定义 3.3.1 中称为后门准则，它适用于所关心的量是 $X$ 对 $Y$ 的总效应之时。若要评估的是直接效应，则适用定理 4.5.3 的图形准则。在线性模型中识别直接效应（即路径系数）的修正准则，将在定理 5.3.1 中给出。
+
+这个例子并不是图形方法带来清晰与理解的孤立事例。事实上，SEM 的概念基础通过图而达到了新的精确水平。是什么使一组方程成为“结构的”？这类方程的作者表达了什么假设？这些假设的可检验蕴含是什么？一组给定的结构方程宣告了哪些政策断言？——这些问题都可以通过图形方法得到简单而数学上精确的回答。这些问题即便为现代 SEM 作者所回避（Heckman and Vytlacil 2007；见 \S 11.5.4），仍将在以下各节中得到讨论。
+
+\section{图与模型检验}
+
+1919 年，Wright 发展出他的“路径系数方法”：只要路径图正确地表示了数据背后的因果过程，研究者便可由相关测量计算因果效应的量值。Wright 的方法在于写出一组方程——每对变量 $(X_i,X_j)$ 一个——并令（标准化的）相关系数 $\rho_{ij}$ 等于连接 $X_i$ 与 $X_j$ 的各条路径上路径系数与残差相关系数之乘积的和。然后可以尝试就路径系数求解这些方程，用观测到的相关来表示它们。只要所得的方程对某个路径系数 $p_{mn}$ 给出唯一解、且该解独立于（未观测的）残差相关，便称该系数是\emph{可识别的}。若每一组相关系数 $\rho_{ij}$ 都与某种路径系数的选择相容，则称该模型是\emph{不可检验的}或\emph{不可否证的}（亦称\emph{饱和}、\emph{恰识别}等等），因为它能够完美拟合任何数据。
+
+Wright 的方法部分是图形的、部分是代数的；而有向图理论则使我们能够在收集数据之前，纯以图形术语分析可检验性与可识别性问题，并且使我们能够把这些分析从线性模型推广到非线性或非参数模型。本节讨论线性模型与非参数模型中的可检验性问题。
+
+\subsection{结构模型的可检验蕴含}
+
+当我们为数据生成过程设定一个模型时，该模型往往对收集到的数据的统计量施加限制。在观测研究中，这些限制提供了检验或否证所设模型的唯一视角。在许多情形中，这类限制可以表述为零偏相关的形式；更重要的是，这些限制仅由路径图的结构所蕴含，与参数的数值无关——这正是 d-分离准则所揭示的。
+
+\subsubsection*{预备记号}
+
+在讨论结构模型的可检验蕴含之前，我们先回顾 \S 1.4 中的若干定义，并把它们与 SEM 文献中通用的记号联系起来。
+
+本章讨论的图表示形如
+\begin{equation}
+x_i=f_i(\pa_i,\varepsilon_i),\qquad i=1,\dots,n, \tag{5.1}
+\end{equation}
+的结构方程组，其中 $\pa_i$（意为 parents，父节点）代表那些被判定为 $X_i$ 之直接原因的一组变量的（取值），而 $\varepsilon_i$ 表示由遗漏因子所致的误差。式 \textup{(5.1)} 是标准线性方程
+\begin{equation}
+x_i=\sum_{k\neq i}\alpha_{ik}x_k+\varepsilon_i,\qquad i=1,\dots,n, \tag{5.2}
+\end{equation}
+的非线性、非参数推广；其中 $\pa_i$ 对应于 \textup{(5.2)} 右端系数非零的那些变量。形如 \textup{(5.1)} 的一组方程，若每个方程都表示变量 $X_i$ 之取值（而不只是其概率）被选定的过程，则称为一个\emph{因果模型}。从 $\pa_i$ 的每个成员向 $X_i$ 画一箭头所得的图 $G$，称为\emph{因果图}。除实箭头之外，因果图还应在任何一对误差相依的变量之间包含一条双向（即双箭头）弧。
+
+必须强调：因果图（以及传统的路径图）应当与统计学文献中形形色色的图形模型区分开来——后者的构造与解释完全立足于联合分布的性质（Kiiveri et al. 1984; Edwards 2000; Cowell et al. 1999; Whittaker 1990; Cox and Wermuth 1996; Lauritzen 1996; Andersson et al. 1998）。那些统计模型中缺失的连线表示条件独立，而因果图中缺失的连线则表示因果联系的缺席（见注 3 与 \S 5.4），后者未必蕴含分布中的条件独立。
+
+若因果模型的图不含有向环、且其 $\varepsilon_i$ 相互独立（即不存在双向弧），则称之为\emph{马尔可夫}的。若模型的图无环但含相依误差，则称之为\emph{半马尔可夫}的。
+
+若 $\varepsilon_i$ 为多元正态（这是 SEM 文献中常见的假设），则 \textup{(5.2)} 中的 $X_i$ 亦为多元正态，并将完全由相关系数 $\rho_{ij}$ 刻画。多元正态分布的一个有用性质是：条件方差 $\sigma^2_{X\mid z}$、条件协方差 $\sigma_{XY\mid z}$ 与条件相关系数 $\rho_{XY\mid z}$ 全都与 $z$ 的取值无关。这些量分别称为\emph{偏方差}、\emph{偏协方差}与\emph{偏相关系数}，记作 $\sigma_{X\cdot Z}$、$\sigma_{XY\cdot Z}$ 与 $\rho_{XY\cdot Z}$（其中 $X$ 与 $Y$ 是单个变量，$Z$ 是一组变量）。此外，偏相关系数 $\rho_{XY\cdot Z}$ 为零，当且仅当分布中 $(X\indep Y\mid Z)$ 成立。
+
+\emph{偏回归系数}由
+\[
+r_{YX\cdot Z}=\rho_{YX\cdot Z}\,\frac{\sigma_{Y\cdot Z}}{\sigma_{X\cdot Z}}
+\]
+给出；它等于 $Y$ 对 $X$ 与 $Z$ 作线性回归时 $X$ 的系数（下标的次序至关重要）。换言之，回归方程
+\[
+y=ax+b_1z_1+\cdots+b_kz_k
+\]
+中 $x$ 的系数由
+\[
+a=r_{YX\cdot Z_1Z_2\cdots Z_k}
+\]
+给出。因此，这些系数可以用最小二乘法估计（Crámer 1946）。
+
+\subsubsection*{d-分离与偏相关}
+
+马尔可夫模型（SEM 文献中的平行术语是\emph{递归}模型；\footnote{“递归”一词有歧义：有些作者把相关误差排除在外，有些则不。}Bollen 1989）满足定理 1.2.7 的马尔可夫性；因此，马尔可夫模型的统计参数可以用普通回归分析估计。特别地，d-分离准则在这类模型中有效（这里我们重述定理 1.2.4）。
+
+\begin{theorem}[Verma and Pearl 1988; Geiger et al. 1990]
+若在有向无环图 $G$ 中集合 $X$ 与 $Y$ 被 $Z$ 所 d-分离，则在任何按 $G$ 构造的马尔可夫模型中，$X$ 在给定 $Z$ 时与 $Y$ 独立。反之，若在 DAG $G$ 中 $X$ 与 $Y$ 未被 $Z$ 所 d-分离，则在几乎所有按 $G$ 构造的马尔可夫模型中，$X$ 与 $Y$ 在给定 $Z$ 时相依。
+\end{theorem}
+
+由于条件独立蕴含零偏相关，定理 5.2.1 便转化为一个图形检验，用以识别模型中必然消失的那些偏相关。
+
+\begin{corollary}
+在任何按 DAG $G$ 构造的马尔可夫模型中，只要 $Z$ 中变量所对应的节点在 $G$ 中 d-分离节点 $X$ 与节点 $Y$，偏相关 $\rho_{XY\cdot Z}$ 便消失，而与模型的参数无关。此外，没有其他偏相关会对模型的所有参数都消失。
+\end{corollary}
+
+不受限制的半马尔可夫模型，总可以用包含潜变量的马尔可夫模型来模拟，后者解释了误差项之间的全部相依性。因此，若我们把双向弧解释为发自潜公共父节点，d-分离准则在这类模型中依然有效。在某些线性半马尔可夫模型中，若每个潜变量被限制为至多影响两个观测变量，上述做法也许不再可行（Spirtes et al. 1996）。然而已有证明：d-分离准则在这类受限系统中仍然有效（Spirtes et al. 1996）；而且，当网络含有环时，这种有效性依然保持（Spirtes et al. 1998; Koster 1999）。这些结果概括于下一定理。
+
+\begin{theorem}[一般线性模型中的 d-分离]
+对于任何按图 $D$ 构造的线性模型——$D$ 可以含有环与双向弧——若与变量集 $Z$ 相对应的节点在 $D$ 中 d-分离节点 $X$ 与节点 $Y$，则偏相关 $\rho_{XY\cdot Z}$ 消失。（每条双向弧 $i\longleftrightarrow j$ 均解释为一个潜公共父节点 $i\leftarrow L\rightarrow j$。）
+\end{theorem}
+
+对于线性结构方程模型（见式 \textup{(5.2)}），定理 5.2.3 蕴含：由 d-分离检验所识别出的那些（且仅有那些）偏相关，必独立于模型参数 $\alpha_{ik}$、并独立于误差方差而消失。这提示了一种简单而直接的模型检验方法：与其走标准套路——先求模型参数的最大似然估计，再给这些估计打分以评定其对数据的拟合——我们可以直接检验自由模型所蕴含的每一个零偏相关。Shipley（1997）指出了使用这类检验的优点，并设计了它们的实现。
+
+然而，问题在于：检验一个给定模型所蕴含的大量零偏相关是否可行？幸而这些偏相关并非彼此独立；它们可以从相对少量的偏相关导出，后者构成整个集合的一个基（Pearl and Verma 1987）。
+
+\begin{definition}[基]
+设 $S$ 是一组偏相关。$S$ 的一个\emph{基} $B$ 是一组零偏相关，满足：(i) $B$（利用概率定律）蕴含 $S$ 中每个元素为零；(ii) $B$ 的任何真子集都不具有这种蕴含力。
+\end{definition}
+
+对于 DAG $D$ 所蕴含的零偏相关，一个显然的基之选择是等式组
+\[
+B=\{\rho_{ij\cdot \pa_i}=0\mid i\succ j\},
+\]
+其中 $i$ 取遍 $D$ 中所有节点，$j$ 取遍 $i$ 的一切前驱（其顺序与 $D$ 的箭头一致）。事实上，这组等式反映了马尔可夫模型的“父节点屏蔽”性质（定理 1.2.7），而后者正是 DAG 所编码的一切概率信息的来源。因此，检验这些等式，便足以检验一个线性马尔可夫模型的全部统计断言。此外，当父节点集 $\PA_i$ 很大时，也许可以选择一个更经济的基，如下一定理所示。\footnote{线性模型可能拥有更经济的基这一可能性，是我在与 Rod McDonald 的一次谈话中注意到的。}
+
+\begin{theorem}[图形基]
+设 $(i,j)$ 是 DAG $D$ 中一对不相邻的节点，$Z_{ij}$ 是任一节点集，其中各节点比 $j$ 更靠近 $i$，且 $Z_{ij}$ 把 $i$ 与 $j$ d-分离。则由零偏相关
+\[
+B=\{\rho_{ij\cdot Z_{ij}}=0\mid i\succ j\}
+\]
+组成的集合——每个不相邻节点对一个元素——构成 $D$ 所蕴含的一切零偏相关之集合的一个基。
+\end{theorem}
+
+定理 5.2.5 断言：与图中不相邻节点之间的任何一种分离相对应的零偏相关之集合，囊括了线性马尔可夫模型所传达的全部统计信息。定理 5.2.5 的证明见 Pearl and Meshkat（1999）。
+
+考察图 5.1，我们看到以下两个集合中的每一个都构成该图所示模型的一个基：
+\begin{equation}
+\begin{aligned}
+B_1&=\{\rho_{32\cdot1}=0,\ \rho_{41\cdot3}=0,\ \rho_{42\cdot3}=0,\ \rho_{51\cdot43}=0,\ \rho_{52\cdot43}=0\},\\
+B_2&=\{\rho_{32\cdot1}=0,\ \rho_{41\cdot3}=0,\ \rho_{42\cdot1}=0,\ \rho_{51\cdot3}=0,\ \rho_{52\cdot1}=0\}.
+\end{aligned}\tag{5.3}
+\end{equation}
+基 $B_1$ 用父节点集 $\PA_i$ 把 $i$ 与 $j$ 分离（$i\succ j$）。另一方面，基 $B_2$ 使用更小的分离集，因而导致的检验涉及更少的回归变量。注意，基的每个成员都对应于 DAG 中一条缺失的箭头；因此，验证一个 DAG 所需的检验数目，等于它所含缺失箭头的数目。图越稀疏，它对协方差矩阵的约束就越多，验证这些约束所需的检验也越多。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[vtx] (X1) at (2.4,2.6) {$X_1$};
+  \node[vtx] (X2) at (0.3,1.4) {$X_2$};
+  \node[vtx] (X3) at (2.4,1.4) {$X_3$};
+  \node[vtx] (X4) at (4.3,1.4) {$X_4$};
+  \node[vtx] (X5) at (2.4,0.1) {$X_5$};
+  \draw[ed] (X1)--(X2);
+  \draw[ed] (X1)--(X3);
+  \draw[ed] (X3)--(X4);
+  \draw[ed] (X3)--(X5);
+  \draw[ed] (X4)--(X5);
+\end{tikzpicture}
+\caption{每个缺失连线都可用两个回归变量检验的模型（式 \textup{(5.3)}）。}
+\label{fig:5.1}
+\end{figure}
+
+\subsection{检验可检验者}
+
+在线性结构方程模型中，变量之间所设的因果关系可以表示为一张带系数的有向图：有些系数先验固定（通常固定为零），有些则自由变动。检验此类模型与数据是否相符的传统方法分两个阶段。首先，通过迭代地极大化某个拟合度量（如似然函数）来估计自由参数。其次，把由所估参数蕴含的协方差矩阵与样本协方差相比较，并施加一个统计检验，以判定后者是否可能源自前者（Bollen 1989; Chou and Bentler 1995）。
+
+这一进路有两大弱点：
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 若某些参数不可识别，则第一阶段可能无法得到参数的稳定估计，研究者只好干脆放弃检验；
+\item 若模型未能通过数据拟合检验，研究者几乎得不到任何指引，不知哪些建模假设有误。
+\end{enumerate}
+
+例如，图 5.2 所示路径模型中，若假定 $\mathrm{cov}(\varepsilon_1,\varepsilon_2)$ 未知，则参数 $\alpha$ 不可识别；这意味着最大似然方法可能找不到 $\alpha$ 的合适估计，从而排除了检验的第二阶段。然而，这个模型并不比 $\mathrm{cov}(\varepsilon_1,\varepsilon_2)=0$ 可识别的那个模型更少可检验性，检验本可继续进行。这两个模型对协方差矩阵施加同样的限制——即偏相关 $\rho_{XZ\cdot Y}$ 应当消失（亦即 $\rho_{XZ}=\rho_{XY}\rho_{YZ}$）——然而自由 $\mathrm{cov}(\varepsilon_1,\varepsilon_2)$ 的模型由于 $\alpha$ 不可识别，反而无法对这一限制进行检验。
+
+图 5.3 说明了与模型诊断相关的弱点。假定真实的数据生成模型在 $X$ 与 $W$ 之间有直接的因果联系，如图 5.3(a) 所示，而所设模型（图 5.3(b)）没有这种联系。在统计上，两个模型的差别在于 $\rho_{XW\cdot Z}$ 这一项：按图 5.3(b) 它应当消失，按图 5.3(a) 则自由。一旦差异的性质清楚了，研究者就必须判定：实质知识是否足以证成通过加一条连线或一条弯曲弧来修改模型。然而，由于这一差异的效应会散布在若干个协方差项上，全局拟合检验无法轻易地把差异孤立出来。即便对模型作种种局部修改后再施以多重拟合检验（LISREL 提供此类检验），也未必有多大帮助，因为结果可能被模型其他部分（例如以 $Y$ 为根的子图）的差异所扭曲。因此，全局拟合检验在模型调试中往往只有很小的用处。
+
+全局拟合检验的一个诱人替代是\emph{局部}拟合检验：列出模型所蕴含的限制，逐一检验。例如，像 $\rho_{XW\cdot Z}=0$ 这样的限制可以在局部检验，无需测量 $Y$ 或其任何后代，从而使与那些测量相关的误差不至于干扰对 $\rho_{XW\cdot Z}=0$ 的检验——而后者才是拟合欠缺的真正来源。更一般地说，典型的 SEM 模型往往接近“饱和”：在一张原本几乎不受限制的大图中，只声称少数几条缺失的边。对这些限制的局部直接检验比全局检验更可靠，因为它们的自由度更少，也不被无关的测量误差所污染。\S 5.2.1 所述缺失边进路，为检测并枚举检验给定模型所需的局部检验，提供了一种系统的方式。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[vtx] (e1) at (0,2.0) {$\varepsilon_1$};
+  \node[vtx] (e2) at (2.0,2.0) {$\varepsilon_2$};
+  \node[vtx] (e3) at (4.2,2.0) {$\varepsilon_3$};
+  \node[vtx] (X)  at (0,0.7) {$X$};
+  \node[vtx] (Y)  at (2.0,0.7) {$Y$};
+  \node[vtx] (Z)  at (4.2,0.7) {$Z$};
+  \draw[edd] (e1)--(X); \draw[edd] (e2)--(Y); \draw[edd] (e3)--(Z);
+  \draw[ed] (X)--(Y); \draw[ed] (Y)--(Z);
+  \node[font=\small] at (1.0,0.35) {$\alpha$};
+  \node[font=\small] at (3.1,0.35) {$\beta$};
+  \draw[bid,dashed] (e1) to[bend left=40] (e2);
+\end{tikzpicture}
+\caption{含不可识别参数（$\alpha$）的一个可检验模型。}
+\label{fig:5.2}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.9,every node/.style={transform shape}]
+  % ---- panel (a) ----
+  \node[vtx] (aX) at (1.0,2.4) {$X$};
+  \node[vtx] (aY) at (0.2,1.3) {$Y$};
+  \node[vtx] (aZ) at (2.0,1.3) {$Z$};
+  \node[vtx] (aW) at (3.9,1.3) {$W$};
+  \draw[ed] (aX)--(aY); \draw[ed] (aX)--(aZ); \draw[ed] (aX)--(aW);
+  \draw[ed] (aY)--(aZ); \draw[ed] (aZ)--(aW);
+  \foreach \k in {1,...,4}{
+    \draw[ed] (aY) -- ++(-125+\k*17:0.85);}
+  \node[font=\small] at (1.05,0.25) {(a)};
+  % ---- panel (b) ----
+  \node[vtx] (bX) at (6.4,2.4) {$X$};
+  \node[vtx] (bY) at (5.6,1.3) {$Y$};
+  \node[vtx] (bZ) at (7.4,1.3) {$Z$};
+  \node[vtx] (bW) at (9.3,1.3) {$W$};
+  \draw[ed] (bX)--(bY); \draw[ed] (bX)--(bZ);
+  \draw[ed] (bY)--(bZ); \draw[ed] (bZ)--(bW);
+  \foreach \k in {1,...,4}{
+    \draw[ed] (bY) -- ++(-125+\k*17:0.85);}
+  \node[font=\small] at (6.45,0.25) {(b)};
+\end{tikzpicture}
+\caption{仅在一个局部检验 $\rho_{XW\cdot Z}=0$ 上不同的两个模型。（$Y$ 下方的一组未标注短箭头照原图绘出。）}
+\label{fig:5.3}
+\end{figure}
+
+\subsection{模型等价}
+
+在 \S 2.3（定义 2.3.3）中，我们把两个结构方程模型定义为\emph{观测等价}的：若其中一个模型所生成的每一个概率分布都能由另一个模型生成。在标准的 SEM 中，模型假定为线性，数据由协方差矩阵刻画。因此，两个这样的模型若\emph{协方差等价}，即在观测上不可区分：其中一个模型（通过某种参数选择）所生成的每个协方差矩阵，都能由另一个模型生成。容易验证，定理 1.2.8 的等价判据可推广到协方差等价。
+
+\begin{theorem}
+两个马尔可夫线性—正态模型协方差等价，当且仅当它们蕴含相同的零偏相关集合。此外，两个这样的模型协方差等价，当且仅当它们对应的图具有相同的边集与相同的 v 结构集。
+\end{theorem}
+
+定理 5.2.6 的第一部分界定了马尔可夫模型的可检验蕴含。它断言：在非操纵性研究中，马尔可夫结构方程模型除了 d-分离检验所揭示的那些零偏相关之外，不能对任何其他特征加以检验。它同时提供了一个简单的等价检验：无需核查所有 d-分离条件，只需比较相应的边及其方向性。
+
+在半马尔可夫模型（带相关误差的 DAG）中，d-分离准则对于检验独立性依然有效（见定理 5.2.3），但独立等价不再蕴含观测等价。\footnote{Verma and Pearl（1990）给出了一个使用非参数模型的例子，Richardson 则设计了一个使用带相关误差的线性模型的例子（Spirtes and Richardson 1996）。}两个蕴含相同零偏相关集合（在观测变量之间）的模型，仍可能对协方差矩阵施加不同的不等式约束。尽管如此，定理 5.2.3 与定理 5.2.6 仍为检验等价提供了必要条件。
+
+\subsubsection*{生成等价模型}
+
+只要不破坏或制造 v 结构，就允许箭头反向；借此我们可以用定理 5.2.6 为任何马尔可夫模型生成等价的替代模型。Meek（1995）与 Chickering（1995）证明：$X\to Y$ 可替换为 $Y\to X$，当且仅当 $X$ 的所有父节点也是 $Y$ 的父节点。他们还证明：对任何两个等价模型，总存在这样一系列边反演，把其中一个模型变为另一个。这一简单的边反演规则与 Stelzl（1986）以及 Lee and Hershberger（1990）所提出的规则一致。
+
+在半马尔可夫模型中，生成等价模型的规则更为复杂。尽管如此，定理 5.2.6 仍给出方便的图形原则，用以检验边替换规则的正确性。基本原则是：若我们把每条双向弧 $X\longleftrightarrow Y$ 看作代表一个潜公共原因 $X\leftarrow L\rightarrow Y$，则定理 5.2.6 的“若”部分依然有效；也就是说，任何不破坏、也不制造 v 结构的边替换变换都是允许的。例如，只要 $X$ 与 $Y$ 没有别的父节点（潜的或观测的），边 $X\to Y$ 就可以替换为双向弧 $X\longleftrightarrow Y$。同样，只要 (1) $X$ 与 $Y$ 没有潜父节点，(2) $X$ 或 $Y$ 的每个父节点都是二者的共同父节点，边 $X\to Y$ 就可以替换为双向弧 $X\longleftrightarrow Y$。这类替换不会引入新的 v 结构。然而，由于 v 结构现在可能涉及潜变量，我们可以容忍某些 v 结构的制造或破坏，只要这不影响观测变量之间的偏相关。图 5.4(a) 表明，某些 v 结构的制造是可以容忍的。把箭头 $Z\to X$ 反向，我们制造了两条汇聚箭头 $Z\rightarrow X\leftarrow Y$，它们的尾端并非直接相连，而是通过一个潜公共原因相连。这是可以容忍的，因为尽管 $X$ 处的新汇聚阻断了路径 $(Z,X,Y)$，$Z$ 与 $Y$ 之间（经由弧 $Z\longleftrightarrow Y$）的连通却依然未被阻断，而且事实上无法被任何观测变量集所阻断。
+
+我们可以推广 v 结构的概念，把这一原则推得更远。在马尔可夫模型中，v 结构被定义为两条尾端不以连线相连的汇聚箭头；现在我们则把 v 结构定义为任何一对尾端“可分离”的汇聚箭头。所谓可分离，是指存在一个条件集 $S$ 能够 d-分离这两个尾端。显然，若两个尾端由一条箭头或一条双向弧相连，它们便不可分离。但在半马尔可夫模型中，一对节点即使不以边相连，也可能不可分离（Verma and Pearl 1990）。带着这一推广，我们可以把边替换的必要条件陈述如下。
+
+\noindent\textbf{规则 1：}箭头 $X\to Y$ 可与 $X\longleftrightarrow Y$ 互换，仅当 $X$ 的每个邻节点或父节点都与 $Y$ 不可分离。（所谓\emph{邻节点}，指通过一条双向弧与 $X$ 相连的节点。）
+
+\smallskip
+\noindent\textbf{规则 2：}箭头 $X\to Y$ 可反演为 $X\leftarrow Y$，仅当反演之前：(i) $Y$ 的每个邻节点或父节点（$X$ 除外）都与 $X$ 不可分离；(ii) $X$ 的每个邻节点或父节点都与 $Y$ 不可分离。
+
+例如，考虑模型 $Z\longleftrightarrow X\to Y$。箭头 $X\to Y$ 不能替换为双向弧 $X\longleftrightarrow Y$，因为 $Z$（$X$ 的一个邻节点）可被集合 $S=\{X\}$ 与 $Y$ 分离。的确，$X$ 处新造的 v 结构会使 $Z$ 与 $Y$ 边缘独立，与原来的模型相悖。
+
+再举一例，考虑图 5.4(a)。这里把 $X\to Y$ 替换为 $X\longleftrightarrow Y$、或替换为反向箭头 $X\leftarrow Y$，都是正当的，因为 $X$ 没有邻节点，而 $X$ 的唯一父节点 $Z$ 与 $Y$ 不可分离。同样的考虑适用于图 5.4(b)：变量 $Z$ 与 $Y$ 虽不相邻，却不可分离，因为从 $Z$ 经 $W$ 通往 $Y$ 的路径无法被阻断。
+
+一个更复杂的例子——它表明规则 1 与规则 2 并不足以保证变换的正当性——见图 5.4(c)。这里看起来把 $X\to Y$ 替换为 $X\longleftrightarrow Y$ 是正当的，因为 $X$ 处的（潜）v 结构被箭头 $Z\to Y$ 旁路了。然而，原模型表明从 $W$ 到 $Y$ 的路径在给定 $Z$ 时是 d-连通的，而替换后的模型则表明同一路径在给定 $Z$ 时被 d-分离。于是，偏相关 $\rho_{WY\cdot Z}$ 在替换后的模型中消失，在替换前的模型中却不消失。类似的差异也出现在偏相关 $\rho_{WY\cdot ZX}$ 上：原模型表明从 $W$ 到 $Y$ 的路径在给定 $\{Z,X\}$ 时被阻断，而替换后的模型表明该路径在给定 $\{Z,X\}$ 时是 d-连通的。于是，偏相关 $\rho_{WY\cdot ZX}$ 在替换前的模型中消失，在替换后的模型中却不受约束。\footnote{这个例子是金天（Jin Tian）提请我注意的；另有一个类似的例子由两位匿名审稿人提出。}显然，仅对 $X$ 的父节点与邻节点施加规则是不够的；还应当考虑远处的祖先（例如 $W$）。
+
+这些规则只是 d-分离准则施于半马尔可夫模型时所生蕴含的一小部分。检验两个半马尔可夫模型之 d-分离等价性的充要判据，由 Spirtes and Verma（1992）设计出来。Spirtes and Richardson（1996）把该判据推广到含反馈环的模型。然而我们应当记住：由于两个半马尔可夫模型可以零偏相关等价却并不协方差等价，基于 d-分离的判据只能提供模型等价的必要条件。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.82,every node/.style={transform shape}]
+  % ---- panel (a): Z -> X -> Y with Z <-> Y dashed ----
+  \node[vtx] (aZ) at (0,0) {$Z$};
+  \node[vtx] (aX) at (1.7,0) {$X$};
+  \node[vtx] (aY) at (3.4,0) {$Y$};
+  \draw[ed] (aZ)--(aX); \draw[ed] (aX)--(aY);
+  \draw[bid,dashed] (aZ) to[bend left=45] (aY);
+  \node[font=\small] at (1.7,-0.95) {(a)};
+  % ---- panel (b) ----
+  \node[vtx] (bZ) at (5.2,0) {$Z$};
+  \node[vtx] (bX) at (6.9,0) {$X$};
+  \node[vtx] (bY) at (8.6,0) {$Y$};
+  \node[vtx] (bW) at (6.9,1.5) {$W$};
+  \draw[ed] (bZ)--(bX); \draw[ed] (bX)--(bY);
+  \draw[ed] (bZ)--(bW); \draw[ed] (bX)--(bW); \draw[ed] (bY)--(bW);
+  \draw[bid,dashed] (bZ) to[bend left=40] (bW);
+  \draw[bid,dashed] (bW) to[bend right=40] (bY);
+  \node[font=\small] at (6.9,-0.95) {(b)};
+  % ---- panel (c) ----
+  \node[vtx] (cW) at (10.6,0) {$W$};
+  \node[vtx] (cZ) at (12.2,0) {$Z$};
+  \node[vtx] (cX) at (14.0,0) {$X$};
+  \node[vtx] (cY) at (15.8,0) {$Y$};
+  \draw[ed] (cW)--(cZ);
+  \draw[ed] (cX)--(cY);
+  \draw[ed] (cZ) to[bend right=50] (cY);
+  \draw[bid,dashed] (cZ) to[bend left=55] (cX);
+  \node[font=\small] at (14.0,-1.05) {(c)};
+\end{tikzpicture}
+\caption{允许（(a) 与 (b)）与禁止（(c)）反演 $X\to Y$ 的模型。}
+\label{fig:5.4}
+\end{figure}
+
+\subsubsection*{等价模型的意义}
+
+定理 5.2.6 在方法论上意义重大，因为它澄清了“结构模型是可检验的”这一说法究竟何所指（Bollen 1989, p.~78）。\footnote{针对“路径分析既不能从数据导出因果理论、也不能用数据检验其任何主要部分”这一指责（Freedman 1987, p.~112），Bollen（1989, p.~78）指出：“我们可以检验并拒斥结构模型。……因此，说这些模型不可否证，是没有多少根据的。”}它断言：我们从来不是检验一个模型，而是检验一整个观测等价的模型类——所设模型无法用任何统计手段与该类中的其他模型区分开。它还断言：这个等价类可以（通过察看他）从图上构造出来，从而为研究者生动地呈现各种竞争的替代方案以供考量。给定等价类中所有模型的图形表示，已由 Verma and Pearl（1990）（见 \S 2.6）、Spirtes 等（1993）以及 Andersson 等（1998）设计出来。Richardson（1996）讨论了含环模型之等价类的表示。
+
+（过度识别的）结构方程模型确有可检验蕴含，但这些蕴含只是模型所表示内容的一小部分：模型还表示了一组断言、假设与推论。未能区分因果假设、统计蕴含与政策断言，是社会科学的定量方法备受猜疑与混乱的主要原因之一（Freedman 1987, p.~112; Goldberger 1992; Wermuth 1992）。然而，由于图形方法使这些成分之间的区分变得生动而清晰，它们有望使 SEM 更易为各学科的研究者所接受。
+
+总体而言，SEM 文献一直忽视对等价模型的显式分析。例如，Breckler（1990）发现，社会与人格心理学领域的 72 篇论文中只有一篇承认等价模型的存在。普遍的态度是：数据拟合与模型过度识别的结合，就足以确认所设模型。然而近来，多重等价模型的存在似乎搅动了一些 SEM 研究者的神经。MacCallum 等（1993, p.~198）断言“等价模型现象对使用 CSM 的实证研究者构成了严重问题”，并且是“对 CSM 结果解释之有效性的威胁”（CSM 指“协方差结构建模”；它与 SEM 并无不同，只是某些社会科学家用来委婉掩饰其模型因果内容的一个术语）。Breckler（1990, p.~262）认为“若一个模型得到支持，则其所有等价模型也同样得到支持”，并进而大胆断言“因果建模一词实属误称”。
+
+这类极端之论并不正当。如果我们接受“因果关系不能仅从统计数据推断出来”这一事实，那么等价模型的存在在逻辑上便是不可避免的；正如 Wright（1921）所说，在 SEM 中“关于因果关系的先验知识是作为前提被假定的”。但这并不使 SEM 作为因果建模工具变得无用。从路径图结构所表示的定性因果前提（见注 3），走向图中系数所宣告的定量因果结论，这一跨越既非无用，也非平凡。例如，考虑图 5.5 所示的模型，Bagozzi and Burnkrant（1979）用它来说明与等价模型相关的问题。尽管这个模型是饱和的（即恰识别的），尽管它（至少）有 27 个半马尔可夫等价模型，发现 AFFECT 对 BEHAVIOR 的影响（在标准化尺度上）几乎三倍于 COGNITION 对 BEHAVIOR 的影响，仍然是很有启发性的——如果已知某些行为改变政策影响 AFFECT、另一些影响 COGNITION，这一发现就告诉了我们不同政策的相对效力。当某个路径系数转为负值、而相应的相关系数为正时，这种定量分析对政策分析的意义可能更为戏剧化。这类定量结果可能对政策决定产生深远影响；而得知这些结果是由数据与图中蕴含的定性前提在逻辑上推出的，应当使政策决定的依据更易于辩护或批评（见 \S 11.5.3）。
+
+总之，社会科学家不必全然放弃 SEM；他们只需放弃“SEM 是检验因果模型之方法”这一观念。结构方程建模是检验构成因果模型之假设中极小一部分的方法；而在这部分被发现与数据相容的情形下，该方法阐明前提与数据二者的必然定量推论。由此可知，SEM 的使用者应当专注于审查进入模型的隐含理论前提。正如我们将在 \S 5.4 中看到的，图形方法使这些前提变得生动而精确。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[vtx] (A) at (0,1.2) {};
+  \node[vtx] (C) at (5.0,1.2) {};
+  \node[vtx] (B) at (2.5,-0.5) {};
+  \node[anchor=east,font=\small] at (-0.45,1.2) {AFFECT};
+  \node[anchor=west,font=\small] at (5.45,1.2) {COGNITION};
+  \node[font=\small] at (2.5,-1.35) {BEHAVIOR};
+  \draw[ed] (A)--(B); \draw[ed] (C)--(B);
+  \node[font=\small] at (1.1,0.15) {.65};
+  \node[font=\small] at (3.9,0.15) {.23};
+  \draw[bid,dashed] (A) to[bend left=35] (C);
+  \node[font=\small] at (2.5,2.0) {.83};
+\end{tikzpicture}
+\caption{一个不可检验的模型，其中仍导出了定量的因果信息。}
+\label{fig:5.5}
+\end{figure}
+
+\section{图与可识别性}
+
+\subsection{线性模型中的参数识别}
+
+考虑嵌入路径图 $G$ 中的一条有向边 $X\to Y$，令 $\alpha$ 表示与该边相联系的路径系数。众所周知，回归系数可以分解为和
+\[
+r_{YX}=\alpha+I_{YX},
+\]
+其中 $I_{YX}$ 不是 $\alpha$ 的函数，因为它是由连接 $X$ 与 $Y$ 的其他路径（不含边 $X\to Y$）计算出来的（例如用 Wright 法则）；这类路径既经过单向弧，也经过双向弧。因此，若我们从路径图中删去边 $X\to Y$，并发现所得子图蕴含 $X$ 与 $Y$ 之间零相关，则我们知道 $I_{YX}=0$，从而 $\alpha=r_{YX}$；于是 $\alpha$ 被识别。这种蕴含可以通过检验 $X$ 是否（在子图中被空集 $Z=\varnothing$）与 $Y$ d-分离来图形地建立。图 5.6 说明了这一简单的识别检验：子图 $G_\alpha$ 中 $X$ 与 $Y$ 之间的所有路径都被汇聚箭头阻断，于是 $\alpha$ 可以立即等同于 $r_{YX}$。
+
+我们可以把这一基本想法推广到 $I_{YX}$ 不为零、但可以通过对一组变量 $Z=\{Z_1,Z_2,\dots,Z_k\}$ 作调整而使其为零的情形——这些变量位于 $X$ 与 $Y$ 之间的各条 d-连通路径上。考虑偏回归系数
+\[
+r_{YX\cdot Z}=\rho_{YX\cdot Z}\,\sigma_{Y\cdot Z}/\sigma_{X\cdot Z},
+\]
+它表示把 $Z$“偏出去”之后 $Y$ 与 $X$ 之间的剩余相关。若 $Z$ 不含 $Y$ 的后代，则我们同样可以写出\footnote{这可以从如下事实看出：把 $Y$ 与其父节点之间的关系 $Y=\alpha x+\sum_i\beta_iw_i+\varepsilon$ 代入 $r_{YX\cdot Z}$ 的表达式，得到 $\alpha$ 加上一个涉及变量 $\{X,W_1,\dots,W_k,Z,\varepsilon\}$ 之间偏相关的表达式 $I_{YX\cdot Z}$。由于假定 $Y$ 不是这些变量中任何一个的祖先，它们的联合密度不受 $Y$ 的方程影响；因此 $I_{YX\cdot Z}$ 独立于 $\alpha$。}
+\begin{equation}
+r_{YX\cdot Z}=\alpha+I_{YX\cdot Z},
+\end{equation}
+其中 $I_{YX\cdot Z}$ 表示把 $\alpha$ 置零后 $X$ 与 $Y$ 之间的偏相关，即在一个图 $G_\alpha$ 缺少边 $X\to Y$、而在其他方面与 $G$ 完全相同的模型中的偏相关。若 $Z$ 在 $G_\alpha$ 中 d-分离 $X$ 与 $Y$，则在这种模型中 $I_{YX\cdot Z}$ 确实为零；于是我们可以断定：在我们原来的模型中，$\alpha$ 被识别，且等于 $r_{YX\cdot Z}$。此外，由于 $r_{YX\cdot Z}$ 由 $Y$ 对 $X$ 与 $Z$ 之回归中 $x$ 的系数给出，$\alpha$ 可以用回归
+\[
+y=\alpha x+\beta_1z_1+\cdots+\beta_kz_k+\varepsilon
+\]
+来估计。
+
+这一结果对 \S 5.1.3 中提到的两个问题给出了简单的图形回答：(i) 什么构成一个恰当的回归变量集？(ii) 何时一个回归系数能提供路径系数的一致估计？答案概括于下一定理。\footnote{这一结果发表于 Pearl（1998a）与 Spirtes 等（1998）。}
+
+\begin{theorem}[直接效应的单门准则]
+设 $G$ 是任一途径图，其中 $\alpha$ 是与连线 $X\to Y$ 相联系的路径系数；并令 $G_\alpha$ 表示从 $G$ 中删去 $X\to Y$ 后所得的图。系数 $\alpha$ 可识别，若存在一组变量 $Z$ 使得 (i) $Z$ 不含 $Y$ 的后代；(ii) $Z$ 在 $G_\alpha$ 中 d-分离 $X$ 与 $Y$。若 $Z$ 满足这两个条件，则 $\alpha$ 等于回归系数 $r_{YX\cdot Z}$。反之，若 $Z$ 不满足这两个条件，则 $r_{YX\cdot Z}$ 不是 $\alpha$ 的一致估计量（除极少数测度为零的情形外）。
+\end{theorem}
+
+定理 5.3.1 的用法可举例说明如下。考虑图 5.7 中的图 $G$ 与 $G_\alpha$。在 $G_\alpha$ 中连接 $X$ 与 $Y$ 的唯一路径是经过 $Z$ 的那一条，而由于该路径被 $Z$ d-分离（阻断），$\alpha$ 可识别，且由 $\alpha=r_{YX\cdot Z}$ 给出。系数 $\beta$ 当然可识别，因为在 $G_\beta$ 中 $Z$ 与 $X$ 被（空集 $\varnothing$）d-分离，从而 $\beta=r_{XZ}$。注意，这一“单门”检验与总效应的后门准则（定义 3.3.1）略有不同：这里的集合 $Z$ 必须阻断从 $X$ 到 $Y$ 的一切间接路径，而不只是后门路径。条件 (i) 在两种情形中相同，因为若 $X$ 是 $Y$ 的父节点，则 $Y$ 的每个后代也必是 $X$ 的后代。
+
+现在我们把结构参数的识别推广到通过总效应（而非直接效应）的识别。考虑图 5.8 中的图 $G$。若我们删去连线 $X\to Y$ 构成图 $G_\alpha$，便会看到：不存在任何节点集 $Z$ 能 d-分离从 $X$ 到 $Y$ 的所有路径。若 $Z$ 含有 $Z_1$，则路径 $X\to Z_1\longleftrightarrow Y$ 将因 $Z_1$ 处的汇聚箭头而被打开。若 $Z$ 不含 $Z_1$，则路径 $X\longleftrightarrow Z_2\to Y$ 未被阻断。于是我们断定：$\alpha$ 无法用先前的方法识别。然而，假定我们感兴趣的是 $X$ 对 $Y$ 的总效应，它由 $\alpha+\beta\gamma$ 给出。要使这一和由 $r_{YX}$ 识别，$r_{YX}$ 中就不应有来自除“从 $X$ 通向 $Y$ 的路径”之外的贡献。然而我们看到，图中存在两条这样的路径——它们称为\emph{混杂}路径或\emph{后门}路径——即 $X\leftarrow Z_2\to Y$ 与 $X\longleftrightarrow Z_2\to Y$。所幸这些路径被 $Z_2$ 阻断，于是我们可以断定：对 $Z_2$ 作调整将使 $\alpha+\beta\gamma$ 可识别；因此有
+\[
+\alpha+\beta\gamma=r_{YX\cdot Z_2}.
+\]
+
+这一推理线索正是定义 3.3.1 的后门准则所概括的。为完整起见，我们在此重述。
+
+\begin{theorem}[后门准则]
+对于因果图 $G$ 中的任意两个变量 $X$ 与 $Y$，若存在一组测量 $Z$ 使得 (1) $Z$ 中没有任何成员是 $X$ 的后代，且 (2) $Z$ 在子图 $G_{\underline{X}}$ 中 d-分离 $X$ 与 $Y$——$G_{\underline{X}}$ 由从 $G$ 中删去一切发自 $X$ 的箭头而得——则 $X$ 对 $Y$ 的总效应可识别。此外，若这两个条件满足，则 $X$ 对 $Y$ 的总效应由 $r_{YX\cdot Z}$ 给出。
+\end{theorem}
+
+如我们在 \S 3.3.1 中所见，定理 5.3.2 的两个条件在非线性非高斯模型以及含离散变量的模型中同样有效。该检验保证：对 $Z$ 作调整之后，变量 $X$ 与 $Y$ 不会通过混杂路径相关联，这意味着回归系数 $r_{YX\cdot Z}$ 等于总效应。事实上，我们可以把定理 5.3.1 与定理 5.3.2 看作一个更一般方案的特别情形：为了识别由 $X$ 到 $Y$ 的一组选定因果路径所定义的任何部分效应，我们应当找到一组测量变量 $Z$，阻断 $X$ 与 $Y$ 之间一切未被选中的路径。于是该部分效应将等于回归系数 $r_{YX\cdot Z}$。
+
+图 5.8 表明，有些总效应可以直接从图上确定，而无须识别其各个组成部分。标准的 SEM 方法（Bollen 1989; Chou and Bentler 1995）专注于个别参数的识别与估计，可能错过像图 5.8 中那样的效应的识别与估计——该效应可以可靠地估计，尽管它的某些成分仍然不可识别。
+
+有些总效应不能作为一个整体直接确定，而需要分别确定各个成分。例如在图 5.7 中，$Z$ 对 $Y$ 的效应 $(\gamma=\alpha\beta)$ 不满足后门准则，然而这一效应可以由其成分 $\alpha$ 与 $\beta$ 确定——它们各自满足后门准则，其值为 $\alpha=r_{YX\cdot Z}$ 与 $\beta=r_{XZ}$。
+
+还有第三类因果参数：它既不能直接确定，也不能通过其成分确定，而需要评估它所从属的一个更宽广的因果效应。图 5.9 所示的结构正是这类情形的一个例子。参数 $\alpha$ 既不能直接识别，也不能由其成分识别（它没有成分），然而它可以由 $\alpha\beta$ 与 $\beta$ 确定，后者分别表示 $Z$ 对 $Y$ 的效应与 $Z$ 对 $X$ 的效应。这两个效应可以直接识别，因为从 $Z$ 到 $Y$ 或到 $X$ 都没有后门路径；因此 $\alpha\beta=r_{YZ}$ 且 $\beta=r_{XZ}$。由此可得
+\[
+\alpha=r_{YZ}/r_{XZ},
+\]
+这正是我们熟悉的\emph{工具变量}公式（Bowden and Turkington 1984；另见 \S 3.5，式 \textup{(3.46)}）。
+
+图 5.10 所示的例子综合了迄今所考虑的三种方法。$X$ 对 $Y$ 的总效应由 $\alpha\beta+\gamma\delta$ 给出，它不可识别，因为它不满足后门准则，也不是另一个可识别结构的一部分。然而，假定我们希望估计 $\beta$。通过对 $Z$ 取条件，我们阻断一切经过 $Z$ 的路径，得到 $\alpha\beta=r_{YX\cdot Z}$，即 $X$ 对 $Y$ 的、以 $W$ 为中介的效应。由于从 $X$ 到 $W$ 没有后门路径，$\alpha$ 本身直接等于 $\alpha=r_{WX}$。于是得到
+\[
+\beta=r_{YX\cdot Z}/r_{WX}.
+\]
+另一方面，$\gamma$ 可以通过对 $X$ 取条件（从而阻断一切从 $Z$ 到 $Y$ 的、经过 $X$ 的后门路径）直接求值，得到
+\[
+\gamma=r_{YZ\cdot X}.
+\]
+
+我们一直使用的方法，提示了如下在图中辨认可识别系数的系统程序。
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 首先用后门准则与定理 5.3.1，在图的各变量对之间搜寻可识别的因果效应。这些效应可以是直接效应、总效应或部分效应（即以特定变量集为中介的效应）。
+\item 对每一个如此识别出的效应，收集所涉及的路径系数，放入一个“桶”中。
+\item 按如下程序开始给桶中的系数贴标签：
+\begin{enumerate}[label=(\alph*),leftmargin=2.0em]
+\item 若某桶是单元素集，给其系数贴上标签 I（表示 identifiable，可识别）；
+\item 若某桶不是单元素集，但只含一个未贴标签的元素，则给该元素贴上 I。
+\end{enumerate}
+\item 重复此过程，直到无法再贴新标签为止。
+\item 列出所有已贴标签的系数；它们就是可识别的。
+\end{enumerate}
+
+上述过程并不完备，因为我们坚持一次只给一个系数贴标签，这可能使我们错过某些机会。图 5.11 显示了这一点。从数对 $(X,Z)$、$(X,W)$、$(X',Z)$ 与 $(X',W)$ 出发，我们发现 $\alpha$、$\gamma$、$\alpha'$ 与 $\gamma'$ 可识别。转到 $(X,Y)$，我们发现 $\alpha\beta+\delta\gamma$ 可识别；同样，由 $(X',Y)$ 可见 $\alpha'\beta+\gamma'\delta$ 可识别。这还不足以让我们给 $\beta$ 或 $\delta$ 贴标签，但我们可以就未知量 $\beta$ 与 $\delta$ 解两个方程，只要行列式
+\[
+\begin{vmatrix}\alpha & \gamma\\ \alpha' & \gamma'\end{vmatrix}
+\]
+非零。既然我们关心的不是逐点的可识别性，而是“几乎处处”的可识别性（Koopmans et al. 1950; Simon 1953），我们无需计算该行列式。我们只需查看行列式各行之符号形式，以确认方程非冗余：每个方程至少对已贴标签系数的一个取值，给未贴标签的系数施加新的约束。
+
+有了检测冗余的能力，我们便可以增添下述规则来提高程序的效力：
+
+\begin{enumerate}[label=3*.,leftmargin=2.0em,start=3]
+\item 若有 $k$ 个非冗余的桶，其中至多含 $k$ 个未贴标签的系数，则给这些系数贴标签并继续。
+\end{enumerate}
+
+提高程序效力的另一途径是：不仅列出可识别的效应，还依照 Wright 法则列出涉及双向弧所导致的相关性的表达式。最后，还可以像 \S 4.4 那样，列出若干变量的联合效应。然而，这类增益往往使程序变得更复杂，并可能损害我们的主要目标：为研究者提供一种方式，使他们能够立即辨认给定模型中已被识别的系数，并立即理解模型中那些影响目标量可识别性的特征。下面我们把上述结果与 \S 3.3 所处理的非参数模型中的识别联系起来。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.95,every node/.style={transform shape}]
+  % panel (a): G
+  \node[vtx] (aX) at (0,0) {$X$};
+  \node[vtx] (aY) at (2.2,0) {$Y$};
+  \node[vtx] (aZ) at (4.4,0) {$Z$};
+  \node[vtx] (aW) at (2.2,-1.6) {$W$};
+  \draw[ed] (aX)--(aY) node[midway,above,inner sep=1pt,font=\small] {$\alpha$};
+  \draw[ed] (aY)--(aZ) node[midway,above,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (aX)--(aW); \draw[ed] (aY)--(aW); \draw[ed] (aZ)--(aW);
+  \draw[bid,dashed] (aX) to[bend left=42] (aZ);
+  \draw[bid,dashed] (aY) to[bend left=38] (aZ);
+  \node[font=\small,draw,inner sep=3pt] at (2.2,-2.55) {$G$};
+  % panel (b): G_alpha
+  \node[vtx] (bX) at (7.4,0) {$X$};
+  \node[vtx] (bY) at (9.6,0) {$Y$};
+  \node[vtx] (bZ) at (11.8,0) {$Z$};
+  \node[vtx] (bW) at (9.6,-1.6) {$W$};
+  \draw[ed] (bY)--(bZ) node[midway,above,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (bX)--(bW); \draw[ed] (bY)--(bW); \draw[ed] (bZ)--(bW);
+  \draw[bid,dashed] (bX) to[bend left=42] (bZ);
+  \draw[bid,dashed] (bY) to[bend left=38] (bZ);
+  \node[font=\small,draw,inner sep=3pt] at (9.6,-2.55) {$G_\alpha$};
+  \node[font=\small] at (2.2,-3.4) {(a)};
+  \node[font=\small] at (9.6,-3.4) {(b)};
+\end{tikzpicture}
+\caption{结构参数 $\alpha$ 能否等同于回归系数 $r_{YX}$ 的检验。}
+\label{fig:5.6}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.9,every node/.style={transform shape}]
+  \node[vtx] (aZ) at (0,0) {$Z$};
+  \node[vtx] (aX) at (2.2,0) {$X$};
+  \node[vtx] (aY) at (4.4,0) {$Y$};
+  \draw[ed] (aZ)--(aX) node[midway,above,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (aX)--(aY) node[midway,above,inner sep=1pt,font=\small] {$\alpha$};
+  \draw[bid,dashed] (aZ) to[bend left=42] (aY);
+  \node[font=\small,draw,inner sep=3pt] at (2.2,-1.35) {$G$};
+  \node[vtx] (bZ) at (7.6,0) {$Z$};
+  \node[vtx] (bX) at (9.8,0) {$X$};
+  \node[vtx] (bY) at (12.0,0) {$Y$};
+  \draw[ed] (bZ)--(bX) node[midway,above,inner sep=1pt,font=\small] {$\beta$};
+  \draw[bid,dashed] (bZ) to[bend left=42] (bY);
+  \node[font=\small,draw,inner sep=3pt] at (9.8,-1.35) {$G_\alpha$};
+  \node[font=\small] at (2.2,-2.05) {(a)};
+  \node[font=\small] at (9.8,-2.05) {(b)};
+\end{tikzpicture}
+\caption{以 $r_{YX\cdot Z}$ 识别 $\alpha$（定理 5.3.1）的做法由 $G_\alpha$ 得到确认。}
+\label{fig:5.7}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.9,every node/.style={transform shape}]
+  % G
+  \node[vtx] (aX) at (1.8,2.8) {$X$};
+  \node[vtx] (aZ1) at (-0.5,1.4) {$Z_1$};
+  \node[vtx] (aZ2) at (4.0,2.6) {$Z_2$};
+  \node[vtx] (aY) at (1.9,0) {$Y$};
+  \draw[ed] (aX)--(aZ1) node[midway,above left,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (aX)--(aY) node[midway,right,inner sep=2pt,font=\small] {$\alpha$};
+  \draw[ed] (aZ1)--(aY) node[midway,below,inner sep=1pt,font=\small] {$\gamma$};
+  \draw[ed] (aZ2)--(aY);
+  \draw[bid,dashed] (aZ1) to[bend right=42] (aY);
+  \draw[bid,dashed] (aX) to[bend left=28] (aZ2);
+  \node[font=\small,draw,inner sep=3pt] at (1.9,-1.35) {$G$};
+  % G_alpha
+  \node[vtx] (bX) at (7.4,2.8) {$X$};
+  \node[vtx] (bZ1) at (5.1,1.4) {$Z_1$};
+  \node[vtx] (bZ2) at (9.6,2.6) {$Z_2$};
+  \node[vtx] (bY) at (7.5,0) {$Y$};
+  \draw[ed] (bX)--(bZ1) node[midway,above left,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (bZ1)--(bY) node[midway,below,inner sep=1pt,font=\small] {$\gamma$};
+  \draw[ed] (bZ2)--(bY);
+  \draw[bid,dashed] (bZ1) to[bend right=42] (bY);
+  \draw[bid,dashed] (bX) to[bend left=28] (bZ2);
+  \node[font=\small,draw,inner sep=3pt] at (7.5,-1.35) {$G_\alpha$};
+  % G_X
+  \node[vtx] (cX) at (13.0,2.8) {$X$};
+  \node[vtx] (cZ1) at (10.7,1.4) {$Z_1$};
+  \node[vtx] (cZ2) at (15.2,2.6) {$Z_2$};
+  \node[vtx] (cY) at (13.1,0) {$Y$};
+  \draw[ed] (cZ1)--(cY) node[midway,below,inner sep=1pt,font=\small] {$\gamma$};
+  \draw[ed] (cZ2)--(cY);
+  \draw[bid,dashed] (cZ1) to[bend right=42] (cY);
+  \draw[bid,dashed] (cX) to[bend left=28] (cZ2);
+  \node[font=\small,draw,inner sep=3pt] at (13.1,-1.35) {$G_{\underline{X}}$};
+\end{tikzpicture}
+\caption{$X$ 对 $Y$ 之总效应的图形识别，得到 $\alpha+\beta\gamma=r_{YX\cdot Z_2}$。}
+\label{fig:5.8}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[vtx] (Z) at (0,2.6) {$Z$};
+  \node[vtx] (X) at (1.7,1.3) {$X$};
+  \node[vtx] (Y) at (3.2,0) {$Y$};
+  \draw[ed] (Z)--(X) node[midway,above right,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (X)--(Y) node[midway,above right,inner sep=1pt,font=\small] {$\alpha$};
+  \draw[bid,dashed] (X) to[bend left=45] (Y);
+\end{tikzpicture}
+\caption{用工具变量 $Z$ 对 $\alpha$ 的图形识别。}
+\label{fig:5.9}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[vtx] (W) at (0,1.4) {$W$};
+  \node[vtx] (X) at (2.0,2.8) {$X$};
+  \node[vtx] (Z) at (4.0,1.4) {$Z$};
+  \node[vtx] (Y) at (2.0,0) {$Y$};
+  \draw[ed] (X)--(W) node[midway,above left,inner sep=1pt,font=\small] {$\alpha$};
+  \draw[ed] (W)--(Y) node[midway,below left,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (X)--(Z) node[midway,above right,inner sep=1pt,font=\small] {$\delta$};
+  \draw[ed] (Z)--(Y) node[midway,below right,inner sep=1pt,font=\small] {$\gamma$};
+  \draw[bid,dashed] (X) to[bend left=42] (Z);
+  \draw[bid,dashed] (W) to[bend right=42] (Y);
+\end{tikzpicture}
+\caption{$\alpha$、$\beta$ 与 $\gamma$ 的图形识别。}
+\label{fig:5.10}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.9,every node/.style={transform shape}]
+  \node[vtx] (X) at (1.8,2.8) {$X$};
+  \node[vtx] (Xp) at (6.2,2.8) {$X'$};
+  \node[vtx] (Z) at (0,1.4) {$Z$};
+  \node[vtx] (W) at (8.0,1.4) {$W$};
+  \node[vtx] (Y) at (4.0,0) {$Y$};
+  \draw[ed] (X)--(Z) node[midway,above left,inner sep=1pt,font=\small] {$\alpha$};
+  \draw[ed] (Xp)--(Z) node[midway,below right,inner sep=1pt,font=\small] {$\alpha'$};
+  \draw[ed] (X)--(W) node[midway,below left,inner sep=1pt,font=\small] {$\gamma$};
+  \draw[ed] (Xp)--(W) node[midway,above right,inner sep=1pt,font=\small] {$\gamma'$};
+  \draw[ed] (Z)--(Y) node[midway,below left,inner sep=1pt,font=\small] {$\beta$};
+  \draw[ed] (W)--(Y) node[midway,below right,inner sep=1pt,font=\small] {$\delta$};
+  \draw[bid,dashed] (Z) to[bend left=32] (Y);
+  \draw[bid,dashed] (W) to[bend right=32] (Y);
+\end{tikzpicture}
+\caption{用两个工具变量识别 $\beta$ 与 $\delta$。}
+\label{fig:5.11}
+\end{figure}
+
+\subsection{与非参数识别的比较}
+
+上一节的识别结果，显著强于第三、四章对非参数模型所得的相应结果。然而，非参数模型仍应被参数建模者研究，其理由既有实践方面的，也有概念方面的。在实践方面，研究者常常难以捍卫线性与正态性假设（或其他函数—分布假设），尤其当涉及分类变量时。由于非参数结果对非线性函数及任何误差分布都成立，拥有这类结果使我们能够衡量标准技术对线性与正态假设的敏感程度。在概念方面，非参数模型照亮了结构方程与代数方程之间的区别。寻找与路径系数相对应的非参数量，迫使我们阐明路径系数究竟意味着什么、何以值得费力去识别它们、以及何以结构模型不只是编码协方差信息的一种便捷方式。
+
+在本节中，我们把非参数因果效应识别问题（第三章）置于线性模型参数识别的语境之中。
+
+\subsubsection*{参数模型与非参数模型：一个例子}
+
+考虑结构方程组
+\begin{equation}
+x=f_1(u,\varepsilon_1), \tag{5.4}
+\end{equation}
+\begin{equation}
+z=f_2(x,\varepsilon_2), \tag{5.5}
+\end{equation}
+\begin{equation}
+y=f_3(z,u,\varepsilon_3), \tag{5.6}
+\end{equation}
+其中 $X,Z,Y$ 是观测变量，$f_1,f_2,f_3$ 是未知的任意函数，$U,\varepsilon_1,\varepsilon_2,\varepsilon_3$ 是不可观测量——我们可以把它们视为潜变量或扰动。为便于讨论，我们假定 $U,\varepsilon_1,\varepsilon_2,\varepsilon_3$ 相互独立且分布任意。在图形上，这些影响可以用图 5.12 的路径图表示。
+
+问题如下。我们已经从由 \textup{(5.4)}—\textup{(5.6)} 所定义的过程抽取了一长串独立样本，记录了观测变量 $X$、$Z$ 与 $Y$ 的取值；现在我们希望尽可能估计出模型中未指明的量。
+
+为澄清问题的范围，我们考虑其线性版本：
+\begin{equation}
+x=u+\varepsilon_1, \tag{5.7}
+\end{equation}
+\begin{equation}
+z=\alpha x+\varepsilon_2, \tag{5.8}
+\end{equation}
+\begin{equation}
+y=\beta z+\gamma u+\varepsilon_3, \tag{5.9}
+\end{equation}
+其中 $U,\varepsilon_1,\varepsilon_2,\varepsilon_3$ 是不相关的零均值扰动。\footnote{把 $U$ 从方程中消去、并允许 $\varepsilon_1$ 与 $\varepsilon_3$ 相关（如图 5.7 那样），便得到本模型的一个等价版本。}不难证明，参数 $\alpha$、$\beta$ 与 $\gamma$ 可以由观测量 $X$、$Z$、$Y$ 之间的相关唯一确定。这一识别已在图 5.7 的例子中演示过：那里后门准则给出
+\begin{equation}
+\beta=r_{YZ\cdot X},\qquad \alpha=r_{ZX}, \tag{5.10}
+\end{equation}
+从而
+\begin{equation}
+\gamma=r_{YX}-\alpha\beta. \tag{5.11}
+\end{equation}
+
+于是，回到模型的非参数版本，人们很容易推广地说：为使模型可识别，函数 $\{f_1,f_2,f_3\}$ 必须由数据唯一确定。然而，这种情形不太可能发生，因为已知函数与分布之间的映射是多对一的。换言之，给定任何非参数模型 $M$，若存在一组与给定分布 $P(x,y,z)$ 相容的函数 $\{f_1,f_2,f_3\}$，则这样的函数有无穷多组（见图 1.6）。因此，从 \textup{(5.4)}—\textup{(5.6)} 这样宽泛设定的模型中，似乎推不出任何有用的东西。
+
+然而，即便在线性模型中，识别本身也不是目的。勿宁说，它服务于回答预测与控制的实践问题。问题的关键不在于数据是否允许我们识别方程的形式，而在于数据是否允许我们对那些传统上由参数模型回答的问题给出无歧义的答案。
+
+当 \textup{(5.4)}—\textup{(5.6)} 所给的模型被严格用于预测时（即给定其他变量的一组观测，确定某些变量的概率），识别问题便失去了大部分（若非全部）重要性；一切预测都可以直接由协方差矩阵、或由这些协方差的样本估计得到。若需要降维（例如为提高估计精度），则协方差矩阵可以用形形色色的联立方程模型来编码，它们都有相同的维数。例如，\textup{(5.7)}—\textup{(5.9)} 的线性模型 $M$ 中 $X$、$Y$ 与 $Z$ 之间的相关，完全可以由模型 $M'$（图 5.13）表示：
+\begin{equation}
+x=\varepsilon_1, \tag{5.12}
+\end{equation}
+\begin{equation}
+z=\alpha'x+\varepsilon_2, \tag{5.13}
+\end{equation}
+\begin{equation}
+y=\beta'z+\delta x+\varepsilon_3. \tag{5.14}
+\end{equation}
+
+这个模型与 \textup{(5.7)}—\textup{(5.9)} 一样紧凑，并且就观测变量 $X,Y,Z$ 而言与 $M$ 协方差等价。令 $\alpha'=\alpha$、$\beta'=\beta$、$\delta=\gamma$，模型 $M'$ 便会给出与 \textup{(5.7)}—\textup{(5.9)} 之模型相同的概率预测。然而，若把它们视为数据生成机制，两个模型并不等价。它们各自讲述了关于 $X$、$Y$、$Z$ 生成过程的不同故事，因此，对于使这些过程经受外部干预所导致的变化，二者的预测自然不同。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[lat] (U) at (1.9,2.4) {$U$};
+  \node[vtx] (X) at (0,1.2) {$X$};
+  \node[vtx] (Z) at (1.9,1.2) {$Z$};
+  \node[vtx] (Y) at (3.8,1.2) {$Y$};
+  \node[lat] (e1) at (0,0) {$\varepsilon_1$};
+  \node[lat] (e2) at (1.9,0) {$\varepsilon_2$};
+  \node[lat] (e3) at (3.8,0) {$\varepsilon_3$};
+  \draw[edd] (U)--(X); \draw[edd] (U)--(Y);
+  \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+  \draw[edd] (e1)--(X); \draw[edd] (e2)--(Z); \draw[edd] (e3)--(Y);
+\end{tikzpicture}
+\caption{与方程 \textup{(5.4)}—\textup{(5.6)} 相对应的路径图，其中 $\{X,Z,Y\}$ 为观测变量，$\{U,\varepsilon_1,\varepsilon_2,\varepsilon_3\}$ 为未观测变量。}
+\label{fig:5.12}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[vtx] (X) at (0,1.2) {$X$};
+  \node[vtx] (Z) at (1.9,1.2) {$Z$};
+  \node[vtx] (Y) at (3.8,1.2) {$Y$};
+  \node[lat] (e1) at (0,0) {$\varepsilon_1$};
+  \node[lat] (e2) at (1.9,0) {$\varepsilon_2$};
+  \node[lat] (e3) at (3.8,0) {$\varepsilon_3$};
+  \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+  \draw[ed] (X) to[bend left=40] (Y);
+  \draw[edd] (e1)--(X); \draw[edd] (e2)--(Z); \draw[edd] (e3)--(Y);
+  \node[font=\small] at (0.95,1.48) {$\alpha'$};
+  \node[font=\small] at (2.85,1.48) {$\beta'$};
+  \node[font=\small] at (1.9,2.15) {$\delta$};
+\end{tikzpicture}
+\caption{表示 \textup{(5.12)}—\textup{(5.14)} 之模型 $M'$ 的图。}
+\label{fig:5.13}
+\end{figure}
+
+\subsection{因果效应：结构方程模型的干预解释}
+
+模型 $M$ 与 $M'$ 之间的差异，恰好说明了对联立方程模型作结构解读究竟在何处登场，以及为什么连对因果性心存畏怯的研究者也认为结构参数比协方差及其他统计参数更“有意义”。由 \textup{(5.12)}—\textup{(5.14)} 定义的模型 $M'$，把 $X$ 视为决定 $Y$ 之过程的直接参与者；而由 \textup{(5.7)}—\textup{(5.9)} 定义的模型 $M$，则把 $X$ 视为一个间接因素，其效应以 $Z$ 为中介。这一差异并不显现在数据本身之中，而显现在数据会如何随外部干预而改变。例如，假定我们想预测在干预并把 $X$ 固定于某个常数 $x$ 之后 $Y$ 的期望；记之为 $E(Y\mid \dox{X=x})$。把 $X=x$ 代入 \textup{(5.13)} 与 \textup{(5.14)} 后，模型 $M'$ 给出
+\begin{equation}
+E[Y\mid \dox{X=x}]=E[\beta'\alpha'x+\beta'\varepsilon_2+\delta x+\varepsilon_3] \tag{5.15}
+\end{equation}
+\begin{equation}
+\phantom{E[Y\mid \dox{X=x}]}=(\beta'\alpha'+\delta)x; \tag{5.16}
+\end{equation}
+模型 $M$ 则给出
+\begin{equation}
+E[Y\mid \dox{X=x}]=E[\beta\alpha x+\beta\varepsilon_2+\gamma u+\varepsilon_3] \tag{5.17}
+\end{equation}
+\begin{equation}
+\phantom{E[Y\mid \dox{X=x}]}=\beta\alpha x. \tag{5.18}
+\end{equation}
+令 $\alpha'=\alpha$、$\beta'=\beta$、$\delta=\gamma$（这是协方差等价所要求的；见 \textup{(5.10)} 与 \textup{(5.11)}），我们便清楚地看到：两个模型赋予 $X$ 对 $Y$ 之（总）因果效应以不同的量值——模型 $M$ 预测 $x$ 的单位变化将使 $E(Y)$ 改变 $\beta\alpha$，而模型 $M'$ 则把这一改变量定在 $\beta\alpha'+\gamma$。
+
+至此，人们很自然会问：在 \textup{(5.17)} 中取期望之前，我们是否应当把 $u=x-\varepsilon_1$ 代入 \textup{(5.9)}？如果我们允许像推导 \textup{(5.17)} 时那样把 \textup{(5.8)} 代入 \textup{(5.9)}，为什么不允许把 \textup{(5.7)} 也代入 \textup{(5.9)} 呢？毕竟（这种论证会说），维护一个建模者认为有效的数学等式 $u=x-\varepsilon_1$ 并无害处。然而这一论证是谬误的。\footnote{这类论证导致了所谓证据决策理论中的纽科姆悖论（见 \S 4.1.1）。}结构方程并不应被当作不可更改的数学等式来处理。相反，它们意在定义一个均衡状态——当均衡被外部干预扰动时，这一均衡便遭违反。事实上，结构方程模型之力正在于：它们不仅编码了初始的均衡状态，还编码了判定哪些方程必须被违反、以便刻画新的均衡状态所需的信息。例如，若干预仅仅是使 $X$ 保持在 $x$，则方程 $x=u+\varepsilon_1$——它表示干预前决定 $X$ 的过程——应被推翻，并以方程 $X=x$ 取代之。新方程组的解便表示新的均衡。因此，结构方程区别于普通数学方程的本质特征在于：前者并不代表一组方程，而代表许多组方程，每一组都对应于从原模型中取出某个方程子集。每个这样的子集都表示在给定干预下将盛行的某种假想物理实在。
+
+如果我们采取这样的立场——结构方程的价值不在于概括分布函数，而在于编码用于预测政策效果的因果信息（Haavelmo 1943; Marschak 1950; Simon 1953）——那么自然会把这类预测视为结构系数的恰当推广。例如，线性模型 $M$ 中系数 $\beta$ 的恰当推广，将是对下述控制式提问的回答：“如果我们实施干预、把 $Z$ 的取值从 $z$ 变为 $z+1$，$Y$ 的期望值将改变多少？”这当然不同于观测式提问：“如果我们发现 $Z$ 处于 $z+1$ 而非 $z$ 的水平，$Y$ 的期望值会相差多少？”如第一章所讨论的，观测式提问可以直接由联合分布 $P(x,y,z)$ 回答，而控制式提问还需要因果信息。结构方程在其句法中编码了这种因果信息：把等号左端的变量当作效应，把右端的变量当作原因。在第三章中，我们用符号 $\dox{\cdot}$ 区分这两类提问。例如，我们写
+\begin{equation}
+E(Y\mid \dox{x})\triangleq E[Y\mid \dox{X=x}] \tag{5.19}
+\end{equation}
+表示受控期望，而写
+\begin{equation}
+E(Y\mid x)\triangleq E(Y\mid X=x) \tag{5.20}
+\end{equation}
+表示标准的条件期望或观测期望。$E(Y\mid \dox{x})$ 不等于 $E(Y\mid x)$，这在 \textup{(5.7)}—\textup{(5.9)} 的模型中很容易看出：那里 $E(Y\mid \dox{x})=\alpha\beta x$，而 $E(Y\mid x)=r_{YX}x=(\alpha\beta+\gamma)x$。诚然，被动地观测到 $X=x$ 不应违反任何方程，而这正是我们在取期望之前把 \textup{(5.7)} 与 \textup{(5.8)} 双双代入 \textup{(5.9)} 的理由。
+
+在线性模型中，直接控制问题的答案编码在路径（或结构）系数中，而这些系数可用来导出任何变量对另一变量的总效应。例如，在 \textup{(5.7)}—\textup{(5.9)} 定义的模型中，$E(Y\mid \dox{x})$ 的值为 $\alpha\beta x$，即 $x$ 乘以路径 $X\to Z\to Y$ 上各路径系数之积。
+
+即便我们知道函数 $f_1,f_2,f_3$，$E(Y\mid \dox{x})$ 的计算在非参数情形中也会更为复杂。尽管如此，这一计算是良定义的；它要求解一个修改过的方程组（就 $Y$ 的期望而言），其中 $f_1$ 被“抹去”，$X$ 被常数 $x$ 取代：
+\begin{equation}
+z=f_2(x,\varepsilon_2), \tag{5.21}
+\end{equation}
+\begin{equation}
+y=f_3(z,u,\varepsilon_3). \tag{5.22}
+\end{equation}
+于是，计算 $E(Y\mid \dox{x})$ 需要求值
+\[
+E(Y\mid \dox{x})=E\{f_3[f_2(x,\varepsilon_2),u,\varepsilon_3]\},
+\]
+其中期望取遍 $U$、$\varepsilon_2$ 与 $\varepsilon_3$。值得注意的是，图形方法在不知道 $f_2$、$f_3$ 与 $P(\varepsilon_2,\varepsilon_3,u)$ 的情况下也能完成这一计算（\S 3.3.2）。
+
+这确实就是非参数模型中可识别性的精髓。能够仅凭数据与图唯一地回答干预式提问，正是定义 3.2.3 对因果效应 $P(y\mid \dox{x})$ 之识别所作的解释。正如我们在第三、四章所见，这种能力几乎可以通过察看与方程相伴的图而识别出来。

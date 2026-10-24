@@ -1,0 +1,63 @@
+% 依照 figures/react.png 重排完整问答、推理、动作与观测；原错误答案及工具调用保留。
+\begingroup
+\footnotesize
+\linespread{1.05}\selectfont
+\tcbset{chTenPanel/.style={enhanced,colback=white,colframe=black!45,boxrule=.4pt,arc=1mm,
+  left=4pt,right=4pt,top=4pt,bottom=4pt,boxsep=0pt,before skip=0pt,after skip=5pt,
+  colbacktitle=black!6,coltitle=black,fonttitle=\bfseries\small,center title,before upper={\raggedright}}}
+\newcommand{\chTenBad}{\hfill\textcolor{red!65}{\large$\times$}}
+\newcommand{\chTenGood}{\hfill\tikz[baseline=-.4ex,x=1ex,y=1ex]{\draw[green!50!black,line width=1.2pt,line cap=round,line join=round] (0,.4)--(.35,0)--(1.1,1);}}
+\newcommand{\chTenTool}[1]{\textcolor{blue!65!black}{\texttt{#1}}}
+\begin{minipage}[t]{.485\linewidth}
+\vspace{0pt}
+\raggedright
+\begin{tcolorbox}[chTenPanel]
+\textbf{问题：}除了 Apple Remote，还有什么设备可以控制 Apple Remote 最初设计用来与之交互的程序？
+\end{tcolorbox}
+\begin{tcolorbox}[chTenPanel,title=标准方式]
+\textbf{答案：}\texttt{iPod}\chTenBad
+\end{tcolorbox}
+\begin{tcolorbox}[chTenPanel,title=仅推理]
+\textbf{思考：}让我们逐步思考。\par
+\colorbox{red!20}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{Apple Remote 最初设计用来与 Apple TV 交互。Apple TV 可以由 iPhone、iPad 和 iPod Touch 控制。}}
+\par\noindent 因此，答案是 iPhone、iPad 和 iPod Touch。
+
+\smallskip
+\textbf{答案：}\texttt{iPhone, iPad, iPod Touch}\chTenBad
+\end{tcolorbox}
+\begin{tcolorbox}[chTenPanel,title=仅行动]
+\textbf{动作 1：}\chTenTool{Search[Apple Remote]}\\
+\textbf{观测 1：}Apple Remote 是一种遥控器，推出于……\\
+\textbf{动作 2：}\chTenTool{Search[Front Row]}\\
+\textbf{观测 2：}未找到 [Front Row]。相近结果：……\\
+\textbf{动作 3：}\chTenTool{Search[Front Row (software)]}\\
+\textbf{观测 3：}Front Row 是一款已停止开发的媒体软件……\\
+\textbf{动作 4：}\chTenTool{Finish[}\colorbox{red!20}{\texttt{yes}}\chTenTool{]}\chTenBad
+\end{tcolorbox}
+\end{minipage}\hfill
+\begin{minipage}[t]{.485\linewidth}
+\vspace{0pt}
+\raggedright
+\begin{tcolorbox}[chTenPanel,title=ReAct]
+\textbf{思考 1：}我需要搜索 Apple Remote，并找到它最初设计用来与之交互的程序。\\
+\textbf{动作 1：}\chTenTool{Search[Apple Remote]}\\
+\textbf{观测 1：}Apple Remote 是 Apple 于 2005 年 10 月推出的一种遥控器……最初设计用来控制\colorbox{green!25}{Front Row 媒体中心}程序……
+
+\smallskip
+\textbf{思考 2：}Apple Remote 最初设计用来控制 Front Row 媒体中心程序。我接下来需要搜索 Front Row，找出还有什么设备可以控制它。\\
+\textbf{动作 2：}\chTenTool{Search[Front Row]}\\
+\textbf{观测 2：}未找到 [Front Row]。相近结果：['Front Row Seat to Earth', 'Front Row Motorsports', '\textcolor{green!35!black}{Front Row (software)}', …]
+
+\smallskip
+\textbf{思考 3：}未找到 Front Row。我需要搜索\textcolor{green!35!black}{Front Row (software)}。\\
+\textbf{动作 3：}\chTenTool{Search[Front Row (software)]}\\
+\textbf{观测 3：}Front Row 是一款已停止开发的媒体中心软件……
+
+\smallskip
+\textbf{思考 4：}\par
+\noindent\colorbox{green!25}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{Front Row (software) 可由 Apple Remote 或键盘功能键控制。}}\par
+\noindent 因此，答案是键盘功能键。\\
+\textbf{动作 4：}\chTenTool{Finish[keyboard function keys]}\chTenGood
+\end{tcolorbox}
+\end{minipage}
+\endgroup

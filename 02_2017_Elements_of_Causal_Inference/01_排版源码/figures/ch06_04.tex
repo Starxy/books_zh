@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm]
+\foreach \p/\xx in {a/0,b/4.7,c/9.4}{
+ \begin{scope}[xshift=\xx cm]
+ \node[vtxs] (ch06me-\p-x) at (.5,1) {$X$};
+ \node[vtxs] (ch06me-\p-y) at (0,0) {$Y$};
+ \node[vtxs] (ch06me-\p-z) at (1.4,0) {$Z$};
+ \node[vtxs] (ch06me-\p-v) at (2.25,1) {$V$};
+ \node[vtxs] (ch06me-\p-u) at (3.2,0) {$U$};
+ \draw[ed] (ch06me-\p-x)--(ch06me-\p-y);
+ \draw[ed] (ch06me-\p-x)--(ch06me-\p-z);
+ \draw[ed] (ch06me-\p-v)--(ch06me-\p-z);
+ \draw[ed] (ch06me-\p-z)--(ch06me-\p-y);
+ \end{scope}
+}
+\draw[ed] (ch06me-a-u)--(ch06me-a-v);
+\draw[ed] (ch06me-b-v)--(ch06me-b-u);
+\draw (ch06me-c-v)--(ch06me-c-u);
+\end{tikzpicture}
+\caption{两个马尔可夫等价的 DAG（左、中）；它们是相应马尔可夫等价类中仅有的两个 DAG。该等价类可用右侧的 CPDAG 表示。}
+\end{figure}

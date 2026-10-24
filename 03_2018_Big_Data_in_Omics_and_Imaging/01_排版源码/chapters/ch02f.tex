@@ -1,0 +1,570 @@
+% 原章分章页37—47（至2.5末）。
+\subsection{联合干预数据与观测数据的因果推断}
+
+因果网络重建使用两类数据：观测数据和实验数据。在许多情形中，随机化实验成本高、不符合伦理或技术上不可行，因此往往根据观测数据估计 DAG 的马尔可夫等价类（Markov equivalence class），类中各图满足相同的条件独立关系。然而，因果推断的金标准是干预实验。干预将系统中一个或多个随机变量强制设为指定值。例如，考虑两个变量：若变量 $X$ 直接导致另一变量 $Y$ 的改变，在固定系统中其他变量的同时对 $X$ 强制干预，使 $X$ 和 $Y$ 发生关联（Eberhardt and Scheines 2007）。许多分子生物学研究同时拥有观测数据与干预数据。联合这两类数据进行因果推断，对精准医学尤其有用。
+
+本节主要讨论同时利用观测数据和干预数据进行因果估计。干预分为结构干预和参数干预。从两类数据进行因果发现，取决于干预类型，以及可以对模型作出的假设。假设观测分布相对于真实底层 DAG $D_0$ 满足马尔可夫性和忠实性（faithfulness），即除马尔可夫性质蕴含的条件独立关系外，不存在其他条件独立关系（Ernest et al. 2016；Hauser and Bühlmann 2015）。假设不同干预分布都与 DAG $D_0$ 相联系。进一步假设存在潜在混杂因子，且图无环。
+
+利用干预数据学习因果模型的统计方法包括贝叶斯过程（Cooper and Yoo 1999；Eaton and Murphy 2007）、主动学习（He and Geng, 2008；Eberhardt, 2008）和贪心干预等价搜索（Greedy Interventional Equivalent Search，GIES）（Hauser and Bühlmann 2012）。这里提出一种将结构方程模型与整数规划结合的新算法，用于从观测数据和干预数据发现因果关系。
+
+\subsubsection{干预数据与观测数据的结构方程模型}
+
+再次考虑 $p$ 个内生变量 $y_1,\ldots,y_p$（表型、基因表达、甲基化和影像信号）以及 $q$ 个外生变量 $x_1,\ldots,x_q$（基因型、环境和其他协变量）。假设有 $n_{\mathrm{obs}}$ 个观测样本和 $n_{\mathrm{int}}$ 个干预样本，令 $n=n_{\mathrm{obs}}+n_{\mathrm{int}}$。定义观测数据集：
+\[
+\begin{gathered}
+Y^{(j)}=[y_1^{(j)},\ldots,y_p^{(j)}]^T,\quad
+X^{(j)}=[x_1^{(j)},\ldots,x_q^{(j)}],\quad j=1,\ldots,n_{\mathrm{obs}},\\
+Y^{(\mathrm{obs})}=[Y^{(1)},\ldots,Y^{(n_{\mathrm{obs}})}],
+\quad
+X^{(\mathrm{obs})}=[X^{(1)},\ldots,X^{(n_{\mathrm{obs}})}],
+\end{gathered}
+\]
+以及干预数据集：
+\[
+\begin{gathered}
+Y^{(i)}=[y_1^{(i)},\ldots,y_p^{(i)}]^T,\quad
+X^{(i)}=[x_1^{(i)},\ldots,x_q^{(i)}]^T,\quad i=1,\ldots,n_{\mathrm{int}},\\
+Y^{(\mathrm{int})}=[Y^{(1)},\ldots,Y^{(n_{\mathrm{int}})}],
+\quad
+X^{(\mathrm{int})}=[X^{(1)},\ldots,X^{(n_{\mathrm{int}})}].
+\end{gathered}
+\]
+给定 DAG $D$，干预 DAD $D_I$ 定义为从 $D$ 中删除所有指向 $i\in I$ 的有向边，对全部 $i\in I$ 均如此。
+
+对观测数据集，定义 DAD $D$ 的线性结构方程模型：
+\begin{equation}
+y_{\mathrm{obs},k}^{(j)}
+=\sum_{l=1}^{p}\beta_{kl}y_{\mathrm{obs},l}^{(j)}
++\sum_{m=1}^{q}\alpha_{km}x_{\mathrm{obs},m}^{(j)}
++\varepsilon_k^{(j)},
+\quad k=1,\ldots,p,\ j=1,\ldots,n_{\mathrm{obs}},
+\tag{2.109}
+\end{equation}
+其中，若 $l\notin\pa_D(k)$，则 $\beta_{kl}=0$；若 $m\notin\pa_D(k)$，则 $\alpha_{km}=0$；$\varepsilon_k^{(j)}\sim N(0,\sigma_k^2)$，$\varepsilon_1^{(j)},\ldots,\varepsilon_p^{(j)}$ 相互独立，并且与 $y_k^{(j)},x_m^{(j)}$ 独立。令 $\varepsilon_{\mathrm{obs}}^{(j)}=[\varepsilon_{\mathrm{obs},1}^{(j)},\ldots,\varepsilon_{\mathrm{obs},p}^{(j)}]^T$，$\varepsilon_{\mathrm{obs}}^{(1)},\ldots,\varepsilon_{\mathrm{obs}}^{(n_{\mathrm{net}})}$ 相互独立。
+
+在描述干预模型前，先明确干预的概念。干预是将被干预变量强制设为预先指定的值。令 $I\subseteq\{1,\ldots,p\}$ 为干预目标变量集合。干预常用 do 演算表示（Pearl 2000）。干预分为确定性干预（deterministic intervention）和随机干预（stochastic intervention）。确定性干预 $\doop\,X_I=u_I$，指对变量集合 $X_I$ 进行干预，将其设为 $u_I$。随机干预是将被干预变量 $X_I$ 设为随机向量 $U_I$ 的取值，其中
+\[
+U_I\sim\prod_{j\in I}f_{U_j}(u_j)\,du_j,
+\]
+各密度 $f_{U_j}(\cdot)$（$j\ni I$）相互独立，但不必相同。通常假设干预变量服从高斯分布：$U_j\sim N(\mu_{U_j},\tau_j^2)$。
+
+现在考虑干预数据的结构方程模型。假设干预目标为 $T=I$，内生变量 $y_{\mathrm{int},k}^{(i)}$ 表示为
+\begin{equation}
+y_{\mathrm{int},k}^{(i)}=
+\begin{cases}
+\begin{aligned}
+&\displaystyle\sum_{l\notin I}\beta_{kl}y_{\mathrm{int},l}^{(i)}
++\sum_{l\ni I}\beta_{kl}U_l^{(i)}\\
+&\displaystyle\quad+\sum_{m\notin I}\alpha_{km}x_{\mathrm{int},m}^{(i)}
++\sum_{m\ni I}\alpha_{km}U_m^{(i)}+\varepsilon_k^{(i)},
+\end{aligned}
+&k\notin I,\\
+U_k^{(i)},&k\in I,
+\end{cases}
+\tag{2.110}
+\end{equation}
+其中，$\beta_{kl},\alpha_{km}$ 的定义同模型（2.109）。
+
+为简化表述，将模型（2.109）和（2.110）写成矩阵形式。定义矩阵：
+\begin{equation}
+B\in B(D)=
+\begin{cases}
+\beta_{kl},&l\in\pa_D(k),\\
+0,&l\notin\pa_D(k),
+\end{cases}
+\tag{2.111}
+\end{equation}
+\begin{equation}
+A\in A(D)=
+\begin{cases}
+\alpha_{km},&m\in\pa_D(k),\\
+0,&m\notin\pa_D(k).
+\end{cases}
+\tag{2.112}
+\end{equation}
+模型（2.109）可以改写为
+\begin{equation}
+Y^{(\mathrm{obs})}=BY^{(\mathrm{obs})}+AX^{(\mathrm{obs})}
++\varepsilon^{(\mathrm{obs})},
+\tag{2.113}
+\end{equation}
+其中 $\varepsilon_{\mathrm{obs}}^{(j)}$，$j=1,\ldots,n_{\mathrm{obs}}$，服从 $N_p(0,\diag(\sigma_1^2,\ldots,\sigma_p^2))$。
+
+接下来，通过定义描述原始数据点到干预目标数据点映射的矩阵，给出模型（2.110）的矩阵表示。用例子最容易说明这些矩阵。考虑五个节点 $\{1,2,3,4,5\}$（图2.8），假设目标节点为 $I=\{3,5\}$。原来的非目标数据点重新排列为 $\{1,2,3\}$。从 $\{1,2,3,4,5\}$ 到 $\{1,2,4\}$ 的映射为 $1\to1$、$2\to2$、$4\to3$。原始点由一个向量表示，对应原节点编号的元素为 1，其余元素为零。例如，节点3表示为向量 $[0\ 0\ 1\ 0\ 0]$。令 $I^c=\{1,2,4\}$ 为非目标变量集合。定义矩阵 $P^{(I)}:\R^p\to\R^{p-|I|}$，将原始数据点映射为非目标数据点。本例中，
+\[
+P^{(I)}=
+\begin{bmatrix}
+1&0&0&0&0\\0&1&0&0&0\\0&0&0&1&0
+\end{bmatrix}_{p\times(p-|I|)}.
+\]
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig08.tex}
+\origfig{8}{干预示意图。}
+\end{figure}
+类似地，定义矩阵 $Q^{(I)}:\R^p\to\R^{|I|}$，将原始数据点映射为目标数据点。被干预变量 $\{3,5\}$ 在原始数据集中分别表示为 $[0\ 0\ 1\ 0\ 0]$ 和 $[0\ 0\ 0\ 0\ 1]$。在新的干预数据集中，将干预数据点 $\{3,5\}$ 排列为 $\{1,2\}$。本例中，
+\[
+Q^{(I)}=\begin{bmatrix}0&0&1&0&0\\0&0&0&0&1\end{bmatrix}.
+\]
+最后，定义矩阵 $R:\R^p\to\R^p$，将原始数据集中的原被干预数据点映射到新的干预数据集：
+$R^{(I)}=(P^{(I)})^TP^{(I)}$。本例中，
+\[
+R^{(I)}=
+\begin{bmatrix}
+1&0&0&0&0\\0&1&0&0&0\\0&0&0&0&0\\0&0&0&1&0\\0&0&0&0&0
+\end{bmatrix}.
+\]
+模型（2.110）于是可写为以下矩阵形式：
+\begin{equation}
+Y_{\mathrm{int}}^{(i)}
+=R^{(I)}(BY_{\mathrm{int}}^{(i)}+AX_{\mathrm{int}}^{(i)}
++\varepsilon_{\mathrm{int}}^{(i)})
++(Q^{(I)})^TU^{(i)},
+\tag{2.114}
+\end{equation}
+或者
+\begin{equation}
+Y^{(\mathrm{int})}
+=R^{(I)}\left(BY^{(\mathrm{int})}+AX^{(\mathrm{int})}
++\varepsilon^{(\mathrm{int})}+(Q^{(I)})^TU.
+\right.
+\tag{2.115}
+\end{equation}
+为便于表述，考虑包含观测数据点和干预数据点的整个数据集 $\{Y^{(i)},X^{(i)},i=1,\ldots,n,\ n=n_{\mathrm{obs}}+n_{\mathrm{int}}\}$，将两类数据统一到一个共同框架中。令 $T$ 为干预目标序列 $T^{(1)},\ldots,T^{(n)}$。若第 $i$ 个样本为观测数据，则定义 $T^{(i)}=\phi$，即空目标，并令 $U^{(i)}=0$。完整数据集记为 $Y=[Y^{(1)}\ \cdots\ Y^{(n)}]$、$X=[X^{(1)}\ \cdots\ X^{(n)}]$、$U=[U^{(1)}\ \cdots\ U^{(n)}]$ 和 $\varepsilon=[\varepsilon^{(1)}\ \cdots\ \varepsilon^{(n)}]$。整个数据集的结构方程为
+\begin{equation}
+Y=R^{(I)}(BY+AX+\varepsilon)+(Q^{(I)})^TU,
+\tag{2.116}
+\end{equation}
+其中，常假设 $X^{(i)}$ 为固定变量，$X^{(1)}=\cdots=X^{(n)}=X_0$。
+
+\subsubsection{根据干预数据与观测数据对结构方程模型进行极大似然估计}
+
+从被干预变量的分布开始推导似然函数。回顾 $U=[U^{(1)}\ \cdots\ U^{(n)}]$，其中 $U^{(i)}=[U_1^{(i)}\ \cdots\ U_p^{(i)}]$。假设 $U_1^{(i)},\ldots,U_p^{(i)}$ 相互独立，分布为
+\begin{equation}
+U_j^{(i)}=
+\begin{cases}
+0,&i=1,\ldots,n_{\mathrm{obs}},\\
+N(\mu_{u_j}^{(i)},\tau_j^2),&i=n_{\mathrm{obs}}+1,\ldots,n,
+\end{cases}
+\qquad j=1,\ldots,p.
+\tag{2.117}
+\end{equation}
+记
+\begin{equation}
+\mu_U^{(i)}=
+\begin{cases}
+0,&i=1,\ldots,n_{\mathrm{obs}},\\
+[\mu_{u_1}^{(i)},\ldots,\mu_{u_p}^{(i)}]^T,
+&i=n_{\mathrm{obs}}+1,\ldots,n.
+\end{cases}
+\tag{2.118}
+\end{equation}
+假设误差服从正态分布 $\varepsilon^{(i)}\sim N(0,\Sigma^{(i)})$，其中
+\[
+\Sigma^{(i)}=\diag\left((\sigma_1^{(i)})^2,\ldots,(\sigma_p^{(i)})^2\right).
+\]
+由式（2.116）可得
+\begin{equation}
+\begin{aligned}
+Y={}&(I-R^{(I)}B)^{-1}R^{(I)}AX
++(I-R^{(I)}B)^{-1}R^{(I)}\varepsilon\\
+&{}+(I-R^{(I)}B)^{-1}(Q^{(I)})^TU,
+\end{aligned}\tag{2.119}
+\end{equation}
+或者
+\begin{equation}
+\begin{aligned}
+Y^{(i)}={}&(I-R^{(I)}B)^{-1}R^{(I)}AX^{(i)}
++(I-R^{(I)}B)^{-1}R^{(I)}\varepsilon^{(i)}\\
+&{}+(I-R^{(I)}B)^{-1}(Q^{(I)})^TU^{(i)}.
+\end{aligned}\tag{2.120}
+\end{equation}
+向量 $Y^{(i)}$ 服从正态分布 $N(\mu_Y^{(i)},\Sigma_Y^{(i)})$，其中
+\begin{equation}
+\mu_Y^{(i)}=(I-R^{(I)}B)^{-1}R^{(I)}AX^{(i)}
++(I-R^{(I)}B)^{-1}(Q^{(I)})^T\mu_U^{(i)},
+\tag{2.121}
+\end{equation}
+\begin{equation}
+\Sigma_Y^{(i)}
+=(I-R^{(I)}B)^{-1}
+\left[R^{(I)}\Sigma_\varepsilon^{(i)}R^{(I)}
++(Q^{(I)})^T\Sigma_U^{(i)}Q^{(I)}\right]
+(I-R^{(I)}B)^{-T}.
+\tag{2.122}
+\end{equation}
+其密度函数可写为
+\begin{equation}
+f_{Y^{(i)}}=
+\frac1{(2\pi)^{p/2}|\Sigma_Y^{(i)}|^{1/2}}
+\exp\left\{-\frac12(Y^{(i)}-\mu_Y^{(i)})^T
+(\Sigma_Y^{(i)})^{-1}(Y^{(i)}-\mu_Y^{(i)})\right\}.
+\tag{2.123}
+\end{equation}
+负对数似然于是表示为
+\begin{equation}
+\begin{aligned}
+-l_D(A,B,T,\Sigma_\varepsilon)
+={}&\frac{np}2\log(2\pi)
++\frac12\sum_{i=1}^{n}\Bigl[
+\log|\Sigma_Y^{(i)}|\\
+&\qquad+(Y^{(i)}-\mu_Y^{(i)})^T
+(\Sigma_Y^{(i)})^{-1}(Y^{(i)}-\mu_Y^{(i)})\Bigr].
+\end{aligned}\tag{2.124}
+\end{equation}
+可以证明，式（2.124）的负似然可以简化为（附录2.B）
+\begin{equation}
+\begin{aligned}
+-l_D(A,B,T,\Sigma_\varepsilon)
+\approx{}&\frac12\sum_{i=1}^{n}\Bigl[
+\Tr(K^{(i)}Y^{(i)}(Y^{(i)})^T)\\
+&\quad-2(Y^{(i)})^T(I-B)^TR^{(I)}
+(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+&\quad+\Tr(A^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+R^{(I)}AX^{(i)}(X^{(i)})^T)
+-\sum_{j\notin I}\log\sigma_j^{-2}\Bigr].
+\end{aligned}\tag{2.125}
+\end{equation}
+定义 $n^{(I)}=|\{i\mid T^{(i)}=I\}|$，为被干预变量集合为 $I$ 的样本数，并定义相应的样本矩阵
+\[
+S^{(I)}=\frac1{n^{(I)}}\sum_{i:T^{(i)}=I}Y^{(i)}(Y^{(i)})^T.
+\]
+在矩阵 $K^{(I)}$ 中去掉不含模型参数的项，式（2.125）可进一步简化为
+\[
+\begin{aligned}
+-l_D(A,B,T,\Sigma_\varepsilon)
+\approx{}&\frac12\sum_{I\in T}\Biggl\{
+n^{(I)}\Tr\left(S^{(I)}(I-B)^TR^{(I)}
+(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}(I-B)\right)\\
+&\quad-n^{(I)}\sum_{j\notin I}\log\sigma_j^{-2}\\
+&\quad-\sum_{i:T^{(i)}=I}\Bigl[
+2(Y^{(i)})^T(I-B)^TR^{(I)}
+(\Sigma_\varepsilon^{(i)})^{-1}R^{(I)}AX^{(i)}\\
+&\hspace{4cm}
+-\Tr(A^TR^{(I)}(\Sigma_\varepsilon^{(i)})^{-1}
+R^{(I)}AX^{(i)}(X^{(i)})^T)\Bigr]\Biggr\}.
+\end{aligned}
+\]
+定义 $n^{(-k)}=\sum_{I\in T:k\notin I}n^{(I)}$。在图2.8的例子中，$n^{(-1)}=n^{(-2)}=n^{(-4)}=n$，而 $n^{(-3)}=0$、$n^{(-5)}=0$。定义
+\[
+S^{(-k)}=\sum_{I\in T:k\in I}\frac{n^{(I)}}{n^{(-k)}}S^{(I)},
+\]
+若 $n^{(-k)}=0$，则 $S^{(-k)}=0$。定义 $E_c=\{i\mid\text{至少一个 }a_{ij}\ne0\}$，即与外生变量相连的节点集合，以及
+\[
+n^{(-l)}=\sum_{I\in T:(l\in E_c)\cap(l\notin I)}n^{(I)},
+\]
+它是与外生变量相连的节点 $l$ 未被干预时的样本数。定义
+\[
+\begin{aligned}
+S_{XY}^{(I)}&=\frac1{n^{(I)}}\sum_{i:T^{(i)}=I}X^{(i)}(Y^{(i)})^T,\\
+S_{XX}^{(I)}&=\frac1{n^{(I)}}\sum_{i:T^{(i)}=I}X^{(i)}(X^{(i)})^T,\\
+S_{XY}^{(-l)}&=
+\sum_{\substack{I\in T:(I\in E_c)\cap(l\notin I),,\\i:T^{(i)}=I}}
+\frac{n^{(I)}}{n^{(-l)}}S_{XY}^{(I)},
+\end{aligned}
+\]
+以及
+\[
+S_{XY}^{(-l)}=
+\sum_{\substack{I\in T:(I\in E_c)\cap(l\notin I),,\\i:T^{(I)}=I}}
+\frac{n^{(I)}}{n^{(-l)}}S_{XY}^{(I)}.
+\]
+于是得到如下负对数似然函数（附录2.B）。
+
+\par\medskip\noindent\textbf{结论 2.3：负对数似然函数}\quad
+\begin{equation}
+-l_D(A,B,T,\Sigma_\varepsilon)
+=\sum_{k=1}^{p}l_k(A_k,B_k,\sigma_k^2,T,Y,X),
+\tag{2.126}
+\end{equation}
+其中，当节点与外生变量相连时，
+\begin{equation}
+\begin{aligned}
+l_k(A_{k:},B_{k:},\sigma_k^2,T,Y,X)
+={}&\frac12n^{(-k)}\Bigl\{
+\sigma_k^{-2}(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T-\log\sigma_k^{-2}\\
+&\quad-\sigma_k^{-2}
+\left[2A_{k:}S_{XY}^{(-k)}((I-B)_{k:})^T
+-A_{k:}S_{XX}^{(-k)}(A_{k:})^T\right]\Bigr\},
+\end{aligned}\tag{2.127}
+\end{equation}
+当节点不与任何外生变量相连时，
+\begin{equation}
+l_k(B_{k:},\sigma_k^2,T,Y,X)
+=\frac12n^{(-k)}
+\left\{\sigma_k^{-2}(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T
+-\log\sigma_k^{-2}\right\}.
+\tag{2.128}
+\end{equation}
+
+由于负对数似然函数可以分解为各节点对数似然函数之和，因此可以对每个节点分别估计参数 $A,B$ 和误差方差。首先估计没有外生变量的系统参数，可以证明以下结论（附录2.B）。
+
+\par\medskip\noindent\textbf{结论 2.4：无外生变量时的参数估计}\quad
+\begin{equation}
+B_{k:}^{T}=(S^{(-k)})^{-1}S_{k:}^{(-1)},
+\tag{2.129}
+\end{equation}
+\begin{equation}
+B_{k,\pa_D(k)}
+=S_{k,\pa_D(k)}^{(-k)}
+\left(S_{\pa_D(k),\pa_D(k)}^{(-k)}\right)^{-1},
+\tag{2.130}
+\end{equation}
+\begin{equation}
+\widehat\sigma_k^2
+=(I-\widehat B)_{k:}S^{(-k)}
+\left((I-\widehat B)_{k:}\right)^T,\quad k=1,\ldots,p,
+\tag{2.131}
+\end{equation}
+其中，$B_{k,\pa_D(k)}$ 是由参数矩阵 $B$ 中该节点及其父节点对应的元素构成的行向量。节点 $k$ 的评分定义为
+\begin{equation}
+\operatorname{Score}_D(k)=\frac12n^{(-k)}(1+\log\widehat\sigma_k^2).
+\tag{2.132}
+\end{equation}
+接下来考虑同时包含内生变量和外生变量的系统。附录2.B推导了矩阵 $A,B$、方差 $\sigma_k^2$ 的估计量和节点评分。
+
+\par\medskip\noindent\textbf{结论 2.5：存在外生变量时的参数估计}\quad
+\begin{equation}
+\begin{bmatrix}(B_{k:})^T\\(A_{k:})^T\end{bmatrix}
+=
+\begin{bmatrix}
+S^{(-k)}&S_{YX}^{(-k)}\\
+S_{XY}^{(-k)}&S_{XX}^{(-k)}
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+(S_{k:}^{(-k)})^T\\(S_{XY}^{(-k)})_{:k}
+\end{bmatrix},
+\tag{2.133}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\widehat\sigma_k^2
+={}&(I-\widehat B)_{k:}S^{(-k)}
+\left((I-\widehat B)_{k:}\right)^T\\
+&{}-2\widehat A_{k:}S_{XY}^{(-k)}
+\left((I-\widehat B)_{k:}\right)^T
++\widehat A_{k:}S_{XX}^{(-k)}(\widehat A_{k:})^T,
+\end{aligned}\tag{2.134}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\operatorname{Score}_D(k)
+&=\max_{A_{k:},B_{k:},\sigma_k^2}
+l_k(A_{k:},B_{k:},\sigma_k^2,T,Y,X)\\
+&=\frac12n^{(-k)}(1+\log\widehat\sigma_k^2).
+\end{aligned}\tag{2.135}
+\end{equation}
+
+\subsubsection{联合干预数据与观测数据的稀疏结构方程模型}
+
+因果网络往往是稀疏的，因此矩阵 $A,B$ 也稀疏。为了获得其稀疏估计，自然的方法是采用 $l_1$ 范数惩罚。由于矩阵依赖于图结构，将 $A,B$ 记为 $A(D),B(D)$。考虑一般的负对数似然：
+\[
+\begin{aligned}
+l_k(A_{k:},B_{k:},\sigma_k^2,T,Y,X)
+={}&\frac12n^{(-k)}\Bigl\{
+\sigma_k^{-2}(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T-\log\sigma_k^{-2}\\
+&\quad-\sigma_k^{-2}
+\left[2A_{k:}S_{XY}^{(-k)}((I-B)_{k:})^T
+-A_{k:}S_{XX}^{(-k)}(A_{k:})^T\right]\Bigr\}.
+\end{aligned}
+\]
+定义 $\dim(D_k)$ 为 $\widehat A_{k:}(D)$ 和 $\widehat B_k(D)$ 中非零元素的个数。对于联合干预数据和观测数据的稀疏结构方程模型，$L_1$ 范数惩罚似然优化问题定义为
+\begin{equation}
+\begin{aligned}
+\min_{A_{k:},B_{k:}}\quad&
+(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T\\
+&{}-\left[2A_{k:}S_{XY}^{(-k)}((I-B)_{k:})^T
+-A_{k:}S_{XX}^{(-k)}(A_{k:})^T\right]\\
+&{}+\lambda_1\lVert B_{k:}\rVert_1+\lambda_2\lVert A_{k:}\rVert_1,
+\end{aligned}\tag{2.136}
+\end{equation}
+其中，$\lVert B_{k:}\rVert_1=\sum_{j=1}^{p}|\beta_{kj}|$，
+$\lVert A_{k:}\rVert_1=\sum_{l=1}^{q}|\alpha_{kl}|$。$\lambda_1,\lambda_2$ 为惩罚参数，用于平衡模型对数据的拟合程度与网络稀疏性。若内生变量是 RNA 测序数据，外生变量是 NGS 数据，则以基因为单位的网络分析应采用约束
+\begin{equation}
+\lambda_1\Omega_1(B_{k:})+\lambda_2\Omega_2(A_{k:})
+=\lambda_1\sum_{j=1}^{p}\lVert B_{kj}\rVert_2
++\lambda_2\sum_{l=1}^{q}\lVert A_{kl}\rVert_2,
+\tag{2.137}
+\end{equation}
+其中
+\begin{equation}
+\lVert B_{kj}\rVert_2=
+\sqrt{\sum_{i=1}^{I_j}\beta_{kji}^2},
+\qquad
+\lVert A_{kl}\rVert_2=
+\sqrt{\sum_{m=1}^{M_l}\alpha_{klm}^2}.
+\tag{2.138}
+\end{equation}
+对于以基因为单位的网络分析，式（2.136）变为
+\begin{equation}
+\begin{aligned}
+\min_{A_{k:},B_{k:}}\quad&
+(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T\\
+&{}-\left[2A_{k:}S_{XY}^{(-k)}((I-B)_{k:})^T
+-A_{k:}S_{XX}^{(-k)}(A_{k:})^T\right]\\
+&{}+\lambda_1\Omega_1(B_k)+\lambda_2\Omega_2(A_{k:}).
+\end{aligned}\tag{2.139}
+\end{equation}
+优化问题（2.136）的目标函数可以分解为可微函数部分和非光滑函数部分。定义可微部分为
+\[
+\begin{aligned}
+f(A_{k:},B_{k:})={}&(I-B)_{k:}S^{(-k)}((I-B)_{k:})^T\\
+&{}-\left[2A_{k:}S_{XY}^{(-k)}((I-B)_{k:})^T
+-A_{k:}S_{XX}^{(-k)}(A_{k:})^T\right],
+\end{aligned}
+\]
+非可微部分为
+\[
+\Omega(A_{k:},B_{k:})=
+\lambda_1\lVert B_{k:}\rVert_1+\lambda_2\lVert A_{k:}\rVert_1.
+\]
+类似地，优化问题（2.139）的目标函数分解中，可微部分与（2.136）相同，非可微部分则为
+\[
+\lambda_1\Omega_1(B_{k:})+\lambda_2\Omega_2(A_{k:}).
+\]
+优化问题（2.136）或（2.139）将用第1.3节讨论的近端方法求解。
+
+回顾式（1.38）中考虑的凸优化问题：
+\[
+\min_w\quad f(u,v)+\lambda_1\Omega_1(u)+\lambda_2\Omega_2(v),
+\]
+其中 $f(u,v)$ 为凸可微函数，$\Omega_1(u),\Omega_2(v)$ 为非光滑函数，通常是非光滑范数。求解优化问题（2.139）的近端算子（proximal operator）定义为
+\begin{equation}
+\begin{aligned}
+&\operatorname{Prox}_{\lambda_1\Omega_1+\lambda_2\Omega_2}(u,v)\\
+&\qquad=\argmin_{w\in\R^p}
+\left(\Omega(w)+\frac1{2\lambda_1}\lVert w_1-u\rVert_2^2
++\frac1{2\lambda_2}\lVert w_2-v\rVert_2^2\right).
+\end{aligned}\tag{2.140}
+\end{equation}
+问题（2.139）可用近端梯度法（proximal gradient method）求解。为使两类约束具有统一形式，定义
+\begin{equation}
+\Omega(B_{k:},A_k)=
+\lambda_1\Omega_1(B_{k:})+\lambda_2\Omega_2(A_{k:}),
+\tag{2.141}
+\end{equation}
+其中 $\Omega_1(B_{k:})=|B_{k:}|_1$，$\Omega_2(A_{k:})=|A_{k:}|_1$。
+
+利用式（1.45）、（1.25）和（2.141），得到
+\begin{equation}
+\operatorname{Prox}_{\lambda_1\Omega_1}(u)=
+\begin{bmatrix}
+\sign(u_1)(|u_1|-\lambda_1)_+\\
+\vdots\\
+\sign(u_p)(|u_p|-\lambda_1)_+
+\end{bmatrix}
+\tag{2.142}
+\end{equation}
+和
+\begin{equation}
+\operatorname{Prox}_{\lambda_2\Omega_2}(v)=
+\begin{bmatrix}
+\sign(v_1)(|v_1|-\lambda_2)_+\\
+\vdots\\
+\sign(v_q)(|v_q|-\lambda_2)_+
+\end{bmatrix}.
+\tag{2.143}
+\end{equation}
+类似地，利用式（1.149）、（1.45）和（2.137），得到组套索约束（以基因为单位的网络分析）的近端算子：
+\begin{equation}
+\operatorname{Prox}_{\lambda_1\Omega_1}(u)=
+\begin{bmatrix}
+\left(1-\dfrac{\lambda_1}{\lVert u_1\rVert_2}\right)_+u_1\\
+\vdots\\
+\left(1-\dfrac{\lambda_1}{\lVert u_p\rVert_2}\right)_+u_p
+\end{bmatrix},
+\tag{2.144}
+\end{equation}
+\begin{equation}
+\operatorname{Prox}_{\lambda_2\Omega_2}(v)=
+\begin{bmatrix}
+\left(1-\dfrac{\lambda_1}{\lVert v_1\rVert_2}\right)_+v_1\\
+\vdots\\
+\left(1-\dfrac{\lambda_1}{\lVert v_q\rVert_2}\right)_+v_q
+\end{bmatrix}.
+\tag{2.145}
+\end{equation}
+一般而言，近端梯度法为
+\begin{equation}
+\begin{bmatrix}u^{t+1}\\v^{t+1}\end{bmatrix}
+=
+\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_1}
+\left(u^t-\rho^k\dfrac{\partial f}{\partial\beta}(u^t,v^t)\right)\\
+\operatorname{Prox}_{\lambda_2\Omega_2}
+\left(v^t-\rho^k\dfrac{\partial f(u^t,v^t)}{\partial\alpha}\right)
+\end{bmatrix},
+\tag{2.146}
+\end{equation}
+其中 $\rho^k>0$ 为步长。定义
+\begin{equation}
+\begin{aligned}
+\frac{\partial f(u^t,v^t)}{\partial\beta}
+&=\frac{\partial f(u^t,v^t)}{\partial u}
+=\begin{bmatrix}
+\dfrac{\partial f}{\partial u_1}\\\vdots\\\dfrac{\partial f}{\partial u_p}
+\end{bmatrix}\\
+&=n^{(-k)}\sigma_k^{(-2)}
+\left\{-(I-B)_{k:}S^{(-k)}+A_{k:}S_{XY}^{(-k)}\right\}^T,
+\end{aligned}\tag{2.147}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\frac{\partial f(u^t,v^t)}{\partial\alpha}
+&=\frac{\partial f(u^t,v^t)}{\partial v}
+=\begin{bmatrix}
+\dfrac{\partial f}{\partial v_1}\\\vdots\\\dfrac{\partial f}{\partial v_q}
+\end{bmatrix}\\
+&=n^{(-k)}\sigma_k^{(-2)}
+\left\{-(I-B)_{k:}S^{(-k)}+A_{k:}S_{XY}^{(-k)}\right\}^T.
+\end{aligned}\tag{2.148}
+\end{equation}
+为保证迭代算法收敛，近端梯度法也可以采用下面的形式。定义函数
+\[
+\begin{aligned}
+\widehat f_\lambda(u,v,y_1,y_2)
+={}&f(y)+\nabla_uf(y)^T(u-y_1)+\nabla_vf(y)^T(v-y_2)\\
+&{}+\frac1{2\lambda_1}\lVert u-y_1\rVert_2^2
++\frac1{2\lambda_2}\lVert v-y_2\rVert_2^2,
+\end{aligned}
+\]
+其中 $\lambda_1>0,\lambda_2>0$。
+
+近端梯度法的另一种算法如下。
+\begin{bookalgorithm}{2.1}
+\noindent\textbf{步骤 1：}给定 $u^k,v^k,\lambda_1^{k-1},\lambda_2^{k-1}$ 和参数 $\delta\in(0,1)$，令 $\lambda_1=\lambda_1^{k-1}$、$\lambda_2=\lambda_2^{k-1}$。
+
+\noindent\textbf{步骤 2：}重复：
+\begin{enumerate}
+\item 令
+\item
+\[
+z=\begin{bmatrix}z_1\\z_2\end{bmatrix}
+=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_1}
+\left(u^t-\lambda_1\dfrac{\partial f(u^t,v^t)}{\partial u}\right)\\
+\operatorname{Prox}_{\lambda_2\Omega_2}
+\left(v^t-\lambda_2\dfrac{\partial f(u^t,v^t)}{\partial v}\right)
+\end{bmatrix}.
+\]
+\item 若 $f(z)\leq\widehat f_\lambda(z,u^k,v^k)$，则退出循环。
+\item 更新 $\lambda_1=\delta_1\lambda_1$、$\lambda_2=\delta_2\lambda_2$。
+\end{enumerate}
+\noindent\textbf{步骤 3：}返回 $\lambda_1^t=\lambda_1$、$\lambda_2^t=\lambda_2$、$u^{t+1}=z_1$、$v^{t+1}=z_2$。
+\end{bookalgorithm}
+使用式（2.142）和（2.143），还是式（2.144）和（2.145）来计算近端算子，取决于惩罚内生变量和外生变量时采用向量的哪一种范数，或者研究基因型—表达因果网络时采用哪一种基因表达值和基因型值。如果用总体表达水平表示一个基因的表达，用一个 SNP 表示基因型，就用式（2.142）和（2.143）计算近端算子。如果用 RNA 测序谱表示基因的表达曲线，用多个 SNP 或多个函数主成分得分表示基因内的基因型，则使用式（2.144）和（2.145）。
+
+估计结构方程参数后，可以计算节点的评分函数：
+\begin{equation}
+\begin{aligned}
+\operatorname{Score}(k)={}&
+(I-\widehat B)_{k:}S^{(-k)}
+\left((I-\widehat B)_{k:}\right)^T\\
+&{}-\left[
+2A_{k:}S_{XY}^{(-k)}\left((I-\widehat B)_{k:}\right)^T
+-\widehat A_{k:}S_{XX}^{(-k)}(\widehat A_{k:})^T\right]\\
+&{}+\lambda_1\Omega_1(\widehat B_{k:})
++\lambda_2\Omega_2(\widehat A_{k:}).
+\end{aligned}\tag{2.149}
+\end{equation}
+然后用整数规划寻找因果网络，下一节将对此进行讨论。
+\FloatBarrier

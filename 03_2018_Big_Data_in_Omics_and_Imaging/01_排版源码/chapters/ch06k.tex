@@ -1,0 +1,174 @@
+% 原章第64页至第68页6.6.4标题前，式6.215—6.231。
+\section{用于 fMRI 与基因组数据整合因果分析的时间序列 SEM}
+
+功能磁共振成像（fMRI）可用于推断脑有效连接网络，将结构与有效性结合到有向图中，捕捉脑区域间的因果影响；在这类网络中，一个区域的神经元活动可预测另一区域的活动（Yu et al. 2015）。Granger 因果、动态因果建模、基于图论的方法以及模型无关方法，广泛用于 fMRI 连接分析（Bressler and Seth 2011；Friston et al. 2003）。
+
+影像与基因组技术的进步，产生了极高维的 fMRI、RNA-seq 与下一代测序（NGS）基因型数据，给分析带来巨大挑战。为应对这些挑战，介绍一些近来发展的 fMRI 与基因组学整合因果分析方法。方法包含三个主要部分：（1）用于向量时间序列、同时具有函数型内生变量与外生变量的稀疏 SEM；（2）有向图模型，用于准确估计脑区域之间的有效连接，以及脑区域与基因组变异（包括 NGS 基因型及 RNA-seq 数据）之间的因果关系；（3）用于搜索最佳因果图的 IP 与 DP 算法。
+
+\subsection{模型}
+
+假定将一幅脑图像分割为 $M$ 个子区域，这些子区域的汇总度量称为内生变量。用矩阵 $\Upsilon(t)=[y_1(t),y_2(t),\ldots,y_M(t)]$ 表示时刻 $t$（$t=1,\ldots,T$）这 $M$ 个内生变量的 $n$ 次观测。其中，$y_i(t)=[y_{1i}(t),\ldots,y_{ni}(t)]^T$ 为内生变量 $i$ 的 $n$ 次观测向量，即时刻 $t$ 第 $i$ 个脑子区域的影像汇总度量。协变量与遗传变异定义为外生变量或预定变量，记为 $X(0)=[x_1,\ldots,x_K]$，其中 $x_i=[x_{1i},\ldots,x_{ni}]^T$。类似地，随机误差记为
+\[
+e_i(t)=[e_{1i}(t),\ldots,e_{ni}(t)]^T,\quad
+e(t)=[e_1(t),\ldots,e_M(t)]^T,\quad E=[e(1),\ldots,e(T)].
+\]
+假定 $E[e_i(t)]=0$，$E[e_i(t)e_i(t)^T]=\sigma_i^2I_n$（$i=1,\ldots,M$），且 $E[e_i(t)e_i^T(s)]=0_{n\times n}$（$t\ne s$）。
+
+令 $X(1)=\Upsilon(t-1),\ldots,X(p)=\Upsilon(t-p)$，定义 $X=[X(0)\quad X(1)\quad\cdots\quad X(p)]$。建立以下用于 fMRI 与基因组学联合因果分析的结构方程模型：
+\begin{equation}
+\Upsilon(t)\Gamma+X(0)B(0)+X(1)B(1)+\cdots+X(p)B(p)+e(t)=0,
+\tag{6.215}
+\end{equation}
+其中
+\[
+\Gamma=[\Gamma_1,\ldots,\Gamma_M],\qquad\Gamma={}^i[\gamma_{1i},\ldots,\gamma_{Mi}]^T,
+\]
+\[
+B(0)=\begin{bmatrix}\beta_{11}&\cdots&\beta_{1M}\\\vdots&\ddots&\vdots\\\beta_{K1}&\cdots&\beta_{KM}\end{bmatrix}
+=[\beta_1\quad\cdots\quad\beta_M]=[B_1(0)\quad\cdots\quad B_M(0)],
+\]
+\[
+e(t)=\begin{bmatrix}e_{11}(t)&\cdots&e_{1M}(t)\\\vdots&\ddots&\vdots\\e_{n1}(t)&\cdots&e_{nM}(t)\end{bmatrix}
+=[e_1(t)\quad\cdots\quad e_M(t)],
+\]
+\[
+B(j)=\begin{bmatrix}\alpha_{11}^{(j)}&\cdots&\alpha_{1M}^{(j)}\\\vdots&\ddots&\vdots\\\alpha_{M1}^{(j)}&\cdots&\alpha_{MM}^{(j)}\end{bmatrix},\qquad j=1,\ldots,p.
+\]
+令
+\[
+\begin{aligned}
+B&=\begin{bmatrix}B(0)\\B(1)\\\vdots\\B(p)\end{bmatrix}
+=\begin{bmatrix}
+B_1(0)&\cdots&B_i(0)&\cdots&B_M(0)\\
+B_1(1)&\cdots&B_i(1)&\cdots&B_M(1)\\
+\vdots&\vdots&\vdots&\vdots&\vdots\\
+B_1(p)&\cdots&B_i(p)&\cdots&B_M(p)
+\end{bmatrix}\\
+&=[B_1\quad\cdots\quad B_i\quad\cdots\quad B_M].
+\end{aligned}
+\]
+式 (6.215) 可改写为
+\begin{equation}
+\Upsilon(t)\Gamma+XB+e(t)=0.
+\tag{6.216}
+\end{equation}
+考虑式 (6.216) 的第 $i$ 个方程，得到
+\begin{equation}
+\Upsilon(t)\Gamma_i+XB_i+e_i(t)=0,
+\tag{6.217}
+\end{equation}
+其中
+\[
+B_i=\begin{bmatrix}\beta_i\\B_i(1)\\\vdots\\B_i(p)\end{bmatrix}.
+\]
+设 $\gamma_{ii}=-1$，并定义
+\[
+\Gamma_i=\begin{bmatrix}-1\\\gamma_i\end{bmatrix}.
+\]
+令 $Y_{-i}(t)$ 为观测矩阵 $Y(t)$ 去掉 $y_i(t)$ 后的矩阵，$\gamma_{-i}$ 为参数向量 $\Gamma_i$ 去掉参数 $\gamma_{ii}$ 后的向量。重新排列式 (6.217)，可改写为
+\begin{equation}
+\begin{aligned}
+y_i(t)&=\Upsilon_{-i}(t)\gamma_i+XB_i+e_i(t)\\
+&=Z_i(t)\delta_i+e_i(t),
+\end{aligned}\tag{6.218}
+\end{equation}
+其中
+\[
+Z_i(t)=[\Upsilon_{-i}(t)\quad X],\qquad
+\delta_i=\begin{bmatrix}\gamma_i\\\beta_i\\B_i(1)\\\vdots\\B_i(p)\end{bmatrix}.
+\]
+
+\subsection{简化式方程}
+
+假定矩阵 $\Gamma$ 非奇异。时刻 $t$ 的内生变量（影像汇总度量）$\Upsilon(t)$，可表示为预定变量 $X$ 与滞后内生变量（影像汇总度量）$\Upsilon(t-j)$（$j=1,\ldots,p$）的函数：
+\begin{equation}
+\begin{aligned}
+\Upsilon(t)&=-XB\Gamma^{-1}-e(t)\Gamma^{-1}\\
+&=X\Pi+V(t),
+\end{aligned}\tag{6.219}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+\Pi&=-B\Gamma^{-1}=[-B_1\Gamma^{-1}\quad\cdots\quad-B_M\Gamma^{-1}]=[\Pi_1\quad\cdots\quad\Pi_M],\\
+\Pi_i&=-B_i\Gamma^{-1}=\begin{bmatrix}-\beta_i\Gamma^{-1}\\B_i(1)\Gamma^{-1}\\\vdots\\B_i(p)\Gamma^{-1}\end{bmatrix},
+\end{aligned}\tag{6.220}
+\end{equation}
+\[
+V(t)=-e(t)\Gamma^{-1}=[V_1(t)\quad\cdots\quad V_M(t)].
+\]
+因此，第 $i$ 个简化式方程为
+\begin{equation}
+y_i(t)=X\Pi_i+V_i.
+\tag{6.221}
+\end{equation}
+第 $i$ 个方程与整个系统回归系数的最小二乘估计量分别为
+\[
+\widehat\Pi_i=(X^TX)^{-1}X^Ty_i(t),
+\]
+以及
+\begin{equation}
+\widehat\Pi=(X^TX)^{-1}X^T\Upsilon(t).
+\tag{6.222}
+\end{equation}
+
+\subsection{单方程与广义最小二乘估计量}
+
+将式 (6.222) 代入式 (6.120)，得到
+\begin{equation}
+(X^TX)^{-1}X^T\Upsilon(t)\begin{pmatrix}-1\\\gamma_i\end{pmatrix}=-B_i.
+\tag{6.223}
+\end{equation}
+式 (6.223) 两侧乘以 $X^TX$，得到
+\begin{equation}
+X^T\Upsilon(t)\begin{pmatrix}-1\\\gamma_i\end{pmatrix}=-(X^TX)B_i,
+\tag{6.224}
+\end{equation}
+即
+\[
+-X^Ty_i(t)+X\Upsilon_{-i}(t)\widehat\gamma_i=-X^TX\widehat B_i,
+\]
+或
+\begin{equation}
+X^Ty_i(t)=X^T\Upsilon_{-i}(t)\widehat\gamma_i+X^TX\widehat B_i.
+\tag{6.225}
+\end{equation}
+由式 (6.218)、(6.225)，得到
+\begin{equation}
+X^Ty_i(t)=X^TZ_i(t)\delta_i+X^Te_i(t).
+\tag{6.226}
+\end{equation}
+为高效估计 $\delta_i$，需要研究加权最小二乘估计方法。$X^Te_i(t)$ 的方差为
+\begin{equation}
+\operatorname{Var}(X^Te_i(t))=\sigma_i^2X^TX.
+\tag{6.227}
+\end{equation}
+通过极小化误差平方和，得到 $\delta_i$ 的广义最小二乘估计量：
+\begin{equation}
+\begin{aligned}
+F=\sum_{t=p+1}^T&[X^Ty_i(t)-X^TZ_i(t)\delta_i]^T(\sigma_i^2X^TX)^{-1}\\
+&[X^Ty_i(t)-X^TZ_i(t)\delta_i].
+\end{aligned}\tag{6.228}
+\end{equation}
+令函数 $F$ 的偏导数
+\[
+\frac{\partial F}{\partial\delta_i}=-2\sum_{t=p+1}^TZ_i^T(t)X(\sigma_i^2X^TX)^{-1}[X^Ty_i(t)-X^TZ_i(t)\delta_i]
+\]
+等于零，得到
+\begin{equation}
+\begin{aligned}
+\widehat\delta_i=&\left[\sum_{t=p+1}^TZ_i^T(t)X(X^TX)^{-1}X^TZ_i(t)\right]^{-1}\\
+&\qquad\sum_{t=p+1}^TZ_i^T(t)X(X^TX)^{-1}X^Ty_i(t).
+\end{aligned}\tag{6.229}
+\end{equation}
+该估计量的方差—协方差矩阵为
+\begin{equation}
+\operatorname{Var}(\widehat\delta_i)=\sigma_i^2\left[\sum_{t=p+1}^TZ_i^T(t)X(X^TX)^{-1}X^TZ_i(t)\right]^{-1}.
+\tag{6.230}
+\end{equation}
+方差 $\sigma_i^2$ 估计为
+\begin{equation}
+\widehat\sigma_i^2=\frac{\displaystyle\sum_{t=p+1}^T[y_i(t)-Z_i(t)\widehat\delta_i]^T[y_i(t)-Z_i(t)\widehat\delta_i]}{(T-p-1)(n-m_i-k_i-)},
+\tag{6.231}
+\end{equation}
+其中，$m_i$ 为 $\Gamma_i$ 的非零元素数目，$k_i$ 为 $B_i$ 的非零元素数目。

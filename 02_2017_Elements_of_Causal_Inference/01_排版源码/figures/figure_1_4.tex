@@ -1,0 +1,48 @@
+\begin{figure}[htbp]
+\centering
+\definecolor{interventionred}{RGB}{237,28,36}
+\begin{tikzpicture}[font=\footnotesize,>={Stealth[length=1.7mm,width=1.1mm]}]
+ % 每个面板均使用原 PDF 矢量图中读取的 100 个散点及红色标记坐标。
+ \foreach \panel/\letter/\xoffset/\yoffset in {1/A/0/0,2/A/7.5/0,3/B/0/-6.2,4/B/7.5/-6.2}{
+  \begin{scope}[shift={(\xoffset,\yoffset)},x=.55cm,y=.23cm]
+   \foreach \xtick in {0,2,4,6,8}{
+    \draw[gray!25,densely dotted,thin] (\xtick,-.8)--(\xtick,19.8);
+   }
+   \foreach \ytick in {0,5,10,15}{
+    \draw[gray!25,densely dotted,thin] (-1.4,\ytick)--(8.8,\ytick);
+   }
+   \input{data/figure_1_4_panel_\panel}
+   \input{data/figure_1_4_red_panel_\panel}
+   \draw[gray,thin] (-1.4,19.8)--(-1.4,-.8)--(8.8,-.8);
+   \foreach \xtick in {0,2,4,6,8}{
+    \draw[gray,thin] (\xtick,-.8)--(\xtick,-1.45) node[below=2pt,text=black] {$\xtick$};
+   }
+   \foreach \ytick in {0,5,10,15}{
+    \draw[gray,thin] (-1.4,\ytick)--(-1.7,\ytick) node[left=2pt,text=black] {$\ytick$};
+   }
+   \node at (3.7,-4.15) {基因 \letter\ 的活性};
+   \node[rotate=90] at (-3.05,9.5) {表型};
+   \ifnum\panel=1
+    \node[interventionred,font=\large] at (-.48,5) {?};
+   \fi
+   \ifnum\panel=3
+    \node[interventionred,font=\large] at (-.48,5) {?};
+   \fi
+   \ifnum\panel=2
+    \node[inner sep=1pt] (f14aGene) at (3.1,1.5) {基因 A};
+    \node[inner sep=1pt] (f14aPheno) at (7.2,1.5) {表型};
+    \draw[->,thin] (f14aGene)--(f14aPheno);
+   \fi
+   \ifnum\panel=4
+    \node[inner sep=1pt] (f14bCommon) at (5.4,5.9) {混杂因子};
+    \node[inner sep=1pt] (f14bGene) at (4.0,1.5) {基因 B};
+    \node[inner sep=1pt] (f14bPheno) at (7.6,1.5) {表型};
+    \draw[->,thin] (f14bCommon)--(f14bGene);
+    \draw[->,thin] (f14bCommon)--(f14bPheno);
+   \fi
+  \end{scope}
+ }
+\end{tikzpicture}
+\caption{两个基因的活性（上排：基因 A；下排：基因 B）都与表型高度相关，黑色散点表示观测数据。然而，敲除基因，即将其活性设为 0 时，对表型的最佳预测（左列）取决于因果结构（右列）。如果基因与表型之间的相关由某个共同原因造成，那么干预后表型预计仍保持通常的表现（右下图）；如果基因对表型具有因果影响，干预就会明显改变表型的取值（右上图）。本图的构思来自 Peters et al. [2016]。}
+\label{fig:1.4}
+\end{figure}

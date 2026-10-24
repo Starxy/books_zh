@@ -1,0 +1,66 @@
+% 原书第148—151页：7.2.2。
+\subsection{基于得分的方法}
+
+上一节直接利用独立性陈述推断图。另一种选择是比较不同图结构拟合数据的能力。其依据是，例如，编码了错误条件独立关系的图结构，会导致较差的模型拟合。基于得分的因果学习方法也许有更早的源头，这里主要参考 Geiger and Heckerman［1994a］、Heckerman et al.［1999］、Chickering［2002］及其引用文献。\textbf{最大最小爬山算法（Max-Min Hill-Climbing）}［Tsamardinos et al., 2006］则结合了基于得分与基于独立性的技术。
+
+\paragraph{得分最高的图}
+给定来自变量向量 $X$ 的数据 $D=(X^1,\ldots,X^n)$，也就是包含 $n$ 个独立同分布观测的样本，这类方法为每个图 $\mathcal G$ 赋予得分 $S(D,\mathcal G)$，并在有向无环图空间中搜索得分最高的图：
+\begin{equation}
+ \widehat{\mathcal G}:=
+ \underset{\mathcal G\text{ 为 }X\text{ 上的DAG}}{\argmax}
+ S(D,\mathcal G).
+ \tag{7.6}
+\end{equation}
+得分函数 $S$ 有多种定义方式。人们常假设一个参数模型，例如线性高斯方程或多项分布，这就引入了一组参数 $\theta\in\Theta$。
+
+\paragraph{带惩罚的似然}
+对于每个图，可以考虑 $\theta$ 的最大似然估计量 $\widehat\theta$，再由 BIC 定义得分函数
+\begin{equation}
+ S(D,\mathcal G)=
+ \log p(D\mid\widehat\theta,\mathcal G)
+ -\frac{\#\text{参数}}{2}\log n,
+ \tag{7.7}
+\end{equation}
+其中，$\log p(D\mid\widehat\theta,\mathcal G)$ 为对数似然，$n$ 是样本量。输出带惩罚似然最大的图的估计量，通常具有一致性。这来自 BIC 的一致性［Haughton, 1988］及模型类的可识别性。不过，要保证收敛速率，通常还需要某种“可识别程度”条件［例如 Bühlmann et al., 2014］。实际中，可能无法从所有可能图中找出得分最高者，因此需要在图空间中采用搜索技术，例如见下面“贪心搜索技术”一段。
+
+也可以采用不同于 BIC 的正则化方式。例如，Roos et al.［2008］依据最小描述长度原理［Grünwald, 2007］构造得分。Chickering［2002］利用 Haughton［1988］的工作，讨论了 BIC 方法与下面将介绍的贝叶斯表述之间的联系。
+
+\paragraph{贝叶斯得分函数}
+分别在有向无环图和参数上定义先验 $p_{\mathrm{pr}}(\mathcal G)$ 与 $p_{\mathrm{pr}}(\theta)$，并将对数后验作为得分函数。注意，$p(D)$ 对所有有向无环图都是常数：
+\[
+ S(D,\mathcal G):=\log p(\mathcal G\mid D)
+ \propto\log p_{\mathrm{pr}}(\mathcal G)+\log p(D\mid\mathcal G),
+\]
+\chseventnote{原书在对数形式中使用比例符号 $\propto$。严格地说，两端相差的是与图无关的加法常数 $-\log p(D)$，而不是乘法比例。它们对图的排序以及最大化所得的图均相同。}
+其中，$p(D\mid\mathcal G)$ 是\textbf{边缘似然（marginal likelihood）}：
+\[
+ p(D\mid\mathcal G)=
+ \int_{\theta\in\Theta}
+ p(D\mid\mathcal G,\theta)\,
+ p_{\mathrm{pr}}(\theta\mid\mathcal G)\,\mathrm{d}\theta.
+\]
+这里，式 (7.6) 得到的估计量 $\widehat{\mathcal G}$ 是后验分布的众数，通常称为\textbf{最大后验估计量（maximum a posteriori estimator，MAP）}。另一种做法是输出有向无环图上的完整后验分布。原则上，还可以获得更细致的信息。例如，对所有图取平均，就可以得到某条特定边存在的后验概率。
+
+作为一个例子，考虑只取有限多个值的随机变量。对于给定结构 $\mathcal G$，可以假设：在每一种父节点取值组合下，随机变量 $X_j$ 的概率分布服从多项分布。如果为其参数指定 Dirichlet 先验，再结合关于参数独立性及模块性的一些额外条件，就得到\textbf{贝叶斯 Dirichlet 得分（Bayesian Dirichlet score，BD）}［Geiger and Heckerman, 1994b］。
+
+在参数模型中，如果对于每个参数 $\theta_1$ 都存在相应的参数 $\theta_2$，使图 $\mathcal G_1$ 与 $\theta_1$ 组合得到的分布，等于图 $\mathcal G_2$ 与 $\theta_2$ 组合得到的分布，而且反过来也成立，就称两个图 $\mathcal G_1,\mathcal G_2$ \textbf{分布等价（distribution equivalent）}。例如，可以证明，在线性高斯情形下，两个图分布等价，当且仅当它们马尔可夫等价，见习题7.12。因此，有人主张，对于马尔可夫等价的图 $\mathcal G_1,\mathcal G_2$，$p(D\mid\mathcal G_1)$ 与 $p(D\mid\mathcal G_2)$ 应当相等。BD 得分可以调整为满足这一性质，通常称为\textbf{贝叶斯 Dirichlet 等价得分（Bayesian Dirichlet equivalence score，BDe）}［Geiger and Heckerman, 1994b］。Buntine［1991］提出了这一得分的一个具体版本，使用的超参数更少。
+
+\paragraph{贪心搜索技术}
+所有有向无环图构成的搜索空间，随变量数以超指数速度增长［例如 Chickering, 2002］。对于2、3、4和10个变量，有向无环图的数目分别为3、25、543和4175098976430598143，见表B.1。因此，通过遍历所有图来求解式 (7.6)，往往不可行。可以改用贪心搜索算法：每一步都有一个候选图及其邻近图集合，计算所有这些邻近图的得分，再把得分最高者作为新候选图。如果所有邻近图的得分都不更高，搜索就终止，但此时并不知道所得的是否仅为局部最优。因此，显然必须定义一种邻近关系。例如，从图 $\mathcal G$ 出发，可以把删除、添加或反转一条边所得到的所有图定义为它的邻近图。
+
+对于线性高斯结构因果模型，无法区分马尔可夫等价的图。事实表明，此时将搜索空间从有向无环图改为马尔可夫等价类，会更有利。\textbf{贪心等价搜索（greedy equivalence search，GES）}［Chickering, 2002］优化 BIC 准则 (7.7)，从空图开始，分为两个阶段：第一阶段不断添加边，直至达到局部最大值；第二阶段不断删除边，再次达到局部最大值后，将相应结果作为算法输出。
+
+\paragraph{精确方法}
+一般而言，寻找得分最优的有向无环图是 NP 难的［Chickering, 1996］。尽管如此，仍有许多有意思的研究尝试扩大精确方法能够处理的问题规模。这里的“精确”，是指对于给定的有限数据集，目标是找到得分最高的图中的一个。贪心搜索技术往往属于启发式方法，即使具有保证，通常也只是在数据量趋于无穷的极限下具有保证。
+
+一类研究基于\textbf{动态规划（dynamic programming）}［Silander and Myllymak, 2006；Koivisto and Sood, 2004；Koivisto, 2006］。这些方法利用了实际常用的许多得分具有的可分解性。由马尔可夫分解，对于 $D=(X^1,\ldots,X^n)$，有
+\[
+ \log p(D\mid\widehat\theta,\mathcal G)=
+ \sum_{j=1}^d\sum_{i=1}^n
+ \log p\bigl(X_j^i\mid X_{\PA_j^{\mathcal G}}^i,\widehat\theta\bigr),
+\]
+它是 $d$ 个“局部”得分之和。基于动态规划的方法利用这种可分解性。尽管复杂度为指数级，即使不限制父节点个数，也能够为至少30个变量找到得分最高的图。考虑到这么多个变量上存在数量惊人的不同有向无环图，见表B.1，这一结果相当突出。
+
+\textbf{整数线性规划（integer linear programming，ILP）}框架不仅假定可分解性，还要求得分函数对马尔可夫等价的图赋予相同得分。其思想是把图结构表示成向量，使得得分函数在这种向量表示中成为仿射函数。Studený and Haws［2014］介绍了 Hemmecke et al.［2012］如何基于\textbf{特征 imset（characteristic imset）}构造表示；Jaakkola et al.［2010］及 Cussens［2011］则改用长度为指数级的零一编码，表示节点之间的父子关系，并利用 De Campos and Ji［2011］的工作缩小搜索空间。
+
+将问题表述为 ILP 问题之后，它仍然是 NP 难的，但现在可以使用现成的整数线性规划方法。限制父节点个数还能带来进一步进展。例如，在“\textbf{系谱学习（pedigree learning）}”中，每个节点至多有两个父节点［Sheehan et al., 2014］。

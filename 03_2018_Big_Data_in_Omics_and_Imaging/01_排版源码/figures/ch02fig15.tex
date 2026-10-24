@@ -1,0 +1,42 @@
+\begin{minipage}{.49\linewidth}
+\centering
+\begin{tikzpicture}
+\node[inner sep=0,anchor=south west](ch0215imga)at(0,0){\includegraphics[width=\linewidth]{figures/ch02fig15a.pdf}};
+\begin{scope}[x={(ch0215imga.south east)},y={(ch0215imga.north west)}]
+\fill[white](0,.38)rectangle(.043,.63);
+\fill[white](.43,.038)rectangle(.58,.075);
+\node[inner sep=0,rotate=90,font=\fontsize{7}{8}\selectfont]at(.021,.51){检出功效};
+\node[inner sep=0,font=\fontsize{7}{8}\selectfont]at(.51,.056){样本量};
+\fill[white](.125,.675)rectangle(.40,.89);
+\draw[black,line width=.3pt](.125,.675)rectangle(.40,.89);
+\foreach \yy/\txt in {.86/SEMIP,.825/SEM,.79/{稀疏 MLE},.755/QTLnet,.72/共关联}
+ \node[anchor=west,inner sep=0,font=\fontsize{5}{5.7}\selectfont]at(.213,\yy){\txt};
+\draw[red!85!black,line width=.65pt](.14,.86)--(.20,.86);
+\draw[red!85!black,line width=.65pt,dashed](.14,.825)--(.20,.825);
+\draw[blue!65!black,line width=.65pt](.14,.79)--(.20,.79);
+\draw[blue!65!black,line width=.65pt,dashed](.14,.755)--(.20,.755);
+\draw[green!65!black,line width=.65pt](.14,.72)--(.20,.72);
+\end{scope}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}{.49\linewidth}
+\centering
+\begin{tikzpicture}
+\node[inner sep=0,anchor=south west](ch0215imgb)at(0,0){\includegraphics[height=.826\linewidth]{figures/ch02fig15b.pdf}};
+\begin{scope}[x={(ch0215imgb.south east)},y={(ch0215imgb.north west)}]
+\fill[white](0,.36)rectangle(.043,.64);
+\fill[white](.45,.038)rectangle(.60,.075);
+\node[inner sep=0,rotate=90,font=\fontsize{7}{8}\selectfont]at(.021,.51){错误发现率};
+\node[inner sep=0,font=\fontsize{7}{8}\selectfont]at(.525,.056){样本量};
+\fill[white](.17,.285)rectangle(.455,.485);
+\draw[black,line width=.3pt](.17,.285)rectangle(.455,.485);
+\foreach \yy/\txt in {.455/SEMIP,.42/SEM,.385/{稀疏 MLE},.35/QTLnet,.315/共关联}
+ \node[anchor=west,inner sep=0,font=\fontsize{5}{5.7}\selectfont]at(.26,\yy){\txt};
+\draw[red!85!black,line width=.65pt](.185,.455)--(.25,.455);
+\draw[red!85!black,line width=.65pt,dashed](.185,.42)--(.25,.42);
+\draw[blue!65!black,line width=.65pt](.185,.385)--(.25,.385);
+\draw[blue!65!black,line width=.65pt,dashed](.185,.35)--(.25,.35);
+\draw[green!65!black,line width=.65pt](.185,.315)--(.25,.315);
+\end{scope}
+\end{tikzpicture}
+\end{minipage}

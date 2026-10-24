@@ -1,0 +1,43 @@
+% 原章第66页7.2.2.3标题—第67页7.3标题前。
+\subsubsection{作为多个因果网络联合估计通用框架的整数规划}
+
+我们收集多种类型的数据：基因型、基因表达、微 RNA 表达、甲基化、代谢物、影像、表型和疾病数据（图7.9），希望估计包含不同类型数据的多个因果网络。例如，考虑 $M$ 个基因表达变量 $Y_1,\ldots,Y_M$、$Q$ 个甲基化变量 $Z_1,\ldots,Z_Q$ 和 $K$ 个基因型变量 $X_1,\ldots,X_K$。令 $pa_D(d)$ 为节点 $d$ 的父节点集合，包括基因表达、甲基化和基因型变量。考虑基因表达的 ANM：
+\begin{equation}
+\begin{aligned}
+Y_d={}&f_d\bigl(Y_i\in pa_D(d),Z_q\in pa_D(d),X_j\in pa_D(d)\bigr)+\varepsilon_d,\\
+&d=1,\ldots,M,
+\end{aligned}
+\tag{7.221}
+\end{equation}
+以及甲基化的 ANM：
+\begin{equation}
+Z_q=g_q\bigl(Z_l\in pa_Q(q),X_k\in pa_Q(q)\bigr)+\varepsilon_q,\qquad q=1,\ldots,Q.
+\tag{7.222}
+\end{equation}
+假设非线性函数用 B 样条近似。指定父节点集合 $W_{di}$ 和 $W_{ql}$ 后，可利用第7.2.2.2.2节的方法，计算分别对应于式 (7.221)、(7.222) 中父节点集合 $W_{di}$、$W_{ql}$ 的矩阵 $D_Y^i$、$D_Z^l$。
+
+节点 $Y_d$ 和 $Z_q$ 的评分分别为
+\begin{equation}
+C(Y_d,W_{di})=Y_d^T\left(I-D_Y^i\left((D_Y^i)^TD_Y^i\right)^{-1}(D_Y^i)^T\right)Y_d
+\tag{7.223}
+\end{equation}
+和
+\begin{equation}
+C(Z_q,W_{ql})=Z_q^T\left(I-D_Z^l\left((D_Z^l)^TD_Z^l\right)^{-1}(D_Z^l)^T\right)Z_q.
+\tag{7.224}
+\end{equation}
+令 $V_E$ 为基因表达网络中的节点集合，$V_M$ 为甲基化网络中的节点集合。令 $C_E$ 为 $V_E$ 中的一个节点子集，$C_M$ 为 $V_M$ 中的一个节点子集。与第2.6.2节类似，表达和甲基化联合因果网络可以表述为以下0—1整数线性规划：
+\begin{equation}
+\begin{aligned}
+\operatorname{Min}\quad&\sum_{d=1}^{M}\sum_{i\in pa_D(d)}C(d,W_{di})\chi(W_{di}\to d)\\
+&+\sum_{q=1}^{Q}\sum_{l\in pa_Q(q)}C(q,W_{ql})\chi(W_{lq}\to q)\\
+\text{约束为}\quad&\sum_{i\in pa_D(d)}\chi(W_{di}\to d)=1,\qquad d=1,\ldots,M,\\
+&\sum_{l\in pa_Q(q)}\chi(W_{ql}\to q)=1,\qquad q=1,\ldots,Q,\\
+&\forall C_E\subseteq V_E:\quad
+\sum_{d\in C_E}\sum_{W_d:W_d\cap C_E=\varnothing}\chi(W_d\to d)\ge1,\\
+&\forall C_M\subseteq V_M:\quad
+\sum_{q\in C_M}\sum_{W_q:W_q\cap C_M=\varnothing}\chi(W_q\to q)\ge1.
+\end{aligned}
+\tag{7.225}
+\end{equation}
+利用第2.6节讨论的分支定界等 IP 求解方法，可以求解该 IP 问题，得到与数据最佳拟合的联合基因型—甲基化—表达因果网络，以及基因型—甲基化因果网络。

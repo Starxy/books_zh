@@ -1,0 +1,46 @@
+% 原书分章 PDF 第 14—16 页；第 17.3 节导言与第 17.3.1 小节。
+\section{估计量}
+
+本节为中介泛函 (17.5) 构造嵌套的非靶向代入估计量、IPW 估计量和 TMLE；自然直接效应与自然间接效应的估计量，可通过相应的差值获得。若 $P_0$ 所有相关分量的估计均一致，则前两种估计量一致。另一方面，TMLE 满足有效影响曲线方程，因此，在定理 17.1 所述的模型误设情形下仍保持无偏。在适当的正则性条件下，若所有干扰参数均得到一致估计，则 TMLE 将是渐近有效的（例如 Bickel 等，1997b；van der Laan 和 Robins，2003；van der Laan 和 Rose，2011）。用 $p_{n,A}$、$p_{n,L}$、$p_{n,R}$ 和 $p_{n,Z}$ 表示条件概率的估计量，并以 $\bar p_n$ 作为这些估计量的简写。用
+\[
+ \bar Q_n^{\mathbf a,\mathbf a'}\equiv
+ \bigl(\bar Q_{n,L_t}^{\mathbf a,\mathbf a'},
+ \bar Q_{n,Z_t}^{\mathbf a,\mathbf a'},
+ \bar Q_{n,R_t}^{\mathbf a,\mathbf a'}:t\bigr)
+\]
+表示嵌套期望的估计量。它们可以是基于密度的估计量：将密度估计 $p_{n,L}$、$p_{n,R}$ 和 $p_{n,Z}$ 代入式 (17.7) 中期望的定义；也可以是利用式 (17.13) 的关系获得的基于回归的估计量。
+
+\subsection{非靶向代入估计量}
+
+定义这一统计估计目标的识别公式 (17.5)，通常称为 g 计算公式（g-computation formula；Robins，1986）。它直接给出一个非靶向代入估计量，通常称为 g 计算估计量。为避免估计密度，可利用式 (17.8) 和式 (17.13) 的表示，将该公式改写为关于 $\bar Q^{\mathbf a,\mathbf a'}$ 的形式，再通过回归的非靶向估计 $\bar Q_n^{\mathbf a,\mathbf a'}$，得到 $\Psi^{\mathbf a,\mathbf a'}(P_0)$ 的非靶向代入估计量 $\Psi^{\mathbf a,\mathbf a'}(\bar Q_n^{\mathbf a,\mathbf a'})$。
+
+为估计嵌套条件期望序列 $\bar Q^{\mathbf a,\mathbf a'}(P_0)$，可采用以下算法。该算法利用式 (17.13) 的关系，从而能够使用文献中已有的回归方法。
+\begin{enumerate}[label=\arabic*.]
+ \item 初始化 $\bar Q_{R_{\tau+1}}\mathbf a,\mathbf a'\equiv Y_\tau$。在我们的例子中，这是最终血糖水平；对失访者，可以使用虚拟值。
+ \item 按 $t=\tau,\ldots,1$ 递减的顺序，在每个时点 $t$，上一阶段已得到估计量 $\bar Q_{n,R_{t+1}}^{\mathbf a,\mathbf a'}$。现在依次按以下方法获得 $\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}$ 和 $\bar Q_{n,R_t}^{\mathbf a,\mathbf a'}$。
+ \begin{enumerate}[label=(\alph*),leftmargin=2.4em]
+  \item 在时点 $t$ 仍未删失的观测中，将 $\bar Q_{n,R_{t+1}}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)$ 对观测值 $(\mathbf A_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$ 回归。在我们的例子中，回归的自变量是截至时点 $t$ 的项目参与、糖尿病教育和营养咨询出席历史，以及截至 $t-1$ 的疾病进展和其他健康相关变量。然后，对这些未删失观测，在其观测到的中介与协变量历史 $\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1}$，以及干预暴露 $\mathbf A_t=\mathbf a_t$ 处，对拟合函数求值。具体可为这些未删失个体创建一个新数据集，保留观测到的协变量和中介变量，但将 $\mathbf A_t$ 设为 $\mathbf a_t$。由此为这些未删失个体得到估计
+  \[
+  \begin{aligned}
+   &\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})\\
+   &\quad=E\bigl[\bar Q_{n,R_{t+1}}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)
+   \mid\mathbf A_t=\mathbf a_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1}\bigr].
+  \end{aligned}
+  \]
+  \item 在时点 $t$ 仍未删失的观测中，将刚刚得到的 $\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$ 对 $\mathbf A_t,\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}$ 回归。在我们的例子中，自变量是截至时点 $t$ 的项目参与和糖尿病教育历史，以及截至 $t-1$ 的营养咨询出席情况、疾病进展和其他健康相关变量。然后，对这些未删失观测，在其观测到的中介与协变量历史 $\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}$，以及干预后的收入水平 $\mathbf A_t=\mathbf a'_t$ 处，对拟合函数求值。由此得到估计 $\bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf L_{t-1},\mathbf Z_{t-1})$。
+  \item 只考虑时点 $t$ 仍未删失的观测。将刚刚得到的
+  \[
+   \bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf L_{t-1},\mathbf Z_{t-1})
+  \]
+  对 $\mathbf A_t,\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}$ 回归。在我们的例子中，自变量是截至时点 $t$ 的项目参与历史，以及截至 $t-1$ 的糖尿病教育、营养咨询出席情况、疾病进展和其他健康相关变量。然后，对这些未删失观测，在其观测到的中介与协变量历史 $\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}$，以及干预后的收入水平 $\mathbf A_t=\mathbf a'_t$ 处，对拟合函数求值。由此得到估计 $\bar Q_{n,R_t}^{\mathbf a,\mathbf a'}(\mathbf R_{t-1},\mathbf L_{t-1},\mathbf Z_{t-1})$。
+ \end{enumerate}
+ \item 按步骤 2，从 $t=\tau$ 到 $t=1$ 依次运行算法后，对 $n$ 个观测中的每一个，都已得到 $\bar Q_{n,R_1}^{\mathbf a,\mathbf a'}(L_0)$。
+\end{enumerate}
+非靶向代入估计量为
+\begin{equation}
+ \psi_n^{\mathrm{NTsub}}\equiv\Psi^{\mathbf a,\mathbf a'}(\bar Q_n^{\mathbf a,\mathbf a'})
+ =\frac1n\sum_{i=1}^n\bar Q_{n,R_1}^{\mathbf a,\mathbf a'}(L_{0,i}).
+ \tag{17.14}
+\end{equation}
+
+$\psi_{n,\mathrm{NTsub}}^{\mathbf a,\mathbf a'}$ 的一致性依赖于 $\bar Q_n^{\mathbf a,\mathbf a'}$ 的一致性。只有在少数应用中，才可能用有限维参数模型正确设定 $\bar Q^{\mathbf a,\mathbf a'}(P_0)$。另一种选择是采用超级学习器等机器学习算法。尤其在基于回归的方法中，这一选择更具吸引力，因为已有更多数据自适应方法，可通过回归估计二元变量的条件均值。采用非参数自助法得到的这一估计量的方差估计，没有理论支持，而且可以预期其并不一致。对于由此得到的估计量 $\Psi^{\mathbf a,\mathbf a'}(\bar Q_n^{\mathbf a,\mathbf a'})$，目前尚无关于其渐近行为的理论结果，例如中心极限定理；也没有理由期待这种数据自适应的 g 计算估计量存在极限分布。此外，$\bar Q^{\mathbf a,\mathbf a'}(P_0)$ 的非靶向估计量 $\bar Q_n^{\mathbf a,\mathbf a'}$，是通过最小化针对 $\bar Q^{\mathbf a,\mathbf a'}(P_0)$、而非针对 $\Psi^{\mathbf a,\mathbf a'}(P_0)$ 的全局损失函数得到的。这尤其意味着，$\bar Q_n^{\mathbf a,\mathbf a'}$ 的偏差—方差权衡，是针对高维干扰参数 $\bar Q^{\mathbf a,\mathbf a'}(P_0)$ 优化的，而不是针对维数低得多的感兴趣参数 $\Psi^{\mathbf a,\mathbf a'}(P_0)$ 优化的。因此，非靶向代入估计量的均方误差过高：例如，在所提出的靶向估计量渐近线性且有效、因而以参数速率 $n^{-1/2}$ 收敛的相同条件下，这种数据自适应的 g 计算估计量确实以低于 $n^{-1/2}$ 的速率收敛。第 17.3.3 节提出的靶向估计量，旨在解决这两个问题：它给出一个在适当正则性条件下渐近线性的代入估计量，并通过更新步骤，使 $\bar Q_n^{\mathbf a,\mathbf a'}$ 的偏差—方差权衡朝向 $\Psi^{\mathbf a,\mathbf a'}(P_0)$ 优化。

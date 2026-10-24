@@ -1,0 +1,302 @@
+% 原书分章 PDF 第 13—17 页：第 25.4 节，定理 25.3 与引理 25.3 的完整证明。
+\section{平滑带宽的数据自适应选择器}
+
+令 $h_n$ 为下列方程的一个解：
+\begin{equation}
+ \frac{d}{dh_n}\psi^*_{n,h_n}
+ +C_n\frac{d}{dh_n}\{\sigma_n/(nh_n^d)^{0.5}\}=0,
+\tag{25.7}
+\end{equation}
+其中 $C_n$ 为某个有限或缓慢收敛的序列，例如对某个 $C>0$，
+$C_n=C\log n$ 或 $-C\log n$。
+$C_n$ 符号的选择，取决于 $h$ 接近 0 时 $h\mapsto\psi^*_{n,h}$ 递增还是递减。
+在不太可能出现的情形下，若 $\psi_{n,h}$（也可能包括 $\psi_{0,h}$）
+在 0 的局部邻域 $(0,a)$ 内关于 $h$ 为常数，则选择 $h_n=a$。
+实践中，我们预期式 (25.7) 仅对正的或负的 $C_n$ 之一有解，因此这一选择会自然产生。
+为保证式 (25.7) 的解存在，我们允许 $C_n$ 缓慢趋于无穷；但只有在
+$C_n=O_P(1)$ 时，才能达到最优自适应速率。
+因此，在实践中，我们建议将 $C_n$ 选为满足 $|C_n|\geq1.96$
+且能找到解的最小 $C_n$。
+
+一个有意思的选择是，对某个序列 $\alpha_n$，取
+$C_n=Z_{1-\alpha_n}$ 或 $C=-Z_{1-\alpha_n}$，
+其中 $Z(1-\alpha)$ 是标准正态分布的 $1-\alpha$ 分位数。
+例如，$\alpha_n=1/n$ 对应于 $C_n$ 的行为如同 $\log n$；
+不过，如有可能，应将 $\alpha$ 选在 0.05 这样的固定水平。
+这样，可将 $h_n$ 看成使 $\psi_0$ 的 $1-\alpha_n$ 置信区间上界最小、
+或下界最大的取值，从而得到关于该选择器 $h_n$ 的如下直观理解。
+假定考察 $\psi_{n,h}$ 作为 $h>0$ 的函数在 0 附近的行为时，
+在排除纯噪声的区域，发现它在 $h$ 趋近于 0 时呈上升趋势。
+此时，我们可能愿意假定对所有 $h>0$ 都有 $\psi_0>\psi_{0,h}$，
+这提示我们应最大化 $\psi^*_{n,h}$。
+然而，随着 $h$ 趋近于零，$\psi^*_{n,h}$ 的噪声开始超过信号 $\psi_{0,h}$。
+另一方面，我们有 $(1-\alpha_n)100\%$ 的置信度认为
+$\psi_{0,h}>\psi^*_{n,h}-Z_{1-\alpha_n}\sigma_n/(nh^d)^{0.5}$，
+这提示我们应最大化
+$h\mapsto\psi^*_{n,h}-Z_{1-\alpha_n}\sigma_n/(nh^d)^{0.5}$，于是定义
+\[
+ h_n=\argmax_h\psi^*_{n,h}
+ -Z_{1-\alpha_n}\sigma_n/(nh^d)^{0.5}.
+\]
+按后一定义得到的 $h_n$ 满足式 (25.7)。
+另一种情形是，若确定 $\psi_{0,h}$ 在 $h$ 趋近于零时递减，
+则希望最小化上界
+$\psi^*_{n,h}+Z_{1-\alpha_n}\sigma_n/(nh^d)^{0.5}$：
+\[
+ h_n=\argmin_h\psi^*_{n,h}
+ +Z_{1-\alpha_n}\sigma_n/(nh^d)^{0.5}.
+\]
+
+为简化对所提议的 CV-TMLE 选择器 $h_n$ 的分析，
+我们将 $h_n$ 定义为式 (25.7) 中以交叉验证一步估计量替换
+$\psi^*_{n,h_n}$ 后得到的方程的解；这个估计量为
+\begin{equation}
+ \psi^1_{n,h}=E_{B_n}\Psi_h(\mathbf P_{n,B_n})
+ +E_{B_n}P^1_{n,B_n}D_h^*(\mathbf P_{n,B_n}),
+\tag{25.8}
+\end{equation}
+其中初始估计量 $\mathbf P_{n,B_n}$ 不依赖 $h$。
+$D_h^*(\mathbf P_{n,B_n})$ 仅通过 $K_{h,x_0}$ 依赖 $h$，
+这一事实使条件更易满足；不过，我们预期下面关于 $h_n$ 的定理，
+同样适用于以 CV-TMLE 本身构造的选择器 (25.7)。
+CV-TMLE 还通过靶向估计量 $\mathbf P^*_{n,B_n}$ 依赖 $h$。
+对于许多目标参数，有 $D_h^*(P)=D_h(P)-\Psi_h(P)$；
+此时，这个交叉验证一步估计量简化为
+\[
+ \psi^1_{n,h}=E_{B_n}P^1_{n,B_n}D_h(\mathbf P_{n,B_n})
+ =E_{B_n}P^1_{n,B_n}D(K_{h,x_0},\mathbf P_{n,B_n}).
+\]
+CV-TMLE 也可作同样的表示，只是要把 $\mathbf P_{n,B_n}$
+替换为 $\mathbf P^*_{n,B_n}$。
+
+\begin{bookresult}{定理}{25.3}
+考虑 $h_n$ 的定义 (25.7)，其中将 $\psi^*_{n,h_n}$ 替换为
+CV 一步估计量 $\psi^1_{n,h_n}$，见式 (25.8)。定义
+\[
+\begin{aligned}
+ K_{1,h,x_0}&=h\frac{d}{dh}K_{h,x_0},\\
+ e_{1,n,B_n}&\equiv
+ D_h^*(K_{1,h,x_0},\mathbf P_{n,B_n})
+ -D_h^*(K_{1,h,x_0},P_1),\\
+ r_1(n)&=\|e_{1,n,B_n}\|_{P_0},\\
+ Z_n&=\sqrt n(P_n-P_0)h^{-d/2}D_h^*(K_{1,h,x_0},P_1),\\
+ \sigma_{10}^2&\equiv\lim_{h\to0}
+ \mathrm{VAR}\bigl(h^{d/2}D_h^*(K_{1,h,x_0},\mathbf P_1)\bigr),
+\end{aligned}
+\]
+其中 $P_1$ 为 $\mathbf P^*_{n,B_n}$ 的极限，并假定右端的极限存在。
+
+\noindent\textbf{假设。}\enspace
+令 $P_0\in\mathcal M(J_0)$，其中整数 $J_0\geq1$ 未知，
+并令 $h_n\to_p0$ 为式 (25.7) 的一个解。
+令 $J_0^*=\min(J_0,J)$，其中 $J-1$ 为核 $K$ 的阶数。
+令 $r(n)$ 使对某个满足 $R_{20}(P_1,P_0)=0$ 的
+$P_1\in\mathcal M$，有
+\[
+\begin{aligned}
+ &\|D_h^*(K_{1,h_n,x_0},\mathbf P_{n,B_n})
+ -D_h^*(K_{1,h_n,x_0},P_1)\|_{P_0}\\
+ &\qquad=O_P(h_n^{-d/2}r(n)).
+\end{aligned}
+\]
+令 $r(n)\log(h_n^{-d/2}r(n))\to_p0$。
+假定存在确定性序列 $\tilde h_n$，使 $h_n/\tilde h_n\to_p1$。
+考虑函数类
+\[
+ \mathcal F_n=\{
+ D(K_{1,h,x_0},\mathbf P_{n,B_n})
+ -D(K_{1,h,x_0},P_1):h,\epsilon\},
+\]
+并令 $F_n$ 为其包络函数。假定对某个整数 $p>0$，
+\[
+ \sup_\Lambda N(\delta|F_n|,\mathcal F_n,L^2(\Lambda)=O(\delta^{-p}).
+\]
+此外，假定
+\begin{equation}
+ \sqrt{nh_n^d}\,E_{B_n}\int_x
+ K_{1,x_0,h_n}(x)R_x(\mathbf P_{n,B_n},P_0)\,dx=o_P(1).
+\tag{25.9}
+\end{equation}
+则
+\[
+ -h_n^{J_0^*}J_0B_0(J_0)+o(h_n^{J_0^*})
+ =(nh_n^d)^{-0.5}(Z_n+0.5dC_n\sigma_n+o_P(1)),
+\]
+其中 $Z_n=O_P(1)$。因此，$h_n$ 的行为如同
+$(C_n^2/n)^{-1/(2J_0^*+d)}$。
+特别地，若 $C_n=O_P(1)$，则 $h_n$ 以最优速率
+$n^{-1/(2J_0^*+d)}$ 收敛到零。
+\end{bookresult}
+
+在特殊情形下，若对某个 $a>0$，当 $h\in(0,a)$ 时有
+$\frac{d}{dh}\psi_{0,h}=0$，我们只需要
+$h_n\to_pa^*$，其中某个 $a^*\in(0,a]$。
+这一情形对应于 $\psi_0$ 实际上路径可微的情况；
+此时 CV-TMLE $\psi^*_{n,h_n}$ 以 $n^{-0.5}$ 的速率收敛，
+事实上还将是 $\psi_0$ 的渐近有效估计量。
+
+作为 $h$ 的函数，$K_{1,h,x_0}$ 恰好具有与 $K_{h,x_0}$ 相同的行为。
+具体地，$EK_{1,h,x_0}^2(X)$ 的行为如同 $EK_{h,x_0}^2(X)$；
+类似地，$D(K_{1,h,x_0},P)$ 的方差作为 $h$ 的函数，
+其行为也如同 $D(K_{h,x_0},P)$ 的方差，因此为 $O(h^{-d})$。
+为理解这一点，考虑 $d=2$，使
+$K(x_1,x_2)=K^*(x_1)K^*(x_2)$ 为二元乘积核。有
+\[
+\begin{aligned}
+ K_{1,h,x_0}(X)
+ &=-dK_{h,x_0}(X)\\
+ &\quad-h^{-d}K^{*\prime}((x_1-x_{01})/h)
+ (x_1-x_{01})/h\,K^*((x_2-x_{02})/h)\\
+ &\quad-h^{-d}K^{*\prime}((x_2-x_{02})/h)
+ (x_2-x_{02})/h\,K^*((x_1-x_{01})/h).
+\end{aligned}
+\]
+第一项显然与 $K_{h,x_0}(X)$ 类似。
+第二、三项合起来可写为 $h_{-d}K_1((x-x_0)/h)$，
+其中多元乘积核为
+$K_1(x_1,x_2)=K^{*\prime}(x_1)x_1K^*(x_2)
++K^{*\prime}(x_2)x_2K(x_1)$。有
+\[
+ E(h^{-d}K_1((X-x_0)/h))^2
+ =h^{-d}\int_yK_1^2(y)p_{0,X}(x_0+hy)\,dy.
+\]
+这证明了作为 $h$ 的函数，核 $K_{1,h,x_0}$ 的确具有与
+$K_{h,x_0}$ 相同的行为。因此，$\Var D(K_{1,h,x_0},P)=O(h^{-d})$。
+
+\begin{proof}[定理 25.3 的证明]
+重排式 (25.7) 可得
+\begin{equation}
+ \frac{d}{dh_n}\Psi^1_{n,h_n}
+ =-0.5dC_n\sigma_nn^{-1/2}h_n^{-d/2-1}.
+\tag{25.10}
+\end{equation}
+另有
+\[
+\begin{aligned}
+ \Psi^1_{n,h_n}-\Psi_{h_n}(P_0)
+ &=E_{B_n}\bigl(\Psi_{h_n}(\mathbf P_{n,B_n})-\Psi_{h_n}(P_0)\bigr)\\
+ &\quad+E_{B_n}P^1_{n,B_n}D_{h_n}^*(\mathbf P_{n,B_n})\\
+ &=E_{B_n}\bigl(\Psi_{h_n}(\mathbf P_{n,B_n})-\Psi_{h_n}(P_0)\bigr)\\
+ &\quad+E_{B_n}(P^1_{n,B_n}-P_0)D_{h_n}^*(\mathbf P_{n,B_n})
+ +E_{B_n}P_0D_{h_n}^*(\mathbf P_{n,B_n})\\
+ &=E_{B_n}(P^1_{n,B_n}-P_0)D_{h_n}^*(\mathbf P_{n,B_n})
+ +E_{B_n}R_{20,h_n}(\mathbf P_{n,B_n},P_0).
+\end{aligned}
+\]
+现在对左右两端关于 $h_n$ 求导，并应用式 (25.10)，得到
+\[
+\begin{aligned}
+ -\frac{d}{dh_n}\Psi_{h_n}(P_0)
+ &=E_{B_n}(P^1_{n,B_n}-P_0)
+ D\left(\frac{d}{dh_n}K_{h_n,x_0},\mathbf P_{n,B_n}\right)\\
+ &\quad+E_{B_n}\int_x\frac{d}{dh_n}K_{h,x_0}(x)
+ R_x(\mathbf P_{n,B_n},P_0)\,dx\\
+ &\quad+0.5dC_n\sigma_nn^{-1/2}h_n^{-d/2-1}.
+\end{aligned}
+\]
+写成
+\[
+ \frac{d}{dh_n}K_{h_n,x_0}
+ =h_n^{-1}\left(h_n\frac{d}{dh_n}K_{h_n,x_0}\right)
+ \equiv h^{-1}K_{1,h_n,x_0},
+\]
+其中 $K_{1,h,x_0}=h\frac{d}{dh}K_{h,x_0}$。
+于是，上式可表示为
+\[
+\begin{aligned}
+ -\frac{d}{dh_n}\Psi_{h_n}(P_0)
+ &=h_n^{-1}E_{B_n}(P^1_{n,B_n}-P_0)
+ D(K_{1,h_n,x_0},\mathbf P_{n,B_n})\\
+ &\quad+h_n^{-1}E_{B_n}\int_xK_{1,h_n,x_0}(x)
+ R_x(\mathbf P_{n,B_n},P_0)\,dx\\
+ &\quad+0.5dC_n\sigma_nn^{-1/2}h_n^{-d/2-1}.
+\end{aligned}
+\]
+如上所示，有 $\Var D(K_{1,h,x_0},P)=O(h^{-d})$。
+因此，可以用分析 CV-TMLE 中经验过程项
+$E_{B_n}(P^1_{n,B_n}-P_0)D_{h_n}^*(\mathbf P^*_{n,B_n,h_n})$
+的相同方法，分析这里的经验过程项，见定理 25.1。
+由引理 25.2，在所述条件下，
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ D_{h_n}^*(\mathbf P_{n,B_n})\\
+ &\quad=\sqrt{nh_n^d}(P_n-P_0)h_n^{-d/2}
+ D_{h_n}^*(K_{1,h_n,x_0},\mathbf P_1)+o_P(1),
+\end{aligned}
+\]
+且右端依分布收敛到 $N(0,\sigma_{10}^2)$。换言之，
+\[
+ \sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ D_{h_n}^*(\mathbf P_{n,B_n})=Z_n+o_P(1),
+\]
+其中 $Z_n\Rightarrow_dN(0,\sigma_{01}^2)$。
+结合假设 (25.9)，后一个结果给出
+\[
+\begin{aligned}
+ -\frac{d}{dh_n}\Psi_{h_n}(P_0)
+ &=h_n^{-1}(nh_n^d)^{-0.5}(Z_n+o_P(1))\\
+ &\quad+0.5dC_n\sigma_nn^{-1/2}h_n^{-d/2-1}.
+\end{aligned}
+\]
+现在应用下面的引理 25.3，得到 $\frac{d}{dh_n}\Psi_{h_n}(P_0)$ 的表达式。
+于是有
+\[
+\begin{aligned}
+ -h_n^{J_0^*-1}J_0B_0(J_0^*)+o(h_n^{J_0^*-1})
+ &=h_n^{-1}(nh_n^d)^{-0.5}(Z_n+o_P(1))\\
+ &\quad+0.5dC_n\sigma_nn^{-1/2}h_n^{-d/2-1}.
+\end{aligned}
+\]
+因此，
+\[
+ -h_n^{J_0^*}J_0^*B_0(J_0^*)+o(h_n^{J_0^*})
+ =(nh_n^d)^{-0.5}(Z_n+0.5dC_n\sigma_n+o_P(1)).
+\]
+在 $C_n=O_P(1)$ 的特殊情形下，这对应于
+$h_n^{2J_0^*}=(nh_n^d)^{-1}$，给出最优速率
+$h_n=n^{-1/(2J_0^*+d)}$。证毕。
+\end{proof}
+
+\begin{bookresult}{引理}{25.3}
+假定 $P_0\in\mathcal M(J_0)$，且核 $K$ 的阶数 $J-1$ 满足 $J\geq J_0$。
+则
+\[
+ \frac{d}{dh}\Psi_{h,J_0}(P_0)
+ =h^{J_0-1}J_0B_0(J_0)+o(h^{J_0-1}).
+\]
+\end{bookresult}
+
+\begin{proof}
+我们有
+\[
+\begin{aligned}
+ \frac{d}{dh}\Psi_h(P_0)
+ &=\frac{d}{dh}\int_xK_{h,x_0}(x)\Psi(P_0)(x)\,dx\\
+ &=\frac{d}{dh}\int_yK(y)\psi_0(x_0+hy)\,dy\\
+ &=\frac{d}{dh}\int_yK(y)
+ \left\{\psi_0(x_0)+\sum_{j=1}^{J_0-1}
+ \sum_{m,\,\sum_lm_l=j}
+ \frac{h^j\prod_ly_l^{m_l}}{\prod_lm_l!}\psi_0^m(x_0)\right\}\\
+ &\quad+\frac{d}{dh}\int_yh^{J_0}K(y)
+ \sum_{m,\,\sum_lm_l=J_0}
+ \frac{\prod_ly_l^{m_l}}{\prod_lm_l!}\psi_0^m(x_0)+o(h^{J_0})\\
+ &=J_0h^{J_0-1}\int_yK(y)
+ \sum_{m,\,\sum_lm_l=J_0}
+ \frac{\prod_ly_l^{m_l}}{\prod_lm_l!}\psi_0^m(x_0)+o(h^{J_0-1})\\
+ &=J_0h^{J_0-1}B_0(J_0)+o(h^{J_0-1}).
+\end{aligned}
+\]
+\end{proof}
+
+\begin{remarkenv}
+如果 $C_n$ 趋于无穷，那么相对于最优速率，带宽 $h_n$ 过度平滑，
+因而 $(nh_n^d)^{0.5}(\psi^*_{h,n}-\psi_0)$ 不会收敛到正态分布。
+我们仍有
+$(nh_n^d)^{0.5}(\psi^*_{h,n}-\psi_{h_n,0})
+\Rightarrow_dN(0,\sigma_0^2)$，但此时偏差大于标准误。
+因此，在这种情况下，我们希望缩小选出的 $h_n$。
+具体地，若选择
+$h_n^1=C_n^{-2/(2J_0^*+d)}h_n$，则 $h_n^1$ 将遵循最优速率。
+不过，由于 $J_0$ 未知，这一缩放选择也是未知的。
+\end{remarkenv}

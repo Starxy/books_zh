@@ -1,0 +1,334 @@
+% 原章第1—11页，至结论5.1；所有公式据渲染原页核对。
+\chapter{甲基化数据分析}
+\label{ch:methylation}
+
+DNA（CpG）甲基化（DNA methylation）是一种表观遗传机制，在基因调控、细胞分化和个体发育等多个生物学层面，调节人类的许多生物学过程（Vincent et al. 2017）。DNA 甲基化数据分析能够揭示环境扰动如何触发细胞重编程，进而影响细胞功能（Lappalainen and Greally 2017），并提供调控基因表达的表观遗传信息（Li et al. 2015）。
+
+常用的 DNA 甲基化数据分析包括数据预处理、标准化、差异甲基化分析（Fortin et al. 2017；Kurdyukov and Bullock 2016），以及全表观基因组关联研究（epigenome-wide association studies，EWAS）（Lappalainen and Greally 2017；Laird 2010）。DNA 甲基化数据的预处理、标准化和差异甲基化分析，在原理上与基因表达数据分析相似。为节省篇幅，这里不再详细讨论。本章重点介绍 DNA 甲基化数据的因果分析。
+
+\section{DNA 甲基化分析}
+
+DNA 甲基化是一种调控基因表达、改变基因功能的表观遗传机制。DNA 甲基化将甲基（$\mathrm{CH}_3$）添加到 DNA 分子上，通常加在胞嘧啶环的第 5 个碳原子上，从而形成 5-甲基胞嘧啶（图 5.1）。众所周知，每个核苷酸都包含四种核碱基之一：胞嘧啶（C）、鸟嘌呤（G）、腺嘌呤（A）或胸腺嘧啶（T）。其中，胞嘧啶和腺嘌呤可以被甲基化。甲基通过阻止促进转录活性的因子与 DNA 结合，抑制转录。甲基的添加由 DNA 甲基转移酶（DNA methyltransferases，DNMTs）家族完成，该家族包括 DNMT1、DNMT2、DNMT3A、DNMT3B 和 DNMT3L（Jin et al. 2011）。
+
+\input{figures/ch05_figure1}
+
+尽管哺乳动物的 DNA 甲基化可以发生在基因组任意序列背景中的胞嘧啶上，但在体细胞中，超过 98\% 的 DNA 甲基化发生于 CpG 二核苷酸区域（Jin et al. 2011）。DNA 甲基化模式在体细胞分裂过程中保持稳定，并且能够代代传递（Krueger et al. 2012）。为在 DNA 复制过程中维持 CpG 的甲基化状态，CpG 甲基化通常发生于 DNA 的两条链；非 CpG 甲基化则必须在每次细胞分裂后重新从头建立。一般而言，甲基化胞嘧啶在基因组中的比例较低，并且常常聚集在称为 CpG 岛的密集区域。CpG 岛没有正式的定义，通常将其定义为长度至少 200 bp、GC 百分比超过 50\% 的区域（\url{https://en.wikipedia.org/wiki/CpG_site}）。
+
+甲基化可以用 DNA 样本中甲基胞嘧啶的总体含量来定量。现已发展出多种甲基化水平测量方法，包括甲基化 DNA 免疫沉淀，或利用甲基结合蛋白富集甲基化片段；甲基化敏感限制性内切酶消化；以及 DNA 的亚硫酸氢盐修饰（Krueger et al. 2012）。这些方法可以分为酶切、亲和富集和亚硫酸氢盐转化三类（Yong et al. 2016）。亚硫酸氢盐转化常用于甲基化测量。用亚硫酸氢钠处理 DNA，会将胞嘧啶（C）转化为尿嘧啶（U），而甲基化的 C 残基保持不变。随后的聚合酶链式反应（polymerase chain reaction，PCR）再将 U 转化为胸腺嘧啶（T）（图 5.2）。比较修饰后的 DNA 与原始序列，就可以检测并测量甲基化。
+
+\input{figures/ch05_figure2}
+
+Illumina 的 Infinium Human Methylation450 BeadChip（HM450K）采用基于亚硫酸氢盐转化的方法。每张 HM450K BeadChip 可以检测超过 450,000 个甲基化位点。然而，HM450K 对远端调控元件的覆盖较少。为克服这一局限，Illumina 开发了 MethylationEPIC（EPIC）BeadChip，以单核苷酸分辨率覆盖超过 850,000 个 CpG 位点，包括 HM450 中超过 90\% 的 CpG，以及额外的 413,743 个 CpG（Pidsley et al. 2016）。全基因组亚硫酸氢盐测序（whole genome bisulfite sequencing，WGBS）是目前主要的基于亚硫酸氢盐转化的方法之一（Krueger et al. 2012）。DNA 片段先经亚硫酸氢钠处理，再进行 PCR 扩增，随后对所得文库测序，从而检测和测量甲基化。WGBS 可以评估几乎每个 CpG 位点的甲基化状态，发现全部甲基化信息。WGBS 无偏，而且不需要经酶切的模板。
+
+令 $m$ 为甲基化胞嘧啶的读段数，$u$ 为未甲基化胞嘧啶的读段数。该位点的甲基化水平定义为
+\[
+\frac{m}{m+u}.
+\]
+表 5.1 列出了 5 名个体在 4 个 CpG 位点的甲基化水平。
+
+\begin{table}[htbp]
+\centering
+\origtable{1}{甲基化数据示例。}
+\label{tab:ch05-methylation-example}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrr@{}}
+\toprule
+ & \multicolumn{4}{c}{甲基化水平} \\
+基因 & AP1S1 & RPN1 & GNAS & C11orf24 \\
+个体 & cg27665659 & cg27662379 & cg27661264 & cg27655905 \\
+\midrule
+1 & 0.03107011 & 0.01847027 & 0.3440003 & 0.06395125 \\
+2 & 0.05291088 & 0.0406794 & 0.3748224 & 0.08925108 \\
+3 & 0.0495046 & 0.04009077 & 0.2824244 & 0.1097811 \\
+4 & 0.03407283 & 0.0218635 & 0.3223184 & 0.0663179 \\
+5 & 0.03349082 & 0.01669993 & 0.315316 & 0.0691947 \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+DNA 甲基化分析流程包括：（1）过滤低质量探针；（2）校正批次效应；（3）标准化、函数型标准化和 beta 混合分位数标准化；（4）主成分分析；（5）奇异值分解；（6）无监督学习和聚类分析；（7）差异甲基化分析；（8）识别差异甲基化区块（differentially methylated blocks，DMBs），这类区块是包含数百个基因间 CpG 位点的大尺度基因组区域（10 kb 至 Mb）；（9）检测用户定义的基因网络中的差异甲基化热点（Tian et al. 2017）。
+
+\FloatBarrier
+\section{全表观基因组关联研究（EWAS）}
+
+目前的全表观基因组关联研究，主要识别与环境和疾病有关的 DNA 甲基化信号（Hachiya et al. 2017）。EWAS 检验基因组中单个胞嘧啶或相邻胞嘧啶集合的 DNA 甲基化，与所关注表型和疾病之间的关联，并在血细胞中发现与各种暴露、中间表型和疾病有关的位点特异性 DNA 甲基化（DNAm）。DNA 甲基化变异既可能引起疾病，也可能直接或间接成为疾病的后果（Rakyan et al. 2011）。
+
+\subsection{单位点检验}
+
+逻辑回归是检验 DNA 甲基化与疾病关联的常用统计方法。假定抽取了 $n$ 名个体。若第 $i$ 名个体患病，令 $y_i=1$；否则，令 $y_i=0$。考虑 $m$ 个协变量 $x_{i1},\ldots,x_{im}$，将待检验 CpG 位点的甲基化水平记为 $z_i$。用于 EWAS 的 逻辑回归模型为
+\begin{equation}
+\log\frac{P(y_i=1)}{1-P(y_i=1)}=\alpha_0+\alpha^T X_i+\beta z_i,
+\tag{5.1}
+\end{equation}
+其中，$\alpha=[\alpha_1,\ldots,\alpha_m]^T$ 为协变量的回归系数向量，$X_i=[x_{i1},\ldots,x_{im}]^T$ 为协变量向量，$\beta$ 为该 CpG 位点甲基化水平的回归系数。逻辑回归模型 (1) 是一种单位点检验。然而，当多个 CpG 位点之间存在相关性时，就需要发展基于集合（或基因）的检验，利用多个 CpG 位点的相关结构提高统计功效。
+
+\subsection{基于集合的方法}
+\subsubsection{逻辑回归模型}
+
+逻辑回归模型 (1) 可以扩展为包含多个 CpG 位点：
+\begin{equation}
+\log\frac{P(y_i=1)}{1-P(y_i=1)}=\alpha_0+\alpha^TX_i+\beta^TZ_i,
+\tag{5.2}
+\end{equation}
+其中，$\beta$ 为甲基化效应系数向量，$Z_i=[z_{i1},\ldots,z_{ip}]^T$ 为 $p$ 个 CpG 位点的甲基化水平向量，其余变量与参数的定义同前。
+
+\subsubsection{广义 \texorpdfstring{$T^2$}{T²} 检验统计量}
+
+考虑 $k$ 个 CpG 位点。令 $x_{ij}$ 和 $y_{ij}$ 分别为病例组和对照组中，第 $i$ 名个体在第 $j$ 个 CpG 位点的甲基化水平。定义两个向量：
+\[
+X_i=(x_{i1},\ldots,x_{ik})^T,\qquad Y_i=(y_{i1},\ldots,y_{ik})^T.
+\]
+对于每个 CpG 位点，分别计算病例组和对照组在第 $j$ 个位点的甲基化水平均值 $\bar X_j$ 和 $\bar Y_j$：
+\[
+\bar X_j=\frac1{n_A}\sum_{i=1}^{n_A}X_{ij},\qquad
+\bar Y_j=\frac1{n_G}\sum_{i=1}^{n_G}Y_{ij},
+\]
+其中，$n_A$ 和 $n_G$ 分别为病例组和对照组的抽样个体数。
+
+将所有均值 $\bar X_j$ 和 $\bar Y_j$（$j=1,\ldots,k$）组成向量 $\bar X$ 和 $\bar Y$，即 $\bar X=(\bar X_1,\ldots,\bar X_k)^T$，$\bar Y=(\bar Y_1,\ldots,\bar Y_k)^T$。假定病例组和对照组甲基化谱的协方差矩阵相同，则甲基化变量的合并样本方差—协方差矩阵定义为
+\[
+S=\frac1{n_A+n_G-2}\left[
+\sum_{i=1}^{n_A}(X_i-\bar X)(X_i-\bar X)^T
++\sum_{i=1}^{n_G}(Y_i-\bar Y)(Y_i-\bar Y)^T
+\right].
+\]
+于是，Hotelling（1931）的 $T^2$ 统计量定义为
+\begin{equation}
+T^2=\frac1{\dfrac1{n_A}+\dfrac1{n_G}}
+(\bar X-\bar Y)^T S^{-1}(\bar X-\bar Y).
+\tag{5.3}
+\end{equation}
+在这 $k$ 个 CpG 位点的甲基化与疾病无关联的零假设下，统计量 $T^2$ 渐近服从中心 $\chi^2_{(k)}$ 分布。
+
+\subsubsection{主成分分析}
+
+主成分分析（principal component analysis，PCA）可用于降低甲基化水平数据的维数。当 $p$ 个 CpG 位点相关时，可以用前 $k$ 个少量主成分（principal components，PCs），替代 EWAS 的 逻辑回归模型 (2) 中原有的 $p$ 个 CpG 位点甲基化变量。基于 PCA 的 EWAS 逻辑回归模型为
+\begin{equation}
+\log\frac{P(y_i=1)}{1-P(y_i=1)}=\alpha_0+\alpha^TX_i+\beta^T PC_i,
+\tag{5.4}
+\end{equation}
+其中，$PC_i=[PC_i^1,\ldots,PC_i^k]^T$ 为主成分得分向量。
+
+\subsubsection{测序核关联检验（SKAT）}
+
+测序核关联检验（sequencing kernel association test，SKAT）（Wu et al. 2011）基于 Logistic 混合效应模型，可用于罕见变异关联分析。用于 EWAS 的 SKAT 假定如下 逻辑回归模型：
+\[
+\log\frac{P(y_i=1)}{1-P(y_i=1)}=\alpha_0+\alpha^TX_i+\beta^TZ_i,
+\]
+其中变量定义同前。检验一个区域内 CpG 位点与疾病关联的一种方法，是检验零假设
+\[
+H_0:\beta=0.
+\]
+由于一个基因内的 CpG 位点往往很多，而每个位点对疾病风险的贡献较小，标准似然比检验的功效通常较低。为提高功效，SKAT 汇集整个基因组区域内的 CpG 位点，并在零假设
+\[
+H_0:\tau=0
+\]
+下检验方差分量。SKAT 统计量（Wu et al. 2011 中的式 3）为
+\begin{equation}
+Q=(y-\widehat\mu)K(y-\widehat\mu),
+\tag{5.5}
+\end{equation}
+其中，$K=ZWZ^T$，$Z$ 为 $p$ 个 CpG 位点的甲基化水平矩阵，$W=\diag(w_1,\ldots,w_p)$，每个权重 $w_i$ 均预先指定。
+
+Wu et al.（2011）表明，在零假设下，
+\begin{equation}
+Q\sim\sum_{i=1}^n\lambda_i\chi^2_{1,i},
+\tag{5.6}
+\end{equation}
+其中，$\lambda_i$ 为矩阵 $P_0^{1/2}KP_0^{1/2}$ 的特征值，$P_0=V-V\widetilde X(\widetilde X^TV\widetilde X)^{-1}\widetilde X^TV$，$\widetilde X=[1,X]$，$V=\diag(\widehat\mu_1(1-\widehat\mu_1),\ldots,\widehat\mu_n(1-\widehat\mu_n))$，而 $\chi^2_{1,i}$ 表示相互独立的 $\chi^2_{(1)}$ 随机变量。
+
+\subsubsection{典型相关分析}
+
+与 GWAS 类似，典型相关分析（canonical correlation analysis，CCA）为检验甲基化与疾病之间的关联提供了另一种统计框架。CCA 的目标，是寻找疾病与一个基因组区域内 CpG 位点线性组合之间的最优相关性。CCA 衡量多个 CpG 位点与疾病的关联强度。
+
+考虑一个二元性状 $y$ 和 $L$ 个 CpG 位点，其甲基化变量为 $z_1,\ldots,z_L$。定义方差和协方差矩阵：
+\[
+\Sigma_{yy}=\sigma_y^2,\qquad
+\Sigma_{yz}=[\mathrm{cov}(y,z_1)\ \cdots\ \mathrm{cov}(y,z_L)]=\Sigma_{zy}^T,
+\]
+以及
+\[
+\Sigma_{zz}=\begin{bmatrix}
+\sigma_{z_1z_1}&\cdots&\sigma_{z_1z_L}\\
+\vdots&\ddots&\vdots\\
+\sigma_{z_Lz_1}&\cdots&\sigma_{z_Lz_L}
+\end{bmatrix}.
+\]
+定义
+\[
+R=\Sigma_{yy}^{-1/2}\Sigma_{yz}\Sigma_{zz}^{-1}\Sigma_{zy}\Sigma_{yy}^{-1/2}.
+\]
+由于 $\Sigma_{yy}=\sigma_y^2$ 是一个数，矩阵 $R$ 简化为
+\[
+R=\frac{\Sigma_{yz}\Sigma_{zz}^{-1}\Sigma_{zy}}{\sigma_y^2}.
+\]
+特征值为
+\[
+\lambda^2=\frac{\Sigma_{yz}\Sigma_{zz}^{-1}\Sigma_{zy}}{\sigma_y^2}.
+\]
+令 $\widehat\sigma_y^2$、$S_{yg}$、$S_{gg}$ 和 $S_{gy}$ 分别为 $\sigma_y^2$、$\Sigma_{yz}$、$\Sigma_{zz}$ 和 $\Sigma_{zy}$ 的样本版本，则
+\[
+\widehat\lambda^2=\frac{S_{yz}S_{zz}^{-1}S_{zy}}{\widehat\sigma_y^2}.
+\]
+用于检验该基因组区域内甲基化与疾病关联的统计量定义为
+\begin{equation}
+T_{\mathrm{CCA}}=-N\log(1-\widehat\lambda^2).
+\tag{5.7}
+\end{equation}
+在该区域内甲基化与疾病无关联的零假设下，$T_{\mathrm{CCA}}$ 服从中心 $\chi^2_{(L)}$ 分布。
+
+\section{全表观基因组因果研究}
+\subsection{引言}
+
+尽管 GWAS 和 EWAS 在解析复杂疾病的遗传及表观遗传结构方面取得了显著进展，但我们对复杂疾病病因及机制的理解仍然有限。目前基因组与表观基因组分析的范式是关联分析和相关分析。关联分析的实践充分表明，这类分析缺乏发现疾病机制的能力。观测到的关联可能部分源于偶然、偏倚和混杂。近期研究发现，“关联信号往往遍布基因组的大部分区域”，再次说明关联信号所提供的疾病原因信息有限，也使人们对 GWAS 的未来提出疑问（Boyle et al. 2017；Callaway 2017）。观测到关联，并不一定能够据此推断因果关系；未观测到关联，也不一定意味着不存在因果关系。在复杂疾病的遗传与表观遗传研究中，关联分析占据主导地位，是阻碍基因组和表观基因组科学理论发展及其实际应用的关键问题。
+
+因果分析比关联分析更有力，能够估计干预或分布变化的效应（Peters et al. 2017）。因果模型可以预测干预结果，而关联通常不能。与 EWAS 及数量性状基因座（mQTL）分析类似，我们计划为定性性状和数量性状的全表观基因组因果研究（epigenome-wide causal studies，EWCS）发展新的统计方法，使复杂疾病表观遗传研究的范式从 EWAS 转向 EWCS。因果推断是发现疾病机制不可缺少的组成部分。
+
+\subsection{用于 EWCS 的加性函数模型}
+\subsubsection{EACS 的数学表述}
+
+在 EWCA 中，我们考虑一个表示疾病状态的二元性状，以及一个表示 CpG 位点甲基化水平的连续变量，研究从连续变量（甲基化水平）指向二元变量（疾病变量）的因果方向。令 $Y$ 表示二元性状，$X$ 表示连续甲基化水平变量。二元性状 $Y$ 可以建模为
+\begin{equation}
+Y=f(X,\varepsilon),
+\tag{5.8}
+\end{equation}
+其中，$f$ 为非线性函数，$\varepsilon$ 为误差项，且与假定的原因 $X$ 独立。非线性模型 (5.8) 的一个特殊情形，是加性噪声模型（additive noise model，ANM）：
+\begin{equation}
+Y=f(X)+\varepsilon,
+\tag{5.9}
+\end{equation}
+其中，$f$ 仍为非线性函数，$\varepsilon$ 为误差项，且独立于假定的原因 $X$。
+
+对于二元结果、连续原因的加性噪声模型，误差估计较为困难。评估连续变量与二元性状之间因果关系的有效方法，是用离散加性噪声模型近似连续加性噪声模型，再用所得离散加性噪声模型评估 $x$ 与 $y$ 的因果关系。
+
+接下来讨论，为何直接将连续—离散加性噪声模型用于因果推断会遇到困难。由于 Logistic sigmoid 函数常被用作非线性函数，我们在式 (5.9) 中将它作为 $f$。因此，式 (5.9) 的加性噪声模型可写为
+\begin{equation}
+Y=\sigma(\alpha X+b)+\varepsilon,
+\tag{5.10}
+\end{equation}
+其中，$\alpha$ 为系数，$b$ 为偏置，$\sigma$ 为 Logistic sigmoid 函数，定义为
+\begin{equation}
+\sigma(t)=\frac1{1+e^{-t}}.
+\tag{5.11}
+\end{equation}
+Logistic sigmoid 函数包含两部分。第一部分是线性层，计算 $t=\alpha x+b$；第二部分通过 sigmoid 函数将 $t$ 转化为概率。
+
+容易看出，
+\begin{equation}
+\frac{d}{dt}\sigma(t)
+=\left(\frac1{1+e^{-t}}\right)^2e^{-t}
+=\frac1{1+e^{-t}}\frac{e^{-t}}{1+e^{-t}}
+=\sigma(t)(1-\sigma(t).
+\tag{5.12}
+\end{equation}
+
+\subsubsection{参数估计}
+
+令 $\theta=[\alpha,b]^T$。参数 $\theta$ 的最小二乘估计，是寻找使残差平方和最小的一组参数 $\theta$：
+\begin{equation}
+F(\theta)=\sum_{i=1}^n[Y_i-\sigma(\alpha X_i+b)]^2.
+\tag{5.13}
+\end{equation}
+定义
+\begin{equation}
+\begin{aligned}
+\frac{\partial F(\theta^{(k)})}{\partial\alpha}
+&=-\sum_{i=1}^n[Y_i-\sigma(\alpha^{(k)}X_i+b^{(k)})]X_i,\\
+\frac{\partial F(\theta^{(k)})}{\partial b}
+&=-\sum_{i=1}^n\sigma(\alpha^{(k)}X_i+b^{(k)})(1-\sigma(\alpha^{(k)}X_i+b^{(k)})
+[Y_i-\sigma(\alpha^{(k)}X_i+b^{(k)})],\\
+\frac{\partial^2F(\theta^{(k)})}{\partial\alpha^2}
+&=\sum_{i=1}^n\sigma(\alpha^{(k)}X_i+b^{(k)})(1-\sigma(\alpha^{(k)}X_i+b^{(k)})^2X_i^2,\\
+\frac{\partial^2F(\theta^{(k)})}{\partial\alpha\partial b}
+&=\sum_{i=1}^n\sigma(\alpha^{(k)}X_i+b^{(k)})(1-\sigma(\alpha^{(k)}X_i+b^{(k)})^2X_i.
+\end{aligned}
+\tag{5.14}
+\end{equation}
+\[
+\begin{aligned}
+\frac{\partial^2F(\theta^{(k)})}{\partial b\partial\alpha}
+&=\sum_{i=1}^n\sigma(\alpha^{(k)}X_i+b^{(k)})^2(1-\sigma(\alpha^{(k)}X_i+b^{(k)})^2X_i,\\
+\frac{\partial^2F(\theta^{(k)})}{\partial b^2}
+&=\sum_{i=1}^n\sigma(\alpha^{(k)}X_i+b^{(k)})^2(1-\sigma(\alpha^{(k)}X_i+b^{(k)})^2.
+\end{aligned}
+\]
+令
+\begin{equation}
+H(\theta^{(k)})=
+\begin{bmatrix}
+\dfrac{\partial^2F(\theta^{(k)})}{\partial\alpha^2}
+&\dfrac{\partial^2F(\theta^{(k)})}{\partial\alpha\partial b}\\[6pt]
+\dfrac{\partial^2F(\theta^{(k)})}{\partial b\partial\alpha}
+&\dfrac{\partial^2F(\theta^{(k)})}{\partial b^2}
+\end{bmatrix}
+\tag{5.15}
+\end{equation}
+为残差平方和 $F$ 的 Hessian 矩阵。
+
+使残差平方和 $F$ 最小的必要条件为
+\begin{equation}
+\frac{\partial F}{\partial\theta}=0.
+\tag{5.16}
+\end{equation}
+式 (5.16) 是一个非线性方程组，可以用 Newton–Raphson 方法求解。具体地，残差平方和 $F$ 的梯度可以近似为
+\[
+\frac{\partial F(\theta)}{\partial\theta}
+\approx \frac{\partial F(\theta^{(k)})}{\partial\theta}
++H(\theta^{(k)})(\theta-\theta^{(k)}).
+\]
+令 $\partial F(\theta)/\partial\theta=0$，得到
+\begin{equation}
+\frac{\partial F(\theta^{(k)})}{\partial\theta}
++H(\theta^{(k)})(\theta-\theta^{(k)})=0.
+\tag{5.17}
+\end{equation}
+由式 (5.17) 解出参数向量 $\theta$，得到式 (5.17) 的近似解：
+\begin{equation}
+\theta^{(k+1)}=\theta^{(k)}-H^{-1}(\theta^{(k)})
+\frac{\partial F(\theta^{(k)})}{\partial\theta}.
+\tag{5.18}
+\end{equation}
+令
+\[
+Y=\begin{bmatrix}Y_1\\\vdots\\Y_n\end{bmatrix},\qquad
+H=\begin{bmatrix}X_1&1\\\vdots&\vdots\\X_n&1\end{bmatrix}.
+\]
+参数 $\theta$ 的 Newton–Raphson 估计算法汇总于结论 5.1。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论 5.1：Newton–Raphson 算法}\par
+\begin{enumerate}[label=步骤 \arabic*：,leftmargin=4.8em]
+\item 初始化。计算初值：
+\[
+\theta^{(0)}=(H^tH)^{-1}H^TY.
+\]
+\item 计算残差平方和 $F$ 的梯度：
+\[
+\frac{\partial F(\theta^{(k)})}{\partial\theta}=
+\begin{bmatrix}
+-\displaystyle\sum_{i=1}^n[Y_i-\sigma(\alpha^{(k)}X_i+b^{(k)})]X_i\\[6pt]
+\begin{gathered}
+-\displaystyle\sum_{i=1}^n\sigma(\alpha^{(k)}X_i+b^{(k)})(1-\sigma(\alpha^{(k)}X_i+b^{(k)})\\[-1pt]
+{}\times[Y_i-\sigma(\alpha^{(k)}X_i+b^{(k)})]
+\end{gathered}
+\end{bmatrix}.
+\]
+\item 计算残差平方和 $F$ 的 Hessian 矩阵：
+\[
+H(\theta^{(k)})=
+\begin{bmatrix}
+\dfrac{\partial^2F(\theta^{(k)})}{\partial\alpha^2}
+&\dfrac{\partial^2F(\theta^{(k)})}{\partial\alpha\partial b}\\[6pt]
+\dfrac{\partial^2F(\theta^{(k)})}{\partial b\partial\alpha}
+&\dfrac{\partial^2F(\theta^{(k)})}{\partial b^2}
+\end{bmatrix},
+\]
+具体定义见式 (5.14) 与式 (5.15)。
+\item 更新参数 $\theta$：
+\[
+\theta^{(k+1)}=\theta^{(k)}-H^{-1}(\theta^{(k)})
+\frac{\partial F(\theta^{(k)})}{\partial\theta}.
+\]
+\item 检查收敛。若 $\lVert\theta^{(k+1)}-\theta^{(k)}\rVert_2\leq\varepsilon$，则停止；否则，令 $\theta^{(k)}\leftarrow\theta^{(k+1)}$，返回步骤 2。其中，$\varepsilon$ 是预先指定的误差。
+\end{enumerate}

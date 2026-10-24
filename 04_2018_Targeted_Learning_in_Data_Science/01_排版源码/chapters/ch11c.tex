@@ -1,0 +1,72 @@
+% 原书分章 PDF 第 7—8 页：第 11.5—11.7 节。
+\section{初始估计}
+
+我们用经验分布 $Q_{n,L_0}$，作为基线协变量分布的初始估计量。为构造 $\bar Q_0$ 的初始估计，从时点 $K+1$ 开始。$\bar Q_{0,K+1}$ 的初始估计量，应对满足 $L_{K,1}=1$ 的个体赋值为 1，对满足 $L_{K,2}=1$ 的个体赋值为 0。对于其余个体，需要估计给定 $L_0$ 时 $L_{K+1,1}$ 的条件均值。最简单的做法是，在满足 $\bar A_K=\bar1_{K+1}$ 且 $L_K=(0,0)$ 的数据子集中，将结局 $L_{K+1,1}$ 对 $L_0$ 的函数作参数回归。不过，更理想的是采用更灵活的技术，例如包含非参数工具的超级学习器。
+
+接着转到时点 $K$。$\bar Q_{0,K}$ 的估计，应对满足 $L_{K-1,1}=1$ 的个体赋值为 1，对满足 $L_{K-1,2}=1$ 的个体赋值为 0。对于其余个体，可以在满足 $\bar A_{K-1}=\bar1_K$ 且 $L_{K-1}=(0,0)$ 的数据子集中，将 $\bar Q_{0,K+1}$ 的估计对 $L_0$ 的函数作回归，从而估计 $\bar Q_{0,K}$。对其余每个时点，继续这一过程：对于此前已经发生终点事件的个体，根据事件类型赋值为 1 或 0；对于其余个体，则将上一次回归的预测值，作为下一次回归的结局。
+
+\section{子模型与损失函数}
+
+给定估计量 $Q_n$ 和 $G_n$，现在定义合适的参数扰动子模型与损失函数，以更新 $Q_n$。对于基线协变量分布，使用负对数似然损失
+\[
+ L(o,Q_{L_0})=-\log\{dQ_{L_0}(\ell_0)\}
+\]
+以及子模型
+\[
+ \{(1+\epsilon D_0^*(\bar Q))\,dQ_{L_0}:\epsilon\}.
+\]
+对于 $\bar Q_{0,K+1}$ 估计的扰动，使用负对数似然损失函数
+\[
+ \begin{aligned}
+ L(o,\bar Q_{K+1})
+ =-I(\bar a_K=\bar1_{K+1})\bigl[
+ &\ell_{K+1,1}\log\{\bar Q_{K+1}(\bar\ell_K)\}\\
+ &+(1-\ell_{K+1,1})\log\{1-\bar Q_{K+1}(\bar\ell_K)\}\bigr],
+ \end{aligned}
+\]
+其真实风险确实在 $\bar Q_{0,K+1}$ 处达到最小。给定某个 $G$，$\bar Q_{n,K+1}$ 的一个合适子模型记为 $\{\bar Q_{\epsilon,K+1}:\epsilon\}$，其中略微沿用了已有记号，并定义
+\[
+ \bar Q_{\epsilon,K+1}
+ =\expit\{\logit(\bar Q_{n,K+1})+\epsilon H_{K+1}(G)\}.
+\]
+容易验证，
+\[
+ \left.\frac{d}{d\epsilon}L(o,\bar Q_{\epsilon,K+1})\right|_{\epsilon=0}
+ =D_{K+1}^*(Q,G)(o).
+\]
+对于 $k=1,\ldots,K$，给定 $\bar Q_{k+1}$，定义以下以它为指标的 $\bar Q_{0,k}$ 的负对数似然损失函数：
+\[
+ \begin{aligned}
+ L_{\bar Q_{k+1}}(o,\bar Q_k)
+ =-I(\bar a_{k-1}=\bar1_k)\bigl[
+ &\bar Q_{k+1}(\bar\ell_k)\log\{\bar Q_k(\bar\ell_{k-1})\}\\
+ &+\{1-\bar Q_{k+1}(\bar\ell_k)\}
+ \log\{1-\bar Q_k(\bar\ell_{k-1})\}\bigr].
+ \end{aligned}
+\]
+可以确认，只要指标参数等于其真值 $\bar Q_{0,k+1}$，这一损失函数的真实风险，就在 $\bar Q_{0,k}$ 处达到最小。对于给定 $G$，我们再次使用 Logistic 子模型，仍略微沿用已有记号，将其记为 $\{\bar Q_{\epsilon,k}:\epsilon\}$，其中
+\[
+ \bar Q_{\epsilon,k}
+ =\expit\{\logit(\bar Q_{n,k})+\epsilon H_k(G)\}.
+\]
+可以证明，
+\[
+ \left.\frac{d}{d\epsilon}L_{\bar Q_{k+1}}(o,\bar Q_{\epsilon,k})\right|_{\epsilon=0}
+ =D_k^*(Q,G)(o).
+\]
+
+\section{TMLE 算法}
+
+TMLE 算法遵循上述初始估计过程，只是在每个时点增加一个扰动步骤：
+\begin{enumerate}
+ \item 生成条件处理机制和删失机制的初始估计 $G_n$。可以采用标准方法，例如用 Logistic 回归估计处理机制、用 Kaplan--Meier 方法估计删失机制；更理想的是，将一组经典工具与机器学习技术通过超级学习器组合起来。利用这些估计，计算 $k=1,\ldots,K+1$ 时的 $H_k(G_n)$。
+ \item 按照上文方法，生成第一个迭代条件均值的初始估计 $\bar Q_{n,K+1}$。
+ \item 在满足 $\bar A_K=\bar1_{K+1}$ 的数据子集中，拟合以 $L_{k,1}$ 为结局、$\logit\{\bar Q_{n,K+1}(\bar L_K)\}$ 为偏移项（offset）、$H_{K+1}(G_n)(O)$ 为协变量的 Logistic 回归，将其系数记为 $\epsilon_n$。令 $\bar Q_{n,K+1}^*=\bar Q_{\epsilon_n,K+1}$，并令 $k=K$。
+ \item 按照上文方法，生成 $\bar Q_{0,k}$ 的初始估计 $\bar Q_{n,k}$：首先，在 $L_{k-1}\ne(0,0)$ 时赋予已知值；然后，在满足 $\bar A_{k-1}=\bar1_k$ 且 $L_{k-1}=(0,0)$ 的数据子集中，使用适当形式的回归估计未知值，其中以 $\bar Q_{n,k+1}^*$ 为结局，以 $L_0$ 的函数为预测变量。
+ \item 在满足 $\bar A_k=\bar1_{k+1}$ 的数据子集中，拟合以 $\bar Q_{n,k+1}^*(\bar L_k)$ 为结局、$\logit\{\bar Q_{n,k}(\bar L_k)\}$ 为偏移项、$H_k(G_n)(O)$ 为协变量的 Logistic 回归，得到下一个 $\epsilon_n$。令 $\bar Q_{n,k}^*=\bar Q_{\epsilon_n,k}$，并令 $k=k-1$。
+ \item 重复步骤 4—5，直到 $k=0$。
+ \item 得到估计
+ \[
+  \psi_n^*=\frac1n\sum_{i=1}^n\bar Q_{n,1}^*(O_i).
+ \]
+\end{enumerate}

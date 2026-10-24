@@ -1,0 +1,367 @@
+% 原章分章页47—59，第2.6节。
+\section{用于因果结构学习的整数规划}
+\label{sec:ch02-ip}
+
+因果网络或贝叶斯网络学习有两类基本方法：基于评分的方法和基于约束的方法（Cussens et al. 2016）。前者通过最大化刻画因果网络的评分度量来学习网络，后者则通过检验条件独立关系来学习网络。基于评分的方法是最常用的因果网络学习方法，本节将重点讨论这一类方法。
+
+基于评分的因果网络学习是一个组合优化问题：根据数据（观测数据、干预数据，或两者兼有）搜索使评分度量最优的因果网络结构。学习最优因果网络结构是 NP 难问题（Chickering 1996）。近年来，已提出多种用于因果结构学习的计算算法，包括动态规划（Yuan and Malone 2013）、A* 搜索（Yuan et al. 2011）和整数线性规划（integer linear programming，IP）（Cussens et al. 2016）。本节主要介绍用于 DAG（因果网络）学习的 GOBNILP（Cussens 2011）。GOBNILP 将整数规划、割平面和分支割方法结合起来，为基于评分的因果网络学习构建高效计算算法。
+
+\subsection{引言}
+
+整数线性规划是求解组合优化问题的常用方法，可用于精确 DAG 学习和因果推断。整数规划包含三个组成部分：整数变量、约束和目标函数。约束必须是变量的线性函数，将变量值限制在可行域内。整数线性规划的一种标准形式为
+\begin{equation}
+\begin{aligned}
+\min\quad&C^TX\\
+&AX\leq b,\\
+&X\geq0,\\
+&X\in Z^n,
+\end{aligned}\tag{2.150}
+\end{equation}
+其中 $C\in\R^n$、$b\in\R^m$、矩阵 $A\in\R^{m\times n}$，$Z=\{0,1,2,\ldots\}$。
+
+如果所有变量均限制取值于 $B=\{0,1\}$，就得到 0--1 整数线性规划：
+\begin{equation}
+\begin{aligned}
+\min\quad&C^TX\\
+&AX\leq b,\\
+&X\geq0,\\
+&X\in B^n.
+\end{aligned}\tag{2.151}
+\end{equation}
+
+\begin{bookexample}{2.2}
+考虑如下整数线性规划：
+\[
+\begin{aligned}
+\min\quad&x+2y\\
+&x+y\leq6,\\
+&-2x+y\leq2,\\
+&x\geq0,\quad y\geq0.
+\end{aligned}
+\]
+可行域如图2.9所示，由红色整数点构成。
+\end{bookexample}
+\begin{figure}[htbp]
+\centering\includegraphics[width=.72\textwidth]{figures/ch02fig09.pdf}
+\origfig{9}{例2.2的示意图。}
+\end{figure}
+
+\subsection{DAG 学习的整数线性规划表述}
+
+“评分与搜索”是 DAG 学习的一种常用方法（Jaakkola et al. 2002；Barlett and Cussens 2013；Cussens 2011, 2014）。前一节讨论了如何定义 DAG 的评分函数。假设这些评分函数已经给定，现在研究如何将 DAG 学习表述为 0--1 整数线性规划（ILP）。每个候选 DAG 都有一个评分，度量它对数据的拟合程度。任务是通过整数规划搜索评分最优的 DAG。定义 DAG 为 $G=(V,E)$，其中节点集合 $V$ 表示随机变量集合 $Y=\{Y_1,\ldots,Y_p\}$，$p=|V|$，$E$ 为有向边集合。变量 $v\in V$ 的父变量集合记为 $W_v$。一个 DAG 可以由图 $G$ 中全部节点 $V$ 的父变量集合 $W=\{W_1,\ldots,W_p\}$ 编码。图2.10说明了如何编码 DAG；更多例子见习题16和图2.11。各父变量集合为 $W_1=\{\phi\}$、$W_2=\{\phi\}$、$W_3=\{X_1\}$、$W_4=\{X_2,X_3\}$、$W_5=\{X_4\}$。学习 DAG，就是搜索由父变量集合表示的所有可能 DAG，找出评分最优的那个。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig10.tex}
+\origfig{10}{一个典型的 DAG。}
+\end{figure}
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig11.tex}
+\origfig{11}{供习题使用的 DAG。}
+\end{figure}
+全局评分是各节点评分之和。用 $C(v,W_v)$ 表示节点 $v$ 与其父节点集合 $W_v$ 这一组合的评分函数，假设所有评分函数均为正。首先定义 DAG 学习的一般优化问题。全局评分定义为
+\[
+C(D)=\sum_{i\in V}C(v,W_v).
+\]
+学习任务是在所有可能的 DAG $D$ 或父节点集合上，寻找使全局评分 $C(D)$ 最优的 DAG：
+\[
+\min_D\quad\sum_{i\in V,W_v\in D}C(v,W_v).
+\]
+接下来，将 DAG 学习表述为具体的 ILP 优化问题。定义变量 $x(W_v\to v)$，表示父节点集合 $W_v$ 在 DAG 中是否存在。换言之，当且仅当 $W_v$ 为节点 $v$ 的父节点集合时，$x(W_v\to v)=1$。父节点集合 $W_v$ 可以为空。DAG 学习的 ILP 目标函数定义为
+\begin{equation}
+\sum_{v=1}^{p}\sum_{j_v=1}^{J_v}
+C(v,W_{j_v})x(W_{j_v}\to v).
+\tag{2.152}
+\end{equation}
+例如，考虑三个节点 $\{X_1,X_2,X_3\}$ 的 DAG，为简单起见记为 $\{1,2,3\}$。图2.12给出了这三个变量的 DAG，表2.2列出了该图的指示变量编码。其目标函数定义为
+\[
+\begin{aligned}
+&C(1,\phi)x(\phi\to1)+C(1,\{2\})x(\{2\}\to1)
++C(1,\{3\})x(\{3\}\to1)\\
+&\quad+C(1,\{2,3\})x(\{2,3\}\to1)\\
+&{}+C(2,\phi)x(\phi\to1)+C(2,\{1\})x(\{1\}\to2)
++C(2,\{3\})x(\{3\}\to2)\\
+&\quad+C(2,\{1,3\})x(\{1,3\}\to2)\\
+&{}+C(3,\phi)x(\phi\to3)+C(3,\{1\})x(\{1\}\to3)
++C(3,\{2\})x(\{2\}\to3)\\
+&\quad+C(3,\{1,2\})x(\{1,2\}\to3).
+\end{aligned}
+\]
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig12.tex}
+\origfig{12}{因果网络的一个例子。}
+\end{figure}
+\begin{table}[htbp]
+\centering
+\origtable{2}{图2.12的指示变量编码。}
+\begin{tabular}{cccc}
+\toprule
+$1\leftarrow\{\}$&$1\leftarrow\{2\}$&$1\leftarrow\{3\}$&$1\leftarrow\{2,3\}$\\
+0&1&0&0\\
+$2\leftarrow\{\}$&$2\leftarrow\{1\}$&$2\leftarrow\{3\}$&$2\leftarrow\{1,3\}$\\
+1&0&0&0\\
+$3\leftarrow\{\}$&$3\leftarrow\{1\}$&$3\leftarrow\{2\}$&$3\leftarrow\{1,2\}$\\
+0&0&0&1\\
+\bottomrule
+\end{tabular}
+\end{table}
+目标是通过优化（极小化或极大化）目标函数（2.152），为每个节点 $v$ 找到候选父节点集合 $W_v$。显然，每个 DAG 都可以用 0--1 指示变量编码，但任意一组 0--1 数却未必编码一个 DAG。必须施加一组线性约束，使指示变量表示 DAG。没有约束时，所有父节点集合的指示变量会全部为零或全部为一，这些解不能形成 DAG。因此，需要约束来保证解编码一个 DAG。目标函数中的所有变量都表示某个父变量集合是否存在，故应取值 0 或 1。为了保证父变量集合编码有效 DAG，每个节点必须恰好有一个父节点集合，它也可以为空。这称为凸性约束（convexity constraint），可以表示为
+\begin{equation}
+\sum_{j_v=1}^{J_v}x(W_{j_v}\to v)=1,\qquad v=1,\ldots,p.
+\tag{2.153}
+\end{equation}
+例如，考虑三个节点 $\{X_1,X_2,X_3\}$ 的 DAG，父节点集合表示为（表2.2）
+\[
+\begin{aligned}
+W_{1,1}&=\{\phi\},&W_{2,1}&=\{X_2\},&W_{3,1}&=\{X_3\},&W_{4,1}&=\{X_2,X_3\},\\
+W_{1,2}&=\{\phi\},&W_{2,2}&=\{X_1\},&W_{3,2}&=\{X_3\},&W_{4,2}&=\{X_1,X_3\},\\
+W_{1,3}&=\{\phi\},&W_{2,3}&=\{X_1\},&W_{3,3}&=\{X_2\},&W_{4,3}&=\{X_1,X_2\}.
+\end{aligned}
+\]
+该三节点 DAG 的约束为
+\begin{equation}
+\begin{aligned}
+x(W_{1,1}\to1)+x(W_{2,1}\to1)+x(W_{3,1}\to1)+x(W_{4,1}\to1)&=1,\\
+x(W_{1,2}\to2)+x(W_{2,2}\to2)+x(W_{3,2}\to2)+x(W_{4,2}\to2)&=1,\\
+x(W_{1,3}\to3)+x(W_{2,3}\to3)+x(W_{3,3}\to3)+x(W_{4,3}\to3)&=1.
+\end{aligned}\tag{2.154}
+\end{equation}
+凸性约束（2.153）能够定义有向图，但生成的有向图可能有环。有向环是一条至少含一条边、首尾节点相同的有向路径。例如，假设 $x(W_{2,1}\to1)=1$、$x(W_{3,2}\to2)=1$、$x(W_{2,3}\to3)=1$，其余所有变量为零。这些解满足约束（2.154），但形成环 $X_3\to X_2\to X_1\to X_3$。
+
+为排除环，需要施加其他约束。可以观察到，DAG 节点集 $V$ 的任意子集 $C$ 中，必有至少一个节点在 $C$ 中没有父节点。数学上表示为
+\begin{equation}
+\forall C\subseteq V:\quad
+\sum_{v\in C}\sum_{W:W\cap C=\phi}x(W\to v)\geq1,
+\tag{2.155}
+\end{equation}
+称为基于簇的约束（cluster-based constraint）。
+
+为说明有向环违反约束（2.155），考虑环 $X_1\to X_2\to X_3\to X_4\to X_1$。所有父变量显然都在集合 $C=\{X_1,X_2,X_3,X_4\}\subseteq V$ 中，因此
+$\forall C\subseteq V:\sum_{v\in C}\sum_{W:W\cap C=\phi}x(W\to v)=0$，违反簇约束（2.155）。
+
+现在考虑 $X_1\to X_2\to X_3\to X_4$ 和 $X_1\to X_4$。它们不形成有向环，变量 $X_1$ 的父节点集合为空，于是 $x(\phi\to X_1)=1$，因此约束（2.155）成立。
+
+约束（2.155）的基本含义是，DAG 至少有一个节点的父节点不在 $C$ 中。它可以推广到更一般的情形。考虑一个在 $C$ 中恰有一个父节点的节点，即 $|W\cap C|=1<2$。此时，为确保 DAG 没有有向环，必须有
+\[
+\forall C\subseteq V:\quad
+\sum_{v\in C}\sum_{W:W\cap C=1}x(W\to v)\geq2.
+\]
+例如，考虑无环的三节点 DAG $X_1\to X_2\to X_3$。观察到
+\[
+\begin{aligned}
+x(\phi\to1)&=1,\\
+x(\{1\}\to2)+x(\{2\}\to3)&=1+1=2\geq2,
+\end{aligned}
+\]
+故上述 $\forall C\subseteq V$ 的不等式成立。一般而言，
+\begin{equation}
+\forall C\subseteq V:\quad
+\sum_{v\in C}\sum_{W:W\cap C<k}x(W\to v)\geq k,
+\quad\forall k,\ 1\leq k\leq|C|,
+\tag{2.156}
+\end{equation}
+称为基于 $k$ 簇的约束（$k$-cluster-based constraint）。
+
+综上，DAG 学习可以表述为以下 0--1 整数线性规划：
+\begin{equation}
+\begin{aligned}
+\min\quad&\sum_{v=1}^{p}\sum_{j_v=1}^{J_v}C(v,W_{j_v})x(W_{j_v}\to v)\\
+&\sum_{j_v=1}^{J_v}x(W_{j_v}\to v)=1,\quad v=1,\ldots,p,\\
+&\forall C\subseteq V:\quad
+\sum_{v\in C}\sum_{\substack{W_{j_v}:W_{j_v}\cap C=\phi,\\j_v=1,\ldots,J_v}}
+x(W_{j_v}\to v)\geq1,\\
+&x(W_{j_v}\to v)=0\text{ 或 }1,
+\end{aligned}\tag{2.157}
+\end{equation}
+或者
+\begin{equation}
+\begin{aligned}
+\min\quad&\sum_{v=1}^{p}\sum_{j_v=1}^{J_v}C(v,W_{j_v})x(W_{j_v}\to v)\\
+&\sum_{j_v=1}^{J_v}x(W_{j_v}\to v)=1,\quad v=1,\ldots,p,\\
+&\forall C\subseteq V:\quad
+\sum_{v\in C}\sum_{\substack{W:j_vW_{j_v}\cap C<k,\\j_v=1,\ldots,J_v}}
+x(W_{j_v}\to v)\geq k,\quad\forall k,\ 1\leq k\leq|C|,\\
+&x(W_{j_v}\to v)=0\text{ 或 }1.
+\end{aligned}\tag{2.158}
+\end{equation}
+
+\subsection{整数线性规划的割平面}
+
+整数线性规划是 NP 难问题（Fugenschuh and Martin 2005），不存在在多项式时间内求解它的高效算法。常用方法是通过松弛求解整数规划问题。在算法初始阶段，IP 中不包含簇约束（2.155），并松弛整数性条件。
+
+整数规划求解困难主要来自整数性约束。为了提高算法效率，需要去掉要求整数解的整数性约束，同时把原来的解保留在松弛问题的可行域内。换言之，向问题添加割平面（cutting plane）作为新约束，使：（1）可行整数解集合保持不变；（2）新约束切掉当前线性规划（LP）松弛解，从而缩小新 LP 松弛的可行域（Cussens et al. 2016；Bartlett and Cussens 2015）。
+
+图2.13展示了由若干约束确定的凸可行域。LP 松弛问题的最优解 $\widehat x$（黄色点）不是整数，因此不是原整数规划的解。如果找到一个平面，将 LP 松弛解 $\widehat x$ 与原可行域中整数点的凸包分离，去掉包含非整数解的一部分区域，就可能得到最优整数解。用于在搜索中去掉部分区域、并作为附加线性约束的平面，称为割平面。割平面在数学上定义为 $a^Tx\leq b$，在图2.13中用红线表示。当前 LP 松弛解 $\widehat x$ 违反这一约束，但它不会切掉可行域 $Q$ 内的可行整数解。
+\begin{figure}[htbp]
+\centering\includegraphics[width=.92\textwidth]{figures/ch02fig13.pdf}
+\origfig{13}{割平面技术示意图。}
+\end{figure}
+割平面有很多种，这里主要讨论基于约束的割平面。选择良好的割平面，使真实目标与 LP 松弛解给出的界之间的误差尽可能缩小，并深切入 LP 可行域，是整数规划成功用于 DAG 学习的关键。本节把割平面搜索表述为一个子整数规划问题，搜索簇割。选择割平面的常用准则是其有效性。所选割平面与当前 LP 松弛解 $\widehat x$ 应处于可行域的同一侧（外侧）。割的有效性定义为
+\begin{equation}
+d=a^T\widehat x-b,
+\tag{2.159}
+\end{equation}
+其中割平面定义为 $a^Tx\leq b$。
+
+为获得较大的有效性，取某个簇 $C$ 的约束作为候选割平面。凸性约束要求每个节点恰有一个父节点集合。簇 $C$ 的约束（习题18和图2.14）要求 DAG 节点集 $V$ 的任意子集 $C$ 中，至少有一个节点在 $C$ 内没有父节点。换言之，$C$ 中至多有 $|C|-1$ 个节点在 $C$ 内有父节点。因此，约束（2.151）可以重新表述为
+\begin{equation}
+\forall C\subseteq V:\quad
+\sum_{v\in C}\sum_{W:W\cap C\ne\phi}x(W\to v)\leq|C|-1.
+\tag{2.160}
+\end{equation}
+式（2.160）意味着簇 $C$ 中不可能所有节点都在该簇内有父节点。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig14.tex}
+\origfig{14}{（a）有向无环图。（b）有向有环图。}
+\end{figure}
+以图2.12为例，考虑簇 $C=\{1,2,3\}$。式（2.160）对该图的约束为
+\[
+I(\{2\}\to1)+I(\{1,2\}\to3)=2\leq|3|-1.
+\]
+利用式（2.151）和（2.152），距离 $d$ 可简化为
+\begin{equation}
+d=-|C|+\sum_{v\in C}\sum_{W:W\cap C\ne\phi}\widehat x(W\to v).
+\tag{2.161}
+\end{equation}
+为了深切入可行域，希望找到一个簇，使当前 LP 松弛解 $\widehat x$ 与割平面之间的距离 $d$ 尽可能大。
+
+用指示函数 $I(v\in C)$ 表示簇，用 $J(W\to v)$ 表示与 $\widehat x(W\to v)$ 对应的指示变量。为使有效性最大，求解如下优化问题：
+\begin{equation}
+\max\quad -|C|+\sum_v\sum_W\widehat x(W\to v)J(W\to v).
+\tag{2.162}
+\end{equation}
+对每个 $J(W\to v)$：
+\begin{equation}
+J(W\to v)\Rightarrow I(v\in C),
+\tag{2.163}
+\end{equation}
+\begin{equation}
+J(W\to v)\Rightarrow\bigvee_{w\in W}I(w\in C),
+\tag{2.164}
+\end{equation}
+\[
+|C|\geq2.
+\]
+这些约束用一阶逻辑表示，$\phi\Rightarrow\psi$ 表示 $\neg\phi\vee\psi$。约束（2.163）表示 $J(W\to v)=1$ 蕴含 $v\in C$，约束（2.164）表示 $J(W\to v)$ 还蕴含父节点集合 $W$ 至少有一个成员在簇 $C$ 中。因此，为满足约束（2.163）和（2.153），必须有一个非零的 $v$ 在簇 $C$ 中，且至少一个父节点也在 $C$ 中。对于任意可行解，
+\begin{equation}
+\begin{aligned}
+-|C|+\sum_v\sum_W\widehat x(W\to v)J(W\to v)
+&\geq-|C|+|C|=0>-1,\quad\text{或}\\
+-|C|+\sum_{v\in C}\sum_{W:W\cap C\ne\phi}\widehat x(W\to v)J(W\to v)
+&\geq-|C|+|C|=0>-1.
+\end{aligned}\tag{2.165}
+\end{equation}
+任何可行解都确定了一个簇，其对应约束（2.160）被当前 LP 松弛解违反，从而定义一个割平面。上述优化问题将找到收紧松弛的最佳割平面。
+
+寻找割平面的算法如下。
+\begin{bookalgorithm}{2.2}
+\textbf{割平面算法}
+\begin{enumerate}
+\item $P_r=$ ILP 的 LP 松弛。
+\item $\widehat x=P_r$ 的解。
+\item 若 $P_r$ 无界或不可行，则停止；结束条件判断。
+\item $C=$ 在 $\widehat x$ 中可能包含有向环的簇集合。
+\item 当 $C\ne\phi$ 时执行循环。
+\item 通过求解优化问题（2.162）、（2.163）、（2.164），取得最有效割平面 $c^*\in C$。
+\item 将约束 $c^*$ 加入 $P_r$。
+\item $\widetilde x=P_r$ 的解。
+\item 若 $P_r$ 不可行，则停止；否则：
+\begin{enumerate}[label=(\alph*)]
+\item $\widehat x=\widetilde x$；
+\item $C=$ 在 $\widehat x$ 中被违反的无环性约束集合。
+\end{enumerate}
+结束条件判断。
+\item 结束循环。
+\item 返回 $x^*=\widehat x$。
+\end{enumerate}
+\end{bookalgorithm}
+
+\subsection{整数线性规划的分支割算法}
+
+分支定界法（branch and bound method）是一种常用算法，能够保证找到 0--1 ILP 问题的最优解。它对 $2p$ 个 0--1 解进行隐式、穷尽且不重复的搜索。随着 DAG 中节点数 $p$ 增加，DAG 学习的计算时间呈指数增长。分支定界法的基本思想，是把 ILP 逐步分成更小、更易求解的问题，并缩小搜索空间。若某个父节点集合的子集评分更好，则该父节点集合不可能最优。分支割算法如下。
+
+\begin{bookalgorithm}{2.3}
+\textbf{分支割算法}
+
+\noindent\textbf{步骤 1（根节点）：}初始化子问题列表 $L:=\{R\}$，$\widehat c:=\infty$。为每个节点的若干父节点集合计算评分函数，建立各节点的凸性约束。
+
+\noindent\textbf{步骤 2：}若 $L=\phi$，则停止并返回 $x^*=\widehat x$ 和 $c^*=\widehat c$。
+
+\noindent\textbf{步骤 3：节点选择。}使用割方法检查是否存在有效的簇约束，使当前 LP 松弛解 $\widehat x$ 不满足该约束。加入被当前解 $\widehat x$ 违反的约束。选择 $Q\in L$，令 $L:=L\setminus\{Q\}$。
+
+\noindent\textbf{步骤 4：}去掉 ILP $Q$ 的整数性约束和簇约束，得到 LP 松弛 $Q_{\mathrm{relax}}$。用单纯形法求解它。若解不可行（为空），令 $\widehat c:=\infty$；否则令 $\breve x$ 为 $Q_{\mathrm{relax}}$ 的最优解，$\breve c$ 为相应目标值。
+
+\noindent\textbf{步骤 5：}若 $\breve c\geq\widehat c$，舍弃解 $\widehat x$，切除子问题、剪去搜索树的大部分分支，然后转步骤2；否则转步骤6。
+
+\noindent\textbf{步骤 6：}若解 $\breve x$ 为整数值且可行，则当前问题已解，令 $x^*=\widehat x:=\breve x$、$c^*=\widehat c:=\breve c$，转步骤2。否则，若 $\breve x$ 非整数值，转步骤7。
+
+\noindent\textbf{步骤 7：}在 $\widehat x$ 中一个取分数值的变量上分支，例如 $\widehat x_j\notin Z$，$j\in\{1,\ldots,p\}$。建立两个子问题
+\[
+Q_j^-=Q\cap\{x_j\leq\lfloor\widehat x_j\rfloor\},
+\qquad
+Q_j^+=Q\cap\{\lceil\widehat x_j\rceil\}.
+\]
+\end{bookalgorithm}
+分支是分支割算法的关键。把问题分成两个子问题的一种常用策略，是对变量分支。分支变量选择的基本算法如下。
+
+\begin{bookalgorithm}{2.4}
+\textbf{分支变量选择算法}
+\begin{enumerate}
+\item 令 $F=\{k\in\{1,\ldots,p\}\mid x_k\notin Z\}$ 为候选分支变量集合。
+\item 对所有候选 $k\in F$，计算评分
+\[
+s_k=\max\{\breve c_{Q_k^-}-\breve c,10^{-6}\}
+\max\{\breve c_{Q_k^+}-\breve c_Q,10^{-6}\}.
+\]
+\item 返回满足 $s_j=\max_{k\in F}\{s_k\}$ 的下标 $j\in F$。
+\end{enumerate}
+可以在变量 $x_j$ 上分支。
+\end{bookalgorithm}
+
+\subsection{寻找汇点的原始启发式算法}
+
+寻找汇点（sink finding），是搜索一个可行整数解，使其生成的 DAG 接近当前 LP 松弛解（Barlett and Cussens 2013）。算法的目的，是在分支过程早期找到次优可行解，从而尽早剪枝。可行解保证有向图无环。
+
+寻找汇点算法首先定义一个代价函数，用来选择最佳候选汇点。希望找到某个变量（节点），其估计 $\widehat x_s(W\to s)$ 接近当前 LP 松弛解。假设将父节点集合的指示变量排成一张表，每个节点对应一行，总行数为 $p=|V|$。在每一行中，按对应的目标系数 $C(V,W)$ 排列父节点集合的指示变量（表2.3）。例如，$x(1\to3)$ 是节点3的最佳父节点集合，目标系数最大；$x(2\to3)$ 最差。
+
+令 $\widehat x(W_{v,1}\to v)$ 为节点 $v$ 中目标系数最大的最佳父节点集合所对应的指示变量。对节点 $v$ 的每个父节点集合指示变量，定义代价 $f_v=1-\widehat x(W_{v,1}\to v)$。寻找汇点算法如下。
+\begin{table}[htbp]
+\centering
+\origtable{3}{（A）DAG 对应的代价函数；（B）按目标系数排列的指示变量列表。}
+\begin{tabular}{ccccc}
+\toprule
+\multicolumn{5}{l}{A}\\
+节点&1&2&3&4\\\midrule
+1&0&0&3&2\\2&0&0&2&0\\3&0&0&0&1\\4&0&0&0&0\\
+\midrule
+\multicolumn{5}{l}{B}\\
+节点&1&2&3&4\\\midrule
+1&$\{\}$&$\{\}$&$\{\}$&$\{\}$\\
+2&$\{\}$&$\{\}$&$\{\}$&$\{\}$\\
+3&$x(1\to3)$&$x(2\to3)$&$\{\}$&$\{\}$\\
+4&$x(1\to4)$&$x(3\to4)$&$\{\}$&$\{\}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{bookalgorithm}{2.5}
+\textbf{寻找汇点算法}
+\begin{enumerate}
+\item 选择候选汇点 $V_j=\min_v f_v$。
+\item 删除所有包含所选节点 $V_j$ 的父节点的父节点集合，生成删去这些集合的新表。例如，选择节点 $V_j=3$，包含其父节点的集合涉及节点 $\{1\}$ 和 $\{2\}$。在指示变量 $x(1\to4)$ 中，父节点 $\{1\}$ 也包含于 $x(1\to3)$ 的父节点中，因此去掉 $x(1\to4)$。表2.3B经此变换后得到表2.4。
+\end{enumerate}
+重复步骤1、2，直到所有节点都被访问。
+
+汇点（sink node）是没有子节点的节点。DAG 至少有一个汇点。寻找汇点算法为 DAG 中的每个节点寻找父节点集合。它先选择代价最小的最佳节点 $v$ 作为汇点，然后从其他节点的父节点集合中删除所有包含 $v$ 的集合，保证 $v$ 没有子节点。第二次迭代时，在剩余节点 $V\setminus\{v\}$ 组成的 DAG 上重复同一过程。之后的迭代类似，直到找到图中所有节点的父节点集合，完整构建 DAG。
+\end{bookalgorithm}
+\begin{table}[htbp]
+\centering
+\origtable{4}{表2.3B删除包含所选汇点 $\{3\}$ 的父节点的父节点集合后所得的变换表。}
+\begin{tabular}{ccccc}
+\toprule
+节点&1&2&3&4\\\midrule
+1&$\{\}$&$\{\}$&$\{\}$&$\{\}$\\
+2&$\{\}$&$\{\}$&$\{\}$&$\{\}$\\
+3&$x(1\to3)$&$x(2\to3)$&$\{\}$&$\{\}$\\
+4&&$x(3\to4)$&$\{\}$&$\{\}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier

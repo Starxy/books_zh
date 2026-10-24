@@ -1,0 +1,29 @@
+{
+  "reviewed_at": "2026-10-23T18:25:23",
+  "project_terms": [
+    {
+      "en": "margin assumption",
+      "zh": "间隔假设"
+    },
+    {
+      "en": "margin condition",
+      "zh": "间隔条件"
+    }
+  ],
+  "source_book_context": "第22章MA1与第23章相应条件约束处理增益在阈值附近的概率质量，并用于控制规则估计的快速收敛率。",
+  "primary_sources": [
+    {
+      "title": "Audibert and Tsybakov (2007), Fast learning rates for plug-in classifiers",
+      "url": "https://arxiv.org/abs/0708.2321",
+      "relevance": "作者称margin或low-noise assumption，并研究分类超额风险的快速率。"
+    },
+    {
+      "title": "Luedtke and Chambaz (2020), Performance guarantees for policy learning",
+      "url": "https://projecteuclid.org/journals/annales-de-linstitut-henri-poincare-probabilites-et-statistiques/volume-56/issue-3/Performance-guarantees-for-policy-learning/10.1214/19-AIHP1034.pdf",
+      "relevance": "MA明确约束0<|gamma(X)|≤t的概率，用于策略学习率；仅供词义对照。"
+    }
+  ],
+  "editorial_decision": "“间隔假设／间隔条件”为本项目依语义作出的统一译名；未声称中文文献存在唯一权威译法。首现保留英文，避免与marginal distribution的边际分布混淆。",
+  "untrusted_aggregator_translations_used": false,
+  "added_external_references_to_book_body_or_bibliography": false
+}

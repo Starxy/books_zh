@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.2cm,y=1.2cm,every node/.style={font=\small,inner sep=3pt}]
+\node (c09y) at (0,2.3) {$Y$};
+\node (c09x) at (3,2.3) {$X$};
+\node (c09h) at (0,0) {$H$};
+\node (c09g) at (3,0) {$G$};
+\node (c09z) at (1.2,.8) {$Z$};
+\draw[->,green!55!black] (c09x) -- node[above] {$q$} (c09y);
+\draw[->,green!55!black] (c09y) -- node[left] {$a$} (c09h);
+\draw[->,green!55!black] (c09h) -- node[below] {$b$} (c09g);
+\draw[->,green!55!black] (c09x) -- node[right] {$e$} (c09g);
+\draw[->,green!55!black] (c09y) -- node[left] {$h$} (c09z);
+\draw[->,green!55!black] (c09h) -- node[above left] {$c$} (c09z);
+\draw[->,green!55!black] (c09x) -- node[above right] {$f$} (c09z);
+\draw[->,green!55!black] (c09z) -- node[below left] {$d$} (c09g);
+\draw[->,green!55!black] (c09y) -- node[above right,pos=.4] {$g$} (c09g);
+\end{tikzpicture}
+\origfig{9}{说明总效应计算的模型。}
+\label{fig:ch01c-09}
+\end{figure}

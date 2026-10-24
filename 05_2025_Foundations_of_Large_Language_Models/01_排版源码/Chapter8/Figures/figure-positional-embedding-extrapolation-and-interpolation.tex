@@ -1,0 +1,151 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        at={(0,0)},
+        width=0.95\textwidth,
+        height=0.25\textwidth,
+        title={},
+        xlabel={\makecell{序列长度\\（a）不具泛化能力的编码}},
+        ylabel={取值},
+        ylabel style={yshift=0.5em},xlabel style={yshift=0.5em},
+        grid=none,
+        xmin=0, xmax=2048,
+        xtick={0, 1024, 2048},
+        ymin=-1.2, ymax=1.2,
+        ytick={-1, 0, 1}
+    ]
+        % \addplot[
+        %     % only marks,
+        %     % draw=blue,
+        %     % fill=blue,
+        %     % mark=*,
+        %     domain=0:1024,
+        %     samples=5
+        % ]{sin(deg(x))};
+
+        \addplot[blue,mark=*,mark size=1.5pt,thick,mark options={fill=blue,draw=blue,line width=1.25pt}, only marks] coordinates {
+        (0, sin(0)
+        (128, sin(deg(1/100*128)
+        (256, sin(deg(1/100*256)
+        (384, sin(deg(1/100*384)
+        (512, sin(deg(1/100*512)
+        (640, sin(deg(1/100*640)
+        (768, sin(deg(1/100*768)
+        (896, sin(deg(1/100*896)
+        (1024, sin(deg(1/100*1024) };
+
+        \addplot[red,mark=*,mark size=1.5pt,thick,mark options={fill=red,draw=red,line width=1.25pt}, only marks] coordinates {
+        (1152, sin(deg(1/100*1152)
+        (1280, sin(deg(1/100*1280)
+        (1408, sin(deg(1/100*1408)
+        (1536, sin(deg(1/100*1536)
+        (1664, sin(deg(1/100*1664)
+        (1792, sin(deg(1/100*1792)
+        (1920, sin(deg(1/100*1920)
+        (2048, sin(deg(1/100*2048)  };
+    \draw[dashed, thick] (axis cs:1024,-1.2) -- (axis cs:1024,1.2);
+
+    \end{axis}
+
+    \begin{axis}[
+        at={(0,-0.28\textwidth)},
+        width=0.95\textwidth,
+        height=0.25\textwidth,
+        title={},
+        xlabel={\makecell{序列长度\\（b）外推}},
+        ylabel={取值},
+        ylabel style={yshift=0.5em},xlabel style={yshift=0.5em},
+        grid=none,
+        xmin=0, xmax=2048,
+        xtick={0, 1024, 2048},
+        ymin=-1.2, ymax=1.2,
+        ytick={-1, 0, 1}
+    ]
+        \addplot[
+            domain=0:1024,
+            samples=10,
+            % samples at={0, 1024/11, 1024/11*2, 1024/11*3, 512, 640, 768, 896, 1024},
+            smooth,
+        ]{sin(deg(1/100*x))};
+
+        \addplot[
+            dotted,
+            thick,
+            domain=1024:2048,
+            samples=10,
+            % samples at={0, 128, 256, 384, 512, 640, 768, 896, 1024},
+            smooth,
+        ]{sin(deg(1/100*x))};
+
+
+    \addplot[blue,mark=*,mark size=1.5pt,thick,mark options={fill=blue,draw=blue,line width=1.25pt}, only marks] coordinates {
+        (0, sin(0)
+        (128, sin(deg(1/100*128)
+        (256, sin(deg(1/100*256)
+        (384, sin(deg(1/100*384)
+        (512, sin(deg(1/100*512)
+        (640, sin(deg(1/100*640)
+        (768, sin(deg(1/100*768)
+        (896, sin(deg(1/100*896)
+        (1024, sin(deg(1/100*1024) };
+
+        \addplot[red,mark=*,mark size=1.5pt,thick,mark options={fill=red,draw=red,line width=1.25pt}, only marks] coordinates {
+        (1152, sin(deg(1/100*1152)
+        (1280, sin(deg(1/100*1280)
+        (1408, sin(deg(1/100*1408)
+        (1536, sin(deg(1/100*1536)
+        (1664, sin(deg(1/100*1664)
+        (1792, sin(deg(1/100*1792)
+        (1920, sin(deg(1/100*1920)
+        (2048, sin(deg(1/100*2048)  };
+    \draw[dashed, thick] (axis cs:1024,-1.2) -- (axis cs:1024,1.2);
+
+    \end{axis}
+    \begin{axis}[
+        at={(0,-0.56\textwidth)},
+        width=0.95\textwidth,
+        height=0.25\textwidth,
+        title={},
+        xlabel={\makecell{序列长度\\（c）插值}},
+        ylabel={取值},
+        ylabel style={yshift=0.5em},xlabel style={yshift=0.5em},
+        grid=none,
+        xmin=0, xmax=2048,
+        xtick={0, 1024, 2048},
+        ymin=-1.2, ymax=1.2,
+        ytick={-1, 0, 1}
+    ]
+          \addplot[
+            domain=0:1024,
+            samples=20,
+            smooth,
+        ]{sin(deg(1/50*x))};
+
+
+
+
+    \addplot[blue,mark=*,mark size=1.5pt,thick,mark options={fill=blue,draw=blue,line width=1.25pt}, only marks] coordinates {
+        (0, sin(0)
+        (128, sin(deg(1/100*2*128)
+        (256, sin(deg(1/100*2*256)
+        (384, sin(deg(1/100*2*384)
+        (512, sin(deg(1/100*2*512)
+        (640, sin(deg(1/100*2*640)
+        (768, sin(deg(1/100*2*768)
+        (896, sin(deg(1/100*2*896)
+        (1024, sin(deg(1/100*2*1024)
+        };
+
+        \addplot[red,mark=*,mark size=1.5pt,thick,mark options={fill=red,draw=red,line width=1.25pt}, only marks] coordinates {
+        (64, sin(deg(1/100*2*64)
+        (192, sin(deg(1/100*2*192)
+        (320, sin(deg(1/100*2*320)
+        (448, sin(deg(1/100*2*448)
+        (576, sin(deg(1/100*2*576)
+        (704, sin(deg(1/100*2*704)
+        (832, sin(deg(1/100*2*832)
+        (960, sin(deg(1/100*2*960)
+        };
+    \draw[dashed, thick] (axis cs:1024,-1.2) -- (axis cs:1024,1.2);
+
+    \end{axis}
+    \end{tikzpicture} 

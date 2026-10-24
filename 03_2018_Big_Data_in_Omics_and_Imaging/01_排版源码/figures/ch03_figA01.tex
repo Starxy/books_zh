@@ -1,0 +1,100 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,
+  neuron/.style={circle,draw=blue!55!black,fill=green!55!yellow!65,minimum size=5mm,inner sep=1pt,font=\small},
+  netarrow/.style={->,>=Stealth,blue!65!black,thin},
+  netlabel/.style={font=\scriptsize,fill=white,inner sep=1pt}]
+\node[neuron] (ch03a01c0r0) at (0,6.0) {$$};
+\node[neuron] (ch03a01c0r1) at (0,3.0) {$$};
+\node[neuron] (ch03a01c0r2) at (0,0.0) {$$};
+\node[neuron] (ch03a01c1r0) at (2.55,6.0) {\color{red}$1$};
+\node[neuron] (ch03a01c1r1) at (2.55,3.0) {\color{red}$j$};
+\node[neuron] (ch03a01c1r2) at (2.55,0.0) {$m_1$};
+\node[neuron] (ch03a01c2r0) at (5.5,6.0) {\color{red}$1$};
+\node[neuron] (ch03a01c2r1) at (5.5,3.0) {\color{red}$j$};
+\node[neuron] (ch03a01c2r2) at (5.5,0.0) {$m_l$};
+\node[neuron] (ch03a01c3r0) at (8.5,6.0) {\color{red}$1$};
+\node[neuron] (ch03a01c3r1) at (8.5,3.0) {\color{red}$j$};
+\node[neuron] (ch03a01c3r2) at (8.5,0.0) {$m_{l+1}$};
+\node[neuron] (ch03a01c4r0) at (11.5,6.0) {\color{red}$1$};
+\node[neuron] (ch03a01c4r1) at (11.5,3.0) {\color{red}$j$};
+\node[neuron] (ch03a01c4r2) at (11.5,0.0) {$m_L$};
+\node[anchor=east,font=\small] at (-.3,6.0) {$x_1$};
+\node[anchor=east,font=\small] at (-.3,3.0) {$x_2$};
+\node[anchor=east,font=\small] at (-.3,0.0) {$x_{m_0}$};
+\draw[dashed] (-.1,5.3) -- (-.1,3.7);
+\draw[dashed] (-.1,2.3) -- (-.1,0.7);
+\draw[netarrow,green!60!black] (ch03a01c0r0) -- (ch03a01c1r0);
+\draw[netarrow,green!60!black] (ch03a01c0r0) -- (ch03a01c1r1);
+\draw[netarrow,green!60!black] (ch03a01c0r0) -- (ch03a01c1r2);
+\draw[netarrow,green!60!black] (ch03a01c0r1) -- (ch03a01c1r0);
+\draw[netarrow,green!60!black] (ch03a01c0r1) -- (ch03a01c1r1);
+\draw[netarrow,green!60!black] (ch03a01c0r1) -- (ch03a01c1r2);
+\draw[netarrow,green!60!black] (ch03a01c0r2) -- (ch03a01c1r0);
+\draw[netarrow,green!60!black] (ch03a01c0r2) -- (ch03a01c1r1);
+\draw[netarrow,green!60!black] (ch03a01c0r2) -- (ch03a01c1r2);
+\draw[netarrow] (ch03a01c2r0) -- (ch03a01c3r0);
+\draw[netarrow] (ch03a01c2r0) -- (ch03a01c3r1);
+\draw[netarrow] (ch03a01c2r0) -- (ch03a01c3r2);
+\draw[netarrow] (ch03a01c2r1) -- (ch03a01c3r0);
+\draw[netarrow] (ch03a01c2r1) -- (ch03a01c3r1);
+\draw[netarrow] (ch03a01c2r1) -- (ch03a01c3r2);
+\draw[netarrow] (ch03a01c2r2) -- (ch03a01c3r0);
+\draw[netarrow] (ch03a01c2r2) -- (ch03a01c3r1);
+\draw[netarrow] (ch03a01c2r2) -- (ch03a01c3r2);
+\draw[netarrow] (ch03a01c3r0) -- (ch03a01c4r0);
+\draw[netarrow] (ch03a01c3r0) -- (ch03a01c4r1);
+\draw[netarrow] (ch03a01c3r0) -- (ch03a01c4r2);
+\draw[netarrow] (ch03a01c3r1) -- (ch03a01c4r0);
+\draw[netarrow] (ch03a01c3r1) -- (ch03a01c4r1);
+\draw[netarrow] (ch03a01c3r1) -- (ch03a01c4r2);
+\draw[netarrow] (ch03a01c3r2) -- (ch03a01c4r0);
+\draw[netarrow] (ch03a01c3r2) -- (ch03a01c4r1);
+\draw[netarrow] (ch03a01c3r2) -- (ch03a01c4r2);
+\draw[netarrow] (ch03a01c1r0) -- (3.5,6.0);
+\draw[netarrow] (ch03a01c1r0) -- (3.4499999999999997,5.15);
+\draw[netarrow] (ch03a01c1r0) -- (3.1999999999999997,4.8);
+\draw[netarrow,green!60!black] (5.1,6.8) -- (ch03a01c2r0);
+\draw[netarrow] (4.6,6.0) -- (ch03a01c2r0);
+\draw[netarrow] (5.2,5.15) -- (ch03a01c2r0);
+\draw[netarrow] (ch03a01c1r1) -- (3.5,3.85);
+\draw[netarrow] (ch03a01c1r1) -- (3.5,3.0);
+\draw[netarrow] (ch03a01c1r1) -- (3.3499999999999996,2.15);
+\draw[netarrow] (4.85,3.75) -- (ch03a01c2r1);
+\draw[netarrow] (4.6,3.0) -- (ch03a01c2r1);
+\draw[netarrow] (4.95,2.3) -- (ch03a01c2r1);
+\draw[netarrow] (ch03a01c1r2) -- (3.1999999999999997,0.85);
+\draw[netarrow] (ch03a01c1r2) -- (3.5,0.65);
+\draw[netarrow] (ch03a01c1r2) -- (3.5,0.0);
+\draw[netarrow] (4.85,0.75) -- (ch03a01c2r2);
+\draw[netarrow] (4.6,0.35) -- (ch03a01c2r2);
+\draw[netarrow] (4.6,0.0) -- (ch03a01c2r2);
+\node[font=\small] at (2.55,7.2) {第1层};
+\node[font=\small] at (5.5,7.2) {第 $l$ 层};
+\node[font=\small] at (8.5,7.2) {第 $l+1$ 层};
+\node[font=\small] at (11.5,7.2) {第 $L$ 层};
+\node[netlabel] at (0.95,6.25) {$w_{11}^{(1)}$};
+\node[netlabel] at (0.95,4.95) {$w_{21}^{(1)}$};
+\node[netlabel] at (4.5,6.28) {$w_{11}^{(l)}$};
+\node[netlabel] at (5.05,5.45) {$z_1^{(l)}$};
+\node[netlabel] at (6.05,5.65) {$a_1^{(l)}$};
+\node[netlabel] at (4.95,3.35) {$z_j^{(l)}$};
+\node[netlabel] at (6.05,2.65) {$a_j^{(l)}$};
+\node[netlabel] at (7.0,6.28) {$w_{11}^{(l+1)}$};
+\node[netlabel] at (7.0,5.0) {$w_{j1}^{(l+1)}$};
+\node[netlabel] at (6.25,3.95) {$w_{1j}^{(l+1)}$};
+\node[netlabel] at (7.65,1.55) {$w_{m_{l+1}1}^{(l+1)}$};
+\node[netlabel] at (7.95,5.5) {$z_1^{(l+1)}$};
+\node[netlabel] at (6.95,1.3) {$b$};
+\node[netlabel] at (10.7,5.5) {$z_1^{(L)}$};
+\node[netlabel] at (12.0,6.0) {$a_1^{(L)}$};
+\node[netlabel] at (10.85,2.5) {$z_j^{(L)}$};
+\node[netlabel] at (12.0,3.0) {$a_j^{(L)}$};
+\node[netlabel] at (10.55,3.75) {$w_{j1}^{(L)}$};
+\end{tikzpicture}
+\begingroup
+\renewcommand{\thefigure}{3.A.1}
+\caption{多层前向传播。}
+\label{fig:ch03-A01}
+\endgroup
+\end{figure}

@@ -1,0 +1,164 @@
+% 原书分章 PDF 第 16—18 页：第 8.6 节。
+\section{基于双变量右删失数据的双变量生存函数}
+
+本节给出基于双变量右删失数据的双变量生存函数的有效影响曲线的 HAL 估计量。对一般维数 $d\geq2$，它很容易推广为基于 $d$ 变量右删失数据的 $d$ 变量生存函数的有效影响曲线的 HAL 估计量。令
+\[
+ O=\bigl(\widetilde T_1=\min(T_1,C_1),\Delta_1=I(T_1\leq C_1),
+ \widetilde T_2=\min(T_2,C_2),\Delta_2=I(T_2\leq C_2)\bigr),
+\]
+其中，$T=(T_1,T_2)$ 与 $C=(C_1,C_2)$ 独立，累积分布函数分别为 $F$ 与 $G$。设 $P_{F,G}$ 为 $O$ 的概率分布。令
+$\Delta=(\Delta_1,\Delta_2)$，$\widetilde T=(\widetilde T_1,\widetilde T_2)$，
+从而可写 $O=(\widetilde T,\Delta)$。考虑对 $F$ 和 $G$ 均不作限定的统计模型 $\mathcal M$。令 $\Psi:\mathcal M\to\mathbb R$ 为双变量生存概率
+\[
+ \bar F(t_{10},t_{20})=\int_{((t_{10},t_{20}),\infty)}dF(x_1,x_2).
+\]
+也使用记号 $t_0=(t_{10},t_{20})$，并将 $\Psi(P_{F,G})$ 记为 $\Psi(F)$。$O$ 的密度分解为一个 $F$ 因子与一个 $G$ 因子。因此，模型 $\mathcal M$ 中 $\Psi$ 在 $P_{F,G}$ 处的有效影响曲线，与 $G$ 已知的模型 $\mathcal M(G)=\{P_{F,G}:F\}$ 中相同。在模型 $\mathcal M(G)$ 中，$\Psi$ 的一个梯度为
+\[
+ D(F,G)(O)=\kappa_{t_0}(O)\frac{I(\Delta=(1,1))}{\bar G(\widetilde T)}
+ -\Psi(F),
+\]
+其中 $\kappa_t(O)=I(\widetilde T>t_0)$。这是简单 IPCW 估计量
+$\frac1n\sum_{i=1}^n\kappa_{t_0}(O_i)I(\Delta_i=(1,1))/\bar G(\widetilde T_i)$
+的影响曲线，因而确实是梯度。在模型 $\mathcal M(G)$ 中，得分算子
+$A_F:L_0^2(F)\to L_0^2(P_{F,G})$
+将 $dF_{\epsilon,h}(t)=(1+\epsilon h(t))dF(t)$ 的得分
+$h\in L_0^2(F)$ 映射为 $\{P_{F_{\epsilon,h},G}:\epsilon\}$ 的得分，具体为
+% 原书两个单分量删失项都印为 I(Delta=(0,1))，照录。
+\[
+ \begin{aligned}
+ A_F(h)(O)&=E_F(h(T)\mid\widetilde T,\Delta)\\
+ &=h(T)I(\Delta=(1,1))\\
+ &\quad+\frac{\int_{\widetilde T_1}^{\infty}
+ h(t_1,\widetilde T_2)F^{01}(dt_1,\widetilde T_2)}
+ {\bar F^{01}(\widetilde T_1,\widetilde T_2)}I(\Delta=(0,1))\\
+ &\quad+\frac{\int_{\widetilde T_2}^{\infty}
+ h(\widetilde T_1,t_2)F^{10}(\widetilde T_1,dt_2)}
+ {\bar F^{10}(\widetilde T_1,\widetilde T_2)}I(\Delta=(0,1))\\
+ &\quad+\frac{\int_{\widetilde T_1}^{\infty}\int_{\widetilde T_2}^{\infty}
+ h(t_1,t_2)\,dF(t_1,t_2)}
+ {\bar F(\widetilde T_1,\widetilde T_2)}I(\Delta=(0,0)),
+ \end{aligned}
+\]
+其中，
+\[
+ \begin{aligned}
+ F^{01}(t_1,t_2)&=\frac{d}{dt_2}F(t_1,t_2),&
+ \bar F^{01}(t_1,t_2)&=\int_{t_1}^{\infty}F^{01}(ds_1,t_2),\\
+ F^{10}(t_1,t_2)&=\frac{d}{dt_1}F(t_1,t_2),&
+ \bar F^{10}(t_1,t_2)&=\int_{t_2}^{\infty}F^{10}(t_1,ds_2).
+ \end{aligned}
+\]
+令 $Fh=\int h\,dF$，并以某个 $h\in L^2(F)$ 的 $h-Fh$ 表示 $L_0^2(F)$ 中的函数。有效影响曲线为 $A_F(h^*)$，其中
+\[
+ h^*(P)=\argmin_{h\in L^2(F)}P\{D(F,G)-A_F(h)+Fh\}^2.
+\]
+
+具有有限变差范数的双变量 càdlàg 函数 $h\in L^2(F)$，可表示为
+\[
+ \begin{aligned}
+ h(t_1,t_2)={}&h(0,0)+\int_0^{t_1}h(dx_1,0)
+ +\int_0^{t_2}h(0,dx_2)\\
+ &+\int_0^{t_1}\int_0^{t_2}h(dx_1,dx_2)\\
+ ={}&h(0,0)+\int\phi_{1,x_1}(t_1)h(dx_1,0)
+ +\int\phi_{2,x_2}(t_2)h(0,dx_2)\\
+ &+\int\phi_{x_1,x_2}(t_1,t_2)h(dx_1,dx_2),
+ \end{aligned}
+\]
+其中 $\phi_{1,x_1}(t)=I(t_1\geq x_1)$，
+$\phi_{2,x_2}(t)=I(t_2\geq x_2)$，
+且 $\phi_{x_1,x_2}(t)=I(t_1\geq x_1,t_2\geq x_2)$。
+这样，就把函数 $h$ 写成了遍及所有 $x$ 值的指示函数
+$\phi_{1,x_1},\phi_{2,x_2},\phi_x$
+的无限线性组合。由于 $A_F$ 是线性算子，得到
+\[
+ \begin{aligned}
+ A_F(h)={}&h(0,0)+\int A_F(\phi_{1,x_1})h(dx_1,0)
+ +\int A_F(\phi_{2,x_2})h(0,dx_2)\\
+ &+\int A_F(\phi_{x_1,x_2})h(dx_1,dx_2)\\
+ \equiv{}&h(0,0)+\int\bar F_1(x_1\mid O)h(dx_1,0)
+ +\int\bar F_2(x_2\mid O)h(0,dx_2)\\
+ &+\int\bar F(x_1,x_2\mid O)h(dx_1,dx_2),
+ \end{aligned}
+\]
+其中，$\bar F_1(x_1\mid O)$、$\bar F_2(x_2\mid O)$ 与 $\bar F(x\mid O)$，分别表示给定 $O$ 时 $T_1>x_1$、$T_2>x_2$ 以及 $T>(x_1,x_2)$ 的条件概率。还要注意，
+\[
+ \begin{aligned}
+ Fh={}&h(0,0)+\int\bar F_1(x_1)h(dx_1,0)
+ +\int\bar F_2(x_2)h(0,dx_2)\\
+ &+\int\bar F(x_1,x_2)h(dx_1,dx_2),
+ \end{aligned}
+\]
+其中 $\bar F_1(x_1)=P_F(T_1>x_1)$，
+$\bar F_2(x_2)=P_F(T_2>x_2)$，
+且 $\bar F(x_1,x_2)=P_F(T_1>x_1,T_2>x_2)$。
+因此，对具有有限变差范数的任意 càdlàg 函数 $h$，我们证明了
+\[
+ \begin{aligned}
+ A_F(h-Fh)={}&\int\{\bar F_1(x_1\mid O)-\bar F_1(x_1)\}h(dx_1,0)\\
+ &+\int\{\bar F_2(x_2\mid O)-\bar F_2(x_2)\}h(0,dx_2)\\
+ &+\int\{\bar F(x\mid O)-\bar F(x)\}h(dx).
+ \end{aligned}
+\]
+设 $O_1,\ldots,O_n$ 为来自 $P_{F,G}$ 的独立同分布样本。可以用下式近似 $h^*$：
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \{D(F,G)(O_i)-A_F(h-Fh)(O_i)\}^2.
+\]
+我们主张，这一最小值可由离散测度 $h$ 达到：$h(dx_1,0)$ 只在
+$\{\widetilde T_{1i}:i\}$ 上放置质量，$h(0,dx_2)$ 只在
+$\{\widetilde T_{2i}:i\}$ 上放置质量，而 $h(dx_1,dx_2)$ 只在
+$\{(\widetilde T_i:i\}$ 上放置质量。将这三组支撑点分别记为
+$\{m_{1j}:j=1,\ldots,n\}$、$\{m_{2j}:j=1,\ldots,n\}$ 和
+$\{m_j:j=1,\ldots,n\}$。
+对于这样的阶梯函数 $h$，
+\[
+ \begin{aligned}
+ A_F(h-Fh)(O_i)={}&\sum_j\{\bar F_1(m_{1j}\mid O_i)-\bar F_1(m_{1j})\}
+ h(dm_{j1},0)\\
+ &+\sum_j\{\bar F_2(m_{2j}\mid O_i)-\bar F_2(m_{2j})\}h(0,dm_{2j})\\
+ &+\sum_j\{\bar F(m_j\mid O_i)-\bar F(m_j)\}h(dm_j).
+ \end{aligned}
+\]
+
+这给出了 $h_{n,M}^*$ 作为有限维线性回归最小二乘估计量的表示。令
+$\beta_{1j}=h(dm_{1j},0)$、$\beta_{2j}=h(0,dm_{2j})$、
+$\beta_j=h(dm_j)$，
+并令 $\beta=(\beta_{1j},\beta_{2j},\beta_j:j=1,\ldots,n)$ 为包含所有这些分量的向量。此外，令
+$X_i=(X_{1i}(j),X_{2i}(j),X_i(j):j=1,\ldots,n)$，其中
+\[
+ \begin{aligned}
+ X_{1i}(j)&=\bar F_1(m_{1j}\mid O_i)-\bar F_1(m_{1j}),\\
+ X_{2i}(j)&=\bar F_2(m_{2j}\mid O_i)-\bar F_2(m_{2j}),\\
+ X_i(j)&=\bar F(m_j\mid O_i)-\bar F(m_j).
+ \end{aligned}
+\]
+令 $\|\beta\|_1=\sum_{j=1}^n|\beta_{1j}|+|\beta_{2j}|+|\beta_j|$，
+为系数向量 $\beta$ 的 $L_1$ 范数。现在可以把 $A_F(h-Fh)$ 表示为线性回归模型：
+\[
+ \begin{aligned}
+ A_F(h-Fh)(O_i)={}&\sum_j\beta_{1j}
+ \{\bar F_1(m_{1j}\mid O_i)-\bar F_1(m_{1j})\}\\
+ &+\sum_j\beta_{2j}
+ \{\bar F_2(m_{2j}\mid O_i)-\bar F_2(m_{2j})\}\\
+ &+\sum_j\beta_j\{\bar F(m_j\mid O_i)-\bar F(m_j)\}\\
+ \equiv{}&\beta^\top X_i,
+ \end{aligned}
+\]
+而 $h$ 的变差范数由 $\|\beta\|_1$ 定义。
+
+对于给定 $M$，定义受约束的最小二乘回归估计量
+\[
+ \beta_{n,M}=\argmin_{\beta,\|\beta\|_1<M}\frac1n\sum_{i=1}^n
+ \{D(F,G)(O_i)-\beta^\top X_i\}^2.
+\]
+这是一个标准的 Lasso 最小二乘回归估计量，$L_1$ 约束设为 $M$。令 $M_n$ 为 $M$ 的交叉验证选择器，并定义 $\beta_n=\beta_{n,M_n}$。那么，有效影响曲线 $D^*(P)$ 的估计量为
+% 首个系数后原书遗漏左括号，且使用 O_i/X_i；依印刷式保留。
+\[
+ \begin{aligned}
+ D_n^*(P)(O)&=\beta_n^\top X_i\\
+ &=\sum_{j=1}^n\beta_{1nj}\bar F_1(m_{1j}\mid O_i)-\bar F_1(m_{1j}))\\
+ &\quad+\sum_j\beta_{2nj}\{\bar F_2(m_{2j}\mid O_i)-\bar F_2(m_{2j})\}\\
+ &\quad+\sum_j\beta_{nj}\{\bar F(m_j\mid O_i)-\bar F(m_j)\}.
+ \end{aligned}
+\]
+根据我们的理论结果，估计量 $D_n^*(P)$ 在 $L^2(P)$ 范数下，以快于 $n^{-1/4}$ 的速率收敛到 $D^*(P)$。

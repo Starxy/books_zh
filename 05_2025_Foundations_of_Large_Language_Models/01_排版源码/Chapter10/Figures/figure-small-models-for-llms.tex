@@ -1,0 +1,218 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.9cm}
+
+\tikzstyle{snode} = [minimum width=1.7cm,minimum height=0.8cm,inner sep=2pt,draw,thick,fill=white]
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=1.5cm,inner sep=2pt,draw,thick,fill=white]
+\tikzstyle{cnode} = [minimum width=0.2cm,minimum height=0.2cm,inner sep=2pt,rounded corners=0.2mm]
+\tikzstyle{dnode} = [minimum width=2.5cm,minimum height=0.7cm,inner sep=2pt,draw]
+\tikzstyle{xnode} = [minimum width=1.4cm,minimum height=0.3cm,rounded corners=0.1mm,inner sep=1pt]
+
+%%% fine-tuning an LLM with a small model (synthetic data)
+\begin{scope}
+
+\node [lnode,anchor=west,drop shadow,draw=blue] (llm) at (0,0) {大模型};
+\node [xnode,anchor=north west,fill=gray!80] (inputx) at ([yshift=-0.2cm]llm.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\node [xnode,anchor=south east,fill=gray!80] (outputy) at ([yshift=0.2cm]llm.north east) {\color{white} \tiny{$\hat{\mathbf{y}}$}};
+
+\draw [->] ([yshift=0.01cm]inputx.north) -- ([yshift=0.17cm]inputx.north);
+\draw [<-] ([yshift=-0.01cm]outputy.south) -- ([yshift=-0.17cm]outputy.south);
+
+\node [anchor=south] (loss) at (outputy.north) {\tiny{计算损失并训练}};
+
+\node [dnode,anchor=south east] (data) at ([xshift=-0.8cm]llm.south west) {};
+\node [anchor=west,fill=white,draw,inner sep=3pt,rounded corners=1mm] (datalabel) at ([xshift=-0.1cm,yshift=-0.1cm]data.north west) {\tiny{数据集}};
+\node [anchor=west] (arrow) at (data.east) {$\Longrightarrow$};
+
+\node [cnode,fill=gray] (data1s) at ([yshift=-0.2cm,xshift=-0.2cm]data.north) {};
+\node [cnode,anchor=west,fill=gray] (data1l) at ([xshift=0.05cm]data1s.east) {};
+\node [anchor=north] (data1slabel) at ([yshift=0.05cm]data1s.south) {\tiny{$\mathbf{x}$}};
+\node [anchor=north] (data1llabel) at ([yshift=0.1cm]data1l.south) {\tiny{$\hat{\mathbf{y}}$}};
+
+\node [cnode,anchor=east,fill=gray] (data2s) at ([yshift=-0.1cm,xshift=-0.6cm]data.east) {};
+\node [cnode,anchor=west,fill=gray] (data2l) at ([xshift=0.05cm]data2s.east) {};
+
+\node [cnode,anchor=south west,fill=gray] (data3s) at ([yshift=0.1cm,xshift=0.1cm]data.south west) {};
+\node [cnode,anchor=west,fill=gray] (data3l) at ([xshift=0.05cm]data3s.east) {};
+
+\node [snode,anchor=south,drop shadow,draw=red] (slm) at ([yshift=0.8cm]data.north) {\scriptsize{小模型}};
+
+\draw [->] ([yshift=1pt]data1s.north) -- ([yshift=0.83cm]data1s.north) node [pos=0.5,left] {\tiny{输入}};
+\draw [<-] ([yshift=1pt]data1l.north) -- ([yshift=0.83cm]data1l.north) node [pos=0.5,right] {\tiny{预测}};
+
+\node [inner sep=0.5pt,draw,thin,dotted] [fit = (data1l)] {};
+
+\node [anchor=north] (caption) at ([yshift=-0.8cm]llm.south west) {\footnotesize{(a) 在小模型生成的数据上微调}};
+\node [anchor=north west] (caption2) at ([yshift=0.15cm]caption.south west) {\footnotesize{\hspace{1em} （弱到强泛化）}};
+
+\end{scope}
+
+%%% fine-tuning an LLM with a small model (loss)
+\begin{scope}[xshift=7.2cm]
+
+\node [lnode,anchor=west,drop shadow,draw=blue] (llm) at (0,0) {大模型};
+\node [xnode,anchor=north west,fill=gray!80] (inputx) at ([yshift=-0.2cm]llm.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\node [xnode,anchor=south east,fill=gray!80] (outputy) at ([yshift=0.2cm]llm.north east) {\color{white} \tiny{$\mathbf{y}$}};
+
+\draw [->] ([yshift=0.01cm]inputx.north) -- ([yshift=0.17cm]inputx.north);
+\draw [<-] ([yshift=-0.01cm]outputy.south) -- ([yshift=-0.17cm]outputy.south);
+
+\node [anchor=south] (loss) at (outputy.north) {\tiny{计算损失并训练}};
+
+\node [dnode,anchor=south east] (data) at ([xshift=-0.8cm]llm.south west) {};
+\node [anchor=west,fill=white,draw,inner sep=3pt,rounded corners=1mm] (datalabel) at ([xshift=-0.1cm,yshift=-0.1cm]data.north west) {\tiny{数据集}};
+\node [anchor=west] (arrow) at (data.east) {$\Longrightarrow$};
+
+\node [cnode,fill=gray] (data1s) at ([yshift=-0.2cm,xshift=-0.2cm]data.north) {};
+\node [cnode,anchor=west,fill=gray] (data1l) at ([xshift=0.05cm]data1s.east) {};
+\node [anchor=north] (data1slabel) at ([yshift=0.05cm]data1s.south) {\tiny{$\mathbf{x}$}};
+\node [anchor=north] (data1llabel) at ([yshift=0.05cm]data1l.south) {\tiny{$\mathbf{y}$}};
+
+\node [cnode,anchor=east,fill=gray] (data2s) at ([yshift=-0.1cm,xshift=-0.6cm]data.east) {};
+\node [cnode,anchor=west,fill=gray] (data2l) at ([xshift=0.05cm]data2s.east) {};
+
+\node [cnode,anchor=south west,fill=gray] (data3s) at ([yshift=0.1cm,xshift=0.1cm]data.south west) {};
+\node [cnode,anchor=west,fill=gray] (data3l) at ([xshift=0.05cm]data3s.east) {};
+
+\node [snode,anchor=south,drop shadow,draw=red] (slm) at ([yshift=1.5cm,xshift=0.4cm]data.north) {\scriptsize{小模型}};
+\draw [->] ([xshift=0.1cm]slm.east) -- ([xshift=2.5cm]slm.east) node [pos=0.5,above] {\scriptsize{KD 损失}} -- ([xshift=2.5cm,yshift=-0.2cm]slm.east);
+
+\node [anchor=south] (loss1) at ([yshift=0.8cm]outputy.north) {\scriptsize{语言建模损失}};
+\draw [->] (loss1.south) -- ([yshift=-0.42cm]loss1.south);
+
+\node [anchor=north] (caption) at ([yshift=-0.8cm]llm.south west) {\footnotesize{(b) 加入小模型的 KD 损失微调}};
+\node [anchor=north west] (caption2) at ([yshift=0.15cm]caption.south west) {\footnotesize{\hspace{1em} （弱到强泛化）}};
+
+\end{scope}
+
+%%% using the small to select or filter data
+\begin{scope}[yshift=-5.8cm]
+
+\node [lnode,anchor=west,drop shadow,draw=blue] (llm) at (0,0) {大模型};
+\node [xnode,anchor=north west,fill=gray!80] (inputx) at ([yshift=-0.2cm]llm.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\node [xnode,anchor=south east,fill=gray!80] (outputy) at ([yshift=0.2cm]llm.north east) {\color{white} \tiny{$\mathbf{y}$}};
+
+\draw [->] ([yshift=0.01cm]inputx.north) -- ([yshift=0.17cm]inputx.north);
+\draw [<-] ([yshift=-0.01cm]outputy.south) -- ([yshift=-0.17cm]outputy.south);
+
+\node [anchor=south] (loss) at (outputy.north) {\tiny{计算损失并训练}};
+
+\node [dnode,anchor=south east] (data) at ([xshift=-0.8cm]llm.south west) {};
+\node [anchor=west,fill=white,draw,inner sep=3pt,rounded corners=1mm] (datalabel) at ([xshift=-0.1cm,yshift=-0.1cm]data.north west) {\tiny{数据集}};
+\node [anchor=west] (arrow) at (data.east) {$\Longrightarrow$};
+
+\node [cnode,fill=gray] (data1s) at ([yshift=-0.2cm,xshift=-0.2cm]data.north) {};
+\node [cnode,anchor=west,fill=gray] (data1l) at ([xshift=0.05cm]data1s.east) {};
+\node [anchor=north] (data1slabel) at ([yshift=0.05cm]data1s.south) {\tiny{$\mathbf{x}$}};
+\node [anchor=north] (data1llabel) at ([yshift=0.05cm]data1l.south) {\tiny{$\mathbf{y}$}};
+
+\node [cnode,anchor=east,fill=gray] (data2s) at ([yshift=-0.1cm,xshift=-0.6cm]data.east) {};
+\node [cnode,anchor=west,fill=gray] (data2l) at ([xshift=0.05cm]data2s.east) {};
+
+\node [cnode,anchor=south west,fill=gray] (data3s) at ([yshift=0.1cm,xshift=0.1cm]data.south west) {};
+\node [cnode,anchor=west,fill=gray] (data3l) at ([xshift=0.05cm]data3s.east) {};
+
+\node [dnode,anchor=south west] (datav2) at ([yshift=2cm]data.north west) {};
+\node [anchor=west,fill=white,draw,inner sep=3pt,rounded corners=1mm] (datav2label) at ([xshift=-0.1cm,yshift=-0.1cm]datav2.north west) {\tiny{数据集}};
+
+\node [cnode,fill=gray] (datav21s) at ([yshift=-0.2cm,xshift=-0.2cm]datav2.north) {};
+\node [cnode,anchor=west,fill=gray] (datav21l) at ([xshift=0.05cm]datav21s.east) {};
+
+\node [cnode,anchor=east,fill=gray] (datav22s) at ([yshift=-0.1cm,xshift=-0.6cm]datav2.east) {};
+\node [cnode,anchor=west,fill=gray] (datav22l) at ([xshift=0.05cm]datav22s.east) {};
+
+\node [cnode,anchor=south west,fill=gray] (datav23s) at ([yshift=0.1cm,xshift=0.1cm]datav2.south west) {};
+\node [cnode,anchor=west,fill=gray] (datav23l) at ([xshift=0.05cm]datav23s.east) {};
+
+\node [cnode,anchor=north,fill=gray] (datav24s) at ([yshift=-0.13cm,xshift=-0.2cm]datav21s.south) {};
+\node [cnode,anchor=west,fill=gray] (datav24l) at ([xshift=0.05cm]datav24s.east) {};
+
+\node [cnode,anchor=north east,fill=gray] (datav25s) at ([yshift=-0.08cm,xshift=-0.4cm]datav2.north east) {};
+\node [cnode,anchor=west,fill=gray] (datav25l) at ([xshift=0.05cm]datav25s.east) {};
+
+\draw [-] ([xshift=-1pt,yshift=1pt]datav24s.north west) -- ([xshift=1pt,yshift=-1pt]datav24l.south east);
+\draw [-] ([xshift=-1pt,yshift=-1pt]datav24s.south west) -- ([xshift=1pt,yshift=1pt]datav24l.north east);
+
+\draw [-] ([xshift=-1pt,yshift=1pt]datav25s.north west) -- ([xshift=1pt,yshift=-1pt]datav25l.south east);
+\draw [-] ([xshift=-1pt,yshift=-1pt]datav25s.south west) -- ([xshift=1pt,yshift=1pt]datav25l.north east);
+
+\node [snode,anchor=south,drop shadow,draw=red] (slm) at ([yshift=0.6cm,xshift=-0.4cm]data.north) {\scriptsize{小模型}};
+
+\draw [->,thick] ([xshift=0.8cm,yshift=-1pt]datav2.south) -- ([xshift=0.8cm,yshift=1pt]data.north) node [pos=0.5,right,align=left] {\tiny{数据} \\[-0.2cm] \tiny{选择}};
+
+\node [anchor=north] (caption) at ([yshift=-0.8cm]llm.south west) {\footnotesize{(c) 用小模型选择数据}};
+
+\end{scope}
+
+%%% model ensemble
+\begin{scope}[xshift=7.2cm,yshift=-5.8cm]
+
+\node [snode,anchor=south,drop shadow,draw=red] (slm2) at (0,-0.1cm) {\tiny{小模型 2}};
+\node [snode,anchor=east,drop shadow,draw=red] (slm1) at ([xshift=-0.3cm]slm2.west) {\tiny{小模型 1}};
+\node [snode,anchor=west,drop shadow,draw=red] (slm3) at ([xshift=0.3cm]slm2.east) {\tiny{小模型 3}};
+
+\node [xnode,minimum width=0.9cm,anchor=north west,fill=gray!80] (inputx1) at ([yshift=-0.3cm]slm1.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\draw [->] ([yshift=0.01cm]inputx1.north) -- ([yshift=0.27cm]inputx1.north);
+\draw [->] ([xshift=-0.5cm,yshift=1pt]slm1.north east) -- ([xshift=-0.5cm,yshift=0.2cm]slm1.north east);
+
+\node [xnode,minimum width=0.9cm,anchor=north west,fill=gray!80] (inputx2) at ([yshift=-0.3cm]slm2.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\draw [->] ([yshift=0.01cm]inputx2.north) -- ([yshift=0.27cm]inputx2.north);
+\draw [->] ([xshift=-0.5cm,yshift=1pt]slm2.north east) -- ([xshift=-0.5cm,yshift=0.2cm]slm2.north east);
+
+\node [xnode,minimum width=0.9cm,anchor=north west,fill=gray!80] (inputx3) at ([yshift=-0.3cm]slm3.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\draw [->] ([yshift=0.01cm]inputx3.north) -- ([yshift=0.27cm]inputx3.north);
+\draw [->] ([xshift=-0.5cm,yshift=1pt]slm3.north east) -- ([xshift=-0.5cm,yshift=0.2cm]slm3.north east);
+
+\node [anchor=south,minimum width=5.75cm,minimum height=0.5cm,draw,thick,inner sep=2pt] (ensemble) at ([yshift=0.22cm]slm2.north) {\scriptsize{组合模型}};
+
+\node [xnode,minimum width=2.5cm,anchor=south,fill=gray!80] (outputy) at ([yshift=0.4cm]ensemble.north) {\color{white} \tiny{$\mathbf{y}$}};
+\draw [->] ([yshift=1pt]ensemble.north) -- ([yshift=-1pt]outputy.south);
+
+\begin{pgfonlayer}{background}
+\node [draw=blue,dotted,thick,inner sep=5pt]  [fit = (slm1) (slm3) (ensemble)] (llm) {};
+\end{pgfonlayer}
+
+\node [anchor=north] (caption) at ([yshift=-1.45cm]slm2.south) {\footnotesize{(d) 多个小模型的集成}};
+
+\end{scope}
+
+%%% cascading
+\begin{scope}[yshift=-11.6cm,xshift=3.5cm]
+
+\node [lnode,anchor=west,drop shadow,draw=blue] (llm) at (0,0) {大模型};
+\node [xnode,anchor=north west,fill=gray!80] (inputx) at ([yshift=-0.2cm]llm.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\node [xnode,anchor=south east,fill=gray!80] (outputy) at ([yshift=0.2cm]llm.north east) {\color{white} \tiny{$\mathbf{y}_2$}};
+
+\draw [->] ([yshift=0.01cm]inputx.north) -- ([yshift=0.17cm]inputx.north);
+\draw [<-] ([yshift=-0.01cm]outputy.south) -- ([yshift=-0.17cm]outputy.south);
+
+\node [snode,anchor=east,drop shadow,draw=red] (slm) at ([xshift=-0.9cm]llm.west) {\scriptsize{小模型}};
+
+
+\node [anchor=north] (caption) at ([yshift=-0.8cm]llm.south west) {\footnotesize{(e) 级联（推理阶段）}};
+
+\node [xnode,minimum width=0.8cm,anchor=north west,fill=gray!80] (inputx2) at ([yshift=-0.2cm]slm.south west) {\color{white} \tiny{$\mathbf{x}$}};
+\node [xnode,minimum width=0.8cm,anchor=south east,fill=gray!80] (outputy2) at ([yshift=0.2cm]slm.north east) {\color{white} \tiny{$\mathbf{y}_1$}};
+
+\draw [->] ([yshift=0.01cm]inputx2.north) -- ([yshift=0.17cm]inputx2.north);
+\draw [<-] ([yshift=-0.01cm]outputy2.south) -- ([yshift=-0.17cm]outputy2.south);
+
+\node [anchor=south west] (llmlabel) at ([yshift=0.6cm,xshift=-0.1cm]llm.north west) {\small{步骤 2}};
+\node [anchor=north west] (llmlabel2) at ([yshift=0.2cm]llmlabel.south west) {\tiny{（成本高）}};
+\node [anchor=east] (slmlabel) at ([xshift=-1.5cm]llmlabel.west) {\small{步骤 1}};
+\node [anchor=north west] (slmlabel2) at ([yshift=0.2cm]slmlabel.south west) {\tiny{（成本低）}};
+
+\draw [-,dashed] ([xshift=-0.3cm,yshift=-0.1cm]llmlabel.north west) -- ([xshift=-0.3cm,yshift=-3.5cm]llmlabel.north west);
+
+\draw [<-,thick] ([yshift=1pt]llmlabel.north) .. controls +(north:2em) and +(north:2em) .. ([yshift=1pt]slmlabel.north) node [pos=0.5,above] {\scriptsize{若步骤 1 结果不理想，则进入步骤 2}};
+
+\end{scope}
+
+
+
+\end{tikzpicture}
+\end{center}

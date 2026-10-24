@@ -1,0 +1,39 @@
+% 原书分章 PDF 第 15—16 页：引理 23.3 与定理 23.4 的完整证明。
+\noindent\textbf{第 23.4 节的证明。}在证明定理 23.4 之前，先给出下列引理。
+
+\begin{bookresult}{引理}{23.3}
+令 $P_0$ 和 $P$ 为满足正值性假设、且 $Y$ 依概率有界的分布。令 $d$ 为某个随机处理规则，$\tau$ 为某个实数。有
+$\Psi_d(P)-\Psi(P_0)=-\E_0[D(d,\tau_0,P)(O)]+R_0(d,P)$。
+\end{bookresult}
+
+\begin{proof}[证明（引理 23.3）]
+注意，
+\[
+\begin{aligned}
+ &\Psi_d(P)-\Psi(P_0)+\E_0[D(d,\tau_0,P)(O)]\\
+ &\quad=\Psi_d(P)-\Psi_d(P_0)+\sum_{j=1}^2\E_{P_U\times P_0}[D_j(d(U,\cdot),P)(O)]\\
+ &\qquad+\Psi_d(P_0)-\Psi_{d_0}(P_0)-\tau_0\E_{P_U\times P_0}[d(U,W)-\kappa].
+\end{aligned}
+\]
+标准计算表明，右侧第一项等于 $R_{10}(d,P)$（van der Laan 与 Robins，2003）。如果 $\tau_0>0$，那么式 (23.4) 表明
+$\tau_0\E_{P_U\times P_0}[d-\kappa]=\tau_0\E_{P_U\times P_0}[d-d_0]$。
+如果 $\tau_0=0$，显然也有
+$\tau_0\E_{P_U\times P_0}[d-\kappa]=\tau_0\E_{P_U\times P_0}[d-d_0]$。
+引理 23.2 表明，$\Psi_d(P_0)-\Psi_{d_0}(P_0)=\E_{P_U\times P_0}[(d-d_0)\bar Q_{b,0}]$。
+因此，上式第二行等于 $R_{20}(d)$。
+\end{proof}
+
+\begin{proof}[证明（定理 23.4）]
+本证明采用经验过程理论的记号：对于分布 $P$ 与函数 $f$，有 $Pf=\E_P[f(O)]$。于是，
+\[
+\begin{aligned}
+ &\hat\Psi(P_n)-\Psi(P_0)\\
+ &\quad=-P_0D(d_n,\tau_0,P_n^*)+R_0(d_n,P_n^*)
+ \qquad\text{（由引理 23.3）}\\
+ &\quad=(P_n-P_0)D(d_n,\tau_0,P_n^*)+R_0(d_n,P_n^*)+o_{P_0}(n^{-1/2})\\
+ &\hspace{23em}\text{（由条件 23.4）}\\
+ &\quad=(P_n-P_0)D_0+(P_n-P_0)(D(d_n,\tau_0,P_n^*)-D_0)+R_0(d_n,P_n^*).
+\end{aligned}
+\]
+由 23.4、23.4、23.4 和 23.4，最后一行的中间项为 $o_{P_0}(n^{-1/2})$（van der Vaart 与 Wellner，1996）；由 23.4，第三项为 $o_{P_0}(n^{-1/2})$。这就得到了渐近线性结果。当条件 23.3、23.3、23.3 和 23.4 成立时，Bickel 等（1997b）第 3.3 节的命题 1 给出关于正则性和渐近有效性的结论（见定理 23.3）。
+\end{proof}

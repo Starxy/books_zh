@@ -1,0 +1,218 @@
+% 原书PDF第33页7.1.4.5.4至第38页7.1.4.5.5标题前。
+\bookdeepheading{paragraph}{7.1.4.5.4}{核化迹方法}
+上一节研究了用于因果推断的线性迹方法。但在实践中，$X$ 与 $Y$ 之间的关系可能是非线性的。若将线性迹方法用于具有非线性关系的数据，可能得到错误的因果结论。Chen et al. (2013) 将线性迹方法推广为用于非线性因果发现的核化迹方法。本节介绍这一推广。
+
+\bookdeepheading{subparagraph}{7.1.4.5.4.1}{问题的表述}
+假设将数据从原空间映射到高维特征空间：
+\[
+\Psi:x\in\chi\mapsto\Psi(x)\in\mathcal H,
+\]
+其中特征空间中的内积由核函数 $k(x,x')$ 定义为
+\[
+\langle\Psi(x),\Psi(x')\rangle=k(x,x').
+\]
+假设 $\{\psi_1(x),\ldots,\psi_{n_H}(x)\}$ 构成一组正交归一基函数。令 $f_i(x)\in\mathcal H$ 为非线性函数，则 $f_i(x)$ 可以按基函数 $\psi_j(x)$ 展开为
+\begin{equation}
+f_i(x)=\sum_{j=1}^{n_H}a_{ij}\psi_j(x).
+\tag{7.134}
+\end{equation}
+令
+\[
+\begin{gathered}
+y=\begin{bmatrix}y_1\\\vdots\\y_m\end{bmatrix}
+=\begin{bmatrix}f_1(x)\\\vdots\\f_m(x)\end{bmatrix}=f(x),\qquad
+\Psi(x)=\begin{bmatrix}\psi_1(x)\\\psi_{n_H}(x)\end{bmatrix},\\
+A=\begin{bmatrix}a_{11}&\cdots&a_{1n_H}\\\vdots&\vdots&\vdots\\a_{m1}&\cdots&a_{mn_H}\end{bmatrix}.
+\end{gathered}
+\]
+由式 (7.134) 得
+\begin{equation}
+y=A\Psi(x).
+\tag{7.135}
+\end{equation}
+假设抽取了 $L$ 个点，定义
+\[
+Y=\begin{bmatrix}y_{11}&\cdots&y_{1L}\\\vdots&\vdots&\vdots\\y_{m1}&\cdots&y_{mL}\end{bmatrix},\qquad
+\Psi=\begin{bmatrix}\psi_1(x_1)&\cdots&\psi_1(x_L)\\\vdots&\vdots&\vdots\\\psi_{n_H}(x)^1&\cdots&\psi_{n_H}(x_L)\end{bmatrix}.
+\]
+则输出数据矩阵 $Y$ 可表示为
+\begin{equation}
+Y=A\Psi.
+\tag{7.136}
+\end{equation}
+$\Psi(x)$ 的协方差矩阵 $\Sigma_{\Psi(x)}$ 可估计为
+\begin{equation}
+\Sigma_{\Psi(x)}=\frac1N\Psi\Psi^T.
+\tag{7.137}
+\end{equation}
+定义 $X$ 的核Gram矩阵为
+\[
+K_x=\begin{bmatrix}
+k(x_1,x_1)&\cdots&k(x_1,x_L)\\\vdots&\vdots&\vdots\\k(x_L,x_1)&\cdots&k(x_L,x_L)
+\end{bmatrix}=\Psi^T\Psi.
+\]
+现在考虑特征空间中的变量，并希望评估 $\Psi$ 与 $Y$ 之间的因果关系。由线性迹方法，可以定义
+\begin{equation}
+\Delta_{\Psi(x)\to Y}=\log\frac{\tau_m(A\Sigma_{\Psi(x)}A^T)}{\tau_m(AA^T)\tau_L(\Sigma_{\Psi(x)})}.
+\tag{7.138}
+\end{equation}
+类似地，考虑展开式
+\begin{equation}
+x_i=g_i(x)=\sum_{j=1}^{n_y}b_{ij}\phi_j(y).
+\tag{7.139}
+\end{equation}
+令
+\[
+\begin{gathered}
+X=\begin{bmatrix}x_{11}&\cdots&x_{1L}\\\vdots&\vdots&\vdots\\x_{n1}&\cdots&x_{nL}\end{bmatrix},\qquad
+B=\begin{bmatrix}b_{11}&\cdots&b_{1n_y}\\\vdots&\vdots&\vdots\\b_{n1}&\cdots&b_{nn_y}\end{bmatrix},\\
+\Phi=\begin{bmatrix}\phi_1(y_1)&\cdots&\phi_1(y_L)\\\vdots&\vdots&\vdots\\\phi_{n_y}(y_1)&\cdots&\phi_{n_y}(y_L)\end{bmatrix}.
+\end{gathered}
+\]
+于是有
+\begin{equation}
+X=B\Phi.
+\tag{7.140}
+\end{equation}
+同样，$\Phi(y)$ 的协方差矩阵 $\Sigma_{\Phi(y)}$ 可估计为
+\begin{equation}
+\Sigma_{\Phi(y)}=\frac1N\Phi\Phi^T.
+\tag{7.141}
+\end{equation}
+定义 $Y$ 的核Gram矩阵为
+\[
+K_y=\begin{bmatrix}k(y_1,y_1)&\cdots&k(y_1,y_L)\\\vdots&\vdots&\vdots\\k(y_L,y_1)&\cdots&k(y_L,y_L)\end{bmatrix}=\Phi^T\Phi.
+\]
+现在定义 $\Delta_{\Phi(y)\to x}$ 为
+\begin{equation}
+\Delta_{\Phi(y)\to x}=\log\frac{\tau_n(B\Sigma_{\Phi(y)}B^T)}{\tau_n(BB^T)\tau_L(\Sigma_{\Phi(y)})}.
+\tag{7.142}
+\end{equation}
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.21：核化迹方法}\label{ch07a-result-kernel}\par
+若 $X\to Y$，则
+\begin{equation}
+\Delta_{\Psi(x)\to Y}=\log\frac{\tau_m(A\Sigma_{\Psi(x)}A^T)}{\tau_m(AA^T)\tau_L(\Sigma_{\Psi(x)})}\approx0
+\tag{7.143}
+\end{equation}
+且
+\begin{equation}
+\Delta_{\Phi(y)\to x}=\log\frac{\tau_n(B\Sigma_{\Phi(y)}B^T)}{\tau_n(BB^T)\tau_L(\Sigma_{\Phi(y)})}<0.
+\tag{7.144}
+\end{equation}
+
+\bookdeepheading{subparagraph}{7.1.4.5.4.2}{参数的估计}
+利用式 (7.128) 和 (7.129) 发现因果关系时，需要估计矩阵 $A$ 和 $B$，以实现核化迹方法。假设矩阵 $A$ 可以表示为
+\begin{equation}
+A=R\Psi^T,
+\tag{7.145}
+\end{equation}
+其中矩阵 $R$ 待估计。将式 (7.145) 代入式 (7.136)，可以将 $A$ 重新表示为
+\begin{equation}
+Y=R\Psi^T\Psi=RK_x.
+\tag{7.146}
+\end{equation}
+因此，可以通过最小化下列正则化损失估计 $R$：
+\begin{equation}
+F=\Tr\bigl((Y-RK_x)^T(Y-RK_x)\bigr)+\frac\lambda2\Tr(RK_xR^T).
+\tag{7.147}
+\end{equation}
+利用矩阵求导公式，令 $\frac{\partial F}{\partial R}=0$，得到
+\begin{equation}
+\frac{\partial F}{\partial R}=-(Y-RK_x)K_x^T+\lambda RK_x^T=0.
+\tag{7.148}
+\end{equation}
+由式 (7.148) 解出 $R$ 为
+\begin{equation}
+R=Y(K_x+\lambda I)^{-1}.
+\tag{7.149}
+\end{equation}
+将式 (7.149) 代入式 (7.145)，得到
+\begin{equation}
+A=Y(K_x+\lambda I)^{-1}\Psi^T.
+\tag{7.150}
+\end{equation}
+通过类似论证，有
+\begin{equation}
+\tau_m(AA^T)=\tau_m(K_xR^TR),
+\tag{7.151}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\tau_m(A\Sigma_{\Psi(x)}A^T)&=\frac1N\tau_m(A\Psi\Psi^TA^T)\\
+&=\frac1N\tau_m(R\Psi^T\Psi\Psi^T\Psi R^T)\\
+&=\frac1N\tau_m(RK_x^2R^T)\\
+&=\frac1N\tau_m(K_x^2R^TR),
+\end{aligned}
+\tag{7.152}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\tau_L(\Sigma_{\Psi(x)})&=\tau_L(\Sigma_{\Psi(x)})\\
+&=\frac1N\tau_L(\Psi\Psi^T)\\
+&=\frac1N\tau_L(\Psi^T\Psi).\\
+&=\frac1N\tau_L(K_x).
+\end{aligned}
+\tag{7.153}
+\end{equation}
+因此有
+\begin{equation}
+\Delta_{\Psi(x)\to Y}=\log\frac{\tau_m(K_x^2R^TR)}{\tau_m(K_xR^TR)\tau_L(K_x)}.
+\tag{7.154}
+\end{equation}
+类似地，有
+\begin{equation}
+X=B\Phi,
+\tag{7.155}
+\end{equation}
+\begin{equation}
+B=Q\Phi^T,
+\tag{7.156}
+\end{equation}
+以及
+\begin{equation}
+X=QK_y.
+\tag{7.157}
+\end{equation}
+求解下列优化问题：
+\[
+F=\Tr(X-QK_y)^T(X-QK_y)+\frac\lambda2\Tr(QK_yQ^T)
+\]
+得到
+\[
+Q=X(K_y+\lambda I)^{-1},
+\]
+\begin{equation}
+\Delta_{\Phi(y)\to x}=\log\frac{\tau_n(K_y^2Q^TQ)}{\tau_n(K_yQ^TQ)\tau_L(K_y)}<0.
+\tag{7.158}
+\end{equation}
+现在将实现核化迹方法的算法汇总为结论7.21。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.21：核化迹方法的算法}\label{ch07a-result-kernel-algorithm}\par
+\noindent\textbf{步骤1：}选择核函数，计算 $K_x$ 和 $K_y$。选择惩罚参数 $\lambda$。
+
+\noindent\textbf{步骤2：}计算 $R=Y(K_x+\lambda I)^{-1}$ 与 $Q=X(K_y+\lambda I)^{-1}$。
+
+\noindent\textbf{步骤3：}计算
+\[
+\Delta_{\Psi(x)\to Y}=\log\frac{\tau_m(K_x^2R^TR)}{\tau_m(K_xR^TR)\tau_L(K_x)}
+\]
+和
+\[
+\Delta_{\Phi(y)\to x}=\log\frac{\tau_n(K_y^2Q^TQ)}{\tau_n(K_yQ^TQ)\tau_L(K_y)}.
+\]
+\noindent\textbf{步骤5：}若 $|\Delta_{\Phi(y)\to X}|>(1+\varepsilon)|\Delta_{\Psi(x)\to Y}|$，则
+\[
+X\to Y.
+\]
+否则：
+\begin{quote}
+若 $|\Delta_{\Psi(X)\to Y}|>(1+\varepsilon)|\Delta_{\Phi(y)\to X}|$，则
+\[
+Y\to X.
+\]
+否则：没有因果关系，然后检验关联。
+
+结束条件判断。
+\end{quote}
+结束条件判断。

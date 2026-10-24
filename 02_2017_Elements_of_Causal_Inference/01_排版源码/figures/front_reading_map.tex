@@ -1,0 +1,26 @@
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ book/.style={draw=gray,rounded corners=5pt,align=center,minimum height=1.5cm,text width=2.7cm,font=\small},
+ flow/.style={->,draw=gray,line width=1pt}]
+\node[font=\bfseries] at (0,1.8) {导论};
+\node[font=\bfseries] at (4.65,1.8) {二元模型};
+\node[font=\bfseries] at (10.85,1.8) {多元模型};
+\node[book] (fr1) at (0,0) {第 1 章\\统计模型与因果模型};
+\node[book] (fr3) at (4.65,0) {第 3 章\\原因—结果模型};
+\node[book] (fr6) at (10.85,0) {第 6 章\\多元因果模型};
+\node[font=\footnotesize] at (6.2,2.7) {建议从第一行的任一章开始阅读};
+\draw[dashed,gray] (-1.4,-1.25)--(13.8,-1.25);
+\node[book] (fr2) at (0,-3) {第 2 章\\因果推断的假设};
+\node[book] (fr4) at (3.1,-3) {第 4 章\\学习原因—结果模型};
+\node[book] (fr5) at (6.2,-3) {第 5 章\\与机器学习的联系（一）};
+\node[book] (fr7) at (9.3,-3) {第 7 章\\学习多元因果模型};
+\node[book] (fr8) at (12.4,-3) {第 8 章\\与机器学习的联系（二）};
+\node[book] (fr9) at (7.75,-5.7) {第 9 章\\潜变量};
+\node[book] (fr10) at (10.85,-5.7) {第 10 章\\时间序列};
+\draw[flow] (fr1)--(fr2);
+\draw[flow] (fr3)--(fr4);
+\draw[flow] (fr3)--(fr5);
+\draw[flow] (fr6)--(fr7);
+\draw[flow] (fr6)--(fr8);
+\draw[flow] (fr7)--(fr9);
+\draw[flow] (fr7)--(fr10);
+\end{tikzpicture}

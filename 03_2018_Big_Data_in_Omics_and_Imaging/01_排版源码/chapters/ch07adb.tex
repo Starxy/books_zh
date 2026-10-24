@@ -1,0 +1,93 @@
+% 原分章PDF第50页7.1.5.4标题至第54页7.2标题前。
+\subsubsection{离散数据因果推断的加性噪声模型}
+本节介绍加性噪声模型方法（Shimizu et al. 2006；Peters et al. 2011），用于从离散数据中发现因果方向$X\to Y$或$Y\to X$。离散数据的加性噪声因果推断可应用于复杂疾病的全基因组因果研究；这类研究考察疾病变量与SNP基因型变量这两个离散变量之间的因果关系。
+
+\bookdeepheading{paragraph}{7.1.5.4.1}{整数模型}
+先考虑整数加性噪声模型：
+\begin{equation}
+Y=f(X)+N_1,\qquad N_1\perp X,\tag{7.192}
+\end{equation}
+其中$X$、$Y$是两个整数随机变量，$f:Z\to Z$将整数空间中的值映射到整数空间，$N_1$为取整数值且独立于假定原因$X$的加性噪声。式(7.192)称为从$X$到$Y$的正向加性噪声模型。还可以定义从$Y$到$X$的反向加性噪声模型：
+\begin{equation}
+X=g(Y)+N_2,\qquad N_2\perp Y,\tag{7.193}
+\end{equation}
+其中$g:Z\to Z$将整数空间中的值映射到整数空间，$N_2$为取整数值且独立于假定原因$Y$的加性噪声。
+
+正向和反向的两个加性噪声模型能否同时很好地拟合数据？这是利用加性噪声模型判断因果方向的基本问题。考虑一个平凡例子：$P(X=0)=1$、$f(0)=0$、$P(N_1=0)=1$、$P(Y=0)=1$、$g(0)=0$、$P(N_2=0)=1$。显然，这些分布同时满足两个方向的加性噪声模型(7.192)与(7.193)。不过，这种情形非常少见（Peters et al. 2011）。在大多数情况下，正向或反向的加性疾病模型之一能够拟合数据，但两个模型不能同时拟合数据。若两个模型都能拟合数据，就无法选择因果方向。图7.4中的联合分布只允许从$X$到$Y$的加性噪声模型（ANM），不允许从$Y$到$X$的模型；而图7.5中的联合分布允许从$X$到$Y$、从$Y$到$X$两个方向的ANM。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/ch07ad_fig04}
+\origfig{4}{联合分布允许$X\to Y$方向的ANM，但不允许$Y\to X$方向的ANM。}
+\end{figure}
+
+\bookdeepheading{paragraph}{7.1.5.4.2}{循环模型}
+先介绍取模运算与有限环$Z/mZ$。对整数$a$和$b$作除法，写为
+\[
+\frac ab=k\quad\text{余数为 }r.
+\]
+这里关心的是余数$r$，定义$r$为$a$模$b$的余数，记作$r=a\bmod b$。例如，$14\bmod3=2$。有限环$Z/mZ$定义为按$n$取模时所有可能余数的集合，即
+\[
+Z/mZ=\{Z\bmod m\}=\{0,1,\ldots,m-1\}.
+\]
+下面定义循环加性噪声模型（Peters et al. 2011）。设$X$和$Y$分别为$m$循环与$\widetilde m$循环随机变量，$f:Z/mZ\to Z/\widetilde m Z$为一个函数，$N$为$\widetilde m$循环噪声。定义从$X$到$Y$的加性噪声模型为
+\begin{equation}
+Y=f(X)+N,\qquad N\perp X,\tag{7.194}
+\end{equation}
+其中$N$独立于$X$，且$P(N=0)>P(N=j)$，$j\ne0$。若该模型可逆，则存在函数$g:Z/\widetilde m Z\to Z/mZ$以及$m$循环噪声$\widetilde N$，使得
+\begin{equation}
+X=g(Y)+\widetilde N,\qquad \widetilde N\perp Y.\tag{7.195}
+\end{equation}
+某些例子表明，联合分布可以允许正反两个方向的ANM。不过，在一般情形下，ANM是可识别的（Peters et al. 2011）。已有研究讨论了ANM可识别性的部分条件（Peters et al. 2011），但这些条件较为复杂，限于本书篇幅，此处不再介绍。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/ch07ad_fig05}
+\origfig{5}{联合分布允许两个方向的ANM。}
+\end{figure}
+
+\bookdeepheading{paragraph}{7.1.5.4.3}{离散变量ANM的统计检验}
+在实际应用中，利用离散变量ANM进行因果推断的关键问题，是建立相应的统计检验。Peters et al.（2011）提出了基于ANM进行因果推断的一般流程，现重述于结论7.25。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.25：利用ANM进行因果推断的一般流程}\par
+利用ANM进行因果推断的一般步骤如下。
+\begin{enumerate}[label=\textbf{步骤\arabic*.},leftmargin=4.8em]
+\item 输入$n$个数据样本$\{(x_1,y_1),\ldots,(x_n,y_n)\}$。
+\item 对正向模型$Y=f(X)+N$进行非线性回归，计算残差$\widehat N_i=y_i-f(x_i)$，$i=1,\ldots,n$。
+\item 对反向模型$X=g(Y)+\widetilde N$进行非线性回归，计算残差$\widehat{\widetilde N}_i=x_i-g(y_i)$，$i=1,\ldots,n$。
+\item 若残差$\widehat N$独立于$X$，而$\widetilde N$不独立于$Y$，则$X$导致$Y$（$X\to Y$）；若$\widehat N$不独立于$X$，而$\widetilde N$独立于$Y$，则$Y$导致$X$（$Y\to X$）。
+\item 若$\widehat N$独立于$X$且$\widetilde N$独立于$Y$，或$\widehat N$不独立于$X$且$\widetilde N$也不独立于$Y$，则无法作出判定，此时因果关系未知。
+\end{enumerate}
+
+要实施这些流程，需要发展离散变量的非线性回归统计方法，以及检验两个随机变量独立性的统计量（Peters et al. 2011）。先介绍离散变量的回归。目标是选取回归函数，使残差尽可能独立于回归变量（潜在原因），因此，可将残差与回归变量之间的依赖性度量作为回归的损失函数。对ANM $Y=f(X)+N$，将这一度量记为$\operatorname{DM}(\widehat N,X)$。令$\widehat P(X,Y)$为联合分布$P(X,Y)$的样本分布。下面给出基于距离相关的回归，它能够涵盖多元情形，也可视为Peters et al.（2011）论文中算法1的简单推广。在结论7.26中，将单变量ANM推广到多变量ANM，并假设$W$是$m$维变量向量、$Z$是$q$维变量向量。多变量ANM写为
+\[
+Z=F(W)+N,
+\]
+其中$Z=[Z_1,\ldots,Z_m]$，$W=[W_1,\ldots,W_q]$，$F(W)=[f_1(W),\ldots,f_m(W)]$，$N=[N_1,\ldots,N_m]$，并且$N$独立于$W$。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.26：采用距离相关依赖性度量的距离回归}\par
+\begin{enumerate}[label=\textbf{步骤\arabic*.},leftmargin=4.8em]
+\item 计算抽样分布$\widehat P(W,Z)$。
+\item 初始化：
+\[
+F^{(0)}(w^i)=\mathop{\arg\max}_{Z}\widehat P(W=w^i,Z=z),\quad t=0,
+\]
+其中$w^i=[w_1^i,\ldots,w_q^i]$。
+\item 重复：$t=t+1$；
+\item 对$i=1,\ldots,n$执行下述操作。
+\item 更新
+\[
+F^{(t)}(w^i)=\mathop{\arg\min}_{Z}\operatorname{DM}\bigl(w^i,Z-F^{(t-1)}(w^i)\bigr),
+\]
+结束循环。
+\item 直到$\|F^{(t)}-F^{(t)}\|_2<\varepsilon$或$t=T$，其中$\varepsilon$和$T$均预先给定。
+\end{enumerate}
+若考虑模型$Y=F(X)+N$，则令$Z=Y$、$W=X$；在反向模型$X=G(Y)+\widetilde N$中，令$Z=Y$、$W=Y$。在涉及至少一个变量向量的因果推断中，以距离相关作为$\operatorname{DM}$。若推断两个变量之间的因果结构，则采用Pearson $\chi^2$检验与Fisher精确检验（Peters et al. 2011），检验残差和回归变量（因果变量）之间的独立性，并以相应$P$值作为$\operatorname{DM}$。
+
+\begin{bookexample}{7.15}
+设$X$、$Y$分别为$m$循环和$\widetilde m$循环随机变量。考虑四种组合
+\[
+(m,\widetilde m)\in\{(4,4),(4,6),(6,4),(6,6)\},
+\]
+并模拟1000个不同模型。根据分布$P(X)$、$P(N)$和非常数函数$f$，总共抽取10,000个数据点。设显著性水平$\alpha=0.05$。采用循环模型的ANM拟合模拟数据，并以$\chi^2$检验所得的$P$值作为依赖性度量。结果汇总于表7.2；两个方向都无法拟合数据的ANM比例接近显著性水平$\alpha=0.05$。
+\end{bookexample}

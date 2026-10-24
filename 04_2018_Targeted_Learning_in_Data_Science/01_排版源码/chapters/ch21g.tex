@@ -1,0 +1,70 @@
+% 原书分章PDF第20—21页：21.5全部软件估计示例。
+\section{在 R 中估计网络相依数据的因果效应}
+
+定义了模拟网络数据及目标因果量的真实值（即金标准）之后，现在讨论如何在 R 中估计这类因果参数。具体而言，我们将使用 \texttt{tmlenet} R 包（Sofrygin 和 van der Laan，2015），该包实现了适用于网络相依数据的 TMLE。
+
+\paragraph{定义基于网络的汇总量。}
+首先使用函数 \texttt{def\_sW} 定义一些基线网络汇总量 $W_i^s$，下例展示这一做法。注意，这些汇总量将根据输入的网络数据自动求值。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+require("tmlenet")
+sW <-  def_sW(W1, W2, WNoise, corrW.F1, corrW.F2,
+  corrW.F3, corrW.F4, corrW.F5, HUB =
+  ifelse(nF >= 25, 1, 0))
+\end{lstlisting}
+\end{minipage}\par
+类似地，使用函数 \texttt{def\_sA} 定义一些“有效暴露”，即暴露的网络汇总量 $A_i^s$，如下例所示。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+sA <-  def_sA(A, nF.PA = sum(PA[[1:Kmax]]),
+ replaceNAw0 = TRUE) +
+ def_sA(A.PAeq0 = A * (PA == 0)) +
+ def_sA(nFPAeq0.PAeq1 = (nF.PA < 1) * (PA == 1)) +
+ def_sA(sum.netA = (sum(A[[1:Kmax]])*(HUB==0) +
+    sum((W1[[1:Kmax]] > 4)*A[[1:Kmax]])*(HUB==1)),
+  sum.netA.sum.netPA = sum.netA*nF.PA,
+  replaceNAw0 = TRUE)
+\end{lstlisting}
+\end{minipage}\par
+
+\paragraph{回归模型。}
+接下来，指定用于拟合条件有效暴露模型及条件结局模型的回归公式，如下所示。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+hform <- "A + sum.netA ~ HUB + PA + nF.PA +
+          nFPAeq0.PAeq1"
+Qforms <- "Y ~ nF.PA + A.PAeq0 + nFPAeq0.PAeq1 +
+               sum.netA + sum.netA.sum.netPA + PA +
+               W1 + W2 + corrW.F1 + corrW.F2 +
+               corrW.F3 + corrW.F4 + corrW.F5"
+\end{lstlisting}
+\end{minipage}\par
+
+\paragraph{干预。}
+下一步，举例说明如何使用 \texttt{tmlenet} R 包的语法指定感兴趣的干预。首先给出对每个 $A_i$ 施加随机干预的例子，将暴露分配给样本中随机选出的35\%。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+new.sA1.stoch.2 <-  def_new_sA(A =
+  rbinom(n = length(A), size = 1, prob = 0.35))
+\end{lstlisting}
+\end{minipage}\par
+接着，给出以朋友数（\texttt{nF}）为条件，对每个 $A_i$ 施加动态干预的例子。这一干预将暴露分配给网络中连接最多的约10\%的个体。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+new.sA1.dyn.4 <- def_new_sA(A = rbinom(n = length(A),
+  size = 1, prob = ifelse(nF >= 20, 0.9,
+  ifelse(nF >= 15, 0.40, 0))))
+\end{lstlisting}
+\end{minipage}\par
+
+\paragraph{估计。}
+下例说明，如何利用观测输入数据集和观测到的网络数据运行 TMLE，估计上述干预下结局期望的样本平均。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+res <- tmlenet(data = datO, sW = sW, sA = sA,
+  Ynode = "Y", Kmax = K,
+  NETIDmat = attributes(datO)$netind_cl$NetInd,
+  intervene1.sA = new.sA1.stoch.2, Qform = Qform,
+  hform.g0 = hform, hform.gstar = hform)
+\end{lstlisting}
+\end{minipage}\par

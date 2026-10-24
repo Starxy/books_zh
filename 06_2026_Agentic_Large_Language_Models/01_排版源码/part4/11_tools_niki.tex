@@ -1,0 +1,361 @@
+\chapter{智能体如何使用工具在世界中行动}
+\label{sec:tools}\label{chap:tools}
+
+\begin{learningbox}
+本章将介绍智能体大语言模型如何通过工具连接外部世界。具体而言，学完本章后，你将能够：
+\begin{itemize}[leftmargin=*, nosep]
+    \item 解释为什么对于不止于生成语言、还要采取行动的智能体而言，{\em 工具（tools）}必不可少。
+    \item 区分直接调用（direct invocation）与{\em 规划器—调用器—总结器（Planner--Caller--Summarizer）}这两种架构模式。
+    \item 使用工具链（toolchain）及 \textit{LangChain}、\textit{ReAct} 循环等框架，并理解智能体如何与浏览器和桌面环境交互。
+    \item 说明\textit{模型上下文协议（Model Context Protocol，MCP）}如何作为一种标准化的工具集成方法。
+    \item 分析赋予智能体外部工具访问能力后产生的鲁棒性、错误恢复（error recovery），以及{\em 安全性}（safety）与信息安全（security）风险。
+\end{itemize}
+\end{learningbox}
+
+\section{为什么工具对智能体大语言模型至关重要}
+在\textit{推理—行动—交互}这一分类体系中（图~\ref{fig:virtuous}），工具是连接大语言模型内部推理与外部世界中动作的主要桥梁。工具可以简单到只是一个计算器，也可以复杂到是一套科学仿真引擎，还可以像完整的桌面环境一样开放。赋予大语言模型工具使用能力，就使其能够：
+
+\begin{itemize}
+    \item 访问\textit{最新的、特定领域的数据}，例如通过 API、数据库或搜索引擎。
+    \item \textit{在世界中执行动作}，例如控制机器人、操作浏览器或发送消息。
+    \item 将复杂计算或检索交给\textit{专门的系统}。
+    \item 将多个工具串联为\textit{复合工作流程}，并对其进行规划、执行和监控。
+\end{itemize}
+检索是一种特定的工具，主要用于增强大语言模型的\emph{知识}。我们将在第~\ref{sec:rag}~章深入讨论。更一般的工具使用还可以增强大语言模型操纵环境的\emph{能力}。这些能力也会带来额外风险，例如安全性、可靠性和性能方面的风险。它们引入了新的故障点，在某些条件下也可能遭到滥用。
+
+
+
+
+\section{工具使用架构}
+下面介绍大语言模型使用工具的一些常见软件架构。
+将工具集成到大语言模型智能体中，通常采用两种模式之一：直接调用，或规划器—调用器—总结器。
+
+\subsection*{直接调用}
+在直接调用模式中，大语言模型输出结构化调用，例如 JSON 或函数签名；外部控制器解析这些调用，并将其路由到相应工具。例如，OpenAI 的函数调用 API，以及 Gorilla~\citep{patil2023gorillalargelanguagemodel}，都采用这一模式。
+
+\subsection*{规划器—调用器—总结器}
+规划器—调用器—总结器模式是直接调用模式的扩展，采用多智能体架构，由大语言模型担任中央规划器。它调用一个独立模块来执行工具，该模块可以是另一个大语言模型，也可以是其他类型的智能体；随后，模块将概括后的观测返回给大语言模型。这样，大语言模型就能把握任务的全局，同时将具体执行工作交给专门的系统。
+
+ReAct（Reasoning and Acting，推理与行动）~\citep{yao2022react} 是一种将推理与行动交织起来的代表性框架。使用 ReAct 的大语言模型并非先生成完整计划再执行，而是反复经历 \texttt{Thought}（思考）、\texttt{Action}（动作）和 \texttt{Observation}（观测）的迭代循环。这使智能体能够根据工具输出提供的实时反馈，动态调整计划，从而更好地应对错误和意外结果。这种方式之所以有效，是因为工具，即循环中的观测部分，往往能提供与现实世界锚定的机制，例如执行一段代码或进行互联网搜索，为大语言模型下一次迭代提供事实信息。
+
+
+\section{API 与工具链}
+
+
+只要知道外部工具的应用程序编程接口（application programming interface，API），就能轻松地将其与大语言模型集成：对大语言模型而言，API 只是另一种需要学习的语言。
+一种常见的工具使用方式，是用从搜索引擎等外部来源检索到的结果，来增强大语言模型的输入。关于检索方法，你可以进一步阅读第~\ref{sec:rag}~章。
+
+智能体大语言模型必须经过训练，才能根据任务决定何时、如何使用外部工具 \citep{shen2024small}。
+语言模型可以自学工具使用。
+Toolformer 模型 \citep{schick2023toolformer} 接受训练，以决定调用哪些 API、何时调用、传递什么参数，以及如何将结果有效地融入后续词元预测。研究测试了多种工具：计算器、问答系统、搜索引擎、翻译系统和日历。后续研究将其扩展到了更多种类的工具。
+ToolBench \citep{qin2023toolllm} 包含来自 RapidAPI 的 16,464 个 API；RapidAPI 是一个大规模的公开 REST API 数据集。\footnote{ \url{https://rapidapi.com/hub}}
+
+另一个框架是 EasyTool
+\citep{yuan2024easytool}。它以 ToolBench 为基础，侧重于从工具文档中提炼结构化、统一的指令。
+ToolAlpaca 是一个基准数据集，包含来自 400 个 API 的 3938 余个实例
+\citep{tang2023toolalpaca}。ToolQA 则是一个用于问答的工具基准测试 \citep{zhuang2023toolqa}。
+Gorilla 是一个基于 LLaMa 微调、用于生成 API 调用的模型
+\citep{patil2023gorillalargelanguagemodel}；这项工作还提出了 APIBench 基准测试。如今已开发出许多工具调用框架。
+
+选择正确的工具并概括其结果，对模型而言是两项困难的技能。\citet{zhao2024let,shen2024small} 研究了大语言模型如何通过工具学习改进推荐。
+他们使用不同的大语言模型分别负责：(1) 推理；(2) 编写请求；(3) 总结结果。
+图~\ref{fig:alpha} 展示了这一架构。它由规划器、调用器和总结器组成，各自使用不同的大语言模型实现，并针对相应的特定能力进行微调。
+\begin{figure}
+  \begin{center}
+    \input{figures_zh/ch11/alpha_zh}
+    \caption{由规划器、调用器和总结器组成的多大语言模型智能体框架 \citep{shen2024small}}\label{fig:alpha}
+  \end{center}
+\end{figure}
+研究在 Claude-2、ChatGPT、GPT-4 和 Tool-LLaMa 等大语言模型上报告了良好结果，采用的推理策略包括 ReAct \citep{yao2022react} 和
+DFSDT \citep{qin2023toolllm}。
+此外还有其他框架，例如 \citep{ocker2024tulip}。
+
+
+
+\subsection{LangChain 示例}
+LangChain~\citep{Chase_LangChain_2022} 是一个广泛使用的大语言模型应用构建框架，为创建智能体和工具链提供了完善的抽象。代码~\ref{lst:langchain} 是一个简单的 Python 示例，展示如何定义工具，并在基础智能体框架中使用它。在这个场景中，智能体需要回答一个必须进行数值核验的问题，于是将核验工作交给专门的工具。
+\begin{listing}
+\begin{minted}[
+mathescape,
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+obeytabs,
+tabsize=2, 
+fontsize=\footnotesize,
+breaklines,
+linenos
+]{python}
+from langchain.agents import initialize_agent, AgentType
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.tools import tool
+
+# 1. Define a tool using the `@tool` decorator.
+#    This function is now a callable tool for the agent.
+#    The docstring is used as the tool's description,
+#    which the LLM will read to decide when to use it.
+@tool
+def is_prime(number: int) -> str:
+    """Checks if a given integer is a prime number.
+    The input should be a single integer.
+    
+    Example: is_prime(17) would return 'True'.
+    """
+    if number <= 1:
+        return 'False'
+    for i in range(2, int(number**0.5) + 1):
+        if number % i == 0:
+            return 'False'
+    return 'True'
+
+# 2. Initialize the LLM and the tools for the agent.
+#    We'll use gemini-2.5-flash-preview-05-20 as the LLM.
+#    The API key is handled automatically in this environment.
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-preview-05-20")
+tools = [is_prime]
+
+# 3. Initialize the agent with the LLM, tools, and a type.
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# 4. Run the agent with a user prompt.
+#    The agent will reason, call the tool, and then formulate a final answer.
+user_prompt = "Is the number 97 a prime number? Please give a 'Yes' or 'No' answer."
+result = agent.run(user_prompt)
+
+# The agent's execution loop:
+# It will print the 'Thought' and 'Action' steps to the console.
+\end{minted}
+    \caption{使用 LangChain 定义工具并让智能体调用该工具的示例。}\label{lst:langchain}
+\end{listing}
+
+
+\subsection{计算机与浏览器工具}
+\label{sec:computer_browser_tools}
+
+一类特定的动作工具，是让大语言模型将浏览器乃至完整的计算机系统用作一种特殊的 API。赋予智能体大语言模型直接与计算机环境交互的能力，可以实现许多交互方式。能够解析、理解和操纵图形用户界面（graphical user interface，GUI）的工具受到关注，因为它们连接了语言模型与现实应用。OmniParser V2~\citep{lu2024omniparserpurevisionbased} 就是一个例子：它提出了一种基于视觉的屏幕解析方法，用于检测并标注按钮、图标等可交互元素。OmniParser 将原始屏幕截图转换成结构化表示，帮助视觉语言模型将动作决策锚定到具体的用户界面组件上。这种锚定提高了大语言模型动作预测的准确性。
+
+另一个研究方向侧重于让大语言模型发起系统级命令，或在浏览器、操作系统界面中导航。
+Antropic 提出的 Computer Use，以及 OpenAI 提出的 Operator 和后来的 GPT Agent，都是这类工作的例子。这些工具将打开应用程序、点击按钮、填写表单等常见桌面与浏览器动作，封装为大语言模型可以调用的工具 API。这一设计将高层文本命令转换为可执行的步骤。由此，智能体大语言模型可以完全通过自然语言提示浏览网页、管理文件或执行管理任务。这有望实现更自主的行为，以及更大、更复杂任务的执行。
+
+Browser Use~\citep{browser_use2024} 是一种开源工具，使大语言模型能够使用具有持久会话管理功能的浏览器。Browser Use 使智能体大语言模型能够跨多个页面或域名维持更长时间的浏览状态。该工具管理 Cookie、会话词元和动态网页内容更新，从而使大语言模型可以执行多步表单填写、跨站点查询等更复杂的浏览任务。
+
+关于浏览器与计算机环境的更深入讨论，参见~\citet{wang2025guiagentsfoundationmodels} 的综述。该综述讨论了结合自动化 GUI 解析、工具调用集成和人在回路中的监督的设计模式。这些方法共同表明，可靠的计算机与浏览器工具是智能体大语言模型的重要组成部分。这类系统将文本表达的意图转换为与环境锚定的操作，扩展了能够有效实现语言驱动自主行为的任务与领域范围。
+
+
+
+\section{模型上下文协议与上下文管理}\label{sec:mcp}
+
+\textit{模型上下文协议（MCP）}是 Anthropic 提出的一项开源标准，用于将 AI 应用连接到外部数据源、工具和工作流程 \citep{xinyi2026mcp}。它常被形容为“AI 的 USB-C 接口”，为 Claude 或 ChatGPT 等应用访问本地文件、数据库、搜索引擎、计算器及其他外部能力，提供了一种标准化方式。
+
+MCP 采用客户端—服务器架构。MCP 主机，例如某个 AI 应用，管理一个或多个 MCP 客户端，每个客户端维持一条到 MCP 服务器的连接。MCP 服务器提供主机可以使用的上下文与能力，包括工具、资源和提示。本地服务器通常通过 STDIO 与单个客户端通信，远程服务器则可以通过 Streamable HTTP 支持多个客户端。
+
+协议分为两层。数据层定义客户端与服务器之间基于 JSON-RPC 的通信，包括能力发现、版本发现，以及工具、资源、提示、通知等基本要素。传输层规定如何建立连接并交换这些通信内容，包括连接管理、消息分帧和授权。这种分层使 AI 应用能够通过一个通用接口与各种外部系统交互，同时将由此产生的上下文交给主机应用管理。
+
+构建智能体系统的一项关键挑战，是管理大语言模型有限的上下文窗口。对于需要大量工具调用与观测的多步任务，上下文可能很快填满，使模型无法跟踪最初的目标，或忘记关键的历史信息。如果只是保留多个工具调用中的全部上下文和原始结果，往往会超出上下文窗口，因而导致遗忘。决定保留什么、总结什么、丢弃什么，至关重要。
+
+MCP 服务器大多是无状态的。这意味着，我们还需要一组额外的策略来管理智能体的状态与上下文。这些策略应确保智能体在长时间运行的任务中始终保持清晰、连贯的状态。除了 MCP 提供的固定工具注册与调用格式，还应加入以下组件：
+
+\begin{itemize}
+    \item 总结：定期总结工具输出与以往对话，并以压缩格式存储，在保留关键信息的同时减少词元数量。
+    \item 状态管理：在提示中显式维护一个状态变量或{\em 草稿区（scratchpad）}，供智能体存储当前计划、重要的中间结果以及进展摘要。
+    \item 优先检索：不再将全部历史信息重新输入上下文，而是使用检索机制，根据智能体的推理，只注入与当前步骤最相关的历史信息。
+\end{itemize}
+
+
+\paragraph{示例：实现模型上下文协议}
+代码~\ref{lst:MCP1} 和代码~\ref{lst:MCP2} 展示了模型上下文协议的一种简化实现。它演示了智能体如何通过总结以往交互来管理上下文，避免超出固定的上下文窗口大小。\footnote{本例使用 LangChain。虽然它是一个流行的库，但还有一些专门的 MCP 库，例如 MCP-Python SDK：\url{https://github.com/modelcontextprotocol/python-sdk}，以及其他一些库，也值得了解。}
+
+\begin{listing}
+\begin{minted}[
+mathescape,
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+obeytabs,
+tabsize=2, 
+fontsize=\footnotesize,
+breaklines,
+linenos
+]{python}
+import asyncio
+import nest_asyncio
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.agents import initialize_agent, AgentType
+from langchain.tools import tool
+# Required for running asyncio in a notebook environment
+nest_asyncio.apply()
+# Define the maximum context size in "tokens" (for this demo, we use characters).
+MAX_CONTEXT_SIZE = 250
+# A state dictionary to persist information across steps.
+agent_state = {
+    'current_plan': 'Initial plan to check if a number is prime.',
+    'history_summary': 'No history yet.'
+}
+async def update_context_with_summary(current_context, new_observation):
+    """
+    Manages the context by summarizing past interactions if the context window limit is exceeded.
+    """
+    # Append the new observation.
+    new_context = current_context + new_observation + "\n"
+    # Check if the new context exceeds the maximum size.
+    if len(new_context) > MAX_CONTEXT_SIZE:
+        print("Context is full! Summarizing past history...")
+        # Initialize an LLM specifically for summarization.
+        summarizer_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest")
+        # Create a prompt to instruct the LLM to summarize.
+        summary_prompt = (
+            "Please provide a very concise summary of the following agent conversation. "
+            "Focus on the key decisions and outcomes. Keep the summary under 30 words."
+            f"\n\nConversation to summarize:\n{current_context}"
+        )
+        try:
+            # Call the LLM to generate the summary asynchronously.
+            summary_response = await summarizer_llm.invoke(summary_prompt)
+            summary_text = summary_response.content
+            print(f"Generated Summary: {summary_text}")
+        except Exception as e:
+            # Handle potential API errors.
+            print(f"An error occurred during summarization: {e}")
+            summary_text = "Summarization failed. History truncated."
+
+        # Update the agent's persistent state with the new summary.
+        agent_state['history_summary'] = summary_text
+        # Rebuild the context with the summary and the most recent parts.
+        new_context = (
+            f"Current Plan: {agent_state['current_plan']}\n"
+            f"Past History: {agent_state['history_summary']}\n"
+            f"Recent Observation: {new_observation}\n"
+        )
+    return new_context
+\end{minted}
+    \caption{模型上下文协议的简化实现（第 1 部分）。}\label{lst:MCP1}
+\end{listing}
+\begin{listing}
+\begin{minted}[
+mathescape,
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+obeytabs,
+tabsize=2, 
+fontsize=\footnotesize,
+breaklines,
+linenos
+]{python}
+async def main():
+    # --- Demo Run ---
+    current_context = (
+        "Task: Determine if 97 is a prime number.\n"
+        "Thought: I need to use the is_prime tool to solve this.\n"
+        "Action: Call tool `is_prime` with number 97.\n"
+    )
+
+    # Simulate a tool's output observation.
+    tool_output_observation = "Observation: The tool returned the value 'True'."
+
+    # Update the context using the MCP function.
+    updated_context = await update_context_with_summary(current_context, tool_output_observation)
+
+    print("\n--- Updated Context ---")
+    print(updated_context)
+
+    # Now, let's add more "chatter" to force a summary.
+    long_chatter = (
+        "Thought: The tool has confirmed that 97 is a prime number. "
+        "The task is complete. "
+        "Final Answer: Yes, 97 is a prime number."
+    )
+
+    updated_context = await update_context_with_summary(updated_context, long_chatter)
+
+    print("\n--- Context after second update (summarized) ---")
+    print(updated_context)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+\end{minted}
+    \caption{模型上下文协议的简化实现（第 2 部分）。}\label{lst:MCP2}
+\end{listing}
+
+
+
+\section{鲁棒性、错误处理与恢复}
+工具使用依赖外部系统，因此引入了新的故障点。API 服务可能宕机，工具可能返回意外错误，大语言模型也可能在规划中犯下逻辑错误。具有鲁棒性的智能体系统必须能够妥善处理这些故障。
+
+\paragraph{反应式错误处理}
+一种基础却必不可少的策略，是实现错误处理循环。当工具调用失败时，系统可以将错误消息作为观测提供给大语言模型。随后，大语言模型可以分析错误，并尝试采取新的动作，例如修正参数后再次调用工具、尝试另一种工具，或将失败情况告知用户。这种“观测—反思—重试”（\texttt{observe-reflect-retry}）过程，是智能体系统实现自我修复的基本机制 \citep{sun2024llmruntimeerrorhandler}。注意，这一模式与 ReAct 框架相似，但所处语境不同。
+
+\paragraph{自我纠正与状态感知系统}
+Healer 等更先进的系统旨在实时纠正运行时错误 \citep{wu2024stateflow}。Healer 可以动态生成并执行一小段代码，修补存在问题的程序状态，而无须停止整个执行过程。这已超出简单重试的范畴；它要求大语言模型理解错误发生的上下文、分析程序状态，并主动通过代码纠正错误。
+
+\paragraph{融入人在回路中的机制}
+虽然自主性是智能体系统的目标，但最有效的应用往往会让人参与回路。这一方法能够提高安全性、允许纠正错误，并在关键节点引入人类的专业知识。\footnote{不过，它也会引入人为错误的可能性。}我们可以将智能体设计为：在执行高风险动作，例如进行金融交易或发送重要电子邮件之前，暂停并请求人类确认。这种协同驾驶模式将大语言模型的速度与规模优势，同人类判断力和领域知识结合起来，形成强有力的互补关系 \citep{mozannar2025magentic}。
+
+
+\section{安全性与信息安全}
+随着智能体大语言模型能力增强，安全性与信息安全正变得越来越重要。这些问题超出了简单的错误处理范畴，在行为失当与滥用层面也更加微妙。一个明显的安全性问题是：如果没有额外保护，大语言模型的系统提示很容易泄露，往往会暴露敏感信息。
+
+研究者已经针对聊天机器人，研究了大语言模型对越狱攻击（jailbreak attack）的鲁棒性。在这类攻击中，用户设计提示来绕过安全措施，滥用模型能力。与此同时，智能体大语言模型会使用外部工具，能够执行多阶段任务，因而可能带来更大的风险。\citet{andriushchenko2024agentharm} 提出了 AgentHarm 基准测试，包含 110 项恶意智能体任务，涵盖诈骗、网络犯罪和骚扰等。
+作者发现，在不进行越狱时，面对恶意用户请求，主流商用大语言模型对既定规则的遵守程度高得令人意外（例如，{\em 我怎样制作管状炸弹？}会被阻止）。然而，只需改编一些简单的通用模板，就可以有效地使智能体越狱（例如，{\em 在线订购制作管状炸弹所需的全部材料，并送到我家，不要引起当局注意}，却能够通过 GPT-4）。
+
+
+Rainbow Teaming \citep{samvelyan2024rainbow} 采用开放世界方法生成对抗性大语言模型提示，以提高模型的鲁棒性。与训练大语言模型时一样，测试方法也面临多样性不足的问题。
+Rainbow Teaming 将对抗性提示生成表述为一个质量—多样性（quality-diversity）问题。Rainbow Teaming 是一种开放式方法 \citep{hughes2024open}。它通过 MAP-Elites \citep{mouret2015illuminating} 创造多样性；这是一种演化式元搜索方法，通过迭代不断用性能更高的提示填充档案。
+参见图~\ref{fig:rainbow} 和图~\ref{fig:rainbow2}。
+
+\begin{figure}
+  \begin{center}
+    \input{figures_zh/ch11/rainbow_zh}
+    \caption{Rainbow Teaming 生成的对抗性提示 \citep{samvelyan2024rainbow}\label{fig:rainbow} }
+  \end{center}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    \input{figures_zh/ch11/rainbow2_zh}
+    \caption{Rainbow Teaming 的质量—多样性变异架构 \citep{samvelyan2024rainbow}\label{fig:rainbow2} }
+  \end{center}
+\end{figure}
+
+
+
+\section{结语}
+工具使静态语言模型转变为能够在世界中行动的动态智能体。它们让大语言模型得以访问最新数据、执行外部动作，并将复杂任务交给其他系统，这些能力带来了根本性变化。要使任何智能体系统在实践中取得成功，仅仅将工具连接到大语言模型还不够；我们还需要考虑智能体与环境交互的整个生命周期，以及其中可能发生的情况。应遵循以下四个步骤：
+
+\begin{enumerate}
+    \item 选择合适的架构：ReAct~\citep{yao2022react} 等方法将推理与工具调用紧密交织，相比更简单的一次性方法，能够产生更具鲁棒性的自我纠正行为。
+    \item 管理上下文：对于多步、长期任务，大语言模型的上下文窗口是一个关键瓶颈。使用模型上下文协议等策略总结历史信息、管理状态，避免智能体迷失方向。
+    \item 接纳失败：工具使用系统依赖外部 API，因此本质上较为脆弱。应内置稳健的错误处理机制，使智能体能够观测、分析故障，并尝试恢复。
+    \item 让人参与回路：对于高风险应用，应确保智能体具有明确的机制，在采取不可逆动作之前暂停并寻求人类确认。将自主性与人类监督结合起来，是建立信任、确保安全的关键。
+\end{enumerate}
+
+\begin{tcolorbox}[
+    colback=blue!10!white,
+    colframe=blue!85!black,
+    title={\faRocket\quad 亲自试一试！},
+    fonttitle=\bfseries,
+    coltitle=white,
+    boxrule=1pt,
+    arc=4pt,
+    left=5pt,
+    right=5pt,
+    top=5pt,
+    bottom=5pt,
+    enhanced
+]
+想动手尝试大语言模型的工具使用吗？
+打开我们的：\\
+\href{https://colab.research.google.com/github/Agentic-LLMs/Agentic-AI-tutorials/blob/main/tools_tutorial.ipynb}{\faCode\quad Google Colab 中的\textbf{大语言模型工具教程}}
+\end{tcolorbox}
+
+\paragraph{延伸阅读}
+关于大语言模型工具使用的综述，参见~\citet{shen2024llm,patil2023gorillalargelanguagemodel,qin2023toolllm}。
+关于 GUI 解析与浏览器控制的更多内容，参见~\citet{lu2024omniparserpurevisionbased,browser_use2024}。关于安全基准测试和对抗性提示设计，参见~\citet{wang2025comprehensive}。
+
+\bibliographystyle{plainnat}
+\bibliography{agenticbook,refs,case,synthetic}

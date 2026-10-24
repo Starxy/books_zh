@@ -1,0 +1,54 @@
+% 原书第 126—129 页；6.10。
+\section{联系单个对象的广义结构因果模型}
+\label{sec:ch06-generalized}
+
+到目前为止，我们研究的是随机变量 $X_1,\ldots,X_d$ 之间的因果关系，而且只关注数据由 $P_{\mathbf X}$ 独立同分布抽样得到的情形。现在，考虑因果 DAG 的节点集 $\mathbf v=\{x_1,\ldots,x_d\}$，其中 $x_1,\ldots,x_d$ 可以是用于形式化观测概念的任意数学对象。例如，观测到不同作者撰写的文本 $x_1,\ldots,x_d$ 之间的相似性后，我们可能关心：哪位作者受到了哪位作者的影响，也就是相应的因果关系。下面沿用 Steudel et al.［2010］的思路，说明在给定适当信息概念后，即使不涉及统计抽样，背后的 DAG 也能在某种意义上蕴含条件独立陈述。
+
+为此，假设给定信息函数
+\[
+ R:2^{\mathbf V}\longrightarrow\RR_0^+,
+\]
+它具有单调性，即一个节点集所包含的信息，不可能多于其任意超集。因此，对任意两个节点集 $\mathbf x,\mathbf y\subseteq\mathbf v$，表达式 $R(\mathbf x,\mathbf y)-R(\mathbf y)$ 非负，可以解释为给定 $\mathbf y$ 时 $\mathbf x$ 的条件信息量。此外，假设对于任意三个两两不相交的节点集 $\mathbf x,\mathbf y,\mathbf z$，表达式
+\begin{equation}
+ I(\mathbf x:\mathbf y\mid\mathbf z)
+ :=R(\mathbf x,\mathbf z)+R(\mathbf y,\mathbf z)
+ -R(\mathbf x,\mathbf y,\mathbf z)-R(\mathbf z)
+ \tag{6.28}
+\end{equation}
+非负。这当且仅当 $R$ 具有\textbf{次模性（submodularity）}，见第 9.5.2 节。于是可以将式 (6.28) 解释为给定 $\mathbf z$ 时 $\mathbf x$ 与 $\mathbf y$ 之间的\textbf{广义条件互信息（generalized conditional mutual information）}：$R(\mathbf x,\mathbf z)-R(\mathbf z)$ 衡量给定 $\mathbf z$ 时 $\mathbf x$ 的信息量；而 $R(\mathbf x,\mathbf y,\mathbf z)-R(\mathbf y,\mathbf z)$ 衡量给定 $\mathbf y,\mathbf z$ 时 $\mathbf x$ 的信息量。同样，随机变量之间的条件互信息也可以写为 Shannon 熵之差［Cover and Thomas, 1991］。若式 (6.28) 为零，就称给定 $\mathbf z$ 后 $\mathbf x$ 与 $\mathbf y$ 条件独立。
+
+为定义广义结构因果模型，对每个观测节点 $x_j$ 引入一个未观测的噪声对象 $n_j$，并提出如下原理。
+
+\begin{principle}[无额外信息]
+在父节点 $\pa_j$ 与未观测节点 $n_j$ 所含信息之外，节点 $x_j$ 不包含任何额外信息，即
+\[
+ R(x_j,\pa_j,n_j)=R(\pa_j,n_j).
+\]
+\end{principle}
+
+它推广了“每个随机变量 $X_j$ 由其父节点与噪声变量决定”的假设。对于离散随机变量，这相当于说，$X_j,\PA_j,N_j$ 的 Shannon 熵，与 $\PA_j,N_j$ 的 Shannon 熵相同。结构因果模型的第二项关键假设，是噪声项在统计意义上相互独立。这一假设的广义版本如下。
+
+\begin{principle}[未观测对象的独立性]
+未观测节点 $n_j$ 不包含彼此的信息，即
+\[
+ R(n_1,\ldots,n_d)=\sum_{j=1}^d R(n_j).
+\]
+\end{principle}
+
+Steudel et al.［2010］证明了以下定理。
+
+\begin{theorem}[广义因果马尔可夫条件]
+如果原理 6.50 与原理 6.51 都成立，那么，对于任意三个节点集，只要 $\mathbf x$ 与 $\mathbf y$ 被 $\mathbf z$ d-分离，给定 $\mathbf z$ 后 $\mathbf x$ 与 $\mathbf y$ 就条件独立。
+\end{theorem}
+
+将这些概念用于文本例子：把一篇文本视为其中有意义词语的集合，以不同词语的数量作为其信息量 $R$。假设 $d$ 篇文本 $x_1,\ldots,x_d$ 之间的影响，通过以下简化机制发生：$x_j$ 的作者从其父文本中选取一些词语，再加入源于自己想法的一些词语。新增词语由 $n_j$ 给出。根据 $n_j$ 的定义，原理 6.50 成立；原理 6.51 则要求不同作者新增的词语彼此不同。如果两篇文本共有的词语全部已经出现在第三篇文本中，就称给定第三篇文本后，前两篇文本条件独立。
+
+这个例子表明，合理的条件独立概念，可以定义在比随机变量广泛得多的对象类上。为了保证因果马尔可夫条件相对于某种特定独立性概念成立，底层信息度量必须在原理 6.50、6.51 的意义上，适合所考察的因果机制类。
+
+Janzing and Schölkopf［2010］利用相对于某个固定图灵机 $T$ 的 Kolmogorov 复杂度 $K$，量化二进制串之间的信息量，见第 4.1.9 节。函数 $K$ 在相差 $O(1)$ 项的意义下近似满足次模性，即误差不随所考察字符串的长度增长。随后，Janzing and Schölkopf［2010］定义一种“因果性的算法模型”：图灵机 $T$ 根据每个 $x_j$ 的父节点及噪声串 $n_j$ 计算 $x_j$，从而保证原理 6.50。每个 $n_j$ 也可以理解为根据父节点计算 $x_j$ 的程序，即由直接原因生成 $x_j$ 的机制。于是，原理 6.51 就相当于机制独立性，见原理 2.1。\footnote{由此可以看出，图 2.2 的第二条与第三条分支重合：字符串 $n_j$ 编码机制，即在图灵机上运行的程序；同时，它也是统计情形中噪声项的对应物。}
+对 $R=K$ 应用定理 6.52，得到“\textbf{算法马尔可夫条件（algorithmic Markov condition）}”［Janzing and Schölkopf, 2010］：只要 $\mathbf x$ 与 $\mathbf y$ 被 $\mathbf z$ d-分离，对于免费获得 $\mathbf z$ 作为背景信息的图灵机，知道 $\mathbf y$ 并不能缩短对 $\mathbf x$ 的描述。
+
+从更高层面看，这回应了因果推理中的一个深刻问题：“观测之间只有在存在因果联系时才会相依”这一陈述，是原理 1.1 的推广；它成立的前提，是相依度量适合所考察的观测对象类与可能的因果机制类。例如，看到某个儿童在过去十年中身高增长，同时某只股票的价格也上涨，并不会据此推断二者有因果关系，因为增长是许多互无因果联系的时间序列共有的性质。只有当两个时间序列共享更复杂的增长或下降模式时，我们才会追问相似性背后的共同原因。
+
+非平稳时间序列无处不在，因此，寻找使相依关系能够被合理理解为因果联系信号的信息度量，是一个有趣问题。如果时间序列是通过在大型数据库中搜索找到的，还需要充分处理多重检验问题。从应用机器学习的角度说，这个问题引导我们构造适当的特征，使特征空间中的相似性能够指示因果关系。
+\FloatBarrier

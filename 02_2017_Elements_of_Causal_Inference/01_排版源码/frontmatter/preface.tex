@@ -1,0 +1,42 @@
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+\markboth{前言}{前言}
+
+因果性是一个引人入胜的研究主题。对因果性的数学化研究起步较晚，许多概念问题至今仍在讨论，而且争论往往十分激烈。
+
+本书总结了我们十年来探索因果性的部分成果。不过，许多学者研究这一问题的时间远比我们长，因果性方面也已有不少著作，其中包括 Pearl [2009]、Spirtes et al. [2000] 以及 Imbens and Rubin [2015] 的系统论述。我们希望，本书能够从两个方面补充已有工作。
+
+首先，本书侧重于因果性中的一个子问题。这个问题既可以说最为基础，也可以说最不贴近现实：它就是原因—结果问题，所研究的系统只包含两个可观测变量。过去十年，我们较为深入地研究了这一问题。本书介绍了其中的许多工作，并尝试将它们置于更广阔的背景之中。在我们看来，这些背景知识有助于读者对因果性中的一些核心问题形成深入理解。按章节顺序先学习二元情形，可能更便于掌握相关思想；不过，读者也可以直接从讨论多元情形的章节读起，见图 I。
+
+其次，我们的论述受到机器学习与计算统计学的启发和影响。我们关心这些领域的方法如何帮助推断因果结构，更关心因果推理能否反过来启发机器学习的方法。事实上，我们认为，若要理解机器学习中一些最深刻的未解问题，最好的出发点并非由概率分布描述的随机试验，而是产生该分布的底层因果结构。
+
+我们尝试对这一主题作系统介绍，使掌握概率论与统计学或机器学习基础的读者能够顺利阅读。为完整起见，最重要的概念在附录 A.1 和 A.2 中作了概述。
+
+本书以 Pearl [2009] 和 Spirtes et al. [2000] 等工作所代表的因果图方法为基础，同时，主题的选择也反映了我们个人的研究偏好。为使本书易于理解，并将重点放在概念问题上，对于因果性研究中的不少重要问题，我们不得不只作简短介绍。这些问题既包括特定情形下更深入的理论结果，也包括具有实际意义的各种方法。对于一些最明显的遗漏，我们尽量提供了文献线索，但仍可能忽略某些重要主题。
+
+本书也存在若干不足。其中有些是这一研究领域普遍面临的问题，例如，理论结果常常只适用于拥有无限数据的情形。虽然本书也介绍了适用于有限数据的算法和方法，但并未讨论这些方法的统计性质。此外，我们有时会略去测度论方面的问题，常见的做法是直接假定密度存在。我们认为，这些问题都很重要，也很有趣；之所以作出上述取舍，是为了控制篇幅，使更广泛的读者能够阅读本书。
+
+还需要说明一点：计算因果方法仍处于发展的初期，尤其是从数据中学习因果结构，目前只能在相当有限的情形下做到。我们尽量在可行之处给出具体算法，但也清楚地知道，因果推断中的许多问题比通常的机器学习问题更难。因此，我们无法保证这些算法一定适用于读者所面临的问题。请不要因此却步——因果学习是一个非常有吸引力的研究主题，我们希望，读完本书后，你也愿意投身其中。
+
+\begin{figure}[p]
+\centering
+\input{figures/front_reading_map}
+\caption*{\textbf{图 I}\quad 本图展示各章之间较强的依赖关系；此外还存在许多较弱的联系。建议读者从第 1、3 或 6 章开始阅读。}
+\end{figure}
+
+没有许多人的支持，我们不可能完成本书。
+
+我们感谢德国奥伯沃尔法赫数学研究所（Mathematisches Forschungsinstitut Oberwolfach）对三位作者参加 Research in Pairs 访学项目的支持。本书有相当一部分内容是在此次访学期间写成的。
+
+感谢 Michel Besserve、Peter Bühlmann、Rune Christiansen、Frederick Eberhardt、Jan Ernest、Philipp Geiger、Niels Richard Hansen、Alain Hauser、Biwei Huang、Marek Kaluba、Hansruedi Künsch、Steffen Lauritzen、Jan Lemeire、David Lopez-Paz、Marloes Maathuis、Nicolai Meinshausen、Søren Wengel Mogensen、Joris Mooij、Krikamol Muandet、Judea Pearl、Niklas Pfister、Thomas Richardson、Mateo Rojas-Carulla、Eleni Sgouritsa、Carl Johann Simon-Gabriel、Xiaohai Sun、Ilya Tolstikhin、Kun Zhang 和 Jakob Zscheischler。在本书写作期间，他们提出了许多有益意见，并与我们进行了富有启发的讨论。特别是 Joris 和 Kun，参与了本书所介绍的许多研究。
+
+感谢卡尔斯鲁厄理工学院、苏黎世联邦理工学院和蒂宾根大学的各位学生，他们校读了本书的早期版本，并提出了许多启发性问题。
+
+最后，感谢匿名审稿人以及 Westchester Publishing Services 的文字编辑团队所提供的有益意见；也感谢 MIT Press 的工作人员，特别是 Marie Lufkin Lee 和 Christine Bridget Savage，在整个出版过程中给予的热情支持。
+
+\begin{flushright}
+哥本哈根、蒂宾根，2017 年 8 月\par
+Jonas Peters\par
+Dominik Janzing\par
+Bernhard Schölkopf
+\end{flushright}

@@ -1,0 +1,89 @@
+% 原书第 167—169 页；第 8.3—8.4 节全文。
+\section{领域适应}
+\label{sec:ch08-domain}
+
+\textbf{领域适应（domain adaptation）}是另一个与因果性有着自然联系的机器学习问题［Schölkopf et al., 2012］。下面将领域适应与第 7.2.5 节“不同环境”中所称的不变预测联系起来。我们并不声称这一联系以目前的形式就能带来重大改进，但相信它可能有助于发展新的领域适应方法。
+
+假设我们在不同的域 $e\in\mathcal E=\{1,\ldots,D\}$ 中，获得目标变量 $Y^e$ 与 $d$ 个候选预测变量 $\mathbf X^e=(X^e_1,\ldots,X^e_d)$ 的数据，目标是预测 $Y$。遵循广泛使用的表述，这里采用“域”（domain）或“任务”（task）这些术语。表 8.1 将本节考虑的三类领域适应问题加以区分。
+
+\begin{table}[!htbp]
+ \centering
+ \small
+ \begin{tabular}{@{}lll@{}}
+  \toprule
+  方法 & 训练数据来自 & 测试域 \\
+  \midrule
+  领域泛化 & $(\mathbf X^1,Y^1),\ldots,(\mathbf X^D,Y^D)$ & $T\coloneqq D+1$ \\
+  多任务学习 & $(\mathbf X^1,Y^1),\ldots,(\mathbf X^D,Y^D)$ & $T\in\{1,\ldots,D\}$ \\
+  非对称多任务学习 & $(\mathbf X^1,Y^1),\ldots,(\mathbf X^D,Y^D)$ & $T\coloneqq D$ \\
+  \bottomrule
+ \end{tabular}
+ \caption{在领域泛化中，测试数据来自未见过的域；在多任务学习中，则可以获得测试域中的一部分数据。}
+ \label{tab:ch08-domains}
+\end{table}
+
+我们的主要假设是：存在集合 $S^*\subseteq\{1,\ldots,d\}$，使条件分布 $Y^e\mid\mathbf X^e_{S^*}$ 在所有域 $e\in\mathcal E$ 中都相同，包括测试域。也就是说，对于所有 $e,f\in\mathcal E$ 以及所有 $\mathbf x_{S^*}$，都有
+\begin{equation}
+ Y^e\mid\mathbf X^e_{S^*}=\mathbf x_{S^*}
+ \quad\text{与}\quad
+ Y^f\mid\mathbf X^f_{S^*}=\mathbf x_{S^*}
+ \quad\text{同分布}.
+ \tag{8.7}
+\end{equation}
+
+\par\smallskip
+{\small\noindent\textbf{译注：}原书先用 $\mathcal E=\{1,\ldots,D\}$ 表示已观测到的域，随后又要求上述不变性涵盖测试域。对于领域泛化，表 8.1 中测试域为 $T=D+1$，因此这里的假设应理解为也延伸至该未见测试域；仅在训练域之间成立的不变性，并不足以保证它在测试域中仍成立。}
+\par\smallskip
+
+在第 7.1.6 节和第 7.2.5 节，我们考虑过类似设定，只是使用“环境”而非“域”这一术语，并将性质 (8.7) 称为“不变预测”。前文已说明：如果存在底层结构因果模型，而且环境对应于对目标 $Y$ 以外节点的干预，那么对于 $S^*=\PA_Y$，性质 (8.7) 成立；亦可参照第 2.2 节关于 Simon 不变性准则的讨论。不过，除因果父节点集外，其他集合也可能满足性质 (8.7)。由于目标是预测，我们最关心的集合 $S^*$，不仅应满足 (8.7)，还应尽可能准确地预测 $Y$。暂且假定已经给定这样一个集合 $S^*$，稍后再讨论如何得到它。下面说明假设 (8.7) 与领域适应的关系。
+
+在协变量偏移的设定中［例如 Shimodaira, 2000；Quionero-Candela et al., 2009；Ben-David et al., 2010］，通常假设条件分布 $Y^e\mid\mathbf X^e=\mathbf x$ 在所有任务 $e$ 中保持不变。假设 (8.7) 意味着，协变量偏移对某个变量子集 $S^*$ 成立，因此推广了协变量偏移假设。
+
+对于领域泛化，如果集合 $S^*$ 已知，就可以针对这一子集使用传统的协变量偏移方法。例如，如果数据在输入空间中的支撑集相互重叠，或者系统是线性的，那么在测试域 $T$ 中，可以使用估计量 $f_{S^*}(\mathbf X^T_{S^*})$，其中 $f_{S^*}(\mathbf x)\coloneqq\EE[Y^1\mid\mathbf X^1_{S^*}=\mathbf x]$。可以证明，在一种对抗性设定下，这一方法是最优的：除要求条件分布 (8.7) 保持不变以外，允许测试域的分布与训练域任意不同［Rojas-Carulla et al., 2016，定理 1］。在多任务学习中，如何利用已知的集合 $S^*$ 并不那么显然。实践中，需要将两方面的信息结合起来：一方面是合并各任务、将 $Y$ 对 $S^*$ 回归所得的信息；另一方面是单独考察测试任务所得的信息［Rojas-Carulla et al., 2016］。
+
+如果集合 $S^*$ 未知，我们同样建议在已有的域中搜索满足 (8.7) 的集合 $S$。学习因果预测变量时，通常倾向于采取保守做法，因此不变因果预测方法［Peters et al., 2016］输出所有满足 (8.7) 的集合 $S$ 的交集，见式 (7.5)。这里关心的则是预测。因此，在所有能够实现不变预测的集合中，可以选择预测表现最好的集合 $S$；它通常是其中较大的集合之一。如果已知多个不同的集合 $S$ 都满足 (8.7)，也可以采用同样的做法。如果数据由结构因果模型生成，而且不同域对应于不同干预，那么在无穷数据的极限下，可以证明，满足 (8.7) 且预测能力最强的集合 $S$，是 $Y$ 的马尔可夫毯的一个子集，见习题 8.5。
+\FloatBarrier
+
+\section{习题}
+\label{sec:ch08-problems}
+
+% 本章原书习题接续两条命题的序号，使用独立习题计数器对齐。
+\setcounter{problem}{2}
+\begin{problem}[半同胞回归]
+考虑图 8.1 中的有向无环图。由因果忠实性可以推出：在 $Y$ 已提供的信息之外，$X$ 还能提供关于 $Q$ 的额外信息。为什么？
+\end{problem}
+
+\begin{problem}[逆概率加权]
+考虑如下形式的结构因果模型 $\mathfrak C$：
+\[
+ \begin{aligned}
+ Z&\coloneqq N_Z,\\
+ Y&\coloneqq Z^2+N_Y,
+ \end{aligned}
+\]
+其中，$N_Y,N_Z\overset{\mathrm{iid}}{\sim}\mathcal N(0,1)$。再考虑实施干预后的版本 $\widetilde{\mathfrak C}$：
+\[
+ \dox{Z\coloneqq\widetilde N_Z},
+\]
+其中 $\widetilde N_Z\sim\mathcal N(2,1)$。
+\begin{enumerate}[label=\alph*)]
+ \item （选做）计算 $\EE[Y]\coloneqq\EE_{P^{\mathfrak C}}[Y]$ 和 $\widetilde{\EE}[Y]\coloneqq\EE_{P^{\widetilde{\mathfrak C}}}[Y]$。
+ \item 从结构因果模型 $\mathfrak C$ 中抽取 $n=200$ 个独立同分布数据点，并实现估计量 (8.3)，以估计 $\widetilde{\EE}[Y]$。
+ \item 使样本量 $n$ 从 $n=5$ 增大到 $n=50{,}000$，计算 b) 中的估计值，以及式 (8.3) 中权重的经验方差。你能得出什么结论？
+\end{enumerate}
+\end{problem}
+
+\Needspace{8\baselineskip}
+\begin{problem}[不变预测变量]
+下面为第 8.3 节的最后一句话提供依据。考虑变量 $Y$、$E$ 以及 $X_1,\ldots,X_d$ 上的一个有向无环图，其中，$E$ 表示“环境”（environment），它既不是 $Y$ 的父节点，本身也没有父节点。将 $Y$ 的马尔可夫毯记为 $M$。证明：对于任意满足
+\[
+ Y\indep E\mid S
+\]
+的集合 $S\subseteq\{X_1,\ldots,X_d\}$，都存在另一个集合 $S_{\mathrm{new}}\subseteq M$，使得
+\[
+ Y\indep E\mid S_{\mathrm{new}}
+ \qquad\text{且}\qquad
+ Y\indep(S\setminus S_{\mathrm{new}})\mid S_{\mathrm{new}}.
+\]
+\end{problem}
+\FloatBarrier

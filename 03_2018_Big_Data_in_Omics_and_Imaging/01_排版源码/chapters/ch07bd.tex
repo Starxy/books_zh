@@ -1,0 +1,154 @@
+% 原章第67页7.3标题—第72页7.3.3标题前。
+\section{存在混杂因子时的因果推断}
+
+前面的讨论假设全部变量均已测量。尽管基因组、表观基因组与影像数据的整合分析在因果推断中考虑了大量变量，但仍存在未测量的因果相关变量。观测研究中因果推断有效性的一大挑战，是存在同时影响干预和结局的未测量混杂（Baiocchi et al. 2014；Louizos et al. 2017）。因果推断的任务是发现以下因果结构：（1）观测变量之间的结构；（2）观测变量与未观测变量之间的结构；（3）仅存在于未观测变量之间的结构（Wolfe et al. 2016）。如果混杂变量已经观测到，通常将这些变量纳入模型并进行调整。如果混杂变量未被观测到，它们往往被忽视。忽略未观测混杂，可能导致错误的因果结构推断，以及有偏的因果效应估计。
+
+迫切需要发展有效的统计方法和计算算法，以处理具有隐藏混杂变量的因果推断。本节介绍几种相关方法。首先介绍因果充分性的概念，然后研究可测量的代理变量或工具变量，用以替代未测量的混杂变量；同时讨论含有隐藏混杂变量的结构因果模型的几种图表示。
+
+\subsection{因果充分性}
+
+前面的讨论隐含假定，可用变量集合具有因果充分性，但没有给出精确定义。直观而言，所研究系统在因果运作上是封闭的。换言之，系统包含的全部变量，都不与系统外部的变量共享共同原因。我们已观测到观测变量的全部共同原因。
+
+\begin{bookdefinition}{7.14：因果充分性}
+如果任一观测变量都不存在隐藏的共同原因，就称这个变量集合具有因果充分性。共同原因通常称为混杂因子（confounder）。因果充分性假设要求全部潜在因果变量均已被观测（Ernest 2016）。然而，复杂疾病的遗传学研究不可能将所有遗传和环境因素纳入同一研究。必须假设某些共同原因是隐藏的，因此需要发展含有隐藏变量的因果推断方法。
+\end{bookdefinition}
+
+\subsection{工具变量}
+
+考虑一个甲基化—基因型—微 RNA—表达—表型网络（图7.9）。假设甲基化、基因表达和表型已经观测到，而基因型和微 RNA 变量是隐藏变量。图7.9表示一个具有混杂变量的中介模型。甲基化通过基因表达的中介作用影响表型。假设中介是内生变量，观测到的甲基化与基因表达之间的相关，可能由隐藏基因型变量的变异引起。基因型和微 RNA 可能造成基因表达与表型之间的相关，而这种相关可能被解释为基因表达对表型的因果效应。这意味着，图7.9所示的中介模型不可识别。
+
+工具变量方法常用于解决识别问题（Dippel et al. 2017；Peters et al. 2017）。考虑三个观测变量 $X$（甲基化）、$Y$（基因表达）和 $Z$（表型）。图7.9中，未观测外生变量 $H_G$ 称为一般混杂因子；由 $X$ 引起、又导致观测中介 $Y$ 的变量 $H_R$，称为未观测中介。考虑五个相互独立的误差变量 $\varepsilon_X,\varepsilon_Y,\varepsilon_Z,\varepsilon_{H_G},\varepsilon_{H_R}$。假设中介模型为
+\begin{equation}
+\begin{aligned}
+H_G&=f_{H_G}(\varepsilon_{H_G}),\\
+X&=f_X(H_G,\varepsilon_X),\\
+H_R&=f_{H_R}(X,\varepsilon_{H_R}),\\
+Y&=f_Y(X,H_R,H_G,\varepsilon_Y),\\
+Z&=f_Z(X,Y,H_R,H_G,\varepsilon_Z).
+\end{aligned}
+\tag{7.226}
+\end{equation}
+显然，未观测混杂因子 $H_G$ 造成变量 $X$ 与中介 $Y$、结局 $Z$ 之间的相关。未观测混杂因子 $H_G$ 和未观测中介 $H_R$，又造成中介 $Y$ 与结局 $Z$ 之间的相关。
+
+为便于表述，首先介绍图7.10a中的标准工具变量（instrumental variable，IV）模型。其中，$I$ 表示工具变量，$X$ 表示原因变量，$Z$ 表示效应变量，$H_G$ 表示隐藏混杂因子。一个变量成为 IV 的条件是（Peters et al. 2017）：
+\begin{enumerate}
+\item $I$ 与 $H_G$ 独立；
+\item $I$ 与 $X$ 相关；
+\item $I$ 仅通过 $X$ 影响 $Y$。
+\end{enumerate}
+\input{figures/ch07b_fig10}
+
+图7.10a的结构方程模型为
+\begin{equation}
+X=\xi I+\gamma H_G+N_X,
+\tag{7.227}
+\end{equation}
+\begin{equation}
+Z=\alpha X+\delta H_G+N_Z.
+\tag{7.228}
+\end{equation}
+为估计 $X$ 对 $Z$ 的直接效应，利用 IV 与混杂因子 $H_G$ 不相关的假设，将式 (7.228) 两边与 IV $I$ 取协方差，得
+\[
+\operatorname{cov}(Z,I)=\alpha\operatorname{cov}(X,I),
+\]
+从而
+\begin{equation}
+\widehat\alpha=\frac{\operatorname{cov}(Z,I)}{\operatorname{cov}(X,I)}.
+\tag{7.229}
+\end{equation}
+
+接下来，向含有未观测混杂因子和未观测中介的中介因果模型中引入 IV（图7.10b）。为简单起见，考虑以下含 IV、混杂和未观测中介的线性中介模型：
+\begin{equation}
+H_G=N_G,
+\tag{7.230}
+\end{equation}
+\begin{equation}
+X=\xi I+\delta H_G+N_X,
+\tag{7.231}
+\end{equation}
+\begin{equation}
+H_R=\eta X+N_{H_R},
+\tag{7.332}
+\end{equation}
+\begin{equation}
+Y=\alpha X+\beta_{H_R}H_R+\beta_{H_G}H_G+N_Y,
+\tag{7.333}
+\end{equation}
+\begin{equation}
+Z=\pi X+\gamma Y+\Lambda_{H_G}H_G+\Lambda_{H_R}H_R+N_Z,
+\tag{7.334}
+\end{equation}
+其中，IV $I$ 与混杂因子 $H_G$、未测量中介 $H_R$ 不相关，误差变量 $N_G,N_X,N_{H_R},N_Y,N_Z$ 相互独立。
+
+与 Dippel et al.（2017）的方法类似，可以利用两阶段最小二乘估计和 IV，估计甲基化 $X$ 对表型 $Z$ 的效应。第一阶段和第二阶段回归分别为
+\begin{equation}
+X=C_x+\beta I+\varepsilon_x,
+\tag{7.335}
+\end{equation}
+\begin{equation}
+Z=C_Z+\alpha X+\varepsilon_Z.
+\tag{7.336}
+\end{equation}
+两边与 $I$ 取协方差，得
+\begin{equation}
+\widehat\alpha=\frac{\operatorname{cov}(Z,I)}{\operatorname{cov}(X,I)}.
+\tag{7.337}
+\end{equation}
+附录7.J说明，回归系数 $\widehat\alpha$ 等于 $X$ 对 $Z$ 的效应，其中
+\begin{equation}
+\widehat\alpha=\pi+\gamma(\alpha+\beta_{H_R}\eta)+\Lambda_{H_R}\eta.
+\tag{7.338}
+\end{equation}
+
+接着，由以下回归方程定义甲基化 $X$ 对基因表达 $Y$ 的效应的两阶段最小二乘估计量：
+\begin{equation}
+X=C_x+\beta I+\varepsilon_x,
+\tag{7.339}
+\end{equation}
+\begin{equation}
+Y=C_y+\delta_YX+\varepsilon_Y.
+\tag{7.340}
+\end{equation}
+采用与前面类似的论证，从回归式 (7.340) 得到估计量 $\widehat\delta_Y$：
+\begin{equation}
+\widehat\delta_Y=\frac{\operatorname{cov}(Y,I)}{\operatorname{cov}(X,I)}.
+\tag{7.341}
+\end{equation}
+附录7.J说明，由式 (7.332)，估计量 $\widehat\delta_Y$ 可表示为
+\begin{equation}
+\widehat\delta_Y=\alpha+\beta_{H_R}\eta,
+\tag{7.342}
+\end{equation}
+它等于 $X$ 对 $Y$ 的效应。
+
+最后，估计给定 $X$（甲基化）后，$Y$（基因表达）对 $Z$（表型）的效应。两阶段最小二乘估计量由以下两个方程定义：
+\begin{equation}
+Y=C_{Y\mid X}+\beta_1I+\beta_2X+\varepsilon_{Y\mid X},
+\tag{7.343}
+\end{equation}
+\begin{equation}
+Z=C_{Z\mid X}+\alpha_1Y+\alpha_2X+\varepsilon_{Z\mid X}.
+\tag{7.344}
+\end{equation}
+两阶段最小二乘估计量 $\alpha_1$ 和 $\alpha_2$ 分别为
+\begin{equation}
+\alpha_1=\frac{\operatorname{cov}(Z,I)\operatorname{cov}(X,X)-\operatorname{cov}(Z,X)\operatorname{cov}(X,Z)}{\Delta},
+\tag{7.345}
+\end{equation}
+\begin{equation}
+\alpha_2=\frac{\operatorname{cov}(Y,I)\operatorname{cov}(Z,X)-\operatorname{cov}(Y,X)\operatorname{cov}(Z,I)}{\Delta},
+\tag{7.346}
+\end{equation}
+其中，$\Delta=\operatorname{cov}(Y,I)\operatorname{cov}(X,X)-\operatorname{cov}(X,I)\operatorname{cov}(Y,X)$。
+
+附录7.J说明，两阶段最小二乘估计量 $\alpha_1$ 和 $\alpha_2$ 分别可表示为
+\begin{equation}
+\widehat\alpha_1=\frac{\gamma\beta_{H_G}+\Lambda_{H_G}}{\beta_{H_G}},
+\tag{7.347}
+\end{equation}
+以及
+\begin{equation}
+\widehat\alpha_2=\pi+\eta\Lambda_{H_R}-\frac{(\alpha+\eta\beta_{H_R})\Lambda_{H_G}}{\beta_{H_G}}.
+\tag{7.348}
+\end{equation}
+显然，如果 $\Lambda_{H_G}=0$，则 $\widehat\alpha_1=\alpha_1^*$、$\widehat\alpha_2=\alpha_2^*$，两阶段最小二乘估计量收敛到给定 $X$（甲基化）后 $Y$（基因表达）对 $Z$（表型）的效应。

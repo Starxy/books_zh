@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=1.55cm,y=1.05cm,>=Stealth,
+ch02u/.style={ellipse,draw=inkblue,minimum width=9mm,minimum height=6mm,font=\small},
+ch02t/.style={font=\small,inner sep=2pt}]
+\foreach \k in {1,2,3,4}{
+\node[ch02u](ch0204u\k)at(\k,2){$u_{\k}$};
+\node[ch02t](ch0204y\k)at(\k,0){$Y_{\k}$};
+\node[ch02t](ch0204e\k)at(\k,-1.2){$e_{\k}$};
+\draw[->,red,thin](ch0204u\k)--(ch0204y\k);
+\draw[->,blue!70,thin](ch0204e\k)--(ch0204y\k);
+}
+\draw[->,green!60!black](ch0204y1)--node[below,font=\small]{$\Upsilon_{21}$}(ch0204y2);
+\draw[->,green!60!black](ch0204y2)--node[below,font=\small]{$\Upsilon_{32}$}(ch0204y3);
+\draw[->,green!60!black](ch0204y3)--node[above,font=\small]{$\Upsilon_{43}$}(ch0204y4);
+\draw[->,green!60!black](ch0204y1.north)--(1,.6)--node[above,font=\small]{$\Upsilon_{31}$}(3,.6)--(ch0204y3.north);
+\end{tikzpicture}

@@ -1,0 +1,33 @@
+% 图 14.1：每面板 6 条实线有向边，另有一条无箭头虚线相关弧。
+\begin{tikzpicture}[causal,x=1.25cm,y=1.25cm,every node/.style={inner sep=2pt,font=\normalsize}]
+ \begin{scope}
+  \node (aUW) at (0,2.65) {$U_W$};
+  \node (aW) at (0,1.7) {$W$};
+  \node (aA) at (-.75,1) {$A$};
+  \node (aY) at (.75,1) {$Y$};
+  \node (aUA) at (-1.5,.25) {$U_A$};
+  \node (aUY) at (1.5,.25) {$U_Y$};
+  \draw[ed] (aUW)--(aW);
+  \draw[ed] (aW)--(aA);
+  \draw[ed] (aW)--(aY);
+  \draw[ed] (aA)--(aY);
+  \draw[ed] (aUA)--(aA);
+  \draw[ed] (aUY)--(aY);
+  \draw[dashed] (aUW.east) .. controls (1.42,2.02) and (1.5,1.25) .. (aUY.north);
+ \end{scope}
+ \begin{scope}[xshift=6.9cm]
+  \node (bUW) at (0,2.65) {$U_W$};
+  \node (bW) at (0,1.7) {$W$};
+  \node (bA) at (-.75,1) {$A$};
+  \node (bY) at (.75,1) {$Y$};
+  \node (bUA) at (-1.5,.25) {$U_A$};
+  \node (bUY) at (1.5,.25) {$U_Y$};
+  \draw[ed] (bUW)--(bW);
+  \draw[ed] (bW)--(bA);
+  \draw[ed] (bW)--(bY);
+  \draw[ed] (bA)--(bY);
+  \draw[ed] (bUA)--(bA);
+  \draw[ed] (bUY)--(bY);
+  \draw[dashed] (bUW.west) .. controls (-1.42,2.02) and (-1.5,1.25) .. (bUA.north);
+ \end{scope}
+\end{tikzpicture}

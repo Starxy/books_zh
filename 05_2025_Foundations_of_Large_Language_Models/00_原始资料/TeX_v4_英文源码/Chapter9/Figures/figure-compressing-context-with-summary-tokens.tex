@@ -1,0 +1,82 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.3cm}
+\def\bsep{2.0cm}
+
+\tikzstyle{enode} = [minimum width=0.8cm,minimum height=0.8cm,inner sep=2pt];
+\tikzstyle{lnode} = [minimum width=9.2cm,minimum height=1.3cm,inner sep=2pt];
+
+\begin{scope}
+
+\node [enode,anchor=center,fill=red!20] (e1) at (0,0) {\footnotesize{$\sigma^{<i}_1$}};
+\node [enode,anchor=west,fill=red!20] (e2) at ([xshift=\ssep]e1.east) {\footnotesize{$\sigma^{<i}_2$}};
+\node [enode,anchor=west,fill=ugreen!20] (e3) at ([xshift=\ssep]e2.east) {\footnotesize{$\mathbf{e}_1^i$}};
+\node [enode,anchor=west,fill=ugreen!20] (e4) at ([xshift=\ssep]e3.east) {\footnotesize{$\mathbf{e}_2^i$}};
+\node [enode,anchor=west,fill=ugreen!20] (e5) at ([xshift=\ssep]e4.east) {\footnotesize{$\mathbf{e}_3^i$}};
+\node [enode,anchor=west,fill=ugreen!20] (e6) at ([xshift=\ssep]e5.east) {\footnotesize{$\mathbf{e}_4^i$}};
+\node [enode,anchor=west,fill=blue!20,inner sep=0pt] (e7) at ([xshift=\ssep]e6.east) {\footnotesize{$\langle \mathbf{e}_1 \rangle$}};
+\node [enode,anchor=west,fill=blue!20,inner sep=0pt] (e8) at ([xshift=\ssep]e7.east) {\footnotesize{$\langle \mathbf{e}_2 \rangle$}};
+
+\node [enode,anchor=north] (x3) at ([yshift=-0.3cm]e3.south) {\footnotesize{$z_1^i$}};
+\node [enode,anchor=north] (x4) at ([yshift=-0.3cm]e4.south) {\footnotesize{$z_2^i$}};
+\node [enode,anchor=north] (x5) at ([yshift=-0.3cm]e5.south) {\footnotesize{$z_3^i$}};
+\node [enode,anchor=north] (x6) at ([yshift=-0.3cm]e6.south) {\footnotesize{$z_4^i$}};
+\node [enode,anchor=north] (x7) at ([yshift=-0.3cm]e7.south) {\footnotesize{$\langle \mathrm{g}_1 \rangle$}};
+\node [enode,anchor=north] (x8) at ([yshift=-0.3cm]e8.south) {\footnotesize{$\langle \mathrm{g}_2 \rangle$}};
+
+\draw [->] ([yshift=-3pt]x3.north) -- ([yshift=-1pt]e3.south);
+\draw [->] ([yshift=-3pt]x4.north) -- ([yshift=-1pt]e4.south);
+\draw [->] ([yshift=-3pt]x5.north) -- ([yshift=-1pt]e5.south);
+\draw [->] ([yshift=-3pt]x6.north) -- ([yshift=-1pt]e6.south);
+\draw [->] ([yshift=-3pt]x7.north) -- ([yshift=-1pt]e7.south);
+\draw [->] ([yshift=-3pt]x8.north) -- ([yshift=-1pt]e8.south);
+
+\node [lnode,anchor=south west,draw,thick] (transformer) at ([xshift=-0.3cm,yshift=0.4cm]e1.north west) {};
+\node [anchor=south] (tcaption) at ([yshift=0.3cm]transformer.south) {\Large{Transformer Layers}};
+
+\node [enode,anchor=south,fill=gray!30] (h1) at ([yshift=2.2cm]e1.north) {\footnotesize{\color{black!30} $\mathbf{h}^{<i}_1$}};
+\node [enode,anchor=south,fill=gray!30] (h2) at ([yshift=2.2cm]e2.north) {\footnotesize{\color{black!30} $\mathbf{h}^{<i}_1$}};
+\node [enode,anchor=south,fill=gray!30] (h3) at ([yshift=2.2cm]e3.north) {\footnotesize{\color{black!30} $\mathbf{h}_1$}};
+\node [enode,anchor=south,fill=gray!30] (h4) at ([yshift=2.2cm]e4.north) {\footnotesize{\color{black!30} $\mathbf{h}_2$}};
+\node [enode,anchor=south,fill=gray!30] (h5) at ([yshift=2.2cm]e5.north) {\footnotesize{\color{black!30} $\mathbf{h}_3$}};
+\node [enode,anchor=south,fill=gray!30] (h6) at ([yshift=2.2cm]e6.north) {\footnotesize{\color{black!30} $\mathbf{h}_4$}};
+\node [enode,anchor=south,fill=red!20,inner sep=0pt] (h7) at ([yshift=2.2cm]e7.north) {\tiny{$\sigma^{<i+1}_1$}};
+\node [enode,anchor=south,fill=red!20,inner sep=0pt] (h8) at ([yshift=2.2cm]e8.north) {\tiny{$\sigma^{<i+1}_2$}};
+
+\draw [->] ([yshift=1pt]e1.north) -- ([yshift=0.37cm]e1.north);
+\draw [->] ([yshift=1pt]e2.north) -- ([yshift=0.37cm]e2.north);
+\draw [->] ([yshift=1pt]e3.north) -- ([yshift=0.37cm]e3.north);
+\draw [->] ([yshift=1pt]e4.north) -- ([yshift=0.37cm]e4.north);
+\draw [->] ([yshift=1pt]e5.north) -- ([yshift=0.37cm]e5.north);
+\draw [->] ([yshift=1pt]e6.north) -- ([yshift=0.37cm]e6.north);
+\draw [->] ([yshift=1pt]e7.north) -- ([yshift=0.37cm]e7.north);
+\draw [->] ([yshift=1pt]e8.north) -- ([yshift=0.37cm]e8.north);
+
+\draw [<-,gray] ([yshift=-1pt]h1.south) -- ([yshift=-0.4cm]h1.south);
+\draw [<-,gray] ([yshift=-1pt]h2.south) -- ([yshift=-0.4cm]h2.south);
+\draw [<-,gray] ([yshift=-1pt]h3.south) -- ([yshift=-0.4cm]h3.south);
+\draw [<-,gray] ([yshift=-1pt]h4.south) -- ([yshift=-0.4cm]h4.south);
+\draw [<-,gray] ([yshift=-1pt]h5.south) -- ([yshift=-0.4cm]h5.south);
+\draw [<-,gray] ([yshift=-1pt]h6.south) -- ([yshift=-0.4cm]h6.south);
+\draw [<-] ([yshift=-1pt]h7.south) -- ([yshift=-0.4cm]h7.south);
+\draw [<-] ([yshift=-1pt]h8.south) -- ([yshift=-0.4cm]h8.south);
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,thick] [fit = (e1) (e2)] (softlast) {};
+\node [draw,dotted,thick] [fit = (h7) (h8)] (softcur) {};
+\end{pgfonlayer}
+
+\node [anchor=east] (softlastl) at ([xshift=-0.1cm]softlast.west) {\footnotesize{Soft Prompts}};
+\node [anchor=north west] (softlast2) at ([yshift=0.2cm]softlastl.south west) {\footnotesize{at Step $i-1$}};
+
+\node [anchor=west] (softcurl) at ([xshift=0.1cm]softcur.east) {\footnotesize{Soft Prompts}};
+\node [anchor=north west] (softcur2) at ([yshift=0.2cm]softcurl.south west) {\footnotesize{at the Current Step}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,447 @@
+% ============================================================
+%  第十章  实际原因（10.3—10.4 及章末）
+% ============================================================
+\section{因果束与基于维持的因果性}
+
+\subsection{因果束：定义与含义}
+
+我们首先考虑 \S 7.1 所定义的因果模型 $M$，并为每个家族、每个 $u$ 选取一个由维持性父变量组成的子集 $S$。回想在因果模型中，函数 $\{f_i\}$ 的论元曾在某种意义下被假定为极小的：我们从每个 $f_i$ 中剪去了全部冗余论元，只保留那些使 $f_i(pa_i,u)$ 非平凡的 $pa_i$（定义 7.1.1）。然而，该定义所关心的是相对于一切可能的 $u$ 而言的非平凡性；当我们处于某一特定状态 $U=u$ 时，还可以进一步剪枝。
+
+为说明这一点，考虑函数 $f_i=ax_1+bux_2$。这里 $PA_i=\{X_1,X_2\}$，因为总存在某个 $u$ 值使 $f_i$ 对 $x_1$ 或 $x_2$ 的变化敏感。然而，既然我们处于 $u=0$ 的状态，就可以放心地把 $X_2$ 视为平凡论元，把 $f_i$ 换成 $f_i^0=ax_1$，并把 $X_1$ 视为 $f_i$ 的唯一本质论元。我们把 $f_i^0$ 称为 $f_i$ 在 $u=0$ 上的\emph{投影}；更一般地，我们将把 $M$ 中每个函数替换为它相对于某个特定 $u$ 及其非本质部分之特定取值的投影，以此考虑整个模型的投影。由此得到一个新模型，我们称之为\emph{因果束}。
+
+\begin{definition}[因果束]
+对模型 $M=\langle U,V,\{f_i\}\rangle$ 与状态 $U=u$，因果束是一个新模型 $M_u=\langle u,V,\{f_i^u\}\rangle$，其中函数集 $f_i^u$ 由 $\{f_i\}$ 如下构造。
+\begin{enumerate}[label=\arabic*.,leftmargin=1.9em]
+\item 对每个变量 $V_i\in V$，把 $PA_i$ 分成两个子集 $PA_i=S\cup\bar S$，其中 $S$（意指“维持”）是 $PA_i$ 的任一满足下式的子集\footnote{Pearl (1998b) 曾要求 $S$ 为极小，但这一限制对我们的目的而言是不必要的（不过我们的全部例子都将使用极小充分集）。按惯例，我们用小写字母（如 $s,\bar s$）表示相应变量（如 $S,\bar S$）的具体取值，并用 $S_x(u)$ 表示在 $U=u$ 与 $\dox{X=x}$ 之下 $S$ 的取值。当然，每个父节点集 $PA_i$ 都会有一个不同的分划 $PA_i=S_i\cup\bar S_i$，但为清楚起见我们略去下标 $i$。}：
+\begin{equation}
+f_i(S(u),s,u)=f_i(S(u),s',u)\quad\text{对所有 } s'.\tag{10.6}
+\end{equation}
+换言之，$S$ 是 $PA_i$ 的任一足以蕴涵 $V_i(u)$ 之实际值的子集，无论我们如何设定 $PA_i$ 的其余成员。
+\item 对每个变量 $V_i\in V$，找出 $\bar S$ 的一个子集 $W$，使得存在某个取值 $W=w$，它使函数 $f_i(s,\bar S_w(u),u)$ 在 $s$ 上非平凡；亦即
+\[
+f_i(s',\bar S_w(u),u)\neq V_i(u)\quad\text{对某个 } s'.
+\]
+此处 $\bar S$ 不应与任何其他变量 $V_j$（$j\neq i$）的维持集相交。（同样，设定 $W=w$ 也不应与别处的任何此类设定相矛盾。）
+\item 把 $f_i(s,\bar s,u)$ 替换为它的投影 $f_i^u(s)$，后者由下式给出
+\begin{equation}
+f_i^u(s)=f_i(s,\bar S_w(u),u).\tag{10.7}
+\end{equation}
+\end{enumerate}
+于是 $V_i$ 的新父节点集成为 $PA_i^u=S$，且每个 $f^u$ 函数都对其新父节点集 $S$ 敏感。
+\end{definition}
+
+\begin{definition}[自然束]
+若定义 10.3.1 的条件 2 在 $W=\varnothing$（对所有 $V_i\in V$）之下得到满足，则称因果束 $M_u$ 是\emph{自然的}。
+\end{definition}
+
+换言之，自然束是这样形成的：把维持集之外的一切变量“冻结”在其实际值 $\bar S(u)$ 上，由此得到投影 $f_i^u(s)=f_i(s,\bar S(u),u)$。
+
+\begin{definition}[实际原因]
+我们说事件 $X=x$ 在状态 $u$ 中是 $Y=y$ 的\emph{实际原因}（简称“$x$ 引起 $y$”），当且仅当存在一个自然束 $M_u$ 使得
+\begin{equation}
+Y_x=y\quad\text{在 } M_u \text{ 中},\tag{10.8}
+\end{equation}
+并且
+\begin{equation}
+Y_{x'}\neq y\quad\text{在 } M_u \text{ 中，对某个 } x'\neq x.\tag{10.9}
+\end{equation}
+\end{definition}
+
+注意式 \textup{(10.8)} 等价于
+\begin{equation}
+Y_x(u)=y,\tag{10.10}
+\end{equation}
+而后者由 $X(u)=x$ 与 $Y(u)=y$ 所蕴涵。但式 \textup{(10.9)} 保证：在把 $\bar S$ 所表示的“平凡环境”冻结之后，$Y=y$ 不会被 $X$ 的某个取值 $x'$ 所维持。
+
+\begin{definition}[贡献原因]
+我们说 $x$ 在状态 $u$ 中是 $y$ 的\emph{贡献原因}，当且仅当存在某个满足式 \textup{(10.8)} 与 \textup{(10.9)} 的因果束，但不存在满足二者的自然束。
+\end{definition}
+
+总之，因果束可以被解释为这样一种理论：它在某些变量（$\bar S$）被 do(.) 算子假设性地冻结的条件下，为每个实际事件 $V_i(u)=v_i$ 提供一个充分而非平凡的解释。借助这一新理论，我们对事件 $X=x$ 施加反事实检验，检查若 $X$ 不是 $x$ 时 $Y$ 是否会改变。若冻结在 $\bar S$ 的实际值上进行（即 $W=\varnothing$）时 $Y$ 发生变化，我们就说“$x$ 是 $y$ 的实际原因”。若变化只在偏离实际状态的冻结状态下发生（即 $W\neq\varnothing$），我们就说“$x$ 是 $y$ 的贡献原因”。
+
+\begin{remarkenv}
+虽然 $W$ 的选取是为了使 $V_i$ 对 $S$ 敏感，但这并不保证 $S(u)$ 对 $V_i(u)$ 既必要又充分，因为局部敏感性并不排除存在另一个状态 $s''\neq S(u)$ 使得 $f_i^u(s'')=V_i(u)$。因此，式 \textup{(10.8)} 并不保证 $x$ 对 $y$ 既必要又充分。这正是式 \textup{(10.9)} 中最后那道反事实检验的理由。要求 $w$ 对 $S$ 的每个 $s$ 都使 $f^u$ 非平凡，则未免过严；这样的 $W$ 可能并不存在。若式 \textup{(10.8)}—式 \textup{(10.9)} 得到满足，则 $W=w$ 表示对世界模型的某种假设性修改，在该修改之下 $x$ 对 $y$ 既充分又必要。
+\end{remarkenv}
+
+\noindent{\heiti 关于多变量事件的注记：}尽管定义 10.3.3 与 10.3.4 既适用于单变量原因与结果，也适用于多变量原因与结果，但当 $X$ 与 $Y$ 由变量集构成时，仍需作一些细化。\footnote{这些细化是 Joseph Halpern 在 Halpern and Pearl (1999) 所给定义的语境中提出的。}若所考虑的结果 $E$ 是变量集 $Y=\{Y_1,\dots,Y_k\}$ 的任一布尔函数，则式 \textup{(10.8)} 应对 $Y$ 的每个成员 $Y_i$ 都成立，而式 \textup{(10.9)} 应改写为 $Y_{x'}\Rightarrow\neg E$，而不是 $Y_{x'}\neq y$。此外，若 $X$ 由若干变量组成，则要求 $X$ 极小是合理的——换言之，要求这些变量的任何子集都不能通过式 \textup{(10.8)}—式 \textup{(10.9)} 的检验。这一要求把 $X$ 中不相干的、过度指定的细节剥除。例如，若饮下毒药有资格作为 Joe 之死的实际原因，那么尴尬的是，“饮下毒药并且打了个喷嚏”也会通过式 \textup{(10.8)}—式 \textup{(10.9)} 的检验，从而有资格作为 Joe 之死的原因。极小性把“打喷嚏”从因果事件 $X=x$ 中剔除。
+
+\subsubsection*{纳入概率与证据}
+
+设状态 $u$ 是不确定的，其不确定性由概率 $P(u)$ 刻画。若 $e$ 是该情形中可得的证据，则 $x$ 引起 $y$ 的概率，可由对所有使断言“$x$ 引起 $y$”为真的状态 $u$ 求证据权重 $P(u\mid e)$ 之和而得到。
+
+\begin{definition}[实际因果性的概率]
+设 $U_{xy}$ 为使断言“$x$ 是 $y$ 的实际原因”为真的状态集（定义 10.3.3），并设 $U_e$ 为与证据 $e$ 相容的状态集。在证据 $e$ 之下 $x$ 引起 $y$ 的概率，记作 $P(\mathrm{caused}(x,y\mid e))$，由下式给出
+\begin{equation}
+P(\mathrm{caused}(x,y\mid e))=\frac{P(U_{xy}\cap U_e)}{P(U_e)}.\tag{10.11}
+\end{equation}
+\end{definition}
+
+\subsection{例：从析取到一般公式}
+
+\subsubsection*{过度决定与贡献原因}
+
+贡献因果性的典型情形是：两个行动共同导致某一事件，而任一行动单独施行也仍会导致该事件。在这类情形中，模型只包含一个机制，它通过一个简单析取式把结果 $E$ 与两个行动连接起来：$E=A_1\vee A_2$。不存在任何自然束能使 $A_1$ 或 $A_2$ 有资格成为 $E$ 的实际原因。若把 $A_1$ 或 $A_2$ 中之一固定在其当前值（即真），则 $E$ 将成为另一个行动的平凡函数。然而，若我们偏离当前事态、把 $A_2$ 设为假（即构造一个 $W=\{A_2\}$ 的束并把 $W$ 设为假），那么 $E$ 就会对 $A_1$ 敏感，从而通过式 \textup{(10.9)} 的反事实检验。
+
+这个例子说明了束判据在何种意义上囊括了 Lewis 的准依赖概念。如果我们同意在由 $\dox{A_2=\text{false}}$ 算子创造的假设子模型中检验这种依赖，那么事件 $E$ 就可以被视为准依赖于 $A_1$。在 \S 10.2 中我们论证过：这种假设性检验——尽管与当前情景 $u$ 相冲突——已隐含地写入每个因果模型的特许状之中。因此，因果束可以被视为对 Lewis 的准依赖过程概念的形式化阐析，而各个 $W$ 的并集则表示该过程的“特殊环境”——（在适当修改之后）正是它使 $X=x$ 成为 $Y=y$ 的必要条件。
+
+\subsubsection*{析取范式}
+
+考虑由布尔函数
+\[
+y=f(x,z,r,h,t,u)=xz\vee rh\vee t
+\]
+刻画的单一机制，其中（为简便起见）假定变量 $X,Z,R,H,T$ 彼此因果独立（即在因果图 $G(M)$ 中没有一个变量是另一个的后代）。下面我们说明 $x$ 有资格作为 $y$ 的贡献原因或实际原因的条件。
+
+首先，考虑所有变量皆为真的状态 $U=u$：
+\[
+X(u)=Z(u)=R(u)=H(u)=T(u)=Y(u)=\text{true}.
+\]
+在这一状态中，每个析取项都表示一个极小的维持变量集。特别地，取 $S=\{X,Z\}$，我们发现投影 $f^u(x,z)=f(x,z,R(u),H(u),T(u))$ 变成恒真。因此不存在自然束 $M_u$，$x$ 不可能成为 $y$ 的实际原因。可行的因果束可以通过取 $w=\{r',t'\}$ 或 $w=\{h',t'\}$ 得到，其中撇号表示取补。这两种选择各自给出投影 $f^u(x,z)=xz$。显然，$M_u$ 满足式 \textup{(10.8)} 与 \textup{(10.9)} 的条件，从而认定 $x$ 是 $y$ 的贡献原因。
+
+用同样的论证容易看出，在满足
+\[
+X(u')=Z(u')=\text{true}\quad\text{且}\quad R(u')=T(u')=\text{false}
+\]
+的状态 $u'$ 中，自然束存在；也就是说，通过把冗余变量 $R,H,T$ 设为它们在 $u'$ 中的实际值，可以实现非平凡的投影 $f^{u'}(x,z)=xz$。于是 $x$ 有资格作为 $y$ 的实际原因。
+
+这个例子说明，Mackie 关于 INUS 条件的直觉如何在结构框架中得到阐析；它也说明结构性的（或“倾向性的”）知识（例如 $f_i(pa_i,u)$）与情境性知识（例如 $X(u)=\text{true}$）各自所起的精确作用——而严格的逻辑方案未能清楚地区分二者。
+
+\subsubsection*{一般布尔形式下的单一机制}
+
+考虑函数
+\begin{equation}
+y=f(x,z,h,u)=xz'\vee x'z\vee xh',\tag{10.12}
+\end{equation}
+它等价于
+\begin{equation}
+y=f(x,z,h,u)=xz'\vee x'z\vee zh'.\tag{10.13}
+\end{equation}
+如前假定：(a) 我们考虑一个 $X,Z,H$ 皆为真的状态 $u$；(b) 我们追问事件 $x:X=\text{true}$ 是否引起了事件 $y:Y=\text{false}$。在这一状态中，唯一的维持集是 $S=\{X,Z,R\}$，因为在该 $u$ 下无论取哪两个变量，都不能不顾第三个变量而蕴涵 $Y=\text{false}$。\footnote{原书此处作 $S=\{X,Z,R\}$；按上下文（下文称 $\bar S$ 为空，且 $Y$ 的父节点为 $X,Z,H$），此处应为 $S=\{X,Z,H\}$。} 由于 $\bar S$ 为空，束的选择是唯一的：$M_u=M$，对此有 $y=f^u(x,z,h)=xz'\vee x'z\vee xh'$。这个 $M_u$ 通过式 \textup{(10.9)} 的反事实检验，因为 $f^u(x',z,h)=\text{true}$；因此我们断定 $x$ 是 $y$ 的实际原因。同样可以看出，事件 $H=\text{true}$ 是 $Y=\text{false}$ 的实际原因。这直接来自反事实检验
+\[
+Y_h(u)=\text{false}\quad\text{与}\quad Y_{h'}(u)=\text{true}.
+\]
+
+由于定义 10.3.3 与 10.3.4 立足于语义上的考虑，从 $f$ 的任何逻辑等价形式（不必是极小析取形式）都会得到相同的结论——只要 $f$ 表示单一机制。因此，在简单的单一机制模型中，束判据可以被视为 INUS 直觉背后的语义基础。束判据中结构敏感的那些方面，将在下面两个例子中显现，那里考虑的是具有多个层次的模型。
+
+\subsection{束、抢先与单一事件因果性的概率}
+
+本节把束判据用于沙漠旅行者例子的一个概率版本。这将说明：(i) 结构信息在涉及抢先的问题中如何被利用；(ii) 在给定一组观测时，我们如何计算一个事件“是另一事件之实际原因”的概率。
+
+考虑沙漠旅行者例子的一个修改版本：我们不知道旅行者是否在水壶被打穿之前设法喝到了毒水。为刻画这一不确定性，我们加入一个二值变量 $U$，它指示毒水是否被喝下（$u=0$ 表示喝下，$u=1$ 表示未喝）。由于 $U$ 同时影响 $D$ 与 $C$，我们得到图 10.3 所示的结构。为完整地指定模型，我们需要为图中的各家族指派函数 $f_i(pa_i,u)$ 以及一个概率分布 $P(u)$。为使模型在形式上完整，我们引入哑背景变量 $U_X$ 与 $U_P$，它们代表两个仇敌行动背后的因素。
+
+对故事的通常理解给出如下函数关系：
+\[
+c=p(u'\vee x'),\qquad d=x(u\vee p'),\qquad y=c\vee d,
+\]
+连同证据信息
+\[
+X(u_X)=1,\qquad P(u_P)=1.
+\]
+（我们假定，即使 $T$ 在枪击之前喝下了未下毒的水（$p'u'$），他也不会在水壶已空（$x$）的情况下存活。）
+
+为构造因果束 $M_u$，我们逐一考察这三个函数，并作出它们各自在 $u$ 上的投影。例如，对 $u=1$ 我们得到式 \textup{(10.1)} 所示的函数，其（极小）维持父节点集为：$X$（对 $C$）、$X$（对 $D$）与 $D$（对 $Y$）。投影后的函数成为
+\begin{equation}
+\begin{aligned}
+c&=x',\\
+d&=x,\\
+y&=d,
+\end{aligned}\tag{10.14}
+\end{equation}
+而束模型 $M_{u=1}$ 是自然的；其结构见图 10.4。为检验 $x$（或 $p$）是否为 $y$ 的原因，我们应用式 \textup{(10.8)}—式 \textup{(10.9)}，得到
+\begin{equation}
+\begin{aligned}
+Y_x=1\ \text{ 且 }\ Y_{x'}=0&\quad\text{在 } M_{u=1} \text{ 中},\\
+Y_p=1\ \text{ 且 }\ Y_{p'}=1&\quad\text{在 } M_{u=1} \text{ 中}.
+\end{aligned}\tag{10.15}
+\end{equation}
+于是，仇敌 2 向水壶射击（$x$）被归为 $T$ 之死（$y$）的实际原因，而仇敌 1 在水中下毒（$p$）不是 $y$ 的实际原因。
+
+接下来考虑状态 $u=0$，它表示我们这位旅行者在仇敌 2 向水壶开枪之前伸手喝了一口。对应于 $M_{u=0}$ 的图见图 10.5，它给出
+\begin{equation}
+\begin{aligned}
+Y_x=1\ \text{ 且 }\ Y_{x'}=1&\quad\text{在 } M_{u=0} \text{ 中},\\
+Y_p=1\ \text{ 且 }\ Y_{p'}=0&\quad\text{在 } M_{u=0} \text{ 中}.
+\end{aligned}\tag{10.16}
+\end{equation}
+于是，在这一事态下我们把仇敌 1 的行动归为 $T$ 之死的实际原因，而仇敌 2 的行动不被视为死亡的原因。
+
+若我们不知道究竟是哪个状态占了上风，$u=1$ 还是 $u=0$，那就只能满足于 $x$ 引起 $y$ 的概率。同样，若我们观察到某些反映 $P(u)$ 的证据 $e$，这类证据将给出（见式 \textup{(10.11)}）
+\[
+P(\mathrm{caused}(x,y\mid e))=P(u=1\mid e)
+\]
+以及
+\[
+P(\mathrm{caused}(p,y\mid e))=P(u=0\mid e).
+\]
+例如，一份确认“体内无氰化物”的法医报告将排除状态 $u=0$、支持 $u=1$，于是 $x$ 成为 $y$ 之原因的概率变为 100\%。更为精致的概率模型见 Pearl (1999) 的分析。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[lat] (UX) at (-3.8,3.5) {$U_X$};
+  \node[lat] (UP) at (3.8,3.5) {$U_P$};
+  \node[circle,fill,inner sep=1.2pt] (X) at (-3.8,2.2) {};
+  \node[font=\small,left=0.8mm] at (-3.8,2.2) {$X=1$};
+  \node[circle,fill,inner sep=1.2pt] (P) at (3.8,2.2) {};
+  \node[font=\small,right=0.8mm] at (3.8,2.2) {$P=1$};
+  \node[circle,fill,inner sep=1.2pt] (U) at (0,2.9) {};
+  \node[font=\small,above=0.8mm] at (0,2.9) {$u$};
+  \node[circle,fill,inner sep=1.2pt] (D) at (-1.6,1.1) {};
+  \node[font=\small,left=1.0mm] at (-1.72,1.1) {$D$};
+  \node[circle,fill,inner sep=1.2pt] (C) at (1.6,1.1) {};
+  \node[font=\small,right=1.0mm] at (1.72,1.1) {$C$};
+  \node[circle,fill,inner sep=1.2pt] (y) at (0,-0.1) {};
+  \node[font=\small,left=1.0mm] at (-0.12,-0.1) {$y$};
+  \draw[edd] (UX)--(X); \draw[edd] (UP)--(P);
+  \draw[ed] (X)--(D); \draw[ed] (X)--(C);
+  \draw[ed] (U)--(D); \draw[ed] (U)--(C);
+  \draw[ed] (P)--(C); \draw[ed] (P)--(D);
+  \draw[ed] (D)--(y); \draw[ed] (C)--(y);
+  \node[font=\small,left=1.4mm,align=right] at (-4.85,2.2) {仇敌 2\\射击水壶};
+  \node[font=\small,right=1.4mm,align=left] at (4.85,2.2) {仇敌 1\\投毒};
+  \node[font=\small,above=0.6mm,align=center] at (0,3.15) {首次饮水\\时间};
+  \node[font=\small,anchor=east] at (-2.25,1.1) {脱水};
+  \node[font=\small,anchor=west] at (2.18,1.1) {氰化物摄入};
+  \node[font=\small,anchor=west] at (0.38,-0.1) {死亡};
+\end{tikzpicture}
+\caption{概率化沙漠旅行者的因果关系。}
+\label{fig:10.3}
+\end{figure}
+
+\begin{figure}[hbt]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[circle,fill,inner sep=1.2pt] (x) at (0,2.2) {}; \node[font=\small,left=0.7mm] at (0,2.2) {$X=1$};
+  \node[circle,fill,inner sep=1.2pt] (u) at (2.4,2.2) {}; \node[font=\small,above=0.6mm] at (2.4,2.2) {$u=1$};
+  \node[circle,fill,inner sep=1.2pt] (p) at (4.6,2.2) {}; \node[font=\small,right=0.7mm] at (4.6,2.2) {$P=1$};
+  \node[circle,fill,inner sep=1.2pt] (D) at (0.55,1.15) {}; \node[font=\small,anchor=east] at (-0.05,1.15) {$D=1$};
+  \node[circle,fill,inner sep=1.2pt] (C) at (2.3,1.15) {}; \node[font=\small,anchor=west] at (2.55,1.15) {$C=0$};
+  \node[circle,fill,inner sep=1.2pt] (y) at (0.95,0.1) {}; \node[font=\small,below=0.7mm] at (0.95,0.1) {$y=1$};
+  \draw[ed] (x)--(D); \draw[ed] (x)--(C); \draw[ed] (D)--(y);
+\end{tikzpicture}
+\caption{表示状态 $u=1$ 的自然因果束。}
+\label{fig:10.4}
+\end{figure}
+
+\begin{figure}[hbt]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[circle,fill,inner sep=1.2pt] (x) at (0,2.2) {}; \node[font=\small,left=0.7mm] at (0,2.2) {$X=1$};
+  \node[circle,fill,inner sep=1.2pt] (u) at (2.4,2.2) {}; \node[font=\small,above=0.6mm] at (2.4,2.2) {$u=0$};
+  \node[circle,fill,inner sep=1.2pt] (p) at (4.6,2.2) {}; \node[font=\small,right=0.7mm] at (4.6,2.2) {$P=1$};
+  \node[circle,fill,inner sep=1.2pt] (D) at (0.55,1.15) {}; \node[font=\small,anchor=east] at (-0.05,1.15) {$D=0$};
+  \node[circle,fill,inner sep=1.2pt] (C) at (2.3,1.15) {}; \node[font=\small,anchor=west] at (2.55,1.15) {$C=1$};
+  \node[circle,fill,inner sep=1.2pt] (y) at (1.25,0.1) {}; \node[font=\small,below=0.7mm] at (1.25,0.1) {$y=1$};
+  \draw[ed] (p)--(D); \draw[ed] (p)--(C); \draw[ed] (C)--(y);
+\end{tikzpicture}
+\caption{表示状态 $u=0$ 的自然因果束。}
+\label{fig:10.5}
+\end{figure}
+
+\subsection{路径切换因果性}
+
+\begin{example}
+设 $x$ 是一个双位开关的状态。在位置 1（$x=1$），开关打开一盏灯（$z=1$）并关掉一只手电筒（$w=0$）。在位置 0（$x=0$），开关打开手电筒（$w=1$）并关掉灯（$z=0$）。令 $Y=1$ 表示“房间被照亮”这一命题。
+\end{example}
+
+与开关处于位置 1 和位置 2 的状态相应的因果束 $M_u$ 与 $M_{u'}$，分别见图 10.6 的两幅图。$M_u$ 又一次蕴涵 $Y_x=1$ 与 $Y_{x'}=0$。同样，$M_{u'}$ 蕴涵 $Y_x=1$ 与 $Y_{x'}=0$。于是，“开关处于位置 1”与“开关处于位置 2”都被视为“房间被照亮”的实际原因，尽管二者都不是必要条件。
+
+这个例子进一步凸显了“实际原因”这一概念的微妙之处：把 $X$ 从 1 改为 0，只不过改变了因果通路的走向，而其源头与归宿依旧。当前的开关位置（$X=1$）应当被视为房间灯光的实际原因（或“解释”）吗？尽管 $X=1$ 使电流得以通过灯管，而且事实上是当前维持灯光的唯一机制，人们仍可以争辩说，它在日常交谈中并不配“原因”之名。例如，说 $X=1$ 是挫败一场未遂盗窃的原因，会显得古怪。然而，回想因果解释的价值正是在结构列联所造就的反常环境中获得的，那么每当我们在模型中把一只手电筒指定为一个单独的机制时，它发生故障的可能性就应当进入我们的考虑。把这一列联放在心上，把开关位置说成挫败盗窃的原因，就不至于太古怪了。
+
+\begin{figure}[hbt]
+\centering
+\begin{tikzpicture}[causal,scale=0.98,every node/.style={transform shape}]
+  \begin{scope}
+    \node[circle,fill,inner sep=1.2pt] (a1) at (0,1.7) {}; \node[font=\small,above=0.5mm] at (0,1.7) {$X(u)=1$};
+    \node[circle,fill,inner sep=1.2pt] (a2) at (-1.1,0.85) {}; \node[font=\small,left=0.7mm] at (-1.1,0.85) {$z=1$};
+    \node[circle,fill,inner sep=1.2pt] (a3) at (1.1,0.85) {}; \node[font=\small,right=0.7mm] at (1.1,0.85) {$w=0$};
+    \node[circle,fill,inner sep=1.2pt] (a4) at (0,0.0) {}; \node[font=\small,below=0.6mm] at (0,0.0) {$y=1$};
+    \draw[ed] (a1)--(a2); \draw[ed] (a1)--(a3); \draw[ed] (a2)--(a4);
+  \end{scope}
+  \begin{scope}[xshift=5.6cm]
+    \node[circle,fill,inner sep=1.2pt] (b1) at (0,1.7) {}; \node[font=\small,above=0.5mm] at (0,1.7) {$X(u')=0$};
+    \node[circle,fill,inner sep=1.2pt] (b2) at (-1.1,0.85) {}; \node[font=\small,left=0.7mm] at (-1.1,0.85) {$z=0$};
+    \node[circle,fill,inner sep=1.2pt] (b3) at (1.1,0.85) {}; \node[font=\small,right=0.7mm] at (1.1,0.85) {$w=1$};
+    \node[circle,fill,inner sep=1.2pt] (b4) at (0,0.0) {}; \node[font=\small,below=0.6mm] at (0,0.0) {$y=1$};
+    \draw[ed] (b1)--(b2); \draw[ed] (b1)--(b3); \draw[ed] (b3)--(b4);
+  \end{scope}
+\end{tikzpicture}
+\caption{表示例 10.3.6 中路径切换的自然束。}
+\label{fig:10.6}
+\end{figure}
+
+\subsection{时间性抢先}
+
+考虑本章序言中提到的例子：两场火向一座房子推进。若火 A 在火 B 之前烧毁了房子，我们就会把火 A 视为损害的实际原因，尽管若不是因为 A，火 B 也会造成同样的结果。若我们简单地把结构模型写成
+\[
+H=A\vee B,
+\]
+其中 $H$ 表示“房子烧毁”，那么束方法会把两场火都归为同等程度的贡献原因，这与直觉相悖——火 B 并不被认为对 $H$ 有任何贡献。
+
+这个例子与沙漠旅行者相似，但又有不同：这里一个原因抢先另一个的方式更为微妙，第二个原因之所以失效，仅仅是因为结果已经发生。Hall (2004) 把这类抢先视为等同于普通的抢先，并用一个因果图来建模：其中 $H$ 一旦被激活，就抑制自己的父节点。这样的抑制性反馈回路导致不可逆行为，与定义 7.1.1 的唯一解假定相冲突。
+
+要表达“房子一旦烧毁，即使起火的原因消失也仍将保持烧毁”这一事实，更直接的办法是诉诸动态因果模型（如图 3.3），其中的变量带时间下标。的确，用 \S 7.1 定义的静态因果模型无法刻画“先到达”这类时间关系；必须改用动态模型。
+
+设位置 $x$、时刻 $t$ 处的火情 $V(x,t)$ 取三个值：$g$（绿色）、$f$（着火）与 $b$（烧毁）。刻画火势蔓延的动态结构方程于是可（简化地）写成\footnote{原书第三行条件如此排印，前后自相矛盾；按上下文，该行应为“若 $V(x,t-1)=f$”（着火之地在下一时刻转为烧毁）。}：
+\begin{equation}
+V(x,t)=
+\begin{cases}
+f & \text{若 } V(x,t-1)=g \text{ 且 } V(x-1,t-1)=f,\\
+f & \text{若 } V(x,t-1)=g \text{ 且 } V(x+1,t-1)=f,\\
+b & \text{若 } V(x,t-1)=b \text{ 且 } V(x,t-1)=f,\\
+g & \text{其他}.
+\end{cases}\tag{10.17}
+\end{equation}
+
+与这一模型相应的因果图见图 10.7(a)，它为每个变量 $V(x,t)$ 指定三个父节点：其北邻的先前状态 $V(x+1,t-1)$、其南邻的先前状态 $V(x-1,t-1)$，以及位置 $x$ 处的先前状态 $V(x,t-1)$。由火 A 与火 B 相隔一个时间单位先后燃起（对应于行动 $\dox{V(x^*+2,t^*-2)=f}$ 与 $\dox{V(x^*-2,t^*-1)=f}$）所产生的场景，见图 10.7(b)。黑色与灰色圆点分别表示处于状态 $f$（着火）与 $b$（烧毁）的时空区域。这一束既是自然的，又是唯一的，这从式 \textup{(10.17)} 可以看出。图 10.7(b) 中的箭头表示由各家族处（唯一的）极小充分集 $S$ 构造出来的自然束。该束指派给每个变量的父节点集 $S$ 的状态，构成一个对该变量实际状态既必要又充分的事件（这里假定 $\bar S$ 中的变量被冻结在其实际值上）。
+
+对这一束施加式 \textup{(10.9)} 的检验，我们发现事件 $V(x^*-2,t^*-2)=f$（表示火 A 的燃起）与序列 $V(x^*,t),\,t>t^*$（表示房子随时间变化的状态）之间存在反事实依赖。对火 B 则不存在这样的依赖。据此，我们把火 A 归为房子起火的实际原因。值得注意的是，把因果性归于加速结果发生之事件这一常见直觉，在故事的时空表示中被看作束检验的一个推论。然而，正如 Paul (1998) 所建议的那样，这一直觉不能充当实际因果性的定义性原则。例如在我们的故事中，两场火单独都没有加速（或延迟、或改变其任何属性）下面这个事件：$E=$ 房主第二天没能好好吃早饭。然而我们仍然认为火 A（而非火 B）是 $E$ 的实际原因，这正是束判据所预言的。
+
+这一判据的概念基础，可以通过考察图 10.7(b) 中极小束的构造而得到说明。构造的关键一步在于时空区域 $(x^*,t^*)$，它表示火灾到达之时的房子。表示该时刻房子状态的变量 $V(x^*,t^*)$ 有一个双父节点的维持集 $S=\{V(x^*+1,t^*-1),V(x^*,t^*-1)\}$，其取值分别为 $f$ 与 $g$。利用式 \textup{(10.17)} 可见，南侧父节点 $V(x^*-1,t^*-1)$ 是冗余的，因为 $V(x^*,t^*)$ 的值（为 $f$）由另外两个父节点的当前值所决定。因此，这个父节点可以被排除在束之外，从而使 $V(x^*,t^*)$ 依赖于火 A。此外，由于南侧父节点的值为 $g$，它不可能属于任何极小维持集，这就保证了 $V(x^*,t^*)$ 独立于火 B。（当然，我们可以把这个父节点加入 $S$，但 $V(x^*,t^*)$ 仍将独立于火 B。）
+
+下一个要考察的变量是 $V(x^*,t^*+1)$，其父节点 $V(x^*+1,t^*)$、$V(x^*,t^*)$ 与 $V(x^*-1,t^*)$ 的取值分别为 $b$、$f$、$f$。由式 \textup{(10.17)}，中间父节点的值 $f$ 已足以确保子变量取值 $b$；因此这个父节点有资格作为单元素维持集 $S=\{V(x^*,t^*)\}$，这使我们能把另外两个父节点排除在束之外，从而让子变量（经由 $S$）依赖火 A、而不依赖火 B。北侧与南侧父节点本身不足以维持子节点的当前值（$b$）（邻近区域着火可以使房子起火，却不能使其立即“烧毁”）；因此我们必须把中间父节点留在 $S$ 中，而这样做就使一切变量 $V(x^*,t)$（$t>t^*$）都独立于火 B。
+
+可见，维持方面的考虑通过两个关键步骤导致直觉的结果：(1) 允许把每个变量 $V(x^*,t)$（$t>t^*$）的南侧父节点排除在束之外，从而保持 $V(x^*,t)$ 对火 A 的依赖；(2) 要求把每个变量 $V(x^*,t)$（$t>t^*$）的中间父节点纳入（任何）束中，从而阻止 $V(x^*,t)$ 对火 B 的依赖。步骤 (1) 相当于选出从原因到结果的内在过程，然后压制其非内在环境的影响。步骤 (2) 则阻止因果过程越过其内在边界而扩张。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.82,every node/.style={transform shape}]
+  \begin{scope}
+    \foreach \r in {1,...,5} { \foreach \c in {1,...,6} {
+      \pgfmathsetmacro{\ay}{(6-\r)*0.85}
+      \pgfmathsetmacro{\ax}{\c*0.95}\pgfmathsetmacro{\bx}{(\c+1)*0.95}
+      \draw[->,line width=0.35pt] (\ax,\ay)--(\bx,\ay);
+    }}
+    \foreach \r in {1,...,4} { \foreach \c in {1,...,6} {
+      \pgfmathsetmacro{\ay}{(6-\r)*0.85}\pgfmathsetmacro{\by}{(5-\r)*0.85}
+      \pgfmathsetmacro{\ax}{\c*0.95}\pgfmathsetmacro{\bx}{(\c+1)*0.95}
+      \draw[->,line width=0.35pt] (\ax,\ay)--(\bx,\by);
+      \draw[->,line width=0.35pt] (\ax,\by)--(\bx,\ay);
+    }}
+    \foreach \r in {1,...,5} { \foreach \c in {1,...,7} {
+      \pgfmathsetmacro{\ay}{(6-\r)*0.85}\pgfmathsetmacro{\ax}{\c*0.95}
+      \node[circle,draw,fill=white,inner sep=0.2pt,minimum size=2.4mm,line width=0.4pt] (a\r\c) at (\ax,\ay) {};
+    }}
+    \draw[->] (0.55,-0.45)--(7.35,-0.45) node[right,font=\small] {$t$};
+    \draw[->] (0.55,-0.45)--(0.55,4.95) node[above,font=\small] {$x$};
+    \node[font=\small,anchor=east] at (0.45,2.55) {$x^*$};
+    \node[font=\small,anchor=east] at (-0.15,2.55) {房子};
+    \draw[dashed] (2.85,-0.45)--(2.85,0.05);
+    \node[font=\small,below] at (2.85,-0.5) {$t^*$};
+    \node[font=\small] at (3.9,-1.25) {(a)};
+  \end{scope}
+  \begin{scope}[xshift=9.4cm]
+    \foreach \r in {1,...,5} { \foreach \c in {1,...,6} {
+      \pgfmathsetmacro{\ay}{(6-\r)*0.85}
+      \pgfmathsetmacro{\ax}{\c*0.95}\pgfmathsetmacro{\bx}{(\c+1)*0.95}
+      \draw[->,line width=0.35pt] (\ax,\ay)--(\bx,\ay);
+    }}
+    \draw[->,line width=0.7pt] (0.95,4.25)--(1.90,3.40);
+    \draw[->,line width=0.7pt] (1.90,3.40)--(2.85,2.55);
+    \draw[->,line width=0.7pt] (1.90,0.85)--(2.85,1.70);
+    \foreach \r in {1,...,5} { \foreach \c in {1,...,7} {
+      \pgfmathsetmacro{\ay}{(6-\r)*0.85}\pgfmathsetmacro{\ax}{\c*0.95}
+      \node[circle,draw,fill=white,inner sep=0.2pt,minimum size=2.4mm,line width=0.4pt] (b\r\c) at (\ax,\ay) {};
+    }}
+    \foreach \c in {2,...,7} {\fill[gray!55] (b1\c) circle (0.105);}
+    \fill (b11) circle (0.105);
+    \foreach \c in {3,...,7} {\fill[gray!55] (b2\c) circle (0.105);}
+    \fill (b22) circle (0.105);
+    \foreach \c in {4,...,7} {\fill[gray!55] (b3\c) circle (0.105);}
+    \fill (b33) circle (0.105);
+    \foreach \c in {4,...,7} {\fill[gray!55] (b4\c) circle (0.105);}
+    \fill (b43) circle (0.105);
+    \foreach \c in {3,...,7} {\fill[gray!55] (b5\c) circle (0.105);}
+    \fill (b52) circle (0.105);
+    \draw[->,thick] (0.95,4.25)-- ++(0,0.55);
+    \node[font=\small,anchor=west] at (1.15,4.85) {火 A};
+    \draw[->,thick] (1.90,0.85)-- ++(0,-0.55);
+    \node[font=\small,anchor=west] at (2.05,0.42) {火 B};
+    \draw[->] (0.55,-0.45)--(7.35,-0.45) node[right,font=\small] {$t$};
+    \draw[->] (0.55,-0.45)--(0.55,4.95) node[above,font=\small] {$x$};
+    \node[font=\small,anchor=east] at (0.45,2.55) {$x^*$};
+    \node[font=\small,anchor=east] at (-0.15,2.55) {房子};
+    \draw[dashed] (2.85,-0.45)--(2.85,0.05);
+    \node[font=\small,below] at (2.85,-0.5) {$t^*$};
+    \node[font=\small] at (3.9,-1.25) {(b)};
+  \end{scope}
+\end{tikzpicture}
+\caption{(a) 与 \textup{(10.17)} 的动态模型相应的因果图。(b) 与火 A、火 B 在不同时刻燃起相应的因果束，显示火 B 与位置 $x=x^*$ 处房子的状态之间没有联系。}
+\label{fig:10.7}
+\end{figure}
+
+\section{结论}
+
+我们已经看到，维持这一性质（定义 10.2.1）——它体现在束检验（定义 10.3.3）之中——是阐析实际因果性概念（用法律术语说，即“事实上的原因”）的关键；在涉及具有多个潜在原因的多阶段情景的案子中，这一性质应当取代“若非”检验。维持刻画了待定原因在面对结构列联时维持结果取值的能力，并把必要性的反事实检验作为一个特例包含在内，此时结构列联被压制（即 $W=\varnothing$）。
+
+我们论证了：(a) 传达因果断言之真正含义的是结构列联而非情境列联；(b) 因此这些结构列联应当成为因果解释的基础。我们进一步说明，基于这类列联的解释如何化解长期困扰单一事件因果性之反事实理论的种种困难——主要是与抢先、过度决定、时间性抢先以及切换式因果性相关的困难。
+
+然而，维持并不完全取代生产，即充分性的第二个成分——待定原因在结果不出现的情境中产生该结果的能力。例如在火柴—氧气例子中（见 \S 9.5），氧气与点燃的火柴各自都满足定义 10.3.3 的维持检验（此时 $W=\varnothing$ 且 $\bar S=\varnothing$）；因此，每个因素都会有资格成为所观察到的火灾的实际原因。使氧气在此成为尴尬解释的，并不是它在面对列联时维持火的能力不足（列联集 $W$ 为空），而是它无法在我们最常遇到的那种情形 $U=u'$ 中产生火——在那种情形里火柴未被划燃（因而火灾没有发生）。
+
+这一论证仍未告诉我们：为什么在火柴—氧气故事中我们应当考虑这类假设情形 $U=u'$，而在本章所考察的任何例子中（维持在其中大获全胜）却不应当。尽管世界 $U=u'$（火柴未被划燃）既规则又常见，它们毕竟是反事实的世界，因为火灾确实发生了。那么，在为实际世界中的事件（火灾）给出解释时，人们为什么要远赴这样一个“本可能的世界”呢？
+
+我认为，答案在于所求解释的语用学。火柴—氧气故事中解释的隐含目标是这样一个问题：“这场火本来怎样才能被防止？”鉴于这一目标，我们别无选择，只能放弃实际世界（火在其中燃起），前往某个 $U=u'$——在那里，行动者仍然有能力防止这场火。\footnote{Herbert Simon 曾告诉我，在事故责任案件中（常适用于铁路道口事故）有一条常见准则，即“最后明显机会”原则：对碰撞负有责任者，是那个拥有避免碰撞之最后明显机会的人。}
+
+例 10.3.6 的开关—灯故事中，因果解释则由另一种语用学所驱动。这里人们可能更关心如何让房间保持照明，目标问题是：“面对未预见的列联，我们怎样才能确保房间一直亮着？”鉴于这一目标，我们不妨安处于事实世界 $U=u$ 之中，施用维持而非生产的判据。
+
+看来，围绕我们寻求解释的种种语用问题，是决定应当使用因果性哪一方面的关键；而把这种语用学数学化，则是走向自动生成恰当解释的关键一步。遗憾的是，我现在只能把这一任务留给未来的研究。
+
+\section*{致谢}
+\addcontentsline{toc}{section}{致谢}
+
+我对实际因果性这一课题的兴趣，是由 Don Michie 点燃的：他花了大量电子邮件试图说服我，(1) 这个问题并不平凡；(2) Good (1961, 1962) 的因果倾向度量可以推广到处理单个事件。就 (1) 而言，他说服了我；本章即基于 1998 年春季在 UCLA 举行的一次研讨会，该研讨会以“实际因果性”为主题。我感谢研讨会的参加者 Ray Golish、Andrew Lister、Eitan Mendelowitz、Peyman Meshkat、Igor Roizen 与 Jin Tian，他们推翻了我早先关于束与维持的两次尝试，并进行了富有启发的讨论，促成了现在的方案。与 Clark Glymour、Igal Kvart、Jim Woodward、Ned Hall、Herbert Simon、Gary Schwartz 与 Richard Baldwin 的讨论，加深了我对所涉哲学与法律问题的理解。此后与 Joseph Halpern 的合作帮助进一步打磨了这些想法，并导致了 Halpern and Pearl (2000) 中所报告的更一般、更具陈述性的实际原因定义。
+
+\section*{第二版后记}
+\addcontentsline{toc}{section}{第二版后记}
+
+Halpern and Pearl (2001a,b) 发现有必要改进 \S 10.3.3 的因果束定义。他们保留了“在被列联扰动的世界中以反事实依赖定义实际因果性”这一想法，但允许更宽泛的列联集。
+
+为看出因果束定义确需改进，考虑下面这个例子。
+
+\begin{example}
+举行一次有两人参加的投票。只要其中至少一人投赞成票，议案 $Y$ 即获通过。事实上，两人都投了赞成票，议案获得通过。
+\end{example}
+
+这个版本的故事与 \S 10.1.3 所讨论的析取式场景完全相同；在那里，我们希望宣称每一张赞成票 $V_1=1$ 与 $V_2=1$ 都是 $Y=1$ 的贡献原因。
+
+然而，假设有一台计票机来统计选票。令 $M$ 表示机器记录的总票数。显然 $M=V_1+V_2$，且 $Y=1$ 当且仅当 $M\ge 1$。图 10.8 表示这个更为精致的故事版本。
+
+在这一场景中，束判据不再使 $V_1=1$ 有资格成为 $Y=1$ 的贡献原因，因为相对于 $M$，$V_2$ 不能被标为“不活动”，于是我们不能像在简单析取情形中那样，随意设定列联 $V_2=0$ 并检验 $Y$ 对 $V_1$ 的反事实依赖。
+
+Halpern and Pearl (2001a,b) 提出了一个能恰当处理这类反例的改进方案，但不幸的是，Hopkins and Pearl (2002) 表明，该方案对列联的约束过于宽松。这导致了进一步的改进（Halpern and Pearl 2005a,b），以及下面给出的定义：
+
+\begin{definition}[实际因果性（Halpern and Pearl 2005）]
+在世界 $U=u$ 中，$X=x$ 是 $Y=y$ 的\emph{实际原因}，若下列三个条件成立：
+\begin{enumerate}[label=AC\arabic*.,leftmargin=3.4em]
+\item $X(u)=x$，$Y(u)=y$。
+\item 存在 $V$ 的一个二分划，即两个子集 $Z$ 与 $W$，满足 $X\subseteq Z$，并存在 $X$ 与 $W$ 中变量的一组设定 $x'$ 与 $w$，使得若 $Z(u)=z^*$，则下面两个条件都成立：
+\begin{enumerate}[label=(\alph*),leftmargin=1.8em]
+\item $Y_{x',w}\neq y$。
+\item 对 $W$ 的一切子集 $W'$ 与 $Z$ 的一切子集 $Z'$，$Y_{x,w,z^*}=y$，其中 $W'$ 的设定 $w$ 与 $Z'$ 的设定 $z^*$，分别等于这些变量在 $W=w$ 与 $Z=z^*$ 中的设定。
+\end{enumerate}
+\item $W$ 是极小的；$X$ 的任何子集都不满足条件 AC1 与 AC2。
+\end{enumerate}
+\end{definition}
+
+赋值 $W=w$ 充当一个列联，$X=x$ 在它的背景下接受反事实检验，如 AC2(a) 所述。
+
+AC2(b) 限制列联的选择。粗略地说，它说的是：若把 $X$ 中的变量重设为其原值，则 $Y=y$ 必须成立，即使在列联 $W=w$ 之下、即使 $Z$ 中某些变量被赋予其原值（即 $z^*$ 中的值）。
+
+在计票机的例子中，若我们把 $W=w$ 等同于 $V_2=0$、把 $Z=z^*$ 等同于 $V_1=1$，就会看到 $V_1=1$ 在 AC2 之下有资格成为原因；我们不再要求 $M$ 对列联 $V_2=0$ 保持不变，只需 $Y=1$ 不变即可。
+
+这一定义虽然正确解决了文献中提出的大部分问题（Hiddleston 2005; Hall 2007; Hitchcock 2007, 2008），却仍有一处缺陷：它必须把某些列联作为不合理的列联排除在外。Halpern (2008) 通过诉诸缺省逻辑中的“常规性”概念（Spohn 1988; Kraus et al. 1990; Pearl 1990b）为这一问题提供了方案：只应考虑那些与实际世界中的对应物处于同一“常规性”水平的列联。
+
+Halpern and Hitchcock (2010) 综述了实际因果性之结构进路的研究现状，并讨论了它对变量选择的敏感性。
+
+\begin{figure}[hbt]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  \node[circle,fill,inner sep=1.2pt] (v1) at (0,2.0) {}; \node[font=\small,left=0.7mm] at (0,2.0) {$V_1$};
+  \node[circle,fill,inner sep=1.2pt] (v2) at (2.2,2.0) {}; \node[font=\small,right=0.7mm] at (2.2,2.0) {$V_2$};
+  \node[circle,fill,inner sep=1.2pt] (M) at (1.1,1.1) {}; \node[font=\small,right=0.7mm] at (1.1,1.1) {$M$};
+  \node[circle,fill,inner sep=1.2pt] (Y) at (1.1,0.2) {}; \node[font=\small,right=0.7mm] at (1.1,0.2) {$Y$};
+  \draw[ed] (v1)--(M); \draw[ed] (v2)--(M); \draw[ed] (M)--(Y);
+\end{tikzpicture}
+\caption{一个说明束定义需要改进的例子。}
+\label{fig:10.8}
+\end{figure}

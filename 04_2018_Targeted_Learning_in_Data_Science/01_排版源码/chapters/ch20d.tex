@@ -1,0 +1,45 @@
+% 原书分章 PDF 第 12—14 页；第 20.4.7—20.4.10 小节。
+\subsection{似然与统计模型}
+
+根据假设，可将数据 $\mathbf O=(\mathbf W,\mathbf A,\bar{\mathbf Y}=(\mathbf Y(1),\ldots,\mathbf Y(\tau)))$ 的概率密度分解为
+\begin{equation}
+\begin{aligned}
+ p(\mathbf w,\mathbf a,\bar{\mathbf y})
+ &=q_{\mathbf W}(\mathbf w)\prod_{i=1}^N\bar g(a_i\mid c_{A,i}(\mathbf w))\\
+ &\quad{}\times\prod_{t=1}^\tau\prod_{i=1}^N
+ \bar q_t(y_i(t)\mid c_{Y(t),i}(\mathbf w,\mathbf a,\bar{\mathbf y}(t-1))).
+\end{aligned}
+\tag{20.7}
+\end{equation}
+其中，用 $q_{\mathbf W}$ 表示 $\mathbf W$ 联合边际密度对应的因子，用 $\bar q_t$ 表示各个 $Y_i(t)$ 的条件密度。给定 $\operatorname{Pa}(Y_i(t))$ 时，这些条件密度作为 $Y_i(t)$ 和 $C_{Y(t),i}$ 的函数，对所有 $i$ 均相同。类似地，用共同条件密度 $\bar g$ 对 $\mathbf g$ 因子建模。令 $\mu_{\mathbf W}$、$(\mu_{Y(t)}:t=1,\ldots,\tau)$ 和 $\mu_A$ 表示这些密度对应的控制测度（dominating measure）。用 $\bar q:=(\bar q_t:t=1,\ldots,\tau)$ 表示这些条件密度的集合，从而 $\mathbf O$ 的分布由 $(q_{\mathbf W},\bar q,\bar g)$ 参数化。
+
+条件分布 $\bar q_t(Y(t)\mid C_{Y(t)})$ 是 $Y(t)$ 与 $C_{Y(t)}$ 的未指定函数，唯一要求是：对 $C_{Y(t)}$ 的每个取值，它均为有良好定义的条件密度；同时，$q_{\mathbf W}$ 满足前述特定独立性模型，即 $\mathbf W$ 至少弱相依。类似地，$\bar g$ 也是未指定的条件密度。这便给出了以 $(q_{\mathbf W},\bar q,\bar g)$ 对 $\mathbf O$ 分布的统计参数化，并导出以下关于 $P_0$ 的统计模型：
+\begin{equation}
+ \mathcal M=\{P_{q_{\mathbf W},\bar g,\bar q}:
+ q_{\mathbf W}\in\mathcal Q_{\mathbf W},\bar g\in\mathcal G,
+ \bar q\in\mathcal Q_{\bar Y}\},
+ \tag{20.8}
+\end{equation}
+其中，$\mathcal Q_{\mathbf W}$、$\mathcal G$ 和 $\mathcal Q_{\bar Y}$，分别表示 $q_{\mathbf W}$、$\bar g$ 及 $\bar q=(\bar q_t:t=1,\ldots,\tau)$ 的参数空间。
+
+\subsection{统计目标参数}
+
+令 $\mathbf Y^{\mathbf g^*}(\tau)$ 表示从特定干预分布 $P^{\mathbf g^*}$，即式 (20.6)，中抽取的最终 $N$ 个结局。注意，$P^{\mathbf g^*}$ 被定义为 $\mathbf O$ 的数据分布 $P$ 的函数：具体而言，将 $P$ 中的 $\mathbf g$ 因子替换为相应的联合随机干预 $\mathbf g^*$，即可得到 $P^{\mathbf g^*}$。将统计目标参数定义为 $N^{-1}\sum_{i=1}^NE[Y_i^{\mathbf g^*}(\tau)]$，它是 $P^{\mathbf g^*}$ 的函数。还应注意，在上述因果假设下，这个参数等于目标因果量 $N^{-1}\sum_{i=1}^NE[Y_{i,\mathbf g^*}(\tau)]$。因此，
+\begin{equation}
+ \frac1N\sum_{i=1}^NE\bigl[Y_i^{\mathbf g^*}(\tau)\bigr]
+ =\Psi(P_{q_{\mathbf W},\bar g,\bar q})=\Psi(q_{\mathbf W},\bar q)
+ \tag{20.9}
+\end{equation}
+仅通过 $\mathbf W$ 的边际分布与条件密度 $\bar q=(\bar q_t:t=1,\ldots,\tau)$，依赖于数据生成分布 $P$。
+
+此外，这一统计参数可表示为 $E_{\mathbf W}(\bar Q(\mathbf W))$，其中 $\bar Q(\mathbf W)$ 定义了给定 $\mathbf W$ 时 $\bar Y^{\mathbf g^*}$ 的期望，即 $\bar Q(\mathbf W):=E_{\bar q,\mathbf g^*}(\bar Y^{\mathbf g^*}(\tau)\mid\mathbf W)$。这表明，参数 $\Psi(P_{q_{\mathbf W},\bar g,\bar q})$ 也可表示为映射 $\Psi(q_{\mathbf W},\bar Q^{\mathbf g^*})$。计算 $\bar Q(\mathbf W)$，需要相对于共同条件密度 $\bar q_t$，$t=1,\ldots,\tau$，以及 $g_i^*$，$i=1,\ldots,N$，的乘积测度，对所有向量 $\mathbf Y(t)$ 和 $\mathbf A^*$ 取期望。下文仅关注基于映射 $\Psi(q_{\mathbf W},\bar q)$ 的目标参数估计。如前所述，可通过蒙特卡洛模拟计算这一统计目标参数：从干预后分布 $P^{\mathbf g^*}$ 抽取 $\bar Y^{\mathbf g^*}$；按时间向前，从 $p^{\mathbf g^*}$ 的每个后续因子中抽取 $N$ 个随机变量，从 $q_{\mathbf W}$ 开始，一直进行到 $\bar q_\tau$。
+
+最后，也可通过对全部观测 $\mathbf W$ 条件化，定义另一个统计参数，即 $E_{\bar q,\mathbf g^*}(\bar Y^{\mathbf g^*}\mid\mathbf W)$。仍可采用相同的蒙特卡洛抽样程序有效计算该参数，只需跳过第一个因子 $q_{\mathbf W}$ 的抽样，改用实际观测到的 $\mathbf W$ 值。
+
+\subsection{统计估计问题}
+
+现在，我们已为 $\mathbf O$ 的分布 (20.7) 定义统计模型 $\mathcal M$，即式 (20.8)，以及统计目标参数映射 $\Psi:\mathcal M\to\mathbb R$，即式 (20.9)，其中 $\Psi(P_{q_{\mathbf W},\bar g,\bar q})$ 只依赖于 $(q_{\mathbf W,0},\bar q)$，$\bar q=(\bar q_t:t=1,\ldots,\tau)$。也将这一目标参数记为 $\Psi(q_{\mathbf W},\bar q)$，即略微宽泛地用 $\Psi$ 表示这两个映射。给定一次抽取 $\mathbf O\sim P_{q_{\mathbf W,0},\bar g_0,\bar q_0}$，我们希望估计 $\Psi(q_{\mathbf W,0},\bar q_0)$，并构造渐近有效的置信区间。回顾前文，记号中省略了数据分布 $P_{q_{\mathbf W},\bar g,\bar q}$、统计模型 $\mathcal M$ 和目标参数 $\Psi$ 对 $N$ 与 $\mathbf F$ 的依赖。
+
+\subsection{小结}
+
+我们定义了结构因果模型 (20.5)，其中包括前述对外生误差的独立性及独立同分布假设、降维假设，以及序贯随机化假设 (20.4)。这些假设导出了 $\mathbf O$ 的分布 $P_0$ 的似然 (20.7)，以及相应的统计模型 $\mathcal M$，即式 (20.8)。此外，借助这些假设，可以将因果量 $\psi_0^F$ 写为统计估计目标 $\Psi(q_{\mathbf W},\bar q_{\bar Y})$，即式 (20.9)：$\psi_0^F=\Psi(q_{\mathbf W},\bar q)$，其中，密度 $\bar q=(\bar q_t:t=1,\ldots,\tau)$ 可在 $N\to\infty$ 时从一次抽取 $\mathbf O$ 中学习。纯统计估计问题至此已经定义：$\mathbf O\sim P_0\in\mathcal M$，我们要学习 $\psi_0=\Psi(P_0)$，其中 $\Psi:\mathcal M\to\mathbb R$。在 $P_0\in\mathcal M$ 的统计假设之外，若不可检验的因果假设成立，则可将 $\psi_0$ 解释为 $\psi_0^F$。不过，即使这些不可检验假设不成立，仍可将 $\psi_0$ 及其对比解释为：控制观测混杂因素后，感兴趣效应度量的纯统计参数。

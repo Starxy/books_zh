@@ -1,0 +1,45 @@
+{
+  "title": "大语言模型基础",
+  "source": "arXiv-2501.09223v4.tar.gz",
+  "source_sha256": "c08ae059c66d5887b0e01257516866ac6e2bd87409e9c65ccfa0613b48d868aa",
+  "basis": "Only the supplied v4 TeX source; older book PDFs and translations were not used.",
+  "language": "zh-CN",
+  "status": "complete",
+  "chapters_total": 6,
+  "chapters_completed": 6,
+  "chapter_directories": {
+    "1": "Chapter7",
+    "2": "Chapter8",
+    "3": "Chapter9",
+    "4": "Chapter10",
+    "5": "Chapter11",
+    "6": "Chapter12"
+  },
+  "compiler": "XeLaTeX",
+  "bibliography": "Original bibliographic metadata, rebuilt with BibTeX.",
+  "index": "Chinese visible terms, regenerated for translated pagination, pinyin collation.",
+  "terminology": {
+    "inference": "推理",
+    "reasoning": "推理",
+    "disambiguation": "Use context; parenthetical English only where needed."
+  },
+  "completed_on": "2026-10-23",
+  "compiled_pages": 285,
+  "glossary_terms": 406,
+  "validation": {
+    "numbered_equation_targets": 302,
+    "numbered_figures": 64,
+    "numbered_tables": 7,
+    "bibliography_entries": 363,
+    "missing_characters": 0,
+    "undefined_references": 0,
+    "index_stable": true,
+    "label_numbers_match": true,
+    "navigation_correct": true,
+    "merged_visual_review_completed": true
+  },
+  "pdf_file": "Foundations_of_Large_Language_Models_cn_translated.pdf",
+  "organized_on": "2026-10-24",
+  "build_command": "python build.py",
+  "edition_date": "2026-10-23"
+}

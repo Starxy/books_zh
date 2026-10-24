@@ -1,0 +1,135 @@
+% 原书第 95—98 页；章首导言及第 7.1 节。
+\chapter{普遍有效的 HAL-TMLE}
+\label{ch:generally-efficient-hal-tmle}
+\chapterauthors{Mark J. van der Laan}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_7}。}
+
+我们将提出 $\psi_0$ 的一个靶向最小损失估计量（targeted minimum loss-based estimator，TMLE），它在任意 $P\in\mathcal M$ 处都具有渐近有效性（asymptotic efficiency）。这是一个引人注目的结论，因为我们只假设强正值性（strong positivity）、若干全局界，以及 $\bar Q_0,\bar G_0$ 的变差范数（variation norm）有限。我们将以特定处理下均值（treatment-specific mean）的估计问题为主要例子，展示一种一般形式的一步 TMLE（one-step TMLE）：对于任意模型和路径可微的目标参数，它都能保证渐近有效；所需的基本条件只有一个正值性假设，而这个假设同时也保证目标参数的强可识别性（strong identifiability）。
+
+\begin{sourcebox}
+一步 TMLE 的关键是：使用超级学习器（super learner）作为初始估计量，并在算法库中纳入高度自适应 Lasso 估计量（highly adaptive lasso estimator，HAL）作为候选估计量。因此，我们将这样的 TMLE 称为高度自适应 Lasso TMLE（HAL-TMLE）。根据关于 HAL 估计量的严格结果，我们知道，超级学习器相对于基于损失的差异度（loss-based dissimilarity），将以快于 $n^{-1/4}$ 的速率收敛。这通常足以证明 TMLE 分析中的二阶余项为 $o_P(n^{-1/2})$，而后者正是 TMLE 有效性证明的关键条件。
+\end{sourcebox}
+
+本章着重以特定处理下均值为例，说明这一一般形式的 HAL-TMLE；随后展示，如何容易地将证明推广到一般的有界模型和目标参数。关于完全一般的 HAL-TMLE 和 HAL-CV-TMLE 及其一般有效性定理，包括允许无界模型的情形，请参阅我们的论文 van der Laan（2017）。
+
+\section{特定处理下的均值}
+\label{sec:ch07-treatment-specific-mean}
+
+假设我们观测到随机变量 $(W,A,Y)$ 的 $n$ 个独立同分布观测 $(W_i,A_i,Y_i)$，$i=1,\ldots,n$，其概率分布为 $P_0$，其中，$W$ 是一个 $d$ 维协变量向量，$A$ 是二值处理，$Y$ 是二值结局。考虑一项观察性研究，并假设已知：给定 $W$ 的一个 $d_1$ 维协变量子向量 $W_1$ 后，$A$ 与 $W$ 独立。令 $\bar G(W)=P(A=1\mid W)=P(A=1\mid W_1)$，以及 $\bar Q(W)=E(Y\mid A=1,W)$。此外，假设我们知道，对于某个 $\delta>0$，有 $\bar G_0(W)>\delta>0$；函数 $\bar Q_0,\bar G_0$ 右连续且有左极限（càdlàg），其有限变差范数均小于某个通用常数 $C$。我们还假设，对于某个 $\delta_1>0$，有 $\delta_1<\bar Q_0(W)<1-\delta_1$。这一关于 $\delta_1$ 的约束并不关键，因为在定义 $\bar Q_0$ 的 HAL 估计量和 TMLE 时，可以用平方误差损失替代对数似然损失，从而去掉这一约束。假设我们对 $P_0$ 没有其他知识。这就为 $P_0$ 定义了一个高度非参数化的模型 $\mathcal M$，其中包含已知的整体界 $C,\delta,\delta_1$，以及 $\bar G(W)=\bar G(W_1)$ 这一约束。目标参数映射 $\Psi:\mathcal M\to\mathbb R$ 定义为
+$\Psi(P)=E_PE_P(Y\mid A=1,W)$。
+这个目标参数在任意 $P\in\mathcal M$ 处均路径可微，其典范梯度（canonical gradient）为
+\[
+ D^*(P)(O)=\frac{A}{\bar G(W)}(Y-\bar Q(W))+\bar Q(W)-\Psi(P).
+\]
+由于 $\Psi(P)=Q_W\bar Q$，我们也将目标参数记为 $\Psi(Q)$，其中 $Q=(Q_W,\bar Q)$。
+
+\subsection{HAL-TMLE}
+\label{subsec:ch07-hal-tmle}
+
+令
+\[
+ \begin{aligned}
+ L_1(\bar Q)(O)
+   &=-A\{Y\log\bar Q(W)+(1-Y)\log(1-\bar Q(W))\},\\
+ L_2(\bar G)
+   &=-\{A\log\bar G(W)+(1-A)\log(1-\bar G(W))\}
+ \end{aligned}
+\]
+分别为 $\bar Q_0$ 和 $\bar G_0$ 的对数似然损失函数。令 $\bar Q_n$ 和 $\bar G_n$ 分别为 $\bar Q_0$ 和 $\bar G_0$ 的基于损失的超级学习器；其算法库中都包含 logistic HAL 估计量这一候选算法，并将 $\lambda$ 的上界设为 $C$。注意，$\bar G_0$ 只通过 $W_1$ 依赖于 $W$，因此，估计 $\bar G_n$ 时，只需拟合关于 $W_1$ 的示性基函数的线性 logistic Lasso 回归。在这个 logistic Lasso 估计量中，使用示性基函数的线性组合近似 $\log\bar Q_0/(1-\bar Q_0)$ 和 $\log\bar G_0/(1-\bar G_0)$。对于 $\bar Q_n$ 的 logit，基函数线性组合的系数向量的 $L_1$ 范数界 $\lambda$，意味着 $\bar Q_n$ 一致地远离 $0$ 和 $1$。同样，对于 $\bar G_n$ 的 logit，相应基函数线性组合的系数向量的 $L_1$ 范数界 $\lambda$，也意味着 $\bar G_n$ 一致地远离 $0$ 和 $1$。
+
+根据 HAL 估计量的结果，我们有
+\[
+ \begin{aligned}
+ d_{01}(\bar Q_n,\bar Q_0)
+   &=O_P\bigl(n^{-(0.5+\alpha(d)/4)}\bigr),\\
+ d_{02}(\bar G_n,\bar G_0)
+   &=O_P\bigl(n^{-(0.5+\alpha(d_1)/4)}\bigr).
+ \end{aligned}
+\]
+我们将以 $\delta$ 为下界截断 $\bar G_n$，以保证它以概率 $1$ 一致地远离零。由于 $\bar G_0>\delta>0$，这不会影响其收敛速率。为方便记号，我们仍将这一估计量记为 $\bar G_n$。同样，我们将从上下两侧以 $\delta_1$ 截断 $\bar Q_n$，使得 $\delta_1<\bar Q_n<1-\delta_1$。又由于 $\delta_1<\bar Q_0<1-\delta_1$，对 $\bar Q_n$ 进行这样的截断，不会影响它向 $\bar Q_0$ 收敛的速率。我们知道，当密度一致地远离零时，Kullback--Leibler 差异度与 $L^2(P_0)$ 范数等价。因此，在 $\bar Q_0$ 和 $\bar G_0$ 满足 $\delta_1,\delta$ 所给出的界时，我们还有
+\[
+ \begin{aligned}
+ \|\bar Q_n-\bar Q_0\|_{P_0}^2
+   &=O_P\bigl(n^{-(0.5+\alpha(d)/4)}\bigr),\\
+ \|\bar G_n-\bar G_0\|_{P_0}^2
+   &=O_P\bigl(n^{-(0.5+\alpha(d_1)/4)}\bigr),
+ \end{aligned}
+\]
+其中，$\|f\|_{P_0}=\sqrt{P_0f^2}$ 是 $L^2(P_0)$ 范数。
+
+考虑由下式定义的子模型 $\{\bar Q_{n,\epsilon}:\epsilon\}$：
+\[
+ \operatorname{Logit}\bar Q_{n,\epsilon}
+ =\operatorname{Logit}\bar Q_n+\epsilon H(\bar G_n),
+\]
+其中，$H(\bar G_n)=1/\bar G_n(W)$。这一子模型与损失函数 $L_1(\bar Q)$ 相结合，生成有效影响曲线（efficient influence curve）$D^*(Q,G)$ 中所需的分量：
+% 原书负对数似然损失的导数写为正的残差分量，照录。
+\[
+ \left.\frac{d}{d\epsilon}L_1(\bar Q_{n,\epsilon})
+ \right|_{\epsilon=0}=D_Y(\bar Q_n,\bar G_n),
+\]
+其中，$D_Y(\bar Q,\bar G)(O)=\frac{A}{\bar G(W)}(Y-\bar Q(W))$。我们用 $W_1,\ldots,W_n$ 的经验概率分布 $Q_{W,n}$，估计 $W$ 的概率分布 $Q_{W,0}$。令
+$\epsilon_n=\argmin_\epsilon P_nL(\bar Q_{n,\epsilon})$。
+$\bar Q_0$ 的 TMLE 为 $\bar Q_n^*=\bar Q_{n,\epsilon_n}$；再令 $Q_n^*=(\bar Q_n^*,Q_{W,n})$ 为 $(\bar Q_0,Q_{W,0})$ 的 TMLE。$\psi_0$ 的 TMLE 由代入估计量（substitution estimator）$\Psi(Q_n^*)=Q_{W,n}\bar Q_n^*$ 给出。
+
+\subsection{渐近有效性}
+\label{subsec:ch07-asymptotic-efficiency}
+
+我们有 $P_nD^*(Q_n^*,\bar G_n)=0$，并且有恒等式
+$\Psi(Q_n^*)-\Psi(Q_0)=-P_0D^*(Q_n^*,G_n)+R_{20}(P_n^*,P_0)$，
+其中，
+\[
+ R_{20}(P_n^*,P_0)
+ =P_0\frac{\bar G_n-\bar G_0}{\bar G_n}(\bar Q_n^*-\bar Q_0).
+\]
+由此得到分析的出发点：
+\[
+ \Psi(Q_n^*)-\Psi(Q_0)
+ =(P_n-P_0)D^*(Q_n^*,G_n)+R_{20}(P_n^*,P_0).
+\]
+由于 $Q_n^*$ 和 $G_n$ 的变差范数以 $C$ 为界，且 $\bar G_0>\delta>0$，因此，除一个小的因子之外，$D^*(Q_n^*,G_n)$ 的变差范数以 $C/\delta$ 为界。这表明，$D^*(Q_n^*,G_n)$ 以概率 $1$ 属于一个 $P_0$-Donsker 类。根据 $\bar Q_n$ 和 $\bar G_n$ 的一致性，还可得
+$P_0\{D^*(Q_n^*,G_n)-D^*(Q_0,G_0)\}^2$
+依概率趋于零。这就证明了
+$(P_n-P_0)D^*(Q_n^*,G_n)
+ =(P_n-P_0)D^*(Q_0,G_0)+o_P(n^{-1/2})$。
+现在，根据 $\bar G_n>\delta$ 和 Cauchy--Schwarz 不等式，我们有
+% 原书此界使用未加星号的 Qbar_n，照录。
+\[
+ R_{20}(P_n^*,P_0)
+ \leq\frac1\delta
+ \|\bar G_n-\bar G_0\|_{P_0}\|\bar Q_n-\bar Q_0\|_{P_0},
+\]
+这里使用的是 $L^2(P_0)$ 范数，满足 $\|f\|_{P_0}^2=P_0f^2$。根据我们关于 $L^2(P_0)$ 范数下收敛的结果，可得
+\[
+ R_{20}(P_n^*,P_0)
+ =O_P\bigl(n^{-(0.5+\alpha(d)/8+\alpha(d_1)/8)}\bigr)
+ =o_P(n^{-1/2}).
+\]
+这证明了
+\[
+ \Psi(Q_n^*)-\Psi(Q_0)
+ =(P_n-P_0)D^*(Q_0,G_0)+o_P(n^{-1/2}),
+\]
+因而，$\Psi(Q_n^*)$ 是 $\psi_0$ 的一个渐近有效估计量。这就证明了以下定理。
+
+\begin{bookresult}{定理}{7.1}
+考虑关于 $P_0$ 的统计模型 $\mathcal M$，其中假设：对于某个 $\delta>0$，有 $\bar G_0(W)>\delta>0$；$\bar Q_0,\bar G_0$ 右连续且有左极限，其有限变差范数小于某个通用常数 $C$；对于某个 $\delta_1>0$，有 $\delta_1<\bar Q_0(W)<1-\delta_1$。令 $\Psi:\mathcal M\to\mathbb R$ 由 $\Psi(Q_0)=Q_{W,0}\bar Q_0$ 定义。考虑上文定义的 TMLE $\Psi(Q_n^*)=Q_{W,n}\bar Q_n^*$。那么，$\Psi(Q_n^*)$ 是 $\psi_0$ 的一个渐近有效估计量。
+\end{bookresult}
+
+$\psi_0$ 的一个渐近 $0.95$ 置信区间为
+\[
+ \psi_n\pm1.96\sigma_n/\sqrt n,
+\]
+其中，
+\[
+ \sigma_n^2=P_n\{D^*(Q_n^*,G_n)\}^2.
+\]
+$Q_n^*,G_n$ 在 $L^2(P_0)$ 范数下的一致性、$G_n>\delta>0$，以及 $D^*(Q_n^*,G_n^*)$ 的变差范数以 $Q_n^*,G_n$ 的变差范数为界，这几项性质意味着
+\[
+ \sigma_n^2\to_p\sigma_0^2=P_0\{D^*(Q_0,G_0)\}^2
+ \quad\text{当 }n\to\infty.
+\]
+这就证明了，这个 $0.95$ 置信区间的渐近覆盖率确实等于 $0.95$。
+

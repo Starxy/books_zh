@@ -1,0 +1,36 @@
+\chapter*{记号与术语}
+\addcontentsline{toc}{chapter}{记号与术语}
+\markboth{记号与术语}{记号与术语}
+\begingroup
+\small
+\setlength{\LTpre}{0pt}
+\begin{longtable}{@{}p{0.34\textwidth}p{0.62\textwidth}@{}}
+\toprule
+记号 & 含义 \\
+\midrule
+\endhead
+$X,Y,Z$ & 随机变量；噪声变量用 $N,N_X,N_j,\ldots$ 表示。 \\
+$x$ & 随机变量 $X$ 的取值。 \\
+$P$ & 概率测度。 \\
+$P_X$ & $X$ 的概率分布。 \\
+$X_1,\ldots,X_n\overset{\mathrm{iid}}{\sim}P_X$ & 容量为 $n$ 的独立同分布样本；样本索引通常为 $i$。 \\
+$P_{Y\mid X=x}$ & 给定 $X=x$ 时 $Y$ 的条件分布。 \\
+$P_{Y\mid X}$ & 对所有 $x$，由 $P_{Y\mid X=x}$ 构成的族；简称给定 $X$ 时 $Y$ 的条件分布。 \\
+$p$ & 密度，泛指概率质量函数或概率密度函数。 \\
+$p_X$ & $P_X$ 的密度。 \\
+$p(x)$ & $P_X$ 的密度在点 $x$ 处的值。 \\
+$p(y\mid x)$ & $P_{Y\mid X=x}$ 的（条件）密度在 $y$ 处的值。 \\
+$\mathbb E[X]$ & $X$ 的期望。 \\
+$\mathrm{var}[X]$ & $X$ 的方差。 \\
+$\mathrm{cov}[X,Y]$ & $X,Y$ 的协方差。 \\
+$X\indep Y$ & 随机变量 $X$ 与 $Y$ 相互独立。 \\
+$X\indep Y\mid Z$ & 条件独立。 \\
+$\mathbf X=(X_1,\ldots,X_d)$ & 长度为 $d$ 的随机向量；维度索引通常为 $j$。 \\
+$\mathfrak C$ & 结构因果模型。 \\
+$P_Y^{\mathfrak C;\dox{X:=3}}$ & 干预分布。 \\
+$P_Y^{\mathfrak C\mid Z=2,X=1;\dox{X:=3}}$ & 反事实分布。 \\
+$\mathcal G$ & 图。 \\
+$\PA_X^{\mathcal G},\DE_X^{\mathcal G},\AN_X^{\mathcal G}$ & 图 $\mathcal G$ 中节点 $X$ 的父节点集、后代节点集和祖先节点集。 \\
+\bottomrule
+\end{longtable}
+\endgroup

@@ -1,0 +1,341 @@
+{
+  "chapter": 15,
+  "status": "complete",
+  "title_en": "LTMLE with Clustering",
+  "title_zh": "聚集数据中的LTMLE",
+  "authors": [
+    "Mireille E. Schnitzer",
+    "Mark J. van der Laan",
+    "Erica E. M. Moodie",
+    "Robert W. Platt"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/16_CH15_LTMLE_with_Clustering.pdf",
+    "pages": 19,
+    "printed_pages": "233–251",
+    "english_words_approx": 6966,
+    "all_source_pages_viewed": true,
+    "reader_annotations_excluded_in_memory": true,
+    "source_pdf_unchanged": true
+  },
+  "pages": 17,
+  "han_characters_tex_without_comment_lines": 8519,
+  "han_characters_pdf_including_running_heads": 8712,
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch15.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch15a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch15b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch15c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch15d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch15e.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch15_time_order.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch15_hospitalization.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch15_hospitalization_data.pdf"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第15章_中文译稿.pdf",
+  "sha256": "54bc80ad6b4b7bd3e97b5202fef0bd5f999e93a2bce7645b17ea54633763064a",
+  "coverage": {
+    "full_chapter": true,
+    "sections": 6,
+    "subsections": 14,
+    "all_prose_math_algorithms_tables_citations": true,
+    "source_and_chinese_page_mapping": "work/targeted_learning/ch15_work/coverage_detail.json"
+  },
+  "formulas": {
+    "source_display_groups": 21,
+    "translation_display_groups": 33,
+    "numbered_tags": [
+      "15.1",
+      "15.2",
+      "15.3"
+    ],
+    "unnumbered_groups": 30,
+    "original_numbering_preserved": true,
+    "all_math_visually_checked": true,
+    "inventory_and_layout_note": "work/targeted_learning/ch15_work/coverage_detail.json"
+  },
+  "figures": [
+    {
+      "number": "15.1",
+      "source_split_page": 4,
+      "chinese_page": 4,
+      "method": "中文TikZ；按源保留t−1至t时间轴/区间住院括号/Ct无箭头虚线连线/t→At实心向下箭头。",
+      "all_nodes_labels_and_connectors_checked": true
+    },
+    {
+      "number": "15.2",
+      "source_split_page": 19,
+      "chinese_page": 17,
+      "method": "原始矢量数据层；仅替换两个中文轴标签。",
+      "actual_points": 6,
+      "drawing_objects": 32,
+      "max_coordinate_change_pt": 0,
+      "all_curves_ci_and_numeric_ticks_retained": true,
+      "evidence": "work/targeted_learning/ch15_work/figure15_2_provenance.json"
+    }
+  ],
+  "tables": [
+    {
+      "number": "15.1",
+      "source_split_page": 3,
+      "chinese_page": 3,
+      "rows_including_category_headers": 21,
+      "numeric_values": 48,
+      "blank_data_cells": 22,
+      "notes": 2
+    },
+    {
+      "number": "15.2",
+      "source_split_page": 4,
+      "chinese_page": 4,
+      "rows": 7,
+      "columns": 6,
+      "numeric_values": 41,
+      "dash_cells": 1
+    },
+    {
+      "number": "15.3",
+      "source_split_page": 10,
+      "chinese_page": 9,
+      "rows": 6,
+      "nested_Q_terms": 21,
+      "deterministic_L_terms": 15,
+      "all_parent_conditions_retained": true
+    },
+    {
+      "number": "15.4",
+      "source_split_page": 16,
+      "chinese_page": 14,
+      "rows": 3,
+      "numeric_values": 6,
+      "note_numeric_values": 2
+    },
+    {
+      "number": "15.5",
+      "source_split_page": 18,
+      "chinese_page": 16,
+      "contrasts": 3,
+      "rows": 15,
+      "numeric_values": 60,
+      "negative_zero_estimates": 4
+    }
+  ],
+  "table_numeric_and_blank_cell_audit": {
+    "all_match_source": true,
+    "numeric_values": 155,
+    "note_values": 2,
+    "evidence": "work/targeted_learning/ch15_work/table_audit.json"
+  },
+  "source_boxes": 1,
+  "footnotes": 0,
+  "all_table_notes_preserved": true,
+  "all_unlabelled_derivations_translated": true,
+  "citation_audit": {
+    "author_names_checked": true,
+    "source_link_year_tokens": 35,
+    "all_years_and_suffixes_match": true,
+    "evidence": "work/targeted_learning/ch15_work/structural_citation_audit.json"
+  },
+  "new_terms": [
+    {
+      "en": "breastfeeding",
+      "zh": "母乳喂养",
+      "note": ""
+    },
+    {
+      "en": "exclusive breastfeeding",
+      "zh": "纯母乳喂养",
+      "note": ""
+    },
+    {
+      "en": "longitudinal count outcome",
+      "zh": "纵向计数结局",
+      "note": "本章Y为发生住院的时间区间数。"
+    },
+    {
+      "en": "sequential g-computation",
+      "zh": "序贯g计算",
+      "note": ""
+    },
+    {
+      "en": "saturated marginal structural model",
+      "zh": "饱和边际结构模型",
+      "note": ""
+    },
+    {
+      "en": "nested expectation",
+      "zh": "嵌套期望",
+      "note": ""
+    },
+    {
+      "en": "sequential consistency",
+      "zh": "序贯一致性",
+      "note": ""
+    },
+    {
+      "en": "sequential exchangeability",
+      "zh": "序贯可交换性",
+      "note": ""
+    },
+    {
+      "en": "pairs cluster bootstrap",
+      "zh": "成对簇自助法",
+      "note": "本章对簇进行重抽样，保留簇内所有个体。"
+    },
+    {
+      "en": "unstabilized weights",
+      "zh": "非稳定化权重",
+      "note": ""
+    }
+  ],
+  "source_anomalies": [
+    {
+      "id": "table15.1-gestational-unit",
+      "source_split_page": 3,
+      "reason": "胎龄单位印为months，数值40、IQR(39,40)。",
+      "action": "按原书译作“胎龄（个月）”，不自行改成周。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "fig15.1-time-and-caption",
+      "source_split_page": 4,
+      "reason": "图仅标t=1,…,5，表15.2列6次访视；图题末句印为infection status。",
+      "action": "范围分别保留；正文关于第6次母乳信息不使用的说明完整译出；图题保留“感染状态”。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "eq15.2-final-conditioning",
+      "source_split_page": 8,
+      "reason": "式15.2末项印为Pr(L1=l1|C1=0)，未含L0。",
+      "action": "400dpi确认后照录全部原条件，不补L0。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "eq15.3-and-recursion-indices",
+      "source_split_page": 9,
+      "reason": "文字称AK的序贯可交换性；式15.3各Qt直接写E(Y|…)；后段定义Qbar_K=Y，与下一算法Qn,7=Y不同。",
+      "action": "AK、式15.3及Qbar_K=Y均按印刷保留，不静默改索引或递推。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "QL-initial-subscript",
+      "source_split_page": 9,
+      "reason": "15.2.3第二步文字将前一步量写作Qbar_{0,L6 1}，其他处无0。",
+      "action": "文字保留额外的0下标；各公式与表15.3分别照原式。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "count-LTMLE-r-sum",
+      "source_split_page": 13,
+      "reason": "15.3.4首式两处求和均印r≤6，随后等于L6残差。",
+      "action": "400dpi确认，两个r≤6均照录，未改成r≤5。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "count-LTMLE-tilde-indices",
+      "source_split_page": 13,
+      "reason": "tildeQt定义条件用Ct−1/At−2/Lt−2，并写tildeQ6=Y−L6；紧随算法却定义tildeQ6=E(L6|…)且递归条件用Ct/At−1/Lt−1。",
+      "action": "正文与算法分别完整保留其原始定义/索引，不合并更正。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "interference-negative-definition",
+      "source_split_page": 14,
+      "reason": "15.4.1原文“Interference means”后使用not dependent，实际描述无干扰。",
+      "action": "保留源句的否定含义并译出本段全部后续辨析，未擅自改原书逻辑。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "variance-printed-notation",
+      "source_split_page": 15,
+      "reason": "源文写Var(Di*×Dj*)=E(Di*×Dj*)；对角项为E(D(O_i*)²)，最后两求和式未加整体分组括号。",
+      "action": "400dpi确认后保留Var、星号层级及原求和分组排法。",
+      "blocks_delivery": false
+    }
+  ],
+  "unresolved_items": [],
+  "compile": {
+    "engine": "XeLaTeX",
+    "build_directory": "work/targeted_learning/ch15_work/build_174020",
+    "return_codes": [
+      0,
+      0
+    ],
+    "errors": [],
+    "missing_glyphs": [],
+    "overfull": [],
+    "undefined_references": []
+  },
+  "visual_checks": {
+    "all_source_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "all_output_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "source_400dpi_crop_count": 10,
+    "all_figures_tables_and_displays_checked": true,
+    "output_png_pattern": "work/targeted_learning/ch15_work/qa_final_*.png"
+  },
+  "delivered_pdf_reopened": {
+    "path": "outputs/分章中文/Targeted_Learning_第15章_中文译稿.pdf",
+    "pages": 17,
+    "last_bookmark": [
+      2,
+      "15.6 讨论",
+      17
+    ],
+    "sha256": "54bc80ad6b4b7bd3e97b5202fef0bd5f999e93a2bce7645b17ea54633763064a",
+    "matches_final_build": true
+  },
+  "isolated_test_drivers_removed": [
+    "work/targeted_learning/ch15_work/test_ch15.tex"
+  ],
+  "integration_focus_chinese_pages": [
+    3,
+    4,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    16,
+    17
+  ],
+  "shared_files_edited": []
+}

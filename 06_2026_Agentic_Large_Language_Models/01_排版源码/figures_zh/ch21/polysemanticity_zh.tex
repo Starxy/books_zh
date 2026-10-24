@@ -1,0 +1,21 @@
+\begin{tikzpicture}
+  \node[anchor=south west, inner sep=0] (polyimage) at (0,0)
+    {\includegraphics[width=0.84\linewidth]{figures_zh/ch21/polysemanticity_graphics.pdf}};
+  \begin{scope}[x={(polyimage.south east)},y={(polyimage.north west)}]
+    \node[font=\small\sffamily\bfseries] at (0.526,0.967) {神经元激活空间中的多义性};
+    \node[font=\footnotesize\sffamily] at (0.527,0.034) {神经元 A 的激活};
+    \node[rotate=90, font=\footnotesize\sffamily] at (0.041,0.503) {神经元 B 的激活};
+    \node[anchor=west, font=\footnotesize\sffamily\bfseries] at (0.838,0.275) {概念 1};
+    \node[anchor=west, font=\footnotesize\sffamily\bfseries] at (0.259,0.699) {概念 2};
+    \node[anchor=west, font=\footnotesize\sffamily\bfseries] at (0.722,0.738) {概念 3};
+    \node[anchor=west, font=\footnotesize\sffamily\bfseries] at (0.335,0.468) {概念 4};
+    \node[anchor=west, font=\footnotesize\sffamily\bfseries] at (0.645,0.391) {概念 5};
+    \node[anchor=north west, inner sep=0, text width=0.420\linewidth,
+          font=\footnotesize\sffamily, align=left] at (0.162,0.871) {
+      \textbf{多义性：}\\
+      单个神经元（坐标轴）参与表征多个不同概念。
+      这些概念以激活空间中的“方向”分布，
+      而不是与各个坐标轴完全对齐。
+    };
+  \end{scope}
+\end{tikzpicture}

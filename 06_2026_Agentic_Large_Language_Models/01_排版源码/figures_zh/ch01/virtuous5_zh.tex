@@ -1,0 +1,50 @@
+% 依照源码包 figures/virtuous5.png 重绘；中心 LLM 无连接线。
+% 单向：多步→推理，社会能力→交互；其余绿色节点与相应红色节点双向相连。
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    x=1cm,y=1cm,
+    every node/.style={font=\normalsize,align=center,inner sep=5pt},
+    category/.style={draw=red!85!black,line width=1.5pt,fill=white,minimum height=.58cm},
+    concept/.style={draw=green!65!black,line width=1.5pt,fill=white,minimum height=.58cm},
+    flow/.style={-{Stealth[length=2.6mm,width=2mm]},line width=.85pt},
+    datalabel/.style={font=\small,fill=white,inner sep=2pt}
+]
+\node[category] (reason) at (7.1,4.1) {推理};
+\node[category] (act) at (9.2,2.0) {行动};
+\node[category] (interact) at (4.9,2.0) {交互};
+\node[draw=black,line width=1.5pt,font=\bfseries\large,fill=white,minimum height=.78cm] (llm) at (7.1,2.8) {LLM};
+\node[concept] (multi) at (4.1,5.7) {多步};
+\node[concept] (reflect) at (7.1,6.2) {自我反思};
+\node[concept] (retrieve) at (9.8,5.7) {检索};
+\node[concept] (world) at (12.1,3.7) {世界模型、VLA};
+\node[concept] (tools) at (12.1,1.8) {机器人、工具};
+\node[concept] (assist) at (10.5,.25) {助手};
+\node[concept] (social) at (1.6,3.6) {社会能力};
+\node[concept] (role) at (1.6,1.8) {基于角色的交互};
+\node[concept] (society) at (2.4,.25) {开放式社会};
+
+% 三种主要类别形成有向循环；每条边生成新数据。
+\draw[flow] (reason.east) to[out=-10,in=90] node[datalabel,pos=.5,above right] {新数据} (act.north);
+\draw[flow] (act.south west) to[out=220,in=-40] node[datalabel,pos=.5,below] {新数据} (interact.south east);
+\draw[flow] (interact.north) to[out=100,in=180] node[datalabel,pos=.52,above left] {新数据} (reason.west);
+
+\draw[flow] (multi.south east) -- (reason.north west);
+\draw[flow] ([xshift=-2mm]reason.north) to[out=135,in=225] ([xshift=-2mm]reflect.south);
+\draw[flow] ([xshift=2mm]reflect.south) to[out=-45,in=45] ([xshift=2mm]reason.north);
+\draw[flow] (reason.north east) .. controls (7.95,5.4) and (8.6,5.85) .. (retrieve.west);
+\draw[flow] (retrieve.south) to[out=-90,in=0] (reason.east);
+
+\draw[flow] (act.north east) to[out=100,in=180] (world.west);
+\draw[flow] (world.south west) to[out=-90,in=0] (act.north east);
+\draw[flow] (act.east) to[out=50,in=130] (tools.north west);
+\draw[flow] (tools.south west) to[out=230,in=-50] (act.east);
+\draw[flow] (act.south) to[out=0,in=90] (assist.north);
+\draw[flow] (assist.west) to[out=180,in=-90] (act.south west);
+
+\draw[flow] (social.south east) -- (interact.north west);
+\draw[flow] (role.north east) to[out=60,in=150] (interact.west);
+\draw[flow] (interact.south west) to[out=250,in=-30] (role.east);
+\draw[flow] (society.north east) to[out=110,in=180] (interact.south west);
+\draw[flow] (interact.south) to[out=-70,in=0] (society.east);
+\end{tikzpicture}%
+}

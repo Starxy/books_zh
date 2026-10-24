@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1pt,y=-1pt]
+\node[anchor=north west,inner sep=0] at (0,0) {\includegraphics[width=333.7pt]{figures/ch16_survival_base.pdf}};
+\foreach \xx in {5.6,180.8}{
+ \foreach \yy in {87.8,309.6}{
+  \node[rotate=90,font=\fontsize{6.2}{7}\selectfont,inner sep=0] at (\xx,\yy) {生存概率 $P(T_d>t)$（权重未截断）};
+ }
+}
+\foreach \xx in {103.4,277.6}{
+ \foreach \yy in {191.9,414.2}{
+  \node[font=\fontsize{7}{8}\selectfont,inner sep=0] at (\xx,\yy) {入组后的季度数};
+ }
+}
+\end{tikzpicture}

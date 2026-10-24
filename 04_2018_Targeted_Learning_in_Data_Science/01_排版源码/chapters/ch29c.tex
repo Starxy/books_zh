@@ -1,0 +1,115 @@
+% 原书分章PDF第9—13页：第29.4节及两个小节。
+\section{示例：连续暴露的变量重要性}
+
+我们通过推断连续暴露的一个变量重要性度量，来说明调查抽样靶向学习的模板。在这一例子中，第 $i$ 个观测 $O_i$ 写为 $(W_i,A_i,Y_i)\in\mathcal O\equiv\mathcal W\times\mathcal A\times[0,1]$。这里，$W_i\in\mathcal W$ 是第 $i$ 个背景变量，$A_i\in\mathcal A$ 是第 $i$ 个暴露，$Y_i\in[0,1]$ 是第 $i$ 个结局。暴露在 $\mathcal A\ni0$ 中取值，其中 $\mathcal A$ 是 $\mathbb R$ 中包含0的一个有界子集，0作为暴露的参照水平。例如，在生物统计学或流行病学中，$W_i$ 可以是描述第 $i$ 名研究对象的基线协变量，$A_i$ 可以描述她的分配，例如剂量水平，或她的暴露水平，而 $Y_i$ 可以量化她的生物学响应。
+
+\subsection{预备知识}
+
+对配备Borel $\sigma$ 域的 $\mathcal O$ 上的每个概率测度 $P$，令 $g_P(0\mid W)\equiv P(A=0\mid W)$ 为暴露等于参照值0的条件概率，$Q_P(A,W)\equiv\mathbb E_P[Y\mid A,W]$ 为给定暴露与背景变量时响应的条件期望。我们假定，$P_0(A\ne0\mid W)$ 以 $P_{0,W}$ 概率1为正，且存在常数 $c(P_0)>0$，使 $P_0(A=0\mid W)\ge c(P_0)$ 以 $P_{0,W}$ 概率1成立。Chambaz 等（2012）以及 Chambaz 和 Neuvial（2015）引入的真实目标参数为
+\[
+\begin{aligned}
+\psi_0^c
+&\equiv\operatorname*{arg\,min}_{\beta\in\mathbb R}
+\mathbb E_{P_0}\!\left[\left(Y-\mathbb E_{P_0}[Y\mid A=0,W]-\beta A\right)^2\right]\\
+&=\operatorname*{arg\,min}_{\beta\in\mathbb R}
+\mathbb E_{P_0}\!\left[\left(\mathbb E_{P_0}[Y\mid A,W]
+-\mathbb E_{P_0}[Y\mid A=0,W]-\beta A\right)^2\right]
+\end{aligned}
+\]
+其中，上标“$c$”代表“continuous”。
+
+在这个例子中，$\mathcal M$ 表示配备Borel $\sigma$ 域的 $\mathcal O$ 上所有满足下述性质的概率测度 $P$ 所成的非参数集合：存在常数 $c(P)>0$，保证 $P(A\ne0\mid W)>0$ 及 $g_P(0\mid W)\ge c(P)$ 以 $P_W$ 概率1成立。特别地，由上述假设，有 $P_0\in\mathcal M$。我们将 $\psi_0^c$ 视为泛函 $\Psi^c$ 在 $P_0$ 处的取值，其中 $\Psi^c$ 在 $\mathcal M$ 上由下式刻画：
+\[
+\Psi^c(P)\equiv\operatorname*{arg\,min}_{\beta\in\mathbb R}
+\mathbb E_P\!\left[\left(\mathbb E_P[Y\mid A,W]
+-\mathbb E_P[Y\mid A=0,W]-\beta A\right)^2\right].
+\]
+任取 $P\in\mathcal M$，并定义 $\mu_P(W)\equiv\mathbb E_P[A\mid W]$ 及 $\zeta^2(P)\equiv\mathbb E_P[A^2]$。由 Chambaz 等（2012）的命题1，有
+\[
+\Psi^c(P)=\frac{\mathbb E_P[A(Q_P(A,W)-Q_P(0,W))]}{\mathbb E_P[A^2]}.
+\]
+此外，$\Psi^c$ 在 $P$ 处路径可微，影响曲线为 $D^c(P)\equiv D_1^c(P)+D_2^c(P)\in L_0^2(P)$，由下式给出：
+\[
+\begin{aligned}
+\zeta^2(P)D_1^c(P)(O)
+&\equiv A\left(Q_P(A,W)-Q_P(0,W)-A\Psi^c(P)\right),\\
+\zeta^2(P)D_2^c(P)(O)
+&\equiv(Y-Q_P(A,W))
+\left(A-\frac{\mu_P(W)I\{A=0\}}{g_P(0\mid W)}\right).
+\end{aligned}
+\]
+具体而言，对所有有界的 $s\in L_0^2(P)\setminus\{0\}$，若对所有 $|\epsilon|<c$，取 $c\equiv\|s\|_\infty^{-1}$，通过设定 $dP_{s,\epsilon}\equiv1+\epsilon s$ 来定义 $P_{s,\epsilon}\ll P$，那么，$\{P_{s,\epsilon}:\epsilon\in(-c,c)\}$ 是 $\mathcal M$ 的一个得分为 $s$ 的子模型，且 $\epsilon\mapsto\Psi^c(P_{s,\epsilon})$ 在 $\epsilon=0$ 处可微，导数为 $PsD^c(P)$。由于得分集合的线性张成空间的闭包就是 $L_0^2(P)$ 本身，$D^c(P)$ 因而是 $P$ 处的有效影响曲线。现在令 $\mathcal R^c:\mathcal M^2\to\mathbb R$ 为
+\[
+\begin{aligned}
+\mathcal R^c(P,P')
+&\equiv\Psi^c(P')-\Psi^c(P)-(P'-P)D^c(P)\\
+&\equiv\Psi^c(P')-\Psi^c(P)-P'D^c(P).
+\end{aligned}
+\]
+根据\textbf{A3}，有 $\psi_0-\psi_n^*-P_0D^c(P_n^*)=\mathcal R^c(P_n^*,P_0)$。Chambaz 等（2012）中命题1证明的最后一步表明，对任意 $P,P'\in\mathcal M$，
+\begin{equation}
+\begin{aligned}
+\mathcal R^c(P,P')
+&=\left(1-\frac{\zeta^2(P')}{\zeta^2(P)}\right)
+\left(\Psi^c(P')-\Psi^c(P)\right)\\
+&\quad+\frac1{\zeta^2(P)}P'\!\left(
+\left(Q_{P'}(0,\cdot)-Q_P(0,\cdot)\right)
+\left(\mu_{P'}-\mu_P\frac{g_{P'}(0\mid\cdot)}{g_P(0\mid\cdot)}\right)
+\right).
+\end{aligned}
+\tag{29.14}
+\end{equation}
+我们将利用这一等式，推导一个易于解释的、使\textbf{A3}成立的充分条件。
+
+\subsection{TMLE的构造}
+
+令 $\mathcal Q^w$、$\mathcal M^w$ 和 $\mathcal G^w$ 为用户指定的三个函数类，分别将 $\mathcal A\times\mathcal W$、$\mathcal W$ 和 $\mathcal W$ 映到 $[0,1]$。首先，根据 $P_n^{\mathrm{HT}}$、$\mathcal Q^w$、$\mathcal M^w$ 和 $\mathcal G^w$，构造 $Q_n$、$\mu_n$ 和 $g_n$，分别估计 $Q_{P_0}$、$\mu_{P_0}$ 和 $g_{P_0}$。例如，可以直接最小化加权经验风险，并定义
+\[
+\begin{aligned}
+Q_n&\equiv\operatorname*{arg\,min}_{Q\in\mathcal Q^w}
+P_n^{\mathrm{HT}}\ell(Y,Q(A,W)),\\
+\mu_n&\equiv\operatorname*{arg\,min}_{\mu\in\mathcal M^w}
+P_n^{\mathrm{HT}}\ell(A,\mu(W)),\\
+g_n&\equiv\operatorname*{arg\,min}_{g\in\mathcal G^w}
+P_n^{\mathrm{HT}}\ell(I\{A=0\},g(0\mid W)),
+\end{aligned}
+\]
+其中，$\ell$ 是下式给出的logistic损失函数：
+\[
+-\ell(u,v)\equiv u\log(v)+(1-u)\log(1-v)
+\]
+对所有 $u,v\in[0,1]$，约定 $\log(0)\equiv-\infty$ 及 $0\log(0)\equiv0$。也可以选择最小化经过交叉验证的加权经验风险。此时，应牢记，由于通过调查抽样进行选择，观测之间是相依的。其次，用 $P_{n,W}^{\mathrm{HT}}/P_n^{\mathrm{HT}}I$ 估计 $P_0$ 下 $W$ 的边际分布 $P_{0,W}$，其中 $P_{n,W}^{\mathrm{HT}}$ 的定义与式 (29.1) 相同，只是以 $W_i$ 替代 $O_i$；并用 $\zeta^2(P_n^{\mathrm{HT}}/P_n^{\mathrm{HT}}I)$ 估计实值参数 $\zeta^2(P_0)$。注意，$P_{n,W}^{\mathrm{HT}}/P_n^{\mathrm{HT}}I$ 和 $P_n^{\mathrm{HT}}/P_n^{\mathrm{HT}}I$，即以 $P_n^{\mathrm{HT}}I=N^{-1}\sum_{i=1}^N\eta_i/\pi_i$ 重新归一化后的经验测度 $P_{n,W}^{\mathrm{HT}}$ 和 $P_n^{\mathrm{HT}}$，分别是分布 $P_{0,W}$ 和 $P_0$ 的非参数极大似然估计量。此外，由\textbf{A1}，重新归一化因子以 $\sqrt n$ 速率收敛于1。
+
+令 $P_n^0$ 为一个满足 $Q_{P_n^0}=Q_n$、$\mu_{P_n^0}=\mu_n$、$g_{P_n^0}=g_n$、$\zeta^2(P_n^0)=\zeta^2(P_n^{\mathrm{HT}}/P_n^{\mathrm{HT}}I)$、$P_{n,W}^0=P_{n,W}^{\mathrm{HT}}/P_n^{\mathrm{HT}}I$ 的测度，并且我们能够从中在给定 $W$ 的条件下抽取 $A$。选取这样的 $P_n^0$ 是一项容易的技术工作；Chambaz 等（2012）的引理5给出了一种计算上高效的选择。于是，$\psi_0^b$ 的初始估计量 $\Psi^b(P_n^0)$ 可以通过Monte Carlo方法高精度地计算。只需抽取大量独立的 $(A^{(b)},W^{(b)})$，数量记为 $B$，例如取 $B=10^7$：对 $b=1,\ldots,B$，反复进行 (a) 从 $P_{n,W}^0=P_{n,W}^{\mathrm{HT}}/P_n^{\mathrm{HT}}I$ 抽取 $W^{(b)}$，然后 (b) 从 $P_n^0$ 下给定 $W=W^{(b)}$ 时 $A$ 的条件分布中抽取 $A^{(b)}$，并作近似
+\[
+\Psi^c(P_n^0)\approx
+\frac{B^{-1}\sum_{b=1}^BA^{(b)}\left(Q_n(A^{(b)},W^{(b)})-Q_n(0,W^{(b)})\right)}{\zeta^2(P_n^0)}.
+\]
+
+现在，我们对推断程序进行靶向拟合，将 $P_n^0$ 调整为满足式 (29.3) 的 $P_n^*$，其中用 $D^c$ 替代 $D$。我们采用迭代方式。假定对某个 $k\ge0$，已经构造出 $P_n^k$。我们用一维参数模型
+\[
+\left\{P_n^k(\epsilon):|\epsilon|\le c(P_n^k)/2\|D^c(P_n^k)\|_\infty\right\}
+\]
+对 $P_n^k$ 作波动，该模型由 $dP_n^k(\epsilon)/dP_n^k\equiv1+\epsilon D^c(P_n^k)$ 刻画。Chambaz 等（2012）的引理1表明，$Q_{P_n^k(\epsilon)}$、$\mu_{P_n^k(\epsilon)}$、$g_{P_n^k(\epsilon)}$、$\zeta^2(P_n^k(\epsilon))$ 和 $P_{n,W}^k(\epsilon)$ 如何偏离它们在 $\epsilon=0$ 时的对应量。沿波动的最优移动由下式索引：
+\[
+\epsilon_n^k\equiv\operatorname*{arg\,max}_{\epsilon}
+P_n^{\mathrm{HT}}\log\left(1+\epsilon D^c(P_n^k)\right),
+\]
+即 $\epsilon$ 的加权极大似然估计量。注意，随机函数 $\epsilon\mapsto P_n^{\mathrm{HT}}\log(1+\epsilon D^c(P_n^k))$ 严格凹。最优移动给出 $P_n^0$ 的第 $k+1$ 次更新，$P_n^{k+1}\equiv P_n^k(\epsilon_n^k)$。
+
+无法保证某个 $P_n^{k+1}$ 会与其前一次估计 $P_n^k$ 相同。我们假定，迭代更新程序随 $k$ 收敛，其含义是：当 $k_n$ 足够大时，$P_n^{\mathrm{HT}}D^c(P_n^{k_n})=o_P(1/\sqrt n)$。令 $P_n^*\equiv P_n^{k_n}$。事实上，借助通用最不利模型，可以得到一步更新程序，即对所有 $k\ge1$，都有 $P_n^k=P_n^{k+1}$ 的更新程序（van der Laan 和 Gruber，2016）。为简单起见，我们采用这个多步更新程序。
+
+不失一般性，可以假定我们能够从 $P_n^*$ 中，在给定 $W$ 的条件下抽取 $A$。与前面对 $\Psi^c(P_n^0)$ 的计算类似，最终估计量也可以高精度地计算：令 $Q_n^*\equiv Q_{P_n^*}$，抽取 $B$ 个独立的 $(A^{(b)},W^{(b)})$，方法是对 $b=1,\ldots,B$，反复进行 (a) 从 $P_{n,W}^*$ 中抽取 $W^{(b)}$，然后 (b) 从 $P_n^*$ 下给定 $W=W^{(b)}$ 时 $A$ 的条件分布中抽取 $A^{(b)}$，并作近似
+\[
+\psi_n^*\equiv\Psi^c(P_n^*)\approx
+\frac{B^{-1}\sum_{b=1}^BA^{(b)}\left(Q_n^*(A^{(b)},W^{(b)})-Q_n^*(0,W^{(b)})\right)}{\zeta^2(P_n^*)}.
+\]
+
+本节最后，利用式 (29.14)，我们推导一个易于解释的、可替代\textbf{A3}的条件。若 $\zeta^2(P_n^*)=\zeta^2(P_0)+o_P(1)$，则可以用
+\[
+P_0\!\left(
+\left(Q_{P_0}(0,\cdot)-Q_{P_n^*}(0,\cdot)\right)
+\left(\mu_{P_0}-\mu_{P_n^*}\frac{g_{P_0}(0\mid\cdot)}{g_{P_n^*}(0\mid\cdot)}\right)
+\right)=o_P(1/\sqrt n)
+\]
+替代\textbf{A3}。通过这一乘积，我们利用了 $Q_{P_n^*}(0,\cdot)$ 向 $Q_{P_0}(0,\cdot)$ 收敛，以及 $(\mu_{P_n^*},g_{P_n^*})$ 向 $(\mu_{P_0},g_{P_0})$ 收敛所产生的协同作用，例如可以应用Cauchy--Schwarz不等式。

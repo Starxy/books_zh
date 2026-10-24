@@ -1,0 +1,91 @@
+% 原书分章PDF第1—4页：章首导言与第29.1节。
+\ctexset{chapter/aftername=\par}
+\chapter{利用自适应调查抽样进行靶向学习}
+\ctexset{chapter/aftername=\quad}
+\label{ch:adaptive-survey-sampling}
+\chapterauthors{Antoine Chambaz、Emilien Joly 与 Xavier Mary}
+\chapteraffiliations{%
+A. Chambaz（通讯作者）：法国巴黎笛卡尔大学MAP5（UMR CNRS 8145），45 rue des Saints-Pères, 75270 Paris cedex 06, France；电子邮箱：\href{mailto:antoine.chambaz@parisdescartes.fr}{antoine.chambaz@parisdescartes.fr}。\\
+E. Joly、X. Mary：法国巴黎南泰尔大学Modal'X，200 av de la République, 92000 Nanterre, France；电子邮箱：\mbox{\href{mailto:emilien.joly@gmail.com}{emilien.joly@gmail.com}}；\mbox{\href{mailto:xmary@parisnanterre.fr}{xmary@parisnanterre.fr}}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_29}。}
+
+\begin{sourcebox}
+考虑如下情形：我们希望利用从分布 $P_0$ 独立抽取的随机变量组成的数据集 $O_1,\ldots,O_N$，为在 $P_0$ 处取值的实值路径可微参数 $\Psi$，即 $\psi_0\equiv\Psi(P_0)$，构造一个置信区间（confidence interval，CI）。然而，如今经常遇到的情况是，$N$ 太大，以致我们无法使用全部数据。为克服这一计算障碍，我们决定：(a) 以不等的包含概率，从 $N$ 个观测中随机选取 $n$ 个；(b) 根据选择得到的较小数据集，调整靶向最小损失估计（targeted minimum loss-based estimation，TMLE）。
+\end{sourcebox}
+
+我们的分析是渐近的：假定 $N$ 趋于无穷，$n$ 也随 $N$ 一起趋于无穷，并使比值 $n/N$ 趋于0。从 $N$ 个观测中选取 $n$ 个，将是某一调查抽样设计（survey sampling design）的随机结果。下文假定，每个观测 $O_i$ 都由一个低维随机变量 $V_i$ 加以汇总，并且 $V_1,\ldots,V_N$ 全部可观测。我们将利用 $V_1,\ldots,V_N$，调整每个 $O_i$ 被抽中的概率。
+
+这一方法最初由 Bertail 等（2016a）探索，是 van der Laan 和 Lendle（2014）所发展的所谓“在线靶向学习”的一种替代方法。它与两阶段设计中的逆删失概率加权（IPCW）TMLE（Rose 和 van der Laan，2011）有许多相似之处，但沿三个方向作了推广。第一，随机选择过程以 $(V_1,\ldots,V_N)$ 为条件，并以整体方式实施，而不是对每个观测分别实施。这会使选中的观测之间产生相依性。第二，当 $N$ 趋于无穷时，$O_1,\ldots,O_N$ 的包含概率趋于0。从计算角度看，这一点很方便，否则很难从 $O_1,\ldots,O_N$ 中抽取 $n=o(N)$ 个观测。第三，这一方法自然适用于多阶段抽样版本，可以优化包含概率，以实现诸如最小化靶向最小损失估计量（TMLE）渐近方差之类的目标。
+
+我们将展开介绍两种调查抽样设计：Sampford抽样设计与行列式抽样设计。Sampford抽样设计又称基于不等包含概率Poisson抽样的拒绝抽样设计（rejective sampling design），是不放回抽样的一个特例（Hanif 和 Brewer，1980）。自奠基性论文（Hajek，1964；Sampford，1967）发表以来，这一设计已得到深入研究。Loonis 和 Mary（2015）最近将行列式抽样设计引入抽样理论；它受益于关于行列式点过程（determinantal point process）的丰富文献（Macchi，1975；Lyons，2003；Hough 等，2006）。我们将用一个例子说明这一方法，即推断连续暴露的非参数变量重要性度量（Chambaz 等，2012）。还将通过模拟研究，评估这一程序在该情形下的表现。
+
+\section{通过调查抽样进行靶向推断的模板}
+
+本节给出一个模板，用于通过调查抽样，从大型数据集中开展靶向推断。全章对任意测度 $\mu$ 及关于 $\mu$ 可测、可积的函数 $f$，记 $\mu f\equiv\int f\,d\mu$，$\|f\|_{2,\mu}\equiv(\mu f^2)^{1/2}$。
+
+\subsection{通过调查抽样获取观测}
+
+如导言所述，推断程序的第一步，是从 $N$ 个观测中随机不放回地选取 $n$ 个。调查样本量 $n$ 预先设定，其选择通常取决于切实的计算方面的考虑。我们假定，$n$ 和 $N$ 都趋于无穷，且 $n/N$ 趋于0。对于 $n$ 如何依赖 $N$，可能需要、也可能不需要作更精确的描述。本章结果可以推广到 $n$ 为随机量、并且几乎必然满足这两个条件的情形；这里的几乎必然，是关于抽样设计的分布而言，下文将作进一步说明。
+
+从 $N$ 个观测中随机选取 $n$ 个，可以表示为二元随机变量向量 $\eta\equiv(\eta_1,\ldots,\eta_N)$：对每个 $1\le i\le N$，当且仅当 $\eta_i$ 等于1时，$O_i$ 被选中。给定 $O_1,\ldots,O_N$ 时 $\eta$ 的条件联合分布，就是调查抽样设计。按照构造，它与给定汇总度量 $V_1,\ldots,V_n$ 时 $\eta$ 的条件联合分布相同；与 $O_1,\ldots,O_N$ 不同，这些汇总度量在研究开始时全部可观测。
+
+我们用 $P^s$ 表示给定 $O_1,\ldots,O_n$ 时 $\eta$ 的一个一般条件联合分布，上标“$s$”代表“survey”。一阶包含概率（first-order inclusion probabilities）是条件边际概率 $\pi_i\equiv P^s(\eta_i=1)$，$1\le i\le N$。若这些概率相等，就称该抽样设计为等权设计。二阶包含概率（second-order inclusion probabilities）是条件联合概率 $\pi_{ij}\equiv P^s(\eta_i=1,\eta_j=1)=P^s(\eta_i\eta_j=1)$，$1\le i\ne j\le N$。Horvitz--Thompson经验测度
+\begin{equation}
+P_n^{\mathrm{HT}}\equiv\frac1N\sum_{i=1}^N\frac{\eta_i}{\pi_i}\operatorname{Dirac}(O_i)
+\tag{29.1}
+\end{equation}
+所起的作用，与我们若能获取经验测度 $P_N\equiv N^{-1}\sum_{i=1}^N\operatorname{Dirac}(O_i)$ 时，后者所起的作用相同。前者是后者的一个无偏估计量，其含义是：对来自 $P_0$ 的 $O$ 的任意函数 $f$，
+\[
+\mathbb E_{P^s}\!\left[P_n^{\mathrm{HT}}f\right]=P_Nf.
+\]
+在给定 $O_1,\ldots,O_N$ 的条件下，$\sqrt n(P_n^{\mathrm{HT}}-P_N)f$ 可能满足中心极限定理（central limit theorem，CLT）。是否满足，尤其取决于 $\operatorname{Var}_{P^s}[P_n^{\mathrm{HT}}f]$ 的渐近行为。一般而言，有
+\begin{equation}
+\begin{aligned}
+\operatorname{Var}_{P^s}\!\left[P_n^{\mathrm{HT}}f\right]
+&=\frac1{N^2}\sum_{i=1}^N\left(\frac1{\pi_i}-1\right)f^2(O_i)\\
+&\quad+\frac1{N^2}\sum_{1\le i\ne j\le N}
+\left(\frac{\pi_{ij}}{\pi_i\pi_j}-1\right)f(O_i)f(O_j).
+\end{aligned}
+\tag{29.2}
+\end{equation}
+第29.2节和第29.3节将重点讨论Sampford调查抽样设计与行列式调查抽样设计这两个具体例子。抽样设计的选择会影响TMLE的极限方差。目前，我们不再对调查抽样设计作进一步刻画。
+
+\subsection{TMLE的中心极限定理及所得置信区间}
+
+\paragraph{构造TMLE。}
+令 $\mathcal M$ 为 $P_0$ 的一个统计模型。令 $\mathcal O$ 表示一个集合，使任意 $P\in\mathcal M$ 中抽取的 $O$ 都在其中取值；并对每个 $P\in\mathcal M$，以 $L_0^2(P)$ 表示 $\mathcal O$ 上满足 $Pf=0$ 且 $Pf^2$ 有限的可测函数 $f$ 所成的集合。我们考虑这样的情形：将 $\Psi$ 视为从 $\mathcal M$ 到 $\mathbb R$ 的泛函时，它具有以下意义下的路径可微性。对给定损失函数 $L:\mathcal M\times\mathcal O\to\mathbb R$，对每个 $P\in\mathcal M$，存在 $L_0^2(P)$ 的子集 $S(P)$ 以及影响函数 $D(P)\in L_0^2(P)$，使得对所有 $s\in S(P)$，都存在 $\mathcal M$ 的一个具有广义得分 $s$ 的子模型 $\{P_{s,\epsilon}:\epsilon\in(-c,c)\}$，并使 $\epsilon\mapsto\Psi(P_{s,\epsilon})$ 在 $\epsilon=0$ 处可微，导数等于 $PsD(P)$。这里，广义得分的含义是：对 $P$ 几乎所有的 $o\in\mathcal O$，$\epsilon\mapsto L(P_{s,\epsilon},o)$ 在 $\epsilon=0$ 处可微，其导数等于 $s(o)$。例如，在第29.4节的例子中，$\mathcal M$ 是由满足某些正值性约束的所有可能 $O$ 分布组成的非参数模型；$L$ 是负对数似然函数；$S(P)$ 是 $L_0^2(P)$ 中所有不恒为0、且具有有限上确界范数的元素所成的子集。对每个 $s\in S(P)$，可以通过定义 $P_{s,\epsilon}\ll P$，且 $dP_{s,\epsilon}/dP\equiv1-\epsilon s$，来刻画该子模型，取 $c\equiv\|s\|_\infty^{-1}$。在这一情形下，$s$ 是子模型 $\{P_{s,\epsilon}:\epsilon\in(-c,c)\}$ 的经典得分，而 $D(P)$ 是 $\Psi$ 在 $P$ 处的有效影响曲线。
+
+假定我们已经构造出针对 $\psi_0$ 靶向拟合的 $P_n^*\in\mathcal M$，其含义是
+\begin{equation}
+P_n^{\mathrm{HT}}D(P_n^*)=o_P(1/\sqrt n).
+\tag{29.3}
+\end{equation}
+TMLE就是代入估计量 $\psi_n^*\equiv\Psi(P_n^*)$。
+
+\paragraph{中心极限定理与置信区间。}
+CLT依赖三个假设。令 $h$ 为 $\mathcal O$ 上一个待定的实值函数。我们假定，存在 $\mathcal O$ 上的一个可测实值函数类 $\mathcal F$，使得
+\begin{description}[leftmargin=2.7em,labelsep=0.6em]
+\item[\textbf{A1.}] 经验过程 $\sqrt n(P_n^{\mathrm{HT}}-P_0)$ 在 $\ell^\infty(\mathcal F)$ 中依分布收敛于均值为零、协方差函数为 $\Sigma_h$ 的高斯过程。
+\item[\textbf{A2.}] 以趋于1的 $P_0$ 概率，有 $D(P_n^*)\in\mathcal F$，且存在 $f_1\in\mathcal F$，使 $\|D(P_n^*)-f_1\|_{2,P_0}=o_P(1)$。此外，已知 $\sigma_1^2\equiv\Sigma_h(f_1,f_1)$ 的一个保守估计量 $\sigma_n^2$。
+\end{description}
+在\textbf{A1}和\textbf{A2}下，
+\begin{equation}
+\hat\sigma_n^2\equiv P_n^{\mathrm{HT}}D(P_n^*)^2h^{-1}
+\tag{29.4}
+\end{equation}
+一致估计 $\sigma_1^2$。不过，在实践中，估计 $\sigma_1^2$ 可能更加困难。要求一个保守估计量虽不是最优的，却赋予了一定的灵活性。第三个假设保证，$\psi_n^*=\Psi(P_n^*)$ 在 $P_0$ 附近展开中的一个二阶项，确实是二阶的：
+\begin{description}[leftmargin=2.7em,labelsep=0.6em]
+\item[\textbf{A3.}] 有 $\psi_0-\psi_n^*-P_0D(P_n^*)=o_P(1/\sqrt n)$。
+\end{description}
+假设\textbf{A1}、\textbf{A2}和\textbf{A3}，是对TMLE渐近分析中通常所作假设的轻微变形。它们允许推导出下列CLT，第29.6.1节将给出证明概要。取 $\alpha\in(0,1)$，并以 $\xi_{1-\alpha/2}$ 表示标准正态分布的 $(1-\alpha/2)$ 分位数。
+
+\begin{bookresult}{命题}{29.1}
+在\textbf{A1}、\textbf{A2}和\textbf{A3}下，$\sqrt n(\psi_n^*-\psi_0)$ 依分布收敛于均值为零、方差为 $\sigma_1^2$ 的高斯分布。因此，
+\begin{equation}
+\left[\psi_n^*\pm\xi_{1-\alpha/2}\sqrt{\frac{\sigma_n^2}{n}}\right]
+\tag{29.5}
+\end{equation}
+是 $\psi_0$ 的一个置信区间，其渐近覆盖率不低于 $(1-\alpha)$。
+\end{bookresult}
+
+因此，借助调查抽样，可以为 $\psi_0$ 构造CI。CI (29.5) 的宽度通过 $\sigma_n^2$ 依赖调查抽样设计，更准确地说，依赖\textbf{A1}中的协方差函数。在这方面，第29.2节和第29.3节将说明，不同调查抽样设计并非等效。特别地，简单随机抽样，即以相等权重从 $N$ 个观测中不放回地选取 $n$ 个，并不是最优的。

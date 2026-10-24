@@ -1,0 +1,77 @@
+% 原书第 39—41 页；3.5。原书习题接续前文编号为 3.5—3.8。
+\section{习题}
+\label{sec:ch03-problems}
+\setcounter{problem}{4}
+
+\begin{problem}[从结构因果模型中抽样]
+考虑结构因果模型
+\begin{equation}
+ X:=Y^2+N_X
+ \tag{3.10}
+\end{equation}
+\begin{equation}
+ Y:=N_Y,
+ \tag{3.11}
+\end{equation}
+其中 $N_X,N_Y\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1)$。请从 $(X,Y)$ 的联合分布中，生成容量为 $200$ 的独立同分布样本。
+\end{problem}
+
+\begin{problem}[条件分布]
+证明式 (3.4) 中的 $P_{C\mid E=2}^{\mathfrak{C}}$ 是一个高斯分布：
+\[
+ C\mid E=2\sim\mathcal{N}\left(\frac{8}{17},\sigma^2=\frac{1}{17}\right).
+\]
+\end{problem}
+
+\begin{problem}[干预]
+假设已知某个过程或者遵循结构因果模型
+\[
+ \begin{aligned}
+ X&:=Y+N_X\\
+ Y&:=N_Y,
+ \end{aligned}
+\]
+其中 $N_X\sim\mathcal{N}(\mu_X,\sigma_X^2)$、$N_Y\sim\mathcal{N}(\mu_X,\sigma_Y^2)$，\footnote{译注：原书此处将 $N_Y$ 的均值印为 $\mu_X$，但下文同时将 $\mu_X,\mu_Y$ 列为未知参数；按上下文，此处很可能应为 $\mu_Y$。本题公式保留原书印法。}$\mu_X$、$\mu_Y$ 以及 $\sigma_X,\sigma_Y>0$ 均未知；或者遵循结构因果模型
+\[
+ \begin{aligned}
+ X&:=M_X\\
+ Y&:=X+M_Y,
+ \end{aligned}
+\]
+其中 $M_X\sim\mathcal{N}(\nu_X,\tau_X^2)$、$M_Y\sim\mathcal{N}(\nu_Y,\tau_Y^2)$，$\nu_X$、$\nu_Y$ 以及 $\tau_X,\tau_Y>0$ 均未知。是否存在某个单一的干预分布，能够让你区分这两个结构因果模型？
+\end{problem}
+
+\begin{problem}[有环结构因果模型]
+前面已经提到，如果赋值具有有环结构，那么结构因果模型不一定会在观测变量上诱导出唯一的分布。有时模型无解，有时解不唯一。
+
+\begin{enumerate}[label=\alph*)]
+ \item 先看一个能够导出唯一解的例子。考虑结构因果模型
+ \begin{equation}
+ X:=2\cdot Y+N_X
+ \tag{3.12}
+ \end{equation}
+ \begin{equation}
+ Y:=2\cdot X+N_Y,
+ \tag{3.13}
+ \end{equation}
+ 其中 $(N_X,N_Y)\sim P$，$P$ 为任意分布。求 $\alpha,\beta,\gamma,\delta$，使
+ \[
+ \begin{aligned}
+ X&:=\alpha N_X+\beta N_Y\\
+ Y&:=\gamma N_X+\delta N_Y
+ \end{aligned}
+ \]
+ 给出该结构因果模型的一个解 $(X,Y,N_X,N_Y)$，即这个向量满足式 (3.12) 和式 (3.13)。这个解可以看作式 (6.2) 的一个特例。
+
+ \item 考虑结构因果模型
+ \[
+ \begin{aligned}
+ X&:=Y+N_X\\
+ Y&:=X+N_Y,
+ \end{aligned}
+ \]
+ 其中 $(N_X,N_Y)\sim P$。证明：如果 $P$ 相对于 Lebesgue 测度存在密度，而且能够分解，也就是 $N_X\indep N_Y$，那么该结构因果模型不存在解 $(X,Y,N_X,N_Y)$。
+
+ 进一步地，构造一个分布 $P$ 和一个向量 $(X,Y,N_X,N_Y)$，使其满足该结构因果模型。
+\end{enumerate}
+\end{problem}

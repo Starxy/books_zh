@@ -1,0 +1,17 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.2cm]
+ \node[latent] (ch09f8-h) at (.75,1) {$H$};
+ \node[latent] (ch09f8-j) at (3,1) {$J$};
+ \node[vtx] (ch09f8-a) at (0,0) {$A$};
+ \node[vtx] (ch09f8-b) at (1.5,0) {$B$};
+ \node[vtx] (ch09f8-c) at (2.25,0) {$C$};
+ \node[vtx] (ch09f8-d) at (3.75,0) {$D$};
+ \draw[ed] (ch09f8-h)--node[left] {$\alpha$}(ch09f8-a);
+ \draw[ed] (ch09f8-h)--node[below left] {$\beta$}(ch09f8-b);
+ \draw[ed] (ch09f8-h)--node[above] {$\eta$}(ch09f8-j);
+ \draw[ed] (ch09f8-j)--node[below right] {$\gamma$}(ch09f8-c);
+ \draw[ed] (ch09f8-j)--node[right] {$\delta$}(ch09f8-d);
+\end{tikzpicture}
+\caption{如果该图对应一个线性结构因果模型，其导出的分布将满足四元约束(9.12)—(9.14)。}
+\end{figure}

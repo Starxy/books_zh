@@ -1,0 +1,57 @@
+\begin{tikzpicture}[
+    font=\small,
+    node distance=9mm and 9mm,
+    >=Latex,
+    process/.style={draw, rounded corners=2pt, align=center, minimum width=28mm, minimum height=8mm},
+    store/.style={draw, rounded corners=2pt, align=center, minimum width=28mm, minimum height=8mm, dashed},
+    group/.style={draw, rounded corners=4pt, inner sep=3pt, fill=black!3},
+    dot/.style={circle, fill=black, inner sep=0.7pt},
+    every label/.style={font=\small}
+  ]
+
+  \tikzset{rowy/.store in=\rowy}
+  \def\rowA{0}
+  \def\rowB{-1.8}
+  \def\rowC{-4.0}
+
+  \node[process] (index)            at (0, \rowA) {建立索引};
+  \node[process, right=of index] (query)           {查询\\构造};
+  \node[process, right=of query, xshift=3mm] (retrieve)        {候选文档\\检索};
+  \node[process, right=of retrieve] (rerank)        {重排序};
+  \node[process, right=of rerank] (context)       {上下文\\组装};
+  \node[process, right=of context] (generate)      {基于证据\\生成};
+  \node[process, right=of generate] (attrib)       {来源归属\\与日志};
+
+  \draw[->] (index) -- (query);
+  \draw[->] (query) -- (retrieve);
+  \draw[->] (retrieve) -- (rerank);
+  \draw[->] (rerank) -- (context);
+  \draw[->] (context) -- (generate);
+  \draw[->] (generate) -- (attrib);
+
+  \node[store] (sparse)  at ($(retrieve.south) + (-10mm, \rowB)$) {稀疏索引\\(BM25/SPLADE)};
+  \node[store] (dense)   at ($(retrieve.south) + (18mm, \rowB)$)  {向量索引\\(ANN: HNSW/IVF-PQ)};
+
+  \node[process] (hybrid) at ($(retrieve)!0.5!(rerank) + (0, \rowB)$) {混合融合};
+  \draw[->] (sparse) -- (hybrid);
+  \draw[->] (dense)  -- (hybrid);
+  \draw[->] (hybrid) -- (rerank);
+
+  \node[store] (corpus)  at ($(index.south) + (0, \rowC)$) {文档存储／\\语料库};
+  \node[store] (meta)    at ($(context.south) + (-20mm, \rowC)$) {元数据、\\访问控制与版本};
+  \node[store] (logs)    at ($(attrib.south) + (0, \rowC)$) {执行轨迹、\\遥测数据};
+
+  \draw[->] (corpus) -- (index);
+  \draw[->] (meta)   -- (context);
+  \draw[->] (attrib) -- (logs);
+
+  \node[group, fit={(query) ($(query.south)+(0,-13mm)$)}, label={[align=center]below:改写 \\ 分解 \\ HyDE / Self-RAG}] (qbox) {};
+  \draw[-{Latex}] (qbox.north) -- ($(query.south)+(0,-0.5mm)$);
+
+  \node[group, fit={(context) ($(context.south)+(0,-12mm)$)}, label={[align=center]below:多样性（MMR） \\ 去重（MinHash/SimHash） \\ 时效性过滤}] (cbox) {};
+  \draw[-{Latex}] (cbox.north) -- ($(context.south)+(0,-0.5mm)$);
+
+  \node[group, fit={(generate) ($(generate.south)+(0,-12mm)$)}, label={[align=center]below:要求引用 \\ NLI／蕴涵检验 \\ 证据不足时拒答}] (gbox) {};
+  \draw[-{Latex}] (gbox.north) -- ($(generate.south)+(0,-0.5mm)$);
+
+\end{tikzpicture}

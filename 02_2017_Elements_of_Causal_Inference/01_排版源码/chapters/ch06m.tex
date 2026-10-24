@@ -1,0 +1,110 @@
+% 原书第 132—134 页；6.12。
+\section{习题}
+\label{sec:ch06-problems}
+\setcounter{problem}{53}
+
+\begin{problem}[DAG]
+表 B.1（原书第 223 页）指出，三个节点共有 25 个 DAG。为什么？
+\end{problem}
+
+\begin{problem}[多元结构因果模型]
+考虑以下结构因果模型 $\mathfrak C$：
+\[
+ \begin{aligned}
+ V&:=N_V\\
+ W&:=-2V+3Y+5Z+N_W\\
+ X&:=2V+N_X\\
+ Y&:=-X+N_Y\\
+ Z&:=\alpha X+N_Z,
+ \end{aligned}
+\]
+其中 $N_V,N_W,N_X,N_Y,N_Z\overset{\mathrm{iid}}{\sim}\mathcal N(0,1)$。
+\begin{enumerate}[label=\alph*)]
+ \item 画出该模型对应的图。
+ \item 取 $\alpha=2$，从联合分布中模拟 200 个独立同分布数据点；绘制 $X$ 与 $W$ 的取值，以展示分布 $P_{X,W}^{\mathfrak C}$。
+ \item 同样取 $\alpha=2$，在 $X$ 上实施干预，从干预分布
+ \[
+ P_{X,W}^{\mathfrak C;\dox{X:=3}}
+ \]
+ 中抽取 200 个独立同分布数据点。再次绘图，并与第 b) 项的图比较。
+ \item 从一个节点到另一个节点存在有向路径，不一定意味着前者对后者具有因果效应。选择一个 $\alpha$，并证明在该取值下，$X$ 对 $W$ 没有因果效应。
+ \item 对任意给定的 $\alpha$，计算
+ \[
+ \frac{\partial}{\partial x}\EE^{\mathfrak C;\dox{X:=x}}[W].
+ \]
+\end{enumerate}
+\end{problem}
+
+\begin{problem}[干预]
+考虑结构因果模型
+\[
+ \begin{aligned}
+ X&:=N_X\\
+ Y&:=(X-4)^2+N_Y\\
+ Z&:=X^2+Y^2+N_Z,
+ \end{aligned}
+\]
+其中 $N_X,N_Y,N_Z\overset{\mathrm{iid}}{\sim}\mathcal N(0,1)$。你可以干预 $X$ 或 $Y$。哪一种硬干预能使 $Z$ 的期望最小？
+\end{problem}
+
+\begin{problem}[极小性]
+注 6.6 指出，因果极小性（定义 6.33）蕴含结构极小性。
+\begin{enumerate}[label=\alph*)]
+ \item 确认命题 6.49 证明了这一点。
+ \item 给出一个满足结构极小性、但违反因果极小性的结构因果模型。
+\end{enumerate}
+\end{problem}
+
+\begin{problem}[因果极小性]
+考虑一个因果图模型，其分布具有严格为正的连续密度，但违反因果极小性。根据命题 6.36，可以从图中删除一条“不起作用”的边，得到一个新的因果图模型。证明这两个模型干预等价。
+\end{problem}
+
+\begin{problem}[干预等价性]
+考虑以下形式的两个结构因果模型 $\mathfrak C_1$ 与 $\mathfrak C_2$：
+\[
+ \begin{aligned}
+ X&:=N_X\\
+ Y&:=X+N_Y\\
+ Z&:=f_j(X,Y)+N_Z,
+ \end{aligned}
+\]
+其中 $N_X,N_Y,N_Z\overset{\mathrm{iid}}{\sim}\mathrm U(-1,1)$，即 $-1$ 到 $1$ 之间的连续均匀分布。选择函数 $f_1$ 与 $f_2$，使 $\mathfrak C_1$ 与 $\mathfrak C_2$ 观测等价，在所有单节点干预上也相同，但在同时干预多个节点时不同。本题说明，如果密度并非严格为正，命题 6.48 就不一定成立。
+\end{problem}
+
+\begin{problem}[有环结构因果模型]
+证明：只要方阵 $B$ 的所有特征值的绝对值都严格小于 $1$，即 $B$ 的谱半径严格小于 $1$，则 $I-B$ 可逆。
+\end{problem}
+
+\begin{problem}[有环结构因果模型]
+考虑注 6.5 中的赋值 $\mathbf X:=B\mathbf X+\mathbf N$。证明：若 $B$ 的谱半径严格小于 $1$，则由式 (6.3) 的 $\mathbf X^t:=B\mathbf X^{t-1}+\mathbf N$ 定义的 $\mathbf X^t$，依分布收敛于式 (6.2) 定义的 $\mathbf X:=(I-B)^{-1}\mathbf N$。
+\end{problem}
+
+\begin{problem}[d-分离]
+证明：DAG $\mathcal G$ 中任意两个没有边直接相连的节点，都可以被 d-分离。利用这一陈述证明命题 6.35。
+\end{problem}
+
+\begin{problem}[协变量调整]
+假设 $\mathbf Z$ 是从 $X$ 到 $Y$ 的因果效应的有效调整集，且 $(Y,X,\mathbf Z)$ 服从零均值高斯分布，并满足
+\[
+ \EE[Y\mid X=x,\mathbf Z=\mathbf z]=ax+\mathbf b^{\mathsf t}\mathbf z.
+\]
+证明
+\[
+ \frac{\partial}{\partial x}\EE^{\mathfrak C;\dox{X:=x}}[Y]=a;
+\]
+也就是说，利用式 (6.19) 与式 (6.13) 证明式 (6.20)。这一结果使我们能够通过将 $Y$ 对 $X$ 与 $\mathbf Z$ 回归，对因果效应 $a$ 进行一致估计。
+\end{problem}
+
+\begin{problem}[协变量调整]
+利用式 (6.17)，证明命题 6.41 第 (i)、(ii) 项中的父节点调整与后门准则。
+\end{problem}
+
+\begin{problem}[协变量调整]
+从
+\[
+ p^{\mathfrak C;\dox{X:=x}}(y)
+ =\sum_zp^{\mathfrak C;\dox{X:=x}}(y\mid z,x)
+ p^{\mathfrak C;\dox{X:=x}}(z)
+\]
+出发，再使用第 6.7 节 do 演算的规则 2、3，证明前门准则 (6.23)。
+\end{problem}

@@ -1,0 +1,250 @@
+% 原分章PDF83页附录7.A标题—88页附录7.B标题之前，印刷页659—664。
+\section*{附录7.A\quad LiNGAM的对数似然比近似}
+\addcontentsline{toc}{section}{附录7.A LiNGAM的对数似然比近似}
+\markright{附录7.A LiNGAM的对数似然比近似}
+
+近似式的推导采用Hyvärinen and Smith（2013）的方法。考虑式（7.3）中的因果模型 $X\to Y$：
+\begin{equation}
+\begin{aligned}
+X&=\alpha u+\varepsilon_x,\\
+Y&=\rho X+\beta u+\varepsilon_y.
+\end{aligned}\tag{7.A.1}
+\end{equation}
+首先，对变量 $\varepsilon_Y$ 进行标准化。由式（7.A.1），有
+\begin{equation}
+\varepsilon_Y=Y-\rho X-\beta u,\tag{7.A.2}
+\end{equation}
+从而
+\begin{equation}
+\operatorname{Var}(\varepsilon_Y)=\operatorname{Var}(Y)
+ +\operatorname{Var}(\rho X)-2\operatorname{cov}(Y,\rho X).\tag{7.A.3}
+\end{equation}
+假设变量 $X,Y$ 已经标准化，则有
+\begin{equation}
+\begin{aligned}
+\operatorname{Var}(X)&=1,\\
+\operatorname{Var}(Y)&=1,\\
+\operatorname{Cov}(X,Y)&=\rho\operatorname{Var}(X)=\rho.
+\end{aligned}\tag{7.A.4}
+\end{equation}
+将式（7.A.4）代入式（7.A.3），得到
+\begin{equation}
+\begin{aligned}
+\operatorname{Var}(\varepsilon_Y)
+ &=\operatorname{Var}(Y)+\rho^2\operatorname{Var}(X)
+   -2\rho\operatorname{cov}(Y,X)\\
+ &=1+\rho^2-2\rho^2=1-\rho^2.
+\end{aligned}\tag{7.A.5}
+\end{equation}
+定义标准化后的 $\varepsilon_Y$ 为
+\begin{equation}
+d=\frac{\varepsilon_Y}{\sqrt{1-\rho^2}}.\tag{7.A.6}
+\end{equation}
+
+令 $P_x(u)$ 为随机变量 $X$ 的密度函数，$P_d(u)$ 为变量 $d$ 的密度函数。由式（7.A.1），$\varepsilon_X$ 的密度函数等于变量 $X$ 的密度函数 $P_x(u)$。由式（7.A.6），显然有
+\begin{equation}
+P(\varepsilon_Y)=\frac{P_d(u)}{\sqrt{1-\rho^2}}.\tag{7.A.7}
+\end{equation}
+定义 $G_x(u)=\log P_x(u)$、$G_d(u)=\log P_d(u)$。随机变量 $X,Y$ 的联合密度函数为
+\begin{equation}
+\begin{aligned}
+P(x,y)&=P(\varepsilon_X,\varepsilon_Y)\\
+ &=P(\varepsilon_X)P(\varepsilon_Y).
+\end{aligned}\tag{7.A.8}
+\end{equation}
+将式（7.A.7）代入式（7.A.8），得到
+\begin{equation}
+P(x,y)=P_x(x)\frac{P_d\left(\dfrac{y-\rho x-\beta u}{\sqrt{1-\rho^2}}\right)}
+ {\sqrt{1-\rho^2}}.\tag{7.A.9}
+\end{equation}
+对式（7.A.9）两边取对数，得到式（7.A.1）中 $X\to Y$ 的LiNGAM的对数似然：
+\begin{equation}
+l(X\to Y)=\sum_{i=1}^n\left[G_x(x_i)+G_d\left(
+ \frac{y_i-\rho x_i-\beta u_i}{\sqrt{1-\rho^2}}\right)\right]
+ -\frac n2\log(1-\rho^2).\tag{7.A.10}
+\end{equation}
+回顾式（7.4）中的第二个潜在因果模型 $Y\to X$：
+\begin{equation}
+\begin{aligned}
+Y&=\beta u+\varepsilon_y,\\
+X&=\rho Y+\alpha u+\varepsilon_x.
+\end{aligned}\tag{7.A.11}
+\end{equation}
+定义
+\[
+e=\frac{X-\rho Y-\alpha u}{\sqrt{1-\rho^2}}.
+\]
+令 $P_y(u)$ 为随机变量 $Y$ 的密度函数，$P_e(u)$ 为变量 $e$ 的密度函数。定义 $G_y(u)=\log P_y(u)$、$G_e(u)=\log P_e(u)$。类似地，可以得到式（7.A.11）中 $X\leftarrow Y$ 的LiNGAM的对数似然：
+\begin{equation}
+l(X\leftarrow Y)=\sum_{i=1}^n\left[G_y(y_i)+G_e\left(
+ \frac{x_i-\rho y_i-\alpha u_i}{\sqrt{1-\rho^2}}\right)\right]
+ -\frac n2\log(1-\rho^2).\tag{7.A.12}
+\end{equation}
+因此，平均对数似然比为
+\begin{equation}
+\begin{aligned}
+R={}&\frac1n l(X\to Y)-\frac1n l(Y\to X)\\
+={}&\frac1n\sum_{i=1}^n\biggl[G_x(x_i)+G_d\left(
+ \frac{y_i-\rho x_i-\beta u_i}{\sqrt{1-\rho^2}}\right)\\
+&\hspace{4em}{}-G_y(y_i)G_e\left(
+ \frac{x_i-\rho y_i-\alpha u_i}{\sqrt{1-\rho^2}}\right)\biggr].
+\end{aligned}\tag{7.A.13}
+\end{equation}
+可以用Taylor展开近似对数密度函数。$G_d\bigl((y_i-\rho x_i-\beta u_i)/\sqrt{1-\rho^2}\bigr)$ 的一阶近似为
+\begin{equation}
+G_d\left(\frac{y_i-\rho x_i-\beta u_i}{\sqrt{1-\rho^2}}\right)
+ =G(y)-(\rho x+\beta u)g(y)+O(\rho^2),\tag{7.A.14}
+\end{equation}
+其中 $g$ 是 $G$ 的导数。类似地，有
+\begin{equation}
+G_e\left(\frac{x_i-\rho y_i-\alpha u_i}{\sqrt{1-\rho^2}}\right)
+ =G(x)-(\rho y+\alpha u)g(x)+O(\rho^2).\tag{7.A.15}
+\end{equation}
+将式（7.A.14）、（7.A.15）代入式（7.A.13），得到
+\begin{equation}
+\begin{aligned}
+R\approx{}&\frac1n\sum_{i=1}^n\bigl[G(x_i)+G(y_i)
+ -(\rho x_i+\beta u_i)g(y_i)\\
+&\hspace{5em}{}-G(y_i)+(\rho y_i+\alpha u_i)g(x_i)\bigr]\\
+={}&\frac1n\sum_{i=1}^n\bigl[-(\rho x_i-\beta u_i)g(y_i)
+ +(\rho y_i+\alpha u_i)g(x_i)\bigr].
+\end{aligned}\tag{7.A.16}
+\end{equation}
+Hyvärinen and Smith（2013）使用下列逻辑分布密度函数近似对数概率密度函数 $G$：
+\begin{equation}
+G(z)=-2\log\cosh\left(\frac{\pi}{2\sqrt3}z\right)+\mathrm{const},\tag{7.A.17}
+\end{equation}
+其中
+\[
+\cosh(z)=\frac{e^z+e^{-z}}2.
+\]
+若假设 $\pi/(2\sqrt3)\approx1$，并忽略式（7.A.17）中的常数2，则 $G(z)$ 的导数可近似为
+\begin{equation}
+g(z)=\frac{dG(z)}{dz}\approx-\frac{e^z-e^{-z}}{e^z+e^{-z}}
+ =-\tanh(z),\tag{7.A.18}
+\end{equation}
+其中 $\tanh(z)=(e^z-e^{-z})/(e^z+e^{-z})$ 为双曲正切函数。
+
+将式（7.A.18）代入式（7.A.16），得到
+\begin{equation}
+\begin{aligned}
+R\approx{}&\frac1n\sum_{i=1}^n\bigl[-(\rho x_i+\beta u_i)g(y_i)
+ +(\rho y_i+\alpha u_i)g(x_i)\bigr]\\
+={}&\frac1n\sum_{i=1}^n\bigl[(\rho x_i+\beta u_i)\tanh(y_i)
+ -(\rho y_i+\alpha u_i)\tanh(x_i)\bigr]\\
+={}&\frac1n\sum_{i=1}^n\bigl[\rho\bigl(x_i\tanh(y_i)-y_i\tanh(x_i)\bigr)\\
+&\hspace{5em}{}+\beta u_i\tanh(y_i)-\alpha u_i\tanh(x_i)\bigr]\\
+={}&\rho\widehat E[x\tanh(y)-y\tanh(x)]
+ +\beta\widehat E[u\tanh(y_i)]-\alpha\widehat E[u\tanh(x)].
+\end{aligned}\tag{7.A.19}
+\end{equation}
+定义
+\begin{equation}
+R_{NC}=\rho\widehat E[x\tanh(y)-y\tanh(x)]\tag{7.A.20}
+\end{equation}
+以及
+\begin{equation}
+R_C=\beta\widehat E[u\tanh(y_i)]-\alpha\widehat E[u\tanh(x)].\tag{7.A.21}
+\end{equation}
+于是，对数似然比可近似为
+\begin{equation}
+R\approx R_{NC}+R_C.\tag{7.A.22}
+\end{equation}
+接下来，讨论如何近似四个对数概率密度函数 $G_x,G_y,G_d,G_e$。由中心极限定理，有
+\begin{equation}
+\frac1n\sum_{i=1}^nG_x(x_i)\to E[G_x(x)]
+ =\int P_x(x)\log P_x(x)\,dx=-H(x),\tag{7.A.23}
+\end{equation}
+其中 $H$ 表示微分熵（differential entropy）。类似地，有
+\begin{equation}
+\frac1n\sum_{i=1}^nG_d\left(\frac{y_i-\rho x_i-\beta u_i}{\sqrt{1-\rho^2}}\right)
+ \to-H\left(\frac{\widehat\varepsilon_y}{\sigma_{\varepsilon_y}}\right),\tag{7.A.24}
+\end{equation}
+其中
+\[
+\varepsilon_Y=Y-\rho X-\beta u,\qquad
+\sigma_{\varepsilon_Y}=\sqrt{\operatorname{var}(\varepsilon_Y)},
+\]
+\begin{equation}
+\frac1n\sum_{i=1}^nG_y(y_i)\to-H(y),\tag{7.A.25}
+\end{equation}
+\begin{equation}
+\frac1n\sum_{i=1}^nG_e\left(\frac{x_i-\rho y_i-\alpha u_i}{\sqrt{1-\rho^2}}\right)
+ \to-H\left(\frac{\widehat\varepsilon_x}{\sigma_e}\right),\tag{7.A.26}
+\end{equation}
+其中
+\[
+\varepsilon_x=X-\rho Y-\alpha u,\qquad
+\sigma_{\varepsilon_x}=\sqrt{\operatorname{var}(\varepsilon_x)}.
+\]
+因此，结合式（7.A.13）和式（7.A.23）—（7.A.26），得到
+\begin{equation}
+R\to-H(x)-H\left(\frac{\widehat\varepsilon_y}{\sigma_{\varepsilon_y}}\right)
+ +H(y)+H\left(\frac{\widehat\varepsilon_x}{\sigma_e}\right).\tag{7.A.27}
+\end{equation}
+定义
+\[
+\varepsilon_x^0=X-\rho Y,\qquad \varepsilon_y^0=Y-\rho X.
+\]
+于是，有
+\begin{equation}
+\varepsilon_x=\varepsilon_x^0-\alpha u\tag{7.A.28}
+\end{equation}
+以及
+\begin{equation}
+\varepsilon_y=\varepsilon_y^0-\beta u.\tag{7.A.29}
+\end{equation}
+由于随机变量 $X,Y$ 的密度函数未知，在实践中计算微分熵并不容易。一种近似微分熵的方法（Hyvärinen 1998；Hyvärinen and Smith 2013）为
+\begin{equation}
+\widetilde H(z)=H(u)-k_1\{E[\log\cosh(z)]-\gamma\}^2
+ -k_2\left\{E\left[ze^{-z^2/2}\right]\right\}^2,\tag{7.A.30}
+\end{equation}
+其中 $H(u)=\tfrac12(1+2\pi)$、$k_1\approx79.047$、$k_2\approx7.4129$、$\gamma\approx0.37457$。
+
+对 $\widetilde H(z)$ 求导，得到
+\begin{equation}
+\begin{aligned}
+h(z)=\frac{d\widetilde H(z)}{dz}
+ ={}&-2k_1\{E[\log\cosh(z)]-\gamma\}E[\tanh(z)]\\
+&{}-2k_2E\left[ze^{-z^2/2}\right]
+ E\left[(1-z^2)e^{-z^2/2}\right].
+\end{aligned}\tag{7.A.31}
+\end{equation}
+现在利用Taylor展开近似式（7.A.27）中的 $R$。$H\bigl(\widehat\varepsilon_y/\sigma_{\varepsilon_y}\bigr)$ 的一阶Taylor近似为
+\begin{equation}
+\begin{aligned}
+H\left(\frac{\widehat\varepsilon_y}{\sigma_{\varepsilon_y}}\right)
+ &=H\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}
+ -\frac{\beta}{\sigma_{\varepsilon_y}}u\right)\\
+ &\approx H\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)
+ -\frac{\beta}{\sigma_{\varepsilon_y}}
+ h\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)E[u].
+\end{aligned}\tag{7.A.32}
+\end{equation}
+类似地，有
+\begin{equation}
+H\left(\frac{\widehat\varepsilon_x}{\sigma_e}\right)
+ \approx H\left(\frac{\varepsilon_x^0}{\sigma_{\varepsilon_x}}\right)
+ -\frac{\alpha}{\sigma_{\varepsilon_x}}
+ h\left(\frac{\varepsilon_x^0}{\sigma_{\varepsilon_x}}\right)E[u].\tag{7.A.33}
+\end{equation}
+将式（7.A.32）、（7.A.33）代入式（7.A.27），得到
+\begin{equation}
+\begin{aligned}
+R\approx{}&-H(X)-H\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)
+ +\frac{\beta}{\sigma_{\varepsilon_y}}
+ h\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)E[u]\\
+&{}+H(y)+H\left(\frac{\varepsilon_x^0}{\sigma_{\varepsilon_x}}\right)
+ -\frac{\alpha}{\sigma_{\varepsilon_x}}
+ h\left(\frac{\varepsilon_x^0}{\sigma_{\varepsilon_x}}\right)E[u]\\
+={}&R_0+\left[\frac{\beta}{\sigma_{\varepsilon_y}}
+ h\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)
+ -\frac{\alpha}{\sigma_{\varepsilon_x}}
+ h\left(\frac{\varepsilon_x^0}{\sigma_{\varepsilon_x}}\right)\right]E[u],
+\end{aligned}\tag{7.A.34}
+\end{equation}
+其中
+\begin{equation}
+R_0=-H(x)-H\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)
+ +H(y)+H\left(\frac{\varepsilon_x^0}{\sigma_e}\right).\tag{7.A.35}
+\end{equation}

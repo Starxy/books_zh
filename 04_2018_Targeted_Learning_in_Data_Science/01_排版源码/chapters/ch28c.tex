@@ -1,0 +1,151 @@
+% 原书分章 PDF 第 4—6 页：第 28.2.2—28.2.3 节，完整引理与迭代推导。
+\subsection{影响曲线方差的 TMLE}
+
+令 $O\sim P_0\in\mathcal M$，并考虑两个目标参数
+$\Psi:\mathcal M\to\mathbb R$ 和 $\Sigma^2:\mathcal M\to\mathbb R$。
+给定一个在 $P_0$ 处渐近线性的估计量 $\psi_n^*$，其影响曲线为 $D(P_0)$。为简便起见，我们考虑 $\psi_n^*=\Psi(P_n^*)$ 为有效的靶向极大似然估计量（targeted maximum likelihood estimator）的情形，从而 $D(P)=D^*(P)$，且 $D^*(P)$ 为 $\Psi$ 在 $P$ 处的有效影响曲线。此时，$\Sigma^2(P)=P\{D^*(P)\}^2$。令 $D_\Sigma^*(P)$ 为 $\Sigma^2$ 在 $P$ 处的有效影响曲线。假定对于某个参数 $Q_\Sigma(P)$，有
+$\Sigma^2(P)=\Sigma_1^2(Q_\Sigma(P))$；该参数可通过最小化损失函数 $L_\Sigma(Q_\Sigma)$ 的风险来定义，即
+\[
+ Q_\Sigma(P)=\argmin_{Q_\Sigma}PL_\Sigma(Q).
+\]
+此外，假定 $D_\Sigma^*(P)$ 仅通过 $Q_\Sigma(P)$ 及某个其他参数 $g_\Sigma(P)$ 依赖 $P$。为简化记号，我们分别将渐近方差参数及其有效影响曲线的这两种表示记为
+$\Sigma^2(Q_\Sigma)$ 和 $D_\Sigma^*(Q_\Sigma(P),g_\Sigma(P))$。
+
+现在按如下方式构造 $\Sigma^2(P_0)$ 的 TMLE。首先，令 $Q_{\Sigma,n}^0$ 为 $Q_\Sigma(P_0)$ 的初始估计量；它可以由采用损失函数 $L_\Sigma()$ 的超级学习器集成算法得到。类似地，令 $g_{\Sigma,n}$ 为 $g_{\Sigma,0}$ 的估计量。设 $k=0$。考虑子模型
+\[
+ \{Q_{\Sigma,n}^k(\epsilon\mid g_{\Sigma,n}):\epsilon\}
+ \subset Q_\Sigma(\mathcal M),
+\]
+使广义得分
+$\frac{d}{d\epsilon}L_\Sigma(Q_{\Sigma,n}^k(\epsilon\mid g_{\Sigma,n}))$
+在 $\epsilon=0$ 处的各分量所张成的线性空间，包含
+$D_\Sigma^*(Q_{\Sigma,n}^k,g_{\Sigma,n})$。将极大似然估计量定义为
+\[
+ \epsilon_n^k=\argmin_\epsilon
+ P_nL_\Sigma(Q_{\Sigma,n}^k(\epsilon\mid g_{\Sigma,n})),
+\]
+并定义更新
+\[
+ Q_{\Sigma,n}^{k+1}=Q_{\Sigma,n}^k(\epsilon_n^k\mid g_{\Sigma,n}).
+\]
+重复这一更新过程直至收敛，在第 $K$ 步有 $\epsilon_n^K\approx0$。
+将这一最终更新记为 $Q_{\Sigma,n}^*$，称其为 $Q_\Sigma(P_0)$ 的 TMLE；
+而 $\Sigma^2(Q_{\Sigma,n}^*)$ 则是 $\psi_0$ 的 TMLE $\psi_n^*$ 的渐近方差 $\Sigma^2(Q_0)$ 的 TMLE。令 $\tilde P_n^*$ 为与 $Q_{\Sigma,n}^*$ 相容的概率分布。
+
+\noindent\textbf{应用于特定处理下的均值。}\enspace
+$\sqrt n(\psi_n^*-\psi_0)$ 的渐近方差为
+\[
+\begin{aligned}
+ \Sigma^2(P_0)&=E_{P_0}\{D^*(P_0)\}^2\\
+ &=Q_{0,W}\left(
+ \frac{\bar Q_0(1-\bar Q_0)}{\bar g_0}
+ +(\bar Q_0-Q_{0,W}\bar Q_0)^2\right).
+\end{aligned}
+\]
+下面的引理给出它的有效影响曲线 $D_\Sigma^*(P)$。
+
+\begin{bookresult}{引理}{28.1}
+$\Sigma^2$ 在 $P$ 处的有效影响曲线 $D_\Sigma^*(P)$ 为
+\[
+\begin{aligned}
+ D_\Sigma^*(P)(W,A,Y)
+ &=D_{\Sigma^2,Q_W}(P)(W)
+ +D_{\Sigma^2,\bar Q}(P)(O)\\
+ &\quad+D_{\Sigma^2,\bar g}(P)(O),
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+ D_{\Sigma^2,Q_W}(P)(W)
+ &=\frac{\bar Q(1-\bar Q)}{\bar g}(W)
+ -Q_W\frac{\bar Q(1-\bar Q)}{\bar g}\\
+ &\quad+(\bar Q(W)-\Psi(Q))^2
+ -Q_W(\bar Q-\Psi(Q))^2,\\[.4em]
+ D_{\Sigma^2,\bar Q}(P)(O)
+ &=\frac{I(A=1)}{\bar g(W)}
+ \left(\frac{1-2\bar Q(W)}{\bar g(W)}
+ +2(\bar Q(W)-\Psi(Q))\right)(Y-\bar Q(W)),\\[.4em]
+ D_{\Sigma^2,\bar g}(P)(O)
+ &=-\frac{\bar Q(1-\bar Q)(W)}{\bar g^2(W)}(A-\bar g(W)).
+\end{aligned}
+\]
+\end{bookresult}
+
+由此可为 $\Sigma^2(Q_{W,0},\bar Q_0,\bar g_0)$ 构造 TMLE
+$\Sigma^2(Q_{W,n},\bar Q_n^*,\bar g_n^*)$。定义巧妙协变量
+\[
+\begin{aligned}
+ C_Y(\bar g,Q)(A,W)
+ &\equiv\frac{I(A=1)}{\bar g(W)}
+ \left(\frac{1-2\bar Q(W)}{\bar g(W)}
+ +2(\bar Q(W)-\Psi(Q))\right),\\
+ C_A(\bar g,\bar Q)(W)
+ &\equiv\frac{\bar Q(1-\bar Q)(W)}{\bar g^2(W)}.
+\end{aligned}
+\]
+对于 $\bar Q_0$ 的初始估计量 $\bar Q_n^0$，令
+$Q_n^0=(Q_{W,n},\bar Q_n^0)$，其中经验分布 $Q_{W,n}$ 在 TMLE 算法中保持不变。设 $k=0$，考虑子模型
+\[
+\begin{aligned}
+ \mathrm{Logit}\,\bar Q_n^k(\epsilon_1)
+ &=\mathrm{Logit}\,\bar Q_n^k+\epsilon_1C_Y(\bar g_n^k,Q_n^k),\\
+ \mathrm{Logit}\,\bar g_n^k(\epsilon_2)
+ &=\mathrm{Logit}\,\bar g_n^k+\epsilon_1C_A(\bar g_n^k,\bar Q_n^k).
+\end{aligned}
+\]
+再考虑对数似然损失函数
+\[
+\begin{aligned}
+ L_1(\bar Q)&=-I(A=1)\{Y\log\bar Q(W)+(1-Y)\log(1-\bar Q(W))\},\\
+ L_2(\bar g)&=-\{A\log\bar g(W)+(1-A)\log(1-\bar g(W))\}.
+\end{aligned}
+\]
+定义极大似然估计量
+$\epsilon_{1n}^k=\argmin_\epsilon P_nL_1(\bar Q_n^k(\epsilon))$
+与 $\epsilon_{2n}^k=\argmin_\epsilon P_nL_2(\bar g_n^k(\epsilon))$。
+这给出第一步更新
+$\bar Q_n^{k+1}=\bar Q_n^k(\epsilon_{1n}^k)$ 和
+$\bar g_n^{k+1}=\bar g_n^k(\epsilon_{2n}^k)$。
+然后令 $k=k+1$，重复此过程，直至由 $(\epsilon_{1n}^*,\epsilon_{2n}^*)$ 足够接近 $(0,0)$ 所定义的收敛。
+将这一 TMLE 过程的极限记为 $\bar g_n^*,\bar Q_n^*$，并令
+$Q_n^*=(Q_{W,n},\bar Q_n^*)$。
+$\Sigma^2(P_0)$ 的 TMLE 为 $\Sigma^2(\tilde P_n^*)$，其中
+$\tilde P_n^*$ 由 $(Q_{W,n},\bar Q_n^*,\bar g_n^*)$ 定义。
+注意，在 $(\epsilon_{1n}^*,\epsilon_{2n}^*)=(0,0)$ 时，有
+\[
+ 0=P_nD_{\Sigma^2}(\tilde P_n^*)=0,
+\]
+如果算法提前在第 $K$ 步停止，并定义 $\tilde P_n^*=P_n^K$，则只需确保
+\[
+ P_nD_{\Sigma^2}(\tilde P_n^*)=o_P(1/\sqrt n).
+\]
+
+\subsection{目标参数及其渐近方差的联合 TMLE}
+
+我们也可以定义同时靶向于 $\Psi$ 与 $\Sigma^2$ 的 TMLE。其定义与上面完全相同，但现在采用子模型
+$\{P_n^k(\epsilon):\epsilon\}\subset\mathcal M$，使其得分
+$\frac{d}{d\epsilon}L(P_n^k(\epsilon))$ 在 $\epsilon=0$ 处的各分量，同时张成两个有效影响曲线
+$(D_\psi^*(P),D_\Sigma^*(P))$。
+这样得到的 TMLE $\tilde P_n^*$ 解出
+\[
+ P_nD_\psi^*(\tilde P_n^*)=P_nD_\Sigma^*(\tilde P_n^*)=0,
+\]
+并且在正则条件下，同时给出 $\psi_0$ 与 $\sigma_0^2$ 的渐近有效估计量。
+在此情形下，$\psi_0$ 的 TMLE 就可以取为 $\Psi(\tilde P_n^*)$：
+因此，在这一特殊情形下，有 $P_n^*=\tilde P_n^*$。
+特别地，我们可以用二元 TMLE
+$(\Psi(\tilde P_n^*),\Sigma^2(\tilde P_n^*))$
+同时估计 $\psi_0$ 与 $\sigma_0^2$，其中 $\tilde P_n^*$ 同时靶向于
+$\psi_0$ 和 $\sigma_0^2=\Sigma^2(P_0)$。
+此时 $P_n^*=\tilde P_n^*$，因而
+$\psi_n^*=\Psi(\tilde P_n^*)$，$\sigma_n^*=\Sigma^2(\tilde P_n^*)$。
+这一 TMLE 可以按上述 $\Sigma^2(P_0)$ 的迭代 TMLE 来定义，但使用增广子模型
+\[
+ \mathrm{Logit}\,\bar Q_n^k(\epsilon_1)
+ =\mathrm{Logit}\,\bar Q_n^k+\epsilon_0H(\bar g_n^k)
+ +\epsilon_1C_Y(\bar g_n^k,Q_n^k),
+\]
+其中 $H(\bar g)(A,W)=I(A=1)/\bar g(W)$。
+使 $(\Psi(\tilde P_n^*),\Sigma^2(\tilde P_n^*))$ 成为
+$(\Psi(P_0),\Sigma^2(P_0))$ 的渐近有效估计量的条件，与有效估计 $\Psi(P_0)$ 所需的条件基本相同。

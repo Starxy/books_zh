@@ -1,0 +1,302 @@
+% 原章第59页7.2.2标题—第66页7.2.2.3标题前。
+\subsection{用于组学与影像数据整合分析的多层因果网络}
+\subsubsection{引言}
+
+深入的组学整合分析，将为揭示疾病机制和设计治疗性干预开辟新途径，从而改变当前复杂疾病的基因组、表观基因组与影像研究范式。常见疾病源于 DNA 序列变异和通过分子网络发挥作用的非遗传因素之间的相互作用（Zhang et al. 2013；Jiang et al. 2015）。疾病病因复杂，从基因到表型之间经历多个步骤（Delude 2015；Köhler et al. 2017）。每一步都受到基因组和表观基因组变异的影响，并可能掩盖表型的因果机制。有效的遗传分析包括两个主要方面：（1）广度，即相连接的变量或表型的数量；（2）深度，即从遗传变异通往临床结局的过程中，受遗传变异影响的步骤数。只有广泛而深入地搜索连接遗传变异与临床结局的巨大路径空间，才能揭示疾病机制。精准医学要求对组学数据进行深入、系统、全面而精确的分析——“越深入，了解得越多”（Huan et al. 2015）。
+
+本节将利用因果推断理论推断多层组学与影像因果网络。它把基因型子网络、环境子网络、甲基化子网络、基因表达子网络、微 RNA 子网络、代谢子网络、影像子网络、中间表型子网络和多种疾病子网络，整合为一个相互连通的多层基因型—疾病网络，以揭示疾病背后深入的因果机制链（图7.9）。
+
+第2章将整数规划（integer programming，IP）作为估计单个因果网络（DAG）的通用框架。本节进一步将 IP 从单个因果网络的估计，推广到多个因果网络的联合估计，以整合基因组、表观基因组与影像数据。
+\input{figures/ch07b_fig09}
+
+\Needspace{8\baselineskip}
+\subsubsection{多个因果网络的加性噪声模型}
+\bookdeepheading{paragraph}{7.2.2.2.1}{模型}
+
+经典因果推断同时假设马尔可夫条件和忠实性。现在已经清楚，这两个条件只能保证识别到马尔可夫等价类，无法区分两个马尔可夫等价图。近期研究表明，连续变量或离散变量的加性噪声模型、误差变量相等的线性高斯模型，以及线性非高斯无环模型，都是可识别的（Peters et al. 2017）。第2章讨论了用于因果发现的非线性结构方程。本节研究含有几种不同类型数据的因果网络的 ANM。
+
+为便于讨论，考虑 $M$ 个基因表达变量 $Y_1,\ldots,Y_M$、$Q$ 个甲基化变量 $Z_1,\ldots,Z_Q$ 和 $K$ 个基因型变量 $X_1,\ldots,X_K$。令 $pa_D(d)$ 为节点 $d$ 的父节点集合，其中包括基因表达、甲基化和基因型变量。考虑三类 ANM。首先，考虑基因表达的一般 ANM：
+\begin{equation}
+\begin{aligned}
+Y_d={}&f_d\bigl(Y_i\in pa_D(d),Z_q\in pa_D(d),X_j\in pa_D(d)\bigr)+\varepsilon_d,\\
+&d=1,\ldots,M,
+\end{aligned}
+\tag{7.201}
+\end{equation}
+\begin{equation}
+Z_q=f_q\bigl(Z_l\in pa_Q(q),X_m\in pa_Q(q)\bigr)+\varepsilon_q,\qquad q=1,\ldots,Q,
+\tag{7.202}
+\end{equation}
+其中，$f_d$ 和 $f_q$ 分别是从 $R^{|pa_D|}$ 到 $R$、从 $R^{|pa_Q|}$ 到 $R$ 的非线性函数；误差 $\varepsilon_d$ 和 $\varepsilon_q$ 相互独立，分别服从分布 $P_{\varepsilon_d}$ 和 $P_{\varepsilon_q}$。式 (7.201) 定义连接基因表达、甲基化与基因型的因果网络，式 (7.202) 定义连接甲基化与基因型的因果网络。令 $k_i,k_q,k_j$ 分别表示属于节点 $d$ 的父节点集合的基因表达、甲基化和基因型变量的数量；令 $k_l,k_m$ 分别表示属于节点 $q$ 的父节点集合的甲基化和基因型变量数量。然后，考虑连接三个子网络（基因表达子网络、甲基化子网络、基因型子网络）的 $Y_d$ 的 ANM：
+\begin{equation}
+\begin{aligned}
+Y_d={}&F_{di}\bigl(Y_i\in pa_D(d)\bigr)+F_{dq}\bigl(Z_q\in pa_D(d)\bigr)\\
+&+F_{dj}\bigl(X_j\in pa_D(d)\bigr)+\varepsilon_d,
+\end{aligned}
+\tag{7.203}
+\end{equation}
+以及连接两个子网络（甲基化子网络与基因型子网络）的 $Z_q$ 的 ANM：
+\begin{equation}
+Z_q=F_{ql}\bigl(Z_l\in pa_Q(q)\bigr)+F_{qm}\bigl(X_m\in pa_Q(q)\bigr)+\varepsilon_q,
+\tag{7.204}
+\end{equation}
+其中，$F_{di}:R^{k_i}\to R$、$F_{dq}:R^{k_q}\to R$、$F_{dj}:R^{k_j}\to R$、$F_{ql}:R^{k_l}\to R$ 和 $F_{qm}:R^{k_m}\to R$ 是形式未知的非线性函数，$\varepsilon_d$、$\varepsilon_q$ 的定义同前。
+
+最后，考虑 ANM 的一个特殊情形：
+\begin{equation}
+Y_d=\sum_{i\in pa_D(d)}f_{di}(Y_i)+\sum_{q\in pa_D(d)}f_{dq}(Z_q)
++\sum_{j\in pa_D(d)}f_{dj}(X_j)+\varepsilon_d,
+\tag{7.205}
+\end{equation}
+以及
+\begin{equation}
+Z_q=\sum_{l\in pa_Q(q)}f_{ql}(Z_l)+\sum_{m\in pa_Q(q)}f_{qm}(X_m)+\varepsilon_q,
+\tag{7.206}
+\end{equation}
+其中，$\varepsilon_d$ 和 $\varepsilon_q$ 相互独立，且
+\[
+\varepsilon_d\sim N(0,\sigma_d^2),\quad \sigma_d^2>0,\quad
+\varepsilon_q\sim N(0,\sigma_q^2)>0,\quad d=1,\ldots,M,\ q=1,\ldots,Q.
+\]
+
+\bookdeepheading{paragraph}{7.2.2.2.2}{连续变量 ANM 的对数似然函数与惩罚方法}
+
+网络节点包含连续变量和离散变量两类。一般而言，连续变量 ANM 的估计方法与离散变量 ANM 不同。惩罚方法常用于连续变量，但难以应用于离散变量。本节研究 ANM 的惩罚极大似然。为便于表述，主要讨论式 (7.205) 和 (7.206) 中的模型。
+
+假设抽取 $n$ 个个体。进一步假设，可以通过鼓励完整模型的稀疏性，找到父节点（Bühlmann et al. 2014；Meier et al. 2009）。考虑式 (7.206) 的完整模型：
+\begin{equation}
+Z_{qu}=\sum_{l=1,l\ne q}^{Q}f_{ql}\bigl(Z_l^{(u)}\bigr)
++\sum_{m=1}^{K}f_{qm}\bigl(X_m^{(u)}\bigr)+\varepsilon_{qu},\qquad u=1,\ldots,n,
+\tag{7.207}
+\end{equation}
+以及式 (7.205) 的完整模型：
+\begin{equation}
+\begin{aligned}
+Y_{du}={}&\sum_{i=1,i\ne d}^{M}f_{di}\bigl(Y_i^{(u)}\bigr)
++\sum_{q=1}^{Q}f_{dq}\bigl(Z_q^{(u)}\bigr)\\
+&+\sum_{j=1}^{K}f_{dj}\bigl(X_j^{(u)}\bigr)+\varepsilon_{du},\qquad u=1,\ldots,n,
+\end{aligned}
+\tag{7.208}
+\end{equation}
+其中，变量 $Y,Z,X$ 均中心化为零。
+
+定义
+\[
+\begin{aligned}
+f_{ql}&=\begin{bmatrix}f_{ql}(z_l^{(1)})\\\vdots\\f_{ql}(z_l^{(n)})\end{bmatrix},&
+f_{qm}&=\begin{bmatrix}f_{qm}(x_m^{(1)})\\\vdots\\f_{qm}(x_m^{(n)})\end{bmatrix},&
+f_{di}&=\begin{bmatrix}f_{di}(y_i^{(1)})\\\vdots\\f_{di}(y_i^{(n)})\end{bmatrix},\\
+f_{dq}&=\begin{bmatrix}f_{dq}(z_q^{(1)})\\\vdots\\f_{dq}(z_q^{(n)})\end{bmatrix},&
+f_{dj}&=\begin{bmatrix}f_{dj}(x_j^{(1)})\\\vdots\\f_{dj}(x_j^{(n)})\end{bmatrix}.&&
+\end{aligned}
+\]
+令
+\[
+Y_d=\begin{bmatrix}Y_{d1}\\\vdots\\Y_{dn}\end{bmatrix},\qquad
+Z_q=\begin{bmatrix}Z_{q1}\\\vdots\\Z_{qn}\end{bmatrix},
+\]
+并将向量 $f\in R^n$ 的欧氏范数定义为 $\|f\|_2^2=\frac1n\sum_{u=1}^nf_u^2$。
+
+非线性函数可用平滑样条和 B 样条等基函数表示。第2章介绍了用平滑样条近似非线性函数。本节用 B 样条作为基函数展开非线性函数。为得到稀疏而光滑的函数估计量，定义同时对稀疏性和平滑性进行惩罚的惩罚项：
+\[
+\begin{aligned}
+J(f_{ql})&=\sqrt{\|f_{ql}\|_2^2+\mu S^2(f_{ql})},&
+J(f_{qm})&=\sqrt{\|f_{qm}\|_2^2+\mu S^2(f_{qm})},\\
+J(f_{di})&=\sqrt{\|f_{di}\|_2^2+\mu S^2(f_{di})},&
+J(f_{dq})&=\sqrt{\|f_{dq}\|_2^2+\mu S^2(f_{dq})},\\
+J(f_{dj})&=\sqrt{\|f_{dj}\|_2^2+\mu S^2(f_{dj})}.&&
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+S^2(f_{ql})&=\int\bigl(f_{ql}''(z)\bigr)^2\,dz,&
+S^2(f_{qm})&=\int\bigl(f_{qm}''(x)\bigr)^2\,dx,\\
+S^2(f_{di})&=\int\bigl(f_{di}''(y)\bigr)^2\,dy,&
+S^2(f_{dq})&=\int\bigl(f_{dq}''(z)\bigr)^2\,dz,\\
+S^2(f_{dj})&=\int\bigl(f_{dj}''(x)\bigr)^2\,dx.&&
+\end{aligned}
+\]
+参数 $\mu$ 控制函数的平滑程度。
+
+将总惩罚定义为
+\begin{equation}
+\begin{aligned}
+J(f)={}&\sum_{l=1,\ne q}^{Q}J(f_{ql})+\sum_{m=1}^{Q}J(f_{qm})
++\sum_{i=1,\ne d}^{M}J(f_{di})\\
+&+\sum_{q=1}^{Q}J(f_{dq})+\sum_{j=1}^{K}J(f_{dj}).
+\end{aligned}
+\tag{7.209}
+\end{equation}
+为估计函数与网络结构，定义惩罚最小二乘估计的目标为
+\begin{equation}
+\begin{aligned}
+F={}&\Bigl\|Y_d-\sum_{i=1,i\ne d}^{M}f_{di}-\sum_{q=1}^{Q}f_{dq}-\sum_{j=1}^{K}f_{dj}\Bigr\|_2^2\\
+&+\Bigl\|Z_q-\sum_{l=1,l\ne q}^{Q}f_{ql}-\sum_{m=1}^{K}f_{qm}\Bigr\|_2^2+J(f).
+\end{aligned}
+\tag{7.210}
+\end{equation}
+假设 $Y$ 和 $Z$ 已经中心化。最小化目标函数 $F$，会自动使式 (7.210) 中的全部非线性函数项中心化（Meier et al. 2009）。
+
+为计算 $F$，需要推导惩罚函数的计算公式。用三次 B 样条基函数近似每个函数 $f$。具体而言，函数的基展开为
+\begin{equation}
+\begin{aligned}
+f_{di}(y)&=\sum_{v=1}^{V}\beta_{di,v}b_{di,v}(y),&
+f_{dq}(z)&=\sum_{v=1}^{V}\beta_{dq,v}b_{dq,v}(z),\\
+f_{dj}(x)&=\sum_{v=1}^{V}\beta_{dj,v}b_{dj,v}(x),&
+f_{ql}(z)&=\sum_{v=1}^{V}\beta_{ql,v}b_{ql,v}(z),\\
+f_{qm}(x)&=\sum_{v=1}^{V}\beta_{qm,v}b_{qm,v}(x).&&
+\end{aligned}
+\tag{7.211}
+\end{equation}
+利用这些展开，可以计算函数在观测值处的欧氏范数。例如，
+\begin{equation}
+\begin{aligned}
+f_{di}&=\begin{bmatrix}f_{di}(y_i^{(1)})\\\vdots\\f_{di}(y_i^{(n)})\end{bmatrix}\\
+&=\begin{bmatrix}
+b_{di,1}(y_i^{(1)})&\cdots&b_{di,V}(y_i^{(1)})\\
+\vdots&\vdots&\vdots\\
+b_{di,1}(y_i^{(n)})&\cdots&b_{di,V}(y_i^{(n)})
+\end{bmatrix}
+\begin{bmatrix}\beta_{di,1}\\\vdots\\\beta_{di,V}\end{bmatrix}
+=A_{di}\alpha_{di},
+\end{aligned}
+\tag{7.212}
+\end{equation}
+其中
+\[
+A_{di}=\begin{bmatrix}
+b_{di,1}(y_i^{(1)})&\cdots&b_{di,V}(y_i^{(1)})\\
+\vdots&\vdots&\vdots\\
+b_{di,1}(y_i^{(n)})&\cdots&b_{di,V}(y_i^{(n)})
+\end{bmatrix},\qquad
+\alpha_{di}=\begin{bmatrix}\beta_{di,1}\\\vdots\\\beta_{di,V}\end{bmatrix}.
+\]
+类似地，有
+\begin{equation}
+f_{dq}=B_{dq}\beta_{dq},\quad f_{dj}=C_{dj}\gamma_{dj},\quad
+f_{ql}=H_{ql}\delta_{ql},\quad f_{qm}=G_{qm}\theta_{qm},
+\tag{7.213}
+\end{equation}
+其中
+\[
+B_{dq}=\begin{bmatrix}
+b_{dq,1}(z_q^{(1)})&\cdots&b_{dq,V}(z_q^{(1)})\\
+\vdots&\vdots&\vdots\\
+b_{dq,1}(z_q^{(n)})&\cdots&b_{dq,V}(z_q^{(n)})
+\end{bmatrix},\qquad
+\beta_{dq}=\begin{bmatrix}\beta_{dq,1}\\\vdots\\\beta_{dq,V}\end{bmatrix},
+\]
+\[
+C_{dj}=\begin{bmatrix}
+b_{dj,1}(x_j^{(1)})&\cdots&b_{dj,V}(x_j^{(1)})\\
+\vdots&\vdots&\vdots\\
+b_{dj,1}(x_j^{(n)})&\cdots&b_{dj,V}(x_j^{(n)})
+\end{bmatrix},\qquad
+\gamma_{dj}=\begin{bmatrix}\beta_{dj,1}\\\vdots\\\beta_{dj,V}\end{bmatrix},
+\]
+\[
+H_{ql}=\begin{bmatrix}
+b_{ql,1}(z_l^{(1)})&\cdots&b_{dl,V}(z_l^{(1)})\\
+\vdots&\vdots&\vdots\\
+b_{ql,1}(z_l^{(n)})&\cdots&b_{ql,V}(z_l^{(n)})
+\end{bmatrix},\qquad
+\delta_{ql}=\begin{bmatrix}\beta_{ql,1}\\\vdots\\\beta_{ql,V}\end{bmatrix},
+\]
+\[
+G_{qm}=\begin{bmatrix}
+b_{qm,1}(x_m^{(1)})&\cdots&b_{qm,V}(x_m^{(1)})\\
+\vdots&\vdots&\vdots\\
+b_{qm,1}(x_m^{(n)})&\cdots&b_{qm,V}(x_m^{(n)})
+\end{bmatrix},\qquad
+\theta_{qm}=\begin{bmatrix}\beta_{qm,1}\\\vdots\\\beta_{qm,V}\end{bmatrix}.
+\]
+因此，
+\begin{equation}
+\begin{aligned}
+\|f_{ql}\|_2^2&=\frac1n\delta_{ql}^TH_{ql}^TH_{ql}\delta_{ql},&
+\|f_{dq}\|_2^2&=\frac1n\beta_{dq}^TB_{dq}^TB_{dq}\beta_{dq},\\
+\|f_{dj}\|_2^2&=\frac1n\gamma_{dj}^TC_{dj}^TC_{dj}\gamma_{dj},&
+\|f_{di}\|_2^2&=\frac1n\alpha_{di}^TA_{di}^TA_{di}\alpha_{di},\\
+\|f_{qm}\|_2^2&=\frac1n\theta_{qm}^TG_{qm}^TG_{qm}\theta_{qm}.&&
+\end{aligned}
+\tag{7.214}
+\end{equation}
+
+接下来计算函数平滑性的度量。例如，式 (7.211) 中的函数 $f_{ql}(z)$ 可以重写为
+\begin{equation}
+f_{ql}(z)=\delta_{ql}^Tb_{ql}(z),
+\tag{7.215}
+\end{equation}
+其中，$\delta_{ql}=[\beta_{ql,1},\ldots,\beta_{ql,V}]^T$，$b_{ql}(z)=[b_{ql,1}(z),\ldots,b_{ql,V}(z)]^T$。由式 (7.215) 得
+\begin{equation}
+\begin{aligned}
+S^2(f_{ql})&=\int\bigl(f_{ql}''(z)\bigr)^2\,dz\\
+&=\delta_{ql}^T\int b_{ql}''(z)\bigl(b_{ql}''(z)\bigr)^T\,dz\,\delta_{ql}\\
+&=\delta_{ql}^T\Omega_{ql}\delta_{ql},
+\end{aligned}
+\tag{7.216}
+\end{equation}
+其中，$\Omega_{ql}=(\Omega_{ql,uv})_{V\times V}$，$\Omega_{ql,uv}=\int b_{qi,u}''(z)b_{ql,v}''(z)\,dz$。同理，
+\[
+\begin{aligned}
+S^2(f_{qm})&=\theta_{qm}^T\Omega_{qm}\theta_{qm},&
+S^2(f_{di})&=\alpha_{di}^T\Omega_{di}\alpha_{di},\\
+S^2(f_{dq})&=\beta_{dq}^T\Omega_{dq}\beta_{dq},&
+S^2(f_{dj})&=\gamma_{dj}^T\Omega_{dj}\gamma_{dj}.
+\end{aligned}
+\]
+结合式 (7.214) 和 (7.216)，有
+\begin{equation}
+\begin{aligned}
+J(f_{ql})&=\sqrt{\frac1n\delta_{ql}^TH_{ql}^TH_{ql}\delta_{ql}+\mu\delta_{ql}^T\Omega_{ql}\delta_{ql}}\\
+&=\sqrt{\delta_{ql}^T\left(\frac1nH_{ql}^TH_{ql}+\mu\Omega_{ql}\right)\delta_{ql}}.
+\end{aligned}
+\tag{7.217}
+\end{equation}
+同理，
+\begin{equation}
+\begin{aligned}
+J(f_{qm})&=\sqrt{\theta_{qm}^T\left(\frac1nG_{qm}^TG_{qm}+\mu\Omega_{qm}\right)\theta_{qm}},\\
+J(f_{di})&=\sqrt{\alpha_{di}^T\left(\frac1nA_{di}^TA_{di}+\mu\Omega_{di}\right)\alpha_{di}},\\
+J(f_{dq})&=\sqrt{\beta_{dq}^T\left(\frac1nB_{dq}^TB_{dq}+\mu\Omega_{dq}\right)\beta_{dq}},\\
+J(f_{dj})&=\sqrt{\gamma_{dj}^T\left(\frac1nC_{dj}^TC_{dj}+\mu\Omega_{dj}\right)\gamma_{dj}}.
+\end{aligned}
+\tag{7.218}
+\end{equation}
+为便于记号，定义
+\begin{equation}
+\begin{aligned}
+\Psi_{ql}&=\left(\frac1nH_{ql}^TH_{ql}+\mu\Omega_{ql}\right),&
+\Psi_{qm}&=\left(\frac1nG_{qm}^TG_{qm}+\mu\Omega_{qm}\right),\\
+\Psi_{di}&=\left(\frac1nA_{di}^TA_{di}+\mu\Omega_{di}\right),&
+\Psi_{dq}&=\left(\frac1nB_{dq}^TB_{dq}+\mu\Omega_{dq}\right),\\
+\Psi_{dj}&=\left(\frac1nC_{dj}^TC_{dj}+\mu\Omega_{dj}\right).&&
+\end{aligned}
+\tag{7.219}
+\end{equation}
+定义 $A=[A_{d1}\ \cdots\ A_{dM}]$，其中删去下标为 $di$ 的矩阵；$B=[B_{d1}\ \cdots\ B_{dQ}]$；$C=[C_{d1}\ \cdots\ C_{dK}]$；$H=[H_{q1}\ \cdots\ H_{qQ}]$，其中删去下标为 $qq$ 的矩阵；$G=[G_{q1}\ \cdots\ G_{qK}]$；并定义矩阵 $D_Y=[A\ B\ C]$、$D_Z=[H\ G]$。对应向量定义为
+\[
+\begin{aligned}
+\alpha&=[\alpha_{d1}\ \cdots\ \alpha_{dM}]^T,&
+\beta&=[\beta_{d1}\ \cdots\ \beta_{dQ}]^T,\\
+\gamma&=[\gamma_{d1}\ \cdots\ \gamma_{dK}],&
+\delta&=[\delta_{q1}\ \cdots\ \delta_{qQ}],\\
+\theta&=[\theta_{q1}\ \cdots\ \theta_{qK}],&
+\eta_Y&=[\alpha^T\ \beta^T\ \gamma^T]^T,\qquad
+\eta_Z=[\delta^T\ \theta^T]^T.
+\end{aligned}
+\]
+结合式 (7.208)—(7.219)，有
+\begin{equation}
+\begin{aligned}
+F={}&\|Y_d-D_Y\eta_Y\|_2^2+\|Z_q-D_Z\eta_Z\|_2^2\\
+&+\lambda\sqrt V\Biggl(\sum_{i=1,\ne d}^{M}\sqrt{\alpha_{di}^T\Psi_{di}\alpha_{di}}
++\sum_{q=1}^{Q}\sqrt{\beta_{dq}^T\Psi_{dq}\beta_{dq}}\\
+&\qquad+\sum_{j=1}^{K}\sqrt{\gamma_{dj}^T\Psi_{dj}\gamma_{dj}}
++\sum_{l=1,\ne q}^{Q}\sqrt{\delta_{ql}^T\Psi_{ql}\delta_{ql}}\\
+&\qquad+\sum_{m=1}^{Q}\sqrt{\theta_{qm}^T\Psi_{qm}\theta_{qm}}\Biggr).
+\end{aligned}
+\tag{7.220}
+\end{equation}
+目标是求出 $F$ 的最小值。这是一个典型的组套索问题，可以用组套索方法求解。$F$ 的最小值可作为节点评分，$\eta_Y$ 和 $\eta_Z$ 的非零分量则指出哪些节点是节点 $d$ 的父节点。将式 (7.220) 推广到 $Z_q$ 中包含多个甲基化基因的情形是直接的，但会涉及许多复杂记号。

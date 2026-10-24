@@ -1,0 +1,78 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\nsize{4.5cm}
+\def\vstep{1cm}
+
+\tikzstyle{enode} = [minimum width=\nsize,minimum height=0.18*\nsize,inner sep=2pt,draw,thick];
+
+\begin{scope}
+
+\node [enode,anchor=west,draw] (selfattention) at (0,0) {Self-attention};
+
+\node [anchor=north,minimum width=0.33*\nsize,minimum height=0.33*0.4*\nsize,draw] (posembedding) at ([yshift=-1.2*\vstep]selfattention.south) {\small{Position}};
+\node [anchor=east,minimum width=0.33*\nsize,minimum height=0.33*0.4*\nsize,draw] (tokenembedding) at ([xshift=-0pt]posembedding.west) {\small{Token}};
+\node [anchor=west,minimum width=0.33*\nsize,minimum height=0.33*0.4*\nsize,draw] (segembedding) at ([xshift=-0pt]posembedding.east) {\small{Segment}};
+
+\node [anchor=north] (input) at ([yshift=-\vstep]posembedding.south) {$x_{0} x_{1} ... x_{m}$};
+
+\draw [->,thick] ([yshift=0pt]input.north) -- ([yshift=-2pt]posembedding.south);
+\draw [->,thick] ([yshift=2pt]posembedding.north) -- ([yshift=-2pt]selfattention.south);
+
+\node [enode,anchor=south,draw] (lnormself) at ([yshift=0.8*\vstep]selfattention.north) {Layer Normalization};
+\node [enode,anchor=south,draw] (ffn) at ([yshift=1.4*\vstep]lnormself.north) {FFN};
+\node [enode,anchor=south,draw] (lnormffn) at ([yshift=0.8*\vstep]ffn.north) {Layer Normalization};
+
+\draw [->,thick] ([yshift=2pt]selfattention.north) -- ([yshift=-2pt]lnormself.south);
+\draw [->,thick] ([yshift=2pt]lnormself.north) -- ([yshift=-2pt]ffn.south);
+\draw [->,thick] ([yshift=2pt]ffn.north) -- ([yshift=-2pt]lnormffn.south);
+
+\draw [->,thick] ([yshift=-1em,xshift=-2pt]selfattention.south) -- ([yshift=-1em,xshift=-1em]selfattention.south west) -- ([xshift=-1em]lnormself.west) -- ([xshift=-2pt]lnormself.west);
+\draw [->,thick] ([yshift=-1em,xshift=-2pt]ffn.south) -- ([yshift=-1em,xshift=-1em]ffn.south west) -- ([xshift=-1em]lnormffn.west) -- ([xshift=-2pt]lnormffn.west);
+
+\node [enode,anchor=south,draw] (outputlayer) at ([yshift=1.2*\vstep]lnormffn.north) {Output Layer};
+\node [anchor=south] (output) at ([yshift=\vstep]outputlayer.north) {$...$};
+
+\draw [->,thick] ([yshift=2pt]lnormffn.north) -- ([yshift=-2pt]outputlayer.south);
+\draw [->,thick] ([yshift=2pt]outputlayer.north) -- ([yshift=-2pt]output.south);
+
+\node [anchor=west] (encoderoutput) at ([yshift=0.7*\vstep]lnormffn.north) {$\mathbf{h}_0 \mathbf{h}_1 ... \mathbf{h}_m$};
+
+\begin{pgfonlayer}{background}
+\node [anchor=south,densely dashed,minimum width=1.30*\nsize,minimum height=0.75*\nsize,draw]  (selfattention-sub-layer) at ([yshift=-0.6cm]selfattention.south) {};
+\node [anchor=south,densely dashed,minimum width=1.30*\nsize,minimum height=0.75*\nsize,draw]  (ffn-sub-layer) at ([yshift=-0.6cm]ffn.south) {};
+
+\draw [decoration={brace,amplitude=5pt},decorate] ([xshift=-0.7em,yshift=-2pt]selfattention-sub-layer.south west) -- ([xshift=-0.7em,yshift=2pt]ffn-sub-layer.north west) node [pos=0.5,left,xshift=-0.6em] (timeslayer) {};
+\end{pgfonlayer}
+\node [anchor=north east] (timeslayer2) at (timeslayer.south east) {layers};
+
+\node [anchor=west] (vocabulary) at ([xshift=1.5cm,yshift=-0.8cm]segembedding.east) {Input};
+\node [anchor=north west] (vocabulary2) at ([yshift=0.4em]vocabulary.south west) {$x_i$ is the $i$-th token in the input};
+\node [anchor=north west] (vocabulary3) at ([yshift=0.3em]vocabulary2.south west) {and corresponds to an entry in $V$};
+
+\node [anchor=west] (embeddingcaption) at ([xshift=1.5cm,yshift=1.0cm]segembedding.east) {Embedding};
+\node [anchor=north west] (embeddingcaption2) at ([yshift=0.2em]embeddingcaption.south west) {$\mathbf{e} = \mathbf{x} + \mathbf{e}_{\mathrm{pos}} + \mathbf{e}_{\mathrm{seg}} \in \mathbb{R}^{d_e}$};
+
+\node [anchor=west] (selfattentioncaption) at ([xshift=1.5cm,yshift=1.2cm]selfattention.east) {Self-attention Sub-layer};
+\node [anchor=north west] (selfattentioncaption2) at ([yshift=0.4em]selfattentioncaption.south west) {hidden size: $d$};
+\node [anchor=north west] (selfattentioncaption3) at ([yshift=0.3em]selfattentioncaption2.south west) {number of heads: $n_{\mathrm{head}}$};
+
+\node [anchor=west] (ffncaption) at ([xshift=1.5cm,yshift=1.2cm]ffn.east) {FFN Sub-layer};
+\node [anchor=north west] (ffncaption2) at ([yshift=0.4em]ffncaption.south west) {hidden size: $d$};
+\node [anchor=north west] (ffncaption3) at ([yshift=0.3em]ffncaption2.south west) {FFN hidden size: $d_{\mathrm{ffn}}$};
+
+\node [anchor=west] (eoutputcaption) at ([xshift=1.5cm,yshift=2.0cm]lnormffn.east) {Encoder Output};
+\node [anchor=north west] (eoutputcaption2) at ([yshift=0.3em]eoutputcaption.south west) {$\mathbf{h}_i \in \mathbb{R}^{d}$ is the contextual};
+\node [anchor=north west] (eoutputcaption3) at ([yshift=0.3em]eoutputcaption2.south west) {representation of $x_i$};
+
+\draw [-,thin] ([xshift=2pt]input.east) -- ([xshift=-2pt]vocabulary.west);
+\draw [-,thin] ([xshift=2pt]segembedding.east) -- ([xshift=-2pt]embeddingcaption.west);
+\draw [-,thin] ([xshift=2pt]selfattention-sub-layer.east) -- ([xshift=-2pt]selfattentioncaption.west);
+\draw [-,thin] ([xshift=2pt]ffn-sub-layer.east) -- ([xshift=-2pt]ffncaption.west);
+\draw [-,thin] ([xshift=2pt]encoderoutput.east) -- ([xshift=-2pt]eoutputcaption.west);
+
+\end{scope}
+	
+\end{tikzpicture}

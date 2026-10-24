@@ -1,0 +1,232 @@
+% 第6章；原章第1—8页至6.2.1.2标题前，式6.1—6.24。
+\chapter{影像与基因组学}
+\label{ch:imaging-genomics}
+\section{引言}
+
+医学影像（medical imaging）以可视化方式呈现人体内部结构，用于临床分析和医疗干预。目前常用的医学影像技术包括腹部超声（ultrasound，US）（Kulig et al. 2014）、增强计算机断层成像（CT）（Cascio et al. 2012）、磁共振成像（magnetic resonance imaging，MRI）（Javery et al. 2013）、病理影像、扩散张量成像（diffusion tensor imaging，DTI）（Garin-Muga and Borro 2014）、光子发射断层成像（PET）（Bailey et al. 2005），以及功能磁共振成像（functional magnetic resonance imaging，fMRI）（Glover 2011）。这些医学影像用于研究不同组织或器官的解剖结构与功能，识别组织和器官的变化。影像信号可用于疾病诊断、研究生物学过程，以及揭示疾病机制。
+
+医学影像数据分析包括图像采集、存储、配准、检索、特征提取、图像分割、聚类分析、分类、诊断和手术引导。机器学习和其他统计方法已广泛应用于医学图像分析，并逐渐成为图像分割与诊断的首选方法（Moeskops et al. 2017；Litjens et al. 2017）。特别是，深度学习很有可能自动从数据中提取层次化特征表示，从而帮助发现、分类和测量医学影像中的生理与临床模式（Shen et al. 2017）。
+
+尽管生物医学影像在癌症诊断中的作用日益重要，它并未考虑癌症发生发展所涉及的关键生物学过程（Ahmed et al. 2014）。人们越来越认识到，整合影像数据与分子谱，有望在症状出现之前发现疾病（ECR 2014 Press Release）。生物医学影像、基因组学和表观基因组学数据集具有极高维数和高度异质性，并来自多种来源与多个尺度（Phan et al. 2012）。整合分析高维影像、miRNA-seq 和甲基化测序数据集，面临巨大挑战。整合影像、RNA-seq、miRNA-seq 与甲基化测序数据的关键问题，是如何为这些不同类型的数据建立统一表示，使影像强度、甲基化读段数和表达读段数可以比较，并降低数据维数。此外，还将利用贝叶斯网络和因果图，开发新颖且具有高判别能力的算法，将 mRNA、miRNA、甲基化与影像分类器结合起来。
+
+为实现这些目标，本章重点介绍用于无监督与监督图像语义分割的深度学习方法，尤其是卷积神经网络。原则上，这些深度学习方法也可类似地应用于图像分类与诊断。随后，我们将以图像分割为重要框架，建立影像—基因组数据分析的统计方法。更为重要的是，将发展因果推断，作为影像—基因组数据分析的一般框架与有力工具。最后，简要介绍因果机器学习，将因果推断与机器学习结合，以提高图像分类的准确性。
+
+\section{图像分割}
+
+图像分割（image segmentation）将像素或体素聚为一组图像区域。它在预测、诊断、治疗和影像基因组学数据分析中具有重要作用（Gibson et al. 2017；Garcia-Garcia et al. 2017）。分割有两个目的：（1）将图像分解为子区域，以便进一步分析；（2）改变图像的表示形式。已经提出了多种图像分割方法，总体上可分为无监督学习方法与监督学习方法。传统图像分割方法可参见 Dhawan（2011）的著作。本节主要介绍用于图像分割的深度学习技术（Garcia-Garcia et al. 2017；Hosseini-Asl 2016）。
+
+\subsection{用于图像分割的无监督学习方法}
+\subsubsection{非负矩阵分解}
+\bookdeepheading{paragraph}{6.2.1.1.1}{数据矩阵与矩阵分解}
+
+图像分割的任务，是将图像分解为均匀、同质的成分。许多肿瘤会侵入邻近健康组织（Sauwen et al. 2017）。因此，肿瘤边界可能超出常规 MRI（cMRI）所能观察的范围。为克服这一局限，研究还会纳入其他影像模态，例如灌注加权成像（perfusion-weighted imaging，PWI）与扩散加权成像（diffusion-weighted imaging，DWI）。数据中需要包含全部影像模态的测量值，每个像素或体素都可作为一个数据点。
+
+考虑数据矩阵 $X$：
+\[
+X=[x_1\quad\cdots\quad x_n]
+=\begin{bmatrix}x_{11}&\cdots&x_{1n}\\\vdots&\vdots&\vdots\\x_{m1}&\cdots&x_{mn}\end{bmatrix},
+\]
+其中，$n$ 为数据点数，$m$ 为每个数据点的特征数。$X$ 的每一列，表示一个像素、体素或数据点的一组特征。
+
+与基因表达和甲基化解卷积类似，图像数据矩阵也可分解为两个矩阵的乘积：$G\in\mathbb R^{m\times r}$ 与 $H\in\mathbb R^{r\times n}$（图 6.1）。矩阵 $G$ 为组织类型或子区域矩阵；$W$ 的每一列是组织或子区域特异的特征向量，并定义一种组织类型或一个子区域。矩阵 $H$ 为比例矩阵，其每一列表示一个像素或体素所含各组织类型或子区域的比例。假定 $X$ 的秩为 $k$，则 $k\leq\min(m,n)$。矩阵分解试图使近似误差最小：
+\begin{equation}
+\min_{W,H}\quad\lVert X-GH\rVert_F^2,
+\tag{6.1}
+\end{equation}
+其中，$\lVert\cdot\rVert_F$ 表示矩阵的 Frobenius范数。
+
+令 $g_i\in\mathbb R^{1\times r}$ 为 $G$ 的第 $i$ 行，$h_j\in\mathbb R^r$ 为 $H$ 的第 $j$ 列，$x_{ij}$ 为第 $i$ 个样本中第 $j$ 个特征的值。定义内积 $g_ih_j=(GH)_{ij}$。问题 (6.1) 的目标函数可改写为
+\begin{equation}
+\sum_{i=1}^m\sum_{j=1}^n(x_{ij}-g_ih_j)^2.
+\tag{6.2}
+\end{equation}
+\input{figures/ch06_figure1}
+
+截断 $X_{ij}$ 的奇异值分解（SVD），即可得到问题 (6.1) 的一个解（Udell et al. 2016）。设 $X$ 的 SVD 为
+\begin{equation}
+X=U\Lambda V^T,
+\tag{6.3}
+\end{equation}
+其中，$U=[u_1,\ldots,u_r]\in\mathbb R^{m\times r}$，$V=[v_1,\ldots,v_r]\in\mathbb R^{q\times n}$，$U^TU=I_{r\times r}$，$V^TV=I_{r\times r}$，且 $\Lambda=\mathrm{dig}(\lambda_1,\ldots,\lambda_r)\in\mathbb R^{r\times r}$，满足 $\lambda_1\geq\lambda_2\geq\cdots\geq\lambda_r>0$。$U$ 与 $V$ 的各列分别称为 $X$ 的左奇异向量和右奇异向量，$\lambda_1,\ldots,\lambda_r$ 称为 $X$ 的奇异值。
+
+将式 (6.3) 代入式 (6.1)，得到
+\[
+\min_{G,H}\quad\lVert U\Lambda V^T-GH\rVert_F^2,
+\]
+可化为
+\begin{equation}
+\min_{G,H}\quad\lVert\Lambda-U^TGHV\rVert_F^2.
+\tag{6.4}
+\end{equation}
+令 $Z=U^TGHV$，$Z$ 的秩为 $l$，则
+\begin{equation}
+\lVert\Lambda-Z\rVert_F^2
+=\sum_{i=1}^n\sum_{\substack{j=1\\j\ne i}}^rZ_{ij}^2+\sum_i^r(Z_{ii}-\lambda_i)^2.
+\tag{6.5}
+\end{equation}
+要使 $\lVert\Lambda-Z\rVert_F^2$ 最小，必须有 $Z_{ij}=0$（$i\ne j$）、对所有 $i>l$ 有 $Z_{ii}=0$，以及 $Z_{ii}=\lambda_i$（$i=1,\ldots,l$）。换言之，使式 (6.5) 最小的矩阵应为
+\[
+Z=\begin{bmatrix}\Lambda_l&0\\0&0\end{bmatrix},
+\]
+其中，$\Lambda_l=\diag(\lambda_1,\ldots,\lambda_l)$。$X$ 的秩为 $l$ 的矩阵近似误差为
+\begin{equation}
+\lVert\Lambda-Z\rVert_F^2=\sum_{i=l+1}^r\lambda_i^2.
+\tag{6.6}
+\end{equation}
+因此，
+\begin{equation}
+\begin{aligned}
+U^TGHV&=\begin{bmatrix}\Lambda_l&0\\0&0\end{bmatrix},\qquad\text{或}\\
+GH&=U\begin{bmatrix}\Lambda_l&0\\0&0\end{bmatrix}V^T=U_l\Lambda_lV_l^T,
+\end{aligned}
+\tag{6.7}
+\end{equation}
+其中，$U_l=[u_1,\ldots,u_l]$，$V_l=[v_1,\ldots,v_l]$。定义 $G=U_l\Lambda_l^{1/2}$、$H=\Lambda_l^{1/2}$，于是 $X$ 的矩阵分解为
+\begin{equation}
+X\approx GH.
+\tag{6.8}
+\end{equation}
+
+\bookdeepheading{paragraph}{6.2.1.1.2}{稀疏编码与非负矩阵分解（NMF）}
+
+在矩阵分解模型 (6.1) 中，组织类型或子区域矩阵 $G$ 与比例矩阵 $H$ 都是满矩阵。然而，每个像素或体素并不会包含全部组织类型或全部子区域。比例矩阵 $H$ 中的一些元素应为零，因而 $H$ 应当是稀疏矩阵。为此，可以扩展矩阵分解，使其同时具有较小的重构误差和稀疏性。
+
+学习对象的各组成部分或进行语义分割，需要施加非负约束（Lee and Seung 1999）。非负约束允许图像片段相加，但不允许相减。这些约束假定影像数据矩阵 $X$、组织或子区域矩阵 $G$ 和比例矩阵 $H$ 的所有元素均非负。非负矩阵分解（nonnegative matrix factorization，NMF）问题可表述为
+\begin{equation}
+\begin{aligned}
+\min_{G,H}\quad&\frac12\lVert X-GH\rVert_F^2,\\
+\text{约束为}\quad&G\geq0,\quad H\geq0.
+\end{aligned}
+\tag{6.9}
+\end{equation}
+乘法梯度下降方法可用于求解优化问题 (6.9)（Lee and Seung 2001）。根据矩阵 Frobenius范数的定义，有
+\[
+F=\frac12\lVert X-GH\rVert_F^2
+=\frac12\tr((X-GH)^T(X-GH)).
+\]
+为求解问题 (6.9)，首先令函数 $F$ 关于矩阵 $H$ 的偏导数为零：
+\begin{equation}
+\frac{\partial F}{\partial H}=-G^T(X-GH)=0,
+\tag{6.10}
+\end{equation}
+这意味着
+\begin{equation}
+G^TGH=G^TX.
+\tag{6.11}
+\end{equation}
+为保持矩阵元素的负性，只使用逐元素乘法与除法。在式 (6.11) 两边逐元素乘以 $H$，得到以下迭代：
+\begin{equation}
+\begin{aligned}
+(H^{k+1})\mathbin{.*}(G^TGH)&=(H^k)\mathbin{.*}(G^TX),\qquad\text{或}\\
+H^{k+1}&=(H^k)\mathbin{.*}(G^TX)\mathbin{./}(G^TGH).
+\end{aligned}
+\tag{6.12}
+\end{equation}
+类似地，得到
+\begin{equation}
+G^{k+1}=G^k\mathbin{.*}(XH^T)\mathbin{./}(GH H^T).
+\tag{6.13}
+\end{equation}
+为施加稀疏性，在问题 (6.9) 的目标函数中加入稀疏性度量 $f(H)$，得到
+\begin{equation}
+\begin{aligned}
+\min_{G,H}\quad&\frac12\lVert X-GH\rVert_F^2+\lambda f(H),\\
+\text{约束为}\quad&G\geq0,\quad H\geq0,
+\end{aligned}
+\tag{6.14}
+\end{equation}
+其中，$\lambda\in\mathbb R^+$ 为平衡重构误差与稀疏性度量的惩罚参数。
+
+本节考虑三种稀疏性度量 $L_1$、$L_{1/2}$ 和 $L_2$，分别定义为
+\[
+\begin{aligned}
+f_1(H)&=(H)={}_1\lVert H\rVert_1=\sum_{i=1}^r\sum_{j=1}^n|h_{ij}|,\\
+f_2(H)&=\lVert H\rVert_{1/2}=\sum_{i=1}^r\sum_{j=1}^n(h_{ij})^{1/2},\\
+f_3(H)&=\lVert H\rVert_2=\sum_{i=1}^r\sum_{j=1}^nh_{ij}^2.
+\end{aligned}
+\]
+这三种矩阵范数对元素 $h_{ij}$ 的导数分别为
+\begin{equation}
+\begin{aligned}
+\frac{\partial\lVert H\rVert_1}{\partial h_{ij}}&=1,\quad h_{ij}>0,\\
+\frac{\partial\lVert H\rVert_{1/2}}{\partial h_{ij}}&=\frac1{2\sqrt{h_{ij}}},\\
+\frac{\partial\lVert H\rVert_2}{\partial h_{ij}}&=2h_{ij}.
+\end{aligned}
+\tag{6.15}
+\end{equation}
+定义目标函数
+\begin{equation}
+F_i(H)=\frac12\lVert X-GH\rVert_F^2+\lambda f_i(H),\qquad i=1,2,3.
+\tag{6.16}
+\end{equation}
+利用式 (6.15)，得到
+\begin{equation}
+\begin{aligned}
+\frac{\partial F_1(H)}{\partial H}&=-G^T(X-GH)+\lambda\mathbf1\mathbf1^T=0,\\
+\frac{\partial F_2(H)}{\partial H}&=-G^T(X-GH)+\frac\lambda2H^{-1/2}=0,\\
+\frac{\partial F_3(H)}{\partial H}&=-G^T(X-GH)+2\lambda H=0,
+\end{aligned}
+\tag{6.17}
+\end{equation}
+其中，$\mathbf1=[1\quad\cdots\quad1]^T$；$H^{-1/2}$ 表示对 $H$ 中每个元素逐一开平方后取倒数。
+
+式 (6.16) 可进一步简化为
+\begin{equation}
+\begin{aligned}
+1&=(G^TG)\mathbin{./}(G^TGH+\lambda\mathbf1\mathbf1^T),\\
+1&=(G^TG)\mathbin{./}\left(G^TGH+\frac\lambda2H^{-1/2}\right),\\
+1&=(G^TG)\mathbin{./}(G^TGH+2\lambda H).
+\end{aligned}
+\tag{6.18}
+\end{equation}
+考虑三个惩罚函数：
+\[
+f(H)=\lVert H\rVert_1,\qquad f(H)=\lVert H\rVert_{1/2},\qquad f(H)=\lVert H\rVert_2.
+\]
+利用式 (6.18)，并采用与乘法迭代算法 (6.12)、(6.13) 推导相似的技术，可得到稀疏 NMF 问题的求解算法，汇总于结论 6.1。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论 6.1：稀疏 NMF 算法}\par
+\begin{enumerate}[label=步骤 \arabic*. ,leftmargin=4.6em]
+\item 初始化。利用第 6.2.1.1.1 节讨论的矩阵分解算法，得到矩阵 $G^0$ 与 $H^0$，并将矩阵中的全部负元素置为零。也可以将 $W$ 与 $H$ 初始化为随机正矩阵。
+\item 更新规则。
+
+$L_1$ NMF：
+\begin{equation}
+G^{k+1}=G^k\mathbin{.*}(X(H^k)^T)\big/(G^kH^k(H^k)^T),
+\tag{6.19}
+\end{equation}
+\begin{equation}
+H^{k+1}=H^K\mathbin{.*}((G^{k+1})^TG^{k+1})
+\mathbin{./}((G^{k+1})^TG^{k+1}H^{k+1}+\lambda\mathbf1\mathbf1^T).
+\tag{6.20}
+\end{equation}
+$L_{1/2}$ NMF：
+\begin{equation}
+G^{k+1}=G^k\mathbin{.*}(X(H^k)^T)\mathbin{./}(G^kH^k(H^k)^T),
+\tag{6.21}
+\end{equation}
+\begin{equation}
+H^{k+1}=H^K\mathbin{.*}((G^{k+1})^TG^{k+1})
+\mathbin{./}\left((G^{k+1})^TG^{k+1}H^{k+1}+\frac\lambda2(H^k)^{-1/2}\right).
+\tag{6.22}
+\end{equation}
+$L_2$ NMF：
+\begin{equation}
+G^{k+1}=G^k\mathbin{.*}(X(H^k)^T)\mathbin{./}(G^kH^k(H^k)^T),
+\tag{6.23}
+\end{equation}
+\begin{equation}
+H^{k+1}=H^K\mathbin{.*}((G^{k+1})^TG^{k+1})
+\mathbin{./}((G^{k+1})^TG^{k+1}H^{k+1}+2\lambda H^k).
+\tag{6.24}
+\end{equation}
+\item 检查收敛。令 $\varepsilon$ 为预先指定的误差。若 $\lVert G-G\rVert_F<\varepsilon$ 且 $\lVert H-H\rVert_F<\varepsilon$，则停止；否则，令 $k\leftarrow k+1$，返回步骤 2。
+
+参数 $\lambda$ 可以凭经验设定，也可以取
+\[
+\lambda=\frac1{\sqrt m}\sum_{k=1}^n
+\frac{\sqrt n-\dfrac{\lVert x_k\rVert_1}{\lVert x_k\rVert_2}}{\sqrt n-1},
+\]
+其中，$x_k$ 为数据矩阵 $X$ 的第 $k$ 个列向量。
+\end{enumerate}

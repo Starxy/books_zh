@@ -1,0 +1,98 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.9cm}
+
+\tikzstyle{lnode} = [minimum width=3cm,minimum height=1.0cm,inner sep=2pt,draw,thick,fill=white,rounded corners=1pt]
+
+%%% a math problem and corresponding reasoning paths
+\begin{scope}
+
+
+\node [anchor=west,align=left,minimum width=13.5cm,draw,thick,inner sep=6pt] (question) at (0,0) {\small{\textbf{问题}（出自 The International Junior Math Olympiad）：}\\ \small{Jessica 的手机里有很多应用，应用数量可被 5 整除。如果她}\\ \small{再下载 10 个应用，应用总数仍少于 50。那么 Jessica 原来的应用数量 \hspace{1cm}}\\ \small{最多可能是多少？}};
+
+%%% response 1
+\begin{scope}
+\node [anchor=north west,align=left] (response1) at ([xshift=0.4cm,yshift=-0.3cm]question.south west) {\small{\textbf{回答 1}:}};
+
+\node [anchor=north west,align=left] (y1) at ([xshift=0.1cm,yshift=-0.2cm]response1.south west) {\small{$x$ 必须是 $5$ 的倍数，即}\\ \small{$x \equiv 0\ (\mathrm{mod}\ 5)$。}};
+\node [anchor=west] (y1r) at ([xshift=5.5cm]y1.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y1label) at ([xshift=0.10cm,yshift=-0.00cm]y1.north west) {\footnotesize{$\bar{\mathbf{y}}_1$:}};
+
+\node [anchor=north west,align=left] (y2) at ([yshift=-0.2cm]y1.south west) {\small{再下载 $10$ 个应用后，应用总数}\\ \small{仍应小于}\\ \small{$50$：$x + 10 < 50$。解这个}\\ \small{不等式得 $x < 40$。}};
+\node [anchor=west] (y2r) at ([xshift=5.5cm]y2.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y2label) at ([xshift=0.15cm,yshift=-0.00cm]y2.north west) {\footnotesize{$\bar{\mathbf{y}}_2$:}};
+
+\node [anchor=north west,align=left] (y3) at ([yshift=-0.2cm]y2.south west) {\small{由于 $x$ 必须是 $5$ 的倍数，且}\\ \small{小于 $40$，故 $x$ 的最大值为 $35$。}};
+\node [anchor=west] (y3r) at ([xshift=5.5cm]y3.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y3label) at ([xshift=0.10cm,yshift=-0.00cm]y3.north west) {\footnotesize{$\bar{\mathbf{y}}_3$:}};
+
+\node [anchor=north west,align=left] (y4) at ([yshift=-0.2cm]y3.south west) {\small{验证结果。若 $x=35$，则再}\\ \small{下载 10 个应用后，Jessica 会有}\\ \small{$35+10=45$ 个应用，满足}\\ \small{$45<50$。}};
+\node [anchor=west] (y4r) at ([xshift=5.5cm]y4.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y4label) at ([xshift=0.10cm,yshift=-0.00cm]y4.north west) {\footnotesize{$\bar{\mathbf{y}}_4$:}};
+
+\node [anchor=north west,align=left] (y5) at ([yshift=-0.2cm]y4.south west) {\small{原来的应用数量最多为}\\ \small{\underline{$35$} 个。}};
+\node [anchor=west] (y5r) at ([xshift=5.5cm]y5.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y5label) at ([xshift=0.10cm,yshift=-0.00cm]y5.north west) {\footnotesize{$\bar{\mathbf{y}}_5$:}};
+
+\begin{pgfonlayer}{background}
+\node [inner sep=0pt,fill=gray!20]  [fit = (y1) (y1r)] (y1box) {};
+\node [inner sep=0pt,fill=gray!20]  [fit = (y2) (y2r)] (y2box) {};
+\node [inner sep=0pt,fill=gray!20]  [fit = (y3) (y3r)] (y3box) {};
+\node [inner sep=0pt,fill=gray!20]  [fit = (y4) (y4r)] (y4box) {};
+\node [inner sep=0pt,fill=gray!20]  [fit = (y5) (y5r)] (y5box) {};
+\end{pgfonlayer}
+
+\draw [->] ([xshift=-1.18cm,yshift=-0.3cm]y5.south) -- ([xshift=-1.18cm,yshift=0.1cm]y5.south);
+\node [anchor=north] (answerlabel) at ([xshift=-1.18cm,yshift=-0.3cm]y5.south) {\footnotesize{正确}};
+
+\end{scope}
+
+%%% response 2
+\begin{scope}
+\node [anchor=west,align=left] (response2) at ([xshift=5cm]response1.east) {\small{\textbf{回答 2}:}};
+
+\node [anchor=north west,align=left] (y1) at ([xshift=0.1cm,yshift=-0.2cm]response2.south west) {\small{应用数量可被 $5$ 整除，}\\ \small{所以 $x$ 必须是 $5$ 的倍数。}};
+\node [anchor=west] (y1r) at ([xshift=5.5cm]y1.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y1label) at ([xshift=0.10cm,yshift=-0.00cm]y1.north west) {\footnotesize{$\bar{\mathbf{y}}_1$:}};
+
+\node [anchor=north west,align=left] (y2) at ([yshift=-0.2cm]y1.south west) {\small{若她再下载 10 个应用，}\\ \small{新的总数为 $x+10$，并且必须}\\ \small{小于 50。因此，$x + 10 < 50$。}\\ \small{化简得 $x < 40$。}};
+\node [anchor=west] (y2r) at ([xshift=5.5cm]y2.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y2label) at ([xshift=0.15cm,yshift=-0.00cm]y2.north west) {\footnotesize{$\bar{\mathbf{y}}_2$:}};
+
+\node [anchor=north west,align=left] (y3) at ([yshift=-0.2cm]y2.south west) {\small{$x$ 必须小于或等于}\\ \small{最大的 $5$ 的倍数，即 $40$。}};
+\node [anchor=west] (y3r) at ([xshift=5.5cm]y3.west) {{\color{red!20} x}};
+\node [anchor=north east] (y3label) at ([xshift=0.10cm,yshift=-0.00cm]y3.north west) {\footnotesize{$\bar{\mathbf{y}}_3$:}};
+
+\node [anchor=north west,align=left] (y4) at ([yshift=-0.2cm]y3.south west) {\small{但 $x + 10$ 不应大于}\\ \small{或等于 50。因此，要}\\ \small{从 $40$ 中减去 $5$。}};
+\node [anchor=west] (y4r) at ([xshift=5.5cm]y4.west) {{\color{red!20} x}};
+\node [anchor=north east] (y4label) at ([xshift=0.10cm,yshift=-0.00cm]y4.north west) {\footnotesize{$\bar{\mathbf{y}}_4$:}};
+
+\node [anchor=north west,align=left] (y5) at ([yshift=-0.2cm]y4.south west) {\small{因此，最终结果为 \underline{$35$}。}};
+\node [anchor=west] (y5r) at ([xshift=5.5cm]y5.west) {{\color{gray!20} x}};
+\node [anchor=north east] (y5label) at ([xshift=0.10cm,yshift=-0.00cm]y5.north west) {\footnotesize{$\bar{\mathbf{y}}_5$:}};
+
+\begin{pgfonlayer}{background}
+\node [inner sep=0pt,fill=gray!20]  [fit = (y1) (y1r)] (y1box) {};
+\node [inner sep=0pt,fill=gray!20]  [fit = (y2) (y2r)] (y2box) {};
+\node [inner sep=0pt,fill=red!20]  [fit = (y3) (y3r)] (y3box) {};
+\node [inner sep=0pt,fill=red!20]  [fit = (y4) (y4r)] (y4box) {};
+\node [inner sep=0pt,fill=gray!20]  [fit = (y5) (y5r)] (y5box) {};
+\end{pgfonlayer}
+
+\draw [->] ([xshift=1.95cm,yshift=-0.3cm]y5.south) -- ([xshift=1.95cm,yshift=0.1cm]y5.south);
+\node [anchor=north] (answerlabel) at ([xshift=1.95cm,yshift=-0.3cm]y5.south) {\footnotesize{正确}};
+
+\node [anchor=north east,fill=white,draw,rounded corners=1pt,inner sep=3pt] (y3wrong) at ([xshift=0.05cm,yshift=0.05cm]y3box.north east) {\tiny{有问题}};
+\node [anchor=north east,fill=white,draw,rounded corners=1pt,inner sep=3pt] (y4wrong) at ([xshift=0.05cm,yshift=0.05cm]y4box.north east) {\tiny{有问题}};
+
+
+\end{scope}
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,58 @@
+% 原书分章 PDF 第 7—9 页；第 14.2 节。
+\section{随机策略的最优性理论}
+
+本章余下部分将以例 14.1 为重点，构造 $\Psi(P)$ 的局部有效且 $\sqrt n$ 一致的估计量。对于例 14.2，若 $d(a,w)=aI(a\leq\delta)+\delta I(a>\delta)$，则不可能构造 $\Psi(P)$ 的 $\sqrt n$ 一致估计量。这是因为，该参数不具路径可微性，因而无法构造 $\sqrt n$ 一致估计量。观察参数的定义，可以直观理解其原因：
+\[
+\begin{aligned}
+ \Psi(P)&=E\{\bar Q(d(A,W),W)\}\\
+ &=E\{\bar Q(AI(A\leq\delta)+\delta I(A>\delta),W)\}\\
+ &=E\{\bar Q(A,W)I(A\leq\delta)\}+E\{\bar Q(\delta,W)I(A>\delta)\}.
+\end{aligned}
+\]
+这里的 $E\{\bar Q(\delta,W)I(A>\delta)\}$ 涉及估计将连续暴露设为 $A=\delta$ 的静态干预的因果效应。在非参数模型中，这类参数没有可用的有效估计理论（Bickel 等，1997b），因为路径导数的任何可能梯度都必然包含一个位于 $\delta$ 处的 Dirac Delta 函数。克服这一问题的另一种方法，是重新定义策略 $d(a,w)$，使参数变得路径可微。Díaz 和 van der Laan（2013a）采用了这一方法；有兴趣的读者可查阅原始研究论文。
+
+本章余下部分将假定 $d(a,w)$ 具有分段光滑可逆性（piecewise smooth invertibility）。也就是说，对每个 $w\in\mathcal W$，我们假定区间 $\mathcal I(w)=(l(w,),u(w))$ 可划分为子区间 $\mathcal I_j(w):j=1,\ldots,J(w)$，使 $d(a,w)$ 在 $\mathcal I_j(w)$ 上等于某个 $d_j(a,w)$，且 $d_j(\cdot,w)$ 具有反函数 $h(\cdot,w)$，其导数为 $h'(\cdot,w)$。这一假设最早由 Haneuse 和 Rotnitzky（2013）提出，也是建立下面引理 14.1 所给出的有效影响函数（efficient influence function，EIF）所必需的。
+
+EIF 是半参数有效估计中的一个关键要素，因为它定义了任意有效的正则渐近线性估计量的线性近似。因此，其方差就是所有正则渐近线性估计量的渐近效率界（Bickel 等，1997b）。
+
+\begin{bookresult}{引理}{14.1（有效影响函数）}
+式 (14.5) 的 EIF 为
+\begin{equation}
+ D(P)(o)=H(a,w)\{y-\bar Q(a,w)\}+\bar Q(d(a,w),w)-\Psi(P),
+ \tag{14.6}
+\end{equation}
+其中
+\[
+ H(a,w)=\sum_{j=1}^{J(w)}I\{h_j(a,w)\in\mathcal I_j(w)\}
+ \frac{g(h_j(a,w)\mid w)}{g(a\mid w)}h'_j(a,w).
+\]
+\end{bookresult}
+
+引理 14.1 推广了 Díaz 和 van der Laan（2012）所证明的一个结果。我们也使用另一种记号 $H(g)(a,w)$，以强调 $H$ 对 $g$ 的依赖。
+
+\begin{bookresult}{例}{14.1（续）}
+利用式 (14.3) 所定义的 $d(a,w)$ 的分段光滑可逆性，可得协变量 $H$ 为
+\[
+ H(a,w)=I(a<u(w))\frac{g_0(a-\delta\mid w)}{g_0(a\mid w)}
+ +I(a\geq u(w)-\delta).
+\]
+注意，对于满足 $A_i\in[u(W_i)-\delta,u(W_i))$ 的个体 $i$，$H$ 等于
+\[
+ H(A_i,W_i)=\frac{g_0(A_i-\delta\mid W_i)}{g_0(A_i\mid W_i)}+1.
+\]
+这个协变量中出现两项，意味着这样的观测在随机策略下代表两种不同类型的观测。第一项出现的原因是：对所有满足 $W_j=W_i$ 且 $A_j=A_i-\delta$ 的观测 $j$，结局 $Y_i$ 都代表其在随机策略下的结局。第二项出现的原因是：观测 $A_i$ 的结局就是其自身在随机策略下的结局。
+\end{bookresult}
+
+下面的引理给出一个结果，确立了求解 EIF 估计方程所得估计量的双重稳健性。
+
+\begin{bookresult}{引理}{14.2（无偏估计方程与双重稳健性）}
+令 $D(O\mid\bar Q,g,\psi_0)$ 为 EIF $D(P)(O)$ 所蕴含的估计函数：
+\[
+ D(O\mid\bar Q,g,\psi_0)=H(g)(A,W)\{Y-\bar Q(A,W)\}
+ +\bar Q(d(A,W),W)-\psi_0,
+\]
+若 $g$ 满足 $H(g)=H(g_0)$，或者 $\bar Q=\bar Q_0$，则有
+$E_{P_0}D(O\mid\bar Q,g,\psi_0)=0$。
+\end{bookresult}
+
+上述引理为基于 EIF 的估计量所具有的双重稳健性提供了一些直观解释。若 $g_0$ 或 $\bar Q_0$ 中任一项已知，就可以构造一个无偏估计方程。随后，在 van der Vaart（1998）第 5 章所列条件下，可以证明相应估计量具有一致性和渐近正态性。由于 $\bar Q_0$ 和 $g_0$ 通常未知，我们不能直接将其真值代入 $D$ 来得到无偏估计方程，而必须使用这些量的估计值。这给 $\psi_0$ 估计量的构造带来额外挑战，尤其涉及其渐近分布。下一节将以靶向最小损失估计量（targeted minimum loss-based estimator，TMLE）为重点，发展获得 $\psi_0$ 的双重稳健、局部有效估计量所需的理论。我们将看到，可以证明 TML 估计量具有双重稳健性：只要 $g_0$ 或 $\bar Q_0$ 中任一项能被一致估计，它就是一致的。此外，若这两个参数均以一定的收敛速率得到一致估计，TML 估计量便是有效的，并且渐近正态。

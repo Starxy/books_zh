@@ -1,0 +1,317 @@
+% 原书PDF第11—21页，4.1.3.6全节；止于4.1.3.7标题前。
+\subsubsection{异构体表达定量}
+\bookdeepheading{paragraph}{4.1.3.6.1}{RNA-seq 数据无缺口比对读段的生成模型}
+
+表达定量的一项主要挑战，是 RNA-seq 读段常可比对到多个基因或异构体（Li and Dewey 2011）。RNA-seq 基因表达定量的目的，是利用 RNA-seq 数据测量样本中转录本的拷贝数。为准确量化表达，必须考虑读段比对的不确定性、测序的非均匀性，以及多个异构体的存在（Li et al. 2010）。当存在可变剪接时，不同外显子可能被不同数量的异构体共享；许多读段难以唯一比对到其来源异构体（Liu et al. 2015）。因此，需要对比对到共享外显子的读段进行解卷积。潜变量生成模型是常用的读段解卷积方法。
+
+图4.5展示了基因结构与异构体。示例基因包含三个外显子和三个转录本（异构体），图中还给出一个包含全部已注释外显子及连接位点的附加转录本。假设抽取了 $N$ 条独立同分布、长度为 $L$ 的读段。读段序列是观测数据，第 $n$ 条读段的序列用随机变量 $R_n$ 表示。用有向图模型或贝叶斯网络（Li et al. 2010）描述读段生成过程，如图4.6所示。
+
+\input{figures/ch04a_fig05}
+\input{figures/ch04a_fig06}
+
+考虑 $M$ 个异构体和参数向量 $\theta=[\theta_0,\theta_1,\ldots,\theta_M]$。其中，$\theta_0$ 对应噪声异构体，$\theta_i$（$1\le i\le M$）对应第 $i$ 个异构体。为生成观测读段序列 $R_n$，引入三个隐藏变量：异构体变量 $G_n$ 表示读段 $n$ 来自哪个异构体；起始位置变量 $S_n$ 表示读段 $n$ 的起始位置；方向变量 $O_n$ 表示测序的是哪一条链。在图4.6的贝叶斯网络假设下，变量 $G_n$、$S_n$、$O_n$ 与 $R_n$ 的联合概率为
+\begin{equation}
+P(g,s,o,r\mid\theta)=\prod_{n=1}^{N}P(g_n\mid\theta)P(s_n\mid g_n)P(o_n\mid g_n)P(r_n\mid g_n,s_n,o_n).
+\tag{4.18}
+\end{equation}
+
+下面分别计算式 (4.18) 中的各项。异构体随机变量取值范围为 $[0,M]$。设第 $i$ 个异构体在异构体总体中所占比例为 $\theta_i$，则选择第 $i$ 个异构体的概率为 $\theta_i$，即 $P(G_n=i\mid\theta)=\theta_i$，且 $\sum_{i=0}^{M}\theta_i=1$（图4.7a）。设 $l_i$（$i=0,\ldots,M$）为第 $i$ 个异构体的长度。读段起始位置的取值区间为 $[1,\max_i l_i]$。假设读段在转录本上均匀起始，并且可以从异构体的最后一个位置开始、延伸至 poly(A) 尾。在这种情况下，读段沿第 $i$ 个转录本从位置 $j$ 开始生成的概率为
+\[
+P(S_n=j\mid G_n=i)=\frac1{l_i}
+\]
+（图4.7b）。若假设 mRNA 末端没有 poly(A) 尾，则
+\[
+P(S_n=j\mid G_n=i)=\frac1{l_i-L+1}.
+\]
+
+\input{figures/ch04a_fig07}
+
+RNA-seq 有两种方案：标准的非链特异 RNA-seq，以及链特异 RNA-seq。标准 RNA-seq 方案会丢失原始 mRNA 测序模板来自哪条链的信息；链特异 RNA-seq 的序列读段从第一条链生成，因而在整个测序过程中保留链信息（Zhao et al. 2015）。方向变量 $O_n$ 是二元变量。设 $O_n=0$ 表示读段 $n$ 的序列方向与其来源异构体相同；$O_n=1$ 表示该序列为反向互补序列。因此，对于链特异方案，假设 $O_n=0$，即 $P(O_n=0\mid G_n\ne0)=1$。对于非链特异 RNA-seq，没有可用的链信息，方向变量 $O_n$ 以相等概率取0或1，即
+\[
+P(O_n=0\mid G_n\ne0)=P(O_n=1\mid G_n\ne0)=0.5.
+\]
+
+最后，计算给定所选异构体与起始位置时，观测到读段序列的概率
+\[
+P(R_n=r_n\mid G_n=i,S_n=j,O_n=k).
+\]
+该概率根据观测序列与异构体的比较，以及二者的比对评分计算（图4.7c）。定义指示随机变量
+\begin{equation}
+Z_{nijk}=\begin{cases}
+1,&G_n=i,\ S_n=j,\ O_n=k,\\
+0,&\text{其他情形}.
+\end{cases}
+\tag{4.19}
+\end{equation}
+于是，上述条件概率可写成 $P(R_n=r_n\mid Z_{nijk}=1)$，并计算为
+\begin{equation}
+P(R_n=r_n\mid Z_{nijk}=1)=\begin{cases}
+\displaystyle\prod_{t=1}^{L}w_t(r_{nt},g_{j+t-1}^{i}),&k=0,\\[1ex]
+\displaystyle\prod_{t=1}^{L}w_t(r_{nt},\bar g_{j+t-1}^{i}),&k=1,
+\end{cases}
+\tag{4.20}
+\end{equation}
+其中 $w_t(a,b)$ 是位置特异的替换矩阵；$r_{nt}$ 为第 $n$ 条读段的第 $t$ 个碱基；$g_{j+t-1}^{i}$ 为第 $i$ 个异构体的第 $j+t-1$ 个碱基；$\bar g_{j+t-1}^{i}g_{j+t-1}^{i}$ 表示该异构体反向互补序列的第 $j+t-1$ 个碱基。替换矩阵为每一对碱基的匹配或错配（替换）赋予评分。$w_t(a,b)$ 的值是在位置 $t$ 将 $a$ 与 $b$ 比对的得分，由位置特异替换矩阵确定。该矩阵或评分不仅考虑匹配／错配，还纳入碱基识别错误、多态性和参考序列错误。这些因素都会导致异构体序列与观测读段之间出现可观察到的替换。
+
+如果读段来自噪声异构体，则假设它由与位置无关的背景分布 $\beta$ 生成。令 $G_n=0$、起始位置 $j=1$、方向变量 $O_n=0$，式 (4.20) 化为
+\begin{equation}
+P(R_n=r_n\mid Z_{n010}=1)=\prod_{t=1}^{L}\beta(r_{nt}).
+\tag{4.21}
+\end{equation}
+
+\bookdeepheading{paragraph}{4.1.3.6.2}{RNA-seq 数据有缺口比对读段的生成模型}
+
+上一生成模型的局限，是无法处理读段的有缺口比对。为克服这一局限，对模型作修改，允许读段采用有缺口比对（Nariai et al. 2013）。将图4.6的无缺口比对模型扩展为图4.8的有缺口比对模型，增加两个节点：$A_n$ 处理比对状态，$Q_n$ 纳入测序质量评分。以 $G_n$、$S_n$、$O_n$、$A_n$、$Q_n$ 和 $R_n$ 分别表示转录本异构体选择、转录本起始位置、读段方向、比对状态、序列质量评分，以及读段变量。参数 $\theta$ 的定义见第4.1.3.6.1节。
+
+比对状态变量 $A_n$ 表示读段 $n$ 与参考异构体 $i$ 在每个比对位置上的状态，即匹配／错配及插入缺失。序列质量评分变量 $Q_n$ 取 Phred 质量评分（Nariai et al. 2013）。图4.8有向图模型中各随机变量的联合概率为
+\begin{equation}
+\begin{aligned}
+P(G_n,S_n,O_n,A_n,Q_n,R_n\mid\theta)
+={}&P(Q_n)P(G_n\mid\theta)P(S_n\mid G_n)P(O_n\mid G_n)\\
+&\times P(A_n\mid G_n,S_n,O_n)P(R_n\mid G_n,O_n,S_n,A_n,Q_n).
+\end{aligned}
+\tag{4.22}
+\end{equation}
+\input{figures/ch04a_fig08}
+
+$P(G_n\mid\theta)$、$P(S_n\mid G_n)$ 和 $P(O_n\mid G_n)$ 已在第4.1.3.6.1节定义。下面计算 $P(A_n\mid G_n,S_n,O_n)$。变量 $A_n$ 表示读段 $n$ 与参考异构体 $i$ 在各比对位置的状态，状态包括匹配（M）、错配（N），以及插入／缺失或缺口（G）。从位置 $j$ 开始的读段 $R_n$ 与异构体 $G_n=i$ 之间的比对见图4.9，比对状态用 $A_n$ 表示。
+
+设 $x$ 为比对位置，$X$ 为比对位置总数，$a[x]$ 为位置 $x$ 的比对状态，$\operatorname{trans}(a[x],a[x+1])$ 为从位置 $x$ 的状态转移到位置 $x+1$ 状态的概率。设 $\operatorname{trans}(a[X],a[X+1])$ 等于以状态 $a[X]$ 结束比对的概率，以 $\operatorname{start}(a[1])$ 表示从状态 $a[1]$ 开始的概率，则（Nariai et al. 2013）
+\begin{equation}
+P(A_n\mid G_n,S_n,O_n)=\operatorname{start}(a[1])\prod_{x=1}^{X}\operatorname{trans}(a[x],a[x+1]).
+\tag{4.23}
+\end{equation}
+
+\begin{bookexample}{4.5}
+选定的异构体 $G_n$、起始位置和读段 $n$ 见图4.9。读段 $n$ 与异构体 $G_n$ 的比对为
+\[
+\begin{array}{ccccccccc}
+\mathrm C&\mathrm C&\mathrm A&\mathrm A&\mathrm G&\mathrm A&\mathrm G&\mathrm T&\mathrm G\\
+\mathrm C&-&\mathrm C&\mathrm A&\mathrm T&\mathrm A&\mathrm G&\mathrm G&\mathrm T.
+\end{array}
+\]
+比对状态 $A_n$ 为
+\[
+\mathrm{MGNMNNMNN}.
+\]
+图4.9给出一个简单的转移概率矩阵。假设 $\operatorname{start}(a[1])=0.5$，则
+\[
+\begin{aligned}
+P(A_n\mid G_n,S_n,O_n)
+&=0.5\times0.4\times0.5\times0.3\times0.3\times0.2\times0.3\times0.3\times0.2\\
+&=3.24\times10^{-5}.
+\end{aligned}
+\]
+\end{bookexample}
+\input{figures/ch04a_fig09}
+
+最后，计算给定异构体选择 $G_n=i$、方向 $O_n=k$、起始位置 $S_n=j$、比对状态 $A_n=a$ 及读段评分时，读段 $n$ 的条件概率 $P(R_n\mid G_n,O_n,S_n,A_n,Q_n)$。先为隐藏变量定义指示变量
+\begin{equation}
+Z_{nikja}=\begin{cases}
+1,&G_n=i,\ O_n=k,\ S_n=j,\ A_n=a,\\
+0,&\text{其他情形}.
+\end{cases}
+\tag{4.24}
+\end{equation}
+然后定义
+\begin{equation}
+\begin{aligned}
+P(R_n\mid G_n,O_n,S_n,A_n,Q_n)
+&=P(R_n\mid Z_{nikja},Q_n)\\
+&=\prod_{x=1}^{X}\operatorname{emit}(r[x],q[x],c[x],a[x]),
+\end{aligned}
+\tag{4.25}
+\end{equation}
+其中 $x$ 为比对位置，$X$ 为比对位置总数，$\operatorname{emit}$ 为发射概率，定义为
+\begin{equation}
+\operatorname{emit}(r[x],q[x],c[x],a[x])=
+\begin{cases}
+\operatorname{subst}(r[x],q[x],c[x]),&a[x]=\text{“M”},\\
+\operatorname{insert}(r[x]),&a[x]=\text{“G”},\\
+\operatorname{delet}(c[x]),&a[x]=\text{“D”}.
+\end{cases}
+\tag{4.26}
+\end{equation}
+这里，“M”表示匹配／错配，“G”表示插入，“D”表示缺失。$\operatorname{subst}$ 为考虑 Phred 质量评分的替换矩阵，用于定义比对得分：在比对位置 $x$，借助质量评分 $q[x]$，为观测读段的核苷酸 $r[x]$ 与参考序列核苷酸 $c[x]$ 的比对赋分。$\operatorname{insert}$ 表示与位置无关、针对每个核苷酸定义的插入概率；$\operatorname{delet}$ 表示与位置无关、针对每个核苷酸定义的缺失概率。
+
+同样，若读段来自噪声异构体，则由与位置无关的背景分布 $\beta$ 生成。令 $G_n=0$、起始位置 $j=1$、方向变量 $O_n=0$，来自噪声异构体的读段条件概率为
+\begin{equation}
+P(R_n=r_n\mid Z_{n010}=1)=\prod_{t=1}^{L}\beta(\operatorname{read}[x]),
+\tag{4.27}
+\end{equation}
+其中 $\operatorname{read}[x]$ 表示位置 $x$ 的核苷酸，$\beta$ 的定义同前。
+
+\bookdeepheading{paragraph}{4.1.3.6.3}{用于参数估计与 RNA-seq 数据标准化的变分贝叶斯方法}
+
+RNA-seq 数据标准化，是给定观测读段，估计总 mRNA 中各异构体丰度所占比例，即参数向量 $\theta=[\theta_0,\theta_1,\ldots,\theta_M]^T$。换言之，最大化后验概率
+\begin{equation}
+P(\theta\mid R_n)=\frac{P(\theta)P(R_n\mid\theta)}{P(R_n)}.
+\tag{4.28}
+\end{equation}
+因此，最大后验估计（MAP）为
+\begin{equation}
+\theta_{\mathrm{MAP}}=\argmax_{\theta}P(\theta)P(R_n\mid\theta).
+\tag{4.29}
+\end{equation}
+然而，MAP 只考察概率密度，而不考察概率质量，可能忽略对积分或累积分布有较大贡献的部分（\url{www.cse.buffalo.edu/faculty/mbeal/thesis/beal03_2.pdf}）。
+
+图4.6和图4.8的模型假设隐藏变量按贝叶斯网络组织。为估计参数，还需要利用隐藏变量的结构化信息。这里采用贝叶斯网络的变分方法估计参数（Nariai et al. 2013），并在此基础上引入期望最大化（expectation-maximization，EM）算法，以及变分贝叶斯 EM 算法。附录4.A说明，无缺口与有缺口比对的 EM 算法分别如下。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论4.1：RNA-seq 数据无缺口比对的 EM 算法}\par
+\noindent\textbf{E 步：}
+\begin{equation}
+\begin{aligned}
+q^{(u+1)}(Z_n)
+&=\frac{\dfrac{\theta_i^{(u)}}{l_i}P(R_n=r_n\mid Z_{nijk}=1,\theta^{(u)})}
+{\displaystyle\sum_{i'=1}^{M}\sum_{j'=1}^{[1,\max_{i'}l_{i'}]}
+\dfrac{\theta_{i'}^{(u)}}{l_{i'}}P(R_n=r_n\mid Z_{ni'j'k}=1,\theta^{(u)})},\\
+&\hspace{1cm}n=1,2,\ldots,N.
+\end{aligned}
+\tag{4.30}
+\end{equation}
+以及
+\par\noindent\textbf{M 步：}
+\begin{equation}
+\theta_i^{(u+1)}=\frac{\sum_{n=1}^{N}\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})}{N},
+\quad i=1,2,\ldots,M.
+\tag{4.31}
+\end{equation}
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论4.2：RNA-seq 数据有缺口比对的 EM 算法}\par
+E 步定义为
+\par\noindent\textbf{E 步：}
+\begin{equation}
+\begin{aligned}
+q^{(u+1)}(Z_n)&=P(Z_{nijk}\mid R_n,Q_n,\theta^{(u)})\\
+&=\frac{P(Z_{nijk}=1,R_n=r_n,Q_n,\theta^{(u)})}
+{\sum_{(i',k',j',a')\in\pi_n}P(Z'_{ni'j'k}=1,R_n=r_n,Q_n,\theta^{(u)})},\\
+&\hspace{1cm}n=1,2,\ldots,N,
+\end{aligned}
+\tag{4.32}
+\end{equation}
+其中 $\pi_n$ 是读段 $n$ 全部可能比对所对应的 $i,k,j,a$ 的集合，且 $(i,k,j,a)\in\pi_n$。
+\par\Needspace{5\baselineskip}\noindent\textbf{M 步定义为：}
+\begin{equation}
+\theta_i^{(u+1)}=\frac{\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})}{N},
+\quad i=1,2,\ldots,M,
+\tag{4.33}
+\end{equation}
+其中 $(i,k,j,a)\in\pi_n$，$\pi_n$ 是读段 $n$ 全部可能比对的 $i,k,j,a$ 集合，并且
+\[
+\begin{aligned}
+P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})
+&=\frac{P(Z_{nikja}=1,R_n=r_n,Q_n,\theta^{(u)})}
+{\sum_{(i',k',j',a')\in\pi_n}P(Z'_{ni'k'j'a}=1,R_n=r_n,Q_n,\theta^{(u)})},\\
+&\hspace{1cm}n=1,2,\ldots,N.
+\end{aligned}
+\]
+
+EM 算法的变分方法可以扩展到贝叶斯学习。用于估计无缺口及有缺口 RNA-seq 比对中转录本异构体丰度的变分贝叶斯（variational Bayesian，VB）算法，分别汇总于结论4.3与结论4.4（附录4.A；Nariai et al. 2013）。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论4.3：RNA-seq 数据无缺口比对的变分贝叶斯算法}\par
+\noindent\textbf{步骤1：初始化。}
+对每个转录本异构体，设置 Dirichlet 分布参数的初值 $\alpha_i^{(0)}$，$i=1,\ldots,M$。
+
+\noindent\textbf{步骤2：VBE 步。}
+利用当前估计 $E_{\theta}[\theta^{(u)}]$，计算密度函数
+\begin{equation}
+q_Z^{(u+1)}(Z)=\prod_n\prod_i\prod_j\prod_k(\eta_{nijk})^{Z_{nijk}},
+\tag{4.34}
+\end{equation}
+其中
+\begin{equation}
+\eta_{n,i,j,k}=\frac{\rho_{n,i,j,k}}
+{\sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k'}}\qquad\text{或}
+\tag{4.35}
+\end{equation}
+\[
+E_Z[Z_{nijk}]=\eta_{nijk},
+\]
+\[
+\begin{aligned}
+\log\rho_{nijk}
+={}&E_{\theta}[\log\theta_i]+\log P(S_n=j\mid G_n=i)\\
+&+\log P(O_n=k\mid G_n=i)+\log P(R_n=r_n\mid Z_{nijk}=1),
+\end{aligned}
+\]
+且
+\[
+E_{\theta}[\log\theta_i]=\psi(\alpha_i)-\psi\left(\sum_{j=1}^{M}\alpha_j\right),
+\qquad
+\psi(\alpha)=\frac{d\Gamma(\alpha)/d\alpha}{\Gamma(\alpha)}
+\]
+为双伽马函数。
+
+\noindent\textbf{步骤3：VBM 步。}
+利用当前估计 $q_Z^{(u+1)}(Z)$，计算
+\begin{equation}
+E_{\theta}[\theta_i^{(u+1)}]=\frac{\alpha_i^{(u+1)}}{\sum_{i=0}^{M}\alpha_i^{(u+1)}},
+\tag{4.36}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+\alpha_i^{(u+1)}&=\alpha_i^{(u)}+\sum_{(n,j,k)\in\pi_n}E_Z[Z_{n,i,j,k}]\\
+&=\alpha_i^{(u)}+\sum_{(n,j,k)\in\pi_n}\eta_{nijk}.
+\end{aligned}
+\tag{4.37}
+\end{equation}
+\noindent\textbf{步骤4：停止准则。}
+若 $\lVert E_{\theta}[\theta^{(u+1)}-\theta^{(u)}]\rVert_2^2<\varepsilon$，则停止；否则返回步骤2。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论4.4：RNA-seq 数据有缺口比对的变分贝叶斯算法}\par
+\noindent\textbf{步骤1：初始化。}
+对每个转录本异构体，设置 Dirichlet 分布参数的初值 $\alpha_i^{(0)}$，$i=1,\ldots,M$。
+
+\noindent\textbf{步骤2：VBE 步。}
+利用当前估计 $E_{\theta}[\theta^{(u)}]$，计算密度函数
+\begin{equation}
+q_Z^{(u+1)}(Z)=\prod_n\prod_i\prod_j\prod_k(\eta_{nijka})^{Z_{nijka}},
+\tag{4.38}
+\end{equation}
+其中
+\begin{equation}
+\eta_{n,i,j,k,a}=\frac{\rho_{n,i,j,k,a}}
+{\sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k',a'}}\qquad\text{或}
+\tag{4.39}
+\end{equation}
+\[
+E_Z[Z_{n,i,j,k,a}]=\eta_{n,i,j,k,a},
+\]
+\[
+\begin{aligned}
+\log\rho_{n,i,j,k,a}
+={}&E_{\theta}[\log\theta_i]+\log P(S_n=j\mid G_n=i)+\log P(O_n=k\mid G_n=i),\\
+&+\log P(A_n=a\mid G_n=i,S_n=j,O_n=k)\\
+&+ +\log P(R_n=r_n\mid Z_{nijk}=1,Q_n),
+\end{aligned}
+\]
+且
+\[
+E_{\theta}[\log\theta_i]=\psi(\alpha_i)-\psi\left(\sum_{j=1}^{M}\alpha_j\right),
+\qquad
+\psi(\alpha)=\frac{d\Gamma(\alpha)/d\alpha}{\Gamma(\alpha)}
+\]
+为双伽马函数。
+
+\noindent\textbf{步骤3：VBM 步。}
+利用当前估计 $q_Z^{(u+1)}(Z)$，计算
+\begin{equation}
+E_{\theta}[\theta_i^{(u+1)}]=\frac{\alpha_i^{(u+1)}}{\sum_{i=0}^{M}\alpha_i^{(u+1)}},
+\tag{4.40}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+\alpha_i^{(u+1)}&=\alpha_i^{(u)}+\sum_{(n,j,k,a)\in\pi_n}E_Z[Z_{n,i,j,k,a}]\\
+&=\alpha_i^{(u)}+\sum_{(n,j,k,a)\in\pi_n}\eta_{n,i,j,k,a}.
+\end{aligned}
+\tag{4.41}
+\end{equation}
+\noindent\textbf{步骤4：停止准则。}
+若 $\lVert E_{\theta}[\theta^{(u+1)}-\theta^{(u)}]\rVert_2^2<\varepsilon$，则停止；否则返回步骤2。
+\FloatBarrier

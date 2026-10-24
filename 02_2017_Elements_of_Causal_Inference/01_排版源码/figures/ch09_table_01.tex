@@ -1,0 +1,24 @@
+% 原书表9.1；由第9.4.1节输入，非第9.5节正文。
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{p{4.0cm}*{4}{>{\centering\arraybackslash}X}}
+\toprule
+图对象&DAG（无潜变量）&MAG&IPG&ADMG（含嵌套马尔可夫模型）\\
+\midrule
+边类型：有向/无向/双向/组合
+ &$\checkmark/-/-/-$&$\checkmark/\checkmark/\checkmark/-$&$\checkmark/-/\checkmark/-$&$\checkmark/-/\checkmark/\checkmark$\\
+正确的因果解释&$\times$&$\checkmark$&$\checkmark$&$\checkmark$\\
+全局马尔可夫性的图分离&d-分离&m-分离&m-分离&m-分离\\
+有效调整集的判据&$\checkmark$&$\checkmark$&?&$\checkmark$\\
+识别干预分布的算法&$\checkmark$&?&?&$\checkmark$\\
+等价类的表示&CPDAG（马尔可夫）&PAG（马尔可夫）&POIPG（马尔可夫）&?（嵌套马尔可夫）\\
+基于独立性的学习方法&PC, IC, SGS&FCI&FCI&--\\
+基于得分的学习方法&GDS, GES&适用于线性/二值/离散SCM&?&适用于二值/离散SCM\\
+能否编码全部等式约束&$\times$&$\times$&$\times$&$\checkmark$（观测变量离散时）\\
+能否编码全部约束&$\times$&$\times$&$\times$&$\times$\\
+\bottomrule
+\end{tabularx}
+\caption{考虑一个结构因果模型，其（已观测）变量为$\mathbf O$、（潜）变量为$\mathbf H$，并诱导出分布$P_{\mathbf O,\mathbf V}$。应如何对观测分布$P_{\mathbf O}$建模？我们希望采用允许任意多个潜变量的结构因果模型，但这一模型类的性质不利于因果学习。本表概括一些可替代的模型类；当前研究尤其关注MAG与ADMG。}
+\end{table}

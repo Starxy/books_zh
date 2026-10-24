@@ -1,0 +1,62 @@
+% 原章第80—81页全部8道习题；第82页仅出版商标志与网址。
+\clearpage
+\section*{习题}
+\addcontentsline{toc}{section}{习题}
+\markright{习题}
+
+\noindent\textbf{习题 1.} 证明
+\[
+\frac{\partial C_E(W,b,x^{(u)})}{\partial w_{jk}^{(l)}}=-(y_j^u(W,b)-x^{(u)})\sigma'(z_j^{(2)})a_k^{(1)},
+\]
+其中
+\[
+\sigma'(x)=\sigma(x)(1-\sigma(x)).
+\]
+
+\noindent\textbf{习题 2.} 证明，对于 $l=L-1,\ldots,1$，有
+\[
+\begin{aligned}
+\delta_j^{(l)}(x^{(u)})&=\sum_{k=1}^{n_{l+1}}\delta_k^{(l+1)}(x^{(u)})w_{kj}^{(l+1)}\sigma'(z_j^{(l)}),\\
+\frac{\partial C_E(W,b,x^{(u)})}{\partial b_j^{(l)}}&=\delta_j^{(l)}(x^{(u)}),\\
+\frac{\partial C_E(W,b,x^{(u)})}{\partial w_{jk}^{(l)}}&=\frac{\partial C_E(W,b,x^{(u)})}{\partial z_j^{(l)}}\frac{\partial z_j^{(l)}}{\partial w_{jk}^{(l)}}=\delta_j^{(l)}(x^{(u)})a_k^{(l-1)}(x^{(u)}).
+\end{aligned}
+\]
+
+\noindent\textbf{习题 3.} 证明
+\[
+\frac{\partial\widehat p_j^{(v)}}{\partial b_g^{(l)}}=\begin{cases}
+0,&l>v,\\
+\sigma'(z_j^{(v)}),&l=v,\\
+\sigma'(z_j^{(v)})\displaystyle\sum_{k=1}^{n_{v-1}}w_{jk}^{(v)}\frac{\partial\widehat p_k^{(v-1)}}{\partial b_g^{(l)}},&l<v.
+\end{cases}
+\]
+
+\noindent\textbf{习题 4.} 考虑例 6.2 的数据。假定 $S=1$，生成特征图。
+
+\noindent\textbf{习题 5.} 考虑图 6.12d 的因子图，写出分布 $p(y)$ 的因子分解。
+
+\clearpage
+\noindent\textbf{习题 6.} 证明
+\[
+\begin{aligned}
+\delta J[h]&=\frac d{d\varepsilon}J[\beta(s,t,u)+\varepsilon h(s,t,u)]\\
+&=\int_S\int_T\int_U\Biggl[\int_S\int_T\int_U\Biggl[R(s_1,t_1,u_1,s_2,t_2,u_2)\beta(s_2,t_2,u_2)\,ds_2\,t_2\,du_2\\
+&\qquad-\lambda\left(\beta(s_1,t_1,u_1)+\mu\frac{\partial^{12}\beta(s_1,t_1,u_1)}{\partial s_1^4\,\partial t_1^4\,\partial u_1^4}\right)\Biggr]h(s_1,t_1,u_1)\,ds_1\,dt_1\,du_1\\
+&=\int_S\int_T\int_U\Biggl[\int_S\int_T\int_U R(s_1,t_1,u_1,s_2,t_2,u_2)\beta(s_2,t_2,u_2)\,ds_2\,dt_2\,du_2\\
+&\qquad-\lambda\left(\beta\biggl(s_1,t_1,u_1+\mu\frac{\partial^{12}\beta(s_1,t_1,u_1)}{\partial s_1^4\,\partial t_1^4\,\partial u_1^4}\biggr)\right)\Biggr]^2\,ds_1\,dt_1\,du_1=0.
+\end{aligned}
+\]
+
+\noindent\textbf{习题 7.} 将以下方程改写为矩阵形式：
+\[
+\begin{aligned}
+&y_1r_{11}+y_2r_{21}+\cdots+y_Mr_{M1}+\sum_{l=1}^{L_1}\eta_{1l}b_{1l}^{(1)}+\cdots+\sum_{l=1}^{L_k}\eta_{kl}b_{kl}^{(1)}+e_1=0\\
+&\qquad\vdots\qquad\qquad\qquad\vdots\qquad\qquad\qquad\vdots\\
+&y_1r_{1M}+y_2r_{2M}+\cdots+y_Mr_{MM}+\sum_{l=1}^{L_1}\eta_{1l}b_{1l}^{(M)}+\cdots+\sum_{l=1}^{L_k}\eta_{kl}b_{kl}^{(M)}+e_M=0.
+\end{aligned}
+\]
+
+\noindent\textbf{习题 8.} 建立 ADMM 算法，求解以下优化问题：
+\[
+\min_{\Theta_{YY},\Theta_{xy}}\quad\frac12\operatorname{Tr}\bigl(Y\Theta_{yy}Y^T+\operatorname{Tr}(X\Theta_{xy}Y^T)+\lambda_1\lVert\Theta_{xy}\rVert_1+\lambda_2\lVert\Theta_{yy}\rVert_1.
+\]

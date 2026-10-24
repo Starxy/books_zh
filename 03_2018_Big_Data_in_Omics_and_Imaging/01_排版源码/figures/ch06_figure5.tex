@@ -1,0 +1,66 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth]
+\filldraw[fill=red!75,draw=white] (0.0,2.4) rectangle ++(0.9,-0.38);
+\node[font=\small] at (0.45,2.21) {1};
+\filldraw[fill=red!75,draw=white] (0.9,2.4) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.35,2.21) {0};
+\filldraw[fill=blue!60,draw=white] (1.8,2.4) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.25,2.21) {1};
+\filldraw[fill=blue!60,draw=white] (2.7,2.4) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.15,2.21) {0};
+\filldraw[fill=red!75,draw=white] (0.0,2.02) rectangle ++(0.9,-0.38);
+\node[font=\small] at (0.45,1.8299999999999998) {0};
+\filldraw[fill=red!75,draw=white] (0.9,2.02) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.35,1.8299999999999998) {2};
+\filldraw[fill=blue!15,draw=white] (1.8,2.02) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.25,1.8299999999999998) {0};
+\filldraw[fill=blue!15,draw=white] (2.7,2.02) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.15,1.8299999999999998) {1};
+\filldraw[fill=blue!10,draw=white] (0.0,1.64) rectangle ++(0.9,-0.38);
+\node[font=\small] at (0.45,1.45) {1};
+\filldraw[fill=blue!10,draw=white] (0.9,1.64) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.35,1.45) {2};
+\filldraw[fill=blue!10,draw=white] (1.8,1.64) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.25,1.45) {1};
+\filldraw[fill=blue!10,draw=white] (2.7,1.64) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.15,1.45) {1};
+\filldraw[fill=blue!15,draw=white] (0.0,1.2599999999999998) rectangle ++(0.9,-0.38);
+\node[font=\small] at (0.45,1.0699999999999998) {1};
+\filldraw[fill=blue!15,draw=white] (0.9,1.2599999999999998) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.35,1.0699999999999998) {3};
+\filldraw[fill=blue!15,draw=white] (1.8,1.2599999999999998) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.25,1.0699999999999998) {0};
+\filldraw[fill=blue!15,draw=white] (2.7,1.2599999999999998) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.15,1.0699999999999998) {2};\filldraw[fill=red!75,draw=white] (4.7,2.0) rectangle ++(0.9,-0.38);
+\node[font=\small] at (5.15,1.81) {1};
+\filldraw[fill=red!75,draw=white] (5.6000000000000005,2.0) rectangle ++(0.9,-0.38);
+\node[font=\small] at (6.050000000000001,1.81) {0};
+\filldraw[fill=red!75,draw=white] (4.7,1.62) rectangle ++(0.9,-0.38);
+\node[font=\small] at (5.15,1.43) {0};
+\filldraw[fill=red!75,draw=white] (5.6000000000000005,1.62) rectangle ++(0.9,-0.38);
+\node[font=\small] at (6.050000000000001,1.43) {1};\filldraw[fill=yellow!80!orange,draw=white] (1.4,-0.1) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.8499999999999999,-0.29000000000000004) {3};
+\filldraw[fill=yellow!80!orange,draw=white] (2.3,-0.1) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.75,-0.29000000000000004) {0};
+\filldraw[fill=yellow!80!orange,draw=white] (3.2,-0.1) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.65,-0.29000000000000004) {2};
+\filldraw[fill=blue!15,draw=white] (1.4,-0.48) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.8499999999999999,-0.67) {2};
+\filldraw[fill=blue!15,draw=white] (2.3,-0.48) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.75,-0.67) {3};
+\filldraw[fill=blue!15,draw=white] (3.2,-0.48) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.65,-0.67) {1};
+\filldraw[fill=blue!10,draw=white] (1.4,-0.86) rectangle ++(0.9,-0.38);
+\node[font=\small] at (1.8499999999999999,-1.05) {4};
+\filldraw[fill=blue!10,draw=white] (2.3,-0.86) rectangle ++(0.9,-0.38);
+\node[font=\small] at (2.75,-1.05) {2};
+\filldraw[fill=blue!10,draw=white] (3.2,-0.86) rectangle ++(0.9,-0.38);
+\node[font=\small] at (3.65,-1.05) {3};
+\node[anchor=west] at (0,.55) {输入 $A$};\node at (5.6,2.3) {核 $W$};
+\node[anchor=west] at (4.2,-.5) {特征图 $(A*W)$};
+\draw[->,green!65!black] (0,2.02)--(-.3,2.02)--(-.3,-.3)--(1.4,-.3);
+\draw[->,green!65!black] (5.6,1.24)--(5.6,.3)--(1.5,.3)--(1.5,-.1);
+\end{tikzpicture}
+\origfig{5}{卷积示例。}
+\end{figure}

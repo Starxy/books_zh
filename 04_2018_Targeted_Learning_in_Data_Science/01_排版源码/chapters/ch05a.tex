@@ -1,0 +1,59 @@
+% 原书分章 PDF 第 2—4 页：章首与第 5.1 节。
+\chapter{一步 TMLE}
+\label{ch:one-step-tmle}
+\chapterauthors{Mark J. van der Laan、Wilson Cai 与 Susan Gruber}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+W. Cai：美国加利福尼亚大学伯克利分校生物统计学部，101 Haviland Hall, \#7358, Berkeley, CA, USA；电子邮箱：\href{mailto:wcai@berkeley.edu}{wcai@berkeley.edu}。\\
+S. Gruber：美国哈佛医学院、哈佛朝圣者医疗保健研究所人口医学系，401 Park Drive, Boston, MA 02215, USA；电子邮箱：\href{mailto:susan_gruber@harvardpilgrim.org}{susan\_gruber@harvardpilgrim.org}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_5}。}
+
+本章介绍一维通用最不利参数子模型（universal least favorable parametric submodel），用于单变量和多变量目标参数的靶向最小损失估计（targeted minimum loss-based estimation，TMLE）。这类模型保证：只需对初始估计量作一次 TMLE 更新，就已经能够解出有效影响曲线（efficient influence curve）方程。我们将说明，为何这种一步 TMLE（one-step TMLE）比迭代 TMLE 更稳定。对于高维乃至无限维目标参数，一步 TMLE 是代入估计量（substitution estimator），因而能够完全遵守无限维参数的结构。本章部分内容依据 van der Laan 和 Gruber（2016）。作为例子，我们将给出整个特定处理下的生存函数的一步 TMLE。
+
+\section{局部最不利子模型与通用最不利子模型}
+
+先考虑一维目标参数。$P$ 处的最不利模型（least favorable model）是一个受 $P$ 控制的模型
+$\mathcal S^*=\{P_{\epsilon,h^*}:\epsilon\}$，满足 $P_{\epsilon=0,h^*}=P$；它使下列子模型特定的 Cramér--Rao 下界最大。该下界针对子模型 $\{P_{\epsilon,h}:\epsilon\}$ 中 $\Psi(P_{\epsilon=0})$ 的正则渐近线性估计量的渐近方差，定义为
+\[
+ \mathrm{CR}(h\mid P)\equiv
+ \frac{\left(\left.\dfrac{d}{d\epsilon}\Psi(P_{\epsilon,h})\right|_{\epsilon=0}\right)^2}
+ {-\left.P\dfrac{d^2}{d\epsilon^2}\log\dfrac{dP_{\epsilon,h}}{dP}\right|_{\epsilon=0}}.
+\]
+在所有这类参数子模型 $\{P_{\epsilon,h}:\epsilon\}$ 中，它使 $\mathrm{CR}(h\mid P)$ 达到最大；这里，$h$ 在某个指标集中变化，其线性张成空间的闭包生成模型在 $P$ 处的整个切空间 $T(P)\subset L_0^2(P)$。假定参数路径可微，典范梯度（canonical gradient）为 $D^*(P)$，并将 $\{P_{\epsilon,h}:\epsilon\}$ 在 $\epsilon=0$ 处的得分记为 $S_h$，则上述子模型准则可写为
+\[
+ \mathrm{CR}(h\mid P)=\frac{\{PD^*(P)S_h\}^2}{PS_h^2}.
+\]
+由 Cauchy--Schwarz 不等式可知，在切空间 $T(P)$ 的所有得分中，$S=D^*(P)$ 使这一准则最大。因此，最不利模型也可以定义为：经过 $P$、且在 $P$ 处的得分等于 $D^*(P)$ 的任意参数模型。
+
+对 $\epsilon\mapsto P\log(dP_{\epsilon,h}/dP)$ 在 $\epsilon=0$ 处作二阶 Taylor 展开，并利用它等于信息量 $PS_h^2$ 这一关系，在对子模型作出某些光滑性假设后，还可以将该准则表示为
+\[
+ \mathrm{CR}(h\mid P)=
+ \lim_{\epsilon\to0}
+ \frac{\{\Psi(P_{\epsilon,h})-\Psi(P)\}^2}
+ {-2P\log(dP_{\epsilon,h}/dP)}.
+\]
+这表明，$\mathrm{CR}(h\mid P)$ 等于在无穷小 $\epsilon$ 下目标参数变化量的平方，除以 $P$ 处对数似然的变化量。因此，我们说，使 $\mathrm{CR}(h\mid P)$ 最大的路径 $\{P_{\epsilon,h^*}:\epsilon\}$，在 $\epsilon=0$ 处（即局部）沿着每单位信息量引起目标参数变化最大的路径前进。
+
+\begin{sourcebox}
+为强调所要求的最优性只在局部成立，我们将这样的子模型称为局部（即 $\epsilon=0$ 处）最不利子模型（local least favorable submodel）。
+\end{sourcebox}
+
+这一准则的后一种表示有着直观的吸引力。对于经过 $P$ 的子模型 $\{P_\epsilon:\epsilon\}$，一个合理目标是：$P$ 的微小扰动能使目标参数产生最大的变化，从而使该参数模型的极大似然估计量（maximum likelihood estimator，MLE）
+$\epsilon_n=\argmax_\epsilon P_n\log(dP_\epsilon/dP)$（TMLE 中所用的估计量），在局部完全用于拟合目标参数，而不把数据浪费在其他事情上。
+
+TMLE 一直遵循这样的直觉：在尽可能少地增加初始估计量经验拟合程度的同时，使目标参数的偏差按要求减小。我们通过用 $P_0$ 的一个良好估计量 $P_n^*$（因而不比 $P_n^0$ 差）求解 $P_nD^*(P_n^*)$，来衡量这种偏差减少。然而，如果 $P_n^0$ 远离 $P_0$，那么 MLE $\epsilon_n^0$ 就会远离局部。尽管它在 $\epsilon\approx0$ 处向正确的方向移动，但当 $\epsilon$ 进一步远离零时，我们无法保证：对于分布的每单位变化，它仍沿着目标参数变化最大的路径前进。结果，TMLE 最终走的可能并不是这样一条靶向路径，并且可能经过多次迭代，才到达局部的 $\epsilon_n^K\approx0$，算法也在此时停止。分布 $P_n^0$ 的变化，可能远远超过减少目标参数偏差所需的程度。也就是说，为实现期望的偏差减少，却付出了不必要的数据拟合代价，因而 $\Psi(P_n^*)$ 的有限样本方差会比必要的更大。根据这一认识，我们希望构造一种 TMLE：其所依据的路径，在每一个 $\epsilon$ 处（而不只在 $\epsilon=0$ 处），都使每单位信息量引起的目标参数变化最大。我们将这样的路径称为通用最不利子模型（universal least favorable submodel）。
+
+\begin{bookresult}{定义}{5.1}
+假定给定 $P\in\mathcal M$，$\operatorname{Ulfm}(P)=\{P_\epsilon:\epsilon\in(-a,a)\}\subset\mathcal M$ 是一个受 $P$ 控制的参数子模型，满足 $P_{\epsilon=0}=P$，且对每个 $\epsilon\in(-a,a)\subset\mathbb R$，都有
+\begin{equation}
+ \frac{d}{d\epsilon}\log\frac{dP_\epsilon}{dP}=D^*(P_\epsilon).
+ \tag{5.1}
+\end{equation}
+则称 $\operatorname{Ulfm}(P)$ 为经过 $P$ 的通用最不利子模型。
+\end{bookresult}
+
+也就是说，这个最不利模型不仅在 $\epsilon=0$ 处最不利，而且在每个 $P_\epsilon\in\operatorname{Ulfm}(P)$ 处都最不利。本章提出这类通用最不利子模型，以及相应的靶向极大似然估计量（targeted maximum likelihood estimator）和靶向最小损失估计量。
+
+\begin{sourcebox}
+这类通用最不利子模型的一个很好的附带结果是：TMLE 总是在一步内“收敛”，下一节将予以说明。这也反映了上述直觉：通用最不利子模型是某种最短路径子模型，因为它以最少的经验对数似然增加，实现所要求的偏差减少。
+\end{sourcebox}

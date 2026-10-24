@@ -1,0 +1,85 @@
+% 原书分章 PDF 第 6—9 页；第 20.4 节导言与第 20.4.1—20.4.3 小节。
+\section{估计问题}
+
+我们提出一个结构因果模型，刻画由相互连接的单位组成的总体的数据生成过程。如前所述，我们假定网络在基线测量，并在整个随访期间保持静态。将为 $(\mathbf O,\mathbf U)=(O_i,U_i:i=1,\ldots,N)$ 的分布提出模型，其中 $O_i$ 表示单位 $i$ 的观测数据，$U_i$ 表示该单位各结构方程的外生误差向量。这一结构因果模型使我们能够定义：对各单位处理节点的集合施加的随机干预 $\mathbf g^*$，这些节点包含在 $O_i$ 中，以及相应的反事实结局。因果量记为
+\[
+ E\biggl(\frac1N\sum_{i=1}^NY_{i,\mathbf g^*}(\tau)\biggr),
+\]
+通过特定干预下反事实结局 $Y_{i,\mathbf g^*}(\tau)$ 的期望，可能是条件期望，来定义，因而是 $(\mathbf O,\mathbf U)$ 分布的参数。随后，从 $N$ 个单位的数据 $\mathbf O=(O_1,\ldots,O_N)$ 的分布 $P_0$ 建立该因果量的可识别性；为 $\mathbf O$ 的概率分布 $P_0$ 选定统计模型 $\mathcal M$；并定义统计目标参数映射 $\Psi:\mathcal M\to\mathbb R$，以给出估计目标 $\Psi(P_0)$。在建立可识别性所需的附加假设下，后一估计目标就等于该因果量。此时，统计估计问题由数据 $\mathbf O\sim P_0\in\mathcal M$、统计模型 $\mathcal M$ 和目标参数 $\Psi:\mathcal M\to\mathbb R$ 所定义。
+
+为定义因果量，假定 $\mathbf O$ 由以下类型的结构方程模型生成：首先，对 $N$ 个单位生成外生误差集合 $\mathbf U_N=(U_i:i=1,\ldots,N)$，其中单位 $i$ 的外生误差为
+\[
+ U_i=(U_{W_i},U_{A_i},U_{Y_i(1)},\ldots,U_{Y_i(\tau)}),\qquad i=1,\ldots,N;
+\]
+再通过计算以下函数，确定性地生成 $\mathbf O$：
+\begin{equation}
+\begin{aligned}
+ W_i&=f_{W_i}(U_{W_i}),&&i=1,\ldots,N,\\
+ A_i&=f_{A_i}(\operatorname{Pa}(A_i),U_{A_i}),&&i=1,\ldots,N,\\
+ Y_i(t)&=f_{Y_i(t)}(\operatorname{Pa}(Y_i(t)),U_{Y_i(t)}),
+ &&i=1,\ldots,N,\quad t=1,\ldots,\tau.
+\end{aligned}
+\tag{20.1}
+\end{equation}
+此时，函数 $f_{W_i}$、$f_{A_i}$ 和 $(f_{Y_i(t)}:t=1,\ldots,\tau)$ 尚未指定，但下文将对其建模。由于 $\operatorname{Pa}(A_i)=\mathbf W$，且 $\operatorname{Pa}(Y_i(t))=(\mathbf W,\mathbf A,\bar{\mathbf Y}(t-1))$，上述结构方程模型还可简洁地表示为
+\begin{equation}
+\begin{aligned}
+ \mathbf W&=\mathbf f_{\mathbf W}(\mathbf U_{\mathbf W}),\\
+ \mathbf A&=\mathbf f_{\mathbf A}(\operatorname{Pa}(\mathbf A),\mathbf U_{\mathbf A}),\\
+ \mathbf Y(t)&=\mathbf f_{\mathbf Y(t)}(\operatorname{Pa}(\mathbf Y(t)),\mathbf U_{\mathbf Y(t)}),
+ \qquad t=1,\ldots,\tau.
+\end{aligned}
+\tag{20.2}
+\end{equation}
+回顾前文，朋友集合 $F_i$ 是 $W_i$ 的一个分量，因而也是由这一结构方程模型定义的随机变量。不过，也可以选择以 $F_i$ 为条件；下一章介绍单时点结局情形，即数据结构 $\mathbf O=(\mathbf W,\mathbf A,\mathbf Y)$ 时，我们将采用这一做法。
+
+\subsection{反事实与随机干预}
+
+对于
+\[
+ \mathbf O=(\mathbf W,\mathbf A,\mathbf Y(1),\ldots,\mathbf Y(\tau)),
+\]
+这一结构方程模型使我们能够定义对 $\mathbf A$ 施加动态干预 $d$ 后的反事实 $\mathbf Y_d(\tau)$（Gill 和 Robins，2001）。例如，对每个对象 $i=1,\ldots,N$，可将 $A_i$ 定义为其父节点 $\operatorname{Pa}(A_i)$ 的某个确定性函数 $d_i$。沿用前面身体活动对体重影响的研究例子，可定义这样一种干预：为所有基线时身体活动不足的对象，新增一位身体活动积极的朋友。这相当于将 $\mathbf A$ 的方程替换为确定性方程 $d_t(\operatorname{Pa}(\mathbf A)$。更一般地，给定 $\mathbf U=\mathbf u$ 和 $\operatorname{Pa}(\mathbf A)$ 时，$\mathbf A$ 的方程描述了抽取 $\mathbf A$ 的退化分布；可将该方程替换为由使用者提供的新变量 $\mathbf A_*$ 在给定 $\operatorname{Pa}(\mathbf A_*)$ 下的条件分布。这样的条件分布就定义了所谓的随机干预（Didelez 等，2006）。
+
+令 $\mathbf g^*$ 表示选定的随机干预，它由给定 $\operatorname{Pa}(\mathbf A_*(t))$ 时 $\mathbf A_*$ 的条件分布确定。为方便起见，用涉及随机误差 $\mathbf U_{\mathbf A_*}$ 的方程 $\mathbf A_*=\mathbf f_{\mathbf A_*}(\operatorname{Pa}(\mathbf A_*),\mathbf U_{\mathbf A_*})$ 表示这一随机干预。由此得到以下修改后的结构方程组：
+\begin{equation}
+\begin{aligned}
+ \mathbf W&=\mathbf f_{\mathbf W}(\mathbf U_{\mathbf W}),\\
+ \mathbf A_*&=\mathbf f_{\mathbf A_*}(\operatorname{Pa}(\mathbf A_*),\mathbf U_{\mathbf A_*}),\\
+ \mathbf Y_*(t)&=\mathbf f_{\mathbf Y(t)}(\operatorname{Pa}(\mathbf Y_*(t)),\mathbf U_{\mathbf Y(t)}),
+ \qquad t=1,\ldots,\tau,
+\end{aligned}
+\tag{20.3}
+\end{equation}
+其中，$\operatorname{Pa}(\mathbf Y_*(t))$ 与 $\operatorname{Pa}(\mathbf Y(t))$ 包含相同的一组变量，只是将 $(\mathbf A,\bar{\mathbf Y}(t-1))$ 替换为 $(\mathbf A_*,\bar{\mathbf Y}_*(t-1))$。用 $Y_{i,\mathbf g^*}(\tau)$，或简写 $Y_{i,*}(\tau)$，表示单位 $i$ 相应的最终反事实结局。对两种干预 $\mathbf g_1^*$ 和 $\mathbf g_2^*$，可将单位层面的因果效应定义为某种对比，例如 $Y_{i,\mathbf g_1^*}(\tau)-Y_{i,\mathbf g_2^*}(\tau)$。例如，$\mathbf g_1^*$ 可对应于上述结构方程模型对观测到的 $\mathbf A$ 所定义的实际数据生成分布，而 $\mathbf g_2^*$ 则对应于在基线为每个单位 $i$ 增加一位超重朋友。
+
+\subsection{干预后分布与序贯随机化假设}
+
+对 $\mathbf U$ 作以下序贯随机化假设：
+\begin{equation}
+ \mathbf A\perp\bar{\mathbf Y}_{\mathbf g^*},\qquad
+ \text{给定 }\operatorname{Pa}(\mathbf A),
+ \tag{20.4}
+\end{equation}
+并假定 $\mathbf U_{\mathbf A_*}\perp\mathbf U$，其中 $\bar{\mathbf Y}_{\mathbf g^*}=(\mathbf Y_{\mathbf g^*}(1),\ldots,\mathbf Y_{\mathbf g^*}(\tau))$。则 $(\mathbf W,\mathbf A_*,\bar{\mathbf Y}_{\mathbf g^*})$ 的概率分布 $P_{\mathbf g^*}$ 由所谓的 g 计算公式给出（Gill 和 Robins，2001）：
+\[
+\begin{aligned}
+ &P_{\mathbf g^*}(\mathbf W,\mathbf A_*,\bar{\mathbf Y}_*)\\
+ &\quad=P_{\mathbf W}(\mathbf W)\prod_{i=1}^N
+ \bar g_i^*(A_{i,*}(t)\mid\operatorname{Pa}(A_{i,*}(t)))\\
+ &\qquad{}\times\prod_{t=1}^\tau\prod_{i=1}^N
+ P_{Y_i(t)}(Y_{i,*}(t)\mid\operatorname{Pa}(Y_{i,*}(t))),
+\end{aligned}
+\]
+其中，$P_{Y_i(t)}$ 为给定 $\operatorname{Pa}(Y_i(t))$ 时 $Y_i(t)$ 的条件分布，$\operatorname{Pa}(Y_{i,*}(t))=(\mathbf W,\mathbf A_*,\bar{\mathbf Y}_*(t-1),\,)$，而 $\bar g_i^*$ 是对 $A_i$ 的个体特定随机干预。注意，$\bar g_i^*$ 由联合密度 $\mathbf g^*$ 的第 $i$ 个边际分布定义；这里隐含假定，给定 $\mathbf W$，$(A_{1,*},\ldots,A_{N,*})$ 条件独立。因此，在这一序贯随机化假设下，干预后分布 $P_{\mathbf g^*}$ 可由这一结构方程模型所生成的 $\mathbf O$ 的观测数据分布识别。
+
+\subsection{作为平均因果效应的目标参数}
+
+可以将平均因果效应（average causal effect，ACE）定义为 $P_{\mathbf g^*}$ 分布的以下目标参数：
+\[
+ E_{P_{\mathbf g_1^*}}\biggl\{\frac1N\sum_{i=1}^NY_{i,\mathbf g_1^*}(\tau)\biggr\}
+ -E_{P_{\mathbf g_2^*}}\biggl\{\frac1N\sum_{i=1}^NY_{i,\mathbf g_2^*}(\tau)\biggr\}.
+\]
+令 $\bar Y_{\mathbf g^*}(\tau)=N^{-1}\sum_{i=1}^NY_{i,\mathbf g^*}(\tau)$，也可将这一因果效应写为 $E(\bar Y_{\mathbf g_1^*}(\tau)-\bar Y_{\mathbf g_2^*}(\tau))$。由于分布 $P_{\mathbf g^*}$ 以 $N$ 为指标，这个参数也必然依赖 $N$。特别地，对由 $N$ 个相互连接单位组成的总体施加随机干预，其效应自然取决于总体大小 $N$ 和网络信息 $\mathbf F$；也就是说，增加一个单位会改变系统的动态。正如下一章讨论单时点结局时将采用的做法，也可以选择将这些边际期望替换为条件期望，以 $(F_i:i=1,\ldots,N)$，甚至以 $(W_i:i=1,\ldots,N)$ 为条件。下面聚焦于使用者指定的随机干预下的因果量 $\psi^F=E_{P_{\mathbf g^*}}\bar Y_{\mathbf g^*}(\tau)$；所得结果可自然推广到由一组特定干预均值的某个欧氏值函数定义的因果量。
+
+参数 $E\bar Y_{\mathbf g^*}(\tau)$，可通过相对于干预后分布 $P_{\mathbf g^*}$ 对 $\bar Y_{\mathbf g^*}(\tau)$ 取期望来计算。不过，在实践中，这个积分往往难以处理；此时可采用蒙特卡洛积分（Monte-Carlo integration），合理近似 $E\bar Y_{\mathbf g^*}(\tau)$。具体过程是：依次从 $P_{\mathbf g^*}$ 的每个因子中，每次抽取 $N$ 个随机变量，直至得到 $\bar Y_{\mathbf g^*}(\tau)$ 的一个实现值。首先，从 $P_{\mathbf W}$ 抽取 $N$ 个值的实现 $\mathbf W=(W_1,\ldots,W_N)$；再给定 $\mathbf W$，从 $\mathbf g^*$ 抽取 $\mathbf A_*$ 的一个实现值。接着，给定 $(\mathbf W,\mathbf A_*)$，抽取 $\mathbf Y_{\mathbf g^*}(1)=(Y_{1,\mathbf g^*}(1),\ldots,Y_{N,\mathbf g^*})$，依此类推，直至给定 $(\mathbf W,\mathbf A_*,\mathbf Y_{\mathbf g^*}(\tau-1))$，抽取 $N$ 个最终结局的样本 $\mathbf Y_{\mathbf g^*}(\tau)$。取 $\mathbf Y_{\mathbf g^*}(\tau)$ 的经验均值 $\bar Y_{\mathbf g^*}(\tau)$，即得到目标参数 $E\bar Y_{\mathbf g^*}(\tau)$ 的一个蒙特卡洛估计。最后，充分重复这一过程，再对这些蒙特卡洛估计取平均，便可得到 $E\bar Y_{\mathbf g^*}(\tau)$ 的足够精确近似。

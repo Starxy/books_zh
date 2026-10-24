@@ -1,0 +1,36 @@
+\chapter*{Notation}
+
+\vspace{1.5em}
+
+\begin{spacing}{1.6}
+\begin{center}
+\begin{tabular}{r l}
+$a$ & variable \\
+$\mathbf{a}$ & row vector or matrix \\
+$\mathbf{a}^\top$ & transpose of vector or matrix $\mathbf{a}$ \\
+$f(a)$ & function of $a$ \\
+$\max f(a)$ & maximum value of $f(a)$ \\
+$\argmax_{a} f(a)$ & value of $a$ that maximizes $f(a)$ \\
+$\mathbf{x}$ & input token sequence to a model \\
+$x_j$ & input token at position $j$ \\
+$\mathbf{y}$ & output token sequence produced by a model \\
+$y_i$ & output token at position $i$ \\
+$|\mathbf{x}|$ (or $|\mathbf{y}|$) & length of sequence $\mathbf{x}$ (or $\mathbf{y}$)  \\
+$V$ & vocabulary \\
+$\theta$ & model parameters \\
+$\Pr(a)$ & probability of $a$ \\
+$\Pr(a|b)$ & conditional probability of $a$ given $b$ \\
+$\Pr(\cdot|b)$ & probability distribution of a variable given $b$ \\
+$\Pr_{\theta}(a)$ &  probability of $a$ as parameterized by $\theta$ \\
+$\mathbb{E}_{a\sim \Pr(a)}[f(a)]$ & expected value of $f(a)$ when $a$ follows the distribution $\Pr(a)$ \\
+$\mathbf{h}_t$ & hidden state at time step $t$ in sequential models \\
+$\mathbf{H}$ & matrix of all hidden states over time in a sequence \\
+$\mathbf{Q}$, $\mathbf{K}$, $\mathbf{V}$ & query, key, and value matrices in attention mechanisms \\
+$\mathrm{Softmax}(\mathbf{A})$ & Softmax function that normalizes the input vector or matrix $\mathbf{A}$ \\
+$\mathcal{L}$ & loss function \\
+$\mathcal{D}$ & dataset used for training or fine-tuning a model \\
+$\frac{\partial \mathcal{L}}{\partial \theta}$ & gradient of the loss function $\mathcal{L}$ with respect to the parameters $\theta$ \\
+$D_{\mathrm{KL}}(p\ ||\ q)$ & KL divergence between distributions $p$ and $q$
+\end{tabular}
+\end{center}
+\end{spacing}

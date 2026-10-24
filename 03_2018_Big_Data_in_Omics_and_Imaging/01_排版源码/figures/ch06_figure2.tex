@@ -1,0 +1,26 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1.25cm,y=1cm,>=Stealth,
+ chSixFtwoNode/.style={circle,draw=green!60!black,minimum size=8mm,inner sep=1pt,font=\small,text=red},
+ chSixFtwoEdge/.style={->,thin,blue!60!black}]
+\node at (0,4.8) {第 1 层};\node at (3,4.8) {第 2 层};\node at (6,4.8) {第 3 层};
+\node[chSixFtwoNode] (chSixF2x1) at (0,4) {$x_1$};
+\node[chSixFtwoNode] (chSixF2x2) at (0,3) {$x_2$};
+\node[chSixFtwoNode,text=black] at (0,2) {$\vdots$};
+\node[chSixFtwoNode] (chSixF2xn) at (0,1) {$x_n$};
+\node[chSixFtwoNode] (chSixF2xb) at (0,0) {$+1$};
+\node[chSixFtwoNode] (chSixF2z1) at (3,3) {$z_1$};
+\node[chSixFtwoNode,text=black] at (3,2) {$\vdots$};
+\node[chSixFtwoNode] (chSixF2zk) at (3,1) {$z_k$};
+\node[chSixFtwoNode] (chSixF2zb) at (3,0) {$+1$};
+\node[chSixFtwoNode] (chSixF2y1) at (6,4) {$y_1$};
+\node[chSixFtwoNode] (chSixF2y2) at (6,3) {$y_2$};
+\node[chSixFtwoNode,text=black] at (6,2) {$\vdots$};
+\node[chSixFtwoNode] (chSixF2yn) at (6,1) {$y_n$};
+\foreach \aa in {x1,x2,xn,xb} \foreach \bb in {z1,zk}
+ \draw[chSixFtwoEdge] (chSixF2\aa)--(chSixF2\bb);
+\foreach \aa in {z1,zk,zb} \foreach \bb in {y1,y2,yn}
+ \draw[chSixFtwoEdge] (chSixF2\aa)--(chSixF2\bb);
+\end{tikzpicture}
+\origfig{2}{自编码器。}
+\end{figure}

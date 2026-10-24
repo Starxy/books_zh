@@ -1,0 +1,31 @@
+% 完整转录原图伪代码；不增加算法编号，沿用原 figure 计数。
+\begingroup
+\algrenewcommand\algorithmicrequire{\textbf{输入：}}
+\algrenewcommand\algorithmicensure{\textbf{输出：}}
+\algrenewcommand\algorithmicwhile{\textbf{当}}
+\algrenewcommand\algorithmicdo{\textbf{时}}
+\algrenewcommand\algorithmicif{\textbf{如果}}
+\algrenewcommand\algorithmicthen{\textbf{则}}
+\algrenewcommand\algorithmicend{\textbf{结束}}
+\algrenewtext{EndWhile}{\textbf{结束循环}}
+\algrenewtext{EndIf}{\textbf{结束判断}}
+\begin{minipage}{.94\linewidth}
+\hrule\smallskip
+\begin{algorithmic}
+\Require 指令 $I$；初始观测 $o_0$
+\Ensure 动作序列 $a_0,a_1,\ldots,a_T$
+\State $t\gets 0$;
+\While{\texttt{True}}
+  \State $\mathcal{A}_t\gets\texttt{get\_candidate}(I,o_t)$;
+  \State $\mathcal{A}'_t\gets\texttt{self\_refine}(\mathcal{A}_t)$;
+  \State $a_t=\arg\max_{a\in\mathcal{A}'_t}\texttt{score}(\texttt{sim}(o_t,a))$;
+  \State $o_{t+1}\gets\texttt{execute}(a_t)$;
+  \State $t\gets t+1$;
+  \If{$\texttt{termination\_check}()=\texttt{True}$}
+    \State \textbf{跳出循环};
+  \EndIf
+\EndWhile
+\end{algorithmic}
+\smallskip\hrule
+\end{minipage}
+\endgroup

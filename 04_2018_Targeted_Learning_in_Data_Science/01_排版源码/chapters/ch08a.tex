@@ -1,0 +1,119 @@
+% 原书分章 PDF 第 1—5 页：章首与第 8.1 节。
+\chapter{有效影响曲线的 HAL 估计量}
+\label{ch:hal-efficient-influence-curve}
+\chapterauthors{Mark J. van der Laan}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_8}。}
+
+\begin{sourcebox}
+为路径可微的目标参数 $\Psi:\mathcal M\to\mathbb R$ 构造有效估计量，需要能够在 $P_0$ 的初始估计量 $P$ 处，求出其典范梯度（canonical gradient）$D^*(P)$ 的值；该初始估计量基于来自 $P_0$ 的原始独立同分布样本。有效影响曲线（efficient influence curve）$D^*(P)$，定义为目标参数沿经过 $P$ 的参数子模型的路径导数的典范梯度。目标参数沿参数子模型的路径导数，总能表示为某个梯度 $D(P)\in L_0^2(P)$ 与该子模型得分的协方差。典范梯度就是这一梯度在 $P$ 处切空间上的投影；这里，切空间定义为经过 $P$ 的参数子模型所能生成的全部得分的线性张成空间的闭包。
+\end{sourcebox}
+
+刻画切空间并不困难。它通常可表示为一个线性得分算子（linear score operator）的值域；该算子将底层路径映射为相应的、经过 $P$ 的子模型的得分。然而，将 $D(P)$ 投影到切空间上，可能是一个困难的优化问题，而且未必存在闭式解。有效影响曲线的一般公式，是最小二乘回归公式 $X(X'X)^{-1}X'Y$ 在 Hilbert 空间中的对应形式；它涉及所谓信息算子（information operator）的逆，信息算子由得分算子与其伴随算子（adjoint operator）的复合定义。对于许多问题，这个无限维信息算子的逆没有闭式表达，而且算法实现也可能十分困难。
+
+不过，典范梯度的投影表述说明：在来自 $P$ 的无限样本下，典范梯度是将梯度对切空间所表示的大型回归模型作最小二乘回归的结果。换句话说，切空间中的每个得分，都表示一条候选回归曲线（作为 $O$ 的函数）。真实回归曲线，即这一模型中与梯度距离最小的回归曲线，等于有效影响曲线。如果切空间是某个线性得分算子的值域，那么，每条回归曲线都由一个底层函数确定；可以把该函数视为回归模型中的未知参数。此外，由于得分算子的线性性质，回归模型对这一参数或函数也是线性的。因此，有效影响曲线可以表述为无限维线性模型的线性最小二乘回归问题。本章介绍一种机器学习方法：从 $P$ 中抽样，再拟合有效影响曲线的高度自适应 Lasso（highly adaptive lasso，HAL）最小二乘线性回归估计量。也可以用其他机器学习算法替代 HAL；但我们针对 HAL 估计量给出的理论结果，使它成为格外合适的选择。这一方法避免了直接求解数学优化问题，而是让机器学习算法估计回归曲面 $D^*(P)$。
+
+\section{有效影响曲线的 HAL 最小二乘线性回归估计量的构造}
+
+设 $\Psi:\mathcal M\to\mathbb R$ 是一个统计目标参数，它在统计模型 $\mathcal M$ 中的概率分布 $P$ 处路径可微，典范梯度为 $D^*(P)$。设 $O\sim P$ 是 $\mathbb R^d$ 中的多维随机变量。给定 $P$，我们的目标是求出有效影响曲线 $O\mapsto D^*(P)(O)$，将其视为 $O$ 的函数。
+
+确定有效影响曲线的一种常用方法，是先找出路径导数的一个初始梯度 $D(P)$，再将其投影到 $P$ 处的切空间 $T(P)$ 上。寻找初始梯度，可以先考虑从 $P$ 抽取 $n$ 个独立同分布观测时 $\Psi(P)$ 的一个初始估计量，再求该估计量的影响曲线。这条影响曲线就是初始梯度 $D(P)$。初始估计量可以选得尽量简单，因为所有梯度的投影都是典范梯度，没有理由偏好某一个梯度。
+
+寻找初始梯度的一种办法，是先将参数 $\Psi:\mathcal M\to\mathbb R$ 扩展到非参数模型 $\Psi^e:\mathcal M_{\mathrm{np}}\to\mathbb R$，使 $P\in\mathcal M$ 时 $\Psi^e(P)=\Psi(P)$。随后，求这一非参数扩展 $\Psi^e$ 的路径导数的梯度。它可以作为该非参数模型中任意正则渐近线性估计量的影响曲线来计算；也可以用泛函 Delta 方法，计算 $\Psi^e(P_n)$ 的影响曲线，其中 $P_n$ 为 $O_1,\ldots,O_n$ 的经验概率分布。在后一种办法中，可以先用离散近似 $O_m$ 逼近 $O$，使 $\Psi^e(P_n)$ 确实具有渐近线性，再求近似误差趋向零（即 $m\to\infty$）时所得影响曲线的极限。不同的非参数扩展会产生不同的影响曲线或梯度，因此可以选择一种使 $\Psi^e(P_n)$ 的影响曲线容易计算的扩展。
+
+确定初始梯度时，还有一项重要观察。可以把某个正交干扰参数（orthogonal nuisance parameter）视为已知，从而在由此定义的 $\mathcal M$ 的子模型中寻找初始梯度。具体来说，假定对某个参数 $Q$，有 $\Psi(P)=\Psi_1(Q(P))$。所谓正交干扰参数，是指只扰动该干扰参数的参数子模型的得分，与只扰动 $Q$ 的参数子模型的得分正交。例如，假定密度 $p(O)=q(O)g(O)$ 分解成两个变动独立（variation independent）的因子 $q$ 和 $g$，且 $\Psi(P)$ 只通过因子 $q$ 依赖 $P$。此外，假定以密度表示的模型为
+$\mathcal M=\{p=qg:q\in\mathcal Q,g\in\mathcal G\}$，
+其中 $\mathcal Q$ 和 $\mathcal G$ 分别为因子 $q$ 与 $g$ 的参数空间。这时，可以令 $g$ 已知，定义子模型
+$\mathcal M(g)=\{p=qg:q\in\mathcal Q\}\subset\mathcal M$。
+在 $g$ 已知的子模型 $\mathcal M(g)$ 中，$\Psi$ 在 $P$ 处的有效影响函数（efficient influence function），与实际模型 $\mathcal M$ 中的有效影响函数相同。在模型 $\mathcal M(g)$ 中寻找梯度通常很直接：一般而言，模型越小，寻找梯度就越容易。例如，在删失数据模型中，可以在删失机制已知的模型下，将梯度定义为逆删失概率加权估计量（inverse probability of censoring weighted estimator）的影响曲线。本章的每个例子都将这样处理。
+
+切空间往往定义为线性得分算子
+$A_P:(H,\langle\cdot,\cdot\rangle_H)\to L_0^2(P)$
+的值域的闭包；其中 $(H,\langle\cdot,\cdot\rangle_H)$ 是底层 Hilbert 空间，对任意 $h_1,h_2\in H$，内积为 $\langle h_1,h_2\rangle_H$。例如，考虑模型 $\{P_\theta:\theta\in\Theta\}$。经过 $P_\theta$ 的参数子模型形如 $\{P_{\theta_{\epsilon,h}}:\epsilon\}$，其中 $h$ 为方向，在某个嵌入 Hilbert 空间的集合 $\mathcal H$ 中变化。令 $H$ 为 $\mathcal H$ 在这一 Hilbert 空间中线性张成空间的闭包。该子模型的得分可以表示为映射
+\[
+ A_P(h)=\left.\frac{d}{d\epsilon}\log p_{\theta_{\epsilon,h}}\right|_{\epsilon=0}.
+\]
+若使用自然的参数化 $\theta_{\epsilon,h}$，则 $A_P$ 是线性算子。于是，切空间就是
+$A_P:(H,\langle\cdot,\cdot\rangle_H)\to L_0^2(P)$
+的值域的闭包。
+
+有效影响曲线可定义为 $D^*(P)=A_P(h^*)$，其中
+\[
+ h^*=\argmin_{h\in H}P\{D(P)-A_P(h)\}^2.
+\]
+在 $D(P)$ 和 $A_P(h)$ 中，我们都将 $P$ 视为已知。因此，$A_P(h^*(P))$ 表示将已知结局 $D(P)(O)$，对未知参数为 $h$ 的回归模型 $\{A_P(h):h\}$ 作最小二乘回归；$h^*(P)$ 就是真实参数值。随后，从 $P$ 抽取样本 $O_1,\ldots,O_n$，并用基于该数据集的机器学习算法估计 $h^*(P)$。令 $P_n$ 为经验概率分布。
+
+假定 $H$ 为 $d$ 元实值函数的 Hilbert 空间。令 $H_M\subset H$ 为其中变差范数小于 $M$ 的右连续且有左极限（càdlàg）函数的子集；函数 $h$ 的变差范数定义为
+\[
+ \|h\|_v=\sum_{S\subset\{1,\ldots,d\}}\int|dh_S(u_S)|.
+\]
+这里，$u_S\mapsto h_S(u_S)=h(u_S,0_{S^c})$ 为 $h$ 的截面，即把不属于 $S$ 的分量都设为零；求和遍及 $\{1,\ldots,d\}$ 的全部子集。此外，假定对某个 $M$，$\|h^*\|_v<M$。可以用有限样本估计量
+\[
+ h_{n,M}=\argmin_{h\in H_M}P_n\{D(P)-A_P(h)\}^2
+\]
+估计 $h^*$。
+
+用 $\widehat h_M$ 表示这一估计量的映射，使 $h_{n,M}=\widehat h_M(P_n)$。由于不知道怎样选取足够大的 $M$，我们通过交叉验证选择器选取 $M=M_n$：
+\[
+ M_n=\argmin_M E_{B_n}P_{n,B_n}^1
+ \{D(P)-A_P(\widehat h_M(P_{n,B_n}^0))\}^2.
+\]
+$h^*$ 的估计量为
+\[
+ h_n\equiv h_{n,M_n}=\widehat h_{M_n}(P_n),
+\]
+进而得到 $D^*(P)$ 的估计量 $A_P(h_n)$。
+
+现在说明，如何用 Lasso 算法拟合高维线性回归模型，从而求出 $h_{n,M}$。对任何具有有限变差范数的 càdlàg 函数 $h$，都可表示为
+\[
+ h(x)=\sum_{S\subset\{1,\ldots,d\}}\int\phi_{x_S}(u_S)\,dh_S(u_S),
+\]
+其中，$u_S\mapsto h_S(u_S)=h(u_S,0_{S^c})$ 为 $h$ 的截面，把不在 $S$ 内的分量设为零，而
+$\phi_{x_S}(u_S)=\prod_{j\in S}I(x_j\geq u_j)$
+是指示基函数（indicator basis function）的乘积。由于 $A_P$ 为线性算子，有
+% 第一行 dh_S(u_S 的右括号在原书中缺失，照录。
+\[
+ \begin{aligned}
+ A_P(h)(O)
+ &=A_P\left(x\mapsto
+ \sum_{S\subset\{1,\ldots,d\}}\int\phi_{x_S}(u_S)\,dh_S(u_S
+ \right)(O)\\
+ &=\sum_{S\subset\{1,\ldots,d\}}\int
+ A_P\bigl(x\mapsto\phi_{x_S}(u_S)\bigr)(O)\,dh_S(u_S).
+ \end{aligned}
+\]
+因此，
+\[
+ h_{n,M}=\argmin_{h\in H_M}\frac1n\sum_{i=1}^n
+ \left\{D(P)(O_i)-\sum_{S\subset\{1,\ldots,d\}}\int
+ A_P\bigl(x\mapsto\phi_{x_S}(u_S)\bigr)(O_i)\,dh_S(u_S)\right\}^2.
+\]
+这是一个无限维最小二乘线性回归估计量：结局为 $Y_i=D(P)(O_i)$，主项为
+$\bigl(A_P(\phi_{\cdot_S}(u_S))(O_i):u_S,S\bigr)$，
+相应系数为 $(dh_S(u_S):u_S,S)$，并强制这些系数的绝对值之和小于 $M$。对这一问题的研究通常会表明：最小值可由这样的 $h$ 达到，对每个 $S\subset\{1,\ldots,d\}$，$dh_S$ 只在至多 $n$ 个取值 $u_{S,j}$（$j=1,\ldots,n$）上放置正质量。这时，该无限维最小二乘线性回归问题变成有限维线性回归
+\[
+ Y_i=\sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n
+ \phi_{S,j}(O_i)\beta_{S,j}+e_i,
+\]
+其中 $\sum_S\sum_{j=1}^n|\beta_{S,j}|\leq M$，且
+$\phi_{S,j}(O_i)=A_P\bigl(\phi_{\cdot_S}(u_{S,j})\bigr)$。
+
+因此，可以定义标准的 Lasso 线性回归估计量：
+\[
+ \beta_{n,M}=\argmin_{\beta,\|\beta\|_1\leq M}
+ \frac1n\sum_{i=1}^n
+ \left\{D(P)(O_i)-\sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n
+ \phi_{S,j}(O_i)\beta_{S,j}\right\}^2.
+\]
+由此定义
+\[
+ D_{n,M}^*(P)(O)=\sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n
+ \phi_{S,j}(O)\beta_{n,M,S,j}.
+\]
+设 $M_n$ 为交叉验证选择器，$\beta_n=\beta_{n,M_n}$。那么，有效影响曲线 $D^*(P)$ 的近似为
+\[
+ D_n^*(P)(O)=D_{n,M_n}^*(P)(O)
+ =\sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n
+ \phi_{S,j}(O)\beta_{n,S,j}.
+\]

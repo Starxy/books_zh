@@ -1,0 +1,10 @@
+% 原书第 34 页；第 3.4—3.5 节。
+\section{计算}
+\label{sec:ch03-computation}
+
+随着并行化和云计算的新进展，计算方面的难题正在迅速得到解决。目前已有 R、H20 和 SAS 软件可用，见 \url{https://berkeleybiostats.github.io}，其中包括 SAS 宏，以及指向 CRAN 上 R 包的链接。在大数据情境下，实现序贯超级学习器可能需要大量计算。因此，应仔细考虑所采用的编程语言、纳入的算法数和时点数，在保持实际应用价值的同时，确保计算上可行。
+
+\section{注记与延伸阅读}
+\label{sec:ch03-notes}
+
+关于超级学习的渐近性质和有限样本性质，关键文献中有更详细的讨论（van der Laan and Dudoit，2003；van der Laan et al.，2007）。另见 van der Laan et al.（2006）、van der Vaart et al.（2006）、van der Laan et al.（2004）、Dudoit and van der Laan（2005），以及 Keleş et al.（2002）。在房颤研究中，已有文献介绍了用于计数过程条件强度（conditional intensity of a counting process）的序贯超级学习器（Brooks，2012）。这一超级学习器通过对所有时点 $t$ 特有的损失函数求和，来定义一个总体损失函数 $L(O,\bar Q_{L_t})$，即 $L(O,\bar Q_{L_t})=\sum_t L(O_t,\bar Q_{L_t})$。Díaz et al.（2015）也介绍了存在缺失的纵向数据中的超级学习。关于机器学习和集成方法的大量参考文献，可见《靶向学习》（2011）第 3 章。

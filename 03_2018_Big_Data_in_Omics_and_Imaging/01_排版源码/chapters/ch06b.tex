@@ -1,0 +1,140 @@
+% 原章第8—12页：6.2.1.2，式6.25—6.47。
+\subsubsection{自编码器}
+\bookdeepheading{paragraph}{6.2.1.2.1}{简单自编码器}
+
+自编码器（autoencoder）网络将高维输入数据压缩为低维数据，并发现高维输入数据的隐藏结构。自编码器是一个编码函数：
+\begin{equation}
+y=f(x,W,B)\approx x,
+\tag{6.25}
+\end{equation}
+其中，$x\in\mathbb R^n$ 为输入向量，$W$ 为权重矩阵，$B$ 为偏置矩阵，$y$ 为输出向量。自编码器的体系结构见图 6.2。它由三层构成：含 $n$ 个输入神经元的输入层、含 $n_1$ 个神经元的隐藏层，以及含 $n$ 个输出神经元的输出层。
+\input{figures/ch06_figure2}
+
+从输入层第 $k$ 个神经元到隐藏层第 $j$ 个神经元的连接权重记为 $w_{jk}^{(1)}$，隐藏层第 $j$ 个神经元的偏置记为 $b_j^{(1)}$。该神经元的加权输入与激活值分别记为 $z_j^{(1)}$ 和 $a_j^{(1)}$。于是，从数据输入层到隐藏层的加权输入，以及隐藏层第 $j$ 个神经元的激活值，分别为
+\begin{equation}
+z_j^{(1)}=\sum_{k=1}^nw_{jk}^{(1)}x_k+b_j^{(1)},\qquad j=1,\ldots,n_1,
+\tag{6.26}
+\end{equation}
+以及
+\begin{equation}
+a_j^{(1)}=\sigma(z_j^{(1)}).
+\tag{6.27}
+\end{equation}
+通常取逻辑 Sigmoid 函数 $\sigma(z)=1/(1+\exp(-z))$。令 $W^{(1)}=(w_{jk}^{(1)})_{n\times n_1}$ 为连接输入数据与隐藏神经元的权重矩阵，$b^{(1)}=[b_1^{(1)}\quad\cdots\quad b_{n_1}^{(1)}]^T$ 为隐藏层偏置向量。式 (6.26)、(6.27) 可改写为矩阵形式：
+\begin{equation}
+z^{(1)}=W^{(1)}x+b^{(1)},
+\tag{6.28}
+\end{equation}
+以及
+\begin{equation}
+a^{(1)}=\sigma(z^{(1)}),
+\tag{6.29}
+\end{equation}
+其中，$z^{(1)}=[z_1^{(1)}\quad\cdots\quad z_{n_1}^{(1)}]^T$，$a^{(1)}=[a_1^{(1)}\quad\cdots\quad a_{n_1}^{(1)}]^T$；$\sigma(z)$ 表示逐元素应用非线性函数，包括逻辑 Sigmoid 函数。
+
+类似地，对于输出层，将隐藏层第 $k$ 个神经元到输出层第 $j$ 个神经元的连接权重记为 $w_{jk}^{(2)}$，该输出神经元的偏置记为 $b_j^{(2)}$。它的加权输入与激活值分别记为 $z_j^{(2)}$ 和 $a_j^{(2)}$。类似于式 (6.26)、(6.27)，得到
+\begin{equation}
+z_j^{(2)}=\sum_{k=1}^{n_1}w_{jk}^{(2)}a_k^1+b_j^{(2)},\qquad j=1,\ldots,n_1,
+\tag{6.30}
+\end{equation}
+\begin{equation}
+a_j^{(2)}=\sigma(z_j^{(2)}).
+\tag{6.31}
+\end{equation}
+同样，式 (6.30)、(6.31) 的矩阵形式为
+\begin{equation}
+z^{(2)}=W^{(2)}x+b^{(2)},
+\tag{6.32}
+\end{equation}
+以及
+\begin{equation}
+a^{(2)}=\sigma(z^{(2)}),
+\tag{6.33}
+\end{equation}
+其中，$z^{(2)}=[z_1^{(2)}\quad\cdots\quad z_n^{(2)}]^T$，$a^{(2)}=[a_1^{(2)}\quad\cdots\quad a_n^{(2)}]^T$，$W^{(2)}=(w_{jk}^{(2)})_{n_1\times n}$，$b^{(2)}=[b_1^{(2)}\quad\cdots\quad b_n^{(2)}]^T$。
+
+输出层神经元的激活值，是隐藏层与输入层激活函数的复合，给定为
+\begin{equation}
+y=\sigma\left(W^{(2)}\sigma(W^{(1)}x+b^{(1)})+b^{(2)}\right).
+\tag{6.34}
+\end{equation}
+神经网络可看作将输入变量向量 $x$ 映射到输出变量向量 $y$ 的一大类非线性函数。我们的目标是利用神经网络，尽可能准确地近似输出变量。给定一组输入变量 $x^{(u)}$ 与输出变量 $y^{(u)}$（$u=1,\ldots,m$），定义度量近似误差的代价函数
+\begin{equation}
+C_E(W,b)=\frac1{2m}\sum_{u=1}^m\lVert y^{(u)}-x^{(u)}\rVert^2.
+\tag{6.35}
+\end{equation}
+为估计模型 (6.25) 中的参数，使代价函数 $C(W,b)$ 最小。稀疏表示有两个作用：（1）降低数据维数；（2）发现数据的隐藏结构。为此，常用 KL 距离限制隐藏神经元的激活（Ehsan Hosseini 2016）。隐藏神经元 $j$ 的平均激活值定义为
+\begin{equation}
+\widehat p_j=\frac1m\sum_{u=1}^ma_j^{(1)}(x^{(u)}),
+\tag{6.36}
+\end{equation}
+其中
+\[
+a_j^{(1)}=\sigma\left(\sum_{k=1}^nw_{jk}^{(1)}x_k^{(u)}+b_j^{(1)}\right).
+\]
+假定 $p$ 为稀疏性参数，通常选取一个接近零的小正数。为施加稀疏性，令 $\widehat p_j=p$，并要求隐藏神经元的平均激活值 $\widehat p_j$ 尽量接近稀疏性参数 $p$（Ehsan Hosseini 2016）。定义 $\widehat p_j$ 与 $p$ 之间的 KL 距离为
+\begin{equation}
+C_{\mathrm{KL}}(p\Vert\widehat p)=\sum_{j=1}^{n_1}
+\left[p\log\frac p{\widehat p_j}+(1-p)\log\frac{1-p}{1-\widehat p_j}\right].
+\tag{6.37}
+\end{equation}
+为防止权重过大，需要减少神经元之间的连接数，或减小权重的平方。为此，可以惩罚以下度量：
+\begin{equation}
+C_W=\lVert W^{(1)}\rVert_F^2+\lVert W^{(2)}\rVert_F^2.
+\tag{6.38}
+\end{equation}
+综合式 (6.35)、(6.37) 和 (6.38)，得到学习稀疏自编码器（sparse autoencoder，SAE）的总代价函数：
+\begin{equation}
+C_{\mathrm{SAE}}(W,b)=C_E(W,b)+\mu C_{\mathrm{KL}}(p\Vert\widehat p)+\lambda C_W,
+\tag{6.39}
+\end{equation}
+其中，$\mu$ 与 $\lambda$ 为惩罚参数。
+
+\bookdeepheading{paragraph}{6.2.1.2.2}{深度自编码器}
+
+基本自编码器由编码器和解码器两部分组成。深度自编码器是一种堆叠自编码器，即由稀疏自编码器组成的多层神经网络（图 6.3）。堆叠自编码器中每一层的输出，被送往后一层作为输入（Zhou et al. 2014）。下面研究深度自编码器如何对数据进行编码与解码。考虑 $L$ 个简单自编码器，每个自编码器包含一个隐藏层和一个重构层。
+
+对于第 $l$ 个自编码器，从第 $l-1$ 层输出的第 $k$ 个神经元，到隐藏层第 $j$ 个神经元的连接权重（编码参数）记为 $w_{jk}^{(l,1)}$；该隐藏神经元的偏置记为 $b_j^{(l,1)}$，加权输入与激活值分别记为 $z_j^{(l,1)}$ 和 $a_j^{(l,1)}$。于是，从第 $l-1$ 层到隐藏层的加权输入，以及隐藏层第 $j$ 个神经元的激活值，分别为
+\begin{equation}
+z_j^{(l,1)}=\sum_{k=1}^{n_{l-1}}w_{jk}^{(l,1)}a_k^{(l-1)}+b_j^{(l,1)},\quad j=1,\ldots,n_l,
+\tag{6.40}
+\end{equation}
+以及
+\begin{equation}
+a_j^{(l,1)}=\sigma(z_j^{(l,1)}).
+\tag{6.41}
+\end{equation}
+\input{figures/ch06_figure3}
+
+令 $W^{(l,1)}=(w_{jk}^{(l,1)})_{m_{l-1}\times n_l}$ 为将第 $l-1$ 个自编码器输出连接到第 $l$ 个编码器隐藏神经元的权重矩阵；$b^{(l,1)}=[b_1^{(l,1)}\quad\cdots\quad b_{n_1}^{(l,1)}]$ 为第 $l$ 个自编码器隐藏层的偏置向量。式 (6.40)、(6.41) 可改写为矩阵形式：
+\begin{equation}
+z^{(l,1)}=W^{(l,1)}a^{(l-1,1)}+b^{(l,1)},
+\tag{6.42}
+\end{equation}
+以及
+\begin{equation}
+a^{(l,1)}=\sigma(z^{(l,1)}),
+\tag{6.43}
+\end{equation}
+其中，$z^{(l,1)}=[z_1^{(l,1)}\quad\cdots\quad z_{n_1}^{(l,1)}]^T$，$a^{(l,1)}=[a_1^{(l,1)}\quad\cdots\quad a_{n_1}^{(l,1)}]^T$；$\sigma(z)$ 表示逐元素应用非线性函数，包括逻辑 Sigmoid 函数。
+
+类似地，对于第 $l$ 个自编码器的输出层，将该自编码器隐藏层第 $k$ 个神经元到其输出层第 $j$ 个神经元的连接权重（解码参数）记为 $w_{jk}^{(l,2)}$，输出层第 $j$ 个神经元的偏置记为 $b_j^{(l,2)}$。该输出神经元的加权输入与激活值分别记为 $z_j^{(l,2)}$ 和 $a_j^{(l,2)}$。类似于式 (6.42)、(6.43)，得到
+\begin{equation}
+z_j^{(l,2)}=\sum_{k=1}^{n_1}w_{jk}^{(l,2)}a_k^{(l,1)}+b_j^{(l,2)},\quad j=1,\ldots,m_1,
+\tag{6.44}
+\end{equation}
+\begin{equation}
+a_j^{(l,2)}=\sigma(z_j^{(l,2)}).
+\tag{6.45}
+\end{equation}
+同样，式 (6.44)、(6.45) 的矩阵形式为
+\begin{equation}
+z^{(l,2)}=W^{(l,2)}x+b^{(l,2)},
+\tag{6.46}
+\end{equation}
+以及
+\begin{equation}
+a^{(l,2)}=\sigma(z^{(l,2)}),
+\tag{6.47}
+\end{equation}
+其中，$z^{(l,2)}=[z_1^{(l,2)}\quad\cdots\quad z_{m_l}^{(l,2)}]^T$，$a^{(l,2)}=[a_1^{(l,2)}\quad\cdots\quad a_{m_l}^{(l,2)}]^T$，$W^{(l,2)}=(w_{jk}^{(l,2)})_{n_l\times m_l}$，$b^{(l,2)}=[b_1^{(l,2)}\quad\cdots\quad b_{m_l}^{(l,2)}]^T$。

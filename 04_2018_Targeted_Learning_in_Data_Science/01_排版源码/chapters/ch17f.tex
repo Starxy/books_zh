@@ -1,0 +1,110 @@
+% 原书分章 PDF 第 18—20 页；第 17.3.3 小节。
+\subsection{TMLE}
+
+为尽可能取得有限样本增益，并在近似正值性违背时给出更稳定的估计，可利用代入原理。TMLE 给出一种基于代入的估计量，同时满足 EIC 方程，因而在模型误设下仍保持无偏。概括而言，我们的策略如下：对 $\bar Q^{\mathbf a,\mathbf a'}(P_0)$ 的初始估计量 $\bar Q_n^{\mathbf a,\mathbf a'}$，沿经过该初始估计量、且相对于 $\Psi^{\mathbf a,\mathbf a'}(P_0)$ 最不利的子模型，最小化预先指定的损失，以进行靶向更新；然后，在更新后的估计量 $\bar Q_n^{*,\mathbf a,\mathbf a'}$ 处计算 $\Psi^{\mathbf a,\mathbf a'}$，得到参数的代入估计量。这一更新过程的一个附带结果是，$\bar p_n$ 和 $\bar Q_n^{*,\mathbf a,\mathbf a'}$ 满足
+\[
+ P_nD^{*,\mathbf a,\mathbf a'}\bigl(\bar Q_n^{*,\mathbf a,\mathbf a'},\bar p_n\bigr)=0,
+\]
+因而，估计量 $\Psi^{\mathbf a,\mathbf a'}(\bar Q_n^{*,\mathbf a,\mathbf a'})$ 具有定理 17.1 和推论 17.2 所述的多重稳健性。
+
+根据式 (17.13) 所指出的嵌套关系，为更新 $\bar Q_{L_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{Z_t}^{\mathbf a,\mathbf a'}$ 和 $\bar Q_{R_t}^{\mathbf a,\mathbf a'}$ 的估计量，我们采用以下损失函数：
+\begin{equation}
+\begin{aligned}
+ L(\bar Q_{L_t}^{\mathbf a,\mathbf a'})
+ &\equiv-\bigl\{\bar Q_{R_{t+1}}^{\mathbf a,\mathbf a'}\log\bigl(\bar Q_{L_t}^{\mathbf a,\mathbf a'}\bigr)\\
+ &\qquad{}+(1-\bar Q_{R_{t+1}}^{\mathbf a,\mathbf a'})\log\bigl(1-\bar Q_{L_t}^{\mathbf a,\mathbf a'}\bigr)\bigr\},\\
+ L(\bar Q_{Z_t}^{\mathbf a,\mathbf a'})
+ &\equiv-\bigl\{\bar Q_{L_t}^{\mathbf a,\mathbf a'}\log\bigl(\bar Q_{Z_t}^{\mathbf a,\mathbf a'}\bigr)\\
+ &\qquad{}+(1-\bar Q_{L_t}^{\mathbf a,\mathbf a'})\log\bigl(1-\bar Q_{Z_t}^{\mathbf a,\mathbf a'}\bigr)\bigr\},\\
+ L(\bar Q_{R_t}^{\mathbf a,\mathbf a'})
+ &\equiv-\bigl\{\bar Q_{Z_t}^{\mathbf a,\mathbf a'}\log\bigl(\bar Q_{R_t}^{\mathbf a,\mathbf a'}\bigr)\\
+ &\qquad{}+(1-\bar Q_{Z_t}^{\mathbf a,\mathbf a'})\log\bigl(1-\bar Q_{R_t}^{\mathbf a,\mathbf a'}\bigr)\bigr\}.
+\end{aligned}
+\tag{17.18}
+\end{equation}
+回顾前文，经过线性变换后，结局界于 0 和 1 之间，故这些损失函数均有良好定义。分别经过 $\bar Q_{L_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{Z_t}^{\mathbf a,\mathbf a'}$ 和 $\bar Q_{R_t}^{\mathbf a,\mathbf a'}$ 的相应最不利子模型，定义为
+\begin{equation}
+\begin{aligned}
+ \bar Q_{L_t}^{\mathbf a,\mathbf a'}(\epsilon)
+ &=\expit\bigl(\logit\bar Q_{L_t}^{\mathbf a,\mathbf a'}+\epsilon\bigr),\\
+ \bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\epsilon)
+ &=\expit\bigl(\logit\bar Q_{Z_t}^{\mathbf a,\mathbf a'}+\epsilon\bigr),\\
+ \bar Q_{R_t}^{\mathbf a,\mathbf a'}(\epsilon)
+ &=\expit\bigl(\logit\bar Q_{R_t}^{\mathbf a,\mathbf a'}+\epsilon\bigr),
+\end{aligned}
+\tag{17.19}
+\end{equation}
+并且注意，
+\[
+\begin{aligned}
+ &\left.\frac{\partial}{\partial\epsilon}
+ H_{L_t}^{\mathbf a,\mathbf a'}(p_A,p_Z)
+ L\bigl(\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\epsilon)\bigr)\right|_{\epsilon=0}
+ =D_{L_t}^{\mathbf a,\mathbf a'}(\bar Q^{\mathbf a,\mathbf a'},p_A,p_Z),\\
+ &\left.\frac{\partial}{\partial\epsilon}
+ H_{Z_t}^{\mathbf a,\mathbf a'}(p_A,p_L,p_R)
+ L\bigl(\bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\epsilon)\bigr)\right|_{\epsilon=0}
+ =D_{Z_t}^{\mathbf a,\mathbf a'}(\bar Q^{\mathbf a,\mathbf a'},p_A,p_L,p_R),\\
+ &\left.\frac{\partial}{\partial\epsilon}
+ H_{R_t}^{\mathbf a,\mathbf a'}(p_A,p_Z)
+ L\bigl(\bar Q_{R_t}^{\mathbf a,\mathbf a'}(\epsilon)\bigr)\right|_{\epsilon=0}
+ =D_{R_t}^{\mathbf a,\mathbf a'}(\bar Q^{\mathbf a,\mathbf a'},p_A,p_Z).
+\end{aligned}
+\]
+
+现在可以描述 TMLE 算法。它按 $t$ 递减的顺序，依次对 $\bar Q_{L_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{Z_t}^{\mathbf a,\mathbf a'}$ 和 $\bar Q_{R_t}^{\mathbf a,\mathbf a'}$ 的估计进行靶向。
+\begin{enumerate}[label=\arabic*.]
+ \item 获得估计量 $p_{n,A}$、$p_{n,Z}$、$p_{n,L}$、$p_{n,R}$。在高维情形中，可用第 17.2 节定义的 $\gamma$ 的估计量 $\gamma_n$，替代 $p_{n,Z}$、$p_{n,L}$、$p_{n,R}$ 的估计。利用这些估计量得到 $H_{n,L_t}^{\mathbf a,\mathbf a'}$、$H_{n,Z_t}^{\mathbf a,\mathbf a'}$ 和 $H_{n,R_t}^{\mathbf a,\mathbf a'}$ 的估计，见式 (17.10)、式 (17.11) 和式 (17.12)。
+ \item 初始化 $\bar Q_{R_{\tau+1}}\mathbf a,\mathbf a'\equiv Y_\tau$。
+ \item 按 $t=\tau,\ldots,1$ 递减的顺序，在每个时点 $t$，上一阶段已得到靶向估计量 $\bar Q_{n,R_{t+1}}^{*,\mathbf a,\mathbf a'}$。现在依次按以下方法得到靶向估计量 $\bar Q_{n,L_t}^{*,\mathbf a,\mathbf a'}$、$\bar Q_{n,Z_t}^{*,\mathbf a,\mathbf a'}$ 和 $\bar Q_{n,R_t}^{*,\mathbf a,\mathbf a'}$。
+ \begin{enumerate}[label=(\alph*),leftmargin=2.4em]
+  \item 在时点 $t$ 仍未删失的观测中，将
+  \[
+   \bar Q_{n,R_{t+1}}^{*,\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)
+  \]
+  对观测值 $(\mathbf A_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$ 回归。然后，对这些未删失观测，在其观测到的中介与协变量历史 $\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1}$，以及干预暴露 $\mathbf A_t=\mathbf a_t$ 处，对拟合函数求值。由此为这些未删失个体得到估计 $\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$。用 $\bar Q_{n,L_t}^{*,\mathbf a,\mathbf a'}\equiv\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}(\epsilon_{n,L_t})$ 更新该估计，其中
+  \[
+   \epsilon_{n,L_t}\equiv\argmin_\epsilon
+   P_nH_{L_t}^{\mathbf a,\mathbf a'}(\bar p_n)
+   L\bigl(\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}(\epsilon)\bigr).
+  \]
+  该 $\epsilon_{n,L_t}$ 是加权 logistic 回归的系数：将被求期望的量 $\bar Q_{n,R_{t+1}}^{*,\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)$ 对仅含截距的模型回归，偏移项为
+  \[
+   \logit\bigl(\bar Q_{n,L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})\bigr),
+  \]
+  权重为 $H_{L_t}^{\mathbf a,\mathbf a'}(\bar p_n)(\mathbf A_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$。
+  \item 接着，为获得初始估计量 $\bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}$，在时点 $t$ 仍未删失的观测中，将上面构造的靶向估计
+  \[
+   \bar Q_{n,L_t}^{*,\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})
+  \]
+  对 $\mathbf A_t,\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}$ 回归。然后，对这些未删失观测，在其观测到的中介与协变量历史 $\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}$，以及干预后的收入水平 $\mathbf A_t=\mathbf a'_t$ 处，对拟合函数求值。由此得到初始估计 $\bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf L_{t-1},\mathbf Z_{t-1})$。用 $\bar Q_{n,Z_t}^{*,\mathbf a,\mathbf a'}\equiv\bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}(\epsilon_{n,Z_t})$ 更新该估计，其中
+  \[
+   \epsilon_{n,Z_t}\equiv\argmin_\epsilon
+   P_nH_{Z_t}^{\mathbf a,\mathbf a'}(\bar p_n)
+   L\bigl(\bar Q_{n,Z_t}^{\mathbf a,\mathbf a'}(\epsilon)\bigr).
+  \]
+  \item 最后，为获得初始估计量 $\bar Q_{n,R_t}^{\mathbf a,\mathbf a'}$，在时点 $t$ 仍未删失的观测中，将上面构造的靶向估计
+  \[
+   \bar Q_{n,Z_t}^{*,\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})
+  \]
+  对 $\mathbf A_t,\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}$ 回归。然后，对这些未删失观测，在其观测到的中介与协变量历史 $\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}$，以及干预后的收入水平 $\mathbf A_t=\mathbf a_t$ 处，对拟合函数求值。由此得到初始估计 $\bar Q_{n,R_t}^{\mathbf a,\mathbf a'}(\mathbf R_{t-1},\mathbf L_{t-1},\mathbf Z_{t-1})$。用 $\bar Q_{n,R_t}^{*,\mathbf a,\mathbf a'}\equiv\bar Q_{n,R_t}^{\mathbf a,\mathbf a'}(\epsilon_{n,R_t})$ 更新该估计，其中
+  \[
+   \epsilon_{n,R_t}\equiv\argmin_\epsilon
+   P_nH_{R_t}^{\mathbf a,\mathbf a'}(\bar p_n)
+   L\bigl(\bar Q_{n,R_t}^{\mathbf a,\mathbf a'}(\epsilon)\bigr).
+  \]
+ \end{enumerate}
+ \item 按步骤 3，从 $t=\tau$ 到 $t=1$ 依次运行算法后，对 $n$ 个观测中的每一个，都已得到靶向估计 $\bar Q_{n,R_1}^{*,\mathbf a,\mathbf a'}(L_0)$。
+\end{enumerate}
+$\Psi^{\mathbf a,\mathbf a'}$ 的 TMLE 为
+\begin{equation}
+ \psi_n^{\mathrm{TMLE}}\equiv\Psi^{\mathbf a,\mathbf a'}(\bar Q_n^{*,\mathbf a,\mathbf a'})
+ =\frac1n\sum_{i=1}^n\bar Q_{n,R_1}^{*,\mathbf a,\mathbf a'}(L_{0,i}).
+ \tag{17.20}
+\end{equation}
+
+根据构造，这一估计量满足 $P_nD^{*,\mathbf a,\mathbf a'}(\bar Q_n^{*,\mathbf a,\mathbf a'},\bar p_n)=0$。因此，它继承了第 17.2 节所述的 EIC 稳健性。在关于估计有效影响曲线的通常经验过程条件下，若二阶余项为 $o_P(n^{-1/2})$，即所有干扰参数均得到一致估计，则它在数据生成分布 $P_0$ 处渐近线性且有效，其影响曲线为 $D^{*,\mathbf a,\mathbf a'}(P_0)$。可用样本方差
+\[
+ \widehat{\Var}D^{*,\mathbf a,\mathbf a'}\bigl(\bar Q_n^{*,\mathbf a,\mathbf a'},\bar p_n\bigr)
+\]
+估计 $\sqrt n\bigl(\psi_n^{\mathrm{TMLE}}-\Psi^{\mathbf a,\mathbf a'}(P_0)\bigr)$ 的渐近方差。它在估计方面具有双重稳健性，但与 IPW 估计量一样，某个估计量不一致会影响它的渐近线性（van der Laan，2014b）。

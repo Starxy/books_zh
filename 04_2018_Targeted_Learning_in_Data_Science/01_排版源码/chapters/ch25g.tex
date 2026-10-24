@@ -1,0 +1,192 @@
+% 原书分章 PDF 第 17—20 页：第 25.5 节及定理 25.4 的完整证明。
+\section{数据自适应带宽选择器结果的推广}
+
+令 $\Psi:\mathcal M\to\mathbb R$ 为感兴趣且不具路径可微性的目标参数。
+令 $\Psi_h:\mathcal M\to\mathbb R$，$h\in\mathbb R_{\geq0}$，
+为逼近 $\Psi$ 的路径可微参数族。这里的逼近是指，
+$\{\Psi_h(P_0)\in\mathbb R:h\in\mathbb R_{\geq0}\}$
+构成 $\Psi(P_0)=\lim_{h\to0}\Psi_h(P_0)$ 的一族路径可微逼近。
+本章此前假定该参数族由核平滑器生成，而本节允许用一般方式定义这一目标参数族。
+由下式定义 $R_{20,h}(P,P_0)$：
+\[
+ \Psi_h(P)-\Psi_h(P_0)=-P_0D_h^*(P)+R_{20,h}(P,P_0),
+\]
+其中 $D_h^*(P)$ 为 $\Psi_h:\mathcal M\to\mathbb R$ 在 $P$ 处的典范梯度。
+假定对某个 $\tilde D_h(P_0)$，有
+$D_h^*(P_0)=h^{-\alpha_0}\tilde D_h(P_0)$，并且当 $h\to0$ 时，
+对某个 $\sigma_0^2$，有 $E_{P_0}\{\tilde D_h(P_0)\}^2\to\sigma_0^2>0$。
+也就是说，对于某个 $\alpha_0>0$，典范梯度的方差的行为如同 $h^{-2\alpha_0}$。
+此外，关于该参数族的偏差，令
+$\Psi_h(P_0)-\Psi(P_0)=h^{J_0}B_0(J_0)+o(h^{J_0})$，
+其中 $J_0>0$，$B_0(J_0)$ 为某一项。
+我们允许 $\alpha_0$ 与 $J_0$ 均未知，且可依赖真实数据分布 $P_0$。
+此前各节采用基于 $d$ 维核的 $\Psi$ 的核平滑逼近，
+其中 $\alpha_0=2d$ 已知，而 $J_0$ 表示 $\Psi(P_0)$ 在 $x_0$ 处未知的底层光滑性。
+
+令 $\sigma_{0h}^2\equiv E_{P_0}\{D_h^*(P_0)\}^2$
+为典范梯度的方差。由上述假设，有
+$\sigma_{0h}^2\approx h^{-2\alpha_0}\sigma_0^2$。
+令 $\sigma_{nh}^2$ 为 $\sigma_{0h}^2$ 的相合估计量，使当 $n\to\infty$ 时，
+$\sigma_{nh}^2/\sigma_{0h}^2$ 依概率趋于 1。
+令 $r_h(n)\equiv(n/\sigma_{hn}^2)^{0.5}$
+表示 $\Psi_h(P_0)$ 的 CV-TMLE 的标准化速率。
+注意，$r_h(n)$ 的行为如同 $h^{\alpha_0}n^{0.5}$。
+令 $\psi_{nh}^*$ 为 CV-TMLE，并假定在适当条件下，
+对任意序列 $h_n\to0$，当 $n\to\infty$ 时，
+\[
+ r_{h_n}(n)(\psi^*_{nh_n}-\psi_{0h_n})\Rightarrow_dN(0,1).
+\]
+可用与上一节分析 CV-TMLE 类似的方法建立这一结果。
+因此，$\psi_{nh}^*$ 的方差的行为如同 $h^{-2\alpha_0}n^{-1}$，
+偏差的行为如同 $h^{J_0}$，从而关于均方误差（MSE）的最优带宽速率为
+\[
+ h_n^*=n^{-1/2(J_0+\alpha_0)}.
+\]
+现在，我们希望与上一节的提议及分析类似，提出数据自适应选择器 $h_n$，
+并建立其行为如同 $h_n^*$ 的结果。
+与上一节一样，我们将以一步估计量为基础构造选择器 $h_n$：
+\[
+ \psi_{nh}^1=E_{B_n}\Psi_h(\mathbf P_{n,B_n})
+ +E_{B_n}P^1_{n,B_n}D_h^*(\mathbf P_{n,B_n}),
+\]
+其中 $\mathbf P_{n,B_n}\in\mathcal M$ 为基于训练样本
+$\{O_i:B_n(i)=0\}$ 的 $P_0$ 估计量。
+对于用户给定的某个序列 $C_n$，令 $h_n$ 为
+\[
+ \frac{d}{dh_n}\psi^1_{nh_n}
+ +C_n\frac{d}{dh_n}\sigma_{nh_n}n^{-0.5}=0
+\]
+的一个解。关于解的存在性与 $C_n$ 的选择，参见上一节的讨论；
+$C_n$ 或者关于 $n$ 一致有界，或者非常缓慢地趋于无穷。
+
+\begin{bookresult}{定理}{25.4}
+作如下假设。
+\begin{itemize}
+\item 对某个 $\tilde D_{1h}(P)$，
+$\frac{d}{dh}D_h^*(P)=h^{-1}\tilde D_{1h}(P)$，
+其中当 $h\to0$ 时，对某个 $\sigma_{10}^2>0$，有
+$h^{2\alpha_0}P_0\{\tilde D_{1h}(P_0)\}^2\to\sigma_{10}^2$。
+换言之，$\tilde D_{1h}(P_0)$ 作为 $h$ 的函数，其行为如同 $D_h^*(P_0)$。
+\item 对任意序列 $h\to0$，有
+\[
+\begin{aligned}
+ E_{B_n}(P^1_{n,B_n}-P_0)\tilde D_{1h_n}(\mathbf P_{n,B_n})
+ &=Z_n/(n^{0.5}h_n^{\alpha_0})\\
+ &\quad+o_P(n^{-0.5}h_n^{-\alpha_0}),
+\end{aligned}
+\]
+其中 $Z_n\Rightarrow_dN(0,\sigma_{01}^2)$。
+\item
+\[
+ h_nE_{B_n}\frac{d}{dh}R_{20,h_n}(\mathbf P_{n,B_n},P_0)
+ =o_P(n^{-0.5}h_n^{-\alpha_0}).
+\]
+\item
+\[
+ -\frac{d}{dh}\sigma_{nh}
+ =h^{-(\alpha_0+1)}c_{nh}+o_P(h^{-(\alpha_0+1)}),
+\]
+其中对于某个 $\delta>0$，$c_{nh}>0$ 关于 $h\in(0,\delta)$ 一致远离零与无穷。
+\item 对任意序列 $h\to0$，有
+\[
+ -\frac{d}{dh}\Psi_h(P_0)
+ \sim c(J_0,h)h^{J_0-1}+o(h^{J_0-1}),
+\]
+其中对于某个 $\delta>0$，$c(J_0,h)$ 关于 $h\in(0,\delta)$ 一致远离零与无穷。
+\end{itemize}
+则
+\[
+ c(J_0,h_n)h_n^{J_0}+o(h_n^{J_0})
+ =n^{-0.5}h_n^{-\alpha_0}
+ \{Z_n-c_{n,h_n}C_n+o_P(1)\}.
+\]
+这证明，若 $\limsup_nC_n<\infty$，则 $h_n$ 通过平衡偏差平方与方差达到最优速率，
+且一般而言，
+\[
+ h_n\sim n^{-1/2(J_0+\alpha_0)}C_n^{1/(J_0+\alpha_0)}.
+\]
+\end{bookresult}
+
+由于 $D_h^*(P_0)=h^{-\alpha_0}\tilde D_h(P_0)$，其中
+$P_0\{\tilde D_h(P_0)\}^2\to\sigma_0^2$，
+关于 $\frac{d}{dh}\sigma_{nh}$ 的第三条假设是合理的。
+类似地，由于
+$\Psi_h(P_0)-\Psi(P_0)=h^{J_0}B_0(J_0)+o(h^{J_0})$，
+第四条假设也是合理的。
+
+\begin{proof}
+我们将按照与定理 25.3 的证明类似的方法分析数据自适应选择器 $h_n$。
+有
+\[
+\begin{aligned}
+ \psi^1_{nh_n}-\Psi_{h_n}(P_0)
+ &=E_{B_n}(P^1_{n,B_n}-P_0)D_{h_n}^*(\mathbf P_{n,B_n})\\
+ &\quad+E_{B_n}R_{20,h_n}(\mathbf P_{n,B_n},P_0).
+\end{aligned}
+\]
+关于 $h$ 在 $h=h_n$ 处求导，并利用 $h_n$ 的定义，得到
+\[
+\begin{aligned}
+ C_n\frac{d}{dh_n}\sigma_{nh_n}/n^{0.5}
+ -\frac{d}{dh_n}\Psi_{h_n}(P_0)
+ &=E_{B_n}(P^1_{n,B_n}-P_0)
+ \frac{d}{dh_n}D_{h_n}^*(\mathbf P_{n,B_n})\\
+ &\quad+E_{B_n}\frac{d}{dh_n}
+ R_{20,h_n}(\mathbf P_{n,B_n},P_0).
+\end{aligned}
+\]
+我们假定 $\frac{d}{dh}D_h^*(P)=h^{-1}\tilde D_{1h}(P)$，
+其中当 $h\to0$ 时，
+$h^{2\alpha_0}P\{\tilde D_{1h}(P)\}^2\to\sigma_1^2$。
+我们假定在正则条件下，有下式；这些条件类似于证明一步估计量
+$\psi^1_{nh}$ 渐近正态性所需的条件：
+\[
+ E_{B_n}(P^1_{n,B_n}-P_0)\tilde D_{1h_n}(\mathbf P_{n,B_n})
+ =Z_n/(n^{0.5}h_n^{\alpha_0})+o_P(1),
+\]
+其中 $Z_n\Rightarrow_dN(0,\sigma_{01}^2)$。
+此外，我们假定
+\[
+ h_nE_{B_n}\frac{d}{dh_n}R_{20,h_n}(\mathbf P_{n,B_n},P_0)
+ =o_P(n^{-0.5}h_n^{-\alpha_0}).
+\]
+由此得到
+\[
+\begin{aligned}
+ -\frac{d}{dh_n}\Psi_{h_n}(P_0)
+ &=h_n^{-1}Z_nn^{-0.5}h_n^{-\alpha_0}
+ +h_n^{-1}o_P(n^{-0.5}h_n^{-\alpha_0})\\
+ &\quad-C_nn^{-0.5}\frac{d}{dh_n}\sigma_{nh_n}.
+\end{aligned}
+\]
+我们还假定
+\[
+ -\frac{d}{dh}\sigma_{nh}=h^{-(\alpha_0+1)}c_{nh},
+\]
+其中序列 $c_{nh}>0$ 远离 0 与 $\infty$。于是得到
+\[
+\begin{aligned}
+ -\frac{d}{dh_n}\Psi_{h_n}(P_0)
+ &=Z_nn^{-0.5}h_n^{-(\alpha_0+1)}
+ +o_P(n^{-0.5}h_n^{-(\alpha_0+1)})\\
+ &\quad-C_nn^{-0.5}c_{nh_n}h_n^{-(\alpha_0+1)}.
+\end{aligned}
+\]
+我们假定
+\[
+ -\frac{d}{dh}\Psi_h(P_0)
+ \sim c(J_0,h)h^{J_0-1}+o(h^{J_0-1}),
+\]
+其中对某个 $\delta>0$，$c(J_0,h)$ 关于 $h\in(0,\delta)$
+一致远离零与无穷。将其代入最后一个等式，得到
+\[
+ c(J_0,h_n)h_n^{J_0}+o(h_n^{J_0})
+ =n^{-0.5}h_n^{-\alpha_0}
+ \{Z_n-c_{n,h_n}C_n+o_P(1)\}.
+\]
+这证明，若 $\limsup_nC_n<\infty$，则 $h_n$ 平衡偏差平方与方差，
+且一般而言，
+\[
+ h_n\sim n^{-1/2(J_0+\alpha_0)}C_n^{1/(J_0+\alpha_0)}.
+\]
+\end{proof}

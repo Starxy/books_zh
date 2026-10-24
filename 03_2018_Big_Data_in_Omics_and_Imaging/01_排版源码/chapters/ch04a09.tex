@@ -1,0 +1,191 @@
+% 原书PDF第63页4.4起至第70页4.5之前。
+\section{基因共表达网络与基因调控网络}
+
+基因表达调控是复杂的生物学过程（Lelli et al. 2012）。大规模调控网络包含数千个相互作用的蛋白质与 RNA 组分，共同调控基因转录、协调细胞功能（Äijö and Bonneau 2017）。推断大规模调控网络，为全面认识调控相互作用、理解生物学活动、设计有效治疗方法、识别复杂疾病的药物靶点及发现新通路提供了通用框架。通过实验构建基因调控网络存在明显局限：耗时、繁琐、昂贵，尤其缺乏可重复性（Liu et al. 2016）。揭示并建模基因调控网络，是基因组学与计算生物学长期面临的挑战。为推断网络，人们已发展了多种统计方法与计算算法。方法的多样性来自调控网络模型、基因组与表观基因组数据生成技术及实验设计的多样性。本节侧重介绍由表达数据推断调控网络的方法。
+
+基因调控网络推断有无监督与有监督两类基本方法。无监督方法包括共表达网络（Wang et al. 2017；Hong et al. 2013）、常微分方程（Noh and Gunawan 2016；Zhu et al. 2012）、高斯图模型（Menéndez et al. 2010；Krämer et al. 2009；Belilovsky et al. 2015；Kalyagin et al. 2017），以及贝叶斯网络（Liu et al. 2016；Akutekwe and Seker 2015）。
+
+\subsection{用 CCA 与 FCCA 从 RNA-seq 数据构建共表达网络}
+基因共表达网络常用于提取共同受调控基因群的重要信息，这些基因在调控过程中起核心作用。共表达网络能够全面刻画环境扰动下转录组各组分之间的关系，有助于认识基因功能、生物学过程、转录组整体结构及复杂疾病机制。
+
+加权相关网络分析、互信息相关网络、协方差选择、稀疏图模型与偏相关等共表达网络构建方法，主要针对微阵列表达数据设计。它们用单个汇总统计值表示基因表达水平，忽略外显子、基因组位置与等位基因间的表达差异信息。为探索基因内部外显子或基因组位置上的表达变异，可用 CCA 构建共表达网络，量化一个基因中外显子或位置层面表达的线性组合，与另一个基因中相应线性组合的相关性。为降维，可采用函数型典型相关分析（FCCA）。针对 ASE，还将介绍用双变量 CCA 构建共表达网络的方法，允许 ASE 水平随 SNP 变化，考虑等位基因特异性剪接及可变转录起始位点造成的复杂模式（Hong et al. 2013）。
+
+\subsubsection{构建基因共表达网络的 CCA 方法}
+将基因共表达网络视为无向图：节点表示基因，连接两个节点的边表示两个基因的共表达关系。构建网络通常通过检测基因表达的成对相关来实现。CCA 寻找两个数据集中变量线性组合之间的最大相关（Hong et al. 2013）。假设一个基因有 $p$ 个外显子或位置，另一个基因有 $q$ 个。以 $x_j^{(1)}$ 表示第一个基因第 $j$ 个外显子的表达，或第 $j$ 个基因组位置的读段计数；对第二个基因类似地定义 $x_j^{(2)}$。令
+\[
+X^{(1)}=[x_1^{(1)},\ldots,x_p^{(1)}]^T,\qquad
+X^{(2)}=[x_1^{(2)},\ldots,x_q^{(2)}]^T.
+\]
+为便于表述，假设 $p\le q$。令
+\[
+X=\begin{bmatrix}X^{(1)}\\X^{(2)}\end{bmatrix},\qquad
+\Sigma=\Cov(X,X)=\begin{bmatrix}\Sigma_{11}&\Sigma_{12}\\\Sigma_{21}&\Sigma_{22}\end{bmatrix}.
+\]
+构建共表达网络时，寻找第一个基因的线性组合 $U=a^TX^{(1)}$ 与第二个基因的线性组合 $V=b^TX^{(2)}$ 之间的最大相关：
+\begin{equation}
+\max_{a,b}\quad\operatorname{corr}(U,V)
+=\frac{a^T\Sigma_{12}b}{\sqrt{a^T\Sigma_{11}a}\sqrt{b^T\Sigma_{22}b}}.
+\tag{4.143}
+\end{equation}
+其解为 Rayleigh 商矩阵的特征值 $\lambda_1\ge\lambda_2\ge\cdots\ge\lambda_p$ 及对应特征向量：
+\[
+R=\Sigma_{11}^{-1/2}\Sigma_{12}\Sigma_{22}^{-1}\Sigma_{21}\Sigma_{11}^{-1/2}.
+\]
+设 $P_k$ 为检验统计量
+\[
+T_k=-\left[n-\frac12(p+q)\right]\sum_{i=k+1}^{p}\log(1-\hat\lambda_i^2)
+\]
+的 $P$ 值，该统计量服从 $\chi^2_{(p-k)(q-k)}$ 分布，$n$ 为检验原假设 $H_0:\lambda_k=\cdots=\lambda_p=0$ 的样本量。赋予连接两个基因的边如下权重：
+\begin{equation}
+w=\frac{\sum_{i=1}^{p}\lambda_iI(\log P_i)}{\sum_{i=1}^{p}I(\log P_i)},
+\tag{4.144}
+\end{equation}
+其中
+\[
+I(\log P)=\begin{cases}1,&P>0.05,\\-\log P,&P\le0.05.\end{cases}
+\]
+用排序过程构建网络：将权重排序，指定阈值，在网络中保留秩大于阈值的边。
+
+\subsubsection{用双变量 CCA 从 ASE 数据构建共表达网络}
+双变量 CCA 可用于 ASE 共表达网络。设 $x_j^{(1)}$ 与 $x_j^{(2)}$ 分别为一个基因第 $j$ 个 SNP 的主要与次要等位基因读段计数，对另一基因类似地定义 $y_j^{(1)}$ 与 $y_j^{(2)}$。令
+\[
+\begin{aligned}
+X&=[x_1^{(1)},x_1^{(2)},\ldots,x_p^{(1)},x_p^{(2)}]^T,\\
+Y&=[y_1^{(1)},y_1^{(2)},\ldots,y_q^{(1)},y_q^{(2)}]^T.
+\end{aligned}
+\]
+定义线性组合 $U=\alpha^TX$ 与 $V=\beta^TX$，其中
+\[
+\begin{aligned}
+\alpha&=[\alpha_1^{(1)},\alpha_1^{(2)},\ldots,\alpha_p^{(1)},\alpha_p^{(2)}]^T,\\
+\beta&=[\beta_1^{(1)},\beta_1^{(2)},\ldots,\beta_q^{(1)},\beta_q^{(2)}]^T.
+\end{aligned}
+\]
+可将它们改写为
+\[
+\begin{aligned}
+U&=[\alpha^{(1)}]^TX^{(1)}+[\alpha^{(2)}]^TX^{(2)},\\
+V&=[\beta^{(1)}]^TY^{(1)}+[\beta^{(2)}]^TY^{(2)},
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+\alpha^{(1)}&=[\alpha_1^{(1)},\ldots,\alpha_p^{(1)}]^T,&
+\alpha^{(2)}&=[\alpha_1^{(2)},\ldots,\alpha_p^{(2)}]^T,\\
+\beta^{(1)}&=[\beta_1^{(1)},\ldots,\beta_q^{(1)}]^T,&
+\beta^{(2)}&=[\beta_1^{(2)},\ldots,\beta_q^{(2)}]^T,\\
+X^{(1)}&=[x_1^{(1)},\ldots,x_p^{(1)}]^T,&
+X^{(2)}&=[x_1^{(2)},\ldots,x_p^{(2)}]^T,\\
+Y^{(1)}&=[y_1^{(1)},\ldots,y_q^{(1)}]^T,&
+Y^{(2)}&=[y_1^{(2)},\ldots,y_q^{(2)}]^T.
+\end{aligned}
+\]
+定义协方差矩阵
+\[
+\Sigma=\begin{bmatrix}\Sigma_{xx}&\Sigma_{xy}\\\Sigma_{yx}&\Sigma_{yy}\end{bmatrix},
+\]
+其中
+\[
+\begin{aligned}
+\Sigma_{xx}&=\begin{bmatrix}\Sigma_{x^{(1)}x^{(1)}}&\Sigma_{x^{(1)}x^{(2)}}\\\Sigma_{x^{(2)}x^{(1)}}&\Sigma_{x^{(2)}x^{(2)}}\end{bmatrix},\\
+\Sigma_{xy}&=\Sigma_{yx}^T=\begin{bmatrix}\Sigma_{x^{(1)}y^{(1)}}&\Sigma_{x^{(1)}y^{(2)}}\\\Sigma_{x^{(2)}y^{(1)}}&\Sigma_{x^{(2)}y^{(2)}}\end{bmatrix},\\
+\Sigma_{yy}&=\begin{bmatrix}\Sigma_{y^{(1)}y^{(1)}}&\Sigma_{y^{(1)}y^{(2)}}\\\Sigma_{y^{(2)}y^{(1)}}&\Sigma_{y^{(2)}y^{(2)}}\end{bmatrix}.
+\end{aligned}
+\]
+CCA 寻找最大相关：
+\begin{equation}
+\max_{\alpha,\beta}\quad\operatorname{corr}(U,V)
+=\frac{\alpha^T\Sigma_{xy}\beta}{\sqrt{\alpha^T\Sigma_{xx}\alpha\sqrt{\beta^T\Sigma_{yy}\beta}}},
+\tag{4.145}
+\end{equation}
+其中
+\[
+\alpha=\begin{bmatrix}\alpha^{(1)}\\\alpha^{(2)}\end{bmatrix},\qquad
+\beta=\begin{bmatrix}\beta^{(1)}\\\beta^{(2)}\end{bmatrix}.
+\]
+优化问题 (4.145) 的解，是下列矩阵的特征向量，相应特征值为 $\lambda_1\ge\lambda_2\ge\cdots\ge\lambda_{2p}$：
+\[
+R=\Sigma_{xx}^{-1/2}\Sigma_{xy}\Sigma_{yy}^{-1}\Sigma_{yx}\Sigma_{xx}^{-1/2}.
+\]
+再次设 $P_k$ 为统计量
+\[
+T_k=-[n-(p+q)]\sum_{i=k+1}^{2p}\log(1-\hat\lambda_i^2)
+\]
+的 $P$ 值，该统计量服从 $\chi^2_{(2p-k)(2q-k)}$ 分布，$n$ 为检验原假设 $H_0:\lambda_k=\cdots=\lambda_{2p}=0$ 的样本量。连接两个基因的边权重为
+\begin{equation}
+w=\frac{\sum_{i=1}^{2p}\lambda_iI(\log P_i)}{\sum_{i=1}^{2p}I(\log P_i)},
+\tag{4.146}
+\end{equation}
+其中
+\[
+I(\log P)=\begin{cases}1,&P>0.05,\\-\log P,&P\le0.05.\end{cases}
+\]
+与单变量 CCA 构建共表达网络类似，对权重排序后，仍用排序过程对网络剪枝。
+
+\subsection{高斯图模型}
+前一节利用相关与典型相关构建共表达网络，它们同时衡量基因对之间的直接与间接交互作用。现在介绍高斯图模型，用偏相关只量化直接交互作用（Krämer et al. 2009）。第1.1节已介绍用于基因型网络的高斯图模型，它们也可用于基因调控网络。高斯图模型为无向图，节点表示变量；在给定其他全部变量后，连接两个节点的边表示两个变量条件相依。在基因调控网络中，每个基因由节点或随机变量表示，边表示调控关系。当且仅当给定网络中其余所有基因表达后，两个基因表达独立时，二者之间没有边。
+
+可用偏相关、浓度矩阵和稀疏回归三种统计工具估计高斯图模型。下面简要讨论，详细说明见第1.1节。假设 $q$ 个基因表达变量组成的向量服从正态分布 $N(0,\Sigma)$。设图 $G=(V,E)$ 包含节点 $V=\{1,\ldots,q\}$ 与无向边，定义 $-(i,j)\equiv\{k:1\le k\ne i,j\le q\}$。基因 $i$ 与 $j$ 表达的偏相关，是给定网络中其他基因表达后的条件相关：
+\begin{equation}
+\rho^{ij}=\operatorname{Corr}(y_i,y_j\mid y_{-(i,j)})
+=\frac{\Cov(y_i,y_j\mid y_{-(i,j)})}
+{[\Var(y_i\mid y_{-(i,j)})\Var(y_j\mid y_{-(i,j)})]^{1/2}},
+\tag{4.147}
+\end{equation}
+其中 $1\le i<j\le q$。在变量（基因表达）服从正态分布的假设下，节点 $i$ 与 $j$ 间有边，当且仅当 $\rho^{ij}\ne0$；这表示给定其余所有基因表达后，$y_i$ 与 $y_j$ 条件相依。因此，可用偏相关估计基因调控网络结构。
+
+设 $\Sigma^{-1}=(\sigma^{ij})_{q\times q}$ 为浓度矩阵或精度矩阵。第1.1节的式 (9.A.4) 表明，
+\begin{equation}
+\rho^{ij}=-\frac{\sigma^{ij}}{\sqrt{\sigma^{ii}\sigma^{jj}}}.
+\tag{4.148}
+\end{equation}
+故浓度矩阵元素 $\sigma^{ij}=0$ 意味着节点 $i$ 与 $j$ 之间没有边，即给定其他所有基因表达后，这两个基因的表达条件独立。
+
+当样本量远大于变量数时，可以直接以样本协方差矩阵的逆估计浓度矩阵。但若网络变量数多于样本量，样本协方差矩阵可能不可逆。图套索（graphical lasso）利用 $l_1$ 正则化学习无向高斯图模型结构，通过估计稀疏浓度矩阵进行网络建模（Friedman et al. 2007）。
+
+估计高斯图模型的第三种方法是稀疏回归（Dobriban and Fan 2016）。偏相关与回归之间存在已知关系：若
+\[
+y_i=\beta_{ij}y_j+\sum_{k\ne i,j}\beta_{ik}y_k+\varepsilon_i,
+\]
+且 $\varepsilon_i$ 独立于 $y_{(-ij)}$，则
+\[
+\beta_{ij}=\rho^{ij}\sqrt{\frac{\sigma^{jj}}{\sigma^{ii}}}.
+\]
+因此，寻找非零偏相关可表述为回归中的变量选择问题，对损失函数施加 $l_1$ 惩罚。具体地，用于估计浓度矩阵的稀疏回归为
+\begin{equation}
+L(\beta,\lambda)=\frac12\left(\sum_{i=1}^{q}\left\lVert Y_i-\sum_{j\ne i}\beta_{ij}Y_j\right\rVert^2\right)
++\lambda\sum_{1\le i<j\le q}|\beta_{ij}|\bigr),
+\tag{4.149}
+\end{equation}
+其中 $Y_i=[y_{i1},\ldots,y_{in}]^T$ 为第 $i$ 个变量的样本，$\lambda$ 为控制惩罚强度的参数。较大的 $\lambda$ 产生更稀疏但拟合较差的回归，较小的 $\lambda$ 则拟合较好，但稀疏程度较低。
+
+\subsection{真实数据应用}
+推断基因共表达网络可简单概括为检测基因表达的成对相关。用集中度、同配性和度分布三种图拓扑度量，评价网络构建方法的性能。下面简要介绍。
+
+\par\medskip\noindent\textbf{网络集中度（network centralization）。}
+它衡量网络围绕特定节点集中的程度，基于节点中心性的定义。对无向图 $G=(V,E)$，网络集中度定义为
+\[
+C_G=\sum_{v\in V}\left(\max_{v'\in V}(c(v'))-c(v)\right),
+\]
+其中 $c(v)$ 为节点 $v$ 的中心性。
+
+\par\medskip\noindent\textbf{同配性（assortativity）。}
+这是评估网络拓扑的重要指标，描述网络中度与度之间的相关。同配系数为正时，网络为同配；为负时，网络为异配。大多数社会网络通常同配，生物网络通常异配，随机网络的同配系数则接近零。无向图的同配系数计算如下：
+\[
+r=\frac{\sum_{jk}jk(e_{jk}-q_jq_k)}{\sum_k k^2q_k-(\sum_k kq_k)^2},
+\]
+其中 $q_k=\sum_j e_{jk}$、$q_j=\sum_k e_{jk}$，$e_{jk}$ 为度分别为 $j$ 与 $k$ 的两个节点连接的概率。
+
+\par\medskip\noindent\textbf{度分布（degree distribution）。}
+许多真实网络的度分布服从幂律分布，具有这一性质的网络也称无标度网络，其中某些节点的度远高于其他节点。无标度性质意味着节点度与下列指数形式成比例：
+\[
+P(d=k)\infty Ak^{-\alpha},
+\]
+其中 $P(d=k)$ 表示节点度为 $k$ 的概率，$\alpha$ 为指数参数。
+
+将 CCA、加权 CCA（WCCA）、图套索（glasso）和稀疏联合回归（Sparse-regression）四种方法，用于从 TCGA 下载的肺鳞状细胞癌（LUSC）数据集，其中有242个样本、20532个基因和239886个外显子。肺癌相关的 KEGG 通路 hsa05223 包含54个基因。删除孤立节点并与筛选后的 TCGA LUSC RNA-seq 数据匹配后，生成一个经 KEGG 整理的网络，包含44个节点与14条边。利用匹配到的44个基因及其相关外显子表达数据，以四种方法构建基因共表达网络。所得网络的拓扑性质见表4.11。
+\input{figures/ch04a_table11}
+
+结果表明，WCCA 与 CCA 共表达网络的拓扑接近 KEGG 数据库中的通路。WCCA、CCA 网络与 KEGG 通路的中心性，均高于 glasso 和稀疏联合回归网络。幂律结果表明，四种方法估计的网络与 KEGG 通路均具有无标度性质。同配性比较表明，只有 CCA 与 WCCA 发现了生物网络的异配性质。相反，glasso 与稀疏联合回归网络的同配系数接近零，或为微小正值，或为微小负值，这通常见于随机网络。
+\FloatBarrier

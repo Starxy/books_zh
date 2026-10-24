@@ -1,0 +1,124 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.2cm}
+
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=0.6cm,inner sep=2pt,draw,fill=white,rounded corners=0pt]
+\tikzstyle{snode} = [minimum width=0.27cm,minimum height=0.18cm,inner sep=2pt,draw,fill=white]
+
+% predictions made by the draft model
+\begin{scope}
+
+\node [lnode,anchor=west] (context) at (0,0) {\small{上下文（$\mathbf{x}, \mathbf{y}_{<i}$）}};
+
+\node [anchor=center] (y1) at ([xshift=1.5*\ssep]context.east) {\color{blue} \small{$\hat{y}_{i+1}$}};
+\node [anchor=center] (y2) at ([xshift=\ssep]y1.center) {\color{blue} \small{$\hat{y}_{i+2}$}};
+\node [anchor=center] (y3) at ([xshift=\ssep]y2.center) {\color{blue} \small{$\hat{y}_{i+3}$}};
+\node [anchor=center] (y4) at ([xshift=\ssep]y3.center) {\color{blue} \small{$\hat{y}_{i+4}$}};
+\node [anchor=center] (y5) at ([xshift=\ssep]y4.center) {\color{blue} \small{$\hat{y}_{i+5}$}};
+
+\draw [->,double] ([xshift=3pt]context.east) -- ([xshift=-4pt]y1.west);
+
+\draw [-] ([yshift=-0.3cm]y1.west) -- ([yshift=-0.3cm]y5.east);
+
+\node [anchor=north,minimum width=5.7cm,minimum height=0.7cm,draw,thick] (draftmodel) at ([yshift=-0.5cm]y3.south) {\small{草稿模型 $\mathrm{Pr}_q(\cdot)$}};
+\draw [->,thick] ([yshift=2pt]draftmodel.north) -- ([yshift=0.4cm]draftmodel.north) node [pos=0.5,right,xshift=0.2cm] (predictlable) {\scriptsize{预测}};
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm,xshift=1cm]draftmodel.south west) {\small{(a) 给定上下文，用草稿模型预测后续 $\tau$ 个词元（$\tau = 5$）}};
+
+\end{scope}
+
+% evaluation by the evaluation model
+\begin{scope}[yshift=-5cm]
+
+\node [lnode,anchor=west] (context) at (0,0) {\small{上下文（$\mathbf{x}, \mathbf{y}_{<i}$）}};
+
+\node [anchor=center] (y1) at ([xshift=1.5*\ssep]context.east) {\color{blue} \small{$\hat{y}_{i+1}$}};
+\node [anchor=center] (y2) at ([xshift=\ssep]y1.center) {\color{blue} \small{$\hat{y}_{i+2}$}};
+\node [anchor=center] (y3) at ([xshift=\ssep]y2.center) {\color{blue} \small{$\hat{y}_{i+3}$}};
+\node [anchor=center] (y4) at ([xshift=\ssep]y3.center) {\color{blue} \small{$\hat{y}_{i+4}$}};
+\node [anchor=center] (y5) at ([xshift=\ssep]y4.center) {\color{blue} \small{$\hat{y}_{i+5}$}};
+
+\draw [->,double] ([xshift=3pt]context.east) -- ([xshift=-4pt]y1.west);
+
+%\draw [-] ([yshift=-0.3cm]y1.west) -- ([yshift=-0.3cm]y5.east);
+
+\node [anchor=north,minimum width=5.7cm,minimum height=0.7cm,draw=gray!30,thick] (draftmodel) at ([yshift=-0.5cm]y3.south) {\color{gray!30} \small{草稿模型 $\mathrm{Pr}_q(\cdot)$}};
+\draw [->,thick,white] ([yshift=2pt]draftmodel.north) -- ([yshift=0.4cm]draftmodel.north);
+
+\node [anchor=south,minimum width=5.7cm,minimum height=0.7cm,draw,thick] (evalmodel) at ([yshift=0.5cm]y3.north) {\small{评估模型 $\mathrm{Pr}_p(\cdot)$}};
+\draw [->,thick] ([yshift=-2pt]evalmodel.south) -- ([yshift=-0.4cm]evalmodel.south) node [pos=0.5,right,xshift=0.2cm] (evaluatelable) {\scriptsize{评价}};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,very thick,inner sep=1pt] [fit = (y1) (y5)] (predictionbox) {};
+\end{pgfonlayer}
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm,xshift=1cm]draftmodel.south west) {\small{(b) 使用评估模型评价预测词元}};
+
+\end{scope}
+
+% determining accepted guesses
+\begin{scope}[yshift=-10cm]
+
+\node [lnode,anchor=west] (context) at (0,0) {\small{上下文（$\mathbf{x}, \mathbf{y}_{<i}$）}};
+
+\node [anchor=center] (y1) at ([xshift=1.5*\ssep]context.east) {\color{blue} \small{$\hat{y}_{i+1}$}};
+\node [anchor=center] (y2) at ([xshift=\ssep]y1.center) {\color{blue} \small{$\hat{y}_{i+2}$}};
+\node [anchor=center] (y3) at ([xshift=\ssep]y2.center) {\color{blue} \small{$\hat{y}_{i+3}$}};
+\node [anchor=center] (y4) at ([xshift=\ssep]y3.center) {\color{blue} \small{$\hat{y}_{i+4}$}};
+\node [anchor=center] (y5) at ([xshift=\ssep]y4.center) {\color{blue} \small{$\hat{y}_{i+5}$}};
+
+\draw [->,double] ([xshift=3pt]context.east) -- ([xshift=-4pt]y1.west);
+
+%\draw [-] ([yshift=-0.3cm]y1.west) -- ([yshift=-0.3cm]y5.east);
+
+\node [anchor=north,minimum width=5.7cm,minimum height=0.7cm,draw=gray!30,thick] (draftmodel) at ([yshift=-0.5cm]y3.south) {\color{gray!30} \small{草稿模型 $\mathrm{Pr}_q(\cdot)$}};
+\draw [->,thick,white] ([yshift=2pt]draftmodel.north) -- ([yshift=0.4cm]draftmodel.north);
+
+\node [anchor=south,minimum width=5.7cm,minimum height=0.7cm,draw=gray!30,thick] (evalmodel) at ([yshift=0.5cm]y3.north) {\color{gray!30} \small{评估模型 $\mathrm{Pr}_p(\cdot)$}};
+\draw [->,thick,white] ([yshift=-2pt]evalmodel.south) -- ([yshift=-0.4cm]evalmodel.south);
+
+\begin{pgfonlayer}{background}
+\node [draw=blue,dotted,very thick,inner sep=1pt] [fit = (y1) (y3)] (predictionbox) {};
+\node [draw=red,dotted,very thick,inner sep=1pt] [fit = (y4) (y5)] (predictionbox2) {};
+\end{pgfonlayer}
+
+\node [anchor=south] (acceptedlabel) at (predictionbox.north) {\color{blue} \scriptsize{接受}};
+\node [anchor=south] (rejectedlabel) at (predictionbox2.north) {\color{red} \scriptsize{拒绝}};
+\draw [-,red] ([yshift=-2pt,xshift=3pt]predictionbox2.north west) -- ([yshift=2pt,xshift=-3pt]predictionbox2.south east);
+\draw [-,red] ([yshift=-2pt,xshift=-3pt]predictionbox2.north east) -- ([yshift=2pt,xshift=3pt]predictionbox2.south west);
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm,xshift=1cm]draftmodel.south west) {\small{(c) 确定接受的词元数}};
+
+\end{scope}
+
+% predicting a new token
+\begin{scope}[yshift=-15cm]
+
+\node [lnode,anchor=west] (context) at (0,0) {\small{上下文（$\mathbf{x}, \mathbf{y}_{<i}$）}};
+
+\node [anchor=center] (y1) at ([xshift=1.5*\ssep]context.east) {\color{blue} \small{$\hat{y}_{i+1}$}};
+\node [anchor=center] (y2) at ([xshift=\ssep]y1.center) {\color{blue} \small{$\hat{y}_{i+2}$}};
+\node [anchor=center] (y3) at ([xshift=\ssep]y2.center) {\color{blue} \small{$\hat{y}_{i+3}$}};
+\node [anchor=center,fill=gray!30] (y4) at ([xshift=\ssep]y3.center) {\color{black} \small{$\bar{y}_{i+4}$}};
+
+\draw [->,double] ([xshift=3pt]context.east) -- ([xshift=-4pt]y1.west);
+
+%\draw [-] ([yshift=-0.3cm]y1.west) -- ([yshift=-0.3cm]y5.east);
+\draw [<-,thick] ([yshift=2pt]y4.north) -- ([yshift=0.45cm]y4.north);
+
+\node [anchor=north,minimum width=5.7cm,minimum height=0.7cm,draw=gray!30,thick] (draftmodel) at ([yshift=-0.5cm]y3.south) {\color{gray!30} \small{草稿模型 $\mathrm{Pr}_q(\cdot)$}};
+\draw [->,thick,white] ([yshift=2pt]draftmodel.north) -- ([yshift=0.4cm]draftmodel.north);
+
+\node [anchor=south,minimum width=5.7cm,minimum height=0.7cm,draw,thick] (evalmodel) at ([yshift=0.5cm]y3.north) {\small{评估模型 $\mathrm{Pr}_p(\cdot)$}};
+\draw [->,thick,white] ([yshift=-2pt]evalmodel.south) -- ([yshift=-0.4cm]evalmodel.south);
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm,xshift=1cm]draftmodel.south west) {\small{(d) 使用评估模型在已接受词元之后预测一个新词元}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

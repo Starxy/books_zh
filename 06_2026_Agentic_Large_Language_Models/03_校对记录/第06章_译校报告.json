@@ -1,0 +1,402 @@
+{
+  "chapter": 6,
+  "title_zh": "大语言模型中的多步推理",
+  "status": "complete",
+  "page_count": 22,
+  "page_count_scope": "单章独立编译，正文至第 16 页，随附原文参考文献为第 17–22 页。",
+  "source": {
+    "effective_tex": "work/agentic/active/part2/06_reasoning.tex",
+    "effective_source_lines": 471,
+    "assets_directory": "work/agentic/en/figures/",
+    "source_chapter_pdf_used": false,
+    "figure_pdfs_used": [
+      "figures/cot2.pdf",
+      "figures/selfconsistency.pdf"
+    ],
+    "bibliography": "保留原文 bibliographystyle 与 bibliography 调用，使用工程中从原包复制的 part2/06_reasoning.bbl；未改写参考文献。"
+  },
+  "file_list": [
+    "01_排版源码/part2/06_reasoning.tex",
+    "01_排版源码/figures_zh/ch06/cot_zh.tex",
+    "01_排版源码/figures_zh/ch06/selfconsistency_zh.tex",
+    "01_排版源码/figures_zh/ch06/totcode_zh.tex",
+    "01_排版源码/figures_zh/ch06/tot_example_zh.tex",
+    "01_排版源码/figures_zh/ch06/reasoning_structures_zh.tex",
+    "01_排版源码/figures_zh/ch06/selfrefine_zh.tex",
+    "01_排版源码/figures_zh/ch06/reflexion_zh.tex",
+    "01_排版源码/figures_zh/ch06/buffer_of_thoughts_zh.tex",
+    "03_校对记录/第06章_译校报告.json"
+  ],
+  "coverage": "全部有效正文逐段译出，包括 6 项学习目标、3 节、10 小节、6 小小节、11 个段标题、数学文字题及其解答、提示示例、全部 5 条脚注、9 幅图与题注、结语及参考文献调用。有效原文没有独立 example 环境、练习节或表格；没有另增或省略这些结构。",
+  "structure_checks": {
+    "chapter": {
+      "source_count": 1,
+      "translation_count": 1,
+      "count_match": true
+    },
+    "section": {
+      "source_count": 3,
+      "translation_count": 3,
+      "count_match": true
+    },
+    "subsection": {
+      "source_count": 10,
+      "translation_count": 10,
+      "count_match": true
+    },
+    "subsubsection": {
+      "source_count": 6,
+      "translation_count": 6,
+      "count_match": true
+    },
+    "paragraph": {
+      "source_count": 11,
+      "translation_count": 11,
+      "count_match": true
+    },
+    "item": {
+      "source_count": 6,
+      "translation_count": 6,
+      "count_match": true
+    },
+    "label": {
+      "source_count": 27,
+      "translation_count": 27,
+      "ordered_calls_match": true
+    },
+    "references": {
+      "source_count": 22,
+      "translation_count": 22,
+      "ordered_calls_match": true
+    },
+    "citations": {
+      "source_count": 83,
+      "translation_count": 83,
+      "ordered_calls_match": true
+    },
+    "caption": {
+      "source_count": 9,
+      "translation_count": 9,
+      "count_match": true
+    },
+    "footnote": {
+      "source_count": 5,
+      "translation_count": 5,
+      "count_match": true
+    },
+    "bibliography_calls": {
+      "source_count": 2,
+      "translation_count": 2,
+      "ordered_calls_match": true
+    },
+    "environment_sequence_match": true,
+    "verbatim_prompt": {
+      "source_count": 1,
+      "translation_count": 1,
+      "exact_match": true
+    },
+    "math": {
+      "source_count": 16,
+      "translation_count": 16,
+      "all_source_expressions_preserved_verbatim_with_multiplicity": true,
+      "display_math_preserved": "$$f(p)\\rightarrow a.$$ 原样保留。",
+      "ordering_note": "只有同一句中输入提示 p 与答案 a 的出现先后，随中文语序调整；所有数学表达式和出现次数不变。"
+    },
+    "forbidden_inference_terms_found": false,
+    "untranslated_prose_lines_found": false,
+    "audit_file": "01_排版源码/build/ch06_f7ca6ea4/qa/structure_audit.json"
+  },
+  "figures": {
+    "source_assets_inspected": [
+      "cot2.pdf",
+      "selfconsistency.pdf",
+      "ttt.png",
+      "totcode.png",
+      "tot-ex.png",
+      "cot-tot.png",
+      "selfref.png",
+      "reflexion3.png",
+      "bot.png"
+    ],
+    "chinese_redraws": [
+      {
+        "label": "fig:cot / fig:zero / fig:pal",
+        "file": "figures_zh/ch06/cot_zh.tex",
+        "description": "四列分别保留少样本提示、少样本 CoT、零样本 CoT、PAL；上方输入与下方输出逐项对应。Roger 的 5 个网球、两罐各 3 个球，Lisa 的 23/20/6 个苹果，11/27/9 等答案及所有中间算式保留。PAL 的六行原始代码标识符、运算符与数值保留，包括 anwer 拼写。"
+      },
+      {
+        "label": "fig:sc",
+        "file": "figures_zh/ch06/selfconsistency_zh.tex",
+        "description": "保留共同提示中的 3+2=5 停车场示例、Janet 每日 16 个蛋/早餐 3 个/松饼 4 个/每个 2 美元的完整题目、左侧错误单路径，以及右侧三个推理分支。14、18、26、18 美元各分支和最终多数答案 18 美元原样保留。"
+      },
+      {
+        "label": "fig:totcode",
+        "file": "figures_zh/ch06/totcode_zh.tex",
+        "description": "左右重排 ToT-BFS 与 ToT-DFS 两段伪代码，保留输入、参数、集合表达式、筛选/递归/返回语句与算法内部原有的 1/2 标识。G/V 提示调用保留红/绿轮廓与对应箭头。仅翻译自然语言要求及注释，控制关键字和数学标识符保留。"
+      },
+      {
+        "label": "fig:tot-ex",
+        "file": "figures_zh/ch06/tot_example_zh.tex",
+        "description": "保留 4 9 10 13 输入、六个标有运算的树节点、全部剩余数字及省略分支、灰/橙提示箭头、两个 LM、提议/价值提示和生成/评估面板。13-6=7、13-9=4、4+6=10、4*6=24 及右侧 (13-10)*13=3*13=39、10+13+13=36 等原式均保留。树上 left 标签译作“余”，使节点之间保有清楚间距。"
+      },
+      {
+        "label": "fig:tot / fig:bot",
+        "file": "figures_zh/ch06/reasoning_structures_zh.tex",
+        "description": "保留 IO、CoT、CoT-SC、ToT 四面板、全部 30 个输入/输出/中间状态节点、原有分支关系、成功与失败颜色区分及多数投票括号。未为源图中未连接的最终输出额外增加连线。"
+      },
+      {
+        "label": "fig:refine",
+        "file": "figures_zh/ch06/selfrefine_zh.tex",
+        "description": "保留输入、模型 M、反馈、改进四个节点，编号 0/1/2、双侧循环和底部两条说明；中心装饰性图标改为清楚的中文模型节点。"
+      },
+      {
+        "label": "fig:reflexion2",
+        "file": "figures_zh/ch06/reflexion_zh.tex",
+        "description": "保留智能体边界、自我反思/评估者/行动者 LM、轨迹短期记忆、经验长期记忆、环境，以及外部反馈、内部反馈、反思文本、观测/奖励、动作的全部有向关系。"
+      },
+      {
+        "label": "fig:bot2",
+        "file": "figures_zh/ch06/buffer_of_thoughts_zh.tex",
+        "description": "保留单次查询、多次查询与思维缓冲三行结构，N 跳双向迭代、问题蒸馏器、实例化推理、元缓冲区、思维检索、高层思维、输出到缓冲区的蒸馏更新，以及准确率/效率升降和三张表情的比较含义。"
+      }
+    ],
+    "retained_original": {
+      "label": "fig:ttt",
+      "asset": "figures/ttt.png",
+      "reason": "原图没有待译文字，直接保留原棋盘、棋子和获胜斜线，配以完整中文题注。"
+    },
+    "statistical_data_redrawn": false,
+    "code_executed": false
+  },
+  "new_terms": {
+    "prompt-learning": "提示学习",
+    "context window": "上下文窗口",
+    "few-shot learning": "少样本学习",
+    "zero-shot learning": "零样本学习",
+    "many-shot learning": "多样本学习",
+    "self evaluation": "自我评估",
+    "self verification": "自我验证",
+    "self consistency": "自一致性",
+    "majority voting": "多数投票",
+    "self debugging": "自我调试",
+    "program aided language": "程序辅助语言",
+    "knowing-doing gap": "知行鸿沟",
+    "stateful problem": "有状态问题",
+    "semantic compression": "语义压缩",
+    "search-based prompt optimization": "基于搜索的提示优化",
+    "look-ahead": "前瞻",
+    "backtracking": "回溯",
+    "thought generator": "思维生成器",
+    "state evaluator": "状态评估器",
+    "graph of thoughts": "思维图",
+    "thought-template": "思维模板",
+    "buffer of thoughts": "思维缓冲",
+    "meta-buffer": "元缓冲区",
+    "metareasoning": "元推理",
+    "metacognition": "元认知",
+    "problem distiller": "问题蒸馏器",
+    "instantiated reasoning": "实例化推理",
+    "actor / evaluator / reflector": "行动者／评估者／反思者",
+    "symbolic AI": "符号人工智能",
+    "connectionist AI": "联结主义人工智能",
+    "associative memory": "联想记忆",
+    "System 1 / System 2": "系统 1／系统 2"
+  },
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "source_anomalies": [
+    {
+      "location": "Chain of Thought figure (cot2.pdf)",
+      "description": "27 是少样本提示的错误答案，用于与 CoT/PAL 对比，已故意保留。PAL 输出的代码原图写作 anwer = apples - eaten + bought，未擅自改成 answer；提示问句用 Roger，部分回答用 Rogers，译图同样保留这一拼写差异。图中英文语法小错只按原意译出。"
+    },
+    {
+      "location": "Self Consistency figure (selfconsistency.pdf)",
+      "description": "原图左侧将 3+4=7 个已用蛋误作售出数量，得到 14 美元；第二个采样分支把 $2*(16-4-3) 写成 26 美元。这些错误正是单路径与多数投票对照的一部分，所有错误数值、分支及最终 18 美元答案均保留，未进行计算替换。"
+    },
+    {
+      "location": "Multi-step Reasoning Benchmarks / Chain of Thought Prompting",
+      "description": "同章先称 GPT-3-175B 在 GSM8K 上准确率约为 15%，后称 CoT 从 16% 提高到 47%；两处原始数值均保留。Romeo 饼干题中的 two dozen batches 原文措辞略含混，译文按随附 4×2×12/16=6 算式表述为每盘两打，算式完整保留。"
+    },
+    {
+      "location": "In-Context Learning / Long Context Windows",
+      "description": "前文概括上下文窗口通常只有数千词元，后文另谈长上下文与线性架构；译文完整保留这一原始概括，没有按译者所知更新窗口规格。"
+    },
+    {
+      "location": "LLMs are Memory-less Functions",
+      "description": "原文用 vast model of (K,V)-parameters 描述模型知识存储。译文保留 (K,V) 记号及其原始表述，没有自行改写为权重矩阵或 KV 缓存解释。"
+    },
+    {
+      "location": "Retrieval Augmentation and Long Context Windows",
+      "description": "原文将 RAG 展开为 retrieval augmentation for generative AI，非术语表常用的 retrieval-augmented generation。译文中文统一用“检索增强生成”，英文括注仍保留原文展开。"
+    },
+    {
+      "location": "Tree of Thoughts DFS pseudocode",
+      "description": "原图算法签名/输入条件使用 v_th，条件语句使用 v_thres；条件中 V(p_theta,{s'},x) 又出现未列在 DFS 形参中的 x。中文重排保留全部原始标识符与控制流程，供主编判断，不替原作者修正算法。"
+    },
+    {
+      "location": "ReAct / Evolving code generation prompts",
+      "description": "原文直接把 ReAct 描述为强化学习框架，并用 accuracy improvements 描述 BBOB 上提升 11 个百分点。译文保留原有分类与指标说法；这些表述与提示控制、实际参数训练以及优化基准指标之间的界限，可在科学性复核时进一步确认。"
+    },
+    {
+      "location": "Source prose and caption punctuation",
+      "description": "原文 caption 中 Chain of Though 拼写、正文 rule of an agentic harness 等措辞，以及基准测试长句中多余右括号，均按上下文自然译出或整理标点，未增删任何方法、任务或引文。"
+    }
+  ],
+  "compile": {
+    "command": "bundled-python -X utf8 build.py --chapter 6 --name ch06",
+    "passes": 3,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overfull_count": 0,
+    "undefined_references": false,
+    "undefined_citations": false,
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch06_f7ca6ea4/agenticbook.pdf",
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch06_f7ca6ea4/build_report.json"
+  },
+  "visual_qa": {
+    "renderer": "Poppler pdftoppm",
+    "full_document_resolution_dpi": 108,
+    "final_affected_page_resolution_dpi": 140,
+    "full_document_render_directory": "01_排版源码/build/ch06_a5c0a426/qa",
+    "layout_correction_render_directory": "01_排版源码/build/ch06_23664436/qa",
+    "final_affected_page_render": "01_排版源码/build/ch06_f7ca6ea4/qa/page_11.png",
+    "contact_sheet_pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22
+    ],
+    "full_size_pages_inspected": [
+      4,
+      6,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "final_affected_pages_reinspected": [
+      11
+    ],
+    "editor_independent_check": "主编另行渲染第 4、10、11 页，确认 CoT 四列、ToT 两段伪代码、24 点提示图清晰，无越界或节点遮挡，示例数值、错误答案及代码符号均可读。",
+    "checks": "全章页图总览后，全尺寸核对全部关键图、正文数学文字题、函数关系式、五条脚注与参考文献。修正 CoT 输入框底部留白、ToT G/V 反馈箭头穿字、24 点树节点与剩余数字间距、四种推理结构页脚标签间距，以及思维缓冲图中文字与循环箭头的避让。最终树图的“余”标签与运算分行清楚，全部节点及箭头保持原有关系；未见缺字、裁切、公式或图节点遮挡。最后仅重渲染受影响页，未重复重跑未改动页。"
+  },
+  "editorial_choices": {
+    "register": "自然、完整的学术教材译文，以“你”称呼读者。",
+    "terminology": "按更新术语表统一 inference/reasoning 为“推理”；保持“训练流程”“智能体控制框架”等已确认译名。",
+    "counters": "章文件不设计数覆盖；保留源标签、引用、自动计数。ToT 图内部的算法 1/2 是原图标识的重排，不新增算法计数器。",
+    "code": "PAL 标识符与算式、正文 verbatim 提示及算法控制语句仅作排版，不执行示例代码。",
+    "ownership": "仅修改第 6 章、figures_zh/ch06/ 和本报告；构建及 QA 产物留在 build/；共享导言区、构建脚本、原始素材、其他章节与术语表保持只读。"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

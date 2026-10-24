@@ -1,0 +1,145 @@
+% 原书分章 PDF 第 15—18 页：第 5.5 节。
+\section{多维目标参数的通用典范一维子模型}
+
+设 $\Psi:\mathcal M\to H$ 是取值于 Hilbert 空间、且路径可微的目标参数。通常，$H$ 就是赋予标准内积 $\langle x,y\rangle=\sum_{j=1}^d x_jy_j$ 的 $\mathbb R^d$。不过，我们也允许 $\Psi(P)$ 是从 $\tau\subset\mathbb R$ 到 $\mathbb R$ 的函数 $t\mapsto\Psi(P)(t)$，属于赋予内积
+$\langle h_1,h_2\rangle=\int h_1(t)h_2(t)\,d\Lambda(t)$
+的 Hilbert 空间 $L^2(\Lambda)$；其中，$\Lambda$ 是用户给定的正测度，满足 $\int d\Lambda(t)<\infty$。为记号方便，仿照 $\mathbb R^d$ 中内积的常用记法，我们经常把 $\langle h_1,h_2\rangle$ 记为 $h_1^\top h_2$。令 $\|h\|=\sqrt{\langle h,h\rangle}$ 为 Hilbert 空间范数；在 $H=\mathbb R^d$ 时，它就是标准 Euclidean 范数。设 $D^*(P)$ 为典范梯度。若 $H=\mathbb R^d$，它就是 $d$ 维典范梯度
+$D^*(P)=(D_j^*(P):j=1,\ldots,d)$；
+一般情形下，$D^*(P)=(D_t^*(P):t\in\tau)$。令 $L(p)=-\log p$，其中 $p=dP/d\mu$ 是 $P\ll\mu$ 相对于某个控制测度 $\mu$ 的密度。本节将构造一个在 $\epsilon=0$ 处经过 $P$ 的一维子模型 $\{P_\epsilon:\epsilon\geq0\}$，使任意 $\epsilon\geq0$ 都满足
+\begin{equation}
+ \frac{d}{d\epsilon}P_nL(p_\epsilon)=\|P_nD^*(P_\epsilon)\|.
+ \tag{5.6}
+\end{equation}
+此时，一步 TMLE $P_{\epsilon_n}$（其中 $\epsilon_n=\argmin_\epsilon P_nL(P_\epsilon)$，或者把 $\epsilon_n$ 取得足够大，使导数小于例如 $1/n$）满足
+$\left.\frac{d}{d\epsilon}P_nL(P_\epsilon)\right|_{\epsilon=0}=0$
+（或 $<1/n$），从而 $\|P_nD^*(P_{\epsilon_n})\|=0$（或 $<1/n$）。注意，$\|P_nD^*(P_{\epsilon_n})\|=0$ 意味着对所有 $t\in\tau$，都有 $P_nD_t^*(P_{\epsilon_n})=0$；所以，一步 TMLE 解出了所有所需的估计方程。
+
+考虑以下子模型。对于 $\epsilon\geq0$，定义
+% 原书 (5.7) 分母未含 P_n；与本节后文的不同分别照录。
+\begin{equation}
+ \begin{aligned}
+ p_\epsilon
+ &=p\Pi_{[0,\epsilon]}
+ \left(1+\frac{\{P_nD^*(P_x)\}^\top D^*(P_x)}
+ {\|D^*(P_x)\|}\,dx\right)\\
+ &=p\exp\left(\int_0^\epsilon
+ \frac{\{P_nD^*(P_x)\}^\top D^*(P_x)}
+ {\|D^*(P_x)\|}\,dx\right).
+ \end{aligned}
+ \tag{5.7}
+\end{equation}
+
+\begin{bookresult}{定理}{5.4}
+$\{p_\epsilon:\epsilon\geq0\}$ 是一族概率密度。它在 $\epsilon$ 处的得分是 $D_t^*(P_\epsilon)$（$t\in\tau$）的线性组合，因而属于切空间 $T(P_\epsilon)$，且
+\[
+ \frac{d}{d\epsilon}P_nL(P_\epsilon)=\|P_nD^*(P_\epsilon)\|.
+\]
+因此，$\frac{d}{d\epsilon}P_nL(P_\epsilon)=0$ 意味着 $\|P_nD^*(P_\epsilon)\|=0$。
+\end{bookresult}
+
+与之前一样，下面的实用构造将说明：在正则条件下，实际上还有 $\{p_\epsilon:\epsilon\}\subset\mathcal M$，所以它也是一个子模型。
+
+用 $\|D^*(P_x)\|$ 归一化的动机，来自下文的一个实用对应构造；它也揭示了该解析构造背后的重要直觉。不过，可以换用任何其他归一化方式，只要 $\epsilon$ 处的对数似然导数等于 $P_nD^*(P_\epsilon)$ 的某个范数。为说明这一点，考虑 $H=\mathbb R^d$ 的情形。例如，可以考虑以下子模型。设
+$\Sigma_n(P_x)=P_n\{D^*(P_x)D^*(P_x)^\top\}$
+为 $D^*(P_x)$ 的经验协方差矩阵，$\Sigma_n^{-1}(P_x)$ 为其逆矩阵。对于 $\epsilon>0$，可以定义
+\[
+ p_\epsilon=p\exp\left(\int_0^\epsilon
+ \{P_nD^*(P_x)\}^\top\Sigma_n^{-1}D^*(P_x)\,dx\right).
+\]
+此时有
+\[
+ \frac{d}{d\epsilon}P_nL(P_\epsilon)
+ =P_nD^*(P_\epsilon)^\top
+ \Sigma_n(P_\epsilon)^{-1}P_nD^*(P_\epsilon).
+\]
+这看起来是一个经过适当归一化的范数，等于将原始 $D^*(P_\epsilon)$ 正交归一化后的 Euclidean 范数，因此一步 TMLE 仍满足 $\|P_nD^*(P_{\epsilon_n})\|=0$。
+
+我们尚不清楚，这些选择是否会影响所得一步 TMLE 的有限样本表现（渐近性质相同），也不清楚某种选择是否优于另一种。无论如何，所得一步 TMLE 最终都会得到一个满足 $P_nD^*(P_{\epsilon_n})=0$（或 $o_P(1/\sqrt n)$）的 $P_{\epsilon_n}$；而这正是证明 TMLE 渐近有效性所需的唯一关键要素。
+
+\subsection{实用构造}
+
+通过以下局部性质定义局部最不利子模型 $\{p_\delta^{\mathrm{lfm}}:\delta\}\subset\mathcal M$：对所有 $\delta$，
+\[
+ \left.\frac{d}{d\delta}\log p_\delta^{\mathrm{lfm}}
+ \right|_{\delta=0}^{\top}\delta
+ =D^*(P)^\top\delta.
+\]
+对于 $H=\mathbb R^d$，这相当于假定子模型在 $\delta=0$ 处的得分等于典范梯度 $D^*(P)$；对于一般 Hilbert 空间，则表示 $\log p_\epsilon$ 沿方向 $\delta$（$H$ 中的一个函数）的导数等于
+$\langle D^*(P),\delta\rangle=\int D_t^*(P)\delta(t)\,d\Lambda(t)$。
+
+考虑对数似然准则 $P_nL(P_\delta^{\mathrm{lfm}})$，注意它在 $\delta=0$ 处沿方向 $\delta$ 的导数等于
+$\langle P_nD^*(P),\delta\rangle=\{P_nD^*(P)\}^\top\delta$。
+对于一个很小的数 $dx$，我们希望在所有满足 $\|\delta\|\leq dx$ 的 $\delta$ 中使对数似然最大；在局部，这相当于使其线性梯度近似
+\[
+ \delta\mapsto\{P_nD^*(P)\}^\top\delta
+\]
+最大。由 Cauchy--Schwarz 不等式，在 $\|\delta\|\leq dx$ 下，使其最大的选择为
+\[
+ \delta_n^*(P,dx)=\frac{P_nD^*(P)}{\|P_nD^*(P)\|}dx
+ \equiv\delta_n^*(P)dx,
+\]
+其中定义 $\delta_n^*(P)=P_nD^*(P)/\|P_nD^*(P)\|$。现在可以定义更新
+$P_{dx}=P_{\delta_n^*(P,dx)}^{\mathrm{lfm}}$。
+把上式中的 $P$ 换为 $P_{dx}$，即可重复这一过程，得到更新 $P_{2dx}$，一般地得到 $P_{Kdx}$。因此，这一更新过程由下列微分方程定义：
+\[
+ P_{x+dx}=P_{x,\delta_n^*(P_x)dx}^{\mathrm{lfm}},
+\]
+其中，$P_{x,\delta}^{\mathrm{lfm}}$ 是上述局部最不利多维子模型，但现在经过的是 $P_x$，而不是 $P$。
+
+假定局部最不利模型 $h\mapsto p_{x,h}^{\mathrm{lfm}}$ 连续二次可微，且在 $h=0$ 处的得分为 $D^*(P_x)$，则二阶 Taylor 展开给出
+\[
+ \begin{aligned}
+ p_{x,\delta_n^*(P_x)dx}^{\mathrm{lfm}}
+ &=p_x+\left\{
+ \left.\frac{d}{dh}p_{x,h}^{\mathrm{lfm}}\right|_{h=0}
+ \right\}^{\top}\delta_n^*(P_x)dx+O((dx)^2)\\
+ &=p_x\{1+\{\delta_n^*(P_x)\}^\top D^*(P_x)dx\}
+ +O((dx)^2).
+ \end{aligned}
+\]
+于是，在温和的正则条件下，
+\[
+ p_{x+dx}=p_x\{1+\{\delta_n^*(P_x)\}^\top D^*(P_x)dx\}
+ +O((dx)^2).
+\]
+这意味着
+% 原书此式左端为 p_x，而积分上限为 epsilon，照录。
+\[
+ p_x=p\exp\left(\int_0^\epsilon
+ \frac{\{P_nD^*(P_x)\}^\top}{\|P_nD^*(P_x)\|}
+ D^*(P_x)\,dx\right).
+\]
+因此，我们得到了与上文完全相同的解析表示式 (5.7)。由于上述实用构造从 $P\in\mathcal M$ 出发，且始终不离开模型 $\mathcal M$，这就证明：在温和的正则条件下，解析表示式 (5.7) 终究是 $\mathcal M$ 的子模型。不过，为了使实际实现与近似始终留在模型 $\mathcal M$ 中，应采用上述基于真正的局部最不利子模型的实用构造。我们可以用类似定理 5.2 的定理将这一点形式化；不过，这样一个定理将在第 5.7 节中，针对更一般的靶向最小损失估计方法给出。
+
+上述实用构造，使我们能直观理解用 $\|P_nD^*(P_x)\|$ 归一化的原因。
+
+\subsection{MLE 或近似 MLE \texorpdfstring{$\epsilon_n$}{εn} 的存在性}
+
+由于
+\[
+ P_n\log p_\epsilon=\int_0^\epsilon\|P_nD^*(P_x)\|\,dx,
+\]
+其导数等于 $\|P_nD^*(P_\epsilon)\|$，所以对数似然关于 $\epsilon$ 非递减。
+
+如果一维通用典范子模型 $\{p_\epsilon:\epsilon\geq0\}$（式 (5.7)）的实用构造中，局部最不利子模型只包含上确界范数小于某个 $M<\infty$ 的密度（例如模型 $\mathcal M$ 作出了这一假定），那么
+$\sup_{\epsilon\geq0}\sup_{o\in\mathcal O}p_\epsilon(o)<M<\infty$。
+因此，$P_n\log p_\epsilon$ 有上界 $\log M$。先假定
+$\lim_{\epsilon\to\infty}P_n\log p_\epsilon<\infty$。
+于是，对数似然在变得平坦之前严格递增（如果最终会变平的话）。假定对某个 $\delta>0$，
+$\limsup_{x\to\infty}\|P_nD^*(P_x)\|>\delta>0$。
+那么，当 $x$ 趋向无穷时，对数似然也趋向无穷，这与它有上界 $\log M<\infty$ 的假定矛盾。因此，
+$\limsup_{x\to\infty}\|P_nD^*(P_x)\|=0$，
+从而能够找到一个 $\epsilon_n$，使所有 $\epsilon>\epsilon_n$ 都有
+$\|P_nD^*(P_\epsilon)\|<1/n$，满足要求。
+
+现在假定，当 $\epsilon\to\infty$ 时，对数似然趋向无穷，因而违反了上述对数似然有界假定。这可能对应于如下情况：每个 $p_\epsilon$ 都是连续密度，但随着 $\epsilon\to\infty$，$p_\epsilon$ 开始逼近经验分布。即使在这种情况下，我们也预期仍有
+$\|P_nD^*(P_\epsilon)\|\to0$；
+正如生存时间连续密度的非参数极大似然估计量（nonparametric maximum likelihood estimator，NPMLE）能解出其生存函数的有效影响曲线方程一样。
+
+上述子模型的实用构造，沿着对数似然的梯度迭代作局部极大化。它强烈暗示，即使没有上述有界性假定，导数 $\|P_nD^*(P_\epsilon)\|$ 也会在 $\epsilon\to\infty$ 时趋向零，因此所需的 MLE 或近似 MLE 存在。我们对多变量目标参数的一步 TMLE 所作的初步实用实现表明，它的表现良好，寻找所需的极大值或近似极大值并不困难。下一节将展示这种一步 TMLE 的实现及其实际表现。
+
+\subsection{通用的特定得分一维子模型}
+
+在前两个小节中，只需把 $D^*(P)$ 换成用户给定的 $D(P)$，就能得到理论上的一维参数模型 $\{P_\epsilon:\epsilon\}$，使 $\epsilon$ 处的导数 $\frac{d}{d\epsilon}P_nL(P_\epsilon)$ 等于 $\|P_nD(P_\epsilon)\|$；相应的一步 TMLE 就能解出 $P_nD(P_{\epsilon_n})=0$。类似地，给定一个在 $\epsilon=0$ 处得分等于 $D(P)$ 的局部参数模型，就能得到这一通用子模型的相应实用构造。还可以用这种通用的特定得分子模型（universal score-specific submodel），构造具有附加性质的一维目标参数的一步 TMLE：让它不仅解出有效影响曲线方程，还解出其他感兴趣的方程，例如第 8.4 节中的
+$P_nD_1^*(Q_n^*)=P_nD_2^*(Q_n^*)=0$。
+在现有文献中，求解多个得分方程通常需要基于局部特定得分子模型的迭代 TMLE，因此可以利用这种新的一步 TMLE，重新研究这些估计问题（见我们的补充材料）。

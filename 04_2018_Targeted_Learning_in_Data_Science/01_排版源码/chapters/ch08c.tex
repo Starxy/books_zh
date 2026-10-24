@@ -1,0 +1,72 @@
+% 原书分章 PDF 第 7—9 页：第 8.3 节。
+\section{基于现状数据的截断均值}
+
+设 $O=(C,\Delta=I(T\leq C))$，其中 $T$ 和 $C$ 独立。分别令 $F(t)=P(T\leq t)$ 和 $G(t)=P(C\leq t)$ 为 $T$ 与 $C$ 的累积分布函数。设 $g$ 为 $G$ 的 Lebesgue 密度，$\bar F=1-F$，$P=P_{F,G}$ 为 $O$ 的真实概率分布。对 $F$ 不作限定，而 $G$ 可以限制在集合 $\mathcal G$ 内，于是统计模型为
+$\mathcal M=\{P_{F,G}:F,G\in\mathcal G\}$。
+定义 $\Psi:\mathcal M\to\mathbb R$ 为
+\[
+ \Psi(P)=\int(1-F)(t)r(t)\,dt,
+\]
+其中 $r$ 为给定函数。取 $r(t)=t$ 时，$\Psi(P)$ 等于 $T$ 的均值；若将 $r$ 取为恒等函数的一个截断版本，则得到截断均值（truncated mean）。通过选取适当的 $r$，还能生成许多其他泛函。注意，$P$ 的密度
+$p(c,\delta)=F(c)^\delta(1-F(c))^{1-\delta}g(c)$，
+分解为分别只依赖 $F$ 与 $g$ 的因子，而 $\Psi(P)=\Psi(F)$ 只依赖 $F$。因此，只需在 $G$ 已知的模型 $\mathcal M(G)$ 中确定有效影响曲线。在该模型中，可以使用梯度
+\[
+ D(F,G)=\frac{r(C)}{g(C)}(1-\Delta)-\Psi(F).
+\]
+事实上，
+$\psi_n=\frac1n\sum_{i=1}^n\frac{r(C_i)}{g(C_i)}(1-\Delta_i)$
+是 $\Psi(F)$ 的无偏估计量，影响曲线为 $D(F,G)$，所以 $D(F,G)$ 确实是模型 $\mathcal M(G)$ 中的梯度。
+
+令 $dF_{\epsilon,h}=(1+\epsilon h)dF$ 是在 $\epsilon=0$ 处经过 $F$、得分为 $h\in L_0^2(F)$ 的子模型。$\{P_{F_{\epsilon,h},G}:\epsilon\}$ 的得分为
+\[
+ \begin{aligned}
+ A_F(h)(O)&=E_F(h(T)\mid O)\\
+ &=\frac{\int_0^C h(t)\,dF(t)}{F(C)}\Delta
+ +\frac{\int_C^\infty h(t)\,dF(t)}{1-F(C)}(1-\Delta).
+ \end{aligned}
+\]
+因此，得分算子就是这一线性算子 $A_F:L_0^2(F)\to L_0^2(P_{F,G})$。有效影响曲线定义为 $D^*(F,G)=A_F(h^*-Fh^*)$，其中
+\[
+ h^*=\argmin_{h\in L^2(F)}P\{D(F,G)-A_F(h-Fh)\}^2.
+\]
+
+可以表示为
+$h(t)=h(0)+\int I(t\geq x)\,dh(x)=h(0)+\int\phi_x(t)\,dh(x)$，
+其中 $\phi_x(t)=I(t\geq x)$。由此，
+$Fh=h(0)+\int\bar F(x)\,dh(x)$。
+将这一 $h$ 的表示代入上式，得到
+\[
+ \begin{aligned}
+ h^*&=\argmin_h P\left\{D(F,G)-\int A_F(\phi_x)\,dh(x)
+ +\int\bar F(x)\,dh(x)\right\}^2\\
+ &=\argmin_h P\left\{D(F,G)-\int
+ \{\bar F(x\mid\cdot)-\bar F(x)\}\,dh(x)\right\}^2,
+ \end{aligned}
+\]
+其中 $\bar F(x\mid C,\Delta)=P(T>x\mid C,\Delta)$。设
+$O_1,\ldots,O_n\sim_{\mathrm{iid}}P_{F,G}$
+为来自 $P_{F,G}$ 的样本，$M$ 为 $h^*$ 变差范数的上界。那么，可以用下式估计 $h^*$：
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \left\{D(F,G)(C_i,\Delta_i)-\int
+ \{\bar F(x\mid C_i,\Delta_i)-\bar F(x)\}\,dh(x)\right\}^2.
+\]
+这一最小值可由只在 $\{C_1,\ldots,C_n\}$ 上放置质量的离散测度 $dh$ 达到：
+% 离散化后原书的边际项仍印为 Fbar(x)，未改成 Fbar(C_j)。
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \left\{D(F,G)(C_i,\Delta_i)-\sum_{j=1}^n
+ \{\bar F(C_j\mid C_i,\Delta_i)-\bar F(x)\}\,dh(C_j)\right\}^2.
+\]
+令 $\beta_j=dh(C_j)$，$\|\beta\|_1=\sum_{j=1}^n|\beta_j|$，并定义
+\[
+ \beta_{n,M}=\argmin_{\beta,\|\beta\|_1<M}\frac1n\sum_{i=1}^n
+ \left\{D(F,G)(C_i,\Delta_i)-\sum_{j=1}^n
+ \beta_j\{\bar F(C_j\mid C_i,\Delta_i)-\bar F(x)\}\right\}^2.
+\]
+这是一个标准的 Lasso 最小二乘回归估计量，$L_1$ 约束设为 $M$。令 $M_n$ 为交叉验证选择器，并定义 $\beta_n=\beta_{n,M_n}$。那么，有效影响曲线 $D^*(P)$ 的估计量为
+\[
+ D_n^*(P)(C,\Delta)=\sum_{j=1}^n
+ \beta_{n,j}\{\bar F(C_j\mid C,\Delta)-\bar F(x)\}.
+\]
+根据定理 8.1，该估计量在 $L^2(P)$ 范数下，以快于 $n^{-1/4}$ 的速率收敛到 $D^*(P)$。

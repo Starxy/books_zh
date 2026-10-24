@@ -1,0 +1,31 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+
+\node[ellipse,draw=inkblue,minimum width=3cm,minimum height=1.6cm] (ch04agG) at (2,1.9) {};
+\node at (2,1.4) {$G_n$};\node[text=red] at (.85,2.2) {$M$};
+\draw[magenta] (1.2,2.5)--(2.1,2.5);\draw[green!65!black] (2.1,2.5)--(2.8,2.5);
+\draw[magenta] (1.2,2.25)--(2.1,2.25);\draw[inkblue] (2.1,2.25)--(2.5,2.25);
+\draw[magenta] (1.2,2)--(2.1,2);\draw[inkblue] (2.1,2)--(3.15,2);
+\node at (-.65,1.9) {$\theta$};\draw[green!65!black,->] (-.35,1.9)--(ch04agG.west);
+\node[ellipse,draw=inkblue,minimum width=3cm,minimum height=1.65cm] (ch04agS) at (5.3,4.1) {};
+\node at (5.3,3.72) {$S_n$};
+\draw[inkblue] (4.3,4.4)--(6.3,4.4);
+\foreach \x in {4.3,4.75,5.2,5.65,6.1}{\fill[red] (\x,4.4) circle(.06);}
+\draw[orange,->] (4.65,3.95)--(4.75,4.35);
+\node[ellipse,draw=inkblue,minimum width=2.7cm,minimum height=1.4cm] (ch04agO) at (5.3,.6) {$O_n$};
+\node[ellipse,draw=inkblue,minimum width=3.4cm,minimum height=1.9cm] (ch04agR) at (10,2.1) {};
+\node at (10,1.55) {$R_n$};\draw[inkblue] (8.95,2.25)--(11.05,2.4);
+\foreach \x in {9,9.45,9.9,10.35,10.8}{\fill[red] (\x,2.45) circle(.06);}
+\node at (10.65,4.05) {读段序列};\draw[green!65!black,->,thin] (9.9,2.45)--(10.6,3.8);
+\node at (1.2,4.7) {$N$};
+\draw[green!65!black,->] (ch04agG)--(ch04agS);
+\draw[green!65!black,->] (ch04agG)--(ch04agO);
+\draw[green!65!black,->] (ch04agG)--(ch04agR);
+\draw[green!65!black,->] (ch04agS)--(ch04agR);
+\draw[green!65!black,->] (ch04agO)--(ch04agR);
+
+\end{tikzpicture}
+\origfig{6}{RNA-seq 数据的图形生成模型。}
+\label{fig:ch04a-06}
+\end{figure}

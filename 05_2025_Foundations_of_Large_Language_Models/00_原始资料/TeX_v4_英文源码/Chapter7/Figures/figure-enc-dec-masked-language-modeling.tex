@@ -1,0 +1,157 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\nodestep{0.7cm}
+\def\bignodestep{0.8cm}
+
+\tikzstyle{enode} = [minimum width=9*\nodestep,minimum height=1.4*\nodestep,inner sep=2pt,draw,thick];
+
+%%% training an encoder-decoder model with masked language modeling
+\begin{scope}
+
+\node [anchor=center] (x0) at (0,0) {\scriptsize{$\mathrm{[CLS]}$}};
+\node [anchor=center] (x1) at ([xshift=\nodestep]x0.center) {\scriptsize{The}};
+\node [anchor=center] (x2) at ([xshift=\nodestep+1pt,yshift=-1pt]x1.center) {\scriptsize{puppies}};
+\node [anchor=center] (x3) at ([xshift=\nodestep]x2.center) {\scriptsize{are}};
+\node [anchor=center] (x4) at ([xshift=\nodestep]x3.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (x5) at ([xshift=\nodestep]x4.center) {\scriptsize{in}};
+\node [anchor=center] (x6) at ([xshift=\nodestep]x5.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (x7) at ([xshift=\nodestep]x6.center) {\scriptsize{house}};
+\node [anchor=center] (x8) at ([xshift=\nodestep]x7.center) {\scriptsize{.}};
+
+\draw [->] ([yshift=0.6em]x0.center) -- ([yshift=\nodestep-2pt]x0.center);
+\draw [->] ([yshift=0.6em]x1.center) -- ([yshift=\nodestep-2pt]x1.center);
+\draw [->] ([yshift=0.6em]x2.center) -- ([yshift=\nodestep-2pt]x2.center);
+\draw [->] ([yshift=0.6em]x3.center) -- ([yshift=\nodestep-2pt]x3.center);
+\draw [->] ([yshift=0.6em]x4.center) -- ([yshift=\nodestep-2pt]x4.center);
+\draw [->] ([yshift=0.6em]x5.center) -- ([yshift=\nodestep-2pt]x5.center);
+\draw [->] ([yshift=0.6em]x6.center) -- ([yshift=\nodestep-2pt]x6.center);
+\draw [->] ([yshift=0.6em]x7.center) -- ([yshift=\nodestep-2pt]x7.center);
+\draw [->] ([yshift=0.6em]x8.center) -- ([yshift=\nodestep-2pt]x8.center);
+
+\node [enode,anchor=south] (encoder) at ([xshift=1.3*\nodestep,yshift=\nodestep]x3.west) {Encoder};
+\node [enode,anchor=west] (decoder) at ([xshift=2em]encoder.east) {Decoder};
+
+\draw [->,very thick] ([xshift=2pt]encoder.east) -- ([xshift=-2pt]decoder.west);
+
+\node [anchor=center] (y4) at ([yshift=-\nodestep,xshift=0.5*\nodestep]decoder.south) {\scriptsize{frolicking}};
+\node [anchor=center] (y3) at ([xshift=-\bignodestep,yshift=0.1em]y4.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (y2) at ([xshift=-\bignodestep]y3.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (y1) at ([xshift=-\bignodestep]y2.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (y0) at ([xshift=-\bignodestep]y1.center) {\scriptsize{$\langle s \rangle$}};
+\node [anchor=center] (y5) at ([xshift=\bignodestep,yshift=0.1em]y4.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (y6) at ([xshift=\bignodestep]y5.center) {\scriptsize{the}};
+\node [anchor=center] (y7) at ([xshift=\bignodestep]y6.center) {\scriptsize{$\mathrm{[M]}$}};
+
+\draw [->] ([yshift=0.6em]y0.center) -- ([yshift=\nodestep-2pt]y0.center);
+\draw [->] ([yshift=0.6em]y1.center) -- ([yshift=\nodestep-2pt]y1.center);
+\draw [->] ([yshift=0.6em]y2.center) -- ([yshift=\nodestep-2pt]y2.center);
+\draw [->] ([yshift=0.6em]y3.center) -- ([yshift=\nodestep-2pt]y3.center);
+\draw [->] ([yshift=0.6em]y4.center) -- ([yshift=\nodestep-2pt]y4.center);
+\draw [->] ([yshift=0.6em]y5.center) -- ([yshift=\nodestep-2pt]y5.center);
+\draw [->] ([yshift=0.6em]y6.center) -- ([yshift=\nodestep-2pt]y6.center);
+\draw [->] ([yshift=0.6em]y7.center) -- ([yshift=\nodestep-2pt]y7.center);
+
+\node [anchor=center] (o0) at ([yshift=3.5*\nodestep]y0.center) {\scriptsize{{\color{gray!50} $\mathrm{[M]}$}}};
+\node [anchor=center] (o1) at ([yshift=3.5*\nodestep]y1.center) {\scriptsize{{\color{gray!50} $\mathrm{[M]}$}}};
+\node [anchor=center] (o2) at ([yshift=3.5*\nodestep]y2.center) {\scriptsize{{\color{gray!50} $\mathrm{[M]}$}}};
+\node [anchor=center] (o3) at ([yshift=3.5*\nodestep]y3.center) {\scriptsize{frolicking}};
+\node [anchor=center] (o4) at ([yshift=3.5*\nodestep]y4.center) {\scriptsize{{\color{gray!50} $\mathrm{[M]}$}}};
+\node [anchor=center] (o5) at ([yshift=3.5*\nodestep]y5.center) {\scriptsize{the}};
+\node [anchor=center] (o6) at ([yshift=3.5*\nodestep]y6.center) {\scriptsize{{\color{gray!50} $\mathrm{[M]}$}}};
+\node [anchor=center] (o7) at ([yshift=3.5*\nodestep]y7.center) {\scriptsize{{\color{gray!50} $\mathrm{[M]}$}}};
+
+\draw [<-,gray!50] ([yshift=-0.6em]o0.center) -- ([yshift=-\nodestep+2pt]o0.center);
+\draw [<-,gray!50] ([yshift=-0.6em]o1.center) -- ([yshift=-\nodestep+2pt]o1.center);
+\draw [<-,gray!50] ([yshift=-0.6em]o2.center) -- ([yshift=-\nodestep+2pt]o2.center);
+\draw [<-] ([yshift=-0.6em]o3.center) -- ([yshift=-\nodestep+2pt]o3.center);
+\draw [<-,gray!50] ([yshift=-0.6em]o4.center) -- ([yshift=-\nodestep+2pt]o4.center);
+\draw [<-] ([yshift=-0.6em]o5.center) -- ([yshift=-\nodestep+2pt]o5.center);
+\draw [<-,gray!50] ([yshift=-0.6em]o6.center) -- ([yshift=-\nodestep+2pt]o6.center);
+\draw [<-,gray!50] ([yshift=-0.6em]o7.center) -- ([yshift=-\nodestep+2pt]o7.center);
+
+\node [anchor=south] (loss) at ([yshift=1.5em,xshift=-1em]o3.north) {\footnotesize{Loss}};
+
+\draw [->,thick,dotted] ([yshift=-0.0em,xshift=0.2em]loss.south) .. controls +(south:1.5em) and +(north:1.3em) .. ([yshift=0.0em]o3.north);
+\draw [->,thick,dotted] ([yshift=-0.0em,xshift=0.5em]loss.south) .. controls +(south:1em) and +(north:1.8em) .. ([yshift=0.0em]o5.north);
+
+\node [anchor=north] (caption) at ([xshift=1em,yshift=-3em]encoder.south east) {\small{(a) Training an encoder-decoder model with BERT-style masked language modeling}};
+
+\end{scope}
+
+%%% training an encoder-decoder model with denosing autoencoding methods
+\begin{scope}[yshift=-5.5cm]
+
+\node [anchor=center] (x0) at (0,0) {\scriptsize{$\mathrm{[CLS]}$}};
+\node [anchor=center] (x1) at ([xshift=\nodestep]x0.center) {\scriptsize{The}};
+\node [anchor=center] (x2) at ([xshift=\nodestep+1pt,yshift=-1pt]x1.center) {\scriptsize{puppies}};
+\node [anchor=center] (x3) at ([xshift=\nodestep]x2.center) {\scriptsize{are}};
+\node [anchor=center] (x4) at ([xshift=\nodestep]x3.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (x5) at ([xshift=\nodestep]x4.center) {\scriptsize{in}};
+\node [anchor=center] (x6) at ([xshift=\nodestep]x5.center) {\scriptsize{$\mathrm{[M]}$}};
+\node [anchor=center] (x7) at ([xshift=\nodestep]x6.center) {\scriptsize{house}};
+\node [anchor=center] (x8) at ([xshift=\nodestep]x7.center) {\scriptsize{.}};
+
+\draw [->] ([yshift=0.6em]x0.center) -- ([yshift=\nodestep-2pt]x0.center);
+\draw [->] ([yshift=0.6em]x1.center) -- ([yshift=\nodestep-2pt]x1.center);
+\draw [->] ([yshift=0.6em]x2.center) -- ([yshift=\nodestep-2pt]x2.center);
+\draw [->] ([yshift=0.6em]x3.center) -- ([yshift=\nodestep-2pt]x3.center);
+\draw [->] ([yshift=0.6em]x4.center) -- ([yshift=\nodestep-2pt]x4.center);
+\draw [->] ([yshift=0.6em]x5.center) -- ([yshift=\nodestep-2pt]x5.center);
+\draw [->] ([yshift=0.6em]x6.center) -- ([yshift=\nodestep-2pt]x6.center);
+\draw [->] ([yshift=0.6em]x7.center) -- ([yshift=\nodestep-2pt]x7.center);
+\draw [->] ([yshift=0.6em]x8.center) -- ([yshift=\nodestep-2pt]x8.center);
+
+\node [enode,anchor=south] (encoder) at ([xshift=1.3*\nodestep,yshift=\nodestep]x3.west) {Encoder};
+\node [enode,anchor=west] (decoder) at ([xshift=2em]encoder.east) {Decoder};
+
+\draw [->,very thick] ([xshift=2pt]encoder.east) -- ([xshift=-2pt]decoder.west);
+
+\node [anchor=center] (y4) at ([yshift=-\nodestep,xshift=0.5*\nodestep]decoder.south) {\scriptsize{frolicking}};
+\node [anchor=center] (y3) at ([xshift=-\bignodestep,yshift=0.02em]y4.center) {\scriptsize{are}};
+\node [anchor=center] (y2) at ([xshift=-\bignodestep]y3.center) {\scriptsize{puppies}};
+\node [anchor=center] (y1) at ([xshift=-\bignodestep,yshift=0.1em]y2.center) {\scriptsize{The}};
+\node [anchor=center] (y0) at ([xshift=-\bignodestep]y1.center) {\scriptsize{$\langle s \rangle$}};
+\node [anchor=center] (y5) at ([xshift=\bignodestep,yshift=0.05em]y4.center) {\scriptsize{in}};
+\node [anchor=center] (y6) at ([xshift=\bignodestep]y5.center) {\scriptsize{the}};
+\node [anchor=center] (y7) at ([xshift=\bignodestep]y6.center) {\scriptsize{house}};
+
+\draw [->] ([yshift=0.6em]y0.center) -- ([yshift=\nodestep-2pt]y0.center);
+\draw [->] ([yshift=0.6em]y1.center) -- ([yshift=\nodestep-2pt]y1.center);
+\draw [->] ([yshift=0.6em]y2.center) -- ([yshift=\nodestep-2pt]y2.center);
+\draw [->] ([yshift=0.6em]y3.center) -- ([yshift=\nodestep-2pt]y3.center);
+\draw [->] ([yshift=0.6em]y4.center) -- ([yshift=\nodestep-2pt]y4.center);
+\draw [->] ([yshift=0.6em]y5.center) -- ([yshift=\nodestep-2pt]y5.center);
+\draw [->] ([yshift=0.6em]y6.center) -- ([yshift=\nodestep-2pt]y6.center);
+\draw [->] ([yshift=0.6em]y7.center) -- ([yshift=\nodestep-2pt]y7.center);
+
+\node [anchor=center] (o0) at ([yshift=3.5*\nodestep]y0.center) {\scriptsize{The}};
+\node [anchor=center] (o1) at ([yshift=3.5*\nodestep-1pt]y1.center) {\scriptsize{puppies}};
+\node [anchor=center] (o2) at ([yshift=3.5*\nodestep+0.02em]y2.center) {\scriptsize{are}};
+\node [anchor=center] (o3) at ([yshift=3.5*\nodestep]y3.center) {\scriptsize{frolicking}};
+\node [anchor=center] (o4) at ([yshift=3.5*\nodestep+0.1em]y4.center) {\scriptsize{in}};
+\node [anchor=center] (o5) at ([yshift=3.5*\nodestep]y5.center) {\scriptsize{the}};
+\node [anchor=center] (o6) at ([yshift=3.5*\nodestep]y6.center) {\scriptsize{house}};
+\node [anchor=center] (o7) at ([yshift=3.5*\nodestep]y7.center) {\scriptsize{.}};
+
+\draw [<-] ([yshift=-0.6em]o0.center) -- ([yshift=-\nodestep+2pt]o0.center);
+\draw [<-] ([yshift=-0.6em]o1.center) -- ([yshift=-\nodestep+2pt]o1.center);
+\draw [<-] ([yshift=-0.6em]o2.center) -- ([yshift=-\nodestep+2pt]o2.center);
+\draw [<-] ([yshift=-0.6em]o3.center) -- ([yshift=-\nodestep+2pt]o3.center);
+\draw [<-] ([yshift=-0.6em]o4.center) -- ([yshift=-\nodestep+2pt]o4.center);
+\draw [<-] ([yshift=-0.6em]o5.center) -- ([yshift=-\nodestep+2pt]o5.center);
+\draw [<-] ([yshift=-0.6em]o6.center) -- ([yshift=-\nodestep+2pt]o6.center);
+\draw [<-] ([yshift=-0.6em]o7.center) -- ([yshift=-\nodestep+2pt]o7.center);
+
+
+\node [anchor=north] (caption) at ([xshift=1em,yshift=-3em]encoder.south east) {\small{(b) Training an encoder-decoder model with denoising autoencoding}};
+
+\node [anchor=south] (loss) at ([yshift=1em,xshift=-0.5em]o3.north east) {\small{Loss over the sequence}};
+
+\draw [decoration={brace,amplitude=5pt},decorate] ([yshift=0.7em,xshift=-0.3em]o0.center) -- ([yshift=0.7em,xshift=0.3em]o7.center);
+
+\end{scope}
+	
+\end{tikzpicture}

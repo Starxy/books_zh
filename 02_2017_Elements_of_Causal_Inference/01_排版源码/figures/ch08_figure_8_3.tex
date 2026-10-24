@@ -1,0 +1,21 @@
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.65cm,y=1.4cm]
+ \foreach \j in {1,2,3,4}{\node[vtx] (ch08f83S\j) at (\j,1) {$S_{\j}$};}
+ \foreach \j in {1,2,3}{\pgfmathtruncatemacro{\next}{\j+1}
+  \node[vtx] (ch08f83A\j) at (\next,2) {$A_{\j}$};
+  \draw[ed] (ch08f83S\j)--(ch08f83S\next);
+  \draw[ed,color=red,line width=1.1pt] (ch08f83S\j)--(ch08f83A\j);
+  \draw[ed] (ch08f83A\j)--(ch08f83S\next);
+ }
+ \node[latent] (ch08f83H) at (1,0) {$H$};
+ \node[vtx] (ch08f83Y) at (4,0) {$Y$};
+ \foreach \j in {1,2,3,4}{
+  \draw[ed] (ch08f83H)--(ch08f83S\j);
+  \draw[ed] (ch08f83S\j)--(ch08f83Y);
+ }
+ \draw[ed] (ch08f83H)--(ch08f83Y);
+\end{tikzpicture}
+\caption{回合式强化学习问题的因果图。动作变量 $A_i$ 影响系统的下一状态 $S_{i+1}$。变量 $Y$ 表示一个回合结束后得到的输出或回报。回报 $Y$ 也可能依赖动作；为使图形清晰，这些边已略去。回报常被建模为每次决策后所获奖励的总和，也可以带权，见第 8.2.3 节。整个系统可能受到未观测变量 $H$ 的混杂。红色粗边表示玩家能够改变的条件分布，即策略。式 (8.4) 利用策略 $\pi$ 下获得的数据，估计策略 $\widetilde\pi$ 下的期望结果 $\widetilde{\EE}[Y]$。即使再加入从动作 $A$ 指向 $H$ 和／或 $Y$ 的边，该式仍成立。}
+\label{fig:ch08-erl}
+\end{figure}

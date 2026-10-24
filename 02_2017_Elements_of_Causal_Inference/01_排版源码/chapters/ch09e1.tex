@@ -1,0 +1,78 @@
+% 原书185—189页；9.5.1、9.5.2。
+\subsection{Verma约束}
+Verma and Pearl［1991］给出了图9.5中的例子。相对于该图满足马尔可夫性的任意分布，都满足如下\textbf{Verma约束（Verma constraint）}［例如Spirtes et al., 2000，第6.9节］：存在某个函数$f$，使
+\begin{equation}
+ \sum_b p(b\mid a)p(d\mid a,b,c)=f(c,d).
+ \tag{9.3}
+\end{equation}
+\input{figures/ch09_05}
+
+与条件独立性约束不同，式(9.3)使我们能够判断是否存在从$A$到$D$的有向边。注意，在图9.5中，$A$与$D$无法被d-分离。尽管关于这类代数约束仍有许多未解决问题，人们已在理解这些约束何时出现方面取得进展［Tian and Pearl, 2002］。Shpitser and Pearl［2008b］研究了\textbf{休眠独立性（dormant independence）}这一特殊子类：这些约束会在干预分布中表现为独立性约束。
+
+接下来的问题是，如何利用这些约束开展因果学习。例如，对于二值变量，Richardson et al.［2012, 2017］与Shpitser et al.［2012］利用\textbf{嵌套马尔可夫模型（nested Markov model）}将此类模型参数化，并提供了计算约束极大似然估计量的方法；另见第9.4.1节。不过，嵌套马尔可夫模型并不包含全部不等式约束，下一小节将讨论这一点。
+
+\subsection{不等式约束}
+将图模型中的某些变量边缘化，会诱导出大量不等式约束［例如见Kang and Tian, 2006；Evans, 2012，及其参考文献］。列举所有已知约束超出了本书范围。这里希望强调的，是它们应用领域的多样性。为此，我们考察两个含观测变量与潜变量的DAG，它们出现在截然不同的背景中。
+\input{figures/ch09_06}
+
+注意，本节只讨论关于可观测变量\emph{观测分布}的不等式。文献中还有将这些变量的观测分布与干预分布联系起来的不等式［例如Balke, 1995；Pearl, 2009，第8章］，有时还需附加假设［Silva and Evans, 2014；Geiger et al., 2014］。前一类任务旨在否证某个假设的潜变量结构；后一类则在相应DAG为真时，允许我们对干预作出陈述。举一个只涉及观测概率的不等式的例子：对于二值变量，图9.6(a)中的因果结构蕴含
+\begin{equation}
+ P(X=0,Y=0\mid Z=0)+P(X=1,Y=1\mid Z=1)\le1.
+ \tag{9.4}
+\end{equation}
+
+文献已经给出类似不等式［Bonet, 2001，式(3)］，用于检验某个变量是否为工具变量。\chninenote{原印式(9.4)不能由工具变量图一般地推出。例如，合法模型$X=Z$、$Y=X$使左侧等于$2$。标准工具不等式的相应形式固定同一个$x$：$P(X=x,Y=0\mid Z=z_0)+P(X=x,Y=1\mid Z=z_1)\le1$。编号公式按原书保留。}这个DAG在分析依从性不完全的随机化临床试验时十分重要：$Z$表示要求患者服药的指令，$X$表示患者实际上是否服药，例如可假设通过血液检测判断，$Y$表示患者是否康复［例如见Pearl, 2009］。
+
+\Needspace{4cm}
+例如，当$X,Y,S,T$均在$\{-1,1\}$中取值时，已知图9.6(b)中的因果结构蕴含\textbf{Clauser-Horne-Shimony-Holt（CHSH）不等式}［Clauser et al., 1969］：
+\begin{equation}
+\begin{aligned}
+ &\EE[XY\mid S=-1,T=-1]+\EE[XY\mid S=-1,T=1]\\
+ &\qquad+\EE[XY\mid S=1,T=-1]+\EE[XY\mid S=1,T=1]\le2.
+\end{aligned}
+\tag{9.5}
+\end{equation}
+
+式(9.5)是\textbf{Bell不等式（Bell's inequality）}［Bell, 1964］的推广。\chninenote{原式(9.5)将四项全部相加，存在符号错误；即使$X=Y=1$恒成立，左侧也等于$4$。标准CHSH组合需要一项取负号，例如将最后一项改为$-\EE[XY\mid S=1,T=1]$。以下关于实验违反CHSH界的讨论，应针对这一标准形式理解。原编号公式保留印法。}潜在共同原因可以取任意多个值；只要存在一个变量，使$\{X,S\}$与$\{Y,T\}$被d-分离，就蕴含式(9.5)。令人关注的是，在某些量子物理情形中，直觉上会认同其底层因果结构正是图9.6(b)，但CHSH不等式却被违反。
+
+设两位物理学家$A$与$B$身处不同地点，接收来自同一源的粒子，该源由$H$描述。$X$与$Y$分别描述$A$、$B$对收到的粒子所作二分测量的结果。$S$是一次抛硬币的结果，决定$A$在两种可能测量中选择哪一种；同样，$T$决定$B$采用哪一种测量。$X$与$Y$未被观测到的共同原因，就是$A$、$B$所收粒子的共同来源。根据一种广泛接受的解释，实验中观察到对式(9.5)的违反［Aspect et al., 1981］，表明不存在一个描述入射粒子联合状态的经典随机变量$H$，能使$\{S,X\}$与$\{T,Y\}$在给定$H$后条件独立。这是因为量子物理系统的状态，不能用随机变量的取值描述；相应的对象是Hilbert空间上的密度算子。
+
+关于潜变量结构的信息论不等式，近年来受到关注，因为它们有时比直接涉及概率的不等式更容易处理［例如Steudel and Ay, 2015］。Chaves et al.［2014］对离散变量描述了一族不完备、但可由如下系统方法生成的不等式。
+
+首先，从$d$个离散变量$\mathbf X:=(X_1,\ldots,X_d)$上的结构因果模型导出的分布出发。给定联合分布$P_{X_1,\ldots,X_d}$，可以定义函数
+\[
+ H:2^{\mathbf X}\longrightarrow\mathbb R_0^+,
+\]
+使$H(X_{j_1},\ldots,X_{j_k})$表示$(X_{j_1},\ldots,X_{j_k})$的Shannon熵。\footnote{为简化记号，我们写作$H(X_{j_1},\ldots,X_{j_k})$而不是$H\bigl((X_{j_1},\ldots,X_{j_k})\bigr)$，并再次对向量使用集合运算。}$H$的已知性质包括下列\textbf{基本不等式（elementary inequality）}：
+\begin{equation}
+ H(S\cup\{X_j\})\ge H(S),\tag{9.6}
+\end{equation}
+\begin{equation}
+ H(S\cup\{X_j,X_k\})\le H(S\cup\{X_j\})+H(S\cup\{X_k\}),\tag{9.7}
+\end{equation}
+\begin{equation}
+ H(\varnothing)=0,\tag{9.8}
+\end{equation}
+其中$S$是$\mathbf X$的子集。式(9.6)与式(9.7)分别称为单调性与次模性条件，另见第6.10节。在组合优化中，式(9.6)—(9.8)也称为\textbf{多拟阵公理（polymatroid axiom）}。\chninenote{标准次模性在式(9.7)右侧还包含$-H(S)$。原印式由于少减了非负的$H(S)$，仍然成立，但比标准次模性弱，不能与其等同。此处保留原式。}
+
+为了利用因果结构，回顾如下事实：对三个两两不相交的节点子集$S,T,R$，若$S$与$T$被$R$ d-分离，则$S\indep T\mid R$。用Shannon互信息［Cover and Thomas, 1991］可以将其改写为
+\begin{equation}
+ I(S:T\mid R)=0,\tag{9.9}
+\end{equation}
+等价于
+\begin{equation}
+ H(S\cup R)+H(T\cup R)=H(S\cup T\cup R)+H(R).\tag{9.10}
+\end{equation}
+值得注意的是，式(9.10)是一条\emph{线性}等式。由于条件独立关系在概率向量空间中定义的是\emph{非线性}约束，转而考察熵向量空间上的约束更方便。
+
+这些基本不等式与式(9.9)一起，还会蕴含其他不等式。为通过算法推导这些不等式，Chaves et al.［2014］采用了线性规划中的\textbf{Fourier-Motzkin消元法（Fourier-Motzkin elimination）}［Williams, 1986］。给定观测变量子集$\mathbf O\subset\mathbf X$，尽管可能不存在只涉及观测变量的条件独立性约束，这一过程仍经常能得到只含$\mathbf O$中变量的熵的不等式。
+
+图9.7给出一个例子，Chaves et al.［2014，定理1］对它得到
+\begin{equation}
+ I(X:Z)+I(Y:Z)\le H(Z),\tag{9.11}
+\end{equation}
+以及对变量名作循环置换后得到的对应不等式。例如，若三个观测变量以各$1/2$的概率全部取$0$或全部取$1$，所得联合分布就违反式(9.11)，因为此时$H(Z)=1\,\mathrm{bit}$，而$I(X:Z)=I(Y:Z)=1\,\mathrm{bit}$。
+\input{figures/ch09_07}
+
+直观上，在这个例子中，每个观测节点，例如$Z$，都需要与$X$、$Y$同时保持确定性关系，因此也要与$U$、$V$同时保持确定性关系。但$Z$由未观测原因$U$决定的程度，与它由$V$决定的程度之间存在权衡。$Z$无法同时完美遵循$U$与$V$的“指令”，因为后两者自身相互独立。
+\FloatBarrier

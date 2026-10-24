@@ -1,0 +1,212 @@
+% 原章分章页32—36，第2.5.2节。
+\subsection{线性与非线性混合结构方程模型}
+
+前面讨论了线性结构方程模型和非线性结构方程模型。本节介绍具有高斯噪声的线性结构方程模型，或线性与非线性混合结构方程模型（Ernest et al. 2016）。一般而言，网络中某些边的函数可能是线性的，另一些边的函数则可能是非线性的。线性与非线性混合结构方程模型是最一般的因果模型。例如，图2.7给出了一个混合模型，其中实线表示非线性边，虚线表示线性边。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig07.tex}
+\origfig{7}{线性与非线性混合结构方程模型示意图。}
+\end{figure}
+式（2.77）中的一般非线性结构方程模型可以写为（Ernest et al. 2016）
+\begin{equation}
+Y_j=\mu_j+\sum_{i\in\pa_D(j)}f_{ji}(W_i)+\varepsilon_j,
+\tag{2.92}
+\end{equation}
+其中，$\mu_j\in\R$，$f_{ji}$ 二次可微，$\E[f_{ji}(W_i)]=0$，$\varepsilon_j\sim N(0,\sigma_j^2)$，$\sigma_j^2>0$，$j=1,2,\ldots,p$。图 $D$ 中有向边 $i\to j$ 对应的函数 $f_{ji}$ 可以是线性函数，也可以是非线性函数。如果 $f_{ji}$ 是线性函数，就称边 $i\to j$ 为线性边；否则称为非线性边。正如 Ernest et al.（2016）所指出的，边的线性或非线性是相对于某个具体 DAG $D$ 定义的。
+
+总因果效应可以分解为线性因果效应与非线性因果效应。模型（2.92）可以改写为
+\begin{equation}
+y_j=\mu_j+\sum_{l=1}^{l_j}\alpha_{jl}w_l
++\sum_{i=1}^{i_j}f_{ji}(w_i)+\varepsilon_j,
+\tag{2.93}
+\end{equation}
+其中，$l_j$ 表示节点 $j$ 通过线性边连接的父节点个数，$i_j$ 表示节点 $j$ 通过非线性边连接的父节点个数。例如，节点4的函数模型为
+\[
+y_4=\mu_4+\alpha_{41}y_1+f_{42}(y_2)+\varepsilon_4.
+\]
+一般而言，函数 $f_{ji}$ 未知，需要用非参数函数逼近。本节仍使用平滑样条表示非线性函数 $f_{ji}$。考虑平滑样条回归模型（附录2.A）：
+\begin{equation}
+y_j=\mu_j+\sum_{l=1}^{l_j}\alpha_{jl}w_l
++\sum_{i=1}^{i_j}L_{ji}f_{ji}+\varepsilon_j,
+\tag{2.94}
+\end{equation}
+其中，$L_{ji}$ 是定义在 RKHS $H^i$ 上的连续泛函，$f_{ji}$ 表示一般未知函数，$\varepsilon_i$ 为均值为零、共同方差为 $\sigma_j^2$ 的独立随机误差。希尔伯特空间 $H^i$ 可分解为两个子空间（Wang 2011）：
+\[
+H^i=H_0^i\oplus H_1^i,
+\]
+其中，$H_0^i$ 为有限维空间，具有正交归一基函数 $\varphi_1^i(x),\ldots,\varphi_p^i(x)$；它的正交补 $H_1^i$ 是具有再生核 $R_1^i(x,z)$ 的 RKHS。
+
+估计式（2.94）中的回归系数 $\alpha_{jl}$ 和函数 $f_{ji}$ 时，应使观测值 $Y_j$ 与估计量 $\widehat\alpha_{ji},\widehat f_{ji}$ 之间的误差，以及对光滑性的偏离，都尽可能小。用函数 $f_{ji}$ 向 RKHS $H_1$ 的投影 $P_1f_{ji}$ 作为惩罚函数。为此，回归系数估计量和函数 $f_{ji}$ 的平滑样条估计量所对应的目标函数为
+\begin{equation}
+\frac1n\sum_{v=1}^{n}
+\left(y_j^v-\sum_{l=1}^{l_j}\alpha_{jl}w_l^v
+-\sum_{i=1}^{i_j}L_vf_{ji}\right)^2
++\lambda\left\lVert\sum_{i=1}^{i_j}P_1f_{ji}\right\rVert^2,
+\tag{2.95}
+\end{equation}
+其中，$\lambda$ 为平滑惩罚参数，用于平衡拟合优度和光滑性。令 $R^i(w,z)$ 为与 $f_{ji}$ 对应的再生核，可分解为
+\[
+R^i(w,z)=R_0^i(w,z)+R_1^i(w,z),
+\]
+其中
+\begin{equation}
+R_0^i(w,z)=\sum_{m=1}^{p}\varphi_m^i(w)\varphi_m^i(z).
+\tag{2.96}
+\end{equation}
+假设估计量 $\widehat f_{ji}$ 表示为
+\begin{equation}
+\widehat f_{ji}(w)=\sum_{m=1}^{p}a_m^i\varphi_m^i(w)
++\sum_{u=1}^{n}b_u^i\xi_u^i(w),
+\tag{2.97}
+\end{equation}
+其中 $\xi_u^i(w)=L_{u(z)}R_1^i(w,z)$。因此，
+\begin{equation}
+L_{v(w)}\widehat f_{ji}(w)=
+\sum_{m=1}^{p}a_m^iL_{v(w)}\varphi_m^i(w)
++\sum_{u=1}^{n}b_u^iL_{v(w)}L_{u(z)}R_1^i(w,z),
+\tag{2.98}
+\end{equation}
+或者
+\[
+\begin{aligned}
+\begin{bmatrix}
+L_{1(w)}\widehat f_{ji}(w)\\\vdots\\L_{n(x)}\widehat f(x)
+\end{bmatrix}
+={}&
+\begin{bmatrix}
+L_{1(w)}\varphi_1^i(w)&\cdots&L_{1(w)}\varphi_p^i(w)\\
+\vdots&\vdots&\vdots\\
+L_{n(w)}\varphi_1^i(w)&\cdots&L_{n(w)}\varphi_p^i(w)
+\end{bmatrix}
+\begin{bmatrix}a_1^i\\\vdots\\a_p^i\end{bmatrix}\\
+&{}+
+\begin{bmatrix}
+L_{1(w)}L_{1(z)}R_1^i(x,z)&\cdots&L_{1(w)}L_{n(z)}R_1^i(x,z)\\
+\vdots&\vdots&\vdots\\
+L_{n(w)}L_{1(z)}R_1^i(x,z)&\cdots&L_{n(w)}L_{n(z)}R_1^i(x,z)
+\end{bmatrix}
+\begin{bmatrix}b_1^i\\\vdots\\b_n^i\end{bmatrix}\\
+={}&T^ia^i+\Sigma^ib^i,
+\end{aligned}
+\]
+其中
+\[
+T^i=
+\begin{bmatrix}
+L_{1(w)}\varphi_1^i(w)&\cdots&L_{1(w)}\varphi_p^i(w)\\
+\vdots&\vdots&\vdots\\
+L_{n(w)}\varphi_1^i(w)&\cdots&L_{n(w)}\varphi_p^i(w)
+\end{bmatrix},
+\qquad
+a^i=\begin{bmatrix}a_1^i\\\vdots\\a_p^i\end{bmatrix},
+\]
+\[
+\Sigma^i=
+\begin{bmatrix}
+L_{1(w)}L_{1(z)}R_1^i(x,z)&\cdots&L_{1(w)}L_{n(z)}R_1^i(x,z)\\
+\vdots&\vdots&\vdots\\
+L_{n(w)}L_{1(z)}R_1^i(x,z)&\cdots&L_{n(w)}L_{n(z)}R_1^i(x,z)
+\end{bmatrix},
+\qquad
+b^i=\begin{bmatrix}b_1^i\\\vdots\\b_n^i\end{bmatrix}.
+\]
+令
+\[
+\begin{gathered}
+Y_j=\begin{bmatrix}y_j^1\\\vdots\\y_j^n\end{bmatrix},
+\quad
+W=\begin{bmatrix}w_1^1&\cdots&w_{l_j}^1\\
+\vdots&\vdots&\vdots\\w_1^n&\cdots&w_{l_j}^n\end{bmatrix},
+\quad
+\alpha^j=\begin{bmatrix}\alpha_{j1}\\\vdots\\\alpha_{jl_j}\end{bmatrix},\\
+a=\begin{bmatrix}a^1\\\vdots\\a^{i_j}\end{bmatrix},
+\quad b=\begin{bmatrix}b^1\\\vdots\\b^{i_j}\end{bmatrix},
+\quad\gamma=\begin{bmatrix}\alpha\\a\end{bmatrix},\\
+T=[T^1\ \cdots\ T^{i_j}],\qquad A=[W\ T],
+\qquad\Sigma=[\Sigma^1\ \cdots\ \Sigma^{i_j}].
+\end{gathered}
+\]
+还可以证明
+\begin{equation}
+\left|\sum_{i=1}^{i_j}P_1f_{ji}\right|^2=b^T\Sigma b.
+\tag{2.99}
+\end{equation}
+用矩阵形式，式（2.95）可以简化为
+\begin{equation}
+\min_{\gamma,b}\quad
+\frac1n\lVert Y_j-A\gamma-\Sigma b\rVert^2+\lambda b^T\Sigma b.
+\tag{2.100}
+\end{equation}
+优化问题（2.100）的解为（附录2.A）
+\begin{equation}
+\begin{aligned}
+A\gamma+(\Sigma+n\lambda I)b&=Y_j,\\
+A^Tb&=0.
+\end{aligned}\tag{2.101}
+\end{equation}
+对矩阵 $A$ 作 QR 分解：
+\[
+T=[Q_1\ Q_2]\begin{bmatrix}R\\0\end{bmatrix}.
+\]
+最终得到平滑样条回归系数
+\begin{equation}
+\begin{aligned}
+\widehat\gamma&=
+R^{-1}Q_1^T[I-MQ_2(Q_2^TMQ_2)^{-1}Q_2^T]Y_j,\\
+\widehat b&=Q_2(Q_2^TMQ_2)^{-1}Q_2^TY_j,
+\end{aligned}\tag{2.102}
+\end{equation}
+其中 $M=\Sigma+n\lambda I$。
+
+现在定义父节点集合同时通过线性边和非线性边连接时的节点评分。假设节点 $j$ 有 $m_j$ 个父节点。考虑有向边 $i\to j$，定义线性边指示变量：
+\begin{equation}
+\pi_i=
+\begin{cases}
+1,&\text{边 }i\to j\text{ 为线性边},\\
+0,&\text{边 }i\to j\text{ 为非线性边}.
+\end{cases}
+\tag{2.103}
+\end{equation}
+函数模型（2.93）可以改写为
+\begin{equation}
+y_j=\mu_j+\sum_{li=1}^{m_j}\pi_i\alpha_{jl}w_l
++\sum_{i=1}^{im_j}(1-\pi_i)f_{ji}(w_i)+\varepsilon_j.
+\tag{2.104}
+\end{equation}
+为了使模型（2.104）拟合数据，需要极小化以下惩罚目标函数：
+\begin{equation}
+\begin{aligned}
+&\frac1n\sum_{v=1}^{n}
+\left(y_j^v-\sum_{i=1}^{m_j}\pi_i\alpha_{jl}w_l^v
+-\sum_{i=1}^{m_j}(1-\pi_i)L_vf_{ji}\right)^2\\
+&\qquad+\lambda\left\lVert\sum_{i=1}^{m_j}(1-\pi_i)P_1f_{ji}\right\rVert^2.
+\end{aligned}\tag{2.105}
+\end{equation}
+展开连续泛函 $L_v$，式（2.105）可以进一步化为
+\begin{equation}
+\begin{aligned}
+&\frac1n\sum_{v=1}^{n}\Biggl\{
+y_j^v-\sum_{i=1}^{m_j}\pi_i\alpha_{ji}w_i^v
+-\sum_{i=1}^{m_j}(1-\pi_i)\\
+&\quad{}\times\left[
+\sum_{q=1}^{p}a_q^iL_{v(w)}\varphi_q^i(w)
++\sum_{u=1}^{n}b_u^iL_{v(w)}L_{v(z)}R_1^i(w,z)
+\right]\Biggr\}^2\\
+&\qquad+\lambda\left\lVert\sum_{i=1}^{m_j}(1-\pi_i)P_1f_{ji}\right\rVert^2.
+\end{aligned}\tag{2.106}
+\end{equation}
+用矩阵形式，优化问题（2.106）可以改写为
+\begin{equation}
+\begin{aligned}
+\min_{\pi,\alpha,a,b}\quad&
+\frac1n\lVert Y_j-W\pi\alpha-T(I-\pi)a-\Sigma(I-\pi)b\rVert^2\\
+&{}+\lambda b^T(I-\pi)\Sigma(I-\pi)b,
+\end{aligned}\tag{2.107}
+\end{equation}
+其中 $\pi=\diag(\pi_1,\ldots,\pi_{m_j})$，$I$ 为单位矩阵，其余量的定义同前。在优化问题（2.107）中，对角矩阵 $\pi$ 的元素取 0 或 1，向量 $\alpha,a,b$ 取实数。因此，问题（2.107）是混合整数规划问题，其求解将在第2.6节讨论。求解后，节点 $j$ 的评分函数定义为
+\begin{equation}
+\begin{aligned}
+\operatorname{Score}(j,\pa_j)
+={}&\frac1n\lVert Y_j-W\pi\alpha-T(I-\pi)a-\Sigma(I-\pi)b\rVert^2\\
+&{}+\lambda b^T(I-\pi)\Sigma(I-\pi)b.
+\end{aligned}\tag{2.108}
+\end{equation}

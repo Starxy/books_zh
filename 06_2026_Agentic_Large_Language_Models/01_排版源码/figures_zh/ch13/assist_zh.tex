@@ -1,0 +1,33 @@
+% 按 figures/assist.png 的六条工具/记忆/规划关系及用户输入关系重绘。
+\resizebox{10.2cm}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+  every node/.style={font=\normalsize,align=center},
+  unit/.style={draw=black!50,line width=.65pt,rounded corners=1pt,
+    minimum height=.82cm,minimum width=1.8cm,fill=cyan!18},
+  edge/.style={-{Stealth[length=2.7mm,width=1.9mm]},line width=.8pt,draw=black!75},
+  relation/.style={fill=white,inner sep=2pt,font=\small}]
+  \node[unit,fill=yellow!35,minimum width=2.7cm] (ch13request) at (4.8,5.7) {用户请求};
+  \node[unit,fill=green!17,minimum width=1.7cm] (ch13agent) at (4.8,2.6) {智能体};
+  \node[unit] (ch13tools) at (1.0,0) {工具};
+  \node[unit] (ch13memory) at (4.8,0) {记忆};
+  \node[unit,minimum width=2.0cm] (ch13plan) at (9.2,0) {规划};
+  \draw[edge] (ch13request.south) -- node[relation,right,pos=.54] {与之交互} (ch13agent.north);
+  \draw[edge] (ch13agent.south west) -- node[relation,above left,pos=.55] {使用} (ch13tools.north east);
+  \draw[edge] (ch13tools.west) .. controls (-1.35,1.0) and (-.8,2.0) .. (ch13agent.west);
+  \node[relation] at (-.05,1.35) {执行};
+  \draw[edge] (ch13agent.south west) .. controls (3.45,1.55) and (3.6,.9) .. (ch13memory.north west);
+  \node[relation] at (4.25,1.35) {存储};
+  \draw[edge] (ch13memory.north) .. controls (5.17,1.1) and (5.17,1.65) .. (ch13agent.south);
+  \node[relation] at (5.65,1.35) {检索};
+  \draw[edge] (ch13agent.south east) -- node[relation,above right,pos=.62] {规划} (ch13plan.north west);
+  \draw[edge] (ch13plan.north) .. controls (8.65,1.85) and (7.2,2.28) .. (ch13agent.east);
+  \node[relation] at (9.5,1.35) {更新};
+  % 原图中的用户图标与其标签。
+  \draw[draw=black!55,line width=.7pt] (7.65,6.42) circle (.18);
+  \draw[draw=black!55,line width=.7pt] (7.65,6.24) -- (7.65,5.55)
+    (7.32,6.02) -- (7.98,6.02)
+    (7.65,5.55) -- (7.31,5.15)
+    (7.65,5.55) -- (7.99,5.15);
+  \node[font=\small] at (7.65,4.93) {用户};
+\end{tikzpicture}%
+}

@@ -1,0 +1,60 @@
+% 原书分章PDF第6—8页：21.2导言、引理21.1完整推导与EIC/靶向更新。
+\section{估计}
+
+本节介绍如何使用 TMLE 估计目标参数。关于独立同分布数据中 TMLE 的一般概述，可参阅第21.7节所列文献。为改善目标参数 TMLE 的有限样本性能，通常希望在定义 TMLE 时，只选择数据生成分布中尽可能小的相关部分，然后由 TMLE 对其进行估计与更新。此外，聚焦于真正需要估计的部分，也可以使所得 TMLE 更易于实现。因此，在把目标参数定义为映射 $\Psi(P_0^N)$ 之后，下一步就是为这一映射找到最精简的表示，即一个只依赖 $N$ 个观测单位的联合分布 $P_0^N$ 的最小汇总量的新映射。更确切地说，下面的引理表明，目标参数 $\Psi(P_0^N)$ 可以表示为等价映射 $\bar\Psi(\bar P_0)$，其中 $\bar P_0$ 是联合数据生成分布 $P_0^N$ 中 $N$ 个单位特定组成部分的混合。我们还将说明，新映射 $\bar\Psi$ 只通过下文定义的组成部分 $\bar Q_0$ 和 $\bar q_{W,0}$ 依赖于 $\bar P_0$。
+
+\begin{bookresult}{引理}{21.1}
+设 $P^N\in\mathcal M$。对每个 $i=1,\ldots,N$，令 $P_i^s$ 表示单位 $i$ 特定的汇总数据 $O_i^s=(W_i^s,A_i^s,Y_i)$ 的分布，并假定其具有定义良好的密度 $p_i^s$。注意，每个 $O_i^s$ 的似然均可分解为
+\begin{equation}
+ \begin{aligned}
+ p_i^s(Y_i,A_i^s,W_i^s)
+ &=q_Y(Y_i\mid A_i^s,W_i^s)h_i(A_i^s,W_i^s)\\
+ &=q_Y(Y_i\mid A_i^s,W_i^s)g_i^s(A_i^s\mid W_i^s)q_{W_i^s}(W_i^s).
+ \end{aligned}
+ \tag{21.9}
+\end{equation}
+现在，将混合分布 $\bar P$ 定义为 $N$ 个单位特定汇总分布 $P_i^s$ 的有限混合，每个 $P_i^s$ 的权重均为 $1/N$。假定 $\bar P$ 具有定义良好的密度 $\bar p$，并用 $\bar O^s=(\bar W^s,\bar A^s,\bar Y)\sim\bar P$ 表示从 $\bar P$ 抽取的一个样本。于是，$\bar O^s$ 的似然可以写为
+\begin{equation}
+ \begin{aligned}
+ \bar p(\bar Y,\bar A^s,\bar W^s)
+ &=\bar q_Y(\bar Y\mid\bar A^s,\bar W^s)\bar h(\bar A^s,\bar W^s)\\
+ &=\bar q_Y(\bar Y\mid\bar A^s,\bar W^s)\bar g(\bar A^s\mid\bar W^s)\bar q_W(\bar W^s),
+ \end{aligned}
+ \tag{21.10}
+\end{equation}
+其中，$\bar q_Y=q_Y$（$q_Y$ 是第21.1节定义的 $Q_Y\in\mathcal M$ 的密度，即给定 $(A_i^s,W_i^s)$ 时 $Y_i$ 对所有 $i$ 共同的条件密度），$\bar h(a^s,w^s):=(1/N)\sum_{i=1}^N h_i(a^s,w^s)$，$\bar q_W(w^s):=(1/N)\sum_{i=1}^N q_{W_i^s}(w^s)$，且 $\bar g(a^s\mid w^s)=\bar h(a^s,w^s)/\bar q_W(w^s)$。注意，对式（21.4）中 $\bm O^*$ 的干预后似然 $P_{\bm Q,\bm G^*}^N$，也可以作类似处理，从而写出如下干预后混合分布的似然：
+\begin{equation}
+ \bar p(\bar Y^*,\bar A^{*,s},\bar W^s)
+ =q_Y(\bar Y^*\mid\bar A^{*,s},\bar W^s)
+ \bar g^*(\bar A^{*,s}\mid\bar W^s)\bar q_W(\bar W^s).
+ \tag{21.11}
+\end{equation}
+这里，$\bar q_W$ 是前面为 $\bar p$ 定义的因子；$\bar g^*(a^s\mid w^s):=\bar h^*(a^s,w^s)/\bar q_W(w^s)$，$\bar h^*(a^s,w^s):=(1/N)\sum_{i=1}^N h_i^*(a^s,w^s)$，而 $h_i^*$ 是 $(A_i^{*,s},W_i^s)$ 的联合分布密度。于是有 $\Psi(P^N)\equiv\bar\Psi(\bar P)$，其中新映射 $\bar\Psi(\bar P)$ 为
+\[
+ \begin{aligned}
+ \bar\Psi(\bar Q,\bar q_W)
+ &=E_{\bar Q_W}\left[E_{\bar g^*}[\bar Q(\bar A^{*s},\bar W^s)\mid\bar W^s]\right]\\
+ &=\int_{w^s\in\mathcal W^s,a^s\in\mathcal A^s}
+ \bar Q(a^s,w^s)\bar g^*(a^s\mid w^s)\,d\bar Q_W(w^s),
+ \end{aligned}
+\]
+其中 $\bar Q(a^s,w^s)$ 与前面的定义相同。略微滥用记号，我们将交替使用 $\bar\Psi(\bar Q,\bar q_W)$ 与 $\bar\Psi(\bar P)$，以强调 $\bar\Psi$ 只通过 $(\bar Q,\bar q_W)$ 依赖于 $\bar P$。
+\end{bookresult}
+
+因此，上述引理表明，感兴趣的参数 $\Psi(P_0^N)$ 可以表示为 $\bar Y^*$ 的期望。也就是说，在使用观测汇总数据 $(\bar W^s,\bar A^s,\bar Y)\sim\bar P_0$ 时，它等于前面定义的随机干预 $\bar g_0^*$ 下，平均结局 $E\bar Y_{\bar g_0^*}$ 的 g 计算公式所对应的参数。注意，该引理意味着，估计 $\psi_0$ 只需估计混合分布 $\bar P_0$ 的相关组成部分，即 $\bar Q_0$ 与 $\bar q_{W,0}$；这可以遵循标准的 TMLE 模板完成。最后，将相依数据的参数表示为混合分布 $\bar P_0$ 的某个函数，还意味着估计 $\bar P_0$ 的各因子时，只需把观测到的相依单位当作独立同分布观测处理，Sofrygin 和 van der Laan（2017）的引理4.1对此作了说明。总之，每当要估计 $\bar P_0$ 的某个参数，例如上述 $\psi_0$，就可以忽略单位 $O_i^s$（$i=1,\ldots,N$）之间的相依性，得到 $\psi_0$ 的独立同分布型估计量。当然，虽然估计可以这样进行，但要作出有效推断，仍需考虑单位之间实际存在的相依性。
+
+在介绍用于估计 $\psi_0$ 的 TMLE 之前，必须先定义该参数的有效影响曲线（efficient influence curve，EIC）。也就是说，给定参数的 TMLE 从该参数特定的有效影响曲线推导而来；在这里，EIC 为
+\begin{equation}
+ \begin{aligned}
+ \bar D(P^N)(\bm O)
+ =\frac{1}{N}\sum_{i=1}^N\Bigl\{&
+ \Bigl(\frac{\bar g^*}{\bar g}(A_i^s\mid W_i^s)
+       (Y_i-\bar Q(A_i^s,W_i^s))\Bigr)\\
+ &+\Bigl(E_{\bm q_0,\bm g^*}[Y_i^*\mid\bm W]
+       -E_{\bm q_0,\bm g^*}[Y_i^*]\Bigr)\Bigr\}.
+ \end{aligned}
+ \tag{21.12}
+\end{equation}
+这个 EIC 使我们能够定义估计 $\psi_0$ 所需的损失函数与最不利子模型。注意，我们将用上述 EIC 的组成部分来描述 $\psi_0$ 的 TMLE，即分别估计 $\bar Q_0$、$\bar g_0$、$\bar g_0^*$ 和 $\bar Q_{W,0}$ 的估计量 $\bar Q_N$、$\bar g_N$、$\bar g_N^*$ 与 $\bar Q_{W,N}$。接着，通过更新初始估计量 $\bar Q_N$，得到 $\bar Q_0$ 的靶向估计量 $\bar Q_N^*$，并将 TMLE $\psi_N^*$ 定义为混合映射 $\bar\Psi(\bar Q_N^*,\bar Q_{W,N})$ 相应的代入估计量。
+
+我们利用 $\bar Q_0$ 的损失函数，以及用 $\bar g_0$、$\bar g_0^*$ 表示的、经过 $\bar Q_0$ 的最不利扰动子模型，来定义靶向更新 $\bar Q_N^*$。模型更新 $\bar Q_N^*$ 的得分表示式（21.12）中的有效影响曲线 $\bar D$。具体而言，靶向估计量 $\bar Q_N^*$ 通过以下步骤更新 $\bar Q_N$：（1）使用估计权重 $\bar g_N^*/\bar g_N$；（2）使用一个经过初始估计量的参数子模型 $\{\bar Q_N(\varepsilon,\bar g_N^*/\bar g_N)\}$，该初始估计量在 $\varepsilon=0$ 时满足 $\bar Q_N=\bar Q_N(0,\bar g_N^*/\bar g_N)$，并将 $\{\bar Q_N(\varepsilon,\bar g_N^*/\bar g_N)\}$ 称为最不利子模型；（3）用标准的参数极大似然估计拟合 $\varepsilon$，将拟合值记为 $\varepsilon^N$；最后，（4）定义靶向（更新后）估计量为 $\bar Q_N^*:=\bar Q_N(\varepsilon^N,\bar g_N^*/\bar g_N)$。最后，由于 TMLE $\psi_N^*$ 解出了由式（21.12）中有效影响曲线 $\bar D$ 给出的经验得分方程，$\psi_N^*$ 也就继承了该有效影响曲线的双重稳健性。

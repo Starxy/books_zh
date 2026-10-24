@@ -1,0 +1,53 @@
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.3cm,y=1.1cm]
+\node[ch10node] (ch10f7a-X-0) at (0,2) {$X_{t-3}$};
+\node[ch10node] (ch10f7a-X-1) at (1,2) {$X_{t-2}$};
+\node[ch10node] (ch10f7a-X-2) at (2,2) {$X_{t-1}$};
+\node[ch10node] (ch10f7a-X-3) at (3,2) {$X_{t}$};
+\node[ch10node,dashed] (ch10f7a-Z-0) at (0,1) {$Z_{t-3}$};
+\node[ch10node,dashed] (ch10f7a-Z-1) at (1,1) {$Z_{t-2}$};
+\node[ch10node,dashed] (ch10f7a-Z-2) at (2,1) {$Z_{t-1}$};
+\node[ch10node,dashed] (ch10f7a-Z-3) at (3,1) {$Z_{t}$};
+\node[ch10node] (ch10f7a-Y-0) at (0,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f7a-Y-1) at (1,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f7a-Y-2) at (2,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f7a-Y-3) at (3,0) {$Y_{t}$};
+\draw[ed] (ch10f7a-X-0)--(ch10f7a-X-1);
+\draw[ed] (ch10f7a-X-1)--(ch10f7a-X-2);
+\draw[ed] (ch10f7a-X-2)--(ch10f7a-X-3);
+\draw[ed] (ch10f7a-Y-0)--(ch10f7a-Y-1);
+\draw[ed] (ch10f7a-Y-1)--(ch10f7a-Y-2);
+\draw[ed] (ch10f7a-Y-2)--(ch10f7a-Y-3);
+\draw[ed] (ch10f7a-Z-0)--(ch10f7a-X-1);
+\draw[ed] (ch10f7a-Z-1)--(ch10f7a-X-2);
+\draw[ed] (ch10f7a-Z-2)--(ch10f7a-X-3);
+\draw[ed] (ch10f7a-Z-0)--(ch10f7a-Y-2);
+\draw[ed] (ch10f7a-Z-1)--(ch10f7a-Y-3);
+\end{tikzpicture}
+\par\small (a) 由于存在潜在共同原因$Z$，Granger因果性错误地推断$X$对$Y$存在因果影响。
+\end{minipage}\hfill
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.3cm,y=1.15cm]
+\node[ch10node] (ch10f7b-X-0) at (0,1) {$X_{t-3}$};
+\node[ch10node] (ch10f7b-X-1) at (1,1) {$X_{t-2}$};
+\node[ch10node] (ch10f7b-X-2) at (2,1) {$X_{t-1}$};
+\node[ch10node] (ch10f7b-X-3) at (3,1) {$X_{t}$};
+\node[ch10node] (ch10f7b-Y-0) at (0,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f7b-Y-1) at (1,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f7b-Y-2) at (2,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f7b-Y-3) at (3,0) {$Y_{t}$};
+\draw[ed] (ch10f7b-X-0)--(ch10f7b-Y-1);
+\draw[ed] (ch10f7b-Y-0)--(ch10f7b-X-1);
+\draw[ed] (ch10f7b-X-1)--(ch10f7b-Y-2);
+\draw[ed] (ch10f7b-Y-1)--(ch10f7b-X-2);
+\draw[ed] (ch10f7b-X-2)--(ch10f7b-Y-3);
+\draw[ed] (ch10f7b-Y-2)--(ch10f7b-X-3);
+\end{tikzpicture}
+\par\small (b) 如果$X_t$对$Y_{t+1}$的影响与$Y_t$对$X_{t+1}$的影响都是确定性的，Granger因果性会错误地推断$X$对$Y$及$Y$对$X$均无因果影响。
+\end{minipage}
+\caption{在这些例子中，Granger因果性推断出错误的图结构。}
+\end{figure}

@@ -1,0 +1,63 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.9cm}
+
+\tikzstyle{snode} = [minimum width=2.5cm,minimum height=1.5cm,inner sep=2pt,draw,thick,fill=white]
+
+\begin{scope}
+
+% step 0
+\node [snode,anchor=west] (step0) at (0,0) {初始化};
+\node [anchor=north west,align=left] (step0text) at ([xshift=0.5cm]step0.north east) {\small{用若干条指令及相应的输入输出样本}\\[-0.1cm] \small{初始化任务池。}};
+\node [anchor=north west] (step0sample1) at ([yshift=-0.1cm]step0text.south west) {\scriptsize{样本 1：}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (step0sample1text) at (step0sample1.east) {\scriptsize{$(\mathrm{Instruction},\mathrm{User}\text{-}\mathrm{input},\mathrm{Output})$}};
+\node [anchor=north west] (step0sample2) at ([yshift=-2pt]step0sample1.south west) {\scriptsize{样本 2：}};
+\node [anchor=west,fill=gray!30,inner sep=3pt] (step0sample2text) at (step0sample2.east) {\scriptsize{$(\mathrm{Instruction},\mathrm{User}\text{-}\mathrm{input},\mathrm{Output})$}};
+\node [anchor=north] (step0sample3) at ([yshift=-2pt]step0sample2.south) {\scriptsize{$\cdots$}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([xshift=0.2cm]step0sample1text.north east) --  ([xshift=0.2cm,yshift=-1.5cm]step0sample1text.north east);
+
+\node [anchor=west,minimum width=1.3cm,minimum height=0.7cm,draw,fill=white,drop shadow] (pool) at ([xshift=0.5cm,yshift=0.1cm]step0sample2text.east) {\footnotesize{任务池}};
+
+% step 1
+\node [snode,anchor=north west] (step1) at ([yshift=-\ssep]step0.south west) {采样};
+\node [anchor=north west,align=left] (step1text) at ([xshift=0.5cm]step1.north east) {\small{从任务池中抽取几条指令}};
+
+\node [anchor=north west,fill=gray!30,inner sep=3pt] (step1instruction1) at ([yshift=-0.1cm,xshift=0.1cm]step1text.south west) {\scriptsize{$\mathrm{Instruction}_a$}};
+\node [anchor=north west,fill=gray!30,inner sep=3pt] (step1instruction2) at ([yshift=-3pt]step1instruction1.south west) {\scriptsize{$\mathrm{Instruction}_b$}};
+\node [anchor=north west,fill=gray!30,inner sep=3pt] (step1instruction3) at ([yshift=-3pt]step1instruction2.south west) {\scriptsize{$\mathrm{Instruction}_c$}};
+
+\node [anchor=west,minimum width=1.3cm,minimum height=0.7cm,draw,fill=white,drop shadow] (pool) at ([xshift=2.0cm,yshift=0pt]step1instruction2.east) {\footnotesize{任务池}};
+\draw [->,thick] ([xshift=-3pt]pool.west) -- ([xshift=-1.85cm]pool.west) node [pos=0.5,above] {\scriptsize{采样}};
+
+% step 2
+\node [snode,anchor=north west,align=left] (step2) at ([yshift=-\ssep]step1.south west) {指令\\生成};
+\node [anchor=north west,align=left] (step2text) at ([xshift=0.5cm,yshift=0.2cm]step2.north east) {\small{提示大语言模型根据抽取的指令}\\[-0.1cm] \small{生成一条新指令。}};
+
+\node [anchor=north west,minimum width=5cm,align=left,draw,thin,rounded corners=0.3cm] (prompt1) at ([yshift=-0.1cm,xshift=0.15cm]step2text.south west) {\tiny{\texttt{下面提供了执行若干任务的不同指令。}}\\ [-0.25cm] \tiny{\texttt{请以这些指令为基础，生成一条新指令。}} \\ [-0.2cm] \tiny{\texttt{任务 1：} \ctext[rgb]{0.85, 0.85, 0.85}{$\mathrm{Instruction}_a$}} \\ [-0.2cm] \tiny{\texttt{任务 2：} \ctext[rgb]{0.85, 0.85, 0.85}{$\mathrm{Instruction}_b$}} \\ [-0.2cm] \tiny{\texttt{任务 3：} \ctext[rgb]{0.85, 0.85, 0.85}{$\mathrm{Instruction}_c$}} \\ [-0.2cm] \tiny{\texttt{新任务：} \underline{\ctext[RGB]{255,204,204}{$\mathrm{Instruction}_{\mathrm{new}}$}}}};
+
+% step 3
+\node [snode,anchor=north west,align=left] (step3) at ([yshift=-\ssep-0.2cm]step2.south west) {样本\\生成};
+\node [anchor=north west,align=left] (step3text) at ([xshift=0.5cm,yshift=0.1cm]step3.north east) {\small{给定新生成的指令及若干输入输出样本，}\\[-0.1cm] \small{生成一个新样本。}};
+
+\node [anchor=north west,minimum width=8.1cm,align=left,draw,thin,rounded corners=0.3cm] (prompt2) at ([yshift=-0.1cm,xshift=0.15cm]step3text.south west) {\tiny{\texttt{下面提供了一组任务的输入输出样本，}}\\ [-0.25cm] \tiny{\texttt{每个样本由指令、用户输入和输出组成。}} \\ [-0.25cm] \tiny{\texttt{请以这些样本为基础，生成一个新样本。}} \\ [-0.2cm] \tiny{\texttt{样本 1：} \ctext[rgb]{0.85, 0.85, 0.85}{$\mathrm{Sample}_a$}} \\ [-0.2cm] \tiny{\texttt{样本 2：} \ctext[rgb]{0.85, 0.85, 0.85}{$\mathrm{Sample}_b$}} \\ [-0.2cm] \tiny{\texttt{新样本：} \ctext[RGB]{255,204,204}{$\mathrm{Instruction}_{\mathrm{new}}$} \ctext[RGB]{153,204,255}{$\mathrm{User\text{-}input}_{\mathrm{new}}$} \ctext[RGB]{153,204,255}{$\mathrm{Output}_{\mathrm{new}}$}}};
+
+% step 4
+\node [snode,anchor=north west] (step4) at ([yshift=-\ssep-0.2cm]step3.south west) {过滤};
+\node [anchor=north west,align=left] (step4text) at ([xshift=0.5cm,yshift=0.1cm]step4.north east) {\small{过滤掉无效和低质量样本。} \\[-0.1cm] \small{将剩余样本加入任务池。}};
+
+% connections
+\draw [->,thick] ([yshift=-2pt]step0.south) -- ([yshift=2pt]step1.north);
+\draw [->,thick] ([yshift=-2pt]step1.south) -- ([yshift=2pt]step2.north);
+\draw [->,thick] ([yshift=-2pt]step2.south) -- ([yshift=2pt]step3.north);
+\draw [->,thick] ([yshift=-2pt]step3.south) -- ([yshift=2pt]step4.north);
+\draw [->,thick] ([yshift=-2pt]step4.south) -- ([yshift=-0.5cm]step4.south) -- ([yshift=-0.5cm,xshift=-0.8cm]step4.south west) -- ([xshift=-0.8cm]step1.west) -- ([xshift=-2pt]step1.west);
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

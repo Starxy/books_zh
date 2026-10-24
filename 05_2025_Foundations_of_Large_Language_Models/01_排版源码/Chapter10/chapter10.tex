@@ -1,0 +1,1217 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+%----------------------------------------------------------------------------------------
+% Natural Language Processing: Neural Networks and Large Language Models
+%
+% Copyright 2021-2026
+% Tong Xiao (xiaotong@mail.neu.edu.cn) and Jingbo Zhu (zhujingbo@mail.neu.edu.cn)
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%    CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+%\setcounter{chapter}{9}
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 10
+%----------------------------------------------------------------------------------------
+
+\chapter{对齐}
+
+\thispagestyle{chapterurl} % add urls to the header
+
+\noindent 对齐（alignment）在自然语言处理（natural language processing，NLP）中并非新概念，但其含义会随领域和时间而变化。在传统 NLP 中，\textit{对齐}通常指在两个集合的对应元素之间建立联系，例如将中文句子与英文句子中的词对齐。随着大语言模型（large language model，LLM）在 NLP 研究中的地位日益重要，这一术语如今更广泛地用于描述使模型输出符合人类期望的过程。对齐所要解决的问题是：模型输出可能不符合用户预期的具体目标或情境。例如，预训练（pre-training）大语言模型可能无法遵循用户指令，因为它们并未接受过这方面的训练；又如，大语言模型可能生成有害内容，或延续训练数据中固有的偏见。这带来了新的挑战：既要确保大语言模型的输出准确、相关，也要使其符合伦理、不带歧视。
+
+仅对大语言模型进行预训练，可能产生各种对齐问题。对齐的最终目标是解决或缓解这些问题，确保大语言模型既有用又安全。由于大语言模型在海量数据上训练，人们可能认为，只要有足够多的高质量数据，预训练就能使模型足够准确、安全，从而可能无须单独的对齐阶段。然而，现实中几乎不可能收集到涵盖所有任务、或充分反映人类偏好（human preference）的数据。因此，仅靠预训练很难实现对齐。目前，对齐仍是大语言模型开发中的关键步骤。
+
+本章重点介绍大语言模型的对齐方法。首先讨论对齐的一般概念，再介绍两种广泛使用的方法：\mindex{指令对齐}（instruction alignment）和\mindex{人类偏好对齐}（human preference alignment）。前者采用监督微调（supervised fine-tuning，SFT），引导大语言模型生成严格遵循用户指令的输出；后者通常依赖强化学习（reinforcement learning，RL）技术，依据人类反馈（human feedback）训练模型。尽管这两类方法的出发点不同，但开发对齐良好的大语言模型时，通常会将它们结合使用。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{大语言模型对齐概述}
+
+\noindent 对齐可以通过多种方式实现。大语言模型对齐问题本身复杂而多面，需要结合不同技术策略，因此也需要不同的方法。这里介绍三种广泛使用的大语言模型对齐方法。
+
+第一种方法是使用有标注数据微调（fine-tuning）大语言模型。这种方法很直接：在预训练的基础上继续训练，使大语言模型适配具体任务。\mindex{监督微调}（\mindex{SFT}）就是一个例子，即在由特定任务指令及其期望输出组成的数据集上继续训练大语言模型。与原始训练集相比，SFT 数据集通常小得多，但针对性很强。经过 SFT，大语言模型能够学会依据用户指令执行任务，包括 SFT 期间见过的任务，以及此前未见但相似的新任务。例如，在一组问答对上微调，可以使模型回答具体问题，甚至回答 SFT 数据集中没有直接覆盖的问题。当输入输出关系相对容易描述、数据易于标注时，这种方法尤其有用。
+
+第二种方法是使用奖励模型（reward model，RM）微调大语言模型。对齐的一项困难在于，人类价值观和期望十分复杂，难以描述。在许多情况下，人类自身也很难确切说明什么在伦理上正确、什么在文化上合适。因此，微调数据的收集与标注并不像 SFT 那样直接。此外，对齐不只是数据拟合任务。人工标注的有限样本往往不足以全面定义这些复杂行为，因而必须教会模型评估哪些输出最能反映人类偏好。例如，既希望输出在技术上准确，也希望它符合人类期望和价值观。一个思路是构建模拟人类判断的奖励模型：当大语言模型生成更符合人类偏好的回答时，奖励模型就给予奖励，类似教师向学生提供反馈。为获得这样的奖励模型，可以利用人类偏好数据训练一个评分函数，再以训练好的奖励模型为指导，调整和改进大语言模型。这样，大语言模型对齐任务便被表述为强化学习任务。由此得到的方法，例如\mindex{基于人类反馈的强化学习}（reinforcement learning from human feedback，\mindex{RLHF}），已被证明在使大语言模型适应人类行为和社会规范的细微之处方面尤为成功。
+
+第三种方法是在模型推理（inference）时进行对齐，而非在训练或微调时进行。从这一角度看，大语言模型中的提示方法（prompting）也可以视为无须训练的对齐方式，因而能够以很低的成本动态适配各种任务。另一种推理时对齐方式是对大语言模型输出重新评分。例如，可以构建评分系统（类似奖励模型），模拟人类对模型输出的反馈，并优先选取获得更多正面反馈的输出。
+
+上述三种方法通常在预训练完成后依次使用：先进行 SFT，再进行 RLHF，最后在推理时向大语言模型提供提示。由此，大语言模型的开发大致可分为预训练阶段和对齐阶段，图~\ref{fig:pre-training-then-alignment} 展示了这一过程。上一章已经详细讨论提示技术，因此本章其余部分将主要关注基于微调的对齐方法。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-pretrain-then-align}
+\caption{开发大语言模型的“先预训练、后对齐”流程示意图。预训练阶段，在海量数据上通过下一词元预测训练大语言模型；随后在对齐阶段，使模型符合用户指令、意图和偏好，包括指令对齐、人类偏好对齐和提示方法。}
+\label{fig:pre-training-then-alignment}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{指令对齐}
+
+\noindent 大语言模型的一个特点是，能够遵循用户提供的提示（prompt）执行各种任务。在许多应用中，提示由简单指令和用户输入组成，目标是让大语言模型准确按指令完成任务。这种能力通常称为指令遵循（instruction following）。例如，下面的提示要求模型从一篇长文中提取要点，生成简洁摘要。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \small{指令}} & 用三句话概括这段文本。 \\ [0.2cm]
+{\color{gray} \small{输入}} & 夏令时（DST）是夏季将时钟拨快一小时的做法，\\
+& 于 1916 年在德国开始实行。\\
+& 第一次世界大战期间，这是一种节省……的方式。 \\ [0.2cm]
+{\color{gray} \small{输出}} & \underline{\hspace{2em}}
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这项任务要求大语言模型理解“用三句话概括这段文本”的指令，并据此概括文本。然而，预训练的基础大语言模型通常针对下一词元预测进行训练，而非针对遵循指令生成输出进行训练。若直接将预训练模型用于上述例子，模型很可能继续写这篇文章，而非生成摘要。指令对齐（或\mindex{指令微调}，instruction fine-tuning）的目标，就是调整大语言模型，使其准确响应用户指令与意图。本节其余部分讨论与指令对齐相关的若干主题，包括微调模型以遵循指令、生成或收集指令数据，以及指令对齐的泛化。
+
+\subsection{监督微调}
+
+\noindent 使大语言模型适配指令遵循的一种直接方式，是利用标注输入输出对微调这些模型~\cite{ouyang-etal:2022training,wei-etal:2022finetuned}。在大语言模型对齐中，SFT 通常以指令微调的形式实现。标准语言模型训练会计算序列中所有词元的损失，而 SFT 只计算给定输入时输出词元的损失。设 $\mathbf{x}=x_0...x_m$ 为输入序列（如指令加用户输入），$\mathbf{y}=y_1...y_n$ 为相应输出序列。SFT 数据由这样的输入输出对组成（记为 $S$），其中每个输出都是对应输入的期望回答。例如，下表展示了一个 SFT 数据集中的若干样本。
+
+\begin{center}
+\begin{tabular}{l | l}
+$\mathbf{x}$（指令 + 用户输入） & $\mathbf{y}$（输出） \\ \hline
+\colorbox{gray!30}{概括下面的文章。} & $\{*\textrm{summary}*\}$ \\
+文章：近年来，太阳能以前所未有的速度增长， & \\
+成为增长最快的…… & \\ \hline
+\colorbox{gray!30}{分析下面这条评论的情感。} & 正面 \\
+评论：我非常喜欢这次全新的用餐体验。 & \\
+食物美味极了，服务也无可挑剔。 & \\ \hline
+\colorbox{gray!30}{将下面的句子翻译成法语。} & La pratique aide \\
+句子：practice indeed helps. & effectivement. \\ \hline
+\colorbox{gray!30}{从下面的财报中提取} & 营收：10 百万美元，\\
+\colorbox{gray!30}{主要财务数据。} & 利润率：15\% \\
+报告：该公司报告第一季度营收为 10 百万美元，\\
+利润率为 15\%…… \\ \hline
+\colorbox{gray!30}{判断下面的邮件是否为垃圾邮件。} & 垃圾邮件 \\
+文本：恭喜！您赢得了一张 500 美元的礼品卡。\\
+立即点击此处领取。 \\ \hline
+\colorbox{gray!30}{针对下面的技术问题提供解决方案。} & 首先，检查…… \\
+问题：我的电脑运行缓慢，而且经常卡死。 &
+\end{tabular}
+\end{center}
+
+\noindent 其中，指令以高亮显示。该数据集包含多种不同 NLP 问题的指令及相应输出，因此可以微调一个大语言模型，使其同时处理多项任务。
+
+在 SFT 中，目标是最大化给定输入时正确输出的概率。考虑一个预训练参数为 $\hat{\theta}$ 的大语言模型，微调目标可表述为
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\hat{\theta}^+} \sum_{(\mathbf{x},\mathbf{y}) \in \mathcal{D}} \log \mathrm{Pr}_{\hat{\theta}^+}(\mathbf{y}|\mathbf{x}), \label{eq:instruction-fine-tuning}
+\end{eqnarray}
+
+\noindent 其中，$\tilde{\theta}$ 表示通过微调优化后的参数，$\hat{\theta}^+$ 表示对 $\hat{\theta}$ 的调整。为使记号简洁，下面省略上标 $+$，用 $\theta$ 表示 $\hat{\theta}^+$。但应记住，微调从预训练参数开始，而非从随机初始化的参数开始。
+
+目标函数 $\log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{x})$ 的计算方式是：对 $\mathbf{y}$ 中各词元的对数概率求和，其条件为输入 $\mathbf{x}$ 以及此前的所有词元 $\mathbf{y}_{<i}$：
+\begin{eqnarray}
+\log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{x}) & = & \sum_{i=1}^{n} \log \mathrm{Pr}_{\theta}(y_i|\mathbf{x},\mathbf{y}_{<i}).
+\end{eqnarray}
+
+\noindent 这一表述等价于最小化交叉熵（cross-entropy）损失。
+
+若将 $\mathbf{x}$ 和 $\mathbf{y}$ 拼接为单个序列，则更一般的语言建模形式基于联合对数概率 $\log \mathrm{Pr}_{\theta}(\mathbf{x},\mathbf{y})$，即在序列 $\mathrm{seq}_{\mathbf{x},\mathbf{y}} = [\mathbf{x},\mathbf{y}]$ 的所有词元上最小化损失（或最大化对数似然）。利用链式法则，可将该序列的概率写为
+\begin{eqnarray}
+\log \mathrm{Pr}_{\theta}(\mathrm{seq}_{\mathbf{x},\mathbf{y}}) & = & \log \mathrm{Pr}_{\theta}(\mathbf{x},\mathbf{y}) \nonumber \\
+ & = & \underbrace{\log \mathrm{Pr}_{\theta}(\mathbf{x})}_{\text{置为 $0$}} + \underbrace{\log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{x})}_{\text{计算损失}}. \label{eq:sft-xy-chain-rule}
+\end{eqnarray}
+
+\noindent 等式右侧有两项。只需忽略第一项 $\log \mathrm{Pr}_{\theta}(\mathbf{x})$，仅关注第二项 $\log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{x})$，用于损失计算。因此，可以用标准大语言模型实现这一训练过程。对于序列 $\mathrm{seq}_{\mathbf{x},\mathbf{y}}$，先照常执行前向传播，再在反向传播时强制将 $\mathbf{x}$ 对应的损失置为零。图~\ref{fig:sft-forward-backward} 展示了这一过程。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-sft-forward-and-backward}
+\caption{大语言模型监督微调示意图。将输入与输出拼接为单个序列。前向传播时，照常运行大语言模型；反向传播时，只计算输出部分的损失，将输入部分的损失直接置为 0。}
+\label{fig:sft-forward-backward}
+\end{figure}
+
+以 $\log \mathrm{Pr}_{\theta}(\mathrm{seq}_{\mathbf{x},\mathbf{y}})$ 为目标函数，便可用常规语言模型训练的形式描述 SFT：
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\theta} \sum_{(\mathbf{x},\mathbf{y}) \in \mathcal{D}} \log \mathrm{Pr}_{\theta}(\mathrm{seq}_{\mathbf{x},\mathbf{y}}). \label{eq:sft-single-round-prediction-mle}
+\end{eqnarray}
+
+上面考虑的问题本质上是\mindex{单轮预测}（single-round prediction）问题：大语言模型根据单次输入生成回答，随后不再与用户交互，也不再接收用户反馈。输入的处理与输出的生成一次完成。这常见于只提出一个问题、只给出一个答案，没有后续追问或澄清的情形。然而，实际中有时需要处理多轮预测（multi-round prediction）问题，例如大语言模型参与多轮对话。在这种设置中，模型不仅根据初始输入生成回答，还需利用后续输入来细化或扩展此前的交互。例如，可以让大语言模型充当医疗助理聊天机器人，与用户进行如下对话。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \small{用户}} & 我最近一直觉得很疲惫。\\  [0.1cm]
+{\color{gray} \small{聊天机器人}} & \uline{听到这个消息我很遗憾。除了疲惫，你还注意到} \\
+& \uline{其他症状吗？} \\ [0.2cm]
+{\color{gray} \small{用户}} & 是的，我还经常头痛。\\  [0.1cm]
+{\color{gray} \small{聊天机器人}} & \uline{这些症状持续多久了？} \\ [0.2cm]
+{\color{gray} \small{用户}} & 大约一周了。\\  [0.1cm]
+{\color{gray} \small{聊天机器人}} & \uline{最好咨询一下医护人员。} \\
+& \uline{需要我帮你预约吗？} \\ [0.2cm]
+{\color{gray} \small{用户}} & 好的，谢谢。能安排在下班后吗？\\  [0.1cm]
+{\color{gray} \small{聊天机器人}} & \uline{当然，我可以安排。下周三和下周四} \\ [0.1cm]
+& \uline{下午 5 点后都有空档。哪天更方便？} \\ [0.2cm]
+& ...
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+这项任务包含多轮对话，每一轮都根据用户请求或问题及对话历史生成回答。假设有 $K$ 轮对话，记为 $\{\mathbf{x}^1,\mathbf{y}^1,\mathbf{x}^2,\mathbf{y}^2,...,\mathbf{x}^K,\mathbf{y}^K\}$。对于每一轮 $k$，$\mathbf{x}^k$ 和 $\mathbf{y}^k$ 分别表示用户请求与回答。生成该回答的对数概率可写为 $\log \mathrm{Pr}_{\theta}(\mathbf{y}^k|\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{x}^k)$。目标是最大化这些对数概率之和：
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\theta} \sum_{k=1}^{K} \log \mathrm{Pr}_{\theta}(\mathbf{y}^k|\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{x}^k). \label{eq:sft-xy-conversation-objective-function}
+\end{eqnarray}
+
+一种直接实现方式是分别计算每个 $k$ 对应的条件概率，但这需要运行大语言模型 $K$ 次，每次都使用不断增长的对话历史进行预测。更高效的方式是只运行一次模型，计算所有回答的损失。为此，将对话表示为序列 $\mathrm{seq}_{\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{x}^K,\mathbf{y}^K} = [\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{x}^K,\mathbf{y}^K]$（简记为 $\mathrm{seq}$）。该序列的对数概率为
+\begin{eqnarray}
+\log \mathrm{Pr}_{\theta}(\mathrm{seq}) & = & \log \mathrm{Pr}_{\theta}(\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{x}^K,\mathbf{y}^K) \nonumber \\
+                                        & = & \underbrace{\log \mathrm{Pr}_{\theta}(\mathbf{x}^1)}_{\text{置为 $0$}} + \underbrace{\log \mathrm{Pr}_{\theta}(\mathbf{y}^1|\mathbf{x}^1)}_{\text{计算损失}} + \cdots + \nonumber \\
+                                        &   & \underbrace{\log \mathrm{Pr}_{\theta}(\mathbf{x}^K|\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{y}^{K-1})}_{\text{置为 $0$}} + \nonumber \\
+                                        &   & \underbrace{\log \mathrm{Pr}_{\theta}(\mathbf{y}^K|\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{x}^K)}_{\text{计算损失}}. \label{eq:sft-xy-conversation-chain-rule}
+\end{eqnarray}
+
+这里的技巧是忽略生成用户输入的损失（即 $\log \mathrm{Pr}_{\theta}(\mathbf{x}^1),...,\allowbreak \log \mathrm{Pr}_{\theta}(\mathbf{x}^K|\mathbf{x}^1,\mathbf{y}^1,...,\mathbf{y}^{K-1})$），如图~\ref{fig:sft-conversational-models} 所示。这样，只计算给定对话历史时生成回答的概率；换言之，式（\ref{eq:sft-xy-conversation-chain-rule}）等价于式（\ref{eq:sft-xy-conversation-objective-function}）。与式（\ref{eq:sft-single-round-prediction-mle}）一样，可以在训练数据集 $\mathcal{D}$ 上最大化对数似然，训练这一多轮预测模型：
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\theta} \sum_{\mathrm{seq} \in \mathcal{D}} \log \mathrm{Pr}_{\theta}(\mathrm{seq}).
+\end{eqnarray}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-sft-multi-round-prediction}
+\caption{对话模型监督微调示意图。大语言模型充当聊天机器人，根据对话历史回应每个请求。对话在用户与聊天机器人之间交替进行。SFT 将整段对话视为一个序列，形式与标准大语言模型相同，但只计算模型回答部分的损失。}
+\label{fig:sft-conversational-models}
+\end{figure}
+
+上面介绍的 SFT 方法与常规语言模型训练本质相同，实现起来似乎很简单，但实践中仍有若干问题需要考虑。例如：
+
+\begin{itemize}
+\item \vspace{0.5em} SFT 需要有标注数据。这与预训练很不相同：预训练使用容易获取的原始文本作为训练数据。与其他监督机器学习问题一样，SFT 的数据标注和选择并不简单。一般希望构建数量充足、质量较高，且与模型将执行的任务高度相关的 SFT 数据；另一方面，又希望用更少的数据微调，以降低计算和数据构建成本。大语言模型的质量往往高度依赖 SFT 所用数据，因此必须仔细构建和检查这些数据。后续小节将介绍，如何利用更先进的数据构建技术，使 SFT 更高效、更有效。
+\item \vspace{0.3em} 由于大语言模型规模庞大，SFT 的计算开销仍然很高，维护与更新模型因而需要大量资源。例如，对数十亿参数进行梯度更新，需要很强的计算能力和大量内存，通常依赖运行成本高昂的高性能计算环境。为应对这些挑战，已有研究探索剪枝（pruning）、量化（quantization）和更高效训练算法等多种优化策略。其中，参数高效微调（parameter-efficient fine-tuning，PEFT）方法尤其受到关注，其目标是在无须大量计算资源的情况下，保持最先进的性能。第 \ChapterLLMPrompting\ 章已经介绍，软提示（soft prompt）等技术能够提高微调效率。关于参数高效方法的进一步讨论，可参阅相关论文~\cite{houlsby-etal:2019parameter,hu-etal:2022lora,han-etal:2024parameter}。
+\item \vspace{0.3em} SFT 可以视为预训练之后的后训练（post-training）步骤。它是一个独立训练阶段，旨在保留初始预训练优势的同时作出新的调整。这似乎有些矛盾，因为用更多数据更新预训练模型，可能使其遗忘部分原有知识。设想有大量 SFT 数据，并对大语言模型进行充分微调，模型就可能过拟合这些数据，进而降低泛化性能，或引发灾难性遗忘（catastrophic forgetting）。缓解这一问题的常见策略是采用正则化与早停技术。另一种实用方式是使用更小的学习率（learning rate），温和地调整模型权重。此外，利用来自不同来源、不同问题领域的数据进行微调，也可能有益。尽管如此，实践中仍需仔细检查 SFT 步骤，并投入大量工程和实验工作进行优化。
+\end{itemize}
+\vspace{0.5em}
+
+\subsection{微调数据的构建}
+
+\noindent 微调数据至关重要，因此近年大量大语言模型研究聚焦于指令微调数据集的构建。与大多数机器学习任务一样，构建微调数据集通常有两条途径：人工生成数据和自动生成数据。
+
+\subsubsection{人工生成数据}
+
+\noindent 一种直接方式是招募人工标注者，为目标任务创建输入输出对。在文本分类等传统 NLP 数据标注中，标注者只需按照指南为收集到的文本赋予标签；而为大语言模型创建微调数据，需要更多步骤与工作，因而更具挑战。假设希望为英译中机器翻译任务获取微调数据，第一步是编写提示模板（prompt template），清楚地描述任务、组织问题格式。例如：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \small{指令}} & 将文本从英文翻译成中文。 \\ [0.2cm]
+{\color{gray} \small{用户输入}} & $\{*\mathrm{text}*\}$  \\ [0.2cm]
+{\color{gray} \small{输出}} & \underline{$\{*\mathrm{translation}*\}$}
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+然后收集源文本与目标文本对（即英文文本及其相应中文译文），替换变量 $\{*\mathrm{text}*\}$ 和 $\{*\mathrm{translation}*\}$，生成微调样本。例如，给定下面这对英汉句子
+
+\begin{center}
+\begin{tabular}{r c l}
+How's the weather today? & $\to$ & \begin{CJK*}{UTF8}{gbsn} 今天天气怎么样？ \end{CJK*} \\
+\multicolumn{1}{c}{$\{*\mathrm{text}*\}$} & & \multicolumn{1}{c}{$\{*\mathrm{translation}*\}$}
+\end{tabular}
+\end{center}
+
+\noindent 可以利用提示模板生成如下微调样本：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \small{指令}} & 将文本从英文翻译成中文。 \\ [0.2cm]
+{\color{gray} \small{用户输入}} & How's the weather today?  \\ [0.2cm]
+{\color{gray} \small{输出}} & \underline{\begin{CJK*}{UTF8}{gbsn} 今天天气怎么样？ \end{CJK*}}
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 即
+\begin{eqnarray}
+& \mathbf{x}: & \text{将文本从英文翻译成中文。$\backslash$n How's the weather today?} \nonumber \\ & \mathbf{y}: & \text{\begin{CJK*}{UTF8}{gbsn} 今天天气怎么样？ \end{CJK*}} \nonumber
+\end{eqnarray}
+
+\noindent 可以按上一小节所述，用这个 $(\mathbf{x},\mathbf{y})$ 对微调大语言模型。
+
+这里的一项困难是，同一任务的提示模板有很多写法，不同人编写的模板在质量与复杂度上可能差异很大。有时，模板中的指令可能过于复杂或冗长；有时，甚至不完全清楚目标任务究竟是什么、应如何描述。一种广泛采用的策略，是为已有 NLP 任务创建提示模板，因为这一领域已有大量成熟的问题与基准~\cite{bach-etal:2022promptsource,wang-etal:2022super,mishra-etal:2022cross}。此时，可以向标注者提供原始任务描述和大量样例，再由他们以各自的方式表述如何提示大语言模型完成任务。虽然这种方法能够简化提示创建过程，但仍需借助标注框架与众包系统管理工作、控制质量。例如，通常需要设计标注指南和统一的提示模板编写格式，尤其是多名标注者参与同一任务时。从现有 NLP 任务归纳提示的一个优势是，模板开发完成后，就能方便地利用原始数据集的标注样本生成微调样本。例如，给定英译中双语数据集，只需将其中的句子对填入上述模板的槽位，即可创建大量微调样本。
+
+另一种方法是直接利用互联网上自然存在的数据。一个常见例子是从问答网站收集问答对，用于微调大语言模型，使其执行开放域问答（open-domain QA）任务~\cite{joshi-etal:2017triviaqa}。许多问答基准就是这样构建的，因为问题类型如此丰富，少量标注者很难预见所有可能的问题类型。使用这些网站的数据，则可以确保大语言模型的微调数据具有足够的规模与多样性。
+
+除利用现有资源外，构建微调数据集的另一种直接方式是众包。一个简单做法是允许用户输入任意问题，随后由人工撰写回答，或由大语言模型自动生成回答，再交由人工标注者审阅、修正。这样能够捕捉真实用户行为，进而收集大量传统 NLP 任务未覆盖的新问题的输入与输出。
+
+微调数据集构建中的另一个问题是，通常希望数据尽可能多样。许多研究发现，提高微调数据的多样性，能够改善大语言模型的鲁棒性与泛化能力。因此，将更多样的提示和任务纳入微调数据集，已引起广泛关注。第~\ref{sec:instruction-generalization} 节将进一步讨论微调的泛化。
+
+\subsubsection{自动生成数据}
+
+\noindent 人工生成数据的一个局限，是其质量和多样性很大程度上取决于人的经验与创造力。因此，若希望大语言模型泛化到多样的用户指令，依赖人工标注数据进行微调往往效率不高。此外，这类数据的覆盖范围可能有限，甚至可能包含标注者自身引入的偏见。一种替代方式是自动生成数据。例如，可以通过众包收集一批问题，再用一个调优良好的大语言模型为其生成答案，随后照常将这些问答对作为微调样本。这种方法虽很简单，却已被广泛用于生成大规模大语言模型微调数据。
+
+上述合成微调数据的生成方式，与 NLP 数据增强（data augmentation）中的方法相似。有了大语言模型，就能针对任意输入生成输出；对不同输入反复执行这一过程，便可创建大量微调数据。这种方法尤其适合利用调优良好的大语言模型来微调新模型。不过，它的一个缺点是，数据生成依赖人工编写或收集的输入，而这些输入可能不适合促进大语言模型泛化。在许多应用中，用户问题和请求的范围极广，其中大量内容未被现有 NLP 任务与数据集覆盖，这是一个重大挑战。此时，不仅需要生成预测结果，也需要生成输入本身。
+
+这里以\mindex{自指令}（self-instruct）为例，说明如何生成大语言模型的微调样本~\cite{wang-etal:2023selfinstruct,honovich-etal:2023unnatural}。其思路是提示大语言模型从其他指令中学习，创建一条新指令；给定这条指令后，再由模型补全其他字段（如用户输入）并生成输出。图~\ref{fig:self-instruct} 给出了自指令方法的示意图。下面简要介绍其关键步骤。
+
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-self-instruct}
+\caption{自指令方法示意图~\cite{wang-etal:2023self}。该方法维护一个由指令及相应输入输出样本构成的池。初始池中包含若干人工编写的指令与样本。每次从池中抽取少量指令，再提示大语言模型据此生成新指令与样本。最后，过滤新生成的指令与样本，并将其加入池中。}
+\label{fig:self-instruct}
+\end{figure}
+
+\begin{itemize}
+\item \vspace{0.5em} 自指令算法维护一个任务池。初始任务池包含若干人工编写的种子任务，每项任务都有一条指令和一个输入输出样本。随着算法运行，将大语言模型生成的指令与样本加入池中。
+\item \vspace{0.3em} 每一步从指令池中抽取少量指令。例如，可以随机选取几条人工编写的指令与几条模型生成的指令，以保证多样性。
+    \newpage
+\item \vspace{0.3em} 将选中指令作为上下文示例（in-context demonstration），用于生成新指令。下面是提示大语言模型的一个模板。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    下面提供了执行若干任务的不同指令。请以这些指令为基础，生成一条新指令。
+
+    \vspace{0.2cm}
+
+    任务 1：$\{*\mathrm{instruction}1*\}$
+
+    \vspace{0.2cm}
+
+    任务 2：$\{*\mathrm{instruction}2*\}$
+
+    \vspace{0.2cm}
+
+    任务 3：$\{*\mathrm{instruction}3*\}$
+
+    \vspace{0.2cm}
+
+    任务 4：$\{*\mathrm{instruction}4*\}$
+
+    \vspace{0.2cm}
+
+    新任务：\underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+\item \vspace{0.3em} 给定生成的指令，再提示大语言模型补全样本，填写其余输入字段并生成相应输出。下面是一个提示模板。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    下面提供了一组输入输出样本，每个样本由一条指令、一个用户输入和一个输出组成。请以这些样本为基础，生成一个新样本。
+
+    \vspace{0.2cm}
+
+    样本 1：$\{*\mathrm{instruction}1*\}$
+
+    \vspace{0.1cm}
+
+    输入：$\{*\mathrm{user\text{-}input}1*\}$
+
+    \vspace{0.1cm}
+
+    输出：$\{*\mathrm{output}1*\}$
+
+    \vspace{0.2cm}
+
+    样本 2：$\{*\mathrm{instruction}2*\}$
+
+    \vspace{0.1cm}
+
+    输入：$\{*\mathrm{user\text{-}input}2*\}$
+
+    \vspace{0.1cm}
+
+    输出：$\{*\mathrm{output}2*\}$
+
+    \vspace{0.2cm}
+
+    新样本：$\{*\mathrm{new\text{-}instruction}*\}$
+
+    \vspace{0.1cm}
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+\item \vspace{0.3em} 用启发式规则评估或过滤新生成的样本，例如过滤与池中已有样本或指令相似的内容。若样本通过检查，就将它及其指令加入池中。
+\end{itemize}
+\vspace{0.5em}
+
+反复执行这一生成过程，即可获得足够多的微调样本。上面只展示了生成指令与微调样本的简单提示模板，当然还可以设计更好的模板，以生成更多样、更准确的指令和样本。例如，在文本分类等任务中，大语言模型可能倾向于产生有偏预测，如生成的大部分样本都属于同一类别。此时，可以调整不同字段的生成顺序。具体而言，先依据某种先验指定输出（即类别），再同时给定指令和输出，提示模型生成用户输入。这与\mindex{输入反演}（input inversion）方法相似，即由大语言模型根据指定输出生成输入~\cite{longpre-etal:2023flan}。
+
+使用大语言模型生成指令与微调样本，已成为开发大语言模型的常见方法，尤其是人工构建这类数据的成本很高，大多数研究团队难以承担。许多调优良好的模型在微调数据集中使用了一定数量的合成数据，其有效性已得到验证~\cite{ouyang-etal:2022training,taori-etal:2023alpaca,chiang-etal:2023vicuna}。围绕大语言模型微调的合成数据生成，还有进一步研究。例如，可以引入演化算法生成更多样的指令~\cite{xu-etal:2024wizardlm}，或在更先进的微调过程中将合成数据作为监督信号~\cite{chen-etal:2024self}。近来，在预训练阶段使用合成数据也引起了广泛关注~\cite{gunasekar-etal:2023textbooks,allal-etal:2024cosmopedia}。
+
+许多应用中的现实情况是：给定一项任务，只能收集或标注相对少量的微调数据，例如招募专家为特定领域的问答任务编写问题。这些数据的数量与多样性通常不够。此时，可以用自指令技术生成更多样的问答对，扩充微调数据。这提供了一种从种子微调样本集出发，以自举方式改进大语言模型的途径。使用自行生成的数据是一种常见做法，在 NLP 中已有悠久历史。例如，这种方法已成功应用于句法分析和机器翻译~\cite{charniak:1997statistical,sennrich-etal:2016improving}。
+
+\subsection{使用更少数据进行微调}
+
+\noindent 随着指令微调的重要性不断提高，对大规模高质量微调数据的需求也迅速增长。例如，FLAN 微调数据集汇集了 1,836 项任务，包含 1,500 万个样本~\cite{longpre-etal:2023flan}。使用这样的大型数据集微调大语言模型，通常需要高昂的计算开销，尤其是模型中大量参数的更新本身就十分耗费资源。一种缓解方式是探索高效模型训练方法，例如采用参数高效方法，仅更新模型的一小部分。
+
+另一种方法是只用信息量最大的训练样本微调大语言模型，从而在保持微调性能的同时，减少需要处理的数据量。实现这一目标的方法有很多。例如，\citet{zhou-etal:2023lima} 通过精心编写提示，并从多种 NLP 任务收集样本，构建了一个仅含 1,000 个样本的指令遵循数据集。他们发现，用该数据集微调的 LLaMa 65B 模型，能够媲美甚至优于经过更多微调的模型。这表明，大语言模型无须在所有类型的指令遵循数据上微调，也能适配多样任务。\citet{chen-etal:2024alpagasus} 构建了一个基于 GPT-3.5 的系统，评估每个指令遵循样本的质量，因而能从已有数据集中选出高质量样本，用更少样本获得更好的微调性能。研究者还提出了基于启发式规则选择或过滤数据的方法~\cite{zhao-etal:2024long,ge-etal:2024clustering}，以及优先选择对微调过程影响更大数据的方法~\cite{xia-etal:2024less}。事实上，大多数方法都可以视为更广泛的数据选择与过滤方法的具体实例。使用质量更高、但数量可能更少的数据，往往有利于 NLP 模型训练。
+
+指令微调中的这些发现，与 NLP 的传统观点有所不同：只需少量标注数据，就能激活模型处理复杂问题的能力，而无须用海量监督数据进行充分训练。一种可能的解释是，模型在预训练时已经学会根据指令生成正确回答，但在推理时，可能并未给这些回答赋予较高概率。微调只需小幅调整模型，使其遵循指令，因此所需训练投入远低于预训练。这与\mindex{表层对齐假说}（superficial alignment hypothesis）密切相关：学习主要发生在预训练阶段，后续微调或对齐阶段并未显著增加大语言模型的底层知识~\cite{zhou-etal:2023lima}。模型的核心能力与知识已由预训练建立，因此只需相对较少的微调，就能有效对齐用户需求。这意味着，使用极少数据微调大语言模型是可能的。另一个方向是，微调未必必须局限于配对的指令—回答数据。例如，\citet{hewitt-etal:2024instruction} 发现，仅在回答上微调模型、无须相应指令，也能隐式获得指令遵循能力。
+
+与此相关的一个概念是样本效率（sample efficiency）。若一种机器学习方法能够从少量训练样本中有效学习，就称其具有\mindex{样本高效}性（sample efficient）。从这一意义上说，相较于预训练，指令微调是样本高效的。从机器学习角度看，样本高效方法能够有效采样数据空间，优势在于充分利用稀缺数据。这些思想也适用于强化学习，样本效率在其中尤其重要。因此，许多强化学习算法等基于采样的学习技术，都能从样本高效方法中受益。例如，在人类偏好对齐中，既可以通过奖励模型高效采样偏好数据~\cite{liu-etal:2024statistical}，也可以提高策略学习中的采样效率~\cite{wang-etal:2024esrl}。
+
+\subsection{指令泛化}
+\label{sec:instruction-generalization}
+
+在许多机器学习与 NLP 问题中，使模型具备泛化能力是一项根本目标。例如，在文本分类中，希望模型能够正确分类训练时未见过的新文本。然而，指令微调中的泛化还面临额外挑战：不仅期望模型在同一任务内对不同输入生成合适回答，也期望它准确执行不同指令描述的各类任务。为说明这一问题，考虑大语言模型 $\Pr(\mathbf{y}|\mathbf{c},\mathbf{z})$，其中 $\mathbf{c}$ 是指令，$\mathbf{z}$ 是用户输入，$\mathbf{y}$ 是相应模型输出（即回答）。假定使用某个指标评测模型性能，记为 $\mathrm{Performance}(\Pr(\mathbf{y}|\mathbf{c},\mathbf{z}))$，或简记为 $\mathrm{P}(\mathbf{c},\mathbf{z},\mathbf{y})$。非形式化地说，若模型能够在给定任务内（由指令 $\mathbf{c}^*$ 指定）泛化，则存在某个阈值 $\epsilon$，使其在新输入上的平均性能高于该值：
+\begin{eqnarray}
+\frac{1}{|\mathcal{Z}|} \sum_{\mathbf{z}'\in \mathcal{Z}} \mathrm{P}(\mathbf{c}^*,\mathbf{z}',\mathbf{y}') > \epsilon,
+\end{eqnarray}
+
+\noindent 其中，$\mathcal{Z}$ 是新输入的集合，$\mathbf{z}'$ 是一个输入，$\mathbf{y}'$ 是模型对输入 $\mathbf{z}'$ 给出的输出。
+
+同样，若模型在所有指令—输入对上的平均性能高于某个 $\epsilon$，就可以说它能够跨任务泛化：
+\begin{eqnarray}
+\frac{1}{|\mathcal{D}|} \sum_{(\mathbf{c}',\mathbf{z}') \in \mathcal{D}} \mathrm{P}(\mathbf{c}',\mathbf{z}',\mathbf{y}') > \epsilon,
+\end{eqnarray}
+
+\noindent 其中，$\mathcal{D}$ 是新指令—输入对的集合。
+
+
+这里需要处理两个维度的变化：指令和用户输入。这使泛化问题非常复杂，因为直观上，模型要实现良好泛化，需要从大量任务，以及各任务对应的不同输入输出对中学习。如本书多次讨论的那样，实现这种泛化的成本远低于预训练。一般而言，利用指令—回答数据对大语言模型进行一定程度的微调，就能使其在新任务中表现出指令遵循能力。不过，通常仍认为需要投入一定工作，使模型广泛理解并执行各种指令。
+
+提高指令微调泛化能力的一种方式，是增加微调数据的多样性。早期指令微调研究构建了许多数据集，覆盖广泛的 NLP 任务，并为每项任务提供不同指令~\cite{wang-etal:2022super,sanh-etal:2022multitask,longpre-etal:2023flan}。将这些任务转换为统一格式，即可用足够多的样本微调大语言模型。例如，一些指令微调数据集包含超过 100 项 NLP 任务和超过一百万个样本。然而，这些早期数据集主要聚焦已有学术问题，未关注真实应用中的任务。近期许多工作转向新的、更实际的问题。例如，研究者十分关注构建包含复杂长示例及最先进模型对真实用户问题所作回答的数据集~\cite{wang-etal:2023far,teknium:2023openhermes}。
+
+使用规模大且多样的微调数据集，可能源于从不同维度扩大大语言模型规模的尝试。事实上，缩放定律（scaling law）已广泛用于指导各种指令微调模型的开发。扩大指令微调规模，使模型遵循广泛指令，是合理的。但从大语言模型对齐角度看，这未必是实现泛化的最高效方式。
+
+一个问题是，指令微调依赖监督学习（supervised learning），通过显式指令—回答映射建模任务泛化。然而，这种方法难以捕捉细微或复杂的人类偏好（如语气、风格或主观质量），因为它们很难编码为显式的指令—回答数据。此外，泛化性能也受指令—回答数据集的多样性与质量限制。考虑到这些局限，更希望在指令微调后增加一个利用偏好模型的微调步骤，使大语言模型进一步泛化（见第~\ref{sec:human-preference-alignment} 节）。
+
+另一种观点是，部分指令—回答映射可能在预训练时就已学得。但由于通常不确切知道预训练使用了哪些数据，很难判断微调时是否仍需学习这些映射。与此相关的问题是，分布外泛化（out-of-distribution generalization）主要在预训练还是微调中实现。直接回答这一问题超出了本章范围，但已有研究表明，在大而多样的数据集上预训练，有助于改善分布外性能~\cite{hendrycks-etal:2020pretrained,radford-etal:2021learning,gunasekar-etal:2023textbooks}。这引出了一个有趣问题：若大语言模型已充分接受大规模预训练，微调对于分布外泛化可能就没有那么关键，因为模型可能已经见过足够丰富的分布变化。这促使研究者以较小投入微调模型，或探索实现指令遵循的新方法。例如，上一小节已经讨论，仅在少量精心选择的指令—回答对上微调，就能实现指令遵循~\cite{zhou-etal:2023lima}；甚至一些并非为此显式设计的方法，也能达到这一目的~\cite{kung-and-peng:2023models}。
+
+上述讨论给出了两种不同策略：一种需要扩大微调数据集，以提高多样性；另一种只需小而必要的微调数据集，以高效适配大语言模型。不过，实践中纳入多样指令通常有益。许多时候，需要为特定用途适配模型；但模型在预训练时可能已经编码了广泛的指令遵循映射，即使只做适度微调，也仍可能倾向于充当通用指令执行者。一个有趣现象是，在数学数据上微调后，模型未必专注于数学输出，而可能仍正常响应一般指令，例如按要求写诗~\cite{hewitt:2024instructionblog}。这并非坏事，但表明模型遵循通用指令的特性可能不容易改变。此时，利用更多样数据进行额外适配，可能有助于调整模型遵循指令的方式，尤其是针对希望解决的任务。
+
+\subsection{弱到强泛化}
+
+\noindent 至此，已经介绍多种基于有标注数据的指令微调方法。许多方法的一项局限是，要求数据由人工标注或由强大语言模型生成，以提供准确监督信号。然而，很多时候，手中的大语言模型已经很强，或至少擅长问题求解的某些方面，因而很难找到更强模型来监督它。即使是人类专家，面对复杂问题时，提供正确且详细的答案也可能很困难，有时甚至不可行。例如，面对一篇极长文档，专家若不做全面且耗时的审查，就很难识别其中的不一致、细微偏见或遗漏的要点。
+
+此时可以问：能否用弱大语言模型监督强大语言模型？这似乎是重大挑战，但可能反映一种未来情境：需要监督比人类或现有人工智能系统更聪明的系统~\cite{burns-etal:2023weakblog}。利用较小、较简单模型改进较大、较复杂模型训练的问题，也称\mindex{弱到强泛化}（weak-to-strong generalization）问题。尽管目前还没有成熟的弱到强泛化方法，但在大语言模型的若干领域，用小模型辅助强模型确实已被证明有用。
+
+对于指令微调，使用弱大语言模型最简单的方式之一，是让它生成合成微调数据。假设有输入集合 $X$，每个输入包含一条指令，并在必要时包含用户输入。对于每个 $\mathbf{x} \in X$，用弱大语言模型 $\Pr^{w}(\cdot)$ 生成预测 $\hat{\mathbf{y}} = \argmax_{\mathbf{y}} \Pr^{w}(\mathbf{y}|\mathbf{x})$，再用这些预测训练强大语言模型 $\Pr^{s}_{\theta}(\cdot)$（见式（\ref{eq:instruction-fine-tuning}））：
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\theta} \sum_{\mathbf{x} \in X} \log \mathrm{Pr}_{\theta}^{s}(\hat{\mathbf{y}}|\mathbf{x}),
+\end{eqnarray}
+
+\noindent 其中，$\theta$ 表示模型参数。
+
+上述形式将微调转化为知识蒸馏（knowledge distillation）问题，即从弱模型向强模型蒸馏知识，因此可以采用多种知识蒸馏方法来实现。不过，从知识蒸馏角度解释弱到强微调并不简单。主要顾虑是，强模型可能只会模仿或过拟合弱模型的错误，无法泛化。例如，微调后的强模型，仍不能解决弱模型无法准确预测的难题。幸运的是，这一方向的初步实验已呈现积极且有希望的结果。例如，\citet{burns-etal:2023weak} 发现，用 GPT-2 级别的监督微调 GPT-4 级别模型，能够改善多个 NLP 任务上的泛化。为衡量弱模型对强模型泛化的改进程度，定义以下术语：
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{弱模型性能}（weak performance，$\mathrm{P}_{\mathrm{weak}}$）。弱模型在测试集上的性能，可视为基线性能。
+\item \vspace{0.3em} \mindex{弱到强性能}（weak-to-strong performance，$\mathrm{P}_{\mathrm{weak} \to \mathrm{strong}}$）。使用弱模型微调后的强模型在测试集上的性能。
+\item \vspace{0.3em} \mindex{强模型性能上限}（strong ceiling performance，$\mathrm{P}_{\mathrm{ceiling}}$）。使用真实值数据微调后的强模型在测试集上的性能。例如，用人工标注数据微调强模型，并将所得模型作为性能上限。
+\end{itemize}
+\vspace{0.5em}
+
+然后，可以将\mindex{性能差距弥合比例}（performance gap recovered，\mindex{PGR}）定义为
+\begin{eqnarray}
+\mathrm{PGR} & = & \max \Big\{0, \frac{\mathrm{P}_{\mathrm{weak} \to \mathrm{strong}} - \mathrm{P}_{\mathrm{weak}}}{\mathrm{P}_{\mathrm{ceiling}} - \mathrm{P}_{\mathrm{weak}}} \Big\}.
+\end{eqnarray}
+
+这一指标衡量弱到强模型能够弥合多少强模型性能上限与弱模型性能之间的差距。PGR 为 1，表示弱到强微调完全弥合了性能差距；PGR 为 0，则表示没有改进。\citet{burns-etal:2023weak} 的工作表明，在 22 项 NLP 分类任务上，$\mathrm{PGR}$ 可以达到约 $0.8$。尽管弱到强微调潜力可期，但实现显著的弱到强泛化仍是一个充满挑战、需要进一步研究的目标~\cite{aschenbrenner:2024situational}。
+
+利用弱监督微调大语言模型，只是用小模型改进大模型的一种方式。尽管本节主要关注微调，这里也介绍其他方法，使讨论更完整（这些方法的示意见图~\ref{fig:small-to-large-improvement}）。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-small-models-for-llms}
+\caption{使用小模型改进大语言模型的示意图。一类方法使用小模型辅助大模型微调或预训练，包括生成合成数据（a）、加入辅助损失（b）和选择适当数据（c）。另一类方法结合小模型与大模型，包括通过聚合多个小模型来学习强模型（d），以及将小模型与大模型级联（e）。}
+\label{fig:small-to-large-improvement}
+\end{figure}
+
+\begin{itemize}
+\item \vspace{0.5em} 除使用小模型生成合成数据外，也可以直接加入基于小模型的知识蒸馏损失。例如，可以定义如下简单损失函数，度量小模型与大模型的差异：
+    \begin{eqnarray}
+    \mathcal{L}_{\mathrm{kd}} & = & D_{\mathrm{KL}}(\mathrm{Pr}^{w}(\cdot|\mathbf{x})\ \|\ \mathrm{Pr}^{s}_{\theta}(\cdot|\mathbf{x})),
+    \end{eqnarray}
+    \noindent 该损失促使强模型分布与弱模型分布对齐。将其加入原始语言建模损失，得到如下训练目标：
+    \begin{eqnarray}
+    \tilde{\theta} & = & \argmax_{\theta} \sum_{(\mathbf{x},\mathbf{y}) \in \mathcal{D}} \log \mathrm{Pr}_{\theta}^{s}(\mathbf{y}|\mathbf{x}) - \lambda \cdot \mathcal{L}_{\mathrm{kd}},
+    \end{eqnarray}
+    \noindent 其中，$\mathcal{D}$ 是输入输出对的集合，$\lambda$ 是插值系数。这种方法既可用于预训练，也可用于微调。通过调整 $\lambda$，可以控制小模型对训练的影响程度。例如，随着大模型能力增强，逐渐减小 $\lambda$，使训练更依赖原始语言建模损失。
+\item \vspace{0.3em} 在大语言模型预训练和微调中引入小模型的另一种方式，是让小模型进行数据选择或过滤。给定序列，可用小模型计算似然或交叉熵，再将这些量作为选择或过滤数据的准则。例如，低似然或高交叉熵序列可能被排除出训练集，因为它们与小模型所学分布不够一致；相反，高似然或低交叉熵序列可被优先选择，使训练聚焦更相关或更高质量的数据。
+\item \vspace{0.3em} 集成学习（ensemble learning）是一种结合多个弱模型、构建强模型的简单有效方式，应用于大语言模型也很直接。可以聚合多个小模型或专门子模型预测的分布，再根据聚合结果得出最终预测。聚合方式包括多数投票、加权平均或堆叠等。
+\item \vspace{0.3em} 小模型还可用于推理阶段，以提高整体效率。假设有一个速度慢但更准确的大模型，以及一个速度快但不够准确的小模型。在模型级联（model cascading）中，先由小模型处理输入数据，快速生成初步结果；若结果满足预设准则，就直接采用。若初步结果不够好，则将输入交给更大、更准确的模型，生成更好的结果。由于小模型能在无须调用大模型的情况下有效处理许多输入，这种方法能够显著降低计算成本与时延。
+\end{itemize}
+\vspace{0.5em}
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{人类偏好对齐：RLHF}
+\label{sec:human-preference-alignment}
+
+\noindent 本章至此主要讨论利用有标注输入输出对微调大语言模型，通过监督学习使其遵循指令。然而，在许多应用中，模型不仅需要遵循指令，其行为也需要更符合人类价值观和偏好。设想用户询问如何入侵计算机系统：若大语言模型没有得到适当对齐，可能会给出实施这一违法行为的细节。更理想的回答则可能是劝告用户不要从事违法活动，并概括说明此类行为的后果。实现这一目标的困难在于，这些情境涉及的伦理细节与上下文因素，往往难以显式编码到微调数据中。更具挑战的是，人类自身也常常无法精确表达自己的偏好。
+
+本节讨论另一种大语言模型微调方法，称为基于人类反馈的强化学习，简称 RLHF~\cite{christiano-etal:2017deep,stiennon-etal:2020learning}。其基本思路是：通过奖励模型，让大语言模型从模型输出的比较中学习（见图~\ref{fig:sft-vs-rlhf}）。具体而言，可以招募人类专家，让他们从一对模型输出中指出更偏好哪一个。用这些偏好数据训练奖励模型，使其预测人们感知到的大语言模型输出质量。训练完成后，奖励模型为大语言模型针对输入生成的新输出赋分，提供反馈；大语言模型再利用这些分数，通过强化学习算法更新参数。为便于后续讨论，本节先介绍强化学习的基本概念，再讨论如何训练奖励模型，以及如何借助它们对齐大语言模型。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-sft-vs-rlhf}
+\caption{监督微调与基于人类反馈的强化学习。在监督微调中，最大化给定输入时预测输出的概率，优化大语言模型。在基于人类反馈的强化学习中，先使用人类偏好数据训练奖励模型；对于每一对预测结果，要求评估者选出更偏好的一个。随后，用这一奖励模型在微调过程中监督大语言模型。}
+\label{fig:sft-vs-rlhf}
+\end{figure}
+
+\subsection{强化学习基础}
+\label{sec:rl-basics}
+
+\noindent 首先介绍强化学习的一些基本概念。为使描述与强化学习文献更一致，这里的记号与前面各节、各章略有不同，但会说明这些记号如何对应语言建模中的记号。熟悉强化学习技术的读者可以跳过或略读本小节。
+
+一般的强化学习框架描述智能体如何与动态环境交互。这种交互被建模为一系列动作：智能体根据环境状态采取动作。每个时间步，智能体观察当前状态，依据自身策略选择并执行动作，然后从环境中接收奖励和新状态作为反馈。不断重复这一“观察—动作—奖励”过程，直到智能体达成目标。
+
+强化学习系统包含以下几个组成部分：
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{智能体}（agent）。强化学习中的学习者或决策者。在大语言模型场景中，可以将其视为模型本身。
+\item \vspace{0.3em} \textbf{环境}（environment）。包括智能体之外、与智能体交互的一切。不过，大语言模型中的环境主要并非物理或虚拟空间，而是智能体（如大语言模型）接收反馈、进行学习所处的框架。
+\item \vspace{0.3em} \textbf{状态}（state，$s$）。状态表示环境当前的状况。对于语言建模的给定词元（token）序列，某个时间步的状态可视为目前已观察到的词元，即用于预测下一个词元的上下文词元。例如，预测时间步 $t$ 的下一个词元时，可以将 $(\mathbf{x}, \mathbf{y}_{< t})$ 定义为状态。
+\item \vspace{0.3em} \textbf{动作}（action，$a$）。动作表示智能体可能作出的决策。在大语言模型中，动作对应词表（vocabulary）中的候选词元。
+\item \vspace{0.3em} \textbf{奖励}（reward，$R$）。奖励是环境提供的反馈，用于评价动作的成功程度。例如，$r(s,a,s')$ 表示智能体在状态 $s$ 下采取动作 $a$、转移到下一状态 $s'$ 时获得的奖励。给定状态—动作序列后，可将时间步 $t$ 的奖励记为 $r_t = r(s_t,a_t,s_{t+1})$。此外，若决策过程是确定性的，则可省略 $s_{t+1}$，因为它可由 $s_t$ 和 $a_t$ 确定。此时，可用 $r(s_t,a_t)$ 简记 $r(s_t,a_t,s_{t+1})$。
+\item \vspace{0.3em} \textbf{策略}（policy，$\pi$）。对于大语言模型，策略定义为：给定此前上下文词元时，模型对预测词元给出的概率分布。形式上可表示为
+    \begin{eqnarray}
+    \pi(a|s) = \Pr(y_t|\mathbf{x}, \mathbf{y}_{< t}),
+    \end{eqnarray}
+    其中，$a$ 对应词元 $y_t$，$s$ 对应上下文 $(\mathbf{x}, \mathbf{y}_{< t})$。图~\ref{fig:llm-as-policy-in-rl} 展示了如何在强化学习框架中将大语言模型视为策略。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-llm-as-policy}
+\caption{将大语言模型视为强化学习中的策略。在每个时间步 $t$，大语言模型根据输入 $\mathbf{x}$ 和此前已生成的词元 $\mathbf{y}_{<t}$，预测词元 $y_t$。这一过程可表述为强化学习问题：$y_t$ 是动作，$(\mathbf{x},\mathbf{y}_{<t})$ 是状态，预测分布 $\Pr(y_t|\mathbf{x},\mathbf{y}_{<t})$ 是策略。奖励模型评价生成的回答，赋予奖励分数，再用这些分数估计 $V(s_t)$ 和 $Q(s_t,a_t)$ 等价值函数，用于策略优化。实践中，RLHF 的奖励模型通常针对完整回答定义，尽管优化目标仍可按词元分解。}
+\label{fig:llm-as-policy-in-rl}
+\end{figure}
+
+\item \vspace{0.3em} \textbf{价值函数}（value function，$V$ 和 $Q$）。\mindex{状态价值函数}（state-value function，简称价值函数）评价智能体从特定状态 $s$ 出发，遵循特定策略 $\pi$ 时的期望折扣回报（即累积奖励），定义为
+    \begin{eqnarray}
+    V(s) & = & \mathbb{E} \Big[ r(s_0,a_0,s_1) + \gamma r(s_1,a_1,s_2) + \gamma^2 r(s_2,a_2,s_3) + \cdots \ \big | \ s_0 = s, \pi \Big] \nonumber \\
+         & = & \mathbb{E} \Big[ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots \ \big | \ s_0 = s, \pi \Big] \nonumber \\
+         & = & \mathbb{E} \Big[ \sum_{t=0}^{\infty} \gamma^{t} r_t \ \big | \ s_0 = s, \pi \Big], \label{eq:general-value-function}
+    \end{eqnarray}
+    \noindent 其中，$\gamma \in [0,1]$ 是折扣因子（discount factor），用于调整未来奖励的重要程度；$s_0 = s$ 表示智能体从状态 $s$ 出发；期望 $\mathbb{E}$ 对所有可能的轨迹（trajectory，即状态—动作序列）求取。类似地，\mindex{动作价值函数}（action-value function，也称\mindex{Q 价值函数}，Q-value function）衡量从状态 $s$ 出发、采取动作 $a$，此后遵循策略 $\pi$ 时的期望回报，即
+    \begin{eqnarray}
+    Q(s,a) & = & \mathbb{E} \Big[ \sum_{t=0}^{\infty} \gamma^{t} r_t \ \big | \ s_0 = s, a_0 = a, \pi \Big],
+    \end{eqnarray}
+    \noindent 其中，$a_0 = a$ 表示在初始状态采取的动作是 $a$。
+\end{itemize}
+\vspace{0.5em}
+
+强化学习的目标，是学习使智能体长期获得的\mindex{累积奖励}（cumulative reward，或\mindex{回报}，return）最大的策略。为简便起见，除非另有说明，后续推导省略折扣因子（即 $\gamma = 1$）。给定状态—动作序列 $\tau = \{(s_1,a_1),...,(s_T,a_T)\}$\footnote{为与本章常用记号保持一致，假定状态—动作序列从 $s_1$ 和 $a_1$ 开始，而非 $s_0$ 和 $a_0$，因为预测序列 $\mathbf{y}$ 通常从 $y_1$ 开始。当然，文献中也常将状态—动作序列记为 $\{(s_0,a_0),...,(s_T,a_T)\}$ 或 $\{(s_0,a_0),...,(s_{T-1},a_{T-1})\}$。这种记号差异不影响这里对模型的讨论。}，该序列上的累积奖励可写为
+\begin{eqnarray}
+R(\tau) & = & \sum_{t=1}^{T} r_t. \label{eq:rl-sequence-reward}
+\end{eqnarray}
+
+在状态—动作序列空间上，累积奖励的期望形式为
+\begin{eqnarray}
+J(\theta) & = & \mathop{\mathbb{E}}_{\tau \sim \mathcal{T}} \Big[ R(\tau) \ \big | \pi_{\theta} \Big] \nonumber \\
+          & = & \sum_{\tau \in \mathcal{T}} \mathrm{Pr}_{\theta}(\tau) R(\tau) \nonumber \\
+          & = & \sum_{\tau \in \mathcal{T}} \mathrm{Pr}_{\theta}(\tau) \sum_{t=1}^{T} r_t, \label{eq:performance-function-basic}
+\end{eqnarray}
+
+\noindent 其中，$\tau \sim \mathcal{T}$ 表示从状态—动作序列空间 $\mathcal{T}$ 中抽取 $\tau$，下标 $\theta$ 表示策略参数。$J(\theta)$ 也称\mindex{性能函数}（performance function）。
+
+于是，训练目标是最大化 $J(\theta)$：
+
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\theta} J(\theta). \label{eq:rl-optimize-j-theta}
+\end{eqnarray}
+
+现在得到了一个简单的强化学习方法：1）采样若干状态—动作序列；2）用性能函数评价每个序列；3）更新模型，使该性能函数最大化。若采用式（\ref{eq:performance-function-basic}），用梯度下降优化策略，就构成了策略梯度（policy gradient）方法~\cite{williams:1992simple}。
+
+许多 NLP 问题（如机器翻译）中的奖励通常是稀疏的（sparse reward）。例如，只有生成完整句子后才获得奖励。这意味着，对于所有 $t < T$，都有 $r_t = 0$，只有 $t = T$ 时 $r_t$ 才非零。理想情况下，可能更希望反馈即时且频繁（即稠密，dense），从而使策略训练更容易、更高效。尽管已有奖励塑形（reward shaping）等多种方法处理稀疏奖励，下面仍假定采用稀疏奖励设置：只有完成预测后才能获得奖励。
+
+式（\ref{eq:rl-sequence-reward}—\ref{eq:rl-optimize-j-theta}）建立了强化学习的一种基本形式，围绕它已有许多变体与改进。在介绍更复杂模型之前，先从策略梯度角度解释目标函数 $J(\theta)$。使用梯度下降时，需要计算 $J(\theta)$ 对 $\theta$ 的梯度：
+\begin{eqnarray}
+\frac{\partial J(\theta)}{\partial \theta} & = & \frac{\partial  \sum_{\tau \in \mathcal{T}} \mathrm{Pr}_{\theta}(\tau) R(\tau)}{\partial \theta} \nonumber \\
+& = & \sum_{\tau \in \mathcal{T}} \frac{\partial  \mathrm{Pr}_{\theta}(\tau) }{\partial \theta}  R(\tau) \nonumber \\
+& = & \sum_{\tau \in \mathcal{T}} \mathrm{Pr}_{\theta}(\tau) \frac{\partial  \mathrm{Pr}_{\theta}(\tau)/\partial \theta}{\mathrm{Pr}_{\theta}(\tau) } R(\tau) \nonumber \\
+& = & \sum_{\tau \in \mathcal{T}} \mathrm{Pr}_{\theta}(\tau) \frac{\partial  \log \mathrm{Pr}_{\theta}(\tau) }{\partial \theta} R(\tau). \label{eq:rl-gradient-j-theta}
+\end{eqnarray}
+
+实践中，通常用从一个批次中均匀采样的轨迹近似该期望（即 $\mathrm{Pr}_{\theta}(\tau) = 1/|\mathcal{T}|$）。此时，可以简化式（\ref{eq:rl-gradient-j-theta}），只需考虑 $\frac{\partial \log \mathrm{Pr}_{\theta}(\tau)}{\partial \theta}$ 和 $R(\tau)$ 两项：
+\begin{eqnarray}
+\frac{\partial J(\theta)}{\partial \theta} & = & \frac{1}{m} \sum_{\tau \in \mathcal{T}} \frac{\partial  \log \mathrm{Pr}_{\theta}(\tau)}{\partial \theta} R(\tau). \label{eq:rl-j-theta-gradient-simplified}
+\end{eqnarray}
+
+\noindent 这一结果的一个优势是，$R(\tau)$ 无须可微，因此强化学习可以使用任意类型的奖励函数（reward function）。
+
+将序列 $\tau$ 的生成视为马尔可夫决策过程（Markov decision process，MDP），可进一步推导 $\frac{\partial \log \mathrm{Pr}_{\theta}(\tau)}{\partial \theta}$，得到
+\begin{eqnarray}
+\frac{\partial \log \mathrm{Pr}_{\theta}(\tau)}{\partial \theta} & = & \frac{\partial}{\partial \theta} \log \prod_{t=1}^{T} \pi_{\theta}(a_t|s_t) \Pr(s_{t+1}|s_t,a_t) \nonumber \\
+& = & \frac{\partial}{\partial \theta} \sum_{t=1}^{T} \underbrace{\log \pi_{\theta}(a_t|s_t)}_{\text{策略}} + \frac{\partial}{\partial \theta} \sum_{t=1}^{T} \underbrace{\log \Pr(s_{t+1}|s_t,a_t)}_{\text{环境动态}}, \label{eq:gradient-policy-and-dynamics}
+\end{eqnarray}
+
+\noindent 这里将梯度分为策略梯度与环境动态梯度两部分。策略部分 $\log \pi_{\theta}(a_t|s_t)$ 决定给定状态 $s_t$ 时采取动作 $a_t$ 的对数概率，由 $\theta$ 参数化。环境动态（dynamics）部分 $\log \Pr(s_{t+1}|s_t,a_t)$ 表示采取动作 $a_t$ 后，从状态 $s_t$ 转移到状态 $s_{t+1}$ 的对数概率。在典型强化学习设置中，环境动态不直接受策略参数 $\theta$ 影响，其导数通常为零。因此，此时式（\ref{eq:gradient-policy-and-dynamics}）可简化为
+\begin{eqnarray}
+\frac{\partial \log \mathrm{Pr}_{\theta}(\tau)}{\partial \theta} & = & \frac{\partial}{\partial \theta} \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t). \label{eq:rl-policy-gradient-product-of-pi}
+\end{eqnarray}
+
+\noindent 换言之，只需集中优化策略，无须考虑底层环境动态。
+
+将式（\ref{eq:rl-policy-gradient-product-of-pi}）代入式（\ref{eq:rl-j-theta-gradient-simplified}），并展开 $R(\tau)$，得到
+\begin{eqnarray}
+\frac{\partial J(\theta)}{\partial \theta} & = & \frac{1}{|\mathcal{T}|} \sum_{\tau \in \mathcal{T}} \frac{\partial}{\partial \theta} \Big( \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) \sum_{t=1}^{T} r_t \Big).
+\end{eqnarray}
+
+这种策略梯度方法虽然直接，却存在梯度估计方差可能很大的问题，导致学习过程噪声大、效率低。一个原因是，不同步骤或情境中的奖励可能差异很大。设想一系列动作决策中，奖励模型倾向于给好动作较小奖励（如 $R_t = 2$），给差动作较大惩罚（如 $R_t = -50$）。好坏动作的奖励尺度差异如此之大，即使序列中包含好动作，其总奖励也可能很低。
+
+降低梯度方差的一种简单方式是设置基线（baseline）$b$，从 $\sum_{t=1}^{T} r_t$ 中减去它，得到 $\sum_{t=1}^{T} r_t - b$。\footnote{事实上，使用基线 $b$ 不会改变总奖励 $\sum_{t=1}^{T} r_t$ 的方差。不过，引入基线虽然不改变奖励的整体方差，却有助于降低梯度估计的方差。一般而言，$\sum_{t=1}^{T} r_t - b$ 将奖励中心移至零附近（例如，将 $b$ 定义为 $\sum_{t=1}^{T} r_t$ 的期望），从而可能降低乘积 $\sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) (\sum_{t=1}^{T} r_t - b)$ 的方差。}这里可以将基线理解为参照点。通过使奖励围绕基线居中，消除奖励信号中的系统性偏移，使更新更稳定，对单个奖励的极端波动不那么敏感。
+
+带基线的策略梯度模型可表示为
+\begin{eqnarray}
+\frac{\partial J(\theta)}{\partial \theta} & = & \frac{1}{|\mathcal{T}|} \sum_{\tau \in \mathcal{T}} \frac{\partial}{\partial \theta} \Big( \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) \Big) \Big(\sum_{t=1}^{T} r_t - b \Big) \nonumber \\
+& = & \frac{1}{|\mathcal{T}|} \sum_{\tau \in \mathcal{T}} \frac{\partial}{\partial \theta} \Big[ \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) \Big(\sum_{k=1}^{T} r_k - b \Big) \Big] \nonumber \\
+& = & \frac{1}{|\mathcal{T}|} \sum_{\tau \in \mathcal{T}} \frac{\partial}{\partial \theta} \Big[ \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) \Big(\sum_{k=1}^{t-1} r_k + \sum_{k=t}^{T} r_k - b \Big) \Big]. \label{eq:policy-gradient-with-baseline}
+\end{eqnarray}
+
+\noindent 这里将 $\sum_{k=1}^{T} r_k$ 写为 $\sum_{k=1}^{t-1} r_k$ 与 $\sum_{k=t}^{T} r_k$ 两项之和，以区分时间步 $t$ 的动作之前和之后获得的奖励。注意，时间步 $t$ 之前收到的奖励，不依赖时间步 $t$ 采取的动作。因此，$\sum_{k=1}^{t-1} r_k$ 对梯度没有贡献，可以省略，得到式（\ref{eq:policy-gradient-with-baseline}）的简化形式：
+\begin{eqnarray}
+\frac{\partial J(\theta)}{\partial \theta} & = & \frac{1}{|\mathcal{T}|} \sum_{\tau \in \mathcal{T}} \frac{\partial}{\partial \theta} \Big[ \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) \Big(\sum_{k=t}^{T} r_k - b \Big) \Big].
+\end{eqnarray}
+
+\noindent 此外，去掉 $\sum_{k=1}^{t-1} r_k$ 还可以进一步降低梯度方差。
+
+基线 $b$ 的定义方式有很多。这里考虑状态 $s_t$ 的价值函数，即处于状态 $s_t$ 时的估计价值：$V(s_t) = \mathbb{E}(r_t + r_{t+1} + \cdots + r_{T})$。于是有
+\begin{eqnarray}
+A(s_t,a_t) & = & \sum_{k=t}^{T} r_k - b \nonumber \\
+           & = & \sum_{k=t}^{T} r_k - V(s_t),
+\end{eqnarray}
+
+\noindent 其中，$\sum_{k=t}^{T} r_k $ 是实际获得的回报，$V(s_t)$ 是期望回报。$A(s_t,a_t)$（简记为 $A_t$）称为时间步 $t$ 的\mindex{优势}（advantage），度量动作 $a_t$ 相对于从状态 $s_t$ 出发继续遵循策略的期望价值，能够带来多少相对收益。
+
+使用优势函数 $A(s_t,a_t)$，$J(\theta)$ 的梯度可写为
+\begin{eqnarray}
+\frac{\partial J(\theta)}{\partial \theta} & = & \frac{1}{|\mathcal{T}|} \sum_{\tau \in \mathcal{T}} \frac{\partial}{\partial \theta} \Big( \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) A(s_t,a_t) \Big). \label{eq:a2c-policy-gradient}
+\end{eqnarray}
+
+这一目标构成强化学习中\mindex{优势演员—评论家}（advantage actor-critic，\mindex{A2C}）方法的基础~\cite{mnih-etal:2016asynchronous}。在该方法中，演员（actor）旨在学习策略，利用式（\ref{eq:a2c-policy-gradient}）更新策略参数，使其更关注可能改善性能的动作。评论家（critic）则更新价值函数的估计，用于计算优势函数 $A(s_t,a_t)$，从而评价演员正在学习的策略。
+
+在 A2C 方法中，$A(s_t,a_t)$ 通常表示为动作价值函数 $Q(s_t,a_t)$ 与状态价值函数 $V(s_t)$ 之差：
+\begin{eqnarray}
+A(s_t,a_t) & = & Q(s_t,a_t) - V(s_t). \label{eq:advantage-q-v}
+\end{eqnarray}
+
+\noindent 乍看之下，这个模型似乎难以构建，因为需要两个独立子模型分别计算 $Q(s_t,a_t)$ 和 $V(s_t)$。幸运的是，考虑到 $Q(s_t,a_t)$ 可以定义为回报 $r_t + V(s_{t+1})$，式（\ref{eq:advantage-q-v}）可改写为
+\begin{eqnarray}
+A(s_t,a_t) & = & r_t + V(s_{t+1}) - V(s_t),
+\end{eqnarray}
+
+\noindent 也可以引入折扣因子 $\gamma$，得到更一般的形式：
+\begin{eqnarray}
+A(s_t,a_t) & = & r_t + \gamma V(s_{t+1}) - V(s_t).
+\end{eqnarray}
+
+\noindent $A(s_t,a_t) = r_t + \gamma V(s_{t+1}) - V(s_t)$ 也称\mindex{时序差分}（temporal difference，\mindex{TD}）误差。只需为价值函数 $V(s_t)$ 训练一个评论家网络，再用它计算优势函数\footnote{A2C 中价值网络（或评论家网络）的训练损失，通常写为计算所得回报 $r_t + \gamma V(s_{t+1})$ 与预测状态价值 $V(s_t)$ 之间的均方误差（mean squared error，MSE）。假设价值网络的参数为 $\omega$，损失函数为
+\begin{eqnarray}
+\mathcal{L}_v(\omega) & = & \frac{1}{M} \sum \big(r_t + \gamma V_{\omega}(s_{t+1}) - V_{\omega}(s_t) \big)^2,
+\end{eqnarray}
+
+\noindent 其中，$M$ 是训练样本数量。例如，对于包含 $T$ 个词元的序列，可以设置 $M=T$。
+}.
+
+至此，已经用了相当篇幅介绍强化学习基础，尤其是 A2C 方法优化目标的推导。不过，强化学习是一个庞大领域，这里无法涵盖所有技术细节，更多内容可参阅强化学习教材~\cite{Sutton-and-Barto:2018RL,szepesvari:2010algorithms}。现在已经具备进一步讨论 RLHF 所需的知识。后续小节将回到大语言模型对齐，说明如何用 A2C 方法实现人类偏好对齐。
+
+\subsection{奖励模型的训练}
+\label{sec:training-reward-models}
+
+\noindent 前面已经说明，奖励模型在一般强化学习框架中十分重要，也是计算价值函数的基础。现在讨论如何训练这些奖励模型。
+
+在 RLHF 中，奖励模型是一个神经网络，将一对输入输出词元序列映射为标量奖励分数。给定输入 $\mathbf{x}$ 和输出 $\mathbf{y}$，奖励可表示为
+\begin{eqnarray}
+r & = & \mathrm{Reward}(\mathbf{x},\mathbf{y}),
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Reward}(\cdot)$ 是奖励模型。$r$ 可以理解为：度量给定输入 $\mathbf{x}$ 时，输出 $\mathbf{y}$ 与期望行为符合的程度。如上一小节所述，假定 $\mathbf{x}$ 和 $\mathbf{y}$ 都是完整词元序列。因此，奖励模型评价给定输入时完整生成输出的质量，而非为生成过程的中间步骤赋予奖励。例如，在序列生成中，通常只在输出序列 $\mathbf{y}=y_1...y_n$ 的最后一个位置提供奖励。为使记号简洁，从这里开始用 $r(\mathbf{x},\mathbf{y})$ 表示奖励模型 $\mathrm{Reward}(\mathbf{x},\mathbf{y})$。
+
+奖励模型有多种实现方式。一种简单方法是以预训练大语言模型为基础构建。具体而言，将 $\mathbf{x}$ 和 $\mathbf{y}$ 拼接为单个词元序列 $\mathrm{seq}_{\mathbf{x},\mathbf{y}} = [\mathbf{x}, \mathbf{y}]$，照常在该序列上运行预训练模型，在每个位置获得最后一层 Transformer 的表示。然后取最后一个位置的表示（记为 $\mathbf{h}_{\mathrm{last}}$），通过线性变换映射为标量：
+\begin{eqnarray}
+r(\mathbf{x},\mathbf{y}) & = & \mathbf{h}_{\mathrm{last}} \mathbf{W}_{r},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{h}_{\mathrm{last}}$ 是 $d$ 维向量，$\mathbf{W}_{r}$ 是 $d \times 1$ 线性映射矩阵。图~\ref{fig:reward-model-architecture} 展示了这种奖励模型架构。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-reward-model-architecture}
+\caption{基于 Transformer 的奖励模型架构。模型的主体仍是一个大语言模型，使用 Transformer 解码器（decoder）作为序列表示模型。取解码器最后一个位置的表示，作为整个序列 $[\mathbf{x},\mathbf{y}]$ 的表示，再通过线性变换将其映射为标量，作为 $[\mathbf{x},\mathbf{y}]$ 的奖励分数。}
+\label{fig:reward-model-architecture}
+\end{figure}
+
+训练奖励模型的第一步，是收集人类对一组生成输出的反馈。给定输入 $\mathbf{x}$，用大语言模型生成多个候选输出 $\{\mathbf{y}_1,...,\mathbf{y}_N\}$。人类反馈可通过以下几种方式获取：
+
+\begin{itemize}
+\item \vspace{0.5cm} \textbf{成对比较}（pairwise comparison，也称\textbf{成对排序}，pairwise ranking）。给定两个不同输出，由人类专家选出更好的一个。
+\item \vspace{0.3cm} \textbf{评分}（rating）。由人类专家为每个输出打分或评级。分数通常是连续或离散数值，例如某个量表上的评分（如 1 至 5 星，或 1 至 10 分）。有时也可以采用二元评分，表示“是/否”或“正面/负面”偏好。
+\item \vspace{0.3em} \textbf{列表式排序}（listwise ranking）。要求人类专家对给定的一组可能输出排序。
+\end{itemize}
+\vspace{0.5em}
+
+这里考虑成对比较反馈，因为它是 RLHF 中最简单、最常见的人类反馈形式之一。每次比较时，从候选池 $\{\mathbf{y}_1,...,\mathbf{y}_N\}$ 中随机抽取两个输出 $(\mathbf{y}_a,\mathbf{y}_b)$，将这对输出呈现给人类专家，要求他们依据清晰度、相关性和准确性等准则，判断更偏好哪一个。人类反馈可以编码为二元标签。例如，$\mathbf{y}_a \succ \mathbf{y}_b$ 表示偏好 $\mathbf{y}_a$，$\mathbf{y}_b \succ \mathbf{y}_a$ 表示偏好 $\mathbf{y}_b$。
+
+描述这种成对比较的一种简单且广泛使用的模型，是 \mindex{Bradley–Terry 模型}~\cite{bradley-and-terry:rank}。它是概率模型，估计一个条目比另一个条目更受偏好的概率。采用这里的记号，可以将偏好 $\mathbf{y}_a$ 而非 $\mathbf{y}_b$ 的概率写为
+\begin{eqnarray}
+\Pr(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) & = & \frac{e^{r(\mathbf{x},\mathbf{y}_a)}}{e^{r(\mathbf{x},\mathbf{y}_a)} + e^{r(\mathbf{x},\mathbf{y}_b)}} \nonumber \\
+                                                  & = & \frac{e^{r(\mathbf{x},\mathbf{y}_a)-r(\mathbf{x},\mathbf{y}_b)}}{e^{r(\mathbf{x},\mathbf{y}_a)-r(\mathbf{x},\mathbf{y}_b)}+1} \nonumber \\
+                                                  & = & \mathrm{Sigmoid}(r(\mathbf{x},\mathbf{y}_a)-r(\mathbf{x},\mathbf{y}_b)).
+\end{eqnarray}
+
+训练奖励模型时，目标是最大化这一偏好概率。基于 Bradley–Terry 模型的损失函数为
+\begin{eqnarray}
+\mathcal{L}_r(\phi) & = & -\mathbb{E}_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \sim \mathcal{D}_r} \big[ \log \mathrm{Pr}_{\phi}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) \big], \label{eq:pairwise-reward-loss-expectation}
+\end{eqnarray}
+
+\noindent 其中，$(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b)$ 从人工标注数据集 $\mathcal{D}_r$ 中抽取，该数据集由具有偏好关系的输出对及其对应输入组成。$\phi$ 表示奖励模型的参数，包括 Transformer 解码器参数和线性映射矩阵 $\mathbf{W}_r$。实践中，假定 $(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b)$ 从 $\mathcal{D}_r$ 中均匀采样，则可用经验平均近似期望：
+\begin{eqnarray}
+\mathcal{L}_r(\phi) & = & -\frac{1}{|\mathcal{D}_r|} \sum_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \in \mathcal{D}_r} \log \mathrm{Pr}_{\phi}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}). \label{eq:pairwise-reward-loss-sum}
+\end{eqnarray}
+
+奖励模型训练的目标，是找到使该损失函数最小的最优参数 $\hat{\phi}$，即
+\begin{eqnarray}
+\hat{\phi} & = & \argmin_{\phi} \mathcal{L}_r(\phi).
+\end{eqnarray}
+
+\noindent 由于奖励模型本身也是大语言模型，直接使用 Transformer 的训练流程即可优化。与标准大语言模型训练的区别，仅在于将交叉熵损失替换为式（\ref{eq:pairwise-reward-loss-sum}）所述的成对比较损失。训练完成后，就可以用奖励模型 $r_{\hat{\phi}}(\cdot)$ 监督目标大语言模型，实现对齐。
+
+虽然奖励模型以成对排序任务训练，但对齐过程中会用它独立地为每个输入输出对打分。成对排序目标确保奖励模型对输出之间的细微差异敏感，而指导大语言模型优化的，则是奖励模型产生的连续分数。这种方式的一个优势是，可以选择或组合多种排序损失函数，并仍按本小节所述方式应用所得奖励模型。这种灵活性使奖励建模框架能够广泛适用于不同形式的人类偏好监督。
+
+\subsection{大语言模型的训练}
+\label{sec:rlhf-training-llms}
+
+\noindent 获得奖励模型后，使用 A2C 方法训练策略（即大语言模型）。回顾第~\ref{sec:rl-basics} 节，状态—动作序列或轨迹 $\tau$ 可通过如下效用函数评价：
+\begin{eqnarray}
+U(\tau;\theta) & = &  \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) A(s_t,a_t), \label{eq:utility-basic-form}
+\end{eqnarray}
+
+\noindent 其中，$A(s_t,a_t)$ 是给定状态 $s_t$ 时采取动作 $a_t$ 的优势。$A(s_t,a_t)$ 的一种估计定义为 TD 误差 $ r_t + \gamma V(s_{t+1}) - V(s_t)$，其中价值函数 $V(s_t)$ 利用奖励模型训练。
+
+给定这一效用函数，基于 A2C 的损失函数可写为
+\begin{eqnarray}
+\mathcal{L}(\theta) & = & -\mathbb{E}_{\tau \sim \mathcal{T}} \big[U(\tau;\theta) \big] \nonumber \\
+          & = & -\mathbb{E}_{\tau \sim \mathcal{T}} \big[ \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) A(s_t,a_t) \big],
+\end{eqnarray}
+
+\noindent 其中，$\mathcal{T}$ 是状态—动作序列空间。如常，策略训练的目标是最小化这一损失函数：
+\begin{eqnarray}
+\tilde{\theta} & = & \argmin_{\theta} \mathcal{L}(\theta).
+\end{eqnarray}
+
+若将问题映射回语言建模，并采用大语言模型中的记号，损失函数可写为
+\begin{eqnarray}
+\mathcal{L}(\theta) & = & -\mathbb{E}_{(\mathbf{x},\mathbf{y}) \sim \mathcal{D}} \big[ U(\mathbf{x},\mathbf{y};\theta) \big],
+\end{eqnarray}
+
+\noindent 其中
+\begin{eqnarray}
+U(\mathbf{x},\mathbf{y};\theta) & = & \sum_{t=1}^{T} \log \pi_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t}) A(\mathbf{x},\mathbf{y}_{<t},y_t).
+\end{eqnarray}
+
+\noindent 这里，$\mathcal{D}$ 是输入输出对的集合，$\pi_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t}) = \mathrm{Pr}_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t})$ 是参数为 $\theta$ 的大语言模型。
+
+一般而言，RLHF 中没有人工标注的输入输出数据集 $\mathcal{D}$，而只有包含输入的数据集。此时，输出通常由大语言模型预测得到。于是将损失函数定义为
+\begin{eqnarray}
+\mathcal{L}(\theta) & = & -\mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \big[ U(\mathbf{x},\mathbf{y};\theta) \big],
+\end{eqnarray}
+
+\noindent 其中，$\mathcal{D}$ 表示只含输入的数据集，$\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})$ 表示输出 $\mathbf{y}$ 由策略 $\pi_{\theta}(\cdot|\mathbf{x})$ 采样得到。
+
+上述表述给出了 A2C 方法用于大语言模型的基本形式。在 RLHF 中，更常采用这一模型的改进版本。为简化表述，后续仍使用强化学习记号，稍后再回到语言建模记号。
+
+策略梯度方法的一项常见改进，是利用\mindex{重要性采样}（importance sampling）构造替代目标（surrogate objective）。所得目标可写为
+\begin{eqnarray}
+U(\tau;\theta) & = &  \sum_{t=1}^{T} \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)} A(s_t,a_t).
+\end{eqnarray}
+
+\noindent 这里用比率 $\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)}$ 替换对数概率 $\log \pi_{\theta}(a_t|s_t)$。$\theta_{\mathrm{ref}}$ 表示先前策略的参数，例如训练开始时所用的初始模型参数。因此，$\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)}$ 也称\mindex{比率函数}（ratio function），可以理解为当前策略 $\pi_{\theta}$ 与 $\pi_{\theta_{\mathrm{ref}}}$ 之间的概率比，后者称为参考策略（reference policy）。通过比率函数，根据动作在当前策略和参考策略下的似然，对观测奖励重新加权。若 $\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)} > 1$，则相较于参考策略，当前策略更偏好动作 $a_t$；若 $\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)} < 1$，则当前策略对动作 $a_t$ 的偏好更弱\footnote{
+考虑更一般的情形：希望利用策略的期望奖励评价策略（另见式（\ref{eq:performance-function-basic}））：
+\begin{eqnarray}
+J(\theta) & = & \mathbb{E}_{\tau \sim \pi_{\theta}} \Big[ R(\tau) \Big].
+\end{eqnarray}
+
+\noindent 这里，$\tau \sim \pi_{\theta}$ 表示序列 $\tau$ 由策略 $\pi_{\theta}$ 生成。也可以将 $J(\theta)$ 写为另一种形式：
+\begin{eqnarray}
+J(\theta) & = & \mathbb{E}_{\tau \sim \pi_{\theta_{\mathrm{ref}}}} \Big[ \frac{\mathrm{Pr}_{\theta}(\tau)}{\mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau)} R(\tau) \Big]. \label{eq:importance-sampling-sequence-reward}
+\end{eqnarray}
+
+容易看出，这两个等式的右侧本质相同，因为 $\mathbb{E}_{\tau \sim \pi_{\theta_{\mathrm{ref}}}} \Big[ \frac{\mathrm{Pr}_{\theta}(\tau)}{\mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau)} R(\tau) \Big] = \sum_{\tau} \mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau) \frac{\mathrm{Pr}_{\theta}(\tau)}{\mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau)} R(\tau) = \sum_{\tau} \mathrm{Pr}_{\theta}(\tau) R(\tau) = \mathbb{E}_{\tau \sim \pi_{\theta}} \Big[ R(\tau) \Big]$。
+
+注意，这种等价性只在对整个序列空间求期望时成立。然而，实践中的策略学习通常只通过某个策略采样相对少量序列，因此采样方法本身很重要。式（\ref{eq:importance-sampling-sequence-reward}）提供了一种分离采样与奖励计算过程的有趣方式：先用基线策略（参数为 $\theta_{\mathrm{ref}}$）采样若干序列，再用目标策略（参数为 $\theta$）计算期望奖励。这样就将用于收集数据的策略，与用于计算梯度的策略分开，避免直接从正在评估的策略中采样。当从目标策略生成序列成本高或较困难时，这一点可能很有益。在强化学习中，$\mathbb{E}_{\tau \sim \pi_{\theta_{\mathrm{ref}}}} \Big[ \frac{\mathrm{Pr}_{\theta}(\tau)}{\mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau)} R(\tau) \Big]$ 常称为\mindex{替代目标}。
+
+式（\ref{eq:importance-sampling-sequence-reward}）也可以从策略梯度角度解释。对于 $\mathbb{E}_{\tau \sim \pi_{\theta_{\mathrm{ref}}}} \Big[ \frac{\mathrm{Pr}_{\theta}(\tau)}{\mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau)} R(\tau) \Big]$，在 $\theta=\theta_{\mathrm{ref}}$ 处的梯度为
+\begin{eqnarray}
+\frac{\partial}{\partial \theta} \mathbb{E}_{\tau \sim \pi_{\theta_{\mathrm{ref}}}} \Big[ \frac{\mathrm{Pr}_{\theta}(\tau)}{\mathrm{Pr}_{\theta_{\mathrm{ref}}}(\tau)} R(\tau) \Big] \Big |_{\theta = \theta_{\mathrm{ref}}} & = & \mathbb{E}_{\tau \sim \pi_{\theta_{\mathrm{ref}}}} \Big[ \frac{\partial \mathrm{Pr}_{\theta}(\tau) |_{\theta = \theta_{\mathrm{ref}}}}{\partial \theta} R(\tau) \Big].
+\end{eqnarray}
+
+右侧是策略梯度方法中的标准形式，表示在优化曲面上的 $\theta=\theta_{\mathrm{ref}}$ 点计算参数更新方向。
+}.
+
+式（\ref{eq:importance-sampling-sequence-reward}）中的模型，以及式（\ref{eq:utility-basic-form}）中的模型，都有梯度估计方差常常较大的问题，使学习过程不稳定。为缓解这一问题，常采用截断（clipping）等技术，限制重要性权重，防止过大的更新。截断后的效用函数（也称截断替代目标函数）为
+\begin{eqnarray}
+U_{\mathrm{clip}}(\tau;\theta) & = & \sum_{t=1}^{T} \mathrm{Clip}\left( \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)}, A(s_t,a_t) \right),
+\end{eqnarray}
+
+\noindent 其中
+\begin{eqnarray}
+& & \mathrm{Clip}\left( \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)}, A(s_t,a_t)\right) \nonumber \\
+& = &  \min\left( \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)} A(s_t,a_t),\mathrm{bound} \left(\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)}, 1 - \epsilon, 1 + \epsilon \right) A(s_t,a_t) \right).
+\end{eqnarray}
+
+\noindent 这里，函数 $\mathrm{bound}(\frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\mathrm{ref}}}(a_t|s_t)}, 1 - \epsilon, 1 + \epsilon)$ 将比率函数限制在 $[1-\epsilon, 1+\epsilon]$ 范围内。
+
+上述模型的进一步改进，是在优化中考虑\mindex{信赖域}（trust region）~\cite{schulman-etal:2015trust}。在强化学习中，过大的策略更新可能导致不稳定，使智能体更新后表现反而变差。一个合理思路是在信赖域内优化模型，即在当前参数估计附近、模型行为良好的区域内优化。引入信赖域的一种方式，是约束策略更新幅度，确保当前策略不会显著偏离参考策略。在 RLHF 中，PPO 常结合额外的 KL 型惩罚，使策略保持接近参考策略。为此，可以加入与当前策略和参考策略差异有关的惩罚。其简单形式为：序列 $\tau$ 在当前策略与参考策略下的对数概率之差。
+\begin{eqnarray}
+\mathrm{Penalty} & = & \log \pi_{\theta}(\tau) - \log \pi_{\theta_{\mathrm{ref}}}(\tau).
+\end{eqnarray}
+
+\noindent 实践中，可以只考虑策略概率、忽略环境动态，近似这一惩罚，得到
+\begin{eqnarray}
+\mathrm{Penalty} & = & \sum_{t=1}^{T} \log \pi_{\theta}(a_t|s_t) - \sum_{t=1}^{T} \log \pi_{\theta_{\mathrm{ref}}}(a_t|s_t).
+\end{eqnarray}
+
+\noindent 将这一惩罚纳入优化目标，便可促使当前策略保持接近参考策略，限制可能导致学习不稳定的过大更新。
+
+将该惩罚加入截断替代目标函数，得到
+\begin{eqnarray}
+U_{\mathrm{ppo\text{-}clip}}(\tau;\theta) & = & U_{\mathrm{clip}}(\tau;\theta) - \beta \mathrm{Penalty},
+\end{eqnarray}
+
+\noindent 其中，$\beta$ 是惩罚权重。这种训练方法称为\mindex{近端策略优化}（proximal policy optimization，\mindex{PPO}），是大语言模型及许多其他领域中最流行的强化学习方法之一~\cite{schulman-etal:2017proximal}。
+
+现在，可以用 PPO 的形式写出大语言模型的训练目标：
+
+\begin{eqnarray}
+U_{\mathrm{ppo\text{-}clip}}(\mathbf{x},\mathbf{y};\theta) & = & U_{\mathrm{clip}}(\mathbf{x},\mathbf{y};\theta) - \beta \mathrm{Penalty} \label{eq:ppo-objective-llm},
+\end{eqnarray}
+
+\noindent 其中
+\begin{eqnarray}
+U_{\mathrm{clip}}(\mathbf{x},\mathbf{y};\theta) & = & \sum_{t=1}^{T} \mathrm{Clip}\left( \frac{\pi_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t})}{\pi_{\theta_{\mathrm{ref}}}(y_t|\mathbf{x},\mathbf{y}_{<t})}, A(\mathbf{x},\mathbf{y}_{<t},y_t)  \right), \\
+\mathrm{Penalty} & = & \log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{x}) - \log \mathrm{Pr}_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \nonumber \\
+                 & = & \sum_{t=1}^{T} \log \mathrm{Pr}_{\theta}(y_t|\mathbf{x},\mathbf{y}_{<t}) - \sum_{t=1}^{T} \log \mathrm{Pr}_{\theta_{\mathrm{ref}}}(y_t|\mathbf{x},\mathbf{y}_{<t}).
+\end{eqnarray}
+
+尽管这里的记号稍显繁琐，PPO 的思路却很简单：将目标策略与参考策略经过截断的似然比，同优势函数结合，构建目标；再施加惩罚，确保策略更新不会过大。图~\ref{fig:ppo-rlhf} 展示了基于 PPO 的 RLHF。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-rlhf-diagram}
+\caption{RLHF 示意图。第一步，收集人类偏好数据，并用其训练奖励模型。奖励模型优化完成后，结合参考模型，开始训练策略和价值函数。每个预测步骤都计算基于 PPO 的损失之和，更新策略参数；这需要使用奖励模型、参考模型和价值函数。同时，通过最小化均方误差损失更新价值函数参数。}
+\label{fig:ppo-rlhf}
+\end{figure}
+
+总的来说，实现 RLHF 需要构建四个模型，它们都基于 Transformer 解码器架构。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{奖励模型}（$r_{\phi}(\cdot)$，其中 $\phi$ 为参数）。奖励模型从人类偏好数据中学习，为每对输入输出词元序列预测奖励。它由 Transformer 解码器及后接的线性层组成，将输入与输出拼接形成的序列映射为实值奖励分数。
+\item \vspace{0.3em} \textbf{价值模型}或\textbf{价值函数}（$V_{\omega}(\cdot)$，其中 $\omega$ 为参数）。价值函数接收奖励模型提供的奖励分数，通过训练预测从某个状态出发能够获得的期望奖励总和。其架构通常与奖励模型相同。
+\item \vspace{0.3em} \textbf{参考模型}（$\pi_{\theta_{\mathrm{ref}}}(\cdot) = \mathrm{Pr}_{\theta_{\mathrm{ref}}}(\cdot)$，其中 $\theta_{\mathrm{ref}}$ 为参数）。参考模型是作为策略训练起点的基线大语言模型。在 RLHF 中，它代表模型的先前版本，或未经人类反馈训练的模型，用于采样输出序列，并参与策略训练的损失计算。
+\item \vspace{0.3em} \textbf{目标模型}或\textbf{策略}（$\pi_{\theta}(\cdot) = \mathrm{Pr}_{\theta}(\cdot)$，其中 $\theta$ 为参数）。策略决定大语言模型如何根据上下文选择最合适的下一个词元，在奖励模型与价值模型的共同监督下训练。
+\end{itemize}
+\vspace{0.5em}
+
+实践中，这些模型需要按一定顺序训练。首先，用现有模型初始化它们。例如，奖励模型与价值模型可用预训练大语言模型初始化，参考模型与目标模型可用经过指令微调的模型初始化。此时，参考模型已经可以使用，不再进一步更新。其次，收集人类偏好数据，并据此训练奖励模型。第三，利用奖励模型，同时训练价值模型和策略。在输出词元序列的每个位置，通过最小化价值预测的均方误差更新价值模型，通过最小化 PPO 损失更新策略。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{改进的人类偏好对齐}
+
+\noindent 上一节回顾了强化学习的基本概念与 RLHF 的一般框架。本节讨论 RLHF 的若干改进，以及实现人类偏好对齐的其他方法。
+
+\subsection{更好的奖励建模}
+\label{sec:better-reward-modeling}
+
+\noindent 第~\ref{sec:training-reward-models} 节着重介绍了从人类偏好中学习，以及用成对排序损失训练奖励模型。这里进一步考察奖励建模的其他方法。讨论将相对一般化；由于奖励模型广泛用于各类强化学习问题，将这里的方法用于 RLHF 及相关应用也很容易。
+
+\subsubsection{监督信号}
+
+\noindent 奖励模型训练大体可以看作排序问题：模型学习为输出赋分，使所得排序反映人类指示的偏好。从排序角度训练奖励模型，有以下几种方法。
+
+一种方法是将成对排序扩展为列表式排序。对于数据集中的每个样本，可以用大语言模型生成多个输出，再请人类专家排序。例如，给定四个输出 $\{\mathbf{y}_1,\mathbf{y}_2,\mathbf{y}_3,\mathbf{y}_4\}$，一种可能的顺序是 $\mathbf{y}_2 \succ \mathbf{y}_3 \succ \mathbf{y}_1 \succ \mathbf{y}_4$。对此类排序建模的一种直接方式，是将成对比较损失相加。例如，累加所有输出对上的损失，可以定义列表式损失：
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{list}} & = & -\mathbb{E}_{\substack{(\mathbf{x},Y) \sim \mathcal{D}_r}} \Big[ \frac{2}{N(N-1)} \sum_{\substack{\mathbf{y}_a \in Y, \mathbf{y}_b \in Y\\ \mathbf{y}_a \succ \mathbf{y}_b}} \log \mathrm{Pr}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) \Big],
+\end{eqnarray}
+
+\noindent 其中，$Y$ 是输出列表，$N$ 是列表中的输出数量。$\mathrm{Pr}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x})$ 可用 Bradley–Terry 模型定义，即 $\Pr(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) = \mathrm{Sigmoid}(r(\mathbf{x},\mathbf{y}_a)-r(\mathbf{x},\mathbf{y}_b))$。为使记号简洁，这里省略 $\Pr(\cdot)$ 上的 $\phi$ 上标。
+
+将 Bradley–Terry 模型扩展到列表式排序时，可以采用同时考虑整个输出列表、而非仅做成对比较的排序机制。\mindex{Plackett–Luce 模型}就是这样一种模型，它推广 Bradley–Terry 模型，处理排序中的多个条目~\cite{plackett:1975analysis}。在 Plackett–Luce 模型中，为列表的每个条目定义一个“价值”（worth），反映它相对于其他条目被选中的强度。对于这里的奖励建模问题，列表 $Y$ 中 $\mathbf{y}$ 的价值可定义为
+\begin{eqnarray}
+\alpha(\mathbf{y}) & = & \exp(r(\mathbf{x},\mathbf{y})).
+\end{eqnarray}
+
+\noindent 于是，从 $Y$ 中选出 $\mathbf{y}$ 作为首位条目的概率为
+\begin{eqnarray}
+\Pr(\mathbf{y}\text{ 被选中}|\mathbf{x},Y) & = & \frac{\alpha(\mathbf{y})}{\sum_{\mathbf{y}' \in Y} \alpha(\mathbf{y}')} \nonumber \\
+                                                & = & \frac{\exp(r(\mathbf{x},\mathbf{y}))}{\sum_{\mathbf{y}' \in Y} \exp(r(\mathbf{x},\mathbf{y}'))}.
+\end{eqnarray}
+
+假设 $\mathring{Y}$ 是有序列表 $\mathbf{y}_{j_1} \succ \mathbf{y}_{j_2} \succ \cdots \succ \mathbf{y}_{j_N}$。该有序列表的整体对数概率，可以定义为各选择阶段条件对数概率之和，即
+\begin{eqnarray}
+\log \Pr(\mathring{Y} | \mathbf{x}) & = & \log \Pr(\mathbf{y}_{j_1} \succ \mathbf{y}_{j_2} \succ \cdots \succ \mathbf{y}_{j_N} | \mathbf{x}) \nonumber \\
+                                    & = & \log \Pr(\mathbf{y}_{j_1} | \mathbf{x}, \{\mathbf{y}_{j_1},\mathbf{y}_{j_2},...,\mathbf{y}_{j_N}\}) + \nonumber \\
+                                    &   & \log \Pr(\mathbf{y}_{j_2} | \mathbf{x}, \{\mathbf{y}_{j_2},...,\mathbf{y}_{j_N}\}) + \nonumber \\
+                                    &   & \cdots + \nonumber \\
+                                    &   & \log \Pr(\mathbf{y}_{j_N} | \mathbf{x}, \{\mathbf{y}_{j_N}\}) \nonumber \\
+                                    & = & \sum_{k = 1}^{N} \log \Pr(\mathbf{y}_{j_k} | \mathbf{x}, \mathring{Y}_{\ge k}),
+\end{eqnarray}
+
+\noindent 其中，$\mathring{Y}_{\ge k}$ 表示第 $k$ 个阶段尚未被选中的输出子集，即 $\mathring{Y}_{\ge k} = \{\mathbf{y}_{j_k},...,\mathbf{y}_{j_N}\}$。给定对数概率 $\log \Pr(\mathring{Y} | \mathbf{x})$，基于 Plackett–Luce 模型的损失函数可定义为
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{pl}} & = & -\mathbb{E}_{(\mathbf{x},\mathring{Y}) \sim \mathcal{D}_r} \big[ \log \Pr(\mathring{Y} | \mathbf{x}) \big].
+\end{eqnarray}
+
+排序建模还有许多其他成对方法和列表式方法，例如 RankNet~\cite{burges-etal:2005learning} 和 ListNet~\cite{cao-etal:2007learning}。这些方法都属于排序学习（learning to rank）这一大家族，其中大多数适用于人类偏好建模。不过，讨论这些方法超出了本章范围，更多细节可参阅相关书籍~\cite{liu:2009learning,li2011:learning}。
+
+除成对排序与列表式排序外，逐点（pointwise）方法提供了训练奖励模型、捕捉人类偏好的另一种方式。与关注不同输出间相对排序的方法不同，逐点方法独立处理每个输出。例如，人类专家可为单个输出打分，如五分制评分。目标是调整奖励模型，使其输出与这些分数一致。实现逐点训练的一种简单方式是回归，将每个输出的奖励作为目标变量。设 $\varphi(\mathbf{x},\mathbf{y})$ 为人类对给定 $\mathbf{x}$ 时输出 $\mathbf{y}$ 的评分。可以最小化预测奖励 $r(\mathbf{x},\mathbf{y})$ 与实际人类反馈 $\varphi(\mathbf{x},\mathbf{y})$ 之间的损失来训练逐点奖励模型，通常采用均方误差或其他回归损失。例如，损失函数可以是
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{point}} & = & \mathbb{E}_{(\mathbf{x},\mathbf{y}) \sim \mathcal{D}_r} \big[ (\varphi(\mathbf{x},\mathbf{y}) - r(\mathbf{x},\mathbf{y}) )^2\big].
+\end{eqnarray}
+
+逐点方法在概念上更简单，也能直接指导奖励模型预测分数，但在 RLHF 中未必总是最佳选择。一个问题是，它们可能难以应对人类反馈中的高方差，尤其是不同专家对相似输出给出不一致评分时。由于这类方法聚焦绝对分数拟合，而非相对差异，评分不一致可能导致模型表现不佳。此外，拟合具体已评分输出可能损害泛化，尤其是 RLHF 训练数据通常很有限。相比之下，考虑相对偏好的方法，可能促进学习更通用的偏好模式。尽管如此，某些情形仍适合逐点方法。例如，训练数据充足，且获得准确、一致标注的成本较低时，逐点方法可以很有效。
+
+事实上，为使奖励模型训练的监督信号更稳健，也可以加入额外正则项。例如，若将式（\ref{eq:ppo-objective-llm}）中的第一项 $U_{\mathrm{ppo\text{-}clip}}(\mathbf{x},\mathbf{y};\theta)$ 视为某种广义奖励，则第二项（即惩罚项）可视为奖励模型的一种正则化形式，只是这里的目标是训练策略，而非奖励模型。另一个例子是，\citet{eisenstein-etal:2023helping} 基于奖励之和的平方构造正则项，并将其加入 RLHF 的成对比较损失：
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{reg}} & = & \mathcal{L}_{\mathrm{pair}} -\lambda \mathbb{E}_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \sim \mathcal{D}_r} \big[ (r(\mathbf{x},\mathbf{y}_a) + r(\mathbf{x},\mathbf{y}_b) )^2 \big] \nonumber \\
+& = & -\mathbb{E}_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \sim \mathcal{D}_r} \big[ \log \mathrm{Pr}_{\phi}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) \big] \nonumber \\
+&   & -\lambda  \mathbb{E}_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \sim \mathcal{D}_r} \big[ (r(\mathbf{x},\mathbf{y}_a) + r(\mathbf{x},\mathbf{y}_b) )^2 \big],
+\end{eqnarray}
+
+\noindent 其中，$\lambda$ 是正则项权重。使用这一正则项优化，有助于缓解奖励模型的欠定性（underdetermination）\footnote{如果存在多组不同参数都能达到同一目标，就称模型是欠定的。}。
+
+\subsubsection{稀疏奖励与稠密奖励}
+
+\noindent 如第~\ref{sec:human-preference-alignment} 节所述，人类反馈提供的奖励通常是稀疏的：只在序列末尾观测到，而非贯穿生成过程持续出现。如何处理稀疏奖励，长期以来一直是强化学习关注的问题，也是许多实际应用的挑战。例如，在机器人领域，往往需要对奖励函数进行塑形，以便优化，而不能只依赖序列末尾奖励。已有多种方法应对这一问题。常见方式之一是奖励塑形，即修改原奖励函数，加入中间奖励，从而提供更即时的反馈。还可以使用课程学习（curriculum learning），按复杂度逐渐增加的顺序安排任务，帮助模型先掌握简单任务，再逐步为更复杂挑战做好准备。内在动机（intrinsic motivation）、事后经验回放（hindsight experience replay）等许多方法，也能缓解稀疏奖励的影响。这些方法大多具有通用性，广泛讨论于强化学习文献中，例如 \citet{Sutton-and-Barto:2018RL} 的经典教材。
+
+尽管这里不详细讨论稀疏奖励的缓解方法，但有一个有趣问题：为何稀疏奖励在 RLHF 中如此成功？回顾第~\ref{sec:rl-basics} 节，每个时间步 $t$ 接收的监督信号，并非当前动作的奖励，而是从 $t$ 到最后一个时间步的某种累积奖励。这种监督信号在序列上是稠密的，因为无论处于哪个时间步，都可以将序列末尾的奖励传回该时间步。换言之，稀疏奖励被转换为稠密监督信号。此外，从奖励塑形角度，\citet{ng1999-etal:policy} 表明，$t$ 时刻的奖励按下式计算：
+\begin{eqnarray}
+r'(s_t,a_t,s_{t+1}) & = & r(s_t,a_t,s_{t+1}) + f(s_t,a_t,s_{t+1}), \label{eq:transformed-reward-function}
+\end{eqnarray}
+
+\noindent 其中，$r'(\cdot)$ 是变换后的奖励函数，$r(\cdot)$ 是原奖励函数，$f(\cdot)$ 是塑形奖励函数。为确保变换后奖励函数下策略的最优性，塑形奖励函数可取如下形式：
+\begin{eqnarray}
+f(s_t,a_t,s_{t+1}) & = & \gamma \Phi(s_{t+1}) - \Phi(s_t), \label{eq:shaping-reward-function}
+\end{eqnarray}
+
+\noindent 其中，$\Phi(s)$ 称为状态 $s$ 的势值。若将 $\Phi(s)$ 定义为式（\ref{eq:general-value-function}）中的价值函数，并将式（\ref{eq:shaping-reward-function}）代入式（\ref{eq:transformed-reward-function}），得到
+\begin{eqnarray}
+r'(s_t,a_t,s_{t+1}) & = & r(s_t,a_t,s_{t+1}) + \gamma V(s_{t+1}) - V(s_t).
+\end{eqnarray}
+
+\noindent 有趣的是，该表达式等价于 PPO 中使用的单步时序差分误差。这将基于优势的方法与奖励塑形联系起来：优势本质上是一种经过塑形的奖励。
+
+另一方面，采用序列末尾奖励的原因之一，来自 RLHF 任务本身的性质。传统强化学习中，智能体与动态环境交互；而 RLHF 任务往往涉及基于语言或其他高层认知过程的复杂决策。这些过程不容易频繁提供有意义的中间奖励，因为只有在更大的完整序列或任务上下文中观察动作的影响后，才能充分评价动作的质量与恰当性。此时，基于人类反馈的奖励信号虽很稀疏，通常却信息丰富且准确。因此，奖励的稀疏性，加上人类反馈的高信息量与准确性，可以使学习既稳健又高效。
+
+\subsubsection{细粒度奖励}
+\label{sec:fine-grained-rewards}
+
+\noindent 许多应用的目标比评价整篇文本更复杂。例如，情感分析往往不只是判断文本情感，还需要将情感与文本讨论主题的具体方面关联起来，进行更细致的分析。考虑句子“这部手机的相机很出色，但电池续航令人失望”。此时，需要分别分析针对相机和电池表达的情感。这种分析称为基于方面的情感分析（aspect-based sentiment analysis），与一般情感分析相比，有助于更细致地理解客户评论。
+
+在奖励建模中，也常需要以类似的细粒度建模序列的不同部分。一种直接方式是，将序列划分为不同片段，独立计算每个片段的奖励~\cite{wu-etal:2023finegrained}。假设输出词元序列 $\mathbf{y}$ 按某种准则划分为 $n_s$ 个片段 $\{\bar{\mathbf{y}}_1,...,\bar{\mathbf{y}}_{n_s}\}$，可用奖励模型评价各片段。同时考虑输入 $\mathbf{x}$、完整输出 $\mathbf{y}$ 和具体片段 $\bar{\mathbf{y}}_k$，第 $k$ 个片段的奖励分数为
+\begin{eqnarray}
+r^k & = & r(\mathbf{x}, \mathbf{y}, \bar{\mathbf{y}}_k).
+\end{eqnarray}
+
+\noindent 整个输出序列的总奖励分数，就是这些片段级奖励之和：
+\begin{eqnarray}
+r(\mathbf{x},\mathbf{y}) & = & \sum_{k=1}^{n_s} r(\mathbf{x}, \mathbf{y}, \bar{\mathbf{y}}_k).
+\end{eqnarray}
+
+\noindent 随后，可用这一奖励 $r(\mathbf{x},\mathbf{y})$，通过 PPO 等标准强化学习算法训练策略。
+
+这种方法的问题是，片段级人类偏好数据难以获取，因此训练片段级奖励模型，不像从整篇文本的人类偏好中学习那样直接。对于评分类问题（例如按虚假信息程度给片段评分），一种简单方式是为每个片段赋分，再用逐点方法训练奖励模型。例如，可以使用强大语言模型为序列 $\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_{k-1}$ 和 $\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_k$ 评分，得到分数 $s(\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_{k-1})$ 和 $s(\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_k)$。然后，将片段 $\bar{\mathbf{y}}_{k}$ 的分数定义为 $s(\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_k)$ 与 $s(\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_{k-1})$ 之差：
+\begin{eqnarray}
+s(\bar{\mathbf{y}}_k) & = &s(\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_k) - s(\bar{\mathbf{y}}_1...\bar{\mathbf{y}}_{k-1}).
+\end{eqnarray}
+
+利用这些片段级分数，可以用回归损失函数训练奖励模型：
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{rating}} & = & \mathbb{E}_{(\mathbf{x},\mathbf{y},\bar{\mathbf{y}}_k) \sim \mathcal{D}_r} \big[ (s(\bar{\mathbf{y}}_k) - r(\mathbf{x}, \mathbf{y}, \bar{\mathbf{y}}_k))^2 \big].
+\end{eqnarray}
+
+有时，对齐可以视为分类问题，例如评估片段是否存在伦理问题。此时，可以由人工或额外分类器，将片段标为符合伦理或不符合伦理。给定这些离散标签，就能使用分类损失函数训练奖励模型。设真实标签为 $\hat{r} \in \{1,-1\}$，其中 $-1$ 表示不符合伦理的片段，$1$ 表示符合伦理的片段；令 $r(\mathbf{x}, \mathbf{y}, \bar{\mathbf{y}}_k)$ 表示奖励模型产生的标量输出\footnote{为使奖励模型输出分类概率或未归一化分数（logit），可以相应调整第~\ref{sec:training-reward-models} 节所述的线性层。}。于是，可以使用合页损失（hinge loss）训练奖励模型：
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{hinge}} & = & \mathbb{E}_{(\mathbf{x},\mathbf{y},\bar{\mathbf{y}}_k) \sim \mathcal{D}_r} \big[  \max(0, 1 - r(\mathbf{x}, \mathbf{y}, \bar{\mathbf{y}}_k) \cdot \hat{r}) \big],
+\end{eqnarray}
+
+\noindent 其中，$\hat{r} \in \{1,-1\}$ 表示真实标签。
+
+剩下的问题是如何将 $\mathbf{y}$ 划分为片段。一种方式是固定长度切分，将 $\mathbf{y}$ 划为等长块，但这未必总是理想的，因为序列内容可能无法很好地匹配固定边界。另一种方式是依据具体语言学或语义线索切分 $\mathbf{y}$，例如句子边界、主题变化或文本中其他有意义的结构。可以用语言切分系统，或提示大语言模型识别序列中的自然断点来实现。还可以根据序列复杂度进行动态切分。例如，在奖励分数显著变化的位置划分片段，这可能对应所建模任务的变化。
+
+\subsubsection{奖励模型的组合}
+
+\noindent 奖励模型可以视为环境的代理。真实环境往往过于复杂或未知，因此通常无法为其构建完美代理。过度将大语言模型对齐到这种不完美代理，可能导致性能下降，这称为\mindex{过度优化问题}（overoptimization problem）~\cite{stiennon-etal:2020learning,gao-etal:2023scaling}\footnote{这一问题也称\mindex{奖励投机}（reward hacking）或\mindex{奖励取巧}（reward gaming）~\cite{krakovna-etal:2020specification,skalse-etal:2022defining,pan-etal:2022theeffects}，指智能体试图欺骗奖励模型，但其行为没有对齐任务真正预期的目标。设想学生完成作业后会获得分数或表扬，便可能寻找以最少努力完成作业、最大化奖励的方法，例如从互联网或以往作业复制粘贴答案，而非自己解题。}。也可以用 Goodhart 定律解释这一点：\textit{当一项度量成为目标时，它就不再是好的度量}~\cite{goodhart:1984problems}。
+
+解决过度优化问题并不容易，目前尚无完全令人满意的方案。理想方式可能是构建一个理想奖励模型（oracle reward model），完美捕捉任务的真实目标，防止智能体“钻空子”。然而，真实环境的复杂性，以及定义所有影响期望结果相关因素的困难，使这类模型极难构建。更实用的方式是组合多个奖励模型，减少单一奖励模型造成的训练目标与真实目标之间的不匹配~\cite{coste-etal:2024reward}。
+
+组合一组奖励模型，在概念上很直接，通常可表述为集成学习问题。一种简单而常见的方法，是组合这些模型的输出，获得更可靠的奖励估计：
+\begin{eqnarray}
+r_{\mathrm{combine}} & = & \sum_{k=1}^{K} w_k \cdot r_k(\mathbf{x},\mathbf{y}),
+\end{eqnarray}
+
+\noindent 其中，$r_k(\cdot)$ 是集成中的第 $k$ 个奖励模型，$w_k$ 是 $r_k(\cdot)$ 的权重，$K$ 是奖励模型数量。组合后的奖励可用于监督策略训练。事实上，不同模型有多种组合方式，例如使用贝叶斯模型平均进行预测，
+或构建融合网络，学习如何组合不同模型的预测。也可以将其表述为多目标优化问题，用多个奖励模型同时训练策略。优化与机器学习文献已广泛讨论这些方法~\cite{miettinen:1999nonlinear,Bishop:2006}。
+
+除模型组合方法外，另一个重要问题是如何收集或构建多个不同的奖励模型。最简单的方式之一是使用集成学习技术，例如从给定数据集的不同子集，或不同数据来源，构建多样的奖励模型。对于 RLHF，还可以从对齐的不同方面构建模型。例如，一个奖励模型评价输出的事实准确性，另一个评价完整性；二者互补，可以组合起来改善整体输出评价。另一种方式是直接用不同现成的大语言模型作为奖励模型。这种方式简单实用，因为已有许多强大的预训练模型，只需少量修改，甚至无须修改，就能使用。这引出一个有趣问题：与其他大语言模型对齐的模型，能否超越它们？乍看之下似乎不能。直观上，目标模型仅凭有限监督模仿其他模型，很难充分捕捉监督者的细微行为。然而，大语言模型具备很强的泛化能力，因此这种方法实际上可能很有帮助。例如，使用开源或商业大语言模型作为奖励模型，在模型对齐中已展现出很强性能，甚至在若干流行任务上取得了最先进的结果~\cite{lambert-etal:2024rewardbench}。
+
+\subsection{直接偏好优化}
+
+\noindent 学习奖励模型虽是强化学习的标准步骤，却使整个训练过程远比标准监督训练复杂。训练可靠的奖励模型本身就不容易，而训练不充分的奖励模型可能严重影响策略学习效果。现在介绍另一种对齐方法，称为\mindex{直接偏好优化}（direct preference optimization，\mindex{DPO}），它通过免除显式奖励建模，简化训练框架~\cite{rafailov-etal:2024direct}。这种方法直接依据用户偏好优化策略，无须训练独立奖励模型，因此能够以类似监督学习的方式实现人类偏好对齐。图~\ref{fig:rlhf-vs-dpo} 比较了标准 RLHF 与 DPO 方法。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-rlhf-vs-dpo}
+\caption{标准 RLHF（PPO）与 DPO 的比较。在 RLHF 中，使用人类偏好数据训练奖励模型，再用奖励模型训练策略与价值函数。在 DPO 中，人类偏好数据的使用更直接：在这些数据上训练策略，无须训练奖励模型。}
+\label{fig:rlhf-vs-dpo}
+\end{figure}
+
+推导 DPO 目标之前，先回顾 RLHF 中策略训练的目标。如第~\ref{sec:rlhf-training-llms} 节所述，通常通过优化带惩罚项的损失函数训练策略。DPO 假定一种简单损失函数：给定输入 $\mathbf{x}$ 时，用奖励模型 $r(\mathbf{x},\mathbf{y})$ 评价输出 $\mathbf{y}$ 的质量。因此，训练目标为
+\begin{eqnarray}
+\tilde{\theta} & = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \big[ \underbrace{-r(\mathbf{x},\mathbf{y})}_{\text{损失}} + \beta \underbrace{(\log \pi_{\theta}(\mathbf{y}|\mathbf{x}) - \log \pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) )}_{\text{惩罚}} \big]. \label{eq:dpo-basic-objective}
+\end{eqnarray}
+
+\noindent 注意，在这个优化问题中，只有 $\pi_{\theta}(\mathbf{y}|\mathbf{x})$ 依赖目标策略 $\pi_{\theta}(\cdot)$。假定给定 $\mathbf{x}$ 和 $\mathbf{y}$ 时，奖励模型 $r(\mathbf{x}, \mathbf{y})$ 与参考模型 $\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x})$ 均固定。相较于 PPO，这是一个较强假设，但后面将看到，它简化了问题，对推导 DPO 目标很重要。
+
+由于 $\theta$ 是待优化变量，重排式（\ref{eq:dpo-basic-objective}）右侧，使对 $\theta$ 的依赖显式化：
+\begin{eqnarray}
+&    & \tilde{\theta} \nonumber \\
+& = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \big[ \beta \log \pi_{\theta}(\mathbf{y}|\mathbf{x}) - \beta \log \pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) - r(\mathbf{x},\mathbf{y}) \big] \nonumber \\
+& = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \big[ \log \pi_{\theta}(\mathbf{y}|\mathbf{x}) - \big(\log \pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) + \frac{1}{\beta} r(\mathbf{x},\mathbf{y}) \big) \big] \nonumber \\
+& = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \Big[ \underbrace{\log \pi_{\theta}(\mathbf{y}|\mathbf{x})}_{\text{依赖 $\theta$}} - \underbrace{\log \Big(\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp \big(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}) \big) \Big)}_{\text{不依赖 $\theta$}} \Big].
+\label{eq:dpo-raw-objective-with-no-normalization}
+\end{eqnarray}
+
+该式将目标函数定义为策略的对数概率，与另一个关于 $\mathbf{y}$ 的函数之差。这种形式并不理想，因为通常更希望比较两个分布，从而将差异解释为分布间的某种散度。一个简单思路是，将第二项（即 $ \log \pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}))$）转化为 $\mathbf{y}$ 定义域上的对数概率分布。若将 $ \pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}))$ 视为 $y$ 的未归一化概率，则除以归一化因子即可得到归一化概率：
+\begin{eqnarray}
+Z(\mathbf{x}) & = & \sum_{\mathbf{y}} \pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp \big(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}) \big).
+\end{eqnarray}
+
+由此，可以定义如下概率分布：
+\begin{eqnarray}
+\pi^*(\mathbf{y}|\mathbf{x}) & = & \frac{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp \big(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}) \big)}{Z(\mathbf{x})}.
+\end{eqnarray}
+
+然后，将式（\ref{eq:dpo-raw-objective-with-no-normalization}）改写为
+\begin{eqnarray}
+\tilde{\theta} & = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \Big[ \log \pi_{\theta}(\mathbf{y}|\mathbf{x}) - \log \frac{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp \big(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}) \big)}{Z(\mathbf{x})} \nonumber \\
+& & \hspace{10.5em} - \log Z(\mathbf{x}) \Big] \nonumber \\
+& = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \Big[ \log \pi_{\theta}(\mathbf{y}|\mathbf{x}) - \log \pi^{*}(\mathbf{y}|\mathbf{x}) - \log Z(\mathbf{x}) \Big] \nonumber \\
+& = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \bigg[ \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \Big[ \log \pi_{\theta}(\mathbf{y}|\mathbf{x}) - \log \pi^{*}(\mathbf{y}|\mathbf{x}) \Big] \nonumber \\
+&  & \hspace{6.5em} - \mathbb{E}_{\mathbf{y} \sim \pi_{\theta}(\cdot|\mathbf{x})} \big[ \log Z(\mathbf{x}) \big] \bigg] \nonumber \\
+& = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \Big[ \underbrace{D_{\mathrm{KL}} \big(\pi_{\theta}(\cdot|\mathbf{x})\ \|\ \pi^{*}(\cdot|\mathbf{x}) \big)}_{\text{KL 散度}} - \underbrace{\log Z(\mathbf{x})}_{\text{关于 $\theta$ 的常数}} \Big].
+\end{eqnarray}
+
+由于 $\log Z(\mathbf{x})$ 与 $\theta$ 无关，不影响 $\argmin_{\theta}$ 运算结果，可从目标中去掉。于是得到新的训练目标：最小化 $\pi_{\theta}(\cdot|\mathbf{x})$ 与 $\pi^{*}(\cdot|\mathbf{x})$ 之间的 KL 散度（Kullback-Leibler divergence），找到最优策略 $\pi_{\theta}$：
+\begin{eqnarray}
+\tilde{\theta} & = & \argmin_{\theta} \mathbb{E}_{\mathbf{x} \sim \mathcal{D}} \Big[ D_{\mathrm{KL}} \big(\pi_{\theta}(\cdot|\mathbf{x})\ \|\ \pi^{*}(\cdot|\mathbf{x}) \big) \Big].
+\end{eqnarray}
+
+显然，这个优化问题的解为
+\begin{eqnarray}
+\pi_{\theta}(\mathbf{y}|\mathbf{x}) & = & \pi^{*}(\mathbf{y}|\mathbf{x}) \nonumber \\
+& = & \frac{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x}) \exp \big(\frac{1}{\beta} r(\mathbf{x},\mathbf{y}))}{Z(\mathbf{x})}.
+\end{eqnarray}
+
+根据该式，可以用目标模型 $\pi_{\theta}(\mathbf{y}|\mathbf{x})$、参考模型 $\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x})$ 与归一化因子 $Z(\mathbf{x})$ 表示奖励 $r(\mathbf{x},\mathbf{y})$：
+\begin{eqnarray}
+r(\mathbf{x},\mathbf{y}) & = & \beta \left(\log \frac{\pi_{\theta}(\mathbf{y}|\mathbf{x})}{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}|\mathbf{x})} + \log Z(\mathbf{x}) \right). \label{eq:dpo-reward-model-expression}
+\end{eqnarray}
+
+这一结果很有趣：最初希望利用奖励模型 $r(\mathbf{x},\mathbf{y})$ 学习策略 $\pi_{\theta}(\cdot)$，最终却得到了基于策略的奖励模型表示。给定式（\ref{eq:dpo-reward-model-expression}）定义的奖励模型，就能将其代入 Bradley–Terry 模型，计算偏好概率（另见第~\ref{sec:training-reward-models} 节）：
+\begin{eqnarray}
+\mathrm{Pr}_{\theta}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) & = & \mathrm{Sigmoid}(r(\mathbf{x},\mathbf{y}_a)-r(\mathbf{x},\mathbf{y}_b)) \nonumber \\
+& = & \mathrm{Sigmoid}\bigg(\beta \Big(\log \frac{\pi_{\theta}(\mathbf{y}_a|\mathbf{x})}{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}_a|\mathbf{x})} + \log Z(\mathbf{x}) \Big) - \nonumber \\
+&    & \hspace{4.3em} \beta \Big(\log \frac{\pi_{\theta}(\mathbf{y}_b|\mathbf{x})}{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}_b|\mathbf{x})} + \log Z(\mathbf{x}) \Big) \bigg) \nonumber \\
+& = & \mathrm{Sigmoid}\bigg( \beta \log \frac{\pi_{\theta}(\mathbf{y}_a|\mathbf{x})}{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}_a|\mathbf{x})}  - \beta \log \frac{\pi_{\theta}(\mathbf{y}_b|\mathbf{x})}{\pi_{\theta_{\mathrm{ref}}}(\mathbf{y}_b|\mathbf{x})} \bigg).
+\end{eqnarray}
+
+这个公式十分简洁：它将奖励之差转化为比率函数之差，无须计算 $Z(\mathbf{x})$ 的值。因此，不再需要奖励模型，只需目标策略与参考模型，就能计算偏好概率。最后，最小化如下 DPO 损失函数，即可训练目标策略：
+\begin{eqnarray}
+\mathcal{L}_{\mathrm{dpo}}(\theta) & = & -\mathbb{E}_{(\mathbf{x},\mathbf{y}_a,\mathbf{y}_b) \sim \mathcal{D}_r} \big[ \log \mathrm{Pr}_{\theta}(\mathbf{y}_a \succ \mathbf{y}_b | \mathbf{x}) \big].
+\end{eqnarray}
+
+\noindent 这一损失函数的形式，与 RLHF 中训练奖励模型所用的损失非常相似（见式（\ref{eq:pairwise-reward-loss-expectation}））。但应注意，这里的损失函数依赖策略参数（即 $\theta$），而非奖励模型参数（即 $\phi$）。
+
+DPO 的主要优势在于简单与高效。其目标很直接：针对基于偏好的反馈直接优化，无须依赖单独构建的奖励模型。此外，DPO 通常具有更高的样本效率，因为它从固定数据集中学习，无须 PPO 中计算成本高昂的采样过程。这使 DPO 成为人类偏好对齐的流行方法，尤其适用于通过强化学习构建和应用奖励模型较为困难的情形。
+
+DPO 大体可以视为\mindex{离线强化学习}（offline reinforcement learning）方法：训练数据预先收集且固定，没有探索。相比之下，PPO 等在线强化学习（online reinforcement learning）方法，需要通过与环境交互（以奖励模型为环境代理）探索新状态，也有其独特优势。其中一项优势是，智能体可从实时反馈中学习，持续适应环境变化。这意味着，在线方法不受预收集数据静态性的约束，可以发现新的问题求解策略。此外，探索有助于覆盖更广泛的状态—动作对，提高泛化能力。这可能是大语言模型的一项重要优势，因为泛化被视为应用此类大型模型的关键方面。
+
+\subsection{偏好数据的自动生成}
+
+\noindent 从人类偏好中学习，是一种有效且流行的大语言模型对齐方法，但偏好数据标注成本高昂。从人类反馈中学习不仅扩展性有限，也可能引入偏见，因为人类反馈本身带有主观性。因此，可以转向人工智能反馈（AI feedback）方法，解决扩展性与一致性问题，避开人工标注者带来的局限。
+
+与指令微调数据生成一样，利用大语言模型生成偏好数据也很直接。给定一组输入，先用模型生成成对输出，再提示模型根据相应输入，判断每对输出中更偏好哪一个。下面的例子提示模型为一对客户服务回答生成偏好标签。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+考虑一个客户提出请求的客服场景。你将审阅针对这一请求的两个回答。请指出更偏好哪一个。好的回答应礼貌、清楚、简洁，直接回应客户关切，提供有帮助的信息或解决方案，并保持积极语气。
+
+\vspace{0.3cm}
+
+请求：
+
+\vspace{0.1cm}
+
+\textit{你好，我发现订单还没有送到，尽管按计划几天前就该到了。能否告知订单目前的状态？谢谢！}
+
+\vspace{0.2cm}
+
+回答 A：
+
+\vspace{0.1cm}
+
+\textit{非常抱歉让您久等了，我理解这会让人失望。我们正尽最大努力，尽快为您解决。}
+
+\vspace{0.3cm}
+
+回答 B：
+
+\vspace{0.1cm}
+
+\textit{嘿，事情总会发生嘛！包裹该到的时候自然会到，没必要紧张。}
+
+\vspace{0.3cm}
+
+\underline{更偏好回答 A。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+收集到这些偏好标签后，就可以将它们与输入及两个回答一起，用于训练奖励模型。当然，还可以提供少量示例，或采用思维链（chain of thought，CoT）等更复杂的提示技术，提高标注性能。例如，在提示中加入一个示例，用思维链解释为何更偏好两个回答中的某一个，以及如何作出这一判断。
+
+除偏好标签外，还可以获得各标签对应的概率~\cite{lee-etal:2023rlaif}。一种简单方法是，从大语言模型输出的概率中提取标签词元（如“A”和“B”）的概率，再用 Softmax 函数或其他归一化技术，将其重新归一化为标签上的分布。如第~\ref{sec:better-reward-modeling} 节所述，这些偏好标签的概率，可作为训练奖励模型的逐点监督信号。
+
+扩大人工智能数据生成规模很容易，但确保准确性与多样性仍至关重要。这里的数据质量和多样性问题，不仅涉及偏好标签，也涉及模型输入与输出。因此，通常需要结合多种技术，获得大规模高质量数据。例如，使用不同大语言模型、提示、上下文示例等，生成多样的输出与标注~\cite{cui-etal:2024ultra}。\citet{dubois-etal:2024alpacafarm} 指出，无论从人类反馈还是人工智能反馈中训练大语言模型，成对偏好数据的变化性都很重要。
+
+从人工智能反馈中学习，虽然扩展性很强，通常也比人类反馈更一致，但更适合定义明确、具有客观性能指标的任务。相比之下，使人工智能系统对齐人类价值观、偏好，以及需要理解微妙或主观情境的复杂现实任务时，人类反馈更有优势。可以将两种方法结合训练大语言模型，同时受益于人类洞察与人工智能反馈的扩展能力。
+
+\subsection{逐步对齐}
+
+\noindent 至此，对齐讨论主要关注用奖励模型评价完整输入输出序列对。这些方法容易适配到根据最终答案就能验证输出正确性的场景。例如，计算数学表达式时，答案正确，奖励模型就给正面反馈；答案错误，就给负面反馈。然而，对许多需要复杂推理的问题，单看最终结果是否正确，并不足以支持学习。设想学生面对一道有挑战的数学题，却只得到最终答案；知道答案对错，并不能帮助他找出错在哪里，以及如何算出正确答案。更好的方式是逐步分解解题过程，引导学生理解每一步背后的概念与逻辑。
+
+第 \ChapterLLMPrompting 章介绍了 CoT 方法，提示大语言模型显式写出得出结论或解决问题所需的中间步骤或推理过程。可以看到，将问题分解为更小部分，有助于理解求解路径，提高输出准确性。这些方法可以自然扩展到模型对齐，即在推理中间步骤监督模型。考虑一项推理任务：大语言模型针对给定输入，生成推理步骤序列 $\mathbf{y} = \{\bar{\mathbf{y}}_1,...,\bar{\mathbf{y}}_{n_s}\}$。假定推理结果包含在最后一步 $\bar{\mathbf{y}}_{n_s}$ 中，且容易验证。对于这类推理问题，\citet{uesato-etal:2022solving} 将大语言模型微调方法分为两类：
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{基于结果的方法}（outcome-based approaches）。只在验证最终结果时提供监督。这是本章讨论过的从人类反馈中学习的标准方式。例如，优化大语言模型，使某种形式的奖励 $r(\mathbf{x},\mathbf{y})$ 最大化。
+\item \vspace{0.3em} \mindex{基于过程的方法}（process-based approaches）。除最后一步外，还对所有中间步骤提供监督。为此，需要构建能在每一步给出监督信号的奖励模型，并设计能够利用这些信号的损失函数。
+\end{itemize}
+\vspace{0.5em}
+
+图~\ref{fig:outcome-vs-process-based-approaches} 展示了大语言模型对一道数学示例题给出的两个输出。虽然两者最终答案都正确，但第二个输出的解题过程有错误。基于结果的方法会忽略这些错误，对整个解答给正面反馈；基于过程的方法则能将这些错误纳入考虑，对具体推理步骤提供额外指导。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter10/Figures/figure-reasoning-paths-for-process-based-approaches}
+\caption{大语言模型对一道数学题的两个回答。回答 1 的最终结果和所有推理步骤均正确；回答 2 的最终结果正确，但推理过程有错误（以红色高亮）。基于结果的方法将两个回答都视为正确；基于过程的方法则可在奖励建模中考虑回答 2 的错误。}
+\label{fig:outcome-vs-process-based-approaches}
+\end{figure}
+
+基于过程的方法面临一项关键挑战：需要在可能很长的推理路径上获得步骤级反馈。可以从现有数据集中收集或生成问题对应的推理路径，再由人类专家为每一步标注正确性标签。这些标注既可直接用于训练大语言模型，也可在奖励建模中用作奖励。不过，实践中通常采用更丰富的标注~\cite{lightman-etal:2024lets}。除 \textit{correct}（正确）与 \textit{incorrect}（错误）外，还可以标注 \textit{neutral}（中性），表示该步骤技术上可能正确，但在整体推理过程中仍可能有问题。此外，可以采用主动学习（active learning）等技术，提高数据标注效率。识别显而易见的错误，通常对从推理错误中学习贡献不大；相比之下，标注模型确信正确、但实际上有问题的步骤，往往更有效。
+
+给定一组步骤级标注推理路径及其对应输入，可以训练奖励模型提供反馈，监督策略学习。奖励模型可视为分类模型，因此其架构可以是上接 Softmax 层的 Transformer 解码器。在第 $k$ 步，奖励模型以问题描述（记为 $\mathbf{x}$）和目前已生成的推理步骤（记为 $\bar{\mathbf{y}}_{\le k}$）为输入，输出标签集 $\{\text{\textit{correct}}, \text{\textit{incorrect}}\}$ 或 $\{\text{\textit{correct}}, \text{\textit{incorrect}}, \text{\textit{neutral}}\}$ 上的概率分布。然后，用学得的奖励模型评估每一步的正确性，评价推理路径。建模正确性的一种简单方式，是统计被分类为 \textit{correct} 的步骤数：
+\begin{eqnarray}
+r(\mathbf{x},\mathbf{y}) & = & \sum_{k=1}^{n_s} \delta(\text{\textit{correct}},C(\mathbf{x},\bar{\mathbf{y}}_{\le k})),
+\end{eqnarray}
+
+\noindent 其中，$C(\mathbf{x},\bar{\mathbf{y}}_{\le k})$ 表示概率最大的标签。还可以用分类对数概率定义整条路径的奖励：
+\begin{eqnarray}
+r(\mathbf{x},\mathbf{y}) & = &  \sum_{k=1}^{n_s} \log \Pr(\textit{correct}|\mathbf{x},\bar{\mathbf{y}}_{\le k}),
+\end{eqnarray}
+
+\noindent 其中，$\Pr(\textit{correct}|\mathbf{x},\bar{\mathbf{y}}_{\le k})$ 表示奖励模型生成 \textit{correct} 标签的概率。随后，照常在 RLHF 中用奖励分数 $r(\mathbf{x},\mathbf{y})$ 训练策略。
+
+虽然这里仅讨论数学问题，但上述方法具有通用性，适用于涉及多步推理与决策的广泛任务。此外，评价步骤质量时，可以考虑多个方面，而不仅是正确性。例如，在对话系统中，回答不仅要准确，还必须在多轮对话中符合上下文。若模型回答正确，却未保持与当前对话上下文的连贯性，步骤级反馈可能帮助它识别和纠正这种不一致。基于过程的方法，也与第~\ref{sec:fine-grained-rewards} 节讨论的细粒度奖励建模相关。这些方法本质上都将输出分解为更小、更易处理的步骤，以向大语言模型提供更细致的监督。不过，基于过程的反馈更关注根据前序步骤评价当前步骤的正确性，而第~\ref{sec:fine-grained-rewards} 节的方法强调独立评价每一步。
+
+逐步对齐大语言模型具有很大应用潜力，尤其是考虑到近来模型使用转向更复杂的推理任务。例如，GPT o1 和 o3 模型都采用更先进的推理技术（如较长的内部思维链），解决科学与数学推理等有挑战的问题~\cite{openai:2024learning}。这些任务往往依赖复杂而漫长的推理路径，因此似乎很有必要在推理过程中引入细致监督信号。此外，从实用角度看，对长推理路径的有效监督，不仅改善推理性能，也有助于消除不必要的推理步骤，降低推理复杂度、提高效率。
+
+\subsection{推理时对齐}
+
+\noindent 本节已介绍多种使模型符合人类偏好与标注的对齐方法。然而，许多方法的一项重要局限是，必须微调大语言模型。对于 RLHF 及其变体，利用奖励模型训练大语言模型，可能计算成本高且不稳定，增加应用时的复杂度与成本。此时，可以考虑在推理时对齐，避免额外复杂度与工作投入。
+
+一种简单的推理时对齐方式，是用奖励模型从大语言模型生成的 $N$ 个备选输出中选出最优者，称为\mindex{$N$ 次采样择优}（best-of-N sampling，\mindex{BoN 采样}）。BoN 采样可以视为一种重排序（reranking）。事实上，重排序早已广泛用于机器翻译等 NLP 任务，通常适合复杂模型训练成本高的情形：直接对输出重排序，就能以很低成本引入这些复杂模型\footnote{重排序方法也有助于研究模型错误与搜索错误，尽管这些问题在大语言模型背景下较少讨论。例如，假设有旧模型和一个能力更强的新模型，可以用新模型从旧模型的 $N$ 最佳列表中选出最优输出，作为理想输出。理想输出与原 $N$ 最佳列表首位输出之间的性能差异，反映新模型带来的性能增益。若增益明显，可以说旧模型存在更多模型错误；若增益较小，则可能说明问题在于搜索错误，即没有找到最佳候选。}。
+
+在 BoN 采样中，大语言模型接收输入序列 $\mathbf{x}$，生成 $N$ 个不同输出序列 $\{\hat{\mathbf{y}}_1,...,\hat{\mathbf{y}}_N\}$：
+\begin{eqnarray}
+\{\hat{\mathbf{y}}_1,...,\hat{\mathbf{y}}_N\} & = & \mathop{\mathrm{argTopN}}_{\mathbf{y}} \left[ \Pr(\mathbf{y}|\mathbf{x}) \right],
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{argTopN}$ 运算返回使函数 $\Pr(\mathbf{y}|\mathbf{x})$ 最大的前 $N$ 个输出。这些输出可通过多种方式生成，取决于模型所用搜索算法（如采样或束搜索）。生成 $N$ 个最佳候选输出后，用奖励模型评价并选出最优者：
+\begin{eqnarray}
+\hat{\mathbf{y}}_{\mathrm{best}} & = & \argmax_{\hat{\mathbf{y}} \in \{\hat{\mathbf{y}}_1,\ldots,\hat{\mathbf{y}}_N\}} r(\mathbf{x},\hat{\mathbf{y}}).
+\end{eqnarray}
+
+BoN 采样的结果也受 $N$ 最佳列表多样性的影响，这是大多数重排序方法的共同问题。理想情况下，$N$ 个最佳候选既应质量较高，也应彼此足够不同。在许多文本生成系统中，$N$ 个最佳输出非常相似，往往只相差一两个词。大语言模型中的多样性问题更具挑战，因为其生成的 $N$ 个最佳输出，虽然措辞可能不同，语义却常常十分相似。实践中，可以调整模型超参数，或使用不同大语言模型，生成更多样的候选用于重排序。尽管如此，与许多实际系统一样，仍需在选择高质量候选与确保生成输出足够多样之间权衡。
+
+BoN 采样也可用于训练大语言模型。与之密切相关的一种方法是\mindex{拒绝采样}（rejection sampling）：先用奖励模型从 $N$ 最佳列表中选出“最佳”输出，再用这些输出微调模型。相较于 RLHF，这种方式能够用简单得多的方法，将人类偏好引入大语言模型训练。许多模型已采用拒绝采样进行微调~\cite{nakano-etal:2021webgpt,touvron-etal:2023llama2}。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{小结}
+
+本章介绍了多种大语言模型对齐技术，重点讨论使模型遵循指令、符合人类偏好的微调方法。微调的一个优势是计算效率：预训练依赖大规模神经网络优化，而微调作为后训练步骤，计算开销较低。此外，微调更适合处理预训练中不易解决的问题，例如人类价值观对齐。人工智能对齐广受关注，也带来了相关论文的快速增长，使得全面涵盖所有新技术十分困难。不过，本章已尽力对指令微调和 RLHF 等基本对齐方法作较详细介绍。
+
+本章聚焦大语言模型对齐技术，但\textit{人工智能对齐}（AI alignment）是一个范围更广的概念，通常指确保人工智能系统的行为符合人类价值观、目标与期望的过程。其思想可以追溯到人工智能早期。关于人工智能对齐的一段广为引用的描述，来自数学家、计算机科学家 Norbert Wiener 的文章~\cite{wiener:1960some}：
+
+\vspace{0.5em}
+\begin{center}
+\parbox{0.8\linewidth}{
+\textit{如果为了实现自己的目的，而使用一种无法有效干预其运作的机械装置……那么，最好充分确信，赋予机器的目的，正是我们真正想要的目的。}
+}
+\end{center}
+\vspace{0.5em}
+
+当时，对齐尚未成为人工智能研究的核心关切；如今，它却深刻影响各种人工智能系统的设计。例如，在机器人领域，对齐对于确保自主机器人与人类及环境安全交互至关重要。在自动驾驶中，汽车不仅要遵守交通规则，还必须实时作出复杂决策，优先保障人类安全、避免事故，并应对伦理困境。
+
+当前人工智能研究通常通过构造类似真实目标的替代目标，并引导系统朝这一目标前进，来处理对齐问题。然而，设计人工智能对齐目标非常困难。一个原因是，人类价值观多样且常依赖情境，难以提炼为单一、普遍适用的目标函数。此外，真实环境十分复杂，价值与目标常常冲突，或随时间演变，进一步增加了对齐难度。即使能定义适当目标，人工智能系统也可能找到非预期的实现方式，产生技术上仍满足目标、却有害或适得其反的“未对齐”结果。
+
+这些挑战持续推动人工智能研究探索对齐更好的系统，包括开发感知世界的新机制，或研究更高效、更具泛化能力的方法，使系统适配给定任务。更重要的是，人工智能系统正变得更强、更智能，尤其是大语言模型近来在许多难题上展现出卓越能力，对齐的需求因而更加迫切。研究者已经开始关注人工智能安全，并提醒学术共同体，应以高度审慎的态度开发和发布人工智能系统，防止其出现未对齐行为~\cite{russell:2019human,bengio-etal:2024managing}。
+

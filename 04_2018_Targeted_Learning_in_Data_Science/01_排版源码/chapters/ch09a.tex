@@ -1,0 +1,88 @@
+% 英文源分章 PDF 第 1—5 页；导言、第 9.1—9.2 节。
+\chapter{数据自适应目标参数}
+\begingroup
+\raggedbottom
+\chapterauthors{Alan E. Hubbard、Chris J. Kennedy 与 Mark J. van der Laan}
+\chapteraffiliations{A. E. Hubbard（通讯作者）、C. J. Kennedy：美国加利福尼亚大学伯克利分校生物统计学部，101 Haviland Hall，\#7358，Berkeley, CA 94720。电子邮箱：\href{mailto:hubbard@berkeley.edu}{hubbard@berkeley.edu}；\href{mailto:ck37@berkeley.edu}{ck37@berkeley.edu}。\par
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall，\#7358，Berkeley, CA 94720。电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\par
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_9}。}
+
+在预测冠心病时，哪些因素最重要？心脏病是美国导致死亡和严重健康损害的首要原因。为回答这一问题，我们考察弗雷明汉心脏研究（Framingham Heart Study）。这项研究在心血管疾病日益流行的背景下启动，旨在研究与冠心病（coronary heart disease，CHD）相关的健康因素。该前瞻性队列研究自 1948 年起，开始监测马萨诸塞州弗雷明汉的 5209 名男性和女性，年龄为 30—62 岁。这些受试者每两年接受一次全面的医学检查和生活方式访谈，由此获得的纵向测量可与结局状态相对照。这些数据已用于无数项观察性研究，并产生了广泛用于评估冠心病风险的风险评分方程。这里，我们采用本章介绍的数据自适应变量重要性方法，开展与 Wilson 等（1998）的比较分析。
+
+\begin{sourcebox}
+本章介绍如何利用数据同时\textbf{定义和估计}目标参数，并对该参数进行推断。
+\end{sourcebox}
+
+考虑一组预测变量 $R$（血压、总胆固醇、吸烟状态、糖尿病状态、年龄等）和一个结局；诊断为 CHD 时 $Y=1$，未诊断为 CHD 时 $Y=0$。我们希望知道，这些变量中哪一个对于解释（预测）$Y$“最重要”，因此这是一个变量重要性度量（variable importance measure，VIM）的估计问题。我们提出的程序\emph{每次针对一个变量}，直接靶向其 VIM，而不是将变量重要性度量作为某个参数模型或机器学习程序的附带产物（Grömping，2009；Auret 和 Aldrich，2011）。这样，即使这些度量是以数据自适应方式导出的，我们仍可优化 VIM 估计量的性能，并获得稳健推断。为此，我们将数据自适应参数方法（Hubbard 和 van der Laan，2016；Hubbard 等，2016）与交叉验证靶向极大似然估计（cross-validated targeted maximum likelihood estimation，CV-TMLE）结合起来。
+
+其他研究者（van der Laan，2006b）已倡导使用受因果推断启发的参数来估计变量重要性度量。我们也曾应用这些技术，对急性创伤患者结局的影响变量（Hubbard 等，2013）、数量性状基因座（Wang 等，2011a,b，2014）、生物标志物发现（Bembom 等，2009）以及医疗支出（Rose，2018）中的变量按重要性排序。我们依次考察 $R$ 中的每个变量 $A\in R$，并将其余变量定义为 $W$，即 $W=R\setminus A$。在一次循环中，对某个特定的关注变量，将数据定义为 $O=(W,\Delta,\Delta*(A,Y))$，其中 $\Delta$ 是 $A$ 或 $Y$ 的缺失指示变量：两者均不缺失时为 1，否则为 0。暂且假设 $A$ 离散，并且已知其“最高风险”水平 $a_H$ 和最低风险水平 $a_L$。那么，一个可用于不同候选预测变量之间比较的变量重要性候选参数为（每个预测变量都有各自的 $(a_L,a_H)$）：
+\begin{equation}
+E_W\{E(Y\mid A=a_H,W)-E(Y\mid A=a_L,W)\}.
+\tag{9.1}
+\end{equation}
+它是在 $W$ 的各个分层内，比较处于 $a_H$ 与 $a_L$ 的受试者所得均值差的加权平均。虽然本章不着重讨论因果解释，但在标准识别假设下，式 (9.1) 识别 $E\{Y(a_H)-Y(a_L)\}$；其中，$Y(a)$ 是将患者的 $A$ 设为 $a$ 时的反事实结局，这种设置可能与事实相反。更一般地说，式 (9.1) 是一个 VIM，可在 $R$ 的不同协变量之间比较，并据此对重要性排序。它还是一个路径可微参数，因此有可能构造半参数有效、渐近正态分布的估计量。但是，如果 $a_H$ 和 $a_L$ 并非事先已知，而必须以数据自适应方式“发现”，情况就会更加复杂。
+
+\section{示例：定义处理或暴露水平}
+
+作为 $A$ 的候选变量并不总是离散变量；即使离散，也往往无法客观界定预测变量的高风险和低风险水平。因此，我们考虑利用数据来定义低风险水平 $a_L$ 和高风险水平 $a_H$ 的情形。令 $P_n$ 表示经验分布。可将某个算法应用于 $P_n$，以定义 $A$ 的这些低风险和高风险水平，即 $(a_L(P_n),a_H(P_n))$。令 $\hat Q:\mathcal M_{NP}\to\mathcal Q=\{Q(P):P\in\mathcal M\}$ 为真实回归函数 $Q_0(A,W)=E_{P_0}(Y\mid A,W)$ 的估计量，而 $Q_n=\hat Q(P_n)$ 是该估计量应用于数据后的实现值。如果 $A$ 为离散变量，具有任意水平 $\mathcal A=(a_1,a_2,\ldots,a_i,\ldots,a_K)$，则可将 $a_L(P_n)$ 和 $a_H(P_n)$ 定义为
+\begin{equation}
+a_L(P_n)=\argmin_{a\in\mathcal A}\frac1n\sum_{i=1}^n Q_n(a,W_i),
+\tag{9.2}
+\end{equation}
+\begin{equation}
+a_H(P_n)=\argmax_{a\in\mathcal A}\frac1n\sum_{i=1}^n Q_n(a,W_i).
+\tag{9.3}
+\end{equation}
+也就是说，根据某个回归估计 $Q_n(A,W)$，“发现”使式 (9.1) 的代入估计达到最大的水平 $(a_L(P_n),a_H(P_n))$。由此可定义一个\emph{数据自适应目标参数}（data-adaptive target parameter）：
+\begin{equation}
+\begin{aligned}
+\Psi_{a_L(P_n),a_H(P_n)}(P)
+={}&E_P\bigl\{E_P(Y\mid A=a_H(P_n),W)\\
+&\hspace{2.6em}-E_P(Y\mid A=a_L(P_n),W)\bigr\},
+\end{aligned}
+\tag{9.4}
+\end{equation}
+其代入估计量为
+\begin{equation}
+\frac1n\sum_{i=1}\{Q_n(a_H(P_n),W_i)-Q_n(a_L(P_n),W_i)\}.
+\tag{9.5}
+\end{equation}
+由于这份数据被重复用于两个目的，代入估计量 (9.5) 会产生过拟合偏差。为说明这一点，考虑如下数据生成分布：
+\[
+E_W\{E(Y\mid A=a_H(P_n),W)-E(Y\mid A=a_L(P_n),W)\}=0.
+\]
+此时，估计 (9.5) 总会具有正向偏差（它始终 $\geq0$）。人们常担心，这类探索性分析会得出错误发现（Ioannidis，2008；Broadhurst 和 Kell，2006）。另一方面，如果划分样本，使得 (1) 用训练样本定义 $(a_L(P_{n,\mathrm{tr}}),a_H(P_{n,\mathrm{tr}}))$，(2) 用另一份独立的估计样本来估计
+\[
+E_W\bigl\{E(Y\mid A=a_H(P_{n,\mathrm{tr}}),W)
+-E(Y\mid A=a_L(P_{n,\mathrm{tr}}),W)\bigr\},
+\]
+那么就有可能获得有效的统计推断。当然，这种样本划分方法因估计样本量缩小而会严重降低检验功效。
+
+\begin{sourcebox}
+本章提出一种数据自适应程序：利用数据定义目标参数，对其进行一致且有效的估计，并给出稳健的不确定性度量和置信区间。与 Hubbard 等（2016）一样，我们讨论借助样本划分来避免过拟合偏差、同时仍利用全部数据集估计数据自适应参数的方法。这些方法适用于如下情形：在探索数据以产生潜在的关注参数时，所受限制很少。它们能够利用“大数据”所具有的极大样本量和／或极高维度。我们首先介绍采用重复样本划分的数据自适应目标参数方法（Hubbard 和 van der Laan，2016；Hubbard 等，2016），随后用 CV-TMLE 对其加以改进（van der Laan 和 Rose，2011，第 27 章）。我们将通过弗雷明汉心脏研究展示这一技术。
+\end{sourcebox}
+
+\section{数据自适应参数的方法}
+
+设 $O_1,\ldots,O_n$ 独立同分布，概率分布为 $P_0$，并且已知 $P_0$ 属于某个给定统计模型 $\mathcal M$。用 $P_n$ 表示从 $P_0$ 抽取的这 $n$ 个观测组成的随机样本的经验分布。交叉验证是所提方法的关键组成部分。为简化表述，我们在 $V$ 折交叉验证的框架下介绍有关程序。
+
+$V$ 折交叉验证包括以下步骤：(1) 将 $\{1,\ldots,n\}$ 分成 $V$ 个大小相等的子组；(2) 对每个 $v$，用大小为 $n/V$ 的第 $v$ 个子组定义估计样本，其补集则为参数生成样本。对第 $v$ 次划分，令 $P_{n,v^c}$ 为参数生成样本的经验分布，$P_{n,v}$ 为其补集的经验分布，我们将后者称为估计样本。对观测 $O_i$，令 $Z_i\in\{1,\ldots,V\}$ 表示包含 $O_i$ 的子组的标签。对第 $v$ 次划分，用参数生成样本 $P_{n,v^c}$ 生成目标参数映射 $\Psi_{P_{n,v^c}}:\mathcal M\to\mathbb R$，并令 $\hat\Psi_{P_{n,v^c}}:\mathcal M_{NP}\to\mathbb R$ 为该目标参数的估计量映射。
+
+为进行统计推断，可以根据 $P_{n,v^c}$ 选择目标参数映射及相应的估计量映射，但不能依据 $P_{n,v}$ 进行选择。我们将样本划分的数据自适应统计目标参数定义为 $\Psi_n:\mathcal M\to\mathbb R$，其中
+\[
+\Psi_n(P)=\operatorname{Ave}\{\Psi_{P_{n,v^c}}(P)\}
+\equiv\frac1V\sum_{v=1}^V\Psi_{P_{n,v^c}}(P).
+\]
+因此，所关注的统计估计目标为
+\begin{equation}
+\psi_{n,0}=\Psi_n(P_0)=\operatorname{Ave}\{\Psi_{P_{n,v^c}}(P_0)\}
+=\frac1V\sum_{v=1}^V\Psi_{P_{n,v^c}}(P_0).
+\tag{9.6}
+\end{equation}
+这一目标参数映射依赖于数据，这正是称其为数据自适应目标参数的原因。给定每个估计样本上的估计量 $\hat\Psi_{P_{n,v^c}}(P_{n,v})$，数据自适应估计目标 $\psi_{n,0}$ 的相应估计量为
+\begin{equation}
+\psi_n=\hat\Psi(P_n)=\operatorname{Ave}\{\hat\Psi_{P_{n,v^c}}(P_{n,v})\}
+=\frac1V\sum_{v=1}^V\Psi_{P_{n,v^c}}(P_{n,v}).
+\tag{9.7}
+\end{equation}
+在 Hubbard 等（2016）以及 Hubbard 和 van der Laan（2016）中，我们证明了，在较弱的正则条件下，$\sqrt n(\psi_n-\psi_{n,0})$ 依分布收敛于均值为零、方差为 $\sigma^2$ 的正态分布；其方差 $\sigma^2$ 可以被一致估计，从而能够构造置信区间并开展假设检验。注意，在这一方法中，$\Psi_{P_{n,v^c}}(P_0)$ 的估计量只基于 $P_{n,v}$。后面我们将介绍一种 CV-TMLE 方法：采用基于 $P_{n,v}$ 的 TMLE 来估计 $\Psi_{P_{n,v^c}}(P_0)$，但 TMLE 中干扰参数的初始估计量可以基于 $P_{n,v^c}$。因此，在这种 CV-TMLE 方法中，只有 TMLE 的靶向步骤基于另行留出的样本 $P_{n,v}$，而这一步仅涉及拟合一个低维系数 $\epsilon$。

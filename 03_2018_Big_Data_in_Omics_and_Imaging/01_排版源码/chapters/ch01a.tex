@@ -1,0 +1,675 @@
+% 原书第1—16页上部，第1.1节；逐页按印刷公式转写。
+\chapter{基因型—表型网络分析}
+\label{ch:genotype-phenotype}
+
+\section{用于基因型网络的无向图}
+\subsection{高斯图模型}
+
+遗传变异之间存在相关性。传统上，通常用\textbf{连锁不平衡（linkage disequilibrium）}衡量遗传变异之间的相依关系。连锁不平衡广泛用于量化两个遗传变异之间的相关程度；然而，高阶连锁不平衡的形式复杂，在实践中难以应用。如何刻画多个遗传变异之间的相依关系，仍是一个有待解决的问题。
+
+\textbf{无向图（undirected graph）}是推断多个变量之间条件相依关系的常用工具，因此很自然地可以用来描述遗传变异之间的相依关系（Mohan et al. 2014；Zhou et al. 2011）。图 $G=(V,E)$ 由节点集 $V=\{1,\ldots,p\}$ 和无向边组成。每个节点表示一个变量（遗传变异），连接两个节点的边表示这两个变量之间的相依关系。图1.1给出了用无向图表示基因型网络的简单例子。如果用节点表示一个基因，就需要用一个汇总该基因范围内遗传信息的统计量来代表它。
+
+无向图刻画变量的联合分布。在联合分布为正态分布的假设下，图结构可以清楚地编码变量之间的相依关系。如果两个节点之间没有边，就表示在给定其余所有变量后，这两个变量条件独立。无向图由\textbf{浓度矩阵（concentration matrix，又称精度矩阵）}中的零元素确定，详见附录1.A。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1.3cm,y=1.0cm,every node/.style={ellipse,draw=inkblue,fill=inkblue!10,minimum width=1.65cm,minimum height=.7cm,font=\small}]
+\node (a11g1) at (0,2.6) {基因1};
+\node (a11g2) at (-.15,.8) {基因2};
+\node (a11g3) at (.9,-.6) {基因3};
+\node (a11g4) at (2.6,2.6) {基因4};
+\node (a11g5) at (3,.8) {基因5};
+\draw[semithick] (a11g1)--(a11g2)--(a11g3);
+\draw[semithick] (a11g2)--(a11g4)--(a11g5);
+\end{tikzpicture}
+\origfig{1}{基因网络。}
+\end{figure}
+
+\begin{bookexample}{1.1}
+下面用一个简单例子说明无向图与浓度矩阵的关系。考虑一个包含四个节点的图，假设协方差矩阵为
+\[
+V=\begin{bmatrix}
+0&1.25&0&0\\
+1.25&0&0.6944&0\\
+0&0.6944&0&1.111\\
+0&0&1.111&0
+\end{bmatrix}.
+\]
+浓度矩阵为
+\[
+V^{-1}=\begin{bmatrix}
+0&0.8&0&-0.5\\
+0.8&0&0&0\\
+0&0&0&0.9\\
+-0.5&0&0.9&0
+\end{bmatrix}.
+\]
+相应的图如图1.2所示。节点 $y_1$ 与 $y_2$、$y_4$ 相连，节点 $y_3$ 与 $y_4$ 相连。
+\end{bookexample}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1.5cm,y=1.1cm,every node/.style={ellipse,draw=inkblue,fill=inkblue!10,minimum width=1.1cm,minimum height=.6cm,font=\small}]
+\node (a12y1) at (0,1.5) {$y_1$};
+\node (a12y2) at (2,1.5) {$y_2$};
+\node (a12y3) at (0,0) {$y_3$};
+\node (a12y4) at (2,0) {$y_4$};
+\draw[semithick] (a12y1)--(a12y2) (a12y1)--(a12y4) (a12y3)--(a12y4);
+\end{tikzpicture}
+\origfig{2}{例1.1所对应的图。}
+\end{figure}
+
+\subsection{用交替方向乘子法估计高斯图模型}
+
+接下来讨论如何估计高斯图模型的图结构和参数。已知从正态分布 $N(\mu,\Sigma_p)$ 中抽取 $N$ 个个体后，学习单个高斯图模型等价于学习稀疏逆矩阵 $\Sigma_p^{-1}$。设已抽取 $N$ 个个体，记 $Y_i=[y_{i1},\ldots,y_{ip}]^T$，$Y=[Y_1,\ldots,Y_N]^T$。数据 $Y$ 的对数似然为
+\begin{equation}
+\begin{aligned}
+l={}&-\frac12pN\log(2\pi)-\frac12N\log|\Sigma_p|
+-\frac12\sum_{i=1}^N(Y_i-\mu)^T\Sigma_p^{-1}(Y_i-\mu)\\
+={}&\frac12pN\log(2\pi)+\frac12N\log|\Sigma_p^{-1}|
+-\frac N2\Tr(\Sigma_p^{-1}S),
+\end{aligned}\tag{1.1}
+\end{equation}
+其中，$S=\frac1N\sum_{i=1}^N(Y_i-\mu)(Y_i-\mu)^T$ 是样本矩阵。
+
+当样本量大于变量个数（$N>p$）时，可通过最大化对数似然估计逆矩阵 $\Sigma_p^{-1}$。当节点数 $p$ 大于样本量 $N$ 时，协方差矩阵为奇异矩阵，因而无法用极大似然法估计其逆矩阵。此时可对 $\Sigma_p$ 施加图套索惩罚，使 $\Sigma_p^{-1}$ 的惩罚极大似然估计中的参数收缩，从而得到浓度矩阵（Mohan et al. 2014）：
+\begin{equation}
+\min_{\Theta}\quad \Tr(S\Theta)-\log|\Theta|+\lambda\|\Theta\|_1.
+\tag{1.2}
+\end{equation}
+其中，$\lambda$ 是惩罚参数，用于控制矩阵中零元素（即缺失边）的数量；$\|\cdot\|_1$ 表示矩阵的 $L_1$ 范数，定义为矩阵所有元素绝对值之和。针对优化问题（1.2），已有多种求解方法，例如坐标下降算法（Friedman et al. 2008；\url{http://www-stat.stanford.edu/~tibs/glasso}）和\textbf{交替方向乘子法（alternating direction method of multipliers，ADMM）}（Boyd et al. 2011）。这里主要介绍 ADMM。
+
+问题（1.2）的目标函数同时包含光滑函数与非光滑函数，属于非光滑优化问题。微积分是求解优化问题的基本工具，但导数不能直接用于非光滑函数，因此处理非光滑项构成了求解问题（1.2）的主要障碍。ADMM 的策略是引入约束，将目标函数中的光滑部分与非光滑部分分开，再利用对偶分解构造分散求解算法。令 $f(\Theta)=\Tr(S\Theta)-\log|\Theta|$，$g(Z)=\lambda\|Z\|_1$，则问题（1.2）可以转化为
+\begin{equation}
+\begin{aligned}
+\min\quad&f(\Theta)+g(Z)\\
+\text{约束为}\quad&\Theta-Z=0.
+\end{aligned}\tag{1.3}
+\end{equation}
+构造增广拉格朗日函数
+\begin{equation}
+L_\rho(\Theta,Z,U)=f(\Theta)+g(Z)+\frac\rho2\|\Theta-Z+U\|_2^2.
+\tag{1.4}
+\end{equation}
+ADMM 通过迭代，把原优化问题分解为分别处理光滑部分与非光滑部分的两个优化问题：
+\begin{equation}
+\Theta^{(k+1)}:=\argmin_{\Theta}L_\rho\bigl(\Theta,Z^{(k)},U^{(k)}\bigr),
+\tag{1.5}
+\end{equation}
+\begin{equation}
+Z^{(k+1)}:=\argmin_ZL_\rho\bigl(\Theta^{(k+1)},Z,U^{(k)}\bigr),
+\tag{1.6}
+\end{equation}
+\begin{equation}
+U^{(k+1)}:=U^{(k)}+\rho\bigl(\Theta^{(k+1)}-Z^{(k+1)}\bigr).
+\tag{1.7}
+\end{equation}
+具体而言，迭代步骤（1.5）—（1.7）可写成
+\begin{equation}
+\Theta^{(k+1)}:=\argmin_{\Theta}\left(\Tr(S\Theta)-\log|\Theta|
++\frac\rho2\|\Theta-Z^{(k)}+U^{(k)}\|_F^2\right),
+\tag{1.8}
+\end{equation}
+\begin{equation}
+Z^{(k+1)}:=\argmin_{\Theta}\left(\lambda\|Z\|_1
++\frac\rho2\|\Theta^{(k+1)}-Z+U^{(k)}\|_F^2\right),
+\tag{1.9}
+\end{equation}
+\begin{equation}
+U^{(k+1)}:=U^{(k)}+\Theta^{(k+1)}-Z^{(k+1)},
+\tag{1.10}
+\end{equation}
+其中，$\|\cdot\|_F$ 是矩阵的 Frobenius 范数，即所有元素平方和的平方根。
+
+为求解问题（1.8），需要用到两个矩阵微积分公式：
+\begin{equation}
+\frac{\partial\Tr(AB)}{\partial B}=A^T,
+\tag{1.11}
+\end{equation}
+\begin{equation}
+\frac{\partial\log|A|}{\partial A}=A^{-T},
+\tag{1.12}
+\end{equation}
+其中，$A$ 和 $B$ 均为矩阵。
+
+先求解问题（1.8）。令
+\[
+W=\Tr(S\Theta)-\log|\Theta|+\frac\rho2\|\Theta-Z^{(k)}+U^{(k)}\|_F^2.
+\]
+利用式（1.11）和（1.12），得到
+\begin{equation}
+\frac{\partial W}{\partial\Theta}=S-\Theta^{-1}
++\rho\bigl(\Theta-Z^{(k)}+U^{(k)}\bigr)=0,
+\tag{1.13}
+\end{equation}
+即
+\begin{equation}
+\rho\Theta-\Theta^{-1}=\rho\bigl(Z^{(k)}-U^{(k)}\bigr)-S.
+\tag{1.14}
+\end{equation}
+通过奇异值分解（SVD），可将矩阵 $\rho(Z^{(k)}-U^{(k)})-S$ 分解为
+\[
+\rho\bigl(Z^{(k)}-U^{(k)}\bigr)-S=Q\Lambda Q^T,
+\]
+其中，$Q$ 为正交归一矩阵，满足 $Q^TQ=QQ^T=I$，且 $\Lambda=\diag(\lambda_1,\ldots,\lambda_p)$。在式（1.14）左侧乘以 $Q^T$，右侧乘以 $Q$，得到
+\begin{equation}
+\begin{aligned}
+\rho Q^T\Theta Q-Q^T\Theta^{-1}Q&=\Lambda,\\
+\text{即}\qquad \rho\widetilde\Theta-\widetilde\Theta^{-1}&=\Lambda.
+\end{aligned}\tag{1.15}
+\end{equation}
+因为 $\Lambda$ 是对角矩阵，$\widetilde\Theta$ 应具有形式 $\widetilde\Theta=\diag(\widetilde\Theta_{11},\ldots,\widetilde\Theta_{pp})$。于是式（1.15）简化为
+\begin{equation}
+\rho\widetilde\Theta_{ii}-\frac1{\widetilde\Theta_{ii}}=\lambda_i,
+\qquad i=1,\ldots,p.
+\tag{1.16}
+\end{equation}
+其解为
+\[
+\widetilde\Theta_{ii}=\frac{\lambda_i+\sqrt{\lambda_i^2+4\rho}}{2\rho},
+\qquad i=1,\ldots,p.
+\]
+因此，式（1.14）的解为 $\Theta^{(k+1)}:=Q\widetilde\Theta Q^T$。
+
+接下来求解非光滑优化问题（1.1）。按定义，$\|Z\|_1=\sum_{i=1}^p\sum_{j=1}^p|z_{ij}|$。$\|Z\|_1$ 的广义导数为
+\begin{equation}
+\frac{\partial\|Z\|_1}{\partial z_{ij}}=\delta_{ij}=
+\begin{cases}
+1,&z_{ij}>0,\\
+\lbrack-1,1\rbrack,&z_{ij}=0,\\
+-1,&z_{ij}<0.
+\end{cases}\tag{1.17}
+\end{equation}
+令 $D=\lambda\|Z\|_1+\frac\rho2\|\Theta^{(k+1)}-Z+U^{(k)}\|_F^2$，函数 $D$ 关于 $z_{ij}$ 的广义导数为
+\begin{equation}
+\frac{\partial D}{\partial z_{ij}}=\lambda\delta_{ij}
+-\rho\bigl(\Theta_{ij}^{(k+1)}-z_{ij}+U_{ij}^{(k)}\bigr)=0,
+\tag{1.18}
+\end{equation}
+从而
+\begin{equation}
+z_{ij}=\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}-\frac\lambda\rho\delta_{ij}.
+\tag{1.19}
+\end{equation}
+可以证明，若 $\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}>0$，则 $Z_{ij}\geq0$。否则，如果 $z_{ij}<0$，就有 $\delta_{ij}=-1$，于是 $\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}+\lambda/\rho>0$，这与假设 $Z_{ij}<0$ 矛盾。同理可证，若 $\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}<0$，则 $Z_{ij}\leq0$。因此，解为
+\begin{equation}
+z_{ij}^{(k+1)}=\sign\bigl(\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}\bigr)
+\left(\left|\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}\right|-\frac\lambda\rho\right)_+,
+\tag{1.20}
+\end{equation}
+其中，$\sign(x)$ 是符号函数，且
+\[
+f(x)_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+综上，用于估计高斯图模型的 ADMM 算法如下。
+
+\begin{enumerate}[label=步骤\arabic*：,leftmargin=4.8em]
+\item 初始化（$k=0$）。通过 SVD 得到 $-S=Q\Lambda Q^T$，计算
+\[
+\widetilde\Theta_{ii}=\frac{\lambda_i+\sqrt{\lambda_i^2+4\rho}}{2\rho},
+\quad i=1,\ldots,p.
+\]
+定义 $\widetilde\Theta=\diag(\widetilde\Theta_{11},\ldots,\widetilde\Theta_{pp})$，并令 $\Theta^{(1)}:=Q\widetilde\Theta Q^T$。计算
+\[
+z_{ij}^{(1)}=\sign\bigl(\Theta_{ij}^{(1)}\bigr)
+\left(\left|\Theta_{ij}^{(k+1)}\right|-\frac\lambda\rho\right)_+,
+\qquad U^{(1)}:=\Theta^{(1)}-Z^{(1)}.
+\]
+反复执行步骤2—4，直至收敛。
+\item 更新矩阵 $\Theta^{(k+1)}$。
+\begin{enumerate}[label=\roman*.]
+\item 通过 SVD 得到正交特征值分解 $\rho(Z^{(k)}-U^{(k)})-S=Q\Lambda Q^T$。
+\item 计算 $\widetilde\Theta_{ii}=(\lambda_i+\sqrt{\lambda_i^2+4\rho})/(2\rho)$，$i=1,\ldots,p$。
+\item 更新矩阵 $\Theta^{(k+1)}:=Q\widetilde\Theta Q^T$。
+\end{enumerate}
+\item 更新矩阵 $Z^{(k+1)}$：
+\[
+z_{ij}^{(k+1)}=\sign\bigl(\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}\bigr)
+\left(\left|\Theta_{ij}^{(k+1)}+U_{ij}^{(k)}\right|-\frac\lambda\rho\right)_+,
+\]
+其中 $i=1,\ldots,p$，$j=1,\ldots,p$。
+\item 更新矩阵 $U^{(k+1)}:=U^{(k)}+\Theta^{(k+1)}-Z^{(k+1)}$。
+\end{enumerate}
+
+\subsection{坐标下降算法与图套索}
+
+坐标下降算法可用于求解\textbf{图套索（graphical lasso，Glasso）}问题（Friedman et al. 2007；Mazumder and Hastie, 2012）。利用式（1.11）和（1.12），可得到非光滑优化问题（1.2）的解所满足的最优性条件：
+\begin{equation}
+S-\Theta^{-1}+\lambda\Delta=0,
+\tag{1.21}
+\end{equation}
+其中
+\[
+\Delta_{ij}=\begin{cases}1,&\Theta_{ij}>0,\\\lbrack-1,1\rbrack,&\Theta_{ij}=0,\\-1,&\Theta_{ij}<0.\end{cases}
+\]
+用分块坐标法求解非线性矩阵方程（1.21）。设矩阵 $\Theta$、$\Delta$ 和 $H=\Theta^{-1}$ 分块如下：
+\[
+\Theta=\begin{bmatrix}\Theta_{11}&\Theta_{12}\\\Theta_{21}&\theta_{22}\end{bmatrix},
+\quad \Delta=\begin{bmatrix}\Delta_{11}&\Delta_{12}\\\Delta_{21}&\Delta_{22}\end{bmatrix},
+\quad H=\begin{bmatrix}H_{11}&H_{12}\\H_{21}&h_{22}\end{bmatrix}.
+\]
+采用与定理1.A.1证明相似的论证，可以得到
+\begin{equation}
+\Theta^{-1}=\begin{bmatrix}
+\displaystyle\left(\Theta_{11}-\frac{\Theta_{12}\Theta_{21}}{\theta_{22}}\right)^{-1}
+&\displaystyle-H_{11}\frac{\Theta_{12}}{\theta_{22}}\\[1.2em]
+\displaystyle H_{11}\frac{\Theta_{21}}{\theta_{22}}
+&\displaystyle\frac1{\theta_{22}}+\frac{\Theta_{21}H_{11}\Theta_{12}}{\theta_{22}^2}
+\end{bmatrix}.
+\tag{1.22}
+\end{equation}
+由 Anderson（1984）的定理A.3.4，得到
+\begin{equation}
+\left(\Theta_{11}-\frac{\Theta_{12}\Theta_{21}}{\theta_{22}}\right)^{-1}
+=\Theta_{11}^{-1}+\frac{\Theta_{11}^{-1}\Theta_{12}\Theta_{21}\Theta_{11}^{-1}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}.
+\tag{1.23}
+\end{equation}
+容易验证 $(\Theta_{12}\Theta_{21}\Theta_{11}^{-1})\Theta_{12}=(\Theta_{21}\Theta_{11}^{-1}\Theta_{12})\Theta_{12}$，因而
+\begin{equation}
+\Theta_{12}\Theta_{21}\Theta_{11}^{-1}=\Theta_{21}\Theta_{11}^{-1}\Theta_{12}.
+\tag{1.24}
+\end{equation}
+利用式（1.24），有
+\begin{equation}
+\begin{aligned}
+H_{11}
+&=\Theta_{11}^{-1}+\frac{\Theta_{11}^{-1}\Theta_{12}\Theta_{21}\Theta_{11}^{-1}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}\\
+&=\Theta_{11}^{-1}\left[I+\frac{\Theta_{12}\Theta_{21}\Theta_{11}^{-1}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}\right]\\
+&=\Theta_{11}^{-1}\frac{\theta_{22}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}.
+\end{aligned}\tag{1.25}
+\end{equation}
+因此，结合式（1.22）与（1.25），得到
+\begin{equation}
+-H_{11}\frac{\Theta_{12}}{\theta_{22}}
+=-\frac{\Theta_{11}^{-1}\theta_{12}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}},
+\tag{1.26}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+\frac1{\theta_{22}}+\frac{\Theta_{21}H_{11}\Theta_{12}}{\theta_{22}^2}
+&=\frac1{\theta_{22}}+\frac{\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}
+{\theta_{22}(\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12})}\\
+&=\frac1{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}.
+\end{aligned}\tag{1.27}
+\end{equation}
+合并式（1.22）、（1.26）和（1.27），得到
+\begin{equation}
+H=\Theta^{-1}=\begin{bmatrix}
+\displaystyle\Theta_{11}^{-1}+\frac{\Theta_{11}^{-1}\Theta_{12}\Theta_{21}\Theta_{11}^{-1}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}
+&\displaystyle-\frac{\Theta_{11}^{-1}\Theta_{12}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}\\[1.4em]
+\displaystyle\frac{\Theta_{21}\Theta_{11}^{-1}}
+{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}
+&\displaystyle\frac1{\theta_{22}-\Theta_{21}\Theta_{11}^{-1}\Theta_{12}}
+\end{bmatrix}.
+\tag{1.28}
+\end{equation}
+Glasso 算法每次针对一列迭代求解式（1.21），如下所示：
+\[
+\begin{bmatrix}H_{11}^{(k)}&H_{12}^{(k+1)}\\(H_{12}^{(k+1)})^T&h_{22}^{(k+1)}\end{bmatrix}.
+\]
+换言之，假设已知 $H_{11}^{(k)}$，希望计算向量 $H_{12}^{(k+1)}$ 与标量 $h_{22}^{(k+1)}$。式（1.2）的最后一列为
+\begin{equation}
+-H_{12}+S_{12}+\lambda\Delta_{12}=0.
+\tag{1.29}
+\end{equation}
+由式（1.22），有
+\begin{equation}
+H_{12}=-\frac{H_{11}\Theta_{12}}{\theta_{22}}.
+\tag{1.30}
+\end{equation}
+代入式（1.29），得到
+\begin{equation}
+H_{11}^{(k)}\frac{\Theta_{12}}{\theta_{22}}+S_{12}+\lambda\Delta_{12}=0.
+\tag{1.31}
+\end{equation}
+令 $\beta=\Theta_{12}/\theta_{22}$，式（1.31）简化为
+\begin{equation}
+H_{11}^{(k)}\beta+S_{12}+\lambda\Delta_{12}=0.
+\tag{1.32}
+\end{equation}
+式（1.21）要求 $\theta_{ii}>0$，因而
+\begin{equation}
+h_{ii}=s_{ii}+\lambda>0,\qquad i=1,\ldots,p,
+\tag{1.33}
+\end{equation}
+且参数 $\beta$、$\theta_{12}$ 和 $\Delta_{12}$ 的符号相同。为便于讨论，令 $V=H_{11}^{(k)}$、$u=S_{12}$、$\delta=\Delta_{12}$，式（1.21）可化为
+\begin{equation}
+V\beta+u+\lambda\delta=0.
+\tag{1.34}
+\end{equation}
+式（1.34）的第 $j$ 个分量为
+\begin{equation}
+V_{jj}\beta_j+\sum_{k\ne j}V_{jk}\beta_{k=0}+\lambda\delta_j=0,
+\tag{1.35}
+\end{equation}
+这等价于套索回归的驻点方程。运用回归中的套索方法，得到解
+\begin{equation}
+\beta_j=\frac{\sign\left(u_j+\sum_{k\ne j}V_{jk}\beta_k\right)
+\left(\left|u_j+\sum_{k\ne j}V_{jk}\beta_k\right|-\lambda\right)_+}{V_{jj}},
+\quad j=1,\ldots,p-1,
+\tag{1.36}
+\end{equation}
+其中，$\sign$ 是符号函数。结合式（1.30）和（1.36），可估计
+\[
+\widehat H_{12}=H_{11}^{(k)}\beta.
+\]
+最后一行、最后一列的元素 $h_{pp}$ 可由式（1.33）估计为
+\[
+\widehat h_{pp}=S_{pp}+\lambda.
+\]
+元素 $h_{22}$ 也记作 $\widehat h_{pp}$。回顾式（1.22），有
+\[
+\frac1{\theta_{22}}=h_{22}-\widehat\beta^T\widehat H_{12}.
+\]
+协方差矩阵的元素 $\widehat\theta_{22}$ 可估计为
+\begin{equation}
+\widehat\theta_{22}=\frac1{h_{22}-\widehat\beta^T\widehat H_{12}}.
+\tag{1.37}
+\end{equation}
+协方差矩阵的向量 $\widehat\theta_{12}$ 估计为
+\[
+\widehat\Theta_{12}=\widehat\theta_{22}\widehat\beta.
+\]
+由此得到算法1.1。
+
+\begin{bookalgorithm}{1.1}
+\textbf{输入：}样本协方差矩阵 $S$ 与惩罚参数 $\lambda$。
+\begin{enumerate}[label=\arabic*.]
+\item 初始化 $H^{(1)}=S+\lambda I$。
+\item 反复循环各列，执行以下步骤直至收敛：
+\begin{enumerate}[label=\alph*.]
+\item 重新排列行、列，使目标列成为最后一列。
+\item 令 $V=H_{11}^{(k)}$、$u=S_{12}$，计算
+\[
+\beta_j=\frac{\sign\left(u_j+\sum_{k\ne j}V_{jk}\beta_k\right)
+\left(\left|u_j+\sum_{k\ne j}V_{jk}\beta_k\right|-\lambda\right)_+}{V_{jj}},
+\quad j=1,\ldots,p-1,
+\]
+并令 $\widehat\beta=[\beta_1,\ldots,\beta_p]^T$。
+\item 计算 $\widehat H_{12}=H_{11}^{(k)}\beta$。
+\item 计算 $\widehat h_{22}=S_{22}+\lambda$（$\widehat h_{pp}=S_{pp}+\lambda$）。
+\item 计算 $\widehat\theta_{22}=1/(\widehat h_{22}-\widehat\beta^T\widehat H_{12})$。
+\item 计算 $\widehat\Theta_{12}=\widehat\theta_{22}\widehat\beta$。
+\item 将该列对应的 $\widehat\beta$ 保存在矩阵 $B$ 中。
+\end{enumerate}
+\item 计算 $h_{jj}=S_{jj}+\lambda$，并利用式（1.37）计算 $\theta_{jj}$。用 $\widehat\Theta_{12}=\widehat\theta_{22}\widehat\beta$ 将矩阵 $B$ 转换为 $\Theta$。
+\end{enumerate}
+\end{bookalgorithm}
+
+\subsection{多个图模型}
+
+许多应用需要同时考虑多个图模型。例如，样本包含患者和健康对照，患者还可进一步划分为多个疾病亚型。相应地，基因型网络可划分为各疾病亚型及健康对照的基因型子网络。这些子网络具有相同的节点，但相依结构不同（Danaher et al. 2014；Guo et al. 2011）。患者与健康对照的子网络既包含所有网络共有的边，也包含各自特有的边。如果分别估计各组的图模型，就无法利用多个图模型之间大量存在的结构相似性，从而降低从观测数据中识别真实图模型的能力。
+
+为了充分利用数据中的信息，需要发展多个图模型的联合估计方法：既利用图模型之间的结构相似性，又允许它们存在一定的结构差异。常用方法分为基于边和基于节点两类。下面先简要介绍基于边的方法，再着重讨论基于节点的多个图模型联合估计。
+
+\subsubsection{基于边的多个图模型联合估计}
+
+考虑数据中的 $K$ 个类别。假设 $X_1^{(k)},\ldots,X_{n_k}^{(k)}\in\mathbb R^p$ 独立同分布于正态分布 $N(\mu_k,\Sigma_k)$，其中 $n_k$ 是第 $k$ 类的样本量。令
+\[
+S^{(k)}=\frac1{n_k}\sum_{i=1}^{n_k}(X_i-\overline X^{(k)})(X_i-\overline X^{(k)})^T
+\]
+为第 $k$ 类的样本协方差矩阵，$\Theta^{(k)}=\Sigma_k^{-1}$ 为第 $k$ 类的精度矩阵。负对数似然函数定义为
+\begin{equation}
+L\bigl(\Theta^{(1)},\ldots,\Theta^{(K)}\bigr)
+=\sum_{k=1}^K n_k\left(-\log|\Theta^{(k)}|+\Tr(S^{(k)}\Theta^{(k)})\right).
+\tag{1.38}
+\end{equation}
+传统方法针对 $\Theta^{(1)},\ldots,\Theta^{(k)}$ 最大化式（1.38），得到估计 $(S^{(1)})^{-1},\ldots,(S^{(K)})^{-1}$。然而，当变量个数大于样本量时，协方差矩阵 $S^{(k)}$ 为奇异矩阵，其逆矩阵 $(S^{(k)})^{-1}$ 不存在。
+
+因此需要考虑惩罚方法。当收集到多个异质数据集时，我们希望综合其中的信息，同时估计多个精度矩阵。为此，求 $\widehat\Theta^{(k)}$（$k=1,\ldots,K$），使以下惩罚负对数似然最小：
+\begin{equation}
+\begin{aligned}
+\min_{\Theta}\quad&L\bigl(\Theta^{(1)},\ldots,\Theta^{(K)}\bigr)
++\lambda_1\sum_{k=1}^K\|\Theta^{(k)}\|_1\\
+&+\lambda_2\sum_{i=1}^p\sum_{\substack{j=1\\j\ne i}}^p
+P\bigl(\Theta_{ij}^{(1)},\ldots,\Theta_{ij}^{(K)}\bigr),
+\end{aligned}\tag{1.39}
+\end{equation}
+其中，$\lambda_1$、$\lambda_2$ 是惩罚参数。$P(\Theta_{ij}^{(1)},\ldots,\Theta_{ij}^{(K)})$ 是作用于边的凸惩罚函数，用于鼓励各网络相应边之间的相似性。可考虑两种具体形式：一种对成对网络之间边参数的差异施加融合套索惩罚；另一种直接对边参数施加组套索惩罚（Tibshirani et al. 2005；Yuan and Lin 2007；Mohan et al. 2014；Danaher et al. 2014）：
+\begin{equation}
+P\bigl(\Theta_{ij}^{(1)},\ldots,\Theta_{ij}^{(K)}\bigr)
+=\sum_{k<k'}\left|\Theta_{ij}^{(k)}-\Theta_{ij}^{(k')}\right|,
+\tag{1.40}
+\end{equation}
+以及
+\begin{equation}
+P\bigl(\Theta_{ij}^{(1)},\ldots,\Theta_{ij}^{(K)}\bigr)
+=\sqrt{\sum_{k=1}^K\bigl(\Theta_{ij}^{(k)}\bigr)^2}.
+\tag{1.41}
+\end{equation}
+式（1.39）的联合估计在估计各子网络时利用了所有可用信息，因此比单独估计各子网络更准确。对于采用式（1.40）或（1.41）的优化问题（1.39），可用 ADMM 求解，见习题1.4。
+
+\subsubsection{基于节点的多个图模型联合估计}
+
+下面讨论基于节点的联合估计。网络的结构差异可能源于某些节点在不同条件下受到扰动。例如，某些单核苷酸多态性（single nucleotide polymorphism，SNP）位点可能发生突变，引起网络节点连接模式的变化。
+
+基于节点的联合估计，关键在于如何定义惩罚函数。由于 $\Theta^{(1)}$ 和 $\Theta^{(2)}$ 都是对称矩阵，它们的 $p$ 列之间存在大量重叠。$\Theta^{(1)}-\Theta^{(2)}$ 的第 $(i,j)$ 个元素同时包含在矩阵的第 $i$ 列和第 $j$ 列中。若直接对精度矩阵的各列施加传统的组套索惩罚（Yuan and Lin, 2007）$\sum_{j=1}^p\|\Theta_j^{(1)}-\Theta_j^{(2)}\|_2$，估计的支撑集就会表现为行与列的交集，而不是并集。为克服这一限制，Mohan et al.（2014）提出了\textbf{行列重叠范数（row-column overlap norm，RCON）}，用以构造惩罚函数。
+
+\begin{bookdefinition}{1.1}
+定义 $Kp\times p$ 矩阵
+\[
+V=\begin{bmatrix}V^{(1)}\\\vdots\\V^{(K)}\end{bmatrix},
+\]
+其中 $V^{(k)}$ 是 $p\times p$ 矩阵。由矩阵范数 $\|\cdot\|$ 诱导的行列重叠范数，通过以下最小化问题定义：
+\begin{equation}
+\begin{aligned}
+\Omega\bigl(\Theta^{(1)},\ldots,\Omega^{(k)}\bigr)
+&=\min_{\Omega^{(1)},\ldots,\Omega^{(K)}}\|V\|,\\
+\text{约束为}\quad \Omega^{(k)}&=V^{(k)}+(V^{(k)})^T,\quad k=1,\ldots,K.
+\end{aligned}\tag{1.42}
+\end{equation}
+如果 $\|V^{(k)}\|=\|(V^{(k)})^T\|$，则式（1.42）简化为
+\begin{equation}
+\Omega\bigl(\Theta^{(1)},\ldots,\Omega^{(k)}\bigr)=\frac12\|\Omega\|,
+\tag{1.43}
+\end{equation}
+其中
+\[
+\Omega=\begin{bmatrix}\Omega^{(1)}\\\vdots\\\Omega^{(K)}\end{bmatrix}.
+\]
+该定义试图将精度矩阵 $\Omega^{(k)}$ 解释为一组列与一组行之和。这里的范数通常选为 $l_1/l_q$ 范数，定义为 $\|V\|=\sum_{j=1}^p\|V_j\|_q$。例如，$l_1/l_2$ 范数为 $\|V\|=\sum_{j=1}^p\|V_j\|_2$。
+\end{bookdefinition}
+
+于是，基于节点的多个图模型联合估计可定义为
+\begin{equation}
+\begin{aligned}
+\min_{\Theta^{(1)},\ldots,\Theta^{(k)}}\quad\biggl\{&L\bigl(\Theta^{(1)},\ldots,\Theta^{(k)}\bigr)
++\lambda_1\sum_{k=1}^K\|\Theta^{(k)}\|_1\\
+&+\lambda_2\sum_{k<k'}\Omega_q\bigl(\Theta^{(k)}-\Theta^{(k')}\bigr)\biggr\}.
+\end{aligned}\tag{1.44}
+\end{equation}
+这一非光滑凸优化问题可用 ADMM 求解。为简化讨论，考虑 $K=2$、$q=2$，此时式（1.44）可写为
+\begin{equation}
+\begin{aligned}
+\min_{\Theta^{(1)},\ldots,\Theta^{(k)}}\quad\biggl\{&L\bigl(\Theta^{(1)},\Theta^{(2)}\bigr)
++\lambda_1\|\Theta^{(1)}\|_1+\lambda_1\|\Theta^{(2)}\|_1
++\lambda_2\sum_{j=1}^p\|V_j\|_2\biggr\},\\
+\text{约束为}\quad&\Theta^{(1)}-\Theta^{(2)}=V+V^T.
+\end{aligned}\tag{1.45}
+\end{equation}
+为使目标函数中不易联合求解的第一项与其余各项解耦，引入辅助变量和约束：$\Theta^{(1)}=Z^{(1)}$、$\Theta^{(2)}=Z^{(2)}$、$W=V^T$。于是式（1.45）转化为
+\begin{equation}
+\begin{aligned}
+\min_{\Theta^{(1)},\ldots,\Theta^{(k)}}\quad\biggl\{&L\bigl(\Theta^{(1)},\Theta^{(2)}\bigr)
++\lambda_1\|\Theta^{(1)}\|_1+\lambda_1\|\Theta^{(2)}\|_1
++\lambda_2\sum_{j=1}^p\|V_j\|_2\biggr\},\\
+\text{约束为}\quad&\Theta^{(1)}-\Theta^{(2)}=V+W,\quad V=W^T,\\
+&\Theta^{(1)}=Z^{(1)},\quad \Theta^{(2)}=Z^{(2)}.
+\end{aligned}\tag{1.46}
+\end{equation}
+利用拉格朗日乘子，式（1.46）可以转化为下列无约束优化问题：
+\begin{equation}
+\begin{aligned}
+\min\quad&L\bigl(\Theta^{(1)},\Theta^{(2)}\bigr)
++\lambda_1\|Z^{(1)}\|_1+\lambda_1\|Z\|_2+\lambda_2\sum_{j=1}^p\|V_j\|_2\\
+&+\frac\rho2\|\Theta^{(1)}-\Theta^{(2)}-(V+W)+U_1\|_2^2\\
+&+\frac\rho2\|V-W^T+U_2\|_2^2
++\frac\rho2\|\Theta^{(1)}-Z^{(1)}+U_3\|_2^2\\
+&+\frac\rho2\|\Theta^{(2)}-Z^{(2)}+U_4\|_2^2.
+\end{aligned}\tag{1.47}
+\end{equation}
+ADMM 包括以下三类迭代。
+
+\noindent（1）更新 $\Theta^{(1)}$、$\Theta^{(2)}$ 和 $W$：
+\[
+\begin{aligned}
+\Theta^{(1)(l+1)}\leftarrow{}&\argmin_{\Theta^{(1)}}L_\rho\bigl(\Theta^{(1)},\Theta^{(2)(l)},Z^{(1)(l)},Z^{(2)(l)},\\
+&\hspace{3.1em}W^{(l)},V^{(l)},U_1^{(l)},U_2^{(l)},U_3^{(l)},U_4^{(l)}\bigr),\\
+\Theta^{(2)(l+1)}\leftarrow{}&\argmin_{\Theta^{(2)}}L_\rho\bigl(\Theta^{(1)(l+1)},\Theta^{(2)},Z^{(1)(l)},Z^{(2)(l)},\\
+&\hspace{3.1em}W^{(l)},V^{(l)},U_1^{(l)},U_2^{(l)},U_3^{(l)},U_4^{(l)}\bigr),\\
+W^{(l+1)}\leftarrow{}&\argmin_{\Theta^{(2)}}L_\rho\bigl(\Theta^{(1)(l+1)},\Theta^{(2)(l+1)},Z^{(1)(l)},Z^{(2)(l)},\\
+&\hspace{3.1em}W,V^{(l)},U_1^{(l)},U_2^{(l)},U_3^{(l)},U_4^{(l)}\bigr).
+\end{aligned}
+\]
+\noindent（2）更新 $Z^{(1)}$、$Z^{(2)}$ 和 $V$：
+\[
+\begin{aligned}
+Z^{(1)(l+1)}\leftarrow{}&\argmin_{\Theta^{(2)}}L_\rho\bigl(\Theta^{(1)(l+1)},\Theta^{(2)(l+1)},Z^{(1)},Z^{(2)(l)},\\
+&\hspace{3.1em}W^{(l+1)},V^{(l)},U_1^{(l)},U_2^{(l)},U_3^{(l)},U_4^{(l)}\bigr),\\
+Z^{(2)(l+1)}\leftarrow{}&\argmin_{\Theta^{(2)}}L_\rho\bigl(\Theta^{(1)(l+1)},\Theta^{(2)(l+1)},Z^{(1)(l+1)},Z^{(2)},\\
+&\hspace{3.1em}W^{(l+1)},V^{(l)},U_1^{(l)},U_2^{(l)},U_3^{(l)},U_4^{(l)}\bigr),\\
+V^{(l+1)}\leftarrow{}&\argmin_{\Theta^{(2)}}L_\rho\bigl(\Theta^{(1)(l+1)},\Theta^{(2)(l+1)},Z^{(1)(l+1)},Z^{(2)(l+1)},\\
+&\hspace{3.1em}W^{(l+1)},V,U_1^{(l)},U_2^{(l)},U_3^{(l)},U_4^{(l)}\bigr).
+\end{aligned}
+\]
+\noindent（3）更新乘子：
+\[
+\begin{aligned}
+U_1^{(l+1)}&=U_1^{(l)}+\Theta^{(1)(l+1)}-\Theta^{(2)(l+1)}-V^{(l+1)}-W^{(l+1)},\\
+U_2^{(l+1)}&=U_2^{(l)}+V^{(l+1)}-(W^{(l+1)})^T,\\
+U_3^{(l+1)}&=U+{}_3\Theta^{(1)(l+1)}-Z^{(1)(l+1)},\\
+U_4^{(l+1)}&=U_4^{(l)}+\Theta^{(2)(l+1)}-Z^{(2)(l+1)}.
+\end{aligned}
+\]
+算法归纳如下，推导见附录1.B。
+
+\begin{bookalgorithm}{1.2}
+\textbf{输入：}样本协方差矩阵 $S^{(1)}$、$S^{(2)}$。
+
+\textbf{步骤1：初始化（$l=0$）。}
+
+定义 $B_1=-\frac{n_1}{2\rho}S^{(1)}$，对矩阵 $B_1$ 作正交特征值分解
+\[
+B_1=Q_1\Lambda_1Q_1^T,\qquad \Lambda_1=\diag(\lambda_1^{(1)},\ldots,\lambda_p^{(1)}).
+\]
+定义
+\[
+\widetilde X_{ii}^{(1)}=\frac{\lambda_i^{(1)}+\sqrt{(\lambda_i^{(1)})^2+2n_1/\rho}}2,
+\qquad \widetilde X^{(1)}=\diag(\widetilde X_{11}^{(1)},\ldots,\widetilde X_{pp}^{(1)}),
+\]
+计算 $\widehat\Theta^{(1)(0)}=Q_1\widetilde X^{(1)}Q_1^T$。
+
+定义 $B_2=\frac12[\Theta^{(1)(0)}]-\frac{n_2}{2\rho}S^{(2)}$，对矩阵 $B_2$ 作正交特征值分解
+\[
+B_2=Q_2\Lambda_2Q_2^T,\qquad \Lambda_2=\diag(\lambda_1^{(2)},\ldots,\lambda_p^{(2)}).
+\]
+定义
+\[
+\widetilde X_{ii}^{(2)}=\frac{\lambda_i^{(2)}+\sqrt{(\lambda_i^{(2)})^2+2n_2/\rho}}2,
+\qquad \widetilde X^{(2)}=\diag(\widetilde X_{11}^{(2)},\ldots,\widetilde X_{pp}^{(2)}),
+\]
+计算 $\widehat\Theta^{(2)(0)}=Q_2\widetilde X^{(2)}Q_2^T$，并计算
+\[
+\begin{aligned}
+Z^{(1)(0)}&=\sign\bigl(\Theta^{(1)(0)}\bigr)
+\left(\left|\Theta^{(1)(0)}\right|-\frac{\lambda_1}\rho\right)_+,\\
+Z^{(2)(0)}&=\sign\bigl(\Theta^{(2)(0)}\bigr)
+\left(\left|\Theta^{(2)(0)}\right|-\frac{\lambda_2}\rho\right)_+.
+\end{aligned}
+\]
+对 $j=1,\ldots,p$，定义 $G_j=\frac12[\Theta^{(1)(0)}-\Theta^{(2)(0)}]_{(j)}$，计算
+\[
+V_j^{(0)}=\left(1-\frac{\lambda_2}{2\rho\|G_j\|_2}\right)_+G_j,
+\qquad V^{(0)}=[V_1^{(0)}\ \cdots\ V_p^{(0)}].
+\]
+结束列循环，再计算
+\[
+W^{(0)}=\frac12\left[\Theta^{(1)(0)}-\Theta^{(2)(0)}+(V^{(0)})^T-V^{(0)}\right],
+\]
+\[
+\begin{aligned}
+U_1^{(0)}&=\Theta^{(1)(0)}-\Theta^{(2)(0)}-V^{(0)}-W^{(0)},\\
+U_2^{(0)}&=V^{(0)}-(W^{(0)})^T,\\
+U_3^{(0)}&=\Theta^{(1)(0)}-Z^{(1)(0)},\\
+U_4^{(0)}&=\Theta^{(2)(0)}-Z^{(2)(0)}.
+\end{aligned}
+\]
+重复步骤2、3、4，直至收敛。
+
+\textbf{步骤2：}
+
+定义
+\[
+B_1=\frac12\left[\Theta^{(2)(l)}+V^{(l)}+W^{(l)}+Z^{(1)(l)}-U_1^{(l)}-U_3^{(l)}\right]
+-\frac{n_1}{2\rho}S^{(1)}.
+\]
+对 $B_1$ 作正交特征值分解
+\[
+B_1=Q_1\Lambda_1Q_1^T,\qquad \Lambda_1=\diag(\lambda_1^{(1)},\ldots,\lambda_p^{(1)}).
+\]
+定义
+\[
+\widetilde X_{ii}^{(1)}=\frac{\lambda_i^{(1)}+\sqrt{(\lambda_i^{(1)})^2+2n_1/\rho}}2,
+\qquad \widetilde X^{(1)}=\diag(\widetilde X_{11}^{(1)},\ldots,\widetilde X_{pp}^{(1)}),
+\]
+计算 $\widehat\Theta^{(1)(l+1)}=Q_1\widetilde X^{(1)}Q_1^T$。
+
+定义
+\[
+B_2=\frac12\left[\Theta^{(1)(l+1)}-V^{(l)}-W^{(l)}+Z^{(2)(l)}+U_1^{(l)}-U_4^{(l)}\right]
+-\frac{n_2}{2\rho}S^{(2)}.
+\]
+对 $B_2$ 作正交特征值分解
+\[
+B_2=Q_2\Lambda_2Q_2^T,\qquad \Lambda_2=\diag(\lambda_1^{(2)},\ldots,\lambda_p^{(2)}).
+\]
+定义
+\[
+\widetilde X_{ii}^{(2)}=\frac{\lambda_i^{(2)}+\sqrt{(\lambda_i^{(2)})^2+2n_2/\rho}}2,
+\qquad \widetilde X^{(2)}=\diag(\widetilde X_{11}^{(2)},\ldots,\widetilde X_{pp}^{(2)}),
+\]
+计算 $\widehat\Theta^{(2)(l+1)}=Q_2\widetilde X^{(2)}Q_2^T$。
+
+\textbf{步骤3：}
+\[
+\begin{aligned}
+Z^{(1)(l+1)}&=\sign\bigl(\Theta^{(1)(l+1)}+U_3^{(l)}\bigr)
+\left(\left|\Theta^{(1)(l+1)}+U_3^{(l)}\right|-\frac{\lambda_1}\rho\right)_+,\\
+Z^{(2)(l+1)}&=\sign\bigl(\Theta^{(2)(l+1)}+U_4^{(l)}\bigr)
+\left(\left|\Theta^{(2)(l+1)}+U_4^{(l)}\right|-\frac{\lambda_2}\rho\right)_+.
+\end{aligned}
+\]
+对 $j=1,\ldots,p$，定义
+\[
+G_j=\frac12\left[\Theta^{(1)(l+1)}-\Theta^{(2)(l+1)}-W^{(l)}+U_1^{(l)}
++(W^{(l)})^T-U_2^{(l)}\right]_{(j)},
+\]
+计算
+\[
+V_j^{(l+1)}=\left(1-\frac{\lambda_2}{2\rho\|G_j\|_2}\right)_+G_j,
+\qquad V^{(l+1)}=[V_1^{(l+1)}\ \cdots\ V_p^{(l+1)}].
+\]
+结束列循环，计算
+\[
+W^{(l+1)}=\frac12\left[\Theta^{(1)(l+1)}-\Theta^{(2)(l+1)}
++(V^{(l+1)})^T-V^{(l+1)}+U_1^{(l+1)}+(U_2^{(l+1)})^T\right].
+\]
+
+\textbf{步骤4：}
+\[
+\begin{aligned}
+U_1^{(l+1)}&=U_1^{(l)}+\Theta^{(1)(l+1)}-\Theta^{(2)(l+1)}-V^{(l+1)}-W^{(l+1)},\\
+U_2^{(l+1)}&=U_2^{(l)}+V^{(l+1)}-(W^{(l+1)})^T,\\
+U_3^{(l+1)}&=U_3^{(l)}\Theta^{(1)(l+1)}-Z^{(1)(l+1)},\\
+U_4^{(l+1)}&=U_4^{(l)}+\Theta^{(2)(l+1)}-Z^{(2)(l+1)}.
+\end{aligned}
+\]
+\end{bookalgorithm}

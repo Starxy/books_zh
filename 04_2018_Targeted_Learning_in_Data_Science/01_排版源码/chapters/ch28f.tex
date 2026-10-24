@@ -1,0 +1,71 @@
+% 原书分章 PDF 第 10—12 页：第 28.4.4 节，全部四类置信区间。
+\subsection{自助法置信区间}
+
+获得自助抽样分布后，可以采用多种已提出的方法，从中生成置信区间端点。Hall（1988）提出了评价自助法置信区间的框架，这里沿用该方法。我们关心各类置信区间的准确性。对于给定的置信区间端点 $\psi_{n,[\alpha]}$，如果可写成
+\[
+ P_0(\psi_0<\psi_{n,[\alpha]})=\alpha+O(n^{-j/2}),
+\]
+则称它具有 $j$ 阶准确性。单侧区间的覆盖概率与其准确性密切相关。我们也将讨论双侧置信区间的覆盖误差。
+
+非参数自助法置信区间准确性的最一般理论结果，来自 Hall（1988）的光滑函数情形。它针对可写为 $f(P_0Y)$ 的参数，其中 $Y$ 为由 $O$ 的一组变换，即 $h^j(O)$，生成的向量，而 $f$ 为光滑函数。这一情形包含均值及其他矩等许多常见参数，但也排除了分位数等其他常见参数。特别地，它不包括特定处理下的均值或其他类型的靶向学习参数。下面介绍一些自助法置信区间方法，并给出它们在这一情形下的相关理论结果。
+
+\noindent\textbf{自助法 Wald 区间。}\enspace
+采用自助方差估计的 Wald 区间，其中
+\[
+ \hat\sigma_{n,\mathrm{boot}}^2
+ =\frac1B\sum_{i=1}^B
+ \bigl(\Psi(P_{n,\#,i})-\bar\Psi(P_{n,\#,i})\bigr)^2,
+\]
+且 $\bar\Psi(P_{n,\#,i})=\frac1B\sum_{i=1}^B\Psi(P_{n,\#,i})$。
+与前面一样，
+\[
+ \psi_{n,[\alpha],\mathrm{Wald}}
+ =\psi_n-n^{-1/2}\hat\sigma_{n,\mathrm{boot}}\phi^{-1}(1-\alpha).
+\]
+在光滑函数情形下，Wald 区间方法具有一阶准确性（Hall，1988）。
+
+\noindent\textbf{百分位区间。}\enspace
+Efron 的百分位区间（percentile interval）直接使用 $\hat G(x)$ 的 $\alpha$ 分位数：
+\[
+ \psi_{n,[\alpha],\mathrm{Percentile}}=\hat G^{-1}(\alpha).
+\]
+在光滑函数情形下，百分位区间也具有一阶准确性（Hall，1988）。
+
+\noindent\textbf{Bootstrap-$t$ 区间。}\enspace
+Bootstrap-$t$ 区间可视为对 Wald 型区间的一种改进。它依赖以下“学生化”（studentized）的分布函数：
+\[
+ K(x)=P\left(\frac{n^{1/2}(\hat\psi_n-\psi_0)}{\hat\sigma_n}<x\right).
+\]
+该分布的自助估计为
+\[
+ \hat K(x)=\frac1B\sum_{i=1}^B
+ I\left(\frac{n^{1/2}(\hat\psi_n^\#-\hat\psi_n)}{\hat\sigma_n}<x\right).
+\]
+将 $\hat y_\alpha=\hat K^{-1}(\alpha)$ 定义为这一分布的 $\alpha$ 分位数的估计，则将 Wald 区间修正为
+\[
+ \psi_{n,[\alpha],\mathrm{bootstrap}\text{-}t}
+ =\psi_n+n^{-1/2}\hat\sigma_n\hat y_\alpha.
+\]
+人们经常提到，这一方法的一个缺点是需要对 $\sigma$ 作出可靠估计（Hall，1988）。然而，在我们的情形中，既可由影响曲线得到 $\sigma$ 的估计，也可由方差的靶向估计得到它。在下面的模拟研究中，除了靶向自助法与联合靶向自助法使用靶向方差估计之外，我们均使用影响曲线方差估计。在光滑函数情形下，bootstrap-$t$ 区间具有二阶准确性（Hall，1988）。
+
+\noindent\textbf{$BC_a$ 区间。}\enspace
+偏差校正加速区间（bias-corrected, accelerated interval，$BC_a$ 区间）最早由 Efron（1987）提出，它在构造置信区间时考虑抽样分布的偏差与偏斜。其发展动机来自通过单调变换使估计量抽样分布正态化的做法。它依赖两个额外参数：偏差常数 $z_0$ 刻画抽样分布的偏差，加速常数 $a$ 刻画抽样分布的偏度。
+
+给定这两个量，$BC_a$ 定义需要查取的新分位数：
+\[
+\begin{aligned}
+ \beta_{z_0,a,\alpha}
+ &=\Phi\left(z_0+\frac{z_0+z_\alpha}{1-a(z_0+z_\alpha)}\right),\\
+ \psi_{n,[\alpha],BC_a}&=\hat G^{-1}(\beta_{z_0,a,\alpha}),
+\end{aligned}
+\]
+其中 $\Phi(x)$ 为标准正态分布，$z_\alpha\equiv\Phi^{-1}(\alpha)$ 为其 $\alpha$ 分位数。实践中生成这一区间，需要估计 $z_0$ 和 $a$。我们用低于原样本估计值的自助估计所占比例，对应的正态分位数来估计 $z_0$：
+\[
+ \hat z_0=\Phi^{-1}[\hat G(\hat\psi_n)].
+\]
+利用已知的影响函数，从原样本估计加速常数 $a$：
+\[
+ \hat a=\frac{\sum_{i=1}^nD(O_i)^3}
+ {6\bigl(\sum_{i=1}^nD(O_i)^2\bigr)^{3/2}}.
+\]
+在光滑函数情形下，$BC_a$ 区间也具有二阶准确性（Hall，1988）。

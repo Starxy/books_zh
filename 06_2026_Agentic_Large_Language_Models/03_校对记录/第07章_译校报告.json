@@ -1,0 +1,370 @@
+{
+  "chapter": 7,
+  "title_zh": "视觉、行动与世界模型",
+  "status": "complete",
+  "page_count": 26,
+  "page_count_scope": "单章独立编译，全部正文、图示及原文参考文献共 26 页。",
+  "source": {
+    "effective_tex": "work/agentic/active/part2/07_robot.tex",
+    "effective_source_lines": 605,
+    "assets_directory": "work/agentic/en/figures/",
+    "source_chapter_pdf_used": false,
+    "bibliography": "保留原文 bibliographystyle 与 bibliography 调用，使用随原包复制的 part2/07_robot.bbl。"
+  },
+  "file_list": [
+    "01_排版源码/part2/07_robot.tex",
+    "01_排版源码/figures_zh/ch07/dalle3_zh.tex",
+    "01_排版源码/figures_zh/ch07/flava_zh.tex",
+    "01_排版源码/figures_zh/ch07/lmnav_zh.tex",
+    "01_排版源码/figures_zh/ch07/magma_zh.tex",
+    "01_排版源码/figures_zh/ch07/mobility_zh.tex",
+    "01_排版源码/figures_zh/ch07/pizero_zh.tex",
+    "01_排版源码/figures_zh/ch07/rt2_zh.tex",
+    "01_排版源码/figures_zh/ch07/stable_zh.tex",
+    "01_排版源码/figures_zh/ch07/vlm_zh.tex",
+    "01_排版源码/figures_zh/ch07/webdreamer_zh.tex",
+    "01_排版源码/figures_zh/ch07/worldcoder_zh.tex",
+    "01_排版源码/figures_zh/ch07/worldgpt_zh.tex",
+    "03_校对记录/第07章_译校报告.json"
+  ],
+  "coverage": "全部有效正文、学习目标、4 节、13 小节、5 小小节、12 段标题、5 条脚注、23 幅图的题注、原图问答及提示、WebDreamer 完整伪代码、结语与参考文献调用均逐段译出；没有缩写为概要或追加原文不存在的例子、表格、定理及练习。",
+  "structure_checks": {
+    "headings": {
+      "chapter": 1,
+      "section": 4,
+      "subsection": 13,
+      "paragraph": 12,
+      "subsubsection": 5
+    },
+    "ordered_heading_type_sequence_match": true,
+    "label": {
+      "source_count": 28,
+      "translation_count": 28,
+      "ordered_calls_match": true
+    },
+    "references": {
+      "source_count": 34,
+      "translation_count": 34,
+      "ordered_calls_match": true
+    },
+    "citations": {
+      "source_count": 85,
+      "translation_count": 85,
+      "ordered_calls_match": true
+    },
+    "caption": {
+      "source_count": 23,
+      "translation_count": 23,
+      "count_match": true
+    },
+    "footnote": {
+      "source_count": 5,
+      "translation_count": 5,
+      "count_match": true
+    },
+    "item": {
+      "source_count": 8,
+      "translation_count": 8,
+      "count_match": true
+    },
+    "bibliography": {
+      "bibliography": 1,
+      "bibliographystyle": 1,
+      "calls_preserved": true
+    },
+    "environment_sequence_match": true,
+    "math": {
+      "source_count": 40,
+      "translation_count": 40,
+      "all_source_expressions_preserved_verbatim_with_multiplicity": true,
+      "ordering_note": "只有标准强化学习循环图题内的 r、theta、pi_theta 因中文句序改变出现先后；40 个行内表达式的字面内容及各自出现次数完全不变。图中参数、坐标、数值与连接关系另作原素材对照。"
+    },
+    "forbidden_inference_terms_found": false,
+    "translation_characters": 22114,
+    "CJK_characters": 10561,
+    "audit_file": "build/ch07_b5484713/qa/structure_audit.json"
+  },
+  "figures": {
+    "chinese_figure_files": 12,
+    "redrawn_or_translated": [
+      {
+        "file": "figures_zh/ch07/vlm_zh.tex",
+        "description": "以中文 TikZ 保留文本解码器、投影视觉词元/文本嵌入、视觉编码器与文本嵌入的层次和方向。"
+      },
+      {
+        "file": "figures_zh/ch07/stable_zh.tex",
+        "description": "保留总架构与 MM-DiT 块双面板、所有连线、Q/K/V、希腊参数、77+77 及 4096 数值。翻译图像描述、分块、位置嵌入、池化、调制、归一化等说明；可选 RMS 归一化以中文说明，避免小框拥挤。"
+      },
+      {
+        "file": "figures_zh/ch07/flava_zh.tex",
+        "description": "保留八幅照片与八个数据集名称；完整中文排入八条图像描述，保留 WIT 的拉丁物种名 Typocerus balteatus。"
+      },
+      {
+        "file": "figures_zh/ch07/dalle3_zh.tex",
+        "description": "三幅生成图保留原像素；下方三段自然语言提示全部译出，分别为花园侏儒、冰瀑与火焰、咖啡海洋中的传送门。"
+      },
+      {
+        "file": "figures_zh/ch07/mobility_zh.tex",
+        "description": "保留双层目标/导航架构、六个拓扑节点、照片、位姿符号与全部箭头；翻译指令气泡、示范巡视、运动恢复结构与所有功能标签，并消除标签边缘英文残片。"
+      },
+      {
+        "file": "figures_zh/ch07/lmnav_zh.tex",
+        "description": "完整翻译自由形式导航指令、冻结权重、目标环境观测、起点/终点与总距离，保留 LLM/VLM/VNM、原导航轨迹、照片及 40m 标尺和 350 米总距离。"
+      },
+      {
+        "file": "figures_zh/ch07/rt2_zh.tex",
+        "description": "保留原照片、互联网 VQA 与动作数据三例、ViT/LLM、所有词元与连线。英/法文问答及三条机器人指令完整译出；A 后数值词元、<task>、平移/旋转的数值与角度完全不变；袋子标签下英文残边已消除。"
+      },
+      {
+        "file": "figures_zh/ch07/magma_zh.tex",
+        "description": "保留四类输入、文本/视觉编码和反词元化、Magma、空间/时间与动作输出结构。四组输入问句与两组语言回答完整译出，保留两条重复的 Supplier 问句、<Task>/<TASK>/<STEPS>/<SPEED>/<Red box> 及动作坐标/增量符号；小框文字经放大目检无越框。"
+      },
+      {
+        "file": "figures_zh/ch07/pizero_zh.tex",
+        "description": "保留 π 跨具身数据集的 π 前缀、全部机器人与任务照片、π0/VLM/动作专家、训练数据流及三类表现分区；任务名与说明均中文化。"
+      },
+      {
+        "file": "figures_zh/ch07/worldgpt_zh.tex",
+        "description": "保留认知架构、知识/记忆存储、词元、LLM、状态/动作序列、上下文反思器细节及全部连线；说明标签中文化，变量下标保留。"
+      },
+      {
+        "file": "figures_zh/ch07/webdreamer_zh.tex",
+        "description": "以可排版伪代码完整转录输入、输出、候选动作、自我精炼、score(sim(...)) 选择、执行、递增计数和终止检查。保留原函数标识符、数学式、先后顺序与 True；不新增算法编号。"
+      },
+      {
+        "file": "figures_zh/ch07/worldcoder_zh.tex",
+        "description": "保留世界、状态/奖励/目标、规划器、LLM、经验回放缓冲区及全部流向；代码截图及 world_model.py、def update、return 等代码标识符原样保留，仅翻译外围说明。"
+      }
+    ],
+    "retained_original": "VQAbanana、captioning、dalle、stablediff、vla/vlas、cliport1/2、sokoban、alfworld 的照片或生成图均保留原素材；stablediff 内英文展示生成图中文字/拼写能力，保持原例。商品包装、现场标识与代码截图不更改。",
+    "shared_figures": "figures/rl 与 figures/mbrl 使用主编维护的中文共享图，只读引用。",
+    "statistical_data_redrawn": false,
+    "code_executed": false
+  },
+  "new_terms": {
+    "visual question answering (VQA)": "视觉问答（VQA）",
+    "image captioning": "图像描述",
+    "decision transformer (DT)": "决策 Transformer（DT）",
+    "decision-pretrained transformer (DPT)": "决策预训练 Transformer（DPT）",
+    "multi-modal instruction navigation with demonstration tours (MINT)": "带示范巡视的多模态指令导航（MINT）",
+    "visual-navigation model (VNM)": "视觉导航模型（VNM）",
+    "Set-of-Mark": "标记集合",
+    "Trace-of-Mark": "标记轨迹",
+    "action expert": "动作专家",
+    "flow matching": "流匹配",
+    "late-fusion": "后期融合",
+    "cross-embodiment dataset": "跨具身数据集",
+    "topological map": "拓扑地图",
+    "structure from motion": "运动恢复结构",
+    "latent dynamics model": "潜在动力学模型",
+    "context reflection": "上下文反思",
+    "model predictive control (MPC)": "模型预测控制（MPC）",
+    "program synthesis": "程序合成",
+    "local surrogate model": "本地代理模型",
+    "joint embedding predictive architecture (JEPA)": "联合嵌入预测架构（JEPA）",
+    "text tokenizer / de-tokenizer": "文本词元化器／反词元化器"
+  },
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "source_anomalies": [
+    {
+      "location": "LM-Nav / fig:lmnav",
+      "description": "原题注称 Three-LLM Architecture，正文则逐项列为 LLM、VLM、VNM 三个预训练模型。题注按原意译作“三大语言模型架构”，正文保留三种实际类型，没有替作者统一为同一类型。"
+    },
+    {
+      "location": "WorldGPT / architecture and learning algorithm",
+      "description": "正文两处写 Vicuna-7B-v0，随附脚注链接却指向 vicuna-7b-v1.3。型号和 URL 各按原文保留。"
+    },
+    {
+      "location": "WebDreamer / architecture and learning algorithm",
+      "description": "架构段写 Qwen-70B，学习算法段写 Qwen-2-VL 与 Qwen2-VL-72B，并给出 310 万交互例。原文的型号写法与数值均保留，没有自行改成某个统一型号。"
+    },
+    {
+      "location": "π0 / architecture",
+      "description": "原文把 π0 作为强调强化学习方法的模型介绍，同时随后说明动作专家通过 flow matching 生成动作；两项陈述均依原文保留，未替作者改写训练范式。"
+    },
+    {
+      "location": "Model-free reinforcement learning",
+      "description": "原文将马尔可夫决策过程表述为 S、T、A、R 四个函数，S(o) 表示状态、A(s) 返回动作。正文及数学表达式均保持该特殊记号，没有改写成另一个标准元组。"
+    },
+    {
+      "location": "figures/magma.png / UI Navigation",
+      "description": "源图连续两次列出 Check the Supplier；中文图同样连续两次保留“查看供应商”，没有删成一条。"
+    },
+    {
+      "location": "Model predictive control / WebDreamer learning algorithm",
+      "description": "原文把 MPC 解释为用于工程控制问题、进行自适应重新训练的强化学习方法。译文保留这一原始分类与措辞，未按译者理解替换为另一种定义。"
+    }
+  ],
+  "compile": {
+    "command": "bundled-python build.py --chapter 7 --name ch07",
+    "passes": 3,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overfull_count": 0,
+    "undefined_references": false,
+    "undefined_citations": false,
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch07_b5484713/agenticbook.pdf",
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch07_b5484713/build_report.json"
+  },
+  "visual_qa": {
+    "renderer": "PyMuPDF；最终受影响页 144 dpi，图块 216 dpi。",
+    "full_document_render_directory": "01_排版源码/build/ch07_1ad73561/qa",
+    "contact_sheet_pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "full_size_pages_inspected": [
+      4,
+      6,
+      7,
+      10,
+      11,
+      15
+    ],
+    "editor_independent_pages_inspected": [
+      6,
+      7,
+      10,
+      11,
+      12,
+      16
+    ],
+    "final_affected_pages_reinspected": [
+      10,
+      11
+    ],
+    "final_affected_page_render_directory": "01_排版源码/build/ch07_b5484713/qa",
+    "final_figure_crops": [
+      "mobility.png",
+      "rt2.png",
+      "magma.png"
+    ],
+    "editor_independent_check": "主编另行渲染第 6、7、12、16 页，确认 FLAVA、DALL-E3、π0、WebDreamer/WorldCoder 图清楚，原素材和中文内容逐项对应。π 跨具身数据集的 π 前缀与原图一致。随后独立复核最终 ch07_b5484713 第 10、11 页，确认 Mobility、LM-Nav、RT-2、Magma 均可读，中文问答在框内，照片、连线与数值保留，无追加修改。",
+    "checks": "全章 PNG 总览确认正文、图题、页眉页脚及参考文献完整。全尺寸复核复杂架构图、新增提示译图和伪代码。最后只对新改动的第 10、11 页重渲染，放大核对所有中英遮罩边缘、问答小框及照片边界；无缺字、裁切、越框、文字或连线遮挡，所有原始数值、符号、照片和箭头保留。"
+  },
+  "editorial_choices": {
+    "terminology": "inference 与 reasoning 均为“推理”；依已确认术语采用“训练流程”“智能体控制框架”“视觉语言动作模型”。",
+    "counters": "保留原 chapter/section 等结构、标签与自动计数；章文件中不设置章号覆盖，不新增 part 或手工 tag。",
+    "math": "不改写原始数学表达式，完整保留所有变量、算子、数值及出现次数。",
+    "code": "WebDreamer 与 WorldCoder 图只翻译自然语言和排版；所有教材代码、训练、安装、联网及服务命令均未执行。",
+    "ownership": "只编辑第 7 章、figures_zh/ch07/ 和本报告；构建及 QA 产物留在 build/，共享导言区、构建脚本、原图、其他章及术语表均保持只读。"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

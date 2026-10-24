@@ -1,0 +1,134 @@
+% 原书第 82—84 页；第 6.3—6.4 节。
+\section{在变差范数小于 \texorpdfstring{$\lambda$}{λ} 的全部函数上最小化的最小损失估计量（MLE）}
+\label{sec:ch06-minimum-loss-estimator}
+
+考虑估计量 $\psi_{n,\lambda}=\argmin_{\psi,\|\psi\|_v\leq\lambda}P_nL(\psi)$。它定义为在参数空间 $\boldsymbol{\Psi}$ 中、变差范数小于 $\lambda$ 的所有函数 $\psi$ 上，最小化经验风险所得的解，即最小损失估计量（minimum loss-based estimator，MLE）。设 $\psi_{0,\lambda}=\argmin_{\psi,\|\psi\|_v\leq\lambda}P_0L(\psi)$ 为真实风险的最小化解。如果 $\lambda>\|\psi_0\|_v$，就有 $\psi_{0,\lambda}=\psi_0$。
+
+设 $d_0(\psi,\psi_0)=P_0L(\psi)-P_0L(\psi_0)$ 为基于损失的差异度。我们可以证明，$d_0(\psi_{n,\lambda},\psi_{0,\lambda})=O_P(n^{-(0.5+\alpha(d)/4)})$，其中，$\alpha(d)=1/(d+1)$。
+
+\begin{bookresult}{定理}{6.1}
+设 $\boldsymbol{\Psi}_\lambda=\{\psi\in\boldsymbol{\Psi}:\|\psi\|_v\leq\lambda\}$。我们假设
+\[
+ \begin{aligned}
+ \sup_{\psi\in\boldsymbol{\Psi}_\lambda}
+       \frac{\|L(\psi)\|_v}{\|\psi\|_v}&<\infty,\\
+ \sup_{\psi\in\boldsymbol{\Psi}_\lambda}
+       \frac{\|L(\psi)-L(\psi_{0,\lambda})\|_{P_0}^2}
+            {d_0(\psi,\psi_{0,\lambda})}&<\infty.
+ \end{aligned}
+\]
+则 $d_0(\psi_{n,\lambda},\psi_{0,\lambda})=O_P(n^{-(0.5+\alpha(d)/4)})$，其中，$\alpha(d)=1/(d+1)$。
+
+特别地，如果 $\lambda>\lambda_0\equiv\|\psi_0\|_v$，则 $d_0(\psi_{n,\lambda},\psi_0)=O_P(n^{-(0.5+\alpha(d)/4)})$。
+\end{bookresult}
+
+\begin{proof}
+有
+\[
+ \begin{aligned}
+ 0\leq d_0(\psi_{n,\lambda},\psi_{0,\lambda})
+   & =P_0\{L(\psi_{n,\lambda})-L(\psi_{0,\lambda})\}\\
+   & =-(P_n-P_0)\{L(\psi_{n,\lambda})-L(\psi_{0,\lambda})\}\\
+   & \qquad{}+P_n\{L(\psi_{n,\lambda})-L(\psi_{0,\lambda})\}\\
+   & \leq-(P_n-P_0)\{L(\psi_{n,\lambda})-L(\psi_{0,\lambda})\}.
+ \end{aligned}
+\]
+我们已经假设 $\sup_{\psi\in\boldsymbol{\Psi}}\|L(\psi)\|_v/\|\psi\|_v<\infty$。由于 $L(\psi_{n,\lambda})-L(\psi_{0,\lambda})$ 落在一个 $P_0$-Donsker 类（Donsker class）中，即所有变差范数小于某个常数的 càdlàg 函数组成的类，因此上式右端为 $O_P(1/\sqrt n)$，从而 $d_0(\psi_{n,\lambda},\psi_{0,\lambda})=O_P(n^{-1/2})$。我们也假设存在 $M_2<\infty$，使得对所有满足 $\|\psi\|_v<\lambda$ 的 $\psi\in\boldsymbol{\Psi}$，都有
+\[
+ P_0\{L(\psi)-L(\psi_{0,\lambda})\}^2
+   \leq M_2P_0\{L(\psi)-L(\psi_{0,\lambda})\}.
+\]
+于是，$\|L(\psi_{n,\lambda})-L(\psi_{0,\lambda})\|_{P_0}^2=O_P(1/\sqrt n)$。根据经验过程（empirical process）理论，如果 $f_n$ 以趋于 1 的概率落在一个 $P_0$-Donsker 类中，并且在 $n\to\infty$ 时 $P_0f_n^2\to_p0$，那么 $\sqrt n(P_n-P_0)f_n\to_p0$。将这一结论用于 $f_n=L(\psi_{n,\lambda})-L(\psi_{0,\lambda})$，可得 $(P_n-P_0)(L(\psi_{n,\lambda})-L(\psi_{0,\lambda}))=o_P(1/\sqrt n)$，从而证明 $d_0(\psi_{n,\lambda},\psi_{0,\lambda})=o_P(1/\sqrt n)$。
+
+现在应用下面的引理 6.1，取 $\mathcal F_n=\{L(\psi)-L(\psi_{0,\lambda}):\|\psi\|_v\leq\lambda\}$、包络界 $M_n=\lambda$、$\alpha=\alpha(d)$（见 van der Vaart and Wellner，1996），以及 $r_0(n)=n^{-1/4}$，便可证明
+\[
+ |\sqrt n(P_n-P_0)f_n|=O_P(n^{-\alpha(d)/4}).
+\]
+这里，我们使用了 van der Vaart and Wellner（1996）的结果：所有变差范数小于某个通用常数的 $d$ 元 càdlàg 函数组成一个 Donsker 类，其熵在 $\alpha=\alpha(d)$ 时满足引理 6.1 中的界。这样就证明了 $d_0(\psi_{n,\lambda},\psi_{0,\lambda})=O_P(n^{-(0.5+\alpha(d)/4)})$。
+\end{proof}
+
+van der Vaart and Wellner（2011）中的一个定理，对具有包络函数（envelope）$F_n$ 的 Donsker 类 $\mathcal F_n$ 给出了以下结果：如果 $Pf^2\leq\delta^2PF_n^2$，则
+% 原书 J 的第三个参数在同一式中分别写作 L^2 与 L_2，照录。
+\[
+ E\|G_n\|_{\mathcal F_n}
+ \leq J(\delta,\mathcal F_n,L^2)
+       \left(1+\frac{J(\delta,\mathcal F_n,L_2)}
+                        {\delta^2\sqrt n\|F_n\|_{P_0}}\right)\|F_n\|_{P_0},
+\]
+其中，
+\[
+ J(\delta,\mathcal F_n,L^2)=\sup_\Lambda\int_0^\delta
+ \bigl(\log(1+N(\epsilon\|F_n\|_{P_0},\mathcal F_n,L^2(\Lambda)))\bigr)^{0.5}\,d\epsilon
+\]
+是从 0 到 $\delta$ 的熵积分（entropy integral）。这里，$\|G_n\|_{\mathcal F_n}=\sup_{f\in\mathcal F_n}G_n(f)$，且 $G_n(f)=\sqrt n(P_n-P_0)f$。这个定理有一个简单推论，即下面的引理。
+
+\begin{bookresult}{引理}{6.1}
+考虑满足 $\|F_n\|_{P_0}<M_n$，以及
+\[
+ \sup_\Lambda\sqrt{\log(1+N(\epsilon\|F_n\|_{P_0},\mathcal F_n,L^2(\Lambda)))}
+      <1/\epsilon^{1-\alpha}
+\]
+的 $\mathcal F_n$。则
+\[
+ \begin{aligned}
+ E\sup_{\substack{f\in\mathcal F_n,\\\|f\|_{P_0}<r_0(n)}}|G_n(f)|
+ \leq{}&\{r_0(n)/M_n\}^{\alpha}M_n\\
+       &{}+\{r_0(n)/M_n\}^{2\alpha-2}n^{-0.5}.
+ \end{aligned}
+\]
+如果 $r_0(n)<n^{-1/4}$，就应在上式右端取 $r_0(n)=n^{-1/4}$，得到如下界：
+\[
+ \begin{aligned}
+ E\sup_{\substack{f\in\mathcal F_n,\\\|f\|_{P_0}<r_0(n)}}|G_n(f)|
+ \leq{}&\{n^{-0.25}/M_n\}^{\alpha}M_n\\
+       &{}+\{M_n\}^{2-2\alpha}n^{-\alpha/2}.
+ \end{aligned}
+\]
+\end{bookresult}
+
+\section{HAL 估计量}
+\label{sec:ch06-hal-estimator}
+
+上面定义了候选估计量 $\psi_{n,\lambda}=\widehat\Psi_\lambda(P_n)$。让 $\lambda$ 在一组 $K_n$ 个值中变化，其中最大值大于 $\|\psi_0\|_v$。这里选择 $K_n$，使得对某个有限的 $p$，有 $K_n<n^p$。考虑一种 $V$ 折交叉验证方案，设 $P^0_{n,v},P^1_{n,v}$ 分别为第 $v$ 次样本划分对应的训练样本和验证样本，$v=1,\ldots,V$。$\lambda$ 的交叉验证选择器定义为
+\[
+ \lambda_n=\argmin_\lambda\frac1V\sum_{v=1}^V
+              P^1_{n,v}L\bigl(\widehat\Psi_\lambda(P^0_{n,v})\bigr).
+\]
+我们提出的 $\psi_0$ 的估计量为 $\psi_n=\psi_{n,\lambda_n}=\widehat\Psi_{\lambda_n}(P_n)$。根据交叉验证选择器的有限样本预言不等式，有
+\[
+ \begin{aligned}
+ d_0(\psi_n,\psi_0)
+   &=O_P(n^{-(0.5+\alpha(d)/4)})+O_P(\log K_n/n)\\
+   &=O_P(n^{-(0.5+\alpha(d)/4)}).
+ \end{aligned}
+\]
+可以将这一估计量 $\psi_n$ 纳入一个包含其他众多算法的超级学习器算法库。这样不仅能够保证超级学习器渐近等价于预言选择出的估计量，还能保证它至少具有 $d_0(\psi_n,\psi_0)=O_P(n^{-(0.5+\alpha(d)/4)})$ 的表现。
+
+下面讨论 HAL 估计量的实现。假设 $L(\psi)(O)$ 通过 $\psi(W)$ 依赖于 $\psi$，其中，对某个指定函数 $f$，有 $W=f(O)\in\mathbb R^d$；例如，$O=(Y,W)$，且 $L(\psi)(O)=(Y-\psi(W))^2$。注意，$P_nL(\psi)$ 只通过 $(\psi(W_i):i=1,\ldots,n)$ 依赖于 $\psi$。这表明，应当能够把在 $\boldsymbol{\Psi}_\lambda$ 上的最小化，替换为一个有限维最小化问题。
+
+对于每个集合 $S\subset\{1,\ldots,d\}$，设 $W_i(S)$ 为子向量 $(W_{ij}:j\in S)$，$i=1,\ldots,n$。回顾 $\psi$ 的离散逼近 $\psi_m$ 的表示式；现在 $\psi_S$ 的支撑点为 $\{W_i(S):i=1,\ldots,n\}$：
+\[
+ \psi_m(w)=\psi_m(0)+\sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n
+                    I(W_j(S)\leq w(S))d\psi_{m,S,j}.
+\]
+也就是说，$\psi_m(\cdot)$ 是基函数 $x\mapsto\phi_{j,S}(w)=I(w(S)\geq W_j(S))$ 的线性组合，对应系数为 $d\psi_{m,S,j}$，其中遍及各子集 $S\subset\{1,\ldots,d\}$ 和 $j=1,\ldots,n$。我们断言，最小化解 $\psi_{n,\lambda}$ 可以由这样一个离散测度 $\psi_m$ 达到。
+
+定义
+\[
+ \psi_\beta=\beta(0)+\sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n
+                          \beta_j(S)\phi_{j,S},
+\]
+以及对应的子空间
+% 原书子空间中 beta_j 未标 S，且 beta_n 的下一式约束没有 beta(0)；照录。
+\[
+ \boldsymbol{\Psi}_{n,\lambda}
+   =\left\{\psi_\beta:\beta,\beta(0)+
+     \sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n|\beta_j|<\lambda\right\}.
+\]
+也就是说，我们断言 $\psi_{n,\lambda}=\psi_{\beta_n}$，其中
+\[
+ \beta_n=\argmin_{\substack{\beta,\\
+              \sum_{S\subset\{1,\ldots,d\}}\sum_{j=1}^n|\beta_j(S)|\leq\lambda}}
+               P_nL(\psi_\beta).
+\]
+注意，基函数的数目为 $m=(2^d-1)n$。因此，计算 $\psi_{n,\lambda}$，就是在 $L_1$ 范数不超过 $\lambda$ 的约束下，对 $m$ 维向量 $\beta$ 进行最小化。

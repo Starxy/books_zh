@@ -1,0 +1,52 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{asyncio}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{nest\PYGZus{}asyncio}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{langchain\PYGZus{}google\PYGZus{}genai}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{ChatGoogleGenerativeAI}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{langchain.agents}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{initialize\PYGZus{}agent}\PYG{p}{,} \PYG{n}{AgentType}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{langchain.tools}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{tool}
+\PYG{c+c1}{\PYGZsh{} Required for running asyncio in a notebook environment}
+\PYG{n}{nest\PYGZus{}asyncio}\PYG{o}{.}\PYG{n}{apply}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{} Define the maximum context size in \PYGZdq{}tokens\PYGZdq{} (for this demo, we use characters).}
+\PYG{n}{MAX\PYGZus{}CONTEXT\PYGZus{}SIZE} \PYG{o}{=} \PYG{l+m+mi}{250}
+\PYG{c+c1}{\PYGZsh{} A state dictionary to persist information across steps.}
+\PYG{n}{agent\PYGZus{}state} \PYG{o}{=} \PYG{p}{\PYGZob{}}
+    \PYG{l+s+s1}{\PYGZsq{}current\PYGZus{}plan\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}Initial plan to check if a number is prime.\PYGZsq{}}\PYG{p}{,}
+    \PYG{l+s+s1}{\PYGZsq{}history\PYGZus{}summary\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}No history yet.\PYGZsq{}}
+\PYG{p}{\PYGZcb{}}
+\PYG{k}{async} \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{update\PYGZus{}context\PYGZus{}with\PYGZus{}summary}\PYG{p}{(}\PYG{n}{current\PYGZus{}context}\PYG{p}{,} \PYG{n}{new\PYGZus{}observation}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Manages the context by summarizing past interactions if the context window limit is exceeded.}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{c+c1}{\PYGZsh{} Append the new observation.}
+    \PYG{n}{new\PYGZus{}context} \PYG{o}{=} \PYG{n}{current\PYGZus{}context} \PYG{o}{+} \PYG{n}{new\PYGZus{}observation} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+    \PYG{c+c1}{\PYGZsh{} Check if the new context exceeds the maximum size.}
+    \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{new\PYGZus{}context}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{n}{MAX\PYGZus{}CONTEXT\PYGZus{}SIZE}\PYG{p}{:}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Context is full! Summarizing past history...\PYGZdq{}}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} Initialize an LLM specifically for summarization.}
+        \PYG{n}{summarizer\PYGZus{}llm} \PYG{o}{=} \PYG{n}{ChatGoogleGenerativeAI}\PYG{p}{(}\PYG{n}{model}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}gemini\PYGZhy{}1.5\PYGZhy{}flash\PYGZhy{}latest\PYGZdq{}}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} Create a prompt to instruct the LLM to summarize.}
+        \PYG{n}{summary\PYGZus{}prompt} \PYG{o}{=} \PYG{p}{(}
+            \PYG{l+s+s2}{\PYGZdq{}Please provide a very concise summary of the following agent conversation. \PYGZdq{}}
+            \PYG{l+s+s2}{\PYGZdq{}Focus on the key decisions and outcomes. Keep the summary under 30 words.\PYGZdq{}}
+            \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n\PYGZbs{}n}\PYG{l+s+s2}{Conversation to summarize:}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{current\PYGZus{}context}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        \PYG{p}{)}
+        \PYG{k}{try}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} Call the LLM to generate the summary asynchronously.}
+            \PYG{n}{summary\PYGZus{}response} \PYG{o}{=} \PYG{k}{await} \PYG{n}{summarizer\PYGZus{}llm}\PYG{o}{.}\PYG{n}{invoke}\PYG{p}{(}\PYG{n}{summary\PYGZus{}prompt}\PYG{p}{)}
+            \PYG{n}{summary\PYGZus{}text} \PYG{o}{=} \PYG{n}{summary\PYGZus{}response}\PYG{o}{.}\PYG{n}{content}
+            \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Generated Summary: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{summary\PYGZus{}text}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{k}{except} \PYG{n+ne}{Exception} \PYG{k}{as} \PYG{n}{e}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} Handle potential API errors.}
+            \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}An error occurred during summarization: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{e}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+            \PYG{n}{summary\PYGZus{}text} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Summarization failed. History truncated.\PYGZdq{}}
+
+        \PYG{c+c1}{\PYGZsh{} Update the agent\PYGZsq{}s persistent state with the new summary.}
+        \PYG{n}{agent\PYGZus{}state}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}history\PYGZus{}summary\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{summary\PYGZus{}text}
+        \PYG{c+c1}{\PYGZsh{} Rebuild the context with the summary and the most recent parts.}
+        \PYG{n}{new\PYGZus{}context} \PYG{o}{=} \PYG{p}{(}
+            \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Current Plan: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{agent\PYGZus{}state}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}current\PYGZus{}plan\PYGZsq{}}\PYG{p}{]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+            \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Past History: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{agent\PYGZus{}state}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}history\PYGZus{}summary\PYGZsq{}}\PYG{p}{]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+            \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Recent Observation: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{new\PYGZus{}observation}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+        \PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{new\PYGZus{}context}
+\end{MintedVerbatim}

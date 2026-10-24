@@ -1,0 +1,119 @@
+% 原书分章 PDF 第 11—14 页：第 5.4 节。
+\section{用于靶向最小损失估计的通用最不利模型}
+
+现在将相对于对数似然损失的通用最不利模型构造推广到一般损失函数，使所得的通用最不利子模型能够用于更一般的靶向最小损失估计方法。假定 $\Psi(P)=\Psi_1(Q(P))$，其中 $Q:\mathcal M\to Q(\mathcal M)$ 是模型上定义的某个参数，$\Psi_1$ 为实值函数。这里，$Q(\mathcal M)=\{Q(P):P\in\mathcal M\}$ 表示参数 $Q$ 的参数空间。设 $L(Q)(O)$ 是 $Q(P)$ 的损失函数，即
+$Q(P)=\argmin_{Q\in Q(\mathcal M)}PL(Q)$。
+稍微滥用记号，将 $\Psi$ 在 $P$ 处的典范梯度写为
+$D^*(P)=D^*(Q(P),G(P))$，其中 $G:\mathcal M\to G(\mathcal M)$ 为某个干扰参数（nuisance parameter）。我们考虑有效影响曲线属于 $Q$ 的切空间的情形，这样，最不利子模型无需扰动 $G$；否则，只需把 $G$ 也纳入 $Q$ 的定义。给定 $(Q,G)$，设
+$\{Q_\epsilon^{\mathrm{lfm}}:\epsilon\in(-a,a)\}\subset Q(\mathcal M)$
+是相对于损失函数 $L(Q)$、在 $\epsilon=0$ 处局部最不利的模型，满足
+\[
+ \left.\frac{d}{d\epsilon}L(Q_\epsilon^{\mathrm{lfm}})
+ \right|_{\epsilon=0}=D^*(Q,G).
+\]
+记号中省略了该子模型对 $G$ 的依赖。
+
+设 $0=x_0<x_1<\cdots<x_N=a$ 是区间 $[0,a]$ 上的等距精细网格，$h=x_j-x_{j-1}$ 是分割单元的宽度。我们给出 $Q_{x_j}$（$j=0,\ldots,N$）的一个构造。令 $Q_{x=0}=Q$，$Q_{x_1}=Q_{x_0,h}^{\mathrm{lfm}}$；一般地，令 $Q_{x_{j+1}}=Q_{x_j,h}^{\mathrm{lfm}}$，$j=1,2,\ldots,N-1$。类似地，设 $-a=-x_N<-x_{N-1}<\cdots<-x_1<x_0=0$ 是 $[-a,0]$ 上相应的网格，并定义
+$Q_{-x_{j+1}}=Q_{-x_j,-h}^{\mathrm{lfm}}$，$j=1,\ldots,N-1$。
+这样就定义了 $Q_{x_j},Q_{-x_j}$，$j=0,\ldots,N$；根据构造，它们都属于参数空间 $Q(\mathcal M)$。在实践中使用这一子模型（例如在 TMLE 中）时，该构造已能满足所需。
+
+对于 $\epsilon\geq0$（$\epsilon<0$ 时类似），这一特定于损失函数的通用最不利子模型的解析表示为：当 $\epsilon>0$、$d\epsilon>0$ 时，
+\begin{equation}
+ Q_{\epsilon+d\epsilon}=Q_{\epsilon,d\epsilon}^{\mathrm{lfm}},
+ \tag{5.3}
+\end{equation}
+从而能以 $Q_{\epsilon=0}=Q$ 为起点递归求解 $Q_\epsilon$。而且，由于
+$Q_{\epsilon,h}^{\mathrm{lfm}}\in Q(\mathcal M)$，其实用近似永远不会离开 $Q$ 的参数空间 $Q(\mathcal M)$。
+
+下面推导相应的积分方程。假定对某个 $\dot L(Q)(O)$，有
+\[
+ \left.\frac{d}{dh}L(Q_{\epsilon,h}^{\mathrm{lfm}})\right|_{h=0}
+ =\dot L(Q_\epsilon)
+ \left.\frac{d}{dh}Q_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}.
+\]
+由最不利子模型的局部性质，
+\[
+ \left.\frac{d}{dh}Q_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}
+ =\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}.
+\]
+利用局部最不利模型 $h\mapsto Q_{\epsilon,h}^{\mathrm{lfm}}$ 连续二次可微、且在 $h=0$ 处的导数为 $D^*(Q_\epsilon,G)/\dot L(Q_\epsilon)$，得到二阶 Taylor 展开
+\[
+ \begin{aligned}
+ Q_{\epsilon,d\epsilon}^{\mathrm{lfm}}
+ &=Q_\epsilon+
+ \left.\frac{d}{dh}Q_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}
+ d\epsilon+O((d\epsilon)^2)\\
+ &=Q_\epsilon+\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}
+ d\epsilon+O((d\epsilon)^2).
+ \end{aligned}
+\]
+注意，$Q_\epsilon$ 也可以表示为 $Q_{\epsilon,0}^{\mathrm{lfm}}$。由此，经过 $Q$ 的通用最不利模型具有以下递归解析定义：
+\begin{equation}
+ Q_\epsilon=Q+\int_0^\epsilon
+ \frac{D^*(Q_x,G)}{\dot L(Q_x)}\,dx.
+ \tag{5.4}
+\end{equation}
+类似地，对于 $\epsilon<0$，
+\[
+ Q_\epsilon=Q-\int_\epsilon^0
+ \frac{D^*(Q_x,G)}{\dot L(Q_x)}\,dx.
+\]
+与对数似然损失（因而 $Q(P)=P$）的情形一样，这表明，在正则条件下，这个 $Q_\epsilon$ 的解析表示属于 $Q(\mathcal M)$；但将它用于实用构造、以求和替代积分时，则很容易离开模型空间 $Q(\mathcal M)$。另一方面，上文通过局部最不利模型和离散网格给出的构造，正是这一通用最不利子模型所需的实用实现。下面的定理将该结果形式化，说明解析形式 (5.4) 确实是一个通用最不利子模型。
+
+\begin{bookresult}{定理}{5.3}
+给定与模型 $\mathcal M$ 相容的任意 $(Q,G)$，设
+$\{Q_\delta^{\mathrm{lfm}}:\delta\in(-a,a)\}\subset Q(\mathcal M)$
+是相对于损失函数 $L(Q)$、在 $\delta=0$ 处局部最不利的模型，满足
+\[
+ \left.\frac{d}{d\delta}L(Q_\delta^{\mathrm{lfm}})\right|_{\delta=0}
+ =D^*(Q,G).
+\]
+假定对某个 $\dot L(Q)(O)$，有
+\[
+ \left.\frac{d}{d\epsilon}L(Q_\epsilon^{\mathrm{lfm}})\right|_{\epsilon=0}
+ =\dot L(Q)
+ \left.\frac{d}{d\epsilon}Q_\epsilon^{\mathrm{lfm}}\right|_{\epsilon=0}.
+\]
+考虑式 (5.4) 定义的相应模型 $\{Q_\epsilon:\epsilon\}$。它在 $\epsilon=0$ 处经过 $Q$，且对所有 $\epsilon$ 满足
+\begin{equation}
+ \frac{d}{d\epsilon}L(Q_\epsilon)=D^*(Q_\epsilon,G).
+ \tag{5.5}
+\end{equation}
+此外，假定上述局部最不利子模型中的 $a>0$，可以选为与
+$(Q,G)\in\{Q_\epsilon,G_\epsilon:\epsilon\}$
+的选择无关，并假定存在如下二阶 Taylor 展开：
+\[
+ \begin{aligned}
+ Q_{\epsilon,d\epsilon}^{\mathrm{lfm}}
+ &=Q_\epsilon+
+ \left.\frac{d}{dh}Q_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}
+ d\epsilon+R_2(Q_\epsilon,G,d\epsilon)\\
+ &=Q_\epsilon+\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}
+ d\epsilon+R_2(Q_\epsilon,G,d\epsilon),
+ \end{aligned}
+\]
+其中
+\[
+ \sup_\epsilon\sup_{o\in\mathcal O}
+ |R_2(Q_\epsilon,G,d\epsilon)(o)|=O((d\epsilon)^2).
+\]
+还假定
+$\sup_\epsilon\sup_{o\in\mathcal O}
+ \left|\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}(o)\right|<\infty$。
+那么还有 $\{Q_\epsilon:\epsilon\}\subset Q(\mathcal M)$。
+\end{bookresult}
+
+\begin{proof}
+令 $\epsilon>0$，则
+\[
+ \begin{aligned}
+ \frac{d}{d\epsilon}L\left(
+ Q+\int_0^\epsilon\frac{D^*(Q_x,G)}{\dot L(Q_x)}\,dx
+ \right)
+ &=\dot L(Q_\epsilon)\frac{d}{d\epsilon}Q_\epsilon\\
+ &=\dot L(Q_\epsilon)\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}\\
+ &=D^*(Q_\epsilon,G).
+ \end{aligned}
+\]
+式 (5.5) 得证。关于子模型的结论已在上文说明，这里给出了正式的充分条件。
+\end{proof}

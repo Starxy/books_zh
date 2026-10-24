@@ -1,0 +1,25 @@
+% 按随附 part1/visuals/lora.png 重绘，保留原图的 d x d 特例与初始化符号。
+\resizebox{.58\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+    every node/.style={font=\normalsize,align=center,inner sep=3pt},
+    flow/.style={-{Stealth[length=3mm,width=2.4mm]},line width=1.1pt,draw=blue!55!black}]
+\filldraw[fill=blue!55!white,draw=black,line width=1pt] (0,1.6) rectangle (3.6,5.2);
+\node[text=white,font=\large] at (1.8,4.1) {预训练权重};
+\node[text=white,font=\large] at (1.8,2.7) {$W\in\mathbb{R}^{d\times d}$};
+\filldraw[fill=orange!85!black,draw=black,line width=1pt] (4,1.6) -- (7.6,1.6) -- (6.5,2.9) -- (5.1,2.9) -- cycle;
+\node[text=white,font=\large] at (5.8,2.05) {$A=\mathcal{N}(0,\sigma^2)$};
+\filldraw[fill=orange!85!black,draw=black,line width=1pt] (4,5.2) -- (7.6,5.2) -- (6.5,3.9) -- (5.1,3.9) -- cycle;
+\node[text=white,font=\large] at (5.8,4.5) {$B=0$};
+\filldraw[fill=yellow!55,draw=black,line width=1pt] (2.0,0) rectangle (5.6,.35);
+\node[font=\Large,anchor=east] at (1.9,.18) {$x$};
+\filldraw[fill=yellow!55,draw=black,line width=1pt] (2.0,6.45) rectangle (5.6,6.8);
+\node[font=\Large,anchor=east] at (1.9,6.62) {$h$};
+\draw[flow] (2.45,.52) -- (1.8,1.4);
+\draw[flow] (5.05,.52) -- (5.8,1.4);
+\draw[flow] (1.8,5.4) -- (2.7,6.2);
+\draw[flow] (5.8,5.4) -- (4.9,6.2);
+\node[text=blue!55!black,font=\Huge] at (3.8,5.95) {$+$};
+\draw[decorate,decoration={brace,amplitude=4pt},draw=blue!55!black] (2.0,.65) -- node[above=4pt,text=black,font=\large] {$d$} (5.6,.65);
+\draw[decorate,decoration={brace,amplitude=4pt},draw=blue!55!black] (5.1,3.15) -- node[above=4pt,text=black,font=\large] {$r$} (6.5,3.15);
+\end{tikzpicture}%
+}

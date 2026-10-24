@@ -1,0 +1,135 @@
+% 原书第62—69页：4.2及4.2.1—4.2.4。
+\FloatBarrier
+\section{结构识别方法}
+
+下面介绍如何利用第4.1节得到的可识别性结果进行因果发现，即根据有限数据集估计一个图。这些都是具有挑战性的统计问题，可以采用许多不同的途径处理。这里着重介绍方法思路，并不声称所介绍的方法能够最有效地利用数据。今后的研究完全可能提出新颖而有效的方法。我们只介绍少数例子，主要选择那些我们对其性能已经积累了一定经验的方法。
+
+\subsection{加性噪声模型}
+
+对于利用定理4.5中加性噪声模型可识别性进行因果学习的方法，主要请参见讨论多元情形的第7.2节。这里概述两种方法，但不声称它们最优。第一种方法检验\textbf{残差的独立性}，它是“回归后进行独立性检验”（regression with subsequent independence test，RESIT）算法的一个特例，见第7.2节。
+\begin{enumerate}
+ \item 对 $Y$ 关于 $X$ 进行回归，即采用某种回归技术，将 $Y$ 写成 $X$ 的函数 $\widehat f_Y$ 与某个噪声之和。
+ \item 检验 $Y-\widehat f_Y(X)$ 是否与 $X$ 独立。
+ \item 交换 $X$ 和 $Y$ 的角色，重复上述过程。
+ \item 如果一个方向接受独立性，而另一个方向拒绝独立性，就将前一个方向推断为因果方向。
+\end{enumerate}
+
+\input{figures/ch04_05}
+
+图4.5展示了在模拟数据集上实施这一过程的结果，底层分布见图4.1。至少在连续情形下，前两步都是机器学习和统计学的标准问题，见附录A.1及A.2；但这里还有一个额外挑战：这两步相互耦合。$\widehat f_Y$ 对 $f_Y$ 的偏离，可能掩盖或者制造噪声与输入变量之间的相依关系。一般而言，任何基于估计残差的检验，都可能无法继续控制第一类错误。样本分割是一种可能的解决办法［Kpotufe et al., 2014］。此外，必须选择能够考虑高阶统计特征的独立性检验，而不能仅检验相关性。只要回归方法包含线性项和截距项，并以最小化平方误差为目标，它就会产生不相关的噪声。\footnote{用下面这个标准几何图景就很容易看清这一点：$\Cov[\cdot,\cdot]$ 在中心化、有限方差的随机变量空间上定义了一个内积。因此，当 $Y-\alpha X$ 与 $X$ 正交时，向量 $Y-\alpha X$ 的长度最小。}
+
+在实际中，例如可以使用\textbf{Hilbert--Schmidt 独立性准则（Hilbert--Schmidt independence criterion，HSIC）}［Gretton et al., 2008］；附录A.2将对此作简要介绍。Mooij et al.［2016，定理20］利用 HSIC 的连续性证明：即使不进行样本分割，当数据量趋于无穷时，也能获得正确的 HSIC 值；不过，该结果并未对检验的 $p$ 值作出结论。
+
+最后一步尤其值得注意，因为它涉及概率与因果性之间的联系。根据用于拒绝和接受独立性的显著性水平，可能在两个方向上都得到加性噪声模型，也可能两个方向都得不到，还可能只在一个方向上得到。如果必须作出判断，就可以直接选择拒绝独立性时 $p$ 值较大的方向，并将其推断为因果方向。
+
+近来的研究提供了一些证据，表明这一过程在真实数据上的成功率高于随机猜测［Mooij et al., 2016］。图4.6给出了一个真实数据的散点图；\footnote{这是原因—结果数据对数据库 \url{https://webdav.tuebingen.mpg.de/cause-effect/} 中的 pair001，另见 Mooij et al.［2016］。}
+对于该数据，加性噪声模型仅在因果方向上拟合得较为合理。关于离散数据所需的修改，参见相应文献［Peters et al., 2011a］。还应注意，后非线性模型 (4.9) 在实际中比更标准的非线性回归模型 (4.3) 难拟合得多。
+
+\input{figures/ch04_06}
+
+作为上述方法的替代，也可以采用基于\textbf{最大似然（maximum likelihood）}的方法。例如，考虑具有高斯加性误差项的非线性结构因果模型。此时，可以比较两个模型的似然得分，以区分 $X\to Y$ 和 $X\leftarrow Y$。为此，先对 $Y$ 关于 $X$ 进行非线性回归，得到残差 $R_Y:=Y-\widehat f_Y(X)$。然后，将
+\begin{equation}
+ L_{X\to Y}
+ =-\log\widehat{\operatorname{var}}[X]
+  -\log\widehat{\operatorname{var}}[R_Y]
+ \tag{4.18}
+\end{equation}
+与交换 $X,Y$ 的角色后得到的对应版本
+\begin{equation}
+ L_{X\leftarrow Y}
+ =-\log\widehat{\operatorname{var}}[R_X]
+  -\log\widehat{\operatorname{var}}[Y]
+ \tag{4.19}
+\end{equation}
+进行比较。不难证明，见习题4.16，如果不实施回归，而是使用真实条件均值 $\widehat f_Y(x)=\EE[Y\mid X=x]$，并类似地处理 $\widehat f_X$，那么这的确对应于比较似然。不过，与前面一样，先回归、再计算样本方差的两步过程需要理论论证。Bühlmann et al.［2014］利用经验过程理论［van de Geer, 2009］证明了其一致性。如果噪声不一定服从高斯分布，就必须调整得分函数，将残差经验方差的对数替换为误差项微分熵的估计［Nowzohour and Bühlmann, 2016］。
+
+\Needspace{14cm}
+\begin{codesnippet}
+下面的代码给出一个有限数据集的例子。它使用了 \texttt{dHSIC}［Pfister et al., 2017］和 \texttt{mgcv}［Wood, 2006］两个软件包。前者包含函数 \texttt{dhsic.test}，实现了 Gretton et al.［2008］提出的独立性检验；后者包含函数 \texttt{gam}，在第10、11行中被用作非线性回归方法，见第A.1节。只有在反方向上，残差与输入的独立性才被拒绝，见第15、17行。第21、23行还显示，高斯似然得分同样支持正向模型，另见式 (4.18)、(4.19)。
+\begin{lstlisting}[language=R]
+library(dHSIC)
+library(mgcv)
+#
+# generate data set
+set.seed(1)
+X <- rnorm(200)
+Y <- X^3 + rnorm(200)
+#
+# fit models
+modelforw <- gam(Y ~ s(X))
+modelbackw <- gam(X ~ s(Y))
+#
+# independence tests
+dhsic.test(modelforw$residuals, X)$p.value
+# [1] 0.7628932
+dhsic.test(modelbackw$residuals, Y)$p.value
+# [1] 0.004221031
+#
+# computing likelihoods
+- log(var(X)) - log(var(modelforw$residuals))
+# [1] 0.1420063
+- log(var(modelbackw$residuals)) - log(var(Y))
+# [1] -1.014013
+\end{lstlisting}
+\end{codesnippet}
+
+\subsection{信息几何因果推断}
+
+这里简要概述 IGCI 的实现，详情参见 Mooij et al.［2016］。其理论基础是定理4.10的可识别性结果，以及由此得到的一些简单推论。可以证明，如果定义
+\[
+ C_{X\to Y}:=\int_0^1\log f'(x)p(x)\,\mathrm{d}x,
+\]
+并类似地定义 $C_{Y\to X}$，那么独立性条件 (4.10) 蕴含
+\[
+ C_{X\to Y}\leq C_{Y\to X}.
+\]
+这里使用下面这个直接的估计量：
+\[
+ \widehat C_{X\to Y}:=
+ \frac{1}{N-1}\sum_{j=1}^{N-1}
+ \log\frac{|y_{j+1}-y_j|}{|x_{j+1}-x_j|},
+\]
+其中，$x_1<x_2<\cdots<x_N$ 是按升序排列的观测 $x$ 值。如果 $Y$ 是 $X$ 的递增函数，相应的 $y$ 值也按顺序排列；但对于真实数据，通常并非如此。类似地定义估计量 $\widehat C_{Y\to X}$，并在 $\widehat C_{X\to Y}<\widehat C_{Y\to X}$ 时推断 $X\to Y$。
+
+除了这种所谓基于斜率的方法，还存在一种基于熵的方法。可以证明，式 (4.10) 还蕴含\chfourtnote{原书所印 $H(X)\leq H(Y)$ 与紧随其后的解释不一致。对于本节的递增微分同胚，有 $H(Y)=H(X)+\EE[\log f^\prime(X)]$；由独立性条件及 Jensen 不等式可得 $\EE[\log f^\prime(X)]\leq0$，因而应为 $H(Y)\leq H(X)$，与“熵较大的变量是原因”一致。正文保留原书不等号。}
+\[
+ H(X)\leq H(Y),
+\]
+其中，$H$ 表示微分 Shannon 熵：
+\[
+ H(X):=-\int_0^1p(x)\log p(x)\,\mathrm{d}x.
+\]
+% 原书此处不等号与下文“较大熵者为原因”及前述积分推论不一致，见报告。
+直观地说，将非线性函数 $f$ 作用于 $p_X$，会引入额外的不规则性，从而使 $p_Y$ 比 $p_X$ 更不均匀；只有当 $f$ 的非线性相对于 $p_X$ 作了调谐时才会例外。因此，假定熵较大的变量是原因。为估计 $H$，可以采用文献中任意一种标准的熵估计量。
+
+\subsection{迹方法}
+
+回顾一下，这种方法依赖高维变量 $X$ 和 $Y$ 之间的线性关系。先假设样本量相对于 $X,Y$ 的维度足够大，能够通过标准线性回归估计协方差矩阵 $\Sigma_{XX},\Sigma_{YY}$ 以及结构矩阵 $A_Y,A_X$。为了利用定理4.12的可识别性结果，可以计算\textbf{迹相依比（tracial dependency ratio）}
+\[
+ r_{X\to Y}:=
+ \frac{\tau(A_Y\Sigma_{XX}A_Y^{\mathsf T})}
+ {\tau(A_YA_Y^{\mathsf T})\tau(\Sigma_{XX})},
+\]
+并通过交换 $X,Y$ 的角色，类似地计算 $r_{Y\to X}$。然后，将更接近1的比值所对应的方向推断为因果方向［Janzing et al., 2010］。
+
+Zscheischler et al.［2011］给出了一种判断这种对1的偏离是否显著的方法。其生成模型通过一个随机正交映射，使两个矩阵 $A$ 与 $\Sigma_{XX}$ 发生相对旋转，以模拟二者的独立性。\textbf{自由概率论（free probability theory）}［Voiculescu, 1997］是描述大型随机矩阵渐近行为的一套数学框架。利用其中的思想，Zscheischler et al.［2011］构造了维度大于样本量时迹条件的实现方法。他们证明，在无噪声情形下，只要额外假定 $A$ 与 $X$ 的经验协方差矩阵独立，即使没有足够数据估计 $\Sigma_{XX}$ 和 $A$，仍然能够估计 $r_{X\to Y}$。因此，当估计量显著偏离1时，就可以拒绝假设 $X\to Y$。此时，要么额外的独立性假设不成立，要么 $r_{X\to Y}$ 的确显著偏离1。
+
+\subsection{监督学习方法}
+
+最后，介绍一种更接近机器学习视角的因果学习方法。原则上，这种方法既能利用受限函数类，也能利用独立性条件。假设给定带标签的训练数据
+\[
+ (D_1,A_1),\ldots,(D_n,A_n).
+\]
+其中，每个 $D_i$ 都是一个数据集，
+\[
+ D_i=\{(X_1,Y_1),\ldots,(X_{n_i},Y_{n_i})\},
+\]
+包含实现值 $(X_1,Y_1),\ldots,(X_{n_i},Y_{n_i})\overset{\mathrm{i.i.d.}}{\sim}P^i_{X,Y}$；每个标签 $A_i\in\{\to,\leftarrow\}$ 说明数据集 $D_i$ 对应 $X\to Y$ 还是 $X\leftarrow Y$。这样，因果学习就变成了一个经典的预测问题。我们可以训练分类器，并希望它们能够从因果真相已知的数据集，良好地泛化到未见过的测试数据集。
+
+据我们所知，Guyon［2013］最早以竞赛形式系统研究了这一方法，提供了由模拟数据和真实数据混合构成的、因果真相已知的数据集。显然，若只利用相关、协方差等对称特征，这种方法就不可能成功。竞赛中许多有竞争力的分类器都基于人工构造的特征。例如，边缘分布的熵估计，以及对 $X$ 关于 $Y$ 或 $Y$ 关于 $X$ 进行回归后，所得残差分布的熵估计。
+
+有意思的是，这些特征可以与加性噪声模型的概念联系起来。例如，对于高斯分布变量，熵是方差对数的线性函数。因此，这些特征具有足够的表达能力，可以重构式 (4.18)、(4.19) 的得分。用熵代替方差的对数，则相当于放宽高斯性假设［Nowzohour and Bühlmann, 2016］。
+
+Lopez-Paz et al.［2015］致力于自动构造这类特征。其思想是，将联合分布 $P^i_{X,Y}$（$i=1,\ldots,n$）映射到一个\textbf{再生核 Hilbert 空间（reproducing kernel Hilbert space）}，见附录A.2，再在这个空间中分类。在实际中，无法获得完整分布 $P^i_{X,Y}$，而是以经验分布近似它。类似的方法也曾用于区分时间逆转后的时间序列与其原始版本［Peters et al., 2009a］。由于原因与结果的分类似乎依赖于联合分布相当复杂的性质，因此，训练集需要较大的样本量 $n$。为了加入有用的模拟数据集，必须从具有可识别性的情形中生成这些数据。例如，Lopez-Paz et al.［2015］就加入了来自加性噪声模型的额外样本。
+
+监督学习方法目前还不能作为独立的因果学习方法使用。不过，作为能够有效利用已知可识别性性质及其组合的统计工具，它们也许会很有价值。

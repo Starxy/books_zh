@@ -1,0 +1,200 @@
+% 原书分章 PDF 第 10—14 页；第 17.2 节。
+\section{有效影响曲线}
+
+本节为这些参数建立一般的半参数推断框架。具体而言，我们推导局部饱和的半参数模型下式 (17.5)、式 (17.6) 和式 (17.5) 的有效影响曲线（efficient influence curve，EIC），并确立其稳健性质。对给定的路径可微参数 $\Psi$，在一定正则性条件下，$\Psi$ 的 EIC 方差是 $\Psi$ 的渐近线性估计量的影响曲线方差的广义 Cramér--Rao 下界。因此，EIC 的方差为 $\Psi$ 的正则渐近线性（regular and asymptotically linear，RAL）估计量提供了效率界。此外，在局部饱和模型下，任何 RAL 估计量的影响曲线实际上就是 EIC。关于有效半参数推断的一般理论，读者可参阅 Bickel 等（1997b）。
+
+\noindent\textbf{条件中介公式的嵌套期望表示。}
+令 $\mathcal M$ 表示包含真实数据生成分布 $P_0$ 的局部饱和半参数模型。根据 Bang 和 Robins（2005）的一项重要观察，对 $t=\tau,\ldots,1$，在 $P\in\mathcal M$ 处递归定义以下泛函。令 $\bar Q_{R_{\tau+1}}^{\mathbf a,\mathbf a'}\equiv Y_\tau$。随后，对每个 $t=\tau,\ldots,1$，定义
+\begin{equation}
+\begin{aligned}
+ &\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})\\
+ &\quad\equiv\sum_{l_t}\bar Q_{R_{t+1}}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1},l_t)
+ p(l_t\mid\mathbf A_t=\mathbf a_t,\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1}),\\
+ &\bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\quad\equiv\sum_{z_t}\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},z_t,\mathbf L_{t-1})
+ p(z_t\mid\mathbf A_t=\mathbf a'_t,\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}),\\
+ &\bar Q_{R_t}^{\mathbf a,\mathbf a'}(\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\quad\equiv\sum_{r_t}\bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_{t-1},r_t,\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\qquad{}\times p(r_t\mid\mathbf A_{t-1}=\mathbf a_{t-1},\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}).
+\end{aligned}
+\tag{17.7}
+\end{equation}
+将这些泛函在数据生成分布 $P_0$ 处求值，便得到识别表达式 (17.5) 的嵌套期望表示：
+\begin{equation}
+ \Psi^{\mathbf a,\mathbf a'}(P_0)=E_{P_0}\bigl[\bar Q_{R_1}^{\mathbf a,\mathbf a'}(P_0)(L_0)\bigr].
+ \tag{17.8}
+\end{equation}
+用 $\bar Q^{\mathbf a,\mathbf a'}$ 表示这些嵌套期望 $\bigl(\bar Q_{L_t}^{\mathbf a,\mathbf a'},\bar Q_{Z_t}^{\mathbf a,\mathbf a'},\bar Q_{R_t}^{\mathbf a,\mathbf a'}:t\geq1\bigr)$。用 $P_n$ 表示 $O\sim P_0$ 的 $n$ 个独立同分布副本的经验分布。给定函数 $O\mapsto f(O)$，$P_nf$ 表示经验均值，即 $P_nf\equiv n^{-1}\sum_{i=1}^nf(O_i)$。
+
+\noindent\textbf{中介公式以及直接和间接效应的有效影响曲线。}
+式 (17.5) 的中介公式，可看作 $\mathcal M$ 上映射 $P\mapsto\Psi^{\mathbf a,\mathbf a'}(P)\equiv E_P[\bar Q_{R_1}^{\mathbf a,\mathbf a'}(P)(L_0)]$ 在 $P_0$ 处的取值。特别地，该映射通过 $\bar Q^{\mathbf a,\mathbf a'}$ 依赖于 $P$，即 $\Psi^{\mathbf a,\mathbf a'}(P)=\Psi^{\mathbf a,\mathbf a'}(\bar Q^{\mathbf a,\mathbf a'})$。类似地，式 (17.6) 的自然直接效应和式 (17.5) 的自然间接效应，分别是映射 $P\mapsto\Psi^{\mathrm{NDE}}(P)=\Psi^{1,0}(P)-\Psi^{0,0}(P)$ 及 $P\mapsto\Psi^{\mathrm{NIE}}(P)=\Psi^{1,1}(P)-\Psi^{1,0}(P)$ 在 $P_0$ 处的取值。
+
+\begin{bookresult}{定理}{17.1（有效影响曲线）}
+令 $\Psi^{\mathbf a,\mathbf a'}:\mathcal M\to\mathbb R$ 如上定义。假定在 $P\in\mathcal M$ 处，似然分解 (17.1) 中 $A_t$、$R_t$、$Z_t$、$L_t$ 的条件概率均与 0 和 1 保持正距离。则 $\Psi^{\mathbf a,\mathbf a'}$ 在 $P$ 处的有效影响曲线为
+$D^{*,\mathbf a,\mathbf a'}(P)\equiv D^{*,\mathbf a,\mathbf a'}(P,\Psi^{\mathbf a,\mathbf a'}(\bar Q^{\mathbf a,\mathbf a'}))$，其中
+\begin{equation}
+ D^{*,\mathbf a,\mathbf a'}(P,\psi)
+ \equiv\sum_{t\equiv1}^\tau\bigl(D_{L_t}^{\mathbf a,\mathbf a'}(P)
+ +D_{Z_t}^{\mathbf a,\mathbf a'}(P)+D_{R_t}^{\mathbf a,\mathbf a'}(P)\bigr)
+ +D_{L_0}^{\mathbf a,\mathbf a'}(P,\psi),
+ \tag{17.9}
+\end{equation}
+且
+\[
+\begin{aligned}
+ D_{L_t}^{\mathbf a,\mathbf a'}(P)
+ &\equiv H_{L_t}^{\mathbf a,\mathbf a'}\bigl\{
+ \bar Q_{R_{t+1}}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)
+ -\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})\bigr\},\\
+ D_{Z_t}^{\mathbf a,\mathbf a'}(P)
+ &\equiv H_{Z_t}^{\mathbf a,\mathbf a'}\bigl\{
+ \bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})
+ -\bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})\bigr\},\\
+ D_{R_t}^{\mathbf a,\mathbf a'}(P)
+ &\equiv H_{R_t}^{\mathbf a,\mathbf a'}\bigl\{
+ \bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})
+ -\bar Q_{R_t}^{\mathbf a,\mathbf a'}(\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1})\bigr\},\\
+ D_{L_0}^{\mathbf a,\mathbf a'}(P,\psi)
+ &\equiv\bar Q_{t=1}^{R,\mathbf a,\mathbf a'}(L_0)-\psi,
+\end{aligned}
+\]
+其中
+\begin{equation}
+\begin{aligned}
+ H_{L_t}^{\mathbf a,\mathbf a'}
+ &\equiv\frac{I(\mathbf A_t\equiv\mathbf a_t)}
+ {\prod_{j\equiv1}^t p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^t
+ \frac{p_Z(Z_j\mid\mathbf a'_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}
+ {p_Z(Z_j\mid\mathbf a_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})},
+\end{aligned}
+\tag{17.10}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+ H_{Z_t}^{\mathbf a,\mathbf a'}
+ &\equiv\frac{I(\mathbf A_t\equiv\mathbf a'_t)}
+ {\prod_{j\equiv1}^t p_A(a'_j\mid\mathbf a'_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^{t-1}
+ \frac{p_L(L_j\mid\mathbf a_j,\mathbf R_j,\mathbf Z_j,\mathbf L_{j-1})}
+ {p_L(L_j\mid\mathbf a'_j,\mathbf R_j,\mathbf Z_j,\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^{t}
+ \frac{p_R(R_j\mid\mathbf a_j,\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}
+ {p_R(R_j\mid\mathbf a'_j,\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})},
+\end{aligned}
+\tag{17.11}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+ H_{R_t}^{\mathbf a,\mathbf a'}
+ &\equiv\frac{I(\mathbf A_t\equiv\mathbf a_t)}
+ {\prod_{j\equiv1}^t p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^{t-1}
+ \frac{p_Z(Z_j\mid\mathbf a'_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}
+ {p_Z(Z_j\mid\mathbf a_j,\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}.
+\end{aligned}
+\tag{17.12}
+\end{equation}
+此外，$D^{*,\mathbf a,\mathbf a'}(P)$ 是 $\Psi^{\mathbf a,\mathbf a'}(P)$ 的多重稳健（multiply robust）估计函数，具体含义是：若下列任一条件成立，
+\begin{enumerate}[label=R\arabic*.,leftmargin=2.8em]
+ \item 条件概率 $p_R$、$p_L$ 和 $p_Z$ 设定正确；
+ \item 条件概率 $p_A$、$p_R$ 和 $p_L$ 设定正确；
+ \item 条件概率 $p_A$ 和 $p_Z$ 设定正确，
+\end{enumerate}
+则 $E_{P_0}D^{*,\mathbf a,\mathbf a'}(P)=0$ 蕴含 $\Psi^{\mathbf a,\mathbf a'}(P)=\Psi^{\mathbf a,\mathbf a'}(P_0)$。
+\end{bookresult}
+\begin{proof}
+见第 A.2 节。
+\end{proof}
+
+容易看到，当 $\mathbf a=\mathbf a'$ 时，式 (17.9) 就是时变暴露的总体处理效应的有效影响曲线，例如 van der Laan 和 Gruber（2012）。对式 (17.9) 简单应用 Delta 方法，就能推导自然直接效应（NDE）和自然间接效应（NIE）的 EIC。我们在下面的推论中给出它们，不再证明。
+
+\begin{bookresult}{推论}{1}
+假定对 $\mathbf a,\mathbf a'\in\{0,1\}$，定理 17.1 的条件成立。则自然直接效应的有效影响曲线为
+\[
+ D^{*,\mathrm{NDE}}(P)(O)=D^{*,1,0}(P)-D^{*,0,0}(P),
+\]
+自然间接效应的有效影响曲线为
+\[
+ D^{*,\mathrm{NIE}}(P)(O)=D^{*,1,1}(P)-D^{*,1,0}(P).
+\]
+此外，$D^{*,\mathrm{NDE}}$ 和 $D^{*\mathrm{NIE}}$ 对 $\mathbf a=0,1$ 及 $\mathbf a'=0,1$，满足定理 17.1 中相同的稳健性条件。
+\end{bookresult}
+
+方差 $\Var_{P_0}(D^{*,\mathbf a,\mathbf a'}(P_0))$、$\Var_{P_0}(D^{*,\mathrm{NDE}}(P_0))$ 和 $\Var_{P_0}(D^{*,\mathrm{NIE}}(P_0))$，分别是 $\Psi^{\mathbf a,\mathbf a'}(P_0)$、$\Psi^{\mathrm{NDE}}(P_0)$ 和 $\Psi^{\mathrm{NIE}}(P_0)$ 的 RAL 估计量渐近方差的广义 Cramér--Rao 下界。满足 EIC 方程的估计量，也会继承相应的稳健性质。下一节将介绍四种估计量，其中两种具有稳健性和局部有效性。
+
+\noindent\textbf{关于有效影响曲线各分量估计的说明。}
+目标参数 (17.5) 及相应的 EIC (17.9)，都是用条件概率 $p_R$、$p_L$、$p_Z$、$p_A$ 表示的。在协变量或中介变量可能为高维的应用中，估计这些条件密度可能十分困难。为在这些情形下进行估计，首先，由迭代期望法则可知
+\begin{equation}
+\begin{aligned}
+ &\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})\\
+ &\quad=E_P\bigl[\bar Q_{R_{t+1}}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)
+ \mid\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1}\bigr],\\
+ &\bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\quad=E_P\bigl[\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})
+ \mid\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}\bigr],\\
+ &\bar Q_{R_t}^{\mathbf a,\mathbf a'}(\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1})\\
+ &\quad=E_P\bigl[\bar Q_{Z_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1})
+ \mid\mathbf R_{t-1},\mathbf Z_{t-1}.\mathbf L_{t-1}\bigr].
+\end{aligned}
+\tag{17.13}
+\end{equation}
+因此，可以用参数算法或数据自适应算法，将 $\bar Q_{R_{t+1}}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_t)$ 对协变量 $(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$ 回归，直接估计期望 $\bar Q_{L_t}^{\mathbf a,\mathbf a'}(\mathbf R_t,\mathbf Z_t,\mathbf L_{t-1})$，而不必估计 $L_t$ 的条件概率。$Z_t$ 和 $R_t$ 所对应的期望也类似。其次，定义
+\[
+ \gamma^{1,s,j}(A_s\mid\mathbf A_{s-1},\mathbf R_j,\mathbf Z_j,\mathbf L_{j-1})
+ \equiv p(A_s\mid\mathbf A_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1}),
+\]
+以及
+\[
+ \gamma^{2,s,j}(A_s\mid\mathbf A_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})
+ \equiv p(A_s\mid\mathbf A_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1}).
+\]
+于是，EIC 中的表达式可改写为
+\[
+\begin{aligned}
+ H_{L_t}^{\mathbf a,\mathbf a'}
+ &=\frac{I(\mathbf A_t\equiv\mathbf a_t)}
+ {\prod_{j\equiv1}^t p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^t\prod_{s=1}^j
+ \frac{\gamma^{1,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ {\gamma^{1,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ \frac{\gamma^{2,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1}}
+ {\gamma^{2,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})},\\
+ H_{R_t}^{\mathbf a,\mathbf a'}
+ &=\frac{I(\mathbf A_t\equiv\mathbf a_t)}
+ {\prod_{j\equiv1}^t p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^{t-1}\prod_{s=1}^j
+ \frac{\gamma^{1,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ {\gamma^{1,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ \frac{\gamma^{2,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1}}
+ {\gamma^{2,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})},
+\end{aligned}
+\]
+以及
+\[
+\begin{aligned}
+ H_{Z_t}^{\mathbf a,\mathbf a'}
+ &=\frac{I(\mathbf A_t\equiv\mathbf a'_t)}
+ {\prod_{j\equiv1}^t p_A(a'_j\mid\mathbf a'_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^{t-1}\prod_{s=1}^j
+ \frac{\gamma^{1,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}
+ {\gamma^{1,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j\mathbf Z_j,\mathbf L_{j-1})}\\
+ &\quad{}\times\prod_{j\equiv1}^{t}
+ \frac{p_A(a'_j\mid\mathbf a'_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}
+ {p_A(a_j\mid\mathbf a_{j-1},\mathbf R_{j-1},\mathbf Z_{j-1},\mathbf L_{j-1})}
+ \prod_{s=1}^j
+ \frac{\gamma^{2,s,j}(a_s\mid\mathbf a_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1}}
+ {\gamma^{2,s,j}(a'_s\mid\mathbf a'_{s-1},\mathbf R_j,\mathbf Z_{j-1},\mathbf L_{j-1})}.
+\end{aligned}
+\]
+注意，这些 $A_s$ 的条件概率与 $p_A$ 所编码的条件概率，以及可能的删失概率不同，因为 $\gamma$ 并不以 $A_s$ 的父节点为条件。不过，正如下一个引理将说明的，它们提供了获得稳健估计量的另一条途径，更适用于 $L_t$ 或 $Z_t$ 为高维的现实情形。记 $\gamma=(\gamma^{1,s,t},\gamma^{2,s,t}:1\leq t\leq\tau,s\leq t)$。基于这一表示，可以推广定理 17.1 的稳健性条件。
+
+\begin{bookresult}{推论}{2}
+令 $\gamma$ 如上定义。若以下任一条件成立，
+\begin{enumerate}[label=R\arabic*.,leftmargin=2.8em]
+ \item 式 (17.13) 所表示的嵌套回归 $\bar Q^{\mathbf a,\mathbf a'}$ 设定正确；
+ \item $p_A$、$\bar Q_{R_t}^{\mathbf a,\mathbf a'}$、$\bar Q_{L_t}^{\mathbf a,\mathbf a'}$，以及 $(p_L,p_R)$ 或 $\gamma$ 中的一者设定正确；
+ \item $p_A$、$\bar Q_{Z_t}^{\mathbf a,\mathbf a'}$，以及 $p_Z$ 或 $\gamma$ 中的一者设定正确，
+\end{enumerate}
+则 $E_{P_0}D^{*,\mathbf a,\mathbf a'}(P)=0$ 蕴含 $\Psi^{\mathbf a,\mathbf a'}(P)=\Psi^{\mathbf a,\mathbf a'}(P_0)$。
+\end{bookresult}

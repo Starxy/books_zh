@@ -1,0 +1,73 @@
+% 原书分章PDF第2—5页：章首导言、18.1及三个小节；Part V页由总审处理。
+\begingroup
+\chapter{在线超级学习}
+\chapterauthors{Mark J. van der Laan 和 David Benkeser}
+\chapteraffiliations{M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部与统计学系，101 Haviland Hall，\#7358，Berkeley，CA 94720；邮箱：\texttt{laan@berkeley.edu}。\\
+D. Benkeser：美国埃默里大学罗林斯公共卫生学院生物统计与生物信息学系，1518 Clifton Rd. NE，Atlanta，GA 30322；邮箱：\texttt{benkeser@emory.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_18}。}
+
+我们考虑如下情形：数据 $O^n=(O(1),\ldots,O(n))\sim P_0^n$ 按序生成；在时点 $t$，给定过去数据 $\bar O(t-1)=(O(1),\ldots,O(t-1))$ 的某些汇总量后，$O(t)$ 由条件概率分布 $P_{\theta,t}$ 生成，而这个随 $t$ 而异的条件概率分布 $P_{\theta,t}$ 由一个共同参数 $\theta\in\Theta$ 确定。例如，时点 $t$ 的实验从概率分布 $\bar P_0(\cdot\mid z)$ 生成新的观测 $O(t)$，这一分布由过去数据 $O(1),\ldots,O(t-1)$ 的固定维度汇总量 $Z$ 决定，并假定此条件分布 $\bar P_0$ 属于某个半参数模型。一个重要的特殊情形是，样本可视为从一个固定的数据生成分布独立同分布抽取的观测，且已知这一分布属于某个半参数统计模型，例如非参数模型：此时，$\bar P_0(\cdot\mid z)=\bar P_0(\cdot)$ 不依赖过去数据。另一个重要情形是，数据由分组序贯自适应设计生成，其中随机化机制和／或删失机制是先前抽样各组的观测数据汇总量的函数（van der Laan，2008b；Chambaz 和 van der Laan，2011a,b,c）。更一般地，这一设定涵盖了一大类时间序列模型。
+
+\begin{sourcebox}
+我们的目标是，对这一共同机制 $\theta$ 的某个特定无限维目标参数，例如条件密度或回归函数，构建一个在线估计量（online estimator）。在线估计量利用新到来的一批数据更新当前估计量，而不必重新访问过去的数据。因此，这类估计量可以扩展到大数据，并随时间快速更新。
+\end{sourcebox}
+
+对于参数模型和独立同分布观测，现有文献已经提供了这类在线估计量，它们建立在随机梯度下降算法的各种变体之上（例如 Bottou，2012；附录A.3简要回顾了这些方法）。不过，我们希望允许 $\bar P_0$ 属于较大的无限维模型，因此需要构建一个高度数据自适应的在线估计量。对于独立同分布数据，文献提供了基于交叉验证的超级学习器（super learner）。由预言不等式可知，这类估计量在渐近意义下，至少不逊于候选估计量组成的算法库中的最佳估计量（van der Laan 和 Dudoit，2003；van der Vaart 等，2006；van der Laan 等，2006，2007；Polley 等，2011）。正是由于这一集成学习器具有预言性质，我们将其称为超级学习器。本章把这种标准的交叉验证方法，推广为适用于上述相依时间序列数据的在线交叉验证选择器。
+
+\begin{sourcebox}
+本章将提出一类在线交叉验证选择器，从候选在线估计量组成的算法库中进行选择，例如从由不同参数模型所索引的参数在线估计量中进行选择。我们对得到的交叉验证选择器建立预言不等式，并表明，在给定条件下，这一不等式证明了交叉验证选择器与预言选择器渐近等价，因而具有渐近最优性。我们还将该交叉验证选择器推广到无限的候选估计量族，例如一组候选估计量的所有凸组合。我们把所得在线估计量称为在线超级学习器，因为它保证在渐近意义下至少不逊于这类候选在线估计量中的最佳者，同时它本身也是在线估计量。
+\end{sourcebox}
+
+这些在线估计量和在线超级学习器也可以用于大型独立同分布数据集：将数据集划分成许多小子集，再赋予这些子集一个顺序。不过，对于独立同分布数据，顺序的选择是随机的。因此，我们将在线交叉验证选择器及其预言不等式推广到对数据集不同排序取平均的情形，并提出 $V$ 种特定排序，使其性能可以与经典的 $V$ 折交叉验证选择器相比较。
+
+\section{估计问题的统计表述}
+
+本节首先表述时间序列数据的统计模型，以及我们希望为之构建在线超级学习器的目标参数。我们还将给出一个例子。
+
+\subsection{统计模型}
+
+假设我们在每个时点 $t$ 观察到随机变量 $O(t)$，$t=1,\ldots,n$。例如，$O(t)=(W(t),Y(t))$，其中 $W(t)$ 是基线协变量向量，$Y(t)$ 是在某个单位上测量的结局。我们不假定不同时点 $t$ 的随机变量 $O(t)$ 彼此独立。令 $P_0^n$ 为 $O(1),\ldots,O(n)$ 的真实概率分布，$p_0^n$ 为它相对于支配测度 $\mu^n$ 的密度。我们按时间顺序分解 $O(1),\ldots,O(n)$ 的密度，使得在 $t=1,\ldots,n$ 时，$O(t)$ 从给定 $O(1),\ldots,O(t-1)$ 后的条件分布抽取，并对这些条件分布作出如下条件独立假设：
+\begin{equation}
+ \text{给定 }Z(t)\text{ 后，}O(t)\text{ 与 }\bar O(t-1)\text{ 独立。}
+ \tag{18.1}
+\end{equation}
+这里，$Z(t)=f_t(\bar O(t-1))\in\RR^d$ 是从 $O(1),\ldots,O(t-1)$ 提取的一个指定的 $d$ 维量，且所有 $t=1,\ldots,n$ 的维度 $d$ 均相同。设 $\mathcal Z$ 和 $\mathcal O$ 为如下集合：对所有 $t$，均有 $P_0^n(O(t)\in\mathcal O,Z(t)\in\mathcal Z)=1$。
+
+设 $(t,\theta,z)\mapsto P_{\theta,t}(\cdot\mid z)$ 是一个指定的参数化，将 $(t,\theta,z)$ 映射为 $\mathcal O$ 上的条件概率分布。我们假定，对每个 $t=1,\ldots,n$，均有
+\begin{equation}
+ P_0^n(O(t)\in S\mid Z(t)=z)=P_{\theta_0,t}(S\mid z),
+ \qquad \text{其中 }\theta_0\in\Theta.
+ \tag{18.2}
+\end{equation}
+令 $p_{\theta,t}(\cdot\mid z)$ 表示 $P_{\theta,t}(\cdot\mid z)$ 相对于某个支配测度 $\mu$ 的条件密度。为方便记号，我们也用 $P_{\theta,t,z}$ 表示在某个特定 $z\in\mathcal Z$ 处的概率分布 $P_{\theta,t}(\cdot\mid z)$。设 $P_\theta^n$ 为 $\theta\in\Theta$ 所蕴含的 $O^n$ 的概率分布。由此，便定义了 $O^n$ 的概率分布 $P_0^n$ 的统计模型：
+\[
+ \mathcal M^n=\{P_\theta^n:\theta\in\Theta\}.
+\]
+
+\subsection{统计目标参数与损失函数}
+
+我们的统计目标参数 $\Psi^n:\mathcal M^n\to\bm{\Psi}$ 定义为 $\Psi^n(P_\theta^n)=\Psi(\theta)$，其中 $\Psi:\Theta\to\bm{\Psi}$，$\bm{\Psi}$ 为某个参数空间。
+
+设 $(Z,O,\psi)\mapsto L(\psi)(Z,O)$ 是 $\psi_0$ 的损失函数，使得对所有 $z\in\mathcal Z$ 和 $t$，均有
+\[
+ P_{\theta_0,t,z}L(\psi_0)
+ =\argmin_{\psi\in\bm{\Psi}}P_{\theta_0,t,z}L(\psi),
+\]
+其中使用了记号 $P_{\theta_0,t,z}L(\psi)=\int L(\psi)(z,o)\,dP_{\theta_0,t,z}(o)$。
+
+\subsection{回归例}
+
+本章可以以下例为背景。假设 $O(t)=(W(t),Y(t))$。设对每个 $t$，均有 $P_{o(t)}(\cdot\mid\bar O(t-1))=\bar P(\cdot\mid Z(t))$，其中 $\bar P\in\mathcal M$ 为某个共同的条件概率分布，$Z(t)$ 为汇总量。令 $\mathcal M$ 为非参数模型。这一模型意味着 $E_0(Y(t)\mid W(t),\bar O(t-1))=E_0(Y(t)\mid W(t),Z(t))$，且存在某个共同函数 $\psi_0$，使得 $E_0(Y(t)\mid W(t)=w,Z(t)=z)=\psi_0(w,z)$。令 $\bar P_{0,y\mid w,z}$ 表示在 $\bar P_0$ 下，给定 $W=w,Z=z$ 时 $Y$ 的条件分布；$\bar P_{0,z}(\cdot)=\bar P_0(\cdot\mid z)$ 表示给定 $Z=z$ 时 $(W,Y)$ 的条件概率分布。假设目标参数为 $\psi_0$。一种可行的损失函数是平方误差损失：
+\[
+ L(\psi)(Z,W,Y)=(Y-\psi(Z,W))^2.
+\]
+对于给定的 $w,z$，
+\[
+ E_0\bigl((Y(t)-\psi(Z(t),W(t)))^2\mid W(t)=w,Z(t)=z\bigr)
+ =\bar P_{0,y\mid w,z}L(\psi)
+\]
+在 $\psi_0(z,w)$ 处取到最小值。特别地，这意味着，对所有 $z\in\mathcal Z$，$\bar P_{0,z}L(\psi)$ 均在 $\psi_0$ 处最小。另一种选择是：若 $Y$ 为二元变量，则可以采用对数似然损失：
+\[
+ L(\psi)(Z,W,Y)
+ =-\bigl[Y\log\psi(Z,W)+(1-Y)\log(1-\psi(Z,W))\bigr].
+\]

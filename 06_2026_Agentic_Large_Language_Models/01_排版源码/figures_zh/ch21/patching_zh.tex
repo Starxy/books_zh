@@ -1,0 +1,42 @@
+\begin{tikzpicture}[
+    node distance=1.2cm and 2.5cm,
+    layer/.style={rectangle, draw, fill=gray!10, minimum width=2.5cm, minimum height=0.7cm, font=\small\sffamily, rounded corners=2pt},
+    stream/.style={-{Stealth}, line width=1.5pt},
+    clean_color/.style={color=green!60!black},
+    corr_color/.style={color=red!60!black},
+    patch_color/.style={color=blue!70, dashed, line width=2pt},
+    box/.style={rectangle, draw, font=\footnotesize\sffamily, inner sep=4pt, rounded corners=1pt, fill=white}
+]
+
+    \node (in_clean) at (0,0) [font=\small\sffamily\bfseries, clean_color] {干净输入 ($x_{clean}$)};
+    \node (l1_clean) [layer, above=of in_clean] {第 1 层};
+    \node (l2_clean) [layer, above=of l1_clean, draw=green!60!black, fill=green!5, thick] {组件 $z_{i, \ell}$};
+    \node (l3_clean) [layer, above=of l2_clean] {第 3 层};
+    \node (out_clean) [above=of l3_clean, clean_color, font=\small\sffamily\bfseries] {正确输出};
+
+    \draw [stream, clean_color] (in_clean) -- (l1_clean);
+    \draw [stream, clean_color] (l1_clean) -- (l2_clean);
+    \draw [stream, clean_color] (l2_clean) -- (l3_clean);
+    \draw [stream, clean_color] (l3_clean) -- (out_clean);
+
+    \node (in_corr) at (5,0) [font=\small\sffamily\bfseries, corr_color] {扰乱输入 ($x_{corr}$)};
+    \node (l1_corr) [layer, above=of in_corr] {第 1 层};
+    \node (l2_corr) [layer, above=of l1_corr, dashed, draw=red!60!black] {已消融／含噪声};
+    \node (l3_corr) [layer, above=of l2_corr] {第 3 层};
+    \node (out_corr) [above=of l3_corr, blue!70!black, font=\small\sffamily\bfseries] {输出恢复？};
+
+    \draw [stream, corr_color] (in_corr) -- (l1_corr);
+    \draw [stream, corr_color] (l1_corr) -- (l2_corr);
+    \draw [stream, corr_color] (l2_corr) -- (l3_corr);
+    \draw [stream, corr_color] (l3_corr) -- (out_corr);
+
+    \draw [patch_color, -{Stealth[scale=1.5]}] (l2_clean.east) to[bend left=20]
+        node[midway, above, font=\footnotesize\sffamily\bfseries, color=blue!70] {修补激活}
+        (l2_corr.west);
+
+    \node [below left=0.1cm and 0.1cm of l2_clean, font=\footnotesize\sffamily, color=green!60!black] {信息来源};
+    \node [below right=0.1cm and 0.1cm of l2_corr, font=\footnotesize\sffamily, color=red!60!black] {干预目标};
+
+    \node at (2.5, 6) [box, align=center, draw=blue!70] {测量目标概率\\的变化};
+
+\end{tikzpicture}

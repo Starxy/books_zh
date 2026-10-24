@@ -1,0 +1,132 @@
+% 原章第68页6.6.4起至第70页末，式6.232—6.241及结论6.3。
+\subsection{稀疏 SEM 与交替方向乘子法}
+
+一般而言，网络是稀疏的。为得到矩阵 $\Gamma,B$ 的稀疏估计，自然的方法是对式 (6.226) 作 $l_1$ 范数惩罚回归。令 $W_i(t)=Z_i(t)$、$\Delta_i=\delta_i$，且
+\[
+Z_i(t)=[\Upsilon_{-i}(t)\quad X],\quad X(0)=[x_1,\ldots,x_K],\quad x_i=[x_{1i},\ldots,x_{ni}]^T,
+\]
+\[
+X=[X(0)\quad X(1)\quad\cdots\quad X(p)],\qquad
+X^Ty_i(t)=X^TW_i(t)\Delta_i+X^Te_i(t).
+\]
+采用加权最小二乘与 $l_1$ 范数惩罚，建立以下优化问题：
+\begin{equation}
+\begin{aligned}
+&\min_{\Delta_i}f(\Delta_i)+\lambda\lVert\Delta_i\rVert_1,\\
+&\text{其中 }f(\Delta_i)=\sum_{t=p+1}^T\Bigl[(X^Ty_i(t)-X^TW_i(t)\Delta_i)^T(X^TX)^{-1}\\
+&\hspace{11em}(X^Ty_i(t)-X^TW_i(t)\Delta_i)\Bigr].
+\end{aligned}\tag{6.232}
+\end{equation}
+优化问题 (6.232) 可进一步化为
+\begin{equation}
+\begin{aligned}
+\min\quad&f(\Delta_i)+\lambda\lVert Z_i\rVert_1\\
+\text{约束为}\quad&\Delta_i-Z_i=0,
+\end{aligned}\tag{6.233}
+\end{equation}
+其中
+\[
+\begin{aligned}
+f(\Delta_i)=\sum_{t=p+1}^T\Bigl[&(X^Ty_i(t)-X^TW_i(t)\Delta_i)^T(X^TX)^{-1}\\
+&(X^Ty_i(t)-X^TW_i(t)\Delta_i)\Bigr].
+\end{aligned}
+\]
+为求解优化问题 (6.233)，构造增广拉格朗日函数
+\begin{equation}
+L_\rho(\Delta_i,Z_i,\mu)=f(\Delta_i)+\lambda\lVert Z_i\rVert_1+\mu^T(\Delta_i-Z_i)+\frac\rho2\lVert\Delta_i-Z_i\rVert_2^2.
+\tag{6.234}
+\end{equation}
+交替方向乘子法（ADMM）由以下迭代组成：
+\begin{equation}
+\Delta_i^{(k+1)}:==\arg\min_{\Delta_i}L_\rho(\Delta_i,Z_i^{(k)},\mu^{(k)}),
+\tag{6.235}
+\end{equation}
+\begin{equation}
+Z_i^{(k+1)}:==\arg\min_{Z_i}L_\rho(\Delta_i^{(k+1),},Z_i,\mu^{(k)}),
+\tag{6.236}
+\end{equation}
+\begin{equation}
+\mu^{(k+1)}:==\mu^{(k+1)}+\rho(\Delta_i^{(k+1)}-Z_i^{(k+1)}),
+\tag{6.237}
+\end{equation}
+其中，$\rho>0$。令 $u=\mu/\rho$，式 (6.235)—(6.237) 可化为
+\begin{equation}
+\Delta_i^{(k+1)}:==\arg\min_{\Delta_i}\left(f(\Delta_i)+\frac\rho2\lVert\Delta_i-Z_i^{(k)}+u^{(k)}\rVert_2^2\right),
+\tag{6.238}
+\end{equation}
+\begin{equation}
+Z_i^{(k+1)}:==\arg\min_{Z_i}\left(\lambda\lVert Z_i\rVert_1+\frac\rho2\lVert\Delta_i^{(k+1)}-Z_i+u^{(k)}\rVert_2^2\right),
+\tag{6.239}
+\end{equation}
+\begin{equation}
+u^{(k+)}:==u^{(k)}+(\Delta_i^{(k+1)}-Z_i^{(k+1)}).
+\tag{6.240}
+\end{equation}
+求解极小化问题 (6.238)，得到
+\[
+\begin{aligned}
+\Delta_i^{(k+1)}=&\left\{\left[\sum_{t=p+1}^TW_i^T(t)X(X^TX)^{-1}X^TW(t)\right]+\rho I\right\}^{-1}\\
+&\qquad\left\{\left[\sum_{t=p+1}^TW_i^T(t)X(X^TX)^{-1}X^Ty_i(t)\right]+\rho(Z_i^k-u^k)\right\}.
+\end{aligned}
+\]
+优化问题 (6.239) 不可微。虽然其第一项不可微，仍可利用次微分运算，得到问题 (6.239) 的简单闭式解。令 $\Gamma_j$ 为向量 $Z_i$ 的第 $j$ 个分量 $Z_i^j$ 的广义导数，$\Gamma=[\Gamma_1,\ldots,\Gamma_{M+K-1}]^T$，其中
+\[
+\Gamma_j=\begin{cases}1,&Z_i^j>0,\\{}[-1,1],&Z_i^j=0,\\-1,&Z_i^j<0.\end{cases}
+\]
+于是有
+\[
+\frac\lambda\rho\Gamma+Z_i=\Delta_i^{k+1}+u^k,
+\]
+进而得到
+\begin{equation}
+Z_i^{(k+1)}=\operatorname{sgn}(\Delta_i^{k+1}+u^k)\left(|\Delta_i^{k+1}+u^k|-\frac\lambda\rho\right)_+,
+\tag{6.241}
+\end{equation}
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+算法归纳为结论 6.3。
+
+\Needspace{5\baselineskip}
+\noindent\textbf{结论 6.3\quad 学习稀疏 fMRI 的算法}
+
+对于 $i=1,\ldots,M$：
+
+\noindent\textbf{步骤 1：初始化。}
+\[
+\begin{aligned}
+u^0&:=0,\\
+\Delta_i^0&:=\left[\sum_{t=p+1}^TW_i^T(t)X(X^TX)^{-1}X^TW_i(t)\right]^{-1}\\
+&\qquad\sum_{t=p+1}^TW_i^T(t)X(X^TX)^{-1}X^Ty_i(t),\\
+Z_i^0&:=\Delta_i^0.
+\end{aligned}
+\]
+执行步骤 2、3、4，直至收敛。
+
+\noindent\textbf{步骤 2：}
+\[
+\begin{aligned}
+\Delta_i^{(k+1)}=&\left\{\left[\sum_{t=p+1}^TW_i^T(t)X(X^TX)^{-1}X^TW(t)\right]+\rho I\right\}^{-1}\\
+&\qquad\left\{\left[\sum_{t=p+1}^TW_i^T(t)X(X^TX)^{-1}X^Ty_i(t)\right]+\rho(Z_i^k-u^k)\right\}.
+\end{aligned}
+\]
+\noindent\textbf{步骤 3：}
+\[
+Z_i^{(k+1)}:=\operatorname{sgn}(\Delta_i^{k+1}+u^k)\left(|\Delta_i^{k+1}+u^k|-\frac\lambda\rho\right)_+,
+\]
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+\noindent\textbf{步骤 4：}
+\[
+u^{(k+)}:==u^{(k)}+(\Delta_i^{(k+1)}-Z_i^{(k+1)}).
+\]
+检查收敛性：若 $\lVert\Delta_i^{(k+1)}-\Delta_i^{(k)}\rVert>\varepsilon$，则
+\[
+\Delta_i^{(k)}\leftarrow\Delta_i^{(k+1)},\quad
+Z_i^{(k+1)}\leftarrow Z_i^{(k)},\quad
+u^{(k+1)}\leftarrow u^{(k)},\quad k\leftarrow k+1,
+\]
+返回步骤 2；否则停止。

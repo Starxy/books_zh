@@ -1,0 +1,51 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.35cm}
+\def\bsep{2.0cm}
+
+\tikzstyle{tnode} = [minimum width=2.6cm,minimum height=1.5cm,inner sep=2pt,draw];
+
+\begin{scope}
+
+\begin{pgfonlayer}{background}
+\node [anchor=west,minimum width=3.5cm,minimum height=5cm,fill=blue!20] (trainingbox) at (0,0) {};
+\node [anchor=west,minimum width=10.5cm,minimum height=5cm,fill=orange!20] (alignmentbox) at (trainingbox.east) {};
+\end{pgfonlayer}
+
+\node [anchor=center,tnode,draw,thick] (pretraining) at ([yshift=-0.4cm]trainingbox.center) {Pre-training};
+\node [anchor=west,tnode,draw,thick] (sft) at ([xshift=1.0cm]pretraining.east) {};
+\node [anchor=west,tnode,draw,thick] (rlhf) at ([xshift=0.8cm]sft.east) {};
+\node [anchor=west,tnode,draw,thick] (prompting) at ([xshift=0.8cm]rlhf.east) {Prompting};
+
+\node [anchor=north west] (sft1) at ([yshift=-0.1cm]sft.north west) {\footnotesize{Instruction}};
+\node [anchor=north west] (sft2) at ([yshift=0.1cm]sft1.south west) {\footnotesize{Alignment}};
+\node [anchor=north west] (sft3) at ([yshift=0.1cm]sft2.south west) {\footnotesize{(e.g., SFT)}};
+
+\node [anchor=north west] (rlhf1) at ([yshift=-0.1cm]rlhf.north west) {\footnotesize{Human Preference}};
+\node [anchor=north west] (rlhf2) at ([yshift=0.1cm]rlhf1.south west) {\footnotesize{Alignment}};
+\node [anchor=north west] (rlhf3) at ([yshift=0.1cm]rlhf2.south west) {\footnotesize{(e.g., RLHF)}};
+
+\draw [->,thick] ([xshift=0.1cm]pretraining.east) -- ([xshift=-0.1cm]sft.west);
+\draw [->,thick] ([xshift=0.1cm]sft.east) -- ([xshift=-0.1cm]rlhf.west);
+\draw [->,thick] ([xshift=0.1cm]rlhf.east) -- ([xshift=-0.1cm]prompting.west);
+
+\node [anchor=north] (pretrainingcaption) at ([yshift=-0.2cm]trainingbox.north) {{\color{blue} \textbf{Pre-training}}};
+\node [anchor=north] (pretrainingcaption2) at ([yshift=0.1cm]pretrainingcaption.south) {{\color{blue} \textbf{Stage}}};
+
+\node [anchor=north] (alignmentcaption) at ([yshift=-0.2cm]alignmentbox.north) {{\color{orange} \textbf{Alignment}}};
+\node [anchor=north] (alignmentcaption2) at ([yshift=0.1cm]alignmentcaption.south) {{\color{orange} \textbf{Stage}}};
+
+\draw [-,dotted,thick] ([xshift=0.4cm,yshift=0.3cm]rlhf.north east) -- ([xshift=0.4cm,yshift=-0.3cm]rlhf.south east);
+
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([xshift=0.3cm,yshift=-0.5cm]rlhf.south east) --  ([xshift=-0.1cm,yshift=-0.5cm]pretraining.south west) node [pos=0.5,below,yshift=-0.2cm] {\small{Training \& Fine-tuning}};
+
+\draw [decoration={brace,amplitude=4pt},decorate,thick] ([xshift=0.1cm,yshift=-0.5cm]prompting.south east) -- ([xshift=0.5cm,yshift=-0.5cm]rlhf.south east)  node [pos=0.5,below,yshift=-0.2cm] {\small{Inference}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

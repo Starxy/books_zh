@@ -1,0 +1,389 @@
+% 原章第11页5.3.2.3起至第19页；RKHS、算子与HSIC。
+\subsubsection{独立性检验}
+
+为检验甲基化数据是否满足加性噪声模型，需要将数据分为训练集与测试集。利用训练数据 $D_N$，将二元性状 $Y$ 对甲基化水平 $X$ 回归，估计回归函数 $f_Y$。再利用测试集 $D_t$，估计残差 $\varepsilon=Y-\widehat f_Y(X)$。最后检验残差 $\varepsilon$ 与潜在原因 $X$ 相互独立的零假设。如果不能拒绝独立性，则数据满足加性噪声模型 $X\to Y$。
+
+检验两个随机变量独立性的方法，包括基于核的非参数独立性检验（Zhang et al. 2017）、基于熵评分的方法（Kpotufe et al. 2014）、基于 Bayes 评分的方法（Friedman and Nachman 2000），以及最小消息长度评分检验（Mooij and Janzing 2010）。广泛使用的是基于核的非参数方法。这类方法利用概率测度在再生核希尔伯特空间（reproducing kernel Hilbert space，RKHS）中的表示，为非参数独立性检验提供一般数学框架。其中一个重要度量，是 Hilbert–Schmidt 独立性准则（Hilbert–Schmidt independence criterion，HSIC），它利用概率分布在 RKHS 中嵌入之间的距离（Gretton et al. 2005，2015）。下面先简要介绍 RKHS 嵌入的关键概念。
+
+\bookdeepheading{paragraph}{5.3.2.3.1}{RKHS 嵌入与 HSIC}
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.1}
+\textbf{再生核希尔伯特空间（RKHS）}
+
+设 $\mathcal X$ 为非空集合。定义在 $\mathcal X$ 上、由函数 $f:\mathcal X\to\mathbb R$ 构成的 希尔伯特空间 $\mathcal H$，若对所有 $x\in\mathcal X$，求值泛函 $\delta_x:f\mapsto f(x)$ 都连续，则称 $\mathcal H$ 为再生核希尔伯特空间。
+\end{bookdefinition}
+
+一般而言，高维特征空间具有复杂得多的结构。我们常将低维空间中的数据映射到高维特征空间，以揭示低维数据中的模式。考虑将二维数据映射到三维特征空间的特征映射：
+\[
+\phi(x)=\begin{bmatrix}x_1\\x_2\\x_1x_2\end{bmatrix},
+\]
+以及两组数据：
+\[
+A=\begin{bmatrix}-1&-2&1&2\\-1&-2&1&2\end{bmatrix},\qquad
+B=\begin{bmatrix}-1&-2&1&2\\1&2&-1&-2\end{bmatrix}.
+\]
+将 A 组和 B 组的点映射为
+\[
+\phi(A)=\begin{bmatrix}-1&-2&1&2\\-1&-2&1&2\\1&4&1&4\end{bmatrix},\qquad
+\phi(B)=\begin{bmatrix}-1&-2&1&2\\1&2&-1&-2\\-1&-4&-1&-4\end{bmatrix}.
+\]
+在线性分类器下，无法将 A 组的模式（蓝色）与 B 组的模式（红色）分开（图 5.3）。但在三维特征空间中，我们很容易将它们分开。现在给出核的定义（Gretton 2015）。
+
+\input{figures/ch05_figure3}
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.2}
+\textbf{核}
+
+设 $\mathcal X$ 为非空集合。若存在一个 希尔伯特空间及特征映射 $\phi:\mathcal X\to\mathcal H$，使得对所有 $x,x'\in\mathcal X$，都有
+\begin{equation}
+k(x,y)=\langle\phi(x),\phi(y)\rangle_H,
+\tag{5.19}
+\end{equation}
+则称函数 $k:\mathcal X\times\mathcal X\to\mathbb R$ 为核。
+\end{bookdefinition}
+
+核的简单例子包括
+\[
+k(\cdot,x)=\phi(x)=\begin{bmatrix}x\\x^2\end{bmatrix},\qquad
+k(x,y)=xy+x^2y^2,
+\]
+以及
+\[
+k(\cdot,x)=\phi(x)=\begin{bmatrix}x_1\\x_2\\x_1x_2\end{bmatrix},\qquad
+k(x,y)=x_1y_1+x_2y_2+x_1x_2y_1y_2.
+\]
+三种常用核为：
+\begin{enumerate}
+\item 线性核：$k(x,y)=x^Ty$；
+\item 多项式核：$k(x,y)=(x^Ty+1)^d$；
+\item 带宽为 $\sigma>0$ 的高斯核：$k(x,y)=e^{\frac{\lVert x-y\rVert}{2\sigma^2}}$。
+\end{enumerate}
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.3}
+\textbf{RKHS}
+
+设 $H$ 为定义在 $\chi$ 上的实值函数所构成的 希尔伯特空间。若函数 $k:\chi\times\chi\to\mathbb R$ 满足以下两个条件：
+\begin{enumerate}
+\item
+\begin{equation}
+\forall x\in\chi,\quad k(\cdot,x)\in H;
+\tag{5.20}
+\end{equation}
+\item $\forall x\in\chi,\ \forall f\in H,\ \langle f,k(\cdot,x)\rangle_H=f(x)$，
+\end{enumerate}
+则称 $k$ 为 $H$ 的再生核，称 $H$ 为再生核希尔伯特空间。
+\end{bookdefinition}
+
+例如，考虑函数 $f(x)=ax+bx^2+cx^3$。定义
+\[
+k(\cdot,x)=\begin{bmatrix}x\\x^2\\x^3\end{bmatrix},\qquad
+f(\cdot)=\begin{bmatrix}a\\b\\c\end{bmatrix}.
+\]
+于是，有
+\[
+f(x)=\langle f(\cdot),k(\cdot,x)\rangle
+=\begin{bmatrix}a\\b\\c\end{bmatrix}^{\!T}
+\begin{bmatrix}x\\x^2\\x^3\end{bmatrix}.
+\]
+考虑函数 $k(x,y)$，令 $f(\cdot)=k(\cdot,y)$，$k(\cdot,x)$ 为再生核。由式 (5.20) 可得
+\begin{equation}
+\langle k(\cdot,y),k(\cdot,x)\rangle_H=k(x,y).
+\tag{5.21}
+\end{equation}
+
+众所周知，内积是相似性的一种度量。式 (5.21) 通过核给出了点之间的相似性度量。表示拓扑空间中点的一种传统方法，是通过特征映射 $\Phi(x)$ 将其嵌入特征空间 $\mathbb R^m$：
+\[
+\Phi(x)=[\phi_1(x)\ \cdots\ \phi_m(x)]^T.
+\]
+核函数将特征映射从有限维空间扩展到无限维空间。特别地，考虑一组分布，可以将每个分布嵌入为 RKHS 中的一个点，以此表示该分布。由式 (5.20)，有
+\begin{equation}
+\begin{aligned}
+E_p[f(x)]
+&=E_P[\langle f(\cdot),k(\cdot,x)\rangle_H]\\
+&=\langle f(\cdot),E_p[k(\cdot,x)]\rangle_H
+=\langle f(\cdot),\mu_p\rangle_H,
+\end{aligned}
+\tag{5.22}
+\end{equation}
+由此得到如下均值嵌入的定义（Gretton 2015）。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.4}
+\textbf{均值嵌入}
+
+设 $P$ 为一个分布，$k$ 为 RKHS $H$ 中的核。概率分布 $P$ 的均值嵌入（mean embedding）定义为 $E_P[k(\cdot,x)]\in H$，使得
+\begin{equation}
+E_p[f(x)]=\langle f(\cdot),E_p[k(\cdot,x)]\rangle_H.
+\tag{5.23}
+\end{equation}
+\end{bookdefinition}
+
+均值嵌入提供了一种度量两个概率分布间距离的工具。利用均值嵌入，可以定义最大均值差异（Zhang et al. 2017）。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.5}
+\textbf{最大均值差异（MMD）}
+
+假定 $k$ 为定义在 $\chi$ 上的核，$P$ 和 $Q$ 为两个概率分布。关于核 $k$，分布 $P$ 与 $Q$ 的最大均值差异（maximum mean discrepancy，MMD），定义为两个分布在 RKHS 中均值嵌入之间的平方距离：
+\begin{equation}
+\mathrm{MMD}_k(P,Q)=\lVert E_P[k(\cdot,x)]-E_Q[k(\cdot,x)]\rVert_{H_k}^2.
+\tag{5.24}
+\end{equation}
+\end{bookdefinition}
+
+MMD 的估计量可用于构造非参数两样本检验统计量（Zhang et al. 2017；Gretton et al. 2012，2015）。在将均值嵌入扩展为联合嵌入之前，先简要介绍张量积的概念。张量积（tensor product）也称 Kronecker 积或直积，旨在由两个较小的向量空间构造一个较大的向量空间。
+
+首先介绍两个向量的张量积。考虑 $n$ 维向量 $X=[x_1,\ldots,x_n]^T$ 和 $m$ 维向量 $Y=[y_1,\ldots,y_m]^T$。$X$ 与 $Y$ 的张量积定义为
+\[
+X\otimes Y=XY^T=\begin{bmatrix}
+x_1y_1&\cdots&x_1y_m\\
+\vdots&\vdots&\vdots\\
+x_ny_1&\cdots&x_ny_m
+\end{bmatrix}.
+\]
+接下来考虑两个矩阵 $A$ 和 $B$ 的张量积。令
+\[
+A=\begin{bmatrix}a_{11}&\cdots&a_{1m}\\\vdots&\vdots&\vdots\\a_{n1}&\cdots&a_{nm}\end{bmatrix},\qquad
+B=\begin{bmatrix}b_{11}&\cdots&b_{1l}\\\vdots&\vdots&\vdots\\b_{k1}&\cdots&b_{kl}\end{bmatrix}.
+\]
+矩阵 $A$ 与矩阵 $B$ 的张量积定义为
+\[
+A\otimes B=\begin{bmatrix}a_{11}B&\cdots&a_{1m}B\\\vdots&\vdots&\vdots\\a_{n1}B&\cdots&a_{nm}B\end{bmatrix}
+\]
+\[
+\begingroup\setlength{\arraycolsep}{3pt}
+=\begin{bmatrix}
+a_{11}b_{11}&\cdots&a_{11}b_{1l}&\cdots\cdots\cdots&a_{1m}b_{11}&\cdots&a_{1m}b_{1l}\\
+\vdots&\vdots&\vdots&\vdots\ \vdots\ \vdots&\vdots&\vdots&\vdots\\
+a_{11}b_{k1}&\cdots&a_{11}b_{kl}&\cdots\cdots\cdots&a_{1m}b_{k1}&\cdots&a_{1m}b_{kl}\\
+\vdots&&&\vdots&&&\vdots\\
+a_{n1}b_{11}&\cdots&a_{n1}b_{1l}&\cdots\cdots\cdots&a_{nm}b_{11}&\cdots&a_{nm}b_{1l}\\
+\vdots&\vdots&\vdots&\vdots\ \vdots\ \vdots&\vdots&\vdots&\vdots\\
+a_{n1}&\cdots&a_{n1}b_{kl}&\cdots\cdots\cdots&a_{nm}b_{k1}&\cdots&a_{nm}b_{kl}
+\end{bmatrix}.
+\endgroup
+\]
+
+下面定义秩一算子（rank-one operator）（Gretton 2015）。设 $a\in G$，$b\in F$，从 $G$ 到 $F$ 的秩一算子定义为
+\begin{equation}
+(b\otimes a)f=\langle a,f\rangle_Fb,
+\tag{5.25}
+\end{equation}
+其中，$f\in F$。
+
+若 $a$、$b$ 与 $f$ 为向量，则有
+\[
+(b\otimes a)f=ba^Tf=\langle a,f\rangle b.
+\]
+现在定义算子的 Hilbert–Schmidt 范数。假定 $F$ 和 $H$ 为两个可分希尔伯特空间，$e_i$（$i\in I$）为 $F$ 的正交归一基，$v_j$（$j\in J$）为 $H$ 的正交归一基。指标集 $I$、$J$ 可以是有限集，也可以是可数无限集。设 $A$ 为 希尔伯特空间 $H$ 上的算子。显然，$Av_j$ 位于 希尔伯特空间 $F$ 中，其范数为 $\lVert Av_j\rVert_F$。空间 $F$ 中的元素 $Av_j$ 还可以按正交归一基 $e_i$ 展开：
+\begin{equation}
+Av_j=\sum_{i\in I}\langle Av_j,e_i\rangle e_i.
+\tag{5.26}
+\end{equation}
+现在定义算子的 Hilbert–Schmidt 范数（Gretton et al. 2015）。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.6}
+\textbf{算子的 Hilbert–Schmidt 范数与两个算子的 Hilbert–Schmidt 内积}
+
+算子 $A$ 的 Hilbert–Schmidt 范数定义为
+\begin{equation}
+\begin{aligned}
+\lVert A\rVert_{\mathrm{HS}}^2
+&=\sum_{j\in I}\lVert Av_j\rVert_f^2\\
+&=\sum_{i\in I}\sum_{j\in J}|\langle Av_j,e_i\rangle_F|^2.
+\end{aligned}
+\tag{5.27}
+\end{equation}
+若算子 $A$ 的 Hilbert–Schmidt 范数有限，则称 $A$ 为 Hilbert–Schmidt 算子。两个 Hilbert–Schmidt 算子 $A$ 与 $B$ 的 Hilbert–Schmidt 内积定义为
+\begin{equation}
+\langle A,B\rangle_{\mathrm{HS}}=\sum_{j\in J}\langle Av_j,Bv_j\rangle_F.
+\tag{5.28}
+\end{equation}
+\end{bookdefinition}
+
+可以证明（习题 3），
+\begin{equation}
+\langle A,B\rangle_{\mathrm{HS}}
+=\sum_{i\in I}\sum_{j\in J}\langle Av_j,e_i\rangle_F\langle Bv_j,e_i\rangle_F.
+\tag{5.29}
+\end{equation}
+接下来计算秩一算子或张量积的 Hilbert–Schmidt 范数。利用式 (5.25) 与式 (5.27)，得到
+\begin{equation}
+\begin{aligned}
+\lVert a\otimes b\rVert_{\mathrm{HS}}^2
+&=\sum_j\lVert(a\otimes b)v_j\rVert_F^2\\
+&=\sum_j\lVert\langle b,v_j\rangle_Fa\rVert_F^2\\
+&=\sum_j(\langle b,v_j\rangle_F)^2\lVert a\rVert_F^2\\
+&=\lVert a\rVert_F^2\sum_j(\langle b,v_j\rangle_F)^2\\
+&=\lVert a\rVert_F^2\lVert b\rVert_F^2.
+\end{aligned}
+\tag{5.30}
+\end{equation}
+因此，得到结论 5.2（Gretton 2015）。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.2：秩一算子的 Hilbert–Schmidt 范数}\par
+秩一算子是 Hilbert–Schmidt 算子，其 Hilbert–Schmidt 范数为
+\begin{equation}
+\lVert a\otimes b\rVert_{\mathrm{HS}}^2=\lVert a\rVert_F^2\lVert b\rVert_F^2.
+\tag{5.31}
+\end{equation}
+
+下面介绍两个秩一算子的 Hilbert–Schmidt 内积。利用式 (5.28)，得到
+\begin{equation}
+\begin{aligned}
+\langle L,a\otimes b\rangle_{\mathrm{HS}}
+&=\sum_j\langle Lv_j,(a\otimes b)v_j\rangle_F\\
+&=\sum_j\langle Lv,\langle b,v_j\rangle_Fa\rangle_F\\
+&=\sum_j\langle L(\langle b,v_j\rangle_Fv_j,a\rangle_F\\
+&=\left\langle L\sum_j\langle b,v_j\rangle_Fv_j,a\right\rangle_F\\
+&=\langle Lb,a\rangle_F.
+\end{aligned}
+\tag{5.32}
+\end{equation}
+将 $L=c\otimes d$ 代入式 (5.32)，得到
+\begin{equation}
+\begin{aligned}
+\langle c\otimes d,a\otimes b\rangle_{\mathrm{HS}}
+&=\langle(c\otimes d)b,a\rangle_F\\
+&=\langle\langle d,b\rangle_Fc,a\rangle_F\\
+&=\langle c,a\rangle_F\langle d,b\rangle_F.
+\end{aligned}
+\tag{5.33}
+\end{equation}
+这样就证明了结论 5.3（Gretton 2015）。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.3：秩一算子的 Hilbert–Schmidt 内积}\par
+设 $L\in\mathrm{HS}(,G,F)$ 为另一个 Hilbert–Schmidt 算子，则 $L$ 与 $a\otimes b$ 的 Hilbert–Schmidt 内积为
+\begin{equation}
+\langle L,a\otimes b\rangle_{\mathrm{HS}}=\langle Lb,a\rangle_F,
+\tag{5.34}
+\end{equation}
+并且
+\begin{equation}
+\langle c\otimes d,a\otimes b\rangle_{\mathrm{HS}}=\langle c,a\rangle_F\langle d,b\rangle_F.
+\tag{5.35}
+\end{equation}
+
+现在介绍联合分布的嵌入。考虑具有联合分布 $P(x,y)$ 的两个随机变量 $X$ 和 $Y$。令 $X\times Y$ 为 $X$ 和 $Y$ 的乘积定义域，定义特征映射
+\[
+\Phi(x\otimes y)=\Phi(x)\otimes\Phi(y).
+\]
+令 $\Phi(x)=k(\cdot,x)$，$\Phi(y)=k(\cdot,y)$，则有
+\begin{equation}
+\Phi(x\otimes y)=k(\cdot,x)\otimes k(\cdot,y).
+\tag{5.36}
+\end{equation}
+利用式 (5.35)，得到
+\begin{equation}
+\begin{aligned}
+k&=k((x,y),(x',y'))\\
+&=\lVert k(\cdot,x)\otimes k(\cdot,y)\rVert_{\mathrm{HS}}^2\\
+&=\langle k(\cdot,x)\otimes k(\cdot,y),k(\cdot,x)\otimes k(\cdot,y)\rangle_{\mathrm{HS}}\\
+&=k(x,x')k(y,y').
+\end{aligned}
+\tag{5.37}
+\end{equation}
+因此，$k=k(\cdot,x)\otimes k(\cdot,y)$ 是乘积定义域 $X\times Y$ 上的一个有效核。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.7}
+\textbf{联合概率分布的嵌入}
+
+联合分布 $P$ 的嵌入定义为
+\begin{equation}
+P\mapsto C_{XY}(P):=E_P[k(\cdot,x)\otimes k(\cdot,y)].
+\tag{5.38}
+\end{equation}
+\end{bookdefinition}
+
+与表示期望算子的均值嵌入类似，对于任意两个函数 $f,g\in H$，联合嵌入 $C_{XY}$ 可以视为未中心化的互协方差算子（Gretton 2015）。事实上，非线性函数乘积 $f(X)g(Y)$ 的期望可以化为
+\begin{equation}
+E_P[f(X)g(Y)]
+=E_P[\langle f(\cdot),k(\cdot,x)\rangle_H\langle g(\cdot),k(\cdot,y)\rangle_H].
+\tag{5.39}
+\end{equation}
+利用式 (5.33)，得到
+\begin{equation}
+\begin{aligned}
+&E_p[\langle f(),k(\cdot,x)\rangle_H\langle g(),k(\cdot,y)\rangle_H]\\
+&\qquad=E_P[\langle f\otimes g,k(\cdot,x)\otimes k(\cdot,y)\rangle_{\mathrm{HS}}]\\
+&\qquad=\langle f\otimes g,E_P[k(\cdot,x)\otimes k(\cdot,y)]\rangle_{\mathrm{HS}}\\
+&\qquad=\langle f\otimes g,C_{XY}\rangle_{\mathrm{HS}}.
+\end{aligned}
+\tag{5.40}
+\end{equation}
+由式 (5.32)，可得
+\begin{equation}
+\langle f\otimes g,C_{XY}\rangle_{\mathrm{HS}}=\langle f,C_{XY}g\rangle_H.
+\tag{5.41}
+\end{equation}
+将式 (5.40) 和式 (5.41) 代入式 (5.39)，得到
+\begin{equation}
+E_P[f(X)g(Y)]=\langle f,C_{XY}g\rangle_H.
+\tag{5.42}
+\end{equation}
+类似地，可以定义自协方差算子（Lienart 2015）。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.8}
+\textbf{自协方差算子}
+
+自方差算子 $C_{XX}$ 和 $C_{YY}$ 分别定义为
+\begin{equation}
+C_{XX}=E_P[k(\cdot,x)\otimes k(\cdot,x)]
+\tag{5.43}
+\end{equation}
+和
+\begin{equation}
+C_{YY}=E_P[k(\cdot,y)\otimes k(\cdot,y)].
+\tag{5.44}
+\end{equation}
+\end{bookdefinition}
+
+我们已经定义了非中心化协方差算子，它是非中心化协方差的推广。与协方差类似，还可以定义一般协方差算子，即中心化协方差算子。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.9}
+\textbf{中心化协方差算子}
+
+一般协方差算子或中心化协方差算子定义为
+\begin{equation}
+\widetilde C_{XY}=C_{XY}-\mu_X\otimes\mu_Y,
+\tag{5.45}
+\end{equation}
+其中，$\mu_X=E_X[k(\cdot,X)]$，$\mu_Y=E_X[k(\cdot,Y)]$。
+\end{bookdefinition}
+
+前面的讨论假定两个变量共享同一个核函数，但这一限制可以放宽：互协方差算子可以基于两个不同的核函数定义（Lienart 2015）。
+
+下面介绍用于度量两个变量相依性的 Hilbert–Schmidt 独立性准则（HSIC）。若假定 RKHS 嵌入是单射，即原空间中不同的点映射为特征空间 RKHS 中两个不同的点，则 RKHS 中的距离可以作为分布空间中相似性的替代度量（Lienart 2015；Zhang et al. 2017）。换言之，联合分布 $P(x,y)$ 的嵌入 $C_{XY}$，与两个边际分布 $P(x)$、$P(y)$ 的均值嵌入张量积之间的距离，可以度量两个随机变量 $X$ 和 $Y$ 的相依性。
+
+在经典统计学中，若假定变量 $X$ 和 $Y$ 均服从正态分布，则 $\mathrm{cov}(x,y)=0$ 当且仅当 $X$ 与 $Y$ 独立。如果 $X$ 与 $Y$ 不是正态变量，这一结论就不成立。但是，已有研究表明，对于 $X$ 与 $Y$ 的一般分布，$\widetilde C_{XY}=0$ 当且仅当 $X$ 与 $Y$ 独立（Mooij et al. 2016）。现在给出 HSIC 的数学定义。
+
+\Needspace{4\baselineskip}
+\begin{bookdefinition}{5.10}
+\textbf{Hilbert–Schmidt 独立性准则（HSIC）}
+
+设 $P(x,y)$ 为随机变量 $X$ 和 $Y$ 的联合分布，$P(x)$ 和 $P(y)$ 分别为两者的边际分布。令 $C_{XY}$ 和 $\widetilde C_{XY}$ 分别为 $X$ 与 $Y$ 的非中心化及中心化协方差算子，$k(\cdot,x)$ 和 $k(\cdot,y)$ 为核。$X$ 与 $Y$ 的 Hilbert–Schmidt 独立性准则定义为
+\begin{equation}
+\begin{aligned}
+\mathrm{HSIC}(X,Y)
+&=\lVert C_{XY}-\mu_X\otimes\mu_Y\rVert_{H_{k_x}\times H_{k_y}}^2\\
+&=\bigl\lVert E_{P(x,y)}[k(\cdot,X)\otimes k(\cdot,Y)]\\
+&\qquad-E_{P(x)}[k(\cdot,X)]\otimes E_{P(y)}[k(\cdot,Y)]\bigr\rVert_{H_{k_x}\times H_{k_y}}^2.
+\end{aligned}
+\tag{5.46}
+\end{equation}
+\end{bookdefinition}
+
+用于检验独立性的结论 5.4，取自 Mooij et al.（2016）的引理 12（第 47 页）。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.4：HSIC 与独立性检验}\par
+假定乘积核 $k=k(\cdot,x)\otimes k(\cdot,y)$ 为特征核（characteristic kernel）（Sriperumbudur et al. 2010），则 $\mathrm{HSIC}(X,Y)=0$ 当且仅当 $X$ 与 $Y$ 相互独立。

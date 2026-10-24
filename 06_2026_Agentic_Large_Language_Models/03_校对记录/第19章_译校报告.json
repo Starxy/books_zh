@@ -1,0 +1,581 @@
+{
+  "chapter": 19,
+  "status": "complete",
+  "page_count": 24,
+  "body_page_range": [
+    1,
+    12
+  ],
+  "references_page_range": [
+    12,
+    24
+  ],
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/part6/19_synthetic.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch19/data_stock_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch19/self_instruct_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch19/student_learner_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch19/unnatural_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/03_校对记录/第19章_译校报告.json",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch19_98a04312/agenticbook.pdf"
+  ],
+  "source": "work/agentic/active/part6/19_synthetic.tex",
+  "coverage": {
+    "all_effective_prose_translated": true,
+    "source_english_words": 6099,
+    "translated_CJK": 9326,
+    "source_paragraph_blocks": 77,
+    "translated_paragraph_blocks": 77,
+    "translated_source_lines": 130,
+    "heading_counts": {
+      "chapter": 1,
+      "section": 6,
+      "subsection": 14,
+      "subsubsection": 0,
+      "paragraph": 8
+    },
+    "learning_boxes": 1,
+    "learning_objectives": 5,
+    "figures": 5,
+    "raster_figures_with_Chinese_LaTeX_overlays": 4,
+    "inline_TikZ_diagrams_translated": 1,
+    "equations": 1,
+    "examples": 1,
+    "tables": 0,
+    "footnotes": 0,
+    "program_code_blocks": 0,
+    "inline_code_fragments": 3,
+    "bibliography_entries_preserved": 87,
+    "confirmed_topics": [
+      "数据重要性与SYNTHLLM扩展行为",
+      "蒸馏的信号、数据来源、时机、教师身份四个维度",
+      "KL散度、温度、白盒与黑盒目标",
+      "同策略/离策略、曝光偏差、GKD与强化学习联系",
+      "自蒸馏、自我改进、STaR、SPIN与CURE",
+      "训练数据、评估数据和智能体轨迹的生成",
+      "外在效用以及正确性、多样性、污染、公平性的内在检查",
+      "模型坍塌、偏差放大、安全、隐私、版权与API使用条款"
+    ],
+    "source_assets_and_projection_values_preserved": [
+      "data_stock.png全部曲线、置信区域、刻度、模型点位、2020–2034年份、2028年原预测及5倍超额训练标线",
+      "student_learner.png两个面板、四组柱形、差异箭头与Δ数学不等式",
+      "unnatural.png两个基准面板的全部原始数据点、拟合虚线与刻度",
+      "self-instruct.png全部图标、分支与循环箭头、175项种子任务、分类与非分类自然语言示例"
+    ],
+    "only_authoritative_TeX_and_supplied_assets_used": true,
+    "old_English_book_PDF_read": false,
+    "external_fact_updates_or_browsing": false,
+    "book_program_code_executed": false
+  },
+  "structure_checks": {
+    "headings": {
+      "match": true,
+      "source_count": 29,
+      "translation_count": 29
+    },
+    "labels": {
+      "match": true,
+      "source_count": 11,
+      "translation_count": 11
+    },
+    "references": {
+      "match": true,
+      "source_count": 19,
+      "translation_count": 19
+    },
+    "citation_keys": {
+      "match": true,
+      "source_count": 82,
+      "translation_count": 82
+    },
+    "environments": {
+      "match": true,
+      "source_count": 11,
+      "translation_count": 11
+    },
+    "bibliography": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "structural_commands": {
+      "match": true,
+      "source_count": 10,
+      "translation_count": 10
+    },
+    "code_blocks": {
+      "match": true
+    },
+    "math_segments": {
+      "match": true,
+      "symbol_multiset_match": true,
+      "source_count": 15,
+      "translation_count": 15
+    },
+    "text": {
+      "source_english_words": 6099,
+      "translated_CJK": 9326,
+      "translation_characters": 18264,
+      "source_characters": 42838,
+      "source_paragraph_blocks": 77,
+      "translation_paragraph_blocks": 77
+    },
+    "stray_chapter_counter": false,
+    "stray_part": false,
+    "inline_code": {
+      "match": true,
+      "source_count": 3,
+      "translation_count": 3,
+      "literal_contents": [
+        "get\\_forecast(city, days)",
+        "get\\_forecast(\"Leiden\", 2)",
+        "\\{sat: rain, sun: clear\\}"
+      ]
+    },
+    "inline_tikz_topology": {
+      "draw_and_foreach_commands_match": true,
+      "node_names_and_order_match": true,
+      "node_names": [
+        "seed",
+        "gen",
+        "raw",
+        "inst-eval",
+        "cur",
+        "train",
+        "model",
+        "eval"
+      ],
+      "expanded_directed_edges": 8,
+      "dashed_return_edge": "model.north -> gen.north"
+    },
+    "heading_counts": {
+      "chapter": 1,
+      "section": 6,
+      "subsection": 14,
+      "subsubsection": 0,
+      "paragraph": 8
+    },
+    "figure_count": 5,
+    "equation_count": 1,
+    "example_count": 1,
+    "table_count": 0,
+    "literal_star_retained_in_both_chapter_titles": true,
+    "no_local_counter_redefinitions": true,
+    "no_forbidden_inference_translation": true,
+    "no_unexpected_control_characters": true,
+    "raster_source_integrity": {
+      "data_stock.png": {
+        "unchanged": true,
+        "sha256": "5a978c29718ea9282069f0ad949a9ddfadf4fc851c659830a5a34a4e9d5ca2f5"
+      },
+      "student_learner.png": {
+        "unchanged": true,
+        "sha256": "7a827641c775d43f802bf90a4a711b53829eb015a877bae22b31eecc2a040f1f"
+      },
+      "unnatural.png": {
+        "unchanged": true,
+        "sha256": "8a81f8e4b1d1d1894ca6f90bf26f94fc35c2022f3bd28fe666b812baf34bb907"
+      },
+      "self-instruct.png": {
+        "unchanged": true,
+        "sha256": "cd35ec3a60704965ba5ab124c071bc707f95851cbdf80c180813549494f01daa"
+      }
+    },
+    "translated_chapter_sha256": "c62a720bf39fc0ef3b506324a1477c9fe298b8aa11dc045cf6b586b3d84e8db9",
+    "all_required_checks_pass": true,
+    "numbered_labels": {
+      "fig:data-stock": {
+        "number": "19.1",
+        "standalone_page": "2"
+      },
+      "fig:synth-pipeline": {
+        "number": "19.2",
+        "standalone_page": "3"
+      },
+      "fig:small-model-learnability": {
+        "number": "19.3",
+        "standalone_page": "4"
+      },
+      "fig:unnatural": {
+        "number": "19.4",
+        "standalone_page": "6"
+      },
+      "fig:self-instruct": {
+        "number": "19.5",
+        "standalone_page": "7"
+      },
+      "eq:kd": {
+        "number": "19.1",
+        "standalone_page": "3"
+      }
+    }
+  },
+  "new_terms": {
+    "digital oil": "数字石油",
+    "effective stock": "有效存量",
+    "rectified scaling law": "经修正的扩展定律",
+    "white-box distillation": "白盒蒸馏",
+    "black-box distillation": "黑盒蒸馏",
+    "soft target": "软目标",
+    "Generalized Knowledge Distillation (GKD)": "广义知识蒸馏（GKD）",
+    "Self-Play Finetuning (SPIN)": "自博弈微调（SPIN）",
+    "rationale": "推理依据",
+    "Generative Teaching": "生成式教学",
+    "tool schema": "工具模式",
+    "utility": "效用",
+    "generative artifacts": "生成痕迹",
+    "logit suppression": "logit 抑制",
+    "meta-prompting": "元提示",
+    "membership-inference-style probing": "成员身份推理式探测",
+    "data-poisoning attack": "数据投毒攻击",
+    "personally identifiable information (PII)": "个人身份信息（PII）",
+    "differential privacy": "差分隐私",
+    "privacy budget": "隐私预算"
+  },
+  "source_anomalies": [
+    "长标题和可选短标题都以普通星号开头；保留为编号章标题字符，未改为chapter*。",
+    "回译一段原文将过程描述为源语言→目标语言→源语言；译文按原叙述保留。",
+    "图19.4原纵轴名称为单数Super-Natural Instruction (Test)，而题注使用复数Instructions；轴中保留原专名拼写，只将Test译为测试。"
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "engine": "XeLaTeX",
+    "command": "python PROJECT/build.py --chapter 19 --name ch19",
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch19_98a04312/agenticbook.pdf",
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch19_98a04312/build_report.json",
+    "passes": 3,
+    "stable": true,
+    "errors": 0,
+    "missing": 0,
+    "overflow": [],
+    "refs": {
+      "undefined": false,
+      "cross_chapter_pageref_note": "保留原调用，合排时核验页码。"
+    },
+    "cites": {
+      "undefined": false
+    },
+    "no_shell_escape": true,
+    "minted_frozen_cache": true,
+    "chapter_counter_override_in_body": false,
+    "example_counter_redefined": false,
+    "fresh_builds": 4,
+    "final_PDF_sha256": "12c7e43b0b91ba3be5bb5c276098bd7c4c6b4fc736f57b97cfc24b0a9f9bb978"
+  },
+  "visual_qa": {
+    "performed": true,
+    "render_dpi": 140,
+    "detail_crops_dpi": 300,
+    "pages_actually_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      24
+    ],
+    "figure_pages": [
+      2,
+      3,
+      4,
+      6,
+      7
+    ],
+    "formula_pages": [
+      3
+    ],
+    "learning_box_pages": [
+      1
+    ],
+    "example_box_pages": [
+      8
+    ],
+    "representative_prose_pages": [
+      1,
+      5,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "bibliography_pages_viewed": [
+      12,
+      24
+    ],
+    "view_events": [
+      {
+        "build": "ch19_8f33c81a",
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          24
+        ]
+      },
+      {
+        "build": "ch19_95a89534",
+        "pages": [
+          2,
+          4,
+          6,
+          7
+        ],
+        "detail_crops": [
+          "student_detail.png",
+          "self_detail.png"
+        ]
+      },
+      {
+        "build": "ch19_63ee0010",
+        "pages": [
+          2,
+          4,
+          7,
+          9
+        ]
+      },
+      {
+        "build": "ch19_98a04312",
+        "pages": [
+          2
+        ]
+      }
+    ],
+    "final_render_equivalence_to_actual_views": [
+      {
+        "page": 1,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_01.png"
+      },
+      {
+        "page": 2,
+        "actually_viewed_build": "ch19_98a04312",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_02.png"
+      },
+      {
+        "page": 3,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_03.png"
+      },
+      {
+        "page": 4,
+        "actually_viewed_build": "ch19_63ee0010",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_04.png"
+      },
+      {
+        "page": 5,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_05.png"
+      },
+      {
+        "page": 6,
+        "actually_viewed_build": "ch19_95a89534",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_06.png"
+      },
+      {
+        "page": 7,
+        "actually_viewed_build": "ch19_63ee0010",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_07.png"
+      },
+      {
+        "page": 8,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_08.png"
+      },
+      {
+        "page": 9,
+        "actually_viewed_build": "ch19_63ee0010",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_09.png"
+      },
+      {
+        "page": 10,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_10.png"
+      },
+      {
+        "page": 11,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_11.png"
+      },
+      {
+        "page": 12,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_12.png"
+      },
+      {
+        "page": 24,
+        "actually_viewed_build": "ch19_8f33c81a",
+        "final_pixels_identical": true,
+        "final_render": "work/agentic/ch19_work/qa_ch19_98a04312/page_24.png"
+      }
+    ],
+    "issues_fixed": [
+      "清除小模型图不同遮罩之间残留的英文像素，并保留原箭头尖端。",
+      "Self-Instruct顶部卡片的遮罩收回边框内，下方输入/输出行分开定位，恢复原蓝色任务标签颜色。",
+      "数据存量图例统一字体及行距，扩大单一覆盖区消除边缘细线。",
+      "生成痕迹的中文用语已修订，并复核受影响正文第9页。"
+    ],
+    "remaining_visual_issues": [],
+    "cross_chapter_pageref_limitation": "单章缺页码已在wave6实际合排中解决：第289页显示图1.1、第13页，两处链接均到实际图页；全书最终版另行复核。",
+    "evidence_manifest": "work/agentic/ch19_work/qa_manifest.json",
+    "final_render_folder": "work/agentic/ch19_work/qa_ch19_98a04312"
+  },
+  "scratch_checkpoint": "work/agentic/ch19_work/checkpoint.md",
+  "ownership": {
+    "shared_source_files_modified": false,
+    "shared_glossary_modified": false,
+    "shared_figures_modified": false,
+    "new_macros_in_shared_preamble": false,
+    "published_from_child": false
+  },
+  "editorial_choices": {
+    "membership_inference_term": "membership 补足为“成员身份”；inference 按用户约定保留“推理”。"
+  },
+  "resolved_integration_issues": [
+    {
+      "scope": "whole-book integration",
+      "issue": "单章第1页对fig:virtuous的跨章pageref页码字段为空。",
+      "resolution_owner": "root",
+      "action": "已保留原pageref调用；需要在整书合排PDF中核实回填页码。",
+      "resolution": {
+        "build": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/wave6_3dd34220/agenticbook.pdf",
+        "source_physical_and_printed_page": 289,
+        "label": "fig:virtuous",
+        "displayed_reference": "图1.1，第13页",
+        "target_physical_and_printed_page": 13,
+        "both_figure_and_page_links_target_actual_figure": true,
+        "named_destinations": [
+          "figure.caption.2",
+          "figure.caption.2"
+        ],
+        "actually_reviewed_images": [
+          "work/agentic/render_wave6/extra_289.png",
+          "work/agentic/render_wave6/extra_013.png"
+        ],
+        "translation_call_preserved": true
+      }
+    }
+  ],
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

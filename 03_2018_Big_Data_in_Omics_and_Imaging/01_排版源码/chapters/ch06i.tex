@@ -1,0 +1,123 @@
+% 原章第57—60页6.5标题前，式6.190—6.205。
+\subsection{用于影像遗传学研究中基因—基因交互检测的二次正则化函数型典型相关分析}
+
+考虑两个基因组区域，第一、第二个区域分别有 $p,q$ 个 SNP。假定抽取 $n$ 个个体。对第 $i$ 个个体，两个基因组区域的遗传变异数据（基因型或函数主成分得分）向量，分别记为 $x_i=[x_{i1},\ldots,x_{ip}]$ 与 $z_i=[z_{i1},\ldots,z_{iq}]$。令
+\[
+\xi_i=[x_{i1}z_{i1},\ldots,x_{i1}z_{iq},\ldots,x_{ip}z_{i1},\ldots,x_{ip}z_{iq}].
+\]
+利用单变量回归（单个影像汇总度量）或多元回归（多个影像汇总度量），对基因型数据预处理，去除两个基因组区域的遗传主效应，再取残差进行交互分析。先从单个汇总度量的交互分析开始。
+
+\subsubsection{单个影像汇总度量}
+
+交互分析前，先将单个影像汇总度量对两个基因组区域的基因型回归。令 $y_i$ 为第 $i$ 个个体的单个影像汇总度量，考虑回归模型
+\begin{equation}
+y_i=\mu+\sum_{m=1}^M\tau_{im}\theta_m+\sum_{j=1}^px_{ij}\alpha_j+\sum_{l=1}^qz_{il}\beta_l+\varepsilon_i,
+\tag{6.190}
+\end{equation}
+其中，$\mu$ 为总体均值；$\tau_{im}$ 为年龄、性别、用于去除群体结构影响的主成分（PC）得分等协变量，$\theta_m$ 为对应回归系数；$\alpha_j,\beta_l$ 分别为第一、第二个基因组区域的遗传主效应。模型拟合数据后，计算每个个体的残差：
+\begin{equation}
+\eta_i=y_i-\widehat\mu-\sum_{m=1}^M\tau_{im}\widehat\theta_m-\sum_{j=1}^px_{ij}\widehat\alpha_j-\sum_{l=1}^qz_{il}\widehat\beta_l.
+\tag{6.191}
+\end{equation}
+定义残差向量与遗传数据矩阵：
+\begin{equation}
+\eta=\begin{bmatrix}\eta_1\\\vdots\\\eta_m\end{bmatrix},\qquad
+\xi=\begin{bmatrix}\xi_{11}&\cdots&\xi_{1pq}\\\vdots&\vdots&\vdots\\\xi_{n1}&\vdots&\xi_{npq}\end{bmatrix}.
+\tag{6.192}
+\end{equation}
+
+\subsubsection{多个影像汇总度量}
+
+考虑 $K$ 个影像汇总度量，令 $y_{ik}$ 为第 $i$ 个个体的第 $k$ 个影像汇总度量。多元回归模型为
+\begin{equation}
+y_{ik}=\mu_k+\sum_{m=1}^M\tau_{im}\theta_{mk}+\sum_{j=1}^{J_1}x_{ij}\alpha_{kj}+\sum_{l=1}^{J_2}z_{il}\beta_{kl}+\varepsilon_{ik},
+\tag{6.193}
+\end{equation}
+其中，$\mu_k$ 为第 $k$ 个影像汇总度量的总体均值，$\theta_{mk}$ 为与协变量 $\tau_{im}$ 关联的回归系数，$\alpha_{kj}$ 为第一个基因组区域中第 $j$ 个遗传变异对第 $k$ 个影像汇总度量的主要遗传加性效应，$\beta_{kl}$ 为第二个基因组区域中第 $l$ 个遗传变异对第 $k$ 个影像汇总度量的主要遗传加性效应。
+
+令 $\widehat y_{ik}$ 为拟合模型的预测值：
+\[
+\widehat y_{ik}=\widehat\mu_k+\sum_{m=1}^M\tau_{im}\widehat\theta_{mk}+\sum_{j=1}^{J_1}x_{ij}\widehat\alpha_{kj}+\sum_{l=1}^{J_2}z_{il}\widehat\beta_{kl}.
+\]
+残差定义为
+\[
+\eta_{ik}=y_{ik}-\widehat y_{ik}.
+\]
+定义残差矩阵：
+\begin{equation}
+\eta=\begin{bmatrix}\eta_{11}&\cdots&\eta_{1K}\\\vdots&&\vdots\\\eta_{n1}&\cdots&\eta_{nK}\end{bmatrix}.
+\tag{6.194}
+\end{equation}
+数据矩阵 $\xi$ 的定义同前。
+
+\subsubsection{用于交互分析的 CCA 与函数型 CCA}
+
+为方便起见，假定 $K\leq pq$。定义协方差矩阵
+\[
+\Sigma=\begin{bmatrix}\Sigma_{\xi\xi}&\Sigma_{\xi\eta}\\\Sigma_{\eta\xi}&\Sigma_{\eta\eta}\end{bmatrix}.
+\]
+矩阵 $\Sigma$ 的估计为
+\begin{equation}
+\widehat\Sigma=\begin{bmatrix}\widehat\Sigma_{\xi\xi}&\widehat\Sigma_{\xi\eta}\\\widehat\Sigma_{\eta\xi}&\widehat\Sigma_{\eta\eta}\end{bmatrix}
+=\frac1n\begin{bmatrix}\xi^T\xi&\xi^T\eta\\\eta^T\xi&\eta^T\eta\end{bmatrix}.
+\tag{6.195}
+\end{equation}
+求解 CCA，先定义 $R^2$ 矩阵：
+\begin{equation}
+R^2=\widehat\Sigma_{\eta\eta}^{-1/2}\widehat\Sigma_{\eta\xi}\widehat\Sigma_{\xi\xi}^{-1}\widehat\Sigma_{\xi\eta}\widehat\Sigma_{\eta\eta}^{-1/2}.
+\tag{6.196}
+\end{equation}
+令
+\begin{equation}
+W=\widehat\Sigma_{\xi\xi}^{-1/2}\widehat\Sigma_{\xi\eta}\widehat\Sigma_{\eta\eta}^{-1/2}.
+\tag{6.197}
+\end{equation}
+设该矩阵的奇异值分解（SVD）为
+\begin{equation}
+W=U\Lambda V^T,
+\tag{6.198}
+\end{equation}
+其中，$\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_d)$，$d=\min(K,pq)$。显然，
+\begin{equation}
+W^TW=R^2=V\Lambda^2V^T.
+\tag{6.199}
+\end{equation}
+典型协变量的矩阵定义为
+\begin{equation}
+A=\Sigma_{\xi\xi}^{-1/2}U,\qquad B=\Sigma_{\eta\eta}^{-1/2}V.
+\tag{6.200}
+\end{equation}
+典型相关系数向量为
+\begin{equation}
+\mathrm{CC}=[\lambda_1,\ldots,\lambda_d]^T.
+\tag{6.201}
+\end{equation}
+交互项与影像汇总度量之间的典型相关，度量交互的强度。CCA 产生多个典型相关系数，而我们希望用单个数值量化交互。为此，提出用奇异值平方和度量交互：
+\begin{equation}
+r=\sum_{i=1}^d\lambda_i^2=\operatorname{Tr}(\Lambda^2)=\operatorname{Tr}(R^2).
+\tag{6.202}
+\end{equation}
+检验两个基因组区域之间的交互，等价于检验 $\xi$ 与 $\eta$ 独立，或检验 $\xi$ 集中每个变量均与 $\eta$ 集中每个变量不相关。无交互的零假设可表述为
+\[
+H_0:\Sigma_{\xi\eta}=0.
+\]
+检验 $H_0:\Sigma_{\xi\eta}=0$ 的似然比为
+\begin{equation}
+\Lambda_r=\frac{|\Sigma|}{|\Sigma_{\xi\xi}||\Sigma_{\eta\eta}|}=\prod_{i=1}^d(1-\lambda_i^2),
+\tag{6.203}
+\end{equation}
+等于 Wilks 的 $\Lambda$。这说明，利用多元线性回归检验交互，可视为 CCA 的特例。
+
+通常定义以下似然比统计量检验交互：
+\begin{equation}
+T_{\mathrm{CCA}}=-N\sum_{i=1}^d\log(1-\lambda_i^2).
+\tag{6.204}
+\end{equation}
+当 $\lambda_i^2$ 较小时，$T_{\mathrm{CCA}}$ 可近似为 $N\sum_{i=1}^d\lambda_i^2=Nr$，其中 $r$ 为两个基因组区域的交互度量。交互越强，检验统计量检测交互的功效越高。
+
+在零假设 $H_0:\Sigma_{\xi\eta}=0$ 下，$T_{\mathrm{CCA}}$ 渐近服从中心 $\chi_{Kpq}^2$ 分布。样本量较大时，Bartlett（1939）建议使用以下统计量进行假设检验：
+\begin{equation}
+T_{\mathrm{CCA}}=-\left[N-\frac{d+3}{2}\right]\sum_{i=1}^d\log(1-\lambda_i^2).
+\tag{6.205}
+\end{equation}
+若将函数主成分得分作为矩阵 $\xi$ 中的遗传变异，则多元 CCA 变为函数型 CCA。前面对多元 CCA 的全部讨论，均可应用于函数型 CCA。

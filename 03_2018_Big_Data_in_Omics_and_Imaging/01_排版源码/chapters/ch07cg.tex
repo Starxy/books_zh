@@ -1,0 +1,237 @@
+% 原分章PDF106页附录7.G标题—110页末，印刷页682—686。
+\section*{附录7.G\quad 带噪声线性模型的迹方法}
+\addcontentsline{toc}{section}{附录7.G 带噪声线性模型的迹方法}
+\markright{附录7.G 带噪声线性模型的迹方法}
+
+回顾
+\begin{equation}
+\Sigma_{XY}=\Sigma_XA^T\tag{7.G.1}
+\end{equation}
+以及
+\begin{equation}
+\Sigma_Y=A\Sigma_XA^T+\lambda I,\tag{7.G.2}
+\end{equation}
+其中 $A$ 为正交矩阵。由式（7.112），有
+\begin{equation}
+\begin{aligned}
+\widetilde A&=\Sigma_XA^T(A\Sigma_XA^T+\lambda I)^{-1}\\
+ &=\Sigma_X(\Sigma_X+\lambda I)^{-1}A^T.
+\end{aligned}\tag{7.G.3}
+\end{equation}
+假设协方差矩阵 $\Sigma_X$ 的特征值分解为
+\begin{equation}
+\Sigma_X=U\Lambda U^T,\tag{7.G.4}
+\end{equation}
+其中 $U^TU=I$、$\Lambda=\operatorname{diag}(\mu_1,\ldots,\mu_n)$，且 $\mu_1\ge\mu_2\ge\cdots\mu_n\ge0$。于是，由式（7.G.3）、（7.G.4），得到
+\begin{equation}
+\begin{aligned}
+\widetilde A&=U\Delta U^T(U\Delta U^T+\lambda I)^{-1}A^T\\
+ &=U\Delta(\Delta+\lambda I)^{-1}U^TA^T.
+\end{aligned}\tag{7.G.5}
+\end{equation}
+因此，
+\begin{equation}
+\begin{aligned}
+\tau_n(\widetilde A\widetilde A^T)
+ &=\tau_n\bigl(U\Delta(\Delta+\lambda I)^{-1}U^TA^TAU
+  (\Delta+\lambda I)^{-1}\Delta U^T\bigr)\\
+ &=\tau_n\left(\bigl[\Delta(\Delta+\lambda I)^{-1}\bigr]^2\right).
+\end{aligned}\tag{7.G.6}
+\end{equation}
+利用式（7.G.2）、（7.G.4），得到
+\begin{equation}
+\Sigma_Y=AU\Delta U^TA^T+\lambda I,\tag{7.G.7}
+\end{equation}
+从而
+\begin{equation}
+\tau_n(\Sigma_Y)=\tau_n(\Delta)+\lambda.\tag{7.G.8}
+\end{equation}
+现在考虑模型
+\[
+X=\widetilde AY+\widetilde e,
+\]
+并计算 $\tau_n(\widetilde A\Sigma_Y\widetilde A^T)$：
+\begin{equation}
+\begin{aligned}
+&\tau_n(\widetilde A\Sigma_Y\widetilde A^T)\\
+&\quad=\tau_n\Bigl(U\Delta(\Delta+\lambda I)^{-1}U^TA^T
+ (AU\Delta U^TA^T+\lambda I)\\
+&\hspace{8em}{}\cdot AU(\Delta+\lambda I)^{-1}\Delta U^T\Bigr)\\
+&\quad=\tau_n\bigl(U\Delta(\Delta+\lambda I)^{-1}
+ (\Delta+\lambda I)(\Delta+\lambda I)^{-1}\Delta U^T\bigr)\\
+&\quad=\tau_n\bigl(U\Delta(\Delta+\lambda I)^{-1}\Delta U^T\bigr)\\
+&\quad=\tau_n\bigl(\Delta^2(\Delta+\lambda I)^{-1}\bigr).
+\end{aligned}\tag{7.G.9}
+\end{equation}
+由式（7.G.6）、（7.G.8）、（7.G.9），得到评估因果方向 $Y\to X$ 的统计量：
+\begin{equation}
+\begin{aligned}
+\Delta_{Y\to X}
+={}&\log\frac{\tau_n(\widetilde A\Sigma_Y\widetilde A^T)}
+ {\tau_n(\Sigma_Y)\tau_n(\widetilde A\widetilde A^T)}\\
+={}&\log\frac{\tau_n\bigl(\Delta^2(\Delta+\lambda I)^{-1}\bigr)}
+ {(\tau_n(\Delta)+\lambda)\tau_n\left(\bigl[\Delta(\Delta+\lambda I)^{-1}\bigr]^2\right)}\\
+={}&\log\frac1n\sum_{i=1}^n\frac{\mu_i^2}{\mu_i+\lambda}
+ -\log\frac1n\sum_{i=1}^n(\mu_i+\lambda)\\
+&{}-\log\frac1n\sum_{i=1}^n\frac{\mu_i^2}{(\mu_i+\lambda)^2}.
+\end{aligned}\tag{7.G.10}
+\end{equation}
+现在用归纳法证明 $\Delta_{Y\to X}>0$。令 $n=2$，需证明
+\begin{equation}
+\frac12\left(\frac{\mu_1^2}{\mu_1+\lambda}+\frac{\mu_2^2}{\mu_2+\lambda}\right)
+ >\frac12(\mu_1+\lambda+\mu_2+\lambda)\frac12
+ \left(\frac{\mu_1^2}{(\mu_1+\lambda)^2}+\frac{\mu_2^2}{(\mu_2+\lambda)^2}\right).\tag{7.G.11}
+\end{equation}
+事实上，式（7.G.11）蕴含
+\begin{equation}
+2\left(\frac{\mu_1^2}{\mu_1+\lambda}+\frac{\mu_2^2}{\mu_2+\lambda}\right)
+ >(\mu_1+\lambda+\mu_2+\lambda)
+ \left(\frac{\mu_1^2}{(\mu_1+\lambda)^2}+\frac{\mu_2^2}{(\mu_2+\lambda)^2}\right).\tag{7.G.12}
+\end{equation}
+展开式（7.G.12）的右侧，得到
+\begin{equation}
+\begin{aligned}
+&(\mu_1+\lambda+\mu_2+\lambda)
+ \left(\frac{\mu_1^2}{(\mu_1+\lambda)^2}+\frac{\mu_2^2}{(\mu_2+\lambda)^2}\right)\\
+&\quad=\frac{\mu_1^2}{\mu_1+\lambda}+\frac{\mu_2^2}{\mu_2+\lambda}
+ +(\mu_1+\lambda)\frac{\mu_2^2}{(\mu_2+\lambda)^2}
+ +(\mu_2+\lambda)\frac{\mu_1^2}{(\mu_1+\lambda)^2}.
+\end{aligned}\tag{7.G.13}
+\end{equation}
+结合式（7.G.12）、（7.G.13），需要证明
+\begin{equation}
+\left(\frac{\mu_1^2}{\mu_1+\lambda}+\frac{\mu_2^2}{\mu_2+\lambda}\right)
+ >(\mu_1+\lambda)\frac{\mu_2^2}{(\mu_2+\lambda)^2}
+ +(\mu_2+\lambda)\frac{\mu_1^2}{(\mu_1+\lambda)^2}.\tag{7.G.14}
+\end{equation}
+注意
+\begin{equation}
+\begin{aligned}
+\frac{\mu_1^2}{\mu_1+\lambda}-(\mu_2+\lambda)\frac{\mu_1^2}{(\mu_1+\lambda)^2}
+ &=\left(1-\frac{\mu_2+\lambda}{\mu_1+\lambda}\right)\frac{\mu_1^2}{\mu_1+\lambda}\\
+ &=\frac{\mu_1-\mu_2}{\mu_1+\lambda}\frac{\mu_1^2}{\mu_1+\lambda}
+\end{aligned}\tag{7.G.15}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+\frac{\mu_2^2}{\mu_2+\lambda}-(\mu_1+\lambda)\frac{\mu_2^2}{(\mu_2+\lambda)^2}
+ &=\left(1-\frac{\mu_1+\lambda}{\mu_2+\lambda}\right)\frac{\mu_2^2}{\mu_2+\lambda}\\
+ &=\frac{\mu_2-\mu_1}{\mu_2+\lambda}\frac{\mu_2^2}{\mu_2+\lambda}.
+\end{aligned}\tag{7.G.16}
+\end{equation}
+由式（7.G.15）、（7.G.16），得到
+\begin{equation}
+\begin{aligned}
+&\left(\frac{\mu_1^2}{\mu_1+\lambda}+\frac{\mu_2^2}{\mu_2+\lambda}\right)
+ -(\mu_1+\lambda)\frac{\mu_2^2}{(\mu_2+\lambda)^2}
+ -(\mu_2+\lambda)\frac{\mu_1^2}{(\mu_1+\lambda)^2}\\
+&\quad=\frac{\mu_1-\mu_2}{\mu_1+\lambda}\frac{\mu_1^2}{\mu_1+\lambda}
+ +\frac{\mu_2-\mu_1}{\mu_2+\lambda}\frac{\mu_2^2}{\mu_2+\lambda}\\
+&\quad=(\mu_1-\mu_2)\left(\frac{\mu_1^2}{(\mu_1+\lambda)^2}
+ -\frac{\mu_2^2}{(\mu_2+\lambda)^2}\right)\\
+&\quad=(\mu_1-\mu_2)\left(\frac{\mu_1}{\mu_1+\lambda}-\frac{\mu_2}{\mu_2+\lambda}\right)
+ \left(\frac{\mu_1}{\mu_1+\lambda}+\frac{\mu_2}{\mu_2+\lambda}\right)\\
+&\quad=\frac{\lambda(\mu_1-\mu_2)^2}{(\mu_1+\lambda)(\mu_2+\lambda)}
+ \left(\frac{\mu_1}{\mu_1+\lambda}+\frac{\mu_2}{\mu_2+\lambda}\right)>0.
+\end{aligned}\tag{7.G.17}
+\end{equation}
+这就证明了不等式（7.G.11）。现在假设 $n=k$ 时，下列不等式成立：
+\begin{equation}
+\frac1n\sum_{i=1}^n\frac{\mu_i^2}{\mu_i+\lambda}
+ >\left(\frac1n\sum_{i-1}^n(\mu_i+\lambda)\right)
+ \left(\frac1n\sum_{i=1}^n\frac{\mu_i^2}{(\mu_i+\lambda)^2}\right).\tag{7.G.18}
+\end{equation}
+下面证明 $n=k+1$ 时，不等式（7.G.18）仍然成立。令
+\[
+S_k^1=\sum_{i=1}^k\frac{\mu_i^2}{\mu_i+\lambda},\qquad
+S_k^2=\sum_{i=1}^k(\mu_i+\lambda),\qquad
+S_k^3=\sum_{i=1}^k\frac{\mu_i^2}{(\mu_i+\lambda)^2}.
+\]
+于是，不等式（7.G.18）表明
+\begin{equation}
+kS_k^1>S_k^2S_k^3\tag{7.G.19}
+\end{equation}
+成立。注意
+\[
+\begin{aligned}
+\sum_{i=1}^{k+1}\frac{\mu_i^2}{\mu_i+\lambda}
+ &=S_k^1+\frac{\mu_{k+1}^2}{\mu_{k+1}+\lambda},\\
+\sum_{i=1}^{k+1}(\mu_i+\lambda)&=S_k^2+\mu_{k+1}+\lambda,\qquad\text{且}\\
+\sum_{i=1}^{k+1}\frac{\mu_i^2}{(\mu_i+\lambda)^2}
+ &=S_K^3+\frac{\mu_{k+1}^2}{(\mu_{k+1}+\lambda)^2}.
+\end{aligned}
+\]
+为了说明不等式（7.G.18）成立，必须证明
+\[
+\frac1{k+1}\sum_{i=1}^{k+1}\frac{\mu_i^2}{\mu_i+\lambda}
+ >\left(\frac1{k+1}\sum_{i=1}^{k+1}(\mu_i+\lambda)\right)
+ \left(\frac1{k+1}\sum_{i=1}^{k+1}\frac{\mu_i^2}{(\mu_i+\lambda)^2}\right),
+\]
+即
+\begin{equation}
+(k+1)\sum_{i=1}^{k+1}\frac{\mu_i^2}{\mu_i+\lambda}
+ >\left(\sum_{i=1}^{k+1}(\mu_i+\lambda)\right)
+ \left(\sum_{i=1}^{k+1}\frac{\mu_i^2}{(\mu_i+\lambda)^2}\right).\tag{7.G.20}
+\end{equation}
+注意
+\begin{equation}
+\sum_{i=1}^{k+1}\frac{\mu_i^2}{\mu_i+\lambda}
+ =S_k^1+\frac{\mu_{k+1}^2}{\mu_{k+1}+\lambda},\tag{7.G.21}
+\end{equation}
+\begin{equation}
+\sum_{i=1}^{k+1}(\mu_i+\lambda)=S_k^2+\mu_{k+1}+\lambda,\tag{7.G.22}
+\end{equation}
+\begin{equation}
+\sum_{i=1}^{k+1}\frac{\mu_i^2}{(\mu_i+\lambda)^2}
+ =S_k^3+\frac{\mu_{k+1}^2}{(\mu_{k+1}+\lambda)^2}.\tag{7.G.23}
+\end{equation}
+将式（7.G.21）—（7.G.23）代入式（7.G.20），得到
+\begin{equation}
+(k+1)S_k^1+(k+1)\frac{\mu_{k+1}^2}{\mu_{k+1}+\lambda}
+ >(S_k^2+\mu_{k+1}+\lambda)
+ \left(S_k^3+\frac{\mu_{k+1}^2}{(\mu_{k+1}+\lambda)^2}\right).\tag{7.G.24}
+\end{equation}
+利用式（7.G.19），可将式（7.G.24）化为
+\begin{equation}
+S_k^1+k\frac{\mu_{k+1}^2}{\mu_{k+1}+\lambda}
+ >(\mu_{k+1}+\lambda)S_k^3
+ +\frac{\mu_{k+1}^2}{(\mu_{k+1}+\lambda)^2}S_k^2.\tag{7.G.25}
+\end{equation}
+将式（7.G.25）的右侧移至左侧，得到
+\begin{equation}
+\begin{aligned}
+&\sum_{i=1}^k\frac{\mu_i^2}{\mu_i+\lambda}
+ \left(1-\frac{\mu_{k+1}+\lambda}{\mu_i+\lambda}\right)
+ +\sum_{i=1}^k\frac{\mu_{k+1}^2}{\mu_{k+1}+\lambda}
+ \left(1-\frac{\mu_i+\lambda}{\mu_{k+1}+\lambda}\right)\\
+&\quad=\sum_{i=1}^k\frac{\mu_i^2}{\mu_i+\lambda}
+ \frac{\mu_i-\mu_{k+1}}{\mu_i+\lambda}
+ +\sum_{i=1}^k\frac{\mu_{k+1}^2}{\mu_{k+1}+\lambda}
+ \frac{\mu_{k+1}-\mu_i}{\mu_{k+1}+\lambda}\\
+&\quad=\sum_{i=1}^k(\mu_i-\mu_{k+1})
+ \left(\frac{\mu_i^2}{(\mu_i+\lambda)^2}
+ -\frac{\mu_{k+1}^2}{(\mu_{k+1}+\lambda)^2}\right)\\
+&\quad=\sum_{i=1}^k(\mu_i-\mu_{k+1})
+ \left(\frac{\mu_i}{\mu_i+\lambda}-\frac{\mu_{k+1}}{\mu_{k+1}+\lambda}\right)
+ \left(\frac{\mu_i}{\mu_i+\lambda}+\frac{\mu_{k+1}}{\mu_{k+1}+\lambda}\right)\\
+&\quad=\sum_{i=1}^k(\mu_i-\mu_{k+1})^2\lambda
+ \frac1{(\mu_{i+1}+\lambda)(\mu_{k+1}+\lambda)}
+ \left(\frac{\mu_i}{\mu_i+\lambda}+\frac{\mu_{k+1}}{\mu_{k+1}+\lambda}\right)\ge0.
+\end{aligned}\tag{7.G.26}
+\end{equation}
+结合式（7.G.20）、（7.G.24）—（7.G.26），证明了
+\begin{equation}
+\frac1n\sum_{i=1}^n\frac{\mu_i^2}{\mu_i+\lambda}
+ >\left(\frac1n\sum_{i=1}^n(\mu_i+\lambda)\right)
+ \left(\frac1n\sum_{i=1}^n\frac{\mu_i^2}{(\mu_i+\lambda)^2}\right)\tag{7.G.27}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+\Delta_{Y\to X}
+={}&\log\frac1n\sum_{i=1}^n\frac{\mu_i^2}{\mu_i+\lambda}
+ -\log\frac1n\sum_{i=1}^n(\mu_i+\lambda)\\
+&{}-\log\frac1n\sum_{i=1}^n\frac{\mu_i^2}{(\mu_i+\lambda)^2}>0.
+\end{aligned}\tag{7.G.28}
+\end{equation}

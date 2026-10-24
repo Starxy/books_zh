@@ -1,0 +1,185 @@
+% 原分章PDF115页附录7.J标题—118页末，印刷页691—694。
+\section*{附录7.J\quad 贝叶斯线性模型预测分布的推导}
+\addcontentsline{toc}{section}{附录7.J 贝叶斯线性模型预测分布的推导}
+\markright{附录7.J 贝叶斯线性模型预测分布的推导}
+
+为使叙述自洽，本附录按照Rasmussen and Williams（2016）的方法，简要推导贝叶斯线性模型中的预测分布。由式（7.367）、（7.373），得到
+\begin{equation}
+\begin{aligned}
+&p(y_{new}\mid x_{new},w)p(w\mid X,y)\\
+&\quad\propto\exp\biggl\{-\frac12\biggl[
+ \frac1{\sigma_n^2}(y_{new}-x_{new}^Tw)^T(y_{new}-x_{new}^Tw)
+ +(w-\mu)^T\Lambda(w-\mu)\biggr]\biggr\}.
+\end{aligned}\tag{7.J.1}
+\end{equation}
+注意
+\begin{equation}
+\begin{aligned}
+&\frac1{\sigma_n^2}(y_{new}-x_{new}^Tw)^T(y_{new}-x_{new}^Tw)\\
+&\quad=\frac1{\sigma_n^2}y_{new}^2-\frac2{\sigma_n^2}w^Tx_{new}y_{new}
+ +\frac{w^Tx_{new}x_{new}^T}{\sigma_n^2}w,
+\end{aligned}\tag{7.J.2}
+\end{equation}
+\begin{equation}
+(w-\mu)^T\Lambda(w-\mu)=w^T\Lambda w-2w^T\mu+\mu^T\Lambda\mu.\tag{7.J.3}
+\end{equation}
+将式（7.J.2）、（7.J.3）代入式（7.J.1），得到
+\begin{equation}
+\begin{aligned}
+&p(y_{new}\mid x_{new},w)p(w\mid X,y)\\
+&\quad\propto\exp\biggl\{-\frac12\biggl[
+ w^T\left(\Lambda+\frac{x_{new}x_{new}^T}{\sigma_n^2}\right)w\\
+&\hspace{8em}{}-2w^T\left(\Lambda\mu+\frac{x_{new}y_{new}}{\sigma_n^2}\right)
+ +\frac{y_{new}^2}{\sigma_n^2}\biggr]\biggr\}.
+\end{aligned}\tag{7.J.4}
+\end{equation}
+令
+\begin{equation}
+V=\Lambda+\frac{x_{new}x_{new}^T}{\sigma_n^2}.\tag{7.J.5}
+\end{equation}
+于是，
+\begin{equation}
+V^{-1}=\Lambda^{-1}-\frac1{\sigma_n^2}
+ \frac{\Lambda^{-1}x_{new}x_{new}^T\Lambda^{-1}}
+ {1+\dfrac1{\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}}.\tag{7.J.6}
+\end{equation}
+定义
+\begin{equation}
+(w-m)^TV(w-m)=w^TVw-2w^TVm+m^TVm.\tag{7.J.7}
+\end{equation}
+为求均值 $m$，令
+\begin{equation}
+Vm=\Lambda\mu+\frac{x_{new}y_{new}}{\sigma_n^2}.\tag{7.J.8}
+\end{equation}
+由式（7.J.8）解出 $m$，得到
+\begin{equation}
+m=V^{-1}\left(\Lambda\mu+\frac{x_{new}y_{new}}{\sigma_n^2}\right),\tag{7.J.9}
+\end{equation}
+从而
+\begin{equation}
+\begin{aligned}
+m^TVm
+ &=\left(\Lambda\mu+\frac{x_{new}y_{new}}{\sigma_n^2}\right)^T
+ V^{-1}\left(\Lambda\mu+\frac{x_{new}y_{new}}{\sigma_n^2}\right)\\
+ &=\frac{x_{new}^TV^{-1}x_{new}}{\sigma_n^4}y_{new}^2
+ +2\frac{\mu^T\Lambda V^{-1}x_{new}y_{new}}{\sigma_n^2}+\mathrm{const}.
+\end{aligned}\tag{7.J.10}
+\end{equation}
+将式（7.J.10）代入式（7.J.4），得到
+\begin{equation}
+\begin{aligned}
+&p(y_{new}\mid x_{new},w)p(w\mid X,y)\\
+&\quad\propto\exp\left\{-\frac12\left[(w-m)^TV(w-m)-m^TVm
+ +\frac{y_{new}^2}{\sigma_n^2}\right]\right\}\\
+&\quad\propto\exp\biggl\{-\frac12(w-m)^TV(w-m)\\
+&\hspace{6em}{}-\frac12\biggl[\frac{y_{new}^2}{\sigma_n^2}
+ -\frac{x_{new}^TV^{-1}x_{new}}{\sigma_n^4}y_{new}^2\\
+&\hspace{11em}{}-2\frac{\mu^T\Lambda V^{-1}x_{new}y_{new}}{\sigma_n^2}
+ +\mathrm{const}.\biggr]\biggr\}.
+\end{aligned}\tag{7.J.11}
+\end{equation}
+将式（7.J.11）代入式（7.375），得到
+\begin{equation}
+\begin{aligned}
+&p(y_{new}\mid x_{new},X,y)
+ =\int p(y_{new}\mid x_{new},w)p(w\mid X,y)\,dw\\
+&\quad\propto\exp\biggl\{-\frac12\biggl[\frac1{\sigma_n^2}
+ \left(1-\frac1{\sigma_n^2}x_{new}^TV^{-1}x_{new}\right)y_{new}^2\\
+&\hspace{12em}{}-2\frac{\mu^T\Lambda V^{-1}x_{new}y_{new}}{\sigma_n^2}
+ \biggr]\biggr\}.
+\end{aligned}\tag{7.J.12}
+\end{equation}
+令
+\[
+\begin{aligned}
+\lambda(y_{new}-\bar y)^2
+={}&\frac1{\sigma_n^2}\left(1-\frac1{\sigma_n^2}x_{new}^TV^{-1}x_{new}\right)y_{new}^2\\
+&{}-2\frac{\mu^T\Lambda V^{-1}x_{new}y_{new}}{\sigma_n^2}+\bar y^2,
+\end{aligned}
+\]
+得到
+\begin{equation}
+\lambda=\frac1{\sigma_n^2}\left(1-\frac1{\sigma_n^2}x_{new}^TV^{-1}x_{new}\right)\tag{7.J.13}
+\end{equation}
+以及
+\begin{equation}
+\bar y=\frac1\lambda\frac1{\sigma_n^2}x_{new}^TV^{-1}\Lambda\mu,\tag{7.J.14}
+\end{equation}
+其中
+\[
+\mu=\frac1{\sigma_n^2}\Lambda^{-1}Xy.
+\]
+注意
+\begin{equation}
+\begin{aligned}
+x_{new}^TV^{-1}x_{new}
+={}&x_{new}^T\Lambda^{-1}x_{new}
+ -\frac1{\sigma_n^2}\frac{(x_{new}^T\Lambda^{-1}x_{new})^2}
+ {1+\dfrac1{\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}}\\
+={}&x_{new}^T\Lambda^{-1}x_{new}\left[1-\frac1{\sigma_n^2}
+ \frac{x_{new}^T\Lambda^{-1}x_{new}}
+ {1+\dfrac1{\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}}\right]\\
+={}&\frac{x_{new}^T\Lambda^{-1}x_{new}}
+ {1+\dfrac1{\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}}.
+\end{aligned}\tag{7.J.15}
+\end{equation}
+将式（7.J.15）代入式（7.J.13），得到
+\begin{equation}
+\lambda=\frac1{\sigma_n^2\left(1+\dfrac1{\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}\right)}\tag{7.J.16}
+\end{equation}
+或
+\begin{equation}
+\frac1\lambda=\sigma_n^2\left(1+\frac1{\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}\right).\tag{7.J.17}
+\end{equation}
+回顾
+\begin{equation}
+\begin{aligned}
+\bar y&=\frac1\lambda\frac1{\sigma_n^2}x_{new}^TV^{-1}\Lambda\mu\\
+ &=\mu^T\frac{\Lambda V^{-1}x_{new}}{\lambda^T\lambda\sigma_n^2}.
+\end{aligned}\tag{7.J.18}
+\end{equation}
+接下来证明
+\[
+\frac{\Lambda V^{-1}x_{new}}{\lambda\sigma_n^2}=x_{new}.
+\]
+为此，作如下变形：
+\begin{equation}
+\begin{aligned}
+V\Lambda^{-1}x_{new}
+ &=\left(\Lambda+\frac{x_{new}x_{new}^T}{\sigma_n^2}\right)\Lambda^{-1}x_{new}\\
+ &=x_{new}+\frac{x_{new}x_{new}^T\Lambda^{-1}x_{new}}{\sigma_n^2}\\
+ &=\left(1+\frac{x_{new}^T\Lambda^{-1}x_{new}}{\sigma_n^2}\right)x_{new}.
+\end{aligned}\tag{7.J.19}
+\end{equation}
+由式（7.J.17），有
+\begin{equation}
+\frac1{\lambda\sigma_n^2}
+ =\frac1{\lambda\sigma_n^2}x_{new}^T\Lambda^{-1}x_{new}.\tag{7.J.20}
+\end{equation}
+将式（7.J.20）代入式（7.J.19），得到
+\begin{equation}
+V\Lambda^{-1}x_{new}=\frac1{\lambda\sigma_n^2}x_{new}.\tag{7.J.21}
+\end{equation}
+将式（7.J.21）两边乘以 $\Lambda V^{-1}$，得到
+\begin{equation}
+x_{new}=\frac{\Lambda V^{-1}x_{new}}{\lambda\sigma_n^2}\tag{7.3A22}
+\end{equation}
+将式（7.J.22）代入式（7.J.18），得到
+\begin{equation}
+\begin{aligned}
+\bar y&=\mu^Tx_{new}\\
+ &=x_{new}^T\mu.
+\end{aligned}\tag{7.J.23}
+\end{equation}
+结合式（7.J.14）、（7.J.23），得到
+\begin{equation}
+\bar y=x_{new}^T\frac1{\sigma_n^2}\Lambda^{-1}Xy.\tag{7.J.24}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+p(y_{new}\mid x_{new},X,y)
+ &\propto\exp\left\{-\frac{\left(y_{new}-\dfrac1{\sigma_n^2}x_{new}^T\Lambda^{-1}Xy\right)}
+ {2x_{new}^T\Lambda^{-1}x_{new}}\right\}\\
+ &=N\left(\frac1{\sigma_n^2}x_{new}^T\Lambda^{-1}Xy,\Lambda^{-1}x_{new}\right).
+\end{aligned}\tag{7.J.25}
+\end{equation}

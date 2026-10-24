@@ -1,0 +1,37 @@
+% 表29.1：原书分章PDF第15页，9行×9数据列=81格。
+% P0,1经验方差行的09、08等前导零是原印，全部保留。
+\begin{table}[htbp]
+\centering
+\caption{模拟研究结果汇总}
+\label{tab:ch29-results}
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.13}
+\begin{tabular}{@{}ll*{9}{c}@{}}
+\toprule
+&&\multicolumn{3}{c}{SRS}&\multicolumn{3}{c}{$P^{s\mathrm P}$，使用 $h_{n_0}^{\mathrm P}$}&\multicolumn{3}{c}{$P^{s\Pi}$，使用 $h_{n_0}^{\Pi}$}\\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}
+&&\multicolumn{3}{c}{$n$}&\multicolumn{3}{c}{$n$}&\multicolumn{3}{c}{$n$}\\
+&&$10^3$&$5\times10^3$&$10^4$&$10^3$&$5\times10^3$&$10^4$&$10^3$&$5\times10^3$&$10^4$\\
+\midrule
+$P_{0,1}$&经验覆盖率&96.2\%&98.9\%&99.2\%&98.1\%&98.6\%&99.4\%&97.8\%&99.2\%&99.3\%\\
+&经验方差&09&08&07&07&06&06&07&06&06\\
+&估计方差&13&14&14&11&11&11&11&11&11\\
+\midrule
+$P_{0,2}$&经验覆盖率&94.0\%&98.9\%&99.2\%&98.9\%&99.9\%&99.1\%&98.4\%&99.4\%&99.3\%\\
+&经验方差&129&104&102&44&41&44&49&42&42\\
+&估计方差&171&196&200&85&86&87&86&85&86\\
+\midrule
+$P_{0,3}$&经验覆盖率&95.6\%&98.8\%&97.8\%&97.8\%&97.9\%&97.1\%&98.5\%&98.3\%&96.3\%\\
+&经验方差&157&134&168&85&91&116&81&85&104\\
+&估计方差&216&242&245&130&133&135&124&128&127\\
+\bottomrule
+\end{tabular}
+\endgroup
+\par\medskip
+\begin{minipage}{\linewidth}
+\footnotesize
+上、中、下三组行分别对应 $P_{0,1}$、$P_{0,2}$ 和 $P_{0,3}$ 下的模拟。对每个子样本量 $n$ 及每种调查抽样设计，各组都报告置信区间的经验覆盖率 $B^{-1}\sum_{b=1}^BI\{\Psi^c(P_{0,j})\in I_{n,b}\}$、估计量经验方差的 $n$ 倍 $n[B^{-1}\sum_{b=1}^B\psi_{n,b}^{*2}-(B^{-1}\sum_{b=1}^B\psi_{n,b}^*)^2]$，以及估计量方差估计的 $n$ 倍的经验均值 $B^{-1}\sum_{b=1}^B\hat\sigma_{n,b}^2$。
+\end{minipage}
+\end{table}

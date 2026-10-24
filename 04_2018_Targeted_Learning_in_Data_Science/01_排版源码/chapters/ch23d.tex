@@ -1,0 +1,43 @@
+% 原书分章 PDF 第 7—8 页：第 23.4 节。
+\section{对 \texorpdfstring{$\Psi(P_0)$}{Ψ(P0)} 的推断}
+
+现在证明，只要对 $P_0$ 中所需部分的估计满足一致性与正则性条件，$\hat\Psi$ 就是 $\Psi(P_0)$ 的渐近线性估计量，影响曲线为 $D_0$。对于满足正值性的任意分布 $P$ 和 $P_0$、随机干预 $d$ 以及实数 $\tau$，定义二阶余项：
+\[
+\begin{aligned}
+ R_{10}(d,P)&\triangleq\E_{P_U\times P_0}\left[\left(1-\frac{g_0(d\mid W)}{g(d\mid W)}\right)
+ \bigl(\bar Q_P(d,W)-\bar Q_0(d,W)\bigr)\right],\\
+ R_{20}(d)&\triangleq\E_{P_U\times P_0}\bigl[(d-d_0)(\bar Q_{b,0}(W)-\tau_0)\bigr].
+\end{aligned}
+\]
+上述记号省略了 $d$ 和 $d_0$ 对 $(U,W)$ 的依赖。令 $R_0(d,P)\triangleq R_{10}(d,P)+R_{20}(d)$。下面的定理使用下列假设。
+\begin{enumerate}[label=(C\arabic*),start=5,leftmargin=3.6em]
+\item $g_0$ 满足强正值性假设：对于某个 $\delta>0$，有 $P_0(\delta<g_0(1\mid W)<1-\delta)=1$。
+\item 以趋于 1 的概率，$g_n$ 对于固定的 $\delta>0$ 满足强正值性假设：存在某个 $\delta>0$，使得以趋于 1 的概率，有 $P_0(\delta<g_n(1\mid W)<1-\delta)=1$。
+\item $R_0(d_n,P_n^*)=o_{P_0}(n^{-1/2})$。
+\item $\E_0[\{D(d_n,\tau_0,P_n^*)(O)-D_0(O)\}^2]=o_{P_0}(1)$。
+\item 以趋于 1 的概率，$D(d_n,\tau_0,P_n^*)$ 属于一个 $P_0$-Donsker 类 $\mathcal D$。
+\item $\frac1n\sum_{i=1}^nD(d_n,\tau_0,P_n^*)(O_i)=o_{P_0}(n^{-1/2})$。
+\end{enumerate}
+注意，最后一个条件中的 $\tau_0$，仅作为 $-\E_{P_U}[d(U,w_i)]-\kappa$ 前面的乘法常数进入求和式。
+
+\begin{bookresult}{定理}{23.4（$\hat\Psi$ 是渐近线性的）}
+假定 23.3 至 23.4 成立。那么 $\hat\Psi$ 是 $\Psi(P_0)$ 的 RAL 估计量，影响曲线为 $D_0$，即
+\[
+ \hat\Psi(P_n)-\Psi(P_0)=\frac1n\sum_{i=1}^nD_0(O_i)+o_{P_0}(n^{-1/2}).
+\]
+此外，$\hat\Psi$ 在 $\Psi(P_0)$ 的所有这类 RAL 估计量中是有效的。
+\end{bookresult}
+
+令 $\sigma_0^2\triangleq\Var_{P_0}(D_0)$。由中心极限定理，$\sqrt n\bigl(\hat\Psi(P_n)-\Psi(P_0)\bigr)$ 依分布收敛到 $N(0,\sigma_0^2)$ 分布。令
+$\sigma_n^2\triangleq\frac1n\sum_{i=1}^nD(d_n,\tau_n,P_n^*)(O_i)^2$
+为 $\sigma_0^2$ 的一个估计。现在给出以下引理，它给出了 $\tau_n$ 对 $\tau_0$ 一致的充分条件。
+
+\begin{bookresult}{引理}{23.1（$\tau_n$ 的一致性）}
+假定 23.3 和 23.3 成立。再假定 $\bar Q_{b,n}$ 在 $L^1(P_0)$ 中对 $\bar Q_{b,0}$ 一致，且以趋于 1 的概率，估计 $\bar Q_{b,n}$ 属于一个 $P_0$ Glivenko--Cantelli 类。那么 $\tau_n\to\tau_0$ 依概率成立。
+\end{bookresult}
+
+容易验证，类似于定理 23.4 的条件，加上上述引理所考虑的 $\tau_n$ 向 $\tau_0$ 的收敛，蕴含 $\sigma_n\to\sigma_0$ 依概率成立。在这些条件下，一个渐近有效的双侧 $1-\alpha$ 置信区间为
+\[
+ \hat\Psi(P_n)\pm z_{1-\alpha/2}\frac{\sigma_n}{\sqrt n},
+\]
+其中 $z_{1-\alpha/2}$ 表示 $N(0,1)$ 随机变量的 $1-\alpha/2$ 分位数。

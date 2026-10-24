@@ -1,0 +1,10 @@
+% 三张生成图像保持原始像素；只遮住原有提示文字区，再完整排入中文。
+\begin{tikzpicture}
+\node[anchor=south west,inner sep=0] (im) at (0,0) {\includegraphics[width=\linewidth]{figures/dalle3.png}};
+\begin{scope}[x={(im.south east)},y={(im.north west)}]
+\fill[white] (0,0) rectangle (1,.152);
+\node[anchor=north west,align=left,inner sep=0pt,text width=.312\linewidth,font=\fontsize{8}{10}\selectfont] at (.018,.145) {一名凶猛的花园侏儒战士，身披用树叶和树皮制成的铠甲，挥舞着一柄小剑和一面小盾。他英勇地站在盛放花园中的岩石上，周围是五颜六色的花朵与高耸的植物。他脸上描绘着坚定的神情，准备保卫自己的花园王国。};
+\node[anchor=north west,align=left,inner sep=0pt,text width=.312\linewidth,font=\fontsize{8}{10}\selectfont] at (.347,.145) {星光点点的天空下是一片冰雪景观，一道壮观的冰冻瀑布从悬崖上倾泻而下。场景中央，一团火明亮地燃烧，火苗仿佛凝固在原处，在周围的冰雪上洒下闪烁的光芒。};
+\node[anchor=north west,align=left,inner sep=0pt,text width=.312\linewidth,font=\fontsize{8}{10}\selectfont] at (.677,.145) {一个旋转的多彩传送门，从咖啡海洋的深处升起，浓郁液体的波浪轻轻向外荡开。传送门吞没了一杯咖啡，这杯咖啡成为通往奇幻次元的入口。周围的数字艺术景观映照着传送门的色彩，营造出一幅充满无限可能、令人着迷的画面。};
+\end{scope}
+\end{tikzpicture}

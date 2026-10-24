@@ -1,0 +1,51 @@
+% 原书第 71—74 页；导言、5.1 节导言和 5.1.1 小节。
+\chapter{与机器学习的联系（一）}
+\label{ch:machine-learning-one}
+
+如第 1 章所述，标准机器学习与统计学具有相同的基础：我们使用从某个未知底层分布独立同分布抽取的数据，尝试推断该分布的性质。相比之下，因果推断假定了一种更强的底层结构，其中包含有向的相依关系。这使得从数据中学习结构更加困难；但是，一旦学到了结构，就能作出新的论断，包括关于分布偏移和干预作用的论断。如果将机器学习看作推断某些超越纯粹统计关联的规律（或“自然定律”）的过程，那么因果性就发挥着至关重要的作用。本章将就此展开一些讨论，仅关注两个变量的情形。第 8 章会重新讨论这一主题，并考察多元情形。
+
+\section{半监督学习}
+\label{sec:ch05-semi-supervised-learning}
+
+考虑一个回归任务，目标是根据 $d$ 维预测变量 $\mathbf{X}$ 来预测目标变量 $Y$。对于许多损失函数，只要知道条件分布 $P_{Y\mid\mathbf{X}}$，就足以解决问题。例如，回归函数
+\[
+ f^0(\mathbf{x})\coloneqq\EE[Y\mid\mathbf{X}=\mathbf{x}]
+\]
+能够使 $L_2$ 损失最小，即
+\[
+ f^0\in\mathop{\mathrm{arg\,min}}_{f:\RR^d\to\RR}
+ \EE\bigl[(Y-f(\mathbf{X}))^2\bigr].
+\]
+
+在\textbf{监督学习（supervised learning）}中，我们获得从联合分布独立同分布抽取的 $n$ 个数据点：
+\[
+ ( \mathbf{X}_1,Y_1),\ldots,(\mathbf{X}_n,Y_n)
+ \overset{\mathrm{iid}}{\sim}P_{\mathbf{X},Y}.
+\]
+因此，在 $L_2$ 损失下进行回归估计，就是利用联合分布中的 $n$ 个数据点来估计条件均值。然而，在（归纳式）\textbf{半监督学习（semi-supervised learning，SSL）}中，我们还会额外获得 $m$ 个无标签数据点
+\[
+ \mathbf{X}_{n+1},\ldots,\mathbf{X}_{n+m}
+ \overset{\mathrm{iid}}{\sim}P_{\mathbf{X}}.
+\]
+我们希望，这些额外的数据点能够提供关于 $P_{\mathbf{X}}$ 的信息，而 $P_{\mathbf{X}}$ 又能告诉我们一些关于 $\EE[Y\mid\mathbf{X}]$ 的信息，或者更一般地，关于 $P_{Y\mid\mathbf{X}}$ 的信息。\footnote{这里仍用 $P_{Y\mid\mathbf{X}}$ 简记条件分布族 $(P_{Y\mid\mathbf{X}=\mathbf{x}})_{\mathbf{x}}$。}
+许多半监督学习技术的基本假设，都涉及 $P_{\mathbf{X}}$ 与 $P_{Y\mid\mathbf{X}}$ 之间的联系，综述见 Chapelle et al.［2006］。例如，\textbf{聚类假设（cluster assumption）}规定，属于 $P_{\mathbf{X}}$ 同一个簇的点，其 $Y$ 值相同或相近。与之类似的\textbf{低密度分离假设（low-density separation assumption）}则规定，分类器的决策边界，即 $P(Y=1\mid\mathbf{X}=\mathbf{x})$ 穿过 $0.5$ 时对应的点 $\mathbf{x}$，应位于 $P_{\mathbf{X}}$ 密度较低的区域。\textbf{半监督光滑性假设（semi-supervised smoothness assumption）}规定，在 $P_{\mathbf{X}}$ 密度较高的区域，条件均值函数 $\mathbf{x}\mapsto\EE[Y\mid\mathbf{X}=\mathbf{x}]$ 应当是光滑的。
+
+\subsection{半监督学习与因果方向}
+\label{sec:ch05-ssl-causal-direction}
+
+在最简单的情形下，因果图只包含两个变量，即原因和结果。此时，机器学习问题既可能沿因果方向展开，即根据原因预测结果；也可能沿\textbf{反因果方向（anticausal direction）}展开，即根据结果预测原因。实践工作者通常不关心给定学习问题背后的因果结构（见图 5.1）。但是，下面我们将说明，这种结构会对机器学习产生影响。
+
+第 2.1 节提出，因果条件分布彼此独立，见原理 2.1 及其后的讨论。Schölkopf et al.［2012］认识到，这一原理对半监督学习具有直接含义。半监督学习依赖 $P_{\mathbf{X}}$ 与 $P_{Y\mid\mathbf{X}}$ 之间的联系，而该原理断言，$P_{\mathrm{cause}}$ 与 $P_{\mathrm{effect}\mid\mathrm{cause}}$ 不包含关于彼此的信息。因此可以推断：如果 $\mathbf{X}$ 对应原因，$Y$ 对应结果，即学习问题沿因果方向展开，那么半监督学习就不会起作用。在这种情况下，额外的 $\mathbf{x}$ 值只会增加我们对 $P_{\mathbf{X}}$ 的了解，但这些信息无助于预测，因为预测所需要的是关于独立对象 $P_{Y\mid\mathbf{X}}$ 的信息。反过来，如果 $\mathbf{X}$ 是结果、$Y$ 是原因，关于 $P_{\mathbf{X}}$ 的信息就可能告诉我们一些关于 $P_{Y\mid\mathbf{X}}$ 的信息。
+
+一项综合分析半监督学习结果的研究支持了这一假设。在所有半监督学习有所帮助的情形中，学习问题或者沿反因果方向展开，或者存在混杂，或者其因果结构尚不明确，见图 5.2。
+
+\input{figures/ch05_figure_5_1}
+
+在双射的确定性因果关系这一简化情景中（见第 4.1.7 节），Janzing and Schölkopf［2015］证明：只要 $P_{\mathrm{cause}}$ 与 $P_{\mathrm{effect}\mid\mathrm{cause}}$ 在式 (4.10) 的意义下相互独立，半监督学习就确实能在反因果方向上优于监督学习，而在因果方向上则不能。其思路是，半监督学习利用式 (4.11) 中的相依关系，构造更好的插值算法。Sgouritsa et al.［2015］利用“半监督学习只能在反因果方向上起作用”这一事实，开发了一种因果学习方法。
+
+最后要注意，半监督学习还将某些形式的\textbf{无监督学习（unsupervised learning）}包含为特例，此时没有带标签的数据。例如，在聚类中，$Y$ 通常是表示簇编号的离散值。类似于上面的推理，我们可以认为，如果 $\mathbf{X}$ 是原因、$Y$ 是结果，聚类的表现应当不佳。不过，在许多对真实数据进行聚类的应用中，簇编号往往是特征的原因，而非其结果。
+
+\input{figures/ch05_figure_5_2}
+
+虽然图 5.2 中的经验结果令人期待，但“半监督学习在因果方向上不起作用”这一说法仍需更精确地表述；这里始终假定原因与机制独立，参见原理 2.1。下一小节将作出更精确的说明。对半监督学习和\textbf{协变量偏移（covariate shift）}感兴趣的读者，可以关注这部分内容；其他读者初读时可以跳过。
+\FloatBarrier

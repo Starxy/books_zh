@@ -1,0 +1,189 @@
+% 原书分章 PDF 第 8—12 页：第 5.3 节与表 5.1。
+\section{例：ATT 的一步 TMLE}
+
+用于估计已处理者中的平均处理效应（average treatment effect among the treated，ATT）参数的迭代 TMLE，会多次返回数据，作一系列局部移动，在每次迭代中更新 $\bar Q_n(A,W)$ 和 $\bar g_n(A,W)$ 的估计。使用通用最不利子模型的一步 TMLE 则只拟合一次数据；其中，MLE 步骤需要在由调节参数步长 $d\epsilon$ 所确定的小得多的局部邻域内，作一系列微小更新。当数据中有足够信息用于估计目标参数时，可以预期两种方法具有相近的表现。当数据稀疏时，理论表明，一步 TMLE 会更加稳定，方差小于迭代 TMLE。
+
+设 $O=(W,A,Y)\sim P_0$，$\mathcal M$ 为非参数统计模型。定义 $\Psi:\mathcal M\to\mathbb R$ 为
+\[
+ \Psi(P)=E_P\{E_P(Y\mid A=1,W)-E_P(Y\mid A=0,W)\mid A=1\}.
+\]
+由 van der Laan 等（2013b），$\Psi$ 在 $P$ 处的有效影响曲线为
+\[
+ \begin{aligned}
+ D^*(P)(O)={}&H_1(g,q)(A,W)\{Y-\bar Q(A,W)\}\\
+ &+\frac{A}{q}\{\bar Q(1,W)-\bar Q(0,W)-\Psi(P)\},
+ \end{aligned}
+\]
+其中，$g(a\mid W)=P(A=a\mid W)$，$\bar Q(a,W)=E_P(Y\mid A=a,W)$，$q=P(A=1)$，且
+\[
+ H_1(g,q)(A,W)=\frac{A}{q}
+ -\frac{(1-A)g(1\mid W)}{qg(0\mid W)}.
+\]
+注意
+\[
+ \Psi(P)=\Psi_1(Q_W,\bar Q,g,q)
+ =\int\{\bar Q(1,w)-\bar Q(0,w)\}
+ \frac{g(1\mid w)}q\,dQ_W(w),
+\]
+其中，$Q_W$ 为 $P$ 下 $W$ 的概率分布。因此，若定义 $Q=(Q_W,\bar Q,g,q)$，则 $\Psi(P)=\Psi_1(Q)$。为记号方便，我们交替使用 $\Psi(P)$ 与 $\Psi(Q)$。由于能够用经验概率分布估计 $Q_W$ 和 $q$，我们只关注 $(\bar Q,g)$ 的通用最不利子模型。在 $L_0^2(P)$ 中，可以将 $D^*(P)=D_1^*(P)+D_2^*(P)+D_3^*(P)$ 正交分解为分别对应 $\bar Q$、$g$ 和 $Q_W$ 的得分，其中
+\[
+ \begin{aligned}
+ D_1^*(P)&=H_1(g,q)(A,W)\{Y-\bar Q(A,W)\},\\
+ D_2^*(P)&=H_2(Q)(W)\{A-g(1\mid W)\},\\
+ D_3^*(P)&=\frac{g(1\mid W)}q
+ \{\bar Q(1,W)-\bar Q(0,W)-\Psi(Q)\},
+ \end{aligned}
+\]
+且
+\[
+ H_2(Q)(W)=\frac{\bar Q(1,W)-\bar Q(0,W)-\Psi(Q)}q.
+\]
+所以，有效影响曲线中对应于 $(\bar Q,g)$ 的分量为 $D_1^*(Q)+D_2^*(Q)$。
+
+考虑 $\bar Q$ 与 $g$ 的下列损失函数和局部最不利子模型（van der Laan 等，2013b）：
+\[
+ \begin{aligned}
+ L_1(\bar Q)(O)&=-\{Y\log\bar Q(A,W)
+ +(1-Y)\log(1-\bar Q(A,W))\},\\
+ \operatorname{Logit}\bar Q_\epsilon^{\mathrm{lfm}}
+ &=\operatorname{Logit}\bar Q-\epsilon H_1(g,q),\\
+ L_2(g)(O)&=-\{A\log g(1\mid W)+(1-A)\log g(0\mid W)\},\\
+ \operatorname{Logit}\bar g_\epsilon^{\mathrm{lfm}}
+ &=\operatorname{Logit}\bar g-\epsilon H_2(Q).
+ \end{aligned}
+\]
+现在定义总和损失函数 $L(\bar Q,g)=L_1(\bar Q)+L_2(g)$，以及在 $\epsilon=0$ 处经过 $(\bar Q,g)$ 的局部最不利子模型 $\{Q_\epsilon^{\mathrm{lfm}},g_\epsilon^{\mathrm{lfm}}:\epsilon\}$，满足
+\[
+ \left.\frac{d}{d\epsilon}
+ L(\bar Q_\epsilon^{\mathrm{lfm}},g_\epsilon^{\mathrm{lfm}})
+ \right|_{\epsilon=0}=D_1^*(Q)+D_2^*(Q).
+\]
+因此，这确实定义了 $(\bar Q,g)$ 的一个局部最不利子模型。
+
+在我们以往有关 ATT 的 TMLE 的工作中，采用了局部最不利子模型
+$\{\bar Q_{\epsilon_1}^{\mathrm{lfm}},\bar g_{\epsilon_2}^{\mathrm{lfm}}:\epsilon_1,\epsilon_2\}$，为 $\bar Q$ 与 $\bar g$ 分别使用 $\epsilon_1$ 和 $\epsilon_2$。也可以只用一个 $\epsilon$ 来实现：将因变量向量 $(Y,A)$ 对一个叠放的设计矩阵作回归；该设计矩阵包含偏移项与协变量 $H$，后者为向量 $(H_1(g,q)(A,W),H_2(Q)(W))$。无论采用一个 $\epsilon$，还是分别采用 $(\epsilon_1,\epsilon_2)$，这一 TMLE 都需要多次迭代才能收敛。
+
+通用最不利子模型 (5.3) 现在由以下递归关系定义：对于 $\epsilon\geq0$、$d\epsilon>0$，
+\[
+ \begin{aligned}
+ \operatorname{Logit}\bar Q_{\epsilon+d\epsilon}
+ &=\operatorname{Logit}\bar Q_{\epsilon,d\epsilon}^{\mathrm{lfm}}
+ =\operatorname{Logit}\bar Q_\epsilon-d\epsilon H_1(g_\epsilon,q),\\
+ \operatorname{Logit}\bar g_{\epsilon+d\epsilon}
+ &=\operatorname{Logit}\bar g_{\epsilon,d\epsilon}^{\mathrm{lfm}}
+ =\operatorname{Logit}\bar g_\epsilon
+ -d\epsilon H_2(Q_W,\bar Q_\epsilon,q).
+ \end{aligned}
+\]
+对于 $\epsilon<0$ 也有类似的递归关系；但这些公式都只是 $\epsilon>0$ 情形的对称版本，因此我们只讨论 $\epsilon>0$。该式用先前计算的 $(Q_x,g_x:x\leq\epsilon)$ 表示下一个 $(Q_{\epsilon+d\epsilon},g_{\epsilon+d\epsilon})$，从而完整定义了这个通用最不利子模型。这一递归定义对应于下列积分表示：
+\[
+ \begin{aligned}
+ \operatorname{Logit}\bar Q_\epsilon
+ &=\operatorname{Logit}\bar Q-\int_0^\epsilon H_1(g_x,q)\,dx,\\
+ \operatorname{Logit}\bar g_\epsilon
+ &=\operatorname{Logit}\bar g-\int_0^\epsilon H_2(Q_W,\bar Q_x,q)\,dx.
+ \end{aligned}
+\]
+
+下面明确验证，它确实具有通用最不利子模型的关键性质。显然，它是一个子模型，且在 $\epsilon=0$ 处包含 $(Q,g)$。$\bar Q_\epsilon$ 在 $\epsilon$ 处的得分为 $H_1(g_\epsilon,q)(Y-\bar Q_\epsilon)$，$g_\epsilon$ 在 $\epsilon$ 处的得分为 $H_2(Q_W,\bar Q_\epsilon,q)\{A-\bar g_\epsilon(W)\}$，所以
+\[
+ \begin{aligned}
+ \frac{d}{d\epsilon}L(\bar Q_\epsilon,g_\epsilon)
+ ={}&H_1(g_\epsilon,q)(Y-\bar Q_\epsilon)\\
+ &+H_2(Q_W,\bar Q_\epsilon,q)\{A-\bar g_\epsilon(W)\}\\
+ ={}&D_1^*(Q_W,\bar Q_\epsilon,g_\epsilon,q)
+ +D_2^*(Q_W,\bar Q_\epsilon,g_\epsilon,q).
+ \end{aligned}
+\]
+这就明确证明，它确实是 $(\bar Q,g)$ 的通用最不利模型。
+
+给定初始估计量 $(\bar Q,g)$，基于上述通用最不利子模型的 TMLE 可以如下实现。
+
+首先，考察 $P_nL(\bar Q_h,g_h)$ 的导数，并确定它在 $h=0$ 处的符号。假设导数为负，因此它在 $h>0$ 时递减。给定 $(\bar Q_x,g_x:x\leq\epsilon)$，用一个小的 $d\epsilon>0$ 不断迭代计算 $(\bar Q_{\epsilon+d\epsilon},g_{\epsilon+d\epsilon})$，直到
+$P_nL(\bar Q_{\epsilon+d\epsilon},g_{\epsilon+d\epsilon})\geq P_nL(\bar Q_\epsilon,g_\epsilon)$，
+此时就达到所需的局部极大似然值 $\epsilon_n$。
+
+此时，$\bar Q_{\epsilon_n},g_{\epsilon_n}$ 就是 $(\bar Q_0,g_0)$ 的 TMLE，并满足
+$P_n\{D_1^*(Q_{\epsilon_n})+D_2^*(Q_{\epsilon_n})\}=0$；
+其中 $Q_{\epsilon_n}=(Q_{W,n},\bar Q_{\epsilon_n},g_{\epsilon_n},q_n)$，$Q_{W,n},q_n$ 为 $Q_{W,0},q_0$ 的经验对应量。又由于 $P_nD_3^*(Q_{\epsilon_n})=0$，所以 $P_nD^*(Q_{\epsilon_n})=0$。$\Psi(Q_0)$ 的（一步）TMLE 就是相应的代入估计量 $\Psi(Q_{\epsilon_n})$。
+
+\paragraph{模拟。}
+van der Laan 和 Gruber（2016）通过两项模拟研究展示了这些性质，这里报告第一项模拟。迭代 TMLE 使用单个 $\epsilon$ 实现，这是最接近一步 TMLE 的形式。有关细节及源代码，见 van der Laan 和 Gruber（2016）。在本研究中，分别以 $n=100$ 和 $n=1000$ 两种样本量生成 1000 个数据集。生成两个服从正态分布的协变量和一个二值协变量：
+$W_1\sim N(0,1)$、$W_2\sim N(0,1)$、$W_3\sim\operatorname{Bern}(0.5)$；
+所有协变量相互独立。处理分配概率为
+\[
+ P(A=1\mid W)=\expit(-0.4-0.2W_1-0.4W_2+0.3W_3).
+\]
+设置
+\[
+ P(Y=1\mid A,W)=\expit(-1.2-1.2A-0.1W_1-0.2W_2-0.1W_3)
+\]
+以生成二值结局 $Y$。ATT 参数的真值为 $\psi_0=-0.1490$。理论上不存在正值性违反（处理分配概率通常介于 0.07 与 0.87 之间），但在较小样本量下，数据在 $W$ 的某些分层内用于估计 $g_0$ 的信息较少。这意味着，某些生成的数据集对迭代 TMLE 的挑战，会比对一步 TMLE 更大。
+
+对 $Q_0$ 和 $g_0$ 的初始估计，分别使用设定正确与设定错误的 logistic 回归。$Q_{\mathrm{cor}}$ 由 $Y$ 对 $A,W_1,W_2,W_3$ 的 logistic 回归估计，$Q_{\mathrm{mis}}$ 由 $Y$ 对 $A,W_1$ 的 logistic 回归估计。$g_{\mathrm{cor}}$ 由 $A$ 对 $W_1,W_2,W_3$ 的 logistic 回归估计，$g_{\mathrm{mis}}$ 则由 $A$ 对 $W_1$ 的 logistic 回归估计。表 5.1 列出了偏差、方差、均方误差（mean squared error，MSE）和相对效率
+$\mathrm{RE}=\mathrm{MSE}_{\text{一步}}/\mathrm{MSE}_{\text{迭代}}$。
+$\mathrm{RE}<1$ 表明一步 TMLE 的有限样本效率优于迭代 TMLE。
+
+当 $n=1000$ 时，一步 TMLE 与迭代 TMLE 表现相近，$\mathrm{RE}=1$。当 $n=100$ 时，1000 个数据集中有 24 个使迭代 TMLE 无法收敛；在其余 976 个数据集上，两种 TMLE 表现很相近。不过，用全部 1000 个数据集评价时，一步 TMLE 的偏差、方差和 MSE 更大。这说明，因迭代 TMLE 失败而被删除的 24 个数据集，确实属于最难处理的数据集。改善迭代 TMLE 表现的一种办法，是将预测的结局概率限制在远离 0 和 1 的范围内。我们重新分析了同样的 1000 个数据集，对两种估计量都强制将 $\bar Q_n$ 限制在 $(10^{-9},1-10^{-9})$ 内。这种程度很小的限制防止了迭代 TMLE 失败，而且应当不会引入截断偏差。限制 $\bar Q_n$ 后，迭代 TMLE 在所有分析中都能给出结果；该限制对一步 TMLE 的估计结果则没有影响。这证实，在局部邻域中采取许多小步、并在每次迭代中微调邻域边界的策略，有助于避开极端情况。虽然限制 $\bar Q_n$ 后迭代 TMLE 不再失败，但其方差和 MSE 仍高于一步 TMLE。一步 TMLE 的效率提高了 7\%—28\%，见表 5.1。
+
+\begin{table}[p]
+\centering
+\caption{模拟研究}
+\label{tab:ch05-simulation}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{lrrrrrrr}
+\toprule
+&\multicolumn{2}{c}{偏差}&\multicolumn{2}{c}{方差}
+&\multicolumn{2}{c}{MSE}&\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+&一步&迭代&一步&迭代&一步&迭代&RE\\
+\midrule
+\multicolumn{8}{c}{$n=1000$}\\
+\multicolumn{8}{l}{\textbf{$Q$ 设定正确}}\\
+$g_{\mathrm{cor}}$&$-0.00042$&$-0.00042$&0.00059&0.00059&0.00059&0.00059&1.00\\
+$g_{\mathrm{mis}}$&$-0.00050$&$-0.00050$&0.00057&0.00057&0.00057&0.00057&1.00\\
+\cmidrule{1-8}
+\multicolumn{8}{l}{\textbf{$Q$ 设定错误}}\\
+$g_{\mathrm{cor}}$&$-0.00035$&$-0.00035$&0.00059&0.00059&0.00059&0.00059&1.00\\
+$g_{\mathrm{mis}}$&0.01210&0.01210&0.00049&0.00048&0.00063&0.00063&1.00\\
+\midrule
+\multicolumn{8}{c}{$n=100$，全部模拟}\\
+\multicolumn{8}{l}{\textbf{$Q$ 设定正确}}\\
+$g_{\mathrm{cor}}$&0.00049&&0.00694&&0.00693&&\\
+$g_{\mathrm{mis}}$&$-0.00215$&&0.00635&&0.00635&&\\
+\cmidrule{1-8}
+\multicolumn{8}{l}{\textbf{$Q$ 设定错误}}\\
+$g_{\mathrm{cor}}$&0.00113&&0.00685&&0.00684&&\\
+$g_{\mathrm{mis}}$&0.01226&&0.00528&&0.00543&&\\
+\midrule
+\multicolumn{8}{c}{$n=100$，删除 24 次模拟}\\
+\multicolumn{8}{l}{\textbf{$Q$ 设定正确}}\\
+$g_{\mathrm{cor}}$&0.00296&0.00295&0.00679&0.00678&0.00679&0.00679&1.00\\
+$g_{\mathrm{mis}}$&0.00023&0.00023&0.00621&0.00621&0.00621&0.00620&1.00\\
+\cmidrule{1-8}
+\multicolumn{8}{l}{\textbf{$Q$ 设定错误}}\\
+$g_{\mathrm{cor}}$&0.00357&0.00363&0.00671&0.00669&0.00671&0.00670&1.00\\
+$g_{\mathrm{mis}}$&0.01474&0.01473&0.00509&0.00509&0.00530&0.00530&1.00\\
+\midrule
+\multicolumn{8}{c}{$n=100$，限制 $Q$ 的范围\textsuperscript{a}}\\
+\multicolumn{8}{l}{\textbf{$Q$ 设定正确}}\\
+$g_{\mathrm{cor}}$&0.00049&$-0.00182$&0.00694&0.00781&0.00693&0.00781&0.89\\
+$g_{\mathrm{mis}}$&$-0.00215$&$-0.00168$&0.00635&0.01033&0.00635&0.01033&0.62\\
+\cmidrule{1-8}
+\multicolumn{8}{l}{\textbf{$Q$ 设定错误}}\\
+$g_{\mathrm{cor}}$&0.00113&$-0.00052$&0.00685&0.00738&0.00684&0.00738&0.93\\
+$g_{\mathrm{mis}}$&0.01226&0.01031&0.00528&0.00592&0.00543&0.00602&0.90\\
+\bottomrule
+\end{tabular}
+\endgroup
+\par\smallskip
+\begin{minipage}{.97\textwidth}
+\footnotesize
+\textsuperscript{a} 当 $n=1000$ 时，限制 $\bar Q_n$ 的范围不影响估计结果。\\
+1000 次 Monte Carlo 模拟中一步 TMLE 与迭代 TMLE 的偏差、方差、MSE 和 RE（$n=1000$ 与 $n=100$）。
+\end{minipage}
+\end{table}
+\FloatBarrier

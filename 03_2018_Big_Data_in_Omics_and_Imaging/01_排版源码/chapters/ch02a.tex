@@ -1,0 +1,186 @@
+% 原章分章页1—6（至2.2末），印刷页73—78。
+\chapter{因果分析与网络生物学}
+\label{ch:causal-network-biology}
+
+因果推断（causal inference）是遗传、表观遗传和影像数据分析的基础。因果推断的主要目标，是根据观测数据（observational data）和干预数据（interventional data）估计因果相依关系。观测数据通常指所研究的变量系统在没有外部操纵时产生的数据。
+
+与其他统计问题类似，似然函数为因果网络建模提供了一般框架。不过，因果网络的似然函数可以按照因果网络的结构进行分解，这一点与其他统计问题不同。因果网络的结构及其参数均未知。学习因果网络的主要目标，是寻找似然最大的因果网络。从数据中学习因果网络是一个 NP 难问题（de Campos 2000）。
+
+因果网络学习由两部分组成：评分度量（scoring metric）和搜索过程。变量分为离散变量与连续变量两类，网络连接则分为三类：离散变量之间的连接、连续变量之间的连接，以及离散变量和连续变量之间的连接。对于离散变量之间的连接，广泛使用的评分度量是贝叶斯 Dirichlet 等价均匀评分（Bayesian Dirichlet equivalent uniform，BDeu），或条件概率表（Barlett and Cussens 2013；Scanagatta et al. 2014）。连续变量之间连接的评分度量用结构方程定义，离散变量与连续变量之间连接的评分度量则用网络惩罚逻辑回归定义。第1章已介绍结构方程。网络惩罚逻辑回归见《组学与影像大数据：关联分析》（\textit{Big Data in Omics and Imaging: Association Analysis}）第8章。本章将介绍 BDeu。
+
+学习因果网络结构有两类方法：基于约束的学习和基于评分的学习。基于约束的学习方法，通过检验数据中的条件独立关系来学习因果网络（Cheng et al. 2002），但这类方法对噪声敏感。基于评分的方法为网络指定评分函数，再搜索评分最优的网络，由此将因果网络学习表述为组合优化问题。从观测数据中学习因果网络的评分搜索算法，包括动态规划（Koivisto et al. 2004）、A* 搜索（Fan et al. 2014）和整数规划（Barlett and Cussens 2013）。由于整数规划能够求解大型因果网络，本章将主要介绍用整数规划搜索因果网络结构的方法。
+
+\section{作为因果推断一般框架的贝叶斯网络}
+\label{sec:ch02-bayesian-framework}
+
+考虑 $p$ 个随机变量 $Y=(Y_1,\ldots,Y_p)$，其联合分布 $P(y_1,\ldots,y_p)$ 满足相对于某个底层有向无环图的马尔可夫条件（Markov condition）。假设有向无环图 $G=(V,E)$ 有 $p$ 个节点，$V=\{1,2,\ldots,p\}$。每个节点 $i$ 表示变量 $y_i$，$i=1,\ldots,p$，每条边均有方向。从节点 $i$ 指向节点 $j$ 的有向边记为 $i\to j$。节点 $i$ 称为节点 $j$ 的父节点，节点 $j$ 称为节点 $i$ 的子节点（child）。节点 $j$ 的父节点集合记为 $\pa_D(j)=\{i\mid i\to j\text{ 在 }G\text{ 中}\}$，其子节点集合记为 $\mathrm{ch}(j)$。起点和终点为同一节点的路径称为环。没有环的有向图称为有向无环图（directed acyclic graph，DAG）。联合概率 $P(y_1,y_2,\ldots,y_p)$ 可以分解为
+\begin{equation}
+\begin{aligned}
+P(y_1,y_2,\ldots,y_p)
+ &=P(y_1)P(y_2\mid y_1)\cdots P(y_p\mid y_1,y_2,\ldots,y_{p-1})\\
+ &=\prod_{i=}^{p}P(y_i\mid y_1,\ldots,y_{i-1})\\
+ &=\prod_{i=1}^{p}P(y_i\mid\pa_i),
+\end{aligned}\tag{2.1}
+\end{equation}
+其中，当节点 $i$ 的父节点集合为空时，$P(y_i\mid\pa_i)=P(y_i)$。
+
+假设贝叶斯网络（Bayesian network）如图2.1所示，则概率函数 $P(y_1,y_2,\ldots,y_7)$ 可以分解为
+\[
+\begin{aligned}
+P(y_1,y_2,y_3,y_4,y_5,y_6,y_7)
+ ={}&P(y_1)P(y_2)P(y_3\mid y_1,y_4)P(y_4\mid y_2)\\
+ &{}\ast P(y_5\mid y_2)P(y_6\mid y_3,y_4)P(y_7\mid y_4,y_5).
+\end{aligned}
+\]
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig01.tex}
+\origfig{1}{贝叶斯网络的概率分解。}
+\end{figure}
+在贝叶斯网络中，给定父变量后，每个变量都与既非其后代、也非其父节点的变量条件独立，这就是马尔可夫条件。
+
+\section{离散贝叶斯网络的参数估计与贝叶斯 Dirichlet 等价均匀评分}
+\label{sec:ch02-bdeu}
+
+学习贝叶斯网络的首要任务，是在给定网络结构时估计参数。考虑构成一个 DAG 的 $p$ 个变量 $Y_1,Y_2,\ldots,Y_p$。假设变量 $Y_i$ 可以取 $r_i$ 个值 $\{y_{i1},y_{i2},\ldots,y_{ir_i}\}$，所有可能取值的集合记为 $\Omega_{Y_i}=\{y_{i1},y_{i2},\ldots,y_{ir_i}\}$。令 $r_{\pa_i}=\prod_{t\in\pa_i}r_t$ 为变量 $Y_i$ 的父变量所有可能取值组合的个数。令 $\pi_{ij}$（$i\in\{1,\ldots,p\}$，$j\in\{1,\ldots,r_{\pa_i}\}$）表示节点 $i$ 的父节点取值。定义 $\theta_{ijk}=P(Y_{ik}\mid\pi_{ij})$，即给定父节点集合取值为 $\pi_{ij}$ 时，观测到 $y_{ik}$ 的条件概率。令 $\theta=(\theta_{ijk})_{\forall ijk}$ 为全部参数组成的向量。
+
+令 $\chi$ 为所有随机变量 $\{Y_1,\ldots,Y_p\}$ 构成的空间，并用粗体字母表示集合或向量。对所有 $\mathbf Y\subseteq\chi$，定义 $\Omega_{\mathbf Y}=\bigcup_{Y\in\mathbf Y}\Omega_Y$，表示 $\mathbf Y$ 中变量的所有实例或取值。假设抽取了 $n$ 名受试者，考虑完整数据集 $D=\{D_1,\ldots,D_n\}$。参数 $\theta_{ijk}$ 可以刻画 $\{Y_1,\ldots,Y_p\}$ 的联合分布。评分度量可以定义为参数 $\theta_{ijk}$ 的后验分布。参数 $\theta_{ijk}$ 的先验分布为 Dirichlet 分布，其密度函数为
+\begin{equation}
+P(\theta_{ijk}\mid\pa_i)
+ =\Gamma\left(\sum_{k=1}^{r_i}\alpha_{ijk}\right)
+ \prod_{k=1}^{r_i}\frac{\theta_{ijk}^{\alpha_{ijk}-1}}{\Gamma(\alpha_{ijk})}.
+\tag{2.2}
+\end{equation}
+令 $P(\theta\mid G)$ 为给定 $G$ 时 $\theta$ 的先验。由式（2.2），$\theta$ 的 Dirichlet 先验为
+\begin{equation}
+P(\theta\mid G)=
+\prod_{i=1}^{p}\prod_{j=1}^{r_{\pa_i}}
+\Gamma\left(\sum_{k=1}^{r_i}\alpha_{ijk}\right)
+\prod_{k=1}^{r_i}\frac{\theta_{ijk}^{\alpha_{ijk}-1}}{\Gamma(\alpha_{ijk})}.
+\tag{2.3}
+\end{equation}
+令 $n_{ijk}$ 为同时具有 $y_{ik}$ 和 $\pi_{ij}$ 的受试者人数，定义 $n_{ij}=\sum_{k=1}^{r_i}n_{ijk}$ 和 $n_i=\sum_{j=1}^{r_{\pa_i}}n_{ij}$。观测计数 $n_{ijk}$ 服从多项分布：
+\begin{equation}
+P(n_{ijk}\mid\pa_i,\theta_{ijk})
+ =\frac{n_i!}{\displaystyle\prod_{j=1}^{r_{\pa_i}}\prod_{k=1}^{r_i}n_{ijk}!}
+ \theta_{ijk}^{n_{iijk}}.
+\tag{2.4}
+\end{equation}
+令 $P(D\mid G,\theta)$ 为给定 DAG 结构 $G$ 时观测到数据的概率分布。利用式（2.4），得到
+\begin{equation}
+P(D\mid G,\theta)=
+\prod_{i=1}^{p}\prod_{j=1}^{r_{\pa_i}}\prod_{k=1}^{r_i}
+\frac{n_i!}{n_{ijk}!}\theta_{ijk}^{n_{ijk}}.
+\tag{2.5}
+\end{equation}
+给定 DAG 结构时观测到数据 $D$ 的概率为
+\begin{equation}
+P(D\mid G)=\int P(D\mid G,\theta)P(\theta\mid G)\,d\theta.
+\tag{2.6}
+\end{equation}
+回顾
+\begin{equation}
+\int\prod_{k=1}^{r_i}\theta_{ijk}^{\alpha_{ijk}+n_{ijk}-1}\,d\theta_{ijk}
+ =\frac{\displaystyle\prod_{k=1}^{r_i}\Gamma(\alpha_{ijk}+n_{ijk})}
+ {\displaystyle\Gamma\left(\sum_{k=1}^{r_i}(\alpha_{ijk}+n_{ijk})\right)}.
+\tag{2.7}
+\end{equation}
+将式（2.3）、（2.5）和（2.7）代入式（2.6），得到
+\begin{equation}
+\begin{aligned}
+P(D\mid G)
+={}&\prod_{i=1}^{p}\prod_{j=1}^{r_{\pa_i}}
+\Gamma\left(\sum_{k=1}^{r_i}\alpha_{ijk}\right)
+\prod_{k=1}^{r_i}\frac1{\Gamma(\alpha_{ijk})}
+\int\theta_{ijk}^{n_{ijk}+\alpha_{ijk}-1}\,d\theta_{ijk}\\
+={}&\prod_{i=1}^{p}\prod_{j=1}^{r_{\pa_i}}
+\frac{\Gamma\left(\sum_{k=1}^{r_i}\alpha_{ijk}\right)}
+{\Gamma\left(\sum_{k=1}^{r_i}(\alpha_{ijk}+n_{ijk})\right)}
+\prod_{k=1}^{r_i}\frac{\Gamma(\alpha_{ijk}+n_{ijk})}{\Gamma(\alpha_{ijk})}.
+\end{aligned}\tag{2.8}
+\end{equation}
+DAG 的评分度量定义为
+\begin{equation}
+\begin{aligned}
+\operatorname{Score}_D(G)&=\log P(D\mid G)\\
+&=\sum_{i=1}^{p}\sum_{j=1}^{r_{\pa_i}}
+\left(
+\log\frac{\Gamma\left(\sum_{k=1}^{r_i}\alpha_{ijk}\right)}
+{\Gamma\left(\sum_{k=1}^{r_i}(\alpha_{ijk}+n_{ijk})\right)}
++\sum_{k=1}^{r_i}\log\frac{\Gamma(\alpha_{ijk}+n_{ijk})}{\Gamma(\alpha_{ijk})}
+\right).
+\end{aligned}\tag{2.9}
+\end{equation}
+式（2.9）表明，该评分度量可分解，可以用 DAG 的局部节点表示为
+\begin{equation}
+\operatorname{Score}_D(G)=\sum_{i=1}^{p}\operatorname{Score}_i(\pa_i),
+\tag{2.10}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+\operatorname{Score}_i(\pa_i)
+=\sum_{j=1}^{r_{\pa_i}}\left(
+\log\frac{\Gamma\left(\sum_{k=1}^{r_i}\alpha_{ijk}\right)}
+{\Gamma\left(\sum_{k=1}^{r_i}(\alpha_{ijk}+n_{ijk})\right)}
++\sum_{k=1}^{r_i}\log\frac{\Gamma(\alpha_{ijk}+n_{ijk})}{\Gamma(\alpha_{ijk})}
+\right).
+\end{aligned}\tag{2.11}
+\end{equation}
+评分度量 $\operatorname{Score}_i(\pa_i)$ 称为节点 $i$ 的评分度量。
+
+\begin{bookexample}{2.1}
+考虑表2.1汇总的三个变量的简单数据例子，假设网络结构如图2.2所示，则变量 $x_1,x_2,x_3$ 的概率分布可以按下式计算：
+\begin{equation}
+P(x_1,x_2,x_3)=P(x_1)P(x_2\mid x_1)P(x_3\mid x_2).
+\tag{2.12}
+\end{equation}
+现在计算各个条件概率：
+\[
+\begin{aligned}
+P(x_1=0)&=\frac12,&P(x_1=1)&=\frac12,\\
+P(x_2=0\mid x_1=0)&=\frac34,&P(x_2=1\mid x_1=0)&=\frac14,\\
+P(x_2=0\mid x_1=1)&=\frac15,&P(x_2=1\mid x_1=1)&=\frac45,\\
+P(x_3=0\mid x_2=0)&=\frac45,&P(x_3=1\mid x_2=0)&=\frac15,\\
+P(x_3=0\mid x_2=1)&=0,&P(x_3=1\mid x_2=1)&=1.
+\end{aligned}
+\]
+利用这些条件概率，可以计算联合概率。例如，概率 $P(x_1=0,x_2=0,x_3=0)$ 为
+\begin{equation}
+\begin{aligned}
+P(x_1=0,x_2=0,x_3=0)
+ &=P(x_1=0)P(x_2=0\mid x_1=0)P(x_3=0\mid x_2=0)\\
+ &=\frac12\frac34\frac45=\frac3{10}.
+\end{aligned}\tag{2.13}
+\end{equation}
+\begin{table}[htbp]
+\centering
+\origtable{1}{三个变量的数据示例。}
+\begin{tabular}{rrrr}
+\toprule
+受试者&$x_1$&$x_2$&$x_3$\\
+\midrule
+1&1&0&0\\2&1&1&1\\3&0&0&1\\4&1&1&1\\5&0&0&0\\
+6&0&1&1\\7&1&1&1\\8&0&0&0\\9&1&1&1\\10&0&0&0\\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig02.tex}
+\origfig{2}{因果网络的一个例子。}
+\end{figure}
+现在假设网络结构变为图2.3。计算概率得到
+\[
+P(x_2=0)=\frac12
+\quad\text{以及}\quad x_3=0\mid x_1=0,x_2=0)=\frac34.
+\]
+于是，
+\[
+P(x_1=0,x_2=0,x_3=0)=\frac12\frac12\frac34=\frac3{16}.
+\]
+这个例子表明，联合概率依赖于网络结构。即使观测数据相同，不同网络结构下的联合概率也可能不同。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig03.tex}
+\origfig{3}{因果网络的一个例子。}
+\end{figure}
+\end{bookexample}
+\FloatBarrier

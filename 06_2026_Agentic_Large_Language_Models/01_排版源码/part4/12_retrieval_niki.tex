@@ -1,0 +1,618 @@
+\chapter{智能体大语言模型中的搜索与检索}\label{sec:rag}
+
+
+\begin{learningbox}
+本章将介绍，对于需要获取训练数据之外知识的智能体系统，检索为何是一项基本能力。具体而言，学完本章后，你将能够：
+\begin{itemize}[leftmargin=*, nosep]
+    \item 描述从索引与分块，到查询构造与答案生成的完整{\em 检索增强生成（retrieval-augmented generation，RAG）}流程。
+    \item 实现 \textit{Self-RAG} 和 \textit{Self-Ask} 等自适应检索（adaptive retrieval）方法，并用 Python 构建稠密检索（dense retrieval）系统。
+    \item 将检索从纯文本扩展到图、代码、表格数据与多模态来源。
+    \item 区分智能体式 RAG（agentic RAG）与简单的单次检索，包括实时与流式的变体。
+    \item 使用\textit{查全率@$k$（Recall@k）}、\textit{平均倒数排名（mean reciprocal rank）}与\textit{忠实性（faithfulness）}得分等标准指标评估检索系统。
+\end{itemize}
+\end{learningbox}
+
+
+
+\section{检索概述}
+\label{sec:retrieval-origins}
+
+在考察智能体大语言模型如何查阅外部知识之前，我们先将检索置于它自身更为悠久的学科发展史中。信息检索（information retrieval，IR）是计算机科学与信息科学中一个成熟的领域，比神经网络早了数十年。现代检索增强生成流程所采用的许多思想，都直接源自经典信息检索研究。该领域的标准参考著作 \citet{salton1983introduction} 及稍后的 \citet{manning2008introduction}，至今仍为本章提供着索引、词项加权、排序与相关性等概念词汇。
+
+\subsection{词袋}
+
+早期信息检索系统将文档与查询表示为\emph{词袋（bag of words）}，并提出一个看似简单的问题：哪些词项能使文档与查询很好地匹配？\citet{sparckjones1972statistical} 通过逆文档频率（inverse document frequency，IDF）这一概念，从统计角度回答了这个问题：只在少数文档中出现的词项，比几乎处处出现的词项更有区分力。根据词项在文档中出现的频繁程度，即词频（term frequency，TF），以及它在整个文档集合中的稀有程度，即 IDF，为词项赋予权重，便得到 TF-IDF 这一类加权方案。它至今仍是生产搜索系统中应用最广泛的表示方法之一。
+
+词频衡量词项 $t$ 在文档 $d$ 中出现的频繁程度：
+\begin{equation}
+\mathrm{TF}(t,d) = \frac{f_{t,d}}{\sum_{t' \in d} f_{t',d}}
+\label{eq:tf}
+\end{equation}
+其中，$f_{t,d}$ 是 $t$ 在 $d$ 中出现的原始次数。按照 \citet{sparckjones1972statistical} 的定义，逆文档频率会降低在许多文档中出现的词项的权重：
+\begin{equation}
+\mathrm{IDF}(t, D) = \log \frac{|D|}{|\{d \in D : t \in d\}|}
+\label{eq:idf}
+\end{equation}
+其中，$D$ 是文档集合。将两者相乘，就得到词项 $t$ 在文档 $d$ 中的经典 TF-IDF 权重：
+\begin{equation}
+\mathrm{TF\text{-}IDF}(t,d,D) = \mathrm{TF}(t,d) \times \mathrm{IDF}(t,D)
+\label{eq:tfidf}
+\end{equation}
+
+\subsection{向量空间模型}
+
+\citet{salton1975vector} 将这一思想形式化为\emph{向量空间模型（vector space model）}：将每篇文档与每条查询表示为高维词项空间中的向量，再根据文档与查询向量之间的余弦相似度进行排序。向量空间模型确立了一种沿用至今的模式，今天的稠密检索器仍直接遵循这一模式（第~\ref{sec:rag-pipeline}~节）：将文档和查询化为共享几何空间中的点，用距离或相似度表示相关性。
+
+更形式化地说，在向量空间模型中，每篇文档 $d$（以及查询 $q$）都表示为词项权重向量 $\vec{d} = (w_{1,d}, w_{2,d}, \dots, w_{n,d})$，通常采用 TF-IDF 权重（式~\ref{eq:tfidf}）。随后，以查询向量与文档向量的余弦相似度近似表示相关性：
+\begin{equation}
+\mathrm{sim}(\vec{q}, \vec{d}) = \cos(\theta) = \frac{\vec{q} \cdot \vec{d}}{\lVert \vec{q} \rVert \, \lVert \vec{d} \rVert}
+\label{eq:cosinerag}
+\end{equation}
+文档按 $\mathrm{sim}(\vec{q}, \vec{d})$ 从高到低排序。对两个学习所得的向量计算余弦相似度，这一相同操作也出现在稠密检索中（第~\ref{sec:rag-pipeline}~节），区别仅在于获取向量的方式。
+向量空间模型使用原始词项共现信息，而稠密段落检索（dense passage retrieval，DPR）等现代稠密检索器~\citep{karpukhin2020dense} 则使用学习得到的神经嵌入，但其背后的几何直觉并未改变。
+
+\subsection{潜在表示与稀疏表示}
+
+另外两项进展连接了经典检索与现代检索。首先，\citet{robertson2009probabilistic} 提出了\emph{概率相关性框架（probabilistic relevance framework）}，将检索视为根据文档的词项统计信息，估计该文档与查询相关的概率的问题。这一框架产生了词项加权与排序函数 BM25~\cite{robertson1994okapi}，针对文档 $d$ 与查询 $q$，按下式给出评分：
+\begin{equation}
+\mathrm{BM25}(q,d) = \sum_{t \in q} \mathrm{IDF}(t,D) \cdot
+\frac{f_{t,d} \, (k_1 + 1)}{f_{t,d} + k_1 \left(1 - b + b \, \dfrac{|d|}{\mathrm{avgdl}}\right)}
+\label{eq:bm25}
+\end{equation}
+其中，$|d|$ 是文档 $d$ 的长度，$\mathrm{avgdl}$ 是文档集合中的平均文档长度，$k_1$ 和 $b$ 是自由参数，分别控制词频饱和与长度归一化（典型取值为 $k_1 \in [1.2, 2.0]$、$b = 0.75$）。BM25 仍是稀疏检索（sparse retrieval）的基线方法，第~\ref{sec:rag-pipeline}~节讨论混合检索时将多次提到它。
+
+其次，\citet{deerwester1990indexing} 提出了\emph{潜在语义分析（latent semantic analysis，LSA）}。这一方法对词项—文档矩阵（term-document matrix）进行奇异值分解（singular value decomposition，SVD），揭示潜在主题，并根据含义匹配文档，而非仅依据词项是否精确重合。LSA 是首个得到广泛应用、用于解决词表不匹配问题的方法；今天的稠密检索与语义检索，也由同一问题驱动。
+
+LSA 作用于词项—文档矩阵 $X \in \mathbb{R}^{m \times n}$，其中 $m$ 是词表大小，$n$ 是文档数。矩阵元素通常为 TF-IDF 权重（式~\ref{eq:tfidf}）。应用截断奇异值分解，
+\begin{equation}
+X \approx U_k \Sigma_k V_k^{\top}
+\label{eq:lsa}
+\end{equation}
+仅保留最大的 $k$ 个奇异值，将其置于 $\Sigma_k$ 中，从而得到秩为 $k$ 的近似来表示 $X$。随后将文档和词项表示在这一降维后的 $k$ 维潜在空间中。即使词项没有精确重合，语义相关的词项与文档在该空间中也彼此接近。
+
+
+从经典信息检索通向本章所用神经检索方法的最后一座桥梁，是通过学习获得的词的稠密向量表示。\citet{mikolov2013efficient} 表明，训练简单的神经网络架构，根据上下文预测词，可以得到连续词嵌入，捕捉丰富的句法与语义规律。这项工作以及随后出现的编码器架构，提供了表示层面的基础构件，稠密检索、DPR 式双编码器（bi-encoder），乃至最终的检索增强生成，都建立在这些构件之上。
+
+换言之，检索是一门已有数十年历史的学科，始终围绕同一个问题：给定一条查询，大型集合中的哪些内容才与它真正相关？大语言模型的出现没有改变这一问题，却改变了它的意义：模型如今查阅检索所得的证据，既为了向人类读者呈现文档排名，也为了以这些证据为条件生成自己的输出。接下来，我们将讨论这一转变为何重要。
+
+
+\section{检索为何对智能体大语言模型重要}
+在上述基础之上，大语言模型又为重视检索提供了新的理由。大语言模型是世界知识的冻结快照。模型的参数不可能包含语料确定之后才产生的信息。当任务需要预训练时尚不存在的时新信息、专有信息或长尾信息时，大语言模型往往难以应对。检索增强通过在推理阶段查阅外部来源，并以检索所得的证据为条件生成输出，缓解了这些局限。
+
+检索增强生成方法旨在将外部知识库中的数据，与语言模型参数中存储的预训练知识结合起来。多数 RAG 方法在推理阶段运行，不过也有一些可用于微调，甚至预训练。多数 RAG 方法处理非结构化的文本数据源。系统对这些文本文档建立索引，以提高访问效率，也可以将它们组织起来并创建知识图谱。最后，通常还会进行类似数据库的查询优化，扩展查询，或将复杂查询拆分为子查询 \citep{cong2024query}。
+
+REALM~\citep{guu2020realm}、DPR~\citep{karpukhin2020dense} 和 RAG~\citep{lewis2020retrieval} 等早期系统推广了这一简单思想。如今，它已发展为一个丰富的设计空间，涵盖索引、查询规划、重排序、引用与归因，以及数据的持续更新。近期综述对这一领域的整体格局与评估实践进行了梳理 \citep{gao2023rag_survey,huang2024rag_survey,yu2024rag_eval,sharma2025rag_survey,peng2024graphrag_survey}。
+
+
+
+
+\paragraph{何时检索。} 以下情况下，检索最有帮助：(1) 任务属于知识密集型任务，涉及定义、实体、数字或参考资料；(2) 领域变化迅速，例如新闻、价格或文档；(3) 需要透明性，即提供引用；(4) 模型必须严格遵守权威事实来源约束，例如合规门户或内部维基。在智能体场景中，检索可以与工具使用和规划交替进行（见第~\ref{sec:tools}~章）。
+
+\section{检索增强生成流程}
+\label{sec:rag-pipeline}
+
+实用的 RAG 系统通常实现以下七个阶段：
+\begin{enumerate}
+\item 索引（indexing）：索引阶段是第一步。将 HTML 页面、PDF、表格或代码等全部原始材料转换为干净、统一的文本。将标题、锚点、时间戳、作者等重要结构保留为元数据。以句子或章节等有意义的边界，将内容拆分为文本块（chunk），块之间保留少量重叠，以免丢失上下文。创建两类可搜索的表示：一类是适于精确关键词匹配的\emph{稀疏}表示，例如经典词项匹配方法 BM25，或扩展词项的较新变体 SPLADE ~\citep{formal2021splade}；另一类是捕捉含义、用于语义匹配的\emph{稠密}嵌入表示。同时存储这两类表示，系统便能在同一次搜索中找到精确匹配项（标识符、数字）与语义匹配项（改写表达、同义词）。
+
+\item 查询构造（query construction）：将用户的问题转为一条或多条准确的搜索查询。这可能包括改写问题以使其更清晰，将复杂问题拆分为子问题（多跳），加入相关词项（查询扩展），甚至生成一个假设答案作为搜索目标，即 HyDE \citep{gao2023hyde}。对于结构化数据源，生成 SQL 查询或图查询等特定查询。目的是让搜索引擎准确理解应查找什么。
+
+\item 候选检索（candidate retrieval）：使用构造好的查询，从索引中找出可能相关的文本块。DPR~\citep{karpukhin2020dense}、Contriever~\citep{izacard2022contriever} 等稠密检索器按含义匹配；BM25、SPLADE 等稀疏方法按精确词项匹配；混合方法则结合两者。为在大规模数据上快速搜索，可以使用 HNSW~\citep{malkov2018HNSWG} 或 IVF-PQ~\citep{herve2011PQNNS} 等近似最近邻（approximate nearest neighbor，ANN）索引。对于代码或图像，使用专用编码器。这一步需要广泛搜集候选，同时保持针对性。
+
+\item 重排序（re-ranking）：对检索得到的候选集合，使用更准确但速度较慢的模型，例如交叉编码器（cross-encoder，如 BERT、MiniLM），按相关性重新排序。ColBERTv2 \citep{santhanam2022colbertv2} 等后期交互模型兼顾质量与速度。这样可以确保排在前面的结果最有可能回答问题。
+
+\item 上下文组装（context assembly）：去除重复内容，确保覆盖查询的不同方面，即保持多样性，并优先选择较新或与领域相关的来源。将选中的段落连同其来源、URL、日期等元数据一起组装成上下文包，输入大语言模型。这样便为模型提供了一组经过筛选、值得信赖的信息。
+
+\item 锚定生成（grounded generation）：要求大语言模型使用给定上下文生成答案，并为每一项论断提供引用。如果证据不足，模型应当暂不作答或请求澄清。一些系统，例如 Self-RAG \citep{asai2023selfrag}，会在运行过程中决定是否检索更多信息。重点是生成正确且有充分依据的答案。
+
+\item 归因与日志记录（attribution and logging）：在答案旁展示来源，供读者核验论断。记录查询、检索所得文档及其版本等全过程信息，用于调试、评估和合规。这样可以使系统透明且可审计。
+\end{enumerate}
+一个简单的 RAG 系统会遵循上述七步流程。代码清单~\ref{lst:basicrag}~展示了这一过程的 Python 风格伪代码。函数接收用户问题，将其改写为一条或多条搜索查询，检索候选段落并进行重排序，组装上下文窗口，最后生成答案，同时跟踪所使用的段落。下文将进一步展开介绍。
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+linenos
+]{python}
+# Input: question q, search index, and number of passages k
+def rag_answer(q, index, k=8):
+    # 1. Construct search queries (possibly decompose multi-hop questions)
+    queries = rewrite_question(q)
+    # 2. Retrieve candidate passages from the index
+    candidates = retrieve(index, queries, k=200)
+    # 3. Re-rank with a cross-encoder or late-interaction model
+    ranked = rerank(candidates)
+    # 4. Assemble a context window from the top-k passages
+    context = assemble(ranked[:k])
+    # 5. Generate an answer conditioned on the context and provide citations
+    answer, citations = generate_answer(q, context)
+    return answer, citations
+\end{minted}
+\caption{基本 RAG 系统的高层流程}
+\label{lst:basicrag}
+\end{listing}
+
+\section{自适应检索方法}\label{sec:adaptive}
+传统 RAG 系统无论是否实际需要检索，都会检索固定数量的段落。这种{\em 始终开启}的策略简化了工程实现，却可能损害效率与准确性。近期研究探索了\emph{自适应}或\emph{门控}检索策略，教会模型决定何时搜索，以及查阅多少证据。这些方法与第~\ref{sec:self-reflection}~节介绍的自我反思思想一致：语言模型会审视自身的置信度，只有识别出知识缺口时才触发检索，而不会盲目摄取检索所得的文本。
+
+具体而言，\citet{asai2023selfrag} 提出了 Self-RAG，训练同一个模型生成答案、请求检索，并使用特殊的\emph{反思词元（reflection token）}评价自身输出。当模型对答案草稿不确定时，它会输出一个 \texttt{<RETRIEVE>} 词元来调用搜索工具，并在下一步纳入检索所得的段落。实验表明，相比静态 RAG，这种通过学习得到的门控机制提高了事实准确性，同时避免了不必要的调用。
+
+一种更轻量的方法是 Self-Ask~\citep{press2022measuring}。模型将复杂问题分解为更简单的子问题，提交给搜索工具，再利用所得答案组合出最终回答。Self-Ask 可以与规划智能体结合，使模型交替进行推理、工具调用与检索。Graph Toolformer~\citep{zhang2023graph} 通过训练一个将搜索查询插入程序图的策略，扩展了这一思想。在推理阶段，大语言模型根据当前推理状态，动态决定是从文本索引、知识图谱还是数据库中检索。
+
+除这些具体例子之外，自适应检索还可以通过以下方式实现：
+\begin{itemize}
+\item 基于置信度的门控（confidence-based gating）：模型估计自身的不确定性，例如依据熵或校准指标，并在置信度低于阈值时触发检索。
+\item 迭代检索（iterative retrieval）：系统先检索少量段落，对其进行推理，然后决定是否需要更多轮搜索，而不是一次性获取全部证据。这一方法适用于多跳问题。
+\item 查询规划（query planning）：智能体将用户查询分解为子任务，分派给搜索、数据库、计算器等不同工具，再整合结果。只有计划需要外部知识时，才调用检索器。
+\item 学习检索（learning to retrieve）：强化学习或监督微调可以教会模型在适当时刻输出 \texttt{<RETRIEVE>} 词元。Self-RAG 是其中一种实现；其他方法则探索将检索策略与生成器一起进行端到端训练。
+\end{itemize}
+自适应检索通过避免不必要的搜索，降低延迟与成本；它将注意力集中到缺失的知识上，因而也往往能提高答案质量。不过，设计有效的门控策略需要仔细评估（见第~\ref{sec:r_evaluation}~节），并可能需要在训练中增加监督。
+
+
+\subsection{通过 Self-RAG 与 Self-Ask 实现自适应检索}
+
+\citet{asai2023selfrag} 的 Self-RAG 框架教会模型在生成过程中输出特殊的 \texttt{<RETRIEVE>} 词元，以便按需请求检索。代码清单~\ref{lst:selfrag}~中的伪代码概述了这种循环的运行方式。模型维护一个不断扩大的上下文，并根据需要，在生成输出词元与获取新证据之间交替进行。
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+linenos
+]{python}
+# Input: question q, search index, and trained Self-RAG model
+def self_rag_answer(q, index, model):
+    context = []
+    output_tokens = []
+    # Generate tokens sequentially
+    for token in model.generate_stream(q, context):
+        if token == "<RETRIEVE>":
+            # Model requests more information
+            new_docs = retrieve(index, rewrite_question(q), k=5)
+            context.extend(new_docs)
+        else:
+            output_tokens.append(token)
+        if token == "<END>":
+            break
+    return detokenize(output_tokens)
+\end{minted}
+\caption{演示 Self-RAG 的高层伪代码}
+\label{lst:selfrag}
+\end{listing}
+
+需要注意，要使 Self-RAG 起作用，必须对基础模型进行训练或微调，使其能够输出 \texttt{<RETRIEVE>} 词元。
+另一方面，Self-Ask~\citep{press2022measuring} 不依赖于具体的语言模型。Self-Ask 将复杂问题分解为更简单的子问题，分别检索证据，再综合得到最终答案。下面的高层伪代码展示了实现这一策略的一种方式：
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+linenos
+]{python}
+def self_ask(q, index):
+    sub_questions = decompose(q)  
+    # e.g. "When was Einstein born?" and "What is the Nobel Prize?"
+    intermediate_answers = []
+    for sq in sub_questions:
+        docs = retrieve(index, rewrite_question(sq), k=5)
+        answer = summarize(docs)
+        intermediate_answers.append(answer)
+    final_answer = compose(intermediate_answers)
+    return final_answer
+\end{minted}
+\caption{演示 Self-Ask 的高层伪代码}
+\label{lst:selfask}
+\end{listing}
+
+
+\subsection{一个简单的 Python 稠密检索示例}
+
+\texttt{sentence\_transformers} 工具包等稠密检索库，可以方便地为小型语料库建立索引并进行语义搜索。代码清单~\ref{lst:dense}~展示了如何将句子语料库嵌入为向量，计算它们与查询的相似度，并显示排名最靠前的结果。
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+linenos
+]{python}
+from sentence_transformers import SentenceTransformer, util
+
+# Prepare a small corpus
+texts = [
+    "The Eiffel Tower is in Paris.",
+    "The capital of France is Paris.",
+    "Berlin is the capital of Germany.",
+    "The Great Wall is in China."
+]
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+corpus_embeddings = model.encode(texts, convert_to_tensor=True)
+
+def semantic_search(question, k=2):
+    query_emb = model.encode(question, convert_to_tensor=True)
+    scores = util.cos_sim(query_emb, corpus_embeddings)[0]
+    top_results = scores.topk(k)
+    for score, idx in zip(top_results.values, top_results.indices):
+        print(texts[idx], "(score:", score.item(), ")")
+
+# Example usage
+semantic_search("What is the capital of France?")
+\end{minted}
+\caption{一个简单的 Python 稠密检索示例}
+\label{lst:dense}
+\end{listing}
+
+
+\subsection{查询改写与扩展}
+
+有效检索往往始于将原始问题转换为索引能够匹配的形式。大语言模型可以充当查询改写器，通过改换表述、展开首字母缩写、添加同义词，甚至生成假设答案作为伪查询，即 HyDE 技术。\footnote{HyDE 是假设文档嵌入（Hypothetical Document Embeddings）的缩写。它生成一个看似合理的答案，再将该答案嵌入为向量，用于检索支持性段落 \citep{gao2023hyde}。}代码清单~\ref{lst:rewrite}~概述了一个简单函数：调用大语言模型，生成多个改写与扩展版本，再将这些结果合并为一组搜索查询。
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+linenos
+]{python}
+def rewrite_question(q, n_variants=3):
+    """
+    Use an LLM to generate alternative phrasings and hypothetical answers.
+
+    :param q: The user question.
+    :param n_variants: Number of rewrites to generate.
+    :return: A list of expanded queries.
+    """
+    variants = [q]
+    # Ask the model for paraphrases and clarifications
+    paraphrases = llm.generate(["Rewrite: " + q] * n_variants)
+    variants.extend(paraphrases)
+    # Ask the model to guess an answer (HyDE) and use it as a pseudo-query
+    guess = llm.generate(["Answer briefly: " + q])[0]
+    variants.append(guess)
+    # Optionally add entity aliases from a knowledge base
+    aliases = lookup_aliases(q)
+    variants.extend(aliases)
+    return variants
+\end{minted}
+\caption{一个简单的查询改写示例}
+\label{lst:rewrite}
+\end{listing}
+
+
+在实践中，\texttt{rewrite\_question} 函数可以调用 OpenAI 的 \texttt{gpt-5} 等 API，生成改写表达与假设答案，再利用同义词库或实体链接工具添加别名。查询扩展能够提高查全率，但也可能引入噪声。
+
+
+
+
+\section[图、代码与表格数据]{超越文本：图、代码、表格数据与多模态}
+尽管多数 RAG 系统处理的是非结构化文本，但许多智能体应用需要对结构化数据、源代码或图像进行推理。将检索扩展到纯文本之外，既带来了新的机会，也引入了建模挑战。
+
+\paragraph{Graph-RAG} 知识图谱以节点表示实体，以边表示关系。在语料库之上构建轻量图，可以使检索器沿着“{\em 就职于}”“{\em 位于}”等链接进行检索，而不只是依赖词袋相似度。GraphRAG 综述将其形式化为三个步骤：基于图的索引、图引导检索，以及图增强生成 \citep{peng2024graphrag_survey}。索引阶段从文本中提取实体与关系，将其规范化，并构建邻域结构。随后，检索阶段通过图扩展查询，找到相关节点及其关联段落，从而支持全局推理和消歧。最后，生成模型可以利用图结构，将事实组织为连贯的叙述并避免矛盾。
+
+
+\subsection{基于图的检索示例}
+
+GraphRAG 系统将知识表示为实体与关系构成的图，并通过图遍历检索相关节点 \citep{peng2024graphrag_survey}。使用 \texttt{networkx} 库可以构建一种轻量实现。在代码清单~\ref{lst:graphrag}~的示例中，我们构建一个小型知识图谱，并实现两个简单的检索原语：(1) 获取实体的直接邻域；(2) 查找两个实体之间的最短路径。这些操作可以支持多跳推理。
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+breaklines,
+linenos
+]{python}
+import networkx as nx
+
+def build_knowledge_graph():
+    G = nx.DiGraph()
+    # Add nodes representing entities
+    G.add_node("Albert Einstein", type="person")
+    G.add_node("Nobel Prize", type="award")
+    G.add_node("Physics", type="field")
+    G.add_node("1921", type="year")
+    # Add edges representing relations
+    G.add_edge("Albert Einstein", "Nobel Prize", relation="received")
+    G.add_edge("Nobel Prize", "Physics", relation="category")
+    G.add_edge("Nobel Prize", "1921", relation="year")
+    return G
+
+def neighbours(G, entity):
+    """Return all outgoing neighbours of an entity."""
+    return list(G.successors(entity))
+
+def shortest_path(G, source, target):
+    """Return the sequence of entities on the shortest path."""
+    try:
+        return nx.shortest_path(G, source, target)
+    except nx.NetworkXNoPath:
+        return []
+
+# Example usage
+G = build_knowledge_graph()
+print(neighbours(G, "Albert Einstein"))  
+# ['Nobel Prize']
+print(shortest_path(G, "Albert Einstein", "Physics"))  
+# ['Albert Einstein', 'Nobel Prize', 'Physics']
+\end{minted}
+\caption{Python 中基于图的检索原语示例}
+\label{lst:graphrag}
+\end{listing}
+
+在完整的 GraphRAG 系统中，图节点会存储指向原始文本段落的指针，检索过程则会同时向大语言模型返回节点序列及其关联段落。图引导检索将推理锚定在显式的边上，并促进相关事实之间的一致性，因此可以减少幻觉。
+
+\paragraph{Code-RAG} 源代码具有丰富的句法结构，其语义与自然语言不同。要有效地检索代码，应当在函数或模块层面建立索引，纳入函数签名、文档字符串（docstring）、抽象语法树（abstract syntax tree，AST）与依赖图。CodeBERT~\citep{feng2020codebert} 等模型学习代码与自然语言的联合嵌入，支持自然语言代码搜索、代码摘要与文档生成等任务。在 Code-RAG 中，检索器可以获取相关函数、API 与测试用例，重排序器则可以使用面向代码的交叉编码器或图神经网络，优先排列精确匹配的结果。检索所得的代码片段、注释与依赖元数据随后会交给大语言模型，模型便可以在引用源文件的同时回答问题、提出修复建议或生成新代码。评估应考虑代码正确性、类型安全以及对依赖关系的遵循情况。
+
+
+\subsection{使用 AST 与嵌入进行代码检索的示例}
+
+检索源代码需要理解其句法与语义。一种简单方法是使用 CodeBERT 等预训练模型，对代码片段与自然语言查询进行嵌入 \citep{feng2020codebert}。另一种互补方法是将代码解析为抽象语法树，并搜索其结构。代码清单~\ref{lst:coderag}~的示例展示了这两种方法：用 CodeBERT 嵌入函数以进行语义搜索，并使用 Python 的 \texttt{ast} 模块提取函数定义与文档字符串，以建立索引。
+
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+breaklines,
+linenos
+]{python}
+from transformers import AutoTokenizer, AutoModel
+import torch, ast, inspect
+
+tokenizer = AutoTokenizer.from_pretrained("microsoft/codebert-base")
+model = AutoModel.from_pretrained("microsoft/codebert-base")
+
+def encode_code(code_str):
+    inputs = tokenizer(code_str, return_tensors="pt")
+    with torch.no_grad():
+        embeddings = model(**inputs).last_hidden_state.mean(dim=1)
+    return embeddings
+
+def extract_functions(module):
+    """Return a list of (name, source, docstring) tuples."""
+    functions = []
+    for name, obj in inspect.getmembers(module, inspect.isfunction):
+        source = inspect.getsource(obj)
+        doc = inspect.getdoc(obj) or ""
+        functions.append((name, source, doc))
+    return functions
+
+# Index a module's functions
+import example_module  # your codebase
+functions = extract_functions(example_module)
+embeddings = [encode_code(src) for (_, src, _) in functions]
+
+def search_code(query, k=2):
+    query_emb = encode_code(query)
+    scores = [torch.nn.functional.cosine_similarity(query_emb, emb)[0] 
+        for emb in embeddings]
+    # Return the top-k functions with highest similarity
+    topk = sorted(zip(scores, functions), key=lambda x: x[0], reverse=True)[:k]
+    for score, (name, src, doc) in topk:
+        print(name, "(score:", score.item(), ")\n", doc)
+
+# Example usage: search for a sorting function
+search_code("sort a list of numbers")
+\end{minted}
+\caption{Python 中基于代码的检索示例}
+\label{lst:coderag}
+\end{listing}
+
+这一示例为导入模块中的函数建立索引，并在查询与编码后的源代码之间进行余弦相似度搜索。在实践中，可以将代码嵌入与标识符、注释等词法特征相结合，并加入基于 AST 的匹配，以处理结构性查询，例如查找所有调用某个特定 API 的函数。对于需要在工具使用过程中读取、执行或修改现有代码的智能体系统，理解代码的检索至关重要。
+
+
+\subsection{多模态与异构来源}
+
+\paragraph{表格与其他异构文档} 当现有 RAG 方法用于同时包含文本和表格成分的异构文档时，会面临严重局限 \citep{yu2025tableragretrievalaugmentedgeneration}。一个主要挑战是\textit{结构信息丢失（structural information loss）}。为了用于基于文本的 RAG，表格数据被线性化或分块时，其固有的关系结构，即行与列之间的相互依赖关系，会遭到破坏。这种结构丢失妨碍了大语言模型准确进行多跳异构推理。这说明，仅将非文本数据转换为文本还不够。为应对这些挑战，研究者提出了 \emph{TableRAG}~\citep{yu2025tableragretrievalaugmentedgeneration} 等混合框架，将文本理解与表格数据上的复杂操作统一起来。
+
+TableRAG 通过编写和执行 SQL，将与表格相关的查询作为不可分割的推理单元处理，从而同时提高计算效率与推理忠实性。类似地，研究表明，\emph{MixRAG}~\citep{zhang2025mixtureofragintegratingtexttables} 可以显著提升异构文档 RAG 的检索性能。这类任务要求对文本与层次化表格数据进行联合检索和推理。
+
+这些方法的成功表明，对于结构化数据，纯粹依靠神经方法，即基于嵌入的 RAG，还不够。将 SQL 等符号推理与神经检索结合，是异构 RAG 的一项关键设计模式。这也体现了智能体大语言模型领域的更广泛趋势：通过神经符号融合，增强数据理解能力与忠实性。
+
+\paragraph{多模态 RAG} 许多知识库包含表格、插图、图解、音频和视频。一种直接的方法是使用光学字符识别（optical character recognition，OCR）提取其中的文本内容，并将其余内容作为纯文本处理。更丰富的方法则存储图像或其他模态的嵌入，例如 CLIP 或 ViT 表示，并将其与题注和上下文配对。可以跨模态联合编码查询，使系统能够检索与文本相伴的相关插图或公式。例如，科研智能体可以检索一张数据图及其题注，回答数据分析问题；教育智能体则可以从教材中获取图解。
+
+多模态 RAG 仍是一个活跃的研究领域。其挑战包括跨模态对齐，以及对高维嵌入进行高效索引。此外，生成的答案还应恰当地以非文本证据为依据。
+
+
+\subsection{多模态检索示例}
+除文本之外，智能体系统有时还需要检索图像、图解或音频片段。CLIP 或对比式语言—音频预训练（Contrastive Language-Audio Pretraining，CLAP）等多模态模型，将自然语言与其他模态嵌入同一共享空间。代码清单~\ref{lst:multimodalrag}~中的高层伪代码概述了如何使用 CLIP 查找与文本查询相关的图像：
+
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+breaklines,
+linenos
+]{python}
+from PIL import Image
+import clip, torch
+
+model, preprocess = clip.load("ViT-B/32")
+
+def embed_image(path):
+    image = preprocess(Image.open(path)).unsqueeze(0)
+    with torch.no_grad():
+        return model.encode_image(image)
+
+def embed_text(text):
+    text_tokens = clip.tokenize([text])
+    with torch.no_grad():
+        return model.encode_text(text_tokens)
+
+# Build an index of image embeddings
+image_paths = ["cat.jpg", "dog.png", "city.png"]
+image_embs = [embed_image(p) for p in image_paths]
+
+def search_images(query, k=2):
+    query_emb = embed_text(query)
+    scores = [torch.nn.functional.cosine_similarity(query_emb, emb)[0] 
+        for emb in image_embs]
+    topk = sorted(zip(scores, image_paths), key=lambda x: x[0], reverse=True)[:k]
+    return topk
+
+# Example usage: search for a picture of a city
+print(search_images("a skyline of a large European city"))
+\end{minted}
+\caption{在 Python 中使用 CLIP 查找相关图像的示例}
+\label{lst:multimodalrag}
+\end{listing}
+
+多模态检索返回最相似图像的文件名。在 RAG 场景中，可以将检索所得的图像输入视觉编码器，提取题注或对象，再将它们纳入语言模型的上下文。因此，多模态智能体可以同时以文本和视觉证据为依据生成输出。
+
+
+
+\section{智能体式 RAG：超越简单检索}
+\label{sec:agentic_rag}
+
+传统 RAG 系统虽然利用外部知识增强大语言模型，但往往是被动的，依赖静态且预先定义的流程。近期的一项重要进展是\textit{智能体式 RAG} 这一概念，它将自主人工智能智能体直接整合到检索增强生成流程中 \citep{singh2025agentic}。这一范式转变使 RAG 从单纯的工具，转变为主动、智能且由智能体驱动的过程。智能体式 RAG 系统的特点是能够动态管理检索策略，迭代深化对上下文的理解，并调整工作流程，以满足复杂任务的要求。
+
+智能体式 RAG 是一种更复杂的检索循环，由大语言模型智能体自身负责编排检索过程。它采用持续反馈循环，这与较简单的 RAG 方法有所不同，而持续反馈循环正是先进智能体系统的基础。智能体能够根据中间结果与持续交互，主动细化查询，无须局限于单次查询转换。这一方法缓解了传统 RAG 系统的局限：传统系统往往受制于静态工作流程，缺乏多步推理和复杂任务管理所需的适应性 \citep{singh2025agentic}。
+
+\subsection{智能体式 RAG 的关键组成部分}
+
+智能体式 RAG 框架通常包含以下关键组成部分，以实现动态行为：
+
+\begin{itemize}
+    \item 动态查询生成（dynamic query generation）：智能体根据当前对任务的理解及检索所得的上下文来构造查询，使搜索更加准确、有效。这可以包括在初次检索失败后，进行查询扩展、分解或改写。
+    \item 迭代细化（iterative refinement）：智能体评估检索信息的质量，必要时使用经过细化的查询，启动新的检索循环。这一迭代过程确保最终回答以最相关、最准确的信息为依据。
+    \item 自主工具使用（autonomous tool use）：智能体可以选择和使用不同检索模型，例如稠密模型与稀疏模型，以及排序算法、外部 API 等多种工具，优化检索策略。有关智能体如何使用工具的更多信息，见第~\ref{sec:tools}~章。
+    \item 自我纠正与反思（self-correction and reflection）：智能体可以评估自身输出的准确性和完整性。如果检测到幻觉或缺乏支持的论断，就可以触发新的检索与推理过程来纠正错误。
+\end{itemize}
+智能体式 RAG 的兴起表明，RAG 在大语言模型系统中的角色正在发生转变。检索从被动的数据查找，转变为主动的智能能力，并成为智能体认知功能的组成部分，使其能够与外部知识来源进行更复杂、更具适应性的交互。这一转变对于开发稳健、可靠、能够处理复杂现实任务的大语言模型智能体至关重要。
+
+
+
+\subsection{实时与流式 RAG}
+
+传统 RAG 系统虽然能够有效处理静态数据，但往往并非为需要持续实时信息的应用而设计。本小节考察 RAG 系统处理持续更新的高吞吐量数据流时，需要考虑的架构问题与挑战。新闻流、社交媒体和金融市场中都有这样的数据流。对于流式数据，仅仅查询更新后的静态索引已不再足够。此时，检索涉及索引的动态管理与知识的持续吸收。
+
+在为静态数据设计的传统 RAG 系统中，预处理速度较慢，不适用于实时分析 \citep{zhu2025staticdynamicstreamingrag,sankaradas2025streamingragrealtimecontextualretrieval}。
+在内存预算与高数据摄取速率的约束下，我们应当如何保持数据新鲜度与语义覆盖范围？\emph{StreamingRAG}~\citep{sankaradas2025streamingragrealtimecontextualretrieval} 等方法，尝试利用随时间实时动态演化的知识图谱来克服这些问题。
+
+医疗、物流与金融等动态领域的大语言模型智能体，必须能够获取持续更新的实时信息。在这些快速变化的环境中，静态 RAG 会给出过时或不准确的信息。在许多智能体应用中，实时 RAG 是提供先进、及时、可靠信息的必要条件。
+
+
+\section{评估}\label{sec:r_evaluation}
+评估检索增强系统比评估独立语言模型更困难，因为检索器与生成器都会影响最终答案。良好的评估既应区分这两个组成部分，也应考察它们的联合作用。
+
+\paragraph{检索指标} 对于给定查询，我们将检索所得的段落与一组标准文档进行比较。标准指标包括：
+\begin{enumerate}
+    \item 查全率@k（式~\ref{eq:recallk}）与查准率@k（precision@k，式~\ref{eq:precisionk}），即前 $k$ 项中检索到的相关文档比例。
+    \item 平均倒数排名（MRR，式~\ref{eq:MRR}）与平均查准率均值（mean average precision），用于衡量排序质量。
+    \item 归一化折损累积增益（normalized discounted cumulative gain，NDCG，式~\ref{eq:nDCG}），它赋予靠前的排名更高权重。
+\end{enumerate}
+BEIR 提供了一个由 18 个数据集组成的异构基准测试，涵盖问答、事实核查与实体检索等任务。其实验表明，后期交互与重排序模型能够提升零样本性能，但会增加成本 \citep{thakur2021beir}。
+
+KILT 在统一的 Wikipedia 快照上评估知识密集型任务，同时衡量任务性能与来源追溯情况，鼓励模型引用所使用的段落 \citep{petroni2021kilt}。
+
+
+\begin{equation}
+\mathrm{Recall@}k = \frac{| \{ \text{相关文档} \} \cap \{ \text{前}k \text{项检索结果} \} |}{| \{ \text{相关文档} \} |}
+\label{eq:recallk}
+\end{equation}
+
+\begin{equation}
+\mathrm{Precision@}k = \frac{| \{ \text{相关文档} \} \cap \{ \text{前}k \text{项检索结果} \} |}{k}
+\label{eq:precisionk}
+\end{equation}
+
+\begin{equation}
+\mathrm{MRR} = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \frac{1}{\mathrm{rank}_i}
+\label{eq:MRR}
+\end{equation}
+其中，$\mathrm{rank}_i$ 是查询 $i$ 的第一个相关文档所在的位置。
+
+\begin{equation}
+\mathrm{nDCG@}k = \frac{\mathrm{DCG@}k}{\mathrm{IDCG@}k}
+\label{eq:nDCG}
+\end{equation}
+其中，
+\[
+\mathrm{DCG@}k = \sum_{i=1}^k \frac{2^{\mathrm{rel}_i} - 1}{\log_2(i+1)}
+\]
+$\mathrm{rel}_i$ 是排名第 $i$ 位的文档的分级相关性。
+
+
+\paragraph{生成指标} 组装好上下文后，必须评估生成答案的质量。BLEU、ROUGE 和 BERTScore 等自动指标的作用有限，因为问题往往没有唯一的标准答案。更合适的指标是\emph{忠实性}与\emph{有用性（helpfulness）}。忠实性通常通过蕴涵模型衡量。对于生成输出 $y$ 与检索所得的上下文 $x$，其做法如下（式~\ref{eq:faithfulness}）：检查每一项论断是否都得到所引用段落的支持，例如使用自然语言推理模型或引文核查。
+\begin{equation}
+    \mathrm{Faithfulness} = \frac{\text{由上下文蕴涵的输出数}}{\text{输出总数}}
+    \label{eq:faithfulness}
+\end{equation}
+有用性（或效用）表示答案是否满足用户的信息需求。衡量这一点，往往需要人工评估或专门的基于大语言模型的评估器。在交互场景中，延迟与成本也很重要。
+
+有用性基于人类或模型的评分：
+\begin{equation}
+\mathrm{Helpfulness} = \frac{\sum_{i=1}^N \text{score}(y_i, \text{query}_i)}{N}
+\label{eq:helpfullness}
+\end{equation}
+其中，$\text{score}$ 是 Likert 量表评分或成对偏好判断。
+
+
+\paragraph{联合评估与新指标} 一个关键挑战是分别评估检索与生成。例如，系统可能检索到不相关的文档，却仍然猜对答案；也可能检索到完美的证据，却未能利用它们。因此，近期工作提出了统一的评估框架。Auepora 流程建议分别报告检索得分与生成得分，再将其组合为综合指标 \citep{yu2024rag_eval}。RAGAS 等工具包提供了自动化流程，使用小型模型计算上下文查全率（context recall）、答案正确性（answer correctness）与引用准确性（citation accuracy）。评估自适应方法（第~\ref{sec:adaptive}~节）时，还需要衡量触发决策：模型在应当检索时，有多大比例进行了检索；又有多大比例无故跳过了检索？
+
+\paragraph{归因与新鲜度} 在许多应用中，模型必须引用来源，并避免使用过时信息。归因测试可以将论断与证据对应起来。这类测试使用自然语言推理，确保 URL 与答案一致。新鲜度指标衡量答案是否反映了最新的有效来源。该指标也可用于量化版本漂移。
+
+对于金融或医疗等时间敏感领域，归因与新鲜度尤其重要。
+
+良好的系统设计建立在仔细评估的基础之上。当检索查全率高而忠实性低时，就需要更好的重排序。类似地，忠实性高而有用性差，可能意味着上下文覆盖不足。为支持错误分析与审计，评估应当伴随对查询、检索所得段落和模型输出的透明日志记录。
+
+
+
+
+
+
+
+\section{结语}
+
+对于任何需要提供最新信息的智能体大语言模型系统，检索都是不可或缺的要素。大语言模型是知识的静态快照，RAG 帮助它们保持知识更新、透明且有据可依。有效的 RAG 需要在索引、查询规划、检索、重排序、上下文组装和锚定生成等环节进行细致的工程设计，还需要自适应技术，让模型决定何时以及如何搜索。我们也已经看到，检索可以超越纯文本，扩展到图、代码与多模态资源。要构建值得信赖的系统，严格评估至关重要。
+
+\paragraph{运行维护事项} 在生产系统中，检索器是一项持续运行的服务，需要细心维护。爬虫、Webhook 和文档处理流程应持续摄取新数据。应注意跟踪版本与弃用情况，并为各个实体维护时间线，以优先使用较新的事实。系统应在检索时应用访问控制列表，并在索引期间隐去个人身份信息。延迟与成本也很重要：缓存嵌入与前 $k$ 项结果，在对话回合间复用检索，通过抽取式摘要压缩上下文，针对不同领域调整 $k$ 和文本块大小，并且只对排名最靠前的候选进行重排序。
+
+\paragraph{实践建议}
+创建 RAG 系统时，可以从混合方法入手：将一个性能强的稠密检索器与 BM25 或 SPLADE 结合，先用交叉编码器对排名前一百的结果进行重排序，再向大语言模型提供六到十二个段落。应当仔细规划语料库分块，例如采用 300–500 个词元的窗口，保留 10–15\,\% 的重叠以及标题和表格，并附加时间戳或其他元数据。在编写查询时，也应仔细设计：改写复杂问题，分解多跳查询，扩展实体别名，并严格应用领域过滤条件。为保持透明，应始终要求提供引用。不过，如果证据薄弱，应提出后续问题，或暂不作答。
+
+最后，应采用基于证据的系统设计，对构建的系统进行度量。你应当跟踪检索查全率、锚定程度、时效性与成本。另一个建议是尝试不同的重排序器。为便于调试，应记录系统执行轨迹。
+
+
+
+\begin{tcolorbox}[
+    colback=blue!10!white,
+    colframe=blue!85!black,
+    title={\faRocket\quad 亲自试一试！},
+    fonttitle=\bfseries,
+    coltitle=white,
+    boxrule=1pt,
+    arc=4pt,
+    left=5pt,
+    right=5pt,
+    top=5pt,
+    bottom=5pt,
+    enhanced
+]
+想动手尝试检索增强生成吗？
+打开我们在 Google Colab 中的教程：\\
+\href{https://colab.research.google.com/github/Agentic-LLMs/Agentic-AI-tutorials/blob/main/rag_tutorial.ipynb}{\faCode\quad \textbf{RAG 教程}}
+\end{tcolorbox}
+
+\paragraph{整合到智能体人工智能中} 检索是智能体大语言模型不可分割的要素，用于规划、自我反思以及在现实世界中行动（见第~\ref{sec:assist}~章）。智能体流程可以根据模型的置信度或计划，动态调用检索器，Self-RAG 与 Graph Toolformer 就是如此。它们可以查询文本、图、代码和图像等不同数据源，发挥各自的优势。因此，{\em 模型}与其{\em 记忆}之间的界限逐渐模糊：RAG 成为智能体认知循环的一部分。
+
+\paragraph{延伸阅读} 若要深入探索，可参阅关于 RAG、评估与基于图的方法的综述 \citep{gao2023rag_survey,huang2024rag_survey,yu2024rag_eval,sharma2025rag_survey,peng2024graphrag_survey}。奠基性工作包括 REALM、DPR 与最初的 RAG 形式 \citep{guu2020realm,karpukhin2020dense,lewis2020retrieval}。GraphRAG、评估与智能体式 RAG 社区都在迅速发展，关注其最新论文与基准测试，是保持了解最新进展的最佳方式。
+
+
+\bibliographystyle{plainnat}
+\bibliography{agenticbook,refs,case,synthetic}

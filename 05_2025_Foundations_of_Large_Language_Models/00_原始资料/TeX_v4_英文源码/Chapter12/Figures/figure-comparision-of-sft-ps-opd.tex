@@ -1,0 +1,110 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\ssep{1.0cm}
+
+\tikzstyle{mnode} = [minimum width=1.8cm,minimum height=0.8cm,draw,thick,inner sep=3pt];
+\tikzstyle{wnode} = [minimum width=0.4cm,minimum height=0.4cm,inner sep=2pt];
+
+%%% sft
+\begin{scope}
+
+\node [mnode,anchor=west] (student) at (0,0) {\small{Student}};
+\node [mnode,anchor=south,align=left] (teacher) at ([yshift=1.5cm]student.north) {\small{Human/}\\[-3pt]\small{Teacher}};
+
+\node [anchor=west,wnode] (w1) at ([xshift=3cm]teacher.east) {\small{This}};
+\node [anchor=center,wnode] (w2) at ([xshift=\ssep]w1.center) {\small{cat}};
+\node [anchor=center,wnode] (w3) at ([xshift=\ssep]w2.center) {\small{is}};
+\node [anchor=center,wnode] (w4) at ([xshift=\ssep]w3.center) {\small{cute}};
+\node [anchor=center,wnode] (w5) at ([xshift=\ssep]w4.center) {\small{.}};
+
+\begin{pgfonlayer}{background}
+\node [draw, rounded corners=1mm]  [fit = (w1) (w5)] (ty) {};
+\end{pgfonlayer}
+
+\draw [->] ([xshift=1pt]teacher.east) -- ([xshift=-1pt]ty.west) node [pos=0.5,above] {\footnotesize{Annotate/Generate}};
+\node [anchor=south] (tylabel) at (ty.north) {\footnotesize{Target Output ($\mathbf{y}^*$)}};
+
+\draw [<->,blue,thick,dashed] ([xshift=-1cm,yshift=-1pt]ty.south) .. controls +(south:1.7cm) and +(east:2cm) .. ([xshift=1pt]student.east) node [pos=0.5,right,align=left,xshift=0.8cm,yshift=-0.1cm] {\footnotesize{Teacher forcing}\\[-1pt] \footnotesize{$\max\limits_{\theta} \Pr_{\theta}^s(\mathbf{y}^*|\mathbf{x})$}};
+
+\node [anchor=north] (caption) at ([xshift=3cm,yshift=-0.5cm]student.south east) {\small{(a) Supervised Fine-tuning}};
+
+\end{scope}
+
+%%% process supervision
+\begin{scope}[yshift=-5.2cm]
+
+\node [mnode,anchor=west] (student) at (0,0) {\small{Student}};
+
+\node [anchor=west,wnode] (w1) at ([xshift=3cm]student.east) {\small{The}};
+\node [anchor=center,wnode] (w2) at ([xshift=\ssep]w1.center) {\small{cat}};
+\node [anchor=center,wnode] (w3) at ([xshift=\ssep]w2.center) {\small{is}};
+\node [anchor=center,wnode,fill=gray!30] (w4) at ([xshift=\ssep,yshift=-0.05cm]w3.center) {\small{lovely}};
+\node [anchor=center,wnode] (w5) at ([xshift=\ssep,yshift=0.05cm]w4.center) {\small{.}};
+
+\begin{pgfonlayer}{background}
+\node [draw, rounded corners=1mm]  [fit = (w1) (w5)] (sy) {};
+\end{pgfonlayer}
+
+\draw [->] ([xshift=1pt]student.east) -- ([xshift=-1pt]sy.west) node [pos=0.5,above] {\footnotesize{Generate}};
+\node [anchor=north] (sylabel) at (sy.south) {\footnotesize{Output of the student model ($\mathbf{y}$)}};
+
+\node [mnode,anchor=south] (verifier) at ([yshift=2.0cm]w4.north) {\small{Verifier}};
+
+\draw [->] ([yshift=-1pt]verifier.south) -- ([yshift=0pt]w4.north) node (verificationlabel) [pos=0.4,left,align=right] {\footnotesize{Generate the verification}\\[-2pt]\footnotesize{score $v_t$ and compute }\\[-2pt]\footnotesize{the advantage $A_t$}};
+
+\draw [<->,blue,thick,dashed] ([yshift=1pt]student.north) .. controls +(north:1cm) and +(west:2cm) .. ([yshift=0.3cm]verificationlabel.west) node [pos=0.3,above,yshift=0.3cm,align=right] {\footnotesize{Training with RL}\\[-1pt]\footnotesize{$\max\limits_{\theta} \sum_{t=1}^{n_p} \log \mathrm{Pr}_{\theta}(\bar{\mathbf{y}}_t | \mathbf{x}, \bar{\mathbf{y}}_{<t}) \cdot A_t$}};
+
+\node [anchor=north] (caption) at ([xshift=3cm,yshift=-0.5cm]student.south east) {\small{(b) Process Supervision}};
+
+\end{scope}
+
+%%% odp
+\begin{scope}[yshift=-10.4cm]
+
+\node [mnode,anchor=west] (student) at (0,0) {\small{Student}};
+
+\node [anchor=west,wnode] (w1) at ([xshift=3cm]student.east) {\small{The}};
+\node [anchor=center,wnode] (w2) at ([xshift=\ssep]w1.center) {\small{cat}};
+\node [anchor=center,wnode] (w3) at ([xshift=\ssep]w2.center) {\small{is}};
+\node [anchor=center,wnode,fill=gray!30] (w4) at ([xshift=\ssep,yshift=-0.05cm]w3.center) {\small{lovely}};
+\node [anchor=center,wnode] (w5) at ([xshift=\ssep,yshift=0.05cm]w4.center) {\small{.}};
+
+\begin{pgfonlayer}{background}
+\node [draw, rounded corners=1mm]  [fit = (w1) (w5)] (sy) {};
+\end{pgfonlayer}
+
+\draw [->] ([xshift=1pt]student.east) -- ([xshift=-1pt]sy.west) node [pos=0.5,above] {\footnotesize{Generate}};
+\node [anchor=north] (sylabel) at (sy.south) {\footnotesize{Output of the student model ($\mathbf{y}$)}};
+
+\node [mnode,anchor=south] (teacher) at ([yshift=2.0cm]w4.north) {\small{Teacher}};
+
+\node [anchor=south,minimum width=0.2cm,minimum height=0.4cm,fill=orange!30] (sh3) at ([yshift=0.5cm]w4.north) {};
+\node [anchor=south east,minimum width=0.2cm,minimum height=0.3cm,fill=orange!30] (sh2) at ([xshift=-1pt]sh3.south west) {};
+\node [anchor=south east,minimum width=0.2cm,minimum height=0.2cm,fill=orange!30] (sh1) at ([xshift=-1pt]sh2.south west) {};
+\node [anchor=south west,minimum width=0.2cm,minimum height=0.2cm,fill=orange!30] (sh4) at ([xshift=1pt]sh3.south east) {};
+\node [anchor=south west,minimum width=0.2cm,minimum height=0.3cm,fill=orange!30] (sh5) at ([xshift=1pt]sh4.south east) {};
+
+\node [anchor=south,minimum width=0.2cm,minimum height=0.3cm,fill=purple!30] (th3) at ([yshift=1.2cm]w4.north) {};
+\node [anchor=south east,minimum width=0.2cm,minimum height=0.2cm,fill=purple!30] (th2) at ([xshift=-1pt]th3.south west) {};
+\node [anchor=south east,minimum width=0.2cm,minimum height=0.4cm,fill=purple!30] (th1) at ([xshift=-1pt]th2.south west) {};
+\node [anchor=south west,minimum width=0.2cm,minimum height=0.3cm,fill=purple!30] (th4) at ([xshift=1pt]th3.south east) {};
+\node [anchor=south west,minimum width=0.2cm,minimum height=0.2cm,fill=purple!30] (th5) at ([xshift=1pt]th4.south east) {};
+
+\draw [->] ([yshift=1pt]w4.north) -- ([yshift=-1pt]sh3.south);
+\draw [->] ([yshift=-1pt]teacher.south) -- ([yshift=-0.3cm]teacher.south);
+
+\node [anchor=south west,align=left,inner sep=2pt] (tdislabel) at ([yshift=-0.1cm,xshift=0.1cm]th5.south east) {\tiny{Teacher's predicted}\\[-6pt]\tiny{Distribution $\mathrm{Pr}^{t}(\cdot | \mathbf{x}, \mathbf{y}_{<i})$}};
+\node [anchor=south west,align=left,inner sep=2pt] (sdislabel) at ([yshift=-0.1cm,xshift=0.1cm]sh5.south east) {\tiny{Student's predicted}\\[-6pt]\tiny{Distribution $\mathrm{Pr}^{s}(\cdot | \mathbf{x}, \mathbf{y}_{<i})$}};
+
+\draw [<->,blue,thick,dashed] ([yshift=1pt]student.north) .. controls +(north:1.2cm) and +(west:3cm) .. ([xshift=-1pt]th1.west) node [pos=0.2,above,yshift=0.4cm,xshift=1.2cm,align=right] {\footnotesize{Minimizing the KL divergence}\\[-1pt]\footnotesize{$\min\limits_{\theta} \sum_{i=1}^{n} D_{\mathrm{KL}} \left( \mathrm{Pr}_{\theta}^{s}(\cdot | \mathbf{x}, \mathbf{y}_{<i}) \parallel \mathrm{Pr}^{t}(\cdot | \mathbf{x}, \mathbf{y}_{<i}) \right)$}};
+
+
+\node [anchor=north] (caption) at ([xshift=3cm,yshift=-0.5cm]student.south east) {\small{(c) On-policy Distillation}};
+
+\end{scope}
+	
+	
+\end{tikzpicture}

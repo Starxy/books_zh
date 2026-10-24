@@ -1,0 +1,182 @@
+% 原书第 154—157 页；第 10.3 节及其两个小节。
+\section{验证 C-TMLE 求解关键方程 (10.4)}
+\label{sec:ch10-verifying-critical-equation}
+
+下一小节将说明，在 TMLE 为一步 TMLE 的情况下，如果
+$\epsilon_n(h_n)h_n=o_P(n^{-1/2})$，
+那么 C-TMLE 所求解的得分方程就能推出所需的关键方程 (10.4)。由于 $\epsilon_n(h)$ 的大小表现为初始估计量 $Q_{n,h}$ 的收敛速率，因而也表现为 C-TMLE 算法中最初的初始估计量 $Q_n$ 的收敛速率；同时，$h_n$ 以与 $G_{n,h_n}$ 的偏差相同的速率趋于零，所以，这个条件相当于假设 $Q_{n,h_n}^*$ 的收敛速率与 $G_{n,h_n}$ 的偏差速率之积小于 $n^{-1/2}$。注意，我们预期 $h_n$ 会导致欠平滑，因此其阶小于 $h_{n,\mathrm{CV}}$。假设 $G_{n,h_{n,\mathrm{CV}}}$ 与 $Q_n$ 的收敛速率之积不小于 $n^{-1/2}$，使得基于 $(Q_n,G_{n,h_{n,\mathrm{CV}}})$ 的标准 TMLE 的二阶余项
+$R_{20}(Q_n^*,G_{n,h_{n,\mathrm{CV}}},Q_0,G_0)$
+不具有渐近线性。这意味着，使用 $G_{n,h_{n,\mathrm{CV}}}$ 的 TMLE 也不具有渐近线性。尽管如此，由于 $h_n$ 小于 $h_{n,\mathrm{CV}}$，仍然可能有
+$\epsilon_n(h_n)h_n=o_P(n^{-1/2})$。
+事实上，考虑 $Q_n$ 不一致这一极端情形。此时，为保证基于 $Q_n$ 和 $G_{n,h_n}$ 的 TMLE 具有渐近线性，需要 $h_n=o(n^{-1/2})$。根据定理 10.1，只要存在一个速率 $h_{n,1}$，能够使估计足够欠平滑，从而使 $G_{n,h_{n,1}}$ 的偏差为 $o(n^{-1/2})$，就有 $h_n=o(n^{-1/2})$。在这种情况下，即使 $\epsilon_n(h_n)$ 根本不趋于零，也有
+$\epsilon_n(h_n)h_n=o_P(n^{-1/2})$。
+第二个小节将说明，通过修改 TMLE 定义中的最不利子模型，可以使 C-TMLE 精确求解式 (10.3)。事实上，第二个小节还将说明，对应的标准 TMLE 也会精确求解式 (10.3)。
+
+\subsection{C-TMLE 求解关键方程 (10.4) 的条件}
+\label{subsec:ch10-critical-equation-condition}
+
+考虑这样的情形：以 $Q_n=Q_{n,h}$ 为初始估计量、在靶向步骤中使用 $G_{n,h}$ 的 TMLE $Q_{n,h}^*$，由首步 TMLE $Q_{n,\epsilon_n(h),G_{n,h}}$ 给出。为方便记号，本小节将初始估计量记为 $Q_n$，省略它对 $h$ 的依赖，因为在下面关于 $h$ 的导数中，$Q_{n,h}$ 被视为固定不变。令 $h_n$ 为 C-TMLE 选择器求解的方程 (10.8) 的解。注意，
+\[
+ \begin{aligned}
+ \frac{d}{dh}P_nL(Q_{n,\epsilon_n(h),G_{n,h}})
+ ={}&\left.\frac{d}{dh}P_nL(Q_{n,\epsilon_n(h),G})\right|_{G=G_{n,h}}\\
+ &{}+\left.\frac{d}{dh}P_nL(Q_{n,\epsilon,G_{n,h}})
+              \right|_{\epsilon=\epsilon_n(h)},
+ \end{aligned}
+\]
+其中，初始估计量被视为不随 $h$ 变化。现在注意，除标量因子 $\frac{d}{dh}\epsilon_n(h)$ 之外，右端第一项等于
+\[
+ \left.\frac{d}{d\epsilon_n(h)}P_nL(Q_{n,\epsilon_n(h),G})
+ \right|_{G=G_{n,h}}.
+\]
+而后一个式子正是极大似然估计值 $\epsilon_n(h)$ 的得分方程，因此等于零。于是，可以得出 $h_n$ 还求解
+\begin{equation}
+ 0=\left.\frac{d}{dh_n}P_nL(Q_{n,\epsilon,G_{n,h_n}})
+   \right|_{\epsilon=\epsilon_n(h_n)}.
+ \tag{10.10}
+\end{equation}
+下面将说明，式 (10.10) 意味着
+$P_n\frac{d}{dh_n}D^*(Q_n,G_{n,h_n})=O(\epsilon_n(h_n))$。
+如果 $\epsilon_n(h_n)h_n=o_P(n^{-1/2})$，这就能建立式 (10.4)；例如，当初始估计量 $Q_n$ 和 $G_{n,h_n}$ 分别以快于 $n^{-1/4}$ 的速率收敛到 $Q_0$ 和 $G_0$ 时，这一条件成立。
+
+\begin{bookresult}{例}{10.5}
+在我们的例子中，式 (10.10) 简化为
+\[
+ 0=\epsilon_n(h_n)\frac1n\sum_{i=1}^n
+ \left.\frac{d}{dh}C(\bar G_{n,h})\right|_{h=h_n}
+ \bigl(Y_i-\bar Q_{n,\epsilon_n(h_n),G_{n,h_n}}\bigr).
+\]
+因此，它意味着
+\[
+ 0=\frac1n\sum_{i=1}^n
+ \left.\frac{d}{dh}C(\bar G_{n,h_n})\right|_{h=h_n}
+ \bigl(Y_i-\bar Q_{n,\epsilon_n(h_n),G_{n,h_n}}\bigr),
+\]
+这就是式 (10.6)。因此，在贯穿本章的例子中，C-TMLE 选择器 $h_n$ 所求解的得分方程 (10.8)，恰好对应于求解式 (10.3)。我们认为，对于通用最不利子模型，式 (10.8) 与式 (10.3) 的这一精确等价关系会更一般地成立。如下文所示，在一般情形下，我们的证明只能得到：式 (10.8) 在相差 $O(\epsilon_n(h))$ 的误差范围内推出式 (10.3)，这为式 (10.4) 提供了基础。
+\end{bookresult}
+
+假设对于某个泛函 $(Q,H)\mapsto f(Q,H)$，有
+$L(Q_{n,\epsilon,G_{n,h}})
+ =f(Q_n,\epsilon C(G_{n,h},Q_n))$。
+换言之，假设对 $Q_n$ 的扰动 $Q_{n,\epsilon,G_{n,h}}$，是向偏移项 $Q_n$ 增加一个依赖于 $\epsilon$ 的扩展项 $\epsilon C(G_{n,h},Q_n)$，从而将 $\epsilon$ 与 $G_{n,h}$ 联结为同一项。令
+$d_2f(Q,H)(r)
+ =\left.\frac{d}{d\delta}f(Q,H+\delta r)\right|_{\delta=0}$
+为 $H\mapsto f(Q,H)$ 在 $(Q,H)$ 处沿方向 $r$ 的方向导数。则
+\[
+ \begin{aligned}
+ \left.\frac{d}{d\epsilon}L(Q_{n,\epsilon,G_{n,h}})
+       \right|_{\epsilon=0}
+ &=\left.d_2f(Q_n,\epsilon C(G_{n,h},Q_n))\right|_{\epsilon=0}
+       \bigl(C(G_{n,h},Q_n)\bigr),\\
+ \frac{d}{dh}L(Q_{n,\epsilon,G_{n,h}})
+ &=d_2f(Q_n,\epsilon C(G_{n,h},Q_n))
+       \left(\epsilon\frac{d}{dh}C(G_{n,h},Q_n)\right).
+ \end{aligned}
+\]
+第一个等式表明，可以将
+$D^*(Q,G_{n,h})
+ =\left.\frac{d}{d\epsilon}L(Q_{n,\epsilon,G_{n,h}})\right|_{\epsilon=0}$
+表示为
+\[
+ D^*(Q_n,G_{n,h})
+ =\left.d_2f(Q_n,\epsilon C(G_{n,h},Q_n))\right|_{\epsilon=0}
+       \bigl(C(G_{n,h},Q_n)\bigr).
+\]
+这一表示又表明
+\[
+ \frac{d}{dh}D^*(Q_n,G_{n,h})
+ =\left.d_2f(Q_n,\epsilon C(G_{n,h},Q_n))\right|_{\epsilon=0}
+       \left(\frac{d}{dh}C(G_{n,h},Q_n)\right).
+\]
+第二个等式表明
+\[
+ \begin{aligned}
+ \frac{\frac{d}{dh}L(Q_{n,\epsilon,G_{n,h}})}{\epsilon}
+ &=d_2f(Q_n,\epsilon C(G_{n,h},Q_n))
+       \left(\frac{d}{dh}C(G_{n,h},Q_n)\right)\\
+ &=\left.d_2f(Q_n,\epsilon C(G_{n,h},Q_n))\right|_{\epsilon=0}
+       \left(\frac{d}{dh}C(G_{n,h},Q_n)\right)+O(\epsilon)\\
+ &=\frac{d}{dh}D^*(Q_n,G_{n,h})+O(\epsilon).
+ \end{aligned}
+\]
+因此，
+\[
+ \frac{d}{dh}L(Q_{n,\epsilon,G_{n,h}})
+ =\epsilon\frac{d}{dh}D^*(Q_n,G_{n,h})+O(\epsilon^2).
+\]
+这证明了，如果
+$\left.P_n\frac{d}{dh_n}L(Q_{n,\epsilon,G_{n,h}})
+ \right|_{\epsilon=\epsilon_n(h)}=0$，
+也就是求解了式 (10.10)，那么
+\[
+ 0=\epsilon_n(h)P_n\frac{d}{dh_n}D^*(Q_n,G_{n,h_n})
+      +O(\epsilon_n(h)^2),
+\]
+从而推出
+\[
+ P_n\frac{d}{dh_n}D^*(Q_n,G_{n,h_n})=O(\epsilon_n(h)).
+\]
+将这一结果表述为以下正式引理。
+
+\begin{bookresult}{引理}{10.1}
+令 $h_n$ 为 C-TMLE 选择器求解的方程 (10.8) 的解。那么，$h_n$ 求解
+\[
+ 0=\left.\frac{d}{dh_n}P_nL(Q_{n,\epsilon,G_{n,h_n}})
+        \right|_{\epsilon=\epsilon_n(h_n)}.
+\]
+假设对于某个泛函 $(Q,H)\mapsto f(Q,H)$，有
+$L(Q_{n,\epsilon,G_{n,h}})
+ =f(Q_n,\epsilon C(G_{n,h},Q_n))$。
+假设 $H\mapsto f(Q,H)$ 在 $H=\epsilon C(G_{n,h},Q_n)$ 处可微，其导数为 $d_2f(Q_n,H)$；并假设这个导数在方向
+$\frac{d}{dh}C(G_{n,h},Q_n)$
+上满足下述意义的连续性：
+\[
+ \begin{aligned}
+ &d_2f(Q_n,\epsilon C(G_{n,h},Q_n))
+       \left(\frac{d}{dh}C(G_{n,h},Q_n)\right)\\
+ &\quad=\left.d_2f(Q_n,\epsilon C(G_{n,h},Q_n))\right|_{\epsilon=0}
+       \left(\frac{d}{dh}C(G_{n,h},Q_n)\right)+O(\epsilon).
+ \end{aligned}
+\]
+那么，
+\[
+ P_n\frac{d}{dh_n}D^*(Q_n,G_{n,h_n})=O(\epsilon_n(h)).
+\]
+\end{bookresult}
+
+\subsection{精确求解方程 (10.3) 的 TMLE 与 C-TMLE}
+\label{subsec:ch10-exact-score-equations}
+
+在典型应用中，即使 $G_1$ 不等于 $G=G(P)$，$D^*(Q,G_1)$ 仍然属于 $Q$ 在 $P$ 处的切空间 $T_Q(P)$。换言之，$D^*(Q,G_1)$ 可以表示为一个扰动模型在 $\delta=0$ 处的得分，该模型 $\{Q_\delta:\delta\}\subset\mathcal M$ 在 $\delta=0$ 时通过 $Q$。在这种情况下，$D^*(Q,G_{h+\delta})-D^*(Q,G_h)$ 属于 $Q$ 在 $P$ 处的切空间，因此也有 $\frac{d}{dh}D^*(Q,G_h)\in T_Q(P)$。于是，$D^*(Q,G_h)$ 和 $D^+(Q,G_h)=d/dhD^*(Q,G_h)$ 都是 $Q$ 在 $P$ 处的得分。因此，存在一个局部最不利子模型 $Q_{\epsilon,h}$，使得 $\frac{d}{d\epsilon}L(Q_{\epsilon,h})$ 在 $\epsilon=0$ 处的线性张成空间同时包含 $D^*(Q,G_h)$ 和 $D^+(Q,G_h)$。使用这一局部最不利子模型，就定义了一个 TMLE $Q_{n,h}^*$，对所有 $h$ 同时求解两个方程
+$P_nD^*(Q_h^*,G_h)=P_nD^+(Q_h^*,G_h)=0$。
+现在，可以采用这一定义的 TMLE $Q_{n,h}^*$，应用前述一般 C-TMLE 算法。此时，C-TMLE 选择器 $h_n$，即 $(G_{n,h_n},Q_{n,h_n}^*)$，将精确求解式 (10.3)。事实上，即使不使用 C-TMLE 算法，只使用基于初始估计量 $(Q_n,G_{n,h_{n,\mathrm{CV}}})$ 的标准 TMLE $Q_{n,h_{n,\mathrm{CV}}}^*$，也会精确求解式 (10.3)。因此，下文的渐近定理既适用于所提出的 C-TMLE，也适用于同时靶向两个方程并使用 $h_{n,\mathrm{CV}}$ 的标准 TMLE。尽管如此，我们仍预期 C-TMLE 在有限样本中具有优势。
+
+\begin{bookresult}{例}{10.6}
+考虑 C-TMLE 算法，但令 $\bar Q_{n,h}^*$ 为基于 $(Q_{n,h},G_{n,h})$ 的一步 TMLE，采用二维巧妙协变量
+% 原书该二维向量缺少最外层右圆括号，保留可见记号。
+$(C(\bar G_{n,h}),\frac{d}{dh}C(\bar G_{n,h})$。
+令
+\[
+ D_1^+(Q,G_{n,h})
+ =\frac{d}{dh}D_1^*(Q,G_{n,h})
+ =\frac{d}{dh}C(G_{n,h})(A,W)(Y-\bar Q(A,W)).
+\]
+此时，对每个 $h$，$(Q_{n,h}^*,G_{n,h})$ 都求解
+\[
+ \begin{aligned}
+ P_nD_1^*(Q_{n,h}^*,G_{n,h})&=0,\\
+ P_nD_1^+(Q_{n,h}^*,G_{n,h})&=0.
+ \end{aligned}
+\]
+它还求解
+\[
+ \begin{aligned}
+ P_nD^*(Q_{n,h}^*,G_{n,h})&=0,\\
+ P_nD^+(Q_{n,h}^*,G_{n,h})&=0,
+ \end{aligned}
+\]
+其中，$D^+(Q,G_{n,h})=\frac{d}{dh}D^*(Q,G_{n,h})$。在 C-TMLE 算法中使用这一定义的 TMLE，就能保证关键方程
+$P_nD^+(Q_{n,h}^*,G_{n,h})=0$
+对所有 $h$ 成立，而不只是对算法定义的 C-TMLE 选择器 $h=h_n$ 成立。因此，在 C-TMLE 算法的描述中，也可以用 $h=h_{n,\mathrm{CV}}$ 替代选择器 $h_n$。事实上，也可以直接使用基于初始估计量 $Q_n$ 和 $G_{n,h_{n,\mathrm{CV}}}$ 的 TMLE，但要采用这一二维最不利子模型。
+\end{bookresult}
+

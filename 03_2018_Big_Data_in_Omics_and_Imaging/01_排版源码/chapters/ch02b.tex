@@ -1,0 +1,524 @@
+% 原章分章页6—16，第2.3节。
+\section{连续因果网络的结构方程与评分度量}
+\label{sec:ch02-continuous-score}
+\subsection{用于生成节点核心度量的多元结构方程模型}
+
+BDeu 及其他针对离散节点的评分度量，不能应用于连续变量节点。当节点变量连续时，第1章研究的结构方程模型（structural equation model，SEM）为选择评分度量提供了有力工具。假设目标节点及其父节点由 $M$ 个连续内生变量和 $K$ 个外生变量组成，外生变量既可以是连续变量，也可以是离散变量。记 $M$ 个内生变量的 $n$ 次观测为矩阵 $y=[y_1,\ldots,y_M]$，外生变量的观测为 $X=[x_1,\ldots,x_K]$。回顾用于描述这些变量关系的线性结构方程：
+\begin{equation}
+y_1\gamma_{1i}+\cdots+y_M\gamma_{Mi}
++x_1\beta_{1i}+\cdots+x_K\beta_{Ki}+e_i=0,\quad i=1,\ldots,M,
+\tag{2.14}
+\end{equation}
+其中，$\gamma$ 和 $\beta$ 是系统中未知的结构参数。用矩阵记号，第 $i$ 个方程可改写为
+\begin{equation}
+Y\Gamma_i+XB_i+E_i=0,
+\tag{2.15}
+\end{equation}
+其中，$\Gamma_i,B_i,E_i$ 为相应向量。令 $y_i$ 为变量 $i$ 的观测向量，$Y_{-i}$ 为观测矩阵 $Y$ 去掉 $y_i$ 后的矩阵，$\gamma_{-1}$ 为参数向量 $\Gamma_i$ 去掉参数 $\gamma_{ii}$ 后的向量。第 $i$ 个方程可写为
+\begin{equation}
+y_i=W_i\Delta_i+e_i,
+\tag{2.16}
+\end{equation}
+其中，$W_i=[Y_{-i},X]$，$\Delta_i=[\gamma_{-i},B_i]$。第1章研究的估计量为
+\begin{equation}
+\widehat\Delta_i=
+(\widehat W_i^T\widehat W_i)^{-1}\widehat W_i^T y_i,
+\tag{2.17}
+\end{equation}
+其中 $\widehat W_i=X(X^TX)^{-1}X^TW_i$。以平方 $l_2$ 损失
+\begin{equation}
+\operatorname{Score}_i=\lVert y_i-W_i\widehat\Delta\rVert_2^2
+\tag{2.18}
+\end{equation}
+作为节点 $y_i$ 的评分度量。
+
+\subsection{用于家系因果推断的混合结构方程模型}
+
+基于人群的抽样设计是目前因果推断的主要研究设计。作为其替代，基于家系的设计具有若干突出特点。家系数据比人群数据包含更多信息：它不仅含有全基因组遗传信息，还含有个体之间的相关性。罕见变异在家系中的分离，提供了分离变异多个拷贝的信息。家系数据还提供了遗传变异代际传递的丰富信息，从而能够提高罕见变异填补的准确性。
+
+此外，人群亚结构往往存在，并可能产生虚假的因果结构。与基于家系的关联分析类似，本章引入混合结构方程模型（mixed structural equation model，MSEM），用于构造连续变量的评分度量，并进行基于家系的因果推断。
+
+\subsubsection{混合结构方程模型}
+
+考虑如下混合结构方程模型：
+\begin{equation}
+\begin{aligned}
+&y_1\gamma_{11}+\cdots+y_M\gamma_{M1}
++x_1\beta_{11}+\cdots+x_K\beta_{K1}
++g_1u_{11}+\cdots+g_qu_{q1}+e_1=0,\\
+&y_1\gamma_{12}+\cdots+y_M\gamma_{M2}
++x_1\beta_{12}+\cdots+x_K\beta_{K2}
++g_1u_{12}+\cdots+g_qu_{q2}+e_2=0,\\
+&\hspace{4cm}\vdots\hspace{3cm}\vdots\\
+&y_1\gamma_{1M}+\cdots+y_{MM}\gamma_{MM}
++x_1\beta_{1M}+\cdots+x_K\beta_{KM}
++g_1u_{1M}+\cdots+g_qu_{qM}+e_M=0.
+\end{aligned}\tag{2.19}
+\end{equation}
+其中，$y_1,\ldots,y_M$ 为 $M$ 个内生变量（性状），$x_1,\ldots,x_K$ 为 $K$ 个外生变量和预定变量（协变量），$g_1,\ldots,g_q$ 为 $q$ 个标准化遗传变量（图2.4），其定义见《组学与影像大数据：关联分析》第6章。$\gamma$ 和 $\beta$ 为结构参数，$u_{11},\ldots,u_{qM}$ 为随机效应，$e_1,\ldots,e_M$ 为 $M$ 个随机变量。
+\begin{figure}[htbp]
+\centering\input{figures/ch02fig04.tex}
+\origfig{4}{四个表型的因果结构。}
+\end{figure}
+定义随机效应向量
+\[
+u_1=\begin{bmatrix}u_{11}\\\vdots\\u_{1M}\end{bmatrix},
+\ldots,\quad
+u_q=\begin{bmatrix}u_{q1}\\\vdots\\u_{qM}\end{bmatrix}.
+\]
+结构方程模型（2.19）可写成矩阵形式：
+\begin{equation}
+Y\Gamma+XB+GU+E=0,
+\tag{2.20}
+\end{equation}
+其中
+\[
+Y=\begin{bmatrix}
+y_{11}&\cdots&y_{1M}\\\vdots&\vdots&\vdots\\y_{n1}&\cdots&y_{nM}
+\end{bmatrix}=[Y_1,\ldots,Y_M],
+\]
+\[
+\Gamma=\begin{bmatrix}
+\gamma_{11}&\cdots&\gamma_{1M}\\\vdots&\vdots&\vdots\\
+\gamma_{M1}&\cdots&\gamma_{MM}
+\end{bmatrix}=[\Gamma_1,\ldots,\Gamma_M],
+\]
+\[
+X=\begin{bmatrix}
+x_{11}&\cdots&x_{1p}\\\vdots&\vdots&\vdots\\x_{n1}&\cdots&x_{np}
+\end{bmatrix}=[X_1,\ldots,X_p],
+\]
+\[
+B=\begin{bmatrix}
+\beta_{11}&\cdots&\beta_{1M}\\\vdots&\vdots&\vdots\\
+\beta_{p1}&\cdots&\beta_{pM}
+\end{bmatrix}=[B_1,\ldots,B_M]
+\]
+为 $p\times M$ 维遗传加性矩阵，
+\[
+G=\begin{bmatrix}
+g_{11}&\cdots&g_{1q}\\\vdots&\vdots&\vdots\\g_{n1}&\cdots&g_{nq}
+\end{bmatrix}=[G_1,\ldots,G_q],
+\]
+\[
+U=\begin{bmatrix}
+u_{11}&\cdots&u_{1M}\\\vdots&\vdots&\vdots\\u_{q1}&\cdots&u_{qM}
+\end{bmatrix}=[u_1,\ldots,u_M]
+\]
+为 $q\times M$ 维随机效应矩阵，并且
+\[
+\varepsilon=\begin{bmatrix}
+\varepsilon_{11}&\cdots&\varepsilon_{1M}\\\vdots&\vdots&\vdots\\
+\varepsilon_{n1}&\cdots&\varepsilon_{nM}
+\end{bmatrix}=[\varepsilon_1,\ldots,\varepsilon_M].
+\]
+假设随机效应与残差的联合分布为
+\begin{equation}
+\begin{bmatrix}\vecop(U)\\\vecop(\varepsilon)\end{bmatrix}
+\sim N\left(
+\begin{bmatrix}0\\0\end{bmatrix}
+\begin{bmatrix}\Sigma_0\otimes I_q&0\\0&R_0\otimes I_n\end{bmatrix}
+\right),
+\tag{2.21}
+\end{equation}
+其中
+\[
+\Sigma_0=
+\begin{bmatrix}
+\sigma^u_{11}&\cdots&\sigma^u_{1M}\\\vdots&\vdots&\vdots\\
+\sigma^u_{M1}&\cdots&\sigma^u_{MM}
+\end{bmatrix},
+\qquad
+R_0=
+\begin{bmatrix}
+\sigma^e_{11}&\cdots&\sigma^e_{1M}\\\vdots&\vdots&\vdots\\
+\sigma^e_{M1}&\cdots&\sigma^e_{MM}
+\end{bmatrix}.
+\]
+接下来考虑 $ZU+\varepsilon$ 的分布。令 $W=GU+\varepsilon$，则
+\begin{equation}
+\begin{aligned}
+\vecop(W)&=\vecop(GU)+\vecop(\varepsilon)\\
+&=(I\otimes G)\vecop(U)+\vecop(\varepsilon).
+\end{aligned}\tag{2.22}
+\end{equation}
+由式（2.24）和（2.25）可得
+\begin{equation}
+\begin{aligned}
+\Lambda=\operatorname{cov}(\vecop(W))
+ &=(I_M\otimes G)(\Sigma_0\otimes I_q)(I_M\otimes G^T)+R_0\otimes I_n\\
+ &=\Sigma_0\otimes(GG^T)+R_0\otimes I_n.
+\end{aligned}\tag{2.23}
+\end{equation}
+
+\subsubsection{混合结构方程模型中固定效应的两阶段估计}
+
+考虑模型（2.19）的第 $i$ 个方程：
+\begin{equation}
+Y\Gamma_i+XB_i+Gu_i+e_i=0.
+\tag{2.24}
+\end{equation}
+为使用回归方法，通常选取一个内生变量放在方程左侧。具体地，第 $i$ 个方程为
+\[
+\begin{aligned}
+&y_1\gamma_{1i}+\cdots+y_{i-1}\gamma_{i-1\,i}
++y_i\gamma_{ii}+y_{i+1}\gamma_{i+1\,i}+\cdots+y_M\gamma_{Mi}\\
+&\qquad+x_1\beta_{1i}+\cdots+x_K\beta_{Ki}
++g_1u_{1i}+\cdots+g_qu_{qi}+e_i=0.
+\end{aligned}
+\]
+将上式两边除以 $-\gamma_{ii}$，再分别将 $-\gamma_{ij}/\gamma_{ii}$、$-\beta_{ji}/\gamma_{ii}$ 和 $-u_{ji}/\gamma_{ii}$ 记为 $\gamma_{ji}$、$\beta_{ji}$ 和 $u_{ji}$，得到
+\begin{equation}
+\begin{aligned}
+y_i={}&y_1\gamma_{1i}+\cdots+y_{i-1}\gamma_{i-1\,i}
++y_{i+1}\gamma_{i+1\,i}+\cdots+y_M\gamma_{Mi}\\
+&{}+x_1\beta_{1i}+\cdots+x_K\beta_{Ki}
++g_1u_{1i}+\cdots+g_qu_{qi}+e_i.
+\end{aligned}\tag{2.25}
+\end{equation}
+$\Gamma_i$ 和 $B_i$ 的某些系数可能为零。假设
+\[
+\Gamma_i=
+\begin{bmatrix}-1\\\gamma_i\\\gamma_i^*\end{bmatrix}
+=\begin{bmatrix}-1\\\gamma_i\\0\end{bmatrix},
+\quad
+B_i=\begin{bmatrix}\beta_i\\\beta_i^*\end{bmatrix}
+=\begin{bmatrix}\beta_i\\0\end{bmatrix},
+\quad Y=[y_i\ Y_i\ Y_i^*],\quad X=[X_i\ X_i^*].
+\]
+于是式（2.25）可重新排列为
+\begin{equation}
+\begin{aligned}
+y_i&=Y_i\gamma_i+Y_i^*\gamma_i^*+X_i\beta_i+X_i^*\beta_i^*+Gu_i+\phi_i\\
+&=Y_i\gamma_i+X_i\beta_i+Gu_i+\varepsilon_i\\
+&=[Y_i\ X_i]\begin{bmatrix}\gamma_i\\\beta_i\end{bmatrix}+Gu_i+\varepsilon_i\\
+&=Z_i\delta_i+Gu_i+\varepsilon_i\\
+&=Z_i\delta_i+W_i,
+\end{aligned}\tag{2.26}
+\end{equation}
+其中
+\[
+Z_i=[Y_i\ X_i],\quad
+\delta_i=\begin{bmatrix}\gamma_i\\\beta_i\end{bmatrix},
+\quad W_i=Gu_i+\varepsilon_i.
+\]
+由式（2.21）回顾
+\[
+\operatorname{var}(u_i)=\sigma^u_{ii}I_q,
+\]
+从而
+\begin{equation}
+W_i\sim N\left(0\ \sigma^u_{ii}GG^T+\sigma^e_{ii}I_n\right).
+\tag{2.27}
+\end{equation}
+在式（2.26）两边左乘 $X^T$，得到
+\begin{equation}
+X^Ty_i=X^TZ_i\delta_i+X^TW_i.
+\tag{2.28}
+\end{equation}
+$X^TW_i$ 的协方差矩阵为
+\begin{equation}
+H=X^T(\sigma^u_{ii}GG^T+\sigma^e_{ii}I_n)X.
+\tag{2.29}
+\end{equation}
+式（2.28）中参数的广义最小二乘估计量为
+\begin{equation}
+\begin{aligned}
+\widehat\delta_i={}&
+\left[(X^TZ_i)^T
+\bigl(X^T(\sigma^u_{ii}GG^T+\sigma^e_{ii}I_n)X\bigr)^{-1}X^TZ_i\right]^{-1}\\
+&{}\times(X^TZ_i)^T
+\bigl(X^T(\sigma^u_{ii}GG^T+\sigma^e_{ii}I_n)X\bigr)^{-1}X^Ty_i.
+\end{aligned}\tag{2.30}
+\end{equation}
+估计量的方差为
+\begin{equation}
+\operatorname{var}(\widehat\delta_i)=
+\left[(X^TZ_i)^T
+\bigl(X^T(\sigma^u_{ii}GG^T+\sigma^e_{ii}I_n)X\bigr)^{-1}X^TZ_i\right]^{-1}.
+\tag{2.31}
+\end{equation}
+
+\subsubsection{混合结构方程模型中固定效应的三阶段估计}
+
+与经典结构方程模型类似，可以用三阶段最小二乘法估计固定效应。第1章的式（1.65）可以修改为
+\begin{equation}
+\begin{bmatrix}X^Ty_1\\X^Ty_2\\\vdots\\X^Ty_M\end{bmatrix}
+=
+\begin{bmatrix}X^TZ_1&&&\\&X^TZ_2&&\\&&\ddots&\\&&&X^TZ_M\end{bmatrix}
+\begin{bmatrix}\delta_1\\\delta_2\\\vdots\\\delta_M\end{bmatrix}
++\begin{bmatrix}X^TW_1\\X^TW_2\\\vdots\\X^TW_M\end{bmatrix},
+\tag{2.32}
+\end{equation}
+其中 $W_i=Gu_i+e_i$，$i=1,2,\ldots,M$。
+
+式（2.32）同样可以写成紧凑的矩阵形式：
+\begin{equation}
+[I\otimes X^T]y=[I\otimes X^T]Z\delta+(I\otimes X^T)W,
+\tag{2.33}
+\end{equation}
+其中
+\[
+\begin{aligned}
+Z&=\begin{bmatrix}Z_1&&&\\&Z_2&&\\&&\ddots&\\&&&Z_M\end{bmatrix}_{TM\times([M(M-1)]},\\
+y&=\begin{bmatrix}y_1\\y_2\\\vdots\\y_M\end{bmatrix}_{TM},
+\quad
+\delta=\begin{bmatrix}\delta_1\\\delta_2\\\vdots\\\delta_M\end{bmatrix}_M,
+\quad
+W=\begin{bmatrix}W_1\\W_2\\\vdots\\W_M\end{bmatrix}_M.
+\end{aligned}
+\]
+回顾残差项 $(I\otimes X^T)W$ 的协方差为
+\begin{equation}
+\begin{aligned}
+\Lambda_0&=\operatorname{cov}\bigl((I_M\otimes X^T)W\bigr)\\
+&=(I_M\otimes X^T)[\Sigma_0\otimes GG^T+R_0\otimes I_n](I_M\otimes X)\\
+&=\Sigma_0\otimes(X^TGG^TX)+R_0\otimes(X^TX).
+\end{aligned}\tag{2.34}
+\end{equation}
+由式（2.33）和（2.34），$\delta$ 的广义最小二乘估计量为
+\begin{equation}
+\begin{aligned}
+\widehat\delta={}&
+\left\{[Z^T(I_M\otimes X)]\Lambda_0^{-1}[(I_M\otimes X^T)Z]\right\}^{-1}\\
+&{}\times[Z^T(I_M\otimes X)]\Lambda_0^{-1}(I_M\otimes X^T)y.
+\end{aligned}\tag{2.35}
+\end{equation}
+回顾 $y$ 的协方差矩阵为
+\[
+\operatorname{cov}(y)=\Sigma_0\otimes GG^T+R_0\otimes I_n,
+\]
+从而
+\begin{equation}
+(I_M\otimes X^T)\operatorname{cov}(y)(I_M\otimes X)=\Lambda_0.
+\tag{2.36}
+\end{equation}
+利用式（2.35）和（2.36），可以得到估计量 $\widehat\delta$ 的方差：
+\begin{equation}
+\begin{aligned}
+\operatorname{var}(\widehat\delta)
+={}&\left\{[Z^T(I_M\otimes X)]\Lambda_0^{-1}[(I_M\otimes X^T)Z]\right\}^{-1}\\
+&{}\times[Z^T(I_M\otimes X)]\Lambda_0^{-1}\Lambda_0\Lambda_0^{-1}
+(I_M\otimes X^T)Z\\
+&{}\ast\left\{[Z^T(I_M\otimes X)]\Lambda_0^{-1}[(I_M\otimes X^T)Z]\right\}^{-1}\\
+={}&\left\{[Z^T(I_M\otimes X)]\Lambda_0^{-1}[(I_M\otimes X^T)Z]\right\}^{-1}.
+\end{aligned}\tag{2.37}
+\end{equation}
+
+\subsubsection{全信息极大似然法}
+
+两阶段和三阶段估计方法都要求随机效应与残差的方差已知。然而，实际应用中这些方差未知，需要估计。全信息极大似然（full information maximum likelihood）方法提供的似然函数，可以用于估计方差分量。假设随机遗传效应与结构误差均服从正态分布，考虑模型
+\begin{equation}
+\begin{bmatrix}y_1\\\vdots\\y_M\end{bmatrix}
+=
+\begin{bmatrix}Z_1&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&Z_M\end{bmatrix}
+\begin{bmatrix}\delta_1\\\vdots\\\delta_M\end{bmatrix}
++
+\begin{bmatrix}G&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&G\end{bmatrix}
+\begin{bmatrix}u_1\\\vdots\\u_M\end{bmatrix}
++\begin{bmatrix}\varepsilon_1\\\vdots\\\varepsilon_M\end{bmatrix}.
+\tag{2.38}
+\end{equation}
+令
+\[
+Z=\begin{bmatrix}Z_1&&&\\&Z_2&&\\&&\ddots&\\&&&Z_M\end{bmatrix}_{TM\times([M(M-1)]},
+\]
+\[
+y=\begin{bmatrix}y_1\\y_2\\\vdots\\y_M\end{bmatrix}_{TM},
+\quad\delta=\begin{bmatrix}\delta_1\\\delta_2\\\vdots\\\delta_M\end{bmatrix}_M,
+\quad u_0=\begin{bmatrix}u_1\\\vdots\\u_M\end{bmatrix},
+\quad\varepsilon_0=\begin{bmatrix}\varepsilon_1\\\varepsilon_2\\\vdots\\\varepsilon_M\end{bmatrix}_M.
+\]
+于是式（2.38）可以写为
+\begin{equation}
+\begin{aligned}
+y&=Z\delta+(I\otimes G)u_0+\varepsilon_0\\
+&=Z\delta+W_0,
+\end{aligned}\tag{2.39}
+\end{equation}
+其中 $W_0=(I\otimes G)u_0+\varepsilon_0$。
+
+接下来推导向量 $W_0$ 的分布。回顾 $u_0$ 和 $\varepsilon_0$ 的联合分布为
+\begin{equation}
+\begin{bmatrix}u_0\\\varepsilon_0\end{bmatrix}
+\sim N\left(
+\begin{bmatrix}0\\0\end{bmatrix}
+\begin{bmatrix}\Sigma_0\otimes I_q&0\\0&R_0\otimes I_n\end{bmatrix}
+\right),
+\tag{2.40}
+\end{equation}
+从而
+\begin{equation}
+W_0\sim N\bigl(0,\Sigma_0\otimes(GG^T)+R_0\otimes I_n\bigr).
+\tag{2.41}
+\end{equation}
+$W_0$ 的联合概率密度函数为
+\begin{equation}
+\begin{aligned}
+f(W_0)={}&\frac1{(2\pi)^{nM/2}
+|\Sigma_0\otimes(GG^T)+R_0\otimes I_n|^{1/2}}\\
+&{}\times\exp\left\{-\frac12W_0^T
+[\Sigma_0\otimes(GG^T)+R_0\otimes I_n]^{-1}W_0\right\}.
+\end{aligned}\tag{2.42}
+\end{equation}
+为了求 $y$ 的联合概率密度函数，作变量变换。对式（2.20）中的矩阵作向量化运算，得到
+\begin{equation}
+\begin{aligned}
+&(\Gamma^T\otimes I_n)\vecop(Y)+(B^Y\otimes I_n)\vecop(X)+\vecop(W)=0,
+ \quad\text{或}\\
+&W_0=-(\Gamma^T\otimes I_n)y-(B^Y\otimes I_n)\vecop(X).
+\end{aligned}\tag{2.43}
+\end{equation}
+雅可比矩阵 $\left|\partial y/\partial W_0^T\right|$ 为
+\begin{equation}
+\left|\left|\frac{\partial y}{\partial W_0^T}\right|^{-1}\right|
+=\left|\left|\frac{\partial W_0}{\partial y^T}\right|\right|
+=|\Gamma^T\otimes I_n|=|\Gamma|^n.
+\tag{2.44}
+\end{equation}
+利用变量变换，可得到 $y$ 的联合概率密度函数的如下结论。
+
+\par\medskip\noindent\textbf{结论 2.1}\quad
+$y$ 的联合概率密度函数为
+\begin{equation}
+\begin{aligned}
+f(y)={}&\frac{|\Gamma|^n}{(2\pi)^{nM/2}
+|\Sigma_0\otimes(GG^T)+R_0\otimes I_n|^{1/2}}\\
+&{}\times\exp\left\{-\frac12(y-Z\delta)^T
+[\Sigma_0\otimes(GG^T)+R_0\otimes I_n]^{-1}(y-Z\delta)\right\}.
+\end{aligned}\tag{2.45}
+\end{equation}
+对数似然函数为
+\begin{equation}
+\begin{aligned}
+l(\delta,\Sigma_0,R_0\mid y)
+={}&-\frac{nM}2\log(2\pi)
+-\frac12\log|\Sigma_0\otimes(GG^T)+R_0\otimes I_n|
++n\log|\Gamma|\\
+&{}-\frac12(y-Z\delta)^T
+[\Sigma_0\otimes(GG^T)+R_0\otimes I_n]^{-1}(y-Z\delta).
+\end{aligned}\tag{2.46}
+\end{equation}
+式（2.46）是同时对固定效应、随机效应和方差分量进行极大似然估计的基础，它利用了数据的全部信息。
+
+\subsubsection{混合结构方程模型的简化式表示}
+
+混合结构方程模型最早提出且广泛使用的方法，是结构方程模型的简化式表示（Gianola and Sorensen 2004；Rosa et al. 2011；Valente et al. 2013）。
+
+考虑混合结构方程模型
+\begin{equation}
+\Lambda y_i=X_i\beta+u_i+\varepsilon_i,
+\tag{2.47}
+\end{equation}
+其中
+\[
+\begin{aligned}
+y_i&=\begin{bmatrix}y_{i1}\\\vdots\\y_{iM}\end{bmatrix},
+&\Lambda&=\begin{bmatrix}\gamma_{11}&\cdots&\gamma_{1M}\\
+\vdots&\vdots&\vdots\\\gamma_{M1}&\cdots&\gamma_{MM}\end{bmatrix},
+&X_i&=\begin{bmatrix}x_{i1}^T&\cdots&0\\
+\vdots&\vdots&\vdots\\0&\cdots&x_{iM}^T\end{bmatrix},\\
+x_{ij}&=\begin{bmatrix}x_{ij1}\\\vdots\\x_{ijp_j}\end{bmatrix},
+&\beta&=\begin{bmatrix}\beta_1\\\vdots\\\beta_M\end{bmatrix},
+&\beta_j&=\begin{bmatrix}\beta_{j1}\\\vdots\\\beta_{jp_j}\end{bmatrix},
+\end{aligned}
+\]
+\[
+u_i=\begin{bmatrix}u_{i1}\\\vdots\\u_{iM}\end{bmatrix},
+\qquad
+\varepsilon_i=\begin{bmatrix}\varepsilon_{i1}\\\vdots\\\varepsilon_{iM}\end{bmatrix}.
+\]
+假设
+\[
+u_i\sim N(0,\Sigma_0)\quad\text{且}\quad\varepsilon_i\sim N(0,R_0).
+\]
+如果 $\Lambda$ 满秩，在式（2.47）两边左乘 $\Lambda^{-1}$，得到简化式
+\begin{equation}
+y_i=\Lambda^{-1}X_i\beta+\Lambda^{-1}u_i+\Lambda^{-1}\varepsilon_i.
+\tag{2.48}
+\end{equation}
+$M$ 个内生变量 $y_i$ 的边际分布为正态分布：
+\begin{equation}
+y_i\sim N\bigl(\Lambda^{-1}X_i\beta,
+\Lambda^{-1}(\Sigma_0+R_0)\Lambda^{-T}\bigr).
+\tag{2.49}
+\end{equation}
+由式（2.48）可得如下协方差矩阵：
+\begin{equation}
+\operatorname{cov}(u_i,y_i)=\Sigma_0\Lambda^{-T}.
+\tag{2.50}
+\end{equation}
+$u_i$ 和 $y_i$ 的联合分布为
+\begin{equation}
+\begin{pmatrix}u_i\\y_i\end{pmatrix}
+\sim N\left(
+\begin{bmatrix}0\\\Lambda^{-1}X_i\beta\end{bmatrix}
+\begin{bmatrix}
+\Sigma_0&\Sigma_0\Lambda^{-T}\\
+\Lambda^{-1}\Sigma_0&\Lambda^{-1}(\Sigma_0+R_0)\Lambda^{-T}
+\end{bmatrix}\right).
+\tag{2.51}
+\end{equation}
+随机效应可以用给定观测内生变量 $y_i$ 时 $u_i$ 的条件均值估计：
+\begin{equation}
+\begin{aligned}
+\widehat u_i=\E[u_i\mid y_i]
+ &=0+\Sigma_0\Lambda^{-T}
+ [\Lambda^{-1}(\Sigma_0+R_0)\Lambda^{-T}]^{-1}
+ (y_i-\Lambda^{-1}X_i\beta)\\
+ &=\Sigma_0(\Sigma_0+R_0)^{-1}\Lambda
+ (y_i-\Lambda^{-1}X_i\beta).
+\end{aligned}\tag{2.52}
+\end{equation}
+模型（2.47）可以扩展到整个数据集：
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}\Lambda y_1\\\vdots\\\Lambda y_n\end{bmatrix}
+&=\begin{bmatrix}X_1\\\vdots\\X_n\end{bmatrix}\beta
++\begin{bmatrix}u_1\\\vdots\\u_n\end{bmatrix}
++\begin{bmatrix}\varepsilon_1\\\vdots\\\varepsilon_n\end{bmatrix}\\
+&=X\beta+u+\varepsilon,
+\end{aligned}\tag{2.53}
+\end{equation}
+或
+\[
+(I_n\otimes\Lambda)y=X\beta+u+\varepsilon.
+\]
+假设遗传随机效应与残差误差组成的向量服从正态分布：
+\begin{equation}
+\begin{bmatrix}u\\\varepsilon\end{bmatrix}
+\sim N\left(
+\begin{bmatrix}0\\0\end{bmatrix}
+\begin{bmatrix}A\otimes\Sigma_0&0\\0&I_n\otimes R_0\end{bmatrix}
+\right),
+\tag{2.54}
+\end{equation}
+其中 $A$ 为遗传关系矩阵（genetic relationship matrix）。
+
+令 $w=u+\varepsilon$，$\Sigma=\operatorname{cov}(w)=A\otimes\Sigma_0+I_n\otimes R_0$。$w$ 的概率密度函数为
+\begin{equation}
+f(w)=\frac1{(2\pi)^{nM/2}|\Sigma|^{1/2}}
+\exp\left\{-\frac12w^T\Sigma^{-1}w\right\}.
+\tag{2.55}
+\end{equation}
+为求 $y$ 的概率密度函数，作如下变量变换：
+\begin{equation}
+w=(I_n\otimes\Lambda)y-X\beta.
+\tag{2.56}
+\end{equation}
+该变量变换的雅可比矩阵为
+\begin{equation}
+J=\frac{\partial w}{\partial y^T}=I_n\otimes\Lambda.
+\tag{2.57}
+\end{equation}
+利用式（2.55）、（2.56）、（2.57）和变量变换定理，可得 $y$ 的概率密度函数：
+\begin{equation}
+\begin{aligned}
+f(y\mid\Lambda,\beta,\Sigma)
+={}&\frac{|\Lambda|^n}{(2\pi)^{nM/2}|\Sigma|^{1/2}}\\
+&{}\times\exp\left\{-\frac12
+\bigl((I_n\otimes\Lambda)y-X\beta\bigr)^T\Sigma^{-1}
+\bigl((I_n\otimes\Lambda)y-X\beta\bigr)\right\}.
+\end{aligned}\tag{2.58}
+\end{equation}
+\FloatBarrier

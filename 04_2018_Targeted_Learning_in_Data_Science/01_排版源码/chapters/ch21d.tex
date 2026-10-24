@@ -1,0 +1,63 @@
+% 原书分章PDF第9—11页：21.2.1—21.2.4全部估计步骤。
+\subsection{用估计量 \texorpdfstring{$\bar Q_{W,N}$}{QW,N} 估计 \texorpdfstring{$\bar Q_{W,0}$}{QW,0}}
+
+为了定义 $\bar Q_{W,0}$ 的估计量 $\bar Q_{W,N}$，先定义 $\bm Q_{\bm W,0}$ 的经验对应物 $\bm Q_{\bm W,N}$，使其在观测到的 $\bm W=(W_1,\ldots,W_N)$ 上赋予概率质量1。于是，对于 $i=1,\ldots,N$，$Q_{W_i^s,0}$ 的经验分布 $Q_{W_i^s,N}$ 会在相应的观测值 $W_i^s=w_i^s(\bm W)$ 上赋予概率质量1。因此，对每个 $w^s\in\mathcal W^s$，$\bar Q_{W,0}(w^s)$ 的经验对应物 $\bar Q_{W,N}(w^s)$ 可定义如下：
+\[
+ \bar Q_{W,N}(w^s):=\frac{1}{N}\sum_{i=1}^N I(W_i^s=w^s).
+\]
+
+\subsection{\texorpdfstring{$\bar Q_0$}{Q0} 的初始（非靶向）估计量 \texorpdfstring{$\bar Q_N$}{QN}}
+
+我们假定所有 $i$ 共享同一个模型 $\bar Q_0$，并且对所有 $i$，给定 $(A_i^s,W_i^s)$ 时，各个 $Y_i$ 条件独立。因此，可以使用合并的汇总数据 $(W_i^s,A_i^s,Y_i)$（$i=1,\ldots,N$）估计共同的 $\bar Q_N$，将样本当作关于 $i$ 独立同分布的数据。此外，还可以采用通常的参数极大似然估计或基于损失的交叉验证来估计 $\bar Q_N$。由于对 $i=1,\ldots,N$，$Y_i$ 可以是取值范围 $Y_i\in[a,b]$ 已知的连续或离散变量，因此可以根据如下对数似然损失来估计 $\bar Q_0$：
+\[
+ \begin{aligned}
+ L(\bar Q)(Y\mid A^s,W^s)
+ =-\sum_{i=1}^N\log\Bigl\{&\bar Q(A_i^s,W_i^s)^{Y_i}\\[-.2em]
+ &\mathord{}(1-\bar Q(A_i^s,W_i^s))^{1-Y_i}\Bigr\},
+ \end{aligned}
+\]
+也可以使用平方误差损失：
+\[
+ L(\bar Q)(O^s)=-\sum_{i=1}^N\bigl(Y_i-\bar Q(A_i^s,W_i^s)\bigr)^2.
+\]
+因此，拟合共同的 $\bar Q_0=E[Y_i\mid A_i^s,W_i^s]$ 的估计量 $\bar Q_N$，就是使用汇总数据结构 $(W_i^s,A_i^s,Y_i)$（$i=1,\ldots,N$）。换言之，我们用全部 $N$ 个观测组成的样本来预测 $Y_i$。例如，当 $Y_i$ 为二元变量时，可用全部 $N$ 个观测拟合单一的逻辑回归模型来估计 $\bar Q_N$，以 $Y_i$ 为结局，以 $(W_i^s,A_i^s)$ 为预测变量，也可以把朋友数 $|F_i|$ 作为一个额外协变量加入。拟合 $\bar Q_N$ 后，会生成单位特定的预测值向量 $(\bar Q_N(A_i^s,W_i^s))_{i=1}^N$。随后，用这些预测值构造 $\bar Q_N$ 的更新版本 $\bar Q_N^*$。
+
+\subsection{估计混合密度 \texorpdfstring{$\bar g_0^*$ 与 $\bar g_0$}{g0*与g0}}
+
+现在介绍一种直接估计 $\bar g_0$ 的方法，它依赖于 Sofrygin 和 van der Laan（2017）的引理4.1。该引理指出，可以取合并样本 $(A_i^s,W_i^s)$（$i=1,\ldots,N$），采用通常针对独立同分布数据、基于极大似然的估计方法，得到 $\bar g_0$ 的一致估计量 $\bar g_N$。这一做法相当于拟合给定 $W_i^s$ 时 $A_i^s$ 的、对各个 $i$ 共同的条件密度，并把 $(A_i^s,W_i^s)$ 当作独立观测。例如，如果 $A_i^s$ 的每个分量均为二元变量，且对所有 $i$ 都有 $|A_i^s|=k$，那么 $\bar g_0$ 的条件分布就可以分解为 $k$ 个二元条件分布的乘积。其中每个二元条件分布，都可以用通常的逻辑回归方法来估计。
+
+现在假设 $\bm g_0$ 已知，随机临床试验（randomized clinical trial，RCT）就是这种情形。上述估计 $\bar g_0$ 的方法很容易作相应调整，以纳入真实 $\bm g_0$ 的知识。具体而言，可以先从 $(\bm g_0,\bm Q_{\bm W,N})$ 模拟生成大量观测 $(A_j^s,W_j^s)_{j=1}^M$，其中 $\bm Q_{\bm W,N}$ 在观测到的 $\bm W$ 上赋予概率质量1；然后，利用这个非常大的样本，拟合 $\bar g_0$ 的基于极大似然的估计量，就像在拟合给定 $W_i^s$ 时 $A_i^s$ 的一个共同模型一样。
+
+注意，$\bar g_0^*:=\bar h^*(\bm G^*,\bm Q_{\bm W,0})/\bar q_W(\bm Q_{\bm W,0})$ 通常未知，因此也需要根据数据估计，尤其是因为 $\bar g_0^*$ 通过 $\bm Q_{\bm W,0}$ 依赖于数据的真实分布。因此，我们建议把上述估计 $\bar g_0$ 的方法用于估计 $\bar g_0^*$，只需用已知的 $\bm g^*$ 替换已知的 $\bm g_0$ 即可。所得模型拟合 $\bar g_N^*$ 与 $\bar g_N$ 用于得到 $N$ 个预测值 $\bar g_N^*(A_i^s\mid W_i^s)/\bar g_N(A_i^s\mid W_i^s)$（$i=1,\ldots,N$）。这些预测值将作为单位层面的权重，用于下一小节所述估计量 $\bar Q_N$ 的 TMLE 更新。
+
+\subsection{TMLE 算法}
+
+定义估计量 $\bar Q_N$、$\bar g_N$、$\bar g_N^*$ 与 $\bar Q_{W,N}$ 之后，先按下面的步骤1为 $\bar Q_N$ 构造模型更新 $\bar Q_N^*$，再按步骤2将 $\psi_N^*$ 作为映射 $\bar\Psi$ 的代入估计量求值，即可得到 TMLE $\psi_N^*$。
+
+\begin{enumerate}[label=\arabic*.]
+\item 为 $\bar Q_N$ 定义如下参数子模型：$\operatorname{Logit}\bar Q_N(\varepsilon)=\varepsilon+\operatorname{Logit}\bar Q_N$，并定义如下加权对数似然损失函数：
+\begin{equation}
+ \begin{aligned}
+ L^w(\bar Q_N(\varepsilon))(\bm O^s)
+ =-\sum_{i=1}^N\log\Bigl\{&\bar Q_N(\varepsilon)(A_i^s,W_i^s)^{Y_i}\\[-.2em]
+ &\mathord{}(1-\bar Q_N(\varepsilon)(A_i^s,W_i^s))^{1-Y_i}\Bigr\}
+ \frac{\bar g_N^*}{\bar g_N}(A_i^s\mid W_i^s).
+ \end{aligned}
+ \tag{21.13}
+\end{equation}
+模型更新 $\bar Q_N^*$ 定义为 $\bar Q_N(\varepsilon^N)=\operatorname{Expit}(\operatorname{Logit}\bar Q_N+\varepsilon^N)$，其中 $\varepsilon^N$ 使上述损失最小，即 $\varepsilon^N=\argmin_\varepsilon L^w(\bar Q_N(\varepsilon))(\bm O^s)$。具体而言，只需对合并的 $N$ 个观测样本 $(W_i^s,A_i^s,Y_i)$（$i=1,\ldots,N$）运行仅含截距的加权逻辑回归，即可拟合 $\varepsilon^N$：以 $Y_i$ 为结局，以 $\varepsilon$ 为截距，使用偏置项 $\operatorname{Logit}\bar Q_N(A_i^s,W_i^s)$、预测权重 $\bar g_N^*(A_i^s\mid W_i^s)/\bar g_N(A_i^s\mid W_i^s)$，且不使用协变量。拟合的截距就是 $\varepsilon$ 的极大似然拟合值 $\varepsilon^N$，从而得到模型更新 $\bar Q_N^*$。对于任意固定的 $(a^s,w^s)$，先计算初始模型预测 $\bar Q_N(a^s,w^s)$，再计算更新 $\bar Q_N(\varepsilon^N)$，即可求出 $\bar Q_N^*$ 的值。
+
+\item TMLE $\psi_N^*=\bar\Psi_N(\bar Q_N^*,\bar Q_{W,N})$ 定义为如下代入估计量：
+\begin{equation}
+ \psi_N^*=\frac{1}{N}\sum_{i=1}^N\int_{\bm a}
+ \bar Q_N^*(a_i^s(\bm a,\bm W),w_i^s(\bm W))
+ \bm g^*(\bm a\mid\bm W)\,d\mu(\bm a).
+ \tag{21.14}
+\end{equation}
+当 $\bm g^*$ 非退化时，可以从 $\bm g^*$ 抽样并进行蒙特卡洛积分，从而很好地近似上述 $\psi_N^*$ 的表达式。具体而言，我们建议对 $j=1,\ldots,M$ 重复以下过程来计算 $\psi_N^*$：（1）以观测到的 $\bm W=(W_1,\ldots,W_N)$ 为条件，从 $\bm g^*(\bm a\mid\bm W)$ 抽取 $N$ 个观测 $\bm A_j^*=(A_{j,1}^*,\ldots,A_{j,N}^*)$；（2）应用汇总量映射，为 $i=1,\ldots,N$ 构造汇总数据集 $(A_{j,i}^{*s},W_i^s)$，其中每个 $A_{j,i}^{*s}:=a_i^s(\bm A_j^*,\bm W)$；（3）将第 $j$ 次迭代中 $\psi_N^*$ 的蒙特卡洛近似计算为
+\begin{equation}
+ \psi_{j,N}^*=\frac{1}{N}\sum_{i=1}^N\bar Q_N^*(A_{j,i}^{s*},W_i^s).
+ \tag{21.15}
+\end{equation}
+然后，对 $j=1,\ldots,M$ 的 $\psi_{j,N}^*$ 取平均，得到 $\psi_N^*$ 的蒙特卡洛估计值 $\bar\psi_N^*$；其中 $M$ 应取得足够大，以保证对 $\psi_N^*$ 的近似误差足够小。最后，注意到只需重复使用第21.2.3节估计 $\bar g_0^*$ 时已经构造好的汇总数据集 $(A_{j,i}^{*s},W_i^s)$，就能大幅缩短该算法的计算时间。
+\end{enumerate}

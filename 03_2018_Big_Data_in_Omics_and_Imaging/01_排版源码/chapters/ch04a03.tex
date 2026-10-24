@@ -1,0 +1,157 @@
+% 原书PDF第21—25页，4.1.3.7全节；止于4.2标题前。
+\subsubsection{利用二倍体基因组的 RNA-seq 数据估计等位基因特异性表达}
+\bookdeepheading{paragraph}{4.1.3.7.1}{生成模型}
+
+经常可以观察到两个等位基因的表达存在差异，即等位基因特异性表达（allele-specific expression，ASE）。RNA-seq 技术为识别 ASE 提供了有力工具。图4.10给出包含 ASE 的读段生成模型贝叶斯网络，本节大部分材料来自 Nariai et al.（2016）。模型包括四个变量：异构体选择变量 $G_n$、单倍型选择变量 $H_n$、起始位置变量 $S_n$，以及观测读段变量 $R_n$。$G_n=i$ 的定义同前，表示读段 $n$ 由第 $i$ 个异构体生成。
+
+$H_n$ 表示生成读段 $n$ 的单倍型。设 $H_n=0$ 表示来自父源单倍型，$H_n=1$ 表示来自母源单倍型。$S_n$ 表示读段 $n$ 的起始位置。模型考虑两个参数向量：$\theta=[\theta_0,\theta_1,\ldots,\theta_M]^T$ 表示异构体丰度；$\phi=[\phi_0,\phi_1,\ldots,\phi_M]^T$ 表示每个异构体中父源单倍型的比例。假设
+\[
+\sum_{i=0}^{M}\theta_i=1,\qquad0\le\theta_i\le1,\qquad0\le\phi_i\le1.
+\]
+\input{figures/ch04a_fig10}
+
+下面计算数据的完整似然。假设给定参数向量 $\theta$ 与 $\phi$ 后，图4.10各节点上的变量构成贝叶斯网络。根据贝叶斯网络的分解规则，数据似然可分解为各因子概率的乘积：
+\begin{equation}
+\begin{aligned}
+L(\theta,\phi)&=P(G_n,H_n,S_n,R_n\mid\theta,\phi)\\
+&=P(G_n\mid\theta)P(H_n\mid G_n,\phi)P(S_n\mid G_n,H_n)P(R_n\mid G_n,H_n,S_n).
+\end{aligned}
+\tag{4.42}
+\end{equation}
+为计算似然，先分别计算各组成部分。与前面相同，$P(G_n=i\mid\theta)$ 是读段 $n$ 由第 $i$ 个异构体生成的概率，因此定义 $P(G_n=i\mid\theta)=\theta_i$。
+
+将 $P(H_n=0\mid G_n=i,\phi)$ 定义为 $\phi_i$，将 $P(H_n=1\mid G_n=i,\phi)$ 定义为 $1-\phi_i$。设 $l_{ih}$ 为单倍型 $h$ 上异构体 $i$ 的长度。概率 $P(S_n=j\mid G_n=i,H_n=h)$ 表示给定异构体 $i$ 和单倍型 $h$ 时，读段 $n$ 从位置 $j$ 生成的概率，计算为
+\[
+P(S_n=j\mid G_n=i,H_n=h)=\frac1{l_{ih}-L+1},
+\]
+其中 $L$ 为读段 $n$ 的长度。为便于讨论，定义指示变量
+\begin{equation}
+Z_{nihj}=\begin{cases}
+1,&G_n=i,\ H_n=h,\ S_n=j,\\
+0,&\text{其他情形}.
+\end{cases}
+\tag{4.43}
+\end{equation}
+令 $\pi_n$ 为读段 $n$ 全部可能比对的 $(i,h,j)$ 元组集合。式 (4.42) 中的概率可表示为
+\begin{equation}
+\begin{aligned}
+P(R_n\mid G_n,H_n,S_n)&=P(R_n=r_n\mid Z_{nihj}=1)\\
+&=\prod_{x=1}^{L}\operatorname{subst}(r_n[x],q_n[x],c_{ih}[x]),
+\end{aligned}
+\tag{4.44}
+\end{equation}
+其中 $\operatorname{subst}(r,q,c)$ 是纳入质量评分的替换矩阵；$x$ 为比对位置；$r_n[x]$ 为读段 $n$ 在位置 $x$ 的核苷酸；$q_n[x]$ 为该位置的质量评分；$c_{ih}[x]$ 为单倍型 $h$ 上异构体 $i$ 的 cDNA 参考序列的核苷酸。替换矩阵可利用 Phred 碱基质量评分估计，也可根据读段 $n$ 与参考 cDNA 序列的最佳比对来估计。显然，式 (4.42) 的模型似然 $L(\theta,\phi)$ 能够完整描述读段 $n$ 的生成。
+
+\bookdeepheading{paragraph}{4.1.3.7.2}{ASE 估计的变分贝叶斯方法}
+
+利用第4.1.3.6.3节介绍的变分贝叶斯方法，可以估计模型参数与 ASE。本节介绍 Nariai et al.（2016）提出的参数及 ASE 估计方法。
+
+变分贝叶斯方法需要指定先验分布。仍以 Dirichlet 分布作为 $\theta$ 的先验：
+\begin{equation}
+P(\theta)=\frac{\Gamma\left(\sum_{i=0}^{M}\alpha_i\right)}
+{\prod_{i=0}^{M}\Gamma(\alpha_i)}\theta_i^{\alpha_i-1},
+\tag{4.45}
+\end{equation}
+其中 $\Gamma(\cdot)$ 为伽马函数。当 $\alpha_i-1\ge0$ 时，$\alpha_i-1$ 表示先验中分配给相应异构体的读段数；当 $\alpha_i-1<0$ 时，表示该异构体丰度等于零。容易证明
+\begin{equation}
+E[\theta_i]=\frac{\alpha_i}{\sum_{j=0}^{M}\alpha_j}.
+\tag{4.46}
+\end{equation}
+参数 $\phi$ 的先验为 Beta 分布：
+\begin{equation}
+P(\phi_i)=\frac1{B(\beta_{i1},\beta_{i2})}\phi_i^{\beta_{i1}-1}(1-\phi_i)^{\beta_{i2}-1},
+\tag{4.47}
+\end{equation}
+其中
+\[
+B(\beta_{i1},\beta_{i2})=\frac{\Gamma(\beta_{i1})\Gamma(\beta_{i2})}{\Gamma(\beta_{i1}+\beta_{i2})}
+\]
+是 Beta 函数；$\beta_{i1}>0$ 与 $\beta_{i2}>0$ 为 Beta 分布的两个形状参数。Beta 分布常用于群体遗传学中等位基因频率的分布建模，也是二项分布的共轭先验概率分布。参数 $\beta_{i1}$ 与 $\beta_{i2}$ 分别表示先验中分配给父源与母源单倍型的读段数。可以证明
+\begin{equation}
+E[\phi]=\frac{\beta_{i1}}{\beta_{i1}+\beta_{i2}}.
+\tag{4.48}
+\end{equation}
+类似于结论4.3，可以构造下列估计 $\theta$ 和 $\phi$ 的变分贝叶斯算法（Nariai et al. 2016）。
+
+\par\medskip\Needspace{5\baselineskip}
+\noindent\textbf{结论4.5：ASE 估计的变分贝叶斯算法}\par
+\noindent\textbf{步骤1：初始化。}
+对每个转录本异构体，将 Dirichlet 分布参数初值设为 $\alpha_i^{(0)}=\alpha_0$，$i=1,\ldots,M$；将 Beta 分布参数初值设为 $\beta_{i1}^{(0)}=1$、$\beta_{i2}^{(0)}=1$，$i=1,\ldots,M$。
+
+\noindent\textbf{步骤2：VBE 步。}
+利用当前估计 $E_{\theta}[\theta^{(u)}]$ 和 $E_{\phi}[\phi^{(u)}]$，计算密度函数
+\begin{equation}
+q_Z^{(u+1)}(Z)=\prod_n\prod_i\prod_h\prod_k(\eta_{nihj})^{Z_{nihj}},
+\tag{4.49}
+\end{equation}
+其中
+\[
+\eta_{n,i,h,j}=\frac{\rho_{n,i,h,j}}{\sum_{(i',h',j')\in\pi_n}\rho_{n',i',h',j'}}\qquad\text{或}
+\]
+\[
+E_Z[Z_{nihj}]=\eta_{nihj},
+\]
+\[
+\log\rho_{nihj}=
+\begin{cases}
+\begin{aligned}
+&E_{\theta}[\log\theta_i^{(u)}]+E_{\phi}[\log\phi_i^{(u)}]+\log P(S_n\mid G_n)\\
+&\qquad+\log P(R_n\mid G_n,H_n,S_n)
+\end{aligned},&H_n=0,\\[1ex]
+\begin{aligned}
+&E_{\theta}[\log\theta_i^{(u)}]+E_{\phi}[\log(1-\phi_i^{(u)})]+\log P(S_n\mid G_n)\\
+&\qquad+\log P(R_n\mid G_n,H_n,S_n)
+\end{aligned},&H_n=1,
+\end{cases}
+\]
+其中
+\begin{equation}
+E_{\theta}[\log\theta_i^{(u)}]
+=\psi(\alpha_i^{(u)})-\psi\left(\sum_{j=1}^{M}\alpha_j^{(u)}\right),
+\tag{4.50}
+\end{equation}
+\[
+\psi(\alpha)=\frac{d\Gamma(\alpha)/d\alpha}{\Gamma(\alpha)}
+\]
+为双伽马函数，并且
+\begin{equation}
+E_{\phi}[\log\phi_i^{(u)}]
+=\psi(\beta_{i1}^{(u)})-\psi(\beta_{i1}^{(u)}+\beta_{i2}^{(u)}),
+\tag{4.51}
+\end{equation}
+以及
+\[
+E_{\phi}[\log(1-\phi_i^{(u)})]
+=\psi(\beta_{i1}^{(u)})-\psi(\beta_{i1}^{(u)}+\beta_{i2}^{(u)}).
+\]
+
+\noindent\textbf{步骤3：VBM 步。}
+利用当前估计 $q_Z^{(u+1)}(Z)$，计算
+\begin{equation}
+E_{\theta}[\theta_i^{(u+1)}]=\frac{\alpha_i^{(u+1)}}{\sum_{i=0}^{M}\alpha_i^{(u+1)}},
+\tag{4.52}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+\alpha_i^{(u+1)}&=\alpha_i^{(u)}+\sum_{(n',i,h',j')\in\pi_n}E_Z[Z'_{n',i,h',j}]\\
+&=\alpha_i^{(u)}+\sum_{(n',i,h',j')\in\pi_n}\eta_{n'ih'j'}.
+\end{aligned}
+\tag{4.53}
+\end{equation}
+同样，利用当前估计 $q^{(u+1)}(Z)$，计算
+\begin{equation}
+E_{\phi}[\phi_i]=\frac{\beta_{i1}^{(u+1)}}{\beta_{i1}^{(u+1)}+\beta_{i2}^{(u+1)}},
+\tag{4.54}
+\end{equation}
+其中
+\[
+\beta_{i1}^{(u+1)}=\beta_{i1}^{(u)}+\sum_{n',t,h'=0,j'}E_Z[Z_{n',t,h',j'}],
+\]
+以及
+\[
+\beta_{i2}^{(u+1)}=\beta_{i2}^{(u)}+\sum_{n',t,h'=1,j'}E_Z[Z_{n',t,h',j'}].
+\]
+\noindent\textbf{步骤4：停止准则。}
+若 $\lVert E_{\theta}[\theta^{(u+1)}-\theta^{(u)}]\rVert_2^2<\varepsilon$，则停止；否则返回步骤2。
+\FloatBarrier

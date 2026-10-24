@@ -1,0 +1,123 @@
+% 原书分章 PDF 第 5—10 页；第 17.1.2—17.1.3 小节。
+\subsection{因果参数与可识别性}
+
+根据上述表述，将条件中介公式（conditional mediation formula）定义为
+\begin{equation}
+ E\bigl[Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})\bigr].
+ \tag{17.2}
+\end{equation}
+为了比较两个暴露方案对时点 $\tau$ 结局的效应，将相应的自然间接效应定义为
+\begin{equation}
+ E\bigl[Y_\tau(1,\bar\Gamma^1)\bigr]-E\bigl[Y_\tau(1,\bar\Gamma^0)\bigr],
+ \tag{17.3}
+\end{equation}
+自然直接效应则为
+\begin{equation}
+ E\bigl[Y_\tau(1,\bar\Gamma^0)\bigr]-E\bigl[Y_\tau(0,\bar\Gamma^0)\bigr].
+ \tag{17.4}
+\end{equation}
+这两个效应将总效应
+\[
+ E\bigl[Y_\tau(1,\bar\Gamma^1)\bigr]-E\bigl[Y_\tau(0,\bar\Gamma^0)\bigr]
+\]
+分解为两部分。下一节将说明，这一总效应与传统总效应度量 $E[Y_\tau(1)]-E[Y_\tau(0)]$ 是同一个数学量，其中 $Y_\tau(\mathbf a)$ 是在暴露 $\mathbf A=\mathbf a$、但不对 $\mathbf Z$ 施加干预时本来会出现的结局。
+
+在上述说明性例子中，试点项目可以通过提高患者的糖尿病健康教育水平、增加营养咨询利用来影响疾病进展；营养咨询利用的增加，既可能来自更顺畅的服务运作，也可能来自患者健康教育水平的提高。假定与其他因素相比，参与项目对 $R_1$ 的提高，即对患者糖尿病健康教育水平的提高，具有很大影响。于是，变量 $R_1(1,\bar\Gamma^0)=r_1$ 将相对较高，而 $Z_2\sim\Gamma_2^0(l_0,r_1)$ 则是一名未参与项目、但具有相同基线特征 $L_0=l_0$ 和同样较高糖尿病健康教育水平的个体的营养咨询利用情况。再假定项目对营养咨询运作的改进，极大地提高了这一服务的利用，则对同一个由 $(l_0,r_1)$ 刻画的个体，$\Gamma_2^0(l_0,r_1)$ 将主要分布在较低利用水平附近，$\Gamma_2^1(l_0,r_1)$ 则主要分布在较高利用水平附近。此后，$L_1(1,\bar\Gamma^0)$ 与 $L_1(1,\bar\Gamma^1)$，分别表示具有相同基线 $l_0$、糖尿病健康教育水平 $r_1$，但因项目改进而具有较低或较高营养咨询利用模式的个体的营养状况和疾病进展。于是，间接效应 $E[Y_\tau(1,\bar\Gamma^0)]-E[Y_\tau(1,\bar\Gamma^1)]$，捕捉的是项目使服务运作更顺畅、从而改变营养咨询利用所产生的对疾病进展的间接效应，却不捕捉项目通过提高患者糖尿病健康教育水平、进而改变其咨询需求所产生的效应。因此，这一间接效应仅比较从暴露，即项目，通往中介变量，即营养咨询利用的路径，不包括从暴露通往协变量，即患者健康教育，再通往中介变量的路径。与之对应，直接效应 $E[Y_\tau(1,\bar\Gamma^0)]-E[Y_\tau(0,\bar\Gamma^0)]$ 捕捉从暴露直接通往最终结局，即糖尿病控制的路径，从暴露经协变量通往最终结局的路径，以及从暴露经协变量和中介变量通往最终结局的路径。在本例中，最后一类路径就是：患者健康教育水平提高，使其对营养咨询的需求增加，由此对糖尿病进展产生的差异效应。
+
+为建立可识别性结果，记 $L_t(\mathbf a,\mathbf z)$ 为施加干预、将 $\mathbf A=\mathbf a$ 且 $\mathbf Z=\mathbf z$ 时，时点 $t$ 的反事实协变量。相应因果参数的可识别性，仅依赖 Robins（1986）的序贯随机化假设（sequential randomization assumptions）和正值性假设。
+
+\begin{bookresult}{引理}{17.1}
+假定下列假设成立。
+\begin{enumerate}[label=A\arabic*.,leftmargin=2.8em]
+ \item $(\mathbf R_{s\geq t}(\mathbf a'),\mathbf Z_{s\geq t}(\mathbf a'),\mathbf L_{s\geq t}(\mathbf a'))
+ \perp A_t\mid\mathbf A_{t-1},\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}$。
+ \item $(\mathbf R_{s\geq t}(\mathbf a,\mathbf z),\mathbf L_{s\geq t}(\mathbf a,\mathbf z))
+ \perp A_t\mid\mathbf A_{t-1},\mathbf R_{t-1},\mathbf Z_{t-1},\mathbf L_{t-1}$。
+
+ 用文字表述，A1 和 A2 要求：给定观测历史后，每个暴露 $A_t$ 与其后所有协变量和中介变量之间的关系不存在未测量混杂，即 $A_t$ 在给定观测历史后是随机化的。
+
+ \item $(\mathbf R_{s>t}(\mathbf a,\mathbf z),\mathbf L_{s\geq t}(\mathbf a,\mathbf z))
+ \perp Z_t\mid\mathbf A_t,\mathbf R_t,\mathbf Z_{t-1},\mathbf L_{t-1}$。
+ 给定观测历史后，每个中介变量 $Z_t$ 与其后所有协变量之间的关系不存在未测量混杂，即 $Z_t$ 在给定已观测过去后是随机化的。
+
+ \item 正值性：对所有 $t\geq1$ 及所有 $\mathbf r,\mathbf l,\mathbf z$，有
+ \begin{enumerate}[label=(\roman*),leftmargin=2.8em]
+  \item 若 $p_0(\mathbf a'_{t-1},\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})>0$，则 $p_0(a'_t\mid\mathbf a'_{t-1},\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})>0$；
+  \item 若 $p_0(\mathbf a_{t-1},\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})>0$，则 $p_0(a_t\mid\mathbf a_{t-1},\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})>0$；
+  \item 若 $p_0(r_t\mid\mathbf a_t,\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})>0$，则 $p_0(r_t\mid\mathbf a'_t,\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})>0$；
+  \item 若 $p_0(l_t\mid\mathbf a_t,\mathbf r_t,\mathbf z_t,\mathbf l_{t-1})>0$，则 $p_0(l_t\mid\mathbf a'_t,\mathbf r_t,\mathbf z_t,\mathbf l_{t-1})>0$；
+  \item 若
+  \[
+  \begin{aligned}
+   &p_0(\mathbf a_t,\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})>0\\
+   &\quad\text{且}\quad
+   p_0(z_t\mid\mathbf a'_t,\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})>0,
+  \end{aligned}
+  \]
+  则 $p_0(z_t\mid\mathbf a_t,\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})>0$。
+ \end{enumerate}
+ 条件 (i) 和 (ii) 要求，在每个有支持的协变量和中介变量分层内，都能观测到所关注的暴露；(iii) 和 (iv) 要求，$\mathbf A=\mathbf a$ 下有支持的协变量取值，在 $\mathbf A=\mathbf a'$ 下也有支持；(v) 要求，$\mathbf A=\mathbf a'$ 下有支持的中介变量取值，在 $\mathbf A=\mathbf a$ 下也有支持。
+\end{enumerate}
+则式 (17.2) 的条件中介公式可识别为
+\[
+\begin{aligned}
+ E\bigl[Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})\bigr]
+ &=\Psi^{\mathbf a,\mathbf a'}(P_0)\\
+ &\equiv\sum_{\mathbf r,\mathbf l,\mathbf z}y_\tau p_{0,L_0}(l_0)
+ \prod_{t=1}^\tau p_{0,R}(r_t\mid\mathbf a_t,\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})\\
+ &\quad{}\times p_{0,Z}(z_t\mid\mathbf a'_t,\mathbf r_t,\mathbf z_{t-1},\mathbf l_{t-1})
+ p_{0,L}(l_t\mid\mathbf a_t,\mathbf r_t,\mathbf z_t,\mathbf l_{t-1}).
+\end{aligned}
+\]
+因此，自然间接效应和直接效应分别识别为
+\begin{equation}
+ E\bigl[Y_\tau(1,\bar\Gamma^1)\bigr]-E\bigl[Y_\tau(1,\bar\Gamma^0)\bigr]
+ =\Psi^{1,1}(P_0)-\Psi^{1,0}(P_0),
+ \tag{17.5}
+\end{equation}
+\begin{equation}
+ E\bigl[Y_\tau(1,\bar\Gamma^0)\bigr]-E\bigl[Y_\tau(0,\bar\Gamma^0)\bigr]
+ =\Psi^{1,0}(P_0)-\Psi^{0,0}(P_0).
+ \tag{17.6}
+\end{equation}
+\end{bookresult}
+\begin{proof}
+见第 A.2 节。
+\end{proof}
+
+如前面讨论所提及的，当 $\mathbf a=\mathbf a'$ 时，$E[Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a})]=\Psi^{\mathbf a,\mathbf a}(P_0)=E[Y_\tau(\mathbf a)]$。因此，所提出的自然直接效应和间接效应将总效应分解为
+\[
+\begin{aligned}
+ &E[Y_\tau(1)]-E[Y_\tau(0)]\\
+ &\quad=\bigl(E[Y_\tau(1,\bar\Gamma^1)]-E[Y_\tau(1,\bar\Gamma^0)]\bigr)\\
+ &\qquad{}+\bigl(E[Y_\tau(1,\bar\Gamma^0)]-E[Y_\tau(0,\bar\Gamma^0)]\bigr).
+\end{aligned}
+\]
+一致性假设是反事实框架下因果推断中的典型假设。正值性假设 (i) 和 (ii) 是研究暴露总效应时的典型要求，而 (iii)—(v) 是所提出的条件随机干预所特有的。假设 A1—A3 就是所谓的强序贯随机化假设。
+
+在上述说明性例子中，对某个时期 $t$，假设 A1 和 A2 要求：项目参与、营养咨询和协变量的历史，包括糖尿病健康教育、疾病进展、合并症、营养状况、生活方式因素等，能够解释当前项目参与与当前及未来协变量、营养咨询利用之间关系的全部混杂。假设 A3 要求：当前项目参与，以及项目参与、营养服务利用和其他协变量的既往历史，能够解释当前营养咨询利用与当前及未来协变量之间关系的全部混杂。例如，若某个未记录事件既影响个体当前是否参与项目，又影响当前及未来的营养咨询利用和协变量，这些假设就会被违反。
+
+\subsection{边际与条件随机干预下的纵向中介分析}
+
+VanderWeele 和 Tchetgen Tchetgen（2017）提出了纵向中介分析的另一种表述，使用基于边际中介分布的随机干预，即仅以基线协变量为条件。具体而言，令 $G_t^{\mathbf a'}$ 表示在将 $\mathbf A=\mathbf a'$ 的理想实验下，给定基线 $L_0$ 时 $Z_t$ 的边际分布，即 $G_t^{\mathbf a'}(z_t\mid L_0)=p_{Z(\mathbf a')}(z_t\mid L_0)$。记 $\mathbf G^{\mathbf a'}=(G_1^{\mathbf a'},\ldots,G_\tau^{\mathbf a'})$。在上述说明性例子中，为生成 $Y_\tau(1,\mathbf G^0)$，在 $t=1$，令基线特征为 $L_0=l_0$ 的个体参加项目，由此使其糖尿病健康教育水平提高。但其营养服务利用 $Z_1\sim G_1^0$，将与一名具有相同基线 $L_0=l_0$、却未参加项目并因而具有较低糖尿病健康教育水平的个体相同。其疾病进展 $L_1(1,\mathbf G^0)=l_1$，则由其 $L_0$、项目参与、由此提高的糖尿病健康教育水平，以及咨询服务利用模式 $G_1^0$ 共同产生。依此类推。$Y_\tau(\mathbf a,\mathbf G^{\mathbf a'})$ 与本章提出的 $Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})$ 的区别在于：在每个时点 $t$，$G_t^{\mathbf a'}$ 是按一名处于 $\mathbf A=\mathbf a'$、具有相同基线的随机个体的分布抽取的，也就是对 $\mathbf A=\mathbf a'$ 影响下的所有时变协变量历史进行边际化；$\Gamma_t^{\mathbf a'}$ 则按一名处于 $\mathbf A=\mathbf a'$、具有相同基线及相同时变协变量历史的随机个体的分布抽取，而这些历史受到 $\mathbf A=\mathbf a$ 的影响。这一表述差异会影响适用性、解释和可识别性，下面分别讨论。
+
+在生存情形下，边际干预反事实 $Y_\tau(\mathbf a,\mathbf G^{\mathbf a'})$ 并没有良好定义，因为一名在 $\mathbf A=\mathbf a$ 下仍存活的个体，可能被允许抽取一名在 $\mathbf A=\mathbf a'$ 下已经死亡的个体的中介取值。另一方面，条件干预反事实 $Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})$ 以该个体自身的时变历史为条件，避开了这一问题，因此在生存情形下具有良好定义。不过，除了形式上的定义之外，这些时变协变量历史在两个暴露方案下仍须得到充分支持；从 $Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})$ 的可识别性条件可以清楚看出这一点。
+
+现在考虑非生存情形。在上述说明性例子中，假设项目参与通过改进课程提高患者的糖尿病健康教育水平，又通过更好的患者教育和更顺畅的咨询服务增加营养咨询利用，并且健康教育与营养咨询对疾病进展变化的贡献相同。那么，在 $t=1$，两种干预下的患者健康教育 $R_1(1,\bar\Gamma^0)$ 和 $R_1(1,\mathbf G^0)$，都会因项目参与 $A_1=1$ 而处于较高水平。但营养服务利用 $G_1^0$，将来自一名未参加项目、因而具有较低糖尿病健康教育水平的个体，例如患者知识有限，营养咨询需求较低；营养服务利用 $\Gamma_1^0$ 则来自一名具有较高糖尿病健康教育水平、但未参加项目的个体。因此，间接效应 $E[Y_\tau(1,\mathbf G^0)]-E[Y_\tau(1,\mathbf G^1)]$ 捕捉的营养服务利用差异，既来自项目使营养咨询服务运作更顺畅，也来自项目提高患者知识、从而增加对这些服务的需求。它既捕捉从项目直接通往营养服务利用的路径，也捕捉从项目经患者健康教育通往营养服务利用的路径。相比之下，间接效应 $E[Y_\tau(1,\bar\Gamma^0)]-E[Y_\tau(1,\bar\Gamma^1)]$ 仅捕捉项目使营养咨询服务运作更顺畅所导致的营养服务利用差异，不包括健康教育提高所导致的需求增加。与间接效应对应，直接效应 $E[Y_\tau(1,\mathbf G^0)]-E[Y_\tau(0,\mathbf G^0)]$ 捕捉从项目直接通往疾病进展的路径，以及从项目经患者健康教育通往疾病的路径。将这些内容与第 17.1.2 节的定义和引例对照，可以看到，在这一纵向情形下，不同的中介表述允许我们提出不同的中介问题；数据结构复杂性的增加，也为潜在的研究问题带来了更多选择。
+
+从式 (17.5) 可以看到，虽然所依据的理想实验不同，但 $E[Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a})]=E(Y_\tau(\mathbf a))$ 在数学上相同。另一方面，根据 VanderWeele 和 Tchetgen Tchetgen（2017）可推得
+\[
+\begin{aligned}
+ &E\bigl(Y_\tau(\mathbf a,\mathbf G^{\mathbf a'})\bigr)\\
+ &\quad=\sum_{\mathbf r,\mathbf l,\mathbf z}\Biggl\{y_\tau p_{0,L_0}(l_0)
+ \prod_{t=1}^\tau p_{0,R}(r_t\mid\mathbf a_t,\mathbf r_{t-1},\mathbf z_{t-1},\mathbf l_{t-1})\\
+ &\qquad{}\times p_{0,L}(l_t\mid\mathbf a_t,\mathbf r_t,\mathbf z_t,\mathbf l_{t-1})\\
+ &\qquad{}\times\Biggl[\sum_{\mathbf r',\mathbf l'_{\tau-1}}
+ \prod_{t=1}^\tau p_{0,R}(r'_t\mid\mathbf a'_t,\mathbf r'_{t-1},\mathbf z_{t-1},\mathbf l'_{t-1})\\
+ &\qquad\qquad{}\times p_{0,Z}(z_t\mid\mathbf a'_t,\mathbf r'_t,\mathbf z_{t-1},\mathbf l'_{t-1})
+ \prod_{t=1}^{\tau-1}p_{0,L}(l'_t\mid\mathbf a'_t,\mathbf r'_t,\mathbf z_t,\mathbf l'_{t-1})\Biggr]\Biggr\}.
+\end{aligned}
+\]
+因此，存在时变混杂时，$E(Y_\tau(\mathbf a,\mathbf G^{\mathbf a}))$ 不等于 $E(Y_\tau(\mathbf a))$。从而，总效应度量 $E[Y_\tau(1,\mathbf G^1)]-E[Y_\tau(0,\mathbf G^0)]$，是对总效应的另一种量化，有别于传统的 $E(Y_\tau(1))-E(Y_\tau(0))$。因此，选择哪一种表述，也取决于我们希望研究哪一种总效应分解。
+
+所提出的条件分布干预能够用于生存情形，并能分解标准总效应，因此更加灵活，但代价是需要更强的可识别性条件。识别边际干预参数 $E[Y_\tau(\mathbf a,\mathbf G^{\mathbf a'})]$，可以采用假设 A2—A3 的较弱版本，只要求对最终感兴趣结局不存在未测量混杂，而不要求对其后所有协变量都如此。例如，在本例中，若某个未记录的短期事件，如短期失业，既影响当前项目参与，又影响当前疾病状态、生活方式和营养服务利用，却不影响最终结局，则 $E[Y_\tau(\mathbf a,\mathbf G^{\mathbf a'})]$ 仍可识别，而 $E[Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})]$ 不可识别。类似地，若存在项目参与或营养咨询利用与患者糖尿病健康教育 $R_t$ 之间的未测量混杂因素，但它并不混杂与最终结局之间的关系，则 $E[Y_\tau(\mathbf a,\mathbf G^{\mathbf a'})]$ 仍可识别，而 $E[Y_\tau(\mathbf a,\bar\Gamma^{\mathbf a'})]$ 不可识别。因此，在非生存情形中，需要仔细权衡可识别性、效应解释和总效应分解。本章余下部分将讨论 $\Psi^{\mathbf a,\mathbf a'}(P_0)$ 的统计推断。

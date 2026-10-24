@@ -1,0 +1,129 @@
+\documentclass[UTF8,11pt,a4paper,openany,fontset=windows]{ctexbook}
+
+\usepackage{natbib}
+\usepackage[sectionbib]{chapterbib}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{newtxmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage[frozencache,cachedir=.]{minted}
+\usepackage{mdframed}
+\usepackage[pagebackref]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=gray, citecolor=gray, linktocpage=true}
+\usepackage{forest}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{tabularx}
+\usepackage{subcaption}
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+\usetikzlibrary{chains}
+\usetikzlibrary{arrows.meta}
+\usepackage{adjustbox}
+
+\usepackage[most]{tcolorbox}
+\usepackage{fontawesome5}
+
+\usepackage{todonotes}
+\usepackage{standalone}
+\usepackage{booktabs}
+\usepackage[inline]{enumitem}
+\usepackage{algorithm}
+
+\usepackage{algpseudocode}
+
+\usepackage{listings}
+
+\counterwithin{listing}{chapter}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\Tau}{\mathcal{T}}
+\newcommand{\cpol}[0]{\pmb{\mu}}
+
+\newcommand\given[1][]{\:#1\vert\:}
+
+\theoremstyle{definition}
+\newtheorem{example}{例}
+
+\surroundwithmdframed[
+    linewidth=0.8pt,
+    innerleftmargin=12pt,
+    innerrightmargin=12pt,
+    innertopmargin=12pt,
+    innerbottommargin=12pt,
+    skipabove=15pt,
+    skipbelow=15pt,
+    roundcorner=3pt
+]{example}
+
+\newtcolorbox{learningbox}{
+    colback=green!8!white,
+    colframe=green!50!black,
+    title={\faGraduationCap\quad 本章学习目标},
+    fonttitle=\bfseries,
+    coltitle=white,
+    boxrule=1pt,
+    arc=4pt,
+    left=5pt,
+    right=5pt,
+    top=5pt,
+    bottom=5pt,
+    enhanced
+}
+
+
+\usepackage[margin=2.6cm,headheight=16pt]{geometry}
+\usepackage{comment}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\linespread{1.25}
+\emergencystretch=1.2em
+\tolerance=2000
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\chaptermark}[1]{\markboth{第\thechapter 章\quad #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\quad #1}}
+\renewcommand{\bibname}{参考文献}
+\providecommand{\refname}{参考文献}
+\renewcommand{\refname}{参考文献}
+\floatname{algorithm}{算法}
+\renewcommand{\listingscaption}{代码}
+\hypersetup{unicode=true,pdftitle={智能体大语言模型},pdfauthor={Max van Duijn; Michiel van der Meer; Aske Plaat; Niki van Stein},linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\renewcommand{\bibsection}{\section*{参考文献}}
+
+\algrenewcommand\algorithmicrequire{\textbf{输入：}}
+\algrenewcommand\algorithmicensure{\textbf{输出：}}
+\algrenewcommand\algorithmicif{\textbf{若}}
+\algrenewcommand\algorithmicthen{\textbf{则}}
+\algrenewcommand\algorithmicelse{\textbf{否则}}
+\algrenewcommand\algorithmicfor{\textbf{对于}}
+\algrenewcommand\algorithmicforall{\textbf{对于所有}}
+\algrenewcommand\algorithmicdo{\textbf{执行}}
+\algrenewcommand\algorithmicwhile{\textbf{当}}
+\algrenewcommand\algorithmicrepeat{\textbf{重复}}
+\algrenewcommand\algorithmicuntil{\textbf{直到}}
+\algrenewcommand\algorithmicend{\textbf{结束}}
+\algrenewcommand\algorithmicreturn{\textbf{返回}}
+\algrenewcommand\algorithmicfunction{\textbf{函数}}
+\algrenewcommand\algorithmicprocedure{\textbf{过程}}
+
+\renewcommand{\lstlistingname}{代码}
+\renewcommand{\lstlistlistingname}{代码目录}

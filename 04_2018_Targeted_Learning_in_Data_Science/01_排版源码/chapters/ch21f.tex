@@ -1,0 +1,142 @@
+% 原书分章PDF第15—19页：完整R数据生成、干预与真实输出，图21.1—21.2。
+\section{在 R 中模拟网络相依数据}
+
+本节介绍一项模拟研究，用以评估上述 TMLE 的有限样本与渐近行为。网络相依数据使用 \texttt{simcausal} R 包（Sofrygin 等，2017）模拟生成。该包便于模拟复杂纵向数据，包括复杂的网络相依数据，尤其适用于第21.1节所述类型的数据生成分布。更多细节可参阅即将发布的、有关开展网络模拟的 \texttt{simcausal} 包使用说明文档。
+
+本章的模拟此前已由 Ogburn 等（2017）介绍过。简而言之，这项模拟旨在模拟一项假想研究：提高一个高度相连的目标社区的身体活动水平。对于编号为 $i=1,\ldots,n$ 的每位社区成员，研究收集其基线协变量 $W_i$，其中包括是否进行身体活动的指示变量 $\PA_i$，以及每名受试者的朋友网络 $F_i$。暴露或处理 $A_i$ 随机分配给社区中25\%的成员。接受处理的个体获得各种经济激励，以鼓励其前往当地健身房。
+
+\subsection{定义观测网络数据的数据生成分布}
+
+首先，通过为 $N$ 个节点指定一个网络图或概率网络图模型，描述这些单位之间的连接网络，例如社交网络或地理网络。接着，为相连的单位参数化一个结构方程模型（structural equation model，SEM），以指定单位层面协变量（节点属性）的分布（van der Laan，2014a）。这一 SEM 允许一个单位的协变量，通过某种已知而被视为未指定的函数形式，依赖于其他相连单位的协变量。
+
+在这项模拟中，假定社交网络按优先连接模型（preferential attachment model；Barabási 和 Albert，1999）建模，节点度（朋友数）的分布服从幂律。首先，用下面的抽样函数定义观测网络图的分布。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+require("igraph")
+require("simcausal")
+generate.igraph.prefattach <- function(n, power,
+  zero.appeal, m, ...) {
+  g <- sample_pa(n, power = power, zero.appeal =
+    zero.appeal, m = m)
+  g <- as.directed(as.undirected(g, mode =
+  "collapse"), mode = "mutual")
+  sparse_AdjMat <- simcausal::igraph.to.sparse
+  AdjMat(g)
+  NetInd_out <-
+    simcausal::sparseAdjMat.to.NetInd(sparse_AdjMat)
+  return(NetInd_out$NetInd_k)
+}
+\end{lstlisting}
+\end{minipage}\par
+然后，把上述网络分布添加到一个 \texttt{simcausal} DAG 对象中，以定义观测数据生成分布，如下所示。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D <- DAG.empty()
+Net.prefattach <- network("Net", netfun =
+  "generate.igraph.prefattach", power = 0.5,
+  zero.appeal = 5, m = 5)
+\end{lstlisting}
+\end{minipage}\par
+下例定义基线协变量的分布。注意，我们定义了基线指示变量 \texttt{HUB}，表示一个人的朋友数是否大于或等于25；还定义基线协变量 \texttt{PA}，表示此人在基线是否进行身体活动。最后定义网络基线汇总量 \texttt{nF.PA}，对每个个体计算其进行身体活动的朋友总数。注意，部分模拟生成的基线协变量未在此列出。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D <- D + Net.prefattach +
+  node("HUB", distr = "rconst", const =
+    ifelse(nF >= 25, 1, 0)) +
+  node("W1", distr = "rcat.b1",
+    probs = c(0.0494, 0.1823, 0.2806, 0.2680, 0.1651,
+      0.0546)) +
+  node("W2", distr = "rbern", prob = plogis(-0.2)) +
+  node("PA", distr = "rbern", prob = W2*0.05 +
+    (1-W2)*0.15) +
+  node("nF.PA", distr = "rconst", const =
+    sum(PA[[1:Kmax]]), replaceNAw0 = TRUE)
+\end{lstlisting}
+\end{minipage}\par
+下一步，把二元暴露 \texttt{A} 随机分配给总体中的25\%。这一暴露对应于宣传体育锻炼益处的信息宣传活动，旨在促进并维持社区成员前往当地健身房。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D <- D + node("A", distr = "rbern", prob = 0.25)
+\end{lstlisting}
+\end{minipage}\par
+然后定义网络汇总量 \texttt{sum.netA}，它依赖于个体朋友们的暴露，也依赖于这些朋友的基线协变量取值。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D <- D + node("sum.netA", distr = "rconst",
+  const = (sum(A[[1:Kmax]])*(HUB==0) +
+    sum((W1[[1:Kmax]] > 4)*A[[1:Kmax]])*(HUB==1)),
+  replaceNAw0 = TRUE)
+\end{lstlisting}
+\end{minipage}\par
+结局 $Y_i$ 是一个二元指示变量，表示在暴露 $A$ 之后预先指定的随访期内是否维持健身房会员资格。下面的变量 \texttt{Y} 定义这一结局。注意，假定每个 $Y$ 依赖于个体自身的暴露与基线协变量，也依赖于网络汇总量 \texttt{sum.netA}，以及在基线进行身体活动的朋友数 \texttt{nF.PA}。
+
+每个 $Y_i$ 的成功概率定义为 $i$ 的暴露 $A_i$（是否接受经济激励的指示变量）、基线协变量 $W_i$，以及 $i$ 的朋友暴露与基线协变量的三个汇总量的 logit 线性函数。具体而言，还假定维持健身房会员资格的概率在 logit 线性尺度上，随下列网络汇总量增大而增大：$i$ 的朋友中接受暴露的总人数 $\sum_{j\in F_i}A_j$、其朋友中在基线进行身体活动的总人数 $\sum_{j\in F_i}\PA_j$，以及这两个汇总量的乘积 $\sum_{j\in F_i}A_j\times\sum_{j\in F_i}\PA_j$。前往当地健身房的经济激励，对基线不进行身体活动的每个个体具有较小的直接效应，对基线已经进行身体活动者则没有直接效应。然而，如果在基线至少有一位进行身体活动的朋友，那么本身进行身体活动的个体更可能在随访期内维持健身房会员资格。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D <- D +
+  node("Y", distr = "rbern",
+    prob = plogis(ifelse(PA == 1,
+      +5 - 15*(nF.PA < 1),
+      -8.0 + 0.25*A) +
+      +0.5*sum.netA + 0.25*nF.PA*sum.netA + 0.5*nF.PA +
+      +0.5*(W1-1) - 0.58*W2),
+    replaceNAw0 = TRUE)
+\end{lstlisting}
+\end{minipage}\par
+最后，如下定义基于优先连接网络模型的数据生成分布。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D.prefattach <- set.DAG(D, n.test = 200)
+\end{lstlisting}
+\end{minipage}\par
+现在调用函数 \texttt{sim}，利用上述数据生成分布，模拟一个含5000个观测的单一网络，如下所示。图21.1给出这个网络的朋友数分布；图21.2则绘出随机抽取的100个单位的网络图。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+datO_5K <- sim(D.prefattach, n = 5000)
+\end{lstlisting}
+\end{minipage}\par
+
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch21_histogram}
+ \caption{包含5000个观测的优先连接网络的朋友数分布。}
+ \label{fig:ch21:histogram}
+\end{figure}
+
+\subsection{定义干预、模拟反事实数据并计算目标因果量}
+
+接下来，对暴露 \texttt{A} 以及进行身体活动的朋友总数 \texttt{nF.PA}，定义若干随机和动态干预。我们还利用优先连接网络模型，计算这些干预相应的因果效应。注意，只需模拟各干预特定的反事实数据，再计算反事实结局的估计均值，就可以方便地求得上述因果参数的真实值；下面各例均展示这一做法。
+
+以下代码给出一个例子：将暴露分配给总体中随机选出的35\%时，即进行随机干预时，计算真实的反事实平均结局。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D.prefattach <- D.prefattach +
+  action("gstar", nodes = node("A", distr = "rbern",
+  prob = aset), aset = 0.35)
+datFull <- sim(D.prefattach, actions="gstar",
+  n = 50000, rndseed = 54321)
+print(psi0_a0.4 <- mean(datFull[["gstar"]]$Y))
+[1] 0.15186
+\end{lstlisting}
+\end{minipage}\par
+以下代码说明，如何计算动态干预下真实的反事实平均结局。该干预只对连接最多的个体，即朋友数大于15的个体，实施（随机）干预，因此仅覆盖总体中约10\%的人。
+\par\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[numbers=none,frame=none]
+D.prefattach <- D.prefattach +
+action("gHubs",
+  nodes = c(node("A", distr = "rbern", prob =
+  ifelse(nF >= 20, 0.9, ifelse(nF >= 15, 0.40, 0)))))
+datFull <- sim(D.prefattach, actions="gHubs",
+  n = 50000, rndseed = 54321)
+print(psi0_g.dynamic <- mean(datFull[["gHubs"]]$Y))
+[1] 0.1204
+\end{lstlisting}
+\end{minipage}\par
+
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch21_network}
+ \caption{包含100个观测的样本的优先连接网络示例。}
+ \label{fig:ch21:network}
+\end{figure}
+\FloatBarrier

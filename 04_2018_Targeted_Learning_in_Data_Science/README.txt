@@ -1,0 +1,21 @@
+﻿Targeted Learning in Data Science: Causal Inference for Complex Longitudinal Studies
+数据科学中的靶向学习
+更新时间：2026-10-24
+
+状态：全书中文译稿已编译完成。
+成品（仓库根目录）：00_books/Targeted_Learning_in_Data_Science_cn_translated.pdf
+页数：541
+说明：8个分部、30章、基础附录和参考文献。
+
+目录用途
+00_原始资料：英文PDF、英文分章资料，以及适用时的原版TeX源码。
+01_排版源码：与上述中文成品对应的中文TeX工程、图形资产及构建脚本。
+02_术语表：本书中英术语对照。
+03_校对记录：当前整理核验和历史校对、制作依据；历史进度不代表当前交付状态。
+05_参考资料：补充参考资料（若有）。
+
+重新编译
+进入01_排版源码后执行 python build.py，或在PowerShell中执行 .\编译.ps1。
+主文件：01_排版源码/main.tex。
+编译依赖和可选参数详见01_排版源码/README_编译说明.txt。
+中间文件只写入系统临时目录；成功后才更新同名成品。

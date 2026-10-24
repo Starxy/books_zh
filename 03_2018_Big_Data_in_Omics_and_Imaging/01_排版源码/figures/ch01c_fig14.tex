@@ -1,0 +1,53 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ n/.style={draw=blue!55!black,fill=white,minimum width=9mm,minimum height=6mm,inner sep=2pt,font=\small},
+ lab/.style={font=\small,inner sep=2pt}]
+\node[n] (c14az) at (0,3) {$Z$};
+\node[n] (c14ax) at (1.4,4.1) {$X$};
+\node[n] (c14ay) at (3,5.4) {$Y$};
+\node[n] (c14au) at (4.7,4.1) {$U$};
+\draw[->,green!55!black] (c14az) -- (c14ax);
+\draw[->,green!55!black] (c14ax) -- (c14ay);
+\draw[->,green!55!black] (c14au) -- (c14ay);
+\draw[->,green!55!black] (c14au) -- (c14ax);
+\node[lab,anchor=west] at (-.5,2.4) {(a)};
+\node[n] (c14bz) at (7,3) {$Z$};
+\node[n] (c14bx) at (8.5,4.1) {$X$};
+\node[n] (c14by) at (11.8,4.1) {$Y$};
+\draw[->,green!55!black] (c14bz) -- node[lab,below right] {$\Upsilon$} (c14bx);
+\draw[->,green!55!black] (c14bx) -- node[lab,below] {$\alpha$} (c14by);
+\draw[<->,green!55!black] (c14bx.north) to[bend left=25] (c14by.north);
+\node[lab,anchor=west] at (6.5,2.4) {(b)};
+\node[n] (c14cz) at (0,-2.2) {$Z$};
+\node[n] (c14cx) at (2.8,-.9) {$X_1$};
+\node[n] (c14cy) at (5.8,-.9) {$Y$};
+\node[n] (c14cw) at (.5,-.9) {$W$};
+\node[n] (c14cf) at (1,1.2) {$F$};
+\node[n] (c14ce) at (2.5,.7) {$E$};
+\draw[->,green!55!black] (c14cw) -- (c14cz);
+\draw[->,green!55!black] (c14cz) -- node[lab,below right] {$\Upsilon$} (c14cx);
+\draw[->,green!55!black] (c14cw) -- (c14cf);
+\draw[->,green!55!black] (c14cw) -- (c14ce);
+\draw[->,green!55!black] (c14cf) -- (c14ce);
+\draw[<->,green!55!black] (c14cf.north) to[out=30,in=90] (c14cy.north);
+\draw[<->,green!55!black] (c14cx.north) to[bend left=25] (c14cy.north);
+\draw[->,green!55!black] (c14cx) -- node[lab,below] {$\alpha$} (c14cy);
+\node[lab,anchor=west] at (-.5,-2.8) {(c)};
+\node[n] (c14dz) at (7,-.3) {$Z$};
+\node[n] (c14dx) at (8.6,1.1) {$X$};
+\node[n] (c14dy) at (11.8,1.1) {$Y$};
+\node[n] (c14dw) at (8.6,-.3) {$W$};
+\node[n] (c14de) at (8.6,-2) {$E$};
+\draw[->,green!55!black] (c14dz) -- node[lab,above left] {$\Upsilon$} (c14dx);
+\draw[->,green!55!black] (c14dz) -- (c14dw);
+\draw[->,green!55!black] (c14dz) -- (c14de);
+\draw[->,green!55!black] (c14de) -- (c14dw);
+\draw[->,green!55!black] (c14dw) -- (c14dx);
+\draw[->,green!55!black] (c14dx) -- node[lab,below] {$\alpha$} (c14dy);
+\draw[<->,green!55!black] (c14dx.north) to[bend left=25] (c14dy.north);
+\node[lab,anchor=west] at (6.5,-2.8) {(d)};
+\end{tikzpicture}
+\origfig{14}{工具变量。(a) 有向无环图；(b) 工具变量定义示意；(c) 给定某些变量集合后，潜在工具变量与结局或响应 $Y$ d-分离；(d) 条件工具变量定义示意。}
+\label{fig:ch01c-14}
+\end{figure}

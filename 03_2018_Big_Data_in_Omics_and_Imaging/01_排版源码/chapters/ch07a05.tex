@@ -1,0 +1,177 @@
+% 原书PDF第25页7.1.4.4至第29页7.1.4.5.3标题前。
+\subsubsection{用于因果推断的信息几何}
+第7.1.4.3节的信息几何结果可用于因果推断。先定义信息投影。
+
+\begin{bookdefinition}{7.8}
+\textbf{信息投影。}设 $\varepsilon$ 为一个概率密度集合。概率分布 $P$ 到分布集合 $\varepsilon$ 的信息投影（information projection）为
+\begin{equation}
+\varepsilon^*=\argmin_{Q\in\varepsilon}D(P\Vert Q).
+\tag{7.90}
+\end{equation}
+一个概率分布集合称为参考流形（reference manifold）。若分布集合来自指数族，则称为指数流形。
+\end{bookdefinition}
+
+结论7.9中勾股定理的等价形式，是针对特定参考分布表述的。现在将结论7.9推广到一般的指数流形（Janzing et al. 2012，公设2）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{假设：参考流形的勾股定理}\par
+设 $\varepsilon_X$ 与 $\varepsilon_Y$ 分别为 $X$、$Y$ 的参考流形。若 $X$ 导致 $Y$，则结论7.9中勾股定理的几个等价表述近似成立，其中 $U_X$ 与 $U_Y$ 分别是分布 $P_X$、$P_Y$ 到流形 $\varepsilon_X$、$\varepsilon_Y$ 的投影，分别记作 $\varepsilon_X^*$ 与 $\varepsilon_Y^*$。
+
+在这一假设下，式 (7.83) 可改写为
+\begin{equation}
+D(P_Y\Vert\varepsilon_Y^*)=D(P_X\Vert\varepsilon_X^*)
++D(U_{\mathrm{out}}(Y)\Vert\varepsilon_Y^*).
+\tag{7.91}
+\end{equation}
+因此，若 $X\to Y$，则
+\begin{equation}
+D(P_X\Vert\varepsilon_X^*)\le D(P_Y\Vert\varepsilon_Y^*).
+\tag{7.92}
+\end{equation}
+二者之差可用于度量因果性：
+\begin{equation}
+C_{X\to Y}=D(P_X\Vert\varepsilon_X^*)-D(P_Y\Vert\varepsilon_Y^*).
+\tag{7.93}
+\end{equation}
+换言之，因果度量 $C_{X\to Y}$ 定义为两个K–L距离之差：一是原因分布 $P_X$ 与其到参考分布流形 $\varepsilon_X$ 的投影 $\varepsilon_X^*$ 之间的K–L距离，二是结果分布 $P_Y$ 与其到参考分布流形 $\varepsilon_Y$ 的投影 $\varepsilon_Y^*$ 之间的K–L距离。为便于计算，可把K–L距离的计算化为熵之差（Janzing et al. 2012）。
+
+事实上，设 $U_X^{(0)}$ 为流形 $\varepsilon_X$ 中包含的均匀分布。信息空间中的勾股定理蕴含
+\begin{equation}
+D(P_X\Vert\varepsilon_X^*)+D\bigl(\varepsilon_X^*\Vert U_X^{(0)}\bigr)
+=D\bigl(P_X\Vert U_X^{(0)}\bigr).
+\tag{7.94}
+\end{equation}
+因此，
+\begin{equation}
+\begin{aligned}
+D(P_X\Vert\varepsilon_X^*)
+&=D\bigl(P_X\Vert U_X^{(0)}\bigr)-D\bigl(\varepsilon_X^*\Vert U_X^{(0)}\bigr)\\
+&=\int\log\frac{P_X}{U_X^{(0)}}P_X\,dx
+-\int\log\frac{\varepsilon_X^*}{U_X^{(0)}}\varepsilon_X^*\,dx\\
+&=\int P_X\log P_X\,dx-\int\varepsilon_X^*\log\varepsilon_X^*\,dx\\
+&=-S(P_X)+S(\varepsilon_X^*).
+\end{aligned}
+\tag{7.95}
+\end{equation}
+类似地，
+\begin{equation}
+D(P_Y\Vert\varepsilon_Y^*)=-S(P_Y)+S(\varepsilon_Y^*).
+\tag{7.96}
+\end{equation}
+结合式 (7.93)、(7.95) 和 (7.96)，得到以下结论（Janzing et al. 2012）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.11：以熵之差表示的因果度量}\par
+设 $P_X$ 与 $P_Y$ 为 $\mathbb R^d$ 上的密度函数。假设 $\varepsilon_X^*$、$\varepsilon_Y^*$ 分别是 $P_X$ 到流形 $\varepsilon_X$ 和 $P_Y$ 到流形 $\varepsilon_Y$ 的投影，则因果度量可计算为
+\begin{equation}
+C_{X\to Y}=S(\varepsilon_X^*)-S(P_X)-\bigl(S(\varepsilon_Y^*)-S(P_Y)\bigr).
+\tag{7.97}
+\end{equation}
+令 $Y=f(X)$。由变量变换理论，
+\[
+dy=|\nabla f(x)|\,dx,\qquad P(y)=\frac{P(x)}{|\nabla f(x)|}.
+\]
+于是，$Y=f(X)$ 的熵可由 $X$ 的熵，以及变换函数 $f(X)$ 的Jacobian行列式 $|\nabla f(x)|$ 计算。由 $Y$ 的熵的定义，得到
+\begin{equation}
+\begin{aligned}
+S(P_Y)&=-\int P(y)\log P(y)\,dy\\
+&=-\int\frac{P(x)}{|\nabla f(x)|}\log\frac{P(x)}{|\nabla f(x)|}|\nabla f(x)|\,dx\\
+&=S(P_X)+\int P(x)\log|\nabla f(x)|\,dx.
+\end{aligned}
+\tag{7.98}
+\end{equation}
+将式 (7.84) 代入式 (7.85)，得到结论7.12（Janzing et al. 2012）。
+
+\par\medskip\Needspace{4\baselineskip}\noindent\textbf{结论7.12：以变换的对数Jacobian行列式均值表示的因果度量}\par
+\begin{equation}
+C_{X\to Y}=S(\varepsilon_X^*)-S(\varepsilon_Y^*)
++\int P(x)\log|\nabla f(x)|\,dx.
+\tag{7.99}
+\end{equation}
+
+\subsubsection{基于信息几何的因果推断方法}
+结论7.11与结论7.12表明，因果度量依赖于熵及其到参考空间的投影。因此，基于信息几何的因果推断方法，可按参考测度和熵的估计方法分类。
+
+\bookdeepheading{paragraph}{7.1.4.5.1}{均匀参考测度}
+考虑两个数据集 $X=[x_1,\ldots,x_n]$ 与 $Y=[y_1,\ldots,y_n]$，假设 $x$ 值和 $y$ 值均按升序排列，即 $x_{i+1}\ge x_i$、$y_{i+1}\ge y_i$。熵可估计为（Kraskov et al. 2003）
+\begin{equation}
+S(P_X)\approx\psi(n)-\psi(1)+\frac1{n-1}\sum_{i=1}^{n-1}\log|x_{i+1}-x_i|,
+\tag{7.100}
+\end{equation}
+\begin{equation}
+S(P_Y)\approx\psi(n)-\psi(1)+\frac1{n-1}\sum_{i=1}^{n-1}\log|y_{i+1}-y_i|.
+\tag{7.101}
+\end{equation}
+将式 (7.100) 与式 (7.101) 代入式 (7.97)，得到检验因果关系的统计量（Janzing et al. 2012；Janzing et al. 2015）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.13：基于熵的因果检验统计量}\par
+令
+\[
+\begin{aligned}
+C_{X\to Y}&=\frac1{n-1}\sum_{i=1}^{n-1}\log\left|\frac{y_{i+1}-y_i}{x_{i+1}-x_i}\right|,\\
+C_{Y\to X}&=\frac1{n-1}\sum_{i=1}^{n}\log\left|\frac{x_{i+1}-x_i}{y_{i+1}-y_i}\right|.
+\end{aligned}
+\]
+定义统计量
+\begin{equation}
+T_E=C_{X\to Y}-C_{Y\to X}.
+\tag{7.102}
+\end{equation}
+若
+\begin{enumerate}
+\item $T_E=0$，则无因果关系；
+\item $T_E<0$，则 $X\to Y$；
+\item $T_E>0$，则 $Y\to X$。
+\end{enumerate}
+
+\bookdeepheading{paragraph}{7.1.4.5.2}{高斯参考测度}
+设 $X$ 与 $Y$ 为 $d$ 维随机向量。假设 $\varepsilon_X$、$\varepsilon_Y$ 都是 $d$ 维高斯分布的流形，则投影 $\varepsilon_X^*$、$\varepsilon_Y^*$ 分别为与 $X$、$Y$ 具有相同均值向量及协方差矩阵 $\Sigma_X$、$\Sigma_Y$ 的 $d$ 维高斯分布。由式 (7.24)，得到
+\begin{equation}
+S(\varepsilon_X^*)=\frac12\log(2\pi e)^d|\Sigma_X|,\qquad
+S(\varepsilon_Y^*)=\frac12\log(2\pi e)^d|\Sigma_Y|.
+\tag{7.103}
+\end{equation}
+将式 (7.103) 代入式 (7.97)，得到
+\begin{equation}
+C_{X\to Y}=\frac12\log\frac{|\Sigma_X|}{|\Sigma_Y|}-S(P_X)+S(P_Y)),
+\tag{7.104}
+\end{equation}
+其中熵 $S(P_X)$、$S(P_Y)$ 可由数据估计。
+
+当 $d=1$，且对 $X$、$Y$ 重新缩放，使二者的方差都等于1时，式 (7.104) 的第一项为零，于是简化为
+\begin{equation}
+C_{X\to Y}=-S(P_X)+S(P_Y)).
+\tag{7.105}
+\end{equation}
+统计量 $C_{X\to Y}$ 可估计为
+\begin{equation}
+C_{X\to Y}=\frac1{n-1}\sum_{i=1}^{n-1}\log\left|\frac{y_{i+1}-y_i}{x_{i+1}-x_i}\right|.
+\tag{7.106}
+\end{equation}
+类似地，
+\begin{equation}
+C_{Y\to X}=\frac12\log\frac{|\Sigma_Y|}{|\Sigma_X|}+S(P_X)-S(P_Y)),
+\tag{7.107}
+\end{equation}
+\begin{equation}
+C_{Y\to X}=S(P_X)-S(P_Y)),
+\tag{7.108}
+\end{equation}
+以及
+\begin{equation}
+C_{Y\to X}=\frac1{n-1}\sum_{i=1}^{n}\log\left|\frac{x_{i+1}-x_i}{y_{i+1}-y_i}\right|.
+\tag{7.109}
+\end{equation}
+综上，得到下列结果（Janzing et al. 2012）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.14：高斯参考测度下的因果检验}\par
+定义统计量
+\begin{equation}
+T_E=C_{X\to Y}-C_{Y\to X}.
+\tag{7.110}
+\end{equation}
+若
+\begin{enumerate}[start=4]
+\item $T_E=0$，则无因果关系；
+\item $T_E<0$，则 $X\to Y$；
+\item $T_E>0$，则 $Y\to X$。
+\end{enumerate}
+其中 $C_{X\to Y}$、$C_{Y\to X}$ 由式 (7.105)—(7.109) 定义。

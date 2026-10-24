@@ -1,0 +1,501 @@
+\chapter{选择偏倚}
+
+\tikzset{chnd/.style={inner sep=2pt,font=\small}}
+
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.60}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+
+设想某研究者做了一项随机化实验，回答这样一个因果问题：“一个人抬头望天，会让其他行人也跟着抬头吗？”她发现自己抬头与其他行人抬头之间存在着很强的关联。这一关联反映了因果效应吗？按照随机化实验的定义，本研究中不应存在混杂偏倚。然而还有另一个潜在问题：分析只纳入了那些在参与实验之后同意使用其数据的行人。害羞的行人（本来就不太可能抬头）以及被研究者当面抬头的行人（觉得自己被捉弄了）都不太愿意参与。于是，被研究者当面抬头的个体（这是拒绝参与的一个理由）更不可能害羞（这是拒绝参与的另一个理由），因而更可能抬头。也就是说，个体进入分析的选择过程本身，就保证了一个人抬头与其他行人抬头之间的关联，无论一个人抬头是否真的会让别人抬头。
+
+因个体被选入分析的过程而产生的关联，称为选择偏倚（selection bias）。与混杂不同，这类偏倚并非源于处理与结局存在共同原因，而且在随机化实验与观察性研究中都可能出现。与混杂一样，选择偏倚也不过是受处理者与未受处理者之间缺乏可交换性的一种形式。本章给出选择偏倚的定义，并综述校正它的方法。
+
+\section{选择偏倚的结构}
+
+“选择偏倚”一词涵盖因个体被选入分析的程序而产生的多种偏倚。这里我们关注的是即便处理对结局没有效应也会出现的偏倚，即零效应下的选择偏倚（如 6.5 节所述）。选择偏倚的结构可以用因果图表示，例如图 8.1，它刻画了二值处理 $A$、结局 $Y$ 以及二者的共同效应 $C$。\mnote{Pearl (1995) 与 Spirtes 等 (2000) 用因果图刻画了因个体被选择而产生的偏倚结构。}设图 8.1 表示一项研究，估计妊娠早期给孕妇服用叶酸补充剂 $A$ 对胎儿在妊娠头两个月发生心脏畸形 $Y$（1：是，0：否）风险的影响。变量 $C$ 表示出生前死亡。心脏畸形会增加死亡风险（箭头 $Y\to C$），而叶酸补充剂通过降低非心脏畸形的风险来降低死亡率（箭头 $A\to C$）。该研究仅限于活到出生的胎儿。也就是说，研究以未死亡 $C=0$ 为条件，故节点 $C$ 外加了方框。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (A) at (0,0) {A};
+  \node[chnd] (Y) at (1.5,0) {Y};
+  \node[chnd] (C) at (3.0,0) {C};
+  \draw[ed] (A) -- (Y);
+  \draw[ed] (Y) -- (C);
+  \draw[ed] (A) to[bend left=34] (C);
+  \draw[thick] (C.south west) rectangle (C.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.1}
+\end{figure}
+
+图 8.1 的图形显示处理与结局之间有两个关联来源：1）开放路径 $A\to Y$，表示 $A$ 对 $Y$ 的因果效应；2）开放路径 $A\to C\leftarrow Y$，它通过二者的（被条件化于其上的）共同效应 $C$ 把 $A$ 与 $Y$ 连接起来。以 $C$ 为条件的分析一般会导致 $A$ 与 $Y$ 之间的关联。我们把这种由以 $C$ 为条件而引出的、处理 $A$ 与结局 $Y$ 之间的关联称为选择偏倚。由于选择偏倚，关联风险比 $\Pr[Y=1\mid A=1,C=0]/\Pr[Y=1\mid A=0,C=0]$ 不等于因果风险比 $\Pr[Y^{a=1}=1]/\Pr[Y^{a=0}=1]$；关联不是因果。如果分析不以共同效应（对撞节点）$C$ 为条件，那么处理与结局之间唯一的开放路径就是 $A\to Y$，于是 $A$ 与 $Y$ 之间的全部关联都来自 $A$ 对 $Y$ 的因果效应。也就是说，关联风险比 $\Pr[Y=1\mid A=1]/\Pr[Y=1\mid A=0]$ 将等于因果风险比 $\Pr[Y^{a=1}=1]/\Pr[Y^{a=0}=1]$；关联即因果。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (A) at (0,0) {A};
+  \node[chnd] (Y) at (1.4,0) {Y};
+  \node[chnd] (C) at (2.8,0) {C};
+  \node[chnd] (S) at (4.3,0) {S};
+  \draw[ed] (A) -- (Y);
+  \draw[ed] (Y) -- (C);
+  \draw[ed] (C) -- (S);
+  \draw[ed] (A) to[bend left=32] (C);
+  \draw[thick] (S.south west) rectangle (S.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.2}
+\end{figure}
+
+图 8.2 的因果图给出选择偏倚的另一个例子。该图包含图 8.1 的全部变量，另加一个节点 $S$，表示父母悲痛（1：是，0：否），它受出生时生命状态的影响。设研究仅限于不悲痛的父母 $S=0$，因为其他人不愿参与。如第 6 章所述，以受对撞节点 $C$ 影响的变量 $S$ 为条件，同样会打开路径 $A\to C\leftarrow Y$。
+
+图 8.1 与图 8.2 都展示了选择偏倚的例子，其中偏倚源于以处理与结局的共同效应为条件：图 8.1 中的 $C$ 与图 8.2 中的 $S$。无论是否存在 $A\to Y$ 的箭头，这种偏倚都会出现，即它是零效应下的选择偏倚。请记住，导致零效应下偏倚的因果结构，在处有效应时同样会造成偏倚。由处理与结局的共同原因所致的混杂（见上一章）与由以处理与结局的共同效应为条件所致的选择偏倚，都是零效应下偏倚的例子。不过，零效应下的选择偏倚可以定义得更一般，如图 8.3 至图 8.6 所示。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (L) at (0,1.5) {L};
+  \node[chnd] (U) at (0,0) {U};
+  \node[chnd] (A) at (1.9,1.7) {A};
+  \node[chnd] (C) at (3.0,1.4) {C};
+  \node[chnd] (Y) at (4.4,2.2) {Y};
+  \draw[ed] (U) -- (L);
+  \draw[ed] (A) -- (C);
+  \draw[ed] (L) .. controls (1.1,0.55) and (2.0,0.75) .. (C);
+  \draw[ed] (U) .. controls (2.2,0.35) and (3.6,1.3) .. (Y);
+  \draw[thick] (C.south west) rectangle (C.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.3}
+\end{figure}
+
+考虑图 8.3 的因果图，它表示一项对 HIV 感染者的随访研究，估计某种抗逆转录病毒治疗 $A$ 对 3 年死亡风险 $Y$ 的影响（为免图形杂乱，未画 $A\to Y$ 的箭头）。未测量变量 $U$ 表示高水平免疫抑制（1：是，0：否）。$U=1$ 者死亡风险更高。退出研究或因其他原因失访的个体被删失（$C=1$）。$U=1$ 者更可能被删失，因为病情严重使其无法参与研究。$U$ 对删失 $C$ 的效应以症状（发热、体重下降、腹泻等）、CD4 计数与血浆病毒载量为中介，这些变量都包含在 $L$ 中，$L$ 可能被测量、也可能未被测量。（$L$ 被测量时在数据分析中的作用见 8.5 节；本节我们视 $L$ 为未测量。）接受治疗者更可能出现副作用，从而退出研究，如箭头 $A\to C$ 所示。$C$ 外的方框表示分析仅限于未删失者（$C=0$），因为只有这些人的 $Y$ 才能被评估。
+
+按 d 分离规则，以对撞节点 $C$ 为条件会打开路径 $A\to C\leftarrow L\leftarrow U\to Y$，于是关联从处理 $A$ 流向结局 $Y$，即关联风险比不等于 1，尽管因果风险比等于 1。图 8.3 可视为图 8.1 的简单变形：图 8.1 中由 $Y$ 对 $C$ 的直接效应产生的 $Y$ 与 $C$ 之间的关联，现在改由 $U$——$Y$ 与 $C$ 的共同原因——产生。这一偏倚的直觉如下：若一位受治疗者出现了治疗引起的副作用（因而退出风险更高），却事实上并未退出（$C=0$），那么另一个独立的退出原因（如 $U=1$）存在的可能性一般就更低。因此，在未退出者（$C=0$）中，预期 $A$ 与 $U$ 之间呈负关联。由于 $U$ 与结局 $Y$ 正相关，把分析限于本研究中的未退出者，就会引出 $A$ 与 $Y$ 之间的负关联。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (A) at (0,1.7) {A};
+  \node[chnd] (L) at (1.9,1.5) {L};
+  \node[chnd] (C) at (3.2,1.5) {C};
+  \node[chnd] (U) at (0,0) {U};
+  \node[chnd] (Y) at (4.6,2.3) {Y};
+  \draw[ed] (A) -- (L);
+  \draw[ed] (L) -- (C);
+  \draw[ed] (U) .. controls (0.7,1.0) and (1.2,1.2) .. (L);
+  \draw[ed] (U) .. controls (2.4,0.3) and (3.7,1.4) .. (Y);
+  \draw[thick] (C.south west) rectangle (C.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.4}
+\end{figure}
+
+图 8.3 中的偏倚是选择偏倚的一例，它源于以删失 $C$ 为条件，而 $C$ 是处理 $A$ 与结局 $Y$ 的某个原因 $U$ 的共同效应，而不是处理与结局的共同效应。下面再给出三个可能导致由失访差异所致选择偏倚的因果图。图 8.4 中，先前的治疗 $A$ 对症状 $L$ 有直接效应。把研究限于未删失者，同样意味着以 $A$ 与 $U$ 的共同效应 $C$ 为条件，从而在处理与结局之间引入关联。图 8.5 与图 8.6 分别是图 8.3 与图 8.4 的变体，其中 $A$ 与另一个被测量变量存在共同原因 $W$。$W$ 表示未测量的生活方式/性格/教育变量，它既决定治疗（箭头 $W\to A$），也决定对待参加研究访视的态度（图 8.5 中箭头 $W\to C$）或报告症状的阈值（图 8.6 中箭头 $W\to L$）。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (W) at (0,2.7) {W};
+  \node[chnd] (L) at (0,1.4) {L};
+  \node[chnd] (U) at (0,0) {U};
+  \node[chnd] (A) at (1.9,1.5) {A};
+  \node[chnd] (C) at (3.4,1.4) {C};
+  \node[chnd] (Y) at (4.8,2.2) {Y};
+  \draw[ed] (W) -- (A);
+  \draw[ed] (W) .. controls (1.9,2.4) and (2.9,2.1) .. (C);
+  \draw[ed] (A) -- (C);
+  \draw[ed] (L) .. controls (1.1,0.55) and (2.3,0.7) .. (C);
+  \draw[ed] (U) -- (L);
+  \draw[ed] (U) .. controls (2.5,0.3) and (3.8,1.3) .. (Y);
+  \draw[thick] (C.south west) rectangle (C.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.5}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (W) at (0,3.0) {W};
+  \node[chnd] (A) at (0.1,1.6) {A};
+  \node[chnd] (L) at (2.0,1.4) {L};
+  \node[chnd] (C) at (3.5,1.4) {C};
+  \node[chnd] (U) at (0,0) {U};
+  \node[chnd] (Y) at (4.9,2.1) {Y};
+  \draw[ed] (W) -- (A);
+  \draw[ed] (W) -- (L);
+  \draw[ed] (A) -- (L);
+  \draw[ed] (L) -- (C);
+  \draw[ed] (U) .. controls (1.0,0.6) and (1.6,1.1) .. (L);
+  \draw[ed] (U) .. controls (2.6,0.3) and (3.9,1.3) .. (Y);
+  \draw[thick] (C.south west) rectangle (C.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.6}
+\end{figure}
+
+我们描述了若干可能导致零效应下选择偏倚的不同因果结构，它们分别见图 8.1–8.6。在所有这些情形中，偏倚都是对图中另外两个变量的共同效应（即对撞节点）进行选择的结果。\mnote{图 8.5 与图 8.6 给出的是 M 偏倚的例子。}我们将用“选择偏倚”一词指代所有因以两个变量的共同效应为条件而产生的偏倚，其中一个是处理或处理的原因，另一个是结局或结局的原因。\mnote{更一般地，选择偏倚可以定义为：以两个变量的共同效应为条件所致的偏倚，其中一个变量是处理或与处理相关，另一个变量是结局或与结局相关（Hernán、Hernández-Díaz 与 Robins 2004）。}下面描述一些具有这一结构的例子。
+
+\section{选择偏倚的例子}
+
+考虑以下因个体被选入分析的机制而产生偏倚的例子：
+
+\begin{itemize}
+\item \textbf{失访差异}：这正是上一节所述、图 8.3–8.6 所概括的偏倚。它也被称为信息性删失所致的偏倚。\mnote{导致缺乏可交换性的两种结构之间的区分，并未在各学科中普遍作出。条件可交换性在统计学中常被称为“弱可忽略性”或“可忽略的治疗分配”（Rosenbaum and Rubin 1983; Rosenbaum 2002），在社会科学中被称为“可观测变量上的选择”（Barnow, Cain, and Goldberger 1980），在计量经济学中被称为“无遗漏变量偏倚”或“外生性”（Imbens 2004）。}
+\item \textbf{缺失数据偏倚、无应答偏倚}：图 8.3–8.6 中的变量 $C$ 可以表示因任何原因造成的结局数据缺失，而不只是失访。例如，个体可能因不愿提供信息或错过研究访视而缺失数据。无论 $Y$ 的数据因何缺失，把分析限于数据完整者（$C=0$）都可能造成偏倚。
+\item \textbf{健康工人偏倚}：图 8.3–8.6 也可以描述在工厂工人队列中估计职业暴露 $A$（如某种化学品）对死亡率 $Y$ 的影响时可能出现的偏倚。潜在的未测量真实健康状况 $U$ 既决定死亡 $Y$，也决定在岗 $C$（1：否，0：是）。研究仅限于结局确定时在岗者（$C=0$）。（$L$ 可以是血液检查与体格检查的结果。）接触该化学品会降低近期在岗的概率：或直接如此（如暴露可致残性哮喘），如图 8.3 与 8.4；或通过共同原因 $W$（如某些暴露岗位因经济原因被裁撤、工人因而下岗），如图 8.5 与 8.6。
+\item \textbf{自选择偏倚、志愿者偏倚}：图 8.3–8.6 还可以表示这样一项研究：$C$ 为同意参与（1：否，0：是），$A$ 为吸烟，$Y$ 为冠心病，$U$ 为心脏病家族史，$W$ 为健康生活方式。（$L$ 是 $U$ 与 $C$ 之间的任何中介，如对心脏病的知晓。）在上述任一结构下，若研究仅限于自愿或选择参与者（$C=0$），就可能存在选择偏倚。
+\item \textbf{受研究入组前所接受治疗影响的选择}：设图 8.3–8.6 中的 $C$ 表示被选入研究（1：否，0：是），且治疗 $A$ 发生在研究开始之前。若治疗影响被选入研究的概率，则预期存在选择偏倚。由治疗对选入研究的影响所产生的选择偏倚，可视为自选择偏倚的推广。任何试图估计研究开始前发生的治疗（或治疗包含入组前成分）的因果效应的研究，都可能存在这种偏倚。例如，在一项招募 50 岁参与者的研究中，若把治疗测量为一生中某因素的暴露（医疗处理、生活方式行为……），就可能出现选择偏倚。除选择偏倚外，如果混杂因子仅在研究期间测量，治疗的研究前成分还可能存在未测量的混杂。\mnote{Robins、Hernán 与 Rotnitzky (2007) 用因果图刻画了研究前治疗对选入研究之影响所致的偏倚结构。}
+\end{itemize}
+
+\begin{finepoint}[病例对照研究中的选择偏倚]
+图 8.1 可用来表示病例对照研究中的选择偏倚。设某研究者想估计绝经后雌激素治疗 $A$ 对冠心病 $Y$ 的影响。变量 $C$ 表示研究人群（用流行病学术语说，就是基础队列）中的一位女性是否被选入病例对照研究（1：否，0：是）。从疾病状态 $Y$ 到选择 $C$ 的箭头表示人群中病例比非病例更可能被选入，这正是病例对照研究的定义性特征。在这项特定的病例对照研究中，研究者决定优先从髋部骨折的女性中选择对照（$Y=0$）。由于治疗 $A$ 对髋部骨折有保护性因果效应，选择髋部骨折者为对照意味着治疗 $A$ 现在对选择 $C$ 有因果效应。$A$ 对 $C$ 的这一效应用箭头 $A\to C$ 表示。可以在 $A$ 与 $C$ 之间加一个中间节点 $F$（表示髋部骨折），但就我们的目的而言没有必要。\mnote{Berkson (1955) 描述了由自选择所致的偏倚结构。}
+
+在病例对照研究中，关联度量（处理-结局优势比）按定义是以被选入研究（$C=0$）为条件的。若髋部骨折者作为对照被过度抽样，那么对照被选中的概率就取决于治疗 $A$ 的一个后果（如从 $A$ 到 $C$ 的路径所示），“不恰当的对照选择”偏倚就会出现。同样，这一偏倚之所以出现，是因为我们以处理与结局的共同效应 $C$ 为条件。该偏倚的直观解释如下。在被选入研究（$C=0$）的个体中，对照比病例更可能有髋部骨折。因此，由于雌激素降低髋部骨折的发生率，对照接受雌激素的可能性低于病例，从而以 $C=0$ 为条件的 $A$-$Y$ 优势比会大于人群中的因果优势比。病例对照研究中的其他形式的选择偏倚，包括 Berkson (1946) 描述的某些偏倚与发病-患病偏倚，也可以用图 8.1 或其变形表示，见 Hernán、Hernández-Díaz 与 Robins (2004) 的讨论。
+\end{finepoint}
+
+除这里描述的偏倚以及精要 8.1、技术注记 8.1 所述之外，因果图还被用来刻画由以共同效应为条件而产生的各种其他偏倚。\mnote{例如，试图消除确定偏倚（Robins 2001）、试图估计直接效应（Cole and Hernán 2002），以及对受先前治疗影响的变量作常规校正（见第三部分），都可能引出选择偏倚。}这些例子表明，选择偏倚可能出现在回顾性研究（治疗 $A$ 的数据在结局 $Y$ 发生之后收集）与前瞻性研究（治疗 $A$ 的数据在结局 $Y$ 发生之前收集）中。此外，这些例子表明，选择偏倚在观察性研究与随机化实验中均可出现。
+
+以图 8.3 与图 8.4 为例，它们既可以表示观察性研究，也可以表示处理 $A$ 被随机分配的实验，因为 $A$ 与任何其他变量都没有共同原因。随机化实验与观察性研究中的个体都可能在结局确定之前失访或退出研究。此时风险 $\Pr[Y=1\mid A=a]$ 无法计算，因为删失个体（$C=1$）的结局 $Y$ 未知。因此只能计算未删失者的风险 $\Pr[Y=1\mid A=a,C=0]$。把分析限于未删失者可能引出选择偏倚，因为坚持到研究结束的未删失者（$C=0$）可能与失访者（$C=1$）不可交换。
+
+于是得到混杂与选择偏倚的一个关键区别：随机化能防止混杂，但当选择发生在随机化之后时，它不能防止选择偏倚。另一方面，随机化实验中在治疗分配之前发生的选入研究不会产生偏倚。例如，随机化临床试验只招募同意参与的志愿者，但这类试验不受志愿者偏倚影响，因为参与者是在同意参与（$C=0$）之后才被随机分配到治疗的。因此图 8.3–8.6 都不能表示随机化试验中的志愿者偏倚。图 8.3 与 8.4 被排除，因为治疗不可能导致同意参与 $C$。图 8.5 与 8.6 被排除，因为由于治疗被随机分配，不可能存在处理与任何其他变量的共同原因。
+
+\section{选择偏倚与混杂}
+
+本章与上一章描述了受处理者与未受处理者可能不可交换的两种原因：1）处理与结局存在共同原因；2）以处理与结局的共同效应（或其原因）为条件。我们把由共同原因所致的偏倚称为“混杂”，把由以共同效应为条件所致的偏倚称为“选择偏倚”。\mnote{出于同样的理由，社会科学家常把未测量的混杂称为“不可观测变量上的选择”。}这一结构化的定义给出了混杂与选择偏倚的清晰分类，尽管它未必与某些学科的传统术语完全吻合。例如，统计学家与计量经济学家常用“选择偏倚”一词指这两类偏倚。他们的理由是，两种情形下偏倚都源于选择：个体被选入分析（结构意义上的“选择偏倚”），或个体被选入某种治疗（结构意义上的“混杂”）。然而，我们的目标不是对术语作规范，而是要强调：无论选用什么词，导致偏倚的因果结构都有两种，且彼此不同。\mnote{术语的选择通常没有实际后果，但无视因果结构可能导致表面上的悖论。例如，所谓的辛普森悖论（1951）正是忽视共同原因与共同效应之别所致。有趣的是，Blyth (1972) 未能把握辛普森例中悖论的因果结构，将其误述为混杂的极端情形。由于多数人读了 Blyth 的文章而未读辛普森的文章，这一误解得以流传。详见 Hernán、Clayton 与 Keiding (2011)。}
+
+两种结构的最终结果都是受处理者与未受处理者之间缺乏可交换性——这意味着这两种偏倚在零效应下也会出现。例如，考虑一项仅限于消防员的研究，旨在估计身体活动 $A$ 对心脏病风险 $Y$ 的因果效应，如图 8.7 所示。为简单起见，我们假定研究者并不知道 $A$ 并不导致 $Y$。父母的社会经济地位 $L$ 影响成为消防员的风险 $C$，并通过童年饮食影响心脏病风险 $Y$。对涉及身体活动的活动的偏好（未测量变量 $U$）影响成为消防员的风险与身体活动的概率（$A$）。$U$ 不影响 $Y$，$L$ 不影响 $A$。按我们的术语，不存在混杂，因为 $A$ 与 $Y$ 没有共同原因。因此，关联风险比 $\Pr[Y=1\mid A=1]/\Pr[Y=1\mid A=0]$ 预期等于因果风险比 $\Pr[Y^{a=1}=1]/\Pr[Y^{a=0}=1]=1$。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (L) at (0,2.0) {L};
+  \node[chnd] (C) at (1.8,1.0) {C};
+  \node[chnd] (A) at (3.0,0.9) {A};
+  \node[chnd] (U) at (0.3,0) {U};
+  \node[chnd] (Y) at (4.2,1.9) {Y};
+  \draw[ed] (L) -- (C);
+  \draw[ed] (L) .. controls (2.0,2.35) and (3.3,2.25) .. (Y);
+  \draw[ed] (U) -- (C);
+  \draw[ed] (U) .. controls (1.7,-0.18) and (2.7,0.3) .. (A);
+  \draw[thick] (C.south west) rectangle (C.north east);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.7}
+\end{figure}
+
+\begin{techpoint}[风险比固有的选择偏倚]
+图 8.8 的因果 DAG 描述一项随机化实验，考察心脏移植 $A$ 对时刻 1（$Y_1$）与时刻 2（$Y_2$）死亡的影响。从 $A$ 到 $Y_1$ 的箭头表示移植降低时刻 1 的死亡风险。$A$ 到 $Y_2$ 没有箭头，表示 $A$ 对时刻 2 的死亡没有直接效应。也就是说，对于未受治疗时（因而受治疗时）能活过时刻 1 的任何个体，心脏移植不影响其在时刻 2 的生存状态。$U$ 是一个未测量的单体型，它降低个体在一切时刻的死亡风险。由于不存在混杂，关联风险比 $aRR_{AY_1}=\Pr[Y_1=1\mid A=1]/\Pr[Y_1=1\mid A=0]$ 与 $aRR_{AY_2}=\Pr[Y_2=1\mid A=1]/\Pr[Y_2=1\mid A=0]$ 分别是 $A$ 对时刻 1 与时刻 2 死亡效应的无偏度量。尽管 $A$ 对 $Y_2$ 没有直接效应，$aRR_{AY_2}$ 仍会小于 1，因为它是 $A$ 对截至时刻 2 的总死亡率之效应的度量。
+
+现在考虑时点别风险比（就一切实际目的而言，它等价于率比）。在离散时间下，时刻 1 的死亡风险是在时刻 1 死亡的概率，因此关联风险比与 $aRR_{AY_1}$ 相同。然而，时刻 2 的风险是活过时刻 1 者在时刻 2 死亡的概率。于是时刻 2 的关联风险比为 $aRR_{AY_2\mid Y_1=0}=\Pr[Y_2=1\mid A=1,Y_1=0]/\Pr[Y_2=1\mid A=0,Y_1=0]$。图 8.8 中 $Y_1$ 外的方框表示这一条件化。受治疗的时刻 1 存活者比未受治疗的时刻 1 存活者更不可能携带保护性单体型 $U$（因为治疗可以解释他们的存活），因而更可能在时刻 2 死亡。也就是说，以 $Y_1$ 为条件时，治疗 $A$ 与时刻 2 更高的死亡率相关。于是时刻 1 的风险比小于 1，而时刻 2 的风险比大于 1，即风险发生了交叉。
+
+\begin{center}
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (A) at (0,0) {A};
+  \node[chnd] (Y1) at (1.7,0) {$Y_1$};
+  \node[chnd] (Y2) at (3.6,0) {$Y_2$};
+  \node[chnd] (U) at (0.15,-1.4) {U};
+  \draw[ed] (A) -- (Y1);
+  \draw[ed] (Y1) -- (Y2);
+  \draw[ed] (A) to[bend left=30] (Y2);
+  \draw[ed] (U) -- (Y1);
+  \draw[ed] (U) .. controls (2.2,-1.7) and (3.2,-1.0) .. (Y2);
+  \draw[thick] (Y1.south west) rectangle (Y1.north east);
+\end{tikzpicture}
+\captionof{figure}{}
+\label{fig:8.8}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node[chnd] (A) at (0,0) {A};
+  \node[chnd] (Y1) at (1.7,0) {$Y_1$};
+  \node[chnd] (Y2) at (3.6,0) {$Y_2$};
+  \draw[ed] (A) -- (Y1);
+  \draw[ed] (Y1) -- (Y2);
+  \draw[ed] (A) to[bend left=30] (Y2);
+  \draw[thick] (Y1.south west) rectangle (Y1.north east);
+\end{tikzpicture}
+\captionof{figure}{}
+\label{fig:8.9}
+\end{center}
+
+我们由此得出结论：时刻 2 的风险比是治疗对时刻 2 死亡率直接效应的有偏估计。该偏倚是选择偏倚，源于以治疗 $A$ 与 $U$ 的共同效应 $Y_1$ 为条件，而 $U$ 是 $Y_2$ 的原因，从而打开了 $A$ 与 $Y_2$ 之间的关联路径 $A\to Y_1\leftarrow U\to Y_2$。在生存分析文献中，像 $U$ 这样与处理边缘无关的未测量死因，常被称为脆弱性（frailty）。
+
+相反，条件风险比 $aRR_{AY_2\mid Y_1=0,U}$ 在 $U$ 的每一层内都等于 1，因为路径 $A\to Y_1\leftarrow U\to Y_2$ 现在被以非对撞节点 $U$ 为条件所阻断。因此，条件风险比正确地表明 $A$ 对 $Y_2$ 没有直接效应。非条件风险比 $aRR_{AY_2\mid Y_1=0}$ 不同于各层别风险比 $aRR_{AY_2\mid Y_1=0,U}$（尽管 $U$ 与 $A$ 独立），这表明风险比不可压缩（noncollapsibility）（Greenland, 1996b）。不幸的是，$A$ 对 $Y_2$ 直接效应的无偏度量 $aRR_{AY_2\mid Y_1=0,U}$ 无法计算，因为 $U$ 未被观测。在没有 $U$ 的数据时，不可能知道 $A$ 对 $Y_2$ 是否有直接效应。也就是说，数据无法判定生成数据的真实因果 DAG 是图 8.8 还是图 8.9。以上一切对观察性研究与随机化实验都适用。
+\end{techpoint}
+
+然而，在仅限于消防员（$C=0$）的研究中，关联风险比与因果风险比会不同，因为以处理与结局之原因的共同效应 $C$ 为条件会引出选择偏倚，导致受处理与未受处理的消防员不可交换。对研究者而言，混杂与选择偏倚的区分没有实际意义，因为无论叫法如何，他们都必须对 $L$ 作校正，才能使受处理与未受处理的消防员可比。这个例子表明，偏倚的结构分类并不总是对研究的分析有影响。事实上，正因如此，许多流行病学家把任何需要校正的变量 $L$ 都称为“混杂因子”，而不论缺乏可交换性是源于以共同效应为条件，还是源于处理与结局的共同原因。
+
+然而，采用结构化的方法对不可交换性来源进行分类确有好处。第一，问题的结构常常指导人们选择分析方法以减少或避免偏倚。例如，在治疗随时间变化的纵向研究中，识别结构使我们能够发现这样的情形：通过分层校正混杂反而会引入选择偏倚（见第三部分）。在这些情形下，g 方法是更好的选择。第二，即便理解偏倚的结构对数据分析没有影响（如消防员研究），它仍可能有助于研究设计。例如，开展仅限于消防员的研究的研究者，应确保收集结局 $Y$ 与选择变量 $C$（即成为消防员）的共同风险因素的信息，正如 7.1 节第一个混杂例子所述。第三，由以处理前变量（如是否为消防员）为条件所致的选择偏倚，可以解释为什么某些变量在有些研究中表现为“混杂因子”，在另一些研究中则不然。在我们的例子中，在不限于消防员的研究里，父母的社会经济地位 $L$ 未必需要校正。最后，因果图能增进研究者之间的沟通，并可能减少误解的发生。
+
+作为最后一点的一个例子，考虑“健康工人偏倚”。上一节我们把这种偏倚描述为以变量 $C$ 为条件所致的偏倚，而 $C$ 是（处理的原因）与（结局的原因）的共同效应。因此该偏倚可以用图 8.3–8.6 的因果图表示。然而，“健康工人偏倚”一词也被用来描述把某一工人群体的风险与一般人群的风险作比较时出现的偏倚。后一种偏倚可以用图 7.1 的因果图表示，其中 $L$ 表示健康状况，$A$ 表示属于工人群体，$Y$ 表示所关心的结局。存在从 $L$ 到 $A$ 与 $Y$ 的箭头，因为健康分别影响工作类型与后续结局的风险。此时偏倚由共同原因 $L$ 引起，我们会称之为混杂。用因果图表示“健康工人偏倚”的结构，可避免因同一术语指称不同不可交换性来源而产生的混淆。
+
+以上讨论都忽略了选择偏倚与混杂的大小或方向。然而，以对撞节点为条件打开的某些非因果路径可能很弱，因而只引入很小的偏倚。由于选择偏倚并非“全有或全无”的问题，在实践中考虑偏倚的预期方向与大小很重要（见精要 8.2）。
+
+\section{选择偏倚与删失}
+
+设想某研究者做了一项边缘随机化实验，估计芥末摄入对一年死亡风险（$Y=1$）的平均因果效应。60 名研究参与者中有一半被随机分配食用加芥末的膳食（$A=1$），直至随访结束或死亡（以先发生者为准）；另一半被分配不含芥末的膳食（$A=0$）。一年后，两组各有 17 人死亡。也就是说，关联风险比 $\Pr[Y=1\mid A=1]/\Pr[Y=1\mid A=0]$ 为 1。由于随机化，因果风险比 $\Pr[Y^{a=1}=1]/\Pr[Y^{a=0}=1]$ 预期也为 1。（如果忽略随机变异让你不安，请设想该研究有 6000 万病人而非 60 人。）
+
+不幸的是，研究者无法观察到两组各 17 例死亡，因为许多病人在研究结束（即死亡或治疗分配后一年）之前失访，即被删失。研究开始时患有心脏病（$L=1$）者与被分配芥末补充剂（$A=1$）者的删失比例（$C=1$）更高。事实上，芥末组只有 9 人、另一组只有 22 人未失访。研究者观察到芥末组 4 例死亡、另一组 11 例死亡。也就是说，未删失者中的关联风险比 $\Pr[Y=1\mid A=1,C=0]/\Pr[Y=1\mid A=0,C=0]$ 为 $(4/9)/(11/22)=0.89$。未删失者中的风险比 0.89 不同于整个人群的因果风险比 1：存在由以共同效应 $C$ 为条件所致的选择偏倚。
+
+图 8.3 的因果图刻画了芥末随机化实验中 $L$、$A$、$C$ 与 $Y$ 之间的关系。$U$ 表示动脉粥样硬化，这是一个未测量变量，同时影响心脏病 $L$ 与死亡 $Y$。图 8.3 表明 $A$ 与 $Y$ 没有共同原因（正如边缘随机化实验所预期），因此无需校正混杂即可计算 $A$ 对 $Y$ 的因果效应。另一方面，图 8.3 表明 $C$ 与 $Y$ 存在共同原因 $U$。后门路径 $C\leftarrow L\leftarrow U\to Y$ 的存在意味着：如果研究者想估计删失 $C$ 对 $Y$ 的因果效应（在图 8.3 中为零），她就必须校正由共同原因 $U$ 所致的混杂。后门准则说这种校正是可行的，因为被测量的变量 $L$ 可以用来阻断后门路径 $C\leftarrow L\leftarrow U\to Y$。
+
+我们迄今考虑的因果对比是“人人都受治疗时的风险”$\Pr[Y^{a=1}=1]$ 与“人人都未受治疗时的风险”$\Pr[Y^{a=0}=1]$，这一对比根本不涉及 $C$。那么为什么我们要谈论 $C$ 的因果效应的混杂？原来，在存在删失（或一般而言，存在选择）时，所关心的因果对比需要修改。因为如果人人都未删失 $C=0$，选择偏倚就不会存在，所以我们希望考虑一个能反映无删失情形下会怎样的因果对比。设 $Y^{a=1,c=0}$ 为个体在接受治疗 $A=1$ 且未删失 $C=0$ 时的反事实结局。\mnote{如第 3 章所述，考虑反事实 $Y^{a,c=0}$ 意味着我们相信存在能把 $C$ 的取值设为 0 的无直接效应干预。}类似地，设 $Y^{a=0,c=0}$ 为个体未接受治疗 $A=0$ 且未删失 $C=0$ 时的反事实结局。我们关心的因果对比现在是“人人都受治疗且未删失时的风险”$\Pr[Y^{a=1,c=0}=1]$ 与“人人都未受治疗且未删失时的风险”$\Pr[Y^{a=0,c=0}=1]$。\mnote{例如，我们可能想计算因果风险比：$\E[Y^{a=1,c=0}]$ 除以 $\E[Y^{a=0,c=0}]$；或因果风险差：$\E[Y^{a=1,c=0}]-\E[Y^{a=0,c=0}]$。}
+
+通常可以合理地假定删失对结局没有因果效应（例外是失访使人无法获得进一步治疗的情形）。由于删失 $C$ 对结局 $Y$ 没有效应，人们或许以为因果效应的定义可以忽略删失，即可以省略上标 $c=0$。然而，省略该上标会掩盖一个事实：在存在选择偏倚时，关于 $C$ 的混杂的考虑在计算 $A$ 对 $Y$ 的因果效应时变得至关重要。事实上，当我们用 $Y^{a,c=0}$ 来构想所关心的因果对比时，可以把删失 $C$ 看作另一种治疗。\mnote{在删失 $C$ 到观测结局 $Y$ 没有箭头的因果图中，我们可以把 $Y$ 替换为反事实结局 $Y^{a,c=0}$，并添加箭头 $C\to Y^{a,c=0}$。}也就是说，分析的目标是计算对 $A$ 与 $C$ 的联合干预的因果效应。要消除处理 $A$ 的效应中的选择偏倚，我们需要校正处理 $C$ 的效应中的混杂。
+
+既然删失 $C$ 现在被视为一种治疗，我们就需要 (i) 确保可识别性条件——可交换性、正值性与一致性——对 $C$ 也成立，如同对 $A$ 一样；(ii) 使用与估计删失 $C$ 的效应时完全相同的分析方法。在这些可识别性条件下并使用这些方法，选择偏倚可以通过分析性校正消除；在没有测量误差与混杂的情况下，处理 $A$ 对结局 $Y$ 的因果效应可以被识别。下一节说明如何做到。
+
+\section{如何校正选择偏倚}
+
+虽然选择偏倚有时可以通过恰当的设计避免（见精要 8.1），但它常常不可避免。例如，失访、自选择以及一般而言导致偏倚的缺失数据，无论研究者多么谨慎都可能发生。在这些情形下，需要在分析中明确校正选择偏倚。这种校正有时可以通过 IP 加权（或标准化）完成，其做法是对每个被选入的个体（$C=0$）赋予权重 $W^C$，使她在分析中不仅代表自己，也代表与她相似（即 $L$ 与 $A$ 取值相同）却未被选入（$C=1$）的人。IP 权重 $W^C$ 是她被选入的概率 $\Pr[C=0\mid L,A]$ 的倒数。\mnote{我们已描述过用于校正混杂的 IP 权重 $W^A=1/f(A\mid L)$ 与用于校正选择偏倚的 $W^C=1/\Pr[C=0\mid A,L]$。当混杂与选择偏倚并存时，乘积权重 $W^{A,C}$ 可用于同时校正两种偏倚，其所需假设见第 12 章与第三部分。}
+
+为描述 IP 加权在校正选择偏倚中的应用，再考虑上一节的芥末随机化实验。图 8.10 的树图给出该试验的数据。60 名试验个体中，40 人在随机化时患有心脏病（$L=1$），20 人没有（$L=0$）。无论 $L$ 状态如何，所有个体被分配到芥末补充剂（$A=1$）的机会都是 50/50。于是 $L=0$ 组有 10 人、$L=1$ 组有 20 人接受了治疗 $A=1$。$L$ 对 $A$ 没有效应，这体现为图 8.3 因果图中 $L$ 到 $A$ 没有箭头。未删失的概率在各分支间不同。例如，被分配芥末且无心脏病者（$L=0$，$A=1$）有 50\% 未删失，而被分配无芥末且有心脏病者（$L=1$，$A=0$）有 60\% 未删失。$A$ 与 $L$ 对 $C$ 的这种效应体现为图 8.3 因果图中 $A$、$L$ 指向 $C$ 的箭头。最后，树图还显示未删失者与删失者中各有多少人死亡（$Y=1$）。当然，在现实生活中，研究者永远无法知道删失者中有多少例死亡。正是这种知识的缺失迫使研究者把分析限于未删失者，从而为选择偏倚打开了大门。这里我们给出删失者中的死亡数，是为了说明：如图 8.3 所示，处理 $A$ 与 $Y$ 边缘独立，且删失 $C$ 在 $L$ 各水平内与 $Y$ 独立。也可以验证：整个人群中的风险比（研究者无法获得）为 1，而未删失者中的风险比（研究者可以获得）为 0.89。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape},font=\scriptsize]
+  \node[draw,circle,inner sep=1pt,minimum size=2.2cm,align=center] (L) at (0,-0.2)
+    {$L=0$ (1/3)\\[-3pt] 20\\[1pt] $L=1$ (2/3)\\[-3pt] 40};
+  \node (A0) at (3.4,3.4) {A};
+  \node (A1) at (3.4,1.1) {A};
+  \node (A2) at (3.4,-1.1) {A};
+  \node (A3) at (3.4,-3.4) {A};
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=0$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (A0);
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=1$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (A1);
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=0$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{20} (A2);
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=1$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{20} (A3);
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n1) at (7.4,3.95) {$Y=0$ (.8)\\[-2pt]$Y=1$ (.2)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n2) at (7.4,2.85) {$Y=0$\\$Y=1$};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n3) at (7.4,1.65) {$Y=0$ (.8)\\[-2pt]$Y=1$ (.2)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n4) at (7.4,0.55) {$Y=0$ (.8)\\[-2pt]$Y=1$ (.2)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n5) at (7.4,-0.55) {$Y=0$ (.25)\\[-2pt]$Y=1$ (.75)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n6) at (7.4,-1.65) {$Y=0$ (.25)\\[-2pt]$Y=1$ (.75)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n7) at (7.4,-2.85) {$Y=0$ (.25)\\[-2pt]$Y=1$ (.75)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n8) at (7.4,-3.95) {$Y=0$ (.25)\\[-2pt]$Y=1$ (.75)};
+  \draw[ed] (A0) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (1)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (n1);
+  \draw[ed] (A0) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (0)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{0} (n2);
+  \draw[ed] (A1) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{5} (n3);
+  \draw[ed] (A1) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{5} (n4);
+  \draw[ed] (A2) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (.6)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{12} (n5);
+  \draw[ed] (A2) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (.4)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{8} (n6);
+  \draw[ed] (A3) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (.2)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{4} (n7);
+  \draw[ed] (A3) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (.8)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{16} (n8);
+  \foreach \nd/\a/\b in {n1/8/2, n2/0/0, n3/4/1, n4/4/1, n5/3/9, n6/2/6, n7/1/3, n8/4/12}{
+    \node[font=\tiny,anchor=west] at ($(\nd.east)+(0.05,0.20)$) {\a};
+    \node[font=\tiny,anchor=west] at ($(\nd.east)+(0.05,-0.20)$) {\b};
+  }
+\end{tikzpicture}
+\caption{}
+\label{fig:8.10}
+\end{figure}
+
+下面描述用 IP 加权校正选择偏倚的直觉。看图 8.10 树图的底部。有 20 名心脏病患者（$L=1$）被分配到芥末补充剂（$A=1$）。其中 4 人未删失，16 人失访。也就是说，该组未删失的条件概率为 1/5，即 $\Pr[C=0\mid L=1,A=1]=4/20=0.2$。在 IP 加权分析中，16 名删失者获得零权重（即不参与分析），而 4 名未删失者获得权重 5，即其未删失概率（1/5）的倒数。IP 加权用 4 名未删失者各自的 5 份复制，替换原来的 20 人。对树图的其他分支重复同样的程序，如图 8.11 所示，就构造出一个与原始研究总体同样大小、但无人失访的伪总体。（各分支的 IP 权重留给读者自行推导。）伪总体中的关联风险比为 1，与原始总体中若无人删失本会算出的风险比 $\Pr[Y^{a=1,c=0}=1]/\Pr[Y^{a=0,c=0}=1]$ 相同。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape},font=\scriptsize]
+  \node[draw,circle,inner sep=1pt,minimum size=2.2cm,align=center] (L) at (0,-0.2)
+    {$L=0$ (1/3)\\[-3pt] 20\\[1pt] $L=1$ (2/3)\\[-3pt] 40};
+  \node (A0) at (3.4,3.4) {A};
+  \node (A1) at (3.4,1.1) {A};
+  \node (A2) at (3.4,-1.1) {A};
+  \node (A3) at (3.4,-3.4) {A};
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=0$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (A0);
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=1$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (A1);
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=0$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{20} (A2);
+  \draw[ed] (L) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$A=1$ (.5)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{20} (A3);
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n1) at (7.4,3.95) {$Y=0$ (.8)\\[-2pt]$Y=1$ (.2)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n2) at (7.4,2.85) {$Y=0$\\$Y=1$};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n3) at (7.4,1.65) {$Y=0$ (.8)\\[-2pt]$Y=1$ (.2)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n4) at (7.4,0.55) {$Y=0$\\$Y=1$};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n5) at (7.4,-0.55) {$Y=0$ (.25)\\[-2pt]$Y=1$ (.75)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n6) at (7.4,-1.65) {$Y=0$\\$Y=1$};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n7) at (7.4,-2.85) {$Y=0$ (.25)\\[-2pt]$Y=1$ (.75)};
+  \node[draw,ellipse,minimum width=1.5cm,minimum height=0.95cm,inner sep=0pt,align=center,font=\tiny] (n8) at (7.4,-3.95) {$Y=0$\\$Y=1$};
+  \draw[ed] (A0) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (1)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (n1);
+  \draw[ed] (A0) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (0)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{0} (n2);
+  \draw[ed] (A1) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (1)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{10} (n3);
+  \draw[ed] (A1) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (0)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{0} (n4);
+  \draw[ed] (A2) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (1)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{20} (n5);
+  \draw[ed] (A2) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (0)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{0} (n6);
+  \draw[ed] (A3) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=0$ (1)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{20} (n7);
+  \draw[ed] (A3) -- node[sloped,yshift=3.2pt,font=\tiny,inner sep=0.5pt]{$C=1$ (0)} node[sloped,yshift=-3.2pt,font=\tiny,inner sep=0.5pt]{0} (n8);
+  \foreach \nd/\a/\b in {n1/8/2, n2/0/0, n3/8/2, n4/0/0, n5/5/15, n6/0/0, n7/5/15, n8/0/0}{
+    \node[font=\tiny,anchor=west] at ($(\nd.east)+(0.05,0.20)$) {\a};
+    \node[font=\tiny,anchor=west] at ($(\nd.east)+(0.05,-0.20)$) {\b};
+  }
+\end{tikzpicture}
+\caption{}
+\label{fig:8.11}
+\end{figure}
+
+若满足以下三个可识别性条件，伪总体中的关联度量就等于原始总体中的效应度量。第一，未删失者的平均结局必须等于 $A$ 与 $L$ 取值相同的删失者的未观测平均结局。若选入概率 $\Pr[C=0\mid L=1,A=1]$ 是以处理 $A$ 以及所有独立预测选择与结局的其他因素为条件计算的——也就是说，若 $A$ 与 $L$ 中的变量足以阻断 $C$ 与 $Y$ 之间的所有后门路径——这一要求就会满足。可惜，人们永远无法确定这些额外因素是否已被识别并记录在 $L$ 中，因此由此得到的选择偏倚校正的因果解释，取决于这个不可检验的可交换性假设。
+
+第二，IP 加权要求：给定 $A$ 与 $L$ 中的变量时，所有未删失的条件概率都必须大于零。注意，这一正值性条件是对未删失（$C=0$）的概率要求的，而不是对删失（$C=1$）的概率要求的，因为我们无意推断研究个体若被删失本会怎样，因而构造一个人人都被删失的伪总体毫无意义。例如，图 8.10 的树图显示 $\Pr[C=1\mid L=0,A=0]=0$，但这个零并不影响我们构造无人删失的伪总体。
+
+第三个条件是一致性，包括干预定义得足够明确。IP 加权用来构造一个伪总体，其中删失 $C$ 已被废除，且处理 $A$ 的效应与原始总体相同。因此，伪总体的效应度量等于无人被删失时的效应度量。当删失源于失访或无应答时，这一效应度量可能定义得较好；但当删失被定义为竞争事件发生时则不然。\mnote{竞争事件是指阻止所关心结局发生的事件。竞争事件的典型例子是死亡，因为一个人一旦死亡，就不可能出现其他结局。}例如，在一项旨在估计某种治疗对阿尔茨海默病风险的影响的研究中，死于其他原因（癌症、心脏病等）是竞争事件。把死亡定义为一种删失是有问题的：我们可能不愿把效应估计建立在一个所有其他死因都已被消除的伪总体之上，因为究竟什么样的干预会产生这样一个总体，甚至在概念上都不清楚。而且，没有任何可行的干预能够只消除一种死因而丝毫不影响其他死因。
+
+最后，有人可能主张，在图 8.3 所述的情形中并不需要用 IP 加权来校正选择偏倚。相反，可以尝试用分层（即在给定 $L$ 变量下估计效应度量）而非 IP 加权来消除选择偏倚。分层可以在 $L$ 各水平内得到无偏的条件效应度量，因为以 $L$ 为条件足以阻断从 $C$ 到 $Y$ 的后门路径。也就是说，条件风险比 $\Pr[Y=1\mid A=1,C=0,L=l]/\Pr[Y=1\mid A=0,C=0,L=l]$ 可以解释为 $L=l$ 的未删失者中的处理效应。同理，在零效应下，若数据可以用图 8.5 的因果结构表示，分层也会奏效（即给出无偏的条件效应度量）。然而，在图 8.4 与图 8.6 所刻画的结构下，分层不会奏效。
+
+以图 8.4 为例。以 $L$ 为条件阻断了从 $C$ 到 $Y$ 的后门路径，但也打开了从 $A$ 到 $Y$ 的路径 $A\to L\leftarrow U\to Y$，因为 $L$ 是该路径上的对撞节点。因此，即便 $A$ 对 $Y$ 的因果效应为零，条件（于 $L$ 的）风险比一般也不等于 1。图 8.6 同理。相反，IP 加权在图 8.3–8.6 下都能适当地校正选择偏倚，因为这种方法不是基于在协变量 $L$ 条件下估计效应度量，而是在按个体的治疗与 $L$ 取值重新加权之后估计无条件效应度量。
+
+这是我们第一次讨论分层无法有效计算处理因果效应的情形，即便可交换性、正值性与一致性三个条件都成立。第三部分讨论随时间变化的治疗效应时，还会讨论其他具有类似结构的情形。
+
+\section{无偏倚的选择}
+
+图 8.12 的因果图表示一项假想研究，涉及二值变量手术 $A$、某种遗传单体型 $E$ 与死亡 $Y$。按 d 分离规则，手术 $A$ 与单体型 $E$ (i) 边缘独立，即接受手术的概率在有、无该遗传单体型的人中相同；(ii) 以 $Y$ 为条件时关联，即当研究仅限于（比如）存活者（$Y=0$）时，接受手术的概率因单体型而异。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node (A) at (0,0.55) {A};
+  \node (E) at (0,-0.55) {E};
+  \node[draw,rectangle,inner sep=3.5pt] (Y) at (1.9,0) {Y};
+  \draw[ed] (A) -- (Y);
+  \draw[ed] (E) -- (Y);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.12}
+\end{figure}
+
+确实，以两个独立原因 $A$ 与 $E$ 的共同效应 $Y$ 为条件，总会在 $Y$ 的至少一个层（比如 $Y=1$）中引出 $A$ 与 $E$ 的条件关联。然而，在一种特殊情形下，$A$ 与 $E$ 在另一层（比如 $Y=0$）内仍条件独立。
+
+设 $A$ 与 $E$ 通过完全独立的机制影响生存，以致 $E$ 不可能修饰 $A$ 对 $Y$ 的效应，反之亦然。例如，设手术 $A$ 通过切除肿瘤影响生存，而单体型 $E$ 通过升高低密度脂蛋白胆固醇水平、增加心脏病发作风险影响生存（无论是否有肿瘤）。在这一情景中，我们可以考虑 3 个死因别死亡变量：死于肿瘤 $Y_A$、死于心脏病发作 $Y_E$、死于任何其他原因 $Y_O$。观测到的死亡变量 $Y$ 在 $Y_A$ 或 $Y_E$ 或 $Y_O$ 等于 1 时等于 1（死亡），在 $Y_A$ 与 $Y_E$ 与 $Y_O$ 都等于 0 时等于 0（存活）。图 8.13 的因果图是图 8.12 的扩展，刻画了连接所有这些变量的因果结构。我们假定未记录根本死因（$Y_A$、$Y_E$、$Y_O$）的数据，因此唯一被测量的变量是图 8.12 中的那些（$A$、$E$、$Y$）。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node (A) at (0,1.0) {A};
+  \node (E) at (0,-1.0) {E};
+  \node[draw,rectangle,inner sep=3pt] (YO) at (1.7,2.3) {$Y_O$};
+  \node[draw,rectangle,inner sep=3pt] (YA) at (1.7,1.0) {$Y_A$};
+  \node[draw,rectangle,inner sep=3pt] (YE) at (1.7,-1.0) {$Y_E$};
+  \node[draw,rectangle,inner sep=3pt] (Y) at (3.4,0.55) {Y};
+  \draw[ed] (A) -- (YA);
+  \draw[ed] (E) -- (YE);
+  \draw[ed] (YA) -- (Y);
+  \draw[ed] (YE) -- (Y);
+  \draw[ed] (YO) -- (Y);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.13}
+\end{figure}
+
+由于 $Y_A$、$Y_E$ 与 $Y_O$ 到 $Y$ 的箭头是确定性的，以观测到的存活（$Y=0$）为条件等价于同时以 $Y_A=0$、$Y_E=0$ 与 $Y_O=0$ 为条件，即 $Y=0$ 蕴含 $Y_A=Y_E=Y_O=0$。因此，对图 8.13 应用 d 分离可得：给定 $Y=0$ 时 $A$ 与 $E$ 条件独立，即当以对撞节点 $Y=0$ 为条件时，$A$ 与 $E$ 之间经过 $Y$ 的路径被以非对撞节点 $Y_A$、$Y_E$ 与 $Y_O$ 为条件所阻断。另一方面，以死亡 $Y=1$ 为条件并不蕴含以 $Y_A$、$Y_E$ 与 $Y_O$ 的任何特定取值为条件，因为事件 $Y=1$ 与 7 种可能的未测量事件相容：$(Y_A=1,Y_E=0,Y_O=0)$、$(Y_A=0,Y_E=1,Y_O=0)$、$(Y_A=0,Y_E=0,Y_O=1)$、$(Y_A=1,Y_E=1,Y_O=0)$、$(Y_A=0,Y_E=1,Y_O=1)$、$(Y_A=1,Y_E=0,Y_O=1)$ 与 $(Y_A=1,Y_E=1,Y_O=1)$。因此，给定 $Y=1$ 时 $A$ 与 $E$ 关联，即当以对撞节点 $Y=1$ 为条件时，$A$ 与 $E$ 之间经过 $Y$ 的路径未被阻断。
+
+与图 8.13 所表示的情形相反，当图 8.14–8.16 所表示的情形之一出现时，$A$ 与 $E$ 在给定 $Y=0$ 时不会独立。若 $A$ 与 $E$ 通过共同机制影响生存，则存在从 $A$ 到 $Y_E$ 或从 $E$ 到 $Y_A$ 的箭头，如图 8.14 所示。此时 $A$ 与 $E$ 在 $Y$ 的两个层内都相关。类似地，若 $Y_A$ 与 $Y_E$ 因共同原因 $V$ 而不独立，如图 8.15 所示，$A$ 与 $E$ 在 $Y$ 的两个层内都相关。最后，若原因 $Y_A$ 与 $Y_O$、以及 $Y_E$ 与 $Y_O$ 因共同原因 $W_1$ 与 $W_2$ 而不独立，如图 8.16 所示，则 $A$ 与 $E$ 在 $Y$ 的两个层内也都相关。当数据可以用图 8.13 概括时，我们说数据服从乘法生存模型（见技术注记 8.2）。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node (A) at (0,1.0) {A};
+  \node (E) at (0,-1.0) {E};
+  \node[draw,rectangle,inner sep=3pt] (YO) at (1.7,2.3) {$Y_O$};
+  \node[draw,rectangle,inner sep=3pt] (YA) at (1.7,1.0) {$Y_A$};
+  \node[draw,rectangle,inner sep=3pt] (YE) at (1.7,-1.0) {$Y_E$};
+  \node[draw,rectangle,inner sep=3pt] (Y) at (3.4,0.55) {Y};
+  \draw[ed] (A) -- (YA);
+  \draw[ed] (E) -- (YE);
+  \draw[ed] (A) -- (YE);
+  \draw[ed] (E) -- (YA);
+  \draw[ed] (YA) -- (Y);
+  \draw[ed] (YE) -- (Y);
+  \draw[ed] (YO) -- (Y);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.14}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node (A) at (0,1.8) {A};
+  \node (E) at (0,-0.4) {E};
+  \node (V) at (0,0.7) {V};
+  \node[draw,rectangle,inner sep=3pt] (YO) at (1.9,3.1) {$Y_O$};
+  \node[draw,rectangle,inner sep=3pt] (YA) at (1.9,1.8) {$Y_A$};
+  \node[draw,rectangle,inner sep=3pt] (YE) at (1.9,-0.4) {$Y_E$};
+  \node[draw,rectangle,inner sep=3pt] (Y) at (3.6,0.7) {Y};
+  \draw[ed] (A) -- (YA);
+  \draw[ed] (E) -- (YE);
+  \draw[ed] (V) -- (YA);
+  \draw[ed] (V) -- (YE);
+  \draw[ed] (YA) -- (Y);
+  \draw[ed] (YE) -- (Y);
+  \draw[ed] (YO) -- (Y);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.15}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.3,every node/.style={transform shape}]
+  \node (W1) at (-0.4,4.3) {$W_1$};
+  \node (W2) at (-0.4,3.0) {$W_2$};
+  \node (A) at (0.5,1.6) {A};
+  \node (E) at (0.1,0) {E};
+  \node[draw,rectangle,inner sep=3pt] (YO) at (2.6,3.7) {$Y_O$};
+  \node[draw,rectangle,inner sep=3pt] (YA) at (2.6,1.6) {$Y_A$};
+  \node[draw,rectangle,inner sep=3pt] (YE) at (2.6,0) {$Y_E$};
+  \node[draw,rectangle,inner sep=3pt] (Y) at (4.3,0.9) {Y};
+  \draw[ed] (W1) -- (YO);
+  \draw[ed] (W1) -- (A);
+  \draw[ed] (W2) -- (YO);
+  \draw[ed] (W2) -- (E);
+  \draw[ed] (A) -- (YA);
+  \draw[ed] (E) -- (YE);
+  \draw[ed] (YA) -- (Y);
+  \draw[ed] (YE) -- (Y);
+  \draw[ed] (YO) -- (Y);
+\end{tikzpicture}
+\caption{}
+\label{fig:8.16}
+\end{figure}
+
+\begin{techpoint}[乘法生存模型]
+当给定 $A$ 与 $E$ 时的条件生存概率 $\Pr[Y=0\mid E=e,A=a]$ 等于 $e$ 与 $a$ 的函数之积 $g(e)h(a)$ 时，我们说乘法生存模型成立。乘法生存模型
+\[
+\Pr[Y=0\mid E=e,A=a]=g(e)h(a)
+\]
+等价于这样一个模型：它假定生存比 $\Pr[Y=0\mid E=e,A=a]/\Pr[Y=0\mid E=e,A=0]$ 不依赖于 $e$，且等于 $h(a)$。当 $A$ 与 $E$ 对 $Y=0$ 在乘法尺度上无交互作用时，数据服从乘法生存模型。图 8.13 表示乘法生存模型，证明如下：
+\[
+\begin{aligned}
+&\Pr[Y_O=0,Y_A=0,Y_E=0\mid E=e,A=a]\\
+&\qquad=\Pr[Y_O=0]\,\Pr[Y_A=0\mid A=a]\,\Pr[Y_E=0\mid E=e],
+\end{aligned}
+\]
+其中第一个等号由确定性，第二个等号由 DAG 分解。令 $g(e)=\Pr[Y_E=0\mid E=e]$，$h(a)=\Pr[Y_O=0]\Pr[Y_A=0\mid A=a]$。注意，若 $\Pr[Y=0\mid E=e,A=a]=g(e)h(a)$，则 $\Pr[Y=1\mid E=e,A=a]=1-g(e)h(a)$ 不服从乘法死亡模型。因此，当 $A$ 与 $E$ 在给定 $Y=0$ 时条件独立时，它们在给定 $Y=1$ 时将条件相关。
+\end{techpoint}
+
+图 8.13 有趣之处在于：通过加入在函数上决定观测变量 $Y$ 的未测量变量 $Y_A$、$Y_E$ 与 $Y_O$，我们构造出一个增广因果图，它既能表示给定 $Y=0$ 时 $A$ 与 $E$ 的条件独立，也能表示给定 $Y=1$ 时二者的条件相关。\mnote{增广因果 DAG 由 Hernán、Hernández-Díaz 与 Robins (2004) 引入，可以扩展用来表示第 5 章所述的充分原因（VanderWeele and Robins, 2007c）。}
+
+总之，以对撞节点为条件总会引出其原因之间的关联，但这种关联可能只限于共同效应的某些水平。换言之，在理论上，当分析仅限于共同效应的单一水平时，对共同效应的选择可能不会导致选择偏倚。对撞节点分层并不总是选择偏倚的来源。
+
+\begin{finepoint}[选择偏倚的强度与方向]
+我们此前把选择偏倚说成“全有或全无”的问题：要么有偏倚，要么没有。然而在实践中，考虑偏倚的预期方向与大小很重要。
+
+两个边缘独立的原因 $A$ 与 $E$ 在其共同效应 $Y$ 各层内的条件关联方向，取决于 $A$ 与 $E$ 如何交互作用导致 $Y$。例如，设在存在一个与 $A$、$E$ 均无关的未发现背景因素 $U$ 时，$A=1$ 或 $E=1$ 之一就足以且必要导致死亡（“或”机制），但若无 $U$，$A$ 与 $E$ 都不导致死亡。那么在死亡者（$Y=1$）中，$A$ 与 $E$ 将负相关，因为 $A=0$ 者更可能有 $E=1$，原因是 $A$ 的缺失增加了 $E$ 是死因的机会。（确实，随着 $U$ 的人群患病率趋近 1.0，条件优势比 $OR_{AE\mid Y=1}$ 的对数将趋近负无穷。）这种“或”机制是正文中给出的、解释共同效应各层内独立原因之条件关联的唯一解释；不过还存在其他可能。
+
+例如，设在存在未发现背景因素 $U$ 时，$A=1$ 且 $E=1$ 才足以且必要导致死亡（“与”机制），且若无 $U$，$A$ 与 $E$ 都不导致死亡。那么在死亡者中，$A=1$ 者更可能有 $E=1$，即 $A$ 与 $E$ 正相关。
+
+像图 8.12 这样的标准 DAG 无法区分 $A$ 与 $E$ 通过“或”机制交互与通过“与”机制交互这两种情形。带有充分因果关系结构的因果 DAG（VanderWeele and Robins, 2007c）克服了这一缺陷。
+
+无论选择偏倚的方向如何，另一个关键问题是它的大小。不足以影响研究结论的偏倚在实践中可以安全地忽略，无论偏倚向上还是向下。一般而言，较大的选择偏倚要求对撞节点与处理、结局都有强关联。Greenland (2003) 在若干情景中研究了零效应下选择偏倚的大小，他称之为对撞节点分层偏倚。
+\end{finepoint}
+
+\renewcommand{\topfraction}{0.7}
+\renewcommand{\bottomfraction}{0.3}
+\renewcommand{\textfraction}{0.2}
+\renewcommand{\floatpagefraction}{0.5}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{1}
+\setcounter{totalnumber}{3}

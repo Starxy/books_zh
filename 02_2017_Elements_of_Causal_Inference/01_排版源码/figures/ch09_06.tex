@@ -1,0 +1,33 @@
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.4cm,y=1.2cm]
+ \node[vtx] (ch09f6a-z) at (0,0) {$Z$};
+ \node[vtx] (ch09f6a-x) at (1.5,0) {$X$};
+ \node[vtx] (ch09f6a-y) at (3,0) {$Y$};
+ \node[latent] (ch09f6a-h) at (2.25,1) {$H$};
+ \draw[ed] (ch09f6a-z)--(ch09f6a-x);
+ \draw[ed] (ch09f6a-x)--(ch09f6a-y);
+ \draw[ed] (ch09f6a-h)--(ch09f6a-x);
+ \draw[ed] (ch09f6a-h)--(ch09f6a-y);
+\end{tikzpicture}
+\par\small (a) 在这一因果结构中，$Z$称为$X$的工具变量，并使我们能够对$X$作用于$Y$的效应作出某些因果陈述。
+\end{minipage}\hfill
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.35cm,y=1.2cm]
+ \node[vtx] (ch09f6b-s) at (0,1) {$S$};
+ \node[latent] (ch09f6b-h) at (1.5,1) {$H$};
+ \node[vtx] (ch09f6b-t) at (3,1) {$T$};
+ \node[vtx] (ch09f6b-x) at (.75,0) {$X$};
+ \node[vtx] (ch09f6b-y) at (2.25,0) {$Y$};
+ \draw[ed] (ch09f6b-s)--(ch09f6b-x);
+ \draw[ed] (ch09f6b-h)--(ch09f6b-x);
+ \draw[ed] (ch09f6b-h)--(ch09f6b-y);
+ \draw[ed] (ch09f6b-t)--(ch09f6b-y);
+\end{tikzpicture}
+\par\small (b) 一个著名实验的因果结构，量子物理学家利用它否证经典物理学的某些假设；见第9.5.2节。
+\end{minipage}
+\caption{蕴含不等式约束的潜变量结构的两个重要例子。}
+\end{figure}

@@ -1,0 +1,84 @@
+% 原书分章 PDF 第 6—8 页：第 22.2 节。
+\section{$V$ 最优规则下平均结局的有效影响曲线}
+
+本节证明 $\Psi$ 的路径可微性，并给出有效影响曲线（efficient influence curve）的显式表达式。在给出这一结果之前，先考虑把规则 $d=(d_{A(0)},d_{A(1)})\in\mathcal D$ 视为已知时，参数 $\Psi:\mathcal M\to\mathbb R$、$\Psi_d(P)\equiv\E_PY_d$ 的有效影响曲线。这条影响曲线已在第 4 章中给出。参数映射 $\Psi_d$ 的有效影响曲线为
+\[
+ D^*(d,P)=\sum_{k=0}^2D_k^*(d,P),
+\]
+其中
+\[
+ D_0^*(d,P)=\E_P\bigl[Y_d\mid L(0),A(0)=d_{A(0)}(V(0))\bigr]-\E_PY_d,
+\]
+\begin{equation}
+\begin{aligned}
+ D_1^*(d,P)
+ &=\frac{I(A(0)=d_{A(0)}(V(0)))}{g_{A(0)}(O)}
+ \bigl(\E_P[Y\mid\bar A(1)=d(A(0),V),\bar L(1)]\\
+ &\hspace{4.5cm}-\E_P[Y_d\mid L(0),A(0)=d_{A(0)}(V(0))]\bigr),\\
+ D_2^*(d,P)
+ &=\frac{I(\bar A(1)=d(A(0),V))}{\prod_{j=0}^1g_{A(j)}(O)}
+ \bigl(Y-\E_P[Y\mid\bar A(1)=d(A(0),V),\bar L(1)]\bigr).
+\end{aligned}
+\tag{22.4}
+\end{equation}
+这里，$(g_{A(0)},g_{A(1)})$ 是分布 $P$ 下的干预机制。提醒读者，$Y_d$ 服从式 (22.1) 中的 $g$ 计算分布，因此
+% 原书内层期望在 Lbar(1) 后多印一个右圆括号，照录可见符号。
+\[
+\begin{aligned}
+ &\E_P\bigl[Y_d\mid L(0),A(0)=d_{A(0)}(V(0))\bigr]\\
+ &\quad=\E_P\bigl[\E_P[Y\mid\bar A(1)=d(A(0),V),\bar L(1))]
+ \mid L(0),A(0)=d_{A(0)}(V(0))\bigr].
+\end{aligned}
+\]
+有时把 $D_k^*(d,P)$ 写为 $D_k^*(d,Q^d,g)$ 会更方便；这里 $Q^d$ 表示 $D_1^*$ 定义中的两个条件期望，以及 $P$ 下 $L(0)$ 的边际分布，$g$ 表示 $P$ 下的干预机制。对于给定规则 $d$，将 $P_0$ 下的这些条件期望记为 $Q_0^d$。类似地，有时也把 $D^*(d,P)$ 记为 $D^*(d,Q^d,g)$。
+
+如果 $D^*(P)$ 没有包含规则 $d$ 的自变量，那么它指的是参数映射 $\Psi$ 的有效影响曲线，其中 $\Psi(P)=\E_PY_{d_P}$，且不把 $P$ 下的最优规则 $d_P$ 视为已知。不把 $d_P$ 视为已知，意味着在映射 $\Psi(P)$ 中，$d_P$ 依赖输入分布 $P$。下一个定理给出 $\Psi$ 在分布 $P$ 处的有效影响曲线。对该分布的主要要求是满足非例外分布条件（nonexceptional law condition）：
+\begin{equation}
+\begin{aligned}
+ \max_{a_0(0)\in\{0,1\}}\Pr_P\bigl(
+ \bar Q_{b,2}((a_0(0),1),V_{a(0)=(a_0(0),1)})=0\bigr)&=0,\\
+ \Pr_P\bigl(\bar Q_{b,1}(V(0))=0\bigr)&=0,
+\end{aligned}
+\tag{22.5}
+\end{equation}
+其中 $\bar Q_{b,2}$ 和 $\bar Q_{b,1}$ 的定义与定理 22.1 中 $\bar Q_{b,20}$ 和 $\bar Q_{b,10}$ 类似，只需把 $P_0$ 下的期望换为 $P$ 下的期望。也就是说，我们假定以概率 1，$P$ 下的每个处理增益函数都处处非零。不满足这一假设的分布被称为“例外分布”（exceptional law）（Robins，2004）。如果我们预期处理对所有 $V$ 分层中的个体都具有有益或有害的效应，那么这类分布确实是例外。如果只预期处理对部分而非全部个体分层的结局有效，那么这一假设可能不成立。后续关于 $\E_0Y_{d_0}$ 的所有渐近线性结果都将对 $P_0$ 作出这一假设；对于第 22.3 节的数据自适应目标参数，则将对最优规则估计向某个固定极限的一致收敛作出一个较弱、但仍非完全平凡的假设。
+
+\begin{bookresult}{定理}{22.2}
+假定 $P\in\mathcal M$，存在某个 $M<\infty$ 使 $\Pr_P(|Y|<M)=1$，且 $P$ 满足正值性假设 (22.2) 与非例外分布条件 (22.5)。那么参数 $\Psi:\mathcal M\to\mathbb R$ 在 $P$ 处路径可微，其典范梯度为
+\[
+ D^*(P)\equiv D^*(d_P,P)=\sum_{k=0}^2D_k^*(d_P,P).
+\]
+也就是说，$D^*(P)$ 等于在 $V$ 最优规则 $d=d_P$ 处，参数 $\Psi_d(P)\equiv\E_PY_d$ 的有效影响曲线 $D^*(d_P,P)$；其中 $\Psi_d$ 把 $d$ 视为给定。
+\end{bookresult}
+
+上述定理已作为 van der Laan 和 Luedtke（2014）的定理 8 得到证明，因此这里略去证明。
+
+有时把 $D^*(P)$ 记为 $D^*(Q,g)$；这里 $Q$ 表示 $Q^{d_P}$，以及似然中足以计算 $V$ 最优规则 $d_P$ 的那些部分。为方便起见，也把 $d_P$ 记为 $d_Q$。我们在配套论文中研究似然的哪些部分足以计算 $V$ 最优规则；不过，定理 22.1 已表明，$\bar Q_{b,20}$ 和 $\bar Q_{b,10}$ 足以确定 $d_0$，对于更一般的 $d_P$，相应函数也足以确定规则。有效影响曲线具有以下性质，这将成为分析下一节 CV-TMLE 的基本要素。
+
+\begin{bookresult}{定理}{22.3}
+令 $d_Q$ 为与 $Q$ 对应的 $V$ 最优规则。对任意 $Q,g$，都有
+\[
+\begin{aligned}
+ P_0D^*(Q,g)
+ &=\Psi(Q_0)-\Psi(Q)\\
+ &\quad+R_{1d_Q}(Q^{d_Q},Q_0^{d_Q},g,g_0)+R_2(Q,Q_0),
+\end{aligned}
+\]
+其中，对所有 $d\in\mathcal D$，
+\[
+\begin{aligned}
+ R_{1d}(Q^d,Q_0^d,g,g_0)
+ &\equiv P_0D^*(d,Q^d,g)-\bigl(\Psi_d(Q_0^d)-\Psi_d(Q^d)\bigr),\\
+ R_2(Q,Q_0)
+ &\equiv\Psi_{d_Q}(Q_0^{d_Q})-\Psi_{d_0}(Q_0^{d_0}),
+\end{aligned}
+\]
+$\Psi_d(P)=\E_PY_d$ 是把 $d$ 视为已知的统计目标参数，而 $D^*(d,Q_0^d,g_0)$ 是定理 22.2 所给的 $\Psi_d$ 在 $P_0$ 处的有效影响曲线。
+\end{bookresult}
+
+由第 4 章对统计目标参数 $\Psi_d$ 的研究可知，
+\[
+ P_0D^*(d,Q^d,g)
+ =\Psi_d(Q_0^d)-\Psi_d(Q^d)+R_{1d}(Q^d,Q_0^d,g,g_0),
+\]
+其中 $R_{1d}$ 是一个具有闭式表达式的二阶项，涉及差 $Q^d-Q_0^d$ 与差 $g-g_0$ 的乘积的积分。

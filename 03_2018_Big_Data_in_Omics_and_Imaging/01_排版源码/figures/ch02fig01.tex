@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1.35cm,y=1.05cm,
+ch02n/.style={ellipse,draw=inkblue,minimum width=13mm,minimum height=8mm,font=\small},
+ch02e/.style={-{Stealth[length=2mm]},draw=green!60!black,semithick}]
+\node[ch02n](ch0201y1) at (0,3){$y_1$};
+\node[ch02n](ch0201y2) at (3,3){$y_2$};
+\node[ch02n](ch0201y3) at (-.5,1.5){$y_3$};
+\node[ch02n](ch0201y4) at (1.8,1.5){$y_4$};
+\node[ch02n](ch0201y5) at (4,1.5){$y_5$};
+\node[ch02n](ch0201y6) at (.4,0){$y_6$};
+\node[ch02n](ch0201y7) at (3.1,0){$y_7$};
+\draw[ch02e](ch0201y1)--(ch0201y3);
+\draw[ch02e](ch0201y2)--(ch0201y4);
+\draw[ch02e](ch0201y2)--(ch0201y5);
+\draw[ch02e](ch0201y4)--(ch0201y3);
+\draw[ch02e](ch0201y3)--(ch0201y6);
+\draw[ch02e](ch0201y4)--(ch0201y6);
+\draw[ch02e](ch0201y4)--(ch0201y7);
+\draw[ch02e](ch0201y5)--(ch0201y7);
+\end{tikzpicture}

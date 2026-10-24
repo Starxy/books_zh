@@ -1,0 +1,77 @@
+% !TeX program = xelatex
+\documentclass[UTF8,11pt,openany,fontset=windows]{ctexbook}
+
+\input{preamble}
+
+\begin{document}
+
+% ---------------- 封面 ----------------
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\vspace*{4.2cm}
+{\heiti\zihao{1} 因果推断：如果}\\[0.6cm]
+{\heiti\zihao{2} Causal Inference: What If}\\[2.4cm]
+{\zihao{4} Miguel A. Hernán\quad James M. Robins}\\[0.4cm]
+{\zihao{5} 中译本}\\[3.6cm]
+{\zihao{5} 2026}
+\vfill
+\end{titlepage}
+
+% ---------------- 版权页 ----------------
+\thispagestyle{empty}
+\vspace*{\fill}
+{\small
+\noindent\textit{Causal Inference: What If}\\
+Miguel A. Hernán, James M. Robins\\
+Copyright 2020, 2026 Miguel Hernán and James M. Robins. All rights reserved.\\[0.6em]
+\noindent 本书中文译本供学习与研究使用。原书在线版：\url{https://miguelhernan.org/whatifbook}\\[0.6em]
+\noindent 建议引用格式：Hernán MA, Robins JM (2020). \textit{Causal Inference: What If}. Boca Raton: Chapman \& Hall/CRC.
+}
+\vspace*{\fill}
+\clearpage
+
+% ---------------- 目录 ----------------
+\frontmatter
+\pagestyle{plain}
+\tableofcontents
+
+\include{chapters/intro}
+
+\mainmatter
+\pagestyle{fancy}
+
+\part{无模型的因果推断}
+\include{chapters/ch01}
+\include{chapters/ch02}
+\include{chapters/ch03}
+\include{chapters/ch04}
+\include{chapters/ch05}
+\include{chapters/ch06}
+\include{chapters/ch07}
+\include{chapters/ch08}
+\include{chapters/ch09}
+\include{chapters/ch10}
+
+\part{有模型的因果推断}
+\include{chapters/ch11}
+\include{chapters/ch12}
+\include{chapters/ch13}
+\include{chapters/ch14}
+\include{chapters/ch15}
+\include{chapters/ch16}
+\include{chapters/ch17}
+\include{chapters/ch18}
+
+\part{时变处理的因果推断}
+\include{chapters/ch19}
+\include{chapters/ch20}
+\include{chapters/ch21}
+\include{chapters/ch22}
+\include{chapters/ch23}
+
+\backmatter
+\include{chapters/refs}
+\include{chapters/index}
+
+\end{document}

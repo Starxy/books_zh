@@ -1,0 +1,116 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.2cm}
+
+\tikzstyle{lnode} = [minimum width=0.9cm,minimum height=0.9cm,inner sep=2pt,draw,fill=white,rounded corners=0pt]
+
+\begin{scope}
+
+\node [lnode,anchor=west,fill=gray!30] (base) at (0,0) {\scriptsize{$\mathbf{k}_{i'}$}};
+\node [lnode,anchor=north,fill=gray!30] (basev) at ([yshift=-\ssep]base.south) {\scriptsize{$\mathbf{v}_{i'}$}};
+
+\node [lnode,anchor=west,fill=gray!30] (query) at ([xshift=3cm]base.east) {\footnotesize{$\mathbf{q}_{i'}$}};
+\node [anchor=west] (querylabel) at (query.east) {\scriptsize{查询}};
+
+\node [lnode,anchor=north west,fill=gray!30] (value) at ([xshift=0.5cm,yshift=-2.2cm]base.south east) {\footnotesize{$\mathbf{v}_{i'}$}};
+\node [lnode,anchor=west,fill=gray!30] (key) at ([xshift=2*\ssep]value.east) {\footnotesize{$\mathbf{k}_{i'}$}};
+\node [anchor=south] (keylabel) at ([yshift=-0.05cm]key.north east) {\scriptsize{键}};
+\node [anchor=south] (valuelabel) at (value.north west) {\scriptsize{值}};
+
+\node [lnode,anchor=north] (input) at ([yshift=-1cm]key.south) {\footnotesize{输入}};
+\node [anchor=north] (inputlabel) at (input.south) {\scriptsize{位置 $i'$ 的输入}};
+
+\draw [->,dotted] ([yshift=2pt]input.north) -- ([yshift=-2pt]key.south);
+\draw [->,dotted] ([yshift=0.5cm]input.north) -| ([yshift=-2pt]value.south);
+\draw [->,dotted] ([yshift=0.5cm]input.north) -| ([yshift=-2pt]query.south);
+%\draw [->] ([yshift=2pt,xshift=-0.2cm]input.north) .. controls +(north:0.5cm) and +(south:0.7cm) .. ([yshift=-2pt]value.south);
+%\draw [->] ([yshift=2pt,xshift=0.2cm]input.north) .. controls +(north:0.5cm) and +(south:4.0cm) .. ([yshift=-2pt]query.south);
+\node [anchor=south west] (linearmaplabel) at (input.north east) {\scriptsize{线性映射}};
+
+\draw [->,dotted] ([yshift=2pt]value.north) .. controls +(north:1cm) and +(east:0.5cm) .. ([xshift=2pt]basev.east);
+\draw [->,dotted] ([yshift=2pt]key.north) .. controls +(north:2cm) and +(east:0.8cm) .. ([xshift=2pt]base.east);
+
+\node [lnode,anchor=east,fill=orange!30] (base2) at ([xshift=-2*\ssep]base.west) {\scriptsize{$\mathbf{k}_{i'-1}$}};
+\node [lnode,anchor=east,fill=orange!30] (basev2) at ([xshift=-2*\ssep]basev.west) {\scriptsize{$\mathbf{v}_{i'-1}$}};
+\node [lnode,anchor=east,draw=white] (base3) at ([xshift=-2*\ssep]base2.west) {\footnotesize{$\cdots$}};
+\node [lnode,anchor=east,draw=white] (basev3) at ([xshift=-2*\ssep]basev2.west) {\footnotesize{$\cdots$}};
+\node [lnode,anchor=east,fill=orange!30] (base4) at ([xshift=-2*\ssep]base3.west) {\footnotesize{$\mathbf{k}_{2}$}};
+\node [lnode,anchor=east,fill=orange!30] (basev4) at ([xshift=-2*\ssep]basev3.west) {\footnotesize{$\mathbf{v}_{2}$}};
+\node [lnode,anchor=east,fill=orange!30] (base5) at ([xshift=-2*\ssep]base4.west) {\footnotesize{$\mathbf{k}_{1}$}};
+\node [lnode,anchor=east,fill=orange!30] (basev5) at ([xshift=-2*\ssep]basev4.west) {\footnotesize{$\mathbf{v}_{1}$}};
+
+\draw [->,red] ([xshift=-0.2cm,yshift=2pt]query.north) .. controls +(north:0.5cm) and +(north:0.5cm) .. ([yshift=2pt]base.north);
+\draw [->,red] ([xshift=-0.1cm,yshift=2pt]query.north) .. controls +(north:0.8cm) and +(north:0.8cm) .. ([yshift=2pt]base2.north);
+\draw [->,red] ([xshift=0.0cm,yshift=2pt]query.north) .. controls +(north:1.1cm) and +(north:1.1cm) .. ([yshift=2pt]base4.north);
+\draw [->,red] ([xshift=0.1cm,yshift=2pt]query.north) .. controls +(north:1.4cm) and +(north:1.4cm) .. ([yshift=2pt]base5.north) node [pos=0.5,above] (attentionlabel) {\color{red} \scriptsize{注意力}};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,thick,inner sep=0.6em] [fit=(base) (basev5)] (kvcachebox) {};
+\end{pgfonlayer}
+\node [anchor=north] (kvcachelabel) at ([yshift=-0.1cm]kvcachebox.south) {\footnotesize{KV 缓存（位置 $1$ 至 $i'-1$）}};
+
+
+\node [anchor=north] (caption) at ([yshift=-4.5cm]basev.south west) {\small{(a) 在位置 $i'$ 更新 KV 缓存}};
+
+\end{scope}
+
+\begin{scope}[yshift=-9.5cm]
+
+\node [lnode,anchor=west,fill=orange!30] (base) at (0,0) {\scriptsize{$\mathbf{k}_{i'}$}};
+\node [lnode,anchor=north,fill=orange!30] (basev) at ([yshift=-\ssep]base.south) {\scriptsize{$\mathbf{v}_{i'}$}};
+\node [lnode,anchor=west,fill=gray!30] (base10) at ([xshift=2*\ssep]base.east) {\scriptsize{$\mathbf{k}_{i'+1}$}};
+\node [lnode,anchor=west,fill=gray!30] (basev10) at ([xshift=2*\ssep]basev.east) {\scriptsize{$\mathbf{v}_{i'+1}$}};
+
+\node [lnode,anchor=west,fill=gray!30] (query) at ([xshift=3cm]base10.east) {\footnotesize{$\mathbf{q}_{i'+1}$}};
+\node [anchor=west] (querylabel) at (query.east) {\scriptsize{查询}};
+
+\node [lnode,anchor=north west,fill=gray!30] (value) at ([xshift=0.5cm,yshift=-2.2cm]base10.south east) {\footnotesize{$\mathbf{v}_{i'+1}$}};
+\node [lnode,anchor=west,fill=gray!30] (key) at ([xshift=2*\ssep]value.east) {\footnotesize{$\mathbf{k}_{i'+1}$}};
+\node [anchor=south] (keylabel) at ([yshift=-0.05cm]key.north east) {\scriptsize{键}};
+\node [anchor=south] (valuelabel) at (value.north west) {\scriptsize{值}};
+
+\node [lnode,anchor=north] (input) at ([yshift=-1cm]key.south) {\footnotesize{输入}};
+\node [anchor=north] (inputlabel) at (input.south) {\scriptsize{位置 $i'+1$ 的输入}};
+
+\draw [->,dotted] ([yshift=2pt]input.north) -- ([yshift=-2pt]key.south);
+\draw [->,dotted] ([yshift=0.5cm]input.north) -| ([yshift=-2pt]value.south);
+\draw [->,dotted] ([yshift=0.5cm]input.north) -| ([yshift=-2pt]query.south);
+%\draw [->] ([yshift=2pt,xshift=-0.2cm]input.north) .. controls +(north:0.5cm) and +(south:0.7cm) .. ([yshift=-2pt]value.south);
+%\draw [->] ([yshift=2pt,xshift=0.2cm]input.north) .. controls +(north:0.5cm) and +(south:4.0cm) .. ([yshift=-2pt]query.south);
+\node [anchor=south west] (linearmaplabel) at (input.north east) {\scriptsize{线性映射}};
+
+\draw [->,dotted] ([yshift=2pt]value.north) .. controls +(north:1cm) and +(east:0.5cm) .. ([xshift=2pt]basev10.east);
+\draw [->,dotted] ([yshift=2pt]key.north) .. controls +(north:2cm) and +(east:0.8cm) .. ([xshift=2pt]base10.east);
+
+
+\node [lnode,anchor=east,fill=orange!30] (base2) at ([xshift=-2*\ssep]base.west) {\scriptsize{$\mathbf{k}_{i'-1}$}};
+\node [lnode,anchor=east,fill=orange!30] (basev2) at ([xshift=-2*\ssep]basev.west) {\scriptsize{$\mathbf{v}_{i'-1}$}};
+\node [lnode,anchor=east,draw=white] (base3) at ([xshift=-2*\ssep]base2.west) {\footnotesize{$\cdots$}};
+\node [lnode,anchor=east,draw=white] (basev3) at ([xshift=-2*\ssep]basev2.west) {\footnotesize{$\cdots$}};
+\node [lnode,anchor=east,fill=orange!30] (base4) at ([xshift=-2*\ssep]base3.west) {\footnotesize{$\mathbf{k}_{2}$}};
+\node [lnode,anchor=east,fill=orange!30] (basev4) at ([xshift=-2*\ssep]basev3.west) {\footnotesize{$\mathbf{v}_{2}$}};
+\node [lnode,anchor=east,fill=orange!30] (base5) at ([xshift=-2*\ssep]base4.west) {\footnotesize{$\mathbf{k}_{1}$}};
+\node [lnode,anchor=east,fill=orange!30] (basev5) at ([xshift=-2*\ssep]basev4.west) {\footnotesize{$\mathbf{v}_{1}$}};
+
+\draw [->,red] ([xshift=-0.3cm,yshift=2pt]query.north) .. controls +(north:0.3cm) and +(north:0.3cm) .. ([yshift=2pt]base10.north);
+\draw [->,red] ([xshift=-0.2cm,yshift=2pt]query.north) .. controls +(north:0.5cm) and +(north:0.5cm) .. ([yshift=2pt]base.north);
+\draw [->,red] ([xshift=-0.1cm,yshift=2pt]query.north) .. controls +(north:0.8cm) and +(north:0.8cm) .. ([yshift=2pt]base2.north);
+\draw [->,red] ([xshift=0.0cm,yshift=2pt]query.north) .. controls +(north:1.1cm) and +(north:1.1cm) .. ([yshift=2pt]base4.north);
+\draw [->,red] ([xshift=0.1cm,yshift=2pt]query.north) .. controls +(north:1.4cm) and +(north:1.4cm) .. ([yshift=2pt]base5.north) node [pos=0.5,above] (attentionlabel) {\color{red} \scriptsize{注意力}};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted,thick,inner sep=0.6em] [fit=(base10) (basev5)] (kvcachebox) {};
+\end{pgfonlayer}
+\node [anchor=north] (kvcachelabel) at ([yshift=-0.1cm]kvcachebox.south) {\footnotesize{KV 缓存（位置 $1$ 至 $i'$）}};
+
+
+\node [anchor=north] (caption) at ([yshift=-4.5cm]basev.south west) {\small{(b) 在位置 $i'+1$ 更新 KV 缓存}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

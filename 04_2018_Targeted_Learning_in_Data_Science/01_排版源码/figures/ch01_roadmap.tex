@@ -1,0 +1,66 @@
+% 图 1.1：逐项依据原书第 12 页重绘。
+\begin{tikzpicture}[
+ x=1cm,y=1cm,
+ ch01roadbox/.style={draw=black!75,rounded corners=2pt,line width=.6pt,
+   text width=12.25cm,align=center,font=\footnotesize,
+   inner xsep=7pt,inner ysep=6pt},
+ ch01roadarrow/.style={-{Stealth[length=2.5mm,width=1.8mm]},line width=.7pt},
+ ch01side/.style={font=\small\bfseries,align=center,inner sep=0pt}
+]
+\node[ch01roadbox] (ch01data) {%
+ \textbf{数据}\\
+ 数据是随机变量 $O$ 的 $n$ 次观测。\\
+ $O$ 的概率分布为 $P_0$。};
+\node[ch01roadbox,below=.55cm of ch01data] (ch01model) {%
+ \textbf{模型}\\
+ 统计模型 $\mathcal M$ 是 $O$ 的可能概率分布的集合，$P_0\in\mathcal M$。\\
+ 模型是在 $P_0$ 的统计模型基础上，可能进一步加入\\
+ 不可检验的因果假设而得到的。};
+\node[ch01roadbox,below=.55cm of ch01model] (ch01target) {%
+ \textbf{目标参数}\\
+ 参数 $\Psi(P_0)$ 是 $P_0$ 的一个特定特征，其中 $\Psi$ 将概率分布 $P_0$\\
+ 映射为感兴趣的目标参数。};
+\node[ch01roadbox,below=.55cm of ch01target] (ch01super) {%
+ \textbf{超级学习器}\\
+ 估计过程的第一步通常是利用机器学习算法——超级学习器，\\
+ 对 $P_0$ 的相关部分得到一个或多个初始估计。};
+\node[ch01roadbox,below=.55cm of ch01super] (ch01tmle) {%
+ \textbf{靶向最小损失估计}\\
+ 利用超级学习获得数据生成分布相关部分的初始估计后，\\
+ TMLE 的第二阶段通过一个靶向步骤更新这些初始拟合，\\
+ 使感兴趣的参数达到最优的偏差—方差权衡。};
+\node[ch01roadbox,below=.55cm of ch01tmle] (ch01inference) {%
+ \textbf{推断}\\
+ 利用影响曲线或基于重抽样的方法计算目标参数估计量的标准误，\\
+ 以评价估计量的不确定性。};
+\node[ch01roadbox,below=.55cm of ch01inference] (ch01interpret) {%
+ \textbf{解释}\\
+ 目标参数可解释为纯粹的统计参数，也可在模型中可能进一步\\
+ 加入不可检验假设的条件下，解释为因果参数。};
+
+\draw[ch01roadarrow] (ch01data.south) -- (ch01model.north);
+\draw[ch01roadarrow] (ch01model.south) -- (ch01target.north);
+\draw[ch01roadarrow] (ch01target.south) -- (ch01super.north);
+\draw[ch01roadarrow] (ch01super.south) -- (ch01tmle.north);
+\draw[ch01roadarrow] (ch01tmle.south) -- (ch01inference.north);
+\draw[ch01roadarrow] (ch01inference.south) -- (ch01interpret.north);
+
+\draw[draw=black!75,rounded corners=2pt,line width=.6pt]
+ ($(ch01data.north west)+(-1.0,0)$) rectangle
+ ($(ch01target.south west)+(-.25,0)$);
+\node[ch01side] at
+ ($(ch01data.north west)!.5!(ch01target.south west)+(-.625,0)$)
+ {\shortstack{界\\定\\研\\究\\问\\题}};
+\draw[draw=black!75,rounded corners=2pt,line width=.6pt]
+ ($(ch01super.north west)+(-1.0,0)$) rectangle
+ ($(ch01tmle.south west)+(-.25,0)$);
+\node[ch01side] at
+ ($(ch01super.north west)!.5!(ch01tmle.south west)+(-.625,0)$)
+ {\shortstack{估\\计}};
+\draw[draw=black!75,rounded corners=2pt,line width=.6pt]
+ ($(ch01inference.north west)+(-1.0,0)$) rectangle
+ ($(ch01interpret.south west)+(-.25,0)$);
+\node[ch01side] at
+ ($(ch01inference.north west)!.5!(ch01interpret.south west)+(-.625,0)$)
+ {\shortstack{推\\断}};
+\end{tikzpicture}

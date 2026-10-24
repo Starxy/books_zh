@@ -1,0 +1,87 @@
+% 原书第 159—163 页；第 8.2 节导言、第 8.2.1—8.2.2 小节。
+\section{因果推断与回合式强化学习}
+\label{sec:ch08-rl}
+
+下面从因果视角描述强化学习中的一类问题。粗略地说，在强化学习中，智能体处于某个世界之中，并从一组不同动作中作出选择。根据世界当前的状态，这些动作会产生某种奖励，并改变世界的状态。智能体的目标是使期望累积奖励最大化，详见第 8.2.2 节。我们先介绍逆概率加权的概念。这一技术已广泛应用于机器学习和统计学的不同情境，然后将其与回合式强化学习联系起来。建立这种联系，是联结因果性与强化学习的一个初步尝试。因果视角使我们能够利用由因果结构直接推出的条件独立关系。下面简要介绍两个应用——二十一点纸牌游戏与广告投放——并说明它们如何从因果知识中获益。因果表述能够很自然地导出这些方法上的改进；当然，也完全可以不用因果语言来表述这些问题及相应算法。本节并不证明强化学习一定能从因果性中获益。我们把它看作向两个领域之间建立形式化联系迈出的一步，希望未来能由此开展有成果的研究，亦见 Bareinboim et al.［2015］。更具体地说，我们认为，因果性可能有助于在不同强化学习任务之间迁移知识，例如进入电子游戏的下一关，或者在乒乓球比赛中更换对手；不过，据我们所知，尚无这样的研究结果。
+
+\subsection{逆概率加权}
+\label{sec:ch08-ipw}
+
+\textbf{逆概率加权（inverse probability weighting）}是一种熟知的技术，用于根据服从某一分布的样本，估计另一个分布的性质。因此，它与因果推断有着自然联系。考虑肾结石的例子（例 6.37）：我们定义了结石大小 $S$、治疗 $T$ 和康复 $R$ 三个二元变量。获得观测数据后，我们关心的是，在一个所有人都接受治疗 A 的假想研究中，期望康复率 $\widetilde{\EE}[R]$ 是多少；这对应于另一个分布。
+
+形式上，考虑结构因果模型 $\mathfrak C$，它导出变量 $\mathbf X=(X_1,\ldots,X_d)$ 上的分布 $P^{\mathfrak C}_{\mathbf X}$。前文已指出，我们通常观测到来自观测分布 $P^{\mathfrak C}_{\mathbf X}$ 的样本，关心的却是某个干预分布 $P^{\widetilde{\mathfrak C}}_{\mathbf X}$。新的结构因果模型 $\widetilde{\mathfrak C}$，由对原模型 $\mathfrak C$ 中某个节点 $X_k$ 实施干预而得，例如
+\[
+ \dox{X_k\coloneqq\widetilde f\bigl(X_{\widetilde{\PA}_k,\widetilde N_k}\bigr)};
+\]
+见第 6.3 节。
+\par\smallskip
+{\small\noindent\textbf{译注：}原书第 160 页此未编号干预式将噪声 $\widetilde N_k$ 排在 $X$ 的下标内。按照第 6.3 节的结构赋值约定，应理解为 $\widetilde f(X_{\widetilde{\PA}_k},\widetilde N_k)$，即噪声是 $\widetilde f$ 的另一个自变量。此处保留原式，并指出这一排印疑误。}
+\par\smallskip
+特别地，我们可能希望估计新分布 $P^{\widetilde{\mathfrak C}}_{\mathbf X}$ 的某个性质
+\[
+ \widetilde{\EE}\,\ell(\mathbf X)
+ \coloneqq\EE_{P^{\widetilde{\mathfrak C}}_{\mathbf X}}\,\ell(\mathbf X).
+\]
+在肾结石的例子中，这一性质就是 $\widetilde{\EE}[R]$。若密度存在，第 6.3 节已说明，$\mathfrak C$ 与 $\widetilde{\mathfrak C}$ 的密度具有相似的分解：
+\[
+ \begin{aligned}
+ p(x_1,\ldots,x_d)&\coloneqq p^{\mathfrak C}(x_1,\ldots,x_d)
+ =\prod_{j=1}^d p^{\mathfrak C}\bigl(x_j\mid x_{\pa(j)}\bigr),\\
+ \widetilde p(x_1,\ldots,x_d)&\coloneqq p^{\widetilde{\mathfrak C}}(x_1,\ldots,x_d)
+ =\prod_{j\neq k}p^{\mathfrak C}\bigl(x_j\mid x_{\pa(j)}\bigr)
+ \widetilde p\bigl(x_k\mid x_{\widetilde{\pa}(k)}\bigr).
+ \end{aligned}
+\]
+除被干预变量对应的那一项外，两个分解完全一致。因此，
+\[
+ \begin{aligned}
+ \xi&\coloneqq\widetilde{\EE}\,\ell(\mathbf X)
+ =\int \ell(\mathbf x)\,\widetilde p(\mathbf x)\,d\mathbf x
+ =\int \ell(\mathbf x)\frac{\widetilde p(\mathbf x)}{p(\mathbf x)}p(\mathbf x)\,d\mathbf x\\
+ &=\int \ell(\mathbf x)
+ \frac{\widetilde p\bigl(x_k\mid x_{\widetilde{\pa}(k)}\bigr)}
+ {p\bigl(x_k\mid x_{\pa(k)}\bigr)}p(\mathbf x)\,d\mathbf x.
+ \end{aligned}
+\]
+为简便起见，本节始终假定密度严格为正。给定从分布 $P^{\mathfrak C}_{\mathbf X}$ 抽取的样本 $\mathbf X^1,\ldots,\mathbf X^n$，可通过对观测重新加权，为 $\xi=\widetilde{\EE}\,\ell(\mathbf X)$ 构造估计量
+\begin{equation}
+ \widehat\xi_n\coloneqq\frac1n\sum_{i=1}^n\ell(\mathbf X^i)
+ \frac{\widetilde p\left(X_k^i\mid\mathbf X^i_{\widetilde{\pa}(k)}\right)}
+ {p\left(X_k^i\mid\mathbf X^i_{\pa(k)}\right)}
+ =\frac1n\sum_{i=1}^n\ell(\mathbf X^i)w_i.
+ \tag{8.2}
+\end{equation}
+这里，权重 $w_i$ 定义为两个条件密度之比。在 $P^{\widetilde{\mathfrak C}}_{\mathbf X}$ 下具有较高似然的数据点，也就是那些“有可能从”我们关心的新分布中抽取的数据点，会获得较大的权重，对估计值 $\widehat\xi_n$ 的贡献也比小权重数据点更大。例如，以下三种情形都会出现这类估计量。
+
+\begin{enumerate}[label=(\roman*)]
+ \item 假设 $\mathbf X=(Y,Z)$ 只包含一个目标变量 $Y$ 和一个因果协变量 $Z$，即 $Z\to Y$。考虑对 $Z$ 的干预，并令 $\ell(\mathbf X)=\ell((Z,Y))=Y$。此时，估计量 (8.2) 化为
+ \begin{equation}
+  \widehat\xi_n\coloneqq\frac1n\sum_{i=1}^nY^i\frac{\widetilde p(Z^i)}{p(Z^i)},
+  \tag{8.3}
+ \end{equation}
+ 这就是 \textbf{Horvitz–Thompson 估计量}［Horvitz and Thompson, 1952］。这一设定对应于协变量偏移假设［例如 Shimodaira, 2000；Quionero-Candela et al., 2009；Ben-David et al., 2010］，亦见第 5.2 节和第 8.3 节。估计量 (8.3) 是加权似然估计量的一个例子。
+ \item 对于 $\mathbf X=Z$，可以利用从 $p$ 抽取的数据，估计 $\widetilde p$ 下的期望 $\widetilde{\EE}[\ell(Z)]$。此时，式 (8.2) 化为
+ \[
+  \widehat\xi_n\coloneqq\frac1n\sum_{i=1}^n\ell(Z^i)\frac{\widetilde p(Z^i)}{p(Z^i)}.
+ \]
+ 这一公式称为\textbf{重要性抽样（importance sampling）}［例如 MacKay, 2002，第 29.2 节］。即使 $p$ 和 $\widetilde p$ 只已知到相差一个常数因子，也可以相应调整该公式。
+ \item 下面将在回合式强化学习中应用式 (8.2)，并稍作详细介绍。
+\end{enumerate}
+
+\subsection{回合式强化学习}
+\label{sec:ch08-episodic}
+
+\textbf{强化学习（reinforcement learning）}［例如 Sutton and Barto, 2015］对智能体在世界中采取动作的行为进行建模。根据世界当前的状态 $S_t$ 和动作 $A_t$，世界状态可以按\textbf{马尔可夫决策过程（Markov decision process）}发生变化［例如 Bellman, 1957］。也就是说，进入新状态 $s$ 的概率 $P(S_{t+1}=s)$，只依赖当前状态 $S_t$ 与动作 $A_t$。此外，智能体还会获得某个奖励 $R_{t+1}$，它依赖于 $S_t$、$A_t$ 和 $S_{t+1}$。所有奖励的总和有时称为\textbf{回报（return）}，记为 $Y\coloneqq\sum_tR_t$。智能体并不知道回报 $Y$ 如何依赖状态与动作，而是尝试改进自己的\textbf{策略（strategy）}$(a,s)\mapsto\pi(a\mid s)\coloneqq P(A_t=a\mid S_t=s)$，即根据世界状态中可观测的部分，选择动作的条件分布。在\textbf{回合式强化学习（episodic reinforcement learning）}中，采取有限次动作之后，系统状态便会重置，见图 8.3。第 8.2.3 节将讨论二十一点纸牌游戏的例子。在图 8.3 的例子中，玩家作出 $K=3$ 次决策后，纸牌会被重新洗牌，随后开始新的回合。
+
+\input{figures/ch08_figure_8_3}
+
+假设我们按照某个策略 $(a,s)\mapsto\pi(a\mid s)$ 进行了 $n$ 局游戏，每一局就是一个回合。函数 $\pi$ 不依赖此前已经进行了多少次“行动”，只取决于状态的值。只要这一策略为每个动作都赋予正概率，就可以利用式 (8.2) 估计另一策略 $(a,s)\mapsto\widetilde\pi(a\mid s)$ 的表现：
+\begin{equation}
+ \widehat\xi_{n,\mathrm{ERL}}\coloneqq\frac1n\sum_{i=1}^nY^i
+ \frac{\prod_{j=1}^K\widetilde\pi(A_j^i\mid S_j^i)}
+ {\prod_{j=1}^K\pi(A_j^i\mid S_j^i)}.
+ \tag{8.4}
+\end{equation}
+这可以视为\textbf{异策略评估（off-policy evaluation）}的一种 Monte Carlo 方法［Sutton and Barto, 2015，第 5.5 节］。实践中，估计量 (8.4) 的方差往往很大；在连续情形下，方差甚至可能为无穷。有人建议重新加权［Sutton and Barto, 2015］，或者舍弃最大的（五个）权重［Bottou et al., 2013］，以增加偏差为代价来降低方差。Bottou et al.［2013］还在密度参数化的情形下计算了置信区间与梯度；若要搜索最优策略，后者十分重要。
+
+下面简要讨论两个例子，其中，利用因果结构能够改善学习过程的\emph{统计}表现。这两个例子有助于理解强化学习与因果性之间的关系。

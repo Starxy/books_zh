@@ -1,0 +1,164 @@
+% 原章第59—63页：附录5.B与全部9道习题；原第64页为出版商标志页。
+\section*{附录 5.B\quad 分块 HSIC 的渐近零分布}
+\phantomsection\addcontentsline{toc}{section}{附录 5.B：分块 HSIC 的渐近零分布}
+\markright{附录 5.B}
+
+注意，
+\begin{equation}
+\Var(\mathrm{BHSIC})=\frac Sn\Var(\widehat c_b).
+\tag{5.B.1}
+\end{equation}
+由于 $\mathrm{var}(S\widehat c_b)\approx\mathrm{var}(W)$，且 $W$ 的分布为
+$\sum_{i=1}^{\infty}\sum_{j=1}^{\infty}\lambda_i\eta_j(N_{i,j}^2-1)$，得到
+\begin{equation}
+\Var(\widehat c_b)\approx\frac1{S^2}\mathrm{var}(W).
+\tag{5.B.2}
+\end{equation}
+众所周知，$\chi_{(1)}^2$ 的方差为 2。由于 $N_{i,j}$ 独立同分布于 $N(0,1)$，得到
+\begin{equation}
+\Var(W)=2\sum_{i=1}^{\infty}\sum_{j=1}^{\infty}\lambda_i^2\eta_j^2.
+\tag{5.B.3}
+\end{equation}
+令 $\widehat K_x(X,X')$ 和 $\widehat K_y(Y,Y')$ 为中心化核矩阵。于是
+\begin{equation}
+\tr(\widehat K_x^2)\to\sum_{i=1}^{\infty}\lambda_i^2,
+\qquad\text{且}\qquad
+\tr(\widehat K_y^2)\to\sum_{j=1}^{\infty}\eta_j^2.
+\tag{5.B.4}
+\end{equation}
+回顾以下关系：
+\begin{equation}
+\begin{aligned}
+\tr(\widehat K_x^2)
+&=\sum_{i=1}^S\sum_{j=1}^Sk_x^2(x_i,x_j)
+=S^2\frac1{S^2}\sum_{i=1}^S\sum_{j=1}^Sk_x^2(x_i,x_j)\\
+&\to S^2E_{XX'}[\widehat k_x^2(X,X')],\\
+\text{以及}\qquad
+\tr(\widehat K_y^2)&\to S^2E_{YY'}[\widehat k_y^2(Y,Y')].
+\end{aligned}
+\tag{5.B.5}
+\end{equation}
+将式 (5.B.4) 和 (5.B.5) 代入式 (5.B.3)，得到
+\begin{equation}
+\mathrm{var}(W)=2S^4E_{XX'}[\widehat k_x^2(X,X')]E_{YY'}[\widehat k_y^2(Y,Y')].
+\tag{5.B.6}
+\end{equation}
+结合式 (5.B.1) 和 (5.B.2)，得到
+\begin{equation}
+\Var(\mathrm{BHSIC})=\frac1{ns}\Var(W).
+\tag{5.B.7}
+\end{equation}
+因此，定义
+\begin{equation}
+T_{BI}=\sqrt{ns}\frac{\mathrm{BHSIC}}{\Var(W)}.
+\tag{5.B.8}
+\end{equation}
+在相互独立的零假设下，$T_{BI}$ 渐近服从 $N(0,1)$ 分布。
+
+\section*{习题}
+\phantomsection\addcontentsline{toc}{section}{习题}
+\markright{习题}
+\begin{enumerate}[label=\textbf{习题 \arabic*.},leftmargin=4.7em]
+\item 假定 $k$ 为线性核，$P$ 为正态分布 $N(0,1)$，$Q$ 为二项分布。计算最大均值差异 $\mathrm{MMD}_k(P,Q)$。
+
+\item 令 $A$ 为 $n\times n$ 维矩阵，$B$ 为 $m\times m$ 维矩阵。证明
+\[
+|A\otimes B|=|A|^n|B|^m,\qquad
+\Tr(A\otimes B)=\Tr(A)\Tr(B),
+\]
+其中，$\Tr$ 表示矩阵的迹。
+
+\item 证明
+\[
+\langle A,B\rangle_{\mathrm{HS}}
+=\sum_{i\in I}\sum_{j\in J}\langle Av_j,e_i\rangle_F\langle Bv_j,e_i\rangle_F.
+\]
+
+\item 证明
+\[
+\sum_{j=1}^n\sum_{l=1}^n\sum_{i\ne(j,l)}^nk_x(x_j,x_i)k_y(y_i,y_l)
+=1_n^T\widehat K_x\widehat K_y1_n,
+\]
+以及
+\[
+\sum_{j=1}^n\sum_{i\ne j}k_x(x_j,x_i)k_y(y_i,y_j)
+=\tr(\widehat K_x\widehat K_y).
+\]
+
+\item 证明
+\[
+\begin{aligned}
+&\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)\sum_{(j,l)\in\mathrm i_2^n}k_y(y_j,y_l)\\
+&=\sum_{(i,q,j)\in\mathrm i_3^n}k_x(x_i,x_q)k_y(y_j,y_i)\\
+&\quad+\sum_{(i,q,l)\in\mathrm i_3^n}k_x(x_i,x_q)k_y(y_q,y_l)\\
+&\quad+\sum_{(i,j,l)\in\mathrm i_3^n}k_x(x_i,x_j)k_y(y_j,y_l)\\
+&\quad+\sum_{(q,j,l)\in\mathrm i_3^n}k_x(x_l,x_q)k_y(y_j,y_l)\\
+&\quad+\sum_{(i,j,q,l)\in\mathrm i_4^n}k_x(x_i,x_q)k_y(y_j,y_l)\\
+&\quad+\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)k_y(y_i,y_q)\\
+&\quad+\sum_{(i,q)\in\mathrm i_2^n}k_x(x_i,x_q)k_y(y_i,y_q).
+\end{aligned}
+\]
+
+\item 证明正文中的式 (5.92)—(5.94)：
+\begin{equation}
+\begin{aligned}
+\widehat\Delta_i
+={}&\left[W_i^TX_0(\sigma_i^2X_0^TX_0)^{-1}X_0^TW_i\right]^{-1}
+W_i^TX_0(\sigma_i^2X_0^TX_0)^{-1}X_0^Ty_i\\
+={}&\left[W_i^TX_0(X_0^TX_0)^{-1}X_0^TW_i\right]^{-1}
+W_i^TX_0(X_0^TX_0)^{-1}X_0^Ty_i,
+\end{aligned}
+\tag{5.92}
+\end{equation}
+以及
+\begin{equation}
+\Lambda_i=\mathrm{var}(\widehat\Delta_i)
+=N\widehat\sigma_i^2\left[W_i^TX_0(X_0^TX_0)^{-1}X_0^TW_i\right]^{-1},
+\tag{5.93}
+\end{equation}
+其中，$\widehat\sigma_i^2$ 估计为
+\begin{equation}
+\widehat\sigma_i^2=\frac1{NJ-m_iJ+1-k_i}
+(y_i-W_i\widehat\Delta_i)^T(y_i-W_i\widehat\Delta_i),
+\tag{5.94}
+\end{equation}
+$m_i$ 与 $k_i$ 分别为第 $i$ 个方程中所含的内生变量和外生变量数目。
+
+\item 证明正文中问题 (5.99) 的最优解为
+\[
+\begin{aligned}
+\widehat\gamma_i&=\left[A_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}A_2(j)\right]^{-1}D,\\
+D&=D_1-\sum_{j=1}^JB_1(j)(B_2(j)+\rho I)^{-1}D_2(j),\\
+\eta_i^{(j)}&=[B_2(j)+\rho I]^{-1}[D_2(j)-A_2(j)\widehat\gamma_i],
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+A_1&=\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TY_{-i}^{(j)},\\
+A_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TY_{-i}^{(j)},\\
+B_1(j)&=(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+B_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^TX,\\
+D_1&=\sum_{j=1}^J(Y_{-i}^{(j)})^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}
++\rho(Z_{i\gamma}^{(l)}-\mu_\gamma^{(l)}),\\
+D_2(j)&=X^TX(\sigma_{ii}^{(j)}X^TX)^{-1}X^Ty_i^{(j)}
++\rho(Z_i^{(j)(l)}-\mu_j^{(l)}).
+\end{aligned}
+\]
+
+\item 证明问题 (5.101) 的最优解为
+\[
+Z_{\lambda i}^{(l+1)}=\sgn(\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)})
+\left(|\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}|-\frac\lambda\rho\right)_+,
+\]
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+
+\item 证明式 (5.105) 推出（习题 8）
+\[
+\left(1+\frac{\lambda\sqrt J}{\rho\lVert Z_{ki}\rVert_2}\right)\lVert Z_{ki}\rVert_2
+=\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2.
+\]
+\end{enumerate}

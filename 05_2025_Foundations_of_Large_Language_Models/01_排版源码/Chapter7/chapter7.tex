@@ -1,0 +1,1015 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+%----------------------------------------------------------------------------------------
+% Natural Language Processing: Neural Networks and Large Language Models
+%
+% Copyright 2021-2026
+% Tong Xiao (xiaotong@mail.neu.edu.cn) and Jingbo Zhu (zhujingbo@mail.neu.edu.cn)
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%    CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+%\setcounter{chapter}{6}
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 7
+%----------------------------------------------------------------------------------------
+
+\chapter{预训练}
+
+\thispagestyle{chapterurl} % add urls to the header
+
+\noindent Transformer 等神经序列模型的发展，以及大规模自监督学习（self-supervised learning）的进步，为通用语言理解与生成打开了大门。这一成就在很大程度上得益于预训练（pre-training）：从众多基于神经网络的系统中提取共同组件，并利用自监督信号，在海量无标注数据上训练这些组件。得到的预训练模型可以作为基础模型（foundation model），通过微调（fine-tuning）或提示方法（prompting）便可方便地适配不同任务。由此，自然语言处理（natural language processing，NLP）的范式发生了根本转变。在许多情况下，无须再为特定任务开展大规模监督学习（supervised learning），只需适配已经预训练好的基础模型。
+
+尽管预训练在近年的 NLP 研究中受到广泛关注，但这一概念可追溯到数十年前深度学习发展的早期。例如，对深度学习系统进行预训练的早期尝试，包括对循环神经网络（RNN）、深度前馈网络、自编码器等开展无监督学习（unsupervised learning）~\cite{schmidhuber-etal:2015deep}。进入现代深度学习时期，预训练再次兴起，其中一个推动因素是对各类词嵌入（word embedding）模型开展大规模无监督训练~\cite{Mikolov-et-al:2013distributed,pennington2014glove}。同期，预训练也在计算机视觉领域引起了广泛兴趣：先在 ImageNet 等规模相对较大的有标注数据集上训练骨干模型，再将其应用于不同的下游任务（downstream task）~\cite{he-etal:2019rethinking,zoph-etal:2020rethinking}。NLP 中大规模预训练研究的起点，是利用自监督学习构建语言模型。这一模型家族包含 \mindex{BERT}~\cite{devlin-etal:2019bert} 和 \mindex{GPT}~\cite{brown-etal:2020language} 等著名模型，它们的共同思路是：在海量文本上训练模型预测被掩码的词或后续的词，从而获得通用语言理解与生成能力。尽管方法简单，得到的模型却展现出捕捉语言结构的出色能力，即使训练时并未显式要求它们这样做。预训练任务的通用性使这些系统在众多 NLP 问题上表现优异，甚至超越了此前最先进的监督学习系统。近来，预训练大语言模型（large language model，LLM）取得了更大的成功，展现出迈向更通用人工智能的令人振奋的前景~\cite{bubeck-etal:2023sparks}。
+
+本章讨论 NLP 背景下的预训练概念。首先概括介绍预训练方法及其应用，然后以 BERT 为例，说明如何通过一种称为\mindex{掩码语言建模}（masked language modeling，MLM）的自监督任务来训练序列模型，接着讨论将预训练序列模型适配到各类 NLP 任务的方法。由于本章主要关注预训练范式，生成式大语言模型的详细讨论将留待后续章节。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{NLP 中的预训练}
+
+\noindent NLP 中的预训练通常涉及两类任务：序列建模（sequence modeling，也称序列编码，sequence encoding）和序列生成（sequence generation）。尽管这些任务的形式不同，为简便起见，这里用一个统一模型来描述，定义如下：
+\begin{eqnarray}
+\mathbf{o} & = & g(x_0,x_1,\cdots,x_m;\theta) \nonumber \\
+           & = & g_{\theta}(x_0,x_1,\cdots,x_m),
+\end{eqnarray}
+
+\noindent 其中，$\{x_0, x_1, \dots, x_m\}$ 表示输入词元（token）序列\footnote{这里假定词元是经词元化（tokenization）得到的文本基本单位。有时本书会交替使用\textit{词元}和\textit{词}这两个术语，尽管它们在 NLP 中的含义密切相关，却略有区别。}，$x_0$ 表示添加在序列开头的特殊符号（$\langle s \rangle$ 或 $\mathbf{[\mathrm{CLS}]}$），$g(\cdot;\theta)$（也写作 $g_{\theta}(\cdot)$）表示参数为 $\theta$ 的神经网络，$\mathbf{o}$ 表示神经网络的输出。输出 $\mathbf{o}$ 的形式因具体问题而异。例如，在语言建模等词元预测任务中，$\mathbf{o}$ 是词表（vocabulary）上的分布；在序列编码任务中，$\mathbf{o}$ 是输入序列的表示，通常写为一个实值向量序列。
+
+这里需要考虑两个基本方面：
+
+\begin{itemize}
+\item \vspace{0.5em} 针对预训练任务优化 $\theta$。与 NLP 中的常规学习问题不同，预训练并不预先假定模型将应用于哪些具体下游任务，而是旨在训练一个能够泛化到多种任务的模型。
+\item \vspace{0.3em} 将预训练模型 $g_{\hat{\theta}}(\cdot)$ 应用于下游任务。要使模型适配这些具体任务，需要用有标注数据微调参数 $\hat{\theta}$，或以任务描述作为提示来引导模型。
+\end{itemize}
+\vspace{0.5em}
+
+本节讨论处理这两个方面的基本概念。
+
+\subsection{无监督、监督与自监督预训练}
+
+\noindent 在深度学习中，预训练是指在神经网络进一步接受微调并应用于下游任务之前，对其进行优化的过程。这一方法基于如下假设：在一个任务上预训练的模型，可以有效适配另一个任务。因此，对于标注数据有限的任务，无须从头训练一个深而复杂的神经网络，而可以利用监督信号更易获取的任务。这样既减少了对特定任务人工标注的依赖，也使我们能够开发不局限于某个具体问题的更通用模型。
+
+在深度学习推动神经网络复兴的时期，许多早期预训练尝试聚焦于\mindex{无监督学习}。这些方法使用与具体目标任务没有直接关联的准则来优化神经网络参数。例如，可以训练模型，使各层输入向量的重构交叉熵最小化~\cite{bengio-etal:2006greedy}。无监督预训练通常用作监督学习之前的准备步骤，具有多方面优势，例如有助于找到更好的局部极小值，并在训练中起到正则化作用~\cite{erhan-etal:2010does}。这些益处使后续的监督学习阶段更容易、更稳定。
+
+第二类方法是在\mindex{监督学习}任务上对神经网络进行预训练。例如，考虑一个将输入序列编码为向量表示的序列模型。预训练时，将该模型与一个分类层组合，在初始监督任务上训练，例如情感分析（判断句子的情感是正面还是负面）。要将预训练序列模型适配到下游任务（例如判断序列表达的是主观意见还是客观事实），可以把初始分类层替换为面向目标任务的新分类层。通常，需要使用该任务的标注数据微调整个组合模型的参数，以优化性能，随后用微调后的模型对新序列分类。监督预训练的一个主要优势是能够直接契合标准监督学习范式。然而，随着模型复杂度增加，对标注数据的需求也相应增长；在缺乏大规模有标注数据集时，这种预训练方法便难以实施。
+
+第三类方法是\mindex{自监督学习}。在这一范式中，神经网络训练所用的监督信号来自数据本身，而非人工标注。通常的做法是直接从无标注数据中构造训练任务，例如预测输入中缺失的部分。尽管自监督学习近来已成为 NLP 的主流方法，其基本思想与\mindex{自训练}（self-training）等较早的机器学习概念也有相似之处。在自训练中，模型需要少量种子数据来构建初始分类器，再由该分类器为无标注数据生成伪标签。随后利用这些伪标签反复改进模型，使其通过自举迭代提升。这种方法已成功应用于词义消歧~\cite{yarowsky:1995unsupervised}和文档分类~\cite{blum-and-tom:1998combining}等 NLP 领域。然而，与标准自训练不同，NLP 中的自监督预训练不依赖初始模型来赋予离散伪标签，而是直接从文本中提取监督信号，并从头训练整个模型。一个著名例子是：将文本中的部分词元掩码，要求序列模型根据周围上下文预测这些词元。这使深度神经网络的大规模自监督学习成为可能，并推动预训练在许多理解、生成和推理任务中取得成功。
+
+图~\ref{fig:unsupervised-supervised-self-supervised-pre-training} 对上述三类预训练方法作了比较。自监督预训练取得了巨大成功，目前大多数最先进的 NLP 模型都基于这一范式。因此，本章及本书其余部分将重点讨论自监督预训练，说明如何通过自监督对序列模型进行预训练，以及如何应用得到的预训练模型。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-unsupervised-supervised-selfsupervised-pre-training}
+\caption{无监督、监督与自监督预训练示意图。无监督预训练在大规模无标注数据上进行，可以视为为后续优化提供良好起点的准备步骤，不过预训练之后，仍需投入相当多的工作，用有标注数据继续训练模型。监督预训练的基本假设是，不同的（监督）学习任务彼此相关。因此，可以先在一个任务上训练模型，再经过一定的训练或调优，将得到的模型迁移到另一个任务。自监督预训练通过自监督在大规模无标注数据上预训练模型。这种方式能够有效训练模型，并可通过微调或提示方法将其高效适配到新任务。}
+\label{fig:unsupervised-supervised-self-supervised-pre-training}
+\end{figure}
+
+\subsection{预训练模型的适配}
+
+\noindent 如前所述，NLP 预训练广泛采用两大类模型。
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{序列编码模型}（sequence encoding model）。给定一个词或词元序列，序列编码模型将其表示为一个实值向量或一个向量序列，从而获得该序列的表示。这种表示通常作为另一个模型的输入，例如句子分类系统。
+\item \vspace{0.3em} \mindex{序列生成模型}（sequence generation model）。在 NLP 中，序列生成通常指根据给定上下文生成词元序列的问题。\textit{上下文}一词在不同应用中的含义不同。例如，在语言建模中它指前面的词元，在机器翻译中则指源语言序列\footnote{更准确地说，在机器翻译的自回归解码（autoregressive decoding）中，每个目标语言词元的生成同时依据此前的目标词元和源语言序列。}。
+\end{itemize}
+\vspace{0.5em}
+
+预训练完成后，将这些模型应用于下游任务需要不同的技术。这里重点介绍以下两种方法。
+
+\subsubsection{预训练模型的微调}
+\label{sec:fine-tuning-encoders}
+
+\noindent 对于经过序列编码预训练的模型，微调是一种常见的适配方法。设 $\mathrm{Encode}_{\theta}(\cdot)$ 表示参数为 $\theta$ 的编码器（encoder），例如，$\mathrm{Encode}_{\theta}(\cdot)$ 可以是标准 Transformer 编码器。假定已经以某种方式预训练该模型，得到了最优参数 $\hat{\theta}$，便可用它对输入序列进行编码：
+\begin{eqnarray}
+\mathbf{H} & = & \mathrm{Encode}_{\hat{\theta}}(\mathbf{x}),
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{x}$ 是输入序列 $\{x_0, \cdots, x_m\}$，$\mathbf{H}$ 是输出表示，为实值向量序列 $\{\mathbf{h}_0,\mathbf{h}_1,\cdots,\mathbf{h}_m\}$。编码器本身并不构成独立的 NLP 系统，因而常作为组件集成到更大的系统中。例如，考虑一个文本分类问题：识别给定文本的情感极性（正面、负面或中性等）。在编码器上方放置一个分类器，即可构建文本分类系统。设 $\mathrm{Classify}_{\omega}(\cdot)$ 是参数为 $\omega$ 的神经网络，则文本分类模型可以写为
+\begin{eqnarray}
+\mathrm{Pr}_{\omega,\hat{\theta}}(\cdot|\mathbf{x}) & = & \mathrm{Classify}_{\omega}(\mathbf{H}) \nonumber \\
+& = & \mathrm{Classify}_{\omega}(\mathrm{Encode}_{\hat{\theta}}(\mathbf{x})).
+\end{eqnarray}
+
+\noindent 这里，$\mathrm{Pr}_{\omega,\hat{\theta}}(\cdot|\mathbf{x})$ 是标签集合 $\{\mathrm{positive}, \mathrm{negative}, \mathrm{neutral}\}$ 上的概率分布，从中选取概率最大的标签作为输出。为使记号简洁，用 $F_{\omega,\hat{\theta}}(\cdot)$ 表示 $\mathrm{Classify}_{\omega}(\mathrm{Encode}_{\hat{\theta}}(\cdot))$。
+
+由于模型参数 $\omega$ 和 $\hat{\theta}$ 尚未针对目标分类任务进行显式优化，不能直接使用这一组合模型，而应对其作相应调整，使其适配任务。一种典型方法是利用下游任务提供的显式标签微调模型。可以把这看作标准监督学习任务，在有标注数据集上训练 $F_{\omega,\hat{\theta}}(\cdot)$。微调过程将得到进一步优化的参数 $\tilde{\omega}$ 和 $\tilde{\theta}$。另一种选择是冻结编码器参数 $\hat{\theta}$，使其保持预训练后的状态，仅优化 $\omega$。这样可以高效适配分类器，使其与预训练编码器有效协同工作。
+
+得到微调后的模型后，就可以用它对新文本分类。例如，假设旅游网站上有这样一条评论：
+
+\begin{center}
+%\vspace{0.5em}
+I love the food here. It's amazing!
+\vspace{0.5em}
+\end{center}
+
+\noindent 首先对这段文本进行词元化\footnote{文本的词元化方式有很多。一种最简单的方式是将其切分为英语单词和标点符号 $\{\textrm{I}, \textrm{love}, \textrm{the}, \textrm{food}, \textrm{here}, \textrm{.}, \textrm{It}, \textrm{'s}, \textrm{amazing}, \textrm{!}\}$}，再将词元序列 $\mathbf{x}_{\mathrm{new}}$ 输入微调后的模型 $F_{\tilde{\omega},\tilde{\theta}}(\cdot)$。模型生成如下类别分布：
+\begin{eqnarray}
+F_{\tilde{\omega},\tilde{\theta}}(\mathbf{x}_{\mathrm{new}}) & = & \begin{bmatrix} \Pr(\mathrm{positive}|\mathbf{x}_{\mathrm{new}}) & \Pr(\mathrm{negative}|\mathbf{x}_{\mathrm{new}}) & \Pr(\mathrm{neutral}|\mathbf{x}_{\mathrm{new}})\end{bmatrix}.
+\end{eqnarray}
+
+\noindent 接着选取概率最大的标签作为输出。在这个例子中，该标签为 $\mathrm{positive}$。
+
+一般而言，微调所用标注数据量远小于预训练数据量，因此微调的计算开销更低。这使预训练模型的适配在实践中十分高效：给定一个预训练模型和一个下游任务，只需收集一些标注数据，并在这些数据上小幅调整模型参数即可。关于微调的更详细讨论，见第~\ref{sec:pre-training-application} 节。
+
+\subsubsection{预训练模型的提示方法}
+
+\noindent 序列生成模型通常可以独立处理问答、机器翻译等语言生成问题，无须附加模块；这一点与序列编码模型不同。因此，可以直接把这类模型作为完整系统，在下游任务上微调。例如，在一些双语数据上微调预训练的编码器—解码器（encoder-decoder）多语言模型，可以改善其在某个特定翻译任务上的性能。
+
+在各类序列生成模型中，一个引人注目的例子是在极大规模数据上训练的大语言模型。这些模型的训练任务很简单：根据前面的词元预测下一个词元。词元预测虽是传统语言建模长期采用的简单任务，但当其规模足够大时，模型便能获得广泛的语言知识和世界知识。因此，预训练大语言模型展现出卓越的词元预测能力，使得许多 NLP 任务可以通过提示转化为简单的文本生成问题。例如，可以把上述文本分类问题改写为如下文本生成任务。
+
+\begin{center}
+\vspace{0.5em}
+I love the food here. It's amazing! I'm \underline{\hspace{3em}}
+\vspace{0.5em}
+\end{center}
+
+\noindent 这里，\underline{\hspace{1em}} 表示希望预测的词或短语，称为\mindex{补全文本}（completion）。如果预测的词是 \textit{happy}、\textit{glad}、\textit{satisfied} 或其他相关的正面词语，就可以把文本归为 $\mathrm{positive}$ 类。这个例子展示了一种简单的提示方法：将输入文本与 \textit{I'm} 拼接，构成提示（prompt），再利用补全文本来确定原文本的标签。
+
+大语言模型具有很强的语言理解与生成能力，因此还可以通过提示引导它们执行更复杂的任务。下面的例子展示了如何指示大语言模型进行情感极性分类：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+假设文本的情感极性是从 \{positive, negative, neutral\} 中选取的标签。请识别输入文本的情感极性。
+
+\vspace{0.2cm}
+
+{\color{blue} 输入}：I love the food here. It's amazing!
+
+\vspace{0.2cm}
+
+{\color{red} 情感极性}：\underline{\hspace{3em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 前两句描述任务。{\color{blue} 输入}和{\color{red} 情感极性}分别标示输入与输出。希望模型在补全文本的同时，给出正确的情感极性标签。利用基于指令的提示，可以使大语言模型适配 NLP 问题，而无须额外训练。
+
+这个例子也展示了大语言模型的零样本学习（zero-shot learning）能力，即执行训练期间未见过的任务。从神经网络中激发新能力的另一种方法是少样本学习（few-shot learning），通常通过\mindex{上下文学习}（in-context learning，\mindex{ICL}）实现。具体而言，在提示中加入一些样本，展示输入与输出如何对应。这些样本称为\mindex{示例}（demonstration），用于教会大语言模型如何执行任务。下面给出一个包含示例的提示：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+假设文本的情感极性是从 \{positive, negative, neutral\} 中选取的标签。请识别输入文本的情感极性。
+
+\vspace{0.2cm}
+
+{\color{blue} 输入}：The traffic is terrible during rush hours, making it difficult to reach the airport on time.
+
+\vspace{0.2cm}
+
+{\color{red} 情感极性}：Negative
+
+\vspace{0.2cm}
+
+{\color{blue} 输入}：The weather here is wonderful.
+
+\vspace{0.2cm}
+
+{\color{red} 情感极性}：Positive
+
+\vspace{0.2cm}
+
+{\color{blue} 输入}：I love the food here. It's amazing!
+
+\vspace{0.2cm}
+
+{\color{red} 情感极性}：\underline{\hspace{3em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+提示方法与上下文学习在近来大语言模型的兴起中发挥着重要作用。第 \ChapterLLMPrompting 章将更详细地讨论这些技术。不过，尽管提示方法能够有效适配大语言模型，仍需进行一定的调优，才能确保模型准确遵循指令。此外，微调过程对于使模型价值观与人类价值观对齐也至关重要。有关微调的更详细讨论，见第 \ChapterLLMTuning 章。
+
+\section{自监督预训练任务}
+
+\noindent 本节考察不同神经网络架构的自监督预训练方法，包括仅解码器（decoder-only）、仅编码器（encoder-only）和编码器—解码器（encoder-decoder）架构。由于 Transformer 是 NLP 中大多数预训练模型的基础，这里只讨论 Transformer。不过，预训练涵盖的范围很广，为保持本节简洁，只简要介绍基本方法。
+
+\subsection{仅解码器预训练}
+\label{sec:decoder-only-pre-training}
+
+\noindent 仅解码器架构已广泛用于构建语言模型~\cite{radford-etal:2018improving}。例如，只需去掉 Transformer 解码器（decoder）的交叉注意力（cross-attention）子层，即可将其用作语言模型。这种模型根据前面的词元，预测下一个词元在词表上的概率分布，并将概率最大的词元作为预测输出。与传统语言建模一样，训练该模型的标准方式，是在词元序列集合上最小化某个损失函数（loss function）。
+
+设 $\mathrm{Decoder}_{\theta}(\cdot)$ 表示参数为 $\theta$ 的解码器。在每个位置 $i$，解码器根据此前的上下文 $\{x_0, \dots, x_i\}$，生成下一个词元的分布，记为 $\mathrm{Pr}_{\theta}(\cdot|x_0, \dots, x_i)$（简记为 $\mathbf{p}_{i+1}^{\theta}$）。假设已知同一位置的标准目标分布，记为 $\mathbf{p}_{i+1}^{\mathrm{gold}}$。对于语言建模，可以将 $\mathbf{p}_{i+1}^{\mathrm{gold}}$ 看作正确的下一个词的独热表示（one-hot representation）。然后定义损失函数 $\mathcal{L}(\mathbf{p}_{i+1}^{\theta}, \mathbf{p}_{i+1}^{\mathrm{gold}})$，度量模型预测与目标分布之间的差异。NLP 中通常使用交叉熵（cross-entropy）损失。
+
+给定词元序列 $\mathbf{x} = \{x_0,\cdots,x_m\}$，该序列上的损失为各位置 $\{0,\cdots,m-1\}$ 上损失之和，即
+\begin{eqnarray}
+\mathrm{Loss}_{\theta}(x_0,\cdots,x_m) & = & \sum_{i=0}^{m-1} \mathcal{L}(\mathbf{p}_{i+1}^{\theta},\mathbf{p}_{i+1}^{\mathrm{gold}}) \nonumber \\
+                                       & = & \sum_{i=0}^{m-1} \mathrm{CrossEntropy}(\mathbf{p}_{i+1}^{\theta},\mathbf{p}_{i+1}^{\mathrm{gold}}),
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{CrossEntropy}(\cdot)$ 表示标准交叉熵损失，$\mathbf{p}_{i+1}^{\mathrm{gold}}$ 是 $x_{i+1}$ 的独热表示。
+
+这一损失函数可以扩展到序列集合 $\mathcal{D}$。此时，预训练的目标是找到使 $\mathcal{D}$ 上损失最小的最优参数：
+\begin{eqnarray}
+\hat{\theta} & = & \argmin_{\theta} \sum_{\mathbf{x} \in \mathcal{D}} \mathrm{Loss}_{\theta}(\mathbf{x}).
+\end{eqnarray}
+
+\noindent 注意，这一目标在数学上等价于最大似然估计（maximum likelihood estimation，MLE），也可改写为
+\begin{eqnarray}
+\hat{\theta} & = & \arg\max_{\theta} \sum_{\mathbf{x} \in \mathcal{D}} \log \mathrm{Pr}_{\theta}(\mathbf{x}) \nonumber \\
+             & = & \arg\max_{\theta} \sum_{\mathbf{x} \in \mathcal{D}} \sum_{i=0}^{|\mathbf{x}|-2} \log \mathrm{Pr}_{\theta}(x_{i+1} | x_0, \dots, x_{i}).
+\end{eqnarray}
+
+得到优化后的参数 $\hat{\theta}$，便可用预训练语言模型 $\mathrm{Decoder}_{\hat{\theta}}(\cdot)$，计算给定序列各位置上的概率 $\mathrm{Pr}_{\hat{\theta}}(x_{i+1} | x_0,\cdots,x_i)$。
+
+\subsection{仅编码器预训练}
+\label{sec:encoder-only-pre-training}
+
+\noindent 按第~\ref{sec:fine-tuning-encoders} 节的定义，编码器 $\mathrm{Encode}_{\theta}(\cdot)$ 是一个函数，读取词元序列 $\mathbf{x} = \{x_0, \dots, x_m\}$，产生向量序列 $\mathbf{H} = \{\mathbf{h}_0, \dots, \mathbf{h}_m\}$\footnote{若将 $\mathbf{h}_i$ 视为行向量，$\mathbf{H}$ 可写为 \begin{align*}\mathbf{H} & = \begin{bmatrix} \mathbf{h}_0 \\ \vdots \\ \mathbf{h}_m \end{bmatrix}.\end{align*}}。训练这样的模型并不直接，因为没有标准答案数据来衡量该函数产生的连续表示的质量。编码器预训练的一种典型方式，是将编码器与面向特定任务的输出层组合，以获得容易获取的监督信号。图~\ref{fig:pre-training-encoder-architecture} 展示了 Transformer 编码器预训练的一种常见架构，即在编码器上方添加一个 Softmax 层。这种架构与基于解码器的语言模型本质相同，其输出是一系列概率分布：
+\begin{eqnarray}
+\begin{bmatrix} \mathbf{p}_1^{\mathbf{W},\theta} \\ \vdots \\ \mathbf{p}_m^{\mathbf{W},\theta} \end{bmatrix} & = &  \mathrm{Softmax}_{\mathbf{W}}(\mathrm{Encode}_{\theta}(\mathbf{x})).
+\end{eqnarray}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-pre-training-and-applying-encoders}
+\caption{Transformer 编码器的预训练（左）及预训练编码器的应用（右）。预训练阶段，通过自监督共同训练编码器与 Softmax 层。应用阶段，去掉 Softmax 层，将预训练编码器与预测网络组合，以处理具体问题。通常，为更好地适配这些任务，还会用有标注数据对系统进行微调。}
+\label{fig:pre-training-encoder-architecture}
+\end{figure}
+
+\noindent 这里，$\mathbf{p}_i^{\mathbf{W},\theta}$ 是位置 $i$ 上的输出分布 $\Pr(\cdot|\mathbf{x})$。用 $\mathrm{Softmax}_{\mathbf{W}}(\cdot)$ 表示参数为 $\mathbf{W}$ 的 Softmax 层，即 $\mathrm{Softmax}_{\mathbf{W}}(\mathbf{H}) = \mathrm{Softmax}(\mathbf{H} \cdot \mathbf{W})$。为使记号简洁，有时会省略各概率分布所带的上标 $\mathbf{W}$ 和 $\theta$。
+
+这种模型与标准语言模型的区别在于，输出 $\mathbf{p}_i$ 在编码器预训练和语言建模中的含义不同。在语言建模中，$\mathbf{p}_i$ 是下一个词元的预测概率分布，遵循自回归解码过程：语言模型只观察到位置 $i$ 为止的词，再预测下一个词。而在编码器预训练中，模型一次就能观察整个序列；如果已经看到某个词元，再预测它就没有难度了。
+
+\subsubsection{掩码语言建模}
+
+\noindent 编码器预训练中最流行的方法之一是\mindex{掩码语言建模}，它是著名的 BERT 模型的基础~\cite{devlin-etal:2019bert}。掩码语言建模的思路是：将输入序列中的部分词元掩码，构造具有挑战性的预测任务，并训练模型预测被掩码的词元。从这个意义上说，传统语言建模问题（有时也称\mindex{因果语言建模}，causal language modeling）是掩码语言建模的特例：在每个位置，将右侧上下文中的词元掩码，再用左侧上下文预测该位置的词元。不过，因果语言建模只用左侧上下文预测词元，模型无法访问右侧上下文中的词元；掩码语言建模则利用所有未被掩码的词元来预测词，因此得到的是一个同时依据左右上下文进行预测的双向模型。
+
+更形式化地说，对于输入序列 $\mathbf{x}=x_0\cdots x_m$，假设将位置集合 $\mathcal{A}(\mathbf{x}) = \{i_1,\cdots,i_{u}\}$ 中的词元掩码。由此得到掩码词元序列 $\bar{\mathbf{x}}$，其中 $\mathcal{A}(\mathbf{x})$ 中每个位置的词元都被特殊符号 $[\mathrm{MASK}]$ 替换。例如，对于下面的序列
+
+\vspace{0.5em}
+\begin{center}
+The early bird catches the worm
+\end{center}
+\vspace{0.5em}
+
+\noindent 可以得到如下掩码词元序列：
+
+\vspace{0.5em}
+\begin{center}
+The $[\mathrm{MASK}]$ bird catches the $[\mathrm{MASK}]$
+\end{center}
+\vspace{0.5em}
+
+\noindent 这里掩码了词元 \textit{early} 和 \textit{worm}（即 $i_1 = 2$、$i_2 = 6$）。
+
+现在有两个序列 $\mathbf{x}$ 和 $\bar{\mathbf{x}}$。接下来优化模型，使其能够根据 $\bar{\mathbf{x}}$ 正确预测 $\mathbf{x}$。这可以看作一个类似自编码的过程，其训练目标是最大化重构概率 $\Pr(\mathbf{x}|\bar{\mathbf{x}})$。注意，$\mathbf{x}$ 与 $\bar{\mathbf{x}}$ 之间存在简单的逐位置对齐关系。由于 $\bar{\mathbf{x}}$ 中未被掩码的词元与 $\mathbf{x}$ 中同一位置的词元相同，无须考虑对这些未被掩码词元的预测。由此得到一个简化的训练目标：只最大化被掩码词元的概率。可以用最大似然估计的形式表达这一目标：
+\begin{eqnarray}
+(\widehat{\mathbf{W}},\hat{\theta}) & = & \argmax_{\mathbf{W},\theta} \sum_{\mathbf{x} \in \mathcal{D}} \sum_{i \in \mathcal{A}(\mathbf{x})} \log \mathrm{Pr}_{i}^{\mathbf{W},\theta}(x_{i}|\bar{\mathbf{x}}),
+\end{eqnarray}
+
+\noindent 也可以使用交叉熵损失来表达：
+\begin{eqnarray}
+(\widehat{\mathbf{W}},\hat{\theta}) & = & \argmin_{\mathbf{W},\theta} \sum_{\mathbf{x} \in \mathcal{D}} \sum_{i \in \mathcal{A}(\mathbf{x})} \mathrm{CrossEntropy}(\mathbf{p}_{i}^{\mathbf{W},\theta},\mathbf{p}_{i}^{\mathrm{gold}}),
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Pr}_k^{\mathbf{W},\theta}(x_k|\bar{\mathbf{x}})$ 是给定受损输入 $\bar{\mathbf{x}}$ 时，位置 $k$ 上真实词元 $x_k$ 的概率，$\mathbf{p}_{k}^{\mathbf{W},\theta}$ 是位置 $k$ 上、给定受损输入 $\bar{\mathbf{x}}$ 时的概率分布。以此前序列“\textit{the early bird catches the worm}”中两个词元被掩码的例子为例，其目标是最大化如下对数概率之和：
+\begin{eqnarray}
+\mathrm{Loss} & = & \log \Pr(x_2 = \textit{early}|\bar{\mathbf{x}}=\textit{$[\mathrm{CLS}]$ The $\underbrace{[\mathrm{MASK}]}_{\bar{x}_2}$ bird catches the $\underbrace{[\mathrm{MASK}]}_{\bar{x}_6}$}) + \nonumber \\
+  &   & \log \Pr(x_6 = \textit{worm}|\bar{\mathbf{x}}=\textit{$[\mathrm{CLS}]$ The $\underbrace{[\mathrm{MASK}]}_{\bar{x}_2}$ bird catches the $\underbrace{[\mathrm{MASK}]}_{\bar{x}_6}$}).
+\end{eqnarray}
+
+得到优化后的参数 $\widehat{\mathbf{W}}$ 和 $\hat{\theta}$ 后，可以去掉 $\widehat{\mathbf{W}}$，再对预训练编码器 $\mathrm{Encode}_{\hat{\theta}}(\cdot)$ 进一步微调，或直接将其应用于下游任务。
+
+\subsubsection{排列语言建模}
+
+\noindent 掩码语言建模虽然简单且应用广泛，却也引入了新的问题。一个缺点是采用了特殊词元 $[\mathrm{MASK}]$：它仅在训练时使用，测试时却不会出现，由此造成训练与推理（inference）之间的差异。此外，自编码过程忽略了被掩码词元之间的依赖关系。例如，在前面讨论的例子中，$x_2$（第一个被掩码词元）的预测独立于 $x_6$（第二个被掩码词元），尽管在句子上下文中，$x_6$ 和 $x_2$ 彼此依赖。
+
+预训练中的\mindex{排列语言建模}（permuted language modeling）方法能够处理这些问题~\cite{yang-etal:2019xlnet}。与因果语言建模相似，排列语言建模也按顺序预测词元。但是，因果语言建模按照文本的自然顺序（例如从左到右或从右到左）进行预测，而排列语言建模允许按任意顺序预测。这一方法很直接：先确定词元的预测顺序，再按第~\ref{sec:decoder-only-pre-training} 节所述的标准语言建模方式训练模型。注意，这种方法不改变文本中词元的实际顺序，与标准语言建模不同的只是预测词元的顺序。例如，考虑一个包含 5 个词元的序列 $x_0 x_1 x_2 x_3 x_4$。设 $\mathbf{e}_i$ 表示 $x_i$ 的嵌入（embedding，即词元嵌入与位置嵌入的组合）。在标准语言建模中，按 $x_0 \to x_1 \to x_2 \to x_3 \to x_4$ 的顺序生成该序列，其概率可以通过如下生成过程建模：
+\begin{eqnarray}
+\Pr(\mathbf{x}) & = & \Pr(x_0) \cdot \Pr(x_1|x_0) \cdot \Pr(x_2|x_0,x_1) \cdot \Pr(x_3|x_0,x_1,x_2) \cdot \nonumber \\
+                &   & \Pr(x_4|x_0,x_1,x_2,x_3).
+\end{eqnarray}
+
+\noindent 实际上，模型以词元嵌入而非词元本身作为条件。因此，上式可以改写为
+\begin{eqnarray}
+\Pr(\mathbf{x}) & = & \Pr(x_0) \cdot \Pr(x_1|\mathbf{e}_0) \cdot \Pr(x_2|\mathbf{e}_0,\mathbf{e}_1) \cdot \Pr(x_3|\mathbf{e}_0,\mathbf{e}_1, \mathbf{e}_2) \cdot \nonumber \\
+                &   & \Pr(x_4|\mathbf{e}_0, \mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3).
+\end{eqnarray}
+
+
+现在考虑一种不同的词元预测顺序：$x_0 \to x_4 \to x_2 \to x_1 \to x_3$。此时，序列生成过程可以表示为
+\begin{eqnarray}
+\Pr(\mathbf{x}) & = & \Pr(x_0) \cdot \Pr(x_4|\mathbf{e}_0) \cdot \Pr(x_2|\mathbf{e}_0, \mathbf{e}_4) \cdot \Pr(x_1|\mathbf{e}_0, \mathbf{e}_4, \mathbf{e}_2) \cdot \nonumber \\
+                &   & \Pr(x_3|\mathbf{e}_0, \mathbf{e}_4, \mathbf{e}_2, \mathbf{e}_1) \label{eq:permuted-factorization-lm-example}.
+\end{eqnarray}
+
+这种新的预测顺序允许部分词元根据更广泛的上下文生成，而不像标准语言模型那样只限于前面的词元。例如，生成 $x_3$ 时，模型会同时考虑其左侧上下文（即 $\{\mathbf{e}_0, \mathbf{e}_1, \mathbf{e}_2\}$）和右侧上下文（即 $\{\mathbf{e}_4\}$）。嵌入 $\mathbf{e}_0, \mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_4$ 包含 $x_0, x_1, x_2, x_4$ 的位置信息，因而保留了词元的原始顺序。因此，这种方法与掩码语言建模有些相似：将 $x_3$ 掩码，用其周围的词元 $x_0, x_1, x_2, x_4$ 来预测它。
+
+对于 Transformer，排列语言模型的实现相对容易。由于自注意力（self-attention）本身具有排列不变性，而位置信息又由位置嵌入（positional embedding）单独编码，因此无须显式重排输入序列，就能得到式（\ref{eq:permuted-factorization-lm-example}）这样的分解。只需为自注意力设置适当掩码，便可实现排列。例如，考虑计算 $\Pr(x_1 | \mathbf{e}_0, \mathbf{e}_4, \mathbf{e}_2)$ 的步骤。可以让 $x_0, x_1, x_2, x_3, x_4$ 保持原位，仅在自注意力计算中阻止 $x_1$ 关注 $x_3$，如下所示：
+
+\begin{center}
+\begin{tikzpicture}
+\def\nodesize{0.7cm}
+\node [] (x0) at (0,0) {$x_0$};
+\node [anchor=west] (x1) at ([xshift=0.3cm]x0.east) {$x_1$};
+\node [anchor=west] (x2) at ([xshift=0.3cm]x1.east) {$x_2$};
+\node [anchor=west] (x3) at ([xshift=0.3cm]x2.east) {$x_3$};
+\node [anchor=west] (x4) at ([xshift=0.3cm]x3.east) {$x_4$};
+\draw [->,thick] (x0.north) .. controls +(north:1em) and +(north:1em) .. ([xshift=-0.3em]x1.north);
+\draw [->,thick] (x2.north) .. controls +(north:0.8em) and +(north:0.8em) .. ([xshift=0.3em]x1.north);
+\draw [->,thick] (x4.north) .. controls +(north:1.7em) and +(north:1.7em) .. ([xshift=0.0em]x1.north);
+
+\node [anchor=north,minimum width=\nodesize,minimum height=\nodesize,draw,fill=blue!70] (box0) at ([yshift=-0.4cm]x0.south) {};
+\node [anchor=north,minimum width=\nodesize,minimum height=\nodesize,draw,fill=blue!70] (box1) at ([yshift=-0.4cm]x1.south) {};
+\node [anchor=north,minimum width=\nodesize,minimum height=\nodesize,draw,fill=blue!70] (box2) at ([yshift=-0.4cm]x2.south) {};
+\node [anchor=north,minimum width=\nodesize,minimum height=\nodesize,draw,fill=gray!30] (box3) at ([yshift=-0.4cm]x3.south) {};
+\node [anchor=north,minimum width=\nodesize,minimum height=\nodesize,draw,fill=blue!70] (box4) at ([yshift=-0.4cm]x4.south) {};
+
+\node [anchor=east] (label) at ([xshift=-1em,yshift=0.6em]box0.west) {自注意力掩码：};
+\node [anchor=north west] (label1) at (label.south west) {\scriptsize{蓝色方框 = 允许关注}};
+\node [anchor=north west] (label2) at ([yshift=0.3em]label1.south west) {\scriptsize{灰色方框 = 禁止关注}};
+\end{tikzpicture}
+\end{center}
+
+\noindent 为更清楚地说明这一点，图~\ref{fig:comparison-of-masking-for-pre-training-lms} 比较了因果语言建模、掩码语言建模与排列语言建模中的自注意力掩码结果。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-masking-for-different-language-models}
+\caption{因果语言建模、掩码语言建模与排列语言建模中自注意力掩码结果的比较。灰色单元格表示位置 $j$ 的词元不关注位置 $i$ 的词元；蓝色单元格 $(i,j)$ 表示位置 $j$ 的词元关注位置 $i$ 的词元。$\mathbf{e}_{\mathrm{mask}}$ 表示符号 $[\mathrm{MASK}]$ 的嵌入，由词元嵌入与位置嵌入组合而成。}
+\label{fig:comparison-of-masking-for-pre-training-lms}
+\end{figure}
+
+\subsubsection{将编码器作为分类器进行预训练}
+\label{sec:pre-training-as-classification}
+
+\noindent 训练编码器的另一种常见方式是使用分类任务。在自监督学习中，通常从无标注文本中构造新的分类问题来实现这一点。分类任务的设计方式有很多，这里介绍两种常用任务。
+
+BERT 的原始论文~\cite{devlin-etal:2019bert} 提出了一种简单方法，称为\mindex{下一句预测}（next sentence prediction，\mindex{NSP}）。NSP 基于这样一个假设：好的文本编码器应能捕捉两个句子之间的关系。为建模这种关系，NSP 使用两个连续句子 $\mathrm{Sent}_{A}$ 和 $\mathrm{Sent}_{B}$ 的编码器输出，判断 $\mathrm{Sent}_{B}$ 是否为紧接 $\mathrm{Sent}_{A}$ 的下一句。例如，假设 $\mathrm{Sent}_{A} = \textit{'It is raining .'}$、$\mathrm{Sent}_{B} = \textit{'I need an umbrella .'}$，则编码器的输入序列可以是
+
+\vspace{0.5em}
+\begin{center}
+$[\mathrm{CLS}]$ It is raining . $[\mathrm{SEP}]$ I need an umbrella . $[\mathrm{SEP}]$
+\end{center}
+\vspace{0.5em}
+
+\noindent 其中，$[\mathrm{CLS}]$ 是编码器预训练中常用的起始符号（即 $x_0$），$[\mathrm{SEP}]$ 是分隔两个句子的分隔符。该序列按照标准 Transformer 编码流程处理：首先用相应嵌入 $\mathbf{e}_i$ 表示每个词元 $x_i$，再将嵌入序列 $\{\mathbf{e}_{0},\cdots,\mathbf{e}_m\}$ 输入编码器，获得输出序列 $\{\mathbf{h}_{0},\cdots,\mathbf{h}_m\}$。由于通常将 $\mathbf{h}_{0}$ 视为整个序列的表示，因此在它上方添加 Softmax 层，即可构建二分类系统。过程如下：
+
+\vspace{0.5em}
+\begin{center}
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{r c c c c c c c c c c c c}
+词元：& {\color{red} $[\mathrm{CLS}]$} & It & is & raining & . & $[\mathrm{SEP}]$ & I & need & an & umbrella & . & $[\mathrm{SEP}]$ \\
+嵌入：& {\color{red} $\mathbf{e}_0$} & $\mathbf{e}_1$ & $\mathbf{e}_2$ & $\mathbf{e}_3$ & $\mathbf{e}_4$ & $\mathbf{e}_5$ & $\mathbf{e}_6$ & $\mathbf{e}_7$ & $\mathbf{e}_8$ & $\mathbf{e}_9$ & $\mathbf{e}_{10}$ & $\mathbf{e}_{11}$ \\
+ & {\color{red} $\downarrow$} & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ \\ \cline{2-13}
+& \multicolumn{12}{|c|}{编码器} \\ \cline{2-13}
+ & {\color{red} $\downarrow$} & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ \\
+ 编码：& {\color{red} $\mathbf{h}_0$} & $\mathbf{h}_1$ & $\mathbf{h}_2$ & $\mathbf{h}_3$ & $\mathbf{h}_4$ & $\mathbf{h}_5$ & $\mathbf{h}_6$ & $\mathbf{h}_7$ & $\mathbf{h}_8$ & $\mathbf{h}_9$ & $\mathbf{h}_{10}$ & $\mathbf{h}_{11}$ \\
+ & $\downarrow$ \\
+ & \multicolumn{3}{l}{Softmax} \\
+ & $\downarrow$ \\
+ & \multicolumn{3}{l}{是否为下一句？}
+\end{tabular}
+\endgroup
+\end{center}
+\vspace{0.5em}
+
+为生成训练样本，从文本语料中抽取句子对。选择两个实际连续的句子，构造正样本；将一个句子与语料中随机选取的另一个句子配对，构造负样本。因此，该模型的训练与分类器的训练相同。通常，NSP 作为附加的训练损失函数，与基于掩码语言建模的预训练结合使用。
+
+第二种将 Transformer 编码器作为分类器训练的方法，在词元层面施加分类监督信号。例如，\citet{clark-etal:2019electra} 在 ELECTRA 模型中提出：训练 Transformer 编码器，识别每个输入词元与原词元是否相同，还是已被以某种方式改动。第一步是从给定词元序列生成一个新序列，改动其中部分词元。为此，使用一个较小的掩码语言模型（称为生成器，generator）：随机掩码部分词元，并训练该模型预测它们。对于每个训练样本，这个掩码语言模型会在各掩码位置输出一个词元，它可能与原词元不同。同时，训练另一个 Transformer 编码器（称为判别器，discriminator），判断每个预测词元与原词元是否相同、是否发生了改动。具体而言，先用生成器生成一个部分词元被替换的序列，如下所示。
+
+\vspace{0.5em}
+\begin{center}
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{r c c c c c c c c c}
+原始序列：& $[\mathrm{CLS}]$ & The & boy & spent & hours & working & on & toys & . \\
+& $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ \\
+掩码后：& $[\mathrm{CLS}]$ & The & boy & spent & {\color{red} $[\mathrm{MASK}]$} & working & on & {\color{red} $[\mathrm{MASK}]$} & . \\
+& $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ \\ \cline{2-10}
+& \multicolumn{9}{|c|}{生成器（小型掩码语言模型）} \\ \cline{2-10}
+& $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ \\
+替换后：& $[\mathrm{CLS}]$ & The & boy & spent & {\color{red} decades} & working & on & {\color{red} toys} & .
+\end{tabular}
+\endgroup
+\end{center}
+\vspace{0.5em}
+
+接着，用判别器为各词元标注 $\mathrm{original}$ 或 $\mathrm{replaced}$ 标签，如下所示：
+
+\vspace{0.5em}
+\begin{center}
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{r c c c c c c c c c}
+替换后：& $[\mathrm{CLS}]$ & The & boy & spent & {\color{red} decades} & working & on & {\color{red} toys} & . \\
+& $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ \\ \cline{2-10}
+& \multicolumn{9}{|c|}{判别器（需要获得的模型）} \\ \cline{2-10}
+& $\downarrow$ & $\downarrow$ & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ & $\downarrow$ & {\color{red} $\downarrow$} & $\downarrow$ \\
+标签：& \footnotesize{$\mathrm{original}$} & \footnotesize{$\mathrm{original}$} & \footnotesize{$\mathrm{original}$} & \footnotesize{$\mathrm{original}$} & {\color{red} \footnotesize{$\mathrm{replaced}$}} & \footnotesize{$\mathrm{original}$} & \footnotesize{$\mathrm{original}$} & {\color{red} \footnotesize{$\mathrm{original}$}} & \footnotesize{$\mathrm{original}$}
+\end{tabular}
+\endgroup
+\end{center}
+\vspace{0.5em}
+
+训练时，生成器作为掩码语言模型，以最大似然估计进行优化；判别器作为分类器，使用分类损失进行优化。ELECTRA 将基于最大似然的损失与分类损失结合，共同训练生成器和判别器。另一种方法是使用生成对抗网络（generative adversarial network，GAN）：训练生成器欺骗判别器，同时训练判别器区分生成器输出与真实分布。不过，GAN 式训练使任务更复杂，也更难扩大规模。无论采用哪种方式，训练完成后都会丢弃生成器，将判别器的编码部分作为预训练模型应用于下游任务。
+
+\subsection{编码器—解码器预训练}
+
+\noindent 在 NLP 中，编码器—解码器架构常用于建模机器翻译、问答等序列到序列（sequence-to-sequence）问题。除这些典型问题之外，编码器—解码器模型还可扩展到许多其他问题。一个简单的思路是：将问题的输入和输出都视为文本，从而直接应用编码器—解码器模型。例如，给定输入文本，可以指示模型生成描述其情感的文本（如 \textit{positive}、\textit{negative} 或 \textit{neutral}）。
+
+这一思路使我们能够构建单一的文本到文本系统，处理任意 NLP 问题：将不同问题表述为相同的文本到文本格式，先通过自监督训练编码器—解码器模型，使其获得通用语言知识，再利用针对特定下游任务的文本到文本数据进行微调。
+
+\subsubsection{掩码式编码器—解码器预训练}
+
+\noindent 在 \citet{raffel-etal:2020exploring} 的 \mindex{T5} 模型中，许多不同任务都被表述为同一种文本到文本任务。T5 中每个样本遵循如下格式：
+\begin{eqnarray}
+\textrm{源文本} & \to & \textrm{目标文本} \nonumber
+\end{eqnarray}
+
+\noindent 这里，$\to$ 将源文本和目标文本分开：源文本由任务描述或指令，以及提供给系统的输入组成；目标文本则是对输入任务的响应。例如，考虑中译英任务，一个训练样本可以表示为
+\begin{eqnarray}
+[\mathrm{CLS}]\ \textrm{将中文翻译成英文：\begin{CJK*}{UTF8}{gbsn}你好！\end{CJK*}} & \to & \langle s \rangle\ \textrm{Hello!} \nonumber
+\end{eqnarray}
+
+\noindent 其中，$[\mathrm{CLS}]$ 和 $\langle s \rangle$ 分别为源端和目标端的起始符号\footnote{不同序列可以使用同一个起始符号。这里使用不同符号，是为了区分编码器端与解码器端的序列。}。
+
+同样，也可以用这种方式表达其他任务。例如：
+\begin{eqnarray}
+&     & \mathrm{[CLS]}\ \textrm{\colorbox{gray!30}{回答：}Albert Einstein 何时出生？} \nonumber \\
+& \to & \langle s \rangle\ \textrm{他出生于 1879 年 3 月 14 日。} \nonumber \\
+&     & \nonumber \\
+&     & \mathrm{[CLS]}\ \textrm{\colorbox{gray!30}{简化：}这位教授在其研究领域发表了大量论文，} \nonumber \\
+&     & \textrm{将于下周就这一主题作报告。} \nonumber \\
+& \to & \langle s \rangle\ \textrm{这位经验丰富的教授下周将作报告。} \nonumber \\
+&     & \nonumber \\
+&     & \mathrm{[CLS]}\ \textrm{\colorbox{gray!30}{文本：}John 买了一辆新车。假设：John 有一辆车。} \nonumber \\
+& \to & \langle s \rangle\ \textrm{蕴含} \nonumber \\
+&     & \nonumber \\
+&     & \mathrm{[CLS]}\ \textrm{\colorbox{gray!30}{对英译中结果评分。}英文：when in Rome, do as} \nonumber \\
+&     & \textrm{ the Romans do. 中文：\begin{CJK*}{UTF8}{gbsn}人\ 在\ 罗马\ 就\ 像\ 罗马\ 人\ 一样\ 做事\ 。\end{CJK*}} \nonumber \\
+& \to & \langle s \rangle\ 0.81 \nonumber
+\end{eqnarray}
+
+\noindent 其中，指令以灰色突出显示。有趣的是，最后一个例子将连续数值评分问题表述为文本生成任务。目标是生成表示数字 $0.81$ 的文本字符串，而非输出一个连续数值。
+
+上述方法提供了一种通用语言理解与生成的新框架。任务指令和问题输入都以文本形式提供给系统，系统再按照指令完成任务。这种方法将不同问题整合起来，好处是可以训练一个同时执行多种任务的模型。
+
+一般而言，要使预训练模型适配某个具体下游任务，需要进行微调。在此过程中，可以用不同方式向模型说明任务，例如在实际输入序列前加上任务的简称作为前缀，或给出详细的任务描述。由于任务指令以文本形式提供，并作为输入的一部分处理，模型在预训练阶段便可获得通用的指令遵循能力，从而大大促进零样本学习。例如，即使训练期间从未见过某个任务的专用指令，预训练模型通常也能泛化并解决这一新问题。
+
+针对 Transformer 编码器或解码器，已有多种强大的自监督学习方法。将它们用于编码器—解码器模型的预训练相对直接。一种常见选择是将编码器—解码器模型作为语言模型训练。例如，编码器接收序列前缀，解码器生成余下序列。不过，这与从第一个词元开始自回归生成整个序列的标准因果语言建模有所不同：这里由编码器一次处理整个前缀，再由解码器按因果语言建模的方式预测后续词元。更准确地说，这是一个\mindex{前缀语言建模}（prefix language modeling）问题：语言模型以给定前缀为预测上下文，预测后续序列。
+
+考虑下面的例子：
+\begin{eqnarray}
+\underbrace{\mathrm{[CLS]}\ \textrm{The puppies are frolicking}}_{\textrm{前缀}} & \to & \underbrace{\langle s \rangle\ \textrm{outside the house .}}_{\textrm{后续序列}} \nonumber
+\end{eqnarray}
+
+\noindent 可以直接用这样的样本训练编码器—解码器模型。于是，编码器学习理解前缀，解码器则在这一理解的基础上学习续写。在大规模预训练中，可以方便地从无标注文本中构造大量训练样本。
+
+要使预训练编码器—解码器模型有效处理多语言和跨语言任务（如机器翻译），应当使用多语言数据训练。这通常要求词表包含多种语言的词元。这样，模型便可学习不同语言的共享表示，从而在多语言和跨语言环境下获得语言理解与生成能力。
+
+编码器—解码器预训练的第二种方法是掩码语言建模。如第~\ref{sec:encoder-only-pre-training} 节所述，这种方法随机将序列中的词元替换为掩码符号，再训练模型根据受损序列预测这些被掩码的词元。
+
+例如，考虑对下面的句子进行掩码与重构：
+
+\vspace{0.5em}
+\begin{center}
+The puppies are frolicking outside the house .
+\end{center}
+\vspace{0.5em}
+
+\noindent 将两个词元（例如 \textit{frolicking} 和 \textit{the}）掩码，可得到如下 BERT 式模型输入与输出：
+\begin{eqnarray}
+&     & \mathrm{[CLS]}\ \textrm{The puppies are $\mathrm{[MASK]}$ outside $\mathrm{[MASK]}$ house .} \nonumber \\
+& \to & \langle s \rangle\ \textrm{\underline{\hspace{1em}}\ \ \underline{\hspace{1em}}\ \ \underline{\hspace{1em}}\ \ frolicking\ \ \underline{\hspace{1em}}\ \ the \underline{\hspace{1em}}\ \ \underline{\hspace{1em}}} \nonumber
+\end{eqnarray}
+
+\noindent 这里，\underline{\hspace{1em}} 表示不进行词元预测的掩码位置。改变文本中被掩码词元的比例，可以将这种方法推广为 BERT 式训练或语言建模式训练~\cite{song-etal:2019mass}。例如，若将所有词元掩码，则训练模型生成整个序列：
+\begin{eqnarray}
+&     & \mathrm{[CLS]}\ \textrm{$\mathrm{[MASK]}$ $\mathrm{[MASK]}$ $\mathrm{[MASK]}$ $\mathrm{[MASK]}$ $\mathrm{[MASK]}$ $\mathrm{[MASK]}$ $\mathrm{[MASK]}$ $\mathrm{[MASK]}$} \nonumber \\
+& \to & \langle s \rangle\ \textrm{The puppies are frolicking outside the house .} \nonumber
+\end{eqnarray}
+
+\noindent 此时，解码器作为语言模型训练。
+
+注意，在编码器—解码器架构中，可以用编码器读取掩码序列，用解码器预测原始序列。采用这一目标，本质上就得到了去噪自编码器（denoising autoencoder）：编码器将受损输入变换为某种隐表示，解码器再从该隐表示中重构未受损的输入。下面给出去噪训练的输入与输出示例。
+
+\begin{eqnarray}
+&     & \mathrm{[CLS]}\ \textrm{The puppies are $\mathrm{[MASK]}$ outside $\mathrm{[MASK]}$ house .} \nonumber \\
+& \to & \langle s \rangle\ \textrm{The puppies are frolicking outside the house .} \nonumber
+\end{eqnarray}
+
+\noindent 通过学习从受损序列到未受损序列的映射，模型在编码器端获得理解能力，在解码器端获得生成能力。图~\ref{fig:encoder-decoder-masked-lm} 展示了如何以 BERT 式目标和去噪自编码目标训练编码器—解码器模型。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-enc-dec-masked-language-modeling}
+\caption{使用 BERT 式方法与去噪自编码方法训练编码器—解码器模型。两种方法中，编码器的输入均为受损词元序列，其中部分词元被掩码并替换为 $\mathrm{[MASK]}$（简写为 $\mathrm{[M]}$）。解码器均预测这些被掩码的词元，但方式不同。在 BERT 式训练中，解码器只需计算被掩码词元的损失，序列中其余词元可直接视为 $\mathrm{[MASK]}$ 词元。在去噪自编码中，解码器以自回归方式预测全部词元构成的序列。因此，与标准语言建模一样，损失由所有这些词元的损失累加得到。}
+\label{fig:encoder-decoder-masked-lm}
+\end{figure}
+
+随机选择词元进行掩码时，也可以掩码连续的词元~\cite{joshi-etal:2020spanbert}。例如：
+\begin{eqnarray}
+&     & \mathrm{[CLS]}\ \textrm{The puppies are $\mathrm{[MASK]}$ outside $\mathrm{[MASK]}$ $\mathrm{[MASK]}$ .} \nonumber \\
+& \to & \langle s \rangle\ \textrm{The puppies are frolicking outside the house .} \nonumber
+\end{eqnarray}
+
+另一种处理连续被掩码词元的方式，是将其表示为片段（span）。这里遵循 \citet{raffel-etal:2020exploring} 的工作，用 $\mathrm{[X]}$、$\mathrm{[Y]}$ 和 $\mathrm{[Z]}$ 表示覆盖一个或多个连续被掩码词元的哨兵词元（sentinel token）。采用这一记法，上述训练样本可改写为
+\begin{eqnarray}
+&     & \mathrm{[CLS]}\ \textrm{The puppies are $\mathrm{[X]}$ outside $\mathrm{[Y]}$ .} \nonumber \\
+& \to & \langle s \rangle\ \textrm{$\mathrm{[X]}$ frolicking $\mathrm{[Y]}$ the house $\mathrm{[Z]}$} \nonumber
+\end{eqnarray}
+
+这一方法将受损序列表示为包含若干占位槽的序列。训练任务是根据周围上下文，用正确词元填充这些槽。它的一个优势是训练所用序列更短，因此训练更高效。注意，掩码语言建模为编码器—解码器模型训练提供了非常通用的框架。通过调整不同设置，例如被掩码词元的比例和被掩码片段的最大长度，可以得到不同的训练形式。
+
+\subsubsection{去噪训练}
+
+\noindent 若将编码器—解码器预训练看作去噪自编码问题，就可以采用多种方式破坏输入。例如，除随机掩码词元外，还可以修改词元或重排词元顺序。
+
+假设有一个编码器—解码器模型，能够将输入序列 $\mathbf{x}$ 映射为输出序列 $\mathbf{y}$：
+\begin{eqnarray}
+\mathbf{y} & = & \mathrm{Decode}_{\omega}(\mathrm{Encode}_{\theta}(\mathbf{x})) \nonumber \\
+           & = & \mathrm{Model}_{\theta,\omega}(\mathbf{x}),
+\end{eqnarray}
+
+\noindent 其中，$\theta$ 和 $\omega$ 分别是编码器和解码器的参数。在去噪自编码中，向 $\mathbf{x}$ 加入噪声，获得含噪声的受损输入 $\mathbf{x}_{\mathrm{noise}}$。将 $\mathbf{x}_{\mathrm{noise}}$ 输入编码器，再训练解码器重构原始输入。训练目标可定义为
+\begin{eqnarray}
+(\hat{\theta},\hat{\omega}) & = & \argmin_{\theta,\omega} \mathrm{Loss}(\mathrm{Model}_{\theta,\omega}(\mathbf{x}_{\mathrm{noise}}),\mathbf{x}),
+\end{eqnarray}
+
+\noindent 这里，损失函数 $\mathrm{Loss}(\mathrm{Model}_{\theta,\omega}(\mathbf{x}_{\mathrm{noise}}),\mathbf{x})$ 评价模型 $\mathrm{Model}_{\theta,\omega}(\mathbf{x}_{\mathrm{noise}})$ 重构原始输入 $\mathbf{x}$ 的效果。如常，可以选用交叉熵损失。
+
+给定模型架构与训练框架后，剩下的问题就是如何破坏输入。\citet{lewis-etal:2020bart} 在 \mindex{BART} 模型中提出了若干种破坏输入序列的方法。
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{词元掩码}（token masking）。这与掩码语言建模中的掩码方法相同：随机选择词元，并将其替换为 $\mathrm{[MASK]}$。
+\item \vspace{0.3em} \mindex{词元删除}（token deletion）。这一方法与词元掩码相似，但不将选中的词元替换为特殊符号 $\mathrm{[MASK]}$，而是直接从序列中删除。下面比较词元掩码与词元删除。
+
+    \begin{center}
+    \begingroup
+    %\setlength{\tabsep}{4pt}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{r l}
+    原始序列（$\mathbf{x}$）：& The puppies are \underline{frolicking} outside \underline{the} house . \\
+    词元掩码（$\mathbf{x}_{\mathrm{noise}}$）：& The puppies are $\mathrm{[MASK]}$ outside $\mathrm{[MASK]}$ house . \\
+    词元删除（$\mathbf{x}_{\mathrm{noise}}$）：& The puppies are {\color{gray} \sout{frolicking}} outside {\color{gray} \sout{the}} house .
+    \end{tabular}
+    \endgroup
+    \end{center}
+
+    \noindent 其中，原始序列中带下划线的词元会被掩码或删除。
+
+\item \vspace{0.3em} \mindex{片段掩码}（span masking）。在序列中随机采样互不重叠的片段，并用 $\mathrm{[MASK]}$ 掩码每个片段。也允许长度为 0 的片段；此时，只需在序列某个位置插入 $\mathrm{[MASK]}$。例如，对上面的序列进行片段掩码，可得到
+
+    \begin{center}
+    \begingroup
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{r l}
+    原始序列（$\mathbf{x}$）：& The \underline{0} puppies are \underline{frolicking outside the} house . \\
+    片段掩码（$\mathbf{x}_{\mathrm{noise}}$）：& The $\mathrm{[MASK]}$ puppies are $\mathrm{[MASK]}$ house .
+    \end{tabular}
+    \endgroup
+    \end{center}
+
+    \noindent 这里，片段 \textit{frolicking outside the} 被一个 $\mathrm{[MASK]}$ 替换。$\underline{0}$ 表示长度为 0 的片段，因此在 \textit{The} 和 \textit{puppies} 之间插入一个 $\mathrm{[MASK]}$。片段掩码引入了新的预测挑战：模型需要知道一个片段应生成多少个词元。这一问题与机器翻译中的繁衍率建模（fertility modeling）非常相似~\cite{brown-etal:1993mathematics}。
+\end{itemize}
+\vspace{0.5em}
+
+如果考虑包含多个句子的序列，还可以采用其他破坏方式。BART 模型采用以下两种方法。
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{句子重排}（sentence reordering）。这一方法随机排列句子，使模型学会恢复文档中句子的顺序。例如，考虑两个连续句子：
+
+    \begin{center}
+    Hard work leads to success . Success brings happiness .
+    \end{center}
+
+    将两个句子重排，可得到受损输入序列：
+
+    \begin{center}
+    Success brings happiness . Hard work leads to success .
+    \end{center}
+
+\item \vspace{0.3em} \mindex{文档旋转}（document rotation）。该任务的目标是识别序列的起始词元。首先，从序列中随机选择一个词元；然后旋转序列，使所选词元成为第一个词元。例如，假设从上述序列中选择词元 \textit{leads}，旋转后得到
+
+    \begin{center}
+    \begin{tikzpicture}
+    \node [anchor=west] (seg1) at (0,0) {leads to success . Success brings happiness .};
+    \node [anchor=east] (seg0) at ([yshift=0.1em]seg1.west) {{\color{gray} Hard work}};
+    \node [anchor=west] (seg2) at ([yshift=0.1em]seg1.east) {Hard work};
+    \draw [-] ([xshift=0.2em]seg0.west) -- ([xshift=-0.2em]seg0.east);
+    \draw [->,dashed] ([yshift=-0.2em]seg0.south) .. controls +(south:2em) and +(south:2em) .. ([yshift=-0.2em]seg2.south);
+    \node [anchor=south] (selected) at ([xshift=1.3em,yshift=0.8em]seg1.north west) {\footnotesize{选中词元}};
+    \draw [->] (selected.south) -- ([yshift=-0.7em]selected.south);
+    \end{tikzpicture}
+    \end{center}
+
+    \noindent 其中，\textit{leads} 前面的子序列 \textit{Hard work} 被移到序列末尾。
+
+\end{itemize}
+\vspace{0.5em}
+
+在预训练中，可以应用多种破坏方式来学习鲁棒模型，例如为每个训练样本随机选择其中一种。实际中，编码器—解码器预训练的效果在很大程度上取决于所用的输入破坏方式，因此通常需要通过细致实验选择适当的训练目标。
+
+\subsection{预训练任务的比较}
+
+\noindent 至此，已经讨论了多种预训练任务。同一个训练目标往往可以用于不同架构，例如仅编码器预训练和编码器—解码器预训练都可以采用掩码语言建模，因此仅按模型架构分类并不充分。下面改为根据训练目标归纳这些任务。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{语言建模}。这一方法通常指序列生成的自回归过程。每一步，模型仅根据此前上下文预测下一个词元。
+\item \vspace{0.3em} \textbf{掩码语言建模}。掩码语言建模遵循通用的“掩码—预测”框架：随机掩码序列中的词元，再利用整个掩码序列预测这些词元。
+\item \vspace{0.3em} \textbf{排列语言建模}。排列语言建模与掩码语言建模有相似之处，但通过排列概率分解顺序，取消了固定的从左到右约束。它保持输入序列不变，仅重排概率分解（预测）的顺序。每次预测都依据随机选择的若干上下文词元。
+\item \vspace{0.3em} \textbf{判别式训练}（discriminative training）。判别式训练从分类任务中构造监督信号，将预训练模型集成到分类器中，与分类器其余部分共同训练，以提高分类性能。
+\item \vspace{0.3em} \textbf{去噪自编码}。这一方法用于编码器—解码器模型的预训练。输入是受损序列（带有掩码、删除或排列等噪声），训练模型来重构原始序列。
+\end{itemize}
+\vspace{0.5em}
+
+表~\ref{tab:comparison-of-pre-training-tasks} 通过示例展示这些方法及其变体。示例的输入输出格式通常不依赖具体模型，但表中明确标出了每项预训练任务适用的模型架构。每个示例的输入为词元序列，输出为词元序列或若干概率。对于语言建模等生成任务，用上标表示目标端的生成顺序；省略上标，则表示输出词元既可自回归预测，也可并行（非自回归）预测。源端假定序列经过标准 Transformer 编码，即自注意力中的每个词元都能看到整个序列。唯一的例外是排列语言建模，它通过在编码器端设置注意力掩码，实现自回归生成过程。为简化讨论，各示例的目标端均省略词元 $\langle s \rangle$。
+
+\begin{table}[!t]
+\centering
+\begingroup
+\makebox[\textwidth]{
+\small{
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{r | c | c | c | l | l }
+方法 & Enc & Dec & E-D & 输入 & 输出 \\ \hline
+{\color{purple} 因果语言建模} & & $\bullet$ & $\bullet$ & & The$^1$ kitten$^2$ is$^3$ chasing$^4$ the$^5$ ball$^6$ .$^7$ \\ \hline
+{\color{purple} 前缀语言建模} & & $\bullet$ & $\bullet$ & $\mathrm{[C]}$ The kitten is & chasing$^1$ the$^2$ ball$^3$ .$^4$ \\ \hline \hline
+{\color{teal} 掩码语言建模} & $\bullet$ & & $\bullet$ & $\mathrm{[C]}$ The kitten $\mathrm{[M]}$ chasing the $\mathrm{[M]}$ . & \underline{\hspace{0.7em}}\ \ \underline{\hspace{0.7em}}\ \ is\ \ \underline{\hspace{0.7em}}\ \ \underline{\hspace{0.7em}}\ \ ball\ \ \underline{\hspace{0.7em}}\\ \hline
+{\color{teal} MASS 式} & $\bullet$ & & $\bullet$ & $\mathrm{[C]}$ The kitten $\mathrm{[M]}$ $\mathrm{[M]}$ $\mathrm{[M]}$ ball . & \underline{\hspace{0.7em}}\ \ \underline{\hspace{0.7em}}\ \ is\ \ chasing the\ \ \underline{\hspace{0.7em}}\ \ \underline{\hspace{0.7em}} \\ \hline
+{\color{teal} BERT 式} & $\bullet$ & & $\bullet$ & $\mathrm{[C]}$ The kitten $\mathrm{[M]}$ {\color{gray} playing} the $\mathrm{[M]}$ . & \underline{\hspace{0.7em}}\ \ kitten\ \ is\ \ chasing\ \ \underline{\hspace{0.7em}}\ \ ball\ \ \underline{\hspace{0.7em}}\\ \hline \hline
+{\color{brown} 排列语言建模} & $\bullet$ & & & $\mathrm{[C]}$ The kitten is chasing the ball . & The$^5$ kitten$^7$ is$^6$ chasing$^1$ the$^4$ ball$^2$ .$^3$ \\ \hline \hline
+{\color{cyan} 下一句} & \multirow{2}{*}{$\bullet$} & & & $\mathrm{[C]}$ The kitten is chasing the ball . & $\Pr(\textrm{IsNext}\ |\ \textrm{$\mathrm{[C]}$ 的表示})$ \\
+{\color{cyan} 预测} & & & & Birds eat worms . & \\ \hline
+{\color{cyan} 句子} & \multirow{2}{*}{$\bullet$} & & & $\mathrm{Sent}_a$: The kitten is chasing the ball . & $\mathrm{Score}(\mathrm{Sent}_a, \mathrm{Sent}_b)$ \\
+{\color{cyan} 比较} & & & & $\mathrm{Sent}_b$: A cat is running after a toy . & \\ \hline
+{\color{cyan} 词元分类} & $\bullet$ & & & $\mathrm{[C]}$ The kitten is chasing the ball . & $\Pr(\cdot|\textrm{The})$ $\Pr(\cdot|\textrm{kitten})$ ... $\Pr(\cdot|\textrm{.})$ \\ \hline \hline
+{\color{orange} 词元重排} & & & $\bullet$ & $\mathrm{[C]}$ . kitten the chasing The is ball & The$^1$ kitten$^2$ is$^3$ chasing$^4$ the$^5$ ball$^6$ .$^7$ \\ \hline
+{\color{orange} 词元删除} & & & $\bullet$ & $\mathrm{[C]}$ The kitten is {\color{gray} \sout{chasing}} the ball . & The$^1$ kitten$^2$ is$^3$ chasing$^4$ the$^5$ ball$^6$ .$^7$ \\ \hline
+{\color{orange} 片段掩码} & & & $\bullet$ & $\mathrm{[C]}$ The kitten $\mathrm{[M]}$ is $\mathrm{[M]}$ . & The$^1$ kitten$^2$ is$^3$ chasing$^4$ the$^5$ ball$^6$ .$^7$  \\ \hline
+{\color{orange} 哨兵词元掩码} & & & $\bullet$ & $\mathrm{[C]}$ The kitten $\mathrm{[X]}$ the $\mathrm{[Y]}$ & $\mathrm{[X]}^1$ is$^2$ chasing$^3$ $\mathrm{[Y]}^4$ ball$^5$ .$^6$  \\ \hline
+{\color{orange} 句子} & & & $\bullet$ & $\mathrm{[C]}$ The ball rolls away swiftly . The & The$^1$ kitten$^2$ is$^3$ chasing$^4$ the$^5$ ball$^6$ .$^7$ \\
+{\color{orange} 重排} & & & &  kitten is chasing the ball . & The$^8$ ball$^9$ rolls$^{10}$ away$^{11}$ swiftly$^{12}$ .$^{13}$ \\ \hline
+{\color{orange} 文档} & & & $\bullet$ & $\mathrm{[C]}$ chasing the ball . The ball rolls & The$^1$ kitten$^2$ is$^3$ chasing$^4$ the$^5$ ball$^6$ .$^7$ \\
+{\color{orange} 旋转} & & & &  away swiftly . The kitten is & The$^8$ ball$^9$ rolls$^{10}$ away$^{11}$ swiftly$^{12}$ .$^{13}$
+\end{tabular}
+}
+} % end of makebox
+\endgroup
+\caption{预训练任务的比较，包括{\color{purple}语言建模}、{\color{teal}掩码语言建模}、{\color{brown}排列语言建模}、{\color{cyan}判别式训练}和{\color{orange}去噪自编码}。$\mathrm{[C]} = \mathrm{[CLS]}$，$\mathrm{[M]} = \mathrm{[MASK]}$，$\mathrm{[X]}, \mathrm{[Y]} = \textrm{哨兵词元}$。Enc、Dec 和 E-D 分别表示该方法是否适用于仅编码器、仅解码器、编码器—解码器模型。对于生成任务，用上标表示词元的顺序。}
+\label{tab:comparison-of-pre-training-tasks}
+\end{table}
+
+这些预训练任务虽有所不同，但仍可以在同一框架和实验设置下进行比较~\cite{dong-etal:2019unified,raffel-etal:2020exploring,lewis-etal:2020bart}。预训练任务数量众多，这里无法一一列举。有关预训练任务的更多讨论，可参阅相关综述~\cite{qiu-etal:2020pre,han-etal:2021pre}。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{示例：BERT}
+
+\noindent 本节介绍 BERT，它是 NLP 中应用最广泛的预训练序列编码模型之一。
+
+\subsection{标准模型}
+
+\noindent \citet{devlin-etal:2019bert} 提出的标准 BERT 模型，是通过掩码语言建模和下一句预测两种自监督任务训练的双向 Transformer 编码器。总体训练损失就是这两项任务损失之和：
+\begin{eqnarray}
+\mathrm{Loss}_{\mathrm{BERT}} & = & \mathrm{Loss}_{\mathrm{mlm}} + \mathrm{Loss}_{\mathrm{nsp}}.
+\end{eqnarray}
+
+\noindent 按照深度学习的标准做法，通过最小化该损失来优化模型参数。训练时，从文本语料中采样小批量（mini-batch），计算各批次的 $\mathrm{Loss}_{\mathrm{BERT}}$，并用梯度下降（gradient descent）或其变体迭代更新模型参数。不断重复这一过程，直到满足停止条件，例如训练损失收敛，或达到预设的最大步数。
+
+\subsubsection{损失函数}
+
+一般而言，BERT 模型用于表示单个句子或句子对，因而能够处理多种下游语言理解问题。本节假定输入表示是包含两个句子 $\mathrm{Sent}_{A}$ 和 $\mathrm{Sent}_{B}$ 的序列，形式为
+\begin{equation}
+\mathrm{[CLS]}\ \ \mathrm{Sent}_{A}\ \ \mathrm{[SEP]}\ \ \mathrm{Sent}_{B}\ \ \mathrm{[SEP]} \nonumber
+\end{equation}
+
+\noindent 这里沿用文献~\cite{devlin-etal:2019bert} 的记号，用 $\mathrm{[SEP]}$ 表示分隔符。
+
+给定这个序列，可以分别获得 $\mathrm{Loss}_{\mathrm{mlm}}$ 和 $\mathrm{Loss}_{\mathrm{nsp}}$。对于掩码语言建模，先随机选择一个词元子集（通常为 15\%）作为预测对象，然后以下列三种方式修改序列：
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{词元掩码}。将选中词元的 $80\%$ 掩码，用符号 $\mathrm{[MASK]}$ 替换。例如：
+\begin{eqnarray}
+\textrm{原始序列：} & & \textrm{$[\mathrm{CLS}]$ It is \underline{raining} . $[\mathrm{SEP}]$ \underline{I} need \underline{an} \underline{umbrella} . $[\mathrm{SEP}]$} \nonumber \\
+\textrm{掩码后：} &  & \textrm{$[\mathrm{CLS}]$ It is $\mathrm{[MASK]}$ . $[\mathrm{SEP}]$ I need $\mathrm{[MASK]}$ umbrella . $[\mathrm{SEP}]$} \nonumber
+\end{eqnarray}
+
+\noindent 其中，选中的词元带有下划线。预测被掩码的词元，可以促使模型从周围上下文中学习表示。
+
+\item \vspace{0.3em} \textbf{随机替换}（random replacement）。将选中词元的 $10\%$ 改为随机词元。例如：
+\begin{eqnarray}
+\textrm{原始序列：} & & \textrm{$[\mathrm{CLS}]$ It is \underline{raining} . $[\mathrm{SEP}]$ \underline{I} need \underline{an} \underline{umbrella} . $[\mathrm{SEP}]$} \nonumber \\
+\textrm{随机词元：} & & \textrm{$[\mathrm{CLS}]$ It is raining . $[\mathrm{SEP}]$ I need a {\color{red} hat} . $[\mathrm{SEP}]$} \nonumber
+\end{eqnarray}
+
+\noindent 这有助于模型学习从受损输入中恢复词元。
+
+\item \vspace{0.3em} \textbf{保持不变}。将选中词元的 $10\%$ 保持不变。例如：
+\begin{eqnarray}
+\textrm{原始序列：} & & \textrm{$[\mathrm{CLS}]$ It is \underline{raining} . $[\mathrm{SEP}]$ \underline{I} need \underline{an} \underline{umbrella} . $[\mathrm{SEP}]$} \nonumber \\
+\textrm{未改动词元：} & & \textrm{$[\mathrm{CLS}]$ It is raining . $[\mathrm{SEP}]$ {\color{red} I} need an umbrella . $[\mathrm{SEP}]$} \nonumber
+\end{eqnarray}
+
+预测未改动的词元虽然很容易，这一策略却至关重要。它促使模型为实际观察到的词保持有意义的表示，从而有助于缓解预训练（使用 $\mathrm{[MASK]}$）与微调（不使用该词元）之间的差异。
+
+\end{itemize}
+\vspace{0.3em}
+
+设 $\mathcal{A}(\mathbf{x})$ 表示词元序列 $\mathbf{x}$ 中选中位置的集合，$\bar{\mathbf{x}}$ 表示 $\mathbf{x}$ 修改后的序列，则掩码语言建模的损失函数可定义为
+\begin{eqnarray}
+\mathrm{Loss}_{\mathrm{mlm}} & = & - \sum_{i \in \mathcal{A}(\mathbf{x})} \log \mathrm{Pr}_i(x_i|\bar{\mathbf{x}}),
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Pr}_i(x_i|\bar{\mathbf{x}})$ 是给定 $\bar{\mathbf{x}}$ 时，在位置 $i$ 预测 $x_i$ 的概率。图~\ref{fig:example-bert-mlm-loss} 给出了计算 $\mathrm{Loss}_{\mathrm{mlm}}$ 的具体示例。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-running-example-of-bert}
+\caption{BERT 式掩码语言建模的具体示例。首先随机选择 $15\%$ 的词元，再以下列三种方式之一处理所选词元：替换为 $\mathrm{[MASK]}$ 词元（概率为 $80\%$）、替换为随机词元（概率为 $10\%$），或保持不变（概率为 $10\%$）。训练模型根据修改后的序列预测这些选中的词元。$\mathbf{e}_i$ 表示位置 $i$ 上词元的嵌入，灰色方框表示 Softmax 层。}
+\label{fig:example-bert-mlm-loss}
+\end{figure}
+
+对于下一句预测，采用第~\ref{sec:pre-training-as-classification} 节所述方法。为每个训练样本赋予集合 $\{\mathrm{IsNext}, \mathrm{NotNext}\}$ 中的一个标签。例如：
+\begin{eqnarray}
+\textrm{序列：} & & \textrm{$[\mathrm{CLS}]$ It is raining . $[\mathrm{SEP}]$ I need an umbrella . $[\mathrm{SEP}]$} \nonumber \\
+\textrm{标签：} & & \textrm{$\mathrm{IsNext}$} \nonumber \\
+& & \nonumber \\
+\textrm{序列：} & & \textrm{$[\mathrm{CLS}]$ The cat sleeps on the windowsill . $[\mathrm{SEP}]$ Apples grow on trees . $[\mathrm{SEP}]$} \nonumber \\
+\textrm{标签：} & & \textrm{$\mathrm{NotNext}$} \nonumber
+\end{eqnarray}
+
+\noindent 将编码器对第一个词元 $\mathrm{[CLS]}$ 输出的向量视为序列表示，记为 $\mathbf{h}_{\mathrm{cls}}$（或 $\mathbf{h}_0$），并在 $\mathbf{h}_{\mathrm{cls}}$ 上构建分类器。然后，可以计算给定 $\mathbf{h}_{\mathrm{cls}}$ 时标签 $c$ 的概率，即 $\Pr(c|\mathbf{h}_{\mathrm{cls}})$。分类问题可选用多种损失函数。例如，在最大似然训练中，可以将 $\mathrm{Loss}_{\mathrm{nsp}}$ 定义为
+\begin{eqnarray}
+\mathrm{Loss}_{\mathrm{nsp}} & = & -\log \Pr(c_{\mathrm{gold}}|\mathbf{h}_{\mathrm{cls}}),
+\end{eqnarray}
+
+\noindent 其中，$c_{\mathrm{gold}}$ 是该样本的正确标签。
+
+\subsubsection{模型设置}
+
+\noindent 如图~\ref{fig:bert-architecture} 所示，BERT 模型基于标准 Transformer 编码器架构。输入为嵌入序列，其中每个嵌入都是词元嵌入、位置嵌入和片段嵌入（segment embedding）之和：
+\begin{eqnarray}
+\mathbf{e} & = & \mathbf{x} + \mathbf{e}_{\mathrm{pos}} + \mathbf{e}_{\mathrm{seg}}.
+\end{eqnarray}
+
+\noindent 词元嵌入（$\mathbf{x}$）和位置嵌入（$\mathbf{e}_{\mathrm{pos}}$）均与原始 Transformer 中所用的相同。片段嵌入（$\mathbf{e}_{\mathrm{seg}}$）是新增的部分，用于标示词元属于 $\mathrm{Sent}_{A}$ 还是 $\mathrm{Sent}_{B}$。下面的例子说明这一点：
+
+\vspace{0.5em}
+\begin{center}
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{2pt}
+{\small
+\makebox[\textwidth]{
+\begin{tabular}{r | c c c c c c c c c c c c}
+词元 & $[\mathrm{CLS}]$ & It & is & raining & . & $[\mathrm{SEP}]$ & I & need & an & umbrella & . & $[\mathrm{SEP}]$ \\ \hline
+$\mathbf{x}$ & $\mathbf{x}_{0}$ & $\mathbf{x}_{1}$ & $\mathbf{x}_{2}$ & $\mathbf{x}_{3}$ & $\mathbf{x}_{4}$ & $\mathbf{x}_{5}$ & $\mathbf{x}_{6}$ & $\mathbf{x}_{7}$ & $\mathbf{x}_{8}$ & $\mathbf{x}_{9}$ & $\mathbf{x}_{10}$ & $\mathbf{x}_{11}$ \\
+$\mathbf{e}_{\mathrm{pos}}$ & \footnotesize{$\mathrm{PE}(0)$} & \footnotesize{$\mathrm{PE}(1)$} & \footnotesize{$\mathrm{PE}(2)$} & \footnotesize{$\mathrm{PE}(3)$} & \footnotesize{$\mathrm{PE}(4)$} & \footnotesize{$\mathrm{PE}(5)$} & \footnotesize{$\mathrm{PE}(6)$} & \footnotesize{$\mathrm{PE}(7)$} & \footnotesize{$\mathrm{PE}(8)$} & \footnotesize{$\mathrm{PE}(9)$} & \footnotesize{$\mathrm{PE}(10)$} & \footnotesize{$\mathrm{PE}(11)$} \\
+$\mathbf{e}_{\mathrm{seg}}$ & $\mathbf{e}_{A}$ & $\mathbf{e}_{A}$ & $\mathbf{e}_{A}$ & $\mathbf{e}_{A}$ & $\mathbf{e}_{A}$ & $\mathbf{e}_{A}$ & $\mathbf{e}_{B}$ & $\mathbf{e}_{B}$ & $\mathbf{e}_{B}$ & $\mathbf{e}_{B}$ & $\mathbf{e}_{B}$ & $\mathbf{e}_{B}$
+\end{tabular}
+}
+}
+\endgroup
+\end{center}
+\vspace{0.5em}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-bert-architecture}
+\caption{BERT 的模型架构（Transformer 编码器）。首先将输入词元表示为嵌入，每个嵌入都是相应词元嵌入、位置嵌入和片段嵌入之和。然后，由堆叠的 Transformer 层处理嵌入序列。每一层包含一个自注意力子层和一个前馈网络（feed-forward network，FFN）子层。BERT 模型的输出，是最后一个 Transformer 层产生的向量序列。}
+\label{fig:bert-architecture}
+\end{figure}
+
+BERT 模型的主体是多层 Transformer 网络。一个 Transformer 层由自注意力子层和前馈网络（feed-forward network，FFN）子层构成。两个子层均采用后置归一化（post-norm）架构：$\mathrm{output} = \mathrm{LNorm}(F(\mathrm{input}) + \mathrm{input})$，其中 $F(\cdot)$ 是子层的核心函数（自注意力模型或 FFN），$\mathrm{LNorm}(\cdot)$ 是层归一化（layer normalization）单元。通常，将多个 Transformer 层堆叠为深度网络。对于序列的每个位置，最终输出表示就是最上层产生的实值向量。
+
+构建 BERT 模型时，可以考虑以下几个方面。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{词表大小}（$|V|$）。在 Transformer 中，每个词元对应词表 $V$ 中的一个条目。较大的词表可以覆盖更多词的表面形式变体，但可能增加存储需求。
+\item \vspace{0.3em} \textbf{嵌入维度}（$d_e$）。每个词元表示为一个 $d_e$ 维实值向量。如上所述，该向量是词元嵌入、位置嵌入和片段嵌入之和，这三者也都是 $d_e$ 维实值向量。
+\item \vspace{0.3em} \textbf{隐层维度}（hidden size，$d$）。子层的输入与输出均为 $d$ 维，子层中大部分隐状态（hidden state）也为 $d$ 维向量。一般可以将 $d$ 粗略理解为网络宽度。
+\item \vspace{0.3em} \textbf{注意力头数}（$n_{\mathrm{head}}$）。在自注意力子层中，需要指定多头自注意力（multi-head self-attention）的头数。更多的头使模型能够联合关注更多表示子空间中的信息。在实际系统中，通常设置 $n_{\mathrm{head}} \ge 4$。
+\item \vspace{0.3em} \textbf{FFN 隐层维度}（$d_{\textrm{ffn}}$）。Transformer 中 FFN 的隐层维度通常大于 $d$，例如常用设置为 $d_{\textrm{ffn}} = 4 d$。对于近来大模型等规模较大的 Transformer，$d_{\textrm{ffn}}$ 可能设为很大的值。
+\item \vspace{0.3em} \textbf{模型深度}（$L$）。采用深度网络是提高 Transformer 表达能力的有效方式。BERT 模型中的 $L$ 通常设为 $12$ 或 $24$，不过更深的网络同样可行，也可用于进一步改进模型。
+\end{itemize}
+\vspace{0.5em}
+
+这些超参数的不同设置，会产生不同规模的模型。两种广泛使用的配置是 BERT$_{\mathrm{base}}$ 和 BERT$_{\mathrm{large}}$：
+
+\begin{itemize}
+\item \vspace{0.5em} BERT$_{\mathrm{base}}$：$d=768$，$L=12$，$n_{\mathrm{head}}=12$，总参数量 $=110$M。
+\item \vspace{0.3em} BERT$_{\mathrm{large}}$：$d=1,024$，$L=24$，$n_{\mathrm{head}}=16$，总参数量 $=340$M。
+\end{itemize}
+\vspace{0.3em}
+
+BERT 模型的训练遵循 Transformer 的标准流程。训练 BERT$_{\mathrm{large}}$ 等更大模型需要投入更多资源与时间。这是预训练的一个普遍问题，尤其是在极大规模数据上训练模型时。在实践中，训练效率往往是主要关注点。一种常见做法是，先在相对较短的序列上训练 BERT 模型较多步，再在剩余训练步中继续使用全长度序列训练。
+
+\subsection{更多训练与更大模型}
+
+\noindent BERT 是 NLP 领域的一个里程碑，激发了大量后续研究。其中一个方向是扩大预训练规模，通常包括两种途径：增加训练数据量和增加模型参数量。
+
+\mindex{RoBERTa} 是标准 BERT 模型的扩展，也是这类工作的一个例子~\cite{liu-etal:2019roberta}。它提出了两项主要改进。第一，无须改变模型架构，只增加训练数据量与计算量，就能改善 BERT 模型。第二，扩大训练规模后，去除 NSP 损失并不会降低下游任务性能。这些发现提示了一个通用的预训练探索方向：即使采用简单的预训练任务，也可以通过持续扩大规模来改进预训练。
+
+改进 BERT 模型的第二种方式是增加模型参数量。例如，在 \citet{he-etal:2021deberta} 的工作中，通过同时增加模型深度与隐层维度，构建了一个包含 15 亿参数的类 BERT 模型。然而，扩大 BERT 及其他各类预训练模型的规模，也为训练带来新的挑战，例如超大模型的训练往往变得不稳定且难以收敛。这使问题更加复杂，需要仔细考虑模型架构、并行计算和参数初始化等多个方面。另一个例子是，\citet{shoeybi-etal:2019megatron} 成功训练了一个 39 亿参数的类 BERT 模型，使用数百块 GPU 来应对增长的计算需求。
+
+\subsection{更高效的模型}
+
+\noindent 在 BERT 提出时，与先前模型相比，它的规模相对较大。模型规模增大，会带来更高的内存需求和更慢的推理速度。开发更小、更快的 BERT 模型，属于构建高效 Transformer 这一更广泛挑战的一部分，相关文献已有深入讨论~\cite{Tay-etal:2020efficient,xiao-and-zhu:2023introduction}。不过，这一主题的深入探讨超出了本节范围，这里只重点介绍 BERT 的几种高效变体。
+
+构建高效 BERT 模型有几个值得关注的研究方向。第一，知识蒸馏（knowledge distillation）研究，例如利用训练良好的教师模型输出训练学生模型，表明可以将较大模型的知识迁移到更紧凑的模型中。BERT 是包含多种层类型的多层网络，因此可以在不同表示层面应用知识蒸馏。例如，除从输出层蒸馏知识外，还可以加入衡量教师模型与学生模型隐层输出差异的训练损失~\cite{sun2020-etal:mobilebert,jiao-etal:2020tinybert}。事实上，知识蒸馏已成为学习小型预训练模型最广泛采用的技术之一。
+
+第二，可以将传统模型压缩方法直接用于 BERT。一种常见方式是对 Transformer 编码器应用通用剪枝（pruning）方法~\cite{gale-etal:2019state}，通常删除整个层~\cite{fan-etal:2019reducing}，或删除网络中一定比例的参数~\cite{sanh-etal:2020movement,chen-etal:2020lottery}。剪枝也适用于多头注意力模型。例如，\citet{michel-etal:2019sixteen} 表明，去掉部分注意力头不会显著降低 BERT 模型性能，却能加快推理。压缩 BERT 的另一种方法是量化（quantization）~\cite{shen-etal:2020qbert}：用低精度数值表示模型参数，可以大幅压缩模型。虽然这种方法并非专为 BERT 设计，但对基于 Transformer 的大型架构同样有效。
+
+第三，考虑到 BERT 是相对较深、较大的网络，另一个研究方向是使用动态网络，使这类模型实现高效推理。其中一个思路是动态选择处理词元所需的层。例如，在深度自适应模型（depth-adaptive model）中，在某个最优深度提前退出，从而跳过层堆栈中余下的层~\cite{xin-etal:2020deebert,zhou-etal:2020bert}。类似地，还可以构建长度自适应模型（length-adaptive model），动态调整输入序列长度。例如，跳过输入序列中的某些词元，减少模型在较不重要词元上的计算负担，提高整体效率。
+
+第四，还可以通过层间参数共享来减小 BERT 模型规模。一种简单做法是，在整个层堆栈中共享一个完整 Transformer 层的参数~\cite{dehghani-etal:2018universal,lan-etal:2020albert}。这既减少了参数量，也使多层 Transformer 网络可以重复使用同一层，从而节省测试时的内存占用。
+
+\subsection{多语言模型}
+
+\noindent 最初的 BERT 模型主要面向英语，提出后很快便被扩展到多种语言。一种简单方式是为每种语言单独构建模型。另一种方式是在所有语言的数据上直接训练多语言模型，这在近来的大语言模型研究中更为流行。相应地，在 104 种语言的文本上训练得到了\mindex{多语言 BERT}（multilingual BERT，\mindexraw{mBERT}）模型\footnote{\url{https://github.com/google-research/bert/}}。与单语言 BERT 模型的主要区别是，mBERT 使用更大的词表来覆盖多种语言的词元。由此，不同语言的词元表示被映射到同一个空间，实现语言间的知识共享。
+
+多语言预训练模型最重要的应用之一是跨语言迁移学习（cross-lingual transfer learning）。在零样本跨语言设置中，先用源语言数据在某项任务上微调模型，再将其应用于目标语言上的同一任务，而无须任何目标语言训练数据。例如，在跨语言文本分类中，可以用标注英语文档微调多语言预训练模型，再直接用微调后的模型对中文文档分类。
+
+对 mBERT 等多语言预训练模型的一种改进，是在预训练中引入双语数据。双语训练不只使用来自多种语言的单语数据，而是显式建模两种语言词元之间的关系。得到的模型具备跨语言迁移能力，因而能够方便地适配不同语言。\citet{lample-conneau:2019cross} 提出了\mindex{跨语言语言模型}（cross-lingual language model，\mindex{XLMs}）的预训练方法。在其工作中，跨语言语言模型既可以采用因果语言建模训练，也可以采用掩码语言建模训练。采用掩码语言建模预训练时，将模型视为编码器，训练目标与 BERT 相同：最大化随机选定词元的概率，这些词元在输入中或者被掩码、或者被随机词元替换、或者保持不变。若在预训练中使用双语数据，则每次采样一对对齐句子，将两句拼接为用于训练的单一序列。例如，考虑下面这对英汉句子：
+
+\vspace{0.5em}
+\begin{center}
+\begin{CJK*}{UTF8}{gbsn}鲸鱼\ \ 是\ \ 哺乳\ \ 动物\ \ 。\end{CJK*}\ \ \ $\leftrightarrow$\ \ \ Whales are mammals\ \ .
+\end{center}
+\vspace{0.5em}
+
+\noindent 将它们拼接，可以得到如下序列：
+
+\vspace{0.5em}
+\begin{center}
+$\mathrm{[CLS]}$ \begin{CJK*}{UTF8}{gbsn}鲸鱼\ \ 是\ \ 哺乳\ \ 动物\ \ 。\end{CJK*}\ \ $\mathrm{[SEP]}$ \ \ Whales are mammals\ \ .\ \ $\mathrm{[SEP]}$
+\end{center}
+\vspace{0.5em}
+
+\noindent 然后选择一定比例的词元，将其替换为 $\mathrm{[MASK]}$。
+
+\vspace{0.5em}
+\begin{center}
+$\mathrm{[CLS]}$ \begin{CJK*}{UTF8}{gbsn}$\mathrm{[MASK]}$\ \ 是\ \ $\mathrm{[MASK]}$\ \ 动物\ \ 。\end{CJK*}\ \ $\mathrm{[SEP]}$ \ \ Whales $\mathrm{[MASK]}$ $\mathrm{[MASK]}$\ \ .\ \ $\mathrm{[SEP]}$
+\end{center}
+\vspace{0.5em}
+
+\noindent 预训练的目标是最大化给定上述序列时，被掩码词元的概率乘积。以这种方式训练，模型既能学习表示英语和中文序列，也能捕捉两种语言中词元的对应关系。例如，预测中文词元\begin{CJK*}{UTF8}{gbsn}鲸鱼\end{CJK*}，可能需要英语词元 \textit{Whales} 提供的信息。对齐两种语言的表示，本质上把模型变成了一个“翻译”模型。因此，这一训练目标也称\mindex{翻译语言建模}（translation language modeling，TLM）。图~\ref{fig:translation-language-modeling} 展示了这种方法。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter7/Figures/figure-xlm-example}
+\caption{翻译语言建模（TLM）示意图。为便于理解，这里采用简化示例，将所有选中词元都掩码，并训练模型预测这些词元。由于输入序列包含两种语言的平行词元，预测一种语言中被掩码的词元时，模型可以关注另一种语言的上下文，从而显式促使跨语言对齐。在 \citet{lample-conneau:2019cross} 提出的原始 XLM 中，输入嵌入（即 $\mathbf{e}_i$）是词元嵌入、位置嵌入和特定语言嵌入（language embedding）之和。因此，需要为每个词元指定语言标签，使模型区分不同语言。不过，在 XLM-R 等现代多语言预训练架构中，共享词表已足够，无须显式指定语言。此外，依赖语言嵌入会使语码转换难以处理。因此，这里假定所有词元表示都不依赖特定语言。}
+\label{fig:translation-language-modeling}
+\end{figure}
+
+多语言预训练模型的一个优势，是天然具备处理语码转换（code-switching）的能力。在 NLP 和语言学中，语码转换指在一段文本中切换使用不同语言。例如，下面是一段包含中文与英语的混合语言文本：
+
+\vspace{0.5em}
+\begin{center}
+\begin{CJK*}{UTF8}{gbsn}周末\ \ 我们\ \ 打算\ \ 去\ \ 做\ \ hiking\ \ ，\ \ 你\ \ 想\ \ 一起\ \ 来\ \ 吗\ \ ？\end{CJK*}
+
+\small{（我们周末打算去徒步，你想一起来吗？）}
+\end{center}
+\vspace{0.5em}
+
+\noindent 对于多语言预训练模型，无须识别某个词元是中文还是英文，每个词元都只是共享词表中的一个条目。可以把这理解为创建了一种“新”语言，将所有希望处理的语言都包含在内。
+
+多语言预训练的效果受多种因素影响。模型架构确定后，还需指定许多配置，例如共享词表大小、每种语言的样本数量（或比例）以及模型规模。\citet{conneau-etal:2020unsupervised} 指出了类 XLM 模型大规模多语言预训练中的几个有趣问题。第一，随着支持语言数量增加，需要更大的模型来处理这些语言。第二，更大的共享词表有助于建模不断增加的语言多样性。第三，低资源语言可从跨语言迁移中显著受益，尤其是当预训练语料包含语言学上相近的高资源语言时。然而，当容量固定的模型在过多语言上训练时，会出现称为\mindex{多语言诅咒}（the curse of multilinguality，也称容量干扰，capacity interference）的现象：持续增加语言最终会导致参数竞争，降低高资源语言上的性能。因此，在实际系统中，需要在支持语言数量与模型容量之间权衡。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{BERT 模型的应用}
+\label{sec:pre-training-application}
+
+\noindent BERT 模型预训练完成后，便可用于解决 NLP 问题，但它并不能立即胜任下游任务，一般还需额外微调以完成适配。第一步是添加预测器，使模型输出与目标任务相匹配。设 $\mathrm{BERT}_{\hat{\theta}}(\cdot)$ 是预训练参数为 $\hat{\theta}$ 的 BERT 模型，$\mathrm{Predict}_{\omega}(\cdot)$ 是参数为 $\omega$ 的预测网络。将预测网络接在 BERT 模型输出之后，便得到处理下游任务的模型，表示为
+\begin{eqnarray}
+\mathbf{y} & = & \mathrm{Predict}_{\omega}(\mathrm{BERT}_{\hat{\theta}}(\mathbf{x})),
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{x}$ 是输入，$\mathbf{y}$ 是符合问题要求的输出。例如，对于分类问题，模型输出标签上的概率分布。
+
+然后，收集有标注样本集合 $\mathcal{D}$，按下式微调模型：
+\begin{eqnarray}
+(\tilde{\omega},\tilde{\theta}) & = & \argmin_{\omega,\hat{\theta}^{+}} \sum_{(\mathbf{x},\mathbf{y}_{\mathrm{gold}}) \in \mathcal{D}} \mathrm{Loss}(\mathbf{y}_{\omega,\hat{\theta}^{+}},\mathbf{y}_{\mathrm{gold}}),
+\end{eqnarray}
+
+\noindent 其中，$(\mathbf{x},\mathbf{y}_{\mathrm{gold}})$ 是由输入及其对应输出组成的二元组。该式的记号看起来稍显复杂，但训练或调优过程是标准的：通过最小化训练数据上的损失优化模型，得到优化后的参数 $\tilde{\omega}$ 和 $\tilde{\theta}$。优化以预训练参数 $\hat{\theta}$ 为起点。这里用 $\hat{\theta}^{+}$ 表示参数由 $\hat{\theta}$ 初始化，用 $\mathbf{y}_{\omega,\hat{\theta}^{+}}$ 表示使用参数 $\omega$ 和 $\hat{\theta}^{+}$ 计算得到的模型输出。
+
+得到微调后的参数 $\tilde{\omega}$ 和 $\tilde{\theta}$ 后，就可以将模型 $\mathrm{Predict}_{\tilde{\omega}}(\mathrm{BERT}_{\tilde{\theta}}(\cdot))$ 应用于同一微调任务的新数据。下游任务的形式决定了模型的输入输出格式及预测网络的架构。下面列举一些适合使用 BERT 模型的任务。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{分类（单篇文本）}。文本分类是 BERT 模型应用最广泛的场景之一。在这一任务中，BERT 接收词元序列，将其编码为向量序列。通常用第一个输出向量 $\mathbf{h}_{\mathrm{cls}}$（或 $\mathbf{h}_{0}$）表示整篇文本。预测网络以 $\mathbf{h}_{\mathrm{cls}}$ 为输入，生成标签分布。设输入序列为 $\mathrm{[CLS]}x_1 x_2 \cdots x_m$，基于 BERT 的文本分类过程见图~\ref{fig:bert-app-classification-single-text}。
+
+\begin{figure}[!ht]
+\centering
+\input{./Chapter7/Figures/figure-bert-app-classification-single-text}
+\caption{基于 BERT 的单篇文本分类。灰色方框表示预测网络。}
+\label{fig:bert-app-classification-single-text}
+\end{figure}
+
+    \noindent 许多 NLP 问题都可以归为文本分类任务，已有多种文本分类基准（benchmark）用于评测预训练模型。例如，可以根据语法正确性（grammaticality）或情感倾向（sentiment）对文本分类~\cite{socher-etal:2013recursive,warstadt-etal:2019neural}。注意，预测网络可以是任意分类模型，例如深度神经网络，也可以是更传统的分类模型。整个模型随后按照标准分类模型的方式训练或微调。例如，预测网络可以只是一个 Softmax 层，通过最大化正确标签的概率来优化模型参数。
+
+\item \vspace{0.3em} \textbf{分类（文本对）}。分类也可以针对文本对进行。假设有两篇文本 $x_1 \cdots x_m$ 和 $y_1 \cdots y_n$，将其拼接为长度为 $\mathrm{len}$ 的单一序列，再根据 $\mathbf{h}_{\mathrm{cls}}$ 向量预测这一组合文本序列的标签，如图~\ref{fig:bert-app-classification-two-texts} 所示。
+
+\begin{figure}[!ht]
+\centering
+\input{./Chapter7/Figures/figure-bert-app-classification-two-texts}
+\caption{基于 BERT 的文本对分类。这里，$\mathrm{len} = n + m + 2$。}
+\label{fig:bert-app-classification-two-texts}
+\end{figure}
+
+    \noindent 文本对分类涵盖多种问题，包括语义等价判断（判断两篇文本的语义是否等价）~\cite{dolan-brockett:2005automatically}、文本蕴含判断（判断一个假设能否由前提在逻辑上推导或蕴含）~\cite{bentivogli-giampiccolo:2011rte,williams-etal:2018broad}、基于情境的常识推理（判断在给定上下文中某事件是否可能发生）~\cite{zellers-etal:2018swag}，以及问答推理（判断某个回答是否对应给定问题）。
+
+\item \vspace{0.3em} \textbf{回归}（regression）。可以让预测网络输出实值分数，而非标签分布。例如，在预测网络中添加 Sigmoid 层，便可用系统计算两个给定句子的相似度。这种架构与基于 BERT 的分类系统相同，只需修改输出层，如图~\ref{fig:bert-app-regression-two-texts} 所示。
+
+\begin{figure}[!ht]
+\centering
+\input{./Chapter7/Figures/figure-bert-app-regression-two-texts}
+\caption{基于 BERT 的文本对回归。}
+\label{fig:bert-app-regression-two-texts}
+\end{figure}
+
+    训练或微调时，照常最小化模型输出的回归损失即可。
+
+\item \vspace{0.3em} \textbf{序列标注}（sequence labeling）。序列标注是一种适用于广泛 NLP 问题的机器学习方法。它为输入序列的每个词元赋予一个标签，再从所得标签序列中导出某些语言学标注。NLP 中的一个例子是词性标注（part-of-speech tagging，POS tagging），为句子中每个词标注相应词性。另一个例子是命名实体识别（named entity recognition，NER），为每个词赋予 NER 标签，并据此识别命名实体。用于 NER 的模型架构见图~\ref{fig:bert-app-sequence-labeling}。
+
+\begin{figure}[!ht]
+\centering
+\input{./Chapter7/Figures/figure-bert-app-sequence-labeling}
+\caption{用于命名实体识别的 BERT 序列标注。这里，$\{\mathrm{B}, \mathrm{I}, \mathrm{O}\}$ 是 NER 的标签集。}
+\label{fig:bert-app-sequence-labeling}
+\end{figure}
+
+    \noindent 在这一模型中，采用 BIO 标注方案表示命名实体。例如，$\mathrm{B}\textrm{-}\mathrm{ORG}$ 表示组织名称的开头，$\mathrm{I}\textrm{-}\mathrm{ORG}$ 表示词位于组织名称内部，$\mathrm{O}$ 表示词不属于任何命名实体。该 NER 模型可以在每个位置输出标签集上的分布，记为 $\mathbf{p}_i$。模型的训练或微调可基于这些分布 $\{\mathbf{p}_1,\cdots,\mathbf{p}_m\}$ 进行。例如，设 $p_i(\mathrm{tag}_i)$ 是位置 $i$ 上正确标签的概率，训练损失可定义为负对数似然（negative log-likelihood）：
+    \begin{eqnarray}
+    \mathrm{Loss} & = & -\frac{1}{m} \sum_{i=1}^{m} \log p_i(\mathrm{tag}_i).
+    \end{eqnarray}
+
+    给定训练好的 NER 模型，寻找最优标签序列是 NLP 中已有充分研究的问题，通常可通过动态规划实现。在格结构中搜索路径的情形下，其复杂度为线性~\cite{huang-etal:2009dynamic}。
+
+\item \vspace{0.3em} \textbf{片段预测}（span prediction）。有些 NLP 任务需要预测文本中的一个片段，常见例子是阅读理解。在这一任务中，给定问题 $x_1 \cdots x_m$ 和上下文文本 $y_1 \cdots y_n$，目标是在 $y_1 \cdots y_n$ 中找出最能回答该问题的连续片段。可以将其表述为类似序列标注的任务，为每个 $y_j$ 预测标签，标示它是否为片段起点或终点。遵循 \citet{seo-etal:2017bidirectional} 的方法，在 BERT 对 $y_j$ 的输出之上添加两个网络：一个生成 $y_j$ 为片段起点的概率（记为 $p_j^{\mathrm{beg}}$），另一个生成 $y_j$ 为片段终点的概率（记为 $p_j^{\mathrm{end}}$）。得到的模型架构如图~\ref{fig:bert-app-span-prediction} 所示。
+
+\begin{figure}[!ht]
+\centering
+\input{./Chapter7/Figures/figure-bert-app-span-prediction}
+\caption{用于阅读理解的 BERT 片段预测。}
+\label{fig:bert-app-span-prediction}
+\end{figure}
+
+    将问题与上下文文本拼接，得到输入序列。预测网络只作用于上下文文本对应的输出，在各位置生成概率 $p_j^{\mathrm{beg}}$ 和 $p_j^{\mathrm{end}}$。将两个模型在整个上下文文本上的负对数似然相加，即可计算损失：
+    \begin{eqnarray}
+    \mathrm{Loss} & = & - \frac{1}{n} \sum_{j=1}^{n} \big( \log p_j^{\mathrm{beg}} + \log p_j^{\mathrm{end}} \big).
+    \end{eqnarray}
+
+    测试时，按下式搜索最优片段：
+    \begin{eqnarray}
+    (\hat{j}_1,\hat{j}_2) & = & \argmax_{1 \le j_1 \le j_2 \le n}\ \big( \log p_{j_1}^{\mathrm{beg}} + \log p_{j_2}^{\mathrm{end}} \big).
+    \end{eqnarray}
+
+\item \vspace{0.3em} \textbf{为编码器—解码器模型提供编码}。本节主要关注语言理解问题，但 BERT 模型的应用范围更广。事实上，凡是需要对文本进行编码的场景，都可以使用 BERT。此前尚未提及的一类应用是文本生成，包括机器翻译、摘要、问答和对话生成等任务。这些任务可以表述为序列到序列问题：用编码器表示源文本，再由解码器生成相应目标文本。应用 BERT 的一种直接方式，就是将其用作编码器。微调之前，用预训练 BERT 模型的参数初始化编码器，然后照常在文本对上微调编码器—解码器模型。图~\ref{fig:bert-app-encoder-decoder} 展示了一个在源端使用 BERT 模型的神经机器翻译系统架构。
+
+\begin{figure}[!ht]
+\centering
+\input{./Chapter7/Figures/figure-bert-app-encoder-decoder}
+\caption{在编码器—解码器模型中使用 BERT 作为编码器。这里，$x_1 \cdots x_m$ 表示源序列，$y_1 \cdots y_n$ 表示目标序列，$\mathbf{e}_{1}^{x} \cdots \mathbf{e}_{m}^{x}$ 表示 $x_1 \cdots x_m$ 的嵌入序列，$\mathbf{e}_{1}^{y} \cdots \mathbf{e}_{n}^{y}$ 表示 $y_1 \cdots y_n$ 的嵌入序列。可选的适配器（adapter）将 BERT 模型的输出映射为更适合解码器的形式。}
+\label{fig:bert-app-encoder-decoder}
+\end{figure}
+
+\end{itemize}
+\vspace{0.5em}
+
+微调 BERT 模型是一个复杂的工程问题，受微调数据量、模型规模、微调所用优化器等众多因素影响。一般希望充分微调模型，使其在下游任务中表现良好。然而，针对特定任务微调 BERT 可能导致过拟合，进而削弱它泛化到其他任务的能力。例如，假设某个 BERT 模型在特定任务上表现良好，随后针对新任务微调它，可能降低它在原任务上的性能。这与持续训练中的\mindex{灾难性遗忘}（catastrophic forgetting）问题有关：神经网络用新样本更新后，会遗忘先前学到的信息。实际应用中，一种常见的缓解方式是在微调数据中加入部分旧数据，用更多样的数据训练模型。也可以采用专门应对灾难性遗忘的方法，例如经验回放（experience replay）~\cite{rolnick-etal:2019experience}和弹性权重巩固（elastic weight consolidation）~\cite{kirkpatrick-etal:2017overcoming}。有关持续学习中这一问题的更详细讨论，可参阅相关综述~\cite{parisi-etal:2019continual,wang-etal:2023comprehensive,wang-etal:2023comprehensive2}。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{小结}
+
+\noindent 本章介绍了 NLP 中预训练的一般概念，重点讨论自监督预训练及其在仅编码器、仅解码器和编码器—解码器架构中的应用，并介绍、比较了适用于这些架构的多种预训练任务。作为具体例子，以 BERT 说明了如何通过掩码语言建模预训练序列模型，并将其应用于不同下游任务。
+
+近年来，大规模采用自监督预训练推动 NLP 取得了显著进展。不仅在 NLP 中，在计算机视觉和其他人工智能领域，许多任务也取得了重大进步。这些进展背后的一个思想是：只需在海量无标注数据上训练人工智能系统，就可以学到大量关于世界的知识。例如，语言模型通过在大规模文本中反复预测被掩码的词，可以学习某种语言的通用知识。由此，预训练语言模型可以作为基础模型，方便地适配具体的下游 NLP 任务。NLP 的这一范式转变，推动了强大的语言理解、生成和推理系统的发展~\cite{manning:2022human}。不过也应认识到，我们仍处于构建真正智能系统的早期阶段，前路依然漫长。尽管如此，大规模预训练已为研究者长期追求的智能系统打开了大门；同时仍有若干关键研究方向有待探索，例如如何从有限数据中高效学习，以及如何获得复杂的推理与规划能力。
+
+本章主要是入门介绍，无法涵盖预训练的所有方面。例如，微调预训练模型的方法众多，能以不同方式使模型适配多样的应用场景。此外，大语言模型虽被视为近年来人工智能最重要的成就之一，本章也未予讨论。这些主题将留待后续章节介绍。

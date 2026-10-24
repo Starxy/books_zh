@@ -1,0 +1,55 @@
+% 原书分章 PDF 第 5—7 页：第 23.3 节。
+\section{最优资源约束价值的典范梯度}
+
+$\Psi$ 的路径导数将是分析估计量渐近性质的关键。有关路径导数在半参数有效性理论中所起关键作用的概述，参见 Pfanzagl（1990）及 Bickel 等（1997b）。提醒读者，如果
+\[
+ \hat\Phi(P_n)-\Phi(P_0)=\frac1n\sum_{i=1}^n\operatorname{IC}_{P_0}(O_i)+o_{P_0}(n^{-1/2}),
+\]
+则估计量 $\hat\Phi$ 是参数 $\Phi(P_0)$ 的渐近线性估计量，影响曲线为 $\operatorname{IC}_{P_0}$。如果 $\Phi$ 是路径可微的，典范梯度为 $\operatorname{IC}_{P_0}$，那么 $\hat\Phi$ 是正则且渐近线性（regular and asymptotically linear，RAL）的，并且在 $\Phi(P_0)$ 所有这类 RAL 估计量中渐近有效（方差最小）（Pfanzagl，1990；Bickel 等，1997b）。
+
+对于 $o\in\mathcal O$、确定性规则 $\tilde d$ 和实数 $\tau$，定义
+\[
+\begin{aligned}
+ D_1(\tilde d,P)(o)&\triangleq\frac{I(a=\tilde d(w))}{g_P(a\mid w)}\bigl(y-\bar Q_P(a,w)\bigr),\\
+ D_2(\tilde d,P)(o)&\triangleq\bar Q_P(\tilde d(w),w)-\E_P\bar Q_P(\tilde d(W),W),
+\end{aligned}
+\]
+其中 $g_P(a\mid W)\triangleq P(A=a\mid W)$。令 $g_0\triangleq g_{P_0}$。注意，$D_1(\tilde d,P)+D_2(\tilde d,P)$ 是参数 $\Psi_{\tilde d}(P)$ 的有效影响曲线。
+
+令 $d$ 为某个随机规则。$\Psi_d$ 的典范梯度为
+\[
+ \operatorname{IC}_d(P)(o)\triangleq\E_{P_U}[D_1(d(U,w),P)(o)+D_2(d(U,w),P)(o)].
+\]
+定义
+\[
+ D(d,\tau,P)(o)\triangleq\operatorname{IC}_d(P)(o)-\tau\{\E_{P_U}[d(U,w)]-\kappa\}.
+\]
+为便于引用，令 $D_0\triangleq D(d_0,\tau_0,P_0)$。下面的定理使用下列假设。
+\begin{enumerate}[label=(C\arabic*),leftmargin=3.6em]
+\item $g_0$ 满足正值性假设：$P_0(0<g_0(1\mid W)<1)=1$。
+\item $\bar Q_{b,0}(W)$ 在 $\eta_0$ 处具有密度 $f_0$，且 $0<f_0(\eta_0)<\infty$。
+\item $S_0$ 在 $\eta_0$ 的一个邻域内连续。
+\item 对于 $\tau_0$ 的一个邻域内的所有 $\tau$，有 $P_0(\bar Q_{b,0}(W)=\tau)=0$。
+\end{enumerate}
+现在给出最优 R-C 价值的典范梯度。
+
+\begin{bookresult}{定理}{23.3}
+假定 23.3 至 23.3 成立。那么 $\Psi$ 在 $P_0$ 处路径可微，典范梯度为 $D_0$。
+\end{bookresult}
+
+注意，23.3 蕴含 $P_0(\bar Q_{b,0}(W)=\tau_0)=0$。因此，$d_0$（几乎处处）是确定性的，在 $D_0$ 的定义中对 $P_U$ 求期望是多余的。尽管如此，当我们试图证明估计量求解了由 $D(d_0,\tau_0,P_0)$ 的一个估计所定义的经验估计方程时，这种表示将很有用。
+
+当资源约束起作用时，即 $\tau_0>0$ 时，上述定理表明，相比不存在资源约束时的最优价值参数，$\Psi$ 多出一个分量（van der Laan 与 Luedtke，2015）。这个额外的分量为 $\tau_0\times\{\E_{P_U}[d_0(U,w)]-\kappa\}$，是导数中依赖于 $d_0$ 需要估计且位于参数空间边界这一事实的部分。我们指出，$D_0(O)$ 的方差可能大于 $\operatorname{IC}_{d_0}(P_0)(O)$ 的方差。如果 $\tau_0=0$，这两个方差相同，因此假定 $\tau_0>0$。那么，只要 $P_0(\bar Q_{b,0}(W)=\tau_0)=0$，就有
+\[
+\begin{aligned}
+ &\Var_{P_0}(D_0(O))-\Var_{P_0}\{\operatorname{IC}_{d_0}(P_0)\}\\
+ &\quad=\tau_0\kappa(1-\kappa)\Bigl(\tau_0
+ -2\E_0[\bar Q_0(1,W)\mid\tilde d_0(W)=1]\\
+ &\hspace{12.2em}+2\E_0[\bar Q_0(0,W)\mid\tilde d_0(W)=0]\Bigr).
+\end{aligned}
+\]
+对于任意 $\kappa\in(0,1)$，都可以给出一个分布 $P_0$，满足定理 23.3 的条件，且有
+$\Var_{P_0}(D_0(O))>\Var_{P_0}(\operatorname{IC}_{d_0}(P_0)(O))$。
+或许更令人意外的是，也可以给出一个分布 $P_0$，满足定理 23.3 的条件，且有
+$\Var_{P_0}(D_0(O))<\Var_{P_0}(\operatorname{IC}_{d_0}(P_0)(O))$。
+这里不再展开讨论，因为本章的重点是估计优化问题 (23.2) 中的价值，而不是讨论这一程序与其他参数估计之间的关系。

@@ -1,0 +1,255 @@
+% 原书分章 PDF 第 8—14 页：第 19.2 节。
+\section{目标参数的有效影响曲线}
+
+有效影响曲线依赖于一系列条件期望和密度之比。我们首先要确定目标参数 $\Psi_J$ 的有效影响曲线。一种推导方法，是在所有随机变量均离散时，求极大似然估计量（maximum likelihood estimator，MLE）的影响曲线。这给出离散数据情形的有效影响曲线；其在连续数据中的自然对应形式，就成为所猜测的有效影响曲线。随后，可通过验证以下两点来确认这一猜测：（1）它是目标参数映射路径导数的梯度；（2）它属于切空间。
+
+考虑所有随机变量均离散的情形。$N$ 足够大时，MLE 定义良好，$\bar q_w$、$\bar q_y$、$\bar g$ 的 MLE 等于相应的经验版本 $\bar q^e_{W,N}$、$\bar q^e_{Y,N}$、$\bar g^e_N$；它们分别基于 $N$ 个相关观测 $(C_w(t),W(t))$、$(C_y(t),Y(t))$ 和 $(C_a(t),A(t))$，$t=1,\ldots,N$，并将这些观测当作独立同分布数据处理。也就是说，这些 MLE 定义为
+\[
+\begin{aligned}
+ \bar q^e_{Y,N}(y(t)\mid c_y(t))
+ &=\frac{\sum_{i=1}^N I(Y(i)=y(t),C_y(i)=c_y(t))}
+ {\sum_{i=1}^N I(C_y(i)=c_y(t))},\\
+ \bar q^e_{W,N}(w(t)\mid c_w(t))
+ &=\frac{\sum_{i=1}^N I(W(i)=w(t),C_w(i)=c_w(t))}
+ {\sum_{i=1}^N I(C_w(i)=c_w(t))},\\
+ \bar g^e_N(a(t)\mid c_a(t))
+ &=\frac{\sum_{i=1}^N I(A(i)=a(t),C_a(i)=c_a(t))}
+ {\sum_{i=1}^N I(C_a(i)=c_a(t))}.
+\end{aligned}
+\]
+线性化可得
+\[
+ \Psi_J(\bar q^e_{Y,N},\bar q^e_{W,N},\bar g^e_N)
+ -\Psi_J(\bar q_{Y,0},\bar q_{W,0},\bar g_0)
+ \approx\frac1N\sum_{i=1}^N\bar D(\bar q_0,\bar g_0)(\bar O(i)),
+\]
+由此得到如下有效影响曲线。
+
+\begin{bookresult}{定理}{19.1}
+$\Psi_J:\mathcal M^N\to\RR^d$ 在 $P^N\in\mathcal M^N$ 处的典范梯度为
+\[
+\begin{aligned}
+ D^N(\bar q,\bar g)(O^N)
+ &=\frac1N\sum_{i=1}^N\bar D(\bar q,\bar g)(\bar O(i))\\
+ &\equiv\frac1N\sum_{i=1}^N\sum_{s=1}^N\bar D_s(\bar q,\bar g)(\bar O(i))\\
+ &\equiv\frac1N\sum_{i=1}^N\sum_{s=1}^N
+ \{\bar D_{q_{y(s)}}(Y(i),C_y(i))+\bar D_{q_{w(s)}}(W(i),C_w(i))\}\\
+ &\quad+\frac1N\sum_{i=1}^N\sum_{s=1}^N\bar D_{g_s}(A(i),C_a(i)),
+\end{aligned}
+\]
+其中，
+\[
+\begin{aligned}
+ &\bar D_{q_{y(s)}}(Y(i),C_y(i))\\
+ &\quad=\frac1J\sum_{j=1}^J I(s\leq\tau_j)
+ \frac{h^*_{c_y(s),j}(C_y(i))}{\bar h_{c_y}(C_y(i))}\\
+ &\qquad\times\{E(Y_{g_j^*}(\tau_j)\mid Y(s)=Y(i),C_y(s)=C_y(i))
+ -E(Y_{g_j^*}(\tau_j)\mid C_y(s)=C_y(i))\},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+ &\bar D_{q_{w(s)}}(W(i),C_w(i))\\
+ &\quad=\frac1J\sum_{j=1}^J I(s\leq\tau_j)
+ \frac{h^*_{c_w(s),j}(C_w(i))}{\bar h_{c_w}(C_w(i))}\\
+ &\qquad\times\{E(Y_{g_j^*}(\tau_j)\mid W(s)=W(i),C_w(s)=C_w(i))
+ -E(Y_{g_j^*}(\tau_j)\mid C_w(s)=c_w(i))\},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+ &\bar D_{\bar g_s}(A(i),C_a(i))\\
+ &\quad=\frac1J\sum_{j=1}^J I(s\leq\tau_j,s\notin\mathcal I_j)
+ \frac{h^*_{c_a(s),j}(C_a(i))}{\bar h_{c_a}(C_a(i))}\\
+ &\qquad\times\{E(Y_{g_j^*}(\tau_j)\mid A(s)=A(i),C_a(s)=C_a(i))
+ -E(Y_{g_j^*}(\tau_j)\mid C_a(s)=c_a(i))\}.
+\end{aligned}
+\]
+并且
+\[
+\begin{aligned}
+ h_{c_y(i)}(c_y)&\equiv p_{c_y(i)}(c_y),&
+ \bar h_{c_y}(c_y)&\equiv\frac1N\sum_{i=1}^N h_{c_y(i)}(c_y),\\
+ h^*_{c_y(s),j}(c_y)&\equiv p_{g_j^*,c_y(s)}(c_y),\\
+ h_{c_w(i)}(c_w)&\equiv p_{c_w(i)}(c_w),&
+ \bar h_{c_w}(c_w)&\equiv\frac1N\sum_{i=1}^N h_{c_w(i)}(c_w),\\
+ h^*_{c_w(s),j}(c_w)&\equiv p^*_{g_j^*,c_w(s)}(c_w),\\
+ h_{c_a(i)}(c_a)&\equiv p_{c_a(i)}(c_a),&
+ \bar h_{c_a}(c_a)&\equiv\frac1N\sum_{i=1}^N h_{c_a(i)}(c_a),\\
+ h^*_{c_a(s),j}(c_a)&\equiv p^*_{g_j^*,c_a(s)}(c_a).
+\end{aligned}
+\]
+这里，$p_{c_y(i)}$ 表示 $P^N$ 下 $C_Y(i)$ 的边际密度，$p_{c_w(i)}$ 和 $p_{c_a(i)}$ 同样定义。此外，$p_{g^*,c_y(s)}$ 表示 $P^N_{g^*}$ 下 $C_Y(s)$ 的边际密度，$p_{g^*,c_w(s)}$ 和 $p_{g^*,c_a(s)}$ 也同样定义。
+\end{bookresult}
+
+\paragraph{$\bar q_w$、$\bar q_y$、$\bar g$ 的有效得分分量。}
+上述有效影响曲线，是分别由 $\bar q_y$、$\bar q_w$ 和 $\bar g$ 生成的三个有效得分分量的正交和：
+\[
+ D^N(O^N)=D^N_{\bar q_y}(O^N)+D^N_{\bar q_w}(O^N)+D^N_{\bar g}(O^N),
+\]
+\[
+\begin{aligned}
+ D^N_{\bar q_y}(O^N)&=\frac1N\sum_{i=1}^N\bar D_{\bar q_y}(Y(i),C_y(i)),\\
+ \bar D_{\bar q_y}(Y(i),C_y(i))&=\sum_{s=1}^N\bar D_{q_{y(s)}}(Y(i),C_y(i)),\\
+ D^N_{\bar q_w}(O^N)&=\frac1N\sum_{i=1}^N\bar D_{\bar q_w}(W(i),C_w(i)),\\
+ \bar D_{\bar q_w}(W(i),C_w(i))&=\sum_{s=1}^N\bar D_{q_{w(s)}}(W(i),C_w(i)),\\
+ D^N_{\bar g}(O^N)&=\frac1N\sum_{i=1}^N\bar D_{\bar g}(A(i),C_a(i)),\\
+ \bar D_{\bar g}(A(i),C_a(i))&=\sum_{s=1}^N\bar D_{g_s}(A(i),C_a(i)).
+\end{aligned}
+\]
+因为每个 $\bar D_{q_{y(s)}}(Y(i),C_y(i))$，相对于给定 $C_y(i)$ 时 $Y(i)$ 的分布，均具有条件均值零，所以 $D^N_{\bar q_y}(O^N)$ 可写成 $N^{-1}\sum_i h(Y(i),C_y(i))$，其中 $h$ 是一个不随 $i$ 改变的共同函数，满足
+\[
+ \int h(y,c)\bar q_y(y\mid c)\,d\mu_y(y\mid c)=0.
+\]
+这证明 $D^N_{\bar q_y}(O^N)$ 属于 $\bar q_y$ 的切空间。同理，$D^N_{\bar q_w}(O^N)$ 和 $D^N_{\bar g}(O^N)$ 也属于模型 $\mathcal M^N$ 在 $P^N$ 处的切空间。
+
+\subsection{利用嵌套假设对有效影响曲线作 Monte Carlo 逼近}
+
+TMLE 和其他估计量的主要组成，是在初始估计量 $(\bar q_N,\bar g_N)$ 下，计算有效影响曲线在 $O^N$ 处的值。本小节讨论用 Monte Carlo 方法逼近这一值 $D^N(\bar q_N,\bar g_N)(O^N)$。我们将使用下面这个关于有效影响曲线定义中条件期望的引理。
+
+\begin{bookresult}{引理}{19.1}
+在嵌套假设下，给定 $Y(s),C_y(s)$ 时 $Y_{g^*}(\tau)$ 的条件分布，与给定 $O(1),\ldots,O(s)$ 时的条件分布相同；给定 $W(s),C_w(s)$ 时 $Y_{g^*}(\tau)$ 的条件分布，与给定 $\bar O(s-1),W(s),C_w(s)$ 时的条件分布相同；给定 $A(s),C_a(s)$ 时 $Y_{g^*}(\tau)$ 的条件分布，与给定 $\bar O(s-1),W(s),A(s),C_a(s)$ 时的条件分布相同。
+\end{bookresult}
+
+\paragraph{计算有效影响曲线中的条件期望。}
+为便于表述，固定 $j$，并将 $g_j^*$ 记为 $g^*$。嵌套假设意味着，可用直接的 Monte Carlo 模拟逼近来计算条件均值
+\[
+ E(Y_{g^*}(\tau)\mid Y(s)=y(s),C_y(s)=c_y(s))
+ =E(Y_{g^*}(\tau)\mid\bar O(s)).
+\]
+其方法是，从 $O(s)$ 之后的节点开始，依次从特定干预密度 $p_{g^*}$ 的各因子抽样。回顾 $O^N$ 中按顺序排列的节点序列。首先，从 $q_{w(s+1)}(\cdot\mid c_w(s+1))$ 抽取下一节点 $W(s+1)$；根据嵌套假设，$c_w(s+1)$ 是 $(y(s),c_y(s))$ 的函数，因而已知。随后，若 $s+1\notin\mathcal I_{g^*}$，则从 $g_{a(s+1)}$ 抽取 $A(s+1)$；否则，从 $g^*_{s+1}$ 抽取。嵌套假设保证，$A(s+1)$ 的父节点是 $(c_y(s),y(s),w(s+1))$ 的已知函数。再从 $q_{y(s+1)}$ 抽取 $Y(s+1)$。依此方式，在 $p_{g^*}$ 下抽取构成 $O^N$ 的整个未来节点序列，直至抽到 $Y_{g^*}(\tau)$。对每个待抽取节点，嵌套假设都保证我们能够由此前实现值计算所需父节点。多次重复这一过程，就可从给定 $Y(s),C_y(s)$ 时 $Y_{g^*}(\tau)$ 的条件概率分布中，得到大量 $Y_{g^*}(\tau)$ 的实现值。对这些实现值取平均，就得到 $E(Y_{g^*}(\tau)\mid Y(s)=y(s),C_y(s)=c_y(s))$ 的 Monte Carlo 逼近。同样，先抽取 $Y(s)$，再按上述方式抽取其余未来序列，就能从给定 $C_y(s)=c_y(s)$ 时 $Y_{g^*}(\tau)$ 的条件概率分布中抽样。
+
+对给定的 $(w(s),c_w(s))$ 和 $(a(s),c_a(s))$，也可类似得到其他条件期望 $E(Y_{g^*}(\tau)\mid W(s),C_w(s))$ 和 $E(Y_{g^*}(\tau)\mid A(s),C_a(s))$ 的 Monte Carlo 逼近。这样，嵌套假设使我们能以合理的计算速度，计算给定 $(\bar q,\bar g)$ 下有效影响曲线 $D^N(\bar q,\bar g)$ 中的条件期望。
+
+\paragraph{用机器学习逼近 $h$ 密度比。}
+现在讨论有效影响曲线中密度比 $h^*_{c_y(s),j}/\bar h_{c_y}$ 的计算或逼近；相同方法也适用于 $h^*_{c_w(s),j}/\bar h_{c_w}$ 和 $h^*_{c_a(s),j}/\bar h_{c_a}$。为便于表述，固定 $j$，并将 $g_j^*$ 记为 $g^*$。给定 $P=P_{\bar q,\bar g}$ 与 $P^*=P_{\bar q,g^*}$，我们的目标是逼近这两个分布下的密度比 $h^*_{c_y(s)}/\bar h_{c_y}$。从 $P_{\bar q,\bar g}$ 抽取 $B$ 个观测 $O_b^N$，再从 $P_{\bar q,g^*}$ 抽取 $B$ 个观测 $O_b^{N*}$，$b=1,\ldots,B$，共得到 $2B$ 个观测。对于每个给定 $s$，这产生来自 $P^*$ 的 $B$ 个观测 $C^*_{y,b}(s)$，$b=1,\ldots,B$。对于每次抽取的 $O_b^N$，随机抽一个 $i_b\in\{1,\ldots,N\}$，即每个值的均匀概率均为 $1/N$，再将 $O_b^N$ 映射为 $C_{y,b}(i_b)$。这产生来自 $P$ 的 $B$ 个观测 $C_{y,b}(i_b)$。将这 $2B$ 个观测 $\{C^*_{y,b}(s),C_{y,b}(i_b):b=1,\ldots,B\}$ 表示为 $(C_j,\Delta_j)$，$j=1,\ldots,2B$：$\Delta_j=1$ 表示该观测是来自 $P$ 的 $B$ 个 $C_{y,b}(i_b)$ 之一，$\Delta_j=0$ 则表示它是来自 $P^*$ 的 $B$ 个 $C^*_{y,b}(s)$ 之一。将这些观测视为随机变量 $(C,\Delta)$ 的独立同分布样本，其中 $P(\Delta=1)=0.5$；给定 $\Delta=1$ 时 $C$ 在 $c$ 处的条件密度 $p(c\mid\Delta=1)$ 等于 $\bar h_{c_y}(c)$，而给定 $\Delta=0$ 时的条件密度 $p(c\mid\Delta=0)$ 等于 $h^*_{c_y(s)}(c)$。有
+\[
+ \frac{h^*_{c_y(s)}(c)}{\bar h_{c_y}(c)}
+ =\frac{p(c\mid\Delta=1)}{p(c\mid\Delta=0)}
+ =\frac{P(\Delta=1\mid C=c)}{1-P(\Delta=1\mid C=c)}.
+\]
+因此，可基于这 $2B$ 个观测 $(C_j,\Delta_j)$，使用灵活的机器学习算法拟合 $P(\Delta=1\mid C)$ 的 logistic 回归，并用拟合值的 logit 逼近密度比函数 $h^*_{c_y(s)}/\bar h_{c_y}$。若 $C$ 离散，则直接使用非参数经验分布。这样，Monte Carlo 模拟可与灵活的 logistic 回归机器学习算法结合，逼近这些密度比。通过令 $B$ 足够大并采用灵活的机器学习算法，就能控制逼近误差。
+
+上述方法还可改进：把每个 $O_b^N$ 映射为 $N$ 个观测 $C_{y,b}(1),\ldots,C_{y,b}(N)$，并从 $P^*$ 抽取 $NB$ 个观测，而仅从 $P$ 抽取 $B$ 个。所得 $2NB$ 个观测仍可表示为 $(C_j,\Delta_j)$，$j=1,\ldots,2NB$，对应于 $(C,\Delta)$，其中 $P(\Delta=1)=0.5$，并且如前有 $P(c\mid\Delta=1)=\bar h_{c_y}(c)$、$P(c\mid\Delta=0)=h_{y,s}(c)$。
+
+\subsection{二元变量下有效影响曲线的一种特殊表示}
+
+对于二元节点，下面给出有效影响曲线分量的其他表示；它们直接导出后文 TMLE 的 logistic 回归扰动模型。若 $Y(s)\in\{0,1\}$ 为二元变量，则
+\[
+\begin{aligned}
+ &E(Y_{g_j^*}(\tau_j)\mid Y(s),C_y(s))-E(Y_{g_j^*}(\tau_j)\mid C_y(s))\\
+ &\qquad=H_{y(s),j}(C_y(s))(Y(s)-\bar q_Y(1\mid C_y(s))),
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+ H_{y(s),j}(C_y(s))\equiv{}&E(Y_{g_j^*}(\tau_j)\mid Y(s)=1,C_y(s))\\
+ &-E(Y_{g_j^*}(\tau_j)\mid Y(s)=0,C_y(s)).
+\end{aligned}
+\]
+令
+\[
+ H_{y(s)}(C_y(s))=\frac1J\sum_{j=1}^J I(s\leq\tau_j)
+ H_{y(s),j}(C_y(s))\frac{h^*_{c_y(s),j}(C_y(s))}{\bar h_{c_y}(C_y(s))},
+\]
+于是
+\[
+ \bar D_{q_{y(s)}}(\bar q,\bar g)(y(s),c_y(s))
+ =H_{y(s)}(c_y(s))(y(s)-\bar Q_y(1\mid c_y(s)).
+\]
+最后定义
+\begin{equation}
+ H_y(c)\equiv\sum_{s=1}^N H_{y(s)}(c),
+ \tag{19.1}
+\end{equation}
+从而由 $\bar q_y$ 生成的有效影响曲线分量为
+\[
+\begin{aligned}
+ D^N_{\bar q_y}(O^N)
+ &=\frac1N\sum_{i=1}^N\bar D_{\bar q_y}(Y(i),C_y(i))\\
+ &=\frac1N\sum_{i=1}^N H_y(C_y(i))(Y(i)-\bar Q_y(1\mid C_y(i))).
+\end{aligned}
+\]
+同样，若 $A(s)\in\{0,1\}$ 为二元变量，则
+\[
+\begin{aligned}
+ &E(Y_{g_j^*}(\tau_j)\mid A(s),C_a(s))-E(Y_{g_j^*}(\tau_j)\mid C_a(s))\\
+ &\qquad=H_{a(s),j}(C_a(s))(A(s)-\bar g(1\mid C_y(s))),
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+ H_{a(s),j}(C_a(s))={}&E(Y_{g_j^*}(\tau_j)\mid A(s)=1,C_a(s))\\
+ &-E(Y_{g^*j}(\tau_j)\mid A(s)=0,C_a(s)).
+\end{aligned}
+\]
+令
+\[
+ H_{a(s)}(C_a(s))=\frac1J\sum_{j=1}^J I(s\leq\tau_j,s\notin\mathcal I_j)
+ H_{a(s),j}(C_a(s))\frac{h^*_{c_a(s),j}(C_a(s))}{\bar h_{c_a}(C_a(s))},
+\]
+于是
+\[
+ \bar D_{\bar g_s}(\bar q,\bar g)(a(s),c_a(s))
+ =H_{a(s)}(c_a(s))(a(s)-\bar g(1\mid c_a(s)).
+\]
+最后定义
+\begin{equation}
+ H_a(c)\equiv\sum_{s=1}^N H_{a(s)}(c),
+ \tag{19.2}
+\end{equation}
+从而由 $\bar g$ 生成的有效影响曲线分量为
+\[
+\begin{aligned}
+ D^N_{\bar g}(O^N)
+ &=\frac1N\sum_{i=1}^N\bar D_{\bar g}(A(i),C_a(i))\\
+ &=\frac1N\sum_{i=1}^N H_a(C_a(i))(A(i)-\bar g(1\mid C_a(i))).
+\end{aligned}
+\]
+假设 $W(s)=(W_k(s):k=1,\ldots,K)$ 是二元变量 $W_k(s)\in\{0,1\}$ 构成的向量，令 $\bar q_{w,k}$ 为 $\bar q_w$ 所蕴含的给定 $W_{1:k-1}(s),C_W(s)$ 时 $W_k(s)$ 的条件密度。令 $C_{w_k}(s)=(C_w(s),W_{1:k-1}(s))$ 为 $W_k(s)$ 的父节点集，于是可以写成 $\bar q_{w,k}(\cdot\mid C_{w_k}(s))$。有
+\[
+\begin{aligned}
+ &E(Y_{g_j^*}(\tau_j)\mid W(s),C_w(s))-E(Y_{g_j^*}(\tau_j)\mid C_w(s))\\
+ &=\sum_{k=1}^{K_s}\{E(Y_{g_j^*}(\tau_j)\mid W_k(s),C_{w_k}(s))
+ -E(Y_{g_j^*}(\tau_j)\mid C_{w_k}(s))\}\\
+ &=\sum_{k=1}^{K_s}H_{w_k(s),j}(C_{w_k}(s))(W_k(s)-\bar q_{w_k}(1\mid C_{w_k}(s))),
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+ H_{w(k),s,j}(C_{w_k}(s))\equiv{}&E(Y_{g^*j}(\tau_j)\mid W_k(s)=1,C_{w_k}(s))\\
+ &-E(Y_{g_j^*}(\tau_j)\mid W_k(s)=0,C_{w_k}(s)).
+\end{aligned}
+\]
+令
+\[
+ H_{w_k(s)}(C_{w_k}(s))=\frac1J\sum_{j=1}^J I(s\leq\tau_j)
+ H_{w_k(s),j}(C_{w_k}(s))\frac{h^*_{w_k,s,j}(C_{w_k}(s))}{\bar h_{w_k}(C_{w_k}(s))},
+\]
+于是
+\[
+ \bar D_{\bar q_{w_k(s)}}(\bar q,\bar g)(w_k(s),c_{w_k}(s))
+ =H_{w_k(s)}(c_{w_k}(s))(w_k(s)-\bar q_{w_k}(1\mid c_{w_k}(s))).
+\]
+最后定义
+\begin{equation}
+ H_{w_k}(c)\equiv\sum_{s=1}^N H_{w_k(s)}(c),
+ \tag{19.3}
+\end{equation}
+从而由 $\bar q_{w_k}$ 生成的有效影响曲线分量为
+\[
+\begin{aligned}
+ D^N_{\bar q_{w_k}}(O^N)
+ &=\frac1N\sum_{i=1}^N\bar D_{\bar q_{w_k}}(W_k(i),C_{w_k}(i))\\
+ &=\frac1N\sum_{i=1}^N H_{w_k}(C_{w_k}(i))(W_k(i)-\bar q_{w_k}(1\mid W_k(i)).
+\end{aligned}
+\]
+当然，将所有这些分量特定的表示结合起来，并利用
+\[
+ D^N(O^N)=D^N_{\bar q_y}(O^N)+D^N_{\bar g}(O^N)
+ +\sum_{k=1}^K D^N_{\bar q_{w_k}},
+\]
+就得到有效影响曲线的相应表示。

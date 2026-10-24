@@ -1,0 +1,249 @@
+
+% 原书附录 PDF 第 4—8 页；所有展示公式均已逐页核验。
+\providecommand{\appba}{\mathbf a}
+\providecommand{\appbap}{\mathbf a'}
+\providecommand{\appbR}{\mathbf R}
+\providecommand{\appbL}{\mathbf L}
+\providecommand{\appbZ}{\mathbf Z}
+\providecommand{\appbA}{\mathbf A}
+\providecommand{\appbr}{\mathbf r}
+\providecommand{\appbl}{\mathbf l}
+\providecommand{\appbz}{\mathbf z}
+\providecommand{\appGam}{\bar\Gamma^{\mathbf a'}}
+\providecommand{\appMedProduct}{p_{L_0}(l_0)\mathbf P_R(\appbr\mid\appba,\appbz,\appbl)\mathbf P_Z(\appbz\mid\appbap,\appbr,\appbl)\mathbf P_L(\appbl\mid\appba,\appbr,\appbz)}
+
+\section{中介分析}
+
+本节建立第 17 章的三个基础结果。首先，证明自然直接效应的识别结果。这一效应定义为两个反事实结局均值的对比，其中对 $A_t$ 作静态干预，对 $Z_t$ 作未知的随机干预。识别结果来自两点：（1）通过 g 计算公式，识别给定干预下的反事实结局均值；（2）识别反事实中介变量的条件分布 $\bar\Gamma_{1,t}^{\appbap}$，该分布表示未知的随机干预（Robins 1986）。其次，证明我们给出的有效影响曲线，确实是统计目标参数路径导数的典范梯度。证明分为四步：（1）指定穿过 $P$ 的一族足够丰富的参数子模型；（2）把切空间，即这族子模型产生的全部得分的线性张成空间的闭包，表示为似然各因子对应切空间的正交和；（3）把沿参数子模型的统计目标参数路径导数，写成所给有效影响曲线与子模型得分的协方差；（4）证明所给有效影响曲线属于切空间。只要统计模型对 $A_t$ 的条件分布建模，并使纵向数据结构中其他所有节点的条件分布保持局部非参数性质，我们的证明就适用。第三，建立有效影响曲线所具有的双重稳健性。
+
+\subsection{引理 17.1 的证明：可识别性结果}
+
+对于 $X_t\in(R_t,L_t)$，还用
+$X_t\bigl(\appba,(\bar\Gamma_{1,s}^{\appbap},\appbz_{s,t})\bigr)$
+表示通过干预设定 $\appbA_t=\appba_t$、$\appbZ_{1,s}\sim\bar\Gamma_{1,s}^{\appbap}$、$\appbZ_{s,t}=\appbz_{s,t}$，在时间 $t$ 生成的反事实协变量。
+\begingroup\small
+\[
+\begin{aligned}
+&E\{Y_\tau(\appba,\appGam)\}
+ =\sum_{\appbr,\appbl,\appbz}y_\tau p[L_0=l_0]\\
+&\quad\times\prod_t\Biggl\{
+ p\left[R_t(\appba,\appGam)=r_t\;\middle|\;
+ \begin{gathered}L_0=l_0,\appbR_{t-1}(\appba,\appGam)=\appbr_{t-1},\\
+ \bar\Gamma_{t-1}^{\appbap}=\appbz_{t-1},
+ \appbL_{t-1}(\appba,\appGam)=\appbl_{t-1}\end{gathered}\right]\\
+&\qquad\times p\left[\Gamma_t^{\appbap}=z_t\;\middle|\;
+ \begin{gathered}L_0=l_0,\appbR_t(\appba,\appGam)=\appbr_t,\\
+ \bar\Gamma_{t-1}^{\appbap}=\appbz_{t-1},
+ \appbL_{t-1}(\appba,\appGam)=\appbl_{t-1}\end{gathered}\right]\\
+&\qquad\times p\left[L_t(\appba,\appGam)=l_t\;\middle|\;
+ \begin{gathered}L_0=l_0,\appbR_t(\appba,\appGam)=\appbr_t,\\
+ \bar\Gamma_t(\appbap)=\appbz_t,
+ \appbL_{t-1}(\appba,\appGam)=\appbl_{t-1}\end{gathered}\right]
+ \Biggr\}.
+\end{aligned}
+\]
+\endgroup
+由 $\Gamma_t^{\appbap}$ 的定义，
+\[
+\begin{aligned}
+&p\left[\Gamma_t^{\appbap}=z_t\;\middle|\;
+ \begin{gathered}\appbR_t(\appba,\appGam)=\appbr_t,
+ \bar\Gamma_{t-1}^{\appbap}=\appbz_{t-1},\\
+ \appbL_{t-1}(\appba,\appGam)=\appbl_{t-1}\end{gathered}\right]\\
+&\quad\equiv p\{Z_t(\appbap)=z_t\mid
+ \appbR_t(\appbap)=\appbr_t,
+ \appbZ_{t-1}(\appbap)=\appbz_{t-1},
+ \appbL_{t-1}(\appbap)=\appbl_{t-1}\}.
+\end{aligned}
+\]
+这一量出现在传统纵向总因果效应问题中：设定 $\appbA=\appbap$，并测量 $\appbZ$ 和 $\appbL$（Robins 1986）。因此，在假设 A1 下，可以从观测数据分布中，将它识别为条件概率
+$p_0(Z_t=z_t\mid\appbA_t=\appba_t',\appbZ_{t-1}=\appbz_{t-1},\appbL_{t-1}=\appbl_{t-1})$。
+为了识别 $R_t(\appba,\appGam)$ 和 $L_t(\appba,\appGam)$ 的条件概率，我们展示前两个协变量的推导；随后可递推得到后续协变量的结果。首先，
+\[
+\begin{aligned}
+&p\{R_1(\appba,\appGam)=r_1\mid L_0=l_0\}
+ =p[R_1(a_1)=r_1\mid L_0=l_0]\\
+&\quad=p[R_1(a_1)=l_1\mid A_1=a_1,L_0=l_0]
+ =p_0[R_1=r_1\mid A_1=a_1,L_0=l_0].
+\end{aligned}
+\]
+第一个等号来自反事实变量 $R_1(\appba,\appGam)$ 的定义。第二个等号来自假设 A2：给定 $L_0$ 时，$A_1$ 与 $R_1(\appba)$ 独立。最后一个等号来自一致性。接下来，
+\[
+\begin{aligned}
+&p\{L_1(\appba,\appGam)=l_1\mid
+ L_0=l_0,R_1(\appba,\appGam)=r_1,\Gamma_1^{\appbap}=z_1\}\\
+&\quad=p\{L_1(a_1,z_1)=l_1\mid
+ L_0=l_0,R_1(\appba,\appGam)=r_1,\Gamma_1^{\appbap}=z_1\}\\
+&\quad=p\{L_1(a_1,z_1)=l_1\mid L_0=l_0,R_1(\appba,\appGam)=r_1\}\\
+&\quad=p[L_1(a_1,z_1)=l_1\mid L_0=l_0,R_1(a_1)=r_1]\\
+&\quad=p_0[L_1=l_1\mid L_0=l_0,A_1=a_1,R_1=r_1,Z_1=z_1].
+\end{aligned}
+\]
+第一个等号来自反事实变量 $L_1(\appba,\appGam)$ 和 $L_1(\appba,\appbz)$ 的定义。第二个等号利用了理想实验中的如下事实：在给定 $L_0=l_0$ 及 $R_1(\appba,\Gamma^{\appbap})=R_1(a_1)=r_1$ 时，$Z_1$ 从分布 $\Gamma_1^{\appbap}(\cdot\mid l_0,r_1)$ 中随机抽取，不影响协变量 $L_1(a_1,z_1)$，后者的值仅依赖于 $R_1(a_1)=r_1$ 和 $l_0$。最后一个等号，是在 $(A,Z)$ 上作静态干预时，应用假设 A2、A3，依据通常的序贯随机化论证得到的。A4 中的正值性假设，保证识别表达式 (17.5) 中的条件概率定义良好。
+
+\subsection{定理 17.1 的证明}
+
+对于任意 $P\in\mathcal M$，回顾式 (17.1) 中的似然分解：
+\[
+\begin{aligned}
+p(O)=p(L_0)\prod_{t=1}^\tau\Bigl(
+ &p(A_t\mid\appbA_{t-1},\appbR_{t-1},\appbZ_{t-1},\appbL_{t-1})\\
+&\times p(R_t\mid\appbA_t,\appbR_{t-1},\appbZ_{t-1},\appbL_{t-1})\\
+&\times p(Z_t\mid\appbA_t,\appbR_t,\appbZ_{t-1},\appbL_{t-1})
+ p(L_t\mid\appbA_t,\appbR_t,\appbZ_t,\appbL_{t-1})\Bigr).
+\end{aligned}
+\]
+对于 $O_j\in\{L_0,A_t,R_t,Z_t,L_t:t=1,\ldots,\tau\}$，令 $P_{O_j}$ 表示条件概率 $P_{O_j}(O_j\mid\mathrm{Pa}(O_j))$。令 $L^2(P)$ 表示配备协方差算子的 Hilbert 空间，其中的元素是关于 $O$ 的均值为零的函数。考虑一族足够丰富的一维参数子模型 $P(\epsilon)$，它们仅通过扰动 $P_{O_j}$ 生成。模型不对条件概率 $P_{O_j}$ 施加限制。因此，给定任意关于 $(O_j,\mathrm{Pa}(O_j))$ 的函数 $S_{O_j}\in L^2(P)$，只要其方差有限，且
+$E_P\{S_{O_j}(O_j,\mathrm{Pa}(O_j))\mid\mathrm{Pa}(O_j)\}=0$，扰动
+$P_{O_j}(\epsilon)=(1+\epsilon S_{O_j}(O_j,\mathrm{Pa}(O_j)))P_{O_j}$
+就是得分为 $S_{O_j}$ 的有效一维子模型。因此，对各 $P_{O_j}$ 作扰动所对应的切子空间为
+\begingroup\small
+\[
+\begin{aligned}
+T(P_{L_0})={}&\{S_{L_0}(L_0):E_P(S_{L_0})=0\},\\
+T(P_{A_t})={}&\bigl\{S_{A_t}(A_t,\appbA_{t-1},\appbR_{t-1},\appbZ_{t-1},\appbL_{t-1}):\\
+&\hspace{1.5em}E_P(S_{A_t}\mid\appbA_{t-1},\appbR_{t-1},\appbZ_{t-1},\appbL_{t-1})=0\bigr\},\\
+T(P_{R_t})={}&\bigl\{S_{R_t}(R_t,\appbA_t,\appbR_{t-1},\appbZ_{t-1},\appbL_{t-1}):\\
+&\hspace{1.5em}E_P(S_{R_t}\mid\appbA_t,\appbR_{t-1},\appbZ_{t-1},\appbL_{t-1})=0\bigr\},\\
+T(P_{Z_t})={}&\bigl\{S_{Z_t}(Z_t,\appbA_t,\appbR_t,\appbZ_{t-1},\appbL_{t-1}):\\
+&\hspace{1.5em}E_P(S_{Z_t}\mid\appbA_t,\appbR_t,\appbZ_{t-1},\appbL_{t-1})=0\bigr\},\\
+T(P_{L_t})={}&\bigl\{S_{L_t}(L_t,\appbA_t,\appbR_t,\appbZ_t,\appbL_{t-1}):\\
+&\hspace{1.5em}E_P(S_{L_t}\mid\appbA_t,\appbZ_t,\appbR_t,\appbL_{t-1})=0\bigr\}.
+\end{aligned}
+\]
+\endgroup
+由式 (17.1) 的分解，当 $O_i\ne O_j$ 时，$T(P_{O_i})$ 与 $T(P_{O_j})$ 正交。此外，扰动整个似然所对应的切空间 $T(P)$，就是这些切子空间的正交和，即 $T(P)=\bigoplus_jT(P_{O_j})$；任意得分 $S(O)\in T(P)$ 都可以分解为 $\sum_jS_{O_j}(O)$。
+
+在上述宽泛的切子空间定义下，任意在 $P$ 下均值为零且方差有限的函数 $S(O)$，都属于 $T(P)$。这尤其意味着，$\Psi^{\appba,\appbap}(\cdot)$ 的路径导数的任意梯度都属于 $T(P)$，因而实际上就是典范梯度。所以，只须证明式 (17.9) 的 $D^{*,\appba,\appbap}(\cdot)$ 是 $\Psi^{\appba,\appbap}(\cdot)$ 的路径导数的一个梯度。事实上，对于任意 $S(O)=\sum_jS_{O_j}(O)\in T(P)$，令 $P^S(\epsilon)$ 表示得分为 $S$ 的 $P$ 的扰动。在适当的正则条件下，在 $P$ 处的路径导数可以写为
+\begingroup\small
+\[
+\begin{aligned}
+&\left.\frac{\mathrm d}{\mathrm d\epsilon}\Psi^{\appba,\appbap}(P^S(\epsilon))\right|_{\epsilon=0}\\
+&=\left.\frac{\mathrm d}{\mathrm d\epsilon}\right|_{\epsilon=0}
+ \sum_{\appbr,\appbz,\appbl}y\Biggl\{
+ [(1+\epsilon S_{L_0})p_{L_0}](l_0)\\
+&\quad\times\prod_{t=1}^\tau\Bigl(
+ [(1+\epsilon S_{R_t})p_{R_t}](r_t\mid\appba_t,\appbr_{t-1}\appbz_{t-1},\appbl_{t-1})\\
+&\qquad\times[(1+\epsilon S_{Z_t})p_{Z_t}](z_t\mid\appba_t',\appbr_t,\appbz_{t-1},\appbl_{t-1})\\
+&\qquad\times[(1+\epsilon S_{L_t})p_{L_t}](l_t\mid\appba_t,\appbr_t,\appbz_t,\appbl_{t-1})\Bigr)\Biggr\}
+\end{aligned}
+\]
+\begin{equation}
+=\sum_{\appbr,\appbz,\appbl}y\left(\appMedProduct\sum_{t=1}^\tau S_{L_t}\right)
+\tag{A.2}
+\end{equation}
+\begin{equation}
+\phantom{=}+\sum_{\appbr,\appbz,\appbl}y\left(\appMedProduct\sum_{t=1}^\tau S_{Z_t}\right)
+\tag{A.3}
+\end{equation}
+\begin{equation}
+\phantom{=}+\sum_{\appbr,\appbz,\appbl}y\left(\appMedProduct\sum_{t=1}^\tau S_{R_t}\right)
+\tag{A.4}
+\end{equation}
+\begin{equation}
+\phantom{=}+\sum_{\appbr,\appbz,\appbl}y\left(\appMedProduct S_{L_0}\right),
+\tag{A.5}
+\end{equation}
+\endgroup
+其中，$\mathbf P_R(\appbr\mid\appba,\appbz,\appbl)\equiv\prod_{t=1}^\tau p_R(r_t\mid\appbA_t=\appba_t,\appbr_{t-1},\appbz_{t-1},\appbl_{t-1})$，$\mathbf P_L$ 的定义类似；并且
+$\mathbf P_Z(\appbz\mid\appba,\appbr,\appbl)\equiv\prod_{t=1}^\tau p_Z(z_t\mid\appbA_t=\appba_t',\appbr_t,\appbz_{t-1},\appbl_{t-1})$。
+
+首先，由 $D_t^L$ 和 $S_{L_t}$ 的定义，对每个 $t=1,\ldots,t_0$，
+\[
+\begin{aligned}
+&E_P\{D_{L_t}^{\appba,\appbap}(\appbR_t,\appbZ_t,\appbL_t)
+ S_{L_t}(\appbA_t,\appbR_t,\appbZ_t,\appbL_t)\}\\
+&\qquad=\sum_{\appbr,\appbz,\appbl}y\appMedProduct S_{L_t}.
+\end{aligned}
+\]
+此外，$D_{L_t}^{\appba,\appbap}(P)(\appbR_t,\appbZ_t,\appbL_t)$ 满足
+$E_P\{D_{L_t}^{\appba,\appbap}(P)(\appbR_t,\appbZ_t,\appbL_t)\mid\appbR_t,\appbZ_t,\appbL_{t-1}\}=0$。
+因此，根据这些切子空间的定义，$D_{L_t}^{\appba,\appbap}(P)\in T(P_{L_t\mid\mathrm{Pa}(L_t)})$。由 $T(P)$ 的正交分解，得到
+\[
+\begin{aligned}
+&E_P\{D_{L_t}^{\appba,\appbap}(P)\times S_{L_t}\}\\
+&\quad=E_P\left\{D_{L_t}^{\appba,\appbap}(P)
+ \left(S_{L_0}+\sum_{t=1}^\tau S_{A_t}+S_{Z_t}+S_{L_t}\right)\right\}.
+\end{aligned}
+\]
+同理，式 (A.3) 可以写为
+\[
+\begin{aligned}
+&E_P\{D_{Z_t}^{\appba,\appbap}(P)\times S_{Z_t}\}\\
+&\quad=E_P\left\{D_{Z_t}^{\appba,\appbap}(P)
+ \left(S_{L_0}+\sum_{t=1}^\tau S_{A_t}+S_{Z_t}+S_{L_t}\right)\right\},
+\end{aligned}
+\]
+式 (A.4) 可以写为
+\[
+\begin{aligned}
+&E_P\{D_{R_t}^{\appba,\appbap}(P)\times S_{R_t}\}\\
+&\quad=E_P\left\{D_{R_t}^{\appba,\appbap}(P)
+ \left(S_{L_0}+\sum_{t=1}^\tau S_{A_t}+S_{Z_t}+S_{L_t}\right)\right\},
+\end{aligned}
+\]
+而式 (A.5) 可以写为
+\[
+\begin{aligned}
+&E_P\{D_{L_0}^{\appba,\appbap}(P)\times S_{L_0}\}\\
+&\quad=E_P\left\{D_{L_0}^{\appba,\appbap}(P)
+ \left(S_{L_0}+\sum_{t=1}^\tau S_{A_t}+S_{Z_t}+S_{L_t}\right)\right\}.
+\end{aligned}
+\]
+合并以上结果，得到
+\[
+\begin{aligned}
+&\left.\frac{\mathrm d}{\mathrm d\epsilon}\Psi^{\appba,\appbap}(P^S(\epsilon))\right|_{\epsilon=0}\\
+&\quad=E_P\left\{\left(D_{L_0}^{\appba,\appbap}(P)
+ +\sum_{t=1}^\tau D_{R_t}^{\appba,\appbap}(P)
+ +D_{Z_t}^{\appba,\appbap}(P)+D_{L_t}^{\appba,\appbap}(P)\right)S\right\}.
+\end{aligned}
+\]
+所以，$D^{*,\appba,\appbap}(P)\equiv D_{L_0}^{\appba,\appbap}(P)+\sum_{t=1}^\tau D_{R_t}^{\appba,\appbap}(P)+D_{Z_t}^{\appba,\appbap}(P)+D_{L_t}^{\appba,\appbap}(P)$，是 $\Psi^{\appba,\appbap}$ 在 $P$ 处的路径导数的一个梯度。如前所述，在非参数模型下，$D^{*,\appba,\appbap}(P)$ 实际上就是典范梯度。
+
+\paragraph*{有效影响曲线的双重稳健性。}
+稳健性条件中的第一种情形直接成立。在第二种情形下，正确的 $p_L$ 与 $p_R$ 给出 $E_{P_0}D_{R_t}^{\appba,\appbap}(P)=0$ 和 $E_{P_0}D_{L_t}^{\appba,\appbap}(P)=0$；正确的 $p_L$、$p_R$ 与 $p_A$ 则使 $D_{Z_t}^{\appba,\appbap}$ 关于 $t$ 的求和形成望远镜求和。具体而言，
+\begingroup\small
+\[
+\begin{aligned}
+&E_{P_0}\sum_tD_{Z_t}^{\appba,\appbap}(P)\\
+&=\sum_{\appbl_{\tau-1},\appbr,\appbz}
+ \bar Q_{L_\tau}(P_0)^{\appba,\appbap}(\appbr,\appbz,\appbl_{\tau-1})
+ p_{0,L_0}(l_0)\\
+&\qquad\times\mathbf P_{0,R}(\appbr\mid\appba,\appbz,\appbl_{\tau-1})
+ \mathbf P_{0,Z}(\appbz\mid\appbap,\appbr,\appbl_{\tau-1})
+ \mathbf P_{0,L}(\appbl_{\tau-1}\mid\appba,\appbr,\appbz)\\
+&\qquad-E_{P_0}\bar Q_{Z_1}^{\appba,\appbap}(\appbR_1,L_0)\\
+&=\Psi^{\appba,\appbap}(P_0)-E_{P_0}\bar Q_{Z_1}^{\appba,\appbap}(\appbR_1,L_0).
+\end{aligned}
+\]
+\endgroup
+另一方面，
+\[
+E_{P_0}D_{L_0}^{\appba,\appbap}(P)
+ =E_{P_0}\sum_{r_1}p_{0,R}(r_1\mid l_0,a_1)
+ \bar Q_{Z_1}^{\appba,\appbap}(r_1,L_0)-\Psi^{\appba,\appbap}(P).
+\]
+因此，$E_{P_0}D^{*,\appba,\appbap}(P)=0$ 蕴含
+\[
+\begin{aligned}
+0={}&E_{P_0}D^{*,\appba,\appbap}(P)
+ =E_{P_0}\sum_tD_{Z_t}^{\appba,\appbap}(P)+E_{P_0}D_{L_0}^{\appba,\appbap}(P)\\
+={}&\Psi^{\appba,\appbap}(P_0)-E_{P_0}\bar Q_{Z_1}^{\appba,\appbap}(\appbR_1,L_0)\\
+&+E_{P_0}\sum_{r_1}p_{0,R}(r_1\mid l_0,a_1)\bar Q_{Z_1}^{\appba,\appbap}(r_1,L_0)
+ -\Psi^{\appba,\appbap}(P)\\
+={}&\Psi^{\appba,\appbap}(P_0)-\Psi^{\appba,\appbap}(P).
+\end{aligned}
+\]
+同理，在第三种情形下，正确的 $p_Z$ 给出 $P_0D_t^{Z_t,\appba,\appbap}(P)=0$；正确的 $p_A$ 与 $p_Z$ 使 $E_{P_0}D_{L_t}^{\appba,\appbap}(P)+E_{P_0}D_{R_t}^{\appba,\appbap}(P)$ 关于 $t$ 的求和形成所需的望远镜求和，最后得到
+\[
+\begin{aligned}
+0={}&E_{P_0}D^{*,\appba,\appbap}(P)\\
+={}&\sum_t\{E_{P_0}D_{L_t}^{\appba,\appbap}(P)
+ +E_{P_0}D_{R_t}^{\appba,\appbap}(P)\}
+ +E_{P_0}D_{L_0}^{\appba,\appbap}(P)\\
+={}&\Psi^{\appba,\appbap}(P_0)-E_{P_0}\bar Q_{R_1}^{\appba,\appbap}(L_0)
+ +E_{P_0}E_{P_0}\bar Q_{R_1}^{\appba,\appbap}(L_0)-\Psi^{\appba,\appbap}(P)\\
+={}&\Psi^{\appba,\appbap}(P_0)-\Psi^{\appba,\appbap}(P).
+\end{aligned}
+\]

@@ -1,0 +1,630 @@
+% 原PDF94页4.6.2标题至106页4.7标题前；全部印刷式按原样保留。
+\providecommand{\chFourBIddots}{\mathinner{\reflectbox{\ensuremath{\ddots}}}}
+\subsection{结构与参数随时间变化的动态结构方程模型的估计与推断}
+
+将普通结构方程模型中常用的三种参数估计方法，即最大似然法、两阶段最小二乘法（two stage least squares，2SLS）和三阶段最小二乘法（three stage squares，3SLS），推广到动态结构方程模型的参数估计（Judge et al. 1982）。
+
+\subsubsection{最大似然估计}
+
+假设结构误差服从正态分布，可以通过极大化似然函数，估计动态结构方程模型中的参数。令
+\[
+e_i^t=\begin{bmatrix}e_{i1}^t\\\vdots\\e_{iM}^t\end{bmatrix},
+\quad t=1,\ldots,T,\qquad
+e_i=\begin{bmatrix}e_i^1\\\vdots\\e_i^T\end{bmatrix},
+\quad i=1,\ldots,n,
+\]
+其中
+\[
+e_i^t=-(\Gamma^t)'y_i^t-(A^t)'y_{li}^{t-1}-(B^t)'x_i,
+\quad i=1,\ldots,n,\quad t=1,\ldots,T.
+\]
+于是，误差向量服从均值为零、协方差矩阵为 $\Sigma$ 的多元正态分布。$e_i$ 的分布可写为
+\[
+g(e_i)=(2\pi)^{-TM/2}|\Sigma|^{-1/2}
+ \exp\left\{-\frac12e_i'\Sigma^{-1}e_i\right\},
+\]
+其中
+\[
+\operatorname{cov}(e_i,e_i)=\Sigma=
+\begin{bmatrix}
+\Sigma_{11}&\Sigma_{12}&\cdots&\Sigma_{1T}\\
+\Sigma_{21}&\Sigma_{22}&\cdots&\Sigma_{2T}\\
+\vdots&\vdots&\vdots&\vdots\\
+\Sigma_{T1}&\Sigma_{T2}&\cdots&\Sigma_{TT}
+\end{bmatrix},\quad i=1,\ldots,n,
+\]
+并且
+\[
+\Sigma_{tt}=\operatorname{cov}(e_i^t,e_i^t)=
+\begin{bmatrix}
+\sigma_{11}^{tt}&\cdots&\sigma_{1M}^{tt}\\
+\vdots&\vdots&\vdots\\
+\sigma_{M1}^{tt}&\cdots&\sigma_{MM}^{tt}
+\end{bmatrix}.
+\]
+结论4.8给出了对数似然函数，其推导见附录4.E。
+
+\par\medskip\noindent\textbf{结论4.8}\quad 对数似然函数定义为
+\begin{equation}
+\begin{aligned}
+l(\Gamma,A,B,\Sigma\mid Y)
+={}&-\frac{nTM}{2}\log(2\pi)-\frac n2\log|\Sigma|
+  +n\sum_{t=1}^{T}\log|\Gamma^t|\\
+ &{}-\frac12\sum_{i=1}^{n}e_i'\Sigma^{-1}e_i.
+\end{aligned}\tag{4.198}
+\end{equation}
+若假设误差 $e_i^t$ 与 $e_i^t$ 不相关，则似然函数化为
+\begin{equation}
+\begin{aligned}
+l(\Gamma,A,B,\Sigma\mid Y)
+={}&-\frac{nTM}{2}\log(2\pi)-\frac n2\sum_{t=1}^{T}\log|\Sigma_{tt}|\\
+ &{}+n\sum_{t=1}^{T}\log|\Gamma^t|
+ -\frac12\sum_{i=1}^{n}\sum_{t=1}^{T}(e_i^t)'\Sigma_{tt}^{-1}e_i^t,
+\end{aligned}\tag{4.199}
+\end{equation}
+其中
+\[
+e_i^t=-(\Gamma^t)'y_i^t-(A^t)'y_{li}^{t-1}-(B^t)'x_i,
+\quad i=1,\ldots,n,\quad t=1,\ldots,T,
+\]
+\[
+e_i^t=\begin{bmatrix}e_{i1}^t\\\vdots\\e_{iM}^t\end{bmatrix},
+\quad t=1,\ldots,T,\qquad
+e_i=\begin{bmatrix}e_i^1\\\vdots\\e_i^T\end{bmatrix},
+\quad i=1,\ldots,n.
+\]
+不同时间点的误差相关时，极大化式（4.198）的对数似然函数；不相关时，则极大化式（4.199）。由此可求得结构方程参数的估计量 $\widehat\Gamma,\widehat A,\widehat B,\widehat\Sigma$。
+
+\subsubsection{广义最小二乘估计}
+
+上述最大似然法需要假设误差随机过程服从正态分布，但实际中这些变量的正态性假设未必成立。因此，需要发展不假设误差随机过程分布的估计方法。理论分析表明，普通最小二乘法对结构方程参数的估计通常是不相合的。不作分布假设的统计方法，包括分别应用于每个结构方程的单方程方法，以及同时应用于全部结构方程的完整系统方法。这里将普通结构方程模型中最重要、应用最广的单方程方法，推广到动态结构方程模型。
+
+首先引入汇集全部时间点数据的记号。令
+\[
+Y=\begin{bmatrix}Y^1&\cdots&Y^T\end{bmatrix},\quad
+W=\begin{bmatrix}W^1&\cdots&W^T\end{bmatrix},\quad
+\Psi=\begin{bmatrix}\Psi^1&\cdots&\Psi^T\end{bmatrix},
+\]
+以及
+\[
+\Pi=\begin{bmatrix}
+\Pi^1&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&\Pi^T
+\end{bmatrix}.
+\]
+由式（4.190）得到
+\begin{equation}
+Y=W\Pi+\Psi.\tag{4.200}
+\end{equation}
+式（4.200）给出了动态结构方程的简化形式。
+
+现在计算 $\Psi$ 的协方差矩阵。回顾矩阵 $\Psi$ 的定义：
+\begin{equation}
+\begin{aligned}
+\Psi&=\begin{bmatrix}\Psi^1&\cdots&\Psi^T\end{bmatrix}\\
+&=\begin{bmatrix}
+\psi_{11}^1&\cdots&\psi_{1M}^1&\cdots&\psi_{11}^T&\cdots&\psi_{1M}^T\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots&\vdots\\
+\psi_{j1}^1&\cdots&\psi_{jM}^1&\cdots&\psi_{j1}^T&\cdots&\psi_{jM}^T\\
+\vdots&\ddots&\chFourBIddots&\ddots&\chFourBIddots&\vdots&\vdots\\
+\psi_{n1}^1&\cdots&\psi_{nM}^1&\cdots&\psi_{n1}^T&\cdots&\psi_{nM}^T
+\end{bmatrix}.
+\end{aligned}\tag{4.201}
+\end{equation}
+令 $\psi_j'$ 为 $\Psi$ 的第 $j$ 行，$e_j'$ 为 $E$ 的第 $j$ 行。容易验证
+\begin{equation}
+(\psi_j^t)'=-(e_j^t)'(\Gamma^t)^{-1}\tag{4.202}
+\end{equation}
+或
+\begin{equation}
+\psi_j^t=-\bigl((\Gamma^t)^{-1}\bigr)e_t^j.\tag{4.203}
+\end{equation}
+因此，由式（4.201）和式（4.203）可得
+\begin{equation}
+\begin{aligned}
+\psi_j
+&=\begin{bmatrix}\psi_j^1\\\psi_j^2\\\vdots\\\psi_j^T\end{bmatrix}
+=-\begin{bmatrix}
+((\Gamma^1)^{-1})'e_j^1\\
+((\Gamma^2)^{-1})'e_j^2\\\vdots\\
+((\Gamma^T)^{-1})'e_j^T
+\end{bmatrix}\\
+&=-(\Gamma^{-1})'e_j,
+\end{aligned}\tag{4.204}
+\end{equation}
+其中
+\[
+\Gamma=\begin{bmatrix}
+\Gamma^1&0&\cdots&0\\0&\Gamma^2&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&\Gamma^T
+\end{bmatrix},\qquad
+e_j=\begin{bmatrix}e_j^1\\e_j^2\\\vdots\\e_j^T\end{bmatrix}.
+\]
+$\psi_j$ 的协方差矩阵为
+\begin{equation}
+\operatorname{cov}(\psi_j,\psi_j)=(\Gamma^{-1})'\Sigma\Gamma^{-1},\tag{4.205}
+\end{equation}
+其中
+\begin{equation}
+\operatorname{cov}(e_i,e_i)=\Sigma=
+\begin{bmatrix}
+\Sigma_{11}&\Sigma_{12}&\cdots&\Sigma_{1T}\\
+\Sigma_{21}&\Sigma_{22}&\cdots&\Sigma_{2T}\\
+\vdots&\vdots&\vdots&\vdots\\
+\Sigma_{T1}&\Sigma_{T2}&\cdots&\Sigma_{TT}
+\end{bmatrix},\quad i=1,\ldots,n.\tag{4.206}
+\end{equation}
+由于 $\operatorname{cov}(e_j,e_s)=0$，有
+\begin{equation}
+\operatorname{cov}(\psi_j,\psi_s)=0.\tag{4.207}
+\end{equation}
+结合式（4.205）与式（4.207），可得
+\begin{equation}
+\operatorname{cov}\bigl(\operatorname{vec}(\Psi'),\operatorname{vec}(\Psi')\bigr)
+=(\Gamma^{-1})'\Sigma\Gamma^{-1}\otimes I_n.\tag{4.208}
+\end{equation}
+由式（4.200）可得简化形式的最小二乘估计量：
+\begin{equation}
+\Pi=(W'W)^{-1}W'Y.\tag{4.209}
+\end{equation}
+附录4.H推导了动态结构方程参数的广义最小二乘估计量，结论4.9概括如下。
+
+\par\medskip\noindent\textbf{结论4.9}\quad 考虑方程
+\begin{equation}
+W_*'y_i=W_*'Z_i\delta_i+W_*'e_i,\tag{4.210}
+\end{equation}
+其中
+\[
+W_*=\begin{bmatrix}W&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&W\end{bmatrix}.
+\]
+参数 $\delta_i$ 的广义最小二乘估计量为
+\begin{equation}
+\widehat\delta_i=
+\bigl[(W_*'Z_i)'\Lambda_i^{-1}W_*'Z_i\bigr]^{-1}
+(W_*'Z_i)'\Lambda_i^{-1}W_*'y_i,\tag{4.211}
+\end{equation}
+其中
+\[
+\Lambda_i=W_*'V_iW_*,
+\]
+\[
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},\quad
+Z_i=\begin{bmatrix}
+Z_i^1&0&\cdots&0\\0&Z_i^2&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&Z_i^T
+\end{bmatrix},\quad
+\delta_i=\begin{bmatrix}\delta_i^1\\\delta_i^2\\\vdots\\\delta_i^T\end{bmatrix},
+\]
+\[
+\Sigma=\begin{bmatrix}
+\Sigma_{11}&\Sigma_{12}&\cdots&\Sigma_{1T}\\
+\Sigma_{21}&\Sigma_{22}&\cdots&\Sigma_{2T}\\
+\vdots&\vdots&\vdots&\vdots\\
+\Sigma_{T1}&\Sigma_{T2}&\cdots&\Sigma_{TT}
+\end{bmatrix},
+\]
+\[
+Z_i^t=\begin{bmatrix}Y_i^t&Y_{li}^{t-1}&X_i\end{bmatrix},\quad
+\delta_i^t=\begin{bmatrix}\gamma_i^t\\\alpha_i^t\\\beta_i^t\end{bmatrix},\quad
+W^t=\begin{bmatrix}Y_l^{t-1}&X\end{bmatrix},\quad
+W=\begin{bmatrix}W^1&\cdots&W^T\end{bmatrix},
+\]
+\[
+V_i=\operatorname{cov}(e_i,e_i)=\Sigma_{ii}\otimes I_n,
+\qquad
+\Sigma_{ii}=\begin{bmatrix}
+\sigma_{ii}^{11}&\cdots&\sigma_{ii}^{1T}\\
+\vdots&\vdots&\vdots\\\sigma_{ii}^{T1}&\cdots&\sigma_{ii}^{TT}
+\end{bmatrix}.
+\]
+协方差矩阵 $\Sigma_{ii}$ 估计为
+\begin{equation}
+\widehat\Sigma_{ii}=
+\frac{1}{nT-m_i+T-k_i-l_i}(y_i-Z_i\delta_i)(y_i-Z_i\delta_i)'.\tag{4.212}
+\end{equation}
+其中，$m_i=\sum_{t=1}^{T}m_i^t$，$l_i=\sum_{t=2}^{T}l_i^t$，
+$k_i=\sum_{t=1}^{T}k_i^t$；$m_i^t,l_i^t,k_i^t$ 分别是第 $i$ 个方程在时间点 $t$ 的内生变量、时间点 $t-1$ 的内生变量，以及当前时间点 $t$ 的外生变量的数目。
+
+估计量 $\widehat\delta_i$ 的协方差矩阵为
+\begin{equation}
+\Sigma_\delta=\operatorname{cov}(\widehat\delta_i,\widehat\delta_i)
+=\bigl[(W_*'Z_i)'\Lambda_i^{-1}W_*'Z_i\bigr]^{-1}.\tag{4.213}
+\end{equation}
+
+\subsection{稀疏动态结构方程模型}
+
+通常，动态结构贝叶斯网络是稀疏的。因此，$\Gamma^t,A^t,B^t$ 都是稀疏矩阵。为了得到它们的稀疏估计，自然的做法是施加 $l_1$ 范数惩罚。
+
+\subsubsection{\texorpdfstring{$L_1$}{L1}惩罚最大似然估计}
+
+为了获得 $\Gamma^t,A^t,B^t$（$t=1,2,\ldots,T$）的稀疏估计，可在对数似然函数中加入 $l_1$ 范数正则项 $\|\Gamma^t\|_1,\|A^t\|_1,\|B^t\|_1$ 并极大化。提出的 $l_1$ 惩罚最大似然估计为
+\begin{equation}
+\begin{aligned}
+\max_{\Gamma^t,A^t,B^t}\quad
+ &l(\Gamma,A,B,\Sigma\mid Y)
+ -\lambda_1\sum_{t=1}^{T}\|\Gamma^t\|_1\\
+ &{}-\lambda_2\sum_{t=1}^{T}\|A^t\|_1
+ -\lambda_3\sum_{t=1}^{T}\|B^t\|_1,
+\end{aligned}\tag{4.214}
+\end{equation}
+其中，$\lambda_1,\lambda_2,\lambda_3$ 为惩罚参数，
+\[
+\begin{aligned}
+l(\Gamma,A,B,\Sigma\mid Y)
+={}&-\frac{nTM}{2}\log(2\pi)-\frac n2\log|\Sigma|
+ +n\sum_{t=1}^{T}\log|\Gamma^t|\\
+ &{}-\frac12\sum_{i=1}^{n}e_i'\Sigma^{-1}e_i,
+\end{aligned}
+\]
+其中
+\[
+\Gamma=\begin{bmatrix}\Gamma^1&0&\cdots&0\\0&\Gamma^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&\Gamma^T\end{bmatrix},\quad
+A=\begin{bmatrix}A^1&0&\cdots&0\\0&A^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&A^T\end{bmatrix},
+\]
+\[
+B=\begin{bmatrix}B^1&0&\cdots&0\\0&B^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&B^T\end{bmatrix},\quad
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},\quad
+y_i^t=\begin{bmatrix}y_{i1}^t\\y_{i2}^t\\\vdots\\y_{iM}^t\end{bmatrix},
+\]
+\[
+y_{li}=\begin{bmatrix}y_{li}^0\\y_{li}^1\\\vdots\\y_{li}^{T-1}\end{bmatrix},\quad
+y_{li}^{t-1}=\begin{bmatrix}y_{li1}^{t-1}\\y_{li2}^{t-1}\\\vdots\\y_{liM}^{t-1}\end{bmatrix},\quad
+X_i=\begin{bmatrix}X_i\\X_i\\\vdots\\X_i\end{bmatrix},\quad
+x_i=\begin{bmatrix}x_{i1}\\x_{i2}\\\vdots\\x_{iK}\end{bmatrix},
+\]
+\[
+e_i=\begin{bmatrix}e_i^1\\e_i^2\\\vdots\\e_i^T\end{bmatrix},\quad
+e_i^t=\begin{bmatrix}e_{i1}^t\\\vdots\\e_{iM}^t\end{bmatrix},
+\]
+\[
+\begin{aligned}
+e_i^t&=-(\Gamma^t)'y_i^t-(A^t)'y_{li}^{t-1}-(B^t)'X_i,
+\quad t=1,\ldots,T,\\
+e_i&=-(\Gamma'y_i+A'y_{li}+B'X_i),\qquad
+e_i=\begin{bmatrix}e_i^1\\e_i^2\\\vdots\\e_i^T\end{bmatrix}.
+\end{aligned}
+\]
+优化问题（4.214）的目标函数包含两部分：凸可微函数和非光滑函数。传统牛顿法能够高效地求解无约束光滑优化问题，但不适于大型非光滑凸问题。近端方法可视为牛顿法从光滑优化向非光滑优化的扩展。附录4.G推导了动态结构方程模型参数的 $L_1$ 惩罚最大似然估计的原始梯度算法，概括如下。
+
+\begin{bookalgorithm}{4.4：近端梯度算法}
+\textbf{步骤1：}用最小二乘法生成初值。令
+\[
+\begin{gathered}
+W^t=\begin{bmatrix}Y_l^{t-1}&X\end{bmatrix},\quad
+W=\begin{bmatrix}W^1&\cdots&W^T\end{bmatrix},\quad
+Z_i^t=\begin{bmatrix}Y_i^t&Y_{li}^{t-1}&X_i\end{bmatrix},\\
+t=1,\ldots,T,\qquad\Lambda_i=W'W;
+\end{gathered}
+\]
+\[
+y_i=\begin{bmatrix}y_i^1\\y_i^2\\\vdots\\y_i^T\end{bmatrix},\quad
+Z_i=\begin{bmatrix}Z_i^1&0&\cdots&0\\0&Z_i^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&Z_i^T\end{bmatrix},\quad
+\delta_i=\begin{bmatrix}\delta_i^1\\\delta_i^2\\\vdots\\\delta_i^T\end{bmatrix},\quad
+\delta_i^t=\begin{bmatrix}\gamma_i^t\\\alpha_i^t\\\beta_i^t\end{bmatrix}.
+\]
+参数 $\delta_i$ 的最小二乘估计量为
+\begin{equation}
+\widehat\delta_i=
+\bigl[(W'Z_i)'\Lambda_i^{-1}W'Z_i\bigr]^{-1}
+(W'Z_i)'\Lambda_i^{-1}W'y_i,\quad i=1,\ldots,M.\tag{4.215}
+\end{equation}
+从 $\widehat\delta_i$ 提取 $\gamma_i^t,\alpha_i^t,\beta_i^t$，并组装成矩阵
+\[
+\Gamma^t=\begin{bmatrix}\gamma_1^t&\cdots&\gamma_M^t\end{bmatrix},\quad
+A^t=\begin{bmatrix}\alpha_1^t&\cdots&\alpha_M^t\end{bmatrix},\quad
+B^t=\begin{bmatrix}\beta_1^t&\cdots&\beta_M^t\end{bmatrix}.
+\]
+定义
+\[
+\Gamma_0=\begin{bmatrix}\Gamma^1&0&\cdots&0\\0&\Gamma^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&\Gamma^T\end{bmatrix},\quad
+A_0=\begin{bmatrix}A^1&0&\cdots&0\\0&A^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&A^T\end{bmatrix},
+\]
+\[
+B_0=\begin{bmatrix}B^1&0&\cdots&0\\0&B^2&\cdots&0\\\vdots&\vdots&\vdots&\vdots\\0&0&\cdots&B^T\end{bmatrix}.
+\]
+设置矩阵 $W^0$ 与向量 $G^0$ 的初值：
+\[
+W_\Gamma^0=\Gamma_0,\quad W_A^0=A_0,\quad W_B^0=B_0,
+\]
+\[
+G_\Gamma^0=\operatorname{vec}(\Gamma_0),\quad
+G_A^0=\operatorname{vec}(A_0),\quad G_B^0=\operatorname{vec}(B_0).
+\]
+计算协方差矩阵 $\Sigma$ 的估计量：
+\begin{equation}
+\widehat\Sigma^1=\frac1n\sum_{i=1}^{n}e_ie_i',\tag{4.216}
+\end{equation}
+或
+\begin{equation}
+\widehat\Sigma^1=\frac{1}{(n-2M-K)T}\sum_{i=1}^{n}e_ie_i',\tag{4.217}
+\end{equation}
+其中
+\[
+e_i'=-(y_i'\Gamma+y_{li}'A+X_i'B),\qquad
+e_i=-(\Gamma'y_i+A'y_{li}+B'X_i).
+\]
+设 $\lambda_1^0=\lambda_2^0=\lambda_3^0=1$，参数
+$\alpha_1,\alpha_2,\alpha_3\in(0,1)$，例如均取 $0.5$。
+设 $k=1$，$\lambda_1=\lambda_1^{k-1}$，$\lambda_2=\lambda_2^{k-1}$，
+$\lambda_3=\lambda_3^{k-1}$，并设 $l=1$。
+
+\textbf{步骤2：}重复以下过程直至收敛。
+\begin{enumerate}
+\item 令
+\[
+Z=\begin{bmatrix}Z_\Gamma\\Z_A\\Z_B\end{bmatrix}
+=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_\Gamma}(u_\Gamma^k)\\
+\operatorname{Prox}_{\lambda_2\Omega_A}(u_A^k)\\
+\operatorname{Prox}_{\lambda_3\Omega_B}(u_B^k)
+\end{bmatrix}.
+\]
+逐元素计算近端算子：
+\[
+\begin{aligned}
+u_\Gamma^k&=W_\Gamma^k-\lambda_1\left.\frac{\partial f}{\partial W_\Gamma}\right|_{W^k},\\
+u_A^k&=W_A^k-\lambda_2\left.\frac{\partial f}{\partial W_A}\right|_{W^k},\qquad
+u_B^k=W_B^k-\lambda_3\left.\frac{\partial f}{\partial W_B}\right|_{W^k},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\frac{\partial f}{\partial\Gamma}
+ &=-n(\Gamma')^{-1}-\sum_{i=1}^{n}y_ie_i'(\Sigma^{-1}),\\
+\frac{\partial f}{\partial A}&=-\sum_{i=1}^{n}y_{li}e_i'\Sigma^{-1},\qquad
+\frac{\partial f}{\partial B}=-\sum_{i=1}^{n}X_ie_i'\Sigma^{-1},\\
+e_i'&=-(y_i'\Gamma+y_{li}'A+X_i'B),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\left.\frac{\partial f}{\partial W_\Gamma}\right|_{W^k}
+ &=\operatorname{vec}\left(\frac{\partial f}{\partial\Gamma}\right),\\
+\left.\frac{\partial f}{\partial W_A}\right|_{W^k}
+ &=\operatorname{vec}\left(\frac{\partial f}{\partial A}\right),\qquad
+\left.\frac{\partial f}{\partial W_B}\right|_{W^k}
+ =\operatorname{vec}\left(\frac{\partial f}{\partial B}\right).
+\end{aligned}
+\]
+所有矩阵与向量均在第 $k$ 次迭代处取值。
+\[
+\begin{gathered}
+W_\Gamma^k=(\gamma_{ij}^k)_{MT\times MT},\quad
+W_A^k=(\alpha_{ij}^k)_{MT\times MT},\quad
+W_B^k=(\beta_{ij}^k)_{KT\times MT},\\
+u_\Gamma^k=(u_{\Gamma ij}^k)_{MT\times MT},\quad
+u_A^k=(u_{Aij}^k)_{MT\times MT},\quad
+u_B^k=(u_{Bij})_{KT\times MT},
+\end{gathered}
+\]
+\begin{equation}
+\gamma_{ij}^z=\operatorname{sign}(u_{\Gamma ij}^k)
+ (|u_{\Gamma ij}^k|-\lambda_1^k)_+,
+\quad i,j=1,\ldots,MT,\tag{4.218}
+\end{equation}
+\begin{equation}
+\alpha_{ij}^z=\operatorname{sign}(u_{Aij}^k)
+ (|u_{Aij}^k|-\lambda_2^k)_+,
+\quad i,j=1,\ldots,MT,\tag{4.219}
+\end{equation}
+\begin{equation}
+\beta_{ij}^z=\operatorname{sign}(u_{Bij}^k)
+ (|u_{Bij}^k|-\lambda_3^k)_+,
+\quad i=1,\ldots,KT,\ j=1,\ldots,MT,\tag{4.220}
+\end{equation}
+\begin{equation}
+\Gamma_z=(\gamma_{ij}^z)_{MT\times MT},\quad
+A_z=(\alpha_{ij}^z)_{MT\times MT},\quad
+B_z=(\beta_{ij})_{KT\times MT},\tag{4.221}
+\end{equation}
+\[
+Z_\Gamma=\operatorname{vec}(\Gamma_z),\quad
+Z_A=\operatorname{vec}(A_z),\quad Z_B=\operatorname{vec}(B_z).
+\]
+\item 计算辅助函数：
+\[
+\begin{aligned}
+f_\lambda(Z,G^k)={}&f(Z)
++\left(\frac{\partial f}{\partial Z}\right)^T(G^k-Z)
++\frac{1}{2\lambda_1}\|G_\Gamma^k-Z_\Gamma\|_2^2\\
+&{}+\frac{1}{2\lambda_2}\|G_A^k-Z_A\|_2^2
++\frac{1}{2\lambda_3}\|G_B^k-Z_B\|_2^2.
+\end{aligned}
+\]
+\item 若 $f(Z)\le\widehat f_\lambda(Z,G^k)$，则退出本轮循环，转至步骤3。
+\item 更新 $\lambda_1=\alpha_1\lambda_1$、$\lambda_2=\alpha_2\lambda_2$、$\lambda_3=\alpha_3\lambda_3$。
+\end{enumerate}
+\textbf{步骤3：}检查结构参数是否收敛。若
+\[
+\|\Gamma_Z-W_\Gamma^k\|_F>\varepsilon_1,\quad
+\|A_Z-W_A^k\|_F>\varepsilon_2,\quad
+\|B_Z-W_B^k\|_F>\varepsilon_3,
+\]
+则令 $\lambda_1^k=\lambda_1$、$\lambda_2^k=\lambda_2$、$\lambda_3^k=\lambda_3$、$G^{k+1}=Z$，并令
+\begin{equation}
+W_\Gamma^{k+1}=\Gamma_Z,\quad W_A^{k+1}=A_Z,\quad
+W_B^{k+1}=B_Z,\quad k\leftarrow k+1.\tag{4.222}
+\end{equation}
+返回步骤2（1）；否则转至步骤4。
+
+\textbf{步骤4：}更新协方差矩阵。
+\begin{equation}
+\widehat\Sigma^{l+1}=\frac1n\sum_{i=1}^{n}e_i^l(e_i^l)',\tag{4.223}
+\end{equation}
+或
+\begin{equation}
+\widehat\Sigma^{l+1}=\frac{1}{(n-2M-K)T}\sum_{i=1}^{n}e_i^l(e_i^l)',\tag{4.224}
+\end{equation}
+其中
+\[
+\begin{aligned}
+(e_i^l)'&=-(y_i'\Gamma_Z+y_{li}'A_Z+X_i'B_Z),\\
+e_i^l&=-(\Gamma_Z'y_i+A_Z'y_{li}+B_Z'X_i).
+\end{aligned}
+\]
+\textbf{步骤5：}检查协方差矩阵是否收敛。若
+$\|\Sigma^{l+1}-\Sigma^l\|_F>\eta$，其中 $\eta$ 是预先指定的小容许误差，
+则令 $\widehat\Sigma^l\leftarrow\widehat\Sigma^{l+1}$、$l\leftarrow l+1$，返回步骤2。
+否则停止。$W_\Gamma^{k+1}=\Gamma_Z$、$W_A^{k+1}=A_Z$、$W_B^{k+1}=B_Z$，分别是 $\Gamma,A,B$ 的参数矩阵估计。
+\end{bookalgorithm}
+
+\subsubsection{\texorpdfstring{$L_1$}{L1}惩罚广义最小二乘估计量}
+
+考虑第 $i$ 个方程：
+\begin{equation}
+y_i=Z_i\delta_i+e_i.\tag{4.225}
+\end{equation}
+重新排列矩阵 $Z_i$ 与向量 $\delta_i$ 的元素，可将式（4.225）化为
+\begin{equation}
+y_i=Z_{\gamma i}\gamma_i+Z_{\alpha i}\alpha_i+Z_{\beta i}\beta_i+e_i,\tag{4.226}
+\end{equation}
+其中
+\[
+\gamma_i=\begin{bmatrix}\gamma_i^1\\\vdots\\\gamma_i^T\end{bmatrix},\quad
+\alpha_i=\begin{bmatrix}\alpha_i^1\\\vdots\\\alpha_i^T\end{bmatrix},\quad
+\beta_i=\begin{bmatrix}\beta_i^1\\\vdots\\\beta_i^T\end{bmatrix},
+\]
+\[
+Z_{\gamma i}=\begin{bmatrix}Z_{\gamma i}^1&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&Z_{\gamma i}^T\end{bmatrix},\quad
+Z_{\alpha i}=\begin{bmatrix}Z_{\alpha i}^1&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&Z_{\alpha i}^T\end{bmatrix},\quad
+Z_{\beta i}=\begin{bmatrix}Z_{\beta i}^1&\cdots&0\\\vdots&\vdots&\vdots\\0&\cdots&Z_{\beta i}^T\end{bmatrix}.
+\]
+$Z_{\gamma i}^t=Y_i^t$、$Z_{\alpha i}^t=Y_{li}^{t-1}$、$Z_{\beta i}^t=X_i$，分别对应第 $i$ 个方程中未出现的、时间点 $t$ 与 $t-1$ 的内生变量（基因表达），以及外生变量。
+
+对式（4.210）使用加权最小二乘与 $l_1$ 范数惩罚，可构造优化问题
+\begin{equation}
+\min_{\delta_i}\quad f(\delta_i)+\Omega(\delta_i),\tag{4.227}
+\end{equation}
+其中
+\[
+\begin{aligned}
+f(\delta_i)={}&
+(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i)'\Lambda_i^{-1}\\
+&{}\times(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i),
+\end{aligned}
+\]
+\[
+\Lambda_i=W'V_iW,\quad W^t=\begin{bmatrix}Y_l^{t-1}&X\end{bmatrix},\quad
+W\begin{bmatrix}W^1&\cdots&W^T\end{bmatrix},
+\]
+\[
+\begin{gathered}
+\Omega(\delta_i)=\lambda_1\Omega_1(\gamma_i)+\lambda_2\Omega_2(\alpha_i)+\lambda_3\Omega_3(\beta_i),\\
+\Omega_1(\gamma_i)=\|\gamma_i\|_1,\qquad
+\Omega_2(\alpha_i)=\|\alpha_i\|_1,\qquad
+\Omega_3(\beta_i)=\|\beta_i\|_1.
+\end{gathered}
+\]
+与附录4.G类似，附录4.H推导了求解优化问题（4.227）的近端梯度算法，概括如下。
+
+\begin{bookalgorithm}{4.5：近端梯度算法}
+\textbf{步骤1：}用最小二乘法生成初值。参数 $\delta_i$ 的最小二乘估计量为
+\begin{equation}
+\widehat\delta_i=
+\bigl[(W'Z_i)'\Lambda_i^{-1}W'Z_i\bigr]^{-1}
+(W'Z_i)'\Lambda_i^{-1}W'y_i,\tag{4.228}
+\end{equation}
+其中，$\Lambda_i=W'W$，$Z_i,y_i$ 的定义见式（4.226）。从 $\widehat\delta_i$ 提取 $\gamma_i,\alpha_i,\beta_i$，并设置初值
+$\gamma_i^1=\gamma_i$、$\alpha_i^1=\alpha_i$、$\beta_i^1=\beta_i$。令
+\[
+\delta_i^1=\begin{bmatrix}\gamma_i^1\\\alpha_i^1\\\beta_i^1\end{bmatrix}.
+\]
+计算协方差矩阵 $\Sigma_{ii}$ 的初值：
+\begin{equation}
+\widehat\Sigma_{ii}^1=\frac{1}{(n-m_i+1-l_i-k_i)T}
+(y_i-Z_i\delta_i^1)(y_i-Z_i\delta_i^1)',\tag{4.229}
+\end{equation}
+\[
+V_i^1=\Sigma_{ii}^1\otimes I_n.
+\]
+设 $\lambda_1^1=\lambda_2^1=\lambda_3^1=1$，参数 $\alpha_1,\alpha_2,\alpha_3\in(0,1)$，例如均取 $0.5$。
+设 $k=1$，$\lambda_1=\lambda_1^1$、$\lambda_2=\lambda_2^1$、$\lambda_3=\lambda_3^1$。设 $k=1$、$l=1$。
+
+\textbf{步骤2：}重复以下过程直至收敛。
+\begin{enumerate}
+\item 令
+\[
+\delta_i^z=\begin{bmatrix}\gamma_i^z\\\alpha_i^z\\\beta_i^z\end{bmatrix}
+=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_1}(u_{\gamma_i}^k)\\
+\operatorname{Prox}_{\lambda_2\Omega_2}(u_{\alpha_i}^k)\\
+\operatorname{Prox}_{\lambda_3\Omega_3}(u_{\beta_i}^k)
+\end{bmatrix}.
+\]
+逐元素计算近端算子：
+\[
+\begin{aligned}
+\left.\frac{\partial f}{\partial\gamma_i}\right|_{\delta_i^k}
+ &=-2Z_{\gamma i}'W\Lambda_i^{-1}
+ (W'y_i-W'Z_{\gamma i}\gamma_i^k-W'Z_{\alpha i}\alpha_i^k-W'Z_{\beta i}\beta_i^k),\\
+\frac{\partial f}{\partial\alpha_i}
+ &=-2Z_{\alpha i}'W\Lambda_i^{-1}
+ (W'y_i-W'Z_{\gamma i}\gamma_i^k-W'Z_{\alpha i}\alpha_i^k-W'Z_{\beta i}\beta_i^k),\\
+\left.\frac{\partial f}{\partial\beta_i}\right|_{\delta_i^k}
+ &=-2Z_{\beta i}'W\Lambda_i^{-1}
+ (W'y_i-W'Z_{\gamma i}\gamma_i^k-W'Z_{\alpha i}\alpha_i^k-W'Z_{\beta i}\beta_i^k),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+u_{\gamma_i}^k&=\gamma_i^k-\lambda_1^k\left.\frac{\partial f}{\partial\gamma_i}\right|_{\delta_i^k},\\
+u_{\alpha_i}^k&=\alpha_i^k-\lambda_2^k\left.\frac{\partial f}{\partial\alpha_i}\right|_{\delta_i^k},\qquad
+u_{\beta_i}^k=\beta_i^k-\lambda_3^k\left.\frac{\partial f}{\partial\beta_i}\right|_{\delta_i^k},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\gamma_{ij}^z&=\operatorname{sign}(u_{\gamma ij}^k)
+(|u_{\gamma ij}^k|-\lambda_1^k)_+,\quad j=1,\ldots,m_i,\\
+\alpha_{ij}^z&=\operatorname{sign}(u_{\alpha ij}^k)
+(|u_{\alpha ij}^k|-\lambda_2^k)_+,\quad j=1,\ldots,l_i,\\
+\beta_{ij}^z&=\operatorname{sign}(u_{\beta ij}^k)
+(|u_{\beta ij}^k|-\lambda_3^k)_+,\quad j=1,\ldots,k_i.
+\end{aligned}
+\]
+将 $\gamma_{ij}^z,\alpha_{ij}^z,\beta_{ij}^z$ 组装成向量：
+\[
+\gamma_i^z=\begin{bmatrix}\gamma_{i1}^z\\\vdots\\\gamma_{im_i}^z\end{bmatrix},\quad
+\alpha_i^z=\begin{bmatrix}\alpha_{i1}^z\\\vdots\\\alpha_{il_i}^z\end{bmatrix},\quad
+\beta_i^z=\begin{bmatrix}\beta_{i1}^z\\\vdots\\\beta_{ik_i}^z\end{bmatrix},\quad
+\delta_i^z=\begin{bmatrix}\gamma_i^z\\\alpha_i^z\\\beta_i^z\end{bmatrix}.
+\]
+\item 计算辅助函数：
+\[
+\begin{aligned}
+f_\lambda(\delta_i^z,\delta_i^k)={}&f(\delta_i^z)
++\left(\left.\frac{\partial f}{\partial\delta_i}\right|_{\delta_i^k}\right)^T
+ (\delta_i^k-\delta_i^z)
++\frac{1}{2\lambda_1}\|\gamma_i^k-\gamma_i^z\|_2^2\\
+&{}+\frac{1}{2\lambda_2}\|\alpha_i^k-\alpha_i^z\|_2^2
++\frac{1}{2\lambda_3}\|\beta_i^k-\beta_i^z\|_2^2.
+\end{aligned}
+\]
+\item 若 $f(\delta_i^z)\le\widehat f_\lambda(\delta_i^z,\delta_i^k)$，则退出本轮循环，转至步骤3。
+\item 更新 $\lambda_1=\alpha_1\lambda_1$、$\lambda_2=\alpha_2\lambda_2$、$\lambda_3=\alpha_3\lambda_3$。
+\end{enumerate}
+\textbf{步骤3：}检查结构参数是否收敛。若
+\[
+\|\gamma_i^z-\gamma_i^k\|_2^2>\varepsilon_1,\quad
+\|\alpha_i^z-\alpha_i^k\|_2^2>\varepsilon_2,\quad
+\|\beta_i^z-\beta_i^k\|_2^2>\varepsilon_3,
+\]
+则令 $\lambda_1^k=\lambda_1$、$\lambda_2^k=\lambda_2$、$\lambda_3^k=\lambda_3$，并令
+\[
+\gamma_i^{k+1}=\gamma_i^z,\quad\alpha_i^{k+1}=\alpha_i^z,\quad
+\beta_i^{k+1}=\beta_i^z,\quad\delta_i^{k+1}=\delta_i^z,\quad k=k+1.
+\]
+返回步骤2（1）；否则转至步骤4。
+
+\textbf{步骤4：}更新协方差矩阵。
+\[
+\widehat\Sigma_{ii}^{l+1}=\frac{1}{(n-m_i+1-l_i-k_i)T}
+(y_i-Z_i\delta_i^z)(y_i-Z_i\delta_i^z)',\qquad
+V_i^{l+1}=\Sigma_{ii}^{l+1}\otimes I_n.
+\]
+\textbf{步骤5：}检查协方差矩阵是否收敛。若
+$\|\Sigma_{ii}^{l+1}-\Sigma_{ii}^{l}\|_F>\eta$，其中 $\eta$ 为预先指定的小容许误差，
+则令 $\widehat\Sigma_{ii}^{l}\leftarrow\widehat\Sigma_{ii}^{l+1}$、
+$V_i^l\leftarrow V_i^{l+1}$、$l\leftarrow l+1$，返回步骤2。
+否则停止。参数向量 $\gamma_i,\alpha_i,\beta_i,\delta_i$ 的最终估计量分别为
+$\gamma_i^z,\alpha_i^z,\beta_i^z,\delta_i^z$。
+\end{bookalgorithm}

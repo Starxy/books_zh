@@ -1,0 +1,26 @@
+\chapter*{前言}
+\vspace{0.5em}
+大语言模型源于自然语言处理，如今已成为近年来人工智能领域最具变革性的技术进展之一。大语言模型带来的一项重要认识是：通过大规模语言建模任务，模型能够获取有关语言和世界的知识，进而成为可以处理多种问题的通用模型。这一发现深刻影响了自然语言处理及许多相关学科的研究方法。过去，我们往往依靠大量标注数据，从头训练面向特定任务的系统；现在，研究范式已转向先通过大规模预训练获得基础模型，再对其进行微调、对齐，并通过提示加以使用。
+
+本书旨在梳理大语言模型的基本概念，介绍相关技术。正如书名所示，本书着重讨论大语言模型的基础知识，而非全面罗列所有前沿方法。全书共六章：
+\begin{itemize}
+\item 第1章介绍预训练的基础知识。预训练是大语言模型的基础，本章讨论常见的预训练方法与模型架构。
+\item 第2章介绍生成模型，即如今通常所说的大语言模型。在说明这类模型的基本构建流程后，本章进一步讨论如何扩大模型训练规模，以及如何处理长文本。
+\item 第3章介绍大语言模型的提示方法，讨论多种提示策略，并介绍思维链推理、自动提示设计等进阶方法。
+\item 第4章介绍大语言模型的对齐方法，重点讨论指令微调以及基于人类反馈的对齐。
+\item 第5章介绍大语言模型的推理方法，讨论多种解码算法、加速方法，以及推理时扩展问题。
+\item 第6章介绍提升大语言模型推理能力的方法，讨论如何通过训练增强推理能力，以及如何在推理阶段投入更多计算，帮助模型解决复杂问题。
+\end{itemize}
+
+如果读者具备一定的机器学习与自然语言处理基础，并对 Transformer 等神经网络有所了解，阅读本书会比较轻松。没有这些背景知识也不妨碍阅读：我们尽量使各章内容自成体系，以减轻读者的阅读负担。
+
+本书内容选自一套较为完整的入门资料，主题是自然语言处理中的神经网络与大语言模型。希望进一步了解序列建模、注意力机制等背景知识的读者，可以访问 \url{https://github.com/NiuTrans/NLPBook} 或 \url{https://niutrans.github.io/NLPBook}。
+
+感谢实验室的同学以及各位朋友与我们交流对大语言模型的认识，并帮助纠正书稿中的错误。特别感谢 Weiqiao Shan、Yongyu Mu、Chenglong Wang、Kaiyan Chang、Yuchun Fan、Hang Zhou、Chuanhao Lv、Xinyu Liu、Tao Zhou、Huiwen Bao、Tong Zheng、Junhao Ruan、Yingfeng Luo、Yuzhang Wu、Yifu Huo、Xiaoqian Liu、Yucheng Qiao、Junxiang Zhang、Miaohe Niu、Junxin Wang、Xin Liu、Xinyi Xu、Dan Chen、Xihan Yang 和 Jingqi Xiao。
+
+\vspace{3em}
+\begin{flushright}
+Tong Xiao 和 Jingbo Zhu
+
+\textit{\today}
+\end{flushright}

@@ -1,0 +1,400 @@
+% 原分章PDF95—103页，附录7.E全部，印刷页671—679。
+\section*{附录7.E\quad 迹的乘法性}
+\addcontentsline{toc}{section}{附录7.E 迹的乘法性}
+\markright{附录7.E 迹的乘法性}
+
+为使叙述完整，本附录采用Janzing et al.（2010）的方法，详细证明迹的乘法性。
+
+\begin{bookdefinition}{7.E.1：Lipschitz连续函数}
+若存在正常数 $K$，使得对所有 $x_1\in\R^d$ 和 $x_2\in\R^d$，都有
+\begin{equation}
+|g(x_1)-g(x_2)|\le\|x_1-x_2\|,\tag{7.E.1}
+\end{equation}
+则称实值函数 $g:\R^d\to\R$ 是Lipschitz连续的。其中 $\|\cdot\|$ 是向量的范数。
+\end{bookdefinition}
+
+接下来介绍一条有助于证明主要结论的引理。
+
+\par\medskip\noindent\textbf{Lévy引理}\quad
+给定定义在 $d$ 维超球面 $S_d$ 上的Lipschitz连续函数 $g:S_d\to\R$，其Lipschitz常数为
+\begin{equation}
+L=\max_{x\ne x'}\frac{|g(x)-g(x')|}{\|x-x'\|}.\tag{7.E.2}
+\end{equation}
+若按球面上的均匀测度随机选择一点 $x\in S_d$，则有
+\begin{equation}
+P\{|g(x)-\bar g|\le\varepsilon\}
+ \ge1-\exp\left\{-\frac{\kappa(d-1)\varepsilon^2}{L^2}\right\}\tag{7.E.3}
+\end{equation}
+其中 $\kappa$ 为某个常数，$\bar g$ 是 $g(x)$ 的均值或中位数。
+
+现在证明关于迹的乘法性的结论。
+
+\begin{bookdefinition}{7.E.2：群}
+群是集合 $G$ 与运算 $*$ 的组合，满足：
+\begin{enumerate}
+\item 群含有单位元。换言之，集合 $G$ 中存在元素 $e$，使得对 $G$ 中所有元素 $a$，都有 $a*e=e*a=a$。
+\item 群含有逆元，即对 $G$ 中所有元素 $a$，都存在元素 $b\in G$，使得 $a*b=e$ 且 $b*a=e$，其中 $e$ 为单位元。
+\item 运算满足结合律，即对所有 $a,b,c\in G$，有 $(a*b)*c=a*(b*c)$。
+\item 群在该运算下封闭，即对所有 $a,b\in G$，有 $a*b\in G$。
+\end{enumerate}
+\end{bookdefinition}
+
+\begin{bookdefinition}{7.E.3：拓扑}
+设 $T$ 是非空集合 $G$ 的一些子集组成的集合族，这些子集称为开集。若满足下列条件，则称 $T$ 为拓扑：
+\begin{enumerate}
+\item 空集 $\phi\in T$，且集合 $G\in T$；
+\item 对 $\alpha\in A$ 的一族开集 $G_\alpha\in T$，其并集属于集合族 $T$，即 $\bigcup_{\alpha\in A}G_\alpha\in T$；
+\item 有限个开集 $G_i\in T$（$i=1,\ldots,n$）的交集属于集合族 $T$，即 $\bigcap_{i=1}^nG_i\in T$。
+\end{enumerate}
+二元组 $(G,T)$ 称为拓扑空间（topological space）。
+\end{bookdefinition}
+
+\begin{bookexample}{7.E.1}
+假设 $G$ 是非空集合。由非空集和全集构成的集合族 $\{\phi,G\}$ 满足以上三个条件，是 $G$ 上的一个拓扑，通常称为平凡拓扑（indiscrete topology）。$G$ 的幂集 $P(G)$ 由 $G$ 的全部子集组成，它是 $G$ 上的一个拓扑，通常称为离散拓扑（discrete topology）。例如，考虑集合 $G=\{a,b,c\}$。空集 $\{\}$ 是 $G=\{a,b,c\}$ 的子集。集合 $G$ 还包含 $\{a\},\{b\},\{c\},\{a,b\},\{a,c\},\{b,c\}$ 以及全集 $\{a,b,c\}$。令 $T$ 表示 $G$ 上的一个拓扑，$T$ 包含 $G$ 中所有子集的集合族。幂集 $P(G)$ 满足：
+\begin{enumerate}
+\item 空集 $\{\phi\}\in T$，且全集 $G\in T$；
+\item 幂集的并在 $T$ 中，例如 $\{a\}\cup\{b,c\}\in\{\{a\},\{b,c\}\}\in T$；
+\item 幂集的交在 $T$ 中，例如 $\{a\}\cap\{b,c\}=\{\phi\}\in T$。
+\end{enumerate}
+因此，幂集 $P(G)$ 是一个拓扑。
+\end{bookexample}
+
+\begin{bookexample}{7.E.2：欧氏空间的例子（Strickland，2017）}
+为了定义度量拓扑，先定义开球与开集。令 $x$ 为空间 $G$ 中的一点，以 $x$ 为中心、半径为 $r$ 的开球定义为集合
+\[
+B(x,r)=\{y\in G\mid d(x,y)<r\}.
+\]
+$G$ 的子集 $U$ 为开集，当且仅当对每个 $x\in U$，都存在开球 $B(x,r)\subset U$。由某个度量诱导的开集族称为度量拓扑（metric topology）。$\R$ 中的度量定义为 $d(x,y)=|x-y|$，$\R^n$ 中的度量定义为 $d(x,y)=\|x-y\|$，其中 $\|x\|$ 是向量的范数，例如可以取
+\[
+\begin{aligned}
+\|x\|&=\|x\|_1,\\
+\|x\|&=\|x\|_2,\qquad\text{以及}\\
+\|x\|&=\|x\|_\infty.
+\end{aligned}
+\]
+\end{bookexample}
+
+\begin{bookdefinition}{7.E.4：Hausdorff拓扑}
+若存在开集 $E\subset V$，使得 $x\in E$，则称集合 $V\subset G$ 为点 $x\in G$ 的邻域。若对每一对不同的点 $x,y\in G$（$x\ne y$），都存在 $x$ 的邻域 $V_x$ 和 $y$ 的邻域 $V_y$，使得 $V_x\cap V_y=\phi$，则称 $G$ 上的拓扑 $T$ 为Hausdorff拓扑。
+\end{bookdefinition}
+
+\begin{bookdefinition}{7.E.5：拓扑群}
+拓扑群（topological group）$G$ 是带有Hausdorff拓扑的群，且群的二元运算（乘法映射 $G\times G\to G$，$(\alpha,\beta)\mapsto\alpha\beta$）和群的求逆函数（逆映射 $G\to G$，$\alpha\mapsto\alpha^{-1}$）都是连续的。作为拓扑空间为紧空间的拓扑群称为紧群（compact group）。
+\end{bookdefinition}
+
+\begin{bookexample}{7.E.3}
+定义 $U(1)=\{z\in\mathbb C\mid|z|=1\}=\{e^{i\theta}\mid0\le\theta<2\pi\}$，采用复数域 $\mathbb C$ 上的普通乘法和 $\mathbb C$ 中的拓扑。换言之，二元乘法运算定义为
+\[
+(\alpha=e^{i\theta},\beta=e^{i\varphi})
+ =\alpha\beta=e^{i(\theta+\varphi)}\in U(1),
+\]
+求逆函数定义为
+\[
+\alpha^{-1}=e^{-i\theta}.
+\]
+定义单位元为 $e^{i0}$，距离度量为
+\[
+d(e^{i\theta},e^{i\varphi})
+ =\sqrt{(\cos\theta-\cos\varphi)^2+(\sin\theta-\sin\varphi)^2}.
+\]
+\end{bookexample}
+
+\begin{bookexample}{7.E.4：矩阵群}
+令 $GL(n)$ 为实可逆 $n\times n$ 矩阵的集合，$SL(n)$ 为行列式等于1的 $n\times n$ 实矩阵集合，$O(n)$ 为 $n\times n$ 实正交矩阵集合。显然，集合 $GL(n),SL(n),O(n)$ 在矩阵乘法下构成群。可通过矩阵内积定义矩阵的拓扑。令 $A,B$ 为两个矩阵，其内积定义为
+\[
+\langle A,B\rangle=\operatorname{Tr}(AB^T)
+ =\sum_{i=1}^n\sum_{j=1}^na_{ij}b_{ij},
+\]
+其中 $a_{ij},b_{ij}$ 分别为矩阵 $A,B$ 的元素。内积诱导的矩阵范数定义为
+\[
+\|A\|=\langle A,A\rangle^{1/2}.
+\]
+在矩阵集合 $GL(n),SL(n),O(n)$ 上定义度量 $\rho$：
+\[
+\rho(A,B)=\|A-B\|.
+\]
+利用这一度量，可以在 $GL(n),SL(n)$ 或 $O(n)$ 上定义拓扑。具体而言，可以定义半径为 $r$ 的开球和开集。例如，令 $A\in GL(n)$，定义
+\[
+N_{GL(n)}(A,r)=\{B\in GL(n)\mid\rho(A,B)<r\}.
+\]
+类似地，若 $Y\subset GL(n)$ 且 $A\in Y$，则可定义 $Y$ 中的开球为
+\[
+N_Y(A,r)=\{B\in Y\mid\|B-A\|<r\}=N_{GL(n)}(A,r)\cap Y.
+\]
+现在可以定义 $Y$ 中的开集。子集 $V\subseteq Y$ 在 $Y$ 中为开集，当且仅当对 $V$ 中的每个集合（$A\in V$），都存在 $\delta>0$，使得 $N_Y(A,\delta)\subseteq V$。
+\end{bookexample}
+
+接下来定义连续映射。
+
+\begin{bookdefinition}{7.E.6：连续映射}
+令 $Y$ 是 $Gl(n),SL(n),O(n)$ 中的任意一个，$(X,T)$ 为拓扑空间。连续函数或连续映射 $f:Y\to X$ 定义如下：对每个 $A\in Y$，以及满足 $f(A)\in U$ 的 $U\in T$，存在 $\delta>0$，使得
+\[
+B\in N_Y(A,\delta)\quad\text{蕴含}\quad f(B)\in U.
+\]
+或者等价地，$f$ 连续，当且仅当对每个 $U\in T$，$f^{-1}(U)\subseteq Y$ 在 $Y$ 中为开集。
+\end{bookdefinition}
+
+根据定义，显然 $Gl(n),SL(n),O(n)$ 构成拓扑群。接下来定义拓扑群上的不变测度。
+
+\begin{bookdefinition}{7.E.7：Haar测度}
+拓扑群 $G$ 上的Haar测度定义为满足下列条件的测度 $\mu$：
+\begin{enumerate}
+\item $\mu(G)=1$；
+\item 对所有 $\alpha\in G$，$\mu(\alpha S)=\mu(S)$，其中 $\alpha S=\{\alpha\beta\mid\beta\in S\}$。
+\end{enumerate}
+Haar测度也可定义为有界线性泛函 $E$：
+\begin{equation}
+E(f)=\int_Gf(\alpha)\,d\mu(\alpha).\tag{7.E.4}
+\end{equation}
+\end{bookdefinition}
+
+定义示性函数：
+\[
+I_S(\gamma)=\begin{cases}1&\gamma\in S,\\0&\gamma\notin S,\end{cases}
+\qquad
+I_{\alpha S}(\gamma)=\begin{cases}1&\gamma\in\alpha S,\\0&\gamma\notin\alpha S.\end{cases}
+\]
+用线性泛函 $E$ 表示时，定义7.E.7的条件（1）和（2）分别化为
+\begin{equation}
+E[1]=\int_Gd\mu(\alpha)=\mu(G)=1\tag{7.E.5}
+\end{equation}
+以及
+\begin{equation}
+E[I_{\alpha S}]=\int_GI_{\alpha S}(\gamma)\,d\mu(\gamma)
+ =\mu(\alpha S)=\mu(S)=\int_GI_S(\gamma)\,d\mu(\gamma)=E[I_S].\tag{7.E.6}
+\end{equation}
+
+\begin{bookexample}{7.E.5：实数群的Haar测度}
+令 $G$ 为以乘法为运算的实数群。考虑
+\[
+\int_Gu(y)f(y)\,dy.
+\]
+为了求得实数群的Haar测度，需要选择 $u(y)$，使得
+\begin{equation}
+\int_Gu(y)f(\alpha^{-1}y)\,dy=\int_Gu(y)f(y)\,dy.\tag{7.E.7}
+\end{equation}
+作变量变换 $x=\alpha^{-1}y$，得到
+\begin{equation}
+\int_Gu(y)f(\alpha^{-1}y)\,dy=\int_Gu(\alpha x)f(x)|\alpha|\,dx.\tag{7.E.8}
+\end{equation}
+将 $\alpha=x^{-1}$ 代入式（7.E.8），得到
+\begin{equation}
+\begin{aligned}
+\int_Gu(\alpha x)f(x)|\alpha|\,dx
+ &=\int_Gu(1)\frac{f(x)}{|x|}\,dx\\
+ &=\int_Gu(1)\frac{f(y)}{|y|}\,dy.
+\end{aligned}\tag{7.E.9}
+\end{equation}
+由于 $u(1)$ 是常数，取 $u(y)=1/|y|$ 即得到式（7.E）。Haar测度和Haar积分分别为
+\begin{equation}
+\int_G\frac1{|y|}\,dy\tag{7.E.10}
+\end{equation}
+以及
+\begin{equation}
+\int_G\frac{f(y)}{|y|}\,dy.\tag{7.E.11}
+\end{equation}
+\end{bookexample}
+
+\begin{bookexample}{7.E.6}
+定义
+\[
+\begin{aligned}
+U_n(1)&=\{z\in\mathbb C^n\mid|z|=1\}\\
+ &=\{(e^{i\theta_1},\ldots,e^{i\theta_n}\mid
+ 0\le\theta_1<2\pi,\ldots,0\le\theta_n\le2\pi\},
+\end{aligned}
+\]
+采用 $n$ 维复数空间中的普通乘法。定义映射 $r:\R^n\to U_n$，$r(\theta_1,\ldots,\theta_n)=(e^{i\theta_1},\ldots,e^{i\theta_n})$。定义在 $U_n(1)$ 上的任意函数 $f$ 都确定函数 $f(r(\theta_1,\ldots,\theta_n))$。于是，Haar积分为
+\begin{equation}
+E[f]=\int_Pf(r(\theta_1,\ldots,\theta_n))\,d\theta_1\cdots d\theta_n,\tag{7.E.12}
+\end{equation}
+其中 $P=\{(\theta_1,\ldots,\theta_n)\mid0\le\theta_i\le2\pi,i=1,\ldots,n\}$。
+
+现在检验其左不变性。令 $y=(e^{is_1},\ldots,e^{is_n})\in U_n(1)$，则 $L_yf(\theta)=f(y^{-1}\theta)$。有下列等式：
+\begin{equation}
+\begin{aligned}
+E[L_yf]
+ &=\int_Pf\bigl(y^{-1}r(\theta_1,\ldots,\theta_n)d\theta_1\cdots d\theta_n\bigr)\\
+ &=\int_Pf(r(\theta_1-s_1,\ldots,\theta_n-s_n))\,d\theta_1\cdots d\theta_n\\
+ &=\int_{P-y}f(r(\theta_1,\ldots,\theta_n))\,d\theta_1\cdots d\theta_n,
+\end{aligned}\tag{7.E.13}
+\end{equation}
+其中 $P-y=\{(\theta_1,\ldots,\theta_n)\mid-s_i\le\theta_i\le2\pi-s_i\}$。
+
+由于 $e^{i(\theta+2\pi)}=e^{i\theta}$，有
+\[
+\int_{P-y}f(r(\theta_1,\ldots,\theta_n))\,d\theta_1\cdots d\theta_n
+ =\int_Pf(r(\theta_1,\ldots,\theta_n))\,d\theta_1\cdots d\theta_n,
+\]
+从而
+\[
+E[L_yf]=E[f].
+\]
+\end{bookexample}
+
+\begin{bookexample}{7.E.7：离散群}
+令 $G$ 为离散群。定义
+\[
+C_c(G)=\{f\mid f:G\to\mathbb C\text{ 连续，且除有限多个点外 }f=0\}.
+\]
+离散群的Haar测度为
+\[
+E[f]=\sum_{x\in G}f(x).
+\]
+由于 $\gamma x\in G$，有 $E[L_\gamma f]=E[f]$。定义
+\[
+L^1(G)=\left\{f\mid f\text{ 有可数支撑集 }S,
+ \sum_{x\in S}|f(x)|<+\infty\right\}.
+\]
+当 $G=\mathbb Z$ 时，令 $f(n)=a_n$，于是Haar测度为
+\begin{equation}
+E[f]=\sum_{n=-\infty}^{\infty}a_n.\tag{7.E.14}
+\end{equation}
+\end{bookexample}
+
+\begin{bookexample}{7.E.8：\texorpdfstring{$GL_n(\R)$}{GLn(R)}的Haar测度}
+考虑 $A,X\in GL_n(\R)$ 及线性变换 $L_A:X\to AX$。用向量空间的语言，这一变换可表示为
+\begin{equation}
+\operatorname{vec}(X)=\begin{bmatrix}
+A&0&\cdots&0\\
+0&A&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\
+0&0&\cdots&A
+\end{bmatrix}\operatorname{vec}(X).\tag{7.E.15}
+\end{equation}
+令 $f\in C_c(G)$、$L_\gamma f(x)=f(\gamma^{-1}x)$。Haar测度应满足
+\begin{equation}
+E[L_\gamma f]=E[f].\tag{7.E.16}
+\end{equation}
+注意
+\begin{equation}
+E[L_\gamma f]=\int_Sf(\gamma^{-1}x)\,dx_1\cdots dx_{n^2}.\tag{7.E.17}
+\end{equation}
+作变量变换 $y=\gamma^{-1}x$，即
+\begin{equation}
+\operatorname{vec}(y)=\begin{bmatrix}
+\gamma^{-1}&0&\cdots&0\\
+0&\gamma^{-1}&\cdots&0\\
+\vdots&\vdots&\vdots&\vdots\\
+0&0&\cdots&\gamma^{-1}
+\end{bmatrix}\operatorname{vec}(x),\tag{7.E.18}
+\end{equation}
+式（7.E.17）化为
+\begin{equation}
+E[L_\gamma f]=\int_Sf(y)|\gamma|^n\,dy_1\cdots dy_{n^2}.\tag{7.E.19}
+\end{equation}
+令 $dy_1\cdots dy_n=dz_1\cdots dz_{n^2}/|\gamma|^n$，则式（7.E.19）化为
+\[
+E[L_\gamma f]=E[f].
+\]
+令 $\gamma=x$，则Haar测度为
+\begin{equation}
+\mu(S)=\int_S\frac{dx}{|x|^n}.\tag{7.E.20}
+\end{equation}
+Haar积分为
+\begin{equation}
+E[f]=\int_S\frac{f(x)}{|x|^n}\,dx.\tag{7.E.21}
+\end{equation}
+\end{bookexample}
+
+为使本附录自洽，下面沿用Janzing et al.（2010）的方法证明有关结论。考虑一组正交归一基 $(\varphi_j)$，$j=1,\ldots,m$。将矩阵 $AU\Sigma U^TA^T$ 按正交归一基展开，得到
+\begin{equation}
+AU\Sigma U^TA^T=\sum_{j=1}^m\xi_j\varphi_j^T.\tag{7.E.22}
+\end{equation}
+将式（7.E.22）两边乘以 $\varphi_j$，得到
+\begin{equation}
+AU\Sigma U^TA^T\varphi_j=\sum_{k=1}^m\xi_k\varphi_k^T\varphi_j=\xi_j.\tag{7.E.23}
+\end{equation}
+对式（7.E.22）两边取迹，并利用式（7.E.23），得到
+\begin{equation}
+\begin{aligned}
+\operatorname{Tr}(AU\Sigma U^TA^T)
+ &=\sum_{j=1}^m\operatorname{Tr}(AU\Sigma U^TA^T\varphi_j\varphi_j^T)\\
+ &=\sum_{j=1}^m\varphi_j^TAU\Sigma U^TA^T\varphi_j\\
+ &=\sum_{j=1}^m(U^TA^T\varphi_j)^T\Sigma(U^TA^T\varphi_j).
+\end{aligned}\tag{7.E.24}
+\end{equation}
+为了应用Lévy引理，需要将式（7.E.24）中的各项标准化。注意
+\begin{equation}
+\|U^TA^T\varphi_j\|_2^2=\varphi_j^TAA^T\varphi_j.\tag{7.E.25}
+\end{equation}
+利用式（7.E.25），得到
+\begin{equation}
+\begin{aligned}
+&(U^TA^T\varphi_j)^T\Sigma(U^TA^T\varphi_j)\\
+&\quad=\frac{(U^TA^T\varphi_j)^T\Sigma(U^TA^T\varphi_j)}
+ {\|U^TA^T\varphi_j\|_2^2}\|U^TA^T\varphi_j\|_2^2\\
+&\quad=\alpha_j^T\Sigma\alpha_j(\varphi_j^TAA^T\varphi_j),
+\end{aligned}\tag{7.E.26}
+\end{equation}
+其中 $\alpha_j=U^TA^T\varphi_j/\|U^TA^T\varphi_j\|$，且 $\|\alpha_j\|=1$。定义
+\begin{equation}
+\begin{aligned}
+f(\alpha_j)&=\alpha_j^T\Sigma\alpha_j,\qquad\text{且}\\
+\bar f(\alpha_j)&=\frac1n\alpha_j^T\Sigma\alpha_j\\
+ &=\frac1n\operatorname{Tr}(\alpha_j^T\Sigma\alpha_j)\\
+ &=\frac1n\operatorname{Tr}(\Sigma).
+\end{aligned}\tag{7.E.27}
+\end{equation}
+应用Lévy引理之前，先计算Lipschitz常数 $L$。注意
+\[
+\begin{aligned}
+|f(\alpha_j)-f(\alpha_j^*)|
+ &=\left|\alpha_j^T\Sigma\alpha_j-(\alpha_j^*)^T\Sigma\alpha_j^*\right|\\
+ &\le\left|(\alpha_j-\alpha_j^*)^T\Sigma\alpha_j\right|
+  +\left|(\alpha_j^*)^T\Sigma(\alpha_j-\alpha_j^*)\right|\\
+ &\le\|\Sigma\|\,\|\alpha_j\|\,\|\alpha_j-\alpha_j^*\|
+   +\|\Sigma\|\,\|\alpha_j^*\|\,\|\alpha_j-\alpha_j^*\|\\
+ &=2\|\Sigma\|\,\|\alpha_j-\alpha_j^*\|.
+\end{aligned}
+\]
+因此，
+\[
+\frac{|f(\alpha_j)-f(\alpha_j^*)|}{\|\alpha_j-\alpha_j^*\|}\le2\|\Sigma\|,
+\]
+从而
+\[
+L=\max_{\alpha_j\ne\alpha_j^*}
+ \frac{|f(\alpha_j)-f(\alpha_j^*)|}{\|\alpha_j-\alpha_j^*\|}=2\|\Sigma\|.
+\]
+令
+\[
+\varepsilon=\frac{\varepsilon'}L,\qquad\text{或}\quad\varepsilon'=L\varepsilon.
+\]
+应用Lévy引理，得到
+\begin{equation}
+|f(\alpha_j)-\bar f|
+ =\left|\alpha_j^T\Sigma\alpha_j-\frac1n\operatorname{Tr}(\Sigma)\right|
+ \le2\varepsilon\|\Sigma\|\tag{7.E.28}
+\end{equation}
+成立的概率为 $1-\exp\{-\kappa(n-1)\varepsilon^2\}$。回顾
+\[
+\tau_m(AU\Sigma U^TA^T)=\frac1m\operatorname{Tr}(AU\Sigma U^TA^T).
+\]
+由式（7.E.24）、（7.E.26），得到
+\begin{equation}
+\tau_m(AU\Sigma U^TA^T)=\frac1m\sum_{j=1}^m
+ \alpha_j^T\Sigma\alpha_j(\varphi_j^TAA^T\varphi_j).\tag{7.E.29}
+\end{equation}
+显然，
+\begin{equation}
+\begin{aligned}
+\tau_m(AA^T)&=\frac1m\sum_{j=1}^m\operatorname{Tr}(AA^T)\\
+ &=\frac1m\sum_{j=1}^m\operatorname{Tr}(\varphi_j^TAA^T\varphi_j)\\
+ &=\frac1m\sum_{j=1}^m\varphi_j^TAA^T\varphi_j.
+\end{aligned}\tag{7.E.30}
+\end{equation}
+由式（7.E.28）—（7.E.30），得到
+\[
+\begin{aligned}
+&\left|\tau_m(AU\Sigma U^TA^T)-\tau_n(\Sigma)\tau_m(AA^T)\right|\\
+&\quad=\biggl|\frac1m\sum_{j=1}^m\alpha_j^T\Sigma\alpha_j(\varphi_j^TAA^T\varphi_j)
+ -\frac1n\operatorname{Tr}(\Sigma)\frac1m\sum_{j=1}^m\varphi_j^TAA^T\varphi_j\biggr|\\
+&\quad=\left|\frac1m\sum_{j=1}^m(\varphi_j^TAA^T\varphi_j)
+ \left(\alpha_j^T\Sigma\alpha_j-\frac1n\operatorname{Tr}(\Sigma)\right)\right|\\
+&\quad\le\frac1m\sum_{j=1}^m(\varphi_j^TAA^T\varphi_j)
+ \left|\left(\alpha_j^T\Sigma\alpha_j-\frac1n\operatorname{Tr}(\Sigma)\right)\right|\\
+&\quad\le\frac{2\varepsilon}m\sum_{j=1}^m(\varphi_j^TAA^T\varphi_j)\|\Sigma\|\\
+&\quad=2\varepsilon\|\Sigma\|\,\|AA^T\|.
+\end{aligned}
+\]

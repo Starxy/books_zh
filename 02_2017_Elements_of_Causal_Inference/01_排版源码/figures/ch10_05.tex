@@ -1,0 +1,52 @@
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.3cm,y=1.15cm]
+\node[ch10node] (ch10f5a-X-0) at (0,1) {$X_{t-3}$};
+\node[ch10node] (ch10f5a-X-1) at (1,1) {$X_{t-2}$};
+\node[ch10node] (ch10f5a-X-2) at (2,1) {$X_{t-1}$};
+\node[ch10node] (ch10f5a-X-3) at (3,1) {$X_{t}$};
+\node[ch10node] (ch10f5a-Y-0) at (0,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f5a-Y-1) at (1,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f5a-Y-2) at (2,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f5a-Y-3) at (3,0) {$Y_{t}$};
+\draw[ed] (ch10f5a-X-0)--(ch10f5a-X-1);
+\draw[ed] (ch10f5a-X-1)--(ch10f5a-X-2);
+\draw[ed] (ch10f5a-X-2)--(ch10f5a-X-3);
+\draw[ed] (ch10f5a-Y-0)--(ch10f5a-Y-1);
+\draw[ed] (ch10f5a-Y-1)--(ch10f5a-Y-2);
+\draw[ed] (ch10f5a-Y-2)--(ch10f5a-Y-3);
+\draw[ed] (ch10f5a-X-0)--(ch10f5a-Y-0);
+\draw[ed] (ch10f5a-X-1)--(ch10f5a-Y-1);
+\draw[ed] (ch10f5a-X-2)--(ch10f5a-Y-2);
+\draw[ed] (ch10f5a-X-3)--(ch10f5a-Y-3);
+\end{tikzpicture}
+\par\small (a) $(Y_t)_{t\in\mathbb Z}$ 的所有节点处均存在 v 结构。
+\end{minipage}\hfill
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.3cm,y=1.15cm]
+\node[ch10node] (ch10f5b-X-0) at (0,1) {$X_{t-3}$};
+\node[ch10node] (ch10f5b-X-1) at (1,1) {$X_{t-2}$};
+\node[ch10node] (ch10f5b-X-2) at (2,1) {$X_{t-1}$};
+\node[ch10node] (ch10f5b-X-3) at (3,1) {$X_{t}$};
+\node[ch10node] (ch10f5b-Y-0) at (0,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f5b-Y-1) at (1,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f5b-Y-2) at (2,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f5b-Y-3) at (3,0) {$Y_{t}$};
+\draw[ed] (ch10f5b-X-0)--(ch10f5b-X-1);
+\draw[ed] (ch10f5b-X-1)--(ch10f5b-X-2);
+\draw[ed] (ch10f5b-X-2)--(ch10f5b-X-3);
+\draw[ed] (ch10f5b-Y-0)--(ch10f5b-Y-1);
+\draw[ed] (ch10f5b-Y-1)--(ch10f5b-Y-2);
+\draw[ed] (ch10f5b-Y-2)--(ch10f5b-Y-3);
+\draw[ed] (ch10f5b-Y-0)--(ch10f5b-X-0);
+\draw[ed] (ch10f5b-Y-1)--(ch10f5b-X-1);
+\draw[ed] (ch10f5b-Y-2)--(ch10f5b-X-2);
+\draw[ed] (ch10f5b-Y-3)--(ch10f5b-X-3);
+\end{tikzpicture}
+\par\small (b) $(X_t)_{t\in\mathbb Z}$ 的所有节点处均存在 v 结构。
+\end{minipage}
+\caption{两个DAG仅在即时效应上不同，却不马尔可夫等价。}
+\end{figure}

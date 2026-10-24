@@ -1,0 +1,231 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.60cm}
+
+\tikzstyle{snode} = [minimum width=1*\ssep,minimum height=1*\ssep,inner sep=0pt,draw=blue,thick,fill=blue!30]
+\tikzstyle{mnode} = [snode,draw=ugreen,fill=ugreen!30]
+\tikzstyle{gnode} = [snode,draw=ugreen!70,fill=ugreen!10,dashed]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% single-head attention
+
+\begin{scope}
+
+\node [snode,anchor=east] (q) at (0,0) {};
+
+\node [mnode,anchor=east] (k) at ([xshift=-3*\ssep]q.west) {};
+\node [mnode,anchor=east] (v) at ([xshift=-0.8*\ssep]k.west) {};
+
+\node [anchor=center] (qcaption) at ([yshift=0.27cm]q.north) {\footnotesize{查询}};
+\node [anchor=center] (kcaption) at ([yshift=0.3cm]k.north) {\footnotesize{键}};
+\node [anchor=center] (vcaption) at ([yshift=0.33cm]v.north) {\footnotesize{值}};
+
+\draw [->] ([xshift=-1pt]q.west) -- ([xshift=1pt]k.east);
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm,xshift=-1.8cm]q.south) {\small{（a）单头注意力}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% multi-head attention
+
+\begin{scope}[xshift=6.5cm]
+
+\node [snode,anchor=east] (q) at (0,0) {};
+\node [snode,anchor=east] (q1) at ([xshift=3*\ssep*0.1,yshift=-3*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q2) at ([xshift=6*\ssep*0.1,yshift=-6*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q3) at ([xshift=9*\ssep*0.1,yshift=-9*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q4) at ([xshift=12*\ssep*0.1,yshift=-12*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q5) at ([xshift=15*\ssep*0.1,yshift=-15*\ssep*0.1]q.east) {};
+
+\node [mnode,anchor=east] (k) at ([xshift=-3*\ssep+0*\ssep*0.1,yshift=0*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v) at ([xshift=-0.8*\ssep]k.west) {};
+\draw [->] ([xshift=-1pt]q.west) -- ([xshift=1pt]k.east);
+
+\node [mnode,anchor=east] (k1) at ([xshift=-3*\ssep+3*\ssep*0.1,yshift=-3*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v1) at ([xshift=-0.8*\ssep]k1.west) {};
+\draw [->] ([xshift=-1pt]q1.west) -- ([xshift=1pt]k1.east);
+
+\node [mnode,anchor=east] (k2) at ([xshift=-3*\ssep+6*\ssep*0.1,yshift=-6*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v2) at ([xshift=-0.8*\ssep]k2.west) {};
+\draw [->] ([xshift=-1pt]q2.west) -- ([xshift=1pt]k2.east);
+
+\node [mnode,anchor=east] (k3) at ([xshift=-3*\ssep+9*\ssep*0.1,yshift=-9*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v3) at ([xshift=-0.8*\ssep]k3.west) {};
+\draw [->] ([xshift=-1pt]q3.west) -- ([xshift=1pt]k3.east);
+
+\node [mnode,anchor=east] (k4) at ([xshift=-3*\ssep+12*\ssep*0.1,yshift=-12*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v4) at ([xshift=-0.8*\ssep]k4.west) {};
+\draw [->] ([xshift=-1pt]q4.west) -- ([xshift=1pt]k4.east);
+
+\node [mnode,anchor=east] (k5) at ([xshift=-3*\ssep+15*\ssep*0.1,yshift=-15*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v5) at ([xshift=-0.8*\ssep]k5.west) {};
+\draw [->] ([xshift=-1pt]q5.west) -- ([xshift=1pt]k5.east);
+
+\node [anchor=center] (qcaption) at ([yshift=0.27cm]q.north) {\footnotesize{查询}};
+\node [anchor=center] (kcaption) at ([yshift=0.3cm]k.north) {\footnotesize{键}};
+\node [anchor=center] (vcaption) at ([yshift=0.33cm]v.north) {\footnotesize{值}};
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm,xshift=-1.2cm]q.south) {\small{（b）多头注意力}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% multi-query attention
+
+\begin{scope}[yshift=-4.5cm]
+
+\node [snode,anchor=east] (q) at (0,0) {};
+\node [snode,anchor=east] (q1) at ([xshift=3*\ssep*0.1,yshift=-3*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q2) at ([xshift=6*\ssep*0.1,yshift=-6*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q3) at ([xshift=9*\ssep*0.1,yshift=-9*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q4) at ([xshift=12*\ssep*0.1,yshift=-12*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q5) at ([xshift=15*\ssep*0.1,yshift=-15*\ssep*0.1]q.east) {};
+
+\node [mnode,anchor=east] (k) at ([xshift=-3*\ssep+0*\ssep*0.1,yshift=0*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v) at ([xshift=-0.8*\ssep]k.west) {};
+
+\draw [->] ([xshift=-1pt,yshift=8pt]q.west) -- ([xshift=1pt,yshift=8pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=5pt]q1.west) -- ([xshift=1pt,yshift=5pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=2pt]q2.west) -- ([xshift=1pt,yshift=2pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=-1pt]q3.west) -- ([xshift=1pt,yshift=-1pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=-4pt]q4.west) -- ([xshift=1pt,yshift=-4pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=-7pt]q5.west) -- ([xshift=1pt,yshift=-7pt]k.east);
+
+\node [anchor=center] (qcaption) at ([yshift=0.27cm]q.north) {\footnotesize{查询}};
+\node [anchor=center] (kcaption) at ([yshift=0.3cm]k.north) {\footnotesize{键}};
+\node [anchor=center] (vcaption) at ([yshift=0.33cm]v.north) {\footnotesize{值}};
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm,xshift=-1.8cm]q.south) {\small{（c）多查询注意力}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% grouped query attention
+
+\begin{scope}[yshift=-4.5cm,xshift=6.5cm]
+
+\node [snode,anchor=east,draw=lolblue,thick,fill=lolblue!30] (q) at (0,0) {};
+\node [snode,anchor=east,draw=lolblue,thick,fill=lolblue!30] (q1) at ([xshift=3*\ssep*0.1,yshift=-3*\ssep*0.1]q.east) {};
+\node [snode,anchor=east,draw=lolblue,thick,fill=lolblue!30] (q2) at ([xshift=6*\ssep*0.1,yshift=-6*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q3) at ([xshift=9*\ssep*0.1,yshift=-9*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q4) at ([xshift=12*\ssep*0.1,yshift=-12*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q5) at ([xshift=15*\ssep*0.1,yshift=-15*\ssep*0.1]q.east) {};
+
+\node [mnode,anchor=east,draw=lolgreen,thick,fill=lolgreen!30] (k) at ([xshift=-3*\ssep+0*\ssep*0.1,yshift=0*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east,draw=lolgreen,thick,fill=lolgreen!30] (v) at ([xshift=-0.8*\ssep]k.west) {};
+
+\draw [->] ([xshift=-1pt,yshift=8pt]q.west) -- ([xshift=1pt,yshift=8pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=5pt]q1.west) -- ([xshift=1pt,yshift=5pt]k.east);
+\draw [->] ([xshift=-1pt,yshift=2pt]q2.west) -- ([xshift=1pt,yshift=2pt]k.east);
+
+\node [mnode,anchor=east] (k5) at ([xshift=-3*\ssep+0*\ssep*0.1,yshift=-15*\ssep*0.1]q.west) {};
+\node [mnode,anchor=east] (v5) at ([xshift=-0.8*\ssep]k5.west) {};
+
+\draw [->] ([xshift=-1pt,yshift=-2pt]q3.west) -- ([xshift=1pt,yshift=-2pt]k5.east);
+\draw [->] ([xshift=-1pt,yshift=-5pt]q4.west) -- ([xshift=1pt,yshift=-5pt]k5.east);
+\draw [->] ([xshift=-1pt,yshift=-8pt]q5.west) -- ([xshift=1pt,yshift=-8pt]k5.east);
+
+\node [anchor=center] (qcaption) at ([yshift=0.27cm]q.north) {\footnotesize{查询}};
+\node [anchor=center] (kcaption) at ([yshift=0.3cm]k.north) {\footnotesize{键}};
+\node [anchor=center] (vcaption) at ([yshift=0.33cm]v.north) {\footnotesize{值}};
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm,xshift=-1.2cm]q.south) {\small{（d）分组查询注意力}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% sharing multi-head attention across layers
+
+\begin{scope}[yshift=-9cm,xshift=3.25cm]
+
+\begin{scope}
+
+\node [snode,anchor=east] (q) at (0,0) {};
+\node [snode,anchor=east] (q1) at ([xshift=3*\ssep*0.1,yshift=-3*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q2) at ([xshift=6*\ssep*0.1,yshift=-6*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q3) at ([xshift=9*\ssep*0.1,yshift=-9*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q4) at ([xshift=12*\ssep*0.1,yshift=-12*\ssep*0.1]q.east) {};
+\node [snode,anchor=east] (q5) at ([xshift=15*\ssep*0.1,yshift=-15*\ssep*0.1]q.east) {};
+
+\node [gnode,anchor=east] (k) at ([xshift=-3*\ssep+0*\ssep*0.1,yshift=0*\ssep*0.1]q.west) {};
+\node [gnode,anchor=east] (v) at ([xshift=-0.8*\ssep]k.west) {};
+\draw [->] ([xshift=-1pt]q.west) -- ([xshift=1pt]k.east);
+
+\node [gnode,anchor=east] (k1) at ([xshift=-3*\ssep+3*\ssep*0.1,yshift=-3*\ssep*0.1]q.west) {};
+\node [gnode,anchor=east] (v1) at ([xshift=-0.8*\ssep]k1.west) {};
+\draw [->] ([xshift=-1pt]q1.west) -- ([xshift=1pt]k1.east);
+
+\node [gnode,anchor=east] (k2) at ([xshift=-3*\ssep+6*\ssep*0.1,yshift=-6*\ssep*0.1]q.west) {};
+\node [gnode,anchor=east] (v2) at ([xshift=-0.8*\ssep]k2.west) {};
+\draw [->] ([xshift=-1pt]q2.west) -- ([xshift=1pt]k2.east);
+
+\node [gnode,anchor=east] (k3) at ([xshift=-3*\ssep+9*\ssep*0.1,yshift=-9*\ssep*0.1]q.west) {};
+\node [gnode,anchor=east] (v3) at ([xshift=-0.8*\ssep]k3.west) {};
+\draw [->] ([xshift=-1pt]q3.west) -- ([xshift=1pt]k3.east);
+
+\node [gnode,anchor=east] (k4) at ([xshift=-3*\ssep+12*\ssep*0.1,yshift=-12*\ssep*0.1]q.west) {};
+\node [gnode,anchor=east] (v4) at ([xshift=-0.8*\ssep]k4.west) {};
+\draw [->] ([xshift=-1pt]q4.west) -- ([xshift=1pt]k4.east);
+
+\node [gnode,anchor=east] (k5) at ([xshift=-3*\ssep+15*\ssep*0.1,yshift=-15*\ssep*0.1]q.west) {};
+\node [gnode,anchor=east] (v5) at ([xshift=-0.8*\ssep]k5.west) {};
+\draw [->] ([xshift=-1pt]q5.west) -- ([xshift=1pt]k5.east);
+
+\node [anchor=center] (qcaption) at ([yshift=0.27cm]q.north) {\footnotesize{查询}};
+\node [anchor=center] (kcaption) at ([yshift=0.3cm]k.north) {\footnotesize{键}};
+\node [anchor=center] (vcaption) at ([yshift=0.33cm]v.north) {\footnotesize{值}};
+\node [anchor=west] (layer) at ([xshift=0.5cm]q5.east) {\small{第 $l$ 层}};
+
+\end{scope}
+
+\begin{scope}
+
+\node [snode,anchor=east] (lq) at (0,-2.5cm) {};
+\node [snode,anchor=east] (lq1) at ([xshift=3*\ssep*0.1,yshift=-3*\ssep*0.1]lq.east) {};
+\node [snode,anchor=east] (lq2) at ([xshift=6*\ssep*0.1,yshift=-6*\ssep*0.1]lq.east) {};
+\node [snode,anchor=east] (lq3) at ([xshift=9*\ssep*0.1,yshift=-9*\ssep*0.1]lq.east) {};
+\node [snode,anchor=east] (lq4) at ([xshift=12*\ssep*0.1,yshift=-12*\ssep*0.1]lq.east) {};
+\node [snode,anchor=east] (lq5) at ([xshift=15*\ssep*0.1,yshift=-15*\ssep*0.1]lq.east) {};
+
+\node [mnode,anchor=east] (lk) at ([xshift=-3*\ssep+0*\ssep*0.1,yshift=0*\ssep*0.1]lq.west) {};
+\node [mnode,anchor=east] (lv) at ([xshift=-0.8*\ssep]lk.west) {};
+\draw [->] ([xshift=-1pt]lq.west) -- ([xshift=1pt]lk.east);
+
+\node [mnode,anchor=east] (lk1) at ([xshift=-3*\ssep+3*\ssep*0.1,yshift=-3*\ssep*0.1]lq.west) {};
+\node [mnode,anchor=east] (lv1) at ([xshift=-0.8*\ssep]lk1.west) {};
+\draw [->] ([xshift=-1pt]lq1.west) -- ([xshift=1pt]lk1.east);
+
+\node [mnode,anchor=east] (lk2) at ([xshift=-3*\ssep+6*\ssep*0.1,yshift=-6*\ssep*0.1]lq.west) {};
+\node [mnode,anchor=east] (lv2) at ([xshift=-0.8*\ssep]lk2.west) {};
+\draw [->] ([xshift=-1pt]lq2.west) -- ([xshift=1pt]lk2.east);
+
+\node [mnode,anchor=east] (lk3) at ([xshift=-3*\ssep+9*\ssep*0.1,yshift=-9*\ssep*0.1]lq.west) {};
+\node [mnode,anchor=east] (lv3) at ([xshift=-0.8*\ssep]lk3.west) {};
+\draw [->] ([xshift=-1pt]lq3.west) -- ([xshift=1pt]lk3.east);
+
+\node [mnode,anchor=east] (lk4) at ([xshift=-3*\ssep+12*\ssep*0.1,yshift=-12*\ssep*0.1]lq.west) {};
+\node [mnode,anchor=east] (lv4) at ([xshift=-0.8*\ssep]lk4.west) {};
+\draw [->] ([xshift=-1pt]lq4.west) -- ([xshift=1pt]lk4.east);
+
+\node [mnode,anchor=east] (lk5) at ([xshift=-3*\ssep+15*\ssep*0.1,yshift=-15*\ssep*0.1]lq.west) {};
+\node [mnode,anchor=east] (lv5) at ([xshift=-0.8*\ssep]lk5.west) {};
+\draw [->] ([xshift=-1pt]lq5.west) -- ([xshift=1pt]lk5.east);
+
+\node [anchor=west] (layer) at ([xshift=0.5cm]lq5.east) {\small{第 $l-1$ 层}};
+
+\end{scope}
+
+\draw [->,thick,red] ([xshift=-3pt]lv.west) -- ([xshift=-0.8cm]lv.west) -- ([xshift=-0.8cm]v.west) node [pos=0.5,left] {\footnotesize{共享}} -- ([xshift=-3pt]v.west);
+
+\node [anchor=north] (caption) at ([yshift=-1.5cm,xshift=-1.2cm]lq.south) {\small{（e）跨层多头注意力}};
+
+\end{scope}
+
+
+\end{tikzpicture}
+\end{center}

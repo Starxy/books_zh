@@ -1,0 +1,26 @@
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,
+ch02b/.style={rectangle,draw=inkblue,minimum width=10mm,minimum height=7mm,font=\small},
+ch02err/.style={ellipse,draw=inkblue,minimum width=10mm,minimum height=6mm,font=\small}]
+\node[ch02b](ch0206ax)at(0,1.7){$X$};
+\node[ch02b](ch0206ay)at(2.4,1.7){$Y$};
+\node[ch02err](ch0206ae)at(2.4,3.2){$E_Y$};
+\draw[->,red](ch0206ax)--(ch0206ay);
+\draw[->,red](ch0206ae)--(ch0206ay);
+\node[anchor=north west,align=left,font=\small]at(-.6,.85){
+$P_Y\ne P_{Y\mid\doop(x)}=P_{Y\mid x}$\\
+$P_X=P_{X\mid\doop(y)}\ne P_{X\mid Y}$\\
+$Y=f_Y(X)+E_Y$\\
+$X\sim P_X,\ E_Y\sim P_{E_Y}$};
+\node[font=\small,anchor=west]at(-.6,-1.5){(a)};
+\node[ch02b](ch0206bx)at(5.0,1.7){$X$};
+\node[ch02b](ch0206by)at(7.4,1.7){$Y$};
+\node[ch02err](ch0206be)at(5.0,3.2){$E_X$};
+\draw[->,red](ch0206by)--(ch0206bx);
+\draw[->,red](ch0206be)--(ch0206bx);
+\node[anchor=north west,align=left,font=\small]at(4.4,.85){
+$P_Y=P_{Y\mid\doop(x)}\ne P_{Y\mid x}$\\
+$P_X\ne P_{X\mid\doop(y)}=P_{X\mid Y}$\\
+$X=f_X(Y)+E_X$\\
+$Y\sim P_Y,\ E_X\sim P_{E_X}$};
+\node[font=\small,anchor=west]at(4.4,-1.5){(b)};
+\end{tikzpicture}

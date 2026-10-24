@@ -1,0 +1,534 @@
+% 原书第3章 PDF 页62—74，附录3.A与习题，印刷页234—246。
+\section*{附录3.A\quad 卷积神经网络参数估计的梯度方法}
+\addcontentsline{toc}{section}{附录3.A 卷积神经网络参数估计的梯度方法}
+\markright{附录3.A\quad 卷积神经网络参数估计的梯度方法}
+\subsection*{3.A.1\quad 多层前向传播}
+\addcontentsline{toc}{subsection}{3.A.1 多层前向传播}
+
+卷积神经网络（CNN）最后阶段的全连接层构成多层前馈神经网络。将全连接神经网络的最终输出层记为第 $L$ 层，以 $l$ 表示当前层。CNN 的最后阶段由一个输入层、一个输出层和 $L-1$ 个隐藏层组成（图3.A.1）。
+
+考虑具有 $p$ 个输入神经元和 $q$ 个输出神经元的网络。输入层第 $k$ 个神经元到第一层第 $j$ 个神经元的连接权重记为 $w_{jk}^{(1)}$，第一层第 $j$ 个神经元的偏置记为 $b_j^{(1)}$。该神经元的加权输入和激活值分别记为 $z_j^{(1)}$ 和 $a_j^{(1)}$。给定 $x^{(1)}=[x_1^{(1)},\ldots,x_p^{(1)}]^T$，则从数据输入层到第一层的加权输入 $z_j^{(1)}$，以及第 $j$ 个神经元的激活值 $a_j^{(1)}$，分别为
+\begin{equation}
+z_j^{(1)}=\sum_{k=1}^{p}w_{jk}^{(1)}x_k^{(1)}+b_j^{(1)},\quad j=1,\ldots,m_1,
+\tag{3.A.1}
+\end{equation}
+和
+\begin{equation}
+a_j^{(1)}=\sigma(z_j^{(1)}).
+\tag{3.A.2}
+\end{equation}
+
+\input{figures/ch03_figA01}
+
+令
+\[
+Z^{(1)}=\begin{bmatrix}z_1^{(1)}\\\vdots\\z_{m_1}^{(1)}\end{bmatrix},\qquad
+W^{(1)}=\begin{bmatrix}
+w_{11}^{(1)}&\cdots&w_{1p}^{(1)}\\
+\vdots&\vdots&\vdots\\
+w_{m_11}^{(1)}&\cdots&w_{m_1p}^{(1)}
+\end{bmatrix},
+\]
+\[
+b^{(1)}=\begin{bmatrix}b_1^{(1)}\\\vdots\\b_{m_1}^{(1)}\end{bmatrix},\qquad
+a^{(1)}=\begin{bmatrix}a_1^{(1)}\\\vdots\\a_{m_1}^{(1)}\end{bmatrix}.
+\]
+式 (3.A.1) 和 (3.A.2) 可写成矩阵形式：
+\begin{equation}
+Z^{(1)}=W^{(1)}x^{(1)}+b^{(1)},
+\tag{3.A.3}
+\end{equation}
+和
+\begin{equation}
+a^{(1)}=\sigma(Z^{(1)}),
+\tag{3.A.4}
+\end{equation}
+其中
+\[
+\sigma(Z^{(1)})=\begin{bmatrix}\sigma(z_1^{(1)})\\\vdots\\\sigma(z_{m_1}^{(1)})\end{bmatrix}.
+\]
+类似地，对于第 $l$ 层，将第 $l-1$ 层第 $k$ 个神经元到第 $l$ 层第 $j$ 个神经元的连接权重记为 $w_{jk}^{(l)}$，将第 $l$ 层第 $j$ 个神经元的偏置记为 $b_j^{(l)}$。其加权输入与激活值分别记为 $z_j^{(l)}$ 和 $a_j^{(l)}$。式 (3.A.1) 和 (3.A.2) 的一般形式为
+\begin{equation}
+z_j^{(l)}=\sum_{k=1}^{m_{l-1}}w_{jk}^{(l)}a_k^{(l-1)}+b_j^{(l)},\quad j=1,\ldots,m_l,
+\tag{3.A.5}
+\end{equation}
+\begin{equation}
+a_j^{(l)}=\sigma(z_j^{(l)}).
+\tag{3.A.6}
+\end{equation}
+定义
+\[
+Z^{(l)}=\begin{bmatrix}z_1^{(l)}\\\vdots\\z_{m_l}^{(l)}\end{bmatrix},\qquad
+W^{(l)}=\begin{bmatrix}
+w_{11}^{(l)}&\cdots&w_{1m_{l-1}}^{(l)}\\
+\vdots&\vdots&\vdots\\
+w_{m_l1}^{(l)}&\cdots&w_{m_lm_{l-1}}^{(l)}
+\end{bmatrix},
+\]
+\[
+b^{(l)}=\begin{bmatrix}b_1^{(l)}\\\vdots\\b_{m_l}^{(l)}\end{bmatrix},\qquad
+a^{(l)}=\begin{bmatrix}a_1^{(l)}\\\vdots\\a_{m_l}^{(l)}\end{bmatrix},\qquad
+\sigma(z^{(l)})=\begin{bmatrix}\sigma(z_1^{(l)})\\\vdots\\\sigma(z_{m_l}^{(l)})\end{bmatrix}.
+\]
+同样，式 (3.A.5) 和 (3.A.6) 可重写为矩阵形式：
+\begin{equation}
+Z^{(l)}=W^{(l)}a^{(l-1)}+b^{(l)},
+\tag{3.A.7}
+\end{equation}
+和
+\begin{equation}
+a^{(l)}=\sigma(Z^{(l)}).
+\tag{3.A.8}
+\end{equation}
+最后，对于输出层，有
+\begin{equation}
+z_j^{(L)}=\sum_{k=1}^{m_{L-1}}w_{jk}^{(L)}a_k^{L-1}+b_j^{(L)},\quad j=1,\ldots,m_l,
+\tag{3.A.9}
+\end{equation}
+\begin{equation}
+a_j^{(L)}=\sigma(z_j^{(L)}).
+\tag{3.A.10}
+\end{equation}
+输出层第 $j$ 个神经元的激活值，是前面各层若干激活函数的复合，具体为
+\begin{equation}
+a_j^L=\sigma\left(\sum_{k=1}^{m_{L-1}}w_{jk}^{(L)}
+\sigma\left(\sum_{u=1}^{m_{L-2}}w_{km}^{(L-1)}\sigma(\cdots)+b_k^{(L-1)}\right)
++b_j^{(L)}\right).
+\tag{3.A.11}
+\end{equation}
+再定义以下向量与矩阵记号：
+\[
+W^{(L)}=\begin{bmatrix}
+w_{11}^{(L)}&\cdots&w_{1m_{L-1}}^{(L)}\\
+\vdots&\vdots&\vdots\\
+w_{c1}^{(L)}&\cdots&w_{cm_{L-1}}^{(L)}
+\end{bmatrix},\qquad
+b^{(l)}=\begin{bmatrix}b_1^{(l)}\\\vdots\\b_c^{(l)}\end{bmatrix},
+\]
+\[
+a^{(L)}=\begin{bmatrix}a_1^{(L)}\\\vdots\\a_c^{(L)}\end{bmatrix},\qquad
+Z^{(L)}=\begin{bmatrix}z_1^{(L)}\\\vdots\\z_c^{(L)}\end{bmatrix},\qquad
+\sigma(Z^L)=\begin{bmatrix}\sigma(z_1^{(L)})\\\vdots\\\sigma(z_c^{(L)})\end{bmatrix}.
+\]
+式 (3.A.9) 和 (3.A.10) 可写为矩阵形式：
+\begin{equation}
+Z^{(L)}=W^{(L)}a^{(L-1)}+b^{(L)},
+\tag{3.A.12}
+\end{equation}
+\begin{equation}
+a^{(L)}=\sigma(Z^{(L)}).
+\tag{3.A.13}
+\end{equation}
+\FloatBarrier
+
+\subsection*{3.A.2\quad 反向传播}
+\addcontentsline{toc}{subsection}{3.A.2 反向传播}
+
+神经网络可视为从输入变量向量 $x$ 映射到输出变量向量 $y$ 的一类一般非线性函数，其中 $y=[y_1,\ldots,y_c]^T$。若输入时间序列的模式 $x$ 属于第 $k$ 类，则 $y_k=1$，否则 $y_k=0$。目标是利用神经网络尽可能准确地逼近输出变量。给定一组输入变量 $x^{(n)}$ 和输出变量 $y^{(n)}$，可定义两种代价函数：
+\begin{equation}
+E(W)=\frac12\sum_{n=1}^{N}\sum_{k=1}^{c}
+\lVert y_k^{(n)}-a_k^L(x^{(n)},W)\rVert^2,
+\tag{3.A.14}
+\end{equation}
+和
+\begin{equation}
+E(W)=-\sum_{n=1}^{N}\sum_{k=1}^{c}y_k^{(n)}\log\bigl(a_k^L(x^{(n)},W)\bigr),
+\tag{3.A.15}
+\end{equation}
+其中 $N$ 是训练样本数，$W$ 是网络权重，$a_k^n(x^{(n)},W)$ 是网络输出的激活值向量；也可将其解释为给定输入数据 $x^{(n)}$ 时，第 $n$ 条时间序列（样本）属于第 $k$ 类的概率。
+
+式 (3.A.14) 和 (3.A.15) 中的损失函数，都是各样本对应项的总和。因此，参数估计首先聚焦于单个模式。两个损失函数可分别化为
+\begin{equation}
+E_n(x^{(n)},W)=\frac12\sum_{k=1}^{c}
+\lVert y_k^{(n)}-a_k^L(x^{(n)},W)\rVert^2
+\tag{3.A.16}
+\end{equation}
+和
+\begin{equation}
+E_n(x^{(n)},W)=-\sum_{k=1}^{c}y_k^{(n)}\log\bigl(a_k^L(x^{(n)},W)\bigr).
+\tag{3.A.17}
+\end{equation}
+通过最小化
+\begin{equation}
+\min_W\quad E_n(x^{(n)},W)=\frac12\sum_{k=1}^{c}
+\lVert y_k^{(n)}-a_k^L(x^{(n)},W)\rVert^2
+\tag{3.A.18}
+\end{equation}
+或
+\begin{equation}
+\min_W\quad E_n(x^{(n)},W)=-\sum_{k=1}^{c}y_k^{(n)}\log\bigl(a_k^L(x^{(n)},W)\bigr),
+\tag{3.A.19}
+\end{equation}
+可以估计权重 $W$。
+
+最小化 $E(W)$ 的常用算法是梯度下降，其思想是沿 $E(W)$ 下降最快的方向更新权重。先处理单个训练样本，再对所有训练样本取平均，从而处理完整数据集。权重的梯度下降更新为
+\begin{equation}
+W^{t+1}=W^t-\eta_t\frac{\partial E_n(x^{(n)},W))}{\partial W},
+\tag{3.A.20}
+\end{equation}
+其中 $\eta_t\in R_+$ 为学习率。
+
+梯度 $\partial E_n(x^{(n)},W)/\partial W$ 由反向传播算法计算。由于 $E_n(x^{(n)},W)$ 是权重 $W$ 的复杂复合函数，计算这一梯度的关键是链式法则。
+
+首先考察 $z_j^L$ 的变化如何引起代价函数 $E_n(x^{(n)},W)$ 的变化。将全连接层最终输出层第 $j$ 个神经元的误差率 $\delta_j^L$ 定义为
+\begin{equation}
+\delta_j^L=\frac{\partial E_n(x^{(n)},W)}{\partial z_j^L}.
+\tag{3.A.21}
+\end{equation}
+利用式 (3.A.12)、(3.A.18) 和 (3.A.21)，得到
+\begin{equation}
+\begin{aligned}
+\delta_j^L&=(a_j^L-y_j^{(n)})\frac{\partial a_j^L}{\partial z_j^L}\\
+&=(a_j^L-y_j^{(n)})\sigma'(z_j^L).
+\end{aligned}
+\tag{3.A.22}
+\end{equation}
+利用式 (3.A.12)、(3.A.19) 和 (3.A.21)，得到
+\begin{equation}
+\delta_j^L=-\frac{y_j^{(n)}}{a_j^L}\sigma'(z_j^L).
+\tag{3.A.23}
+\end{equation}
+为将式 (3.A.22) 和 (3.A.23) 写成向量形式，引入哈达玛积（Hadamard product），定义为两个向量的逐元素乘积：
+\begin{equation}
+u\otimes v=\begin{bmatrix}u_1\\\vdots\\u_m\end{bmatrix}
+\otimes\begin{bmatrix}v_1\\\vdots\\v_m\end{bmatrix}
+=\begin{bmatrix}u_1v_1\\\vdots\\u_mv_m\end{bmatrix}.
+\tag{3.A.24}
+\end{equation}
+于是，式 (3.A.22) 可重写为
+\begin{equation}
+\delta^L=(a^L-y^{(n)})\otimes\sigma'(z^L),
+\tag{3.A.25}
+\end{equation}
+其中
+\[
+a^L=\begin{bmatrix}a_1^L\\\vdots\\a_c^L\end{bmatrix},\qquad
+y^{(n)}=\begin{bmatrix}y_1^{(n)}\\\vdots\\y_c^{(n)}\end{bmatrix},\qquad
+\sigma'(z^L)=\begin{bmatrix}\sigma'(z_1^L)\\\vdots\\\sigma'(z_c^L)\end{bmatrix}.
+\]
+
+现在计算代价相对于网络中任意偏置的变化率 $\partial E_n/\partial b_j^{(L)}$。由于代价是 $z_j^{(L)}$ 的函数，根据定义及链式法则，有
+\begin{equation}
+\begin{aligned}
+\frac{\partial E_n}{\partial b_j^{(L)}}
+&=\frac{\partial E_n}{\partial z_j^{(L)}}\frac{\partial z_j^{(L)}}{\partial b_j^{(L)}}\\
+&=\delta_j^{(L)}\frac{\partial z_j^{(L)}}{\partial b_j^{(L)}}.
+\end{aligned}
+\tag{3.A.26}
+\end{equation}
+由式 (3.A.9) 得
+\begin{equation}
+\frac{\partial z_j^{(l)}}{\partial b_j^{(l)}}=1.
+\tag{3.A.27}
+\end{equation}
+将式 (3.A.27) 代入式 (3.A.26)，得到
+\begin{equation}
+\frac{\partial E_n}{\partial b_j^{(L)}}=\delta_j^{(L)}.
+\tag{3.A.28}
+\end{equation}
+式 (3.A.28) 可写成矩阵形式：
+\begin{equation}
+\frac{\partial E_n}{\partial b}=\delta.
+\tag{3.A.29}
+\end{equation}
+这表明，误差 $\delta_j^{(L)}$ 恰好等于代价相对于偏置的变化率 $\partial E_n/\partial b_j^{(L)}$。
+
+最后计算代价相对于网络中任意权重的变化率 $\partial E_n/\partial w_{jk}^{(L)}$。代价显然通过下列函数涉及权重 $w_{jk}^{(L)}$：
+\[
+E_n\left(z_j^{(L)}=\sum_{k=1}^{m_{l-1}}w_{jk}^{(L)}a_k^{(L-1)}+b_j^{(L)}\right).
+\]
+因此，由链式法则得到
+\begin{equation}
+\frac{\partial E_n}{\partial w_{jk}^{(L)}}
+=\frac{\partial E_n}{\partial z_j^{(L)}}\frac{\partial z_j^{(L)}}{\partial w_{jk}^{(L)}}
+=\delta_j^{(L)}a_k^{(L-1)}.
+\tag{3.A.30}
+\end{equation}
+
+\subsection*{3.A.3\quad 卷积层}
+\addcontentsline{toc}{subsection}{3.A.3 卷积层}
+\bookdeepheading{subsubsection}{3.A.3.1}{最后一个卷积层：\texorpdfstring{$l=L-1$}{l=L-1}}
+
+首先考虑与全连接层 $L$ 相连的卷积层 $l=L-1$。$E_n$ 显然是变量 $Z_1^L,\ldots,Z_{m_L}^L$ 的函数。最后一个卷积层的误差敏感度导数为
+\begin{equation}
+\begin{aligned}
+\delta_j^{(L-1)}
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(L-1)}}\\
+&=\sum_{m=1}^{m_L}\frac{\partial E_n(x_n,W)}{\partial z_m^{(L)}}
+\frac{\partial z_m^{(L)}}{\partial z_j^{(L-1)}}\\
+&=\sum_{m=1}^{m_L}\delta_m^{(L)}\frac{\partial z_m^{(L)}}{\partial z_j^{(L-1)}}.
+\end{aligned}
+\tag{3.A.31}
+\end{equation}
+由式 (3.A.6) 和 (3.A.9)，有
+\begin{equation}
+\frac{\partial z_m^{(L)}}{\partial z_j^{(L-1)}}
+=w_{mj}^{(L)}\sigma'(z_j^{(L-1)}).
+\tag{3.A.32}
+\end{equation}
+将式 (3.A.32) 代入式 (3.A.31)，得
+\begin{equation}
+\delta_j^{(L-1)}=\sigma'(z_j^{(L-1)})
+\sum_{m=1}^{m_L}\delta_m^{(L)}w_{mj}^{(L)},\quad j=1,2,\ldots,N_{L-1}.
+\tag{3.A.33}
+\end{equation}
+再次计算代价相对于任意权重 $w_{mj}^{(L-1)}$ 的变化率。根据定义与链式法则，有
+\begin{equation}
+\begin{aligned}
+\frac{\partial E_n(x_n,W)}{\partial w_{mj}^{(L-1)}(i)}
+&=\sum_{u=1}^{m_{L-1}}\frac{\partial E_n(x_n,W)}{\partial z_u^{(L-1)}(i)}
+\frac{\partial z_u^{(L-1)}(i)}{\partial w_{mj}^{(L-1)}(i)}\\
+&=\sum_{u=1}^{m_{L-1}}\delta_u^{(L-1)}(i)
+\frac{\partial z_u^{(L-1)}(i)}{\partial w_{mj}^{(L-1)}(i)},
+\end{aligned}
+\tag{3.A.34}
+\end{equation}
+其中 $\delta_u^{(L-1)}(i)=\partial E_n(x_n,W)/\partial z_u^{(L-1)}(i)$。回顾
+\begin{equation}
+z_u^{(L-1)}(i)=\sum_{k=1}^{m_{L-1}}w_{uk}^{(L-1)}(i)a_k^{(L-2)}+b_u^{(L-1)},
+\quad u=1,\ldots,m_{L-1}.
+\tag{3.A.35}
+\end{equation}
+由式 (3.A.41)，有
+\begin{equation}
+\frac{\partial z_u^{(L-1)}}{\partial w_{mj}^{(L-1)}(i)}
+=\left\{\begin{array}{ll}a_j^{(L-2)},&u=m,\\0,&u\ne m\end{array}\right\}.
+\tag{3.A.36}
+\end{equation}
+将式 (3.A.36) 代入式 (3.A.34)，得
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{mj}^{(L-1)}(i)}
+=\delta_m^{(L-1)}a_j^{(L-2)}.
+\tag{3.A.37}
+\end{equation}
+类似地，可得
+\begin{equation}
+\begin{aligned}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(L-1)}}
+&=\sum_{i=1}^{n_2^{(L-1)}}\frac{\partial E_n(x_n,W)}{\partial z_j^{(L-1)}(i)}
+\frac{\partial z_j^{(L-1)}(i)}{\partial b_j^{(L-1)}}\\
+&=\sum_{i=1}^{n_2^{(L-1)}}\delta_j^{(L-1)}(i),\quad j=1,\ldots,n_1^L.
+\end{aligned}
+\tag{3.A.38}
+\end{equation}
+
+\bookdeepheading{subsubsection}{3.A.3.2}{最后一个子采样层}
+
+现在考虑最后一个子采样层 $l=L-2$。回顾最后一个卷积层，其每个特征图都恰好与前一个、即最后一个子采样层中的一个特征图连接。这意味着
+\begin{equation}
+z_j^{(L-1)}(i)=w_{jj}^{(L-1)}a_j^{(L-2)}(i)+b_j^{(L-1)},
+\tag{3.A.39}
+\end{equation}
+以及
+\begin{equation}
+a_j^{(L-2)}(i)=\sigma(z_j^{(L-2)}(i)).
+\tag{3.A.40}
+\end{equation}
+因此，最后一个子采样层的敏感度导数为
+\begin{equation}
+\begin{aligned}
+\delta_j^{(L-2)}(i)
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(L-2)}(i)}\\
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(L-1)}(i)}
+\frac{\partial z_j^{(L-1)}(i)}{\partial z_j^{(L-2)}(i)}.
+\end{aligned}
+\tag{3.A.41}
+\end{equation}
+利用式 (3.A.39) 和 (3.A.40)，得
+\begin{equation}
+\frac{\partial z_j^{(L-1)}(i)}{\partial z_j^{(L-2)}(i)}
+=w_{jj}^{(L-1)}\sigma'(z_j^{(L-2)}(i)).
+\tag{3.A.42}
+\end{equation}
+将式 (3.A.42) 代入式 (3.A.41)，得
+\begin{equation}
+\delta_j^{(L-2)}(i)=\delta_j^{(L-1)}(i)w_{jj}^{(L-1)}\sigma'(z_j^{(L-2)}).
+\tag{3.A.43}
+\end{equation}
+现在计算代价函数相对于最后一个子采样层权重和偏置的导数。由定义和链式法则，有
+\begin{equation}
+\begin{aligned}
+\frac{\partial E_n(x_n,W)}{\partial w_{jj}^{(L-2)}}
+&=\sum_{i'}\frac{\partial E_n(x_n,W)}{\partial z_j^{(L-2)}(i')}
+\frac{\partial z_j^{(L-2)}(i')}{\partial w_{jj}^{(L-2)}}\\
+&=\sum_{i'}\delta_j^{(L-2)}(i')
+\frac{\partial z_j^{(L-2)}(i')}{\partial w_{jj}^{(L-2)}},
+\end{aligned}
+\tag{3.A.44}
+\end{equation}
+其中 $i'=1,\ldots,\lfloor i/2\rfloor$。注意
+\begin{equation}
+z_j^{(L-2)}(i')=w_{jj}^{(L-2)}a_j^{(L-3)}(i')+b_j^{(L-2)},
+\tag{3.A.45}
+\end{equation}
+这意味着
+\begin{equation}
+\frac{\partial z_j^{(L-2)}(i')}{\partial w_{jj}^{(L-2)}}=a_j^{(L-3)}(i').
+\tag{3.A.46}
+\end{equation}
+将式 (3.A.46) 代入式 (3.A.44)，得
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{jj}^{(L-2)}}
+=\sum_{i'}\delta_j^{(L-2)}(i')a_j^{(L-3)}(i').
+\tag{3.A.47}
+\end{equation}
+类似地，有
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(L-2)}}
+=\sum_{i'}\delta_j^{(L-2)}(i').
+\tag{3.A.48}
+\end{equation}
+
+\bookdeepheading{subsubsection}{3.A.3.3}{第 \texorpdfstring{$l$}{l} 个卷积层}
+
+接着考虑一般的第 $l$ 个卷积层。卷积层 $l$ 中的每个特征图 $j$，都与子采样层 $l+1$ 中的特征图 $j$ 连接。这意味着
+\begin{equation}
+z_j^{(l+1)}(i')=z_j^{(l)}(i')w_j^{(l+1)}+b_j^{(l+1)}(i'),
+\tag{3.A.49}
+\end{equation}
+其中
+\begin{equation}
+\begin{aligned}
+z_j^{(l)}(i')&=a_j^{(l)}(2i'-1)+a_j^{(l)}(2i')\\
+&=\sigma(z_j^{(l)}(2i'-1))+\sigma(z_j^{(l)}(2i'))
+\end{aligned}
+\tag{3.A.50}
+\end{equation}
+或
+\begin{equation}
+z_j^{(l)}(i')=\max(\sigma(z_j^{(l)}(2i'-1)),\sigma(z_j^{(l)}(2i')).
+\tag{3.A.51}
+\end{equation}
+代价函数相对于卷积层 $l$ 输入的敏感度导数为
+\begin{equation}
+\begin{aligned}
+\delta_j^{(l)}(i)
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(l)}(i)}\\
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(l+1)}(i')}
+\frac{\partial z_j^{(l+1)}(i')}{\partial z_j^{(l)}(i)}\\
+&=\delta_j^{(l+1)}(i')\frac{\partial z_j^{(l+1)}(i')}{\partial z_j^{(l)}(i)}.
+\end{aligned}
+\tag{3.A.52}
+\end{equation}
+由式 (3.A.49)、(3.A.50) 和 (3.A.51)，则有
+\begin{equation}
+\begin{aligned}
+\frac{\partial z_j^{(l+1)}(i')}{\partial z_j^{(l)}(i)}
+&=w_j^{(l+1)}\frac{\partial z_j^{(l)}(i')}{\partial z_j^{(l)}(i)}\\
+&=w_j^{(l+1)}\sigma'(z_J^{(l)}(i)).
+\end{aligned}
+\tag{3.A.53}
+\end{equation}
+将式 (3.A.53) 代入式 (3.A.52)，得
+\begin{equation}
+\delta_j^{(l)}(i)=\delta_j^{(l+1)}(i')w_j^{(l+1)}\sigma'(Z_J^{(l)}(i)),
+\tag{3.A.54}
+\end{equation}
+其中 $i'=\lfloor i/2\rfloor$。
+
+接着计算代价函数相对于权重和偏置的导数。类似于对最后一个卷积层的讨论，可得
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{mj}^{(l)}(i)}=\delta_m^{(l)}a_j^{(l-1)},
+\tag{3.A.55}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(l)}}
+=\sum_{i=1}^{n_2^{(l)}}\delta_j^{(l)}(i),\quad j=1,\ldots,n_1^l.
+\tag{3.A.56}
+\end{equation}
+
+\bookdeepheading{subsubsection}{3.A.3.4}{第 \texorpdfstring{$l$}{l} 个子采样层}
+
+最后计算一般子采样层 $l$ 的敏感度导数，以及代价函数相对于权重和偏置的梯度。由定义与链式法则，有
+\begin{equation}
+\begin{aligned}
+\delta_j^{(l)}(i)
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(l)}(i)}\\
+&=\sum_{m=1}^{m_{l+1}}\frac{\partial E_n(x_n,W)}{\partial z_m^{(l+1)}(i')}
+\frac{\partial z_m^{(l+1)}(i')}{\partial z_j^{(l)}(i)}\\
+&=\sum_{m=1}^{m_{l+1}}\delta_m^{(l+1)}(i')
+\frac{\partial z_m^{(l+1)}(i')}{\partial z_j^{(l)}(i)}.
+\end{aligned}
+\tag{3.A.57}
+\end{equation}
+由式 (3.22)，得
+\begin{equation}
+\frac{\partial z_m^{(l+1)}(i')}{\partial z_j^{(l)}(i)}
+=\sum_{v=-k^l}^{k^l}\sigma'(z_j^l(i))w_{m,j}^{(l+1)}(i'+v).
+\tag{3.A.58}
+\end{equation}
+将式 (3.A.57) 代入式 (3.A.58)，得
+\begin{equation}
+\delta_j^{(l)}(i)=\sigma'(z_j^l(i))
+\sum_{m=1}^{m_{l+1}}\delta_m^{(l+1)}(i')
+\sum_{v=-k^l}^{k^l}w_{m,j}^{(l+1)}(i'+v).
+\tag{3.A.59}
+\end{equation}
+再次计算代价相对于一般子采样层中任意权重的变化率。由定义与链式法则，有
+\begin{equation}
+\begin{aligned}
+\frac{\partial E_n(x_n,W)}{\partial w_{jj}^{(l)}}
+&=\sum_{i'}\frac{\partial E_n(x_n,W)}{\partial z_j^{(l)}(i')}
+\frac{\partial z_j^{(l)}(i')}{\partial w_{jj}^{(L-2)}}\\
+&=\sum_{i'}\delta_j^{(l)}(i')\frac{\partial z_j^{(l)}(i')}{\partial w_{jj}^{(l)}},
+\end{aligned}
+\tag{3.A.60}
+\end{equation}
+其中 $i'=1,\ldots,\lfloor i/2\rfloor$。注意
+\begin{equation}
+z_j^{(l)}(i')=w_{jj}^{(l)}a_j^{(l-1)}(i')+b_j^{(l)},
+\tag{3.A.61}
+\end{equation}
+这意味着
+\begin{equation}
+\frac{\partial z_j^{(l)}(i')}{\partial w_{jj}^{(l)}}=a_j^{(l-1)}(i').
+\tag{3.A.62}
+\end{equation}
+将式 (3.A.62) 代入式 (3.A.60)，得
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{jj}^{(l)}}
+=\sum_{i'}\delta_j^{(l)}(i')a_j^{(l-1)}(i').
+\tag{3.A.63}
+\end{equation}
+类似地，有
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(l)}}=\sum_{i'}\delta_j^{(l)}(i').
+\tag{3.A.64}
+\end{equation}
+\FloatBarrier
+
+\clearpage
+\section*{习题}
+\addcontentsline{toc}{section}{习题}
+\markright{习题}
+\begin{enumerate}[label=\textbf{习题\arabic*.},leftmargin=4.2em]
+\item 证明展开系数 $\xi_{ij}$ 可由下式估计：
+\[
+\xi_{ij}=\int_Tx_i(t)\phi_j(t)\,dt.
+\]
+\item 证明问题 (3.9) 可化为
+\[
+\min_C\quad(Y-\Phi C)^T(Y-\Phi C)+\lambda C^TJC.
+\]
+\item 证明式 (3.14) 的解为
+\[
+h=-\left[\int_TG^T(t)\hat C^T\hat CG(t)\,dt\right]^{-1}
+\int_TG^T(t)\hat C^T\hat C\frac{d^2\phi}{dt^2}\,dt.
+\]
+\item 证明图3.3中正常 QRS 波群的特征值为 $\lambda_1=-1.30+96.9i$ 和 $\lambda_2=-1.30-96.9i$。
+\item 证明图3.4中异常 QRS 波群的特征值为 $\lambda_1=3.48+67.26i$ 和 $\lambda_2=3.48-67.26i$。
+\item 证明 QRS 波群背后的心脏动态系统，对单位阶跃和单位冲激输入信号的响应传递函数分别为 $Y(s)=G(s)/S$ 和 $Y(s)=G(s)$，其中 $G(s)$ 是动态系统的传递函数。
+\item 考虑输入信号 $x(n)=[2,1,4]$ 和冲激响应向量 $h(n)=[1,0,2]$。利用式 (3.21) 计算卷积 $x*h$。
+\item 考虑长度为 $W=4$ 的时间序列 $\{1,0,-1,2\}$，在序列两端各补一个零（$P=1$）。考虑三个滤波器 $\{1,1,-1\}$。计算滤波器与输入时间序列卷积所生成的特征图。
+\item 证明
+\[
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(L-2)}}=\sum_{i'}\delta_j^{(L-2)}(i').
+\]
+\item 证明
+\[
+\int_Sx_i(s)\beta(s,t)\,ds
+=\int_Sx_i(s)\theta^T(s)\,ds\,B\eta(t)
+=x_i^TB\eta(t).
+\]
+\end{enumerate}

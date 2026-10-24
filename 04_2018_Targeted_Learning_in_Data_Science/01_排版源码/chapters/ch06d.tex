@@ -1,0 +1,102 @@
+% 原书第 88—92 页；第 6.6.2—6.6.3 节。
+\subsection{预测模拟}
+\label{subsec:ch06-prediction-simulation}
+
+我们评价了 HAL 估计量相对于其他非参数算法的有限样本表现。比较算法包括回归树（regression tree；Breiman et al.，1984）、随机森林（random forest；Breiman，2001）、梯度提升机（gradient boosted machine，GBM；Friedman，2001）、核回归（kernel regression；Nadaraya，1964；Watson，1964）、支持向量机（support vector machine，SVM；Hearst et al.，1998），以及多项式多元自适应回归样条（Polynomial MARS；Friedman，1991）。我们考虑了三类数据生成机制，分别称为光滑型、跳跃型和正弦型。对于每一类数据生成机制，改变 $W$ 的维数，取 $d\in\{1,3,5\}$，样本量取 $n\in\{500,1000,2000\}$。以 $R^2$ 评价表现，并在一个样本量为 $N=1\mathrm e4$ 的独立测试集上计算。对于给定估计量 $\bar Q_n$，定义
+\[
+ R^2=1-\frac{\sum_{i=1}^N\{Y_i-\bar Q_n(W_i)\}^2}
+                  {\sum_{i=1}^N\{Y_i-\bar Y_N\}^2}.
+\]
+每种情形都设计为使最优的 $R^2$ 值等于 $R^2_{opt}=0.80$，其中，
+\[
+ R^2_{opt}=1-\frac{E_{P_0}\{Y-\bar Q_0(W)\}^2}{\Var_0(Y)}
+\]
+是使用真实回归函数 $\bar Q_0$ 时得到的 $R^2$ 值。这个值可以看作任何估计量表现的上界。
+
+$W$ 的分布如下：$W_1\sim\operatorname{Uniform}(-4,4)$，$W_2\sim\operatorname{Uniform}(-4,4)$，$W_3\sim\operatorname{Bernoulli}(0.5)$，$W_4\sim\operatorname{Normal}(0,1)$，$W_5\sim\operatorname{Gamma}(2,1)$。对于维数 $d$，将目标参数记为 $\bar Q_0^d(W)$，令 $W=(W_j:j=1,\ldots,d\})$。定义 $Y=\bar Q_0^d(W)+\epsilon$，其中，$\epsilon\sim\operatorname{Normal}(0,1)$。
+% 上式 W 的右端多一个右花括号，按原书印刷保留。
+
+对于 $d=1,3,5$，“光滑型”回归函数分别定义为
+\[
+ \begin{aligned}
+ \bar Q_0^1(w)&=0.05w_1+0.42w_1^2;\\
+ \bar Q_0^3(w)&=0.07w_1-0.28w_1^2+0.5w_2+0.25w_2w_3;\\
+ \bar Q_0^5(w)&=0.1w_1-0.3w_1^2+0.25w_2+0.5w_3w_2
+                         -0.5w_4+0.04w_5^2-0.1w_5.
+ \end{aligned}
+\]
+
+“跳跃型”回归函数定义为
+\[
+ \begin{aligned}
+ \bar Q_0^1(w)={}&-2.7I(w_1<-3)+2.5I(w_1>-2)-2I(w_1>0)\\
+                &{}+4I(w_1>2)-3I(w_1>3);\\[.4em]
+ \bar Q_0^3(w)={}&-2I(w_1<-3)w_3+2.5I(w_1>-2)-2I(w_1>0)\\
+                &{}+2.5I(w_1>2)w_3-2.5I(w_1>3)+I(w_2>-1)\\
+                &{}-4I(w_2>1)w_3+2I(w_2>3);\\[.4em]
+ \bar Q_0^5(w)={}&-I(w_1<-3)w_3+0.5I(w_1>-2)-I(w_1>0)\\
+                &{}+2I(w_1>2)w_3-3I(w_1>3)+1.5I(w_2>-1)\\
+                &{}-5I(w_2>1)w_3+2I(w_2>3)+2I(w_4<0)\\
+                &{}-I(w_5>5)-I(w_4<0)I(w_1<0)+2w_3.
+ \end{aligned}
+\]
+
+“正弦型”回归函数定义为
+\[
+ \begin{aligned}
+ \bar Q_0^1(w)={}&2\sin(0.5\pi|w_1|)+2\cos(0.5\pi|w_1|);\\
+ \bar Q_0^3(w)={}&4w_3I(w_2<0)\sin(0.5\pi|w_1|)
+                    +4.1I(w_2\geq0)\cos(0.5\pi|w_1|);\\
+ \bar Q_0^5(w)={}&3.8w_3I(w_2<0)\sin(0.5\pi|w_1|)
+                    +4I(w_2>0)\cos(\pi|w_1|/2)\\
+                &{}+0.1w_5\sin(\pi w_4)+w_3\cos(|w_4-w_5|).
+ \end{aligned}
+\]
+
+图 6.3 展示了模拟研究的结果，其中，行表示不同的数据生成机制，列表示 $W$ 的不同维数。图的边缘面板给出了汇总结果：底部边缘面板在给定维数下，汇总不同数据生成机制的结果；右侧边缘面板则在给定数据生成机制下，汇总不同维数的结果。每个面板中的算法，都按三个样本量下的平均 $R^2$ 值排序：$R^2$ 最高的在顶部，最低的在底部。
+
+先看对应“光滑型”数据生成机制的第一行。当 $d=1$ 时，除随机森林外，所有算法都表现良好，其中核回归最好。但随着维数增加，核回归的相对表现下降，而 HAL 的相对表现上升。综合所有维数，SVM 的总体表现最好，不过 GBM 和 HAL 的表现也与之相近。在对应“跳跃型”情形的第二行中，HAL 表现极佳；对于所有维数，当 $n=2000$ 时，它的 $R^2$ 几乎达到了最优值。在对应“正弦型”情形的第三行中，略令人意外的是，核回归在所有维数下都表现最好。这似乎部分是由于，在 $n=500$ 时，它优于其他估计量。样本量较大时，核回归、随机森林和 HAL 达到的 $R^2$ 都同样很高。右下角最远处的面板汇总了所有模拟的结果，并按平均 $R^2$ 对算法排序；可以看到，HAL 的平均 $R^2$ 最高，其次是核回归和随机森林。总体而言，HAL 在所有情形中，相对于其他算法都表现良好；在局部光滑性假设不成立的跳跃型情形中，它的表现尤其突出。
+
+\begin{landscape}
+\begin{figure}[p]
+ \centering
+ \input{figures/ch06_fig3}
+ \caption{模拟研究结果}
+ \label{fig:ch06-prediction-simulation}
+\end{figure}
+\end{landscape}
+\FloatBarrier
+
+虽然 HAL 在光滑型和正弦型数据生成机制下没有排名第一，但其表现与那些通常被视为先进方法、且表现最好的机器学习算法相当。
+
+\subsection{预测数据分析}
+\label{subsec:ch06-prediction-analysis}
+
+我们分别分析了五个公开可用的数据集，表 6.1 列出了这些数据集及其参考文献。样本量从 201 到 654 不等，$d$ 从 4 到 11 不等。除了模拟中评价的非参数方法外，我们还考虑用几种参数方法估计 $\bar Q_0$。其中包括只含主效应项的广义线性模型（generalized linear model，GLM）、基于 AIC 且纳入二阶交互项的逐步 GLM，以及通过十折交叉验证确定样条阶数的广义可加模型（generalized additive model，GAM）。我们还纳入了超级学习器和离散超级学习器，并将这九种算法分别作为候选算法。
+
+\begin{table}[htbp]
+ \centering
+ \caption{用 HAL 估计量及其他比较方法分析的数据集}
+ \label{tab:ch06-datasets}
+ \begin{tabular}{lrr}
+  \toprule
+  名称 & $n$ & $d$\\
+  \midrule
+  cpu（Kibler et al.，1989） & 209 & 6\\
+  laheart（Afifi and Azen，1979） & 201 & 11\\
+  oecdpanel（Liu and Stengos，1999） & 616 & 6\\
+  pima（Smith et al.，1988） & 392 & 7\\
+  fev（Rosner，1999） & 654 & 4\\
+  \bottomrule
+ \end{tabular}
+\end{table}
+
+为了比较不同方法在不同结局、不同数据集上的表现，我们考察了每种方法的十折交叉验证均方误差，相对于主效应项 GLM 的均方误差的比值。大于 1 的值表示 GLM 的表现更好。各数据分析的结果见图 6.4。灰色圆点表示某个数据集中的相对 MSE，黑色十字表示全部五项研究的几何均值。超级学习器和离散超级学习器表现最好，其次是 HAL 估计量。HAL 估计量在 cpu 数据集上表现尤其出色，其交叉验证 MSE 几乎只有主效应项 GLM 的一半。
+
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch06_fig4}
+ \caption{不同方法在五个真实数据集中的相对交叉验证均方误差。圆圈表示单个数据集的结果，十字表示五个数据集的几何均值。}
+ \label{fig:ch06-relative-mse}
+\end{figure}
+\FloatBarrier

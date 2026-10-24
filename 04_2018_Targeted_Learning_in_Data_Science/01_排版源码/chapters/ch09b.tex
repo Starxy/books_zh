@@ -1,0 +1,106 @@
+% 英文源分章 PDF 第 5—7 页；第 9.3—9.4 节。
+\section{特定于 v 的数据自适应参数的 TMLE}
+
+考虑数据自适应参数 (9.4)。我们已在一份“训练”样本 $P_{n,v^c}$ 上，以数据自适应方式确定了 $a_L$ 和 $a_H$，因此所关注的参数为
+\begin{equation}
+\begin{aligned}
+\Psi_{P_{n,v^c}}(P_0)
+={}&E_{W,0}\bigl\{E_0(Y\mid A=a_H(P_{n,v^c}),W)\\
+&\hspace{2.6em}-E_0(Y\mid A=a_L(P_{n,v^c}),W)\bigr\}.
+\end{aligned}
+\tag{9.8}
+\end{equation}
+与上文一样，定义 $Q(A,W)\equiv E_P(Y\mid A,W)$，其中 $Q_0(A,W)=E_0(Y\mid A,W)$ 为真实回归函数。$(a_L(P_{n,v^c}),a_H(P_{n,v^c}))$ 在训练／参数生成样本中由某种算法确定后，将其视为固定值，则式 (9.8) 的估计量可以直接取为两个“调整后”均值的估计量之差。这是因果推断文献中一个广为人知的问题（例如，参见 van der Laan 和 Rose，2011，\emph{Targeted Learning} 第 4 章）。令 $Q_{n,v}=\hat Q(P_{n,v})$ 为基于估计样本 $P_{n,v}$ 的 $Q_0$ 的估计，$v=1,\ldots,V$，其中 $\hat Q$ 表示某个特定估计量。考虑与式 (9.5) 等价的代入估计量：
+\begin{equation}
+\begin{aligned}
+\hat\Psi_{P_{n,v^c}}(P_{n,v})
+={}&\frac1{n_V}\sum_{i:Z_i=v}\bigl\{Q_{n,v}(a_H(P_{n,v^c}),W_i)\\
+&\hspace{7.3em}-Q_{n,v}(a_L(P_{n,v^c}),W_i)\bigr\},
+\end{aligned}
+\tag{9.9}
+\end{equation}
+其中 $Q_{n,v}=\hat Q(P_{n,v})$。
+
+换言之，在估计样本的观测上，保持协变量取其观测值 $W_i$，将关注变量 $A$ 分别设为训练样本中确定的两个值 $a_H(P_{n,v^c})$ 和 $a_L(P_{n,v^c})$，则上述估计量就是这两组预测值的均值之差；预测值基于在估计样本上拟合的 $Q$，即 $Q_{n,v}$。如果通过机器学习方法（例如超级学习器；van der Laan 等，2007），在一个很大的（半参数）模型中估计 $Q$，那么与依据误设的参数模型进行估计相比，偏差会有所降低。然而，这样的代入估计量仍具有过大的偏差，也不具备渐近线性，因此基于它进行稳健统计推断存在很大困难。不过，正如本书的主题所述，基于这一初始估计量构造靶向极大似然估计量可以降低偏差，并在较弱假设下具有渐近正态抽样分布。下面定义这样的 TMLE。
+
+参数
+$\Psi_{a_L(P_{n,v^c}),a_H(P_{n,v^c})}(P_0)
+=E_{P_0}\{Q_0(a_H(P_{n,v^c}),W)-Q_0(a_L(P_{n,v^c}),W)\}$
+的有效影响曲线为
+\[
+\begin{aligned}
+D^*_{P_{n,v^c}}(O)
+={}&\left\{\frac{I(A=a_H(P_{n,v^c}))}{g_0(a_H(P_{n,v^c})\mid W)}
+-\frac{I(A=a_L(P_{n,v^c}))}{g_0(a_L(P_{n,v^c})\mid W)}\right\}
+\{Y-Q_0(A,W)\}\\
+&+Q_0(a_H(P_{n,v^c}),W)-Q_0(a_L(P_{n,v^c}),W)
+-\Psi_{a_L(P_{n,v^c}),a_H(P_{n,v^c})}(P_0).
+\end{aligned}
+\]
+由此可构造下列最不利子模型 $\{Q_{n,v,\epsilon}:\epsilon\}$，它在 $\epsilon=0$ 时经过 $Q_{n,v}$：
+\begin{equation}
+\operatorname{Logit}Q_{n,v,\epsilon}(A,W)
+=\operatorname{Logit}Q_{n,v}(A,W)+\epsilon H_{P_{n,v^c}}(A,W;g),
+\tag{9.10}
+\end{equation}
+其中
+\begin{equation}
+H_{P_{n,v^c}}(A,W;g)
+=\frac{I(A=a_H(P_{n,v^c}))}{g(a_H(P_{n,v^c})\mid W)}
+-\frac{I(A=a_L(P_{n,v^c}))}{g(a_L(P_{n,v^c})\mid W)},
+\tag{9.11}
+\end{equation}
+且 $g(a\mid W)\equiv P(A=a\mid W)$。在估计样本上估计 $g$，便得到所谓的巧妙协变量（clever covariate）$H_{P_{n,v^c}}(A,W;g_{n,v})$，由此构造出 $\Psi_{P_{n,v^c}}(P_0)$ 的 TMLE：
+\begin{equation}
+\begin{aligned}
+\hat\Psi^{TMLE}_{P_{n,v^c}}(P_{n,v})
+={}&\frac1{n_V}\sum_{i:Z_i=v}\bigl\{Q_{n,v,\epsilon_{(n,v)}}(a_H(P_{n,v^c}),W_i)\\
+&\hspace{7.3em}-Q_{n,v,\epsilon_{(n,v)}}(a_L(P_{n,v^c}),W_i)\bigr\},
+\end{aligned}
+\tag{9.12}
+\end{equation}
+其中，$\epsilon_{(n,v)}$ 是基于 $P_{n,v}$、位于 $H_{P_{n,v^c}}(\cdot;g_{n,v})$ 前的系数 $\epsilon$ 的极大似然估计。
+
+现在讨论 $g_0$ 的估计。虽然 $A$ 可以有很多水平，但我们只需在两个值上预测 $A=a$，即 $A=a_L(P_{n,v^c})$ 和 $A=a_H(P_{n,v^c})$。在估计样本 $P_{n,v}$ 上，可以用多项结局的机器学习算法来估计 $g_0$。另一种做法是采用更常见的二元结局机器学习算法：分别针对每个 $a$ 运行单独的逻辑回归，拟合 $g_0(a\mid W)$，再将这些估计归一化，使最终的 $g_0$ 估计成为一个适当的条件概率分布。由于我们只需要知道分布 $g_0$ 在两个值处的情况，因此可用后一种方法拟合 $A^*\mid W$ 的条件分布，其中，当 $A\in\{a_L(P_{n,v^c}),a_H(P_{n,v^c})\}$ 时 $A^*=A$，否则令其等于第三个值。下文的数据分析将采用这一方法。
+
+得到 TMLE 后，还可获得估计样本 $P_{n,v}$ 中每个观测 $O_i$ 处的影响曲线估计，其形式为
+\begin{equation}
+\begin{aligned}
+D^*_{n,v,P_{n,v^c}}(O)
+={}&\left[\frac{I(A=a_H(P_{n,v^c}))}{g_{n,v}(a_H(P_{n,v^c})\mid W)}
+-\frac{I(A=a_L(P_{n,v^c}))}{g_{n,v}(a_L(P_{n,v^c})\mid W)}\right]\\
+&\qquad\times\{Y-Q_{n,v,\epsilon_{(n,v)}}(A,W)\}\\
+&+\bigl[Q_{n,v,\epsilon_{(n,v)}}(a_H(P_{n,v^c}),W)
+-Q_{n,v,\epsilon_{(n,v)}}(a_L(P_{n,v^c}),W)\bigr]\\
+&-\hat\Psi^{TMLE}_{P_{n,v^c}}(P_{n,v}).
+\end{aligned}
+\tag{9.13}
+\end{equation}
+这些影响曲线估计值 (9.13) 可用于估计 $\Psi_{P_{n,v^c}}(P_0)$ 的 TMLE $\hat\Psi^{TMLE}_{P_{n,v^c}}(P_{n,v})$ 的标准误：
+\[
+\operatorname{se}(\hat\Psi^{TMLE}_{P_{n,v^c}})
+=\sqrt{\frac{\widehat{\operatorname{var}}(D^*_{n,v,P_{n,v^c}}(O))}{n/V}},
+\]
+其中，$\widehat{\operatorname{var}}(D(O))$ 是相对于估计样本 $P_{n,v}$ 而言 $D(O)$ 的样本方差。
+
+\section{跨估计样本合并特定于 v 的 TMLE}
+
+可以像上面的式 (9.6) 那样，定义各次划分特定的数据自适应参数的平均：
+\[
+\Psi_n(P_0)=\frac1V\sum_{v=1}^V\Psi_{P_{n,v^c}}(P_0).
+\]
+与式 (9.7) 一样，可用各次划分特定的 TMLE 估计的平均来估计它：
+\begin{equation}
+\hat\Psi(P_n)=\frac1V\sum_{v=1}^V\hat\Psi^{TMLE}_{P_{n,v^c}}(P_{n,v}).
+\tag{9.14}
+\end{equation}
+这一估计量的渐近方差可以估计为
+\begin{equation}
+\sigma_n^2=\frac1V\sum_{v=1}^V P_{n,v}(D^*_{n,v,P_{n,v^c}})^2,
+\tag{9.15}
+\end{equation}
+其中，式 (9.15) 是 $V$ 个样本各自对应的、特定于 $v$ 的影响曲线方差估计的平均。估计量 $\hat\Psi(P_n)$ 的标准误可估计为
+\[
+\operatorname{se}(\hat\Psi(P_n))=\sigma_n/\sqrt n.
+\]
+如 Hubbard 等（2016）以及 Hubbard 和 van der Laan（2016）所示，在较弱条件下，$\hat\Psi(P_n)$ 是式 (9.6) 的一致且渐近线性的估计量，上述标准误可给出 $\Psi_n(P_0)$ 的有效渐近 0.95 置信区间 $\psi_n\pm1.96\sigma_n/\sqrt n$。

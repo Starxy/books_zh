@@ -1,0 +1,250 @@
+
+% 附录源 PDF 第 18—22 页；A.4 导言和 A.4.1。
+\section{在线靶向学习}
+
+本节将推导形如
+\begin{equation}
+\begin{aligned}
+\Psi_J(P^{N*})-\Psi_J(P_0^N)
+={}&-\frac1N\sum_{i=1}^NP_{0,o(i)}\bar D(P^{N*})\\
+&+R_{2,N}(\theta_N^*,\theta_0)
+\end{aligned}
+\tag{A.11}
+\end{equation}
+的一阶展开，其中 $P_{0,o(i)}$ 表示给定 $\bar O(i-1)$ 时关于 $O(i)$ 的条件期望，
+$R_{2,N}(\theta_N^*,\theta_0)$ 为二阶余项。定理 A.4 给出了这一结果。
+为建立该一阶展开，我们首先证明恒等式
+\[
+\begin{aligned}
+\Psi_J(P^{N*})-\Psi_J(P_0^N)
+={}&-\frac1N\sum_{i=1}^NP_0^N\bar D(P^{N*})\\
+&+R_{21}(\theta_N^*,\theta_0),
+\end{aligned}
+\]
+其中明确给出二阶余项 $R_{21}(\theta_N^*,\theta_0)$。定理 A.3 陈述这一结果。
+注意，这里涉及有效影响曲线的边际期望，而所需的是条件期望。随后在第二小节研究额外的余项
+\[
+R_{22,N}(\theta_N^*,\theta_0)
+ =\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)
+ \{\bar D(\theta_N^*)-\bar D(\theta_0)\},
+\]
+其中 $R_{2,N}()=R_{21}()+R_{22,N}()$。接着说明，在时间序列依赖结构满足一定条件时，$R_{22,N}$ 也是二阶余项。
+
+恒等式 (A.11) 是分析 TMLE 的基础。具体而言，把式 (A.11) 与解方程
+$0=N^{-1}\sum_{i=1}^N\bar D(\theta_N^*)=0$ 的 TMLE $\theta_N^*$ 结合，就得到一阶展开
+\[
+\begin{aligned}
+\Psi_J(P^{N*})-\Psi_J(P_0^N)
+={}&\frac1N\sum_{i=1}^N\{\bar D(P^{N*})-P_{0,o(i)}\bar D(P^{N*})\}\\
+&+R_{2,N}(\theta_N^*,\theta_0).
+\end{aligned}
+\]
+右侧主导项是以 $\theta_N^*$ 为指标的鞅过程，因此可在较弱条件下证明其收敛到正态极限分布。
+随后，我们为在线估计建立类似的一阶展开：
+\[
+\begin{aligned}
+-\frac1N\sum_{i=1}^NP_{0,o(i)}\bar D_{g^*}(\theta_{i-1})
+={}&\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})-\Psi_{g^*}(\theta_0)\\
+&+\bar R_{21,g^*,N}+\bar R_{22,g^*,N}.
+\end{aligned}
+\]
+这一结果同样分两步推导：首先基于边际期望 $P_0^N\bar D_{g^*}(\theta_{i-1})$ 建立只涉及余项 $\bar R_{21,g^*,N}$ 的结果；然后研究余项 $\bar R_{22,g^*,N}$，并指出，要控制它还需增加一个平稳性假设。
+
+\subsection{基于有效影响曲线边际期望的目标参数一阶展开}
+
+注意，
+\[
+P_{g^*,o(t)}f=P_{w(t)}P_{g^*,a(t)}P_{y(t)}f.
+\]
+为简化记号，也将 $P_{g^*}$ 记为 $P^*$。有
+\[
+\Psi_{g^*}(P)=\left(\prod_{t=1}^{\tau}P_{g^*,o(t)}\right)Y(\tau).
+\]
+
+\begin{bookresult}{定理}{A.3}
+令
+\[
+\begin{aligned}
+\Delta_w(P^*_{o(s)},P^*_{0,o(s)})
+ &=(P_{w(s)}-P_{0,w(s)})P^*_{0,a(s)}P_{0,y(s)},\\
+\Delta_a(P^*_{o(s)},P^*_{0,o(s)})
+ &=P_{w(s)}(P^*_{a(s)}-P^*_{0,a(s)})P_{0,y(s)},\\
+\Delta_y(P^*_{o(s)},P^*_{0,o(s)})
+ &=P_{w(s)}P_{a(s)}(P_{y(s)}-P_{0,y(s)}),\\
+\Phi_{x(s)}(x,c_x)
+ &=E(Y_{g^*}(\tau)\mid X(s)=x,C_x(s)=c_x).
+\end{aligned}
+\]
+则
+\[
+-P_0^ND_{g^*}^N(P)=\Psi_{g^*}(P)-\Psi_{g^*}(P_0)+R_{21,g^*}(P,P_0),
+\]
+其中 $R_{21,g^*}(P,P_0)=R_{21a,g^*}(P,P_0)+R_{21b,g^*}(P,P_0)$，且
+\begin{equation}
+\begin{aligned}
+R_{21a,g^*}(\theta,\theta_0)
+={}&\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ \Delta_x(P^*_{o(s)},P^*_{0,o(s)})\\
+&\quad\times\Biggl\{\sum_{j=s+1}^{\tau}
+ \prod_{l=s+1}^{j-1}P^*_{o(l)}(P^*_{o(j)}-P^*_{0,o(j)})\\
+&\hspace{12em}\times\prod_{l=j+1}^{\tau}P^*_{0,o(l)}\Biggr\}Y(\tau),
+\end{aligned}
+\tag{A.12}
+\end{equation}
+\[
+R_{21b,g^*}(P,P_0)
+ =\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}R_{21b,x(s),g^*}(P,P_0),
+\]
+\[
+\begin{aligned}
+&R_{21b,x(s),g^*}(P,P_0)\\
+&=\int_c\int_x\left(\frac{\bar h_{c_x,0}}{\bar h_{c_x}}(c)-1\right)
+ \Phi_{x(s)}(x,c)\\
+&\qquad\times\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c).
+\end{aligned}
+\]
+因此，回顾
+$\Psi_J(P)=J^{-1}\sum_{j=1}^J\Psi_{g_j^*}(P)$ 和
+$D^N(P)=J^{-1}\sum_{j=1}^JD^N_{g_j^*}(P)$，有
+\[
+-P_0^ND^N(P)=\Psi_J(P)-\Psi_J(P_0)+R_{21}(\theta,\theta_0),
+\]
+其中 $R_{21}(\theta,\theta_0)=J^{-1}\sum_{j=1}^JR_{21,g_j^*}(\theta,\theta_0)$。
+\end{bookresult}
+
+\begin{proof}
+定义
+\[
+\begin{aligned}
+&\Psi_{g^*,P,P_0,w(s)}(P^*_{1,w(s)})\\
+&\equiv\left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ P_{1,w(s)}P^*_{0,a(s)}P_{0,y(s)}
+ \left\{\prod_{t=s+1}^{\tau}P^*_{0,o(t)}\right\}Y(\tau),\\
+&\Psi_{g^*,P,P_0,a(s)}(P^*_{1,a(s)})\\
+&\equiv\left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ P_{w(s)}P^*_{1,a(s)}P_{0,y(s)}
+ \left\{\prod_{t=s+1}^{\tau}P^*_{0,o(t)}\right\}Y(\tau),\\
+&\Psi_{g^*,P,P_0,y(s)}(P^*_{1,y(s)})\\
+&\equiv\left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ P_{w(s)}P^*_{a(s)}P_{1,y(s)}
+ \left\{\prod_{t=s+1}^{\tau}P^*_{0,o(t)}\right\}Y(\tau).
+\end{aligned}
+\]
+注意，
+\[
+\begin{aligned}
+&\Psi_{g^*}(P)-\Psi_{g^*}(P_0)\\
+&=\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \Biggl(\left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ \Delta_x(P^*_{o(s)},P^*_{0,o(s)})\\
+&\hspace{13em}\times\left\{\prod_{t=s+1}^{\tau}P^*_{0,o(t)}\right\}\Biggr)Y(\tau)\\
+&=\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \bigl\{\Psi_{g^*,P,P_0,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,P_0,x(s)}(P^*_{0,x(s)})\bigr\}.
+\end{aligned}
+\]
+定义 $\Psi_{g^*,P,x(s)}=\Psi_{g^*,P,P,x(s)}$，并定义二阶项
+\[
+\begin{aligned}
+&-R_{21a,g^*}(\theta,\theta_0)\\
+&=\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \Biggl(\left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ \Delta_x(P^*_{o(s)},P^*_{0,o(s)})
+ \left\{\prod_{t=s+1}^{\tau}P^*_{0,o(t)}\right\}\Biggr)Y(\tau)\\
+&\quad-\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \Biggl(\left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ \Delta_x(P^*_{o(s)},P^*_{0,o(s)})
+ \left\{\prod_{t=s+1}^{\tau}P^*_{o(t)}\right\}\Biggr)Y(\tau)\\
+&=-\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ \Delta_x(P^*_{o(s)},P^*_{0,o(s)})\\
+&\qquad\times\Biggl\{\sum_{j=s+1}^{\tau}
+ \prod_{l=s+1}^{j-1}P^*_{o(l)}(P^*_{o(j)}-P^*_{0,o(j)})
+ \prod_{l=j+1}^{\tau}P^*_{0,o(l)}\Biggr\}Y(\tau).
+\end{aligned}
+\]
+于是，
+\[
+\begin{aligned}
+&\Psi_{g^*}(P)-\Psi_{g^*}(P_0)\\
+&=\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \bigl(\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})\bigr)
+ +R_{21a,g^*}(\theta,\theta_0).
+\end{aligned}
+\]
+另外，
+\[
+D_{g^*}^N(P)(O^N)
+ =\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}\frac1N\sum_{i=1}^N
+ \bar D_{x(s)}(P)(X(i),C_x(i)),
+\]
+其中 $\bar D_{x(s)}$ 是有效影响曲线中对应于给定 $C_x(s)$ 时 $X(s)$ 条件分布得分的分量。
+令
+\[
+D_{x(s)}^N(P)=\frac1N\sum_{i=1}^N\bar D_{x(s)}(P)(X(i),C_x(i)).
+\]
+我们将证明
+\begin{equation}
+\begin{aligned}
+-P_0^ND_{x(s)}^N(P)
+={}&\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})\\
+&+R_{21b,x(s),g^*}(P,P_0).
+\end{aligned}
+\tag{A.13}
+\end{equation}
+这就给出以下推导：
+\[
+\begin{aligned}
+&-P_0^ND_{g^*}^N(P)\\
+&=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}-P_0^ND_{x(s)}^N(P)\\
+&=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}
+ \Bigl\{\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})
+ +R_{21b,x(s),g^*}(P,P_0)\Bigr\}\\
+&=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}
+ \bigl\{\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})\bigr\}\\
+&\quad+\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}R_{21b,x(s),g^*}(P,P_0)\\
+&=\Psi_{g^*}(P)-\Psi_{g^*}(P_0)-R_{21a,g^*}(\theta,\theta_0)\\
+&\quad+\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}R_{21b,x(s),g^*}(P,P_0)\\
+&\equiv\Psi_{g^*}(P)-\Psi_{g^*}(P_0)-R_{21a,g^*}(\theta,\theta_0)
+ +R_{21b,g^*}(P,P_0),
+\end{aligned}
+\]
+从而证明了定理。因此，只需再建立式 (A.13)。有
+\[
+\begin{aligned}
+&-P_0^ND_{x(s)}^N(P)\\
+&=-P_0^N\frac1N\sum_{i=1}^N
+ \frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}\\
+&\quad\times\Bigl\{E(Y_{g^*}(\tau)\mid X(s)=X(i),C_x(s)=C_x(i))\\
+&\hspace{7em}-E(Y_{g^*}(\tau)\mid C_X(s)=C_x(i))\Bigr\}\\
+&=P_0^N\frac1N\sum_{i=1}^N
+ \frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}
+ \int_x\Phi_{x(s)}(x,C_x(i))\\
+&\hspace{8em}\times\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid C_x(i))\\
+&=\frac1N\sum_{i=1}^N\int_c
+ \frac{h^*_{c_x(s)}(c)}{\bar h_{c_x}(c)}
+ \int_x\Phi_{x(s)}(x,c)\\
+&\hspace{6em}\times\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h_{c_x(i),0}(c)\,\mathrm d\mu(c)\\
+&=\int_c\int_x\frac{\bar h_{c_x,0}(c)}{\bar h_{c_x}(c)}
+ \Phi_{x(s)}(x,c)\,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c)\\
+&=\int_c\int_x\left(\frac{\bar h_{c_x,0}}{\bar h_{c_x}}(c)-1\right)
+ \Phi_{x(s)}(x,c)\,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c)\\
+&\quad+\int_{x,c}\Phi_{x(s)}(x,c)
+ \,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c)\\
+&\equiv R_{21b,x(s),g^*}(P,P_0)
+ +\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)}).
+\end{aligned}
+\]
+证明完毕。
+\end{proof}

@@ -1,0 +1,69 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.5cm}
+\def\nsize{0.3cm}
+
+\tikzstyle{lnode} = [minimum width=7cm,minimum height=1.1cm,inner sep=2pt,draw,thick,fill=white]
+
+%%% step t
+\begin{scope}
+
+\node [anchor=west] (x0) at (0,0) {\scriptsize{$x_0$}};
+\node [anchor=west] (x1) at ([xshift=\ssep]x0) {\scriptsize{$x_1$}};
+\node [anchor=west] (x2) at ([xshift=\ssep]x1) {\scriptsize{$...$}};
+\node [anchor=west] (x3) at ([xshift=\ssep]x2) {\scriptsize{$x_m$}};
+\node [anchor=west] (y1) at ([xshift=\ssep]x3) {\scriptsize{$y_1$}};
+\node [anchor=west] (y2) at ([xshift=\ssep]y1) {\scriptsize{$...$}};
+\node [anchor=west] (y3) at ([xshift=\ssep]y2) {\scriptsize{$y_{t-1}$}};
+%\node [anchor=west] (y4) at ([xshift=\ssep]y3) {\scriptsize{$y_{t}$}};
+%\node [anchor=west] (y5) at ([xshift=\ssep]y4) {\scriptsize{$...$}};
+
+\node [lnode,anchor=south] (llm) at ([xshift=0,yshift=0.3cm]y1.north) {\large{策略（LLM）}};
+
+\draw [->] ([yshift=0.18cm]x0.center) -- ([yshift=0.47cm]x0.center);
+\draw [->] ([yshift=0.18cm]x1.center) -- ([yshift=0.47cm]x1.center);
+\draw [->] ([yshift=0.18cm]x3.center) -- ([yshift=0.47cm]x3.center);
+\draw [->] ([yshift=0.18cm]y1.center) -- ([yshift=0.47cm]y1.center);
+\draw [->] ([yshift=0.18cm]y3.center) -- ([yshift=0.47cm]y3.center);
+%\draw [->] ([yshift=0.18cm]y4.center) -- ([yshift=0.47cm]y4.center);
+
+%\node [anchor=center] (ox0) at ([yshift=2.0cm]x0.north) {\scriptsize{\color{gray!50} $x_1$}};
+%\node [anchor=center] (ox1) at ([yshift=2.0cm]x1.north) {\scriptsize{\color{gray!50} $x_2$}};
+%\node [anchor=center] (ox2) at ([yshift=2.0cm]x2.north) {\scriptsize{\color{gray!50} $...$}};
+\node [anchor=center] (ox3) at ([yshift=2.0cm]x3.north) {\scriptsize{\color{gray!50} $y_1$}};
+\node [anchor=center] (oy1) at ([yshift=2.0cm]y1.north) {\scriptsize{\color{gray!50} $y_2$}};
+\node [anchor=center] (oy2) at ([yshift=2.0cm]y2.north) {\scriptsize{\color{gray!50} $...$}};
+\node [anchor=center] (oy3) at ([yshift=2.0cm]y3.north) {\scriptsize{$y_t$}};
+%\node [anchor=center] (oy4) at ([yshift=2.0cm]y4.north) {\scriptsize{$y_{t+1}$}};
+%\node [anchor=center] (oy5) at ([yshift=2.0cm]y5.north) {\scriptsize{$...$}};
+
+%\draw [<-,gray!50] ([yshift=-0.18cm]ox0.center) -- ([yshift=-0.47cm]ox0.center);
+%\draw [<-,gray!50] ([yshift=-0.18cm]ox1.center) -- ([yshift=-0.47cm]ox1.center);
+\draw [<-,gray!50] ([yshift=-0.18cm]ox3.center) -- ([yshift=-0.47cm]ox3.center);
+\draw [<-,gray!50] ([yshift=-0.18cm]oy1.center) -- ([yshift=-0.47cm]oy1.center);
+\draw [<-] ([yshift=-0.18cm]oy3.center) -- ([yshift=-0.47cm]oy3.center);
+%\draw [<-] ([yshift=-0.18cm]oy4.center) -- ([yshift=-0.47cm]oy4.center);
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([xshift=0,yshift=-0.2cm]y3.east) -- ([xshift=0,yshift=-0.2cm]x0.west) node [pos=0.5,below,yshift=-0.2cm,fill=lightsalmon!80] (statebox) {\scriptsize{状态 $s_t$（$\mathbf{x}$ 与 $\mathbf{y}_{<t}$）}};
+
+\node [anchor=south,fill=lightskyblue!80] (actionbox) at ([yshift=-0.0cm]oy3.north) {\scriptsize{动作 $a_t$}};
+
+\node [anchor=south west,minimum width=3.5cm,minimum height=1.3cm,draw,thick,align=center] (rewardmodel) at ([yshift=-1.4cm,xshift=2cm]llm.south east) {\footnotesize{奖励模型}\\[-0.1cm] \small{$R(\ $\ctext[RGB]{255,160,122}{$s_t$},\ \ctext[RGB]{135,206,250}{$a_t$}\ $)$}};
+
+\node [anchor=south west,minimum width=3.5cm,minimum height=1.3cm,draw,thick,align=center] (valuefunction) at ([yshift=1.4cm]rewardmodel.north west) {\footnotesize{价值函数}\\[-0.1cm] \small{$V($\ \ctext[RGB]{255,160,122}{$s_t$}\ $)$} \small{与} \small{$Q($\ \ctext[RGB]{255,160,122}{$s_t$},\ \ctext[RGB]{135,206,250}{$a_t$}\ $)$}};
+
+\draw [->,thin] ([xshift=2pt]actionbox.east) -- ([xshift=2cm]actionbox.east) -- ([xshift=2cm,yshift=-3cm]actionbox.east) --  ([xshift=3cm,yshift=-3cm]actionbox.east);
+\draw [->,thin] ([xshift=2pt]statebox.east) -- ([xshift=4.74cm]statebox.east);
+
+\draw [->,thick] ([yshift=2pt]rewardmodel.north) -- ([yshift=-2pt]valuefunction.south);
+
+\draw [->,thick,dotted] ([yshift=2pt]valuefunction.north) -- ([yshift=1.2cm]valuefunction.north) -- ([yshift=1.2cm,xshift=-5.6cm]valuefunction.north) node [pos=0.5,above] {\small{反馈}} -- ([yshift=-0.17cm,xshift=-5.6cm]valuefunction.north);
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

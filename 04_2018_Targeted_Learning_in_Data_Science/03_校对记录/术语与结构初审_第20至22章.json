@@ -1,0 +1,182 @@
+{
+  "glossary_entries": 493,
+  "glossary_duplicate_keys": [],
+  "new_term_conflicts_between_chapters": [],
+  "local_macro_definitions": [],
+  "chapters": [
+    {
+      "chapter": 20,
+      "files": [
+        "ch20.tex",
+        "ch20a.tex",
+        "ch20b.tex",
+        "ch20c.tex",
+        "ch20d.tex",
+        "ch20e.tex",
+        "ch20f.tex",
+        "ch20g.tex",
+        "ch20h.tex",
+        "ch20i.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "local asymptotic normality",
+          "zh": "局部渐近正态性",
+          "note": "LAN；本章单个N维社区分布的局部扰动渐近性质。"
+        },
+        {
+          "en": "convolution theorem",
+          "zh": "卷积定理",
+          "note": "统计效率极限分布语境。"
+        },
+        {
+          "en": "pre-exposure prophylaxis",
+          "zh": "暴露前预防",
+          "note": "PrEP；本章HIV干预实例。"
+        },
+        {
+          "en": "generalized propensity score",
+          "zh": "广义倾向评分",
+          "note": "一般个体间干扰下广义暴露的条件概率。"
+        },
+        {
+          "en": "generalized exposure",
+          "zh": "广义暴露",
+          "note": "将本人与其他个体的处理及特征映射所得暴露。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 15,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    },
+    {
+      "chapter": 21,
+      "files": [
+        "ch21.tex",
+        "ch21a.tex",
+        "ch21b.tex",
+        "ch21c.tex",
+        "ch21d.tex",
+        "ch21e.tex",
+        "ch21f.tex",
+        "ch21g.tex",
+        "ch21h.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "sample-average mean direct effect",
+          "zh": "样本平均均值直接效应",
+          "note": "存在个体间干扰时，保持或随机化朋友暴露的直接效应目标。"
+        },
+        {
+          "en": "mixture distribution",
+          "zh": "混合分布",
+          "note": "第21章对N个单位特定汇总分布赋相等权重。"
+        },
+        {
+          "en": "mixture density",
+          "zh": "混合密度",
+          "note": "混合汇总分布的密度及条件因子。"
+        },
+        {
+          "en": "effective exposure",
+          "zh": "有效暴露",
+          "note": "暴露的网络汇总量A_i^s；沿用源书引号语义。"
+        },
+        {
+          "en": "parametric bootstrap",
+          "zh": "参数自助法",
+          "note": "从拟合的联合数据分布重抽样并仅重拟合TMLE更新。"
+        },
+        {
+          "en": "empirical analogue estimator",
+          "zh": "经验对应估计量",
+          "note": "相应理论表达式的经验对应物。"
+        },
+        {
+          "en": "power law distribution",
+          "zh": "幂律分布",
+          "note": "网络朋友数分布。"
+        },
+        {
+          "en": "network exposure model",
+          "zh": "网络暴露模型",
+          "note": "Aronow和Samii方法中的名称。"
+        },
+        {
+          "en": "stochastic actor-oriented model",
+          "zh": "随机行动者导向模型",
+          "note": "原书延伸阅读所述网络处理效应方法。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 12,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    },
+    {
+      "chapter": 22,
+      "files": [
+        "ch22.tex",
+        "ch22a.tex",
+        "ch22b.tex",
+        "ch22c.tex",
+        "ch22d.tex",
+        "ch22e.tex",
+        "ch22f.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "sequential randomized controlled trial",
+          "zh": "序贯随机对照试验",
+          "note": "本章的sequential RCT；两个时间点依次随机化处理。"
+        },
+        {
+          "en": "exceptional law",
+          "zh": "例外分布",
+          "note": "与术语表已有nonexceptional law=非例外分布对应；law指概率分布。"
+        },
+        {
+          "en": "data-adaptive parameter",
+          "zh": "数据自适应参数",
+          "note": "与已有data-adaptive target parameter统一；本章目标随训练样本估计规则而变。"
+        },
+        {
+          "en": "individualized treatment rule",
+          "zh": "个体化处理规则",
+          "note": "根据可获得历史或给定协变量子集分配处理。"
+        },
+        {
+          "en": "causally optimal rule",
+          "zh": "因果最优规则",
+          "note": "SCM反事实分布下最大化均值的规则，与未假定识别时的统计最优规则区分。"
+        },
+        {
+          "en": "Q-learning",
+          "zh": "Q学习",
+          "note": "本章逐时点回归并求最优规则的方法；正文首现保留英文。"
+        },
+        {
+          "en": "nonregularity",
+          "zh": "非正则性",
+          "note": "本章亦将irregularity译为非正则性；指估计量的统计正则性。"
+        },
+        {
+          "en": "structural nested mean model",
+          "zh": "结构嵌套均值模型",
+          "note": "本章为最优动态处理的处理增益函数设定模型。"
+        },
+        {
+          "en": "m out of n bootstrap",
+          "zh": "从n个观测中抽取m个观测的自助法",
+          "note": "本章保留m与n的区别，未把它替换为普通n取自n自助法。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 27,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    }
+  ]
+}

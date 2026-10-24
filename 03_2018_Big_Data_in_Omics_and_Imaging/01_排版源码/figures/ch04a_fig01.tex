@@ -1,0 +1,34 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small]
+\fill[red!90] (1.2,5.5) rectangle (6.2,5.95);
+\node[text=white,font=\bfseries] at (3.7,5.72) {AA GTGTT};
+\fill[green!65!black] (1.2,4.8) rectangle (6.2,5.2);
+\node at (.9,5.72) {$5'$};\node at (.9,5) {$3'$};
+\node[anchor=west] at (6.4,5.72) {有义链};
+\node[anchor=west] at (6.4,5) {$5'$ 模板链};
+\draw[->,very thick,inkblue] (3.7,4.75)--(3.7,4.1);
+\fill[red!90] (1,3.55) rectangle (6,4);
+\node[text=white,font=\bfseries] at (3.5,3.77) {AA GUGUU};
+\node at (.7,3.77) {$5'$};
+\node[anchor=west] at (6.2,3.77) {$3'$ 转录产物};
+\node at (.7,3.05) {(a)};
+\draw[red,->] (.6,.2)--(7.35,.2);
+\filldraw[fill=inkblue!65,draw=inkblue] (1.5,.2) rectangle (2.2,.6);
+\filldraw[fill=inkblue!65,draw=inkblue] (2.5,.2) rectangle (3.2,.6);
+\filldraw[fill=inkblue!65,draw=inkblue] (4.6,.2) rectangle (5.3,.6);
+\filldraw[fill=inkblue!65,draw=inkblue] (5.5,.2) rectangle (6.2,.6);
+\filldraw[fill=inkblue!65,draw=inkblue] (6.4,.2) rectangle (7.1,.6);
+\filldraw[fill=green!65!black] (7.4,0) rectangle (11.7,.55);
+\node at (2.3,.95) {增强子};\node at (5.8,.95) {启动子};
+\node at (8.9,.95) {外显子};
+\node[ellipse,draw=inkblue,fill=inkblue!65,minimum width=.9cm,minimum height=1.05cm] (ch04atf) at (4.9,2.35) {};
+\node[anchor=west] at (5.6,2.4) {转录因子};
+\draw[red,->] (ch04atf.south)--(4.9,.65);
+\draw[red,->] (7.4,.55)--(7.4,1.8)--(10.1,1.8);
+\node[anchor=west,align=left] at (8.2,2.35) {基础转录\\装置};
+\node at (.7,-.25) {(b)};
+\end{tikzpicture}
+\origfig{1}{转录过程。}
+\label{fig:ch04a-01}
+\end{figure}

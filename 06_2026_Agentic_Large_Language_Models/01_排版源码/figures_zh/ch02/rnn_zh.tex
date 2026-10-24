@@ -1,0 +1,29 @@
+% 严格保留原图左侧单元自循环与右侧按时间展开的四个单元。
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    font=\large,
+    unit/.style={draw,line width=.9pt,fill=green!15,minimum width=1.15cm,minimum height=.75cm},
+    inp/.style={circle,draw,line width=.8pt,fill=blue!25,minimum size=.66cm,inner sep=1pt},
+    hidden/.style={inp,fill=violet!30},
+    flow/.style={-{Stealth[length=2.5mm]},line width=1pt}
+]
+\node[unit] (a) at (0,0) {$A$};
+\node[inp] (x) at (0,-1.45) {$x_t$};
+\node[hidden] (h) at (0,1.45) {$h_t$};
+\draw[flow] (x) -- (a);
+\draw[flow,rounded corners=3pt] (a.east) -- (1.05,0) -- (1.05,.65) -- (-1.05,.65) -- (-1.05,0) -- (a.west);
+\draw[flow,preaction={draw=white,line width=3pt}] (a) -- (h);
+\node at (2.05,0) {$=$};
+\foreach \id/\xx/\tt in {a0/3.7/0,a1/5.8/1,a2/7.9/2,at/11.1/t}{
+  \node[unit] (\id) at (\xx,0) {$A$};
+  \node[inp] (x\id) at (\xx,-1.45) {$x_{\tt}$};
+  \node[hidden] (h\id) at (\xx,1.45) {$h_{\tt}$};
+  \draw[flow] (x\id) -- (\id);
+  \draw[flow] (\id) -- (h\id);
+}
+\draw[flow] (a0) -- (a1);
+\draw[flow] (a1) -- (a2);
+\draw[flow] (a2) -- (at);
+\node at (9.45,-1.45) {$\cdots$};
+\end{tikzpicture}%
+}

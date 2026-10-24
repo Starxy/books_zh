@@ -1,0 +1,68 @@
+\begingroup
+\scriptsize\setlength{\tabcolsep}{2.6pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{2.55cm}cccrrrrrr@{}}
+\caption{六种 IPW 估计量与基于 DSA 的 TMLE 对 3 年时六个风险差（RD）的推断比较（12 个季度，即 $t_0=11$）。}\label{tab:ch16-two}\\
+\toprule
+RD 估计量 & $\theta_1$ & $\theta_2$ & $g_n^\theta$ & $\psi_n^{\theta_1,\theta_2}$ & $\Gamma_n^{\theta_1,\theta_2}$ & $\psi_n^{\theta_1,\theta_2,-}$ & $\psi_n^{\theta_1,\theta_2,+}$ & $p$ & RE\\
+\midrule
+\endfirsthead
+\multicolumn{10}{l}{\small 表 16.2（续）}\\
+\toprule
+RD 估计量 & $\theta_1$ & $\theta_2$ & $g_n^\theta$ & $\psi_n^{\theta_1,\theta_2}$ & $\Gamma_n^{\theta_1,\theta_2}$ & $\psi_n^{\theta_1,\theta_2,-}$ & $\psi_n^{\theta_1,\theta_2,+}$ & $p$ & RE\\
+\midrule
+\endhead
+\midrule\multicolumn{10}{r}{（续下页）}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\shortstack[l]{Horvitz--Thompson\\$\psi^{\theta_1,\theta_2}_{n,\mathrm{HT}}$} & $8.5$ & $8$ & $g^\theta_{n,t,\mathrm{SL}}$ & $7.3\mathrm e{-03}$ & $4.3\mathrm e{-03}$ & $-1.1\mathrm e{-03}$ & $0.0156$ & $0.089$ & $1.085$\\
+ & $8.5$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0231$ & $7.5\mathrm e{-03}$ & $8.4\mathrm e{-03}$ & $0.0378$ & $2\mathrm e{-03}$ & $1.078$\\
+ & $8.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0506$ & $0.0129$ & $0.0254$ & $0.0758$ & $0$ & $1.082$\\
+ & $8$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0158$ & $6.8\mathrm e{-03}$ & $2.5\mathrm e{-03}$ & $0.0292$ & $2\mathrm e{-02}$ & $1.078$\\
+ & $8$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0433$ & $0.0128$ & $0.0182$ & $0.0685$ & $1\mathrm e{-03}$ & $1.083$\\
+ & $7.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0275$ & $0.0118$ & $4.4\mathrm e{-03}$ & $0.0506$ & $0.019$ & $1.079$\\
+\midrule
+\shortstack[l]{有界 IPW\\$\psi^{\theta_1,\theta_2}_{n,\mathrm{bd}}$} & $8.5$ & $8$ & $g^\theta_{n,t,\mathrm{SL}}$ & $9.8\mathrm e{-03}$ & $4.6\mathrm e{-03}$ & $8\mathrm e{-04}$ & $0.0188$ & $0.032$ & $1.165$\\
+ & $8.5$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0255$ & $7.9\mathrm e{-03}$ & $1\mathrm e{-02}$ & $0.041$ & $1\mathrm e{-03}$ & $1.138$\\
+ & $8.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0572$ & $0.0127$ & $0.0322$ & $0.0822$ & $0$ & $1.072$\\
+ & $8$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0157$ & $7.2\mathrm e{-03}$ & $1.5\mathrm e{-03}$ & $0.0298$ & $3\mathrm e{-02}$ & $1.144$\\
+ & $8$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0474$ & $0.0127$ & $0.0224$ & $0.0723$ & $0$ & $1.072$\\
+ & $7.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0317$ & $0.0117$ & $8.7\mathrm e{-03}$ & $0.0547$ & $7\mathrm e{-03}$ & $1.075$\\
+\midrule
+\shortstack[l]{基于风险函数的 IPW\\$\psi^{\theta_1,\theta_2}_{n,h}$} & $8.5$ & $8$ & $g_n^\theta$ & $0.0109$ & $5.7\mathrm e{-03}$ & $-3\mathrm e{-04}$ & $0.022$ & $0.056$ & \\
+ & $8.5$ & $7.5$ & $g_n^\theta$ & $0.0212$ & $8.7\mathrm e{-03}$ & $4.1\mathrm e{-03}$ & $0.0382$ & $0.015$ & \\
+ & $8.5$ & $7$ & $g_n^\theta$ & $0.0387$ & $0.0135$ & $0.0122$ & $0.0652$ & $4\mathrm e{-03}$ & \\
+ & $8$ & $7.5$ & $g_n^\theta$ & $0.0103$ & $7.8\mathrm e{-03}$ & $-5\mathrm e{-03}$ & $0.0256$ & $0.187$ & \\
+ & $8$ & $7$ & $g_n^\theta$ & $0.0278$ & $0.0138$ & $8\mathrm e{-04}$ & $0.0549$ & $0.044$ & \\
+ & $7.5$ & $7$ & $g_n^\theta$ & $0.0175$ & $0.0133$ & $-8.5\mathrm e{-03}$ & $0.0435$ & $0.187$ & \\
+\midrule
+\shortstack[l]{基于风险函数的 IPW\\$\psi^{\theta_1,\theta_2}_{n,h}$} & $8.5$ & $8$ & $g^\theta_{n,t}$ & $9.9\mathrm e{-03}$ & $5.5\mathrm e{-03}$ & $-9\mathrm e{-04}$ & $0.0207$ & $0.071$ & \\
+ & $8.5$ & $7.5$ & $g^\theta_{n,t}$ & $0.025$ & $7.8\mathrm e{-03}$ & $9.6\mathrm e{-03}$ & $0.0404$ & $1\mathrm e{-03}$ & \\
+ & $8.5$ & $7$ & $g^\theta_{n,t}$ & $0.0418$ & $0.0126$ & $0.0172$ & $0.0664$ & $1\mathrm e{-03}$ & \\
+ & $8$ & $7.5$ & $g^\theta_{n,t}$ & $0.0151$ & $7.1\mathrm e{-03}$ & $1.2\mathrm e{-03}$ & $0.029$ & $0.033$ & \\
+ & $8$ & $7$ & $g^\theta_{n,t}$ & $0.0319$ & $0.0129$ & $6.7\mathrm e{-03}$ & $0.0571$ & $0.013$ & \\
+ & $7.5$ & $7$ & $g^\theta_{n,t}$ & $0.0168$ & $0.012$ & $-6.7\mathrm e{-03}$ & $0.0403$ & $0.162$ & \\
+\midrule
+\shortstack[l]{基于风险函数的 IPW\\$\psi^{\theta_1,\theta_2}_{n,h}$} & $8.5$ & $8$ & $g^\theta_{n,t,\times}$ & $0.0129$ & $5.5\mathrm e{-03}$ & $2.1\mathrm e{-03}$ & $0.0237$ & $2\mathrm e{-02}$ & \\
+ & $8.5$ & $7.5$ & $g^\theta_{n,t,\times}$ & $0.0337$ & $7.9\mathrm e{-03}$ & $0.0183$ & $0.0491$ & $0$ & \\
+ & $8.5$ & $7$ & $g^\theta_{n,t,\times}$ & $0.0483$ & $0.0129$ & $0.0229$ & $0.0737$ & $0$ & \\
+ & $8$ & $7.5$ & $g^\theta_{n,t,\times}$ & $0.0209$ & $6.9\mathrm e{-03}$ & $7.3\mathrm e{-03}$ & $0.0345$ & $3\mathrm e{-03}$ & \\
+ & $8$ & $7$ & $g^\theta_{n,t,\times}$ & $0.0354$ & $0.0129$ & $1\mathrm e{-02}$ & $0.0608$ & $6\mathrm e{-03}$ & \\
+ & $7.5$ & $7$ & $g^\theta_{n,t,\times}$ & $0.0146$ & $0.0121$ & $-9.2\mathrm e{-03}$ & $0.0383$ & $0.23$ & \\
+\midrule
+\shortstack[l]{基于风险函数的 IPW\\$\psi^{\theta_1,\theta_2}_{n,h}$} & $8.5$ & $8$ & $g^\theta_{n,t,\mathrm{SL}}$ & $8\mathrm e{-03}$ & $4\mathrm e{-03}$ & $1\mathrm e{-04}$ & $0.0159$ & $0.046$ & $1.025$\\
+ & $8.5$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0216$ & $7.1\mathrm e{-03}$ & $7.7\mathrm e{-03}$ & $0.0356$ & $2\mathrm e{-03}$ & $1.024$\\
+ & $8.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.041$ & $0.0125$ & $0.0166$ & $0.0655$ & $1\mathrm e{-03}$ & $1.049$\\
+ & $8$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0136$ & $6.5\mathrm e{-03}$ & $1\mathrm e{-03}$ & $0.0263$ & $0.035$ & $1.022$\\
+ & $8$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.033$ & $0.0124$ & $8.6\mathrm e{-03}$ & $0.0574$ & $8\mathrm e{-03}$ & $1.048$\\
+ & $7.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0194$ & $0.0114$ & $-3\mathrm e{-03}$ & $0.0418$ & $9\mathrm e{-02}$ & $1.048$\\
+\midrule
+\shortstack[l]{基于 DSA 的 TMLE\\$\psi^{\theta_1,\theta_2,*}_{n}$} & $8.5$ & $8$ & $g^\theta_{n,t,\mathrm{SL}}$ & $9.1\mathrm e{-03}$ & $3.9\mathrm e{-03}$ & $1.4\mathrm e{-03}$ & $0.0168$ & $0.021$ & $1$\\
+ & $8.5$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0238$ & $6.9\mathrm e{-03}$ & $0.0102$ & $0.0374$ & $1\mathrm e{-03}$ & $1$\\
+ & $8.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0427$ & $0.0119$ & $0.0194$ & $0.0661$ & $0$ & $1$\\
+ & $8$ & $7.5$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0147$ & $6.3\mathrm e{-03}$ & $2.3\mathrm e{-03}$ & $0.0271$ & $2\mathrm e{-02}$ & $1$\\
+ & $8$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0336$ & $0.0119$ & $0.0104$ & $0.0569$ & $5\mathrm e{-03}$ & $1$\\
+ & $7.5$ & $7$ & $g^\theta_{n,t,\mathrm{SL}}$ & $0.0189$ & $0.0109$ & $-2.5\mathrm e{-03}$ & $0.0403$ & $0.083$ & $1$\\
+\end{longtable}
+\endgroup
+\noindent{\footnotesize 对每个 RD，$g_0^\theta$ 的估计量、点估计、标准误估计、该标准误与基于 DSA 的 TMLE 标准误之比、95\% 置信区间上下限估计及相应 $p$ 值，分别记为 $g_n^\theta$、$\psi_n^{\theta_1,\theta_2}$、$\Gamma_n^{\theta_1,\theta_2}$、RE、$\psi_n^{\theta_1,\theta_2,-}$、$\psi_n^{\theta_1,\theta_2,+}$ 和 $p$。}\par

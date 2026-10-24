@@ -1,0 +1,96 @@
+% 原书分章PDF第9—11页：18.3，定理18.1/18.2的完整假设、有限样本界及假设讨论。
+\section{在线交叉验证选择器的预言不等式}
+
+本节针对两类损失函数给出预言不等式。一类是所谓的二次损失函数，其基于损失的差异度表现为候选参数与真实参数之差的平方；另一类为其他损失函数。大多数损失函数都是二次的。之所以预期会有这种二次行为，是因为当 $\psi$ 接近 $\psi_0$ 时，基于损失的差异度对应于在极小点 $\psi_0$ 附近的局部增加，而在该点的一阶导数应为零。对于二次损失函数，我们需要一个大致按 $1/n$ 变化的余项；对于非二次损失函数，按 $1/\sqrt n$ 变化的余项就已足够。因此，与独立同分布情形一样，二次损失函数需要一个单独的、比非二次损失函数更复杂的证明（van der Laan 和 Dudoit，2003；van der Vaart 等，2006；van der Laan 等，2006）。
+
+\subsection{二次损失函数}
+
+下面的正式定理比较了在线交叉验证选择器与相应的预言选择器。
+
+\begin{bookresult}{定理}{18.1}
+考虑前述关于 $O^n=(O(1),\ldots,O(n))$ 的分布 $P_0^n$ 的模型 $\mathcal M^n$；目标参数 $\Psi^n:\mathcal M^n\to\bm{\Psi}$ 定义为 $\Psi^n(P_\theta^n)=\Psi(\theta)$，其中 $\Psi:\Theta\to\bm{\Psi}$；并考虑 $\psi_0=\Psi(\theta_0)$ 的损失函数 $L(\psi)(Z,O)$，以及基于损失的差异度 $d_{0n}(\widehat\Psi_k,\psi_0)$。同时考虑前面定义的在线交叉验证选择器 $k_n$ 与在线预言选择器 $\widetilde k_n$。
+
+\noindent\textbf{假设。}
+\begin{enumerate}[label=A\arabic*.,leftmargin=2.8em]
+\item 存在 $M_1<\infty$，使得
+\[
+ \sup_{\psi\in\bm{\Psi}}\sup_{i,O(i),Z(i)}
+ \bigl|L(\psi)(Z(i),O(i))-L(\psi_0)(Z(i),O(i))\bigr|\le M_1,
+\]
+其中对 $Z(i),O(i)$ 的上确界取遍 $Z(i),O(i)$ 的分布的某个支撑集。
+\item 存在 $M_2<\infty$，使得以概率1有
+\begin{equation}
+ \sup_{\psi\in\bm{\Psi}}
+ \frac{P_{\theta_0,i,Z(i)}\{L(\psi)-L(\psi_0)\}^2}
+ {P_{\theta_0,i,Z(i)}\{L(\psi)-L(\psi_0)\}}
+ \le M_2<\infty.
+ \tag{18.3}
+\end{equation}
+\item 假设存在缓慢递增的序列 $M_{3n}<\infty$（例如 $M_{3n}=\log n$），使得以趋于1的概率，对 $\bar k_n=k_n$ 和 $\bar k_n=\widetilde k_n$，均有
+\[
+ \frac{1}{M_{3n}}
+ <\frac{d_{0n}(\widehat\Psi_{\bar k_n},\psi_0)}
+ {E_0d_{0n}(\widehat\Psi_{\bar k_n},\psi_0)}
+ <M_{3n}.
+\]
+\item
+\[
+ nM_{3n}^{-3}\min_k E_0d_{0n}(\widehat\Psi_k,\psi_0)
+ \longrightarrow\infty,\qquad n\to\infty.
+\]
+\end{enumerate}
+
+\noindent\textbf{有限样本结果。}对于任意 $\delta>0$，存在通用常数 $C(\delta,M_1,M_2)<\infty$（即对 $n$ 及候选估计量的选择均通用），使得
+\[
+ d_{0n}(\widehat\Psi_{k_n},\psi_0)
+ \le(1+2\delta)d_{0n}(\widehat\Psi_{\widetilde k_n},\psi_0)+Z_n,
+\]
+其中 $Z_n=Z_{n1}+Z_{n2}$，当 $n\to\infty$ 时 $P_0^n(Z_{n2}=0)\to1$，且存在某个 $n_1<\infty$，使得对 $n>n_1$，
+\[
+ E_0Z_{n1}
+ \le C(\delta,M_1,M_2)\frac{M_{3n}^2(1+\log(K(n)))}{n}.
+\]
+若假设A4不成立，则有
+\[
+ d_{0n}(\widehat\Psi_{k_n},\psi_0)
+ =o_P(n^{-1}M_{3n}^3)+o_P(n^{-1}M_{3n}^2(1+\log K(n))).
+\]
+\end{bookresult}
+
+\noindent\textbf{假设的讨论。}假设A1要求，对 $(O(t),Z(t))$ 的所有可能实现及 $\psi_0$ 的所有候选估计量，损失函数都一致地被某个常数 $M_1$ 所界定。假设A2恰好是我们预期二次且一致有界的损失函数应满足的假设，van der Laan 和 Dudoit（2003）及相关论文对此作了说明。假设A3指出，以下以均值1为中心的随机变量
+\[
+ \frac{d_{0n}(\widehat\Psi_{k_n},\psi_0)}
+ {E_0d_{0n}(\widehat\Psi_{k_n},\psi_0)}
+\]
+（以及把 $k_n$ 换为 $\widetilde k_n$ 的对应变量）以趋于1的概率落在一个缓慢扩展至其整个支撑集 $(0,\infty)$ 的区间内。我们预期，对于任何趋于无穷的序列 $M_{3n}$，例如 $M_{3n}=\log n$，这一假设都会成立。假设A3在本质上等价于假定，以下以均值零为中心的量
+\[
+ \log d_{0n}(\widehat\Psi_{k_n},\psi_0)
+ -E_0\log d_{0n}(\widehat\Psi_{k_n},\psi_0)
+\]
+以趋于1的概率落在区间 $[-\log n,\log n]$ 内。假设A4并非实质性假设，因为它只影响结果的精确表述。由于 $M_{3n}$ 可以是任意缓慢趋于无穷的序列，假设A4所说的是：由预言选择器选中的估计量，收敛到 $\psi_0$ 的速率慢于正确设定的参数模型中 MLE 所具有的 $1/n$ 速率。因此，假设A4通常会成立；但无论如何，若某个候选估计量以参数速率 $1/n$ 收敛到真值，则在线超级学习器也会以几乎同样快的速率 $M_{3n}^3/n$ 收敛。
+
+\subsection{非二次损失函数}
+
+对于非二次损失函数，可以应用以下直接的定理。
+
+\begin{bookresult}{定理}{18.2}
+考虑前述关于 $O^n=(O(1),\ldots,O(n))$ 的分布 $P_0^n$ 的模型 $\mathcal M^n$；目标参数 $\Psi^n:\mathcal M^n\to\bm{\Psi}$ 定义为 $\Psi^n(P_\theta^n)=\Psi(\theta)$，其中 $\Psi:\Theta\to\bm{\Psi}$；并考虑 $\psi_0=\Psi(\theta_0)$ 的损失函数 $L(\psi)(Z,O)$，以及基于损失的差异度 $d_{0n}(\widehat\Psi_k,\psi_0)$。同时考虑前面定义的在线交叉验证选择器 $k_n$ 与在线预言选择器 $\widetilde k_n$。
+
+\needspace{5\baselineskip}
+\noindent\textbf{假设。}
+\begin{enumerate}[label=A\arabic*.,leftmargin=2.8em]
+\item 存在 $M_1<\infty$，使得
+\[
+ \sup_{\psi\in\bm{\Psi}}\sup_{i,O(i),Z(i)}
+ \bigl|L(\psi)(Z(i),O(i))-L(\psi_0)(Z(i),O(i))\bigr|\le M_1,
+\]
+其中对 $Z(i),O(i)$ 的上确界取遍 $Z(i),O(i)$ 的分布的某个支撑集。
+\end{enumerate}
+
+\noindent\textbf{有限样本结果。}存在通用常数 $C(M_1)<\infty$（即对 $n$ 及候选估计量的选择均通用），使得
+\[
+ E_0d_{0n}(\widehat\Psi_{k_n},\psi_0)
+ \le E_0d_{0n}(\widehat\Psi_{\widetilde k_n},\psi_0)
+ +C(M_1)\frac{\log^{0.5}(1+K(n))}{n^{0.5}}.
+\]
+\end{bookresult}

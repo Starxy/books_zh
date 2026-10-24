@@ -1,0 +1,14 @@
+% 原图瓶颈中的六个示例数值逐项保留。
+\resizebox{.95\linewidth}{!}{%
+\begin{tikzpicture}[font=\normalsize,flow/.style={-{Stealth[length=3mm,width=3mm]},line width=2pt,draw=violet!80!black}]
+\node[align=center] (input) at (-.9,0) {输入\\文本};
+\path[fill=violet!28] (.5,-1.5) -- (.5,1.5) -- (3.4,.85) -- (3.4,-.85) -- cycle;
+\node at (1.9,0) {编码器};
+\node[fill=red!65!black,text=white,align=center,inner sep=4pt,font=\small] (context) at (4,0) {$-0.2$\\$-0.1$\\$0.1$\\$0.4$\\$-0.3$\\$1.1$};
+\path[fill=violet!28] (4.6,-.85) -- (4.6,.85) -- (7.5,1.5) -- (7.5,-1.5) -- cycle;
+\node at (6.1,0) {解码器};
+\node[align=center] (output) at (9,0) {翻译后\\的文本};
+\draw[flow] (-.1,0) -- (.4,0);
+\draw[flow] (7.6,0) -- (8.1,0);
+\end{tikzpicture}%
+}

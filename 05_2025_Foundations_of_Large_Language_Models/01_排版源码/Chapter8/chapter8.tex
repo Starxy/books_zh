@@ -1,0 +1,1808 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+%----------------------------------------------------------------------------------------
+% Natural Language Processing: Neural Networks and Large Language Models
+%
+% Copyright 2021-2026
+% Tong Xiao (xiaotong@mail.neu.edu.cn) and Jingbo Zhu (zhujingbo@mail.neu.edu.cn)
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%    CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+%\setcounter{chapter}{7}
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 8
+%----------------------------------------------------------------------------------------
+
+\chapter{生成式模型}
+
+\thispagestyle{chapterurl} % add urls to the header
+
+\noindent 近年来，自然语言处理（natural language processing，NLP）最重要的进展之一，是大语言模型（large language model，LLM）的发展。这一突破推动了能够以接近人类的水平理解和生成自然语言的系统的诞生。这些系统甚至展现出了推理（reasoning）能力，而推理长期以来一直是人工智能（AI）面临的挑战。凭借这些成果，NLP 取得了长足进步，进入了新的研究时代，开始处理日益复杂的问题，例如构建能够与人类流畅交流的对话智能体。
+
+语言建模（language modeling）的概念可以追溯到~\citet{shannon:1951prediction} 的早期实验。在这项研究中，Shannon 提出用语言模型来估计英语文本的可预测程度，即\textit{在已知前 $N$ 个字母的情况下，能够多准确地预测文本中的下一个字母}。尽管 Shannon 的实验还很初步，语言建模的基本目标和方法在此后数十年间基本保持不变。多年来，尤其是在 2010 年以前，语言建模的主流方法是 $n$ 元语法（n-gram）方法~\cite{Jurafsky-and-Martin:2008}。在 $n$ 元语法语言建模中，我们估计一个词在给定前 $n-1$ 个词时的概率，进而用一系列 $n$ 元语法概率的乘积近似序列的概率。这些概率通常根据文本中 $n$ 元语法的相对计数，经平滑处理后估计得到。这种方法虽然简单，却在 NLP 中得到了广泛应用。例如，现代统计语音识别和机器翻译系统的成功，在很大程度上依赖于 $n$ 元语法语言模型的使用~\cite{jelinek:1998statistical,Koehn:2010}。
+
+将神经网络应用于语言建模，长期以来一直是一个活跃的研究方向，而深度学习技术的发展带来了重大突破。\citet{Bengio-et-al:2003} 的研究被广泛引用，其中使用端到端训练的前馈网络来建模 $n$ 元语法概率。这一模型的重要产物是词的分布式表示，即词嵌入（word embedding）。词嵌入将词映射为低维实值向量，而非将其表示为离散变量，从而能够在连续的表示空间中捕捉词以及词的 $n$ 元语法之间的语义关系。这样，语言模型便不再受维度灾难的困扰，而是能够通过一个紧凑的神经模型表示指数级数量的 $n$ 元语法。
+
+通过神经语言模型学习词表示的思想，启发了此后 NLP 领域的表示学习（representation learning）研究。不过，在提出后的最初几年，这种方法并未引起 NLP 研究界的广泛关注。直到 2012 年前后，通过简单的词预测任务从大规模文本中学习词嵌入，才取得了重要进展。研究者提出了包括 Word2Vec 在内的多种方法，有效地学习了这类嵌入，并将其成功应用于各种 NLP 系统~\cite{mikolov:2013efficient,Mikolov-et-al:2013distributed}。这些进展促使研究者开始利用更强大的语言模型，例如基于 LSTM 的模型，探索序列表示学习~\cite{sutskever-etal:2014sequence,peters-etal:2018deep}。随后，Transformer 架构的提出使序列表示研究迅速取得进展，也吸引了广泛关注。随着 Transformer 架构的兴起，语言建模的概念得到了推广，涵盖在不同范式下学习预测词的模型。许多强大的 Transformer 模型通过这些词预测任务完成预训练（pre-training），并成功应用于各种下游任务（downstream task）~\cite{devlin-etal:2019bert}。
+
+的确，在大规模数据上训练语言模型，让 NLP 研究迎来了令人振奋的时期。长期以来，语言建模被视为一种与人工智能更广泛目标没有直接联系的基础技术，但它却促成了能够通过反复预测词来获取通用知识的智能系统的出现。近期研究表明，单个经过充分训练的 LLM 就能够执行广泛的任务，并且只需极少的适配便可泛化到新任务~\cite{bubeck-etal:2023sparks}。这标志着向更高级的人工智能迈出了一步，也激励人们进一步探索，将更强大的语言模型发展为一类基础模型（foundation model）。
+
+本章讨论生成式 LLM 的基本概念。为简便起见，我们用 LLM 指代 GPT 这类生成式模型；在更广泛的意义上，这一术语也可以包含 BERT 等非生成式模型。我们首先对 LLM 作总体介绍，包括构建这类模型涉及的关键步骤。然后讨论 LLM 扩展中的两个关键挑战：如何大规模训练 LLM，以及如何改进 LLM 以处理长上下文输入。最后，对本章内容作简要总结。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{大语言模型简介}
+
+本节介绍本章其余部分以及后续章节所需的 LLM 基本概念。我们交替使用\textit{词}（word）和\textit{词元}（token）这两个术语。尽管二者原本的含义略有不同，这里都指语言建模所采用的基本单位。
+
+在介绍技术细节之前，先来考虑语言模型如何工作。语言建模的核心目标是估计词元序列的概率。设 $\{x_0, x_1, \cdots, x_m\}$ 为一个词元序列，其中 $x_0$ 是起始符号 $\langle s \rangle$（或 $\langle \mathrm{SOS} \rangle$）\footnote{在 BERT 等某些模型中，序列开头会添加 [CLS] 这样的特殊词元，不过它的作用与自回归模型中的起始符号不同。}。利用链式法则，可以将该序列的概率分解为
+\begin{eqnarray}
+\Pr(x_0,\cdots,x_m) & = & \Pr(x_0) \cdot \Pr(x_1|x_0) \cdot \Pr(x_2|x_0,x_1) \cdots \Pr(x_m|x_0,\cdots,x_{m-1}) \nonumber \\
+                 & = & \prod_{i=0}^{m} \Pr(x_{i}|x_0,\cdots,x_{i-1}), \label{eq:lm-basic-form},
+\end{eqnarray}
+
+\noindent 或者写成对数形式
+
+\begin{eqnarray}
+\log \Pr(x_0,\cdots,x_m) & = & \sum_{i=0}^{m} \log \Pr(x_{i}|x_0,\cdots,x_{i-1}). \label{eq:lm-basic-form-log}.
+\end{eqnarray}
+
+\noindent 这里，$\Pr(x_{i}|x_0,\cdots,x_{i-1})$ 表示在给定前面所有词元 $\{x_0,\cdots,\allowbreak x_{i-1}\}$ 时，词元 $x_i$ 的概率\footnote{我们假设当 $i=0$ 时，$\Pr(x_{i}|x_0,\cdots,x_{i-1})=\Pr(x_0)=1$。因此，$\Pr(x_0,\cdots,x_m) = \Pr(x_0)\Pr(x_1,\cdots,x_m|x_0)=\Pr(x_1,\cdots,x_m|x_0)$。}。在深度学习时代，语言建模的典型做法是使用深度神经网络估计这些概率。为这一任务训练的神经网络接收上下文序列 $x_0,\cdots,x_{i-1}$，输出词表（vocabulary）$V$ 上的概率分布，记为 $\Pr(\cdot|x_0,\cdots,x_{i-1})$。概率 $\Pr(x_{i}|x_0,\cdots,x_{i-1})$ 对应于该分布中与词元 $x_i$ 关联的条目。
+
+应用训练好的语言模型时，一项常见任务是在给定上下文的情况下，找出最可能出现的下一个词元。这可以形式化为
+\begin{eqnarray}
+\hat{x}_i & = & \argmax_{x_i \in V} \Pr(x_{i}|x_0,\cdots,x_{i-1}).
+\end{eqnarray}
+
+我们可以迭代地执行这一词元预测过程，依次生成文本：每一步先预测最可能的词元 $\hat{x}_i$，再将其添加到上下文末尾，用来预测后续词元 $\hat{x}_{i+1}$。由此得到一个从左到右的自回归生成过程，实现了式（\ref{eq:lm-basic-form}）和式（\ref{eq:lm-basic-form-log}）所描述的计算。表~\ref{tab:lm-generation-abcd} 以给定前缀 ``$\langle s \rangle\ \ a$'' 后生成三个词元为例说明这一过程。接下来，我们讨论实践中如何构建、训练和应用 LLM。
+
+\begin{table}[t]
+\centering
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l | l | l | l}
+上下文 & 预测 & 决策规则 & 序列概率 \\ \hline
+$\langle s \rangle\ \ a$ & $b$ & $\argmax_{x_2 \in V} \Pr(x_{2}|\langle s \rangle\ a)$ & $\Pr(\langle s \rangle) \cdot \Pr(a|\langle s \rangle) \cdot $ \colorbox{gray!30}{$\Pr(b|\langle s \rangle\ a)$} \\ \hline
+$\langle s \rangle\ \ a\ \ b$ & $c$ & $\argmax_{x_3 \in V} \Pr(x_{3}|\langle s \rangle\ a\ b)$ & $\Pr(\langle s \rangle) \cdot \Pr(a|\langle s \rangle) \cdot \Pr(b|\langle s \rangle\ a) \cdot$ \\
+& & & \colorbox{gray!30}{$\Pr(c|\langle s \rangle\ a\ b)$} \\ \hline
+$\langle s \rangle\ \ a\ \ b\ \ c$ & $d$ & $\argmax_{x_4 \in V} \Pr(x_{4}|\langle s \rangle\ a\ b\ c)$ & $\Pr(\langle s \rangle) \cdot \Pr(a|\langle s \rangle) \cdot \Pr(b|\langle s \rangle\ a) \cdot$ \\
+& & & $\Pr(c|\langle s \rangle\ a\ b) \cdot $ \colorbox{gray!30}{$\Pr(d|\langle s \rangle\ a\ b\ c)$} \\
+\end{tabular}
+\endgroup
+\caption{给定前缀 $\langle s \rangle\ \ a$，通过语言模型生成三个词元 $b\ \ c\ \ d$ 的示例。每一步，模型从 $V$ 中选择使 $\Pr(x_{i}|x_0,\cdots,x_{i-1})$ 最大的词元 $x_i$，然后将其添加到上下文序列的末尾。下一步基于新的上下文重复相同过程。}
+\label{tab:lm-generation-abcd}
+\end{table}
+
+\subsection{仅解码器 Transformer}
+\label{sec:decoder-only-transformers}
+
+\noindent 按照通常的做法，语言模型的输入是一个词元序列，记为 $\{x_0,\cdots,x_{m-1}\}$。每一步都会生成一个新词元，并将其添加到序列末尾，以进行下一次预测。为此，语言模型在每个位置 $i$ 输出概率分布 $\Pr(\cdot|x_0,\cdots,x_{i-1})$，并根据这一分布生成下一个词元，例如采用采样或贪心解码。训练时，模型最大化对数似然（log-likelihood）$\sum_{i=1}^{m} \log \Pr(x_i|x_0,\allowbreak \cdots,x_{i-1})$\footnote{由于 $\log \Pr(x_0) = 0$，因此有 $\sum_{i=1}^{m} \log \Pr(x_i|x_0,\cdots,x_{i-1}) = \sum_{i=0}^{m} \log \Pr(x_i | x_0,\cdots,x_{i-1})$。}。
+
+这里，我们着重介绍仅解码器 Transformer 架构（decoder-only Transformer architecture），因为它是 LLM 最广泛采用的模型架构之一。输入词元序列由一组 $d_e$ 维向量 $\{\mathbf{e}_0,\cdots,\mathbf{e}_{m-1}\}$ 表示。每个向量 $\mathbf{e}_i$ 都是 $x_i$ 的词元嵌入与位置 $i$ 的位置嵌入（positional embedding）之和。模型的核心由堆叠的 Transformer 块（或层）构成。每个 Transformer 块包含两个子层：自注意力（self-attention）子层和前馈网络（feed-forward network，FFN）子层。这些子层可以采用后置归一化（post-norm）架构来定义
+\begin{eqnarray}
+\mathrm{output} & = & \mathrm{LNorm}(F(\mathrm{input}) + \mathrm{input}) \label{eq:post-norm-lm},
+\end{eqnarray}
+
+\noindent 也可以采用前置归一化（pre-norm）架构
+\begin{eqnarray}
+\mathrm{output} & = & F(\mathrm{LNorm}(\mathrm{input})) + \mathrm{input} \label{eq:pre-norm-lm},
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{input}$ 和 $\mathrm{output}$ 分别表示输入与输出，二者都是 $m \times d$ 的矩阵。$\mathrm{input}$ 和 $\mathrm{output}$ 的第 $i$ 行都可以理解为序列中第 $i$ 个词元的上下文表示。
+
+$F(\cdot)$ 是子层的核心函数。对于 FFN 子层，$F(\cdot)$ 是一个两层 FFN；对于自注意力子层，$F(\cdot)$ 是多头自注意力函数。一般而言，自注意力可以表示为 QKV 注意力的形式
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{qkv}}(\mathbf{Q},\mathbf{K},\mathbf{V}) & = & \mathrm{Softmax}(\frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d}} + \mathbf{Mask}) \mathbf{V} \label{eq:qkv-attention-lm},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{Q}$、$\mathbf{K}$ 和 $\mathbf{V} \in \mathbb{R}^{m \times d}$ 分别是查询（query）、键（key）和值（value）。需要注意的是，预测一个词元时只能考虑它之前的词元。因此，自注意力中加入了掩码变量 $\mathbf{Mask} \in \mathbb{R}^{m \times m}$ 来实现这一约束。$\mathbf{Mask}$ 的第 $(i,k)$ 个元素在 $i \ge k$ 时取值为 0，否则取值为 $-\infty$。
+
+给定表示 $\mathbf{H} \in \mathbb{R}^{m \times d}$，多头自注意力函数可以定义为
+\begin{eqnarray}
+F(\mathbf{H}) & = & \mathrm{Merge}(\mathrm{head}_1,\cdots,\mathrm{head}_{\tau}) \mathbf{W}^{\mathrm{head}},
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Merge}(\cdot)$ 表示将各个输入拼接起来，$\mathbf{W}^{\mathrm{head}} \in \mathbb{R}^{d \times d}$ 为参数矩阵。$\mathrm{head}_j$ 是在表示的某个子空间上进行 QKV 注意力计算所得的输出。
+\begin{eqnarray}
+\mathrm{head}_j & = & \mathrm{Att}_{\mathrm{qkv}}(\mathbf{Q}^{[j]},\mathbf{K}^{[j]},\mathbf{V}^{[j]}).
+\end{eqnarray}
+
+\noindent 这里，$\mathbf{Q}^{[j]}$、$\mathbf{K}^{[j]}$ 和 $\mathbf{V}^{[j]}$ 分别是通过线性变换投影到第 $j$ 个子空间的查询、键和值
+\begin{eqnarray}
+\mathbf{Q}^{[j]} & = & \mathbf{H} \mathbf{W}_j^{q} \\
+\mathbf{K}^{[j]} & = & \mathbf{H} \mathbf{W}_j^{k} \\
+\mathbf{V}^{[j]} & = & \mathbf{H} \mathbf{W}_j^{v},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{W}_j^{q}$、$\mathbf{W}_j^{k}$ 和 $\mathbf{W}_j^{v} \in \mathbb{R}^{d \times \frac{d}{\tau}}$ 是这些变换的参数矩阵。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-lm-decoder-only-architecture}
+\caption{用于语言建模的 Transformer 解码器架构。核心组件是堆叠的 $L$ 个 Transformer 块，每个块包含一个自注意力子层和一个 FFN 子层。为防止模型访问右侧上下文，自注意力中加入了掩码变量。输出层利用 Softmax 函数，根据之前的词元序列生成下一个词元的概率分布。推理（inference）时，模型利用之前预测的词元来预测下一个词元，并重复这一过程，直至到达序列末尾。$\{\mathbf{z}_0,\cdots,\mathbf{z}_{m-1}\}$ 表示一个 Transformer 块的输入，$\{\mathbf{h}_0^{L},\cdots,\mathbf{h}_{m-1}^{L}\}$ 表示最后一个 Transformer 块的输出。}
+\label{fig:llm-transformer-decoder}
+\end{figure}
+
+假设模型包含 $L$ 个 Transformer 块。我们在最后一个块的输出之上构建一个 Softmax 层。该层输出由 $m$ 个词表概率分布组成的序列，如下所示
+\begin{eqnarray}
+\begin{bmatrix}
+\Pr(\cdot | x_0) \\
+\Pr(\cdot | x_0,x_{1}) \\
+\vdots \\
+\Pr(\cdot | x_0,\cdots,x_{m-1})
+\end{bmatrix}
+& = & \mathrm{Softmax}(\mathbf{H}^{L} \mathbf{W}^{o}),
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{H}^{L}$ 是最后一个 Transformer 块的输出，$\mathbf{W}^{o} \in \mathbb{R}^{d \times |V|}$ 是参数矩阵。
+
+图~\ref{fig:llm-transformer-decoder} 展示了用于语言建模的 Transformer 架构。该模型的推理遵循自回归过程。语言模型每次以前缀 $x_0,\cdots,x_{i-1}$ 为输入，预测使概率 $\Pr(x_i|x_0,\cdots,x_{i-1})$ 最大的词元 $x_{i}$。需要注意的是，尽管实现细节不同，许多 LLM 都采用了上述相同的架构。这些模型之所以称为“大”模型，是因为它们的深度和宽度都相当可观。表~\ref{tab:llm-model-size-comparison} 列出了几个 LLM 的模型规模及其配置。
+
+\begin{table}[t]
+\centering
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l | r | r | r | r }
+LLM & 参数量 & 深度 $L$ & 宽度 $d$ & 注意力头数 \\
+    &                  &           &           &   (Q/KV)    \\ \hline
+GPT-1~\cite{radford-etal:2018improving} & 0.117B & 12 & 768 & 12/12 \\
+GPT-2~\cite{radford-etal:2019language} & 1.5B & 48 & 1,600 & 25/25 \\
+GPT-3~\cite{brown-etal:2020language} & 175B & 96 & 12,288 & 96/96 \\ \hline
+\multirow{3}{*}{Llama2~\cite{touvron-etal:2023llama2}}
+                       &  7B & 32 & 4,096 & 32/32 \\
+                       &  13B & 40 & 5,120 & 40/40 \\
+                       &  70B & 80 & 8,192 & 64/64 \\ \hline
+\multirow{3}{*}{Llama3/3.1~\cite{dubey2024llama}}
+                       &  8B & 32 & 4,096 & 32/8 \\
+                       &  70B & 80 & 8,192 & 64/8 \\
+                       &  405B & 126 & 16,384 & 128/8 \\ \hline
+\multirow{3}{*}{Gemma2~\cite{team2024gemma}}
+                       &  2B & 26 & 2,304 & 8/4 \\
+                       &  9B & 42 & 3,584 & 16/8 \\
+                       &  37B & 46 & 4,608 & 32/16 \\ \hline
+\multirow{3}{*}{Qwen2.5~\cite{yang2024qwen2}}
+                       &  0.5B & 24 & 896 & 14/2 \\
+                       &  7B & 28 & 3,584 & 28/4 \\
+                       &  72B & 80 & 8,192 & 64/8 \\ \hline
+\multirow{1}{*}{DeepSeek-V3~\cite{liu2024deepseek}}
+                       &  671B & 61 & 7,168 & 128/128 \\ \hline
+\multirow{3}{*}{Falcon~\cite{penedo-etal:2023refinedweb}}
+                       &  7B & 32 & 4,544 & 71/71 \\
+                       &  40B & 60 & 8,192 & 128/128 \\
+                       &  180B & 80 & 14,848 & 232/232 \\ \hline
+Mistral~\cite{jiang-etal:2023mistral} & 7B & 32 & 4,096 & 32/32
+\end{tabular}
+\endgroup
+\caption{若干 LLM 在模型规模、模型深度、模型宽度和注意力头数方面的比较（$a/b$ 表示查询有 $a$ 个头，而键和值各有 $b$ 个头）。}
+\label{tab:llm-model-size-comparison}
+\end{table}
+
+\subsection{训练大语言模型}
+
+\noindent 现在，假设给定一个包含 $K$ 个序列的训练集 $\mathcal{D}$。可以使用语言模型计算 $\mathcal{D}$ 中每个序列 $\mathbf{x} = x_0 \cdots x_m$ 的对数似然
+\begin{eqnarray}
+\mathcal{J}_{\theta}(\mathbf{x}) & = & \sum_{i=1}^{m} \log \mathrm{Pr}_{\theta}(x_i|x_0,\cdots,x_{i-1}) \label{eq:llm-training-loss-likelihood}.
+\end{eqnarray}
+
+\noindent 其中，$\mathcal{L}_{\theta}(\cdot)$ 和 $\Pr_{\theta}(\cdot)$ 中的下标 $\theta$ 表示语言模型的参数。于是，最大似然训练的目标定义为
+\begin{eqnarray}
+\hat{\theta} & = & \argmax_{\theta} \sum_{\mathbf{x} \in \mathcal{D}} \mathcal{J}_{\theta}(\mathbf{x}) \label{eq:llm-training-mle}.
+\end{eqnarray}
+
+用上述目标训练基于 Transformer 的语言模型，通常可以视为标准的神经网络优化过程。该过程可以通过梯度下降（gradient descent）算法实现，而现成的深度学习工具包普遍支持这类算法。略显出人意料的是，随着语言模型演变为计算开销更大的架构，并在更大的数据集上训练，模型性能也持续提高~\cite{kaplan-etal:2020scaling}。这些成功促使 NLP 研究者不断扩大训练数据和模型规模，以构建越来越强大的语言模型。
+
+然而，随着语言模型不断增大，我们也面临新的训练挑战，使得问题与训练相对较小的模型显著不同。其中一项挑战来自管理数据、模型参数和训练流程所需的大规模分布式系统。开发和维护这类系统，除了深度学习方面的专业知识，还需要在软硬件工程上投入大量工作。与此相关的另一个问题是，扩大训练规模需要海量计算资源，才能在合理的时间内完成训练。例如，从头训练一个拥有数百亿参数的 LLM，通常需要数百乃至数千张 GPU。这一要求极大地增加了训练成本，尤其是考虑到模型开发中还需要反复进行多轮实验。此外，从优化角度看，随着网络深度和参数量的增加，训练过程可能变得非常不稳定。因此，往往需要修改模型架构，使 LLM 适应大规模训练。我们将在第~\ref{sec:llm-training-at-scale} 节更详细地讨论这些问题。
+
+\subsection{微调与应用大语言模型}
+
+\noindent 完成 LLM 的预训练后，就可以用它执行各种 NLP 任务。传统上，语言模型作为其他系统的组件使用。例如，在统计机器翻译系统中，语言模型被广泛用于给译文评分。相比之下，在生成式 AI 中，LLM 被视为完整的系统，通过其生成能力解决 NLP 问题。一种常见做法是用文本描述目标任务，再以这一描述为提示，引导 LLM 生成文本。这是一项标准的文本生成任务：模型从给定上下文出发，续写或补全文本。
+
+更形式化地，令 $\mathbf{x} = x_0 \cdots x_m$ 表示用户所提供上下文的词元序列，$\mathbf{y} = y_1 \cdots y_n$ 表示跟在该上下文之后的词元序列。LLM 的推理过程可以定义为：在给定 $\mathbf{x}$ 时，寻找最可能的序列 $\mathbf{y}$：
+\begin{eqnarray}
+\hat{\mathbf{y}} & = & \argmax_{\mathbf{y}} \log \Pr(\mathbf{y} | \mathbf{x}) \nonumber \\
+                 & = & \argmax_{\mathbf{y}} \sum_{i=1}^{n} \log \Pr(y_i|x_0,\cdots,x_m,y_1,\cdots,y_{i-1}).
+\end{eqnarray}
+
+\noindent 这里，$\sum_{i=1}^{n} \log \Pr(y_i|x_0,\cdots,x_m,y_1,\cdots,y_{i-1})$ 在数学形式上等价于式（\ref{eq:lm-basic-form-log}）的右侧。它建模的是从位置 $m+1$ 而非位置 $0$ 开始预测词元的对数概率。在本章及后续章节中，我们使用不同的变量 $\mathbf{x}$ 和 $\mathbf{y}$ 区分 LLM 的输入与输出，尽管它们可以视为同一连续序列中的两个子序列。采用这一记法后，可以看出上式与神经机器翻译架构等其他 NLP 文本生成模型的形式非常相似。
+
+为了说明如何应用 LLM，考虑判断给定句子在语法上是否正确的问题。我们可以定义如下模板
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{4em} \{*sentence*\}
+
+\hspace{4em} 问题：这个句子在语法上正确吗？
+
+\hspace{4em} 答案：\underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里，$\underline{\hspace{1em}}$ 表示我们希望生成的文本。\{*sentence*\} 是一个占位变量，将被替换为用户提供的实际句子。例如，假设有一个句子 ``\textit{John seems happy today.}''。我们可以用这个句子替换模板中的 \{*sentence*\}，从而构造语言模型的输入
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{4em} John seems happy today.
+
+\hspace{4em} 问题：这个句子在语法上正确吗？
+
+\hspace{4em} 答案：\underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+
+为了执行这项任务，语言模型接收上下文 $\mathbf{x}=$``John seems happy today .$\backslash$n 问题：这个句子在语法上正确吗？$\backslash$n 答案：''\footnote{$\backslash$n 是用于换行的特殊字符。}，然后基于该上下文生成后续文本作为答案。例如，如果 ``Yes'' 是这一上下文下概率最高的文本，语言模型就可能输出它，即 $\mathbf{y} = \textrm{``Yes''}$。
+
+类似地，我们可以定义更多模板来处理其他任务。例如，可以用如下模板把一个英语句子翻译成中文
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{4em} \{*sentence*\}
+
+\hspace{4em} 问题：这个英语句子的中文译文是什么？
+
+\hspace{4em} 答案：\underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 也可以使用类似指令的模板
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{4em} \{*sentence*\}
+
+\hspace{4em} 把这个句子从英语译成中文。
+
+\hspace{4em} \underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 或者使用类似代码的模板。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{4em} [源语言] = 英语 [目标语言] = 中文 [输入] = \{*sentence*\}
+
+\hspace{4em} [输出] = \underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+上述模板提供了一种简单而有效的方法，可以在不改变模型结构的情况下，“提示”（prompt）单个 LLM 执行各种任务。不过，这种方法要求 LLM 能够识别并遵循指令或回答问题。一种实现方式是在预训练数据集中加入包含指令及其对应回答的训练样本。虽然这一方法很直接，但从头构建和训练 LLM 的计算成本很高。此外，要使指令遵循数据在预训练中发挥作用，需要相当大的数据量，而为所有感兴趣的任务收集大规模标注数据非常困难。
+
+第二种方法是通过微调（fine-tuning）来适配 LLM，这已成为近期研究中事实上的标准做法。借助微调，模型在预训练阶段学到的词元预测能力可以泛化到新任务。微调背后的思想是：模型在预训练期间已经获得了一些通用的语言知识，但需要一种机制来激活这些知识，并将其用于新任务。为此，我们可以利用指令遵循数据，对模型参数进行少量微调。这种方法称为\mindex{指令微调}（instruction fine-tuning）。
+
+一个指令微调样本由词元序列表示，可以看作由输入与期望输出组成的元组。其中，输入包括指令、系统信息（或系统前缀），以及用户提供的其他信息\footnote{系统信息是添加在输入开头、用于引导 LLM 行为的一段词元序列，例如\textit{你是一个乐于助人的助手，不应输出有害内容}。}。下面给出几个例子，其中蓝色文本为输入，带下划线的文本为输出。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} 阅读下面的句子，判断其语法是否正确。}
+
+{\color{blue} LLMs are powerful models but are expensive to build.}
+
+\vspace{0.3em}
+
+\underline{Yes}
+}
+\end{center}
+\end{tcolorbox}
+%\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} LLMs are powerful models but are expensive to build.}
+
+{\color{blue} 这个句子在语法上是否通顺？}
+
+{\color{blue} 答案选项}
+
+{\color{blue} - Yes}
+
+{\color{blue} - No}
+
+\vspace{0.3em}
+
+\underline{Yes}
+}
+\end{center}
+\end{tcolorbox}
+%\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} Yes 或 No？Yes 表示下面的句子在语法上正确，No 表示其中存在语法错误。}
+
+{\color{blue} LLMs are powerful models but are expensive to build.}
+
+\vspace{0.3em}
+
+\underline{Yes}
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+这些样本描述的是同一个二分类任务，但采用了不同的指令。为了增加微调数据的多样性，并提高 LLM 的泛化能力，我们还可以用指令定义更多任务。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} 写一个关于三个角色的短篇故事。}
+
+{\color{blue} 角色 1：一个名叫 Andy 的男孩。}
+
+{\color{blue} 角色 2：Andy 的狗。}
+
+{\color{blue} 角色 3：Andy 的朋友 Jane。}
+
+\vspace{0.3em}
+
+\uline{在繁华城市的中心，Andy、他忠诚的狗 Rocket，以及朋友 Jane，趁着暮色发现了一座隐秘的花园。古树环绕，微风低语，他们分享梦想与秘密，结下了牢不可破的情谊。夜色渐深，他们在星空下约定，永远从平凡之中寻找奇迹。他们一起明白了，真正的冒险就藏在与朋友相处的时光里，而每一天都是等待发现的宝藏。}
+}
+\end{center}
+\end{tcolorbox}
+%\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} 给我一份制作冰淇淋的食谱。}
+
+\vspace{0.3em}
+
+\underline{原料：}
+
+\underline{2 杯浓奶油；1 杯牛奶；3/4 杯糖；2 茶匙香草精；}
+
+\underline{一小撮盐。}
+
+\underline{步骤：}
+
+\underline{1. 搅拌所有原料，直至糖溶解。}
+
+\underline{2. 将混合物放入冰箱冷藏 2 小时。}
+
+\underline{3. 倒入浅盘冷冻，每 30 分钟搅拌一次，共搅拌 3--4 次。}
+
+\underline{4. 再冷冻 2 小时，直至完全凝固。}
+
+\underline{5. 享用自制的冰淇淋。}
+}
+\end{center}
+\end{tcolorbox}
+%\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} 如果你买了 5 个苹果，每个苹果的价格为 \$1.20，总共要花多少钱？ }
+
+\vspace{0.3em}
+
+\underline{\$6.00}
+}
+\end{center}
+\end{tcolorbox}
+%\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} 编写一个 Python 程序，计算以下数字的平方和。}
+
+{\color{blue} 1 , 2 , 10 , -9 , 78}
+
+\vspace{0.3em}
+
+\underline{numbers = [1,2,10,-9,78]}
+
+\underline{sum\_of\_squares = sum(x**2 for x in numbers)}
+
+\underline{print(sum\_of\_squares)}
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+为了获得指令遵循能力，需要一定数量的微调数据。这些数据可以包含多样的指令及其可能的回答。研究发现，增加微调任务的数量有助于提高 LLM 的性能~\cite{chung-etal:2022scaling}。需要注意的是，尽管更多微调数据通常有益，但微调数据量一般比预训练数据量小数个数量级。例如，LLM 可以用数万或数十万个样本进行微调；如果样本质量很高，所需数量还可以更少~\cite{zhou-etal:2023lima,chen-etal:2023alpagasus}。而这类模型的预训练可能需要数十亿乃至数万亿词元，因此计算需求显著更大，训练时间也更长~\cite{touvron-etal:2023llama}。
+
+还应注意，不能期望微调数据覆盖我们打算让 LLM 执行的全部下游任务。对于“预训练 + 微调”方法的工作机制，一种常见认识是：LLM 在预训练阶段已经获得了理解指令和生成回答所需的知识，但这些能力只有在引入某种监督之后才会充分激活。当我们使用相对少量的标注数据微调模型时，通用的指令遵循行为便会涌现。因此，可以实现一定程度的\mindex{零样本学习}（zero-shot learning）：微调后的模型能够处理那些没有专门训练或微调过的新任务~\cite{sanh-etal:2022multitask,wei-etal:2022finetuned}。这种零样本学习能力，将生成式 LLM 与 BERT 等早期预训练模型区分开来；后者主要针对特定任务进行微调。
+
+一旦整理好指令数据集，微调过程本身就相对直接了。它可以视为与预训练类似的标准神经网络训练，只不过是在小得多的训练数据集上执行。设 $\mathcal{D}_{\mathrm{tune}}$ 为微调数据集，$\hat{\theta}$ 为经预训练优化得到的模型参数。修改式（\ref{eq:llm-training-mle}），可以得到微调的目标
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\hat{\theta}^+} \sum_{\mathrm{sample} \in \mathcal{D}_{\mathrm{tune}}} \mathcal{J}_{\hat{\theta}^+}(\mathrm{sample}) \label{eq:llm-fine-tuning-mle}.
+\end{eqnarray}
+
+\noindent 这里，$\tilde{\theta}$ 表示最优参数。采用记号 $\hat{\theta}^+$，表示微调从预训练参数 $\hat{\theta}$ 出发。
+
+对于每个 $\mathrm{sample} \in \mathcal{D}_{\mathrm{tune}}$，我们将其划分为输入片段 $\mathbf{x}_{\mathrm{sample}}$ 和输出片段 $\mathbf{y}_{\mathrm{sample}}$，即
+\begin{eqnarray}
+\mathrm{sample} & = & [\mathbf{x}_{\mathrm{sample}}, \mathbf{y}_{\mathrm{sample}}].
+\end{eqnarray}
+
+然后将对数似然函数定义为
+\begin{eqnarray}
+\mathcal{J}_{\hat{\theta}^+}(\mathrm{sample}) & = & \log \mathrm{Pr}_{\hat{\theta}^+}(\mathbf{y}_{\mathrm{sample}}|\mathbf{x}_{\mathrm{sample}}). \label{eq:fining-tuning-loss-sample}
+\end{eqnarray}
+
+\noindent 换言之，我们在子序列 $\mathbf{y}_{\mathrm{sample}}$ 上计算损失，而不是在整个序列上计算。在实现这一公式的反向传播（backpropagation）时，前向计算仍按通常方式构造序列 $[\mathbf{x}_{\mathrm{sample}},\mathbf{y}_{\mathrm{sample}}]$；而在反向计算中，误差梯度只通过网络中与 $\mathbf{y}_{\mathrm{sample}}$ 对应的部分向后传播，网络其余部分保持不变。以如下序列为例
+
+\begin{equation}
+\underbrace{\textrm{{\color{blue} $\langle s \rangle$ 计算这个数的平方。}}\ \textrm{{\color{blue} $2$。}}}_{\textrm{上下文（输入）}}\ \ \underbrace{\textrm{\underline{结果是 $4$。}}}_{\textrm{预测（输出）}}\nonumber
+\end{equation}
+
+\noindent 仅对\underline{结果是 $4$。}计算损失并进行反向传播。
+
+指令微调也需要大量工程工作。为了获得满意的结果，可能需要尝试不同的学习率（learning rate）、批量大小（batch size）、微调步数等配置。这通常需要多次运行微调和评测。尽管微调的成本和实验投入远低于预训练阶段，它们仍然十分关键，不应忽视。
+
+这里以指令微调为例进行说明，但微调技术在各种 LLM 的开发中都发挥着重要作用，其应用范围更为广泛。例如，可以利用对话数据将 LLM 微调为聊天机器人，也可以通过微调使模型能够处理非常长的序列。微调的广泛应用推动研究者不断改进相关技术，例如设计更高效的微调算法。尽管微调研究成果丰富，本节仅概述其中的关键步骤。后续章节将对此作更详细的讨论。
+
+\subsection{使大语言模型与世界对齐}
+
+\noindent 对于定义明确的任务，指令微调提供了一种适配 LLM 的简单方法。广义上，这可以视为一个\mindex{对齐}（alignment）问题。这里，对齐是指引导 LLM 按照符合人类价值观和目标的方式行动的过程。这种引导可以来自标注数据、人类反馈（human feedback），或其他任何形式的人类偏好（human preference）。例如，我们希望 LLM 不仅能够准确遵循指令，还要做到无偏、真实且无害。因此，需要以人类价值观和期望为方向监督模型。一个典型例子是，当我们询问 LLM 如何制造武器时，如果它没有经过仔细对齐，就可能列出关键制作步骤。然而，负责任的模型应当识别出索取有害或非法信息的请求，并避免作答。在这种情况下，对齐对于确保 LLM 负责任地行动并遵循伦理准则至关重要。
+
+与对齐密切相关的一个概念是 AI 安全。AI 研究的最终目标之一，是构建安全且有益于社会的智能系统。为实现这一目标，我们必须确保这些系统在广泛的真实条件下，包括遭到滥用或对抗攻击时，依然保持稳健、安全和可控。对于 LLM，通过人工标注数据，以及部署期间与用户的动态交互，使模型在人类指导下得到恰当对齐，可以显著提高安全性。
+
+对齐很困难，因为人类价值观和期望既多样又不断变化。有时，除非看到 LLM 对用户请求的回答，否则很难准确描述人类想要什么。这使对齐不再只是针对预定义任务调优 LLM 的问题，而成为一个通过与现实世界交互来训练模型的更广泛问题。
+
+出于对 AI 系统可控性的关注，针对 LLM 对齐问题的研究迅速增加。通常，在大规模无标注数据上完成 LLM 预训练之后，还会执行两个对齐步骤。
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{监督微调}（Supervised Fine-tuning，\mindex{SFT}）。这一过程在面向新任务的标注数据上，继续训练预训练 LLM。一种常用的 SFT 技术是指令微调。如上一小节所述，通过学习指令—回答标注数据，LLM 可以与遵循指令的预期行为对齐，从而具备执行各种由指令描述的任务的能力。监督微调遵循“预训练 + 微调”范式，是适配 LLM 的一种相对直接的方法。
+\item \vspace{0.3em} \mindex{从人类反馈中学习}（Learning from Human Feedback）。经过预训练和监督微调后，只要提供合适的提示，LLM 就能回答用户请求。然而，模型仍可能生成不符合事实、带有偏见或有害的内容。为了使 LLM 更好地与人类价值观对齐，一种有效方式是直接从人类反馈中学习。例如，给定指令及模型生成的回答，请人类专家评估回答符合其偏好和安全准则的程度，再利用这些反馈进一步训练 LLM，使其实现更好的对齐。
+\end{itemize}
+\vspace{0.5em}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-rlhf-overview}
+\caption{RLHF 概览。其中包含四个关键步骤：a）通过预训练和监督微调，训练初始 LLM，即策略；b）对 LLM 的输出排序，收集人类偏好数据；c）利用排序结果训练奖励模型；d）基于奖励模型，对策略进行强化学习微调。双线箭头表示训练或微调。}
+\label{fig:llm-rlhf-overview}
+\end{figure}
+
+
+从人类反馈中学习的一种典型方法，是将其视为强化学习（reinforcement learning，RL）问题，称为\mindex{基于人类反馈的强化学习}（reinforcement learning from human feedback，\mindex{RLHF}）~\cite{ouyang-etal:2022training}。RLHF 最初被提出用于处理一般的序贯决策问题~\cite{christiano-etal:2017deep}，后来成功应用于 GPT 系列模型的开发~\cite{stiennon-etal:2020learning}。作为一种强化学习方法，RLHF 的目标是通过最大化来自环境的某种奖励来学习策略（policy）。具体而言，RLHF 由两个主要组件构成：
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{智能体}（Agent）。智能体也称语言模型智能体，即我们希望优化的 LLM。它通过与环境交互来运行：从环境中接收文本，并生成文本回答。该智能体的策略是 LLM 所定义的条件概率分布，记为 $\Pr(\mathbf{y} | \mathbf{x})$。
+\item \vspace{0.3em} \mindex{奖励模型}（Reward Model）。奖励模型充当人类环境的代理。智能体每次生成输出序列后，奖励模型都会对其评估并赋予一个数值分数，即奖励。这个分数明确地向智能体传达其输出的质量与对齐程度。
+\end{itemize}
+\vspace{0.5em}
+
+RLHF 分为两个不同的学习阶段：1）奖励模型学习，利用人类对智能体输出的反馈来训练奖励模型；2）策略学习，在训练好的奖励模型指导下，使用强化学习算法优化策略。RLHF 的关键步骤可以概括如下：
+
+\begin{itemize}
+\item \vspace{0.5em} 通过预训练和指令微调构建初始策略。
+\item \vspace{0.3em} 利用策略为每个输入生成多个输出，再收集人类对这些输出的反馈，例如比较不同输出。
+\item \vspace{0.3em} 根据人类反馈学习奖励模型。
+\item \vspace{0.3em} 在奖励模型的监督下微调策略。
+\end{itemize}
+\vspace{0.5em}
+
+图~\ref{fig:llm-rlhf-overview} 展示了 RLHF 的总体流程。本节仅简要介绍 LLM 的概念，因此不详细讨论 RLHF 技术，而是通过一个简单例子说明其基本思想。
+
+假设我们已经通过预训练和指令微调训练了一个 LLM，并将其部署以回答用户请求。例如，用户可能输入
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+怎样才能过上更环保的生活？
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+我们通过从输出分布中采样，让 LLM 生成四个不同的输出，记为 $\{\mathbf{y}_1, \cdots, \mathbf{y}_4\}$
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+\begingroup
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{L{0.18\textwidth} L{0.70\textwidth} }
+输出 1（$\mathbf{y}_1$）： & 考虑用电动汽车或自行车代替传统汽车，以减少碳排放并保护我们的星球。 \\
+输出 2（$\mathbf{y}_2$）： & 采用极简生活方式。减少拥有的物品，以降低消费，以及制造和废弃处理对环境的影响。 \\
+输出 3（$\mathbf{y}_3$）： & 过离网生活。自行生产可再生能源并收集雨水，实现完全自给自足，减少对不可再生资源的依赖。 \\
+输出 4（$\mathbf{y}_4$）： & 支持本地农产品，以减少食品运输的碳足迹，同时享用新鲜、健康的食物。
+\end{tabular}
+\endgroup
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+随后，我们请标注者评估这些输出。一种直接的方法是为每个输出赋予一个评分。这时，奖励模型学习问题就可以表述为训练回归模型的任务。但对标注者而言，为 LLM 输出给出数值评分并不容易。通常很难设计一套所有标注者都认同且易于遵循的标注标准。另一种在 LLM 开发中更常见的方法，是对这些输出进行排序。例如，上述输出的一种可能排序为
+\begin{equation}
+\mathbf{y}_1  \succ \mathbf{y}_4 \succ \mathbf{y}_2 \succ \mathbf{y}_3 \nonumber
+\end{equation}
+
+接下来，利用这一排序结果训练奖励模型。一般而言，RLHF 中的奖励模型是一种语言模型，与目标 LLM 采用相同架构，但模型规模更小。给定输入 $\mathbf{x}$ 和输出 $\mathbf{y}_k$，将二者拼接成序列 $\mathrm{seq}_k = [\mathbf{x},\mathbf{y}_k]$，再通过强制解码从左到右处理该序列。由于语言建模中每个位置只能访问左侧上下文，最顶层 Transformer 在第一个位置的输出不能用作序列表示。因此，在序列末尾添加一个特殊符号，例如 $\langle /s \rangle$，并将 Transformer 层堆叠在该位置的输出视为整个序列的表示。在这一表示之上构建输出层，例如线性变换层，以生成奖励，记为 $R(\mathrm{seq}_k)$ 或 $R(\mathbf{x},\mathbf{y}_k)$。
+
+我们使用排序损失训练奖励模型。例如，成对排序损失函数可以写成如下形式
+\begin{eqnarray}
+\mathrm{Loss}_{\omega}(\mathcal{D}_r) & = & -\mathbb{E}_{(\mathbf{x},\mathbf{y}_{k_1},\mathbf{y}_{k_2}) \sim \mathcal{D}_r} \log(\mathrm{Sigmoid}(R_{\omega}(\mathbf{x},\mathbf{y}_{k_1}) - R_{\omega}(\mathbf{x},\mathbf{y}_{k_2}))),
+\end{eqnarray}
+
+\noindent 其中，$\omega$ 表示奖励模型的参数，$\mathcal{D}_r$ 表示由一个输入和一对输出组成的元组集合。$(\mathbf{x},\mathbf{y}_{k_1},\mathbf{y}_{k_2}) \sim \mathcal{D}_r$ 是采样操作，按照某种概率从 $\mathcal{D}_r$ 中抽取样本 $(\mathbf{x},\mathbf{y}_{k_1},\mathbf{y}_{k_2})$。例如，假设先按均匀分布抽取模型输入 $\mathbf{x}$，再按给定 $\mathbf{x}$ 时 $\mathbf{y}_{k_1} \succ \mathbf{y}_{k_2}$ 的概率，记为 $\Pr(\mathbf{y}_{k_1} \succ \mathbf{y}_{k_2} | \mathbf{x})$，抽取一对模型输出。对应的损失函数为
+\begin{eqnarray}
+&   & \mathrm{Loss}_{\omega}(\mathcal{D}_r) \nonumber \\
+& = & -\sum \Pr(\mathbf{x}) \cdot \Pr(\mathbf{y}_{k_1} \succ \mathbf{y}_{k_2} | \mathbf{x}) \cdot \log(\mathrm{Sigmoid}(R_{\omega}(\mathbf{x},\mathbf{y}_{k_1}) - R_{\omega}(\mathbf{x},\mathbf{y}_{k_2}))) \nonumber \\
+& = & -\frac{1}{K} \sum \Pr(\mathbf{y}_{k_1} \succ \mathbf{y}_{k_2} | \mathbf{x}) \cdot \log(\mathrm{Sigmoid}(R_{\omega}(\mathbf{x},\mathbf{y}_{k_1}) - R_{\omega}(\mathbf{x},\mathbf{y}_{k_2}))),
+\end{eqnarray}
+
+\noindent 其中，$K$ 表示参与采样的模型输入数量。尽管这些函数的形式看起来复杂，但其思想很简单：当模型预测的两个输出的排序与人工标注的排序不同时，就惩罚模型；当预测排序与人工标注排序一致时，就给予模型奖励。
+
+通过最小化上述排序损失，可以训练奖励模型
+\begin{eqnarray}
+\hat{\omega} & = & \argmin_{\omega} \mathrm{Loss}_{\omega}(\mathcal{D}_r).
+\end{eqnarray}
+
+
+\noindent 得到的模型 $R_{\hat{\omega}}(\cdot)$ 可以用于评估任意给定的输入—输出对。需要注意的是，尽管奖励模型采用基于排序的目标训练，使用时却是用来评分的。因此，它能够提供连续的监督信号，这对于训练其他模型非常有益。
+
+现在转向策略学习问题。一种常用目标是在一组输入—输出对上最大化奖励。采用与式（\ref{eq:llm-fine-tuning-mle}）类似的形式，可以得到强化学习微调的简单训练目标
+\begin{eqnarray}
+\tilde{\theta} & = & \argmax_{\hat{\theta}^+} \mathbb{E}_{(\mathbf{x},\mathbf{y}_{\hat{\theta}^+}) \sim \mathcal{D}_{\mathrm{rlft}}} R_{\hat{\omega}}(\mathbf{x},\mathbf{y}_{\hat{\theta}^+}),
+\end{eqnarray}
+
+\noindent 其中，通过微调预训练参数 $\hat{\theta}$，得到最优参数 $\tilde{\theta}$。$\mathcal{D}_{\mathrm{rlft}}$ 是强化学习微调数据集。对于每个样本 $(\mathbf{x},\mathbf{y}_{\hat{\theta}^+})$，$\mathbf{x}$ 从预先准备的输入序列数据集中采样得到，$\mathbf{y}_{\hat{\theta}^+}$ 则从策略给出的分布 $\mathrm{\Pr}_{\hat{\theta}^+}(\mathbf{y}|\mathbf{x})$ 中采样得到。
+
+实践中，为了使训练更稳定、性能更好，通常会采用\mindex{近端策略优化}（proximal policy optimization，\mindex{PPO}）等更先进的强化学习算法。关于这些算法的详细讨论，留待本书后续广泛使用 RLHF 进行对齐的部分展开。
+
+这里出现了一个有趣的问题：为什么不将从人类偏好中学习视为标准的监督学习问题？这个问题与前面讨论的数据标注困难密切相关。描述人类价值观和目标通常很有挑战，而让人类直接提供对齐良好的输出更为困难。相比之下，标注一组给定模型输出的偏好顺序，是一项更简单的任务。通过这种方式，可以构建一个理解人类偏好的模型，再将其用作训练策略的奖励模型。从机器学习的角度看，当智能体的期望行为难以示范、却容易被人类辨认时，RLHF 尤其有用。RLHF 的另一个优点是能够探索样本空间。借助采样技术，通过强化学习训练的模型可以超出标注数据集的范围，探索额外样本。这种探索能力使 RLHF 能够发现仅凭标注数据难以直接看出的、可能有益的策略。
+
+\subsection{提示大语言模型}
+
+\noindent 到目前为止，我们已经看到，向 LLM 提供合适的提示，就能让它执行各种任务。提示没有固定限制，可以包含任何希望提供给 LLM 的信息，例如自然语言指令和对话上下文。由于这种方法无须额外训练或调优，LLM 开发完成后，便能非常高效地适配不同任务。这从根本上改变了 NLP 的范式：无须再开发面向特定任务的系统，只需通过提示，就能用单个训练充分的 LLM 执行不同任务。因此，LLM 展现出一个很有吸引力的特点：用户可以通过为 LLM 设计自己的提示，轻松创建定制系统。鉴于提示在 LLM 中的重要作用，\mindex{提示工程}（prompt engineering）已成为 NLP 中非常活跃的研究方向。
+
+文献对\textit{提示}一词有多种不同用法。在本章中，它指 LLM 的完整输入，因此我们交替使用\textit{提示}和\textit{模型输入}这两个术语。在进一步讨论提示方法之前，先来看几个提示比前面几小节更复杂的例子。需要注意，本小节的目的并非讲解如何编写高质量提示，而是着重说明提示 LLM 时的一些有趣问题。
+
+一种常见的 LLM 使用方法，是为它指定一个生成回答时所扮演的“角色”。例如，可以让 LLM 以心理学家的身份回答问题。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+{\color{blue} 请解释什么是延迟满足。}
+
+\vspace{0.3em}
+
+{\color{blue} 请注意，你是一位具有深厚心理学背景的研究者。你的研究领域是儿童发展心理学，重点关注控制能力与智力。你非常熟悉延迟满足的概念，并已将其运用于自己的研究。你发表过关于延迟满足的论文，也开展过相关实验。}
+
+\vspace{0.3em}
+
+\uline{延迟满足是指抵制眼前的即时奖励，以期在未来获得更有价值奖励的过程。它是发展心理学中的一个重要概念，尤其涉及儿童如何学习自我控制以及发展认知能力。研究表明，延迟满足能力与学业表现、社会能力和情绪健康等方面的积极结果相关。这一领域的研究与实验表明，尽早培养这种能力，对于支持长期成功和心理韧性非常重要。}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+另一个例子是利用 LLM 检测并纠正文本中的句法或语义等错误。对于同时在代码和自然语言数据上训练的 LLM，我们还可以将其用于代码调试\footnote{为便于阅读，本例代码没有进行词元切分。}。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{blue}
+
+修复下面这个 C 语言程序中的错误。
+
+\vspace{0.3em}
+
+\#include $<$stdio.h$>$
+
+int main() \{
+
+   \hspace{2em} printg("Hello, World!")
+
+   \hspace{2em} return 0;
+
+\}
+
+}
+
+\vspace{0.5em}
+
+\underline{1. 函数名 'printg' 有误，应为 'printf'。}
+
+\underline{2. 'printf' 函数调用的末尾缺少分号。}
+
+\vspace{0.3em}
+
+\underline{下面是修正后的程序： }
+
+\vspace{0.3em}
+
+\underline{\#include $<$stdio.h$>$}
+
+\underline{int main() \{}
+
+\hspace{2em} \underline{printf("Hello, World!");}
+
+\hspace{2em} \underline{return 0;}
+
+\underline{\}}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+此外，也可以将 LLM 微调为对话伙伴\footnote{将 LLM 微调用于多轮对话时，需要在上下文中考虑对话历史，以预测当前轮次的回答。因此，生成回答时实际使用的提示，比单轮对话中的提示相对更长。}。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+\begin{spacing}{1.3}
+
+\underline{ 你好！我是一个助手，有什么可以帮你的吗？}
+
+{\color{blue} 谁赢得了 2022 年国际足联世界杯？}
+
+\underline{阿根廷赢得了 2022 年国际足联世界杯。}
+
+{\color{blue} 比赛在哪里举办？}
+
+\underline{2022 年国际足联世界杯在卡塔尔举办。}
+
+{\color{blue} 阿根廷赢得过几次世界杯？}
+
+\underline{阿根廷共赢得过三次国际足联世界杯。}
+
+...
+
+\end{spacing}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+这些例子和前面的例子表明，包含明确指令与问题的提示，能够引导模型生成恰当的回答。然而，当解决问题需要提示中未明确说明的知识时，即使指令清晰准确，LLM 也可能出错。算术推理和常识推理是 LLM 面临的一类具有挑战性的任务。例如，可以让 LLM 解答用自然语言描述的小学数学题。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{blue} Jack 有 7 个苹果。他晚饭时吃了其中 2 个，之后妈妈又给了他 5 个。第二天，Jack 给了朋友 John 3 个苹果。最后 Jack 还剩几个苹果？}
+
+\vspace{0.3em}
+
+\underline{答案是 10。}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 正确答案应为 7，因此模型的输出是错误的。
+
+解决这类问题的一种方法，是将学习过程融入提示，称为\mindex{上下文学习}（in-context learning，\mindex{ICL}）。ICL 的思想是在提示中展示解决问题的方法，并以这些示例为条件进行预测。下面的例子在提示中给出了一个类似问题及其对应答案，绿色文本表示示例。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{ugreen} Tom 有 12 颗弹珠。他在和朋友玩游戏时又赢了 7 颗，但第二天输了 5 颗。哥哥又送给他 3 颗弹珠。现在 Tom 有多少颗弹珠？}
+
+\vspace{0.3em}
+
+{\color{ugreen} 答案是 17。}
+
+\vspace{0.3em}
+
+{\color{blue} Jack 有 7 个苹果。他晚饭时吃了其中 2 个，之后妈妈又给了他 5 个。第二天，Jack 给了朋友 John 3 个苹果。最后 Jack 还剩几个苹果？}
+
+\vspace{0.3em}
+
+\underline{答案是 12。}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+但这次 LLM 仍然出错了。一个可能的原因是，解答数学题不仅涉及问题到答案的映射，更在很大程度上涉及背后的多步逻辑推理。提高 LLM 推理能力的一种方法是\mindex{思维链提示}（chain-of-thought prompting，\mindex{CoT 提示}）~\cite{wei-etal:2022chain}。在 CoT 提示中，我们将复杂推理问题分解为多个中间求解步骤，并在提示中展示这些步骤，从而引导 LLM 学习模仿解决问题时背后的思考过程。研究发现，CoT 提示对于在 GSM8K 数学推理基准等具有挑战性的任务上取得良好结果非常有用。
+
+考虑上面的示例问题
+\textit{Tom 有 12 颗弹珠。他在和朋友玩游戏时又赢了 7 颗，但第二天输了 5 颗。哥哥又送给他 3 颗弹珠。现在 Tom 有多少颗弹珠？}对应的逻辑推理步骤可以组织为：
+\begin{enumerate}[leftmargin=3.5em]
+\item[步骤 1：] \vspace{0.3em} \textit{Tom 最初有 12 颗弹珠。}
+\item[步骤 2：] \vspace{0.1em} \textit{他在游戏中又赢了 7 颗，因此将其加到最初的数量上：12 颗弹珠 + 7 颗弹珠 = 19 颗弹珠。}
+\item[步骤 3：] \vspace{0.1em} \textit{第二天，Tom 输了 5 颗弹珠，因此从当前总数中减去：19 颗弹珠 - 5 颗弹珠 = 14 颗弹珠。}
+\item[步骤 4：] \vspace{0.1em} \textit{哥哥又给了他 3 颗弹珠，因此将其加到当前总数上：14 颗弹珠 + 3 颗弹珠 = 17 颗弹珠。}
+\item[步骤 5：] \vspace{0.1em} \textit{经过这些事情后，Tom 有 17 颗弹珠。}
+\end{enumerate}
+\vspace{0.5em}
+
+将这些推理步骤加入提示，就可以得到正确答案。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{ugreen} Tom 有 12 颗弹珠。他在和朋友玩游戏时又赢了 7 颗，但第二天输了 5 颗。哥哥又送给他 3 颗弹珠。现在 Tom 有多少颗弹珠？}
+
+\vspace{0.3em}
+
+{\color{ugreen} Tom 最初有 12 颗弹珠。他在游戏中获胜后又得到 7 颗，总数增加到 19 颗。第二天输了 5 颗，总数减少到 14 颗。哥哥又送给他 3 颗，总数增加到 17 颗。因此，Tom 现在有 17 颗弹珠。所以答案是 17。}
+
+\vspace{0.3em}
+
+{\color{blue} Jack 有 7 个苹果。他晚饭时吃了其中 2 个，之后妈妈又给了他 5 个。第二天，Jack 给了朋友 John 3 个苹果。最后 Jack 还剩几个苹果？}
+
+\vspace{0.3em}
+
+\uline{Jack 最初有 7 个苹果。他晚饭时吃了 2 个，因此从 7 中减去 2，剩下 5 个苹果。妈妈又给了他 5 个，于是在当前总数上加 5。现在他有 5 + 5 = 10 个苹果。第二天，Jack 给了朋友 John 3 个苹果。从 10 中减去 3，Jack 剩下 7 个苹果。因此，Jack 还剩 7 个苹果。所以答案是 7。}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+这种方法也称为\mindex{单样本 CoT 提示}（one-shot CoT prompting）。类似地，可以加入更多示例，得到\mindex{少样本 CoT 提示}（few-shot CoT prompting）方法。
+
+此外，一种称为\mindex{零样本 CoT}（zero-shot CoT）的特殊变体，在提示中不显式提供任何中间推理示例，而是加入触发语句，鼓励 LLM 逐步思考~\cite{kojima-etal:2022large}。有趣的是，只需在提示末尾加上“让我们一步一步地思考。”（``Let's think step by step.''），通常就足以引导 LLM 生成内部推理步骤，并得出正确的最终答案。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{blue} Jack 有 7 个苹果。他晚饭时吃了其中 2 个，之后妈妈又给了他 5 个。第二天，Jack 给了朋友 John 3 个苹果。最后 Jack 还剩几个苹果？}
+
+{\color{blue} 让我们一步一步地思考。}
+
+\vspace{0.3em}
+
+\underline{1. 初始数量：Jack 最初有 7 个苹果。}
+
+\underline{2. 晚饭之后：他吃了 2 个苹果，因此剩下 $7-2=5$ 个苹果。}
+
+\underline{3. 妈妈又给了苹果：妈妈又给了他 5 个苹果，因此他现在有 $5+5=10$ }
+
+\hspace{0.8em} \underline{个苹果。}
+
+\underline{4. 送给 John：第二天，Jack 给了朋友 John 3 个苹果，}
+
+\hspace{0.8em} \underline{所以剩下 $10-3=7$ 个苹果。}
+
+\underline{最后，Jack 还剩 7 个苹果。}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+零样本、单样本和少样本学习是 LLM 上下文学习领域的常见概念，并不限于 CoT 提示。广义上，任何仅包含简单指令、不提供示例的提示方法，都可以视为一种零样本学习。随着 LLM 的预训练和/或微调，这种零样本学习能力会涌现出来。当 LLM 尚未获得相应的零样本学习能力时，则更常考虑单样本和少样本学习方法。因此，这些方法对于处理新任务时的上下文学习十分重要。例如，可以通过展示符合任务格式的样本来执行各种 NLP 任务。下面给出通过少样本学习完成句子情感分类和短语翻译的例子。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{blue} 给定以下文本片段，将其情感分类为 Positive、Negative 或 Neutral。}
+
+\vspace{0.5em}
+
+{\color{ugreen} 示例 1：``I had an amazing day at the park!''}
+
+{\color{ugreen} 情感：Positive}
+
+\vspace{0.3em}
+
+{\color{ugreen} 示例 2：``The service at the restaurant was terrible.''}
+
+{\color{ugreen} 情感：Negative}
+
+\vspace{0.3em}
+
+{\color{ugreen} 示例 3：``I think it's going to rain today.''}
+
+{\color{ugreen} 情感：Neutral}
+
+\vspace{0.5em}
+
+{\color{blue} 文本：``This movie was a fantastic journey through imagination.''}
+
+{\color{blue} 情感：} \underline{Positive}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+{\color{blue} 把下面的中文短语翻译成英语。}
+
+\vspace{0.5em}
+
+{\color{ugreen} 示例 1：``\begin{CJK*}{UTF8}{gbsn}你好\end{CJK*}''}
+
+{\color{ugreen} 译文：``Hello''}
+
+\vspace{0.3em}
+
+{\color{ugreen} 示例 2：``\begin{CJK*}{UTF8}{gbsn}谢谢你\end{CJK*}''}
+
+{\color{ugreen} 译文：``Thank you''}
+
+\vspace{0.5em}
+
+{\color{blue} 待译短语：``\begin{CJK*}{UTF8}{gbsn}早上好\end{CJK*}''}
+
+{\color{blue} 译文：} \underline{``Good Morning''}
+
+}
+\end{center}
+\end{tcolorbox}
+\vspace{0.5em}
+
+以上通过一些例子，说明了提示 LLM 所具备的基本上下文学习能力。为了使内容简洁紧凑，本节不涉及更高级的提示技术。关于提示方法的更多讨论，见第 \ChapterLLMPrompting 章。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{大规模训练}
+\label{sec:llm-training-at-scale}
+
+\noindent 开发 LLM 的第一步，是在大量数据上训练这些模型。训练任务本身是标准的：目标是最大化对数似然，可以通过梯度下降实现。然而，随着模型规模和数据量同时扩大，优化问题变得极具挑战。例如，大模型通常会使训练过程不稳定。本节讨论 LLM 大规模训练中固有的若干问题，包括数据准备、模型修改和分布式训练。此外，还讨论 LLM 的缩放定律，帮助我们理解其训练的效率和效果。
+
+\subsection{数据准备}
+
+\noindent 数据对 NLP 的重要性怎么强调都不为过。随着更大的神经网络不断发展，对数据的需求也持续增加。例如，开发 LLM 时，预训练可能需要数万亿词元，见表~\ref{tab:training-data-size-llm}，比传统 NLP 模型的训练数据量大数个数量级。一般来说，我们可能希望尽量收集更多训练数据。然而，更大的训练数据集并不意味着更好的训练结果，LLM 的发展也给这些数据集的创建或收集带来了新问题。
+
+\begin{table}[t]
+\centering
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l | r | l}
+LLM & 词元数 & 数据 \\ \hline
+GPT-3-175B~\cite{brown-etal:2020language}
+& 0.3T & 网页、书籍、Wikipedia \\ \hline
+Falcon-180B~\cite{almazrouei-etal:2023falcon}
+& 3.5T & 网页、书籍、对话、 \\
+& & 代码、技术文章 \\ \hline
+PaLM-540B~\cite{chowdhery-etal:2022palm}
+& 0.78T & 网页、书籍、对话、 \\
+& & 代码、Wikipedia、新闻 \\ \hline
+Gemma-7B~\cite{gemma:24}
+& 6T & 网页、数学、代码 \\ \hline
+Llama3.1-405B~\cite{dubey2024llama}
+& 15.6T & 通用文本、数学、 \\
+& & 推理数据、代码、 \\
+&  & 多语言文本 \\ \hline
+DeepSeek-V3~\cite{liu2024deepseek}
+& 14.8T & 多语言文本、数学、\\
+ & &  代码 \\ \hline
+Qwen3-235B-A22B~\cite{qwen:2025qwen3}
+& 36T & 多语言文本、书籍、 \\
+& & 代码、推理数据、  \\
+& & 合成数据
+\end{tabular}
+\endgroup
+\caption{部分 LLM 已报告的预训练词元数量及主要数据类别。
+T 表示一万亿词元。
+词元数量取决于词元化器，且可能包含对训练数据的
+重复采样。}
+\label{tab:training-data-size-llm}
+\end{table}
+
+第一个问题是数据质量。高质量数据长期以来一直被视为训练数据驱动的 NLP 系统的关键。通常不宜直接将来自不同来源的原始文本输入模型。例如，近期 LLM 的训练数据有相当一部分来自网页抓取，其中往往包含错误和不当内容，如有害语言和虚构事实。此外，随着 AI 的广泛使用，互联网上充斥着越来越多的机器生成内容，给网页抓取语料的过滤带来进一步挑战。研究表明，在未经过滤的数据上训练 LLM 可能产生不良影响~\cite{raffel-etal:2020exploring}。提高数据质量，通常需要在数据处理流程中加入严格的过滤和清洗步骤。例如，\citet{penedo-etal:2023refinedweb} 表明，通过采用一系列启发式处理技术，他们抓取的网页数据中有 90\% 可以在 LLM 训练前被剔除。除了大规模网页文本，LLM 的训练数据通常还包括书籍、学术论文、社交媒体上的用户生成内容，以及其他多样化的语料。大多数最新 LLM 都在这类混合数据集上训练，研究发现，这些数据集对于最终模型的优异性能十分重要。
+
+第二个问题是数据多样性。我们希望训练数据尽可能覆盖多种数据类型，使训练好的模型易于适配不同的下游任务。人们已经普遍认识到，训练数据的质量和多样性都对 LLM 起着非常重要的作用。一个有趣的例子是，将程序代码加入训练数据被发现有益于 LLM。这不仅能增强 LLM 的编程能力，还能提高其解决复杂问题的推理能力，尤其是那些需要 CoT 提示的问题。“多样性”的概念还可以扩展到语言多样性。例如，许多 LLM 在多语言数据上训练，因此可以用单个模型处理多种语言。尽管这种方法在多语言和跨语言任务中表现出较强能力，其在特定语言上的性能，在很大程度上取决于该语言的数据量和数据质量。在一些情况下，这种方法在低资源语言上表现不佳。
+
+第三个问题是训练数据中的偏见。这并非 LLM 独有的问题，而是广泛存在于许多 NLP 系统之中。一个常见例子是性别偏见，即 LLM 表现出缺乏依据的偏好或刻板印象。部分原因在于训练语料中的类别不平衡。例如，在历史文本中，\textit{nurse}（护士）一词与女性的关联不成比例地高。为了消除数据偏见，通常会平衡不同人口群体类别，如性别、族裔和方言的代表性。数据偏见与上述多样性问题有着内在联系。许多 LLM 使用以英语为中心的数据进行训练和对齐，因此天然倾向于英语使用人群中普遍存在的文化价值观与视角。增加训练数据中的语言和文化多样性，可以在一定程度上减轻这些偏见。
+
+大规模数据收集中的另一个问题是隐私。如果 LLM 在广泛来源的数据上训练，就可能带来知识产权和个人数据等敏感信息暴露的风险。考虑到 LLM 能够表示训练数据中的模式，而这一能力可能无意间涉及对具体细节的记忆和复现，这种风险尤其值得关注。一种简单的隐私保护方法，是删除敏感信息或对其进行匿名化。例如，可以利用匿名化技术从训练数据中移除个人身份识别信息，防止 LLM 从这类数据中学习。然而，在实践中，完全清除或遮蔽所有敏感数据很困难。因此，许多 LLM，尤其是面向公众服务的模型，通常会与能够检测敏感数据潜在暴露风险的系统协同工作，或者通过微调拒绝某些可能导致信息泄露的请求。
+
+\subsection{模型修改}
+
+\noindent 训练 LLM 具有很大挑战。一个常见问题是，随着模型规模增大，优化过程越来越不稳定。例如，为了通过梯度下降实现稳定训练，需要选择较小的学习率，但这又会大幅增加训练时间。有时，即使精心设计训练配置，训练仍可能在优化过程中的某些时刻发散。总体而言，LLM 的训练受到参数初始化、批次组织和正则化等多种因素影响。这里，我们重点介绍对标准 Transformer 架构的常见修改与改进，这些改动对稳定训练 LLM 十分重要。
+
+\subsubsection{结合残差连接的层归一化}
+
+\noindent 层归一化（layer normalization）用于稳定深度神经网络的训练。其过程是减去均值，再除以标准差。以这种方式对层输出归一化，可以有效减轻内部协变量偏移，提高训练稳定性。在 Transformer 中，层归一化通常与残差连接（residual connection）配合使用。如第~\ref{sec:decoder-only-transformers} 节所述，子层可以采用后置归一化架构，即在残差块之后立即进行层归一化；也可以采用前置归一化架构，即在残差块内部进行层归一化。尽管这两种架构都广泛应用于基于 Transformer 的系统~\cite{wang-etal:2019learning}，前置归一化架构被证明对训练深层 Transformer 尤其有用。因此，大多数 LLM 采用前置归一化架构，表示为 $\mathrm{output} = F(\mathrm{LNorm}(\mathrm{input})) + \mathrm{input}$。
+
+一种广泛使用的层归一化函数形式为
+\begin{eqnarray}
+\mathrm{LNorm}(\mathbf{h}) & = & \boldsymbol{\alpha} \odot \frac{\mathbf{h} - \mu}{\sigma + \epsilon} + \boldsymbol{\beta},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{h}$ 是一个 $d$ 维实值向量，$\mu$ 是 $\mathbf{h}$ 中所有元素的均值，$\sigma$ 是对应的标准差。引入 $\epsilon$ 是为了保证数值稳定性。$\boldsymbol{\alpha} \in \mathbb{R}^{d}$ 和 $\boldsymbol{\beta} \in \mathbb{R}^{d}$ 分别是增益项与偏置项。
+
+层归一化的一种变体称为均方根（root mean square，RMS）层归一化，它只对输入向量重新缩放，而不重新中心化~\cite{zhang-sennrich:2019root}。RMS 层归一化函数为
+\begin{eqnarray}
+\mathrm{RMSNorm}(\mathbf{h}) & = & \boldsymbol{\alpha} \odot \frac{\mathbf{h}}{\sigma_{\mathrm{rms}} + \epsilon},
+\end{eqnarray}
+
+\noindent 其中，$\sigma_{\mathrm{rms}}$ 是 $\mathbf{h}$ 的均方根，即 $\sigma_{\mathrm{rms}} = (\frac{1}{d} \sum_{k=1}^{d} h_k^2)^{\frac{1}{2}}$。Llama 系列等 LLM 使用了这种层归一化函数。
+
+\subsubsection{前馈网络中的激活函数}
+
+\noindent 在 Transformer 中，FFN 子层的设计目的是为表示学习引入非线性。研究发现，它有助于防止自注意力所学表示发生退化\footnote{这里，退化是指表示矩阵经过处理后，其秩显著下降的现象。}~\cite{dong-etal:2021attention}。这些子层采用的 FFN 的标准形式可以表示为
+\begin{eqnarray}
+\mathrm{FFN}(\mathbf{h}) & = & \sigma(\mathbf{h} \mathbf{W}_h + \mathbf{b}_h) \mathbf{W}_f + \mathbf{b}_f \label{eq:llm-ffn-basic},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{W}_h \in \mathbb{R}^{d \times d_h}$、$\mathbf{b}_h \in \mathbb{R}^{d_h}$、$\mathbf{W}_f \in \mathbb{R}^{d_h \times d}$ 和 $\mathbf{b}_f \in \mathbb{R}^d$ 为参数，$d_h$ 为隐层维度。函数 $\sigma(\cdot)$ 是隐层的激活函数（activation function）。$\sigma(\cdot)$ 的一种常见选择是\mindex{修正线性单元}（rectified linear unit，\mindex{ReLU}），定义为
+\begin{eqnarray}
+\sigma_{\mathrm{relu}}(\mathbf{h}) & = & \max(\mathbf{0}, \mathbf{h}).
+\end{eqnarray}
+
+在实际实现中，增大 $d_h$ 有益，因此 LLM 通常将其设为远大于 $d$ 的数值。不过，隐层维度过大也给训练和部署带来挑战。在这种情况下，激活函数的选择对于宽 FFN 起着更重要的作用。
+
+现代 LLM 提出了若干能够有效替代 ReLU 的函数。其中使用最广泛的之一是\mindex{高斯误差线性单元}（gaussian error linear unit，\mindex{GeLU}），可以视为 ReLU 的平滑近似。GeLU 不根据输入的正负施加硬阈值，而是用标准正态分布的累积分布函数对每个输入加权。具体而言，GeLU 函数按元素定义为
+\begin{eqnarray}
+\sigma_{\mathrm{gelu}}(\mathbf{h}) & = & \mathbf{h} \odot \Phi(\mathbf{h}),
+\end{eqnarray}
+\noindent 其中，$\Phi(\cdot)$ 表示标准正态分布 $\mathcal{N}(\mathbf{0},\mathbf{1})$ 的累积分布函数。BERT、GPT-3 和 BLOOM 等多个 LLM 都采用了 GeLU 函数。
+
+另一类常见激活函数是\mindex{门控线性单元}（gated linear unit，\mindex{GLU}）系列。GLU 的基本形式为
+\begin{eqnarray}
+\sigma_{\mathrm{glu}}(\mathbf{h}) & = & \sigma(\mathbf{h}\mathbf{W}_1 + \mathbf{b}_1) \odot (\mathbf{h}\mathbf{W}_2 + \mathbf{b}_2),
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{W}_1, \mathbf{W}_2 \in \mathbb{R}^{d \times d_h}$ 和 $\mathbf{b}_1, \mathbf{b}_2 \in \mathbb{R}^{d_h}$ 为模型参数。需要注意，GLU 机制实际上替换了标准 FFN 中单一的线性投影与激活步骤，直接将输入 $\mathbf{h}$ 映射到扩展后的隐层维度 $d_h$。对底层激活函数 $\sigma(\cdot)$ 的不同选择，会得到不同的 GLU 变体。例如，若将 $\sigma(\cdot)$ 定义为 GELU 函数，就得到 GeGLU 函数
+\begin{eqnarray}
+\sigma_{\mathrm{geglu}}(\mathbf{h}) & = & \sigma_{\mathrm{gelu}}(\mathbf{h}\mathbf{W}_1 + \mathbf{b}_1) \odot (\mathbf{h}\mathbf{W}_2 + \mathbf{b}_2).
+\end{eqnarray}
+
+\noindent 这种激活函数已成功应用于 Gemma 等 LLM。
+
+另一种选择是将 $\sigma(\cdot)$ 定义为 Swish 函数，即 $\sigma_{\mathrm{swish}}(\mathbf{h}) = \mathbf{h} \odot \mathrm{Sigmoid}(c\mathbf{h})$~\cite{ramachandran-etal:2017searching}，从而得到 SwiGLU 函数
+\begin{eqnarray}
+\sigma_{\mathrm{swiglu}}(\mathbf{h}) & = & \sigma_{\mathrm{swish}}(\mathbf{h}\mathbf{W}_1 + \mathbf{b}_1) \odot (\mathbf{h}\mathbf{W}_2 + \mathbf{b}_2).
+\end{eqnarray}
+
+\noindent PaLM 和 Llama 系列模型的 FFN 层都使用了 SwiGLU 函数。关于 GLU 变体及其影响的更全面讨论，读者可参阅~\citet{shazeer-etal:2020glu} 的研究。
+
+\subsubsection{移除偏置项}
+
+\noindent 另一种常见的模型设计，是去掉 LLM 仿射变换中的偏置项。这一简化可以用于层归一化、QKV 注意力的输入投影以及 FFN 子层。例如，修改式（\ref{eq:llm-ffn-basic}），可以得到不含偏置项的 FFN
+\begin{eqnarray}
+\mathrm{FFN}(\mathbf{h}) & = & \sigma(\mathbf{h} \mathbf{W}_h) \mathbf{W}_f.
+\end{eqnarray}
+
+\citet{chowdhery-etal:2022palm} 报告指出，去掉偏置项有助于提高 LLM 的训练稳定性。这一方法已用于 Llama 和 Gemma 等多个 LLM。
+
+\subsubsection{其他问题}
+
+\noindent 许多 LLM 还修改了位置嵌入模型。例如，可以用旋转位置嵌入（rotary positional embedding）替代正弦位置编码。第~\ref{sec:long-sequence-modeling} 节将讨论这些模型。
+
+需要注意的是，尽管修改模型在 LLM 开发中很常见，但提高训练稳定性还可以采用许多其他方法。例如，有研究发现，随着训练进行而增加批量大小，对某些 LLM 是有益的。总体而言，实现稳定高效的 LLM 大规模训练，需要精心设计学习率调度、优化器选择、并行训练策略和混合精度训练方法等配置。其中一些方面需要大量工程工作，因此通常要进行多次训练，才能获得满意的 LLM。
+
+\subsection{分布式训练}
+\label{sec:llm-distributed-training}
+
+\noindent 训练 LLM 需要大量计算资源。提高训练效率的一种常见方法，是使用大规模分布式系统。幸运的是，随着神经网络在 AI 中兴起，深度学习软硬件也得到了发展，使 LLM 的实现和计算更加容易。例如，现在利用深度学习软件框架和一台配有多张 GPU 的机器，就可以方便地微调 LLM。然而，扩大 LLM 的训练规模仍然具有挑战，需要投入大量工作来开发软硬件系统，以实现稳定高效的分布式训练。
+
+分布式训练中的一个重要考虑是并行。并行有多种形式，包括数据并行、模型并行、张量并行和流水线并行。尽管它们将计算分配到设备上的方式不同，但基本思想相似：将训练问题划分为能够同时执行的较小任务。LLM 训练中的并行问题已有广泛研究~\cite{narayanan-etal:2021efficient,fedus-etal:2022switch}。这里简述其基本概念。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{数据并行}（Data Parallelism）。这是训练神经网络时最广泛使用的并行方法之一。为便于说明，考虑梯度下降使用标准 delta 规则的最简单情况
+    \begin{eqnarray}
+    \theta_{t+1} & = & \theta_{t} - \eta \cdot \frac{\partial L_{\theta_t}(\mathcal{D}_{\mathrm{mini}})}{\partial \theta_t},
+    \end{eqnarray}
+    \noindent 其中，沿着损失函数负梯度方向，以小步长 $\eta$ 更新当前参数 $\theta_{t}$，得到新参数 $\theta_{t+1}$。$\frac{\partial L_{\theta_t}(\mathcal{D}_{\mathrm{mini}})}{\partial \theta_t}$ 是损失对参数 $\theta_t$ 的梯度，在训练样本的小批量（mini-batch）$\mathcal{D}_{\mathrm{mini}}$ 上计算。在数据并行中，我们将 $\mathcal{D}_{\mathrm{mini}}$ 划分为 $N$ 个更小的批次，记为 $\{\mathcal{D}^{1},\cdots,\mathcal{D}^{N}\}$。然后，将这些批次分配给 $N$ 个工作节点，每个节点对应一个批次。数据分配完成后，各工作节点便可以同时工作。将各节点计算的梯度聚合起来，就得到整个小批量的梯度，如下所示
+    \begin{eqnarray}
+    \frac{\partial L_{\theta_t}(\mathcal{D}_{\mathrm{mini}})}{\partial \theta_t} & = & \underbrace{\frac{\partial L_{\theta_t}(\mathcal{D}^{1})}{\partial \theta_t}}_{\textrm{工作节点 1}} + \underbrace{\frac{\partial L_{\theta_t}(\mathcal{D}^{2})}{\partial \theta_t}}_{\textrm{工作节点 2}} + \cdots + \underbrace{\frac{\partial L_{\theta_t}(\mathcal{D}^{N})}{\partial \theta_t}}_{\textrm{工作节点 $N$}}.
+    \end{eqnarray}
+    在工作节点协调良好、通信开销较小的理想条件下，数据并行可以使训练获得接近 $N$ 倍的加速。
+\item \vspace{0.3em} \textbf{模型并行}（Model Parallelism）。尽管数据并行简单有效，但它要求每个工作节点都运行完整的 LLM，并执行完整的前向和反向计算。随着 LLM 不断增大，有时无法在单个设备上加载并运行模型。此时，可以将 LLM 拆分为更小的组件，并在不同设备上运行。一种简单方法是，将层堆叠中连续的若干层分为一组，再将每组分配给一个工作节点，称为朴素模型并行。工作节点按照层堆叠的顺序依次运行，即前向计算从底层向顶层处理输入，反向计算从顶层向底层传播误差梯度。例如，考虑包含 $L$ 个堆叠块的 Transformer 解码器。为了分散计算负载，将每个块分配给一个工作节点。下面展示了该模型一次前向和反向计算的过程。
+
+    \vspace{0.5em}
+    \begin{center}
+    \begingroup
+    \renewcommand{\arraystretch}{1.6}
+    \setlength{\tabcolsep}{2pt}
+    {\small
+    \begin{tabular}{c | c c c c c c c c}
+    工作节点 $L$ & & & & \colorbox{blue!30}{$\mathrm{B}_L$} ({\color{blue} $\uparrow$}) & \colorbox{red!30}{$\mathrm{B}_L$} ({\color{red} $\downarrow$}) & & & \\ \hline
+    ... & & & ... & & & ... & & \\ \hline
+    工作节点 $2$ & & \colorbox{blue!30}{$\mathrm{B}_2$} ({\color{blue} $\uparrow$}) & & & & & \colorbox{red!30}{$\mathrm{B}_2$} ({\color{red} $\downarrow$}) & \\ \hline
+    工作节点 $1$ & \colorbox{blue!30}{$\mathrm{B}_1$} ({\color{blue} $\uparrow$}) & & & & & & & \colorbox{red!30}{$\mathrm{B}_1$} ({\color{red} $\downarrow$})
+    \end{tabular}
+    }
+    \endgroup
+    \end{center}
+    \vspace{0.5em}
+
+    \noindent 这里，$\mathrm{B}_l$ 表示第 $l$ 个块的计算，符号 {\color{blue} $\uparrow$} 和 {\color{red} $\downarrow$} 分别表示前向和反向计算。需要注意，这种并行方法要求工作节点依次运行，因此每个节点都必须等待前一节点完成工作，导致设备大部分时间处于空闲状态。在实际系统中，模型并行通常与其他并行机制结合使用，以最大限度地利用设备。
+
+\item \vspace{0.3em} \textbf{张量并行}（Tensor Parallelism）。单个计算步骤内部也可以实现并行。一种常见方法是将大型参数矩阵切分为若干块，分别将输入张量与每个分块相乘，再将这些乘法结果拼接为输出。例如，考虑 FFN 子层中表示 $\mathbf{h} \in \mathbb{R}^{d}$ 与参数矩阵 $\mathbf{W}_h \in \mathbb{R}^{d \times d_h}$ 的乘法，见式（\ref{eq:llm-ffn-basic}）。可以沿竖直方向将矩阵 $\mathbf{W}_h \in \mathbb{R}^{d \times d_h}$ 切分为 $M$ 个子矩阵
+    \begin{eqnarray}
+    \mathbf{W}_h & = & \begin{bmatrix} \mathbf{W}_h^{1} & \mathbf{W}_h^{2} & \cdots & \mathbf{W}_h^{M} \end{bmatrix},
+    \end{eqnarray}
+    \noindent 其中，每个子矩阵 $\mathbf{W}_h^{k}$ 的形状为 $d \times \frac{d_h}{M}$。$\mathbf{h}$ 与 $\mathbf{W}_h$ 的乘法可以表示为
+    \begin{eqnarray}
+    \mathbf{h} \mathbf{W}_h & = & \mathbf{h} \begin{bmatrix} \mathbf{W}_h^{1} & \mathbf{W}_h^{2} & \cdots & \mathbf{W}_h^{M} \end{bmatrix} \nonumber \\
+                            & = & \begin{bmatrix} \mathbf{h} \mathbf{W}_h^{1} & \mathbf{h} \mathbf{W}_h^{2} & \cdots & \mathbf{h} \mathbf{W}_h^{M} \end{bmatrix}.
+    \end{eqnarray}
+    \noindent 我们可以分别在 $M$ 个设备上执行矩阵乘法 $\{\mathbf{h} \mathbf{W}_h^{1}, \mathbf{h} \mathbf{W}_h^{2}, \cdots ,\mathbf{h} \mathbf{W}_h^{M} \}$。这样便将一次大型矩阵乘法分散到多个设备上，每个设备的内存都可以相对较小。从现代 GPU 设计的角度看，跨 GPU 的张量并行为并行计算提供了一种基于分块的两级方法。首先，在较高层面，将矩阵乘法拆分为可以直接放入 GPU 内存的子矩阵乘法；然后，在较低层面，使用专门针对 GPU 优化的分块并行算法，在各 GPU 上执行这些子矩阵乘法。
+
+\item \vspace{0.3em} \textbf{流水线并行}（Pipeline Parallelism）。上文的模型并行介绍了一种简单方法，将模型组件分组后分配到多个设备。但这种方法效率低，因为处理时每次只有一个设备在工作。流水线并行通过让不同设备上的计算相互重叠来解决这一问题~\cite{harlap-etal:2018pipedream,huang-etal:2019gpipe}。为此，将一批样本划分为若干微批次（micro-batch），再由各工作节点按通常方式处理。当某个工作节点处理完一个微批次并将其传给下一节点后，后续微批次会立即在同一节点上接续执行。换言之，我们创建了一条流水线，当多个任务进入其中时，不同计算步骤可以重叠。下面展示处理三个微批次的流水线并行示例。
+\end{itemize}
+
+    \vspace{0.5em}
+    \begin{center}
+    \begingroup
+    \makebox[\textwidth]{
+    \renewcommand{\arraystretch}{1.6}
+    \setlength{\tabcolsep}{2pt}
+    {\small
+    \begin{tabular}{c | c c c c c c c c c c c c c c}
+    工作节点 $L$ & & & & & & & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{L,1}$}} \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{L,2}$}} \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{L,3}$}} & \colorbox{red!30}{\scriptsize{$\mathrm{B}_{L,1}$}} \colorbox{red!30}{\scriptsize{$\mathrm{B}_{L,2}$}} \colorbox{red!30}{\scriptsize{$\mathrm{B}_{L,3}$}} & & & & & &\\ \hline
+    ... & & & & & & ... & & & ... & & & & & \\ \hline
+    工作节点 $2$ & & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{2,1}$}} & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{2,2}$}} & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{2,3}$}} & & & & &  & \colorbox{red!30}{\scriptsize{$\mathrm{B}_{2,1}$}} & \colorbox{red!30}{\scriptsize{$\mathrm{B}_{2,2}$}} & \colorbox{red!30}{\scriptsize{$\mathrm{B}_{2,3}$}} & \\ \hline
+    工作节点 $1$ & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{1,1}$}} & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{1,2}$}} & \colorbox{blue!30}{\scriptsize{$\mathrm{B}_{1,3}$}} & & & & & & & & \colorbox{red!30}{\scriptsize{$\mathrm{B}_{1,1}$}} & \colorbox{red!30}{\scriptsize{$\mathrm{B}_{1,2}$}}& \colorbox{red!30}{\scriptsize{$\mathrm{B}_{1,3}$}}
+    \end{tabular}
+    }
+    } % end of makebox
+    \endgroup
+    \end{center}
+    \vspace{0.5em}
+
+\begin{itemize}
+\item[] 这里，$\mathrm{B}_{l,k}$ 表示第 $l$ 个工作节点对第 $k$ 个微批次的处理。理想情况下，希望尽可能增加微批次数量，从而将工作节点的空闲时间降到最低。但在实践中，使用较小的微批次往往会降低 GPU 利用率，并增加任务切换成本，反过来可能降低整体系统吞吐量（throughput）。
+\end{itemize}
+\vspace{0.5em}
+
+并行处理的最终目标是实现效率的线性增长，即单位时间内能够处理的样本数随设备数线性增加。然而，分布式训练十分复杂，除所选并行方法之外，还受许多因素影响。分布式系统经常面临的一个问题是通信成本。我们可以将分布式系统看作一组联网的节点，每个节点可以执行本地计算，也可以向其他节点传递数据。如果节点很多，在其间分发和收集数据的开销就会很高。有时，并行所节省的时间会被大型网络的通信开销抵消。大规模分布式系统的另一个问题是节点同步带来的额外成本。一些节点可能需要更长时间才能完成任务，其他节点就不得不等待最慢的节点。虽然可以采用异步训练来处理计算资源的异构性，但这可能导致梯度过时，且无法保证收敛。此外，随着更多节点加入网络，训练期间出现节点故障的概率也会增加，因此需要确保整个系统具备容错能力。在许多实际场景中，为了提高可扩展性，还需要考虑架构设计、数据传输与计算重叠、负载均衡、内存带宽等问题。
+
+训练 LLM 的计算成本非常高，即使已经采用分布式训练，研究者和工程师仍然常常使用各种模型压缩与加速方法来提高训练效率~\cite{weng:2021large}。混合精度（mixed precision）训练就是一个例子：每个节点使用低精度数据，如 FP16 和 FP8，进行梯度计算，使用更高精度的数据，如 FP32/FP64，更新模型~\cite{micikevicius-etal:2018mixed}。这种方法中的关键操作是梯度累积（gradient accumulation），需要跨节点累积并同步梯度。但浮点加法不满足结合律，可能导致不同节点累积的梯度存在细微数值差异，进而影响模型收敛和最终性能。当参与分布式训练的节点很多时，这一问题会更加明显，尤其是低精度数值计算可能出现上溢、下溢，以及不同硬件设备之间不一致等问题。因此，分布式系统的设计需要考虑这些数值计算问题，以确保获得满意的结果和收敛表现。
+
+\subsection{缩放定律}
+
+\noindent LLM 的成功表明，使用更多资源训练更大的语言模型，可以提高模型性能。研究者将这一现象描述为 LLM 的\mindex{缩放定律}（scaling laws）。更具体地说，缩放定律刻画了 LLM 性能与模型规模、训练计算量、训练数据量等训练因素之间的关系。例如，\citet{hestness-etal:2017deep} 表明，深度神经网络的性能是训练数据规模的幂律函数。起初，训练数据量较小时，模型性能提高缓慢。随后，随着更多训练数据投入使用，模型进入性能快速提升阶段，性能曲线呈现幂律趋势。最终，性能提升再次变慢，更多数据不再带来显著收益。图~\ref{fig:scaling-power-law-curve} 展示了一条这样的曲线。
+
+在 NLP 中，一种传统观点认为，随着训练规模扩大，性能收益会在某个点消失。然而，近期结果表明，如果从更大的尺度考虑问题，扩大训练规模依然是获得更强 LLM 的有效方法。例如，无论闭源还是开源 LLM，即使已经使用数万亿词元训练，仍然可以从更多数据中受益。
+
+随着模型训练规模增加，LLM 会展现出新的能力，称为 LLM 的\mindex{涌现能力}（emergent abilities）。例如，\citet{wei-etal:2022emergent} 研究了 LLM 在不同模型规模和计算资源量下的缩放性质。其研究表明，当模型规模增大到一定程度时，某些能力会涌现出来。涌现能力的观察结果说明了大规模训练对增强 LLM 性能的作用，也在一定程度上激励研究者不断尝试训练更大的模型。随着更大、更强的语言模型不断出现，我们对缩放定律的认识也日益成熟。这种认识有助于研究者预测 LLM 在训练过程中的性能，并估计达到给定性能水平所需的计算资源。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-a-curve-of-scaling-laws}
+\caption{测试误差随感兴趣变量（如训练数据集规模）变化的缩放定律~\cite{hestness-etal:2017deep}。缩放定律曲线可以分为三个阶段。最初，随着训练数据增加，测试误差缓慢下降，但这一阶段持续时间较短。第二阶段中，测试误差大幅下降，曲线呈幂律形式。随后在第三阶段，误差下降再次放缓。需要注意，无论训练数据量多大，都存在无法消除的不可约误差。}
+\label{fig:scaling-power-law-curve}
+\end{figure}
+
+为了理解模型性能如何随各种训练因素而变化，通常将性能表示为这些因素的函数。例如，在最简单的情况下，可以将 LLM 的损失或误差表示为某个感兴趣变量的单变量函数。然而，并不存在能够描述这种关系的通用缩放定律；研究者提出了不同函数来拟合 LLM 的学习曲线。
+
+设 $x$ 为感兴趣的变量，如模型参数量，$\mathcal{L}(x)$ 为给定 $x$ 时的模型损失，如测试数据上的交叉熵损失。$\mathcal{L}(x)$ 最简单的形式是幂律
+\begin{eqnarray}
+\mathcal{L}(x) & = & ax^b,
+\end{eqnarray}
+
+\noindent 其中，$a$ 和 $b$ 是通过经验估计的参数。尽管形式简单，这个函数已成功解释了语言模型和机器翻译系统随模型规模（记为 $N$）及训练数据集规模（记为 $D$）变化的缩放行为~\cite{gordon-etal:2021data,hestness-etal:2017deep}。例如，\citet{kaplan-etal:2020scaling} 发现，在最初的短暂过渡阶段后，其语言模型的性能随 $N$ 或 $D$ 按幂律改善，并用 $\mathcal{L}(N) = \big( \frac{N}{8.8 \times 10^{13}} \big)^{-0.076}$ 和 $\mathcal{L}(D) = \big( \frac{D}{5.4 \times 10^{13}} \big)^{-0.095}$ 表示这些关系，见图~\ref{fig:power-law-scaling-for-model-size-and-dataset-size}。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-model-performance-against-model-size-and-training-dataset-size}
+\caption{测试损失随模型规模（$N$）和训练数据集规模（$D$）的变化，图中数据点仅用于示意。图中绘制了测试损失关于 $N$ 的函数 $\mathcal{L}(N) = \big( \frac{N}{8.8 \times 10^{13}} \big)^{-0.076}$，以及关于 $D$ 的函数 $\mathcal{L}(D) = \big( \frac{D}{5.4 \times 10^{13}} \big)^{-0.095}$~\cite{kaplan-etal:2020scaling}。}
+\label{fig:power-law-scaling-for-model-size-and-dataset-size}
+\end{figure}
+
+对这一缩放定律的一项改进，是在幂律中加入\mindex{不可约误差}（irreducible error）项。此时，$\mathcal{L}(x)$ 的形式为
+
+\begin{eqnarray}
+\mathcal{L}(x) & = & ax^b + \epsilon_{\infty} \label{eq:scaling-laws-m2-form},
+\end{eqnarray}
+
+\noindent 其中，$\epsilon_{\infty}$ 为不可约误差，表示未知变量造成的误差，即使 $x \to \infty$ 也依然存在。式（\ref{eq:scaling-laws-m2-form}）是建模 LLM 缩放定律最广泛使用的形式之一。例如，\citet{rosenfeld-etal:2020constructive} 提出了同时包含模型扩展与数据集扩展的缩放定律，如下所示
+\begin{eqnarray}
+\mathcal{L}(N,D) & = & aN^b + cD^d + \epsilon_{\infty}.
+\end{eqnarray}
+
+Chinchilla 缩放定律就是这种表述的一个例子。它指出，每个词元的测试损失是 $N$ 和 $D$ 的负幂律函数之和，再加上一项不可约误差。\citet{hoffmann-etal:2022training} 将这一缩放定律表示为
+\begin{eqnarray}
+\mathcal{L}(N,D) & = & \underbrace{\frac{406.4}{N^{0.34}}}_{\textrm{模型扩展}} + \underbrace{\frac{410.7}{D^{0.28}}}_{\textrm{数据集扩展}} + \underbrace{1.69}_{\textrm{不可约误差}}.
+\end{eqnarray}
+
+上述所有缩放定律都基于单调函数，因此无法涵盖双下降曲线等具有拐点的函数。为此，研究者探索了更复杂的函数来拟合学习曲线。\citet{alabdulmohsin-etal:2022revisiting} 和~\citet{caballero-etal:2023broken} 的研究给出了这类函数的例子。
+
+缩放定律的意义在于，为 LLM 研究提供方向指引：如果仍处在幂律曲线所描述的区域，投入更多资源训练更大的模型，就是一个非常有前景的方向。尽管这一结果促使大型研究团队和公司投入高昂的计算资源来训练更大模型，缩放定律也持续推动着 AI 的能力边界向前发展。另一方面，理解缩放定律有助于研究者在训练 LLM 时作出有依据的决策。例如，可以根据手头的计算资源估计 LLM 最终能够达到的性能。
+
+本节关于缩放定律的最后一点是：对于 LLM，更低的测试损失并不总意味着所有下游任务上的性能都更好。适配 LLM 涉及微调、提示等多个步骤，都可能影响最终结果。因此，在实践中，不同下游任务的缩放定律可能有所不同。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{长序列建模}
+\label{sec:long-sequence-modeling}
+
+\noindent 前面已经看到，在大规模训练中，可以同时增加数据和计算资源，开发更强大的语言模型。不过，扩展也可以沿其他维度进行。例如，在许多现代应用中，LLM 往往需要适配非常长的序列。一种常见场景是：先在标准长度的文本上预训练 LLM，再将其应用于远长于预训练序列的文本。这里用 $\Pr(\mathbf{y}|\mathbf{x})$ 表示生成文本的条件概率，其中 $\mathbf{x}$ 为上下文，$\mathbf{y}$ 为生成文本。广义上，长序列建模问题可以分为三类：
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{长上下文文本生成}，即 $\mathbf{x}$ 是长序列。例如，为一篇长文档生成简短摘要。
+\item \vspace{0.3em} \textbf{长文本生成}，即 $\mathbf{y}$ 是长序列。例如，根据几个关键词生成完整的故事。
+\item \vspace{0.3em} \textbf{长上下文与长文本生成}，即 $\mathbf{x}$ 和 $\mathbf{y}$ 都是长序列。例如，将一篇长文档从中文翻译成英文。
+\end{itemize}
+\vspace{0.5em}
+
+近期，NLP 研究者更加关注在涉及极长输入文本的任务上应用和评测 LLM。设想一个 LLM，能够读取包含数万行的 C++ 源文件，并概述该源文件对应程序的功能。这种能够处理大量文本上下文的模型，通常称为\mindex{长上下文大语言模型}（long-context LLMs）。本节仅讨论长上下文 LLM，但这里的方法也可以应用于其他问题。
+
+对于 Transformer，处理长序列的计算成本很高，因为自注意力的计算开销随序列长度呈二次增长。这使得针对极长输入训练和部署这类模型难以实现。已有两条研究路线尝试使 Transformer 适应长上下文语言建模。
+
+\begin{itemize}
+\item \vspace{0.5em} 第一条路线探索高效的训练方法和模型架构，从长序列数据中学习自注意力模型。
+\item \vspace{0.3em} 另一条路线通过少量微调或完全不微调，使预训练 LLM 适应长序列处理。
+\end{itemize}
+\vspace{0.5em}
+
+这里简要讨论前者，因为关于高效 Transformer 架构的一般性讨论中已有相关介绍 \cite{Tay-etal:2020efficient,xiao-and-zhu:2023introduction}。我们将重点讨论后者，突出近期 LLM 中常用的方法，同时讨论这些长序列模型的优势与局限。
+
+\subsection{硬件与并行计算优化}
+
+\noindent 首先，从高性能计算的角度考虑对标准 Transformer 模型的改进。这些改进多数并非专门为 LLM 设计，但已广泛应用于各种深度学习模型~\cite{kim-etal:2023full}。一种常用方法是采用较低精度的数据格式。例如，模型可以使用 16 位浮点数（FP16/BF16）甚至 8 位整数（INT8）量化，代替标准的 32 位浮点数（FP32）运算。这些低精度数据类型能够提高计算效率和内存吞吐量，从而更容易处理长序列。另一种方法是利用感知硬件特性的技术来改进 Transformer。例如，在现代 GPU 上，可以使用感知 IO 开销的自注意力函数实现来提高 Transformer 的效率~\cite{dao-etal:2022flashattention,kwon-etal:2023efficient}。
+
+处理长序列的另一种方法是序列并行（sequence parallelism）~\cite{li-etal:2023sequence,korthikanti-etal:2023reducing}。具体而言，考虑位置 $i$ 的查询 $\mathbf{q}_i$ 对键 $\mathbf{K}$ 和值 $\mathbf{V}$ 进行注意力计算的一般问题。可以沿序列维度，即按行，将 $\mathbf{K}$ 划分为一组子矩阵 $\{\mathbf{K}^{[1]},\cdots,\mathbf{K}^{[n_u]}\}$，每个子矩阵对应一个序列片段。类似地，也可以得到 $\mathbf{V}$ 的子矩阵，记为 $\{\mathbf{V}^{[1]},\cdots,\mathbf{V}^{[n_u]}\}$。随后，将每对 $\mathbf{K}^{[u]}$ 和 $\mathbf{V}^{[u]}$ 分配给一个计算节点，例如 GPU 集群中的一张 GPU。各节点可以并行运行，从而实现注意力运算的并行化。
+
+回顾自注意力模型的输出，其形式可以写为
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K},\mathbf{V}) & = & \sum_{j=0}^{m-1} \alpha_{i,j} \mathbf{v}_j \label{eq:seq-parallel-qkv},
+\end{eqnarray}
+
+\noindent 其中，$\alpha_{i,j}$ 是位置 $i$ 与 $j$ 之间的注意力权重。在 Transformer 中，$\alpha_{i,j}$ 通过对 $\mathbf{q}_i$ 和 $\mathbf{k}_j$ 之间的缩放点积进行归一化得到。令 $\beta_{i,j}$ 表示 $\mathbf{q}_i$ 和 $\mathbf{k}_j$ 之间的注意力分数，则有
+\begin{eqnarray}
+\beta_{i,j} & = & \frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d}}  + \mathrm{Mask}(i,j),
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Mask}(i,j)$ 是位置对 $(i,j)$ 的因果掩码（causal mask）值。然后，将注意力权重 $\alpha_{i,j}$ 定义为
+
+\begin{eqnarray}
+\alpha_{i,j} & = & \mathrm{Softmax}(\beta_{i,j}) \nonumber \\
+             & = & \frac{\exp(\beta_{i,j})}{\sum_{j'} \exp(\beta_{i,j'})} \label{eq:seq-parallel-att-weight}.
+\end{eqnarray}
+
+每个计算节点都需要实现这些公式。给定分配到该节点的键和值，计算式（\ref{eq:seq-parallel-att-weight}）右侧的分子，即 $\exp(\beta_{i,j})$，很直接，因为所有必要信息都存放在该节点上。但计算式（\ref{eq:seq-parallel-att-weight}）右侧的分母，需要对所有 $j'$ 的 $\exp(\beta_{i,j'})$ 求和，因此需要与其他节点交换数据。例如，假设 $\mathbf{v}_j$ 和 $\mathbf{k}_j$ 存放在节点 $u$ 上，可以将式（\ref{eq:seq-parallel-att-weight}）改写为
+\begin{eqnarray}
+&   & \alpha_{i,j} \nonumber \\
+& = & \frac{\overbrace{\exp(\beta_{i,j})}^{\textrm{节点 $u$}}}{\underbrace{\sum_{\mathbf{k}_{j'} \in \mathbf{K}^{[1]}} \exp(\beta_{i,j'}) }_{\textrm{节点 $1$}} + \cdots + \underbrace{\sum_{\mathbf{k}_{j'} \in \mathbf{K}^{[u]}} \exp(\beta_{i,j'}) }_{\textrm{节点 $u$}} + \cdots + \underbrace{\sum_{\mathbf{k}_{j'} \in \mathbf{K}^{[n_u]}} \exp(\beta_{i,j'}) }_{\textrm{节点 $n_u$}} } \label{eq:seq-parallel-att-weight-distributed},
+\end{eqnarray}
+
+\noindent 其中，记号 $\mathbf{k}_{j'} \in \mathbf{K}^{[u]}$ 表示 $\mathbf{k}_{j'}$ 是 $\mathbf{K}^{[u]}$ 的一个行向量。在一种直接实现中，先在对应节点上分别执行求和 $\{ \sum_{\mathbf{k}_{j'} \in \mathbf{K}^{[u]}} \exp(\beta_{i,j'}) \}$，再收集各节点的求和结果，合并为最终结果。这对应于并行处理中的集合操作。这类操作已有许多高效实现，例如全归约（all-reduce）操作。因此，可以利用集合通信工具包中优化过的例程，计算所有 $\exp(\beta_{i,j})$ 值的总和。
+
+得到注意力权重 $\{\alpha_{i,j}\}$ 后，再利用式（\ref{eq:seq-parallel-qkv}）计算注意力结果。这一问题可以重新表示为
+\begin{eqnarray}
+&   & \mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K},\mathbf{V}) \nonumber \\
+& = & \underbrace{\sum_{\mathbf{v}_{j'} \in \mathbf{V}^{[1]}} \alpha_{i,j'} \mathbf{v}_{j'} }_{\textrm{节点 $1$}} + \cdots + \underbrace{\sum_{\mathbf{v}_{j'} \in \mathbf{V}^{[u]}} \alpha_{i,j'} \mathbf{v}_{j'} }_{\textrm{节点 $u$}} + \cdots + \underbrace{\sum_{\mathbf{v}_{j'} \in \mathbf{V}^{[n_u]}} \alpha_{i,j'} \mathbf{v}_{j'} }_{\textrm{节点 $n_u$}} \label{eq:seq-parallel-qkv-distributed}.
+\end{eqnarray}
+
+与式（\ref{eq:seq-parallel-att-weight-distributed}）类似，式（\ref{eq:seq-parallel-qkv-distributed}）可以通过并行处理中的归约操作实现。首先，在不同节点上同时对值进行加权求和；随后，通过集合操作收集这些节点的结果。
+
+需要注意的是，尽管本节主要关注长序列建模，但序列并行的许多动机来自第~\ref{sec:llm-distributed-training} 节讨论的深度网络分布式训练方法。因此，这些方法的实现可以建立在同一个并行处理库之上。
+
+\subsection{高效架构}
+
+\noindent 将 Transformer 应用于长序列的一个困难是，标准自注意力的时间和内存复杂度都随序列长度呈二次增长。此外，自回归生成需要维护\mindex{键值缓存}（key-value cache，或 \mindex{KV 缓存}），其大小随已处理的词元数增加。尽管 KV 缓存的内存占用随序列长度线性增长，但面对极长上下文时，这一内存需求仍会高到难以承受，使标准 LLM 难以实际部署。因此，长上下文 LLM 的模型架构通常逐渐偏离标准 Transformer，转而开发更高效的变体和替代架构。
+
+一种方法是用稀疏注意力（sparse attention）代替标准自注意力。这类模型的出发点是，长序列中的注意力分布往往高度偏斜，因此只有一小部分词元会对任一给定词元的上下文产生显著影响。由此，可以剪去绝大多数注意力权重，以高度压缩的形式表示这一机制。以标准自注意力的形式为例：
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{qkv}}(\mathbf{Q},\mathbf{K},\mathbf{V}) & = & \alpha(\mathbf{Q},\mathbf{K}) \mathbf{V} \label{eq:qkv-attention-attention-weights},
+\end{eqnarray}
+
+\noindent 其中，注意力权重矩阵 $\alpha(\mathbf{Q},\mathbf{K}) \in \mathbb{R}^{m \times m}$ 由下式得到
+\begin{eqnarray}
+\alpha(\mathbf{Q},\mathbf{K}) & = & \mathrm{Softmax}(\frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d}} + \mathbf{Mask}) \nonumber \\
+                              & = & \begin{bmatrix} \alpha_{0,0} & 0 & 0 & \cdots & 0 \\ \alpha_{1,0} & \alpha_{1,1} & 0 & \cdots & 0 \\ \alpha_{2,0} & \alpha_{2,1} & \alpha_{2,2} & \cdots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ \alpha_{m-1,0} & \alpha_{m-1,1} & \alpha_{m-1,2} & \cdots & \alpha_{m-1,m-1} \end{bmatrix}.
+\end{eqnarray}
+
+每个行向量 $\begin{bmatrix} \alpha_{i,0} & \cdots & \alpha_{i,i} & 0 & \cdots & 0 \end{bmatrix}$ 都对应一个词元上的分布，表示第 $i$ 个词元如何关注其他词元。由于语言模型仅根据左侧上下文预测下一个词元，通常将注意力模型在位置 $i$ 的输出写为
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i}) & = & \begin{bmatrix} \alpha_{i,0} & \cdots & \alpha_{i,i}  \end{bmatrix} \begin{bmatrix} \mathbf{v}_0 \\ \vdots \\ \mathbf{v}_{i} \end{bmatrix} \nonumber \\
+                                                                                & = & \sum_{j = 0}^{i} \alpha_{i,j} \mathbf{v}_{j},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{K}_{\le i} = \begin{bmatrix} \mathbf{k}_0 \\ \vdots \\ \mathbf{k}_{i} \end{bmatrix}$ 和 $\mathbf{V}_{\le i} = \begin{bmatrix} \mathbf{v}_0 \\ \vdots \\ \mathbf{v}_{i} \end{bmatrix}$ 分别为截至位置 $i$ 的键和值。
+
+在标准自注意力中，假设向量 $\begin{bmatrix} \alpha_{i,0} & \cdots & \alpha_{i,i} \end{bmatrix}$ 是稠密的，即几乎所有有效元素都非零。而在稀疏注意力中，只计算预先定义的元素子集，其余元素被显式忽略，强制置零。令 $G \subseteq \{0,\cdots,i\}$ 表示有效非零元素的索引集合，则稀疏注意力模型在位置 $i$ 的输出为：
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{sparse}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i}) & = & \sum_{j \in G} \alpha'_{i,j} \mathbf{v}_{j}.
+\end{eqnarray}
+
+\noindent 这里，$\{\alpha'_{i,j}\}$ 在 $G$ 上归一化，因此其取值与原始注意力权重不同，事实上有 $\alpha'_{i,j} > \alpha_{i,j}$。模型的稀疏程度由 $G$ 的大小决定。不同稀疏注意力模型的区别在于如何定义 $G$。一种简单方法是根据启发式设计的模式定义 $G$。例如，一种广泛使用的模式是让 $G$ 覆盖位置 $i$ 附近一个窗口内的词元~\cite{parmar-etal:2018image}。
+
+尽管稀疏注意力通过稀疏运算减少了计算量，这类模型仍有明显局限，因为推理时仍需保留完整的 KV 缓存，即 $\mathbf{K}_{\le i}$ 和 $\mathbf{V}_{\le i}$。如果序列非常长，存储这一缓存就会消耗大量内存。为此，可以考虑另一类不显式保留 KV 缓存的注意力模型。线性注意力（linear attention）就是其中一种~\cite{katharopoulos-etal:2020transformers}。它使用核函数 $\phi(\cdot)$，将每个查询和键映射到特征空间，分别得到 $\mathbf{q}'_i = \phi(\mathbf{q}_i)$ 和 $\mathbf{k}'_i = \phi(\mathbf{k}_i)$。将 Softmax 归一化替换为线性形式\footnote{经过这一变换后，在新空间中，可以将 Softmax 归一化转化为简单的缩放归一化。}，得到的注意力模型为
+
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i}) & \approx & \mathrm{Att}_{\mathrm{linear}}(\mathbf{q}'_i,\mathbf{K}'_{\le i},\mathbf{V}_{\le i}) \nonumber \\
+                                                                                & = & \frac{\mathbf{q}'_{i} \mu_i}{\mathbf{q}'_{i} \nu_i},
+\end{eqnarray}
+
+\noindent 其中，$\mu_i$ 和 $\nu_i$ 是以循环方式计算的变量
+
+\begin{eqnarray}
+\mu_i & = & \mu_{i-1} + {\mathbf{k}'}_{i}^\top \mathbf{v}_{i} \label{eq:linear-attention-mu-llm} \\
+\nu_i & = & \nu_{i-1} + {\mathbf{k}'}_{i}^\top \label{eq:linear-attention-nu-llm}.
+\end{eqnarray}
+
+\noindent $\mu_i$ 和 $\nu_i$ 可以视为截至位置 $i$ 的历史摘要。这种模型的优点是，无须显式存储过去所有的键和值，只需使用最新的表示 $\mu_i$ 和 $\nu_i$。因此，每一步的计算成本为常数，模型也容易扩展到长序列。
+
+事实上，从循环模型的角度看，这种按顺序进行长序列建模的方法会自然出现。这类模型每次读取一个或少量词元，用这些输入更新循环状态，然后在下一个词元到来之前将输入丢弃。每一步的输出仅根据循环状态生成，而不依赖所有历史状态。内存占用由大小固定的循环状态决定。循环模型可以用于实时学习场景：数据以流的形式到来，模型可以在任意时间步作出预测。在 NLP 中，将循环模型用于语言建模，是序列表示学习最早取得成功的尝试之一。尽管 Transformer 已成为 LLM 的基础架构，循环模型依然强大，尤其适合开发高效 LLM。例如，循环模型，特别是 Mamba 等现代状态空间模型~\cite{gu-and-dao:2023mamba}，在语言建模中重新受到关注，再次被视为一种有前景的 Transformer 替代方案。
+
+图~\ref{fig:comparison-of-efficient-llm-architectures} 比较了本小节讨论的模型。相关综述~\cite{Tay-etal:2020efficient,xiao-and-zhu:2023introduction} 已对这些模型，以及此处未提及的其他模型作了广泛讨论，因此这里不再展开更全面的介绍。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-long-context-llm-architectures}
+\caption{自注意力、稀疏注意力、线性注意力和循环模型的示意图。蓝色方框表示为生成位置 $i$ 的输出而缓存的状态。$f(\cdot)$ 表示循环单元。}
+\label{fig:comparison-of-efficient-llm-architectures}
+\end{figure}
+
+\subsection{缓存与记忆}
+\label{sec:long-context-cache-and-memory}
+
+\noindent 基于标准 Transformer 架构的 LLM 使用全局稠密注意力机制。在自回归推理期间，这些模型需要存储完整的左侧上下文，以预测后续词元。这就需要 KV 缓存，保存此前所有已生成词元的表示，即键和值。因此，随着推理进行，缓存的内存占用线性增长。前面讨论了通过稀疏注意力和线性注意力等高效注意力算法缓解这一上下文瓶颈的方法。一种相关的替代方法，是通过辅助记忆模块显式编码和压缩上下文。
+
+\subsubsection{固定大小的 KV 缓存}
+
+一种直接的方法是使用固定大小的记忆模型表示键和值。假设有一个保存上下文信息的记忆 $\mathrm{Mem}$，可以将位置 $i$ 的注意力运算写成一般形式
+\begin{eqnarray}
+\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}) & = & \mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i}).
+\end{eqnarray}
+
+在这一模型中，$\mathrm{Mem}$ 就是 KV 缓存，即 $\mathrm{Mem} = (\mathbf{K}_{\le i}, \mathbf{V}_{\le i})$。因此，$\mathrm{Mem}$ 的大小由 $i$ 决定。如果将 $\mathrm{Mem}$ 定义为固定大小，那么执行 $\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem})$ 的成本也是固定的。设计 $\mathrm{Mem}$ 有多种方式。
+
+\begin{itemize}
+\item \vspace{0.5em} 最简单的方法之一，是考虑由之前的键和值构成的固定大小窗口。因此，$\mathrm{Mem}$ 为
+    \begin{eqnarray}
+    \mathrm{Mem} & = & (\mathbf{K}_{[i - n_c + 1,i]},\mathbf{V}_{[i - n_c + 1,i]}),
+    \end{eqnarray}
+    \noindent 其中，$n_c$ 表示窗口大小。记号 $\mathbf{K}_{[i - n_c + 1,i]}$ 和 $\mathbf{V}_{[i - n_c + 1,i]}$ 分别表示从位置 $i-n_c+1$ 到 $i$ 的键和值。\footnote{更形式化地，记 $\mathbf{K}_{[i - n_c + 1,i]} = \begin{bmatrix} \mathbf{k}_{i - n_c + 1} \\ \vdots \\ \mathbf{k}_{i} \end{bmatrix}$ 和 $\mathbf{V}_{[i - n_c + 1,i]} = \begin{bmatrix} \mathbf{v}_{i - n_c + 1} \\ \vdots \\ \mathbf{v}_{i} \end{bmatrix}$。有时为简化记号，也将 $\mathbf{K}_{[i - n_c + 1,i]}$ 记为 $\{\mathbf{k}_{i - n_c + 1},\cdots,\mathbf{k}_{i}\}$，将 $\mathbf{V}_{[i - n_c + 1,i]}$ 记为 $\{\mathbf{v}_{i - n_c + 1},\cdots,\mathbf{v}_{i}\}$。}这一模型可以视为一种局部注意力模型。
+\item \vspace{0.5em} 也可以将 $\mathrm{Mem}$ 定义为一对摘要向量，从而得到更压缩的历史表示。对历史键和值求摘要的一种简单方法，是使用这些向量的移动平均。例如，可以将 $\mathrm{Mem}$ 定义为之前 $n_c$ 个键和值的不加权移动平均
+    \begin{eqnarray}
+    \mathrm{Mem} & = & \left(\frac{\sum_{j=i - n_c + 1}^{i} \mathbf{k}_{j}}{n_c} , \frac{\sum_{j=i - n_c + 1}^{i} \mathbf{v}_{j}}{n_c} \right).
+    \end{eqnarray}
+
+    也可以使用加权移动平均
+    \begin{eqnarray}
+    \mathrm{Mem} & = & \left( \frac{\sum_{j=i - n_c + 1}^{i} \beta_{j - i + n_c} \mathbf{k}_{j}} {\sum_{j=1}^{n_c} \beta_j} , \frac{\sum_{j=i - n_c + 1}^{i} \beta_{j - i + n_c} \mathbf{v}_{j}}{\sum_{j=1}^{n_c} \beta_j} \right).
+    \end{eqnarray}
+
+    \noindent 这里，$\{\beta_1,\cdots,\beta_{n_c}\}$ 为系数，既可以作为模型参数学习，也可以通过启发式方法确定。例如，可以将其设置为递增系数，即 $\beta_{1} < \beta_{2} < \cdots < \beta_{n_c -1} < \beta_{n_c}$，使更接近 $i$ 的位置获得更大权重。还可以将移动平均扩展到截至 $i$ 的全部位置，从而得到键和值的累积平均，形式为
+    \begin{eqnarray}
+    \mathrm{Mem} & = & \left( \frac{\sum_{j=0}^{i} \mathbf{k}_j}{i+1}, \frac{\sum_{j=0}^{i} \mathbf{v}_j}{i+1} \right).
+    \end{eqnarray}
+
+    一般而言，累积平均可以写成递归形式
+    \begin{eqnarray}
+    \mathrm{Mem}_{i} & = & \frac{(\mathbf{k}_i,\mathbf{v}_i) + i \cdot \mathrm{Mem}_{i-1}}{i + 1},
+    \end{eqnarray}
+
+    \noindent 其中，$\mathrm{Mem}_{i}$ 和 $\mathrm{Mem}_{i-1}$ 分别表示当前位置与前一位置的累积平均。这种模型的优点是，推理时只需存储单个键值对，无须存储所有键值对。需要注意，上述记忆模型与循环模型有关；研究者还使用了更先进的技术，开发 Transformer 自注意力机制的替代方案~\cite{ma-etal:2023mega}。
+
+\item \vspace{0.3em} 记忆 $\mathrm{Mem}$ 也可以是神经网络。每一步，它同时以记忆上一步的输出和模型当前状态为输入，生成记忆的新输出。这一神经网络可以形式化为函数
+    \begin{eqnarray}
+    \mathrm{Mem} & = & \mathrm{Update}(S_{\mathrm{kv}}, \mathrm{Mem}_{\mathrm{pre}}) \label{eq:long-seq-mem-update}.
+    \end{eqnarray}
+    \noindent 这里，$\mathrm{Mem}$ 和 $\mathrm{Mem}_{\mathrm{pre}}$ 分别表示当前步骤与上一步的记忆输出。$S_{\mathrm{kv}}$ 是一组键值对，表示模型近期的状态。这种表述具有一般性，通过选择不同的 $\mathrm{Update}(\cdot)$ 和 $S_{\mathrm{kv}}$ 配置，可以开发多种记忆模型。例如，如果 $S_{\mathrm{kv}}$ 只包含最新的键值对 $(\mathbf{k}_i,\mathbf{v}_i)$，且 $\mathrm{Update}(\cdot)$ 定义为循环单元，那么式（\ref{eq:long-seq-mem-update}）就可以表示为类似 RNN 的模型
+    \begin{eqnarray}
+    \mathrm{Mem} & = & f((\mathbf{k}_i,\mathbf{v}_i), \mathrm{Mem}_{\mathrm{pre}}),
+    \end{eqnarray}
+
+    \noindent 其中，$f(\cdot)$ 是循环单元。出于效率考虑，循环机制也可以用于片段级建模。一种简单方法是将序列划分为若干片段，并将 $S_{\mathrm{kv}}$ 视为一个片段。将循环模型用于 $\mathrm{Update}(\cdot)$，便得到按片段运作的记忆模型。一种特殊情况是，将 $\mathrm{Update}(\cdot)$ 定义为先进先出（first-in-first-out，FIFO）函数，将 $S_{\mathrm{kv}}$ 添加到记忆中，并移除记忆中最早的键值片段，即
+    \begin{eqnarray}
+    \mathrm{Mem} & = & \mathrm{FIFO}(S_{\mathrm{kv}}, \mathrm{Mem}_{\mathrm{pre}}).
+    \end{eqnarray}
+
+    \noindent 考虑一个包含两个片段的记忆，其中一个是当前片段，另一个是前一片段。在注意力运算中，每个位置都可以访问最近两个连续片段中的历史键值对。尽管概念简单，这种滑动分块局部记忆及其变体，已广泛用于片段级循环架构~\cite{dai-etal:2019transformer,hutchins-etal:2022block,bulatov-etal:2022recurrent}。
+
+\item \vspace{0.3em} 上述记忆模型可以扩展为包含多个记忆。这种方法的一个例子是压缩式 Transformer（Compressive Transformer）~\cite{rae-etal:2020:compressive}。它使用两个不同的固定大小记忆：一个建模局部上下文，记为 $\mathrm{Mem}$；另一个建模并压缩长期历史，记为 $\mathrm{CMem}$。模型中的 KV 缓存由 $\mathrm{Mem}$ 和 $\mathrm{CMem}$ 共同构成。其注意力函数可以写为
+    \begin{eqnarray}
+    \mathrm{Att}_{\mathrm{com}}(\mathbf{q}_i,\mathrm{Mem},\mathrm{CMem}) & = & \mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i, [\mathrm{Mem},\mathrm{CMem}]),
+    \end{eqnarray}
+
+    \noindent 其中，$[\mathrm{Mem},\mathrm{CMem}]$ 为 $\mathrm{Mem}$ 与 $\mathrm{CMem}$ 的组合记忆。与标准片段级模型类似，压缩式 Transformer 按块处理序列。每个片段包含 $n_s$ 个连续词元，$S_{\mathrm{kv}}^{k}$ 表示第 $k$ 个片段生成的原始键值对。当新片段到来时，$\mathrm{Mem}$ 通过 FIFO 队列更新：添加来自 $S_{\mathrm{kv}}^{k}$ 的 $n_s$ 个新键值对，同时移除 $n_s$ 个最早的键值对：
+    \begin{eqnarray}
+    \mathrm{Mem} & = & \mathrm{FIFO}(S_{\mathrm{kv}}^{k}, \mathrm{Mem}_{\mathrm{pre}}).
+    \end{eqnarray}
+
+    \noindent 这些被移出的键值对并不直接丢弃，而是送入压缩网络。$n_s$ 个原始键值对被压缩为更少的 $\frac{n_s}{c}$ 个紧凑键值对。随后，$\mathrm{CMem}$ 充当第二级 FIFO 队列，添加这 $\frac{n_s}{c}$ 个压缩键值对，并丢弃其中最早的 $\frac{n_s}{c}$ 个条目，以维持大小不变。其形式为
+    \begin{eqnarray}
+    \mathrm{CMem}& = & \mathrm{FIFO}(C_{\mathrm{kv}}^{k}, \mathrm{CMem}_{\mathrm{pre}}),
+    \end{eqnarray}
+
+    \noindent 其中，$C_{\mathrm{kv}}^{k}$ 表示压缩键值对的集合。压缩式 Transformer 隐含的假设是：局部上下文应以尽量少的信息损失显式表示，而长程上下文可以进行更大程度的压缩。
+
+\item \vspace{0.3em} 前面已经看到，全局上下文和局部上下文都有用，都可以通过注意力模型建模。这一观点推动了将局部记忆与长期记忆相结合的注意力模型的发展~\cite{ainslie-etal:2020etc,zaheer-etal:2020big,gupta-berant:2020gmat}。一种简单且广泛使用的方法，是让序列开头的几个词元作为全局词元参与注意力计算。这种方法通常与其他稀疏注意力模型结合使用。引入全局词元的一个优点是，它们可以充当注意力汇聚点（attention sink），吸收过多的注意力分数，从而在上下文很大时稳定模型性能~\cite{xiao-etal:2024efficient}。不过，其缺点是，使用固定大小的全局记忆可能导致信息损失。处理长序列时，需要扩大 KV 缓存来充分表示上下文，但这又会增加计算成本。
+
+\end{itemize}
+\vspace{0.5em}
+
+图~\ref{fig:comparison-kv-cache-optimizations} 展示了上述方法。需要注意，尽管这里重点讨论 KV 缓存优化，但这一问题与上一小节的内容密切相关。到目前为止提到的所有方法，广义上都可以归为高效注意力方法，广泛用于各种 Transformer 变体。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-fixed-size-memory}
+\caption{LLM 中固定大小 KV 缓存的示意图。蓝色方框表示 LLM 推理期间生成的键和值，绿色方框表示存储或编码在主记忆中的键和值，橙色方框表示存储或编码在压缩记忆中的键和值。}
+\label{fig:comparison-kv-cache-optimizations}
+\end{figure}
+
+\subsubsection{基于记忆的模型}
+
+\noindent 上述记忆建模基于 KV 缓存的更新，得到的模型通常称为\mindex{内部记忆}（internal memories）。现在考虑另一类模型，称为\mindex{外部记忆}（external memories），它们独立运作，为 LLM 访问大规模上下文。这些方法中，许多根植于经典机器学习中已有广泛研究的\mindex{基于记忆的方法}（memory-based methods）~\cite{Bishop:2006}。一个常见例子是最近邻算法：将上下文表示保存在数据存储库中，通过查询找出其中最相似的表示，再利用检索得到的上下文表示，增强当前查询的注意力机制。
+
+这里考虑\mindexraw{$k$近邻}（k-nearest neighbors，\mindex{$k$-NN}）方法，它是最常见的基于记忆的方法之一。由于本节关注语言建模，我们将数据存储库中的一个样本定义为对应某种上下文状态的键值对。需要注意，这里的“上下文”是一个广义概念，并不局限于文本生成中的序列前缀。例如，可以将整个数据集视为预测词元的上下文。这样就能在一组序列中检索最相似的上下文，而非仅在给定序列的前缀中检索。尽管我们的关注点是单个序列的上下文建模，本小节仍讨论更一般的情况。
+
+假设有一组键 $\{\mathbf{k}_j\}$ 及其对应的值 $\{\mathbf{v}_j\}$，并将这些键值对存入向量数据库\footnote{向量数据库（vector database），也称向量存储库（vector store），提供高度优化的检索接口，用于寻找与查询向量最相近的已存储向量。}。对于每个查询 $\mathbf{q}_{i}$，以 $\mathbf{q}_i$ 为中心逐步增大球的半径，直到其中包含 $\{\mathbf{k}_j\}$ 中的 $k$ 个数据点，从而找到其 $k$ 个最近邻。由此得到 $k$ 个键及其对应值构成的集合，记为 $\mathrm{Mem}_{k\mathrm{nn}}$。与前文一样，用 $\mathrm{Mem}$ 表示查询的局部记忆，例如相邻词元的 KV 缓存。我们的目标是让查询 $\mathbf{q}_i$ 同时关注局部记忆 $\mathrm{Mem}$ 和长期记忆 $\mathrm{Mem}_{k\mathrm{nn}}$。当然，将 $\mathrm{Mem}$ 和 $\mathrm{Mem}_{k\mathrm{nn}}$ 融入注意力模型有多种方式。例如，可以直接将它们合并成单个 KV 缓存 $[\mathrm{Mem},\mathrm{Mem}_{k\mathrm{nn}}]$，再通过标准 QKV 注意力让 $\mathbf{q}_i$ 关注 $[\mathrm{Mem},\mathrm{Mem}_{k\mathrm{nn}}]$；也可以在不同的注意力步骤中分别使用 $\mathrm{Mem}$ 和 $\mathrm{Mem}_{k\mathrm{nn}}$。\citet{wu-etal:2021memorizing} 开发的模型就是后一种方法的例子，它将两类注意力线性组合，形式为
+\begin{eqnarray}
+\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem},\mathrm{Mem}_{k\mathrm{nn}}) & = & \mathbf{g} \odot \mathrm{Att}_{\mathrm{local}} + (1 - \mathbf{g}) \odot \mathrm{Att}_{k\mathrm{nn}} \\
+\mathrm{Att}_{\mathrm{local}} & = & \mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}) \\
+\mathrm{Att}_{k\mathrm{nn}} & = & \mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}_{k\mathrm{nn}}).
+\end{eqnarray}
+
+\noindent 这里，$\mathbf{g} \in \mathbb{R}^{d}$ 为系数向量，可以是通过学习得到的门控机制的输出。
+
+给定上述基于 $k$-NN 的记忆模型，剩下的任务是决定在数据存储库中保留哪些键值对。对于标准语言建模任务，我们将一个序列中已经出现过的词元视为上下文，因此可以把这些词元的全部键和值加入数据存储库。在这种情况下，得到的基于 $k$-NN 的注意力模型，本质上等价于稀疏注意力模型~\cite{gupta-etal:2021memory}。
+
+也可以将上下文从单个序列扩展到一组序列。例如，收集训练数据集所有序列中的全部键值对，并加入数据存储库，以建模更大范围的上下文。这样，LLM 就可以根据广义上下文预测词元。这种方法的一个问题是，如果涉及大量序列，计算成本可能很高。由于这些序列属于训练数据，可以在运行 LLM 前，预先为数据存储库中的向量构建并优化索引。因此，相似向量的检索可以非常高效，现代向量数据库通常就采用这类实现。
+
+事实上，上述所有方法都是更广泛的检索增强范式的实例。除了直接将检索到的向量注入注意力机制，检索还可以用于输出分布层面。一个典型应用是\mindexraw{$k$近邻语言建模}（k-NN language modeling，\mindexraw{$k$-NN LM}）~\cite{khandelwal-etal:2020generalization}。其直观依据是，在 Transformer 网络中，相似的隐状态能够较好地预示：即使上下文不同，下一个词元也可能相似。在 $k$-NN LM 中，数据存储库的每个条目保存为元组 $(\mathbf{z},w)$，其中 $\mathbf{z}$ 表示 LLM 在特定位置的最终隐状态，$w$ 表示该位置实际观察到的下一个词元。通常，将整个训练数据集输入 LLM，离线构建这一数据存储库。
+
+推理时，给定序列前缀，LLM 生成当前隐状态 $\mathbf{h}_i$。使用 $\mathbf{h}_i$ 查询数据存储库，检索最相近的 $k$ 个状态，得到元组集合 $\{(\mathbf{z}_1,w_1),\cdots,(\mathbf{z}_k,w_k)\}$。目标词元 $\{w_1,\cdots,w_k\}$ 充当参考输出。为利用这些参考，将检索距离转换为词表 $V$ 上的概率分布。设 $d(\mathbf{h}_i, \mathbf{z}_j)$ 为距离度量，则 $k$-NN 检索赋予词元 $v \in V$ 的概率质量，可通过聚合经 Softmax 归一化的近邻相似度计算：
+\begin{eqnarray}
+\mathrm{Pr}_{k\mathrm{nn}}(v|\mathbf{h}_i) & \propto & \sum_{(\mathbf{z}_j, w_j) \in \text{top-}k, \atop w_j = v} \exp\left(-d(\mathbf{h}_i, \mathbf{z}_j)\right). \label{eq:knn-lm-dist}
+\end{eqnarray}
+
+\noindent 如果词元 $v$ 未出现在检索得到的 $k$ 个近邻中，其概率 $\mathrm{Pr}_{k\mathrm{nn}}(v|\mathbf{h}_i)$ 为零。最后，用可调超参数 $\lambda \in [0,1]$，在这一基于检索的分布与 LLM 分类头生成的标准参数化分布 $\mathrm{Pr}_{\mathrm{lm}}(\cdot|\mathbf{h}_i)$ 之间进行线性插值：
+\begin{eqnarray}
+\mathrm{Pr}(\cdot|\mathbf{h}_i) & = & \lambda \cdot \mathrm{Pr}_{k\mathrm{nn}}(\cdot|\mathbf{h}_i) + (1 - \lambda) \cdot \mathrm{Pr}_{\mathrm{lm}}(\cdot|\mathbf{h}_i).
+\end{eqnarray}
+
+\noindent 随后，按通常方式，通过最大化概率 $\mathrm{Pr}(y|\mathbf{h}_i)$ 来选择下一个词元 $y$。
+
+与信息检索（information retrieval，IR）系统一样，数据存储库也可以存储和检索文本数据。例如，可以将一组文本文档存入具有全文索引的搜索引擎，再搜索与给定文本查询相匹配的文档。将 IR 技术应用于 LLM，就得到称为\mindex{检索增强生成}（retrieval-augmented generation，\mindex{RAG}）的通用框架。RAG 的工作方式如下：以上下文 $\mathbf{x}$ 为查询，通过高效的 IR 技术，从数据存储库中找出最相关的 $k$ 个文档块 $\{\mathbf{c}_{1},\cdots,\mathbf{c}_{k}\}$\footnote{在实际应用中，查询通常由查询生成系统产生，该系统可以通过词元变体和查询意图的变化来扩展查询。}。这些搜索结果通过提示模板 $g(\cdot)$ 与原始上下文组合\footnote{例如，模板可以是：
+
+\vspace{0.3em}
+\begin{tcolorbox}[frame empty]
+\begin{center}
+\parbox{0.9\textwidth}
+{
+
+\hspace{4em} 信息 = \{*$\mathbf{c}_1$*\} $\cdots$ \{*$\mathbf{c}_k$*\}
+
+\vspace{0.3em}
+
+\hspace{4em} 输入：\{*$\mathbf{x}$*\}
+
+\vspace{0.3em}
+
+\hspace{4em} 输出：\underline{\hspace{2em}}
+
+}
+\end{center}
+\end{tcolorbox}
+
+}，从而为 LLM 形成增强后的输入
+\begin{eqnarray}
+\mathbf{x}' & = & g(\mathbf{c}_{1},\cdots,\mathbf{c}_{k},\mathbf{x}).
+\end{eqnarray}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-knn-models-for-llms}
+\caption{用于语言建模的外部记忆（或数据存储库）示意图。}
+\label{fig:comparison-external-memories}
+\end{figure}
+
+\noindent 然后，以 $\mathbf{x}'$ 为上下文，使用模型 $\Pr(\mathbf{y}|\mathbf{x}')$ 预测后续文本。RAG 的一个优点是，无须修改 LLM 架构，只需通过额外的 IR 系统增强输入。图~\ref{fig:comparison-external-memories} 比较了 LLM 中不同外部记忆的使用方式。
+
+\subsubsection{记忆容量}
+
+\noindent 无论是简单的键值缓存，还是外部数据存储库，LLM 中的记忆模型都可以广义地视为上下文信息的编码器。理想情况下，只有确保记忆模型能够准确重构上下文的任意部分，才能认为它在词元预测中代表了完整上下文。标准 KV 缓存就是这样的模型，因为它保留了完整的序列历史。此时，可以说模型具有充足的、或无界的上下文记忆容量。然而，在许多实际应用中，并不需要完整记忆上下文，主要目标是让 LLM 能够访问显著的上下文信息。因此，研究者开发了本节所述的高效且压缩的记忆模型。需要注意，序列越长，低容量记忆模型就越难捕捉关键的上下文信息。所以，处理长上下文时，直接增大记忆容量是一种常见做法。
+
+尽管通常希望记忆模型容量更大，但其训练和部署的计算成本很高。一种具有挑战性的场景是，词元以连续流的形式到来，使上下文无限增长。为这类流式任务开发 LLM 很困难，因为需要在极长序列上训练 Transformer。一种可能的解决方案是采用基于检索等非参数方法。例如，如前所述，可以利用向量数据库存储所有生成的键值对，从而通过外部记忆模型有效表示上下文。尽管这种方法避开了 Transformer 固有的上下文长度限制，外部记忆模型的构建和维护仍会带来显著计算开销。此外，这类模型通常用于上下文预先给定、且推理期间保持不变的问题，因此不适合动态流式上下文建模。
+
+对于上下文大小不断增长的情况，使用固定大小的记忆模型是一种常见方法。例如，在循环模型中，任意长度的序列都可以概括为一组隐状态，使每一步的计算成本保持固定。在深度学习应用于 NLP 的早期，循环模型一度被认为不善于处理序列建模中的长距离依赖；但近期进展表明，其变体如今能够有效建模极长序列~\cite{bulatov-etal:2022recurrent,hutchins-etal:2022block,munkhdalai-etal:2024leave,ma-etal:2024megalodon}。
+
+LLM 的记忆容量尚无通用定义。一种简单做法是考虑存储上下文信息所用的存储空间。例如，可以用 Transformer 中 KV 缓存的大小，或基于检索的方法所用向量数据库的大小，来定义记忆容量。一个相关概念是模型复杂度。在机器学习中，模型复杂度有多种定义方式，最简单的方法之一是统计参数量。不过，需要强调的是，这里讨论的记忆模型主要用于存储信息，而不是增加可训练参数。因此，记忆容量大的模型未必更复杂。尽管如此，在实践中确定记忆模型的容量并不容易。总体而言，需要在最大化性能与控制内存占用之间权衡。
+
+\subsection{跨注意力头与跨层共享}
+
+\noindent 在 Transformer 中，KV 缓存是一种可沿注意力头、层数和序列长度等多个维度动态调整的数据结构。例如，考虑一个具有 $L$ 层的 LLM，每层有 $\tau$ 个注意力头，每个头生成 $d_h$ 维输出。推理时，存储最多 $m$ 个词元的键和值。这种缓存机制的空间复杂度为 $O(L \cdot \tau \cdot d_h \cdot m)$。如前所述，缓存更少词元的键和值，可以降低这一复杂度。例如，滑动窗口注意力使用固定大小的窗口，缓存局部上下文中的键和值。其空间复杂度为 $O(L \cdot \tau \cdot d_h \cdot m_w)$，其中 $m_w$ 为窗口大小。
+
+除了减小 $m$，还可以沿其他维度缩减 KV 缓存。一种广泛使用的方法，是在多头自注意力中实现跨头共享。回顾第~\ref{sec:decoder-only-transformers} 节，多头自注意力使用多组查询、键和值，每组称为一个头，各自按通常方式执行 QKV 注意力机制。其形式可以表示为
+\begin{eqnarray}
+\mathrm{Output} & = & \mathrm{Merge}(\mathrm{head}_1,\cdots,\mathrm{head}_{\tau}) \mathbf{W}^{\mathrm{head}},
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{head}_j \in \mathbb{R}^{d_h}$ 是第 $j$ 个头的输出，由标准 QKV 注意力函数计算
+\begin{eqnarray}
+\mathrm{head}_j = \mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_{i}^{[j]},\mathbf{K}_{\le i}^{[j]},\mathbf{V}_{\le i}^{[j]}).
+\end{eqnarray}
+
+这里，$\mathbf{q}_{i}^{[j]}$ 表示位置 $i$ 的查询向量，
+$\mathbf{K}_{\le i}^{[j]}$ 和 $\mathbf{V}_{\le i}^{[j]}$ 则表示截至位置 $i$ 的对应
+键矩阵和值矩阵，每个向量都投影到第 $j$ 个特征子空间。因此，可以将这一多头注意力模型理解为在一组特征子空间上并行执行注意力计算，见图~\ref{fig:comparison-of-multihead-attention-models}（b）。KV 缓存需要保留全部注意力头的键和值，即 $\{(\mathbf{K}_{\le i}^{[1]},\mathbf{V}_{\le i}^{[1]}),\cdots,(\mathbf{K}_{\le i}^{[\tau]},\mathbf{V}_{\le i}^{[\tau]})\}$。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-sharing-for-the-KV-cache}
+\caption{基于不同多头机制与共享机制的 QKV 注意力示意图。（a）为单头注意力，（b--e）为多头注意力。}
+\label{fig:comparison-of-multihead-attention-models}
+\end{figure}
+
+对多头注意力模型的一种改进称为\mindex{多查询注意力}（multi-query attention，\mindex{MQA}）：在各头之间共享键和值，同时为每个头保留不同的查询~\cite{shazeer:2019fast}。MQA 只有一组键和值 $(\mathbf{K}_{\le i}, \mathbf{V}_{\le i})$，此外还有 $\tau$ 个查询 $\{\mathbf{q}_{i}^{[1]},\cdots,\mathbf{q}_{i}^{[\tau]}\}$，分别对应不同的头。对于每个头，有
+\begin{eqnarray}
+\mathrm{head}_j = \mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_{i}^{[j]},\mathbf{K}_{\le i},\mathbf{V}_{\le i}).
+\end{eqnarray}
+
+\noindent 图~\ref{fig:comparison-of-multihead-attention-models}（c）展示了这一模型。通过共享键和值，KV 缓存的大小降为 $O(L \cdot d_h \cdot m)$。
+
+\mindex{分组查询注意力}（grouped query attention，\mindex{GQA}）是多头注意力和 MQA 的自然扩展~\cite{ainslie-etal:2023gqa}。在 GQA 中，将各头划分为 $n_g$ 组，每组对应一套共享的键和值。因此，共有 $n_g$ 组键和值 $\{(\mathbf{K}_{\le i}^{[1]},\mathbf{V}_{\le i}^{[1]}),\cdots,(\mathbf{K}_{\le i}^{[n_g]},\mathbf{V}_{\le i}^{[n_g]})\}$，见图~\ref{fig:comparison-of-multihead-attention-models}（d）。令 $g(j)$ 为第 $j$ 个头的组编号，GQA 模型可以表示为
+\begin{eqnarray}
+\mathrm{head}_j = \mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_{i}^{[j]},\mathbf{K}_{\le i}^{[g(j)]},\mathbf{V}_{\le i}^{[g(j)]}).
+\end{eqnarray}
+
+\noindent GQA 的 KV 缓存大小为 $O(L \cdot n_g \cdot d_h \cdot m)$。其一个优点是，可以通过调整 $n_g$，在计算效率与模型表达能力之间权衡。当 $n_g = \tau$ 时，模型变为标准多头注意力模型；当 $n_g = 1$ 时，则变为 MQA 模型。
+
+共享也可以跨层进行。这种方法属于权重共享和激活共享方法，已广泛用于 Transformer~\cite{dehghani-etal:2018universal,lan-etal:2020albert}。例如，可以跨层共享 KV 激活或注意力权重，同时减少计算量和内存占用~\cite{xiao-etal:2019sharing,brandon-etal:2024reducing}。图~\ref{fig:comparison-of-multihead-attention-models}（e）展示了这一方法，其中某一层的查询直接访问较低层的 KV 缓存。
+
+\subsection{位置外推与插值}
+
+\noindent 由于 Transformer 层对输入顺序不敏感，需要以某种方式将位置信息编码到输入词元中。为此，通常将位置嵌入加到词元嵌入上，再把组合后的嵌入送入 Transformer 层堆叠。这时，位置 $i$ 的嵌入可以表示为
+\begin{eqnarray}
+\mathbf{e}_i & = & \mathbf{x}_i + \mathrm{PE}(i) \label{eq:long-context-pe-base},
+\end{eqnarray}
+
+\noindent 其中，$\mathbf{x}_i \in \mathbb{R}^{d}$ 表示词元嵌入，$\mathrm{PE}(i) \in \mathbb{R}^{d}$ 表示位置 $i$ 的位置嵌入。由于词元嵌入 $\mathbf{x}_i$ 与位置无关，位置嵌入 $\mathrm{PE}(i)$ 编码了该词元的绝对或相对位置上下文。一种直接实现，是将 $\mathrm{PE}(i)$ 视为一组可学习变量，与模型其余参数共同训练。这样，模型就能为每个离散位置学习独特的向量表示，从而根据词元在序列中出现的位置将其区分开。
+
+当推理时遇到的序列长度与训练期间的长度接近时，用学习得到的向量表示绝对位置，通常效果不错。然而，在实际 LLM 预训练中，必须严格限制训练序列的最大长度，例如设为 $m_l$，以保证计算可行；但在下游部署时，又往往希望将训练好的模型用于长得多的序列。在这种情况下，使用学习得到的位置嵌入有明显缺点，因为训练阶段未出现过的位置，没有经过训练的嵌入。
+
+另一种建模位置信息的方法，是开发能够泛化的位置嵌入：训练完成后，嵌入模型就可以处理更长的序列。假设在最大长度为 $m_l$ 的序列上训练位置嵌入模型，希望将其应用于长度为 $m$ 的序列，其中 $m \gg m_l$。如果模型只在有限的位置范围上训练，就无法处理该范围之外的新数据。图~\ref{fig:pe-for-a-range-of-positions}（a）说明了这种情况：如果学习得到的嵌入模型不具备外推能力，就无法建模训练域之外的数据点。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-positional-embedding-extrapolation-and-interpolation}
+\caption{不同位置嵌入沿连续序列长度范围的行为示意。蓝点表示训练期间明确观察过的位置，红点表示推理时遇到的未见位置。在子图（a）中，嵌入模型记住了训练域，却无法泛化。在子图（b）和（c）中，模型分别通过外推和插值，成功泛化到未见过的长度。}
+\label{fig:pe-for-a-range-of-positions}
+\end{figure}
+
+使位置嵌入模型获得泛化能力的方法有多种，可以分为两类。
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{外推}（Extrapolation）。在已观察数据点，即位置，上学习得到的模型，可以直接为原始范围之外的数据点赋予有意义的值。例如，如果模型针对位置 $\{1, \cdots, 10\}$ 学到连续的函数关系，理论上就可以在位置 $15$ 计算同一函数，并保持其与先前词元之间正确的相对距离和几何性质。图~\ref{fig:pe-for-a-range-of-positions}（b）展示了这一概念：在训练域内拟合的函数平滑地向外延伸，估计分布外坐标处的值。
+\item \vspace{0.3em} \mindex{插值}（Interpolation）。这种方法将更大范围的数据点映射回原来的观察范围。例如，假设有一个针对 $[1,10]$ 范围内数字设计的模型。当新范围为 $[1,20]$ 时，可以将每个数字除以 2 进行缩放，使所有数字都落入 $[1,10]$。这样，在 $[1,10]$ 范围内训练的模型，就能描述扩展范围 $[1,20]$ 内的数据点。图~\ref{fig:pe-for-a-range-of-positions}（c）展示了这一方法。
+\end{itemize}
+\vspace{0.5em}
+
+事实上，许多系统中的位置嵌入已经实现了一定程度的泛化。例如，最常见的位置嵌入方法正弦编码，使用能够自然扩展到任意长度序列的正弦和余弦函数。尽管这种方法看起来直接且简单，当待处理序列显著变长时，其效果并不好。本小节将讨论若干基于外推或插值的替代方法。
+
+\subsubsection{带可学习偏置的注意力}
+
+\noindent 式（\ref{eq:long-context-pe-base}）的一个问题是，嵌入模型独立处理每个词元，因此忽略了不同词元之间的距离。对这一模型的一种常见改进，是考虑词元之间的成对关系，称为相对位置嵌入（relative positional embedding）~\cite{shaw-etal:2018self}。基本思想是计算任意两个位置之间的偏移，并将其融入自注意力模型。带相对位置嵌入的自注意力，其最简单的形式之一为
+\begin{eqnarray}
+\mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i}) & = & \sum_{j=0}^{i} \alpha(i,j) \mathbf{v}_j \\
+\alpha(i,j) & = & \mathrm{Softmax} \left(\frac{\mathbf{q}_i \mathbf{k}_{j}^\top + \color{red}{\mathrm{PE}(i,j)}}{\sqrt{d}} + \mathrm{Mask}(i,j) \right). \label{eq:attention-weight-base-T5}
+\end{eqnarray}
+
+\noindent 这一模型与原始自注意力模型的唯一区别，是在查询与键的乘积中加入偏置项 $\mathrm{PE}(i,j)$。直观上，$\mathrm{PE}(i,j)$ 可以理解为对位置 $i$ 和 $j$ 之间距离的惩罚。随着 $i$ 与 $j$ 之间的距离增大，$\mathrm{PE}(i,j)$ 减小。
+
+$\mathrm{PE}(i,j)$ 可以有多种不同定义。这里考虑 T5 版本的相对位置嵌入，称为 T5 偏置~\cite{raffel-etal:2020exploring}。对于每对查询 $\mathbf{q}_i$ 和键 $\mathbf{k}_j$，将二者之间的偏移定义为\footnote{在语言建模中，查询只允许关注左侧上下文，因此 $i - j \ge 0$。在更一般的自注意力中，词元可以关注序列中的所有词元，当 $i < j$ 时，就可能出现负偏移。
+}
+\begin{eqnarray}
+d(i,j) & = & i - j.
+\end{eqnarray}
+
+偏置 $\mathrm{PE}(i,j)$ 的一种朴素表述，是为每个可能的离散偏移分配一个独立的可学习标量，即 $\mathrm{PE}(i,j) = u_{i-j}$，其中 $u_{i-j}$ 是与精确距离 $i - j$ 关联的参数。然而，直接为每个偏移赋予独立值，会将模型限制在训练期间观察到的偏移上。当 $i-j$ 超过训练时的最大偏移，模型就无法泛化。
+
+T5 偏置提出了这一方法的推广版本。它不为每个可能的整数偏移分配独立参数，而是将这些位置偏移分成不同的“桶”，映射到同一桶的所有偏移共享一个可学习参数。具体而言，给定 $n_b$ 个桶，分配策略定义如下：
+
+\begin{itemize}
+\item \vspace{0.5em} 对于前一半桶，索引从 $0$ 到 $\lfloor \frac{n_b}{2} \rfloor - 1$，采用一一映射。每个偏移映射到独立的桶：桶 $0 \leftrightarrow$ 偏移 $0$，桶 $1 \leftrightarrow$ 偏移 $1$，依此类推。这个线性映射可以表示为 $b(i - j) = i - j$。
+\item \vspace{0.3em} 对于剩下一半桶，索引从 $\lfloor \frac{n_b}{2} \rfloor$ 到 $n_b - 1$，桶的大小按对数增长。因此，更大的偏移被分到逐渐变宽的区间中。对于偏移 $i - j \ge \lfloor \frac{n_b}{2} \rfloor$，桶索引计算如下：
+    \begin{eqnarray}
+    b(i - j) & = & \lfloor \frac{n_b}{2} \rfloor + \left\lfloor \frac{\log(i - j) - \log(\lfloor \frac{n_b}{2} \rfloor)}{\log(\mathrm{dist}_{\mathrm{max}}) - \log(\lfloor \frac{n_b}{2} \rfloor)} \cdot \left(n_b - \lfloor \frac{n_b}{2} \rfloor - 1\right) \right\rfloor,
+    \end{eqnarray}
+    \noindent 其中，$\mathrm{dist}_{\mathrm{max}}$ 是超参数，表示预期的最大偏移阈值。
+\item \vspace{0.3em} 当 $i - j \ge \mathrm{dist}_{\mathrm{max}}$ 时，将偏移截断并放入最后一个桶 $n_b - 1$。换言之，所有超出预期序列长度的任意大距离，都会归入这个桶。
+\end{itemize}
+
+综合起来，分桶函数定义为
+{\small
+\begin{eqnarray}
+& & b(i - j) \nonumber \\
+& = &
+\begin{cases}
+i - j & \text{当 } 0 \le i - j < \lfloor \frac{n_b}{2} \rfloor, \\
+\min\left(n_b - 1, \lfloor \frac{n_b}{2} \rfloor + \left\lfloor \frac{\log(i - j) - \log(\lfloor \frac{n_b}{2} \rfloor)}{\log(\mathrm{dist}_{\mathrm{max}}) - \log(\lfloor \frac{n_b}{2} \rfloor)} \cdot \left(n_b - \lfloor \frac{n_b}{2} \rfloor - 1\right) \right\rfloor \right) & \text{当 } i - j \ge \lfloor \frac{n_b}{2} \rfloor.
+\end{cases} \nonumber \\
+\end{eqnarray}
+}
+
+图~\ref{fig:qk-distances-in-buckets-T5} 展示了这些桶。可以看到，前一半桶每个只对应 $i - j$ 的一个取值；后一半桶的大小则随着 $i - j$ 增大而增长。最后一个桶用于处理任意长度的序列。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-T5-buckets}
+\caption{T5 模型中将查询—键偏移分配到各桶的示意图，其中 $n_b = 32$，$\mathrm{dist}_{\mathrm{max}}=1024$。方框表示桶。前一半桶采用固定的桶大小，后一半桶的大小按对数增长。最后一个桶包含前面各桶未覆盖的所有查询—键偏移。}
+\label{fig:qk-distances-in-buckets-T5}
+\end{figure}
+
+映射到同一桶 $b(i-j)$ 的所有相对距离，共享相同的可学习偏置标量 $u_{b(i-j)}$。将 $\mathrm{PE}(i,j) = u_{b(i-j)}$ 代入式（\ref{eq:attention-weight-base-T5}），得到最终的注意力权重计算式\footnote{需要注意，在~\citet{raffel-etal:2020exploring} 的 T5 模型中，查询与键乘积的重新缩放操作被移除。因此，注意力权重 $\alpha(i,j)$ 为
+\begin{eqnarray}
+\alpha(i,j) & = & \mathrm{Softmax}(\mathbf{q}_i \mathbf{k}_{j}^\top + u_{b(i-j)} + \mathrm{Mask}(i,j)).
+\end{eqnarray}
+}
+\begin{eqnarray}
+\alpha(i,j) & = & \mathrm{Softmax}\left( \frac{\mathbf{q}_i \mathbf{k}_{j}^\top + \color{red}{u_{b(i-j)}}}{\sqrt{d}} + \mathrm{Mask}(i,j) \right),
+\end{eqnarray}
+
+参数 $\{u_{0},\cdots,u_{n_b-1}\}$ 与模型其他参数共同学习。需要强调的是，这一模型能够泛化到长序列，因为查询—键偏移相近的 $\mathrm{PE}(i,j)$ 共享相同参数。考虑到较大的查询—键偏移在训练中很少出现，这种共享策略对实现良好泛化尤为重要。在实践中，通常将 $n_b$ 设置为适中的数值，这有助于控制位置嵌入模型的过拟合。
+
+\subsubsection{带固定偏置的注意力}
+
+\noindent 相对位置嵌入模型在自注意力的查询与键乘积中，加入一组学习得到的偏置。另一种方法是通过预定义的启发式规则为这些偏置赋予固定值，而不是从数据中学习。这种启发式方法的一个优点是，不依赖训练，因此偏置一旦设定，就可以直接用于任意序列。
+
+\citet{press-etal:2022train} 提出的方法就是一个例子，称为\mindex{带线性偏置的注意力}（attention with linear biases），简称 \mindex{ALiBi}。在 ALiBi 中，偏置项定义为查询—键偏移经缩放后的负值
+\begin{eqnarray}
+\mathrm{PE}(i,j) & = & -\beta \cdot (i - j) \nonumber \\
+                 & = & \beta \cdot (j - i) \label{eq:abili-bias},
+\end{eqnarray}
+
+\noindent 其中，$\beta$ 为缩放因子。将该项加入查询与键的乘积，得到新的注意力权重形式
+\begin{eqnarray}
+\alpha(i,j) & = & \mathrm{Softmax} \left(\frac{\mathbf{q}_i \mathbf{k}_{j}^\top + \color{red}{\beta \cdot (j - i)}}{\sqrt{d}} + \mathrm{Mask}(i,j) \right).
+\end{eqnarray}
+
+这一模型可以理解为：键位置 $j$ 每远离查询位置 $i$ 一步，就对注意力分数 $\mathbf{q}_i \mathbf{k}_{j}^\top$ 施加一次线性惩罚。图~\ref{fig:T5-and-ALiBi-biases} 比较了 T5 偏置与 ALiBi 偏置。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-T5-and-Alibi-biases}
+\caption{加入偏置的查询与键乘积，上方为 T5 偏置，下方为 ALiBi 偏置。偏置的颜色从浅蓝到深蓝，分别表示从小到大的绝对值。}
+\label{fig:T5-and-ALiBi-biases}
+\end{figure}
+
+原则上，可以通过在验证数据集上进行网格搜索来调节标量超参数 $\beta$。不过，\citet{press-etal:2022train} 表明，按照系统性的规则为不同注意力头设置 $\beta$，无须任何调优，就能在多种任务上获得优异性能。具体而言，对于包含 $n_{\mathrm{head}}$ 个头的多头自注意力层，$\beta$ 值按几何级数递减。第 $k$ 个头的标量定义为
+\begin{eqnarray}
+\beta_k & = & 2^{-\frac{8k}{n_{\mathrm{head}}}}. \label{eq:alibi-beta}
+\end{eqnarray}
+
+ALiBi 提供了一种简单的相对位置嵌入形式。还有其他类似方法，利用偏移 $i - j$ 设计查询—键偏置。表~\ref{tab:query-key-biases-comparison} 比较了这些偏置。顺带一提，式（\ref{eq:abili-bias}）右侧的形式，与传统基于特征的系统所使用的距离特征相似。例如，在统计机器翻译系统中，这类特征广泛用于建模词语重排序问题，使模型能够在不同翻译任务中良好泛化~\cite{Koehn:2010}。
+
+\begin{table}[t]
+\centering
+\begingroup
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l | l}
+方法 & 查询—键偏置（$\mathrm{PE}(i,j)$） \\ \hline
+T5~\cite{raffel-etal:2020exploring} & $u_{b(i-j)}$ \\ \hline
+ALiBi~\cite{press-etal:2022train} & $-\beta \cdot (\colorbox{gray!30}{$i - j$})$ \\ \hline
+Kerple~\cite{chi-etal:2022kerple} & $-\beta_1 (\colorbox{gray!30}{$i - j$})^{\beta_2}$ \ \ \ （幂函数） \\
+                                  & $-\beta_1 \log(1 + \beta_2(\colorbox{gray!30}{$i - j$}))$ \ \ \ （对数函数）\\ \hline
+Sandwich~\cite{chi-etal:2023dissecting} & $\sum_{k=1}^{\bar{d}/2} \cos\big((\colorbox{gray!30}{$i - j$})/10000^{2k/\bar{d}} \big)$ \\ \hline
+FIRE~\cite{li-etal:2024functional} & $f\big( \psi(\colorbox{gray!30}{$i - j$})/\psi(\max(m_{\mathrm{len}},i)) \big)$
+\end{tabular}
+\endgroup
+\caption{用作相对位置嵌入的查询—键偏置。$\beta$、$\beta_1$、$\beta_2$、$\bar{d}$ 和 $m_{\mathrm{len}}$ 为超参数。在 T5 模型中，$b(i-j)$ 表示分配给 $i - j$ 的桶。在 FIRE 模型中，$\psi(\cdot)$ 表示单调递增的有界化函数，例如 $\psi(x) = \log(cx+1)$，$f(\cdot)$ 为 FFN。}
+\label{tab:query-key-biases-comparison}
+\end{table}
+
+\subsubsection{旋转位置嵌入}
+
+\noindent 与正弦嵌入类似，旋转位置嵌入（rotary positional embedding，RoPE）也使用预定义的频率尺度~\cite{su-etal:2024roformer}。回顾正弦嵌入模型，绝对位置表示为由不同频率的正弦和余弦函数组成的固定向量，再与词元嵌入相加。旋转位置嵌入则在复数域中，对词元嵌入施加具有几何意义的旋转，以建模位置上下文。这样得到基于乘法交互的形式：
+\begin{eqnarray}
+\mathbf{e}_i & = & \mathbf{x}_i R(i) \label{eq:additive-embedding-e-base},
+\end{eqnarray}
+
+\noindent 其中，$R(i) \in \mathbb{R}^{d \times d}$ 为旋转矩阵，表示对词元嵌入 $\mathbf{x}_i \in \mathbb{R}^{d}$ 所施加的旋转。
+
+为简单起见，先考虑只有两个维度的嵌入，随后再讨论更一般的形式。假设有一个二维词元嵌入，用行向量 $\mathbf{x} = \begin{bmatrix} x_1 & x_2 \end{bmatrix}$ 表示。它可以看作平面上从原点 $(0,0)$ 指向 $(x_1, x_2)$ 的向量。该向量的逆时针旋转，是指保持其长度不变，令其绕原点转动，如图~\ref{fig:vector-rotation}（a）所示。旋转的幅度通常用特定角度定义，记为 $\theta$。这一旋转可以用数学形式表示为
+\begin{eqnarray}
+\mathrm{Ro}(\mathbf{x},\theta) & = & \mathbf{x} R_{\theta} \nonumber \\
+                               & = & \begin{bmatrix} x_1 & x_2 \end{bmatrix}
+                                     \begin{bmatrix} \cos \theta & \sin \theta \\ -\sin \theta & \cos \theta \end{bmatrix} \nonumber \\
+                               & = & \begin{bmatrix} \cos \theta \cdot x_1 - \sin \theta \cdot x_2 & \sin \theta \cdot x_1 + \cos \theta \cdot x_2 \end{bmatrix}.
+\end{eqnarray}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter8/Figures/figure-rotation-examples}
+\caption{平面中的向量旋转示意图。子图（a）和（b）分别展示向量的单步旋转与多步旋转。子图（c）展示两个不同句子中词元 \textit{cat} 和 \textit{sleeping} 的嵌入，句中每个词元所附的下标表示其位置。如果将词元表示为向量，就可以通过旋转这些向量来加入位置信息。旋转保持向量之间的“距离”。例如，由于 \textit{cat} 与 \textit{sleeping} 在两个句子中的距离相同，它们的嵌入之间的夹角在旋转过程中也保持相同。}
+\label{fig:vector-rotation}
+\end{figure}
+
+\noindent 其中，$R_{\theta} = \begin{bmatrix} \cos \theta & \sin \theta \\ -\sin \theta & \cos \theta \end{bmatrix}$ 为旋转矩阵。如果对同一向量执行两次或更多次旋转，就可以将其进一步转动。这是因为，连续旋转的复合本身仍是一次旋转。更形式化地，将向量旋转角度 $\theta$，重复 $t$ 次，可以表示为
+\begin{eqnarray}
+\mathrm{Ro}(\mathbf{x},t\theta) & = & \mathbf{x} R_{t \theta} \nonumber \\
+                                & = & \begin{bmatrix} \cos t \theta \cdot x_1 - \sin t \theta \cdot x_2 & \sin t \theta \cdot x_1 + \cos t \theta \cdot x_2 \end{bmatrix}.
+\end{eqnarray}
+
+如果将 $t$ 理解为由 $\mathbf{x}$ 表示的词元在序列中的位置，就会发现上式定义了一个简单的位置嵌入模型。如图~\ref{fig:vector-rotation}（b）所示，从位置 0 开始移动词元，每向前移动一步，就将向量旋转角度 $\theta$。到达位置 $t$ 时，包含位置上下文的词元表示为 $\mathrm{Ro}(\mathbf{x},t\theta)$。由于旋转不改变嵌入的长度，词元原来的“含义”得以保留，而位置信息则在旋转过程中注入嵌入。
+
+理解向量旋转的一种常见方式是借助复数。通过一个双射线性映射，可以方便地将二维欧几里得空间 $\mathbb{R}^2$ 中的每个向量 $\mathbf{x} = \begin{bmatrix} x_1 & x_2 \end{bmatrix}$，转换为复数空间 $\mathbb{C}$ 中的复数 $\mathbf{x}' = x_1 + \mathtt{i} x_2$。这样，对 $\mathbf{x}$ 旋转角度 $t\theta$，就对应于乘以 $e^{\mathtt{i} t\theta}$。由于 $e^{\mathtt{i} t\theta} = \cos t \theta + \mathtt{i} \sin t \theta$，旋转运算可以重新表示为
+\begin{eqnarray}
+\mathbf{x} R_{t \theta} & \mapsto & \mathbf{x}' e^{\mathtt{i} t\theta} \nonumber \\
+                        & =       & (x_1 + \mathtt{i} x_2) (\cos t \theta + \mathtt{i} \sin t \theta) \nonumber \\
+                        & =       & \cos t \theta \cdot x_1 - \sin t \theta \cdot x_2 + \mathtt{i} (\sin t \theta \cdot x_1 + \cos t \theta \cdot x_2).
+\end{eqnarray}
+
+\noindent 这里，将词元表示 $\mathbf{x}' e^{\mathtt{i} t\theta}$ 记为 $C(\mathbf{x},t\theta)$。位置 $t$ 和 $s$ 上词元表示的内积可以写为
+\begin{eqnarray}
+\langle C(\mathbf{x},t\theta), C(\mathbf{y},s \theta) \rangle & = & (\mathbf{x}' \overline{\mathbf{y}'}) e^{\mathtt{i} (t - s) \theta} \label{eq:rope-inner-product},
+\end{eqnarray}
+
+\noindent 其中，$\overline{\mathbf{y}'}$ 为 $\mathbf{y}'$ 的复共轭。内积结果中包含 $t - s$ 这一项，因此可以建模两个词元之间的偏移。
+
+现在回到二维欧几里得空间中的表示。$\mathrm{Ro}(\mathbf{x},t\theta)$ 与 $\mathrm{Ro}(\mathbf{y},s\theta)$ 的点积，可以写成关于 $(t - s)\theta$ 的函数
+\begin{eqnarray}
+\mathrm{Ro}(\mathbf{x},t\theta) [\mathrm{Ro}(\mathbf{y},s\theta)]^\top & = & \mathbf{x} R_{t \theta} [\mathbf{y} R_{s \theta}]^\top \nonumber \\
+                                                                               & = & \mathbf{x} R_{t \theta} [R_{s \theta}]^\top \mathbf{y}^\top \nonumber \\
+                                                                               & = & \mathbf{x} R_{(t - s) \theta} \mathbf{y}^\top.
+\end{eqnarray}
+
+\noindent 根据这一结果，如果将 $\mathrm{Ro}(\mathbf{x},t\theta)$ 和 $\mathrm{Ro}(\mathbf{y},s\theta)$ 分别作为查询和键，自注意力运算就会隐式建模相对位置上下文。
+
+这种旋转位置嵌入可以扩展到多维嵌入。对于一个 $d$ 维词元嵌入 $\mathbf{x} = \begin{bmatrix} x_1 & x_2 & \cdots & x_d \end{bmatrix}$，可以将其视为 $\frac{d}{2}$ 维复向量 $\mathbf{x}' = \begin{bmatrix} x'_1 & x'_2 & \cdots & x'_{d/2} \end{bmatrix} = \begin{bmatrix} x_1 + \mathtt{i} x_2 & x_3 + \mathtt{i} x_4 & \cdots & x_{d-1} + \mathtt{i} x_d \end{bmatrix}$，每两个相邻元素组成一个复数。此时，复数空间中的旋转位置嵌入为
+\begin{eqnarray}
+C(\mathbf{x},t\theta) & = & \sum_{k=1}^{d/2} x'_k e^{\mathtt{i} t\theta_k} \vec{e}_k,
+\end{eqnarray}
+
+\noindent 其中，$\vec{e}_k$ 为标准基向量，仅在第 $k$ 个坐标上取非零值，其余坐标均为 0~\cite{biderman-etal:2021rotary}。
+
+尽管这个公式的表达较复杂，它在 $d$ 维欧几里得空间中的等价形式却相对容易理解，可以写为
+\begin{eqnarray}
+\mathrm{Ro}(\mathbf{x},t\theta) & = & \begin{bmatrix} x_1 & x_2 & \cdots & x_d \end{bmatrix}
+                                      \begin{bmatrix} R_{t\theta_1} & & & \\ & R_{t\theta_2} & & \\ & & \ddots & \\ & & & R_{t\theta_{d/2}} \end{bmatrix} \label{eq:rope-base},
+\end{eqnarray}
+
+\noindent 其中，$R_{t \theta_k} = \begin{bmatrix} \cos t \theta_k & \sin t \theta_k \\ -\sin t \theta_k & \cos t \theta_k \end{bmatrix}$。$\theta = \begin{bmatrix} \theta_1, \cdots, \theta_{d/2}\end{bmatrix}$ 为控制不同维度旋转角度的参数。通常，将 $\theta_k$ 设为 $10000^{-\frac{2(k-1)}{d}}$，与正弦嵌入中的设置类似。
+
+在实际实现中，式（\ref{eq:rope-base}）可以改写为仅依赖向量逐元素乘法和加法的形式：
+\begin{eqnarray}
+\mathrm{Ro}(\mathbf{x},t\theta) & = & \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_{d-1} \\ x_{d} \end{bmatrix}^\top \odot \begin{bmatrix} \cos t\theta_1 \\ \cos t\theta_1 \\ \vdots \\ \cos t\theta_{d/2} \\ \cos t\theta_{d/2} \end{bmatrix}^\top + \begin{bmatrix} -x_2 \\ x_1 \\ \vdots \\ -x_{d} \\ x_{d-1} \end{bmatrix}^\top \odot \begin{bmatrix} \sin t\theta_1 \\ \sin t\theta_1 \\ \vdots \\ \sin t\theta_{d/2} \\ \sin t\theta_{d/2} \end{bmatrix}^\top \label{eq:rope-simple}.
+\end{eqnarray}
+
+最后，改写式（\ref{eq:additive-embedding-e-base}），得到位置 $i$ 的嵌入形式
+
+\begin{eqnarray}
+\mathbf{e}_i & = & \mathrm{Ro}(\mathbf{x}_i,i\theta).
+\end{eqnarray}
+
+\subsubsection{位置插值}
+
+\noindent 位置插值的目标，是将新序列中的位置映射到训练期间观察到的范围内。假设模型在 $[0, m_l]$ 范围内的位置索引上训练。当推理需要处理长度 $m > m_l$ 的序列时，将 $[0,m]$ 范围内的位置压缩，使其表示落入原始定义域 $[0,m_l]$。
+
+以上述旋转位置嵌入模型为例，每个词元的嵌入由变换 $\mathrm{Ro}(\mathbf{x}_i, i\theta)$ 给出，其中参数向量为 $\theta = \begin{bmatrix} \theta_1, \cdots, \theta_{d/2}\end{bmatrix}$。如式（\ref{eq:rope-simple}）所示，$\mathrm{Ro}(\mathbf{x}_i, i\theta)$ 依赖不同特征维度上的周期函数组合
+\begin{eqnarray}
+\cos i\theta & = & \begin{bmatrix} \cos i\theta_1 & \cdots & \cos i\theta_{d/2} \end{bmatrix} \label{rope-cos-theta} \\
+\sin i\theta & = & \begin{bmatrix} \sin i\theta_1 & \cdots & \sin i\theta_{d/2} \end{bmatrix} \label{rope-sin-theta},
+\end{eqnarray}
+
+\noindent $\theta_k$ 服从指数形式
+\begin{eqnarray}
+\theta_k & = & b^{-\frac{2(k-1)}{d}},
+\end{eqnarray}
+
+\noindent 其中，$b$ 为底数。$\cos i\theta_k$ 和 $\sin i\theta_k$ 的周期为
+\begin{eqnarray}
+T_k & = & 2\pi \cdot b^{\frac{2(k-1)}{d}}.
+\end{eqnarray}
+
+线性位置插值的核心直觉，是调整这些周期，使新增的位置能够在预训练边界 $[0,m_l]$ 内编码。最直接的做法，是按外推比率 $\frac{m}{m_l}$ 线性增大 $T_k$，得到：
+\begin{eqnarray}
+T'_k & = & \frac{m}{m_l} \cdot 2\pi \cdot b^{\frac{2(k-1)}{d}}.
+\end{eqnarray}
+
+\noindent 这样，$[0, m]$ 中的所有位置索引就被均匀压缩到 $[0, m_l]$。这种线性缩放可以通过将嵌入模型中的位置索引除以缩放因子来实现~\cite{chen-etal:2023extending}。采用线性位置插值后，修改后的模型为
+\begin{eqnarray}
+\mathrm{Ro}'(\mathbf{x}_i,i\theta) & = & \mathrm{Ro} \left(\mathbf{x}_i,\frac{m_l}{m} i\theta \right).
+\end{eqnarray}
+
+位置插值的另一种方法是缩放底数 $b$，称为\mindex{感知神经正切核的缩放 RoPE}（NTK-aware scaled RoPE）\footnote{这一方法最早在网络论坛中提出：\url{https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/}}。假设将底数 $b$ 乘以缩放因子 $\lambda$。目标是让新模型在最高频率维度，即 $k = \frac{d}{2}$ 的最后一个维度，具有与线性位置插值模型相同的周期。将 $k = \frac{d}{2}$ 代入指数，得到 $\frac{2(d/2-1)}{d} = \frac{d-2}{d}$。令两个周期相等，可得：
+\begin{eqnarray}
+2\pi \cdot (\lambda b)^{\frac{d-2}{d}} & = & \frac{m}{m_l} \cdot 2\pi \cdot b^{\frac{d-2}{d}}.
+\end{eqnarray}
+
+求解此方程，可以分离出 $\lambda$：
+\begin{eqnarray}
+\lambda^{\frac{d-2}{d}} & = & \frac{m}{m_l}.
+\end{eqnarray}
+
+于是有
+\begin{eqnarray}
+\lambda & = & \left( \frac{m}{m_l} \right)^{\frac{d}{d-2}}.
+\end{eqnarray}
+
+这种方法得到修改后的嵌入模型：
+\begin{eqnarray}
+\mathrm{Ro}'(\mathbf{x}_i,i\theta) & = & \mathrm{Ro}(\mathbf{x}_i,i\theta'),
+\end{eqnarray}
+
+\noindent 其中
+\begin{eqnarray}
+\theta' & = & \begin{bmatrix} (\lambda b)^{-\frac{0}{d}}, (\lambda b)^{-\frac{2}{d}}, \cdots, (\lambda b)^{-\frac{d-2}{d}}\end{bmatrix}.
+\end{eqnarray}
+
+需要注意，缩放底数会对 $\theta$ 的不同维度的周期产生非均匀缩放。研究发现，这种方法有助于将 LLM 扩展到更长序列，并已有若干改进方法被提出~\cite{peng-etal:2024yarn,ding-etal:2024longrope}。
+
+\subsection{讨论}
+\label{sec:long-context-llm-remarks}
+
+\noindent 本节介绍了长上下文语言建模的多种方法。最后，讨论与这些方法相关的一些有趣问题。
+
+\subsubsection{为什么需要长上下文}
+
+\noindent 长上下文 LLM 的最终目标之一，是让模型能够精确编码无限上下文。这里，\textit{无限上下文}是指 LLM 持续处理新到来词元的能力。这推动了能够处理极长上下文或流式数据的 LLM 的发展。如第~\ref{sec:long-context-cache-and-memory} 节所述，通常使用固定大小的记忆模型来处理不断扩展的上下文。许多此类系统基于循环架构或其变体，因为它们天然适合建模历史输入影响会无限延续的序列数据。实现无限记忆的另一条路线，是开发自注意力模型的替代方案。例如，可以使用连续空间注意力模型来编码上下文，消除对上下文长度的依赖~\cite{martins-etal:2022former}。
+
+研究长上下文 LLM 时，自然会思考：什么机制能够解释语言建模对长上下文的利用？能否将无限上下文的表示压缩到一个相对较小的模型中？所有上下文词元都对预测下一个词元有用吗？能否预先知道哪些上下文信息对预测至关重要？这些问题的通用答案并不明显，但它们启发了后续关于可解释模型的研究，并已产生一些有趣结果。例如，\citet{deletang-etal:2024language} 通过大量实验表明，LLM 是强大的上下文压缩器。尽管将预测模型视为压缩模型的思想早已在机器学习中得到研究，这一视角仍有助于理解 LLM 的缩放定律。此外，\citet{pal-etal:2023future} 和 \citet{wu-etal:2024language} 研究了：截至当前计算步骤所学到的内部特征，即使未为此进行显式优化，是否已经足以准确预测未来多个步骤的词元。需要注意，语言建模对长上下文的需求，在很大程度上取决于待解决的问题。一个相关问题是，应当在哪些场景应用 LLM，以及如何评测它们。例如，在摘要任务中，可能只需提炼并关注文本中的几个关键方面；而在类似检索的任务中，则需要“记住”完整上下文，才能访问相关信息。本小节稍后将讨论评测问题。
+
+\subsubsection{预训练还是适配大语言模型？}
+
+训练 LLM 需要大量计算资源。虽然直接在长序列上训练 LLM 并不复杂，但对于大数据集，训练计算开销会高得难以承受。一种常见做法是，先在通用数据集上预训练 LLM，再通过适量微调进行适配。例如，采用相对或旋转位置嵌入的 LLM，可以在预训练阶段直接使用大规模数据训练。尽管得到的模型在推理阶段可能表现出一定的长度外推能力，在更长序列上进行微调，效果可能更好。
+
+理想情况下，希望采用标准 Transformer 架构预训练 LLM，再将其适配到新任务。这样就能利用许多现成的 LLM，并高效地使其处理长序列。然而，采用新架构时，似乎难免需要从头训练模型。这给长上下文 LLM 的开发带来了实际困难，因为无法利用成熟的预训练模型，而必须自行训练。另一方面，即使某些架构与预训练时不同，微调仍是适配 LLM 的有效方式。一个例子是引入外部记忆增强的模型，其中预训练 LLM 保持固定，重点在于 LLM 如何与外部记忆模块交互。例如，RAG 中常通过微调 LLM，提高其利用检索增强输入的能力。另一个例子是，先用完整注意力训练 LLM，再在微调阶段将其替换为稀疏注意力。预训练 LLM 为新模型提供参数初始化，随后按通常方式进行微调。
+
+\subsubsection{评测长上下文大语言模型}
+
+\noindent 评测长上下文 LLM 很重要，但在 NLP 中还是一个相对较新的问题。基本思路是，将长上下文输入 LLM，再检查其输出，判断它是否理解完整上下文，并在预测后续词元时加以利用。在传统 NLP 研究中，这类评测通常旨在考察 NLP 模型处理长程依赖的能力。然而，近期 LLM 使用的上下文，远长于几年前 NLP 系统中的上下文。这促使研究者为长上下文 LLM 开发新的评测基准和指标。
+
+一种方法是使用困惑度（perplexity）指标。不过，这种方法虽然简单，却往往反映 LLM 利用局部上下文的能力，而非全局上下文。因此，有必要开发专门面向长上下文 LLM 的评测方法。常见方法包括各种合成任务，利用人工生成或修改的数据，评测长上下文 LLM 的特定能力。例如，在大海捞针（needle-in-a-haystack）\footnote{\url{https://github.com/gkamradt/LLMTest_NeedleInAHaystack}}和口令检索（passkey retrieval）任务中~\cite{mohtashami-and-jaggi:2024random,chen-etal:2023extending}，要求 LLM 从大量给定文本中识别并提取一小段相关信息。这里的假设是，具有充足记忆的 LLM 在处理新信息时，应能记住文本较早的部分。因此，它能够从大量无关信息中挑出稀疏且隐藏的相关细节。另一种是复制记忆任务，简称复制任务，要求 LLM 多次重复输入文本或其特定片段。这些任务最初用于测试循环模型能在多大程度上保留并回忆先前见过的词元~\cite{hochreiter-schmidhuber:1997long,arjovsky-etal:2016unitary}，如今也被用于评测近期的 LLM~\cite{bulatov-etal:2022recurrent,gu-and-dao:2023mamba}。
+
+评测长上下文 LLM 的另一种方式，是在涉及极长输入序列的 NLP 任务上进行测试，例如长文档或多文档摘要、长文档问答、代码补全等。这种方法的优点是，能够使评测与用户期望相一致。
+
+尽管已有许多方法，长上下文 LLM 仍然没有通用的评测方式~\cite{liu-etal:2024forgetting}。一个问题是，多数方法关注 LLM 的特定方面，而非其建模极长上下文的根本能力。即使 LLM 能从输入中挑出恰当的文本片段，也不能说它真正理解了完整上下文；它可能只是记住了上下文中的某些重要部分，甚至只是利用预训练学到的模型回忆答案。此外，许多任务使用的数据规模较小，也相对初步，导致评测结果与实际应用性能存在差异。一个更有意思的问题是，LLM 的结果还受许多其他因素和实验设置影响，例如，不同提示可能带来截然不同的结果。这使评测更具挑战：改进未必完全来自更好的长上下文建模，也存在夸大性能收益的风险。尽管如此，长上下文 LLM 的开发和评测仍有许多开放问题。例如，这些模型依然受到上下文长度有限、时延（latency）较高等限制。研究这些问题，很可能成为有价值的未来方向。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{小结}
+
+本章讨论了 LLM 的概念及相关技术，可以视为对 LLM 的总体介绍，虽不全面，却为后续章节进一步讨论更高级的主题奠定了基础。此外，我们探索了扩展 LLM 的两条路线。第一条聚焦于大规模预训练，这是开发最先进模型的关键。第二条聚焦于使 LLM 适配长输入的方法，包括优化注意力模型、设计更高效且压缩的 KV 缓存、引入记忆模型，以及探索更好的位置嵌入。
+
+LLM 的强大之处，在于打破了为少数特定任务训练 NLP 模型的限制。LLM 通过简单的词元预测任务，即根据前面的上下文预测序列中的下一个词元，从海量文本中学习。一种普遍观点是，反复执行大量词元预测任务后，LLM 可以获得关于世界和语言的一些知识，再将这些知识用于新任务。因此，只要将任务表述为给定提示后预测后续词元，就可以提示 LLM 执行任意任务。语言模型的这种涌现能力来自多个维度，例如扩大训练规模、模型规模和上下文规模。不可否认，缩放定律是目前开发大语言模型所采用的基本原则，尽管仅仅增加模型规模是否足以实现通用人工智能（AGI），尚未得到证实。研究发现，这些持续扩展的 LLM 展现了通用语言理解、生成和推理能力。近期还发现，在推理时增加计算量，即增加测试时计算量，也能显著改进复杂推理任务的表现~\cite{openai:2024learning}。
+
+LLM 的强大能力，使其技术和应用都引起了广泛关注。随之而来的研究热潮，也催生了大量新技术与新模型。不过，鉴于这一领域发展迅速，我们不试图对 LLM 的所有方面作全面的文献综述。读者仍可以通过综合性综述~\cite{zhao-etal:2023survey,minaee-etal:2024large}，或聚焦特定主题的讨论~\cite{ruan-etal:2024abigsurveyofllms}，进一步了解 LLM。
+

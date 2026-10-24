@@ -1,0 +1,15 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1.15cm,y=1cm,>=Stealth]
+\node[anchor=east] at (-.25,1.5) {隐藏层};\node[anchor=east] at (-.25,0) {输入层};
+\foreach \k in {1,...,6} \node[circle,draw=blue!60!black,fill=blue!60,minimum size=5mm] (chSixF4i\k) at (\k-1,0) {};
+\foreach \k in {1,...,4} {
+ \node[circle,draw=blue!60!black,fill=blue!60,minimum size=5mm] (chSixF4h\k) at (\k,1.5) {};
+ \pgfmathtruncatemacro{\kp}{\k+1}\pgfmathtruncatemacro{\kpp}{\k+2}
+ \draw[->,red] (chSixF4i\k)--(chSixF4h\k);
+ \draw[->,green!65!black] (chSixF4i\kp)--(chSixF4h\k);
+ \draw[->,blue!65!black] (chSixF4i\kpp)--(chSixF4h\k);
+}
+\end{tikzpicture}
+\origfig{4}{局部连接神经元示意图。}
+\end{figure}

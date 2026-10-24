@@ -1,0 +1,315 @@
+% 原PDF119页附录4.A标题—126页4.A.2标题前。
+\section*{附录4.A\quad 参数估计与RNA测序标准化的变分贝叶斯理论}
+\addcontentsline{toc}{section}{附录4.A 参数估计与RNA测序标准化的变分贝叶斯理论}
+\markright{附录4.A 参数估计与RNA测序标准化的变分贝叶斯理论}
+
+\subsection*{4.A.1\quad 期望最大化算法的变分方法}
+\addcontentsline{toc}{subsection}{4.A.1 期望最大化算法的变分方法}
+
+考虑隐藏变量 $Z_n$、质量分数 $Q_n$ 与观测变量 $R_n$。隐藏变量为式（4.19）定义的指示变量 $Z_{nijk}$，或式（4.24）定义的 $Z_{nikja}$。为简便，以 $Z_n$ 统一表示这两种变量。令
+$Z=[Z_1^T,\ldots,Z_N^T]^T$、$Q=[Q_1,\ldots,Q_N]^T$、$R=[R_1^T,\ldots,R_N^T]^T$。
+生成数据 $R_n,Q_n$ 的似然函数为
+\begin{equation}
+P(R,Q\mid\theta)=\prod_{n=1}^{N}P(R_n,Q_n\mid\theta)
+=\prod_{n=1}^{N}\int P(Z_n,R_n,Q_n\mid\theta)\,dZ_n.\tag{4.A.1}
+\end{equation}
+定义对数似然函数
+\begin{equation}
+\begin{aligned}
+L(\theta)&=\log P(R,Q\mid\theta)=\sum_{n=1}^{N}\log P(R_n,Q_n\mid\theta)\\
+&=\sum_{n=1}^{N}\log\int P(Z_n,R_n,Q_n\mid\theta)\,dZ_n.
+\end{aligned}\tag{4.A.2}
+\end{equation}
+由于对数似然函数涉及许多隐藏变量，计算仍然困难。为了高效地对参数极大化对数似然，引入隐藏变量上的分布函数 $q(Z)$，以简化计算。引入这一辅助分布后，式（4.A.2）化为
+\begin{equation}
+L(\theta)=\sum_{n=1}^{N}\log\int
+q(Z_n)\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\,dZ_n.\tag{4.A.3}
+\end{equation}
+记
+\[
+\E\left[\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\right]
+=\int q(Z_n)\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\,dZ_n.
+\]
+由Jensen不等式，
+\begin{equation}
+\begin{aligned}
+\log\E\left[\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\right]
+&\ge\E\left[\log\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\right]\\
+&=\int q(Z_n)\log\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\,dZ_n.
+\end{aligned}\tag{4.A.4}
+\end{equation}
+将式（4.A4）代入式（4.A3），得到
+\[
+\begin{aligned}
+L(\theta)&\ge\sum_{n=1}^{N}\int q(Z_n)
+ \log\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\,dZ_n\\
+&=\sum_{n=1}^{N}\left[
+ \int q(Z_n)\log P(Z_n,R_n,Q_n\mid\theta)\,dZ_n
+ -\int q(Z_n)\log q(Z_n)\,dZ_n\right]\\
+&=F(q(Z),\theta),
+\end{aligned}
+\]
+其中
+\begin{equation}
+\begin{aligned}
+F(q(Z),\theta)=\sum_{n=1}^{N}\biggl[
+ &\int q(Z_n)\log P(Z_n,R_n,Q_n\mid\theta)\,dZ_n\\
+ &{}-\int q(Z_n)\log q(Z_n)\,dZ_n\biggr]
+\end{aligned}\tag{4.A.5}
+\end{equation}
+是对数似然函数 $L(\theta)$ 的下界。目标是寻找分布 $q^*(Z)$，使 $F(q^*(Z),\theta)$ 为最大的下界。为此求解
+\begin{equation}
+\begin{aligned}
+\max_{q(Z)}\quad&F(q(Z),\theta)\\
+\text{约束为}\quad&\int q(Z_n)\,dZ_n=1,\qquad n=1,\ldots,N.
+\end{aligned}\tag{4.A.6}
+\end{equation}
+利用拉格朗日乘子法，将问题（4.A.6）化为
+\begin{equation}
+\overline F(q(Z),\theta,\lambda)=F(q(Z),\theta)
++\sum_{n=1}^{N}\lambda_n\left[1-\int q(Z_n)\,dZ_n\right],\tag{4.A.7}
+\end{equation}
+其中 $\lambda_n$ 为拉格朗日乘子。
+
+多元微积分中，函数 $f(x)$ 取得极大值的必要条件为 $\partial f(x)/\partial x=0$。类似地，变分法中泛函取得相对极大值的必要条件为 $\delta\overline F(h_n,\theta,\lambda)=0$，从而
+\begin{equation}
+\begin{aligned}
+\delta\overline F(h_n,\theta,\lambda)
+&=\frac{\partial\overline F(q(Z_n)+\varepsilon h_n,\theta,\lambda)}{\partial\varepsilon}\\
+&=\int[\log P(Z_n,R_n,Q_n\mid\theta)-\log q(Z_n)-1-\lambda_n]h_n\,dZ_n.
+\end{aligned}\tag{4.A.8}
+\end{equation}
+将 $h_n=[\log P(Z_n,R_n,Q_n\mid\theta)-\log q(Z_n)-1-\lambda_n]$ 代入式（4.A.8），得到
+\begin{equation}
+\delta\overline F(h_n,\theta,\lambda)
+=\int[\log P(Z_n,R_n,Q_n\mid\theta)-\log q(Z_n)-1-\lambda_n]^2\,dZ_n.\tag{4.A.9}
+\end{equation}
+于是，由 $\delta\overline F(h_n,\theta,\lambda)=0$ 与式（4.A.9），得到
+\begin{equation}
+\log P(Z_n,R_n,Q_n\mid\theta)-\log q(Z_n)-1-\lambda_n=0.\tag{4.A.10}
+\end{equation}
+对 $q(Z_n)$ 求解，得到
+\begin{equation}
+q(Z_n)=e^{-(\lambda_n+1)}P(Z_n,R_n,Q_n\mid\theta).\tag{4.A.11}
+\end{equation}
+现在对 $\lambda_n$ 求解式（4.A.10）。将式（4.1A10）左侧的 $-(1+\lambda_n)$ 移至右侧，得到
+\begin{equation}
+\lambda_n+1=\log P(Z_n,R_n,Q_n\mid\theta)-\log q(Z_n).\tag{4.A.12}
+\end{equation}
+因此
+\begin{equation}
+e^{\lambda_n+1}=\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\tag{4.A.13}
+\end{equation}
+或
+\begin{equation}
+q(Z_n)=e^{-(\lambda_n+1)}P(Z_n,R_n,Q_n\mid\theta).\tag{4.A.14}
+\end{equation}
+将式（4.A.14）代入 $\int q(Z_n)\,dZ_n=1$（$n=1,\ldots,N$），得到
+\begin{equation}
+e^{\lambda_n+1}=\int P(Z_n,R_n,Q_n\mid\theta)\,dZ_n
+=P(R_n,Q_n\mid\theta).\tag{4.A.15}
+\end{equation}
+将式（4.A.15）代入式（4.1A.11），得到最终最优解
+\begin{equation}
+q(Z_n)=\frac{P(Z_n,R_n,Q_n\mid\theta)}{P(R_n,Q_n\mid\theta)}
+=P(Z_n\mid R_n,Q_n,\theta).\tag{4.A.16}
+\end{equation}
+由式（4.A.5），可将对数似然的下界 $F(q(Z),\theta)$ 重写为
+\begin{equation}
+\begin{aligned}
+F(q(Z),\theta)
+&=\sum_{n=1}^{N}\int q(Z_n)\log\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\,dZ_n\\
+&=\sum_{n=1}^{N}\int q(Z_n)
+ \log\frac{P(R_n,Q_n\mid\theta)P(Z_n\mid R_n,Q_n,\theta)}{q(Z_n)}\,dZ_n\\
+&=\sum_{n=1}^{N}\int q(Z_n)\log P(R_n,Q_n\mid\theta)\,dZ_n\\
+&\quad{}+\int\sum_{n=1}^{N}q(Z_n)
+ \log\frac{P(Z_n\mid R_n,Q_n,\theta)}{q(Z_n)}\,dZ_n\\
+&=\sum_{n=1}^{N}\int q(Z_n)\log P(R_n,Q_n\mid\theta)\,dZ_n\\
+&\quad{}-\sum_{n=1}^{N}\operatorname{KL}[q(Z_n)\|P(Z_n\mid R_n,Q_n,\theta)]\\
+&=\sum_{n=1}^{N}\log P(R_n,Q_n\mid\theta)
+ -\sum_{n=1}^{N}\operatorname{KL}[q(Z_n)\|P(Z_n\mid R_n,Q_n,\theta),
+\end{aligned}\tag{4.A.17}
+\end{equation}
+其中
+\begin{equation}
+\operatorname{KL}[q(Z_n)\|P(Z_n\mid R_n,Q_n,\theta)
+=\int q(Z_n)\log\frac{q(Z_n)}{P(Z_n\mid R_n,Q_n,\theta)}\,dZ_n\tag{4.A.18}
+\end{equation}
+称为变分分布 $q(Z_n)$ 与隐藏变量后验 $P(Z_n\mid R_n,Q_n,\theta)$ 之间的Kullback—Leibler散度。
+
+由式（4.A.17），
+\begin{equation}
+\begin{aligned}
+\sum_{n=1}^{N}\log P(R_n,Q_n\mid\theta)
+=F(q(Z),\theta)+\sum_{n=1}^{N}\operatorname{KL}[q(Z_n)\|P(Z_n\mid R_n,Q_n,\theta),
+\end{aligned}\tag{4.A.19}
+\end{equation}
+其中
+\[
+F(q(Z),\theta)=\sum_{n=1}^{N}\int q(Z_n)
+\log\frac{P(Z_n,R_n,Q_n\mid\theta)}{q(Z_n)}\,dZ_n.
+\]
+因此，EM算法的更新式为
+\begin{equation}
+\text{E步：}\quad q^{(u=1)}(Z_n)=P(Z_n\mid R_n,Q_n,\theta^{(u)}),
+\quad n=1,2,\ldots,N,\tag{4.A.20}
+\end{equation}
+\begin{equation}
+\text{M步：}\quad\theta^{(u=1)}=\arg\max_\theta F(q^{(u+1)}(Z),\theta).\tag{4.A.21}
+\end{equation}
+现在考虑RNA测序数据的无缺口比对和有缺口比对。对无缺口比对，定义
+\[
+Z_{nijk}=\begin{cases}
+1,&G_n=i,\ S_n=j,\ O_n=k,\\0,&\text{其他情形}.
+\end{cases}
+\]
+概率 $P(Z_n\mid R_n,Q_n,\theta^{(u)})$ 化为 $P(Z_{nijk}\mid R_n,\theta^{(u)})$。
+利用式（4.18），按下式计算：
+\begin{equation}
+\begin{aligned}
+P(Z_{nijk}\mid R_n,\theta^{(u)})
+&=\frac{P(Z_{nijk},R_n,\theta^{(u)})}{P(R_n,\theta^{(u)})}\\
+&=\frac{P(Z_{nijk}=1,R_n=r_n,\theta^{(u)})}{
+\displaystyle\sum_{i'=1}^{M}\sum_{j'=1}^{[1,\max_{i'}l_{i'}]}
+p(Z_{ni'j'k}=1,R_n=r_n,\theta^{(u)})}.
+\end{aligned}\tag{4.A.22}
+\end{equation}
+回顾
+\begin{equation}
+\begin{aligned}
+P(Z_{nijk}=1,\theta^{(u)})
+&=P(G_n=i\mid\theta^{(u)})P(S_n=j\mid G_n)P(O_n=k\mid G_n)\\
+&=\theta_i^{(u)}\frac1{l_i}P(O_n=k\mid G_n=i).
+\end{aligned}\tag{4.A.23}
+\end{equation}
+将式（4.A.23）代入式（4.A.22），得到
+\[
+P(Z_{nijk}\mid R_n,\theta^{(u)})=
+\frac{\displaystyle\frac{\theta_i^{(u)}}{l_i}
+P(R_n=r_n\mid Z_{nijk}=1,\theta^{(u)})}{
+\displaystyle\sum_{i'=1}^{M}\sum_{j'=1}^{[1,\max_{i'}l_{i'}]}
+\frac{\theta_{i'}^{(u)}}{l_{i'}}P(R_n=r_n\mid Z_{ni'j'k}=1,\theta^{(u)})}.
+\]
+因此，E步为
+\begin{equation}
+\begin{aligned}
+q^{(u+1)}(Z_n)=
+\frac{\displaystyle\frac{\theta_i^{(u)}}{l_i}
+P(R_n=r_n\mid Z_{nijk}=1,\theta^{(u)})}{
+\displaystyle\sum_{i'=1}^{M}\sum_{j'=1}^{[1,\max_{i'}l_{i'}]}
+\frac{\theta_{i'}^{(u)}}{l_{i'}}P(R_n=r_n\mid Z_{ni'j'k}=1,\theta^{(u)})},\\
+n=1,2,\ldots,N.
+\end{aligned}\tag{4.A.24}
+\end{equation}
+在进行M步之前，需要计算 $F(q^{(u+1)}(Z),\theta)$。将式（4.A.24）代入式（4.A.19），得到
+\begin{equation}
+F(q^{(u+1)}(Z),\theta)=\sum_{n=1}^{N}\sum_i\sum_j\sum_k
+P(Z_{nijk}\mid R_n,\theta^{(u)})\log\theta_i+D,\tag{4.A.25}
+\end{equation}
+其中，$D$ 不是 $\theta$ 的函数。M步需要求解
+\[
+\begin{aligned}
+\max_\theta\quad&F(q^{(u+1)}(Z),\theta)\\
+\text{约束为}\quad&\sum_i\theta_i=1,
+\end{aligned}
+\]
+或
+\begin{equation}
+\begin{aligned}
+\max_\theta\quad&\sum_{n=1}^{N}\sum_i\sum_j\sum_k
+P(Z_{nijk}\mid R_n,\theta^{(u)})\log\theta_i\\
+\text{约束为}\quad&\sum_i\theta_i=1.
+\end{aligned}\tag{4.A.26}
+\end{equation}
+利用拉格朗日乘子法，将约束优化问题转为无约束问题：
+\begin{equation}
+\max_{\theta,\lambda}\quad L=
+\sum_{n=1}^{N}\sum_i\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})\log\theta_i
++\lambda\left(1-\sum_i\theta_i\right),\tag{4.A.27}
+\end{equation}
+其中 $\lambda$ 为拉格朗日乘子。令
+\begin{equation}
+\frac{\partial L}{\partial\theta_i}
+=\sum_{n=1}^{N}\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})\frac1{\theta_i}-\lambda=0.\tag{4.A.28}
+\end{equation}
+将式（4.A.28）两侧相乘，得到
+\begin{equation}
+\sum_{n=1}^{N}\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})-\lambda\theta_i=0.\tag{4.A.29}
+\end{equation}
+注意
+\begin{equation}
+\sum_iP(Z_{nijk}\mid R_n,\theta^{(u)})
+=P(Z_{nijk}\mid R_n,\theta^{(u)}).\tag{4.A.30}
+\end{equation}
+对式（4.A.29）关于 $I$ 求和，利用式（4.A.30），可得
+\begin{equation}
+\lambda=\sum_{n=1}^{N}\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})=N.\tag{4.A.31}
+\end{equation}
+将式（4.A.31）代入式（4.A.29），得到
+\begin{equation}
+\theta_i^{(u+1)}=\frac{\sum_{n=1}^{N}\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})}{N}.\tag{4.A.32}
+\end{equation}
+因此，M步定义为
+\begin{equation}
+\theta_i^{(u+1)}=\frac{\sum_{n=1}^{N}\sum_j\sum_kP(Z_{nijk}\mid R_n,\theta^{(u)})}{N},
+\quad i=1,2,\ldots,M.\tag{4.A.33}
+\end{equation}
+接下来研究有缺口比对。对有缺口比对，指示变量定义为
+\begin{equation}
+Z_{nikja}=\begin{cases}
+1,&G_n=i,\ O_n=k,\ S_n=j,\ A_n=a,\\0,&\text{其他情形}.
+\end{cases}\tag{4.A.34}
+\end{equation}
+概率 $P(Z_n\mid R_n,Q_n,\theta^{(u)})$ 化为 $P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})$。
+利用式（4.22），计算为
+\[
+\begin{aligned}
+P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})
+&=\frac{P(Z_{nikja},R_n,Q_n,\theta^{(u)})}{P(R_n,Q_n,\theta^{(u)})}\\
+&=\frac{P(Z_{nikja}=1,R_n=r_n,Q_n,\theta^{(u)})}{
+\sum_{(i',k',j',a')\in\pi_n}P(Z'_{ni'k'j'a}=1,R_n=r_n,Q_n,\theta^{(u)})}.
+\end{aligned}
+\]
+于是，E步定义为
+\begin{equation}
+\begin{aligned}
+q^{(u+1)}(Z_n)&=P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})\\
+&=\frac{P(Z_{nikja}=1,R_n=r_n,Q_n,\theta^{(u)})}{
+\sum_{(i',k',j',a')\in\pi_n}P(Z'_{ni'k'j'a}=1,R_n=r_n,Q_n,\theta^{(u)})},\\
+&\hspace{9em}n=1,2,\ldots,N,
+\end{aligned}\tag{4.A35}
+\end{equation}
+其中，$\pi_n$ 是读段 $n$ 所有可能比对的 $i,k,j,a$ 的集合，$(i,k,j,a)\in\pi_n$。
+
+现在研究M步，先计算 $F(q^{(u+1)}(Z),\theta)$。在进行M步前，需要计算 $F(q^{(u+1)}(Z),\theta)$。将式（4.A.35）代入式（4.A.19），得到
+\begin{equation}
+\begin{aligned}
+F(q^{(u+1)}(Z),\theta)
+&=\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})
+ \log\frac{P(Z_{nikja},R_n,Q_n\mid\theta)}{P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})}\\
+&=\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})
+ \log P(Z_{nikja},R_n,Q_n\mid\theta)-{}\\
+&\quad{}-\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})
+ \log P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})\\
+&=\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})\log\theta_i+D.
+\end{aligned}\tag{4.A.36}
+\end{equation}
+由与无缺口比对相同的论证，得到使 $F(q^{(u+1)}(Z),\theta)$ 极大的解
+\[
+\theta_i^{(u+1)}=\frac{\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})}{N},
+\quad i=1,2,\ldots,M,
+\]
+其中概率的定义见式（4.A35）。因此，M步定义为
+\begin{equation}
+\theta_i^{(u+1)}=\frac{\sum_{n=1}^{N}\sum_{i,k,j,a}P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})}{N},
+\quad i=1,2,\ldots,M,\tag{4.A.37}
+\end{equation}
+其中，$(i,k,j,a)\in\pi_n$，$\pi_n$ 为读段 $n$ 所有可能比对的 $i,k,j,a$ 的集合，并且
+\[
+\begin{aligned}
+P(Z_{nikja}\mid R_n,Q_n,\theta^{(u)})
+&=\frac{P(Z_{nikja}=1,R_n=r_n,Q_n,\theta^{(u)})}{
+\sum_{(i',k',j',a')\in\pi_n}P(Z'_{ni'k'j'a}=1,R_n=r_n,Q_n,\theta^{(u)})},\\
+&\hspace{8em}n=1,2,\ldots,N.
+\end{aligned}
+\]

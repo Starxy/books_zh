@@ -1,0 +1,172 @@
+% 原书分章 PDF 第 19—23 页：第 5.6 节与图 5.1。
+\section{例：基于通用典范一维子模型的无限维目标参数的一步 TMLE}
+
+对于生存函数这类路径可微的无限维目标参数 $\Psi(P_0)$，如何构造有效的代入估计量 $\Psi(P_n^*)$，一直是一个未解决的问题。现有方法可能给出彼此不相容的估计，例如分别对每个 $\Psi(P_0)(t)$ 使用 TMLE，结果得到非代入估计量，如不具单调性的生存函数估计。本节通过一个因果推断例子说明：利用我们的通用典范子模型，可以借助上一节定义的一步 TMLE 解决这一问题。
+
+设 $O=(W,A,T)\sim P_0$，其中 $W$ 为基线协变量，$A\in\{0,1\}$ 为单时点处理，$T$ 为生存时间。考虑一个统计模型 $\mathcal M$，它只对给定 $W$ 时 $A$ 的条件分布
+$g_0(a\mid W)=P_0(A=a\mid W)$
+作出假设。设 $W\mapsto d(W)\in\{0,1\}$ 为给定的动态处理，几乎处处满足 $g_0(d(W)\mid W)>0$。定义 $\Psi:\mathcal M\to H$ 为
+\[
+ \Psi(P)(t)=E_PP(T>t\mid A=d(W),W),\qquad t\geq0.
+\]
+在因果模型和随机化假设下，它等于干预 $d$ 下反事实生存时间 $T_d$ 的反事实生存函数 $P(T_d>t)$。
+
+设 $H$ 为 $\mathbb R_{\geq0}$ 上实值函数的 Hilbert 空间，对用户给定的某个正的有限测度 $\Lambda$，赋予内积
+$h_1^\top h_2=\langle h_1,h_2\rangle=\int h_1(t)h_2(t)\,d\Lambda(t)$。
+因此，该 Hilbert 空间的范数为
+$\|h\|=\sqrt{hh^\top}=\sqrt{\int h(t)^2\,d\Lambda(t)}$。
+令 $\bar Q_t(A,W)=P(T>t\mid A,W)$，$Y(t)=I(T>t)$，$Q_W$ 为 $W$ 的边际概率分布，且 $Q=(\bar Q,Q_W)$。有效影响曲线 $D^*(P)=(D_t^*(P):t\geq0)$ 定义为
+\[
+ \begin{aligned}
+ D_t^*(P)(O)={}&\frac{I(A=d(W))}{g(A\mid W)}
+ \{Y(t)-\bar Q_t(A,W)\}\\
+ &+\{\bar Q_t(d(W),W)-\Psi(P)(t)\}\\
+ \equiv{}&D_{1,t}^*(g,\bar Q)+D_{2,t}^*(P),
+ \end{aligned}
+\]
+其中，$D_{1,t}^*(g,\bar Q)$ 是有效影响曲线的第一分量，它是给定 $A,W$ 时 $T$ 的条件分布的得分。注意，
+$\Psi(P)=\Psi_1(Q_W,\bar Q)=(Q_W\bar Q_t:t\geq0)$。
+我们用 $W_1,\ldots,W_n$ 的经验分布估计 $Q_{W,0}$，所以 TMLE 只需靶向更新给定 $A,W$ 时 $T$ 的条件生存函数 $\bar Q_0$ 的估计量。令 $q(t\mid A,W)$ 为给定 $A,W$ 时 $T$ 的密度，$q_n$ 为该条件密度的初始估计量。例如，可以用机器学习估计条件风险函数（conditional hazard）$q_0/\bar Q_0$，进而得到相应的密度估计量 $q_n$。还给定了 $g_0$ 的估计量 $g_n$。
+
+将通用典范一维子模型 (5.7) 应用于 $p=q_n$，可由下列递归关系定义：对于 $\epsilon>0$，
+\[
+ q_{n,\epsilon}=q_n\exp\left(\int_0^\epsilon
+ \frac{\{P_nD_1^*(g_n,\bar Q_{n,x})\}^{\top}
+ D_1^*(g_n,\bar Q_{n,x})}
+ {\|D_1^*(g_n,\bar Q_{n,x})\|}\,dx\right).
+\]
+为进一步理解这一表达式，注意其中的内积可写为
+\begin{equation}
+ \begin{aligned}
+ &\{P_nD_1^*(g_n,\bar Q_{n,x})\}^{\top}
+ D_1^*(g_n,\bar Q_{n,x})(o)\\
+ &\quad=\int_t P_nD_{1,t}^*(g_n,\bar Q_{n,x})
+ D_{1,t}^*(g_n,\bar Q_{n,x})(o)\,d\Lambda(t).
+ \end{aligned}
+ \tag{5.8}
+\end{equation}
+分母中的范数也有类似的积分表示。根据定理 5.4，或者直接验证，可知对所有 $\epsilon\geq0$，$q_{n,\epsilon}$ 都是给定 $A,W$ 时 $T$ 的条件密度，且
+\[
+ \frac{d}{d\epsilon}P_n\log q_{n,\epsilon}
+ =\|P_nD_1^*(g_n,\bar Q_{n,\epsilon})\|.
+\]
+因此，当 $\epsilon$ 远离零时，对数似然增加；我们寻找使该导数小于例如 $1/n$ 的第一个 $\epsilon_n$。令 $q_n^*=q_{n,\epsilon_n}$，并令
+$\bar Q_{n,t}^*(A,W)=\int_t^\infty q_n^*(s\mid A,W)\,ds$
+为对应的条件生存函数，$t\geq0$。那么，$d$ 特定的生存函数 $\Psi(P_0)$ 的一步 TMLE 为
+$\psi_n^*=\Psi(Q_{W,n},\bar Q_n^*)=Q_{W,n}\bar Q_n^*$，即
+\[
+ \psi_n^*(t)=\frac1n\sum_{i=1}^n\bar Q_{n,t}^*(d(W_i),W_i).
+\]
+由于 $q_n^*$ 是真正的条件密度，所以 $\psi_n^*$ 是生存函数。
+
+假定对数似然在 $\epsilon_n$ 处的导数恰好等于零，而不仅是小于 $1/n$。那么，
+$\|P_nD^*(g_n,Q_{W,n},\bar Q_n^*)\|=0$，
+因此对每个 $t\geq0$，有
+$P_nD_t^*(g_n,Q_{W,n},\bar Q_n^*)=0$；
+这使 $\psi_n^*(t)$ 成为 $\psi_0(t)$ 的标准 TMLE，并可据此证明固定 $t$ 时的渐近线性。下面考虑将 $\sqrt n(\psi_n^*-\psi_0)$ 作为随机函数时的弱收敛证明。首先，为简单起见，假定得到了精确的 MLE，使
+$P_nD^*(g_n,Q_{W,n},\bar Q_n^*)=0$。
+结合
+\[
+ \Psi(Q_n^*)-\Psi(Q_0)
+ =-P_0D^*(g_n,Q_n^*)+R_2((Q_n^*,g_n),(Q_0,g_0)),
+\]
+其中 $R_2()=(R_{2t}():t\in\tau)$，而 $R_{2t}(P,P_0)$ 有明确的定义，得到
+\[
+ \psi_n^*-\psi_0
+ =(P_n-P_0)D^*(g_n,Q_n^*)+R_2((Q_n^*,g_n),(Q_0,g_0)).
+\]
+现在假定 $\{D_t^*(P):P\in\mathcal M\,t\in\tau\}$ 是 $P_0$-Donsker 类，
+\[
+ \sup_{t\in\tau}P_0\{D_t^*(g_n,Q_n^*)-D_t^*(g_0,Q_0)\}^2
+ \longrightarrow0
+ \quad\text{依概率},
+\]
+且 $\sup_t|R_{2t}((Q_n^*,g_n),(Q_0,g_0))|=o_P(n^{-1/2})$。于是
+% 原书在 sqrt(n) 标度下仍印 o_P(n^{-1/2})，照录。
+\[
+ \sqrt n(\psi_n^*-\psi_0)
+ =\sqrt n(P_n-P_0)D^*(P_0)+o_P(n^{-1/2})
+ \;\Rightarrow_d\;G_0.
+\]
+也就是说，$\sqrt n(\psi_n^*-\psi_0)$ 作为赋予上确界范数的右连续且有左极限（càdlàg）函数空间中的随机元素，弱收敛于 Gaussian 过程 $G_0$；其协方差结构由协方差函数
+$\rho(s,t)=P_0D_s^*(P_0)D_t^*(P_0)$
+确定。特别地，若 $g_0$ 已知，则
+$R_{2t}((Q_n^*,g_0),(Q_0,g_0))=0$，
+因此二阶项条件
+$\sup_t|R_{2t}((Q_n^*,g_n),(Q_0,g_0))|=o_P(n^{-1/2})$
+自动成立，且 $o_P(n^{-1/2})$ 可换成 0。这还允许构造 $\psi_0$ 的同时置信带（simultaneous confidence band）。由于有效影响曲线具有双重稳健性，在适当条件下，即便 $g_n$ 或 $\bar Q_n$ 中有一个设定错误，仍能得到以非有效影响曲线表示的渐近线性和弱收敛。
+
+如果只有 $\|P_nD^*(P_n^*)\|=o_P(n^{-1/2})$，而非等于 0，上述证明仍适用，此时得到
+% 此式右端原书未含 sqrt(n)，余项阶也照录。
+\[
+ \sqrt n(\psi_n^*-\psi_0)=(P_n-P_0)D^*(P_0)+r_n,
+\]
+但这里 $\|r_n\|=o_P(1/\sqrt n)$。这时，除 $\psi_n^*(t)$ 的逐点有效性之外，我们还得到 Hilbert 空间 $L^2(\Lambda)$ 中的渐近有效性和弱收敛。不过，在实践中可以实际跟踪上确界范数
+$\|P_nD^*(P_{\epsilon_n})\|_\infty=\sup_t|P_nD_t^*(P_{\epsilon_n})|$；
+如果观察到所选 $\epsilon_n$ 使该上确界范数小于 $1/n$，那么，仍能得到前述上确界范数下的渐近有效性。
+
+对于 $q_{n,\epsilon}$ 的实用构造，可以使用经过条件密度 $q$ 的下列无限维局部最不利子模型：
+\[
+ q_\delta^{\mathrm{lfm}}=q\{1+\delta^\top D_1^*(g,\bar Q)\},
+\]
+并依照上一节针对一般局部最不利子模型所述的实用构造实施。注意，这里
+$\delta^\top D_1^*(g,\bar Q)=\int\delta(t)D_{1,t}^*(g,\bar Q)\,d\Lambda(t)$。
+为保证当局部的 $\delta$ 满足 $\|\delta\|<dx$ 时，密度 $q_\delta^{\mathrm{lfm}}$ 的上确界范数始终小于通用常数 $M<\infty$，可以在 logistic 尺度上以条件风险函数来表示这样的模型，将风险函数限制在 $[0,M]$ 之间。不过，我们猜测这在实践中不会成为问题。况且，要解出 $\|P_nD^*(P_\epsilon)\|=0$，连续密度 $q_{n,\epsilon}$ 可能需要在某种意义上逼近经验分布，我们并不想阻止这种情形发生。
+
+Moore 和 van der Laan（2009a,b,c）提出了给定 $t_0$ 时 $S_d(t_0)$ 的迭代 TMLE，定义如下。设 $q_n(t\mid A,W)$ 和 $g_n(A\mid W)$ 分别为 $q_0(t\mid A,W)$ 与 $g_0(A\mid W)$ 的初始估计量。令
+\[
+ \begin{aligned}
+ L(q)(O)=-\sum_{t\leq T}\bigl\{
+ &I(T=t)\log q(t\mid A,W)\\
+ &+(1-I(T=t))\log(1-q(t\mid A,W))
+ \bigr\}
+ \end{aligned}
+\]
+为 $q(t\mid A,W)$ 的对数似然损失函数。定义经过 $q_n$ 的局部最不利子模型为
+\[
+ \logit\bar q_n(\varepsilon)(t\mid A,W)
+ =\logit\bar q_n^0(t\mid A,W)
+ +\varepsilon H_{a,n}^*(t,A,W),
+\]
+其中，估计的时变巧妙协变量（clever covariate）为
+\[
+ H_{a,n}^*(t,A,W)
+ =\left(\frac{I(A=a)}{g_n(a\mid W)}\right)
+ \left(\frac{\bar Q_n(t_0\mid A,W)}{\bar Q_n(t\mid A,W)}\right)
+ I(t\leq t_0).
+\]
+有 $\frac{d}{d\epsilon}L(q_{n,\epsilon})$ 在 $\epsilon=0$ 处等于 $D_{1,t}^*(\bar Q,g)$。令 $Q_{W,n}$ 为 $W$ 的经验概率分布。第一次 TMLE 更新定义为
+$\epsilon_n=\argmin_\epsilon P_nL(q_{n,\epsilon})$，
+以及 $q_n^1=q_{n,\epsilon_n}$。重复这一更新过程，直到 $\epsilon_n\approx0$。将最终更新记为 $q_n^*(t\mid A,W)$，并令 $\bar Q_n^*(t\mid A,W)$ 为相应的生存曲线。$\psi_0(t_0)=S_{d,0}(t_0)$ 的迭代 TMLE 为
+\[
+ \psi_n^*(t_0)=\frac1n\sum_{i=1}^n\bar Q_n^*(t_0\mid A=1,W_i).
+\]
+
+\paragraph{模拟。}
+首先，设
+\[
+ \begin{gathered}
+ W_1\sim\operatorname{Bern}(0.5),\qquad
+ W_2\sim\operatorname{Bern}(0.5),\\
+ A\sim\operatorname{Bern}(0.15+0.5W_1),\qquad
+ T\sim\exp\left(\frac{1+0.5W_1-0.5A}{100}\right).
+ \end{gathered}
+\]
+在此情形下，
+\[
+ S_d(t)=1-\frac{\Phi(5\times10^{-3}t)+\Phi(10^{-2}t)}2,
+ \qquad t\geq0,
+\]
+其中，$\Phi$ 为速率等于 1 的指数分布的累积分布函数。第二项模拟与第一项相同，唯一区别是此时
+$A\sim\operatorname{Bern}(0.05+0.5W)$。
+这两项模拟旨在比较一步 TMLE 与分别在每个 $t$ 处估计 $S_d(t)$ 的迭代 TMLE。
+
+图 5.1(a) 给出了两个数据生成分布各产生的一个 $n=100$ 数据集上的迭代 TMLE 和一步 TMLE。显然，迭代 TMLE 不具单调性，而一步 TMLE 则是一条真正的生存曲线。对于第二个数据生成分布产生的数据集，迭代 TMLE 的波动尤其明显。图 5.1(b) 给出了 0 至 400 各时间点的相对效率。为展示混杂，我们还给出了观测中 $A_i=1$（$i=1,\ldots,n$）者的 Kaplan--Meier 估计量，并给出了基于初始估计量的特定处理下生存曲线估计。结果表明，迭代 TMLE 与一步 TMLE 都是无偏的，但在 $n=100$ 时，迭代 TMLE 的效率是两倍。最后，图 5.1(c) 展示了 $n=1000$ 时的估计量，表明一步 TMLE 与迭代 TMLE 都是渐近有效的；上述效率增益属于有限样本增益，会在渐近情况下消失。
+
+\begin{figure}[p]
+\centering
+\input{figures/ch05_survival_curves}
+\caption{两种模拟设置各自的一个数据集（a）。相对于迭代 TMLE 的相对效率的 Monte Carlo 近似，表示为 $t$ 的函数；样本量分别为 100（b）和 1000（c）。}
+\label{fig:ch05-survival-curves}
+\end{figure}
+\FloatBarrier

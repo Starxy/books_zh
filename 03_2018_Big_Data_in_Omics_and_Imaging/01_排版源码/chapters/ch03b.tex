@@ -1,0 +1,382 @@
+% 原分章PDF第15—29页，第3.1.4节；原印刷页187—201。
+\subsection{用于生理时间序列数据分析的深度学习}
+
+可穿戴生物传感器持续监测个体健康状况，产生实时的时程数据。借助这些传感器，可以在任何地点测量各种生理时间序列数据（Wang et al. 2016）。我们希望根据观测的时程数据开展预测、分割、分类，并发现血压、心率和睡眠模式中的异常（Cristian and Gamboa 2017）。除了自回归、线性动态系统和隐马尔可夫模型等传统方法（其中部分已在第3.1.2和3.1.3节讨论）之外，还可以将深度神经网络用于生理时间序列数据分析。特征提取与选择是成功开展风险预测和异常检测的关键。传统时间序列分析技术，要么难以处理原始形式的自然数据，要么依赖人工提取特征。信号特征是异常检测和分类所需要的数据内部表示。
+
+深度学习（deep learning）是一类现代机器学习技术。通过包含多个层级表示的自动表示学习，它能够强化对判别重要的特征，并抑制数据中不相关的变异（LeCun et al. 2015）。换言之，深度学习利用多层按层级组织的处理单元，从复杂时间序列和影像数据中提取并选择判别信息（Ravi et al. 2016）。近年来，人们已充分认识到，深度学习在发现高维数据中复杂特征方面具有巨大潜力。深度学习已经广泛用于基因组学、可穿戴计算，以及疾病预防、诊断和管理（Albarqouni et al. 2016；Wang et al. 2017；Cheng et al. 2015；Jin and Dong 2016；Marblestone et al. 2016；Sathyanarayana et al. 2016）。卷积神经网络旨在处理信号和数组形式的数据，例如图像。本节重点讨论基于卷积网络的时程数据分析。
+
+\subsubsection{卷积神经网络用于时程数据分析的流程}
+
+卷积神经网络（convolutional neural network，CNN）用于时间序列分析的一般流程见图3.9，其中 RNN 表示循环神经网络（recurrent neural network）。首先，对生理时程数据进行归一化与预处理。随后，使用 CNN 从生理数据中提取判别特征。提取的特征可以直接用于分类和异常检测，也可以输入 RNN 进行时间序列预测。《Big Data in Omics and Imaging: Association Analysis》第8章介绍的许多机器学习技术，都可以直接用于分类。
+
+\input{figures/ch03_fig09}
+\FloatBarrier
+
+\subsubsection{卷积：线性滤波与信号处理的有力工具}
+
+卷积（convolution）是一种线性滤波，用于描述线性时不变（linear time-invariant，LTI）系统受到外部信号扰动时的响应。一般而言，输入信号可以展开为基信号的加权和。每个基信号分别通过线性系统，引起相应响应。基信号包括 Fourier 级数和 delta（冲激）函数。本节重点讨论 delta 函数。
+
+delta（冲激）函数记为 $\delta(t)$，定义为
+\begin{equation}
+\delta(t)=\begin{cases}
+1,&0,\\
+0,&t\ne0.
+\end{cases}
+\tag{3.16}
+\end{equation}
+任意信号都可以展开为 delta 函数 $\delta(t)$ 之和。考虑图3.10的例子，令 $x(0)=4$、$x(1)=1$、$x(2)=3$ 和 $x(3)=2$。显然，信号 $x(0)$、$x(1)$、$x(3)$ 和 $x(4)$ 可以表示为
+\begin{equation}
+\begin{aligned}
+x(n)&=x(0)=4\delta(0)=x(0)\delta(n),\\
+x(n)&=x(1)=1\delta(0)=x(1)\delta(n-1),\\
+x(n)&=x(2)=3\delta(0)=x(2)\delta(n-2),\\
+x(n)&=x(3)=2\delta(0)=x(3)\delta(n-3).
+\end{aligned}
+\tag{3.17}
+\end{equation}
+式 (3.17) 可以概括为一个加权和：
+\begin{equation}
+\begin{aligned}
+x(n)={}&x(0)\delta(n-0)+x(1)\delta(n-1)\\
+&+x(2)\delta(n-2)+x(3)\delta(n-3).
+\end{aligned}
+\tag{3.18}
+\end{equation}
+类似于式 (3.18)，一般信号可以分解为
+\begin{equation}
+x(n)=\sum_{j=-\infty}^{\infty}x(j)\delta(n-j).
+\tag{3.19}
+\end{equation}
+
+\input{figures/ch03_fig10}
+
+接下来讨论线性滤波器，或者说，线性系统对冲激信号输入的冲激响应（impulse response）。如图3.11所示，线性系统的冲激响应，就是系统受到 delta 函数扰动时的输出。从图中可以看到，发生时间平移的 delta 函数所对应的输出，也是平移相同时间量的冲激响应函数；对 delta 输入信号作缩放，输出则为原输入冲激响应的相应缩放。因此，图3.10中信号 $4\delta(0)+\delta(n-1)+3\delta(n-2)+2\delta(n-3)$ 的冲激响应，为 $4h(0)+h(n-1)+3h(n-2)+2h(n-3)$。
+
+\input{figures/ch03_fig11}
+
+如果一般信号 $x(n)$ 按式 (3.19) 展开为 delta 函数之和，则系统响应为（图3.12）
+\begin{equation}
+y(n)=\sum_{j=-\infty}^{\infty}x(j)h(n-j).
+\tag{3.20}
+\end{equation}
+线性系统的输出，也可以视为输入信号与系统 delta 函数的卷积。下面正式定义卷积。
+
+\begin{bookdefinition}{3.1：离散卷积}
+离散函数 $x(n)$ 与 $h(n)$ 的卷积记为 $x*h$，定义为
+\begin{equation}
+\begin{aligned}
+(x*h)(n)
+&=\sum_{j=-\infty}^{\infty}x(j)h(n-j)\\
+&=\sum_{j=-\infty}^{\infty}x(n-j)h(n).
+\end{aligned}
+\tag{3.21}
+\end{equation}
+\end{bookdefinition}
+
+\input{figures/ch03_fig12}
+
+冲激响应完全决定系统。不同冲激响应决定线性系统的不同行为。
+
+\begin{bookexample}{3.1}
+考虑输入信号 $x(n)=[3,1,2]$ 和冲激响应向量 $h(n)=[0,1,2]$（图3.13）。利用式 (3.21)，计算卷积 $x*h$：
+\[
+\begin{aligned}
+y(0)&=\sum_{j=-\infty}^{\infty}x(j)h(0-j)
+=x(0)y(0)=3*0=0,\\
+y(1)&=\sum_{j=-\infty}^{\infty}x(j)h(1-j)\\
+&=x(0)h(1)+x(1)h(0)=3*1+1*0=3,\\
+y(2)&=\sum_{j=-\infty}^{\infty}x(j)h(2-j)\\
+&=x(0)h(2)+x(1)h(1)+x(2)h(0)\\
+&=3*2+1*1+2*0=7,\\
+y(3)&=\sum_{j=-\infty}^{\infty}x(j)h(3-j)\\
+&=x(0)h(3)+x(1)h(2)+x(2)h(1)\\
+&=3*0+1*2+2*1=4,\\
+y(4)&=\sum_{j=-\infty}^{\infty}x(j)h(4-j)\\
+&=x(0)h(4)+x(1)h(3)+x(2)h(2)+x(3)h(1)+x(4)h(0)\\
+&=2*2=4.
+\end{aligned}
+\]
+输出为 $y=[0\ 3\ 7\ 4\ 4]$。
+\end{bookexample}
+
+\input{figures/ch03_fig13}
+\FloatBarrier
+
+\subsubsection{CNN 的架构}
+
+CNN 由一系列层组成：输入层、卷积层、全连接层和分类器（图3.14）。CNN 的每一层通过不同函数，将一组激活转换成另一组激活。卷积层接收由多个时间序列构成的输入信号，并从信号中提取特征。CNN 包含四个关键思想：局部连接、权重共享、池化以及多层结构。为便于讨论，将卷积层进一步分为卷积层和子采样层。每个卷积层或子采样层，都包含滤波操作与非线性激活操作。
+
+输入信号是时间序列。典型时间序列数据的参数包括长度和传输通道。卷积层的神经元与输入中的局部区域连接。设计的滤波器作为过滤输入数据的线性系统，与输入信号作卷积以提取特征。非线性层施加一个逐元素激活函数。子采样（池化）层执行非线性下采样操作，逐步减小特征表示的空间尺寸并控制过拟合。全连接层计算类别得分，再交给分类器完成分类和预测。将卷积层、池化层和全连接层堆叠起来，就形成完整的 CNN 架构。
+
+综上，CNN 主要包括三类层：（1）卷积层；（2）子采样（池化）层；（3）包含全连接层的输出多层感知机（multilayer perceptron，MLP）。一个卷积层与一个子采样层成对出现：每个卷积层后跟随一个子采样层，而最后一个卷积层后接输出全连接层。每层有许多特征图（feature map）。通过增加任意多个卷积层—子采样层对，可以扩展 CNN 的深度。假设共有 $L=2a+2$ 层，其中 $a$ 为正整数。卷积层编号为 $l=1,3,\ldots,2a+1$，子采样（池化）层编号为 $l=2,4,\ldots,2a$。最后一层为全连接 MLP。
+
+\input{figures/ch03_fig14}
+\FloatBarrier
+
+\subsubsection{卷积层}
+
+卷积层是 CNN 的基本组成部分，包括滤波器组层、非线性层和特征池化层。滤波器组层的参数，是一组可以学习的滤波器（或核）。这些滤波器在空间上较小，却跨越输入时间序列的全部通道。图3.15中的滤波器大小为 $5\times3$（$m_1\times m_2$），即5个时间点与3个通道。在前向传播过程中，每个滤波器沿输入时间序列的长度方向作卷积，计算滤波器各元素与输入在任意位置的对应元素之点积，生成长度为 $n$ 的一维特征图。该特征图表示滤波器在各个时间位置的响应。通过设计不同的滤波器，使其在检测到输入信号时产生相应响应，可以捕捉信号的特定特征。将所有滤波器沿时间序列生成的特征图堆叠，就形成卷积层的完整输出体。
+
+\input{figures/ch03_fig15}
+
+\bookdeepheading{paragraph}{3.1.4.4.1}{滤波器}
+
+在卷积层中，每个特征图与前一层的一个或多个特征图连接，每个连接对应一个滤波器（核）。第 $l$ 层每个滤波器的输入为二维数组，由 $n_1^l$ 个大小为 $n_2^l$ 的一维特征图构成。在最初的输入层，特征图就是单变量时间序列。第 $l$ 层第 $u$ 个特征图的第 $j$ 个激活分量记为 $a_{uj}^l$，其中 $u=1,2,\ldots,n_1^l$，$j=1,2,\ldots,n_2^l$。
+
+下面考虑滤波器的大小。在时间序列分析中，滤波器是一个向量，滤波器的元素通常称为神经元。一般而言，输入数据与特征图中的特征维数都很高。处理高维输入和特征数据时，将滤波器的神经元连接到输入层或前一层（第 $l-1$ 层）的全部神经元，在实践中不可行。为克服这一限制，每个神经元仅与输入或前一层中的一个较小局部区域连接。这种连接的范围是一个超参数，通常称为神经元的感受野（receptive field），也简称滤波器大小，记为 $m^l$。沿序列长度方向，连接是局部的；但沿输入层整个深度方向，连接始终是完整的。
+
+现在计算卷积。令 $w_{u,j}^l(i)$ 为从第 $l-1$ 层特征图 $u$ 到第 $l$ 层特征图 $j$ 的滤波器，其中
+\[
+w_{u,j}^l(i)=
+[w_{u,j}^l(i-k^l),\ldots,w_{u,j}^l(i),\ldots,w_{u,j}^l(i+k^l)]^T.
+\]
+第 $l$ 层第 $j$ 个特征图中第 $i$ 个位置的输出记为 $z_i^l(j)$，由 $a_u^{l-1}$ 与滤波器 $w_{u,j}^l$ 的卷积计算：
+\begin{equation}
+\begin{aligned}
+z_j^l(i)
+&=\sum_{u=1}^{n_1^{l-1}}a_u^{l-1}*w_j^l+b_j^l\\
+&=\sum_{u=1}^{n_1^{l-1}}\sum_{v=-k^l}^{k^l}
+a_u^{l-1}(i+v)w_{u,j}^l(i+v)+b_j^l,
+\quad i=1,2,\ldots,n_2^l.
+\end{aligned}
+\tag{3.22}
+\end{equation}
+其中，$*$ 表示卷积算子，$b_j^l$ 是可训练的偏置参数。每个滤波器检测某个特定特征，并在输入或特征图的各个位置输出其激活值。卷积利用输入数据的小片段学习时间序列特征，从而保留时间点之间的相关性。
+
+下面计算特征图大小。特征图大小由深度、步长与零填充三个参数决定。特征图的深度定义为用于提取不同特征的滤波器数。图3.15使用三个不同滤波器，产生三个特征图，因此特征图深度为3。步长（stride）定义为滤波器每次沿输入序列滑动的时间点数。步长为1时，每次滑动一个时间点；步长为2时，每次移动两个时间点。一般而言，步长越大，生成的特征图越小。零填充（zero-padding）是在输入时间序列区间的端部补零。零填充大小定义为时间序列端部补入的零的个数。
+
+令 $W$ 为输入数据大小，即输入时间序列的时间点数，$F$ 为滤波器大小，$S$ 为步长，$P$ 为零填充大小。特征图大小为
+$ (W-F+2P)/S+1$。
+
+\begin{bookexample}{3.2}
+考虑大小 $W=5$ 的时间序列 $\{1,2,-1,0,2\}$，在序列两端各补一个零，$P=1$。考虑三个滤波器 $\{1,0,-1\}$、$\{0,1,-1\}$ 和 $\{-1,1,0\}$，每个滤波器大小均为 $F=3$。数据见图3.16。采用两种步长 $S=1$ 与 $S=2$，对应特征图的大小分别为
+\[
+\frac{W-F+2P}{S}+1=\frac{5-3+2}{1}+1=5,
+\qquad
+\frac{5-3+2}{2}+1=3.
+\]
+滤波器沿输入时间序列滑动，即执行卷积操作，产生特征图。例如，开始时滤波器 $\{1,0,-1\}$ 与 $\{0,1,2\}$ 作卷积，通过两个向量的逐元素相乘，输出 $-2$。随后，滤波器以 $S=1$ 沿输入时间序列滑动，产生特征图 $\{-2,2,2,-1,0\}$。如果步长为 $S=2$，则产生较小的特征图 $\{-2,2,0\}$。
+
+图3.16还绘出了另外两个滤波器生成的特征图。可以看到，不同滤波器会生成不同特征图。一般而言，不同滤波器对同一时间序列作卷积，得到的特征图不同。需要认识到，卷积操作捕捉了原始时间序列中的局部相关性。
+
+假设卷积层输入大小为 $W_1\times D_1$，其中 $W_1$ 是输入时间序列长度，$D_1$ 是通道数，即时间序列数。考虑四个超参数：滤波器数 $K$、滤波器大小 $F$、步长 $S$ 和零填充数 $P$。卷积层生成 $K$ 个大小为 $W_2$ 的特征图，其中
+\[
+W_2=\frac{W_1-F+2p}{S}+1.
+\]
+\end{bookexample}
+
+\input{figures/ch03_fig16}
+\FloatBarrier
+
+\bookdeepheading{paragraph}{3.1.4.4.2}{非线性激活层}
+
+每次卷积操作之后，都会引入非线性激活层，施加非线性操作。非线性函数包括：
+\begin{enumerate}
+\item Sigmoid 函数：
+$\operatorname{sigmoid}(x)=1/(1+e^{-x})$；
+\item 双曲正切函数：
+$\tanh(x)=(e^x-e^{-x})/(e^x+e^{-x})$；
+\item 修正线性单元（rectified linear unit，ReLU）：
+$\operatorname{ReLU}(x)=\max(0,x)$。
+\end{enumerate}
+卷积是由矩阵逐元素乘法与加法构成的线性操作，而许多实际数据是非线性的，因此需要增加非线性激活层来处理数据中的非线性。ReLU 是一种新颖而简单的非线性激活函数。许多学习实践表明，ReLU 可以改善泛化性能、避免梯度消失，并提高计算效率。
+
+\bookdeepheading{paragraph}{3.1.4.4.3}{池化层}
+
+池化（pooling）又称子采样或下采样。池化层的作用，是降低各个特征图的维数、减少参数量与计算量、控制过拟合，并提高对前面已学习特征之变化的稳健性。池化操作分别处理每个特征图，主要包括最大值、平均值与求和三类操作。池化在大小为2、步长为2的窗口（邻域）中执行。通常将输入特征图划分为等长子序列，以构造这些窗口。
+
+平均池化沿步长在不同位置计算每个窗口内的平均值，并将其作为新特征。最大池化计算该窗口内修正后特征图的最大值，选择较优的不变特征，并提高收敛速度，从而改善泛化性能。求和池化则计算修正后特征图窗口内所有元素之和。
+
+概括而言，池化层：
+\begin{enumerate}
+\item 接收大小为 $W_1\times D_1$ 的输入，并具有窗口长度 $F$ 与步长 $S$ 两个参数；
+\item 生成大小为 $W_2\times D_2$ 的特征图，其中 $D_2=D_1$，且
+\[
+W_2=\frac{W_1-F}{S}+1.
+\]
+\end{enumerate}
+
+\bookdeepheading{paragraph}{3.1.4.4.4}{全连接层}
+
+卷积层与池化层的输出，表示输入时间序列的高层特征。全连接层利用这些特征，根据训练数据集将输入时间序列划分为不同类别。全连接层将前一层的全部神经元，与本层全部神经元完全连接。其输出或激活值同样可以通过矩阵乘法再加偏置修正来计算。全连接层的每个神经元输出一个 $m$ 维向量，其中 $m$ 为分类器需要选择的类别数。向量的每个元素表示某一类别的概率（图2.17）。全连接层提取前一层（例如池化层）的特征，并确定哪些特征与某个特定类别最相关。
+
+\subsubsection{参数估计}
+\bookdeepheading{paragraph}{3.1.4.5.1}{损失函数}
+
+最后一层为全连接层，输出输入信号对应的类别（图2.17）。先从全连接层开始讨论（Bouvrie 2006；Zheng et al. 2015）。这些全连接层是一维的，其输出图中的全部特征组织成一个向量。
+
+考虑与 $c$ 个输出单元对应的 $c$ 个类别。令 $p_k^n$ 为第 $n$ 个时间序列（样本）属于第 $k$ 类的概率，$y_k^n$ 为第 $n$ 个样本第 $k$ 个输出单元的预测值，$z_k^n$ 为第 $n$ 个时间序列目标向量的第 $k$ 个元素（图2.17）。这些元素构成向量 $Z^n=[z_1^n,\ldots,z_c^n]^T$。如果第 $n$ 个时间序列的模式 $x^n$ 属于第 $k$ 类，则 $z_k^n$ 为正；目标向量 $Z^n$ 的其他元素则根据输出的非线性激活函数，取零或负值。损失函数可定义为
+\begin{equation}
+E=-\sum_{n=1}^N\sum_{k=1}^cy_k^n\log(p_k^n),
+\tag{3.23}
+\end{equation}
+或者
+\begin{equation}
+E=\frac12\sum_{n=1}^N\sum_{k=1}^c\|z_k^n-y_k^n\|^2.
+\tag{3.24}
+\end{equation}
+式 (3.23) 和式 (3.24) 的损失函数，都是各个样本损失项之和。因此，参数估计时先关注单个模式。令 $Y^n=[y_1^n,\ldots,y_c^n]^T$，则两式分别化为
+\begin{equation}
+E_n(x_n,W)=-\sum_{k=1}^cy_k^n\log(p_k^n),
+\tag{3.25}
+\end{equation}
+以及
+\begin{equation}
+E_n(x_n,W)=\frac12\|Z^n-Y^n\|_2^2.
+\tag{3.26}
+\end{equation}
+
+\bookdeepheading{paragraph}{3.1.4.5.2}{多层前向传播}
+
+卷积神经网络最后阶段的全连接层，构成多层前馈神经网络。将全连接神经网络的最终输出层记为第 $L$ 层，用 $l$ 表示当前层。考虑具有 $p$ 个输入神经元和 $q$ 个输出神经元的网络。从输入层第 $k$ 个神经元到第1层第 $j$ 个神经元的连接权重，记为 $w_{jk}^{(1)}$；第1层第 $j$ 个神经元的偏置记为 $b_j^{(1)}$。第1层的神经元总数为 $m_1$。第1层第 $j$ 个神经元的加权输入和激活值，分别记为 $z_j^{(1)}$ 与 $a_j^{(1)}$。给定 $x^{(1)}=[x_1^{(1)},\ldots,x_p^{(1)}]^T$，从数据输入层到第1层的加权输入与激活值为
+\[
+z_j^{(1)}=\sum_{k=1}^pw_{jk}^{(1)}x_k^{(1)}+b_j^{(1)},
+\quad j=1,\ldots,m_1,
+\qquad
+a_j^{(1)}=\sigma(z_j^{(1)}).
+\]
+类似地，对于第 $l$ 层，从第 $l-1$ 层第 $k$ 个神经元到第 $l$ 层第 $j$ 个神经元的连接权重记为 $w_{jk}^{(l)}$，第 $l$ 层第 $j$ 个神经元的偏置记为 $b_j^{(l)}$。相应加权输入和激活值分别记为 $z_j^{(l)}$、$a_j^{(l)}$。于是
+\[
+\begin{aligned}
+z_j^{(l)}&=\sum_{k=1}^{m_{l-1}}w_{jk}^{(l)}a_k^{(l-1)}+b_j^{(l)},
+\quad j=1,\ldots,m_l,\\
+a_j^{(l)}&=\sigma(z_j^{(l)}).
+\end{aligned}
+\]
+最后，对于输出层，有
+\[
+\begin{aligned}
+z_j^{(L)}&=\sum_{k=1}^{m_{L-1}}w_{jk}^{(L)}a_k^{L-1}+b_j^{(L)},
+\quad j=1,\ldots,m_L,\\
+a_j^{(L)}&=\sigma(z_j^{(L)}).
+\end{aligned}
+\]
+
+\bookdeepheading{paragraph}{3.1.4.5.3}{反向传播}
+
+最小化式 (3.25) 或式 (3.26) 中 $E_n(x_n,W)$ 的一种常用算法是梯度下降（gradient descent）。其思想是沿 $E_n(x_n,W)$ 下降最快的方向更新权重。先处理单个训练样本，再对全部训练样本取平均，以处理整个数据集。权重更新的梯度下降算法为
+\begin{equation}
+W^{t+1}=W^t-\eta_t\frac{\partial E_n(x^{(n)},W))}{\partial W},
+\tag{3.27}
+\end{equation}
+其中 $\eta_t\in\R_+$ 为学习率。
+
+反向传播（backpropagation）算法可以计算这一梯度。由于 $E_n(x^{(n)},W)$ 是权重 $W$ 的复杂复合函数，计算的关键是链式法则，见附录3.A。
+
+先考察 $z_j^L$ 的变化如何引起代价函数 $E_n(x^{(n)},W)$ 的变化。将全连接层最终输出层第 $j$ 个神经元的误差率 $\delta_j^L$ 定义为
+\[
+\delta_j^L=\frac{\partial E_n(x^{(n)},W)}{\partial z_j^L}.
+\]
+附录3.A给出
+\begin{equation}
+\delta_j^L=(a_j^L-y_j^{(n)})\sigma'(z_j^L),
+\tag{3.28}
+\end{equation}
+\begin{equation}
+\delta_j^L=-\frac{y_j^{(n)}}{a_j^L}\sigma'(z_j^L),
+\tag{3.29}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(L)}}=\delta_j^{(L)}.
+\tag{3.30}
+\end{equation}
+将代价相对于 MLP 中任意权重的变化率记为 $\partial E_n/\partial w_{jk}^{(L)}$。可以证明（附录3.A），
+\begin{equation}
+\frac{\partial E_n}{\partial w_{jk}^{(L)}}
+=\delta_j^{(L)}a_k^{(L-1)}.
+\tag{3.31}
+\end{equation}
+
+\bookdeepheading{paragraph}{3.1.4.5.4}{卷积层}
+\bookdeepheading{subparagraph}{3.1.4.5.4.1}{最后一个卷积层：\texorpdfstring{$l=L-1$}{l=L-1}}
+
+首先考虑与全连接层 $L$ 相连的卷积层 $l=L-1$。最后一个卷积层的误差敏感度导数为（附录3.A）
+\begin{equation}
+\delta_j^{(L-1)}
+=\sigma'(z_j^{(L-1)})
+\sum_{m=1}^{m_L}\delta_m^{(L)}w_{mj}^{(L)},
+\quad j=1,2,\ldots,N_{L-1}.
+\tag{3.32}
+\end{equation}
+代价相对于任意权重 $w_{mj}^{(L-1)}$ 和偏置的变化率分别为
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{mj}^{(L-1)}(i)}
+=\delta_m^{(L-1)}a_j^{(L-2)},
+\tag{3.33}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(L-1)}}
+=\sum_{i=1}^{n_2^{(L-1)}}\delta_j^{(L-1)}(i),
+\quad j=1,\ldots,n_1^L.
+\tag{3.34}
+\end{equation}
+
+\bookdeepheading{subparagraph}{3.1.4.5.4.2}{最后一个子采样层}
+
+现在考虑最后一个子采样层。回顾最后一个卷积层，其中每个特征图恰好与前一个子采样层中的一个特征图连接。最后一个子采样层的敏感度导数为
+\begin{equation}
+\begin{aligned}
+\delta_j^{(L-2)}(i)
+&=\frac{\partial E_n(x_n,W)}{\partial z_j^{(L-2)}(i)}\\
+&=\delta_j^{(L-1)}(i)w_{jj}^{(L-1)}\sigma'(z_j^{(L-2)}).
+\end{aligned}
+\tag{3.35}
+\end{equation}
+代价函数相对于最后一个子采样层权重和偏置的导数分别为
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{jj}^{(L-2)}}
+=\sum_{i'}\delta_j^{(L-2)}(i')a_j^{(L-3)}(i'),
+\tag{3.36}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(L-2)}}
+=\sum_{i'}\delta_j^{(L-2)}(i').
+\tag{3.37}
+\end{equation}
+
+\bookdeepheading{subparagraph}{3.1.4.5.4.3}{第 \texorpdfstring{$l$}{l} 个卷积层}
+
+接着考虑一般的第 $l$ 个卷积层。该层的每个特征图 $j$ 与子采样层 $l+1$ 的特征图 $j$ 连接。代价函数相对于卷积层 $l$ 输入的敏感度导数为
+\begin{equation}
+\delta_j^{(l)}(i)
+=\delta_j^{(l+1)}(i')w_j^{(l+1)}\sigma'(Z_J^{(l)}(i)),
+\tag{3.38}
+\end{equation}
+其中 $i'=\lfloor i/2\rfloor$。代价函数相对于权重和偏置的导数为
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{mj}^{(l)}(i)}
+=\delta_m^{(l)}(i)a_j^{(l-1)}(i),
+\tag{3.39}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(l)}}
+=\sum_{i=1}^{n_2^{(l)}}\delta_j^{(l)}(i),
+\quad j=1,\ldots,n_1^l.
+\tag{3.40}
+\end{equation}
+
+\bookdeepheading{subparagraph}{3.1.4.5.4.4}{第 \texorpdfstring{$l$}{l} 个子采样层}
+
+最后，计算一般子采样层 $l$ 的敏感度导数，以及代价函数相对于权重和偏置的梯度。附录3.A给出
+\begin{equation}
+\delta_j^{(l)}(i)=\sigma'(z_j^l(i))
+\sum_{m=1}^{m_{l+1}}\delta_m^{(l+1)}(i')
+\sum_{v=-k^l}^{k^l}w_{m,j}^{(l+1)}(i'+v),
+\tag{3.41}
+\end{equation}
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial w_{jj}^{(l)}}
+=\sum_{i'}\delta_j^{(l)}(i')a_j^{(l-1)}(i'),
+\tag{3.42}
+\end{equation}
+以及
+\begin{equation}
+\frac{\partial E_n(x_n,W)}{\partial b_j^{(l)}}
+=\sum_{i'}\delta_j^{(l)}(i').
+\tag{3.43}
+\end{equation}
+\FloatBarrier

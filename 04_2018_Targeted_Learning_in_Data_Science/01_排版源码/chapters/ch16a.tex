@@ -1,0 +1,65 @@
+% 原书分章 PDF 第 1—6 页：章首、第 16.1—16.2 节。
+\chapter{自适应处理策略的比较效果}
+\label{ch:adaptive-treatment-comparative-effectiveness}
+\chapterauthors{Romain S. Neugebauer、Julie A. Schmittdiel、Patrick J. O'Connor 与 Mark J. van der Laan}
+\chapteraffiliations{%
+R. S. Neugebauer（通讯作者）与 J. A. Schmittdiel：美国凯撒医疗集团研究部，2000 Broadway, Oakland, CA 94612, USA；电子邮箱：\href{mailto:romain.s.neugebauer@kp.org}{romain.s.neugebauer@kp.org}；\href{mailto:julie.a.schmittdiel@kp.org}{julie.a.schmittdiel@kp.org}。\\
+P. J. O'Connor：美国 HealthPartners 研究所，Bloomington, MN 55425, USA；\\
+电子邮箱：\href{mailto:Patrick.J.OConnor@HealthPartners.com}{Patrick.J.OConnor@HealthPartners.com}。\\
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_16}。}
+
+\begin{sourcebox}
+本章介绍一项 2 型糖尿病（type 2 diabetes mellitus，T2DM）研究中电子健康记录（electronic health record，EHR）数据的二次分析；该研究考察四种自适应处理策略（adaptive treatment strategy）对事件发生时间结局的效应。具体而言，我们介绍一种靶向最小损失估计量（targeted minimum loss-based estimator，TMLE），并将其实际表现与三种逆概率加权（inverse probability weighting，IPW）估计量进行比较。这四种估计量针对相同的因果估计目标，而这些目标均基于同一个非参数动态边际结构模型定义。此外，我们还评价对干扰参数采用参数估计或数据自适应估计，会如何实际影响这四种估计量给出的因果推断。本章工作汇集了先前多篇论文中的结果（Neugebauer 等，2012、2013、2014a,b、2016）。
+\end{sourcebox}
+
+T2DM 临床照护的一项主要目标，是尽量减少微血管和大血管并发症。微血管并发症包括视网膜病变、神经病变和肾病，可导致失明、截肢、剧烈疼痛和肾衰竭，后者需要透析或肾移植。大血管并发症包括心肌梗死和卒中，可导致充血性心力衰竭、脑损伤和死亡。长期以来，人们一直认为，通过多种药物治疗积极控制血糖，是减少这些严重并发症发生的有效策略。因此，T2DM 的管理包括经常检测患者的血糖水平，以及定期检测糖化血红蛋白（glycated hemoglobin，A1c）；A1c 反映约 90 天（10—12 周）内的平均血糖水平。由于该疾病具有进展性，T2DM 患者同时使用多种降糖药物十分常见。实际上，血糖控制往往随时间恶化，因而需要反复决定是否使用各种降糖药物实施强化治疗（treatment intensification，TI），持续争取达到推荐的血糖控制水平。广泛接受的指南建议，T2DM 初始采用二甲双胍治疗；若未达到血糖控制目标，或控制状况恶化，再增加其他药物。使用两种或三种非胰岛素降糖药物仍未充分控制血糖时，通常考虑加用胰岛素。
+
+现行 T2DM 指南将许多患者的 A1c 目标定为低于 7\%，同时也指出，积极控制血糖的获益和风险因患者而异（Nathan 等，2006；Skyler 等，2009；The Diabetes Control and Complications Trial Research Group，1993；Nathan 等，2005；UK Prospective Diabetes Study (UKPDS) Group，1998；Holman 等，2008；Action to Control Cardiovascular Risk in Diabetes Study Group，2008；ADVANCE Collaborative Group，2008；Duckworth 等，2009a；Ray 等，2009）。因此，能够平衡治疗获益与风险的最优 A1c 目标水平尚未明确。为弥补这一知识缺口，我们旨在评价：逐步降低降糖策略的积极程度，会如何影响白蛋白尿的发生或进展。白蛋白尿是慢性肾脏病的一项重要生物标志物。
+
+本章分析结果可与两项随机试验的结果对照。在 2008—2010 年发表的 ACCORD 和 ADVANCE 临床试验中（Gerstein 等，2008；Patel 等，2008；Duckworth 等，2009b），采用多类降糖药物的强化降糖策略成功地显著降低了 A1c 水平。ADVANCE 试验中，较强化治疗组的目标是 A1c 低于 6.5\%，最终平均 A1c 为 6.5\%，而对照组为 7.3\%。ACCORD 试验中，较强化治疗组的目标是 A1c 低于 6\%，最终平均 A1c 为 6.4\%，对照组则为 7.5\%。两项试验的大量数据（Ismail-Beigi 等，2010；O'Connor 和 Ismail-Beigi，2011）支持下述假说（NCEP，2002；Nathan 等，2009）：总体而言，通过治疗将 A1c 降至较低水平的 T2DM 患者，其白蛋白尿发生和进展的比率可能较低；例如，ADVANCE 中的风险比为 0.79，区间为 0.66—0.93。
+
+\section{强化治疗研究}
+
+我们利用 HMO Research Network 七个研究点患者的电子健康记录数据（Vogt 等，2004），开展了一项纳入美国成年 T2DM 患者的大型回顾性队列研究，以回答以下务实的临床问题：\emph{一名目前使用两种或更多口服药物或基础胰岛素治疗的成年 T2DM 患者，是否应在 A1c 检测首次显示其水平升至推荐的 7\% 以上时就强化治疗，还是应推迟 TI，直到检测显示 A1c 达到 7.5\%、8\% 或 8.5\% 这些更高阈值？}下面简要介绍研究设计、可用数据、最初分析方法及原始分析发现的主要方面。
+
+\paragraph{入组标准。}
+与临床试验一样，我们通过选择纳入和排除标准，将研究队列限定为与上述比较效果研究（comparative effectiveness research，CER）问题相关的患者。具体而言，我们检索了 2001 年 1 月 1 日至 2009 年 6 月 30 日期间参与医疗保险计划的全部成年参保者，寻找在当前两种或更多口服药物或基础胰岛素治疗下出现治疗“失败”的人。“失败”定义为：患者在当前药物治疗下 A1c 曾低于 7\%，随后首次达到或超过 7\%。首次出现 A1c 升高的日期即为入组日期。首次升高的 A1c 超过 8.5\% 的患者被排除，因为对这些患者是否应加强降糖治疗几乎不存在疑问。因某些合并疾病而预期寿命有限的患者也被排除。这些标准筛得 58,671 名患者。对队列中所有患者，从入组日（索引日期）起随访，直至 2009 年 12 月 31 日（研究行政性结束）、退出保险计划或死亡中最早发生的日期。该队列的中位随访时间约为 2.5 年。
+
+\paragraph{EHR 数据。}
+为便于研究，参与本研究的七个 HMORN 研究点，根据各医疗保险计划为日常运营维护的多种医疗数据库，在虚拟数据仓库（virtual data warehouse，VDW）中建立了一套标准变量。对每位患者，这些变量记录人口学信息；与医疗保险计划发生的各类诊疗接触，包括门诊、急诊、电子邮件、电话、急性住院、非急性机构住院、仅检验、仅放射检查及其他；住院、门诊和急诊就诊中的所有诊断与操作；检验就诊类型及其检测结果；生命体征；以及所有处方和已配发药物。我们汇集了队列中所有患者从索引日期至随访结束的上述 VDW 数据。随后，按下一节详述的标准格式，将其粗化为一个分析数据集，使数据集中每个变量最多每 90 天改变一次。之所以选择这一分析时间单位，是因为通常预计不会在 90 天内多于一次地通过 A1c 检测监测患者的血糖控制。下一节还将回顾把 VDW 数据粗化为分析数据集所采用的原则。
+
+\paragraph{原始分析。}
+理想情况下，应通过随机试验评价积极程度逐步降低的强化治疗策略的效应。例如，可将本研究入组的患者队列随机分到若干治疗组，每组以不同的强化治疗启动延迟时间为特征，如在索引日期启动 TI、在索引日期后 3 个月启动 TI，等等。比较该试验任意两组的累积风险，就能度量逐步推迟 TI 启动的效应。这一方法虽能为本研究所针对的知识缺口提供部分证据，但此类试验的推断不能直接指导照护，因为试验干预是静态的，即只在随机化时决定，因而没有反映实际治疗决策的形成方式。在临床中，治疗决策会依据患者不断变化的血糖控制、症状，以及患者偏好、合并疾病、对既往处方治疗的依从性和总体健康状况等因素，随时间个体化调整。因此，相比静态干预，比较动态干预（亦称自适应处理策略或个体化处理规则）来指导照护，具有更强的临床相关性。
+
+基于这一理由，本研究数据的原始分析旨在评价四种积极程度逐步降低的自适应 TI 启动策略。每种策略以 A1c 阈值 $\theta=7,7.5,8$ 或 $8.5$ 为指标，要求患者的 A1c 检测一旦达到或超过 $\theta\%$，就立即启动 TI（不允许宽限期），并在此后维持强化治疗。为妥善处理时变混杂和信息性选择偏差，我们采用 IPW 估计（Robins，1998；Robins 等，2000；Hernan 等，2002），拟合了针对反事实风险函数的参数动态边际结构模型（Robins，1998；Murphy 等，2001；van der Laan 和 Petersen，2007；Hernan 等，2006；Robins 等，2008b；Cain 等，2010），以比较上述四种 TI 策略下的累积风险。
+
+这些分析的推断与 ACCORD 和 ADVANCE 随机试验一致，意味着这两项试验的结果模式适用于美国日常临床环境中接受治疗的大量成年 T2DM 患者。特别是，这项观察性研究证实，严格控制血糖有益于减少白蛋白尿的发生或进展。
+
+\section{数据}
+
+队列中每位患者的观测数据由暴露、结局和混杂变量的测量组成；从入组到随访结束，每 90 天更新一次。患者随访结束的时间记为 $\widetilde T$，以 90 天为单位，定义为失效时间 $T$ 与右删失事件时间 $C$ 中较早者；这里失效指白蛋白尿的发生或进展。患者发生右删失，即 $\widetilde T=C$ 时，记录其右删失事件类型，记为 $\Gamma$，可能取值为 1、2 或 3，分别表示研究行政性结束、退出医疗保险计划或死亡导致随访终止。对于入组时尿白蛋白水平正常，即微量白蛋白与肌酐比值（microalbumin-to-creatinine ratio，ACR）低于 30 的患者，我们将失效定义为 ACR 测量提示微量白蛋白尿（ACR 为 30—300）或大量白蛋白尿（ACR 大于 300）。对于入组时已有微量白蛋白尿的患者，失效定义为 ACR 测量提示大量白蛋白尿。因此，我们排除了基线 ACR 缺失的 5884 名患者，以及基线测量提示大量白蛋白尿的 1608 名患者，最终样本量为 $n=51,179$。
+
+随访因发生失效事件而结束的指示变量记为 $\Delta$，即 $\Delta=1$ 意味着 $\widetilde T=T$，$\Delta=0$ 意味着 $\widetilde T=C$。强化治疗暴露定义为使用患者入组时未使用的降糖药物。在每个时点 $t=0,\ldots,\widetilde T$，患者是否接受强化治疗以二元变量 $A_1(t)$ 表示；时点 $t$ 的右删失状态指示变量记为 $A_2(t)$。因此，当 $\widetilde T\geq1$ 时，$A_2(t)=0$ 对 $t=0,\ldots,\widetilde T-1$ 成立，且 $A_2(\widetilde T)=1-\Delta$。组合 $A(t)=(A_1(t),A_2(t))$ 称为时点 $t$ 的行动（action）。每个时点 $t=0,\ldots,\widetilde T$ 的协变量测量，如 A1c 或某项诊断，用多维变量 $L(t)$ 表示。
+
+Neugebauer 等（2014b）的表 I 描述了这些协变量所代表的 48 项由专家选取的患者属性，其中时变变量和连续变量分别有 23 项和 10 项。向量 $L(t)$ 中每个变量的构造，都使我们能够假定它发生在时点 $t$ 的行动 $A(t)$ 之前，或者能够假定它不受时点 $t$ 及以后行动 $(A(t),A(t+1),\ldots)$ 的影响。此外，时点 $t$ 的协变量还包括记为 $Y(t)$ 的结局测量，即对 $t=0,\ldots,\widetilde T$，有 $Y(t)\in L(t)$。在每个时点 $t=0,\ldots,\widetilde T+1$，结局是既往已失效的指示变量，即 $Y(t)=I(T\leq t-1)$。由定义可知，$t=0,\ldots,\widetilde T$ 时结局为 0；在 $t=\widetilde T+1$ 时，若 $\Delta=0$ 则结局缺失，若 $\Delta=1$ 则结局为 1。事实上，$\Delta=0$ 时，患者在最后一个随访区间 $\widetilde T$ 内发生右删失事件而终止随访，因此分析者不知道该患者在那一时点是否本会失效，即 $I(T=\widetilde T)$ 缺失，从而 $Y(\widetilde T+1)=I(T\leq\widetilde T)$ 也缺失。为简化记号，我们用上横线表示协变量和暴露历史。例如，患者截至时点 $t$ 的暴露历史记为 $\bar A(t)=(A(0),\ldots,A(t))$。遵循 Robins（1998）提出的分析框架，我们将本研究的观测数据视为 $O$ 的 $n$ 个独立同分布副本的实现值，记为 $O_i$，$i=1,\ldots,n$，其中
+\[
+ O=\bigl(\widetilde T,\Delta,(1-\Delta)\Gamma,\bar L(\widetilde T),
+ \bar A(\widetilde T),\Delta Y(\widetilde T+1)\bigr).
+\]
+最长的观测随访时间记为 $K\equiv\max_{i=1,\ldots,n}\widetilde T_i$；在强化治疗研究中，$K=36$，即 9 年。
+
+关于将连续时间内收集的 EHR 数据映射为上述粗化暴露、协变量和结局变量的算法，更多细节见 Neugebauer 等（2012）的附录 E。构造分析数据集的指导原则，是保证时点 $t$ 的协变量所代表的全部测量均不可能受时点 $t$ 及以后暴露的影响。除下列区间外，所有 90 天区间 $t$ 的暴露均定义为 0，即未接受强化治疗：（a）首次开始使用入组时未使用的某种降糖药物的区间（若存在），即在该区间内至少使用 1 天；（b）此后任一区间，其中有一种或更多入组时未使用的降糖药物，使用天数至少达到该区间天数的 50\%。每日降糖药物使用情况，根据从 VDW 药房数据中提取的处方配药日期和药物配发数量判定。
+
+对于在区间 $K$ 之前已经失效的患者，即 $\Delta=1$ 且 $\widetilde T<K$，我们将其观测数据 $O$ 的定义延伸至 $K+1$：对 $\widetilde T<t\leq K$，纳入结局变量 $Y(t+1)=I(T\leq t-1)=1$。延伸后的观测数据结构为
+\begin{equation}
+ O=\bigl(\widetilde T,\Delta,(1-\Delta)\Gamma,\bar L(\widetilde T),
+ \bar A(\widetilde T),\Delta\bar Y(\widetilde T+1,K+1)\bigr).
+ \tag{16.1}
+\end{equation}
+其中，当 $t\leq t'$ 时，$\Delta\bar Y(t,t')=(\Delta Y(t),\ldots,\Delta Y(t'))$。为简化下文表达式，在 $\Delta=1$ 时，对 $\widetilde T\leq t\leq K$ 的结局 $Y(t+1)$ 也记为 $L(t+1)$；于是观测数据可写成
+\[
+ O=\bigl(\widetilde T,\Delta,(1-\Delta)\Gamma,\bar L(\widetilde T),
+ \bar A(\widetilde T),\Delta\bar L(\widetilde T+1,K+1)\bigr).
+\]
+最后，对 $t=0,\ldots,K$，定义 $\check T(t)=\min(\widetilde T,t)$。

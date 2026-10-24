@@ -1,0 +1,135 @@
+% 原分章PDF88页附录7.B标题—91页附录7.C标题前，印刷页664—667。
+\section*{附录7.B\quad 正交条件与协方差}
+\addcontentsline{toc}{section}{附录7.B 正交条件与协方差}
+\markright{附录7.B 正交条件与协方差}
+
+令
+\begin{equation}
+g_1(x)=D(P_{Y\mid x}\parallel U_Y)
+ =\int\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy.\tag{7.B.1}
+\end{equation}
+现在计算 $\operatorname{cov}_{U_x}\bigl(g_1P_x/U_x\bigr)$。根据定义，有
+\begin{equation}
+\begin{aligned}
+\operatorname{cov}_{U_x}\left(g_1,\frac{P_X}{U_X}\right)
+={}&\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,
+ \frac{P_X}{U_X}U_X\,dx\\
+&{}-\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,U_X\,dx
+ \int\frac{P_X}{U_X}U_X\,dx\\
+={}&\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,P_X\,dx\\
+&{}-\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,U_X\,dx.
+\end{aligned}\tag{7.B.2}
+\end{equation}
+注意，式（7.B.2）的第一项可以表示为
+\begin{equation}
+\begin{aligned}
+&\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,P_X\,dx\\
+&\quad=\iint\log\frac{P(y\mid x)P(x)}{U(y)P(x)}P(y\mid x)P_X\,dy\,dx\\
+&\quad=\iint\log\frac{P(x,y)U(x)}{U(y)U(x)P(x)}P(x,y)\,dy\,dx\\
+&\quad=\iint\log\frac{P(x,y)}{U(y)U(x)}P(x,y)\,dy\,dx\\
+&\qquad\quad{}+\iint\log\frac{U(x)}{P(x)}P(x,y)\,dy\,dx\\
+&\quad=D(P_{Y,X}\parallel U_XU_Y)
+ +\iint\log\frac{U(x)}{P(x)}P(x,y)\,dy\,dx.
+\end{aligned}\tag{7.B.3}
+\end{equation}
+式（7.B.3）的第二项可化为
+\begin{equation}
+\begin{aligned}
+&\iint\log\frac{U(x)}{P(x)}P(x,y)\,dy\,dx\\
+&\quad=-\iint\log\frac{P(x)}{U(x)}P(x,y)\,dx\,dy\\
+&\quad=-\iint\log\frac{P(y\mid x)P(x)}{P(y\mid x)U(x)}P(x,y)\,dx\,dy\\
+&\quad=-\iint\log\frac{P(x,y)}{P(y\mid x)U(x)}P(x,y)\,dx\,dy\\
+&\quad=-D(P_{Y,X}\parallel U_XP_{Y\mid X}).
+\end{aligned}\tag{7.B.4}
+\end{equation}
+将式（7.B.4）代入式（7.B.3），得到
+\begin{equation}
+\begin{aligned}
+&\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,P_X\,dx\\
+&\quad=D(P_{Y,X}\parallel U_XU_Y)-D(P_{Y\,X}\parallel U_XP_{Y\mid X}).
+\end{aligned}\tag{7.B.5}
+\end{equation}
+现在考虑式（7.B.2）的第二项，可将其表示为
+\begin{equation}
+\begin{aligned}
+&\iint\log\frac{P(y\mid x)}{U(y)}P(y\mid x)\,dy\,U(x)\,dx\\
+&\quad=\iint\log\frac{P(y\mid x)U(x)}{U(y)U(x)}P(y\mid x)U(x)\,dx\,dy\\
+&\quad=D(P(y\mid x)U_X\parallel U_Y).
+\end{aligned}\tag{7.B.6}
+\end{equation}
+将式（7.B.5）、（7.B.6）代入式（7.B.2），得到
+\begin{equation}
+\begin{aligned}
+\operatorname{cov}_{U_x}\left(g_1,\frac{P_X}{U_X}\right)
+={}&D(P_{Y,X}\parallel U_XU_Y)-D(P_{Y\,X}\parallel U_XU_{Y\mid X})\\
+&{}-D(P(y\mid x)U_X\parallel U_Y).
+\end{aligned}\tag{7.B.7}
+\end{equation}
+因此，$\operatorname{cov}_{U_x}\bigl(g_1,P_X/U_X\bigr)=0$ 等价于
+\begin{equation}
+\begin{aligned}
+D(P_{Y,X}\parallel U_XU_Y)
+={}&D(P_{Y\,X}\parallel U_XP_{Y\mid X})
+ +D(P(y\mid x)U_X\parallel U_Y).
+\end{aligned}\tag{7.B.8}
+\end{equation}
+接下来考虑
+\begin{equation}
+g_3=\int\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy.\tag{7.B.9}
+\end{equation}
+根据定义，得到
+\begin{equation}
+\begin{aligned}
+\operatorname{cov}_{U_x}\left(g_3,\frac{P_X}{U_X}\right)
+={}&\iint\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy\,
+ \frac{P_X}{U_X}U_X\,dx\\
+&{}-\iint\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy\,U_X\,dx
+ \int\frac{P_X}{U_X}U_X\,dx\\
+={}&\iint\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy\,P_X\,dx\\
+&{}-\iint\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy\,U_X\,dx.
+\end{aligned}\tag{7.B.10}
+\end{equation}
+式（7.B.10）的第一项可化为
+\begin{equation}
+\begin{aligned}
+&\iint\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy\,P_X\,dx\\
+&\quad=\int\left[\int\log\frac{U_{out}(y)}{U(y)}P(x,y)\,dx\right]dy\\
+&\quad=\int\log\frac{U_{out}(y)}{U(y)}\left(\int P(x,y)\,dx\right)dy\\
+&\quad=\int\log\frac{U_{out}(y)}{U(y)}P(y)\,dy\\
+&\quad=-\int\log\frac{U(y)}{U_{out}(y)}P(y)\,dy.
+\end{aligned}\tag{7.B.11}
+\end{equation}
+接下来，为用K–L距离表示式（7.B.11），将其最后一项变形为
+\begin{equation}
+\begin{aligned}
+\int\log\frac{U(y)}{U_{out}(y)}P(y)\,dy
+={}&\int\log\frac{P(y)}{U_{out}(y)}\frac{U(y)}{P(y)}P(y)\,dy\\
+={}&\int\log\frac{P(y)}{U_{out}(y)}P(y)\,dy
+ +\int\log\frac{U(y)}{P(y)}P(y)\,dy\\
+={}&D(P_Y\parallel\vec P_Y)-D(P_Y\parallel U_Y).
+\end{aligned}\tag{7.B.12}
+\end{equation}
+同样，式（7.B.10）的第二项还可进一步化为
+\begin{equation}
+\begin{aligned}
+&\iint\log\frac{U_{out}(y)}{U(y)}P(y\mid x)\,dy\,U(x)\,dx\\
+&\quad=\int\log\frac{U_{out}(y)}{U(y)}
+ \left(\int P(y\mid x\,U(x)\,dx\right)dy\\
+&\quad=\int\log\frac{U_{out}(y)}{U(y)}U_{out}(y)\,dy\\
+&\quad=D(U_{out}(y)\parallel U_Y).
+\end{aligned}\tag{7.B.13}
+\end{equation}
+将式（7.B.11）—（7.B.13）代入式（7.B.10），得到
+\begin{equation}
+\begin{aligned}
+\operatorname{cov}_{U_X}\left(g_3,\frac{P_X}{U_X}\right)
+={}&-D((P_Y)\parallel U_{out}(Y))+D(P_Y\parallel U_Y)\\
+&{}-D(U_{out}(Y)\parallel U_Y).
+\end{aligned}\tag{7.B.14}
+\end{equation}
+式（7.B.14）表明，$\operatorname{cov}_{U_X}\bigl(g_3,P_X/U_X\bigr)=0$ 等价于
+\begin{equation}
+D(P_Y\parallel U_Y)=D(P_Y\mid U_{out}(Y))
+ +D(U_{out}(Y)\parallel U_Y).\tag{7.B.15}
+\end{equation}
+类似地，可以证明式（7.52）。

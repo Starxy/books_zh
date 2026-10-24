@@ -1,0 +1,51 @@
+% 图 2.3；与图 2.1 相同的 13 条实线有向边，及五个 U 节点间的 10 条虚线双向边。
+\begin{tikzpicture}[causal,x=1.7cm,y=1.3cm,
+ ch02n/.style={inner sep=2.2pt,fill=white,font=\normalsize},
+ ch02dep/.style={<->,line width=.45pt,dash pattern=on 4pt off 4pt}]
+\node[ch02n] (ch02cL0) at (0,0) {$L_0$};
+\node[ch02n] (ch02cA0) at (1,1) {$A_0$};
+\node[ch02n] (ch02cL1) at (2,0) {$L_1$};
+\node[ch02n] (ch02cA1) at (3,1) {$A_1$};
+\node[ch02n] (ch02cY) at (4,0) {$Y$};
+\node[ch02n] (ch02cUL0) at (0,-1) {$U_{L_0}$};
+\node[ch02n] (ch02cUA0) at (1,2) {$U_{A_0}$};
+\node[ch02n] (ch02cUL1) at (2,-2) {$U_{L_1}$};
+\node[ch02n] (ch02cUA1) at (3,2) {$U_{A_1}$};
+\node[ch02n] (ch02cUY) at (4,-1) {$U_Y$};
+\begin{scope}[on background layer]
+\draw[ed] (ch02cUL0) -- (ch02cL0);
+\draw[ed] (ch02cUA0) -- (ch02cA0);
+\draw[ed] (ch02cUL1) -- (ch02cL1);
+\draw[ed] (ch02cUA1) -- (ch02cA1);
+\draw[ed] (ch02cUY) -- (ch02cY);
+\draw[ed] (ch02cL0) -- (ch02cA0);
+\draw[ed] (ch02cL0) -- (ch02cL1);
+\draw[ed] (ch02cA0) -- (ch02cL1);
+\draw[ed] (ch02cA0) -- (ch02cA1);
+\draw[ed] (ch02cA0) -- (ch02cY);
+\draw[ed] (ch02cL1) -- (ch02cA1);
+\draw[ed] (ch02cL1) -- (ch02cY);
+\draw[ed] (ch02cA1) -- (ch02cY);
+% 每一对误差节点恰有一条双向边；曲率仅为排版调整。
+\draw[ch02dep] (ch02cUA0.north east)
+ .. controls (1.5,2.4) and (2.5,2.4) .. (ch02cUA1.north west);
+\draw[ch02dep] (ch02cUA0.west)
+ .. controls (-1.1,2.15) and (-1.35,.1) .. (ch02cUL0.west);
+\draw[ch02dep] (ch02cUA0.west)
+ .. controls (-2.2,.65) and (-1.8,-2.8) .. (ch02cUL1.west);
+\draw[ch02dep] (ch02cUA0.north east)
+ .. controls (5.3,4.7) and (5.55,.3) .. (ch02cUY.north east);
+\draw[ch02dep] (ch02cUA1.north west)
+ .. controls (-1.3,4.7) and (-1.55,.3) .. (ch02cUL0.north west);
+\draw[ch02dep] (ch02cUA1.east)
+ .. controls (6.2,.65) and (5.8,-2.8) .. (ch02cUL1.east);
+\draw[ch02dep] (ch02cUA1.east)
+ .. controls (5.1,2.15) and (5.35,.1) .. (ch02cUY.east);
+\draw[ch02dep] (ch02cUL0.south east)
+ .. controls (.55,-1.65) and (1.35,-2.1) .. (ch02cUL1.west);
+\draw[ch02dep] (ch02cUL1.east)
+ .. controls (2.65,-2.1) and (3.45,-1.65) .. (ch02cUY.south west);
+\draw[ch02dep] (ch02cUL0.south east)
+ .. controls (1,-2.95) and (3,-2.95) .. (ch02cUY.south west);
+\end{scope}
+\end{tikzpicture}

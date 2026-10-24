@@ -1,0 +1,554 @@
+% 分章页65末—77；附录2.A导言及2.A.1，印刷页137—149。
+\section*{附录2.A\quad 平滑样条导论}
+\addcontentsline{toc}{section}{附录2.A 平滑样条导论}
+\markright{附录2.A 平滑样条导论}
+
+为使本书尽可能自洽，本附录介绍平滑样条的基本理论。关于平滑样条的大部分材料取自 Wang（2011）的著作。更详细的内容请参阅 Wang（2011）。
+
+\subsection*{2.A.1\quad 单变量平滑样条回归}
+\addcontentsline{toc}{subsection}{2.A.1 单变量平滑样条回归}
+
+第4.3节定义了希尔伯特空间 $H$ 与再生核希尔伯特空间（RKHS）。令 $L$ 为定义在希尔伯特空间 $H$ 上的连续线性泛函。例如，$L$ 可以是如下求值泛函 $L_x$：
+\begin{equation}
+L_xf=f(x),\tag{2.A.1}
+\end{equation}
+也可以是积分泛函
+\[
+Lf=\int_0^1 f(x)\,dx.
+\]
+考虑一般的平滑样条回归模型：
+\begin{equation}
+y_i=L_if+\epsilon_i,\qquad i=1,2,\ldots,n,\tag{2.A.2}
+\end{equation}
+其中，$y_i$ 是第 $i$ 个个体的观测响应，$z_i$ 是第 $i$ 个个体的设计点，$L_i$ 是定义在 $H$ 上的连续泛函，$f$ 表示一般的未知函数，$\epsilon_i$ 为均值为零、方差均为 $\sigma_\epsilon^2$ 的独立随机误差。如果 $L_i$ 为求值泛函，式（2.A.2）就化为
+\begin{equation}
+y_i=f(x_i)+\epsilon_i,\qquad i=1,2,\ldots,n.\tag{2.A.3}
+\end{equation}
+希尔伯特空间 $H$ 可以分解为两个子空间（Wang 2011）：
+\begin{equation}
+H=H_0\oplus H_1,\tag{2.A.4}
+\end{equation}
+其中，$H_0$ 是有限维空间，具有正交归一基函数 $\varphi_1(x),\ldots,\varphi_p(x)$；其正交补 $H_1$ 是再生核为 $R_1(x,z)$ 的再生核希尔伯特空间。假设 $H$ 是再生核为 $R(x,z)$ 的再生核希尔伯特空间，令 $R_0(x,z)$ 为与 $H_0$ 对应的再生核，则有
+\begin{equation}
+R(x,z)=R_0(x,z)+R_1(x,z).\tag{2.A.5}
+\end{equation}
+可以证明，再生核 $R_0(x,z)$ 为
+\begin{equation}
+R_0(x,z)=\sum_{j=1}^p\varphi_j(x)\varphi_j(z).\tag{2.A.6}
+\end{equation}
+根据再生核的定义，要证明式（2.A.6），只须证明
+\begin{equation}
+g(x)=\bigl(g(\cdot),R_0(x,\cdot)\bigr>,\tag{2.A.7}
+\end{equation}
+其中 $g\in H_0$。事实上，由于 $g\in H_0$，且 $\{\varphi_1(x),\ldots,\varphi_p(x)\}$ 是一组正交归一基函数，任意函数 $g\in H_0$ 均可表示为
+\begin{equation}
+g(x)=\sum_{i=1}^pa_i\varphi_i(x).\tag{2.A.8}
+\end{equation}
+因此，有
+\begin{equation}
+\begin{aligned}
+\langle g(\cdot),R_0(x,\cdot)\rangle
+ &=\left\langle\sum_{i=1}^pa_i\varphi_i(\cdot),
+       \sum_{j=1}^p\varphi_j(x)\varphi_j(\cdot)\right\rangle\\
+ &=\sum_{i=1}^pa_i\left\langle\varphi_i(\cdot),
+       \sum_{j=1}^p\varphi_j(x)\varphi_j(\cdot)\right\rangle\\
+ &=\sum_{i=1}^pa_i\sum_{j=1}^p
+       \langle\varphi_i(\cdot),\varphi_j(\cdot)\rangle\varphi_j(x).
+\end{aligned}\tag{2.A.9}
+\end{equation}
+基函数的正交归一性意味着
+\begin{equation}
+\langle\varphi_i,\varphi_j\rangle=
+\begin{cases}
+1&i=j,\\
+0&i\ne j.
+\end{cases}\tag{2.A.10}
+\end{equation}
+将式（2.A.10）代入式（2.A.9），得到
+\[
+\langle g(\cdot),R_0(x,\cdot)\rangle
+ =\sum_{i=1}^pa_i\varphi_i(x)=g(x).
+\]
+这说明 $R_0(x,z)=\sum_{j=1}^p\varphi_j(x)\varphi_j(z)$ 是再生核希尔伯特空间 $H_0$ 的再生核。类似地，假设 $\{\psi_1(x),\ldots,\psi_q(x)\}$ 是再生核希尔伯特空间 $H_1$ 的一组正交归一基函数，则其再生核为
+\begin{equation}
+R_1(x,z)=\sum_{i=1}^q\psi_i(x)\psi_i(z).\tag{2.A.11}
+\end{equation}
+待拟合的函数 $f$ 包含两部分：在 $H_0$ 上的投影函数 $f_0$，以及在 $H_1$ 上的投影函数 $f_1$，即
+\begin{equation}
+f=f_0+f_1.\tag{2.A.12}
+\end{equation}
+估计式（2.A.2）中的函数 $f$ 时，既希望观测值 $y_i$ 与估计函数 $\widehat f$ 之间的误差小，也希望偏离零空间 $H_0$ 的程度 $\|f_1\|^2$ 小。
+
+函数 $f_1$ 是 $f$ 在再生核希尔伯特空间 $H_1$ 上的投影 $P_1f$。因此，为实现上述目标，函数 $f$ 的平滑样条估计量所对应的目标函数为
+\begin{equation}
+\frac1n\sum_{i=1}^n(y_i-L_if)^2+\lambda\|P_1f\|^2,\tag{2.A.13}
+\end{equation}
+其中，$\lambda$ 为平滑惩罚参数，用于平衡拟合优度与平滑程度。增大惩罚参数 $\lambda$ 会提高平滑程度，但降低预测精度。目标是找到使式（2.A.13）的目标函数最小的 $f$：
+\begin{equation}
+\min_f\frac1n\sum_{i=1}^n(y_i-L_if)^2+\lambda\|P_1f\|^2.\tag{2.A.14}
+\end{equation}
+下面建立搜索式（2.A.14）最优解的算法。首先，讨论如何用再生核将函数优化问题（2.A.14）转化为经典的实值优化问题。关键是为一般函数 $f$ 找到适当的表示形式。
+
+再生核理论是表示函数 $f$ 的有力工具。假设 $L$ 为连续泛函，由 Riesz 表示定理，存在表示元 $\eta_i(x)\in H$，使得
+\begin{equation}
+L_if=\langle\eta_i,f)\rangle.\tag{2.A.15}
+\end{equation}
+由于 $H$ 是再生核希尔伯特空间，可以找到再生核 $R_x(z)=R(x,z)$，使得
+\begin{equation}
+\eta_i(x)=\langle\eta_i(\cdot),R(x,\cdot)\rangle
+ =L_iR(x,\cdot)=L_{i(z)}R(x,z).\tag{2.A.16}
+\end{equation}
+式（2.A.16）给出了表示元 $\eta_i(x)$ 与再生核之间的关系，说明对再生核 $R(x,z)$ 作用该泛函，即可得到表示元。已知再生核 $R(x,z)$ 可分解为
+\begin{equation}
+R(x,z)=R_0(x,z)+R_1(x,z),\tag{2.A.17}
+\end{equation}
+其中 $R_0(x,z)$ 和 $R_1(x,z)$ 分别是 $H_0$ 和 $H_1$ 的再生核。因此，由式（2.A.17）有
+\begin{equation}
+\eta_i(x)=L_{i(z)}R(x,z)
+ =L_{i(z)}R_0(x,z)+L_{i(z)}R_1(x,z).\tag{2.A.18}
+\end{equation}
+接着计算 $L_{i(z)}R_1(x,z)$。由式（2.A.15）得到
+\begin{equation}
+L_{i(z)}R_1(x,z)=\langle\eta_i,R_1(x,z)\rangle.\tag{2.A.19}
+\end{equation}
+注意，再生核 $R_1(x,z)$ 是 $R(x,z)$ 在 $H_1$ 上的投影：
+\begin{equation}
+R_1(x,z)=P_1R(x,z).\tag{2.A.20}
+\end{equation}
+将式（2.A.20）代入式（2.A.19），得到
+\begin{equation}
+\begin{aligned}
+L_{i(z)}R_1(x,z)&=\langle\eta_i,P_1R(x,z)\rangle\\
+ &=\langle P_1\eta_i,R(x,z)\rangle\\
+ &=P_1\eta_i.
+\end{aligned}\tag{2.A.21}
+\end{equation}
+将 $P_1\eta_i$ 记为 $\xi_i(x)$，则式（2.A.19）化为
+\begin{equation}
+L_{i(z)}R_1(x,z)=\xi_i(x).\tag{2.A.22}
+\end{equation}
+再计算 $L_{i(z)}R_0(x,z)$。由式（2.A.6）得到
+\begin{equation}
+L_{i(z)}R_0(x,z)=\sum_{j=1}^p\varphi_j(x)L_{i(z)}\varphi_j(z).\tag{2.A.23}
+\end{equation}
+结合式（2.A.18）、（2.A.22）和（2.A.23），得到
+\begin{equation}
+\eta_i(x)=\sum_{j=1}^p\bigl(L_{i(z)}\varphi_j(z)\bigr)\varphi_j(x)+\xi_i(x).\tag{2.A.24}
+\end{equation}
+取 $\{\eta_1(x),\ldots,\eta_n(x)\}$ 为 $H$ 中的一组基函数，则函数 $\widehat f\in H$ 可以表示为
+\begin{equation}
+\begin{aligned}
+\widehat f(x)&=\sum_{i=1}^nb_i\eta_i(x)\\
+ &=\sum_{j=1}^p\bigl(L_{i(z)}\varphi_j(z)\bigr)\varphi_j(x)
+   +\sum_{i=1}^nb_i\xi_i(x).
+\end{aligned}\tag{2.A.25}
+\end{equation}
+令 $a_j=L_{i(z)}\varphi_j(z)$，式（2.A.25）就化为
+\begin{equation}
+\widehat f(x)=\sum_{j=1}^pa_j\varphi_j(x)+\sum_{i=1}^nb_i\xi_i(x).\tag{2.A.26}
+\end{equation}
+现在可以计算目标函数（2.A.13）。注意，由式（2.A.22）有
+\begin{equation}
+L_{i(x)}\xi_j(x)=L_{i(x)}L_{j(z)}R_1(x,z).\tag{2.A.27}
+\end{equation}
+由于 $P_1$ 是到 $H_1$ 的投影算子，且 $\varphi_j\in H_0$、$\xi_j\in H_1$，对 $\widehat f(x)$ 作用投影算子 $P_1$，得到
+\begin{equation}
+\begin{aligned}
+P_1\widehat f(x)&=\sum_{i=1}^nb_i\xi_i(x)\\
+ &=\xi^Tb,
+\end{aligned}\tag{2.A.28}
+\end{equation}
+其中
+\[
+\xi=\begin{bmatrix}\xi_1(x)\\\vdots\\\xi_n(x)\end{bmatrix},
+\qquad b=\begin{bmatrix}b_1\\\vdots\\b_n\end{bmatrix}.
+\]
+由于 $\xi_j\in H_1$，且 $\xi_j=P_1\eta$，有
+\begin{equation}
+L_{i(x)}\xi_j=\langle\xi_i,\xi_j\rangle.\tag{2.A.29}
+\end{equation}
+结合式（2.A.27）与（2.A.29），得到
+\begin{equation}
+L_{i(x)}L_{j(z)}R_1(x,z)=\langle\xi_i,\xi_j\rangle.\tag{2.A.30}
+\end{equation}
+对式（2.A.26）作用算子 $L_{i(x)}$，得到
+\begin{equation}
+L_{i(x)}\widehat f(x)
+ =\sum_{j=1}^pa_jL_{i(x)}\varphi_j(x)
+  +\sum_{i=1}^nb_iL_{i(x)}\xi_i(x).\tag{2.A.31}
+\end{equation}
+将式（2.A.27）代入式（2.A.31），得到
+\begin{equation}
+L_{i(x)}\widehat f(x)
+ =\sum_{j=1}^pa_jL_{i(x)}\varphi_j(x)
+  +\sum_{i=1}^nb_iL_{i(x)}L_{j(z)}R_1(x,z).\tag{2.A.32}
+\end{equation}
+因此，有
+\providecommand{\chTwoT}{\begin{bmatrix}
+L_{1(x)}\varphi_1(x)&\cdots&L_{1(x)}\varphi_p(x)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}\varphi_1(x)&\cdots&L_{n(x)}\varphi_p(x)
+\end{bmatrix}}
+\providecommand{\chTwoSigma}{\begin{bmatrix}
+L_{1(x)}L_{1(z)}R_1(x,z)&\cdots&L_{1(x)}L_{n(z)}R_1(x,z)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}L_{1(z)}R_1(x,z)&\cdots&L_{n(x)}L_{n(z)}R_1(x,z)
+\end{bmatrix}}
+\providecommand{\chTwoAvec}{\begin{bmatrix}a_1\\\vdots\\a_p\end{bmatrix}}
+\providecommand{\chTwoBvec}{\begin{bmatrix}b_1\\\vdots\\b_n\end{bmatrix}}
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}L_{1(x)}\widehat f(x)\\\vdots\\L_{n(x)}\widehat f(x)\end{bmatrix}
+ &=\chTwoT\chTwoAvec\\
+ &\quad+\chTwoSigma\chTwoBvec\\
+ &=Ta+\Sigma b,
+\end{aligned}\tag{2.A.33}
+\end{equation}
+其中
+\[
+T=\chTwoT,\qquad a=\chTwoAvec,
+\]
+\[
+\Sigma=\chTwoSigma,\qquad b=\chTwoBvec.
+\]
+接着计算 $\|P_1f\|^2$。由式（2.A.28）与（2.A.30）得到
+\begin{equation}
+\begin{aligned}
+\|P_1\widehat f\|^2&=b^T\xi\xi^Tb\\
+ &=b^T\Sigma b.
+\end{aligned}\tag{2.A.34}
+\end{equation}
+令
+\[
+Y=\begin{bmatrix}y_1\\\vdots\\y_n\end{bmatrix}.
+\]
+利用式（2.A.33）和（2.A.34），可将优化问题（2.A.14）转化为
+\begin{equation}
+\min_{a,b}\frac1n\|Y-Ta-\Sigma b\|^2+\lambda b^T\Sigma b.\tag{2.A.35}
+\end{equation}
+令 $F=\frac1n\|Y-Ta-\Sigma b\|^2+\lambda b^T\Sigma b$。将函数 $F$ 对向量 $a$ 和 $b$ 的偏导数设为零，得到
+\begin{equation}
+\frac{\partial F}{\partial a}
+ =-\frac2nT^T(Y-Ta-\Sigma b)=0,\tag{2.A.36}
+\end{equation}
+\begin{equation}
+\frac{\partial F}{\partial b}
+ =-\frac2n\Sigma(Y-Ta-\Sigma b)+2\lambda\Sigma b=0.\tag{2.A.37}
+\end{equation}
+求解式（2.A.36）与（2.A.37），得到
+\begin{equation}
+\Sigma Ta+(\Sigma+n\lambda I)\Sigma b=\Sigma Y,\tag{2.A.38}
+\end{equation}
+\begin{equation}
+T^TTa+T^T\Sigma b=T^TY.\tag{2.A.39}
+\end{equation}
+在式（2.A.38）两边乘以 $\Sigma^{-1}$，得到
+\begin{equation}
+Ta+(\Sigma+n\lambda I)b=Y.\tag{2.A.40}
+\end{equation}
+再在式（2.A.40）两边乘以 $T^T$，得到
+\begin{equation}
+T^TTa+T^T\Sigma b+n\lambda IT^Tb=T^TY.\tag{2.A.41}
+\end{equation}
+将式（2.A.39）代入式（2.A.41），得到
+\begin{equation}
+T^Tb=0.\tag{2.A.42}
+\end{equation}
+综上，优化问题（2.A.35）的解满足以下两个方程：
+\begin{equation}
+Ta+(\Sigma+n\lambda I)b=Y,\tag{2.A.43}
+\end{equation}
+\begin{equation}
+T^Tb=0.\tag{2.A.44a}
+\end{equation}
+令 $M=\Sigma+n\lambda I$，由式（2.A.43）解出 $b$，得到
+\begin{equation}
+b=M^{-1}y-M^{-1}Ta.\tag{2.A.44b}
+\end{equation}
+将式（2.A.44a）代入式（2.A.44b），得到
+\begin{equation}
+T^TM^{-1}y-T^TM^{-1}Ta=0.\tag{2.A.45}
+\end{equation}
+从式（2.A.45）解出 $a$，得到
+\begin{equation}
+a=(T^TM^{-1}T)^{-1}T^TM^{-1}Y.\tag{2.A.46}
+\end{equation}
+将式（2.A.46）代入式（2.A.44），得到解
+\begin{equation}
+b=M^{-1}\left[I-T(T^TM^{-1}T)^{-1}T^TM^{-1}\right]Y.\tag{2.A.47}
+\end{equation}
+为高效计算 $a$ 和 $b$，对 $T$ 作 QR 分解：
+\[
+T=\begin{bmatrix}Q_1&Q_2\end{bmatrix}
+  \begin{bmatrix}R\\0\end{bmatrix},
+\]
+其中 $Q=[Q_1\ Q_2]$ 是正交矩阵，$R$ 是可逆上三角矩阵。利用式（2.A.44），有
+\begin{equation}
+T^Tb=\begin{bmatrix}R^T&0\end{bmatrix}
+ \begin{bmatrix}Q_1^T\\Q_2^T\end{bmatrix}b
+ =R^TQ_1^Tb=0.\tag{2.A.48}
+\end{equation}
+由于 $R$ 可逆，由式（2.A.48）得到
+\begin{equation}
+Q_1^Tb=0.\tag{2.A.49}
+\end{equation}
+根据 $Q$ 为正交矩阵的假设，有 $QQ^T=I$，从而
+\begin{equation}
+b=(QQ^T)b=Q_1Q_1^Tb+Q_2Q_2^Tb.\tag{2.A.50}
+\end{equation}
+将式（2.A.49）代入式（2.A.50），得到
+\begin{equation}
+b=Q_2Q_2^Tb.\tag{2.A.51}
+\end{equation}
+注意，
+\begin{equation}
+\begin{aligned}
+Q_2^TT&=\begin{bmatrix}Q_2^TQ_1&Q_2^TQ_2\end{bmatrix}
+ \begin{bmatrix}R\\0\end{bmatrix}\\
+ &=\begin{bmatrix}0&I\end{bmatrix}\begin{bmatrix}R\\0\end{bmatrix}=0.
+\end{aligned}\tag{2.A.52}
+\end{equation}
+将式（2.A.40）乘以 $Q_2^T$，并利用式（2.A.52），得到
+\begin{equation}
+Q_2^TMb=Q_2^TY.\tag{2.A.53}
+\end{equation}
+将式（2.A.51）代入式（2.A.53），得到
+\begin{equation}
+Q_2^TMQ_2Q_2^Tb=Q_2^TY.\tag{2.A.54}
+\end{equation}
+从式（2.A.54）解出 $b$，得到
+\begin{equation}
+\widehat b=Q_2(Q_2^TMQ_2)^{-1}Q_2^TY.\tag{2.A.55}
+\end{equation}
+注意，
+\begin{equation}
+\begin{aligned}
+Q_1^TT&=\begin{bmatrix}Q_1^TQ_1&Q_1^TQ_2\end{bmatrix}
+ \begin{bmatrix}R\\0\end{bmatrix}\\
+ &=\begin{bmatrix}I&0\end{bmatrix}\begin{bmatrix}R\\0\end{bmatrix}=R.
+\end{aligned}\tag{2.A.56}
+\end{equation}
+再将式（2.A.40）乘以 $Q_1$，得到
+\begin{equation}
+\begin{aligned}
+Ra&=Q_1^T(Y-Mb),\quad\text{或}\\
+a&=R^{-1}Q_1^T(Y-Mb).
+\end{aligned}\tag{2.A57}
+\end{equation}
+将式（2.A.55）代入式（2.A.57），得到
+\begin{equation}
+\widehat a=R^{-1}Q_1^T
+ \left[I-MQ_2(Q_2^TMQ_2)^{-1}Q_2^T\right]Y.\tag{2.A.58}
+\end{equation}
+拟合值 $\widehat f$ 定义为
+\begin{equation}
+\widehat f=T\widehat a+\Sigma\widehat b.\tag{2.A.59}
+\end{equation}
+将式（2.A.59）代入式（2.A.40），并利用式（2.A.55），得到计算拟合值的公式：
+\begin{equation}
+\begin{aligned}
+\widehat f&=Y-n\lambda b\\
+ &=\left[I-n\lambda Q_2(Q_2^TMQ_2)^{-1}Q_2^T\right]Y
+ =H(\lambda)Y,
+\end{aligned}\tag{2.A.60}
+\end{equation}
+其中
+\begin{equation}
+H(\lambda)=I-n\lambda Q_2(Q_2^TMQ_2)^{-1}Q_2^T.\tag{2.A.61}
+\end{equation}
+
+平滑样条回归算法可以概括如下。
+\begin{enumerate}
+\item 选择惩罚参数 $\lambda$。
+\item 计算矩阵
+\[
+T=\chTwoT,\qquad
+\]
+\[
+\Sigma=\chTwoSigma.
+\]
+\item 对矩阵 $T$ 作 QR 分解：
+\[
+T=\begin{bmatrix}Q_1&Q_2\end{bmatrix}\begin{bmatrix}R\\0\end{bmatrix}.
+\]
+\item 计算平滑样条回归的系数
+\[
+\widehat a=R^{-1}Q_1^T
+ \left[I-MQ_2(Q_2^TMQ_2)^{-1}Q_2^T\right]Y,
+\qquad
+\]
+\[
+\widehat b=Q_2(Q_2^TMQ_2)^{-1}Q_2^TY,
+\]
+其中 $M=\Sigma+n\lambda I$。
+\item 计算平滑样条回归函数
+\[
+\widehat f(x)=\sum_{j=1}^p\widehat a_j\varphi_j(x)
+ +\sum_{i=1}^n\widehat b_i\xi_i(x),
+\]
+其中 $\xi_i(x)=L_{i(z)}R_1(x,z)$。
+\item 计算拟合值：
+\[
+\widehat f=H(\lambda)Y,
+\]
+其中 $H(\lambda)=I-n\lambda Q_2(Q_2^TMQ_2)^{-1}Q_2^T$。
+\end{enumerate}
+
+\begin{bookexample}{2.A.1：线性样条与三次样条}
+先考虑线性样条。再生核希尔伯特空间 $H_0$ 与 $H_1$ 分别为
+\[
+H_0=\operatorname{span}\{1\},
+\]
+\[
+H_1=\left\{f:f=0,\ \int_a^b(f')^2\,dx<\infty\right\},
+\]
+其对应的再生核为
+\[
+R_0(x,z)=1,\qquad
+R_1(x,z)=\int_0^{\min(x,z)}du=\min(x,z).
+\]
+再考虑三次样条，其 $H_0$ 与 $H_1$ 为
+\[
+H_0=\operatorname{span}\{1,x\},
+\]
+\[
+H_1=\left\{f:f=0,\ f'(a)=0,\ \int_a^b(f''')^2\,dx<\infty\right\}.
+\]
+对应的再生核分别为
+\[
+R_0(x,z)=1+xz,
+\]
+\[
+\begin{aligned}
+R_1(x,z)
+ &=\int_0^{x\wedge z}(x\wedge z-u)(x\vee z-u)\,du\\
+ &=\int_0^{x\wedge z}
+ \left[(x\wedge z)(x\vee z)-(x\wedge z+x\vee z)u+u^2\right]du\\
+ &=(x\vee z)(x\wedge z)^2
+   -(x\wedge z+x\vee z)\frac{(x\wedge z)^2}{2}
+   +\frac{(x\wedge z)^3}{3}\\
+ &=(x\wedge z)^2
+   \left[x\vee z-\frac{x\wedge z+x\vee z}{2}
+   +\frac{x\vee z}{3}\right]\\
+ &=(x\wedge z)^2\frac{3(x\vee z)-x\wedge z}{6}.
+\end{aligned}
+\]
+\end{bookexample}
+
+\begin{bookexample}{2.A.2：基于 Bernoulli 多项式的线性样条与三次样条}
+首先定义 Bernoulli 多项式
+\begin{equation}
+k_r(x)=\frac{B_r(x)}{r!},\tag{2.A.62}
+\end{equation}
+其中，$B_r(x)$ 递归定义为
+\[
+B_0(x)=1,\qquad
+B_r'(x)=rB_{r-1}(x),\qquad
+\int_0^1B_r(x)\,dx=0.
+\]
+现在推导前四个缩放 Bernoulli 多项式。显然，$B_0(x)=1$。
+\[
+B_1(x)=\int B_0(x)\,dx=\int dx=x+c,
+\]
+但 $B_1(x)$ 必须满足
+\[
+\int_0^1B_1(x)\,dx=\frac12+c=0,
+\]
+从而 $c=-\frac12$。因此，
+\[
+B_1(x)=x-\frac12.
+\]
+接着计算 $B_2(x)$。由递推公式得到
+\[
+B_2(x)=2\int B_1(x)\,dx
+ =2\left[\frac{x^2}{2}-\frac x2+c\right]=x^2-x+c,
+\]
+并且
+\[
+\int_0^1B_2(x)\,dx=\frac13-\frac12+c=0.
+\]
+由上式解得 $c=\frac16$。因此，
+\[
+B_2(x)=x^2-x+\frac16.
+\]
+类似地，有
+\[
+B_3(x)=x^3-\frac{3x^2}{2}+\frac x2,
+\qquad
+B_4(x)=x^4-2x^3+x^2-\frac1{30}.
+\]
+由式（2.A.62）得到前四个缩放 Bernoulli 多项式：
+\[
+\begin{aligned}
+k_0(x)&=1,\\
+k_1(x)&=x-\frac12,\\
+k_2(x)&=\frac12\left\{k_1^2(x)-\frac1{12}\right\},\\
+k_4(x)&=\frac1{24}\left\{k_1^4(x)-\frac12k_1^2(x)+\frac7{240}\right\}.
+\end{aligned}
+\]
+Sobolev 空间 $W_2^m[a,b]$ 定义为满足 $f,f',\ldots,f^{(m-1)}$ 绝对连续，且 $\int_a^b(f^{(m)})^2dx<\infty$ 的函数所组成的集合。在 Sobolev 空间 $W_2^m[0,1]$ 中定义内积
+\[
+\langle f,g\rangle
+ =\sum_{j=0}^{m-1}
+  \left(\int_0^1f^{(j)}dx\right)
+  \left(\int_0^1g^{(j)}dx\right)
+  +\int_0^1f^{(m)}g^{(m)}dx.
+\]
+可以证明（Wang 2011），$W_2^m[0,1]=H_0\oplus H_1$，其中
+\[
+H_0=\operatorname{span}\{k_0(x),k_1(x),\ldots,k_{m-1}(x)\},
+\]
+\[
+H_1=\left\{f:\int_0^1f^{(j)}dx=0,\ j=0,1,\ldots,m-1,\
+              \int_0^1(f^{(m)})^2dx<\infty\right\}.
+\]
+可以证明，$\{k_0(x),k_1(x),\ldots,k_{m-1}(x)\}$ 是一组正交归一基函数。事实上，
+\[
+\int_0^1B_j^{(v)}dx=
+\begin{cases}1&v=j,\\0&v\ne j,\end{cases}
+\]
+从而
+\[
+\int_0^1B_j^{(v)}dx\int_0^1B_i^{(v)}dx=
+\begin{cases}1&i=j=v,\\0&\text{其他情形}.\end{cases}
+\]
+因此，当 $i=j$ 时，
+\[
+\begin{aligned}
+\langle k_j(x),k_i(x)\rangle
+ &=\sum_{v=0}^i
+   \left(\int_0^1k_j^{(v)}dx\right)
+   \left(\int_0^1k_i^{(v)}dx\right)\\
+ &=\sum_{v=0}^i\int_0^1\frac{B_j^{(v)}}{j!}dx
+                  \int_0^1\frac{B_i^{(v)}}{i!}dx=1.
+\end{aligned}
+\]
+当 $j<i$ 时，
+\[
+\begin{aligned}
+\langle k_j(x),k_i(x)\rangle
+ &=\sum_{v=0}^i
+   \left(\int_0^1k_j^{(v)}dx\right)
+   \left(\int_0^1k_i^{(v)}dx\right)\\
+ &=\sum_{v=0}^i\int_0^1\frac{B_j^{(v)}}{j!}dx
+                  \int_0^1\frac{B_i^{(v)}}{i!}dx=0.
+\end{aligned}
+\]
+$H_0$ 与 $H_1$ 均为再生核希尔伯特空间，其对应的再生核为
+\[
+R_0(x,z)=\sum_{j=0}^{m-1}k_j(x)k_j(z),
+\qquad
+R_1(x,z)=k_m(x)k_m(z)+(-1)^{m-1}k_{2m}(|x-z|).
+\]
+考虑线性样条，其基函数为 $\{1\}$，并且
+\[
+R_0(x,z)=1,\qquad
+R_1(x,z)=k_1(x)k_1(z)+k_2(|x-z|).
+\]
+对于三次样条，基函数组为 $\{1,k_1(x)\}$，相应的再生核为
+\[
+R_0(x,z)=1+k_1(x)k_1(z),
+\qquad
+R_1(x,z)=k_2(x)k_2(z)-k_4(|x-z|).
+\]
+\end{bookexample}

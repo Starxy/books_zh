@@ -1,0 +1,97 @@
+% 原书第 15—18 页；章首导言、关键定义与第 2.1 节。
+\chapter{定义模型与参数}
+\label{ch:defining-model-parameter}
+\chapterauthors{Sherri Rose 与 Mark J. van der Laan}
+\chapteraffiliations{%
+S. Rose（通讯作者）：美国哈佛医学院卫生保健政策系，180 Longwood Ave, Boston, MA 02115, USA；电子邮箱：\href{mailto:rose@hcp.med.harvard.edu}{rose@hcp.med.harvard.edu}。\\
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_2}。}
+
+在数据科学中，我们常常希望估计因果效应（causal effect），并评价估计量的不确定性。第 1 章介绍了这样一条路线：针对现实研究问题，在复杂数据类型中估计因果效应。本章将详细给出模型和目标参数（target parameter）的形式化定义；它们会随具体研究问题而变化。不过，这里介绍的概念将贯穿全书，适用于多种参数，而所用的基本模板具有一般性。
+
+我们建议读者在阅读本章之前，先熟悉因果推断（causal inference）的基本概念，例如阅读 Judea Pearl 的《因果论》（\emph{Causality}）第 2 版（Pearl，2009a）。第一部《靶向学习》（\emph{Targeted Learning}）第 2 章，针对单时点处理的数据结构和平均处理效应（average treatment effect，ATE）参数，概括了 Pearl 著作中的关键内容；与 Pearl 的书相比，这是一份更为简短的背景材料。本章不会重复全部基础知识，但会提供处理我们所关注的复杂因果问题所必需的内容。读者需要从本章掌握的一个关键认识是：因果推断既需要一个因果模型，将因果效应定义为数据分布的目标参数，也需要稳健的半参数有效估计。本书几乎完全聚焦于后者，也就是估计；而 Pearl 的工作主要聚焦于前者。
+
+\begin{sourcebox}[关键定义与记号]
+\begin{itemize}[leftmargin=1.5em,itemsep=.15em,topsep=.2em]
+ \item 统计模型（statistical model）$\mathcal M$ 是一组可能的概率分布 $P$ 的集合。
+ \item $P_0$ 是 $O$ 的真实分布。
+ \item 定义目标参数，需要指定一个作用于 $P_0$ 的映射 $\Psi$。$\Psi$ 将任意 $P\in\mathcal M$ 映射为数值向量 $\Psi(P)$。对于 $d$ 维参数，这一映射记为 $\Psi\colon\mathcal M\to\mathbb R^d$。
+ \item $\psi_0$ 是 $\Psi(P_0)$ 的取值，即参数的真值。
+\end{itemize}
+统计估计问题，就是将观测数据 $O_1,\ldots,O_n$ 映射为 $\Psi(P_0)$ 的一个估计量，在估计中纳入 $P_0\in\mathcal M$ 这一知识，并同时评价估计量的不确定性。
+
+{\kaishu 更多背景知识见《靶向学习》（2011）第 2 章。}
+\end{sourcebox}
+
+数据 $O_1,\ldots,O_n$ 由随机变量 $O$ 的 $n$ 个独立同分布（independent and identically distributed，i.i.d.）副本组成，$O$ 的真实概率分布为 $P_0$。对于第 1 章的数据结构，例如
+\[
+ O=(L_0,A_0,L_1,A_1,L_2=Y),
+\]
+其中，$L_{0:1}$ 是协变量（covariate）向量，$A_{0:1}$ 是干预（intervention）向量，$L_2=Y$ 是结局。大写字母表示随机变量，小写字母则表示相应变量的某个具体取值。当所有变量都是离散变量时，$P_0(L_0=l_0,A_0=a_0,L_1=l_1,A_1=a_1,Y=y)$ 为 $O=(L_0,A_0,L_1,A_1,Y)$ 的每种可能结果 $(l_0,a_0,l_1,a_1,y)$ 指定一个概率。
+
+接下来，我们将在统计模型所依据的最小假设基础上，加入不可检验的因果假设，从而定义一个模型。这样，我们既能定义一个具有因果解释的感兴趣参数，也能确定：为了从观测数据分布中识别这一因果参数，究竟需要哪些假设。最后，我们将选定统计模型与目标参数。
+
+\section{定义结构因果模型}
+\label{sec:ch02-scm}
+
+我们考虑一组内生变量（endogenous variable）$X=(X_j:j)$。对于这些变量，结构因果模型（structural causal model，SCM）将其定义为其他内生变量与外生误差（exogenous error）的确定性函数。外生变量（exogenous variable）记为 $U=(U_{X_j}:j)$，它们从不被观测。对于每个 $X_j$，我们在其他 $X$ 变量中指定 $X_j$ 的父节点（parent）$\operatorname{Pa}(X_j)$。内生变量 $X$ 往往包含可观测变量 $O$，但也可能包含不可观测变量。我们假设，每个 $X_j$ 都是 $\operatorname{Pa}(X_j)$ 与一个外生变量 $U_{X_j}$ 的函数：
+\[
+ X_j=f_{X_j}\bigl(\operatorname{Pa}(X_j),U_{X_j}\bigr),
+ \qquad j=1\ldots,J.
+\]
+
+函数 $f_{X_j}$ 与 $U$ 的联合分布共同确定 $(U,X)$ 的数据生成分布（data-generating distribution）：它们描述了一个由结构方程构成的确定性系统，将 $U$ 的一个实现值确定地映射为 $X$ 的一个实现值。这些函数 $f_{X_j}$ 以及 $U$ 的联合分布可以不作具体限定；也可能因为具备领域知识，而愿意对它们作出更强的限制。我们的知识通常不足以支持一个完全参数化的 SCM。
+
+\begin{sourcebox}
+\textbf{SCM 是随机变量 $(U,X)$ 的一个统计模型。}
+通过以下两方面的变化，可以定义 $(U,X)$ 的所有可能数据生成分布的集合：
+\begin{enumerate}[itemsep=.15em,topsep=.2em]
+ \item 令函数集 $f=(f_{X_j}:j)$ 在所有允许的函数形式中变化；
+ \item 令误差 $U$ 的分布在所有可能的误差分布中变化。
+\end{enumerate}
+\end{sourcebox}
+
+在第 1 章讨论的体外受精（in vitro fertilization，IVF）研究，以及何时开始 HIV 治疗的研究中，$j=1,\ldots,J$，其中 $J=5$，且 $X$ 中的所有变量均可观测。因此，$X=(X_1,X_2,X_3,X_4,X_5)$。我们再将 $X$ 改写为 $X=(L_0,A_0,L_1,A_1,Y)$，其中 $X_1=L_0$、$X_2=A_0$、$X_3=L_1$、$X_4=A_1$、$X_5=Y$。向量 $L_0$ 和 $L_1$ 可以同时包含二值变量和连续变量；而在两个例子中，$A_0$、$A_1$ 和 $Y$ 都是二值变量。我们需要明确指出，这些变量按如下时间顺序生成：
+\[
+ L_0\to A_0\to L_1\to A_1\to Y.
+\]
+
+具体来看 IVF 研究。首先测量基线变量 $L_0$，包括母亲年龄、IVF 机构、获卵数、移植或冷冻的胚胎数，以及妊娠指标。随后依次出现 $A_0$，表示是否尝试了一个 IVF 周期；接着出现 $L_1$，表示该 IVF 周期是否成功。$A_1$ 在 $L_1$ 之后出现，表示是否尝试了第二个 IVF 周期；最后出现 $Y$，表示在 $L_1$ 时尝试的 IVF 周期中是否至少有一次成功。回顾前面的约定：如果 $A_t=0$，则 $L_{t+1}=0$；如果 $L_1=1$，则 $Y=1$。因此，我们有函数 $f=(f_{L_0},f_{A_0},f_{L_1},f_{A_1},f_Y)$ 和外生变量 $U=(U_{L_0},U_{A_0},U_{L_1},U_{A_1},U_Y)$。结构方程模型为
+% 原书 A_1 方程的误差下标印为 A_0，照录而不改为 A_1。
+\begin{equation}
+ \begin{aligned}
+ L_0&=f_{L_0}(U_{L_0}),\\
+ A_0&=f_{A_0}(L_0,U_{A_0}),\\
+ L_1&=f_{L_1}(L_0,A_0,U_{L_1}),\\
+ A_1&=f_{A_1}(L_0,A_0,L_1,U_{A_0}),\\
+ Y&=f_Y(L_0,A_0,L_1,A_1,U_Y).
+ \end{aligned}
+ \tag{2.1}
+\end{equation}
+我们不对 $f_{L_0}$、$f_{A_0}$、$f_{L_1}$、$f_{A_1}$ 和 $f_Y$ 的函数形式作限制性假设；这些函数 $f$ 是非参数的。此外，本研究还假设不存在未测量的混杂因素（no unmeasured confounders）。确切地说，在式 (2.1) 中，我们假设数据按以下过程生成：
+\begin{enumerate}
+ \item 从概率分布 $P_U$ 抽取 $U$，并确保给定 $L_{0:1}$ 时，$U_{A_{0:1}}$ 与 $U_Y$ 独立。
+ \item 将 $L_0$ 生成为 $U_{L_0}$ 的确定性函数。
+ \item 将 $A_0$ 生成为 $L_0$ 和 $U_{A_0}$ 的确定性函数。
+ \item 将 $L_1$ 生成为 $L_0$、$A_0$ 和 $U_{L_1}$ 的确定性函数。
+ \item 将 $A_1$ 生成为 $L_0$、$A_0$、$L_1$ 和 $U_{A_1}$ 的确定性函数。
+ \item 将 $Y$ 生成为 $L_0$、$A_0$、$L_1$、$A_1$ 和 $U_Y$ 的确定性函数。
+\end{enumerate}
+
+我们假定，观测数据结构 $O=(L_0,A_0,L_1,A_1,Y)$ 是上述系统中结构方程所生成的内生变量 $(L_0,A_0,L_1,A_1,Y)$ 的一个实现值；由此定义 $O$ 的 SCM。
+
+SCM 表示我们根据对数据生成方式的认识而作出的一组不可检验的因果假设。第一部《靶向学习》（2011）的入门内容曾讨论单时点干预的 SCM。如那里所述，$O$ 的 SCM 还涉及界定随机变量 $(U,X)$ 与 $O$ 的关系，使完整数据的 SCM 能够用 $f$ 和 $U$ 的分布 $P_U$，对 $O$ 的概率分布进行参数化。在完整数据的 SCM 中，$(U,X)$ 的每个可能概率分布 $P_{U,X}$，都由所选择的误差分布 $P_U$ 和一组确定性函数 $(f_{X_j}:j)$ 来索引，并导出 $O$ 的一个概率分布 $P(P_{U,X})$。因此，完整数据的 SCM 能够利用 $(U,X)$ 的真实概率分布，对 $O$ 的真实概率分布进行参数化。于是，$O$ 的分布 $P_0$ 的统计模型 $\mathcal M$ 可以表示为 $\mathcal M=\{P(P_{U,X}):P_{U,X}\}$，其中，$P_{U,X}$ 在 SCM 所允许的 $(U,X)$ 的全部概率分布中变化。如果这一 $\mathcal M$ 是非参数的，那么，SCM 所编码的因果假设没有一个能用观测数据检验。
+
+如果研究对象是被随机分配接受 IVF 治疗的，那么，结构方程模型可能为
+% 式 (2.2) 及原书紧随文字均使用 U_{A_0}，与图 2.2 的标签分别照录。
+\begin{equation}
+ \begin{aligned}
+ L_0&=f_{L_0}(U_{L_0}),\\
+ A_0&=f_{A_0}(U_{A_0}),\\
+ L_1&=f_{L_1}(L_0,A_0,U_{L_1}),\\
+ A_1&=f_{A_1}(A_0,U_{A_0}),\\
+ Y&=f_Y(L_0,A_0,L_1,A_1,U_Y).
+ \end{aligned}
+ \tag{2.2}
+\end{equation}
+在式 (2.2) 中，$A_0$ 仅为 $U_{A_0}$ 的确定性函数，$A_1$ 则仅为 $A_0$ 和 $U_{A_0}$ 的确定性函数。我们假定的这一随机化设计依赖此前的处理，但不依赖其他外生变量。虽然本书主要关注没有随机化的观察性研究（observational study），靶向学习（targeted learning）框架却具有相当广泛的适用性；第三编有三章专门讨论随机试验。

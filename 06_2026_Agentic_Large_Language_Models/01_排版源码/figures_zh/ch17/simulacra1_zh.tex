@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small,
+  process/.style={draw,rounded corners=4pt,minimum width=1.85cm,minimum height=.72cm},
+  store/.style={draw,minimum width=2.60cm,minimum height=1.06cm,font=\bfseries}]
+  \path[use as bounding box] (0,0) rectangle (15.50,5.10);
+  \draw[dashed,gray,thick] (2.35,1.25) rectangle (13.10,3.78);
+  \node[fill=white,font=\bfseries] at (7.76,3.58) {生成式智能体记忆};
+  \node[process] (sm-perceive) at (1.02,2.55) {感知};
+  \node[store] (sm-memory) at (4.15,2.55) {记忆流};
+  \draw[gray] (2.89,2.06) rectangle (5.41,3.04);
+  \node[process] (sm-retrieve) at (7.76,2.55) {检索};
+  \node[store] (sm-retrieved) at (11.36,2.55) {检索得到的记忆};
+  \draw[gray] (10.10,2.06) rectangle (12.62,3.04);
+  \node[process] (sm-act) at (14.49,2.55) {行动};
+  \node[process] (sm-plan) at (7.76,4.62) {规划};
+  \node[process] (sm-reflect) at (7.76,.48) {反思};
+  \draw[->] (sm-perceive) -- (sm-memory);
+  \draw[->] (sm-memory) -- (sm-retrieve);
+  \draw[->] (sm-retrieve) -- (sm-retrieved);
+  \draw[->] (sm-retrieved) -- (sm-act);
+  \draw[->] (sm-retrieved.north) to[out=90,in=0] (sm-plan.east);
+  \draw[->] (sm-plan.west) to[out=180,in=90] (sm-memory.north);
+  \draw[->] (sm-retrieved.south) to[out=-90,in=0] (sm-reflect.east);
+  \draw[->] (sm-reflect.west) to[out=180,in=-90] (sm-memory.south);
+\end{tikzpicture}

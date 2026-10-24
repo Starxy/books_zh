@@ -1,0 +1,39 @@
+
+\begin{tikzpicture}[
+ x=1cm,y=1cm,
+ chonebnode/.style={ellipse,draw=inkblue!70,fill=blue!55!cyan!65,
+   text=white,minimum width=10mm,minimum height=7mm,inner sep=1.2pt,font=\small},
+ chonebarrow/.style={-{Stealth[length=1.7mm,width=1.2mm]},draw=red!85,thin}
+]
+ \node[chonebnode] (choneba1) at (1.1,2.1) {$Y_1$};
+ \node[chonebnode] (choneba2) at (2.2,0.3) {$Y_2$};
+ \node[chonebnode] (choneba3) at (0,0.3) {$Y_3$};
+ \draw[chonebarrow] (choneba3) -- (choneba1);
+ \draw[chonebarrow] (choneba1) -- (choneba2);
+ \draw[chonebarrow] (choneba2) -- (choneba3);
+ \node[anchor=west,font=\small] at (-0.5,-0.4) {(a)};
+
+ \node[chonebnode] (chonebb1) at (4.8,2.1) {$Y_1$};
+ \node[chonebnode] (chonebb2) at (5.9,0.3) {$Y_2$};
+ \node[chonebnode] (chonebb3) at (3.7,0.3) {$Y_3$};
+ \draw[chonebarrow] (chonebb3) -- (chonebb1);
+ \draw[chonebarrow] (chonebb1) -- (chonebb2);
+ \draw[chonebarrow] (chonebb3) -- (chonebb2);
+ \node[anchor=west,font=\small] at (3.2,-0.4) {(b)};
+
+ \node[chonebnode] (chonebc1) at (8.4,2.7) {$Y_1$};
+ \node[chonebnode] (chonebc2) at (10.1,1.9) {$Y_2$};
+ \node[chonebnode] (chonebc3) at (8.0,1.6) {$Y_3$};
+ \node[chonebnode] (chonebc4) at (7.5,0.4) {$Y_4$};
+ \node[chonebnode] (chonebc5) at (9.3,0.4) {$Y_5$};
+ \node[chonebnode] (chonebc6) at (11.1,1.3) {$Y_6$};
+ \node[chonebnode] (chonebc7) at (11.0,-0.05) {$Y_7$};
+ \draw[chonebarrow] (chonebc1) -- (chonebc3);
+ \draw[chonebarrow] (chonebc2) -- (chonebc3);
+ \draw[chonebarrow] (chonebc3) -- (chonebc4);
+ \draw[chonebarrow] (chonebc5) -- (chonebc4);
+ \draw[chonebarrow] (chonebc6) -- (chonebc5);
+ \draw[chonebarrow] (chonebc6) -- (chonebc7);
+ \draw[chonebarrow] (chonebc5) -- (chonebc7);
+ \node[anchor=west,font=\small] at (7.0,-0.4) {(c)};
+\end{tikzpicture}

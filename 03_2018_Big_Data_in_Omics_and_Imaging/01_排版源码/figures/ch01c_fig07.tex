@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,every node/.style={font=\small,inner sep=3pt},line width=1pt]
+\node (c07x) at (0,2.4) {$X$};
+\node (c07y1) at (4,2.4) {$Y_1$};
+\node (c07m) at (0,0) {$Y_{\mathrm{ME}}$};
+\node (c07y) at (4,0) {$Y$};
+\draw[->,blue!60] (c07x) -- node[above] {$3$} (c07y1);
+\draw[->,red!80!black] (c07x) -- node[left] {$2$} (c07m);
+\draw[->,green!55!black] (c07m) -- node[below] {$1$} (c07y1);
+\draw[->,green!55!black] (c07y1) -- node[right] {$1$} (c07y);
+\draw[->,green!55!black] (c07m) -- node[below] {$1.5$} (c07y);
+\end{tikzpicture}
+\origfig{7}{中介表型、中介表型的父节点与目标表型的网络结构。}
+\label{fig:ch01c-07}
+\end{figure}

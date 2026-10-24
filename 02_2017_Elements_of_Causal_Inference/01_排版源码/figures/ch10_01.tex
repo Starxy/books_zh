@@ -1,0 +1,46 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.8cm,y=1.15cm]
+\node[ch10node] (ch10f1-x3-0) at (0,2) {$X^{3}_{t}$};
+\node[ch10node] (ch10f1-x3-1) at (1,2) {$X^{3}_{t+1}$};
+\node[ch10node] (ch10f1-x3-2) at (2,2) {$X^{3}_{t+2}$};
+\node[ch10node] (ch10f1-x3-3) at (3,2) {$X^{3}_{t+3}$};
+\node[ch10node] (ch10f1-x3-4) at (4,2) {$X^{3}_{t+4}$};
+\draw[ed] (ch10f1-x3-0)--(ch10f1-x3-1);
+\draw[ed] (ch10f1-x3-1)--(ch10f1-x3-2);
+\draw[ed] (ch10f1-x3-2)--(ch10f1-x3-3);
+\draw[ed] (ch10f1-x3-3)--(ch10f1-x3-4);
+\draw[ed] (-.7,2)--(ch10f1-x3-0);
+\draw[ed] (ch10f1-x3-4)--(4.7,2);
+\node[ch10node] (ch10f1-x1-0) at (0,1) {$X^{1}_{t}$};
+\node[ch10node] (ch10f1-x1-1) at (1,1) {$X^{1}_{t+1}$};
+\node[ch10node] (ch10f1-x1-2) at (2,1) {$X^{1}_{t+2}$};
+\node[ch10node] (ch10f1-x1-3) at (3,1) {$X^{1}_{t+3}$};
+\node[ch10node] (ch10f1-x1-4) at (4,1) {$X^{1}_{t+4}$};
+\draw[ed] (ch10f1-x1-0)--(ch10f1-x1-1);
+\draw[ed] (ch10f1-x1-1)--(ch10f1-x1-2);
+\draw[ed] (ch10f1-x1-2)--(ch10f1-x1-3);
+\draw[ed] (ch10f1-x1-3)--(ch10f1-x1-4);
+\draw[ed] (-.7,1)--(ch10f1-x1-0);
+\draw[ed] (ch10f1-x1-4)--(4.7,1);
+\node[ch10node] (ch10f1-x2-0) at (0,0) {$X^{2}_{t}$};
+\node[ch10node] (ch10f1-x2-1) at (1,0) {$X^{2}_{t+1}$};
+\node[ch10node] (ch10f1-x2-2) at (2,0) {$X^{2}_{t+2}$};
+\node[ch10node] (ch10f1-x2-3) at (3,0) {$X^{2}_{t+3}$};
+\node[ch10node] (ch10f1-x2-4) at (4,0) {$X^{2}_{t+4}$};
+\draw[ed] (ch10f1-x2-0)--(ch10f1-x2-1);
+\draw[ed] (ch10f1-x2-1)--(ch10f1-x2-2);
+\draw[ed] (ch10f1-x2-2)--(ch10f1-x2-3);
+\draw[ed] (ch10f1-x2-3)--(ch10f1-x2-4);
+\draw[ed] (-.7,0)--(ch10f1-x2-0);
+\draw[ed] (ch10f1-x2-4)--(4.7,0);
+\draw[ed] (ch10f1-x1-0)--(ch10f1-x2-1);
+\draw[ed] (ch10f1-x1-1)--(ch10f1-x2-2);
+\draw[ed] (ch10f1-x1-2)--(ch10f1-x2-3);
+\draw[ed] (ch10f1-x1-3)--(ch10f1-x2-4);
+\draw[ed] (ch10f1-x1-0)--(ch10f1-x3-2);
+\draw[ed] (ch10f1-x1-1)--(ch10f1-x3-3);
+\draw[ed] (ch10f1-x1-2)--(ch10f1-x3-4);
+\end{tikzpicture}
+\caption{不存在即时效应的时间序列示例。}
+\end{figure}

@@ -1,0 +1,39 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ n/.style={draw=blue!55!black,fill=white,minimum width=9mm,minimum height=6mm,inner sep=2pt,font=\small},
+ lab/.style={font=\small,inner sep=2pt}]
+\node[n] (c13az) at (0,2.5) {$Z$};
+\node[n] (c13ax) at (2,2.5) {$X$};
+\node[n] (c13ay) at (4,2.5) {$Y$};
+\draw[->,green!55!black] (c13az) -- node[lab,above] {$b$} (c13ax);
+\draw[->,green!55!black] (c13ax) -- node[lab,above] {$\alpha$} (c13ay);
+\draw[<->,blue!65!black] (c13az.north) to[bend left=25] node[lab,above] {$C_{ZY}$} (c13ay.north);
+\node[lab,anchor=west] at (-.5,1.7) {(a)};
+\node[n] (c13bz) at (7,3.3) {$Z$};
+\node[n] (c13bw) at (9.2,3.3) {$W$};
+\node[n] (c13bx) at (6.3,1.5) {$X$};
+\node[n] (c13by) at (10.6,1.5) {$Y$};
+\draw[->,green!55!black] (c13bz) -- node[lab,above] {$b$} (c13bw);
+\draw[->,green!55!black] (c13bz) -- node[lab,left] {$d$} (c13bx);
+\draw[->,green!55!black] (c13bx) -- node[lab,above left] {$e$} (c13bw);
+\draw[->,green!55!black] (c13bw) -- node[lab,above right] {$c$} (c13by);
+\draw[->,green!55!black] (c13bx) -- node[lab,below] {$\alpha$} (c13by);
+\node[lab,anchor=west] at (5.6,.9) {(b)};
+\node[lab] (c13cy) at (3,-.5) {$Y$};
+\node[lab] (c13cx) at (6,-.5) {$X$};
+\node[lab] (c13ch) at (3,-2.8) {$H$};
+\node[lab] (c13cg) at (6,-2.8) {$G$};
+\node[lab] (c13cz) at (4.2,-2) {$Z$};
+\draw[->,green!55!black] (c13cx) -- node[lab,above] {$q$} (c13cy);
+\draw[->,green!55!black] (c13cy) -- node[lab,left] {$a$} (c13ch);
+\draw[->,red!75!black] (c13cg) -- node[lab,below] {$b$} (c13ch);
+\draw[->,green!55!black] (c13cx) -- node[lab,right] {$e$} (c13cg);
+\draw[->,green!55!black] (c13cy) -- node[lab,above right,pos=.45] {$g$} (c13cg);
+\draw[->,green!55!black] (c13ch) -- node[lab,above left] {$c$} (c13cz);
+\draw[->,green!55!black] (c13cx) -- node[lab,above right] {$f$} (c13cz);
+\node[lab,anchor=west] at (2.5,-3.4) {(c)};
+\end{tikzpicture}
+\origfig{13}{d-分离与可识别性。(a) 路径图；(b) 例 9.5.5 的路径图；(c) 例 9.5.6 的路径图。}
+\label{fig:ch01c-13}
+\end{figure}

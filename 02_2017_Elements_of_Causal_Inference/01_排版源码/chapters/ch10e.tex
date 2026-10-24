@@ -1,0 +1,42 @@
+% 原书第210—211页；10.4—10.5。
+\section{动态因果建模}
+\textbf{动态因果建模（dynamic causal modeling，DCM）}是一种专门为推断不同脑区活动之间的因果关系而发展起来的技术［Friston et al., 2003］。若向量$z\in\mathbb R^n$编码$n$个脑区的活动，$u\in\mathbb R^m$是扰动向量，则$z$的动力学由如下形式的微分方程给出：
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}z=F(z,u,\theta),
+ \tag{10.15}
+\end{equation}
+其中$F$是已知函数，$u\in\mathbb R^m$是外部刺激向量，$\theta$将描述不同脑区因果联系的模型类参数化。常用的是式(10.15)的如下双线性近似：
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}z
+ =\left(A+\sum_{j=1}^m u_jB^j\right)z+Cu,
+ \tag{10.16}
+\end{equation}
+其中$A,B^1,\ldots,B^m$为$n\times n$矩阵，$C$为$n\times m$矩阵。$A$描述不同脑区活动$z_j$之间的相互影响，矩阵$B^j$描述$u$如何改变这种相互影响，$C$编码$u$对$z$的直接影响。
+
+这里，$z$无法直接观测，但可以检测\textbf{血流动力学响应（hemodynamic response）}。血流输送更多营养物质，例如氧和葡萄糖，以补偿增加的能量需求。\textbf{功能磁共振成像（functional magnetic resonance imaging，fMRI）}能够通过\textbf{血氧水平依赖（blood-oxygen-level-dependent，BOLD）}信号检测到这种增加。定义一个状态向量$x$，同时包含脑活动和某些血流动力学状态变量，再将式(10.16)与血流动力学响应的动力学模型结合，就得到$x$的微分方程
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}x=f(x,u,\theta).
+ \tag{10.17}
+\end{equation}
+高维参数$\theta$由式(10.16)的所有自由参数，以及血流动力学响应模型中的参数构成。然后，用一个模型描述$x$如何决定实际测量到的BOLD信号$y$：
+\begin{equation}
+ y=\lambda(x).
+ \tag{10.18}
+\end{equation}
+最终，获得的数据是由观测到的$y$向量构成的时间序列。DCM利用多种已知的潜变量模型学习技术，例如\textbf{期望最大化（expectation maximization，EM）}，从这些数据推断式(10.16)中的矩阵。
+
+Lohmann et al.［2012a］对DCM提出批评，主要理由是，模型参数数量随$n$与$m$的增加而爆炸式增长，以至于无法从经验数据中识别这些参数。在他们对模拟脑连接的实验中，DCM为相当多的错误模型给出的证据高于真实模型。这些发现引发了关于DCM的争论：Friston et al.［2013］回应了Lohmann et al.［2012a］，Lohmann et al.［2012b］又对Friston et al.［2013］作了回应。
+
+\section{习题}
+\setcounter{problem}{7}
+\begin{problem}[无环汇总图]
+证明定理10.2。
+\end{problem}
+
+\begin{problem}[即时效应]
+考虑多元时间序列上的一个结构因果模型，其中每个变量$X_t^j$都受到所有分量$X^k$的全部过去取值的影响。此外，假设即时效应构成一个DAG，且分布相对于完整时间图满足马尔可夫性与忠实性。能够从分布中识别即时DAG结构到什么程度？
+\end{problem}
+
+\begin{problem}[Granger因果性]
+如果在图10.7(a)中对所有$t\in\mathbb Z$加入箭头$Z_t\to Z_{t+1}$，解释为什么Granger因果性会同时得到“$X$在Granger意义下导致$Y$”和“$Y$在Granger意义下导致$X$”。
+\end{problem}

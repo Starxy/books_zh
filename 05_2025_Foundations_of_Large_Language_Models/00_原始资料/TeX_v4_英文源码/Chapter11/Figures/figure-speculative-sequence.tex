@@ -1,0 +1,26 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.8cm}
+\def\nodew{10cm}
+
+\tikzstyle{lnode} = [minimum width=3cm,minimum height=1.0cm,inner sep=2pt,draw,thick,fill=white,rounded corners=1pt];
+\tikzstyle{snode} = [circle,minimum size=0.2cm,inner sep=0,draw=white,line width=0.02cm,fill=black];
+
+\begin{scope}
+
+\node[anchor=west] (s1) at (0,0) {$[\mathbf{x},\ \ \mathbf{y}_{<i}]$};
+\node[anchor=west] (s2) at ([xshift=0.1cm]s1.east) {$\hat{y}_{i+1} ... \hat{y}_{i+n_a}$};
+\node[anchor=west] (s3) at ([xshift=0.1cm,yshift=-1pt]s2.east) {$\bar{y}_{i+n_a+1}$};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.0cm,xshift=-2pt]s1.south east) -- ([yshift=-0.0cm,xshift=2pt]s1.south west) node [pos=0.5,below,yshift=-0.1cm] {\scriptsize{Context}};
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.0cm,xshift=-2pt]s2.south east) -- ([yshift=-0.0cm,xshift=2pt]s2.south west) node [pos=0.5,below,yshift=-0.1cm,align=left] {\scriptsize{$n_a$ tokens}\\[-0.15cm] \scriptsize{predicted using}\\[-0.15cm] \scriptsize{the draft model}};
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=-0.0cm,xshift=-3pt]s3.south east) -- ([yshift=-0.0cm,xshift=3pt]s3.south west) node [pos=0.5,below,yshift=-0.1cm,xshift=0.5cm,align=left] {\scriptsize{One token}\\[-0.15cm] \scriptsize{predicted using}\\[-0.15cm] \scriptsize{the verification model}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

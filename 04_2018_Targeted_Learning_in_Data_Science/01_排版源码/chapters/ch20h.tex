@@ -1,0 +1,66 @@
+% 原书分章 PDF 第 19—21 页；第 20.7.2 小节。
+\subsection{有效影响曲线的估计}
+
+有效影响曲线（EIC）仅通过 $(\bar q,\bar h(\bar q,\bar g))$ 依赖于数据生成分布 $P$。给定估计量 $\bar q_N$ 和 $\bar g_N$，可得到 $\bar h_0=\bar h(\bar q_0,\bar g_0)$ 的代入估计量 $\bar h(\bar q_N,g_N)$。这表明，估计 $\bar g_0$ 的唯一目标，是构造 $\bar h_0$ 的良好估计量。这一 $\bar h_0$ 的代入估计量 $\bar h(\bar q_N,\bar g_N)$ 的重要优点在于，它充分利用统计模型所编码的知识。不过，如果计算代入估计 $\bar h(\bar q_N,\bar g_N)$ 的负担过重，也可以考虑独立于 $\bar q_0$ 的估计量 $\bar q_N$，构造 $\bar h_0$ 的直接估计量。为此，注意每个 $\bar h_{t,0}$ 都是 $C_{Y(t),j}$ 的密度。可以使用密度估计器估计 $\bar h_{t,0}$，将 $(C_{Y(t),j}:j=1,\ldots,N)$ 当作独立同分布观测处理。这对应于对 $\bar h_{t,0}$ 使用以下损失函数：
+\[
+ L(\bar h_t)(\mathbf O)=-\sum_j\log\bar h_t(C_{Y(t),j}).
+\]
+
+但是，即使采用这种直接方法估计 $\bar h_{t,0}$，计算巧妙协变量的代入估计 $\bar H_t(\bar h_N,\bar q_N,\mathbf g^*)$，仍可能面临很大的计算困难。具体而言，需要对每个 $m=1,\ldots,N$ 与 $t=1,\ldots,\tau$ 计算
+\[
+\begin{aligned}
+ \bar D_{t,m,N}(c_{y(t)})
+ &=E_{\bar q_N,\mathbf g^*}(\bar Y_{\mathbf g^*}(\tau)\mid Y_m(t)=1,C_{Y(t),m}=c_{y(t)})\\
+ &\quad{}-E_{\bar q_N,\mathbf g^*}(\bar Y_{\mathbf g^*}(\tau)\mid Y_m(t)=0,C_{Y(t),m}=c_{y(t)}),
+\end{aligned}
+\]
+以及 $h^*_{t,m,N}(c_{y(t)})=P_{\bar q_N,\mathbf g^*}(C_{Y(t),m}=c_{y(t)})$。令
+\[
+ \bar Q^{\mathbf g^*}_{t,m}(y(t),c_{y(t)})
+ =E(\bar Y_{\mathbf g^*}(\tau)\mid Y_m(t)=y(t),C_{Y(t),m}=c_{y(t)}),
+\]
+则上式可写为
+\[
+ \bar D_{t,m}(c_{y(t)})
+ =\bar Q^{\mathbf g^*}_{t,m}(1,c_{y(t)})-\bar Q^{\mathbf g^*}_{t,m}(0,c_{y(t)}).
+\]
+注意，当所有 $C_{Y(t),i}$ 都离散时，可采用以下蒙特卡洛模拟方法计算 $\bar Q^{\mathbf g^*}_{t,m,N}(y(t),c_{y(t)})$：
+\begin{enumerate}
+ \item 首先，从干预后分布的估计 $P_{\mathbf g^*,N}$ 中抽取实现 $\mathbf O^{\mathbf g^*,k}$，$k=1,\ldots,K$；每个样本 $\mathbf O^{\mathbf g^*,k}$ 均由 $N$ 个观测构成，且 $K$ 很大。
+ \item 接着，对每个样本 $k$ 计算 $\bar Y^k_{\mathbf g^*}(\tau)$。因此，单个第 $k$ 个样本中的全部 $N$ 个观测都赋予相同结局 $\bar Y^k_{\mathbf g^*}(\tau)$。
+ \item 然后，对固定的 $m=1,\ldots,N$，在 $k=1,\ldots,K$ 中找出所有与指定取值 $(y(t),c_{y(t)})$ 匹配的样本。
+ \item 在这些匹配样本中，对结局 $\bar Y^k(\tau)$ 取平均，即可得到 $\bar Q^{\mathbf g^*}_{t,m,N}(y(t),c_{y(t)})$ 的估计。
+\end{enumerate}
+注意，上述算法很容易并行化。此外，可以在模拟实现 $\mathbf O^{\mathbf g^*,k}$ 的同时，同步近似 $\bar Q^{\mathbf g^*}_{t,m,N}(y(t),c_{y(t)})$。随着生成越来越多这样的样本，即 $K$ 增长，这一 $\bar Q^{\mathbf g^*}_{t,m,N}(y(t),c_{y(t)})$ 的估计将持续改善。另外，基于同一组实现 $\mathbf O^{\mathbf g^*,k}$，$k=1,\ldots,K$，的经验分布，也可用类似方法得到 $h^*_{t,m}(c_{y(t)})$ 的代入估计量。
+
+虽然这种方法在算法上提供了更容易处理的 $\bar D_{t,m}$ 计算方式，但它可能需要大量计算。此外，它无法处理 $C_{Y(t),i}$ 连续的情形。另一种方法是，基于从 $P_{\mathbf g^*,N}$ 中抽取的同样 $K$ 个实现 $\mathbf O^{\mathbf g^*,k}$，采用基于损失的估计，得到 $\bar Q^{\mathbf g^*}_{t,m,N}$ 的良好近似。已知 $\bar Y_{\mathbf g^*}$ 连续且取值位于 $(0,1)$，因此可以采用以下对数似然损失函数：
+\[
+\begin{aligned}
+ &L_{t,m}(\bar Q^{\mathbf g^*}_{t,m})(\mathbf O^{\mathbf g^*,k}:k=1,\ldots,K)\\
+ &\quad=-\sum_{k=1}^K\log\Bigl\{
+   \bar Q^{\mathbf g^*}_{t,m}(Y_m^k(t),C^k_{Y(t),m})^{\bar Y^k_{\mathbf g^*}(\tau)}\\
+ &\hspace{37mm}{}\times(1-\bar Q^{\mathbf g^*}_{t,m}(Y_m^k(t),C^k_{Y(t),m}))^{1-\bar Y^k_{\mathbf g^*}(\tau)}\Bigr\}.
+\end{aligned}
+\]
+对于每个 $\bar Q^{\mathbf g^*}_{t,m}$，也可以考虑以下平方误差损失函数：
+\[
+\begin{aligned}
+ &L_{t,m}(\bar Q^{\mathbf g^*}_{t,m})(\mathbf O^{\mathbf g^*,k}:k=1,\ldots,K)\\
+ &\quad\equiv-\sum_{k=1}^K
+       (\bar Y^k_{\mathbf g^*}(\tau)-\bar Q^{\mathbf g^*}_{t,m}(Y_m^k(t),C^k_{Y(t),m}))^2.
+\end{aligned}
+\]
+
+此外，由于有来自 $P_{\mathbf g^*,N}$ 的 $K$ 个独立实现，可以为 $\bar Q^{\mathbf g^*}_{t,m}$ 设定一个参数模型，例如 $\{\bar Q^{\mathbf g^*}_{t,m,\theta}:\theta\}$，并使用标准极大似然估计
+\[
+ \theta_K=\operatorname*{arg\,min}_{\theta}L_{t,m}(\bar Q^{\mathbf g^*}_{t,m,\theta}).
+\]
+通过假设 $\bar Q^{\mathbf g^*}_{t,m}$ 可由共同参数 $\theta(m,t)$ 参数化，例如 $\{\bar Q^{\mathbf g^*}_{\theta(t,m)}:\theta(m,t)\}$，这一参数模型还可以合并个体观测 $m=1,\ldots,N$ 和各个时间点 $t=1,\ldots,\tau$，使用以下关于 $t$ 与 $m$ 的损失和函数：
+\[
+ L(\bar Q^{\mathbf g^*})\equiv\sum_{t=1}^\tau\sum_{m=1}^NL_{t,m}
+\]
+并用标准极大似然估计拟合这个共同参数：
+\[
+ \theta_K(m,t)=\operatorname*{arg\,min}_{\theta}L(\bar Q^{\mathbf g^*}_{\theta(m,t)}).
+\]
+更重要的是，可以将上述方法用于基于损失的交叉验证和超级学习，拟合上述函数 $\bar Q^{\mathbf g^*}_{t,m}$；既可以分别拟合，也可以跨 $t$、跨 $m$，或同时跨二者合并拟合，从而自适应地估计 $\bar Q^{\mathbf g^*}_{t,m}$。通过跨 $t$ 与 $m$ 合并建立 $\bar Q^*_{t,m}$ 的模型，对于任意时间点个数 $\tau$，这都成为计算上可处理的问题，因为只需一个建模步骤，就能估计所有 $t=1,\ldots,\tau$、$m=1,\ldots,N$ 对应的全部 EIC 分量。

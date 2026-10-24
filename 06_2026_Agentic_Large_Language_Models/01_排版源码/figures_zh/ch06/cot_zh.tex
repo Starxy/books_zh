@@ -1,0 +1,55 @@
+% 依照随附 figures/cot2.pdf 重排四面板；所有例题、算式、错误答案及代码拼写均保留。
+\begingroup
+\definecolor{chSixReason}{RGB}{0,145,0}
+\definecolor{chSixCode}{RGB}{0,145,150}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+    every node/.style={font=\fontsize{8.5pt}{10.7pt}\selectfont,align=left,inner sep=0pt},
+    frame/.style={draw=black!65,line width=.9pt,rounded corners=2mm},
+    head/.style={draw=black!65,line width=.9pt,rounded corners=1mm,minimum width=1.8cm,minimum height=.5cm,align=center,font=\small},
+    title/.style={font=\bfseries\small,align=center,text width=3.3cm},
+    prompt/.style={anchor=north west,text width=3.0cm}]
+\node[title] at (1.625,10.45) {少样本提示};
+\node[title] at (5.175,10.45) {少样本 CoT};
+\node[title] at (8.725,10.45) {零样本 CoT};
+\node[title,text width=5.0cm] at (13.15,10.45) {程序辅助语言模型};
+\foreach \xx/\ww in {0/3.25,3.55/3.25,7.10/3.25,10.65/5.0}{
+  \draw[frame] (\xx,3.2) rectangle (\xx+\ww,9.7);
+  \node[head,fill=cyan!35] at (\xx+\ww/2,9.7) {输入};
+}
+\node[prompt] at (.12,9.25) {问：Roger 有 5 个网球。他买了两罐球，每罐 3 个。他现在有多少个网球？\par\medskip
+答：答案是 11。\par\medskip
+问：Lisa 有 23 个苹果。如果她吃了 20 个，又买了 6 个，她现在有多少个苹果？};
+\node[prompt] at (3.67,9.25) {问：Roger 有 5 个网球。他买了两罐球，每罐 3 个。他现在有多少个网球？\par\medskip
+答：{\color{chSixReason}Rogers 最初有 5 个球。每罐 3 个，2 罐就是 6 个球。$5+6=11$。}答案是 11。\par\medskip
+问：Lisa 有 23 个苹果。如果她吃了 20 个，又买了 6 个，她现在有多少个苹果？};
+\node[prompt] at (7.22,9.25) {问：Lisa 有 23 个苹果。如果她吃了 20 个，又买了 6 个，她现在有多少个苹果？\par\bigskip
+{\color{chSixReason}让我们一步一步地思考。}};
+\node[prompt,text width=4.76cm] at (10.77,9.25) {问：Roger 有 5 个网球。他买了两罐球，每罐 3 个。他现在有多少个网球？\par\medskip
+答：{\color{chSixReason}Rogers 最初有 5 个球。}\par
+{\color{chSixCode}\ttfamily\fontsize{7pt}{10pt}\selectfont tennis\_balls = 5}\par
+{\color{chSixReason}每罐 3 个，2 罐就是}\par
+{\color{chSixCode}\ttfamily\fontsize{7pt}{10pt}\selectfont bought\_balls = 2 * 3}\par
+{\color{chSixReason}个网球。}答案为\par
+{\color{chSixCode}\ttfamily\fontsize{7pt}{10pt}\selectfont answer = tennis\_balls + bought\_balls}\par\medskip
+问：Lisa 有 23 个苹果。如果她吃了 20 个，又买了 6 个，她现在有多少个苹果？};
+
+\draw[frame] (0,1.3) rectangle (3.25,2.5);
+\foreach \xx/\ww in {3.55/3.25,7.10/3.25,10.65/5.0}{
+  \draw[frame] (\xx,-.5) rectangle (\xx+\ww,2.5);
+}
+\foreach \xx/\ww in {0/3.25,3.55/3.25,7.10/3.25,10.65/5.0}{
+  \node[head,fill=green!40] at (\xx+\ww/2,2.5) {输出};
+}
+\node[prompt] at (.12,2.08) {答：答案是 27。};
+\node[text=red!80!black,font=\bfseries\Large] at (2.67,1.7) {$\times$};
+\node[prompt] at (3.67,2.08) {答：{\color{chSixReason}Lisa 最初有 23 个苹果。她吃了 20 个，所以还剩 $23-20=3$ 个。她又买了 6 个，因此 $3+6=9$。}答案是 9。};
+\node[prompt] at (7.22,2.08) {答：{\color{chSixReason}Lisa 最初有 23 个苹果。她吃了 20 个，所以还剩 $23-20=3$ 个。她又买了 6 个，因此 $3+6=9$。}};
+\node[prompt,text width=4.76cm] at (10.77,2.08) {答：{\color{chSixReason}Lisa 最初有 23 个苹果。}\par
+{\color{chSixCode}\ttfamily\fontsize{7pt}{10pt}\selectfont apples = 23}\par
+{\color{chSixReason}她吃了 20 个，然后又买了 6 个。}\par
+{\color{chSixCode}\ttfamily\fontsize{7pt}{10pt}\selectfont eaten = 20; bought = 6}\par
+{\color{chSixCode}\ttfamily\fontsize{7pt}{10pt}\selectfont anwer = apples - eaten + bought}};
+\end{tikzpicture}%
+}
+\endgroup

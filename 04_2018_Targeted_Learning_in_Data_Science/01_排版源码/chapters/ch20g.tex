@@ -1,0 +1,35 @@
+% 原书分章 PDF 第 18—19 页；第 20.7 节导言及第 20.7.1 小节。
+\section{TMLE}
+
+TMLE 通过以下过程，将初始估计量 $\bar q_{t,N}$ 修改为靶向版本 $\bar q^*_{t,N}$，$t=1,\ldots,\tau$：利用 $\bar g_0$ 的估计量 $\bar g_N$，构造一个针对目标参数 $\psi_0$ 的最不利子模型 $\{\bar q^k_{t,N}(\epsilon,\bar g_N):\epsilon\}$，使它在 $\epsilon=0$ 处经过当前拟合 $\bar q^k_{t,N}$；对每个 $t$ 与每一步 $k$，采用标准 MLE $\epsilon^k_{t,N}$ 拟合 $\epsilon$；迭代更新 $\bar q^{k+1}_{t,N}=\bar q^k_{t,N}(\epsilon^k_{t,N})$，$t=1,\ldots,\tau$，直到随着 $k=1,2,\ldots$ 达到收敛。由此，将 $\psi_0$ 的 TMLE 定义为代入估计量 $\Psi(q_{\mathbf W,N},\bar q_N^*)$。因此，这一 TMLE 还需要估计干预机制 $\bar g_0$。为了定义这种 TMLE，需要使用统计目标参数的有效影响曲线，即式 21.12，由它导出这些最不利子模型。这个最不利扰动模型求解有效影响曲线方程 21.12。也就是说，将构造经过密度 $p$ 的 $\bar q_t$ 因子的扰动模型 $\{p_{\bar q_\epsilon}:\epsilon\}$，使之满足
+\begin{equation}
+ \left.\frac d{d\epsilon}\log p_{\bar q_\epsilon}\right|_{\epsilon=0}(\mathbf O)
+ =D^*(q_{\mathbf W},\bar q,\bar h(\bar q,\bar g))(\mathbf O).
+ \tag{20.12}
+\end{equation}
+
+\subsection{局部最不利扰动模型}
+
+现在考虑所有 $Y_i(t)$ 均为二元变量、所有 $W_i$ 均为分类变量的情形，其中 $i=1,\ldots,N$，$t=1,\ldots,\tau$。此时，可使用式 20.11 中二元情形的 EIC 表示。具体而言，式 20.11 表明，EIC 中每个对应于 $t$ 的分量，均可表示为残差 $(Y_i(t)-\bar q_t(1\mid C_{Y(t),i}))$ 的加权和，每个残差均乘以“巧妙协变量”$\bar H_t(C_{Y(t),i})$。因此，可以采用以下经过每个 $\bar q_t$、由参数 $\epsilon_t$ 索引的逻辑回归扰动模型：
+\[
+ \operatorname{Logit}\bar q_{t,\epsilon_t}(1\mid c_{y(t)})
+ =\operatorname{Logit}\bar q_t(1\mid c_{y(t)})
+       +\epsilon_t\bar H_t(c_{y(t)}),
+\]
+上述模型通过密度 $p$ 的 $\bar q_t$ 分量，定义了一个由参数 $\{\epsilon_t:t=1,\ldots,\tau)$ 索引的 $\tau$ 维扰动子模型 $\{\bar q_t(\epsilon_t,\bar g):\epsilon_t,t=1,\ldots,\tau\}$。注意，这种扰动子模型的选择显然满足
+\[
+ \left.\frac d{d\epsilon}\log p_{\bar q_\epsilon}\right|_{\epsilon=0}(\mathbf O)
+ =D^*(q_{\mathbf W},\bar q,\bar h(\bar q,\bar g))(\mathbf O).
+\]
+
+将 $q_{\mathbf W,0}$ 的估计量 $q_{\mathbf W,N}$ 定义为在观测 $\mathbf W$ 上放置概率质量 1 的 NPMLE，并假设它具有良好定义。这意味着，$q_{\mathbf W,N}$ 已经求解由 EIC 分量 $\sum_{i=1}^ND^*_{W_i}(P)(W_i)$ 定义的有效得分方程。定义 $\bar g_0$ 的估计量 $\bar g_N$，以及 $\bar q_0:=(\bar q_{t,0}:t=1,\ldots,\tau)$ 的初始估计量 $\bar q_N:=(\bar q_{t,N}:t=1,\ldots,\tau)$；它们通过前一节概述的某一种方法得到，可以对每个 $t$ 单独拟合，也可以跨所有 $t$ 合并拟合。令 $k=0$，并定义 MLE
+\[
+ \epsilon^k_{t,N}=\operatorname*{arg\,max}_{\epsilon_t}
+       \log\bar q^k_{t,N,\epsilon_t}(\mathbf O),
+       \qquad t=1,\ldots,\tau.
+\]
+注意，通过运行 $t=1,\ldots,\tau$ 个单独回归，即可得到这个模型。也就是说，对每个 $t$ 拟合一个单独的逻辑回归，合并观测结局 $(Y_i(t):i=1,\ldots,N)$，以初始超级学习器拟合 $\bar q_{t,N}(1\mid C_{Y(t),i})$，$i=1,\ldots,N$，作为偏移项，并使用在观测 $C_{Y(t),i}$，$i=1,\ldots,N$，处计算的“巧妙协变量”的代入估计 $\bar H_t(\bar g_N,\mathbf g^*,\bar q_N)(C_{Y(t),i})$。这就构成 TMLE 的第一步，其中定义 $\bar q^{k+1}_{t,N}:=\bar q^k_{t,N,\epsilon^k_{t,N}}$，$t=1,\ldots,\tau$。令 $k=k+1$，迭代这一更新过程，便定义第 $k$ 步 TMLE $q^k_{t,N}$，$k=1,2,\ldots$。相应地，目标参数 $\Psi(q_{\mathbf W,0},\bar q_0)$ 的第 $k$ 步 TMLE 为代入估计量 $\Psi(q_{\mathbf W,N},\bar q_N^k)$，$k=1,2,\ldots$。如果迭代更新，直到第 $K$ 步时对所有 $t$ 都有 $\epsilon^K_{N,t}\approx0$，则根据式 20.12 可得
+\[
+ D^*(q_{\mathbf W,N},\bar q_N^*,\bar h(\bar q_N^*,\bar g_N))(\mathbf O)\approx0,
+\]
+其中，$\bar q_N^*=\bar q_N^K$。如果 $\bar q_t$ 的初始估计量足够接近真值，例如收敛速度快于 $n^{-1/4}$，则我们近期的结果证明，TMLE 只需进行一次迭代，这将显著降低该算法的计算负担，参见第 5 章。

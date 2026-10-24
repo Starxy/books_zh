@@ -1,0 +1,165 @@
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,
+  font=\fontsize{8.2}{9.2}\selectfont,
+  quote/.style={draw=black!75,rounded corners=6pt,fill=white,align=left,inner sep=5pt},
+  debate/.style={draw=orange!90!black,rounded corners=4pt,fill=orange!3,minimum width=2.05cm,
+    minimum height=.57cm,text=orange!90!black},
+  reflect/.style={draw=teal,rounded corners=4pt,fill=teal!3,minimum width=2.05cm,
+    minimum height=.57cm,text=teal},
+  alternative/.style={->,cyan!80!blue,densely dashed,line width=.8pt},
+  selected/.style={->,cyan!80!blue,line width=.85pt}]
+  \path[use as bounding box] (0,0) rectangle (15.55,21.0);
+
+  \node[quote,text width=6.80cm] (som-overquote) at (3.77,20.25)
+    {我是一名擅长……的专家，对自己的答案{\bfseries\color{blue!60!black}充满自信}，并经常{\bfseries\color{blue!60!black}说服其他智能体相信我}……};
+  \node[quote,text width=6.80cm] (som-easyquote) at (11.52,20.25)
+    {我是一名擅长……的专家，{\bfseries\color{red!70!black}保持客观}……只要其他智能体的答案有道理，我{\bfseries\color{red!70!black}可以被说服}……};
+  \node[inner sep=0pt] (som-over) at (3.77,18.98)
+    {\includegraphics[width=1.02cm]{figures_zh/ch17/som_overconfident}};
+  \node[inner sep=0pt] (som-easy) at (11.52,18.98)
+    {\includegraphics[width=1.02cm]{figures_zh/ch17/som_easygoing}};
+  \draw (som-overquote.south) -- (som-over.north);
+  \draw (som-easyquote.south) -- (som-easy.north);
+  \node[font=\small\bfseries] at (2.05,18.97) {过度自信};
+  \node[font=\small\bfseries] at (9.95,18.97) {随和};
+  \node[font=\small\bfseries] at (7.76,18.15) {(a) 两类智能体特征};
+  \draw[->,thick] (7.76,17.99) -- (7.76,17.65);
+  \node[fill=white] at (7.26,17.82) {组成};
+
+  \foreach \idx/\x in {1/2.01,2/5.83,3/9.65,4/13.47} {
+    \draw[rounded corners=5pt] (\x-1.75,15.18) rectangle (\x+1.75,17.26);
+    \node[fill=white,inner sep=2pt,font=\bfseries] at (\x,17.26) {社会 \idx（$S_{\idx}$）};
+    \node[text=red!80!black] at (\x-1.13,16.84) {智能体1};
+    \node[text=green!45!black] at (\x,16.84) {智能体2};
+    \node[text=cyan!75!blue] at (\x+1.13,16.84) {智能体3};
+  }
+  \foreach \x in {.88,2.01,3.14,5.83,6.96,10.78}
+    \node[inner sep=0pt] at (\x,16.01) {\includegraphics[width=.91cm]{figures_zh/ch17/som_overconfident}};
+  \foreach \x in {4.70,8.52,9.65,12.34,13.47,14.60}
+    \node[inner sep=0pt] at (\x,16.01) {\includegraphics[width=.91cm]{figures_zh/ch17/som_easygoing}};
+  \node[font=\small\bfseries] at (7.76,14.78) {(b) 由三个智能体组成的四种社会};
+
+  \draw[->,thick] (.15,14.65) -- (.15,8.20) -- (.60,8.20);
+  \node[fill=white,rotate=90] at (.15,11.34) {求解问题};
+
+  \fill[black!5,rounded corners=8pt] (.48,8.90) rectangle (7.72,14.35);
+  \fill[black!5,rounded corners=8pt] (7.92,8.90) rectangle (15.47,14.35);
+  \draw[dashed,gray,rounded corners=8pt] (.41,8.82) rectangle (15.54,14.43);
+  \node[debate,dashed] at (6.50,14.02) {};
+  \node[inner sep=0pt,opacity=.30] at (6.50,14.02) {\includegraphics[height=.40cm]{figures_zh/ch17/som_chat}};
+  \node[text=orange!90!black,font=\bfseries] at (6.50,14.02) {辩论};
+  \node[reflect,dashed] at (14.25,14.02) {};
+  \node[inner sep=0pt,opacity=.30] at (14.25,14.02) {\includegraphics[height=.40cm]{figures_zh/ch17/som_reflect}};
+  \node[text=teal,font=\bfseries] at (14.25,14.02) {反思};
+
+  \node[quote,draw=none,text width=2.16cm] (som-deb3quote) at (1.89,12.78)
+    {根据智能体1和智能体2的回答，我认为这个问题……};
+  \node[quote,draw=none,text width=3.52cm] (som-deb2quote) at (5.38,13.00)
+    {根据智能体1和智能体3的回答，我认为这个问题……};
+  \node[quote,draw=none,text width=5.85cm] (som-deb1quote) at (4.08,9.44)
+    {根据智能体2和智能体3的回答，我认为这个问题……};
+  \node[inner sep=0pt] (som-deb3) at (1.87,10.78)
+    {\includegraphics[width=1.18cm]{figures_zh/ch17/som_overconfident}};
+  \node[inner sep=0pt] (som-deb2) at (4.55,11.89)
+    {\includegraphics[width=1.18cm]{figures_zh/ch17/som_easygoing}};
+  \node[inner sep=0pt] (som-deb1) at (6.40,10.78)
+    {\includegraphics[width=1.18cm]{figures_zh/ch17/som_easygoing}};
+  \foreach \x/\y in {1.36/11.18,4.04/12.30,5.89/11.19}
+    \node[inner sep=0pt] at (\x,\y) {\includegraphics[width=.27cm]{figures_zh/ch17/som_chat}};
+  \node[text=cyan!75!blue,font=\bfseries] at (1.87,10.12) {智能体3};
+  \node[text=green!45!black,font=\bfseries] at (4.55,11.27) {智能体2};
+  \node[text=red!80!black,font=\bfseries] at (6.40,10.12) {智能体1};
+  \draw (som-deb3quote.south) -- (som-deb3.north);
+  \draw (som-deb2quote.south) -- (som-deb2.north);
+  \draw (som-deb1quote.north) -- (som-deb1.south);
+  \draw[orange!90!black,thick] (4.13,10.52) ellipse (.61cm and .30cm);
+  \node[text=orange!90!black,font=\bfseries] at (4.13,10.52) {辩论};
+
+  \draw[white,line width=3pt] (8.04,12.53) -- (15.34,12.53);
+  \draw[white,line width=3pt] (8.04,10.73) -- (15.34,10.73);
+  \foreach \n/\y/\kind/\col in {1/13.10/easygoing/red!80!black,2/11.36/easygoing/green!45!black,3/9.59/overconfident/cyan!75!blue} {
+    \node[inner sep=0pt] at (8.76,\y)
+      {\includegraphics[width=1.08cm]{figures_zh/ch17/som_\kind}};
+    \node[inner sep=0pt] at (8.30,\y+.42)
+      {\includegraphics[width=.28cm]{figures_zh/ch17/som_reflect}};
+    \node[text=\col,font=\bfseries] at (8.77,\y-.56) {智能体\n};
+  }
+  \node[quote,draw=none,text width=5.18cm] at (12.38,13.10)
+    {我为之前的错误回答致以诚挚的歉意。我犯了一个错误……};
+  \node[quote,draw=none,text width=5.18cm] at (12.38,11.36)
+    {再次为我上一条回复中的错误答案道歉……};
+  \node[quote,draw=none,text width=5.18cm] at (12.38,9.59)
+    {反思我之前的回答后，我认为……};
+  \node[font=\small\bfseries] at (7.76,8.51) {(c) 两种思维模式};
+
+  \fill[cyan!3] (.48,.58) rectangle (15.47,8.14);
+  \draw[->,black!75] (.70,7.53) -- (15.26,7.53);
+  \foreach \x in {1.52,3.69,6.08,9.08,12.08,14.96}
+    \draw[black!75] (\x,7.53) -- (\x,7.78);
+  \foreach \x/\txt in {6.08/第1轮,9.08/第2轮,12.08/第3轮,14.96/第N轮}
+    \node at (\x,7.98) {\txt};
+  \node at (13.70,7.98) {$\cdots$};
+  \node[quote,text width=1.35cm,minimum height=1.0cm,align=center] (som-create) at (1.52,6.66) {创建\\社会};
+  \node[quote,text width=1.35cm,minimum height=1.0cm,align=center] (som-task) at (3.69,6.66) {处理\\任务};
+  \draw[selected] (som-create.east) -- (som-task.west);
+  \foreach \n/\x in {1/6.08,2/9.08,3/12.08} {
+    \node[debate,dashed] (som-d\n) at (\x,6.96) {};
+    \node[inner sep=0pt,opacity=.30] at (\x,6.96) {\includegraphics[height=.40cm]{figures_zh/ch17/som_chat}};
+    \node[text=orange!90!black] at (\x,6.96) {辩论};
+    \node[reflect,dashed] (som-r\n) at (\x,5.81) {};
+    \node[inner sep=0pt,opacity=.30] at (\x,5.81) {\includegraphics[height=.40cm]{figures_zh/ch17/som_reflect}};
+    \node[text=teal] at (\x,5.81) {反思};
+  }
+  \draw[alternative] (som-task.east) -- (som-d1.west);
+  \draw[alternative] (som-task.east) -- (som-r1.west);
+  \foreach \i/\j in {1/2,2/3} {
+    \draw[alternative] (som-d\i.east) -- (som-d\j.west);
+    \draw[alternative] (som-d\i.east) -- (som-r\j.west);
+    \draw[alternative] (som-r\i.east) -- (som-d\j.west);
+    \draw[alternative] (som-r\i.east) -- (som-r\j.west);
+  }
+  \draw[alternative] (som-d3.east) -- (14.45,6.96) -- (14.86,6.63);
+  \draw[alternative] (som-r3.east) -- (14.45,5.81) -- (14.86,6.14);
+  \node at (14.17,6.38) {$\cdots$};
+  \draw[decorate,decoration={brace,mirror,amplitude=6pt},black!75]
+    (5.05,5.30) -- (13.12,5.30);
+  \node[inner sep=0pt] at (2.68,3.94) {\includegraphics[width=3.25cm]{figures_zh/ch17/som_team}};
+
+  \fill[black!5,rounded corners=6pt] (6.54,2.77) rectangle (14.38,4.97);
+  \node[font=\bfseries] at (10.46,4.68) {全部 8 种可能};
+  \node at (8.82,4.24) {$\textcolor{orange!90!black}{p_0}$：辩论};
+  \node at (12.14,4.24) {$\textcolor{teal}{p_1}$：反思};
+  \def\somzero{\textcolor{orange!90!black}{p_0}}
+  \def\somone{\textcolor{teal}{p_1}}
+  \node at (7.56,3.70) {$\somzero\somzero\somzero$};
+  \node at (9.48,3.70) {$\somzero\somzero\somone$};
+  \node at (11.40,3.70) {$\somzero\somone\somzero$};
+  \node at (13.32,3.70) {$\somzero\somone\somone$};
+  \node at (7.56,3.13) {$\somone\somzero\somzero$};
+  \node[draw,rounded corners=2pt,inner sep=2pt] (som-chosen) at (9.48,3.13) {$\somone\somzero\somone$};
+  \node at (11.40,3.13) {$\somone\somone\somzero$};
+  \node at (13.32,3.13) {$\somone\somone\somone$};
+  \draw[->,black!80] (som-chosen.south) -- (10.04,2.43);
+  \node at (10.45,2.28) {8 种可能中的一种};
+  \node[reflect] (som-selected1) at (6.27,1.48) {};
+  \node[inner sep=0pt,opacity=.30] at (6.27,1.48) {\includegraphics[height=.40cm]{figures_zh/ch17/som_reflect}};
+  \node[text=teal] at (6.27,1.48) {反思};
+  \node[debate] (som-selected2) at (9.56,1.48) {};
+  \node[inner sep=0pt,opacity=.30] at (9.56,1.48) {\includegraphics[height=.40cm]{figures_zh/ch17/som_chat}};
+  \node[text=orange!90!black] at (9.56,1.48) {辩论};
+  \node[reflect] (som-selected3) at (12.85,1.48) {};
+  \node[inner sep=0pt,opacity=.30] at (12.85,1.48) {\includegraphics[height=.40cm]{figures_zh/ch17/som_reflect}};
+  \node[text=teal] at (12.85,1.48) {反思};
+  \draw[selected] (4.63,1.48) -- (som-selected1.west);
+  \draw[selected] (som-selected1.east) -- (som-selected2.west);
+  \draw[selected] (som-selected2.east) -- (som-selected3.west);
+
+  \draw[orange!90!black,rounded corners=2pt] (.72,1.37) rectangle (1.22,1.76);
+  \draw[teal,rounded corners=2pt] (.76,1.33) rectangle (1.26,1.72);
+  \draw[fill=white,rounded corners=2pt] (.80,1.29) rectangle (1.30,1.68);
+  \node[anchor=west] at (1.43,1.49) {已选};
+  \draw[selected] (.78,1.12) -- (1.30,1.12);
+  \draw[teal,dashed,rounded corners=2pt] (2.26,1.29) rectangle (2.78,1.68);
+  \node[anchor=west] at (2.92,1.49) {备选};
+  \draw[alternative] (2.25,1.12) -- (2.79,1.12);
+  \node[font=\small\bfseries] at (7.76,.19) {(d) 模拟机器社会的协作};
+\end{tikzpicture}

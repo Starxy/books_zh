@@ -1,0 +1,391 @@
+% ============================================================
+%  第九章  因果概率：解释与识别
+% ============================================================
+\chapter{因果概率：解释与识别}
+
+\begin{flushright}
+\kaishu\small
+来吧，我们拈阄，看是谁惹的祸。\\[2pt]
+——《约拿书》1:7
+\end{flushright}
+
+\section*{序言}
+\addcontentsline{toc}{section}{序言}
+
+评估一个事件是另一事件之原因的可能性，指导着我们对世界的大部分理解，也指导着我们在世界中的大部分行动。例如，按通行的司法标准，当且仅当被告的行为“更可能而非不可能”是原告损害（或死亡）的原因时，才应作出有利于原告的判决。然而因果有两副面孔——必要与充分；立法者要我们考虑的究竟是哪一副？我们又该如何评估它们的概率？
+
+本章为“事件 $x$ 曾是另一事件 $y$ 的必要原因或充分原因（或二者兼是）”的概率提供形式语义。随后我们阐明在什么条件下，必要（或充分）因果的概率可以从统计资料中学得，并说明如何把实验研究与非实验研究的数据结合起来，以得到任何一类研究单独都无法提供的信息。
+
+\section{引论}
+
+因果的标准反事实定义（即：若不是 $C$，$E$ 就不会发生）刻画的是“必要原因”这一概念。“充分原因”以及“必要且充分原因”等与之竞争的概念在许多应用中颇有意义，它们同样可以在结构模型语义下获得简洁的数学定义（\S 7.1）。尽管必要原因与充分原因之别可追溯至 J.~S. Mill (1843)，但半形式的阐明直到 1960 年代才出现——借助条件概率（Good 1961）与逻辑蕴含（Mackie 1965; Rothman 1976）。这些阐明受制于基本的语义困难，\footnote{概率进路的局限见 \S 7.5 的讨论；逻辑进路的局限将在 \S 10.1.4 讨论。}且未能给出计算因果概率的步骤，而结构进路提供了这样的步骤（\S 7.1.3 与 \S 8.3）。
+
+本章我们考察必要原因与充分原因的反事实解释，演示结构模型语义在识别因果概率问题上的应用，并以实例展示从统计数据估计因果概率的新途径。此外我们论证：必要性与充分性是因果的两个不同侧面，二者都应参与因果解释的建构。
+
+我们的结果在流行病学、法律推理、人工智能（AI）与心理学中都有应用。流行病学家长期关注估计某一病例的疾病“可归因于”特定暴露的概率，这通常被反事实地解释为“在疾病与暴露事实上均已发生的条件下，若无暴露，疾病将不会发生的概率”。这一反事实概念被 Robins and Greenland (1989) 称为“因果概率”，它衡量原因对于产生结果的必要性。\footnote{Greenland and Robins (1988) 进一步区分了两种衡量因果概率的方式：第一种（称为“超额分数”）只关心结果（如疾病）是否在某个特定时点之前发生；第二种（称为“病因学分数”）还要求考虑结果发生的时间。我们此处的讨论限于在指定时段内发生的事件，或“全或无”的结局（如出生缺陷）——对后者而言，重要的是发生的概率而非发生的时间。}它频繁用于诉讼，法律责任正是争讼的焦点（例如见 \S 8.3）。我们将用记号 PN 表示这一概念，它是“必要性概率”（probability of necessity）的缩写。
+
+一个与之平行的因果概念，刻画原因对于产生结果的充分程度，在政策分析、AI 与心理学中找到应用。政策制定者可能关心某种暴露对健康人群构成的危害（Khoury et al.\ 1989）。用反事实的话说，这一概念可表述为“一个健康的未暴露个体若曾暴露，将会罹患该病的概率”，记作 PS（充分性概率）。自然的推广是追问必要且充分因果的概率（PNS）——即某个体在两个方向上都受到影响的可能有多大。
+
+正如这些例子所示，PS 评估的是能够产生结果的活动因果过程是否存在，PN 强调的则是其他仍能解释该结果、却不涉及所论原因的替代过程不存在。在法律情境中，原因（$x$）与结果（$y$）的发生都相当确定，最受关注的度量是 PN，原告必须证明：若不是 $x$，$y$ 就不会发生（Robertson 1997）。尽管如此，缺乏充分性仍可能削弱基于 PN 的论证（Good 1993; Michie 1999）。
+
+已知 PN 一般不可识别，即无法从涉及暴露与病例的频率数据中估计（Greenland and Robins 1988; Robins and Greenland 1989）。识别受两个因素阻碍。
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item \textbf{混杂}——暴露者与未暴露者可能在若干相关因素上不同；更一般地说，原因与结果可能同时受第三个因素影响。此时我们说原因相对于结果不是外生的（见 \S 7.4.5）。
+\item \textbf{对生成过程的敏感性}——即便没有混杂，某些反事实关系的概率也无法从频率信息中识别，除非我们指明连接原因与结果的函数关系。只要手头的事实（如疾病）可能受反事实前件（如暴露）影响，就需要函数设定（见 \S 1.4、\S 7.5 与 \S 8.3 的例子）。
+\end{enumerate}
+
+尽管 PN 在一般情况下不可识别，仍有若干公式被提出来，用流行病学研究中得到的频率估计各种归因（Breslow and Day 1980; Hennekens and Buring 1987; Cole 1997）。自然，任何此类公式都必须以关于数据生成过程的某些隐含假设为前提。\S 9.2 阐明其中一些假设，并探讨可将其放宽的条件。\footnote{Robins and Greenland (1989) 给出了识别病因学分数的若干充分条件。然而这些条件对 PN 的识别而言过于严格，因为 PN 并不理会与病因学分数相关的时间侧面。}它在原因受混杂（与结果混杂）、但其效应仍可估计（例如由临床试验或辅助测量估计）的情形下，给出 PN 与 PS 的新公式。\S 9.3 以法律与流行病学情境示范这些公式的用法，\S 9.4 则在函数关系仅部分已知时，给出 PN 与 PS 可识别的一般条件。
+
+必要原因与充分原因之别在 AI 中有重要含义，尤其是在自动生成语言解释的系统中（见 \S 7.2.3）。从流行病学的例子可以看出，必要因果是针对所考察的特定事件量身定制的概念（单称因果），而充分因果立足于某些事件类型产生另一些事件类型的一般倾向。恰当的解释应兼顾这两个方面。若解释仅基于一般倾向（即充分因果），我们便丢失了重要的特定信息。例如，从 1,000 米外瞄准并射击某人，不会被视为该人死亡的解释，因为从如此远距离射出的子弹命中目标的倾向极低。这与常识相悖：当那一枪在那个特定日子确实命中时，无论原因为何，射手显然是后果的罪魁。反之，若解释仅基于单称事件的考量（即必要因果），那么世界上通常存在的各种背景因素都会尴尬地成为解释。例如，房间中氧气的存在会成为一场火灾的解释，仅仅因为若不是氧气，火灾就不会发生。我们判定划火柴而非氧气是火灾的实际原因，这表明我们超出了手头的单称事件（其中每个因素单独都既必要又充分），而考虑了同一一般类型的情境——在其中氧气单独显然不足以引燃。显然，因果解释的必要成分与充分成分之间必须取得某种平衡；本章通过形式地阐明这两个成分之间的基本关系，来照亮这一平衡。
+
+\section{必要原因与充分原因：识别的条件}
+
+\subsection{定义、记号与基本关系}
+
+使用 \S 7.1 引入的反事实记号与结构模型语义，我们对引论中讨论的因果的三个方面给出如下定义。
+
+\begin{definition}[必要性概率，PN]
+设 $X$ 与 $Y$ 是因果模型 $M$ 中的两个二值变量。以 $x$ 与 $y$ 分别表示命题 $X=\text{true}$ 与 $Y=\text{true}$，以 $x'$ 与 $y'$ 表示它们的否定。必要性概率定义为
+\begin{equation}
+\begin{aligned}
+\mathrm{PN} &\triangleq P(Y_{x'}=\text{false}\mid X=\text{true},\,Y=\text{true})\\
+&\triangleq P(y'_{x'}\mid x,y).
+\end{aligned} \tag{9.1}
+\end{equation}
+换言之，PN 表示在 $x$ 与 $y$ 事实上均已发生的条件下，$y'_{x'}$（即若无事件 $x$，事件 $y$ 将不会发生）的概率。
+\end{definition}
+
+观察相对于 \S 7.1 所用记号的一点变化。在 \S 7.1 中小写字母（如 $x$ 与 $y$）表示变量的取值，现在则表示命题（或事件）。另注意缩写：$y_x$ 表示 $Y_x=\text{true}$，$y'_x$ 表示 $Y_x=\text{false}$。\footnote{这些缩写由 Peyman Meshkat（在课堂作业中）提出，它们大大简化了推导。}习惯于把反事实“若曾是 $A$，则会是 $B$”写作“$A>B$”的读者，可把 \textup{(9.1)} 读作 $\mathrm{PN}\triangleq P(x'>y'\mid x,y)$。\footnote{定义 9.2.1 自然地推广到 $X$ 与 $Y$ 多值的情形，比如 $x\in\{x_1,x_2,\dots,x_k\}$、$y\in\{y_1,y_2,\dots,y_l\}$。我们说事件 $C=\bigvee_{i\in I}(X=x_i)$ 对 $E=\bigvee_{j\in J}(Y=y_j)$ 是“反事实必要的”，记作 $C>E$，如果只要 $X=x$ 落在 $C$ 之外，$Y_x$ 就落在 $E$ 之外。相应地，$C$ 是 $E$ 之必要原因的概率定义为 $\mathrm{PN}\triangleq P(\bar{C}>\bar{E}\mid C,E)$。不过为简单起见，我们将在二值情形下展开分析。}
+
+\begin{definition}[充分性概率，PS]
+\begin{equation}
+\mathrm{PS}\triangleq P(y_x\mid y',x'). \tag{9.2}
+\end{equation}
+\end{definition}
+
+PS 衡量 $x$ 产生 $y$ 的能力；由于“产生”意味着从 $x$ 与 $y$ 均不出现过渡到二者均出现，我们把概率 $P(y_x)$ 条件于 $x$ 与 $y$ 均不出现的情境。于是，与 $x$ 的必要性（由 PN 度量）相对应，PS 给出在 $x$ 与 $y$ 事实上均不出现的情境中，设定 $x$ 将产生 $y$ 的概率。
+
+\begin{definition}[必要且充分性概率，PNS]
+\begin{equation}
+\mathrm{PNS}\triangleq P(y_x,y'_{x'}). \tag{9.3}
+\end{equation}
+\end{definition}
+
+PNS 表示 $y$ 会在两个方向上响应 $x$ 的概率，因而同时衡量 $x$ 产生 $y$ 的充分性与必要性。
+
+与这三个基本概念相关联的还有其他一些反事实量，它们或出于实用、或出于概念上的兴趣而受到关注。我们将提及其中两个，但不详加分析，因为它们可由我们对 PN、PS 与 PNS 的处理自然推出。
+
+\begin{definition}[阻抑概率，PD]
+\begin{equation}
+\mathrm{PD}\triangleq P(y'_{x'}\mid y). \tag{9.4}
+\end{equation}
+\end{definition}
+
+PD 衡量“若不是 $x$，$y$ 本会被阻止”的概率；因此它对于希望评估各种预防方案之社会效力的政策制定者颇有意义（Fleiss 1981, pp.~75--6）。
+
+\begin{definition}[促成概率，PE]
+\[
+\mathrm{PE}\triangleq P(y_x\mid y').
+\]
+\end{definition}
+
+PE 与 PS 相似，只是不以 $x'$ 为条件。例如，当我们希望评估某种暴露对全部健康人群（包括已经暴露者）的危险时，它便适用。
+
+这些量中没有一个足以确定其余各量，但它们并非完全独立，如下述引理所示。
+
+\begin{lemma}
+因果概率（PNS、PN 与 PS）满足下述关系：
+\begin{equation}
+\mathrm{PNS}=P(x,y)\,\mathrm{PN}+P(x',y')\,\mathrm{PS}. \tag{9.5}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+(7.20) 的一致性条件 $X=x\Rightarrow Y_x=Y$，在我们的记号下译为
+\[
+x\Rightarrow(y_x=y),\qquad x'\Rightarrow(y_{x'}=y).
+\]
+于是可写
+\begin{align*}
+y_x\wedge y'_{x'} &= (y_x\wedge y'_{x'})\wedge(x\vee x')\\
+&= (y\wedge x\wedge y'_{x'})\vee(y_x\wedge y'\wedge x').
+\end{align*}
+对两边取概率，并利用 $x$ 与 $x'$ 的不相交性，得到
+\begin{align*}
+P(y_x,y'_{x'}) &= P(y'_{x'},x,y)+P(y_x,x',y')\\
+&= P(y'_{x'}\mid x,y)P(x,y)+P(y_x\mid x',y')P(x',y'),
+\end{align*}
+即证得引理 9.2.6。
+\end{proof}
+
+为聚焦于 PN 与 PS 所刻画的因果侧面，刻画那些使这两个度量各自保持不变的对因果模型的改动，是有益的。下面两个引理表明：PN 对引入 $y$ 的潜在抑制因素不敏感，而 PS 对引入 $y$ 的替代原因不敏感。
+
+\begin{lemma}
+以 $\mathrm{PN}(x,y)$ 表示 $x$ 是 $y$ 之必要原因的概率。设 $z=y\wedge q$ 是 $y$ 的一个后果，它可能被 $q'$ 抑制。若 $q\indep\{X,Y,Y_x\}$，则
+\[
+\mathrm{PN}(x,z)\triangleq P(z'_{x'}\mid x,z)=P(y'_{x'}\mid x,y)\triangleq\mathrm{PN}(x,y).
+\]
+\end{lemma}
+
+把过程 $Y_x(u)$ 与联结 $z=y\wedge q$ 级联，相当于以概率 $P(q')$ 抑制该过程的输出。引理 9.2.7 断言：若 $q$ 是随机化的，我们便可加入这样的联结而不影响 PN。理由很清楚：以 $x$ 与 $z$ 为条件意味着，在所考虑的情景中，新加的联结并未被 $q'$ 抑制。
+
+\begin{proof}[引理 9.2.7 的证明]
+我们有
+\begin{equation}
+\begin{aligned}
+\mathrm{PN}(x,z) &= P(z'_{x'}\mid x,z)=\frac{P(z'_{x'},x,z)}{P(x,z)}\\
+&= \frac{P(z'_{x'},x,z\mid q)P(q)+P(z'_{x'},x,z\mid q')P(q')}{P(z,x,q)+P(z,x,q')}.
+\end{aligned} \tag{9.6}
+\end{equation}
+利用 $z=y\wedge q$，可得
+\[
+q\Rightarrow(z=y),\qquad q\Rightarrow(z'_{x'}=y'_{x'}),\qquad q'\Rightarrow z';
+\]
+因此
+\begin{align*}
+\mathrm{PN}(x,z) &= \frac{P(y'_{x'},x,y\mid q)P(q)+0}{P(y,x,q)+0}\\
+&= \frac{P(y'_{x'},x,y)}{P(y,x)}=P(y'_{x'}\mid x,y)=\mathrm{PN}(x,y).
+\end{align*}
+\end{proof}
+
+\begin{lemma}
+以 $\mathrm{PS}(x,y)$ 表示 $x$ 是 $y$ 之充分原因的概率，并设 $z=y\vee r$ 是 $y$ 的一个后果，它也可能由 $r$ 触发。若 $r\indep\{X,Y,Y_x\}$，则
+\[
+\mathrm{PS}(x,z)\triangleq P(z_x\mid x',z')=P(y_x\mid x',y')\triangleq\mathrm{PS}(x,y).
+\]
+\end{lemma}
+
+引理 9.2.8 断言：我们可以加入替代的（独立的）原因（$r$）而不影响 PS。理由同样清楚：以事件 $x'$ 与 $y'$ 为条件意味着，所加入的原因（$r$）并未起作用。引理 9.2.8 的证明与引理 9.2.7 相似。
+
+由于迄今定义的一切因果度量都以 $y$ 为条件，而 $y$ 又被假定受 $x$ 影响，我们知道：这些量中没有一个能仅由因果图 $G(M)$ 与数据 $P(y)$ 的知识识别出来，即便在无混杂的条件下也是如此。此外，这些量在一般情形下谁也不能确定谁。不过，在无混杂这一假设（我们称之为外生性）下，可以为这些量导出简单的关系式与有用的界。
+
+\subsection{外生性下的界与基本关系}
+
+\begin{definition}[外生性]
+变量 $X$ 在模型 $M$ 中相对于 $Y$ 是外生的，当且仅当
+\begin{equation}
+\{Y_x,Y_{x'}\}\indep X. \tag{9.7}
+\end{equation}
+换言之，$Y$ 对条件 $x$ 或 $x'$ 的潜在响应方式，与 $X$ 的实际取值独立。
+\end{definition}
+
+式 \textup{(9.7)} 是第五章（式 \textup{(5.30)}）与第六章（式 \textup{(6.10)}）所用条件的强版本，因为它涉及联合变量 $\{Y_x,Y_{x'}\}$。这一界定在 Rosenbaum and Rubin (1983) 中被称为“强可忽略性”，它与经典的外生性误差判据（Christ 1966, p.~156；见 \S 7.4.5）以及定义 3.3.1 的后门准则一致。较弱的 \textup{(5.30)} 足以支撑本章除式 \textup{(9.11)}、\textup{(9.12)} 与 \textup{(9.19)} 之外的一切结果，而这三式需要强外生性 \textup{(9.7)}。
+
+外生性的重要性在于，它使 $\{P(y_x),P(y_{x'})\}$——$X$ 对 $Y$ 的因果效应——可以被识别，因为（利用 $x\Rightarrow(y_x=y)$）
+\begin{equation}
+P(y_x)=P(y_x\mid x)=P(y\mid x), \tag{9.8}
+\end{equation}
+对 $P(y_{x'})$ 有类似的化简。
+
+\begin{theorem}
+在外生性条件下，PNS 有如下界：
+\begin{equation}
+\max\,[0,\;P(y\mid x)-P(y\mid x')]\le\mathrm{PNS}\le\min\,[P(y\mid x),P(y'\mid x')]. \tag{9.9}
+\end{equation}
+两个界都是紧的（sharp），即：对每个联合分布 $P(x,y)$，都存在一个模型 $y=f(x,u)$（其中 $u$ 与 $x$ 独立），它能实现界所允许的任一 PNS 值。
+\end{theorem}
+
+\begin{proof}
+对任意两个事件 $A$ 与 $B$，有紧界
+\begin{equation}
+\max\,[0,\;P(A)+P(B)-1]\le P(A,B)\le\min\,[P(A),P(B)]. \tag{9.10}
+\end{equation}
+在 \textup{(9.9)} 中取 $A=y_x$、$B=y'_{x'}$、$P(y_x)=P(y\mid x)$ 与 $P(y'_{x'})=P(y'\mid x')$，\textup{(9.9)} 便由 \textup{(9.3)} 与 \textup{(9.10)} 推出。
+\end{proof}
+
+显然，若无法确认外生性，则 PNS 受与 \textup{(9.9)} 类似的不等式约束，只是以 $P(y_x)$ 与 $P(y_{x'})$ 分别替换 $P(y\mid x)$ 与 $P(y'\mid x')$。
+
+\begin{theorem}
+在外生性条件下，概率 PN、PS 与 PNS 之间有如下关系：
+\begin{equation}
+\mathrm{PN}=\frac{\mathrm{PNS}}{P(y\mid x)}, \tag{9.11}
+\end{equation}
+\begin{equation}
+\mathrm{PS}=\frac{\mathrm{PNS}}{P(y'\mid x')}. \tag{9.12}
+\end{equation}
+\end{theorem}
+
+于是，\textup{(9.9)} 中 PNS 的界给出 PN 与 PS 的相应界。
+
+由此得到的 PN 界
+\begin{equation}
+\frac{\max\,[0,\;P(y\mid x)-P(y\mid x')]}{P(y\mid x)}\le\mathrm{PN}\le\frac{\min\,[P(y\mid x),P(y'\mid x')]}{P(y\mid x)}, \tag{9.13}
+\end{equation}
+划定了我们在实验研究（外生性在其中成立）中识别 PN 的能力的限度。
+
+\begin{corollary}
+若 $x$ 与 $y$ 出现在一项实验研究中，且 $P(y_x)$ 与 $P(y_{x'})$ 是该研究中测得的因果效应，则对区间
+\begin{equation}
+\frac{\max\,[0,\;P(y_x)-P(y_{x'})]}{P(y_x)}\le p\le\frac{\min\,[P(y_x),P(y'_{x'})]}{P(y_x)} \tag{9.14}
+\end{equation}
+中的任一点 $p$，都存在一个与 $P(y_x)$ 及 $P(y_{x'})$ 相容、且 $\mathrm{PN}=p$ 的因果模型 $M$。
+\end{corollary}
+
+若我们同时拥有实验研究与观察研究的数据（如 \S 9.3.4），则可为非实验事件建立其他界。这些界非零的宽度意味着：在随机（非拉普拉斯式）模型中——其中对每个 $u$，$Y_x(u)$ 由概率 $P(Y_x(u)=y)$ 而非单一数值指定——因果概率无法被唯一地定义。\footnote{Robins and Greenland (1989) 使用了 $Y_x(u)$ 的随机模型，他们把因果概率定义为 $\mathrm{PN}(u)=[P(y\mid x,u)-P(y\mid x',u)]/P(y\mid x,u)$，而不是 \textup{(9.1)} 中的反事实定义。}
+
+\begin{proof}[定理 9.2.11 的证明]
+利用 $x\Rightarrow(y_x=y)$，可写 $x\wedge y_x=x\wedge y$，于是得到
+\begin{equation}
+\mathrm{PN}=P(y'_{x'}\mid x,y)=\frac{P(y'_{x'},x,y)}{P(x,y)} \tag{9.15}
+\end{equation}
+\begin{equation}
+=\frac{P(y'_{x'},x,y_x)}{P(x,y)} \tag{9.16}
+\end{equation}
+\begin{equation}
+=\frac{P(y'_{x'},y_x)P(x)}{P(x,y)} \tag{9.17}
+\end{equation}
+\begin{equation}
+=\frac{\mathrm{PNS}}{P(y\mid x)}, \tag{9.18}
+\end{equation}
+这就确立了 \textup{(9.11)}。\textup{(9.12)} 由完全相同的步骤推出。
+\end{proof}
+
+为完整起见，我们写出 PNS 与促成、阻抑概率之间的关系：
+\begin{equation}
+\mathrm{PD}=\frac{P(x)\,\mathrm{PNS}}{P(y)},\qquad \mathrm{PE}=\frac{P(x')\,\mathrm{PNS}}{P(y')}. \tag{9.19}
+\end{equation}
+
+\subsection{单调性与外生性下的可识别性}
+
+在着手处理 \textup{(9.1)}—\textup{(9.3)} 中反事实量的一般识别问题之前，先处理一个称为单调性的特殊条件是有益的：它在实践中常被假定，且能使这些量成为可识别的。由此得到的概率表达式将被认出是文献中常见的因果度量。
+
+\begin{definition}[单调性]
+若函数 $Y_x(u)$ 对一切 $u$ 都是 $x$ 的单调函数，则称变量 $Y$ 在因果模型 $M$ 中相对于变量 $X$ 是单调的。等价地，$Y$ 相对于 $X$ 单调，当且仅当
+\begin{equation}
+y'_x\wedge y_{x'}=\text{false}. \tag{9.20}
+\end{equation}
+\end{definition}
+
+单调性表达的假设是：从 $X=\text{false}$ 变为 $X=\text{true}$，在任何情况下都不会使 $Y$ 由 true 变为 false。\footnote{我们的分析对 $x$ 或 $y$（或二者）取补是对称的；因此单调性的一般条件应写作：或者 $y'_x\wedge y_{x'}=\text{false}$，或者 $y'_{x'}\wedge y_x=\text{false}$。不过为简单起见，我们仍沿用 \textup{(9.20)} 的定义。注意：单调性意味着 \textup{(5.30)} 蕴含 \textup{(9.7)}。}在流行病学中，这一假设常被表述为“无预防”，即人群中没有任何个体能因暴露于该风险因素而受益。
+
+\begin{theorem}[外生性与单调性下的可识别性]
+若 $X$ 是外生的且 $Y$ 相对于 $X$ 单调，则概率 PN、PS 与 PNS 全都可识别，并由 \textup{(9.11)}—\textup{(9.12)} 给出，其中
+\begin{equation}
+\mathrm{PNS}=P(y\mid x)-P(y\mid x'). \tag{9.21}
+\end{equation}
+\end{theorem}
+
+\textup{(9.21)} 的右端在流行病学中称为“风险差”，又被误称为“归因风险”（Hennekens and Buring 1987, p.~87）。
+
+由 \textup{(9.11)} 可见必要性概率可识别，且由超额风险比给出
+\begin{equation}
+\mathrm{PN}=\frac{P(y\mid x)-P(y\mid x')}{P(y\mid x)}, \tag{9.22}
+\end{equation}
+它常被误称为“归因分数”（Schlesselman 1982）、“归因率百分比”（Hennekens and Buring 1987, p.~88）或“归因比例”（Cole 1997）。字面上看，\textup{(9.22)} 所示的比率与归因无关，因为它由统计项而非因果或反事实关系构成。然而，外生性与单调性这两个假设合起来，使我们能把 PN 的定义（式 \textup{(9.1)}）中蕴含的归因概念，转换为纯粹统计关联之比。这表明：许多提出或导出 \textup{(9.22)} 作为“暴露病例中可归因于暴露的比例”之度量的作者，都默契地假定了外生性与单调性。
+
+Robins and Greenland (1989) 在随机单调性假设（即 $P(Y_x(u)=y)>P(Y_{x'}(u)=y)$）下分析了 PN 的识别，并表明该假设太弱，不足以容许这种识别；事实上，它给出与 \textup{(9.13)} 相同的界。这表明随机单调性对介于 $X$ 与 $Y$ 之间的函数机制未施加任何约束。
+
+PS 的表达式（式 \textup{(9.12)}）同样颇能说明问题：
+\begin{equation}
+\mathrm{PS}=\frac{P(y\mid x)-P(y\mid x')}{1-P(y\mid x')}, \tag{9.23}
+\end{equation}
+因为它与流行病学家所称的“相对差”（Shep 1958）一致，后者用于衡量人群对暴露 $x$ 的易感性。易感性被定义为具备“一种足以使人在暴露后罹患疾病的基础因素”的人所占比例（Khoury et al.\ 1989）。PS 为易感性提供了形式化的反事实解释，从而使这一定义更精确，并使易感性适于系统分析。
+
+Khoury et al.\ (1989) 认识到易感性一般不可识别，并通过三个假设导出 \textup{(9.23)}：无混杂、单调性，\footnote{Khoury et al.\ (1989) 未提及单调性，但为使他们的推导成立，必定隐含地假定了它。}以及独立性（即假定对暴露的易感性与对不涉及暴露的背景因素的易感性独立）。最后一个假设常被批评为站不住脚；而定理 9.2.14 向我们保证：独立性其实并非必要；\textup{(9.23)} 仅凭外生性与单调性便获得其有效性。
+
+式 \textup{(9.23)} 也与 Cheng (1997) 所称的“因果力”一致，即在抑制“$y$ 的一切其他原因”之后 $x$ 对 $y$ 的效应。PS 的反事实定义 $P(y_x\mid x',y')$ 提示了这一量的另一种解释：它衡量在 $x$ 与 $y$ 事实上均不出现的情境中，设定 $x$ 将产生 $y$ 的概率。以 $x'$ 与 $y'$ 为条件，相当于只挑选（或假设）那些“$y$ 的一切其他原因”确实被抑制的世界。
+
+然而必须注意：三个因果概念之间的简单关系（式 \textup{(9.11)}—\textup{(9.12)}）仅在外生性假设下成立；在一般的不外生情形中，通行的是较弱的 \textup{(9.5)}。此外，所有这些因果概念都以全局关系 $Y_x(u)$ 与 $Y_{x'}(u)$ 定义，而这些关系过于粗糙，不足以完全刻画因果的诸多细微之处；要阐明“实际原因”这类更精细的概念（见第十章），往往需要从 $X$ 通向 $Y$ 的因果模型的详细结构。
+
+\begin{proof}[定理 9.2.14 的证明]
+写出 $y_{x'}\vee y'_{x'}=\text{true}$，我们有
+\begin{equation}
+y_x=y_x\wedge(y_{x'}\vee y'_{x'})=(y_x\wedge y_{x'})\vee(y_x\wedge y'_{x'}), \tag{9.24}
+\end{equation}
+以及
+\begin{equation}
+y_{x'}=y_{x'}\wedge(y_x\vee y'_x)=(y_{x'}\wedge y_x)\vee(y_{x'}\wedge y'_x)=y_{x'}\wedge y_x, \tag{9.25}
+\end{equation}
+因为单调性蕴含 $y_{x'}\wedge y'_x=\text{false}$。把 \textup{(9.25)} 代入 \textup{(9.24)} 得到
+\begin{equation}
+y_x=y_{x'}\vee(y_x\wedge y'_{x'}). \tag{9.26}
+\end{equation}
+对 \textup{(9.26)} 取概率，并利用 $y_{x'}$ 与 $y'_{x'}$ 的不相交性，得到
+\[
+P(y_x)=P(y_{x'})+P(y_x,y'_{x'}),
+\]
+或
+\begin{equation}
+P(y_x,y'_{x'})=P(y_x)-P(y_{x'}). \tag{9.27}
+\end{equation}
+\textup{(9.27)} 连同外生性假设（式 \textup{(9.8)}）便确立了 \textup{(9.21)}。
+\end{proof}
+
+\subsection{单调性与非外生性下的可识别性}
+
+定理 9.2.10—9.2.14 所建立的关系都基于外生性假设。本节我们放宽这一假设，考虑 $X$ 对 $Y$ 的效应受混杂的情形，即 $P(y_x)\ne P(y\mid x)$。在此类情形中，$P(y_x)$ 仍可由辅助手段估计（例如调整某些协变量，或借助实验研究），问题在于这一附加信息能否使因果概率成为可识别的。答案是肯定的。
+
+\begin{theorem}
+若 $Y$ 相对于 $X$ 单调，则只要因果效应 $P(y_x)$ 与 $P(y_{x'})$ 可识别，PNS、PN 与 PS 便都可识别：
+\begin{equation}
+\mathrm{PNS}=P(y_x,y'_{x'})=P(y_x)-P(y_{x'}), \tag{9.28}
+\end{equation}
+\begin{equation}
+\mathrm{PN}=P(y'_{x'}\mid x,y)=\frac{P(y)-P(y_{x'})}{P(x,y)}, \tag{9.29}
+\end{equation}
+\begin{equation}
+\mathrm{PS}=P(y_x\mid x',y')=\frac{P(y_x)-P(y)}{P(x',y')}. \tag{9.30}
+\end{equation}
+\end{theorem}
+
+为领会 \textup{(9.29)} 与 \textup{(9.22)} 之别，我们可展开 $P(y)$ 并写出
+\begin{equation}
+\begin{aligned}
+\mathrm{PN} &= \frac{P(y\mid x)P(x)+P(y\mid x')P(x')-P(y_{x'})}{P(y\mid x)P(x)}\\
+&= \frac{P(y\mid x)-P(y\mid x')}{P(y\mid x)}+\frac{P(y\mid x')-P(y_{x'})}{P(x,y)}.
+\end{aligned} \tag{9.31}
+\end{equation}
+\textup{(9.31)} 右端第一项是熟悉的超额风险比（如 \textup{(9.22)}），代表外生性下 PN 的取值。第二项代表为计入混杂所需的\emph{修正}，即 $[P(y\mid x')-P(y_{x'})]/P(x,y)$。
+
+于是 \textup{(9.28)}—\textup{(9.30)} 提供了更精细的因果度量，可用于 $P(y_x)$ 能通过辅助手段识别的情形（见 \S 9.3.4 的例 4）。还可以证明，\textup{(9.28)}—\textup{(9.30)} 中的表达式在一般非单调情形下给出 PNS、PN 与 PS 的下界（Tian and Pearl 2000, \S 11.9.2）。
+
+值得注意的是，由于 PS 与 PN 必须非负，\textup{(9.29)}—\textup{(9.30)} 为单调性假设提供了一个简单的必要检验：
+\begin{equation}
+P(y_{x'})\ge P(y)\ge P(y_x), \tag{9.32}
+\end{equation}
+它收紧了由 $x'\wedge y\Rightarrow y_{x'}$ 与 $x\wedge y'\Rightarrow y'_x$ 得出的标准不等式
+\begin{equation}
+P(y_{x'})\ge P(x',y),\qquad P(y'_x)\ge P(x,y'). \tag{9.33}
+\end{equation}
+J.~Tian 已证明这些不等式实际上是紧的：凡是满足这些不等式的实验与观察数据组合，都可由某个 $Y$ 关于 $X$ 单调的因果模型生成。常用的“无预防”假设并非完全免于经验检验，这应使许多流行病学家感到宽慰。反之，若无预防假设在理论上无可置疑，则 \textup{(9.32)} 可用于检验实验数据与非实验数据的相容性，即临床试验中的受试者是否代表以联合分布 $P(x,y)$ 为特征的目标人群。
+
+\begin{proof}[定理 9.2.15 的证明]
+\textup{(9.28)} 已在 \textup{(9.27)} 中确立。为证明 \textup{(9.30)}，我们写出
+\begin{equation}
+P(y_x\mid x',y')=\frac{P(y_x,x',y')}{P(x',y')}=\frac{P(y_x,x',y'_{x'})}{P(x',y')}, \tag{9.34}
+\end{equation}
+因为 $x'\wedge y'=x'\wedge y'_{x'}$（由一致性）。为计算 \textup{(9.34)} 的分子，我们把 \textup{(9.26)} 与 $x'$ 合取，得到
+\[
+x'\wedge y_x=(x'\wedge y_{x'})\vee(y_x\wedge y'_{x'}\wedge x').
+\]
+然后对两边取概率，得到（由于 $y_{x'}$ 与 $y'_{x'}$ 不相交）
+\begin{align*}
+P(y_x,y'_{x'},x') &= P(x',y_x)-P(x',y_{x'})\\
+&= P(x',y_x)-P(x',y)\\
+&= P(y_x)-P(x,y_x)-P(x',y)\\
+&= P(y_x)-P(x,y)-P(x',y)\\
+&= P(y_x)-P(y).
+\end{align*}
+把它代入 \textup{(9.34)}，最终得到
+\[
+P(y_x\mid x',y')=\frac{P(y_x)-P(y)}{P(x',y')},
+\]
+这就确立了 \textup{(9.30)}。\textup{(9.29)} 由完全相同的步骤推出。
+\end{proof}
+
+在非外生性条件下允许识别 $P(y_x)$ 的一类常见模型，已在第三章示例。\S 3.2（式 \textup{(3.13)}）表明：对正马尔可夫模型 $M$ 中的任意两个变量 $X$ 与 $Y$，因果效应 $P(y_x)$ 可识别，并由
+\begin{equation}
+P(y_x)=\sum_{\pa_X}P(y\mid \pa_X,x)P(\pa_X) \tag{9.35}
+\end{equation}
+给出，其中 $\pa_X$ 是与 $M$ 相联系的因果图中 $X$ 的父节点（的实现）。于是，把 \textup{(9.35)} 与定理 9.2.15 结合，便得到因果概率可识别的一个具体条件。
+
+\begin{corollary}
+对任一正马尔可夫模型 $M$，若函数 $Y_x(u)$ 单调，则因果概率 PNS、PS 与 PN 可识别，并由 \textup{(9.28)}—\textup{(9.30)} 给出，其中 $P(y_x)$ 如 \textup{(9.35)} 所给。
+\end{corollary}
+
+通过使用后门与前门准则（\S 3.3），可以得到更广泛的识别条件，这些准则适用于半马尔可夫模型。Galles and Pearl (1995)（见 \S 4.3.1）与 Tian and Pearl (2002a)（定理 3.6.1）进一步推广了它们，并引出下述推论。
+
+\begin{corollary}
+设 $GP$ 为满足定理 3.6.1 图形准则的半马尔可夫模型类。若 $Y_x(u)$ 单调，则因果概率 PNS、PS 与 PN 在 $GP$ 中可识别，并由 \textup{(9.28)}—\textup{(9.30)} 给出，其中 $P(y_x)$ 由 $G(M)$ 的拓扑经 Tian and Pearl (2002a) 的算法确定。
+\end{corollary}

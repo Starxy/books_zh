@@ -1,0 +1,84 @@
+% 原书分章 PDF 第 2—5 页：章首与第 25.1 节；第 1 页分部标题由总书管理。
+\chapter{不具路径可微性的目标参数的 CV-TMLE}
+\label{ch:nonpathwise-cvtmle}
+\chapterauthors{Mark J. van der Laan、Aurélien Bibaut 与 Alexander R. Luedtke}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+A. Bibaut：美国加利福尼亚大学伯克利分校生物统计学部，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:aurelien.bibaut@berkeley.edu}{aurelien.bibaut@berkeley.edu}。\\
+A. R. Luedtke：美国 Fred Hutchinson 癌症研究中心疫苗与传染病部，1100 Fairview Ave, Seattle, WA 98109, USA；电子邮箱：\href{mailto:aluedtke@fredhutch.org}{aluedtke@fredhutch.org}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_25}。}
+
+靶向最小损失估计（targeted minimum loss-based estimation，TMLE）旨在为路径可微的目标参数构造有效的代入估计量。许多参数不具路径可微性（nonpathwise differentiable），例如非参数模型中某一点处的密度或回归曲线。在这些情形下，人们往往在特定的光滑性假设下使用特定估计量，为其建立极限分布，进而进行统计推断。然而，这些估计量不能适应数据密度真实而未知的光滑性，因此很容易被能够适应底层真实光滑性的自适应估计量超越。
+
+\begin{sourcebox}
+本章提出一种完全自适应的估计量，它以真实数据密度的底层未知光滑性所决定的自适应最优速率收敛，同时仍能提供正式的统计推断。我们的估计量针对以数据自适应方式选出的、不具路径可微性的目标参数的平滑逼近（smooth approximation），使用交叉验证靶向最小损失估计（cross-validated targeted minimum loss-based estimation，CV-TMLE），从而将有效性理论与通过超级学习实现的先进数据自适应估计结合起来。
+\end{sourcebox}
+
+\section{统计估计问题的定义}
+
+令 $O_1,\ldots,O_n$ 为随机变量 $O$ 的 $n$ 个独立同分布副本，其概率分布为 $P_0$，已知 $P_0$ 属于指定的统计模型 $\mathcal M$。令 $\Psi:\mathcal M\to\mathbb R$ 为感兴趣的目标参数，并考虑 $\mathcal M$ 为无限维模型的情形。假定该目标参数不具路径可微性。我们假定，它可表示为一个函数值参数的逐点评价：
+$\Psi(P)=\Psi_1(P)(x_0)$，其中
+$\Psi_1(P):(a,b)\subset\mathbb R^d\to\mathbb R$，区间 $(a,b)$ 包含 $x_0$。
+为简化记号，我们仍把 $\Psi_1(P)(x)$ 记为 $\Psi(P)(x)$。本章着重研究这类不具路径可微性的目标参数的估计与推断。
+
+先来看几个这样的目标参数的例子。
+
+\noindent\textbf{例 I：}\enspace
+令 $O=(W,Y)\sim P_0$，$\mathcal M$ 为非参数模型。考虑 $W$ 连续取值的情形。对给定的 $w_0$，将目标参数定义为
+$\Psi(P)=E_P(Y\mid W=w_0)$。对于函数值参数
+$\Psi_1(P)(W)=E_P(Y\mid W)$，的确有 $\Psi(P)=\Psi_1(P)(w_0)$。
+为了在给定点 $w_0$ 处正式定义 $E_P(Y\mid W=w_0)$，我们假定，对每个 $P\in\mathcal M$，
+$w\mapsto E_P(Y\mid W=w)$ 在 $w_0$ 处连续，并从等价类中选择一个在 $w_0$ 处连续的 $E_P(Y\mid W)$ 版本。在以下各例中，我们不再讨论正式定义 $\Psi(P)(x_0)$ 所需的技术条件。
+
+\noindent\textbf{例 II：}\enspace
+令 $O=(W,A,Y)\sim P_0$，$\mathcal M$ 为仅对给定 $W$ 时 $A$ 的条件密度作出假设的模型。考虑 $A\in[0,1]$ 连续取值的情形，并假定对于 $P_0$ 几乎所有 $W$，给定 $W$ 时 $A$ 的条件密度在 $a_0$ 处为正。目标参数定义为
+$\Psi(P)=E_PE_P(Y\mid A=a_0,W)$，其中 $a_0$ 为给定值。我们有
+$\Psi(P)=\Psi_1(P)(a)\equiv E_PE_P(Y\mid A=a,W)$。
+如果 $Y=Y_A$，且给定 $W$ 时 $A$ 与 $(Y_a:a)$ 独立，那么 $\Psi(P)$ 表示反事实均值 $EY_{a_0}$ 的估计目标。
+
+\noindent\textbf{例 III：}\enspace
+令 $O=(L(0),A(0),L(1),A(1),Y)$ 为具有两个干预节点 $A(0),A(1)$ 的纵向数据结构。假定 $A(0),A(1)$ 都在 $[0,1]$ 内连续取值。考虑统计模型 $\mathcal M$，它仅对给定 $\bar L(j),\bar A(j-1)$ 时 $A(j)$ 的条件分布作出假设，$j=0,1$；约定 $\bar A(-1)$ 为空。特别地，假定对于 $P_0$ 几乎处处的取值，给定 $\bar L(j),\bar A(j-1)$ 时 $A(j)$ 的条件密度在 $a_0(j)$ 处为正，$j=0,1$。令 $\Psi(P)=\Psi_1(P)(a_0)$，其中
+\[
+\begin{aligned}
+ \Psi_1(P)(a)\equiv E_PE_P\bigl(&E_P(Y\mid\bar L(1),A(0)=a(0),A(1)=a(1))\\
+ &\mid L(0),A(0)=a(0)\bigr).
+\end{aligned}
+\]
+在 Neyman--Rubin 因果模型及序贯随机化下，它表示反事实均值
+$EY_{a_0(0),a_0(1)}$ 的估计目标。
+
+\noindent\textbf{例 IV：}\enspace
+令 $O\sim P_0$ 为连续取值的随机变量，$\mathcal M$ 为非参数模型。我们的目标参数是给定点 $x_0$ 处的
+$\Psi(P)=\Psi_1(P)(x_0)\equiv p(x_0)$，其中
+$p=dP/d\mu$ 为 $P$ 相对于 Lebesgue 测度 $\mu$ 的密度。
+
+\noindent\textbf{例 V：}\enspace
+令 $O=(W,A,\tilde T=\min(T,C),\Delta=I(T\leq C))\sim P_0$，
+其中 $W$ 为基线协变量向量，$A\in[0,1]$ 为连续取值的处理，$T$ 为感兴趣的连续取值生存时间，$C$ 为失效时间 $T$ 被右删失的时间。令
+$A_c(t)=I(\tilde T\leq t,\Delta=0)$ 为在观测到删失事件时从 0 跳到 1 的指示过程。类似地，令
+$N(t)=I(\tilde T\leq t,\Delta=1)$。
+统计模型 $\mathcal M$ 仅对给定 $W$ 时处理 $A$ 的条件分布，以及给定 $\bar A_c(t-),W,A$ 时 $A_c(t)$ 的条件分布作出假设。目标参数为
+$\Psi(P)=\Psi_1(P)(a_0)\equiv E_PS(t\mid A=a_0,W)$，其中
+$S(t\mid A,W)=\exp(-\Lambda(t\mid A,W))$，而
+$d\Lambda(t\mid A,W)=E(dN(t)\mid A,W,\tilde T\geq t)$
+是计数过程 $N$ 相对于历史 $(W,A,\bar N(t-),\bar A_c(t-))$、并以仍处于跳跃风险中为条件的强度。如果假定给定 $A,W$ 时 $C$ 与 $T$ 独立，则
+$\Psi(P)=E_PP(T>t\mid A=a_0,W)$。
+如果还假定因果模型 $T=T_A$，其中 $T_a$ 为处理特异的反事实生存时间，并假定给定 $W$ 时 $A$ 随机化，那么后者表示时刻 $t$ 的反事实处理特异生存曲线 $P(T_{a_0}>t)$。
+
+\noindent\textbf{例 VI：}\enspace
+令 $O=(C,\Delta=I(T\leq C))\sim P_0$ 为关于发病时间 $T$ 的边际现状数据（current status data）结构，其中 $C$ 为测量状态 $I(T\leq C)$ 的监测时间。目标参数为
+$\Psi(P)=\Psi_1(P)(t_0)\equiv E(\Delta\mid C=t_0)$。
+如果假定 $T$ 与 $C$ 独立，则 $\Psi(P)=P(T\leq t_0)$ 是 $T$ 的累积分布函数。
+
+\noindent\textbf{例 VII：}\enspace
+令 $O=(W,A,C,\Delta=I(T\leq C))\sim P_0$，
+其中 $W$ 为基线协变量，$A\in\{0,1\}$ 为二元处理，$C$ 为监测时间，$T$ 为癌症或感染等疾病的发病时间。因此，这是将基线协变量与处理指示变量纳入后的现状数据结构。考虑仅对给定 $W$ 时 $(A,C)$ 的条件分布作出假设的统计模型 $\mathcal M$。对 $a\in\{0,1\}$，目标参数定义为
+$\Psi_a(P)=\Psi_{1,a}(P)(t_0)\equiv E_PE_P(\Delta\mid C=t_0,A=a,W)$。
+如果假定给定 $A,W$ 时 $C$ 与 $T$ 独立，则
+$\Psi_a(P)=E_PP(T\leq t_0\mid A=a,W)$。
+如果还假定因果模型与随机化假设成立，那么后者等于时刻 $t$ 的反事实累积分布函数 $P(T_a\leq t_0)$。特别地，我们可能关心因果对比
+$P(T_1\leq t_0)-P(T_0\leq t_0)=\Psi_1(P)-\Psi_0(P)$。
+
+显然，我们可以列出无穷多个有意义的不具路径可微性的目标参数的例子。基本上，对于每一种数据结构与现实的统计模型，都存在多种不具路径可微性的统计目标参数，用于回答感兴趣的问题。
+
+直观地说，路径可微的目标参数，是在一个具有正 $P_0$ 概率的集合 $\mathcal O_1$ 上，关于各个 $o$ 处数据密度 $p_0(o)$ 的光滑函数。可将 $\mathcal O_1$ 称为该目标参数的“支撑集”。对于这样的路径可微目标参数，落在集合 $\mathcal O_1$ 内的所有观测都提供关于目标参数的信息，因此即使在非参数模型 $\mathcal M$ 下，通常也能构造 $\Psi(P_0)$ 的渐近线性估计量 $\psi_n$，使其以 $n^{-1/2}$ 的速率收敛。另一方面，在非参数模型中，若目标参数由某一点的数据密度，或由 $P_0$ 测度为零的集合 $\mathcal O_1$ 上的数据密度定义，那么它只能利用靠近该目标参数支撑集的观测，而其中每个观测都会给估计量带来偏差。偏差的大小取决于 $p_0$ 的底层光滑性。因此，我们只能使用其支撑集局部邻域内的观测，估计量需要谨慎选择邻域大小，以权衡偏差与方差。偏差与方差的最优权衡，取决于支撑集上数据密度的底层光滑性及估计量的选择。无论如何，最优收敛速率都将慢于 $n^{-1/2}$。

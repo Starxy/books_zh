@@ -1,0 +1,27 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\begin{scope}
+\draw[thin] (0,2.4)--(0,0)--(6,0);
+\foreach \x/\lab in {1.57143/1,2.82143/2,4.78571/3}{
+ \draw[gray!50,thin] (\x,0)--(\x,.1862);
+ \node[below] at (\x,-.02){$s_{\lab}$};}
+\foreach \y in {.2,1.1,2.0}{\draw[gray!50,thin] (0,\y)--(.1766,\y);}
+\input{data/ch05_fig55_curve_1}
+\node[below] at (3,-.65){$x$};
+\node[rotate=90] at (-.42,1.2){$p(x)$};
+\end{scope}
+\begin{scope}[xshift=7.4cm]
+\draw[thin] (0,2.4)--(0,0)--(6,0);
+\foreach \x/\lab in {1.57143/1,2.82143/2,4.78571/3}{
+ \draw[gray!50,thin] (\x,0)--(\x,.1862);
+ \node[below] at (\x,-.02){$s_{\lab}$};}
+\foreach \y in {.2,1.1,2.0}{\draw[gray!50,thin] (0,\y)--(.1766,\y);}
+\input{data/ch05_fig55_curve_2}
+\node[below] at (3,-.65){$y$};
+\node[rotate=90] at (-.42,1.2){$p(y)$};
+\end{scope}
+\end{tikzpicture}
+\caption{一个由 $X$ 导致 $Y$ 的例子。由此，$P_Y$ 与 $P_{X\mid Y}$ 包含关于彼此的信息。左：$P_X$ 是由位于 $s_1,s_2,s_3$ 的尖峰组成的混合分布。右：$P_Y$ 由 $P_X$ 与零均值高斯噪声进行卷积（convolution）得到，因此，其峰仍位于 $s_1,s_2,s_3$，但不再那么尖锐。于是，$P_{X\mid Y}$ 同样包含关于 $s_1,s_2,s_3$ 的信息，见习题 5.1。}
+\label{fig:ch05-shared-peak-information}
+\end{figure}

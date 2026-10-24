@@ -1,0 +1,33 @@
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,
+ch04bv/.style={ellipse,draw=green!65!black,text=green!60!black,minimum width=8mm,minimum height=5mm,font=\small},
+ch04bx/.style={rectangle,rounded corners=1mm,draw=red,text=red,minimum width=7mm,minimum height=5mm,font=\small}]
+\foreach \p/\dx/\dy/\tm in {a/0/0/{t-1},b/4.1/0/t,c/8.2/.65/{t+1}}{
+ \draw[blue!65] (\dx-.55,\dy+3.15)--(\dx+2.75,\dy+1.7)
+  --(\dx+2.75,\dy-2.9)--(\dx-.55,\dy-1.45)--cycle;
+ \node[font=\small]at(\dx+.35,\dy+3.4){$\tm$};
+ \node[ch04bv](ch04b\p y1)at(\dx+.15,\dy+2){$Y_1$};
+ \node[ch04bv](ch04b\p y2)at(\dx+1.85,\dy+1.45){$Y_2$};
+ \node[ch04bv](ch04b\p y3)at(\dx+.1,\dy+.95){$Y_3$};
+ \node[ch04bv](ch04b\p y4)at(\dx+1.35,\dy+.3){$Y_4$};
+ \node[ch04bv](ch04b\p y5)at(\dx,\dy-.35){$Y_5$};
+ \node[ch04bx](ch04b\p x1)at(\dx+.65,\dy-1.2){$X_1$};
+ \node[ch04bx](ch04b\p x2)at(\dx+2.15,\dy-1.65){$X_2$};
+}
+\foreach \p in {a,b,c}{
+ \draw[->,blue!65](ch04b\p y1)--(ch04b\p y3);
+ \draw[->,blue!65](ch04b\p y3)--(ch04b\p y5);
+ \draw[->,blue!65](ch04b\p x2)--(ch04b\p y2);
+}
+\draw[->,blue!65](ch04bay2)--(ch04bay3);
+\draw[->,blue!65](ch04bay2)--(ch04bay4);
+\draw[->,blue!65](ch04bax1)--(ch04bay5);
+\draw[->,blue!65](ch04bby1)--(ch04bby2);
+\draw[->,blue!65](ch04bby2)--(ch04bby3);
+\draw[->,blue!65](ch04bbx1)--(ch04bby5);
+\draw[->,blue!65](ch04bcy1)--(ch04bcy2);
+\draw[->,blue!65](ch04bcy2)--(ch04bcy4);
+\draw[->,blue!65](ch04bcy4)--(ch04bcy5);
+\draw[->,blue!65](ch04bcx1)--(ch04bcy4);
+\foreach \a/\b in {ay1/by1,ay2/by3,ay5/by5,by1/cy1,by4/cy3,by5/cy5}
+ \draw[->,magenta!70](ch04b\a)--(ch04b\b);
+\end{tikzpicture}

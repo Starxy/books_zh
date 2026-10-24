@@ -1,0 +1,57 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.0cm,y=.95cm,every node/.style={ellipse,draw=inkblue,fill=white,minimum width=.7cm,minimum height=.5cm,inner sep=1pt,font=\small}]
+\node (chSevenBf7a1) at (0.7,1) {$x_1$};
+\node (chSevenBf7a2) at (0,0.1) {$x_2$};
+\node (chSevenBf7a3) at (0.7,-0.8) {$x_3$};
+\node (chSevenBf7a4) at (1.6,0.1) {$x_4$};
+\node (chSevenBf7a5) at (2.8,1) {$x_5$};
+\node (chSevenBf7a6) at (2.8,-0.8) {$x_6$};
+\node (chSevenBf7a7) at (4.3,1) {$x_7$};
+\node (chSevenBf7a8) at (4.3,-0.3) {$x_8$};
+\draw[->,blue!70] (chSevenBf7a1)--(chSevenBf7a2);
+\draw[->,blue!70] (chSevenBf7a1)--(chSevenBf7a4);
+\draw[->,blue!70] (chSevenBf7a2)--(chSevenBf7a3);
+\draw[->,blue!70] (chSevenBf7a4)--(chSevenBf7a3);
+\draw[->,blue!70] (chSevenBf7a5)--(chSevenBf7a4);
+\draw[->,blue!70] (chSevenBf7a5)--(chSevenBf7a6);
+\draw[->,blue!70] (chSevenBf7a7)--(chSevenBf7a5);
+\draw[->,red] (chSevenBf7a8)--(chSevenBf7a7);
+\node[draw=none,fill=none] at (-0.1,-1.4) {(a)};
+\node (chSevenBf7b1) at (6.7,1) {$x_1$};
+\node (chSevenBf7b2) at (6,0.1) {$x_2$};
+\node (chSevenBf7b3) at (6.7,-0.8) {$x_3$};
+\node (chSevenBf7b4) at (7.6,0.1) {$x_4$};
+\node (chSevenBf7b5) at (8.8,1) {$x_5$};
+\node (chSevenBf7b6) at (8.8,-0.8) {$x_6$};
+\node (chSevenBf7b7) at (10.3,1) {$x_7$};
+\node (chSevenBf7b8) at (10.3,-0.3) {$x_8$};
+\draw[->,blue!70] (chSevenBf7b1)--(chSevenBf7b2);
+\draw[->,blue!70] (chSevenBf7b1)--(chSevenBf7b4);
+\draw[->,blue!70] (chSevenBf7b2)--(chSevenBf7b3);
+\draw[->,blue!70] (chSevenBf7b4)--(chSevenBf7b3);
+\draw[->,blue!70] (chSevenBf7b5)--(chSevenBf7b4);
+\draw[->,blue!70] (chSevenBf7b5)--(chSevenBf7b6);
+\draw[->,blue!70] (chSevenBf7b7)--(chSevenBf7b5);
+\draw[->,red] (chSevenBf7b7)--(chSevenBf7b8);
+\node[draw=none,fill=none] at (5.9,-1.4) {(b)};
+\node (chSevenBf7c1) at (3.7,-2) {$x_1$};
+\node (chSevenBf7c2) at (3,-2.9) {$x_2$};
+\node (chSevenBf7c3) at (3.7,-3.8) {$x_3$};
+\node (chSevenBf7c4) at (4.6,-2.9) {$x_4$};
+\node (chSevenBf7c5) at (5.8,-2) {$x_5$};
+\node (chSevenBf7c6) at (5.8,-3.8) {$x_6$};
+\node (chSevenBf7c7) at (7.3,-2) {$x_7$};
+\node (chSevenBf7c8) at (7.3,-3.3) {$x_8$};
+\draw[->,blue!70] (chSevenBf7c1)--(chSevenBf7c2);
+\draw[->,blue!70] (chSevenBf7c1)--(chSevenBf7c4);
+\draw[->,blue!70] (chSevenBf7c2)--(chSevenBf7c3);
+\draw[->,blue!70] (chSevenBf7c4)--(chSevenBf7c3);
+\draw[->,blue!70] (chSevenBf7c5)--(chSevenBf7c4);
+\draw[->,blue!70] (chSevenBf7c5)--(chSevenBf7c6);
+\draw[->,blue!70] (chSevenBf7c7)--(chSevenBf7c5);
+\draw[red] (chSevenBf7c7)--(chSevenBf7c8);
+\node[draw=none,fill=none] at (2.9,-4.4) {(c)};
+\end{tikzpicture}
+\origfig{7}{马尔可夫等价类（a、b）及其 CPDAG 表示（c）。}
+\end{figure}

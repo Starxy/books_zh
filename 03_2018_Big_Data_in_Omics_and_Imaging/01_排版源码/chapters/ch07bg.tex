@@ -1,0 +1,85 @@
+% 原章第80页结论7.27—第81页7.3.3.4标题前。
+\Needspace{5\baselineskip}
+\noindent\textbf{结论 7.27\quad 高斯过程回归}
+
+\noindent\textbf{步骤1。}定义高斯核矩阵 $K(X,X)$，计算噪声方差初值：
+\[
+(\widehat\sigma_n^2)^{(0)}=\frac1{n-q}\sum_{i=1}^{n}(y_i-\overline y)^2,
+\qquad \overline y=\frac1n\sum_{i=1}^{n}y_i.
+\]
+令 $t=0$。
+
+\noindent\textbf{步骤2。}估计回归系数：
+\[
+\widehat\alpha=\bigl(K(X,X)+(\widehat\sigma_n^2)^{(t)}I\bigr)^{-1}y.
+\]
+
+\noindent\textbf{步骤3。}给定 $x_{new}$，计算预测值 $\overline y_{new}=k(x_{new},X)^T\widehat\alpha$ 和噪声 $e_{new}=y_{new}-\overline y_{new}$。
+
+\noindent\textbf{步骤4。}计算预测值估计量的协方差矩阵，以及测试数据 $y=y_{new}$ 的预测分布：
+\[
+V(\widehat y_{new})=K(X_{new},X_{new})-K(X_{new},X)K(X,X)^{-1}K(X,X_{new}),
+\]
+\[
+\begin{aligned}
+p(y\mid X)={}&\frac1{(2\pi)^{n/2}|K(X,X)+\sigma_n^2I|^{1/2}}\\
+&\quad\times\exp\left\{-\frac12y^T[K(X,X)+\sigma_n^2I]^{-1}y\right\}.
+\end{aligned}
+\]
+
+\noindent\textbf{步骤5。}计算测试数据集的噪声方差：
+\[
+(\widehat\sigma_n^2)^{(t)}=\frac1{m-q}\sum_{i=1}^{m}
+\bigl(y_{new_i}-k(x_{new_i},X)^T\widehat\alpha)^2\bigr).
+\]
+
+\noindent\textbf{步骤6。}检查收敛。令 $\varepsilon$ 为预设误差。如果
+\[
+\bigl|(\widehat\sigma_n^2)^{(t)}-(\widehat\sigma_n^2)^{(t-1)}\bigr|<\varepsilon,
+\]
+则停止；否则返回步骤2。
+
+如果用 Cholesky 分解计算矩阵的逆，则结论7.27可化为结论7.28（Rasmussen and Williams 2006）。
+
+\Needspace{5\baselineskip}
+\noindent\textbf{结论 7.28\quad 使用 Cholesky 分解的高斯过程回归}
+
+\noindent\textbf{步骤1。}定义高斯核矩阵 $K(X,X)$，计算噪声方差初值：
+\[
+(\widehat\sigma_n^2)^{(0)}=\frac1{n-q}\sum_{i=1}^{n}(y_i-\overline y)^2,
+\qquad \overline y=\frac1n\sum_{i=1}^{n}y_i.
+\]
+令 $t=0$。
+
+\noindent\textbf{步骤2。}估计回归系数。
+
+进行 Cholesky 分解：
+\[
+K(X,X)+(\widehat\sigma_n^2)^{(t)}I=LL^T.
+\]
+解方程 $Lz=y$，求得 $z$；解方程 $L^T\alpha=z$，求得 $\alpha$。
+
+\noindent\textbf{步骤3。}给定 $x_{new}$，计算预测值 $\overline y_{new}=k(x_{new},X)^T\widehat\alpha$ 和噪声 $e_{new}=y_{new}-\overline y_{new}$。
+
+\noindent\textbf{步骤4。}计算预测值估计量的协方差矩阵与边际似然。
+
+解方程 $L\gamma=K(X,X_{new})$，求得 $\gamma$。计算方差：
+\[
+V(\widehat y_{new})=K(X_{new},X_{new})-\gamma^T\gamma.
+\]
+计算带噪声测试数据 $y=y_{new}$ 的预测分布：
+\[
+p(y\mid X)=\frac1{(2\pi)^{n/2}|L|}\exp\left\{-\frac12y^T\widehat\alpha\right\}.
+\]
+
+\noindent\textbf{步骤5。}计算测试数据集的噪声方差：
+\[
+(\widehat\sigma_n^2)^{(t)}=\frac1{m-q}\sum_{i=1}^{m}
+\bigl(y_{new_i}-k(x_{new_i},X)^T\widehat\alpha\bigr)^2.
+\]
+
+\noindent\textbf{步骤6。}检查收敛。令 $\varepsilon$ 为预设误差。如果
+\[
+\bigl|(\widehat\sigma_n^2)^{(t)}-(\widehat\sigma_n^2)^{(t-1)}\bigr|<\varepsilon,
+\]
+则停止；否则返回步骤2。

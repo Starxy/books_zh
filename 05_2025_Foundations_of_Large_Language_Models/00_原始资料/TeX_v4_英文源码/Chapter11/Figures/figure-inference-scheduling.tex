@@ -1,0 +1,82 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.1cm}
+
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=0.6cm,inner sep=2pt,draw,fill=white,rounded corners=0pt];
+\tikzstyle{snode} = [minimum width=0.18cm,minimum height=0.18cm,inner sep=0pt,fill=red!30];
+
+\begin{scope}
+
+\node [anchor=west,draw,thick,minimum height=1.2cm,minimum width=2.8cm] (scheduler) at (0,0) {\small{Scheduler}};
+\node [anchor=west,draw,thick,minimum height=1.2cm,minimum width=2.8cm,align=left] (engine) at ([xshift=4cm]scheduler.east) {\small{Inference}\\[-0.1cm] \small{Engine}};
+
+\draw [->] ([yshift=0.8em,xshift=2pt]scheduler.east) -- ([yshift=0.8em,xshift=-2pt]engine.west);
+\draw [<-] ([yshift=-0.8em,xshift=2pt]scheduler.east) -- ([yshift=-0.8em,xshift=-2pt]engine.west);
+
+\node [snode,anchor=south] (x00) at ([yshift=1.6em,xshift=1cm]scheduler.east) {};
+\node [snode,anchor=west] (x01) at ([xshift=\ssep]x00.east) {};
+\node [snode,anchor=west] (x02) at ([xshift=\ssep]x01.east) {};
+\node [snode,anchor=west] (x03) at ([xshift=\ssep]x02.east) {};
+\node [snode,anchor=south,fill=ugreen!30] (x10) at ([yshift=\ssep]x00.north) {};
+\node [snode,anchor=west,fill=ugreen!30] (x11) at ([xshift=\ssep]x10.east) {};
+\node [snode,anchor=west] (x12) at ([xshift=\ssep]x11.east) {};
+\node [snode,anchor=west] (x13) at ([xshift=\ssep]x12.east) {};
+\node [snode,anchor=south,fill=ugreen!30] (x20) at ([yshift=\ssep]x10.north) {};
+\node [snode,anchor=west] (x21) at ([xshift=\ssep]x20.east) {};
+\node [snode,anchor=west] (x22) at ([xshift=\ssep]x21.east) {};
+\node [snode,anchor=west] (x23) at ([xshift=\ssep]x22.east) {};
+
+\node [snode,anchor=north,fill=ugreen!30] (bx20) at ([yshift=-1.6em,xshift=1cm]scheduler.east) {};
+\node [snode,anchor=west] (bx21) at ([xshift=\ssep]bx20.east) {};
+\node [snode,anchor=west] (bx22) at ([xshift=\ssep]bx21.east) {};
+\node [snode,anchor=west] (bx23) at ([xshift=\ssep]bx22.east) {};
+\node [snode,anchor=north,fill=ugreen!30] (bx10) at ([yshift=-\ssep]bx20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (bx11) at ([xshift=\ssep]bx10.east) {};
+\node [snode,anchor=west] (bx12) at ([xshift=\ssep]bx11.east) {};
+\node [snode,anchor=west] (bx13) at ([xshift=\ssep]bx12.east) {};
+\node [snode,anchor=north] (bx00) at ([yshift=-\ssep]bx10.south) {};
+\node [snode,anchor=west] (bx01) at ([xshift=\ssep]bx00.east) {};
+\node [snode,anchor=west] (bx02) at ([xshift=\ssep]bx01.east) {};
+\node [snode,anchor=west] (bx03) at ([xshift=\ssep]bx02.east) {};
+
+\node [snode,anchor=west,fill=blue!30] (by01) at ([xshift=\ssep]bx03.east) {};
+\node [snode,anchor=west,fill=blue!30] (by02) at ([xshift=\ssep]by01.east) {};
+\node [snode,anchor=west,fill=blue!30] (by03) at ([xshift=\ssep]by02.east) {};
+\node [snode,anchor=west,fill=blue!30] (by04) at ([xshift=\ssep]by03.east) {};
+\node [snode,anchor=west,fill=blue!30] (by11) at ([xshift=\ssep]bx13.east) {};
+\node [snode,anchor=west,fill=blue!30] (by12) at ([xshift=\ssep]by11.east) {};
+\node [snode,anchor=west,fill=blue!30] (by13) at ([xshift=\ssep]by12.east) {};
+\node [snode,anchor=west,fill=gray!30] (by14) at ([xshift=\ssep]by13.east) {};
+\node [snode,anchor=west,fill=blue!30] (by21) at ([xshift=\ssep]bx23.east) {};
+\node [snode,anchor=west,fill=blue!30] (by22) at ([xshift=\ssep]by21.east) {};
+\node [snode,anchor=west,fill=gray!30] (by23) at ([xshift=\ssep]by22.east) {};
+\node [snode,anchor=west,fill=gray!30] (by24) at ([xshift=\ssep]by23.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (x00) (x23)] (batch) {};
+\node [draw,rounded corners=2pt]  [fit = (bx00) (by24)] (batchback) {};
+\end{pgfonlayer}
+
+\node [anchor=south] (batchlabel) at ([yshift=0.0cm]batch.north) {\scriptsize{batch}};
+\node [anchor=north] (batchbacklabel) at ([yshift=-0.0cm]batchback.south) {\scriptsize{batch (after processing)}};
+
+\node [anchor=south,draw,thick,dotted,minimum height=1.2cm,minimum width=2.8cm,align=left] (inputbox) at ([yshift=2cm]scheduler.north) {\footnotesize{Request Pool}\\[-2pt] \footnotesize{$\mathbf{x}_1$, $\mathbf{x}_2$, $\mathbf{x}_3$, ...}};
+\draw [-{Stealth[scale=1]},double] ([yshift=-1pt]inputbox.south) -- ([yshift=1pt]scheduler.north);
+
+\node [anchor=north,draw,thick,dotted,minimum height=1.2cm,minimum width=2.8cm,align=left] (outputbox) at ([yshift=-2cm]scheduler.south) {\footnotesize{Predictions}\\[-2pt] \footnotesize{$\mathbf{y}_2$, $\mathbf{y}_1$, $\mathbf{y}_3$, ...}};
+\draw [{Stealth[scale=1]}-,double] ([yshift=1pt]outputbox.north) -- ([yshift=-1pt]scheduler.south);
+
+\begin{pgfonlayer}{background}
+\node [rounded corners=0pt,fill=gray!10]  [fit = (scheduler) (engine) (batchlabel) (batchbacklabel)] (bigsystem) {};
+\node [draw,rounded corners=2pt]  [fit = (x00) (x23)] (batch) {};
+\node [draw,rounded corners=2pt]  [fit = (bx00) (by24)] (batchback) {};
+\end{pgfonlayer}
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

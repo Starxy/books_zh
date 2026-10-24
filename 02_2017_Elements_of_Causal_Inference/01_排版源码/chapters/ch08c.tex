@@ -1,0 +1,82 @@
+% 原书第 163—167 页；第 8.2.3—8.2.4 小节全文。
+\subsection{二十一点游戏中的状态简化}
+\label{sec:ch08-blackjack}
+
+第 8.2.2 节提出的方法，可以用来学习如何玩二十一点纸牌游戏（blackjack）。设想一名玩家进入赌场，开始玩二十一点。他既不知道游戏目标，也不知道最优策略，而是采用随机策略。游戏的每一步，他都会被问到要从允许的动作中选择哪一个；游戏结束后，庄家告诉他赢了或输了多少钱。玩过一段时间后，玩家可以调整策略，使自己更倾向于选择那些已被证明有效的决策，然后继续游戏。从数学角度看，二十一点已经得到了解决。Baldwin et al.［1956］发现了在牌副数为无穷时的最优策略。对每局下注 1 欧元的玩家而言，该策略对应的期望为 $\EE[Y]\approx-0.006$ 欧元。
+
+因果性如何在这里发挥作用？我们假定，玩家并不知道二十一点的具体规则；不过，他也许知道输赢只由牌面值决定，与花色无关，也就是说，规则不会区分梅花 Q 和红桃 Q。玩家便可以立即断定，最优策略不依赖花色。这给寻找最优策略带来了明显优势：需要考虑的状态数大为减少，可能策略的空间也随之显著缩小。图 8.4 描述了这一论证：变量 $S_t$ 包含全部信息，而变量 $F_t$ 不包含花色。例如，
+\[
+ \begin{aligned}
+ S_3&=(\text{玩家：}\heartsuit K,\spadesuit5,\diamondsuit4;\quad
+       \text{庄家：}\diamondsuit K),\\
+ F_3&=(\text{玩家：}K,\;5,\;4;\quad \text{庄家：}K).
+ \end{aligned}
+\]
+由于最终结果 $Y$ 只依赖于 $(F_1,\ldots,F_4)$，而不依赖于“完整状态”$(S_1,\ldots,S_4)$，所以动作可以只根据 $F$ 变量来选择。同样，也可以利用纸牌顺序不影响结果这一事实。更形式化地说，有如下结果。
+
+\input{figures/ch08_figure_8_4}
+
+\Needspace{8\baselineskip}
+\begin{proposition}[状态简化]
+假设我们关心回报 $Y\coloneqq\sum_jR_j$，且所有变量均为离散变量。设存在函数 $f$，使得对于所有 $j$，令 $F_j\coloneqq f(S_j)$ 后，有
+\begin{equation}
+ R_j\indep S_j\mid F_j,A_j,
+ \tag{8.5}
+\end{equation}
+并且完整状态对状态变化不起作用，具体含义如下：对于所有 $s_j$，以及所有满足 $f(s_{j-1})=f(s^\circ_{j-1})$ 的 $s_{j-1},s^\circ_{j-1}$，都有
+\begin{equation}
+ p\bigl(f(s_j)\mid s_{j-1}\bigr)
+ =p\bigl(f(s_j)\mid s^\circ_{j-1}\bigr).
+ \tag{8.6}
+\end{equation}
+那么，最优策略 $(a,s)\mapsto\pi_{\mathrm{opt}}(a\mid s)$ 只依赖于 $F_j$，而不依赖于 $S_j$。存在
+\[
+ \pi_{\mathrm{opt}}\in\argmax_{\pi}\EE[Y],
+\]
+使得
+\[
+ \begin{gathered}
+ \pi_{\mathrm{opt}}(a_j\mid s_{j-1})
+ =\pi_{\mathrm{opt}}(a_j\mid s^\circ_{j-1})\\
+ \forall s_{j-1},s^\circ_{j-1}:\quad f(s_{j-1})=f(s^\circ_{j-1}).
+ \end{gathered}
+\]
+\end{proposition}
+
+\par\smallskip
+{\small\noindent\textbf{译注：}原书图 8.4 画的是 $F_j\to A_j$ 和 $S_j\to A_j$，但图注写作 $F_{j-1}$ 和 $S_{j-1}$；命题 8.1 的最后一个策略公式也使用 $j-1$，与前文的同下标约定有所切换。译文分别保留原图和原公式，阅读时须留意这一下标差异。}
+\par\smallskip
+
+当 $F_j$ 的可能取值比 $S_j$ 少时，这一结果尤其有用。证明见附录 C.11。在二十一点的例子中，式 (8.6) 表示，再抽到一张 K 的概率，只依赖此前已抽到的牌面值，尤其是其中 K 的数量，而不依赖花色。
+
+\subsection{广告投放中的加权改进}
+\label{sec:ch08-advertisement}
+
+Bottou et al.［2013］在研究最优广告投放时，也采用了相关论证。考虑下面对系统的简化描述。一家公司运营着一个搜索引擎，我们称它为发布商（publisher）。它可能希望在搜索结果上方的区域，即\textbf{主栏（mainline）}中展示广告。只有用户点击某条广告，发布商才会从相应的公司获得收入。在展示广告之前，发布商会设置\textbf{主栏保留阈值（mainline reserve）}$A$。这是一个实值参数，决定主栏中展示多少条广告。在多数系统中，主栏广告数 $F$ 在 0 到 4 之间，即 $F\in\{0,1,2,3,4\}$。主栏保留阈值 $A$ 通常依赖许多元，例如搜索词、搜索的日期和时间，以及地理位置；我们将这些变量统称为状态 $S$。例如，如果搜索词表明用户打算买新鞋，就可能希望比用户查询教堂下次礼拜时间时展示更多广告。
+
+我们可以将该系统建模为每回合长度为 1 的回合式强化学习。\footnote{现实中的系统通常更加复杂。例如，广告主会在类似拍卖的过程中，对特定搜索词进行竞价，这些出价继而影响每次点击的价格。}
+回报 $Y$ 等于每回合的点击次数，其取值为 0 或 1。如何选择最优主栏保留阈值 $A$，就对应于寻找最优策略 $(a,s)\mapsto\pi_{\mathrm{opt}}(a\mid s)$。图 8.5 展示了这一问题的简化图示。状态 $S$ 包含发布商掌握的用户信息。潜变量 $H$ 包含未知的用户信息，例如用户意图。动作 $A$ 是主栏保留阈值，$Y$ 表示用户是否点击了某条广告。最后，离散变量 $F$ 表示展示的广告条数。评估新策略 $(a,s)\mapsto\widetilde p(a\mid s)$，对应于应用式 (8.4)：
+\[
+ \widehat\xi_{n,\mathrm{ERL}}\coloneqq\frac1n\sum_{i=1}^n
+ Y^i\frac{\widetilde p(A^i\mid S^i)}{p(A^i\mid S^i)}.
+\]
+这里为使记号简便，用 $p(a\mid s)$ 代替 $\pi(a\mid s)$。下面这个关键认识能够带来改进：用户是否点击广告，虽然依赖主栏保留阈值 $A$，但这种依赖完全通过 $F$ 的值实现；用户从来看不到实值参数 $A$。一旦考虑系统的因果结构（见图 8.5），这一点便显而易见。利用这一事实，可以改用估计量
+\[
+ \frac1n\sum_{i=1}^nY^i
+ \frac{\widetilde p(F^i\mid S^i)}{p(F^i\mid S^i)};
+\]
+见命题 8.2。由于 $F$ 是离散变量，例如只取 0 到 4 之间的整数，这通常能得到性质好得多的权重。在实践中，这一修改可能显著缩短置信区间［Bottou et al., 2013，第 5.1 节］。与第 8.1 节一样，我们可以利用关于因果结构的知识来改善统计表现。更形式化地说，下面的命题为这一过程提供了依据。
+
+\input{figures/ch08_figure_8_5}
+
+\begin{proposition}[加权改进]
+假设在 $\mathbf X=(A,F,H,S,Y)$ 上存在密度 $p$，它由因果图如图 8.5 所示的结构因果模型 $\mathfrak C$ 导出。进一步假设，密度 $\widetilde p$ 由结构因果模型 $\widetilde{\mathfrak C}$ 导出，后者对应于对 $A$ 实施干预 $\dox{A\coloneqq\widetilde f(S,\widetilde N_A)}$。并且，若 $p(f\mid s)=0$，则 $\widetilde p(f\mid s)=0$；若 $p(a\mid s)=0$，则 $\widetilde p(a\mid s)=0$。那么有
+\[
+ \widetilde{\EE}Y
+ =\int y\,\frac{\widetilde p(a\mid s)}{p(a\mid s)}p(\mathbf x)\,d\mathbf x
+ =\int y\,\frac{\widetilde p(f\mid s)}{p(f\mid s)}p(\mathbf x)\,d\mathbf x.
+\]
+\end{proposition}
+
+证明见附录 C.12。一般来说，密度不能在相关区域为零这一条件确实必要：如果存在一组 $(a,s)$ 值，具有非零 Lebesgue 测度，属于 $\widetilde p$ 的支撑集，并对 $Y$ 的期望有贡献，那么在 $p$ 下也必须有非零概率从该区域抽到数据。
+\FloatBarrier

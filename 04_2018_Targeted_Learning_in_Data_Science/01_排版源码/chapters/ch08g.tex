@@ -1,0 +1,116 @@
+% 原书分章 PDF 第 19—20 页：第 8.7 节。
+\section{基于双变量右删失数据的二值处理对双变量生存概率的因果效应}
+
+考虑双变量生存数据的扩展右删失数据结构：
+\[
+ \begin{aligned}
+ O=\bigl(&W,A,\widetilde T_1=\min(T_1,C_1),\Delta_1=I(T_1\leq C_1),\\
+ &\widetilde T_2=\min(T_2,C_2),\Delta_2=I(T_2\leq C_2)\bigr),
+ \end{aligned}
+\]
+其中，$W$ 为基线协变量，$A\in\{0,1\}$ 为二值处理。沿用前一节的记号，如
+$T=(T_1,T_2)$、$C=(C_1,C_2)$、$\Delta=(\Delta_1,\Delta_2)$ 和
+$\widetilde T=(\widetilde T_1,\widetilde T_2)$。
+于是，观测数据结构可记为 $O=(W,A,\widetilde T,\Delta)$。令 $Q_W$ 为 $W$ 的边际概率分布，
+$g(a\mid W)=P(A=a\mid W)$ 为处理机制，
+$F(\cdot\mid A,W)$ 与 $G_c(\cdot\mid A,W)$ 分别为给定 $A,W$ 时 $T$ 和 $C$ 的条件累积分布函数。令 $G=(g,G_c)$，$Q=(Q_W,F)$。注意，$O$ 的概率分布
+$P_{Q,G}=P_{Q_W,F,g,G_c}$
+由这四个参数索引。考虑统计模型
+$\mathcal M=\{P_{Q,G}:Q,G\in\mathcal G\}$，
+其中对 $Q_W$ 和 $F(\cdot\mid A,W)$ 不作限定；但我们可能掌握有关处理与删失机制的某些知识，因而将 $G=(g,G_c)$ 限制在某个集合 $\mathcal G$ 内。
+
+令 $\Psi:\mathcal M\to\mathbb R$ 为 $t_0=(t_{10},t_{20})$ 处特定处理下的双变量生存概率：
+\[
+ \begin{aligned}
+ \Psi(P)=\bar F_a(t_0)
+ &=\int P(T>t_0\mid A=a,W=w)\,Q_W(dw)\\
+ &=\int\bar F(t_0\mid A=a,W=w)\,Q_W(dw).
+ \end{aligned}
+\]
+由于 $\Psi(P)$ 只通过 $Q=(Q_W,F)$ 依赖 $P$，也使用记号 $\Psi(Q)$。$O$ 的密度分解为一个 $Q$ 因子与一个 $G=(g,G_c)$ 因子。因此，模型 $\mathcal M$ 中 $\Psi$ 在 $P_{Q,G}$ 处的有效影响曲线，与 $G$ 已知的模型 $\mathcal M(G)=\{P_{Q,G}:Q\}$ 中相同。
+
+在模型 $\mathcal M(G)$ 中，$\Psi$ 的一个梯度为
+\[
+ D(Q,G)(O)=\kappa_{t_0}(O)
+ \frac{I(\Delta=(1,1),A=a)}
+ {g(A\mid W)\bar G_c(\widetilde T\mid A,W)}-\Psi(Q),
+\]
+其中 $\kappa_t(O)=I(\widetilde T>t_0)$。这是简单 IPCW 估计量
+\[
+ \frac1n\sum_{i=1}^n
+ \frac{\kappa_{t_0}(O_i)I(\Delta_i=(1,1),A_i=a)}
+ {g(A_i\mid W_i)\bar G(\widetilde T_i\mid A_i,W_i)}
+\]
+的影响曲线，因而确实是梯度。由
+$dQ_W=(1+\epsilon S_W(W))dQ_W$、
+$S_W\in L_0^2(Q_W)$
+的扰动生成的切空间 $T_{Q_W}(P)$，就是 $L_0^2(Q_W)$ 本身。令
+\[
+ D_W^*(Q,G)=E_P(D(Q,G)(O)\mid W)
+ =\bar F(t_0\mid A=a,W)-\bar F_a(t_0).
+\]
+注意，它表示 $D(Q,G)$ 在切空间 $T_{Q_W}(P)$ 上的投影，因此是有效影响曲线 $D^*(P)$ 的一个分量。
+
+用 $L_0^2(F)$ 表示由 $(W,A,T)$ 的函数组成、且给定 $W,A$ 时条件均值为零的 Hilbert 空间。在模型 $\mathcal M(G)$ 中，得分算子
+$A_F:L_0^2(F)\to L_0^2(P_{Q,G})$
+把 $dF_{\epsilon,h}(t\mid A,W)=(1+\epsilon h(t\mid A,W))dF(t\mid A,W)$ 的得分 $h\in L_0^2(F)$，映射为 $\{P_{Q_W,F_{\epsilon,h},G}:\epsilon\}$ 的得分，具体为
+% 与第 8.6 节一样，原书两个单分量项均印为 Delta=(0,1)。
+\[
+ \begin{aligned}
+ A_F(h)(O)
+ &=E_F(h(T\mid A,W)\mid W,A,\widetilde T,\Delta)\\
+ &=h(T\mid A,W)I(\Delta=(1,1))\\
+ &\quad+\frac{\int_{\widetilde T_1}^{\infty}
+ h(t_1,\widetilde T_2\mid A,W)F^{01}(dt_1,\widetilde T_2\mid A,W)}
+ {\bar F^{01}(\widetilde T_1,\widetilde T_2\mid A,W)}I(\Delta=(0,1))\\
+ &\quad+\frac{\int_{\widetilde T_2}^{\infty}
+ h(\widetilde T_1,t_2\mid A,W)F^{10}(\widetilde T_1,dt_2\mid A,W)}
+ {\bar F^{10}(\widetilde T_1,\widetilde T_2\mid A,W)}I(\Delta=(0,1))\\
+ &\quad+\frac{\int_{\widetilde T_1}^{\infty}\int_{\widetilde T_2}^{\infty}
+ h(t_1,t_2\mid A,W)\,dF(t_1,t_2\mid A,W)}
+ {\bar F(\widetilde T_1,\widetilde T_2\mid A,W)}I(\Delta=(0,0)),
+ \end{aligned}
+\]
+其中
+\[
+ \begin{aligned}
+ F^{01}(t_1,t_2\mid A,W)
+ &=\frac{d}{dt_2}F(t_1,t_2\mid A,W),\\
+ \bar F^{01}(t_1,t_2\mid A,W)
+ &=\int_{t_1}^{\infty}F^{01}(ds_1,t_2\mid A,W),\\
+ F^{10}(t_1,t_2\mid A,W)
+ &=\frac{d}{dt_1}F(t_1,t_2\mid A,W),\\
+ \bar F^{10}(t_1,t_2\mid A,W)
+ &=\int_{t_2}^{\infty}F^{10}(t_1,ds_2\mid A,W).
+ \end{aligned}
+\]
+所以，$F$ 生成的切空间 $T_F(P)$ 为 $\overline R(A_F)$，即得分算子
+$A_F:L_0^2(F)\to L_0^2(P_{Q,G})$
+值域的闭包。令
+$Fh=E(h\mid A,W)=\int h(t\mid A,W)\,dF(t\mid A,W)$，
+并用某个 $h\in L^2(F)$ 的 $h-Fh$ 表示 $L_0^2(F)$ 中的函数。
+
+有效影响曲线 $D^*(P)=D^*(Q,G)$，等于 $D(Q,G)$ 在 $T_{Q_W}(P)$ 上的投影 $D_W^*(P)$，加上 $D(P)$ 在 $\overline R(A_F)$ 上的投影 $D_T^*(P)$。因此，它为正交和
+$D^*(Q,G)=D_W^*(Q,G)+D_T^*(Q,G)$。
+由于 $\overline R(A_F)$ 嵌入于给定 $A,W$ 时条件均值为零的 $O$ 的函数空间，
+$D_T^*(P)$ 也是 $D_1(P)\equiv D(P)-E(D(P)\mid A,W)$ 的投影。有
+$D_T^*(Q,G)=A_F(h^*)$，其中
+\[
+ h^*(P)=\argmin_{h\in L^2(F)}
+ P\{D_1(Q,G)-A_F(h)+Fh\}^2.
+\]
+回顾，对于函数 $h(O)$，$Fh=E(h\mid A,W)$ 依赖于 $A,W$。可以在所有 $T$ 的函数中，最小化给定 $(A,W)$ 时平方误差损失的条件期望，从而得到这一最小值。由此定义最优函数
+$T\mapsto h^*(T,A,W)$；
+对 $(A,W)$ 的所有可能取值分别这样处理，便得到完整解
+$(T,A,W)\mapsto h^*(P)(T,A,W)$。
+将这一特定于 $(A,W)$ 的极小化问题的最优函数 $T\mapsto h(T)$ 记为
+$h^*(P\mid A,W)$，注意 $h^*(P)(T,A,W)=h^*(P\mid A,W)$：
+\[
+ h^*(P\mid A,W)=\argmin_{h\in L^2(F_T)}
+ E_P\bigl(\{D_1(Q,G)-A_F(h)+Fh\}^2\mid A,W\bigr).
+\]
+这里，将 $L^2(F_T)$ 定义为只依赖 $T=(T_1,T_2)$ 的函数 $T\mapsto h(T)$ 的空间。对于给定 $A,W$，现在把
+$A_F:L^2(F_T)\to L^2(P_{\mid A,W})$
+视为从 $L^2(F_T)$（$T$ 的函数）到 $(\widetilde T,\Delta)$ 的函数空间的线性算子。
+
+对于给定 $A,W$，接下来可按前一节的方法处理，与“二值处理对区间删失事件发生时间的因果效应”例子相同。这里不再重复这些计算。

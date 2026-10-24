@@ -1,0 +1,23 @@
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm]
+ \node[latent] (ch08f81Q) at (0,1.5) {$Q$};
+ \node[latent] (ch08f81N) at (3.7,1.5) {$N$};
+ \node[latent] (ch08f81R) at (7.4,1.5) {$R$};
+ \node[vtx] (ch08f81Y) at (0,0) {$Y$};
+ \node[vtx] (ch08f81X) at (7.4,0) {$X$};
+ \draw[ed] (ch08f81Q)--(ch08f81Y);
+ \draw[ed] (ch08f81N)--(ch08f81Y);
+ \draw[ed] (ch08f81N)--(ch08f81X);
+ \draw[ed] (ch08f81R)--(ch08f81X);
+ \node[font=\small,anchor=east] at (-1.5,1.5) {未观测};
+ \node[font=\small,anchor=east] at (-1.5,0) {已观测};
+ \node[font=\small,above=4pt] at (ch08f81Q.north) {真实信号};
+ \node[font=\small,above=4pt] at (ch08f81N.north) {系统噪声};
+ \node[font=\small,above=4pt] at (ch08f81R.north) {其他信号};
+ \node[font=\small,below=4pt] at (ch08f81Y.south) {关注的测量值};
+ \node[font=\small,below=4pt] at (ch08f81X.south) {其他测量值};
+\end{tikzpicture}
+\caption{适用于搜寻系外行星问题的因果结构。底层的关注信号 $Q$ 只能以含噪版本 $Y$ 的形式测得。如果同一噪声源也污染了对其他信号的测量，而这些信号与 $Q$ 独立，就可以利用这些测量来去噪。本例中，望远镜 $N$ 构成系统噪声，影响对相互独立的光变曲线的测量 $X$ 和 $Y$。}
+\label{fig:ch08-half-sibling}
+\end{figure}

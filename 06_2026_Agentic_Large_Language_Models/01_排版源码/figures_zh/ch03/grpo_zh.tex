@@ -1,0 +1,70 @@
+\begin{tikzpicture}[
+    x=.97cm,y=.88cm,>=Latex,font=\small,
+    trained/.style={draw=blue!40!black,thick,rounded corners=4pt,fill=yellow!18,minimum width=1.55cm,minimum height=.8cm,align=center},
+    frozen/.style={trained,fill=blue!10},
+    quantity/.style={draw=black!75,rounded corners=2pt,fill=white,minimum width=.85cm,minimum height=.6cm,font=\large},
+    flow/.style={->,semithick}
+]
+    \node[font=\bfseries\large,anchor=west] at (0,7.1) {PPO};
+    \node[quantity] (pq) at (.45,5.5) {$q$};
+    \node[trained] (pp) at (2.2,5.5) {策略模型};
+    \node[quantity] (po) at (3.95,5.5) {$o$};
+    \node[frozen] (pref) at (5.9,7.05) {参考模型};
+    \node[frozen] (prm) at (5.9,5.95) {奖励模型};
+    \node[trained] (pvm) at (5.9,4.85) {价值模型};
+    \node[font=\large,inner sep=0pt] (plus) at (7.55,6.55) {$\oplus$};
+    \node[quantity] (pr) at (8.65,6.55) {$r$};
+    \node[quantity] (pv) at (8.65,4.85) {$v$};
+    \node[quantity,font=\normalsize] (gae) at (10.3,5.5) {GAE};
+    \node[quantity] (pA) at (11.8,5.5) {$A$};
+    \draw[flow] (pq) -- (pp);
+    \draw[flow] (pp) -- (po);
+    \draw[flow] (po.east) to[out=0,in=180] (pref.west);
+    \draw[flow] (po.east) to[out=0,in=180] (prm.west);
+    \draw[flow] (po.east) to[out=0,in=180] (pvm.west);
+    \draw[flow] (pref.east) to[out=0,in=150] node[above,near start,font=\small] {$KL$} (plus);
+    \draw[flow] (prm.east) to[out=0,in=210] (plus);
+    \draw[flow] (plus) -- (pr);
+    \draw[flow] (pvm) -- (pv);
+    \draw[flow] (pr.east) to[out=0,in=150] (gae.west);
+    \draw[flow] (pv.east) to[out=0,in=210] (gae.west);
+    \draw[flow] (gae) -- (pA);
+    \draw[flow] (pA.north) .. controls (11.8,8.3) and (3.2,8.3) .. (pp.north);
+    \draw[flow] (gae.south) .. controls (10.3,4.05) and (7,4.05) .. (pvm.south);
+
+    \draw[dashed,thick,black!45] (0,4.1) -- (12.65,4.1);
+    \node[font=\bfseries\large,anchor=west] at (0,3.5) {GRPO};
+    \node[quantity] (gq) at (.45,1.5) {$q$};
+    \node[trained] (gp) at (2.2,1.5) {策略模型};
+    \fill[black!5,rounded corners=5pt] (3.35,-.02) rectangle (4.55,3.05);
+    \node[quantity] (go1) at (3.95,2.6) {$o_1$};
+    \node[quantity] (go2) at (3.95,1.65) {$o_2$};
+    \node[font=\large] at (3.95,.9) {$\cdots$};
+    \node[quantity] (goG) at (3.95,.35) {$o_G$};
+    \node[frozen] (gref) at (5.9,2.65) {参考模型};
+    \node[frozen] (grm) at (5.9,1.5) {奖励模型};
+    \fill[black!5,rounded corners=5pt] (7.7,-.02) rectangle (8.9,3.05);
+    \node[quantity] (gr1) at (8.3,2.6) {$r_1$};
+    \node[quantity] (gr2) at (8.3,1.65) {$r_2$};
+    \node[font=\large] at (8.3,.9) {$\cdots$};
+    \node[quantity] (grG) at (8.3,.35) {$r_G$};
+    \node[draw=blue!40!black,rounded corners=4pt,align=center,minimum width=1.25cm,minimum height=.85cm] (group) at (10.15,1.5) {组内计算};
+    \fill[black!5,rounded corners=5pt] (11.2,-.02) rectangle (12.4,3.05);
+    \node[quantity] (gA1) at (11.8,2.6) {$A_1$};
+    \node[quantity] (gA2) at (11.8,1.65) {$A_2$};
+    \node[font=\large] at (11.8,.9) {$\cdots$};
+    \node[quantity] (gAG) at (11.8,.35) {$A_G$};
+    \draw[flow] (gq) -- (gp);
+    \draw[flow] (gp.east) -- (3.35,1.5);
+    \draw[flow] (4.55,1.5) to[out=0,in=180] (gref.west);
+    \draw[flow] (4.55,1.5) -- (grm.west);
+    \draw[flow] (grm.east) -- (7.7,1.5);
+    \draw[flow] (8.9,1.5) -- (group.west);
+    \draw[flow] (group.east) -- (11.2,1.5);
+    \draw[flow] (gref.north) .. controls (5.9,3.5) and (3.0,3.55) .. node[above,pos=.38] {$KL$} (gp.north);
+    \draw[flow] (11.8,3.05) .. controls (11.8,4.05) and (3.0,4.05) .. (gp.north);
+
+    \fill[black!5,rounded corners=6pt] (13.05,2.7) rectangle (15.0,6.4);
+    \node[trained,minimum width=1.6cm,align=center] at (14.02,5.5) {训练中的\\模型};
+    \node[frozen,minimum width=1.6cm,align=center] at (14.02,3.7) {冻结的\\模型};
+\end{tikzpicture}

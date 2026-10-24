@@ -1,0 +1,183 @@
+\section{干预演算}
+
+本节建立一组推理规则，用以把涉及干预与观测的概率语句变换为其他此类语句，从而提供一种句法方法，来导出（或验证）关于干预的断言。每条推理规则都尊重 $\doxp(\cdot)$ 算子作为“修改底层模型中一组精选函数”的干预这一解释。由这一解释浮现出来的推理规则集，将称为\emph{do 演算}。
+
+我们假定给定因果图 $G$ 的结构，其中某些节点可观测、另一些未观测。我们的目标是促进形如 $P(y\mid\hat{x})$ 的因果效应表达式的句法推导，其中 $X$ 与 $Y$ 表示被观测变量的任意子集。所谓“推导”，我们指把 $P(y\mid\hat{x})$ 逐步化简为只涉及被观测量的标准概率的等价表达式。凡此种化简可行，$X$ 对 $Y$ 的因果效应便是可识别的（见定义 3.2.4）。
+
+\subsection{预备记号}
+
+设 $X,Y,Z$ 是因果 DAG $G$ 中任意的互不相交节点集。我们用 $G_{\bar{X}}$ 表示从 $G$ 中删去一切指向 $X$ 中节点之箭头所得的图；用 $G_{\underline{X}}$ 表示从 $G$ 中删去一切发自 $X$ 中节点之箭头所得的图。为表示同时删去进入与发出的箭头，我们使用记号 $G_{\bar{X}\underline{Z}}$（示例见图 3.6）。最后，表达式 $P(y\mid\hat{x},z)\triangleq P(y,z\mid\hat{x})/P(z\mid\hat{x})$ 表示：在 $X$ 被保持为常数 $x$、且（在此条件下）观测到 $Z=z$ 时，$Y=y$ 的概率。
+
+\subsection{推理规则}
+
+下述定理陈述所提出的演算的三条基本推理规则；证明见 Pearl (1995a)。
+
+\begin{theorem}[do 演算的规则]
+设 $G$ 是与 \textup{(3.2)} 所定义之因果模型相联系的有向无环图，$P(\cdot)$ 表示该模型所诱导的概率分布。对任意互不相交的变量子集 $X,Y,Z,W$，我们有下列规则。
+
+\medskip
+\noindent\textbf{规则 1（观测的插入/删除）}：
+\begin{equation}
+P(y\mid\hat{x},z,w)=P(y\mid\hat{x},w)\qquad\text{若 } (Y\indep Z\mid X,W)_{G_{\bar{X}}}. \tag{3.31}
+\end{equation}
+
+\noindent\textbf{规则 2（行动/观测的交换）}：
+\begin{equation}
+P(y\mid\hat{x},\hat{z},w)=P(y\mid\hat{x},z,w)\qquad\text{若 } (Y\indep Z\mid X,W)_{G_{\bar{X}\underline{Z}}}. \tag{3.32}
+\end{equation}
+
+\noindent\textbf{规则 3（行动的插入/删除）}：
+\begin{equation}
+P(y\mid\hat{x},\hat{z},w)=P(y\mid\hat{x},w)\qquad\text{若 } (Y\indep Z\mid X,W)_{G_{\bar{X}\overline{Z(W)}}}, \tag{3.33}
+\end{equation}
+其中 $Z(W)$ 是 $Z$ 中那些在 $G_{\bar{X}}$ 里不是任何 $W$ 节点之祖先的节点所成之集。
+\end{theorem}
+
+这些推理规则都源于对“帽”算子 $\hat{\ }$ 的基本解释：它把连接 $X$ 与其行动前父节点的因果机制，替换为由干预力量引入的新机制 $X=x$。结果是一个以子图 $G_{\bar{X}}$ 为特征的子模型（Spirtes et al. 1993 称之为“被操纵图”）。规则 1 重申 d-分离是在干预 $\doxp(X=x)$ 所导致分布中的条件独立之有效检验，因而图中的 $G_{\bar{X}}$ 适用。该规则来自这样一个事实：从系统中删去方程并不会在其余扰动项之间引入任何依赖（见 \textup{(3.2)}）。规则 2 给出一个条件，使外部干预 $\doxp(Z=z)$ 对 $Y$ 的效果与被动观测 $Z=z$ 相同；该条件相当于在 $G_{\bar{X}\underline{Z}}$ 中阻断从 $Z$ 到 $Y$ 的一切后门路径，因为 $G_{\bar{X}\underline{Z}}$ 保留的正是（且仅是）这类路径。规则 3 给出在不影响 $Y=y$ 之概率的前提下引入（或删除）外部干预 $\doxp(Z=z)$ 的条件；该规则的有效性同样源于用“删去 $Z$ 中变量所对应的全部方程”来模拟干预 $\doxp(Z=z)$（因而得到图 $G_{\bar{X}\overline{Z}}$）。把删除限于 $W$ 节点之非祖先的理由，见 Pearl (1995a) 中规则 1—3 的证明。
+
+\begin{corollary}
+因果效应 $q=P(y_1,\dots,y_k\mid\hat{x}_1,\dots,\hat{x}_m)$ 在以图 $G$ 为特征的模型中可识别，当且仅当存在一个有限的变换序列，其中每一步都符合定理 3.4.1 中的某条推理规则，把 $q$ 化简为只涉及被观测量的标准（即“无帽”）概率表达式。
+\end{corollary}
+
+规则 1—3 已被证明是\emph{完备的}，即足以导出一切可识别的因果效应（Shpitser and Pearl 2006a; Huang and Valtorta 2006）。此外，如 \S 3.4.3 所示，使用帽记号的符号推导比旨在从标准概率表达式中消去潜变量的代数推导（如 \S 3.3.2 中导出 \textup{(3.24)} 那样）更为便利。然而，判定是否存在一个把任意因果效应表达式化简的规则序列，这一任务尚未被系统化，因此直接的图形识别准则更可取。这些准则将在第四章发展。
+
+\subsection{因果效应的符号推导：一个例子}
+
+现在演示如何用规则 1—3 导出图 3.5 结构中的一切因果效应估计量。图 3.6 展示了随后推导所需的各个子图。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.92,every node/.style={transform shape}]
+  % G
+  \begin{scope}
+    \node[vtxs] (X) at (0,1.2) {$X$};
+    \node[vtxs] (Z) at (0,0.2) {$Z$};
+    \node[vtxs] (Y) at (0,-0.8) {$Y$};
+    \node[vtxs] (U) at (1.4,1.2) {$U$};
+    \draw[ed] (U)--(X); \draw[ed] (U) to[bend left=25] (Y);
+    \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+    \node[font=\small] at (0.6,-1.55) {$G$};
+  \end{scope}
+  % G_Xbar
+  \begin{scope}[xshift=3.4cm]
+    \node[vtxs] (X) at (0,1.2) {$X$};
+    \node[vtxs] (Z) at (0,0.2) {$Z$};
+    \node[vtxs] (Y) at (0,-0.8) {$Y$};
+    \node[vtxs] (U) at (1.4,1.2) {$U$};
+    \draw[ed] (U) to[bend left=25] (Y);
+    \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+    \node[font=\small] at (0.6,-1.55) {$G_{\bar{X}}$};
+  \end{scope}
+  % G_XZ
+  \begin{scope}[xshift=6.8cm]
+    \node[vtxs] (X) at (0,1.2) {$X$};
+    \node[vtxs] (Z) at (0,0.2) {$Z$};
+    \node[vtxs] (Y) at (0,-0.8) {$Y$};
+    \node[vtxs] (U) at (1.4,1.2) {$U$};
+    \draw[ed] (U) to[bend left=25] (Y);
+    \draw[ed] (X)--(Z);
+    \node[font=\small] at (0.6,-1.55) {$G_{\bar{X}\underline{Z}}$};
+  \end{scope}
+  % G_XZbar
+  \begin{scope}[xshift=10.2cm]
+    \node[vtxs] (X) at (0,1.2) {$X$};
+    \node[vtxs] (Z) at (0,0.2) {$Z$};
+    \node[vtxs] (Y) at (0,-0.8) {$Y$};
+    \node[vtxs] (U) at (1.4,1.2) {$U$};
+    \draw[ed] (X)--(Z);
+    \node[font=\small] at (0.6,-1.55) {$G_{\bar{X}\bar{Z}}$};
+  \end{scope}
+\end{tikzpicture}
+\caption{推导因果效应时所用的 $G$ 的各子图。}
+\label{fig:3.6}
+\end{figure}
+
+\noindent\textbf{任务 1：计算 $P(z\mid\hat{x})$}
+
+此任务一步即可完成，因为 $G$ 满足规则 2 的适用条件。也就是说，在 $G_{\bar{X}}$ 中 $X\indep Z$（因为路径 $X\leftarrow U\to Y\leftarrow Z$ 被 $Y$ 处的收敛箭头阻断），于是可写
+\begin{equation}
+P(z\mid\hat{x})=P(z\mid x). \tag{3.34}
+\end{equation}
+
+\noindent\textbf{任务 2：计算 $P(y\mid\hat{z})$}
+
+这里不能对 $\hat{z}$ 与 $z$ 施用规则 2 作交换，因为 $G_{\underline{Z}}$ 中含有一条从 $Z$ 到 $Y$ 的后门路径：$Z\leftarrow X\leftarrow U\to Y$。自然，我们希望通过测量位于该路径上的变量（如 $X$）来阻断它。这涉及对 $X$ 的一切取值取条件并求和：
+\begin{equation}
+P(y\mid\hat{z})=\sum_{x}P(y\mid x,\hat{z})P(x\mid\hat{z}). \tag{3.35}
+\end{equation}
+现在须处理两个含 $\hat{z}$ 的项：$P(y\mid x,\hat{z})$ 与 $P(x\mid\hat{z})$。后者可施用规则 3（行动删除）直接算出：
+\begin{equation}
+P(x\mid\hat{z})=P(x)\qquad\text{若 } (Z\indep X)_{G_{\underline{Z}}}, \tag{3.36}
+\end{equation}
+因为 $X$ 与 $Z$ 在 $G_{\underline{Z}}$ 中 d-分离。（直觉上，操纵 $Z$ 不应影响 $X$，因为 $Z$ 在 $G$ 中是 $X$ 的后代。）为化简前者 $P(y\mid x,\hat{z})$，我们查规则 2：
+\begin{equation}
+P(y\mid x,\hat{z})=P(y\mid x,z)\qquad\text{若 } (Z\indep Y\mid X)_{G_{\underline{Z}}}, \tag{3.37}
+\end{equation}
+注意 $X$ 在 $G_{\underline{Z}}$ 中把 $Z$ 与 $Y$ d-分离。于是可把 \textup{(3.35)} 写成
+\begin{equation}
+P(y\mid\hat{z})=\sum_{x}P(y\mid x,z)P(x)=E_x\,P(y\mid x,z), \tag{3.38}
+\end{equation}
+它是后门公式（式 \textup{(3.19)}）的一个特别情形。使之合法化的条件 $(Z\indep Y\mid X)_{G_{\underline{Z}}}$ 提供了又一个图形检验，用以判定集合 $X$ 是否足以控制（$Y$ 与 $Z$ 之间的）混杂——它等价于 Rosenbaum and Rubin (1983) 那个晦涩的“可忽略性”条件。
+
+\noindent\textbf{任务 3：计算 $P(y\mid\hat{x})$}
+
+写出
+\begin{equation}
+P(y\mid\hat{x})=\sum_{z}P(y\mid z,\hat{x})P(z\mid\hat{x}), \tag{3.39}
+\end{equation}
+我们看到其中 $P(z\mid\hat{x})$ 已在 \textup{(3.34)} 中化简，但对 $P(y\mid z,\hat{x})$ 却没有任何规则可以消去帽号 $\hat{\ }$。不过，我们可以通过规则 2 合法地加上这个符号：
+\begin{equation}
+P(y\mid z,\hat{x})=P(y\mid\hat{z},\hat{x})\qquad\text{若 } (Y\indep Z\mid X)_{G_{\bar{X}\underline{Z}}}, \tag{3.40}
+\end{equation}
+因为适用条件成立（见图 3.6）。现在可以用规则 3 从 $P(y\mid\hat{z},\hat{x})$ 中删去关于 $X$ 的行动，因为 $Y\indep X\mid Z$ 在 $G_{\underline{Z}}$ 中成立。于是有
+\begin{equation}
+P(y\mid\hat{z},\hat{x})=P(y\mid\hat{z}), \tag{3.41}
+\end{equation}
+后者已在 \textup{(3.38)} 中算出。把 \textup{(3.38)}、\textup{(3.41)} 与 \textup{(3.34)} 代回 \textup{(3.39)}，最终得到
+\begin{equation}
+P(y\mid\hat{x})=\sum_{z}P(z\mid x)\sum_{x'}P(y\mid x',z)P(x'), \tag{3.42}
+\end{equation}
+它与 \textup{(3.28)} 的前门公式完全一致。
+
+\noindent\textbf{任务 4：计算 $P(y,z\mid\hat{x})$}
+
+我们有
+\[
+P(y,z\mid\hat{x})=P(y\mid z,\hat{x})P(z\mid\hat{x}).
+\]
+右端两个因子此前已分别在 \textup{(3.34)} 与 \textup{(3.41)} 中导出，由此得到
+\begin{equation}
+P(y,z\mid\hat{x})=P(y\mid\hat{z})P(z\mid x)=P(z\mid x)\sum_{x'}P(y\mid x',z)P(x'). \tag{3.43}
+\end{equation}
+
+\noindent\textbf{任务 5：计算 $P(x,y\mid\hat{z})$}
+
+我们有
+\begin{equation}
+P(x,y\mid\hat{z})=P(y\mid x,\hat{z})P(x\mid\hat{z})=P(y\mid x,z)P(x). \tag{3.44}
+\end{equation}
+右端第一项由规则 2 得到（其许可条件为 $(Y\indep Z\mid X)_{G_{\underline{Z}}}$），第二项由规则 3 得到（如 \textup{(3.36)}）。
+
+注意，在所有这些推导中，图 $G$ 既提供了施用推理规则的许可证，也提供了选择正确规则的指引。
+
+\subsection{用替代实验作因果推断}
+
+假定我们希望了解 $X$ 对 $Y$ 的因果效应，而 $P(y\mid\hat{x})$ 不可识别；同时出于成本或伦理的实际理由，我们无法用随机实验控制 $X$。于是问题变成：能否通过随机化一个比 $X$ 更易控制的\emph{替代}变量 $Z$ 来识别 $P(y\mid\hat{x})$？例如，若我们关心胆固醇水平（$X$）对心脏病（$Y$）的效应，一个合理的实验是控制受试者的饮食（$Z$），而不是直接控制受试者血液中的胆固醇水平。
+
+形式上，这个问题相当于把 $P(y\mid\hat{x})$ 变换为只有 $Z$ 的成员获得帽号的表达式。用定理 3.4.1 可以证明，下述条件足以容许一个替代变量 $Z$：
+\begin{enumerate}[label=(\roman*),leftmargin=2.2em]
+\item $X$ 截断了从 $Z$ 到 $Y$ 的一切有向路径；且
+\item $P(y\mid\hat{x})$ 在 $G_{\underline{Z}}$ 中可识别。
+\end{enumerate}
+确实，若条件 (i) 成立，则因为 $(Y\indep Z\mid X)_{G_{\underline{Z}}}$，我们可以写 $P(y\mid\hat{x})=P(y\mid\hat{x},\hat{z})$。而 $P(y\mid\hat{x},\hat{z})$ 表示在由 $G_{\underline{Z}}$ 支配之模型中 $X$ 对 $Y$ 的因果效应；依条件 (ii)，它是可识别的。转译到胆固醇的例子，这些条件要求饮食对心脏状况没有直接效应，且胆固醇水平与心脏病之间没有混杂——除非我们能通过额外的测量消解此种混杂。
+
+图 3.9(e) 与 3.9(h)（见 \S 3.5.2）例示了两种条件都成立的模型。以图 3.9(e) 为例，我们得到如下估计量：
+\begin{equation}
+P(y\mid\hat{x})=P(y\mid x,\hat{z})=\frac{P(y,x\mid\hat{z})}{P(x\mid\hat{z})}. \tag{3.45}
+\end{equation}
+这可以这样直接确立：先施用规则 3 加上 $\hat{z}$，因为 $(Y\indep Z\mid X)_{G_{\underline{Z}}}$；再施用规则 2 把 $\hat{x}$ 换成 $x$，因为 $(Y\indep X\mid Z)_{G_{\underline{Z}}}$。
+
+依 \textup{(3.45)}，只需 $Z$ 的一个水平，便足以识别任意 $y$ 与 $x$ 取值下的 $P(y\mid\hat{x})$。换言之，$Z$ 根本不必变化；它可以简单地被外部手段保持在常数水平，而只要 $G$ 所体现的假设有效，\textup{(3.45)} 的右端无论在 $Z$ 被保持在哪个（常数）水平上都应取同一值。然而在实践中，需要 $Z$ 的若干个水平，以确保对每个所需的 $X$ 取值都获得足够样本。例如，若我们关心差值 $E(Y\mid\hat{x})-E(Y\mid\hat{x}')$（$x$ 与 $x'$ 是两个处理水平），我们就应选择 $Z$ 的两个取值 $z$ 与 $z'$，使 $x$ 与 $x'$ 的样本数（分别）最大化，然后估计
+\[
+E(Y\mid\hat{x})-E(Y\mid\hat{x}')=E(Y\mid x,\hat{z})-E(Y\mid x',\hat{z}').
+\]

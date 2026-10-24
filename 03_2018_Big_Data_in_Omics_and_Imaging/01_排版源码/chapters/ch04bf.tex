@@ -1,0 +1,268 @@
+% 原PDF126页4.A.2标题—132页附录4.B标题之前。
+\subsection*{4.A.2\quad 贝叶斯学习的变分方法}
+\addcontentsline{toc}{subsection}{4.A.2 贝叶斯学习的变分方法}
+
+本节将EM算法的变分方法推广到贝叶斯学习，介绍在同时包含观测变量和隐藏变量的贝叶斯网络中估计参数的变分贝叶斯（variational Bayesian，VB）框架。其思路是用简单分布近似隐藏变量与参数的联合分布，并假设给定数据后，隐藏状态与参数相互独立（\url{www.cse.buffalo.edu/faculty/mbeal/thesis/beal03_2.pdf}）。
+
+VB学习方法首先近似边际似然 $P(R,Q)$。在隐藏变量与参数上引入任意分布，可以得到边际似然的下界：
+\begin{equation}
+\begin{aligned}
+\log P(R,Q)&=\log\int P(Z,R,Q,\theta)\,d\theta\,dZ\\
+&=\log\int q(Z,\theta)\frac{P(Z,R,Q,\theta)}{q(Z,\theta)}\,d\theta\,dZ\\
+&\ge\int q(Z,\theta)\log\frac{P(Z,R,Q,\theta)}{q(Z,\theta)}\,d\theta\,dZ.
+\end{aligned}\tag{4.A.38}
+\end{equation}
+假设分布 $q(Z,\theta)$ 可分解为
+\begin{equation}
+q(Z,\theta)\approx q_z(Z)q_\theta(\theta).\tag{4.A.39}
+\end{equation}
+将式（4.A.39）代入式（4.A.38），得到
+\begin{equation}
+\begin{aligned}
+\log P(R,Q)&\ge\int q_z(Z)q_\theta(\theta)
+ \log\frac{P(Z,R,Q\mid\theta)P(\theta)}{q_z(Z)q_\theta(\theta)}\,d\theta\,dZ\\
+&=\int q_\theta(\theta)\left[
+ \int q_z(Z)\log\frac{P(Z,R,Q\mid\theta)}{q_z(Z)}\,dZ
+ +\log\frac{P(\theta)}{q(\theta)}\right]\\
+&=F(q_z(Z),q_\theta(\theta)),
+\end{aligned}\tag{4.A.40}
+\end{equation}
+其中
+\begin{equation}
+F(q_z(Z),q_\theta(\theta))=
+\int q_z(Z)q_\theta(\theta)
+ \log\frac{P(Z,R,Q\mid\theta)P(\theta)}{q_z(Z)q_\theta(\theta)}\,d\theta\,dZ\tag{4.A.41}
+\end{equation}
+或
+\begin{equation}
+\begin{aligned}
+F(q_z(Z),q_\theta(\theta))=
+\int q_\theta(\theta)\left[
+\int q_z(Z)\log\frac{P(Z,R,Q\mid\theta)}{q_z(Z)}\,dZ
++\log\frac{P(\theta)}{q(\theta)}\right].
+\end{aligned}\tag{4.A.42}
+\end{equation}
+为了推导变分贝叶斯EM（variational Bayesian EM，VBEM）的规则，再次使用变分法和式（4.A.42）。显然，它可以重写为
+\begin{equation}
+\begin{aligned}
+F(q_z(Z),q_\theta(\theta))
+=\int d\theta\,q_\theta(\theta)\biggl[&
+\int\bigl(q_z(Z)\log P(Z,R,Q\mid\theta)\\
+&{}-q_z(Z)\log q_z(Z)\bigr)\,dZ
++\log\frac{P(\theta)}{q(\theta)}\biggr].
+\end{aligned}\tag{4.A.43}
+\end{equation}
+与问题（4.A.6）类似，有
+\begin{equation}
+\begin{aligned}
+\max_{q(Z)}\quad&F(q_z(Z),q_\theta(\theta))\\
+\text{约束为}\quad&\int q(Z)\,dZ=1.
+\end{aligned}\tag{4.A.44}
+\end{equation}
+由与前面相同的论证，得到
+\begin{equation}
+q_z^{(u+1)}(Z)=\frac1{C_z}
+\exp\left[\int q_\theta^{(u)}(\theta)\log P(Z,R,Q\mid\theta^{(u)})\,d\theta\right],\tag{4.A.45}
+\end{equation}
+其中，
+\[
+C_z=\int\exp\left[\int q_\theta^{(u)}(\theta)
+\log P(Z,R,Q\mid\theta^{(u)})\,d\theta\right]dZ
+\]
+为标准化常数。通常假设 $Z_n,R_n,Q_n$ 相互独立，则最优 $q_z^{(u+1)}(Z)$ 可分解为
+\begin{equation}
+q_z^{(u+1)}(Z)=\prod_{n=1}^{N}q_{zn}^{(u+1)}(Z_n),\tag{4.A.46}
+\end{equation}
+其中
+\begin{equation}
+q_{zn}^{(u+1)}(Z)=\frac1{C_{zn}}
+\exp\left[\int q_\theta^{(u)}(\theta)
+\log P(Z_n,R_n,Q_n\mid\theta^{(u)})\,d\theta\right],\tag{4.A.47}
+\end{equation}
+\begin{equation}
+C_{Zn}=\int\exp\left[\int q_\theta^{(u)}(\theta)
+\log P(Z_n,R_n,Q_n\mid\theta^{(u)})\,d\theta\right]dZ_n,\tag{4.A.48}
+\end{equation}
+\begin{equation}
+C_Z=\prod_{N=1}^{n}C_{Zn}.\tag{4.A.49}
+\end{equation}
+接下来研究如何更新 $q_\theta(\theta)$，目标是寻找使下列问题最优的 $q_\theta(\theta)$：
+\begin{equation}
+\begin{aligned}
+\max_{q_\theta(\theta)}\quad&F(q_z^{(u+1)}(Z),q_\theta(\theta))\\
+\text{约束为}\quad&\int q_\theta(\theta)\,d\theta=1.
+\end{aligned}\tag{4.A.50}
+\end{equation}
+使用与前面相同的拉格朗日乘子法，得到问题（4.A.50）的解
+\begin{equation}
+q_\theta^{(u+1)}(\theta)=\frac1{C_\theta}P(\theta^{(u)})
+\exp\left[\int q_z(Z^{(u+1)})\log P(Z,R,Q\mid\theta^{(u)})\,dZ\right],\tag{4.A.51}
+\end{equation}
+其中
+\[
+C_\theta=\int P(\theta^{(u)})
+\exp\left[\int q_z(Z^{(u+1)})\log P(Z,R,Q\mid\theta^{(u)})\,dZ\right].
+\]
+一般VBEM算法概括为：
+
+\noindent\textbf{VBE步：}
+\begin{equation}
+q_z^{(u+1)}(Z)=\prod_{n=1}^{N}q_{zn}^{(u+1)}(Z_n),\tag{4.A.52}
+\end{equation}
+其中
+\begin{equation}
+q_{zn}^{(u+1)}(Z)=\frac1{C_{zn}}
+\exp\left[\int q_\theta^{(u)}(\theta)\log P(Z_n,R_n,Q_n\mid\theta)\,d\theta\right],\tag{4.A.53}
+\end{equation}
+\begin{equation}
+C_{Zn}=\int\exp\left[\int q_\theta^{(u)}(\theta)
+\log P(Z_n,R_n,Q_n\mid\theta)\,d\theta\right]dZ_n,\tag{4.A.54}
+\end{equation}
+\begin{equation}
+C_Z=\prod_{n=1}^{N}C_{Zn}.\tag{4.A.55}
+\end{equation}
+\noindent\textbf{VBM步：}
+\begin{equation}
+q_\theta^{(u+1)}(\theta)=\frac1{C_\theta}P(\theta^{(u)})
+\exp\left[\int q_z(Z^{(u+1)})\log P(Z,R,Q\mid\theta^{(u)})\,dZ\right],\tag{4.A.56}
+\end{equation}
+其中
+\[
+C_\theta=\int P(\theta^{(u)})
+\exp\left[\int q_z(Z^{(u+1)})\log P(Z,R,Q\mid\theta^{(u)})\,dZ\right].
+\]
+再次先考虑RNA测序数据的无缺口比对和有缺口比对（Nariai et al. 2013）。对无缺口比对，定义
+\[
+Z_{nijk}=\begin{cases}1,&G_n=i,\ S_n=j,\ O_n=k,\\0,&\text{其他情形}.
+\end{cases}
+\]
+概率 $P(Z_n,R_n,Q_n\mid\theta)$ 化为 $P(Z_{nijk},R_n\mid\theta)$。定义
+\[
+\begin{aligned}
+\log\rho_{nijk}
+={}&\E_\theta[\log\theta_i+\log P(S_n=j\mid G_n=i)
+ +\log P(O_n=k\mid G_n=i)\\
+ &\hspace{4em}{}+\log(R_n=r_n\mid Z_{nijk}=1)]\\
+={}&\E_\theta[\log\theta_i]+\log P(S_n=j\mid G_n=i)
+ +\log P(O_n=k\mid G_n=i)\\
+ &{}+\log(R_n=r_n\mid Z_{nijk}=1),
+\end{aligned}
+\]
+其中
+\[
+\E_\theta[\log\theta_i]=\psi(\alpha_i)-\psi\left(\sum_{j=1}^{M}\alpha_j\right),
+\qquad \psi(\alpha)=\frac{d\Gamma(\alpha)/d\alpha}{\Gamma(\alpha)}
+\]
+为双伽马函数（digamma function）。于是
+\begin{equation}
+\int q_\theta\log P(Z_n,R_n\mid\theta)\,d\theta
+=\sum_{(i,j,k)\in\pi_n}\log\rho_{n,i,j,k}.\tag{4.A.57}
+\end{equation}
+由式（4.A.54），
+\begin{equation}
+C_{zn}=\sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k'}.\tag{4.A.58}
+\end{equation}
+利用式（4.A.53），得到
+\begin{equation}
+\begin{aligned}
+q_{Zn}^{(u+1)}(Z)
+&=\frac1{C_{Zn}}\exp\left[\int q_\theta^{(u)}(\theta)
+ \log P(Z_n,R_n,Q_n\mid\theta)\,d\theta\right]\\
+&=\frac{\exp[\sum_{(i,j,k)\in\pi_n}\log\rho_{n,i,j,k}]}{
+ \sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k'}}\\
+&=\prod_i\prod_j\prod_k
+ \left(\frac{\rho_{n,i,j,k}}{\sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k'}}\right)^{Z_{nijk}}\\
+&=\prod_i\prod_j\prod_k(\eta_{nijk})^{Z_{nijk}},
+\end{aligned}\tag{4.A.59}
+\end{equation}
+其中
+\[
+\eta_{n,i,j,k}=\frac{\rho_{n,i,j,k}}{\sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k'}},
+\qquad \E_Z[Z_{nijk}]=\eta_{nijk}.
+\]
+因此
+\begin{equation}
+\begin{aligned}
+q_Z^{(u+1)}(Z)&=\prod_{n=1}^{N}q_{Zn}^{(u+1)}(Z_n)\\
+&=\prod_n\prod_i\prod_j\prod_k(\eta_{nijk})^{Z_{nijk}}.
+\end{aligned}\tag{4.A.60}
+\end{equation}
+现在研究VBM步。利用式（4.A.56），得到
+\begin{equation}
+\begin{aligned}
+\log q_\theta^{(u+1)}(\theta)
+&=\log P(\theta^{(u)})+\E_Z[\log P(Z,R\mid\theta^{(u)})]+D_0\\
+&=(\alpha_0-1)\sum_{i=0}^{M}\log\theta_i
+ +\sum_{n,i,j,k}\E_Z[Z_{n,i,j,k}]\log\theta_i+D\\
+&=\sum_{i=0}^{M}\left(\alpha_0-1+
+ \sum_{n,j,k}\E_Z[Z_{n,i,j,k}]\log\theta_i\right)+D.
+\end{aligned}\tag{4.A.61}
+\end{equation}
+回顾Dirichlet分布的概率密度函数：
+\begin{equation}
+P(\theta)=\frac{\prod_{i=0}^{M}\Gamma(\alpha_i)}{
+\Gamma(\sum_{i=0}^{M}\alpha_i)}\prod_{i=0}^{M}\theta_i^{\alpha_i-1}.\tag{4.A.62}
+\end{equation}
+于是，其对数为
+\begin{equation}
+\log(P(\theta))=\sum_{i=0}^{M}(\alpha_i-1)\log\theta_i
++\sum_{i=0}^{M}\log\Gamma(\alpha_i)
+-\log\Gamma\left(\sum_{i=0}^{M}\alpha_i\right).\tag{4.A.63}
+\end{equation}
+比较式（4.A.61）与式（4.A.63），可推断 $q_\theta^{(u+1)}$ 为Dirichlet分布，其中
+\begin{equation}
+\begin{aligned}
+\alpha_i^{(u+1)}&=\alpha_i^{(u)}+
+ \sum_{(n,j,k)\in\pi_n}\E_Z[Z_{n,i,j,k}]\\
+&=\alpha_i^{(u)}+\sum_{(n,j,k)\in\pi_n}\eta_{nijk}.
+\end{aligned}\tag{4.A.64}
+\end{equation}
+Dirichlet分布的均值为
+\begin{equation}
+\E_\theta[\theta_i^{(u+1)}]=\frac{\alpha_i^{(u+1)}}{
+\sum_{i=0}^{M}\alpha_i^{(u+1)}}.\tag{4.A.65}
+\end{equation}
+用于无缺口比对RNA测序标准化的变分贝叶斯算法（Nariai et al. 2013）概括如下。
+
+\noindent\textbf{步骤1：初始化。}对每个转录本异构体，设置Dirichlet分布参数的初值 $\alpha_i^{(0)}$，$i=1,\ldots,M$。
+
+\noindent\textbf{步骤2：VBE步。}利用当前估计 $\E_\theta[\theta^{(u)}]$，计算密度函数
+\[
+q_Z^{(u+1)}(Z)=\prod_n\prod_i\prod_j\prod_k(\eta_{nijk})^{Z_{nijk}},
+\]
+其中
+\[
+\eta_{n,i,j,k}=\frac{\rho_{n,i,j,k}}{\sum_{(i',j',k')\in\pi_n}\rho_{n',i',j',k'}},
+\quad\text{或}\quad\E_Z[Z_{nijk}]=\eta_{nijk},
+\]
+\[
+\begin{aligned}
+\log\rho_{nijk}={}&\E_\theta[\log\theta_i]+\log P(S_n=j\mid G_n=i)
+ +\log P(O_n=k\mid G_n=i)\\
+ &{}+\log(R_n=r_n\mid Z_{nijk}=1),
+\end{aligned}
+\]
+其中
+\[
+\E_\theta[\log\theta_i]=\psi(\alpha_i)-\psi\left(\sum_{j=1}^{M}\alpha_j\right),
+\qquad\psi(\alpha)=\frac{d\Gamma(\alpha)/d\alpha}{\Gamma(\alpha)}
+\]
+为双伽马函数。
+
+\noindent\textbf{步骤3：VBM步。}利用当前估计 $q_z^{(u+1)}(Z)$，计算
+\[
+\E_\theta[\theta_i^{(u+1)}]=\frac{\alpha_i^{(u+1)}}{
+\sum_{i=0}^{M}\alpha_i^{(u+1)}},
+\]
+其中
+\[
+\begin{aligned}
+\alpha_i^{(u+1)}&=\alpha_i^{(u)}+
+ \sum_{(n,j,k)\in\pi_n}\E_Z[Z_{n,i,j,k}]\\
+&=\alpha_i^{(u)}\sum_{(n,j,k)\in\pi_n}\eta_{nijk}.
+\end{aligned}
+\]
+\noindent\textbf{步骤4：停止准则。}若
+$\|\E_\theta[\theta^{(u+1)}-\theta^{(u)}\|_2^2<\varepsilon$，则停止；否则返回步骤2。
+
+有缺口比对RNA测序中转录本异构体丰度估计的VB算法，可以类似地推导。

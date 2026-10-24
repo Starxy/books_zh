@@ -1,0 +1,1200 @@
+{
+  "chapter": 25,
+  "status": "complete",
+  "title_en": "CV-TMLE for Nonpathwise Differentiable Target Parameters",
+  "title_zh": "不具路径可微性的目标参数的CV-TMLE",
+  "authors": [
+    "Mark J. van der Laan",
+    "Aurélien Bibaut",
+    "Alexander R. Luedtke"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/26_CH25_CV_TMLE_for_Nonpathwise_Differentiable_Target_Parameters.pdf",
+    "split_pdf_pages": 28,
+    "chapter_body_source_pages": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "printed_pages": "455–481",
+    "english_words_approx": 10441,
+    "source_pages_rendered_and_visually_checked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "source_400dpi_crops_checked": 52,
+    "annotations_removed_in_memory": true,
+    "original_pdf_modified": false,
+    "whole_original_sha_matches_initial": true,
+    "whole_original_sha_evidence": "work/targeted_learning/reports/source_partition.json",
+    "part_VIII_page_1_owner": "root"
+  },
+  "pages": 23,
+  "han_characters_pdf_including_running_heads": 8046,
+  "han_characters_tex_without_comment_lines": 7706,
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25e.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25f.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25g.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25h.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25i.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch25j.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第25章_中文译稿.pdf",
+  "sha256": "ad34cecfe332032a164e52d692059090b9df42479a472c72914a0ab8105e81fd",
+  "coverage": {
+    "full_chapter": true,
+    "sections": 8,
+    "subsections": 4,
+    "all_prose_math_conditions_rates_remainders_proofs_citations": true,
+    "seven_roman_examples_complete": true,
+    "two_full_application_examples_complete": true,
+    "source_and_chinese_page_mapping": "work/targeted_learning/ch25_work/coverage_detail.json"
+  },
+  "formulas": {
+    "numbered_tags": [
+      "25.1",
+      "25.2",
+      "25.3",
+      "25.4",
+      "25.5",
+      "25.6",
+      "25.7",
+      "25.8",
+      "25.9",
+      "25.10",
+      "25.11",
+      "25.12",
+      "25.13",
+      "25.14",
+      "25.15",
+      "25.16"
+    ],
+    "translation_display_groups": 148,
+    "unnumbered_groups": 132,
+    "source_inline_long_formulas_reflowed_without_numbering": 17,
+    "all_math_visually_checked": true,
+    "original_numbering_preserved": true,
+    "inventory": "work/targeted_learning/ch25_work/math_audit.json"
+  },
+  "results": {
+    "theorems": [
+      "25.1",
+      "25.2",
+      "25.3",
+      "25.4",
+      "25.5",
+      "25.6"
+    ],
+    "lemmas": [
+      "25.1",
+      "25.2",
+      "25.3"
+    ],
+    "all_statements_assumptions_and_printed_proofs_complete": true,
+    "actual_proofs_complete": [
+      "引理25.1",
+      "定理25.1",
+      "引理25.2",
+      "定理25.3",
+      "引理25.3",
+      "定理25.4"
+    ],
+    "detailed_inventory": "work/targeted_learning/ch25_work/coverage_detail.json"
+  },
+  "figures": [],
+  "tables": [],
+  "source_boxes": 1,
+  "footnotes": 0,
+  "citation_audit": {
+    "all_author_names_years_suffixes_match": true,
+    "individual_author_year_occurrences": 15,
+    "distinct_author_year_references": 12,
+    "distinct_year_suffix_keys": 11,
+    "evidence": "work/targeted_learning/ch25_work/structural_citation_audit.json"
+  },
+  "new_terms": [
+    {
+      "en": "bandwidth",
+      "zh": "带宽",
+      "note": "平滑调节参数h；与固定h、数据自适应hn及欠平滑hn*区分。"
+    },
+    {
+      "en": "product kernel",
+      "zh": "乘积核",
+      "note": "由一元核K*逐坐标相乘得到。"
+    },
+    {
+      "en": "J-orthogonal kernel",
+      "zh": "J阶正交核",
+      "note": "按本章定义具有1至J阶零矩；保留其原多元矩条件疑点。"
+    },
+    {
+      "en": "kernel density estimator",
+      "zh": "核密度估计量",
+      "note": "一元密度例中CV一步估计量的简化。"
+    },
+    {
+      "en": "kernel density estimation",
+      "zh": "核密度估计",
+      "note": "25.8的历史注记术语。"
+    },
+    {
+      "en": "oversmoothing",
+      "zh": "过度平滑",
+      "note": "25.4末备注，与已有undersmoothing=欠平滑相对。"
+    },
+    {
+      "en": "Euclidean norm",
+      "zh": "欧几里得范数",
+      "note": "25.3向量EIF方程的一维通用最不利子模型所用标准范数。"
+    },
+    {
+      "en": "local polynomial smoothing",
+      "zh": "局部多项式平滑",
+      "note": "因果剂量—反应例引述Kennedy等方法时使用。"
+    },
+    {
+      "en": "augmented IPCW estimator",
+      "zh": "增广逆删失概率加权估计量",
+      "note": "本章印本确写augmented IPCW，按该缩写保留；未替换为IPW。"
+    }
+  ],
+  "source_anomalies": [
+    {
+      "id": "ch25-A01",
+      "source_split_pages": [
+        3,
+        4
+      ],
+      "printed_pages": [
+        456,
+        457
+      ],
+      "files": [
+        "ch25a.tex"
+      ],
+      "item": "例II先固定a0，后仍写Psi(P)=Psi1(P)(a)；例VII最后称“时刻t”而概率式仍用t0。",
+      "treatment": "保留各处原变量a、a0、t、t0，不作一致化修改。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_003.png",
+        "work/targeted_learning/ch25_work/source_03_top_400.png",
+        "work/targeted_learning/ch25_work/source_03_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_004.png",
+        "work/targeted_learning/ch25_work/source_04_top_400.png",
+        "work/targeted_learning/ch25_work/source_04_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A02",
+      "source_split_pages": [
+        5
+      ],
+      "printed_pages": [
+        458
+      ],
+      "files": [
+        "ch25b.tex"
+      ],
+      "item": "多元核矩条件的各sj范围为{0,...,J}，包括全部为零的组合，而积分等号右端仍印0；前一句也称与所有次数≤J的多项式正交。",
+      "treatment": "范围、等号0及原文字面均保留，不补“至少一个sj非零”。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_005.png",
+        "work/targeted_learning/ch25_work/source_05_top_400.png",
+        "work/targeted_learning/ch25_work/source_05_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A03",
+      "source_split_pages": [
+        6
+      ],
+      "printed_pages": [
+        459
+      ],
+      "files": [
+        "ch25b.tex"
+      ],
+      "item": "引理25.1结论中的平滑参数下标为h,J0*，与此前h,J不同。",
+      "treatment": "保留Psi_{h,J0*}。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_006.png",
+        "work/targeted_learning/ch25_work/source_06_top_400.png",
+        "work/targeted_learning/ch25_work/source_06_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A04",
+      "source_split_pages": [
+        6
+      ],
+      "printed_pages": [
+        459
+      ],
+      "files": [
+        "ch25b.tex"
+      ],
+      "item": "引理25.1证明最后一式在Psi差外没有可见闭圆括号。",
+      "treatment": "保留原可见括号缺失；使用普通定界符使TeX合法。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_006.png",
+        "work/targeted_learning/ch25_work/source_06_top_400.png",
+        "work/targeted_learning/ch25_work/source_06_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A05",
+      "source_split_pages": [
+        8
+      ],
+      "printed_pages": [
+        461
+      ],
+      "files": [
+        "ch25c.tex"
+      ],
+      "item": "p_epsilon,h先定义为dP_epsilon,h/dP，随后通用子模型公式却在指数前乘基础密度p；指数内写P_e而非P_e,h。",
+      "treatment": "两种密度记号及P_e均逐处保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_008.png",
+        "work/targeted_learning/ch25_work/source_08_top_400.png",
+        "work/targeted_learning/ch25_work/source_08_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A06",
+      "source_split_pages": [
+        9,
+        11,
+        14
+      ],
+      "printed_pages": [
+        462,
+        464,
+        467
+      ],
+      "files": [
+        "ch25d.tex",
+        "ch25f.tex"
+      ],
+      "item": "三处覆盖数N(delta|Fn|,Fn,L2(Lambda)均缺少关闭N的一个可见右圆括号。",
+      "treatment": "不补原书未印出的括号。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_009.png",
+        "work/targeted_learning/ch25_work/source_09_top_400.png",
+        "work/targeted_learning/ch25_work/source_09_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_011.png",
+        "work/targeted_learning/ch25_work/source_11_top_400.png",
+        "work/targeted_learning/ch25_work/source_11_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_014.png",
+        "work/targeted_learning/ch25_work/source_14_top_400.png",
+        "work/targeted_learning/ch25_work/source_14_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A07",
+      "source_split_pages": [
+        9
+      ],
+      "printed_pages": [
+        462
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "定理25.1最后正态极限N(0,sigma0²)后多印一个右圆括号；随后EIF例子的积分内核输入为大写X，积分变量却为x。",
+      "treatment": "多出的括号与大写X原样保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_009.png",
+        "work/targeted_learning/ch25_work/source_09_top_400.png",
+        "work/targeted_learning/ch25_work/source_09_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A08",
+      "source_split_pages": [
+        10
+      ],
+      "printed_pages": [
+        463
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "定理25.1后的余项讨论先称R20(P1,P0)=0，且声称当H1(P1)=H1(P0)或H2(P1)=H2(P0)时Rx(P,P1)=0，后一参数对不同于先前Rx(P,P0)。",
+      "treatment": "不把R20改Rh，不修改Rx的P1自变量。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_010.png",
+        "work/targeted_learning/ch25_work/source_10_top_400.png",
+        "work/targeted_learning/ch25_work/source_10_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A09",
+      "source_split_pages": [
+        10
+      ],
+      "printed_pages": [
+        463
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "该余项讨论将所满足的条件指为25.9，虽然上下文讨论的是定理25.1的25.5。",
+      "treatment": "交叉引用保留25.9。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_010.png",
+        "work/targeted_learning/ch25_work/source_10_top_400.png",
+        "work/targeted_learning/ch25_work/source_10_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A10",
+      "source_split_pages": [
+        10
+      ],
+      "printed_pages": [
+        463
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "定理25.1证明首个等式右端出现sqrt(n h^d)，而左端及其余项采用hn；f定义多印一个右括号，接下来的EIF差中又缺少关闭首个P*自变量的可见括号。",
+      "treatment": "h/hn和各处可见多/缺定界符均照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_010.png",
+        "work/targeted_learning/ch25_work/source_10_top_400.png",
+        "work/targeted_learning/ch25_work/source_10_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A11",
+      "source_split_pages": [
+        11
+      ],
+      "printed_pages": [
+        464
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "经验过程界先为O_P(r(n){1-log(...)})，随后总结式改印小o_P同一个量。",
+      "treatment": "大小概率阶记号逐式保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_011.png",
+        "work/targeted_learning/ch25_work/source_11_top_400.png",
+        "work/targeted_learning/ch25_work/source_11_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A12",
+      "source_split_pages": [
+        11
+      ],
+      "printed_pages": [
+        464
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "证明末尾把标准化余项改写为核积分时使用x0+h y及P*_{...,h}，而前式用hn。",
+      "treatment": "保留该处h，不代入hn。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_011.png",
+        "work/targeted_learning/ch25_work/source_11_top_400.png",
+        "work/targeted_learning/ch25_work/source_11_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A13",
+      "source_split_pages": [
+        12
+      ],
+      "printed_pages": [
+        465
+      ],
+      "files": [
+        "ch25d.tex"
+      ],
+      "item": "引理25.2证明的熵积分为-p^0.5∫(log epsilon)^0.5 d epsilon；后面∫log epsilon=delta_n-delta log delta_n=delta(1+log delta_n^-1)，正负号及delta/delta_n混用；所谓等价速率条件也保留左端delta_n因子。",
+      "treatment": "所有符号、下标、负号及等价条件完整照录，不按常用熵积分公式改正。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_012.png",
+        "work/targeted_learning/ch25_work/source_12_top_400.png",
+        "work/targeted_learning/ch25_work/source_12_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A14",
+      "source_split_pages": [
+        12
+      ],
+      "printed_pages": [
+        465
+      ],
+      "files": [
+        "ch25e.tex"
+      ],
+      "item": "25.3.3的正态近似均值位置印N(h^J0)B0(J0),sigma0²/(nh^d))，h^J0后有一个提前关闭的右括号。",
+      "treatment": "保留原可见括号位置。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_012.png",
+        "work/targeted_learning/ch25_work/source_12_top_400.png",
+        "work/targeted_learning/ch25_work/source_12_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A15",
+      "source_split_pages": [
+        12,
+        23,
+        27
+      ],
+      "printed_pages": [
+        465,
+        476,
+        480
+      ],
+      "files": [
+        "ch25e.tex",
+        "ch25i.tex",
+        "ch25j.tex"
+      ],
+      "item": "定理25.2和两个应用中的原目标正态极限都以n的负J0*/(2J0*+d或1)次幂乘估计误差。",
+      "treatment": "负指数原样保留，不按通常中心极限定标改为正幂。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_012.png",
+        "work/targeted_learning/ch25_work/source_12_top_400.png",
+        "work/targeted_learning/ch25_work/source_12_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_023.png",
+        "work/targeted_learning/ch25_work/source_23_top_400.png",
+        "work/targeted_learning/ch25_work/source_23_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_027.png",
+        "work/targeted_learning/ch25_work/source_27_top_400.png",
+        "work/targeted_learning/ch25_work/source_27_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A16",
+      "source_split_pages": [
+        13
+      ],
+      "printed_pages": [
+        466
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "分位数选择第二个分支写C=-Z而非Cn；又称alpha_n=1/n对应Cn行为如log n。",
+      "treatment": "C/Cn的区别和原对数量级陈述均保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_013.png",
+        "work/targeted_learning/ch25_work/source_13_top_400.png",
+        "work/targeted_learning/ch25_work/source_13_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A17",
+      "source_split_pages": [
+        14
+      ],
+      "printed_pages": [
+        467
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "定理25.3把此前仅接收P的D_h*写为D_h*(K1,h,x0,P)；Zn中带h^-d/2，而sigma10²定义里为h^d/2；P1被称为P*的极限，选择器却基于初始P。",
+      "treatment": "扩展自变量、相反幂、星号及初始/极限说法逐处按印本保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_014.png",
+        "work/targeted_learning/ch25_work/source_14_top_400.png",
+        "work/targeted_learning/ch25_work/source_14_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A18",
+      "source_split_pages": [
+        15
+      ],
+      "printed_pages": [
+        468
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "25.9中导数核的下标次序印K_{1,x0,hn}，不同于前文K_{1,hn,x0}。",
+      "treatment": "保留该原次序。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_015.png",
+        "work/targeted_learning/ch25_work/source_15_top_400.png",
+        "work/targeted_learning/ch25_work/source_15_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A19",
+      "source_split_pages": [
+        15,
+        16,
+        17
+      ],
+      "printed_pages": [
+        468,
+        469,
+        470
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "定理25.3结论的系数为J0 B0(J0)，证明中先为J0 B0(J0*)，最后又为J0* B0(J0*)。",
+      "treatment": "三个系数和B0自变量不统一改写。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_015.png",
+        "work/targeted_learning/ch25_work/source_15_top_400.png",
+        "work/targeted_learning/ch25_work/source_15_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_016.png",
+        "work/targeted_learning/ch25_work/source_16_top_400.png",
+        "work/targeted_learning/ch25_work/source_16_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_017.png",
+        "work/targeted_learning/ch25_work/source_17_top_400.png",
+        "work/targeted_learning/ch25_work/source_17_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A20",
+      "source_split_pages": [
+        15,
+        23
+      ],
+      "printed_pages": [
+        468,
+        476
+      ],
+      "files": [
+        "ch25f.tex",
+        "ch25i.tex"
+      ],
+      "item": "定理25.3的hn行为及一元密度应用的定理25.5前后两处，都把(Cn²/n)提升到负1/(2J0*+d或1)次幂；与邻近所称最优带宽速率不一致。",
+      "treatment": "全部原负幂保留，不改为正幂。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_015.png",
+        "work/targeted_learning/ch25_work/source_15_top_400.png",
+        "work/targeted_learning/ch25_work/source_15_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_023.png",
+        "work/targeted_learning/ch25_work/source_23_top_400.png",
+        "work/targeted_learning/ch25_work/source_23_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A21",
+      "source_split_pages": [
+        15
+      ],
+      "printed_pages": [
+        468
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "合并导数核两项的文字印h_{-d}下标；定义K1时将原两项负号写成加号，且最后因子为K(x1)而非K*(x1)。",
+      "treatment": "明确排成h的-d下标，并保留两个加号与末项K。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_015.png",
+        "work/targeted_learning/ch25_work/source_15_top_400.png",
+        "work/targeted_learning/ch25_work/source_15_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A22",
+      "source_split_pages": [
+        15
+      ],
+      "printed_pages": [
+        468
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "证明25.10使用大写Psi^1，并将导数等于负0.5d Cn sigma_n n^-1/2 h_n^(-d/2-1)。",
+      "treatment": "大写Psi和负号照印，不由25.7重推后修改。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_015.png",
+        "work/targeted_learning/ch25_work/source_15_top_400.png",
+        "work/targeted_learning/ch25_work/source_15_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A23",
+      "source_split_pages": [
+        16
+      ],
+      "printed_pages": [
+        469
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "核导数恒等式最末项印h^-1 K_{1,hn,x0}，前面的两项却用hn。",
+      "treatment": "末项h原样保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_016.png",
+        "work/targeted_learning/ch25_work/source_16_top_400.png",
+        "work/targeted_learning/ch25_work/source_16_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A24",
+      "source_split_pages": [
+        16
+      ],
+      "printed_pages": [
+        469
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "定理25.3经验过程证明左端使用D_hn*(P_n,Bn)而非导数核对应函数，右端另含h_n^-d/2 D_hn*(K1,...,P1)；方差先称sigma10²后又sigma01²。",
+      "treatment": "两边各自函数、幂及方差下标逐处保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_016.png",
+        "work/targeted_learning/ch25_work/source_16_top_400.png",
+        "work/targeted_learning/ch25_work/source_16_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A25",
+      "source_split_pages": [
+        17
+      ],
+      "printed_pages": [
+        470
+      ],
+      "files": [
+        "ch25f.tex"
+      ],
+      "item": "引理25.3证明的Taylor展开几行有积分号却未印dy，包括花括号展开项及J0阶项。",
+      "treatment": "不补原文未印的积分微分。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_017.png",
+        "work/targeted_learning/ch25_work/source_17_top_400.png",
+        "work/targeted_learning/ch25_work/source_17_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A26",
+      "source_split_pages": [
+        17,
+        20
+      ],
+      "printed_pages": [
+        470,
+        473
+      ],
+      "files": [
+        "ch25f.tex",
+        "ch25h.tex"
+      ],
+      "item": "25.4末备注称Cn发散造成过度平滑；25.5.1推断说明却称令Cn以log n发散可得到略微欠平滑版本。",
+      "treatment": "两处原文结论均完整翻译并保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_017.png",
+        "work/targeted_learning/ch25_work/source_17_top_400.png",
+        "work/targeted_learning/ch25_work/source_17_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_020.png",
+        "work/targeted_learning/ch25_work/source_20_top_400.png",
+        "work/targeted_learning/ch25_work/source_20_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A27",
+      "source_split_pages": [
+        18
+      ],
+      "printed_pages": [
+        471
+      ],
+      "files": [
+        "ch25g.tex"
+      ],
+      "item": "一般逼近族一节把前文d维核情形的alpha0明确印为2d。",
+      "treatment": "保留alpha0=2d，不改为d/2。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_018.png",
+        "work/targeted_learning/ch25_work/source_18_top_400.png",
+        "work/targeted_learning/ch25_work/source_18_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A28",
+      "source_split_pages": [
+        18,
+        20
+      ],
+      "printed_pages": [
+        471,
+        473
+      ],
+      "files": [
+        "ch25g.tex"
+      ],
+      "item": "带宽最优速率与一般结论中的n指数印为单一基线的-1/2(J0+alpha0)，不是以括号表达式为分母的整体分式。",
+      "treatment": "TeX写为n^{-1/2(J0+alpha0)}，保留原字面布局，未添加分母分组。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_018.png",
+        "work/targeted_learning/ch25_work/source_18_top_400.png",
+        "work/targeted_learning/ch25_work/source_18_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_020.png",
+        "work/targeted_learning/ch25_work/source_20_top_400.png",
+        "work/targeted_learning/ch25_work/source_20_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A29",
+      "source_split_pages": [
+        18
+      ],
+      "printed_pages": [
+        471
+      ],
+      "files": [
+        "ch25g.tex"
+      ],
+      "item": "先定义sigma_nh²，标准化速率r_h(n)中却印sigma_hn²。",
+      "treatment": "保留hn与nh的次序差异。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_018.png",
+        "work/targeted_learning/ch25_work/source_18_top_400.png",
+        "work/targeted_learning/ch25_work/source_18_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A30",
+      "source_split_pages": [
+        19
+      ],
+      "printed_pages": [
+        472
+      ],
+      "files": [
+        "ch25g.tex"
+      ],
+      "item": "定理25.4列五条假设；紧接的文字把标准差导数和偏差导数假设称为第三、第四条，实际位于第四、第五条。",
+      "treatment": "保留原文第三/第四的指称。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_019.png",
+        "work/targeted_learning/ch25_work/source_19_top_400.png",
+        "work/targeted_learning/ch25_work/source_19_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A31",
+      "source_split_pages": [
+        19,
+        20
+      ],
+      "printed_pages": [
+        472,
+        473
+      ],
+      "files": [
+        "ch25g.tex"
+      ],
+      "item": "定理25.4证明的第一个导数等式左端为+Cn sigma′/sqrt n-Psi′；随后在- sigma′=正项的代入式中，Cn c项仍带负号。",
+      "treatment": "各等式原符号逐处保留，不调整证明代数。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_019.png",
+        "work/targeted_learning/ch25_work/source_19_top_400.png",
+        "work/targeted_learning/ch25_work/source_19_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_020.png",
+        "work/targeted_learning/ch25_work/source_20_top_400.png",
+        "work/targeted_learning/ch25_work/source_20_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A32",
+      "source_split_pages": [
+        19
+      ],
+      "printed_pages": [
+        472
+      ],
+      "files": [
+        "ch25g.tex"
+      ],
+      "item": "定理25.4第二条的经验过程余项为o_P(n^-0.5 h^-alpha0)，证明相应复述处改为o_P(1)。",
+      "treatment": "声明与证明各自的概率阶照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_019.png",
+        "work/targeted_learning/ch25_work/source_19_top_400.png",
+        "work/targeted_learning/ch25_work/source_19_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A33",
+      "source_split_pages": [
+        20
+      ],
+      "printed_pages": [
+        473
+      ],
+      "files": [
+        "ch25h.tex"
+      ],
+      "item": "25.5.1的标准化渐近正态性式把估计量写为无星的psi_hn,j,n，虽然此前定义的是CV-TMLE psi*。",
+      "treatment": "保留该式无星号。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_020.png",
+        "work/targeted_learning/ch25_work/source_20_top_400.png",
+        "work/targeted_learning/ch25_work/source_20_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A34",
+      "source_split_pages": [
+        21
+      ],
+      "printed_pages": [
+        474
+      ],
+      "files": [
+        "ch25h.tex"
+      ],
+      "item": "Zn(j)经验和式的EIF未印(Oi)评价自变量；分位数先写q_{0,95}再写q_{0.95}；选中jn后的区间仍使用sigma_{j,n}。",
+      "treatment": "不补Oi，不统一小数下标，不把最后sigma_j改为sigma_jn。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_021.png",
+        "work/targeted_learning/ch25_work/source_21_top_400.png",
+        "work/targeted_learning/ch25_work/source_21_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A35",
+      "source_split_pages": [
+        22
+      ],
+      "printed_pages": [
+        475
+      ],
+      "files": [
+        "ch25i.tex"
+      ],
+      "item": "密度例的损失目标经验分布写P_n,Bn而无验证上标1；CV-TMLE定义中P*下标省略h；核均值末项使用K((x0-Oi)/h)，与定义中的(t-x0)/h相反。",
+      "treatment": "无上标/无h和核输入的符号均照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_022.png",
+        "work/targeted_learning/ch25_work/source_22_top_400.png",
+        "work/targeted_learning/ch25_work/source_22_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A36",
+      "source_split_pages": [
+        22,
+        23
+      ],
+      "printed_pages": [
+        475,
+        476
+      ],
+      "files": [
+        "ch25i.tex"
+      ],
+      "item": "密度例先称p0(x0)>0在t0邻域也远离零，接着将一致误差控制放在0周围；局部范数先用t0再用x0，前后积分分别用dx和dP0。",
+      "treatment": "保留原中心变量和积分测度。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_022.png",
+        "work/targeted_learning/ch25_work/source_22_top_400.png",
+        "work/targeted_learning/ch25_work/source_22_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_023.png",
+        "work/targeted_learning/ch25_work/source_23_top_400.png",
+        "work/targeted_learning/ch25_work/source_23_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A37",
+      "source_split_pages": [
+        23
+      ],
+      "printed_pages": [
+        476
+      ],
+      "files": [
+        "ch25i.tex"
+      ],
+      "item": "一元密度定理25.5最后的正态极限定标仍写(n hn^d)^0.5，保留一般维数d。",
+      "treatment": "不将d改为1。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_023.png",
+        "work/targeted_learning/ch25_work/source_23_top_400.png",
+        "work/targeted_learning/ch25_work/source_23_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A38",
+      "source_split_pages": [
+        24,
+        27
+      ],
+      "printed_pages": [
+        477,
+        480
+      ],
+      "files": [
+        "ch25i.tex",
+        "ch25j.tex"
+      ],
+      "item": "两个应用的欠平滑定标均为(n hn*)^-0.5乘估计误差，而随后的95%区间仍除以(n hn*)^+0.5。",
+      "treatment": "两处负定标与正幂分母均照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_024.png",
+        "work/targeted_learning/ch25_work/source_24_top_400.png",
+        "work/targeted_learning/ch25_work/source_24_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_027.png",
+        "work/targeted_learning/ch25_work/source_27_top_400.png",
+        "work/targeted_learning/ch25_work/source_27_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A39",
+      "source_split_pages": [
+        24
+      ],
+      "printed_pages": [
+        477
+      ],
+      "files": [
+        "ch25j.tex"
+      ],
+      "item": "因果剂量—反应例将Kennedy等估计量称为augmented IPCW，而不是通常该例所用的其他加权缩写。",
+      "treatment": "按原IPCW译为增广逆删失概率加权，并保留英文缩写。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_024.png",
+        "work/targeted_learning/ch25_work/source_24_top_400.png",
+        "work/targeted_learning/ch25_work/source_24_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A40",
+      "source_split_pages": [
+        25
+      ],
+      "printed_pages": [
+        478
+      ],
+      "files": [
+        "ch25j.tex"
+      ],
+      "item": "式25.13末尾未印da；QW子模型的损失目标使用L1，随后却定义L(QW)。",
+      "treatment": "不补da，保留L1与L的原差异。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_025.png",
+        "work/targeted_learning/ch25_work/source_25_top_400.png",
+        "work/targeted_learning/ch25_work/source_25_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A41",
+      "source_split_pages": [
+        26
+      ],
+      "printed_pages": [
+        479
+      ],
+      "files": [
+        "ch25j.tex"
+      ],
+      "item": "因果例的CV一步估计量使用依赖h的Qbar*，虽然一般带宽分析中特别要求初始估计量不依赖h。",
+      "treatment": "保留该应用中带h的星号Qbar。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_026.png",
+        "work/targeted_learning/ch25_work/source_26_top_400.png",
+        "work/targeted_learning/ch25_work/source_26_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A42",
+      "source_split_pages": [
+        26,
+        27
+      ],
+      "printed_pages": [
+        479,
+        480
+      ],
+      "files": [
+        "ch25j.tex"
+      ],
+      "item": "二阶项的结局回归输入印为a0+hn y a，多一个a；标准化有处用(nh)^0.5，紧接的充分条件则为(n hn)^0.5，定理25.6内再次用(nh)^0.5。",
+      "treatment": "附加a和h/hn各处均逐式保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_026.png",
+        "work/targeted_learning/ch25_work/source_26_top_400.png",
+        "work/targeted_learning/ch25_work/source_26_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_027.png",
+        "work/targeted_learning/ch25_work/source_27_top_400.png",
+        "work/targeted_learning/ch25_work/source_27_bottom_400.png"
+      ]
+    },
+    {
+      "id": "ch25-A43",
+      "source_split_pages": [
+        26,
+        27
+      ],
+      "printed_pages": [
+        479,
+        480
+      ],
+      "files": [
+        "ch25j.tex"
+      ],
+      "item": "例子推导的局部范数平方对K² f²积分并用dP0(w)；定理25.6的范数根号内则对K² f积分，没有f的平方，并使用dQW,0(w)。",
+      "treatment": "定理处明确保留无平方的f及QW,0测度，不按范数通常定义补平方。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch25/ch25_source_026.png",
+        "work/targeted_learning/ch25_work/source_26_top_400.png",
+        "work/targeted_learning/ch25_work/source_26_bottom_400.png",
+        "work/targeted_learning/render/ch25/ch25_source_027.png",
+        "work/targeted_learning/ch25_work/source_27_top_400.png",
+        "work/targeted_learning/ch25_work/source_27_bottom_400.png"
+      ]
+    }
+  ],
+  "unresolved_items": [],
+  "coverage_detail": "work/targeted_learning/ch25_work/coverage_detail.json",
+  "build_validation": {
+    "build": "work/targeted_learning/ch25_work/build_020045",
+    "two_pass_return_codes": [
+      0,
+      0
+    ],
+    "errors": [],
+    "missing_glyphs": [],
+    "overfull": [],
+    "undefined_references": false,
+    "all_23_output_pages_visually_checked": true,
+    "final_shipped_pdf_reopened": true,
+    "final_page_count": 23,
+    "final_bookmark": [
+      2,
+      "25.8 注记与延伸阅读",
+      23
+    ],
+    "test_driver_cleanup": "removed own ch25_work/test_ch25.* only",
+    "evidence": "work/targeted_learning/ch25_work/delivery_validation.json",
+    "benign_warnings_note": "有一处良性underfull及未用图表caption设置/字体回退提示；未声称所有TeX警告为零。选定错误、缺字、超宽和未定义引用均为零。"
+  },
+  "layout_adjustments": [
+    "A4中文重排；所有长标题完整、自然换行。",
+    "只有原书章首一处强调框；未新增说明框。",
+    "17个原行内长数学式改为无编号展示；其余展示式必要时重分行，全部原符号、原编号及确认的可见缺/多括号保留。"
+  ],
+  "evidence": {
+    "source_detail_crops": "work/targeted_learning/ch25_work/source_crops.json",
+    "output_page_visual_audit": "work/targeted_learning/ch25_work/page_visual_audit.json",
+    "structure_and_year_counters": "work/targeted_learning/ch25_work/qa_ch25_structure.json",
+    "built_text": "work/targeted_learning/ch25_work/ch25_built_text.txt",
+    "source_anomaly_detail": "work/targeted_learning/ch25_work/source_anomalies.json",
+    "delivery_validation": "work/targeted_learning/ch25_work/delivery_validation.json"
+  },
+  "completed_at": "2026-10-24T02:18:34",
+  "frozen_after_final_qa": true
+}

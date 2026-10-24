@@ -1,0 +1,247 @@
+% 原章第50页6.4起至第57页6.4.3标题前，式6.168—6.189。
+\section{影像—基因组数据的关联分析}
+
+影像—基因组数据关联分析常用的统计方法，包括单变量与逐体素分析、多元回归分析和典型相关分析（CCA）（Nathoo et al. 2017；Richfield et al. 2016）。逐体素方法检验一个 SNP 与每个体素的关联（Stein et al. 2010）。多元方法将整幅图像压缩为若干汇总统计量，或分割为若干感兴趣区域，再用一个汇总统计量度量每个区域。随后，用多元回归检验一个 SNP 与多个影像信号汇总度量的关联（Wang et al. 2012）。CCA 寻求图像汇总度量的组合，与一个 SNP 或 SNP 组合之间的最大相关，并检验 SNP 与图像的关联（Lin et al. 2014）。本节简要介绍基于函数型数据分析的关联与交互分析。
+
+\subsection{用于影像—基因组数据分析的多元函数型回归模型}
+\subsubsection{模型}
+
+考虑一般多元回归模型（Jiang et al. 2015）。假定抽取 $n$ 个个体，令 $y_{ik}$（$k=1,2,\ldots,K$）为第 $i$ 个个体的 $K$ 个影像汇总度量，包括影像 FPC 得分。这些影像汇总度量称为性状值。考虑基因组区域 $[a,b]$，令 $x_i(t)$ 为第 $i$ 个个体在 $[a,b]$ 内定义的基因型谱或 RNA-seq 谱。回顾，对第 $k$ 个性状与 SNP 数据进行 QTL 分析的回归模型为
+\begin{equation}
+y_{ik}=\mu_k+\sum_{j=1}^{J_1}x_{ij}\alpha_{kj}+\varepsilon_{ik},
+\tag{6.168}
+\end{equation}
+其中，$\mu_k$ 为第 $k$ 个性状的总体均值，$\alpha_{kj}$ 为基因组区域内第 $j$ 个 SNP 对第 $k$ 个性状的主要遗传加性效应，$x_{ij}$ 为第 $j$ 个 SNP 基因型的指示变量；$\varepsilon_{ik}$（$k=1,\ldots,K$）为独立同分布的正态变量，均值为零、协方差矩阵为 $\Sigma$。
+
+类似于利用 SNP 数据与多个数量性状进行 QTL 分析的多元回归模型，数量性状与基因型谱或 RNA-seq 数据的函数型回归模型可定义为
+\begin{equation}
+y_{ik}=\alpha_{0k}+\int_T\alpha_k(t)x_i(t)\,dt+\varepsilon_{ik},
+\tag{6.169}
+\end{equation}
+其中，$\alpha_{0k}$ 为总体均值，$\alpha_k(t)$ 为位于基因组位置 $t$ 的推定 QTL 对第 $k$ 个性状的遗传加性效应（$k=1,\ldots,K$），$x_i(t)$ 为基因型谱或 RNA-seq 数据，$\varepsilon_{ik}$ 为均值零、协方差矩阵 $\Sigma$ 的独立同分布正态变量。
+
+\subsubsection{加性效应的估计}
+
+假定性状值与基因型谱或 RNA-seq 数据均已中心化。将基因型谱或 RNA-seq 数据 $x_i(t)$ 按正交归一基函数展开为
+\begin{equation}
+x_i(t)=\sum_{j=1}^{\infty}\xi_{ij}\phi_j(t),
+\tag{6.170}
+\end{equation}
+其中，$\phi_j(t)$ 为正交归一基函数序列。展开系数 $\xi_{ij}$ 估计为
+\begin{equation}
+\xi_{ij}=\int_Tx_i(t)\phi_j(t)\,dt.
+\tag{6.171}
+\end{equation}
+实际中用数值积分计算展开系数。将式 (6.170) 代入式 (6.169)，得到
+\begin{equation}
+\begin{aligned}
+y_{ik}&=\int_T\alpha_k(t)\sum_{j=1}^{\infty}\xi_{ij}\phi_j(t)\,dt+\varepsilon_i\\
+&=\sum_{j=1}^{\infty}\xi_{ij}\int_T\alpha_k(t)\phi_j(t)\,dt+\varepsilon_{ik}\\
+&=\sum_{j=1}^{\infty}\xi_{ij}\alpha_{kj}+\varepsilon_{ik},\quad i=1,\ldots,n,\ k=1,\ldots,K,
+\end{aligned}\tag{6.172}
+\end{equation}
+其中，$\alpha_k(t)=\int_T\alpha_k(t)\phi_j(t)\,dt$。参数 $\alpha_{kj}$ 称为第 $k$ 个性状的遗传加性效应得分。这些得分也可视为遗传效应函数关于正交归一基函数的展开系数：
+\begin{equation}
+\alpha_k(t)=\sum_j\alpha_{kj}\phi_j(t).
+\tag{6.173}
+\end{equation}
+令
+\[
+\Upsilon=[\Upsilon_1,\ldots,\Upsilon_K]=\begin{bmatrix}
+\Upsilon_{11}&\cdots&\Upsilon_{1K}\\\vdots&\ddots&\vdots\\\Upsilon_{n1}&\cdots&\Upsilon_{nK}
+\end{bmatrix},\qquad
+\xi=\begin{bmatrix}\xi_{11}&\cdots&\xi_{1J}\\\vdots&\ddots&\vdots\\\xi_{n1}&\cdots&\xi_{nJ}\end{bmatrix},,
+\]
+\[
+\xi_i=\begin{bmatrix}\xi_{i1}\\\vdots\\\xi_{iJ}\end{bmatrix},\quad
+\alpha_k=\begin{bmatrix}\alpha_{k1}\\\vdots\\\alpha_{kJ}\end{bmatrix},\quad
+\alpha=[\alpha_1,\ldots,\alpha_K],\quad
+\varepsilon=\begin{bmatrix}\varepsilon_{11}&\cdots&\varepsilon_{1K}\\\cdots&\cdots&\cdots\\\varepsilon_{n1}&\cdots&\varepsilon_{nK}\end{bmatrix}.
+\]
+则式 (6.171) 可近似为
+\begin{equation}
+\Upsilon=\xi\alpha+\varepsilon.
+\tag{6.174}
+\end{equation}
+参数 $\alpha$ 与方差—协方差矩阵 $\Sigma$ 的标准最小二乘估计量为
+\begin{equation}
+\widehat\alpha=(\xi^T\xi)^{-1}\xi^T(\Upsilon-\bar\Upsilon),
+\tag{6.175}
+\end{equation}
+\begin{equation}
+\widehat\Sigma=\frac1n(\Upsilon=\xi\widehat\alpha)^T(\Upsilon-\xi\widehat\alpha).
+\tag{6.176}
+\end{equation}
+将矩阵 $(\xi^T\xi)^{-1}\xi^T$ 记为 $A$，则参数 $\alpha$ 的估计量为
+\begin{equation}
+\widehat\alpha=A(\Upsilon-\bar\Upsilon).
+\tag{6.177}
+\end{equation}
+矩阵 $\alpha$ 的向量化可写为
+\begin{equation}
+\operatorname{vec}(\widehat\alpha)=(A\otimes I)\operatorname{vec}(\Upsilon-\bar\Upsilon).
+\tag{6.178}
+\end{equation}
+根据 $\Upsilon$ 的方差矩阵假定，得到 $\operatorname{vec}(\Upsilon)$ 的方差矩阵：
+\begin{equation}
+\operatorname{var}(\operatorname{vec}(\Upsilon))=\Sigma\otimes I.
+\tag{6.179}
+\end{equation}
+因此，由式 (6.178)、(6.179)，有
+\begin{equation}
+\begin{aligned}
+\Lambda=\operatorname{var}(\operatorname{vec}(\widehat\alpha))&=(I_k\otimes A)(\Sigma\otimes I_n)(I_k\otimes A^T)\\
+&=\Sigma\otimes(AA^T).
+\end{aligned}\tag{6.180}
+\end{equation}
+
+\subsubsection{检验统计量}
+
+QTL 分析或影像与基因组（遗传或 RNA-seq）数据整合分析的一个基本问题，是检验基因组区域（或基因）与图像的关联。形式上，考虑检验以下假设：
+\[
+\alpha_k(t)=0,\quad\forall t\in[a,b],\quad k=1,\ldots,K,,
+\]
+等价于检验
+\[
+H_0:\alpha=0.
+\]
+定义检验基因组区域（区域内基因型或 RNA-seq）与 $K$ 个影像汇总度量关联的统计量为
+\begin{equation}
+T=\widehat\alpha^T\Lambda^{-1}\widehat\alpha.
+\tag{6.181}
+\end{equation}
+令 $r=\operatorname{rank}(\Lambda)$。若在展开式 (6.170) 中取 $J$ 个成分，则在零假设 $H_0:\alpha=0$ 下，$T$ 渐近服从中心 $\chi_{(KJ)}^2$ 或 $\chi_{(r)}^2$ 分布。
+
+\subsection{用于纵向影像遗传学分析的多元函数型回归模型}
+
+令 $y_i^{(k)}(t)$（$k=1,2,\ldots,K$）为第 $i$ 个个体在时刻 $t$ 的第 $k$ 个影像汇总度量。令 $x_i(s)$ 为基因组区域 $S=[a,b]$ 中基因 $G$ 的基因型谱。研究基因 $G$ 与多个影像汇总度量的关联。用于纵向影像遗传学分析的多元函数型线性模型（multivariate functional linear model，MFLM）可定义为
+\begin{equation}
+\begin{aligned}
+y_i^{(k)}(t_m)&=\int_Sx_i(s)\beta_k(s,t_m)\,ds+\varepsilon_{ik}(t_m),\\
+&\qquad k=1,\ldots,K,\ i=1,\ldots,n,\ m=1,\ldots,T.
+\end{aligned}\tag{6.182}
+\end{equation}
+$\beta_k(s,t_m)$ 是位于基因组位置 $s$ 的基因型，对时刻 $t_m$ 第 $k$ 个影像汇总度量的遗传加性效应函数；$\varepsilon_{ik}(t_m)$ 是第 $i$ 个个体噪声及未解释效应的残差函数。
+
+令 $\eta(t_l)=[\eta_1(t_m),\ldots,\eta_J(t_m)]^T$ 为基函数向量。为将函数型线性模型 (6.182) 转化为标准多元线性模型，对影像汇总度量 $y_{ik}(t_m)$、效应函数 $\beta_k(s,t_m)$ 与基因型函数 $x_i(s)$，考虑以下特征函数展开：
+\[
+\begin{aligned}
+y_i^{(k)}(t_m)&=\sum_{l=1}^{J_y}y_{il}^{(k)}\eta_l(t_m)=y_i^{(k)T}\eta(t_m),\\
+\eta(t_m)&=[\eta_1(t_m),\ldots,\eta_{J_y}(t_m)]^T,\qquad x_i(s)=x_i^T\theta(s),\\
+\beta_k(s,t_m)&=\sum_{j=1}^{J_\beta}\sum_{l=1}^{J_y}b_{jl}^{(k)}\theta_j(s)\eta_l(t_m)=\theta^T(s)B^{(k)}\eta(t_m),\\
+\theta(s)&=[\theta_1(s),\ldots,\theta_{J_\beta}(s)]^T,
+\end{aligned}
+\]
+其中
+\[
+y_i^{(k)}=\begin{bmatrix}y_{i1}^{(k)}\\\vdots\\y_{iJ_y}^{(k)}\end{bmatrix},\qquad
+B_k=\begin{bmatrix}b_{11}^{(k)}&\cdots&b_{1J_y}^{(k)}\\\vdots&\ddots&\vdots\\b_{J_\beta1}^{(k)}&\cdots&b_{J_\beta J_y}^{(k)}\end{bmatrix}.
+\]
+$B^{(k)}=(b_{jl}^{(k)})_{J_\beta\times J_y}$ 是第 $k$ 个影像汇总度量遗传加性效应函数的展开系数矩阵，且
+\[
+\varepsilon_{ik}(t_m)=\sum_{l=1}^{J_y}\varepsilon_{ikl}\eta_l(t_m)=\varepsilon_{ik}^T\eta(t_m),\qquad
+\varepsilon_{ik}=[\varepsilon_{ik1},\ldots,\varepsilon_{ikJ_y}]^T.
+\]
+积分 $\int_Sx_i(s)\beta(s,t_l)\,ds$ 可展开为
+\[
+\int_Sx_i(s)\beta_k(s,t_m)\,ds=\int_Sx_i(s)\theta^T(s)\,dsB^{(k)}\eta(t_m)=x_i^TB^{(k)}\eta(t_m),
+\]
+其中
+\[
+x_i=\left[\int_Tx_i(s)\theta_1(s)\,ds,\ldots,\int_Tx_i(s)\theta_{J_\beta}(s)\,ds\right]^T=[x_{i1},\ldots,x_{iJ_\beta}]^T.
+\]
+将这些展开代入式 (6.182)，得到
+\begin{equation}
+\begin{aligned}
+y_i^{(k)T}\eta(t_m)&=x_i^TB^{(k)}\eta(t_m)+\varepsilon_i^{(k)T}\eta(t_m),\\
+&\qquad k=1,\ldots,K,\ m=1,\ldots,T,\ i=1,\ldots,n.
+\end{aligned}\tag{6.183}
+\end{equation}
+式 (6.183) 应对所有 $t_m$ 成立，因此必有
+\begin{equation}
+y_i^{(k)T}=x_i^TB^{(k)}+\varepsilon_i^{(k)T},\quad i=1,\ldots,n,\ k=1,\ldots,K.
+\tag{6.184}
+\end{equation}
+模型 (6.184) 是标准线性模型。这里使用观测数据的展开系数，作为线性模型 (6.184) 中响应变量与预测变量的取值。式 (6.184) 可进一步写成矩阵形式。令
+\[
+\Upsilon^{(k)}=[\Upsilon_1^{(k)},\ldots,\Upsilon_{J_y}^{(k)}]=\begin{bmatrix}
+\Upsilon_{11}^{(k)}&\cdots&\Upsilon_{1J_y}^{(k)}\\\vdots&\ddots&\vdots\\\Upsilon_{n1}^{(k)}&\cdots&\Upsilon_{nJ_y}^{(k)}
+\end{bmatrix},\quad
+X=\begin{bmatrix}x_{11}&\cdots&x_{1J_\beta}\\\vdots&\ddots&\vdots\\x_{n1}&\cdots&x_{nJ_\beta}\end{bmatrix},
+\]
+\[
+B^{(k)}=\begin{bmatrix}b_{11}^{(k)}&\cdots&b_{1J_y}^{(k)}\\\vdots&\ddots&\vdots\\b_{J_\beta1}^{(k)}&\cdots&b_{J_\beta J_y}^{(k)}\end{bmatrix},\quad
+\varepsilon^{(k)}=\begin{bmatrix}\varepsilon_{11}^{(k)}&\cdots&\varepsilon_{1J_y}^{(k)}\\\vdots&\ddots&\vdots\\\varepsilon_{n1}^{(k)}&\cdots&\varepsilon_{nJ_y}^{(k)}\end{bmatrix}.
+\]
+则式 (6.182) 可近似为
+\begin{equation}
+\Upsilon^{(k)}=XB^{(k)}+\varepsilon^{(k)}.
+\tag{6.185}
+\end{equation}
+令
+\begin{equation}
+\begin{aligned}
+\Upsilon&=[\Upsilon^{(1)}\quad\cdots\quad\Upsilon^{(K)}]\\
+&=X[B^{(1)}\quad\cdots\quad B^{(k)}]+[\varepsilon^{(1)}\quad\cdots\quad\varepsilon^{(K)}]\\
+&=XB+\varepsilon.
+\end{aligned}\tag{6.186}
+\end{equation}
+令
+\[
+\Sigma=\begin{bmatrix}
+\Sigma^{(11)}&\Sigma^{(12)}&\cdots&\Sigma^{(1K)}\\
+\Sigma^{(21)}&\Sigma^{(22)}&\cdots&\Sigma^{(2K)}\\
+\vdots&\vdots&\ddots&\vdots\\
+\Sigma^{(K1)}&\Sigma^{(K2)}&\cdots&\Sigma^{(KK)}
+\end{bmatrix},\qquad
+\Sigma^{(kl)}=\begin{bmatrix}
+\sigma_{11}^{(kl)}&0&\cdots&0\\0&\sigma_{22}^{(kl)}&\cdots&0\\\vdots&\vdots&\ddots&\vdots\\0&0&\cdots&\sigma_{J_yJ_y}^{(kl)}
+\end{bmatrix},
+\]
+以及
+\begin{equation}
+\operatorname{Cov}(\operatorname{vec}(\varepsilon))=\Sigma\otimes I_n,\quad
+\operatorname{cov}(\operatorname{vec}(\varepsilon^{(k)}))=\Sigma^{(kk)}\otimes I_n.
+\tag{6.187}
+\end{equation}
+由式 (6.186)，得到
+\begin{equation}
+\operatorname{Vec}(\Upsilon)=(I\otimes X)\operatorname{vec}(B)+\operatorname{Vec}(\varepsilon).
+\tag{6.188}
+\end{equation}
+首先估计 $\Sigma$：
+\begin{equation}
+\widehat\Sigma=\frac1{nJ_y-J_\beta}\Upsilon^T\left(I_{nJ_y}-X(X^TX)^{-1}X^T\right)\Upsilon.
+\tag{6.189}
+\end{equation}
+\[
+\begin{aligned}
+\Lambda&=\operatorname{cov}(\operatorname{Vec}(\widehat B))=\Sigma\otimes(X^TX)^{-1},\\
+\Lambda_k&=\operatorname{cov}\bigl(\operatorname{vec}(\widehat B^{(k)})=\Sigma^{(kk)}\otimes(X^TX)^{-1},\\
+\Lambda^{-1}&=\Sigma^{-1}\otimes(X^TX),\qquad
+\Lambda_k^{-1}=(\Sigma^{(kk)})^{-1}\otimes(X^TX).
+\end{aligned}
+\]
+极小化以下目标函数，可得到参数估计：
+\[
+\begin{aligned}
+F=\operatorname{Tr}\bigl\{&[\operatorname{vec}(\Upsilon)-(I\otimes X)\operatorname{vec}(B)]^T\Lambda^{-1}\\
+&[\operatorname{vec}(\Upsilon)-(I\otimes X)\operatorname{vec}(B)],
+\end{aligned}
+\]
+定义检验统计量：
+\[
+T=[\operatorname{vec}(B)]^T\Lambda^{-1}\operatorname{vec}(B),\qquad
+T_k=[\operatorname{vec}(\widehat B^{(k)})]^T\Lambda_k^{-1}\operatorname{vec}(\widehat B^{(k)}).
+\]
+在基因或基因组区域与影像信号变异无关联的零假设下，$T$ 服从 $\chi_{(KJ_YJ_\beta)}^2$ 分布。
+
+回顾 $\Lambda_k=\operatorname{cov}(\operatorname{vec}(\widehat B^{(k)})=\Sigma^{(kk)}\otimes(X^TX)^{-1}$，其中 $\Sigma^{(kk)}$ 由式 (6.188) 得到。因此，
+\[
+\Lambda_k^{-1}=(\widehat\Sigma^{(kk)})^{-1}\otimes(X^TX).
+\]
+定义检验基因与第 $k$ 个影像汇总度量（第 $k$ 个影像区域）关联的统计量：
+\[
+T_k=[\operatorname{vec}(\widehat B^{(k)})]^T\Lambda_k^{-1}\operatorname{vec}(\widehat B^{(k)}).
+\]
+在基因与第 $k$ 个影像区域无关联的零假设下，$T_k\sim\chi_{(J_YJ_\beta)}^2$。

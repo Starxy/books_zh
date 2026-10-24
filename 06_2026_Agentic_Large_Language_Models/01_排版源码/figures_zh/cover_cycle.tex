@@ -1,0 +1,13 @@
+
+\begin{tikzpicture}[
+  x=1cm,y=1cm,
+  category/.style={rectangle,draw=red!85!black,line width=1.8pt,fill=white,minimum width=1.5cm,minimum height=.8cm,font=\sffamily\Large},
+  flow/.style={-{Stealth[length=3mm,width=2.5mm]},line width=1.6pt}]
+\node[category] (acting) at (0,1.6) {行动};
+\node[category] (reasoning) at (-2,-1) {推理};
+\node[category] (interacting) at (2,-1) {交互};
+\node[rectangle,draw=black,line width=1.8pt,fill=white,minimum width=1.5cm,minimum height=1cm,font=\sffamily\Huge\bfseries] (llm) at (0,-.15) {LLM};
+\draw[flow] (reasoning.north) to[out=90,in=180] (acting.west);
+\draw[flow] (acting.east) to[out=0,in=90] (interacting.north);
+\draw[flow] (interacting.south west) to[out=230,in=-50,looseness=1.4] (reasoning.south east);
+\end{tikzpicture}

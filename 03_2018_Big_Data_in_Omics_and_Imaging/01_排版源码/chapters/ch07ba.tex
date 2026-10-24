@@ -1,0 +1,111 @@
+% 原章第54页7.2标题—第59页7.2.2标题前。
+\section{多元因果推断与因果网络}
+
+前面各节研究了全基因组单性状和多性状因果研究，其中涉及两个变量或两个变量向量之间的因果推断。本节将因果推断从两个变量或两个向量推广到多个变量；这些变量往往构成因果网络。
+
+\begin{table}[htbp]
+\centering
+\origtable{2}{循环模型下 ANM 的结果}
+\begin{tabular}{lrrrr}
+\toprule
+$(m,\widetilde m)$&$(4,4)$&$(4,6)$&$(6,4)$&$(6,6)$\\
+\midrule
+正确方向&0.941&0.952&0.941&0.944\\
+错误方向&0&0&0&0\\
+两个方向均可拟合&0&0&0&0\\
+两个方向均无法拟合&0.059&0.048&0.059&0.056\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+第1章和第2章介绍了图的概念和结构方程模型。尽管因果推断在改善复杂疾病的预防、管理和治疗方面可能具有巨大潜力，但大多数基因组、表观基因组和影像数据都是观测数据。许多混杂变量没有测量，或无法测量。未测量的混杂变量会使大多数传统因果推断分析失效。因果推断的金标准是开展随机对照试验，以控制混杂效应。遗憾的是，在许多情况下，实施实验不符合伦理或并不可行。多数遗传学研究必须仅根据观测数据推断因果关系。虽然因果推断在科学、工程和生物医学中具有基础地位，但仅依据观测数据的传统因果推断无法识别变量之间唯一的因果关系。所推断因果关系的非唯一性，严重限制了传统因果推断在遗传学和生物医学研究中的应用。
+
+为克服传统因果推断的局限，本节介绍马尔可夫性质、忠实性、因果充分性和最小性等概念。我们将说明，在某些假设下，加性噪声模型是可识别的。然后回顾并发展新的因果模型与学习方法，以唯一地发现因果关系（Peters et al. 2017）。
+
+\subsection{马尔可夫条件、马尔可夫等价、忠实性与最小性}
+
+图模型的基本假设之一是马尔可夫条件（Markov condition）（Peters et al. 2017；Ernest 2016）。马尔可夫条件将条件独立关系编码在分布之中。换言之，如果图结构施加的全部条件独立关系（d-分离）都能在分布中得到识别，那么该图满足马尔可夫性质（Peters et al. 2011）。定义7.11给出马尔可夫条件的正式定义。
+
+\begin{bookdefinition}{7.11：马尔可夫条件}
+马尔可夫条件是指：给定有向无环图（DAG）中某变量的父节点后，该变量与图中除父节点之外的所有非后代节点独立。马尔可夫条件蕴含马尔可夫分解性质：
+\begin{equation}
+P(x)=P(x_1,\ldots,x_p)=\prod_{j=1}^{p}P(x_j\mid pa_j).
+\tag{7.196}
+\end{equation}
+\end{bookdefinition}
+
+\begin{bookexample}{7.16}
+例7.16的 DAG 如图7.6所示。图中因果马尔可夫条件编码的条件独立关系为 $X_2\indep X_4\mid X_1$ 和 $X_5\indep(X_1,X_2,X_4)\mid X_3$。显然，已知 $X_1$ 后，$X_2$ 不会提供关于 $X_4$ 的任何新信息。同样，如果已知 $X_3$，那么 $X_5$ 就不包含关于 $(X_1,X_2,X_4)$ 的任何新信息。这个例子说明，DAG 编码了条件独立分布。然而，DAG 与条件独立分布之间并非一一对应。定义7.12指出，不同 DAG 可以编码完全相同的条件独立关系（Peters et al. 2017）。在引入定义7.12之前，先简要介绍图中的一个概念。如果图中没有有向环，就称该图为部分有向无环图（partially directed acyclic graph，PDAG）。
+\end{bookexample}
+\input{figures/ch07b_fig06}
+
+\begin{bookdefinition}{7.12：马尔可夫等价类}
+马尔可夫等价类（Markov equivalence class）是满足同一组条件独立分布，或者相对于图具有相同马尔可夫性质的 DAG 的集合。
+\end{bookdefinition}
+
+考虑三个简单的 DAG：$x\to y\to z$、$x\leftarrow y\leftarrow z$ 和 $x\to y\to z$。在这三个 DAG 中，变量 $x,y,z$ 都满足因果马尔可夫条件：给定 $y$ 后，$x$ 和 $z$ 独立。这说明，三个 DAG 构成一个马尔可夫等价类。然而，它们表示变量 $x,y,z$ 之间三种不同的因果关系，因而无法实现唯一的因果识别。
+
+所有 DAG 被聚集到一个马尔可夫等价类中。在讨论马尔可夫等价类的刻画之前，先介绍几个图概念（Kalisch and Bühlmann 2007）。如果图中没有有向环，就称其为部分有向无环图（PDAG）。若满足以下条件，则称 PDAG 为完全 PDAG（completed PDAG，CPDAG）：（1）CPDAG 中每条有向边也存在于属于该马尔可夫等价类的所有 DAG 中；（2）对于 CPDAG 中每条无向边 $i-j$，该马尔可夫等价类中存在含 $i\to j$ 的 DAG，也存在含 $i\leftarrow j$ 的 DAG。马尔可夫等价类可以表示为 CPDAG。考虑有序节点三元组 $a,b,c$。若结构为 $a\to b\leftarrow c$，且 $a,c$ 不直接相连，则称其为 v-结构（v-structure）。DAG 的骨架（skeleton）定义为：将 DAG 中所有有向边替换为无向边后得到的无向图。
+
+马尔可夫等价类可以用 CPDAG 表示。同一马尔可夫等价类中的全部 DAG 具有相同的骨架和 v-结构（Verma and Pearl 1991；Ernest 2006）。
+
+\begin{bookexample}{7.17}
+图7.7给出一个马尔可夫等价类（a、b）及其 CPDAG 表示（c）。等价类中的图（a）和（b）具有相同的骨架和 v-结构：$x_1\to x_4\leftarrow x_5$ 和 $x_2\to x_3\leftarrow x_4$。图（c）是该马尔可夫等价类（a、b）对应的 CPDAG。可以看到，CPDAG 保留了图（a）、（b）共有的全部有向边。对于方向相反的两条边，即图（a）中的 $x_8\to x_7$ 和图（b）中的 $x_8\leftarrow x_7$，则在 CPDAG（c）中用无向边 $x_7-x_8$ 替代。
+
+这个例子表明，不同图可能满足同一组条件独立关系。因此，基于条件独立关系的因果推断可能没有唯一解。为使因果推断获得唯一解，我们引入忠实性条件（faithfulness condition）的概念（Ernest 2016）。
+\end{bookexample}
+\input{figures/ch07b_fig07}
+
+\begin{bookdefinition}{7.13：忠实性条件与因果最小性}
+如果条件独立分布与 DAG $G$ 中的 d-分离结构之间存在一一对应关系，就称分布 $P(X)$ 相对于 $G$ 是忠实的。换言之，忠实性条件要求，分布中的每一个条件独立关系，都必须对应于应用到该 DAG 的马尔可夫条件。如果某分布相对于 DAG $G$ 满足马尔可夫性质，但相对于任何真子图都不满足，则称该分布相对于 $G$ 满足因果最小性（causal minimality）。
+\end{bookdefinition}
+
+\begin{bookexample}{7.18}
+考虑图7.8a中的 DAG，其线性结构方程为
+\begin{equation}
+\begin{aligned}
+X&=N_X,\\
+Y&=aX+N_Y,\\
+Z&=bY+N_Z,\\
+W&=cZ+dX+N_W,
+\end{aligned}
+\tag{7.197}
+\end{equation}
+其中，$N_X\sim N(0,\sigma_X^2)$、$N_Y\sim N(0,\sigma_Y^2)$、$N_Z\sim N(0,\sigma_Z^2)$ 和 $N_W\sim N(0,\sigma_W^2)$ 相互独立。
+
+式 (7.197) 可化为
+\begin{equation}
+\begin{aligned}
+X&=N_X,\\
+Y&=aX+N_Y,\\
+Z&=abX+bN_Y+N_Z,\\
+W&=(abc+d)X+cN_Z+N_W.
+\end{aligned}
+\tag{7.198}
+\end{equation}
+假设
+\begin{equation}
+abc+d=0,
+\tag{7.199}
+\end{equation}
+则式 (7.198) 化为
+\begin{equation}
+\begin{aligned}
+X&=N_X,\\
+Y&=\widetilde aX+N_Y,\\
+Z&=\widetilde bX+\widetilde N_Z,\\
+W&=\widetilde N_W,
+\end{aligned}
+\tag{7.200}
+\end{equation}
+其中
+\[
+\begin{aligned}
+\widetilde b&=ab,\\
+\widetilde N_Z&=bN_Y+N_Z,\\
+\widetilde N_W&=CN_Z+N_W.
+\end{aligned}
+\]
+由于 $Z_Z$ 和 $N_W$ 与 $N_X$ 独立，$W$ 和 $X$ 独立，而图7.8a并未蕴含这一关系。因此，式 (7.197) 定义的分布相对于图7.8a并不忠实。式 (7.200) 对应于图7.8b。
+\end{bookexample}
+\input{figures/ch07b_fig08}

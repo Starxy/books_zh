@@ -1,0 +1,131 @@
+% 原书第 199—203 页；第 13.2 节全文。
+\section{无匹配随机试验中的靶向估计}
+\label{sec:ch13-without-matching}
+
+本节考虑不采用配对匹配的随机试验。假设观测数据由 $O=(W,A,Y)$ 的 $n$ 个独立同分布副本组成，其真实但未知的分布为 $P_0$，可分解为
+\[
+ p_0(o)=p_0(w)p_0(a\mid w)p_0(y\mid a,w).
+\]
+我们不对共同的协变量分布 $P_0(W)$ 作任何假设，也不对给定干预与协变量时结局的共同条件分布 $P_0(Y\mid A,W)$ 作任何假设。根据设计，干预 $A$ 以概率 $0.5$ 随机分配。因此，暴露机制已知：
+$P_0(A=1\mid W)\equiv g_0(1\mid W)=0.5$。
+描述所有可能观测数据分布的统计模型 $\mathcal M$ 是半参数模型。
+
+如导言所述，在随机试验中，有许多算法可以对总体效应进行无偏、局部有效的估计，例如 Tsiatis et al.（2008）、Zhang et al.（2008）、Rubin and van der Laan（2008）、Moore and van der Laan（2009b）以及 Shen et al.（2014）。本章始终关注 TMLE。总体效应，即式 (13.1) 的 TMLE，同时也是样本效应，即式 (13.2) 的一致、渐近线性估计量。详细算法可参阅第 12 章。简要而言，算法按以下步骤实施。
+\begin{itemize}
+ \item 步骤 1：初始估计给定暴露和协变量时的条件结局均值 $\bar Q_0(A,W)$。
+ \item 步骤 2：利用已知或估计的暴露机制
+ $g_n(A\mid W)\equiv P_n(A\mid W)$
+ 中的信息，对初始估计量 $\bar Q_n(A,W)$ 进行靶向更新。将 $\bar Q_0(A,W)$ 的靶向估计量记为 $\bar Q_n^*(A,W)$。
+ \item 步骤 3：对干预与对照条件下靶向估计的差值取平均，得到参数估计：
+ \[
+  \Psi_n(P_n)=\frac1n\sum_{i=1}^n\bar Q_n^*(1,W_i)-\bar Q_n^*(0,W_i).
+ \]
+\end{itemize}
+在标准正则条件下，TMLE 同时是总体效应和样本效应的渐近线性估计量（Balzer et al.，2016c）。估计量减去真实效应，可以写为影响曲线的经验均值，加上一个依概率趋于 $0$ 的二阶项。因此，标准化估计量具有渐近正态性，其方差可以用影响曲线的方差除以样本量 $n$ 来很好地近似。
+
+总体效应（PATE）的 TMLE 的影响曲线为
+\[
+ \begin{aligned}
+ D^{\mathcal P}(g_0,\bar Q_{n,\mathrm{lim}}^*)(O)
+ ={}&\left\{\frac{\mathbb I(A=1)}{g_0(1\mid W)}
+            -\frac{\mathbb I(A=0)}{g_0(0\mid W)}\right\}
+       (Y-\bar Q_{n,\mathrm{lim}}^*(A,W))\\
+    &{}+\bar Q_{n,\mathrm{lim}}^*(1,W)
+       -\bar Q_{n,\mathrm{lim}}^*(0,W)-\Psi(P_n),
+ \end{aligned}
+\]
+其中，$\bar Q_{n,\mathrm{lim}}^*(A,W)$ 表示条件均值函数 $\bar Q_0(A,W)$ 的靶向估计量的极限；这里假设暴露机制 $g_0(A\mid W)$ 已知或被一致估计，在随机试验中总能满足这一点（van der Laan and Rose，2011）。这个影响曲线的一个代入估计量为
+\begin{equation}
+ \begin{aligned}
+ D_n^{\mathcal P}(g_n,\bar Q_n^*)(O)
+ ={}&\left\{\frac{\mathbb I(A=1)}{g_n(1\mid W)}
+            -\frac{\mathbb I(A=0)}{g_n(0\mid W)}\right\}
+       (Y-\bar Q_n^*(A,W))\\
+    &{}+\bar Q_n^*(1,W)-\bar Q_n^*(0,W)-\psi_n^*,
+ \end{aligned}
+ \tag{13.3}
+\end{equation}
+其中，$\psi_n^*$ 表示点估计。在有限样本中，可以将估计影响曲线的样本方差，按样本量缩放，来很好地近似 PATE 的 TMLE 的方差：
+\[
+ \sigma_n^{2,\mathcal P}
+ =\frac{\dfrac1n\displaystyle\sum_{i=1}^n
+       [D_n^{\mathcal P}(g_n,\bar Q_n^*)(O_i)]^2}{n}.
+\]
+
+样本效应（SATE）的 TMLE 的影响曲线依赖于不可识别的量，具体而言，是反事实结局 $Y_{1,i}$ 与 $Y_{0,i}$（Balzer et al.，2016c）。尽管如此，忽略这些不可识别的量，就可以得到其影响曲线的一个保守的代入估计量：
+\begin{equation}
+ D_n^S(g_n,\bar Q_n^*)(O)
+ =\left\{\frac{\mathbb I(A=1)}{g_n(1\mid W)}
+         -\frac{\mathbb I(A=0)}{g_n(0\mid W)}\right\}
+   (Y-\bar Q_n^*(A,W)).
+ \tag{13.4}
+\end{equation}
+在有限样本中，可以将这一估计影响曲线的样本方差，按样本量缩放，来保守近似 SATE 的 TMLE 的方差：
+\[
+ \sigma_n^{2,S}
+ =\frac{\dfrac1n\displaystyle\sum_{i=1}^n
+       [D_n^S(g_n,\bar Q_n^*)(O_i)]^2}{n}.
+\]
+比较式 (13.3) 和式 (13.4) 可以看出，对于 SATE，被视为固定的协变量分布没有方差贡献。因此，样本效应的估计精度往往高于总体效应（Neyman，1923；Rubin，1990；Imbens，2004）。事实上，只有在条件均值 $\bar Q_0(A,W)$ 被一致估计、且各单位的干预效应不存在变异时，PATE 的 TMLE 和 SATE 的 TMLE 才会具有相同的效率界（Balzer et al.，2016c）。在许多情形中，效应具有异质性，将 SATE 指定为推断目标，能够带来更高的功效，尤其是在大型试验中。不过，在小型试验中，以 SATE 为目标所获得的精度改善可能减弱，因为这一基于影响曲线的方差估计量是保守的，即存在向上偏差。
+
+\noindent\textbf{步骤 1 的预先指定自适应方法：初始估计。}
+再次考虑假设的 HIV 预防与治疗试验。回顾一下，结局 $Y$ 为 HIV 累积发生率，取值介于 $0$ 与 $1$ 之间。TMLE 算法的第一步，是初始估计给定暴露和已测量协变量时的结局期望 $\bar Q_0(A,W)$。假设采用这样的工作模型：将结局 $Y$ 对处理 $A$ 和协变量 $W$ 作 logistic 回归\footnote{Logistic 回归自然遵守这一连续结局的取值界限。以往研究表明，在存在正值性违反或结局罕见时，采用 logistic 回归而非线性回归，可以提高稳定性（Gruber and van der Laan，2010b）。}。事先并不清楚应在工作模型中纳入哪些协变量，以及应采用什么形式。例如，基线 HIV 流行率是已知的结局预测因素，而且可能在处理组与对照组间不平衡。因此，可以用包含截距、处理主效应和 HIV 流行率主效应的 logistic 回归工作模型，作为 $\bar Q_0(A,W)$ 的初始估计量。同样，各地区的处理效应可能存在明显异质性；允许地区与干预之间存在交互作用，可能减小 TMLE 的方差。将所有协变量及相关交互项都纳入工作模型，则很可能导致过拟合和误导性的推断。为了在候选初始估计量之间，进而在候选 TMLE 之间进行选择，我们提出以下交叉验证选择器。
+
+首先，为条件结局均值 $\bar Q_0(A,W)$ 的初始估计，提出一个候选工作模型库。这个算法库应预先在研究方案或分析计划中指定。一个可能的算法库可以由以下 logistic 回归工作模型组成：
+\[
+ \begin{aligned}
+ \logit[\bar Q^{(a)}(A,W)]&=\beta_0+\beta_1A,\\
+ \logit[\bar Q^{(b)}(A,W)]&=\beta_0+\beta_1A+\beta_2W1,\\
+ \logit[\bar Q^{(c)}(A,W)]&=\beta_0+\beta_1A+\beta_2W2+\beta_3A\times W2,
+ \end{aligned}
+\]
+例如，$W1$ 表示基线流行率，$W2$ 表示地区。当然，还可以有许多其他候选算法；这里为了便于讲解，只考虑这个简单集合。还应注意，第一个工作模型对应于未经调整的估计量。
+
+其次，需要预先指定一个损失函数，衡量候选估计量的表现。按照经验效率最大化原则（Rubin and van der Laan，2008），我们建议，采用感兴趣参数的 TMLE 的影响曲线平方。这个损失函数的期望，称为“风险”，就是 TMLE 的渐近方差。因此，我们的目标是选择使精度最大的候选估计量。如果推断目标是总体效应，损失函数为
+\begin{equation}
+ \mathcal L^{\mathcal P}(g_0,\bar Q)(O)
+ =\{D^{\mathcal P}(g_0,\bar Q)(O)\}^2,
+ \tag{13.5}
+\end{equation}
+其中，我们不估计已知的暴露机制 $g_0(A\mid W)=0.5$。由于样本效应的 TMLE 的真实影响曲线依赖于不可识别的量，SATE 的损失函数采用估计影响曲线的平方：
+\begin{equation}
+ \mathcal L^S(g_0,\bar Q)(O)=\{D_n^S(g_0,\bar Q)(O)\}^2.
+ \tag{13.6}
+\end{equation}
+同样，我们不估计已知的暴露机制 $g_0(A\mid W)=0.5$。此时，SATE 的损失函数对应于 $L_2$ 平方误差损失函数：
+$\mathcal L^S(g_0,\bar Q)=(Y-\bar Q(A,W))^2$。
+% 原文此处等式未保留由 g0=0.5 产生的常数因子4，照印刷保留。
+
+接着，需要预先指定交叉验证方案，用它估计每个候选估计量的风险。为保持一般性，我们介绍 $V$ 折交叉验证：将数据随机划分成 $V$ 份，称为“折”，每折大小约为 $n/V$。考虑到早期临床试验和 CRT 常见的有限样本量，留一交叉验证往往是合适的。它对应于 $V=n$ 折交叉验证，每折包含一个观测。初始估计条件均值 $\bar Q_0(A,W)$ 的交叉验证过程，可以按如下步骤实施。
+\begin{enumerate}[label=(\Alph*)]
+ \item 依次对每一折 $v=\{1,\ldots,V\}$：
+ \begin{enumerate}[label=(\alph*)]
+  \item 将第 $v$ 折中的观测作为验证集，其余观测作为训练集。
+  \item 仅使用训练集数据，拟合估计 $\bar Q_0(A,W)$ 的每个算法。对于上述算法库，根据工作模型，将结局 $Y$ 对暴露 $A$ 和协变量 $W$ 作 logistic 回归。将这些初始回归拟合分别记为
+  $\bar Q_n^{(a)}(A,W)$、$\bar Q_n^{(b)}(A,W)$ 和 $\bar Q_n^{(c)}(A,W)$。
+  \item 对每个算法，使用所估计的拟合，预测验证集观测在处理和对照条件下的结局。例如，第一个算法对验证集观测 $O_k$ 给出 $\bar Q_n^{(a)}(1,W_k)$ 和 $\bar Q_n^{(a)}(0,W_k)$。
+  \item 对每个算法，代入其特定的预测值，评价验证集观测的损失函数。例如，如果推断目标是 SATE，那么对于第一个算法，验证集观测 $O_k$ 的损失为
+  \[
+   \begin{aligned}
+   &\mathcal L^S(g_0,\bar Q_n^{(a)})(O_k)\\
+   &\quad=\left[\left\{\frac{\mathbb I(A_k=1)}{g_0(1\mid W_k)}
+             -\frac{\mathbb I(A_k=0)}{g_0(0\mid W_k)}\right\}
+          (Y_k-\bar Q_n^{(a)}(A_k,W_k))\right]^2.
+   \end{aligned}
+  \]
+  暴露机制已知：$g_0(1\mid W)=0.5$。
+  \item 对每个算法，将验证集 $v$ 中各观测的估计损失取平均，得到风险估计。例如，如果推断目标是 SATE，第一个算法给出
+  \[
+   \mathrm{Risk}_v^{(a)}
+   =\frac1{n_v}\sum_{k\in v}\mathcal L^S(g_0,\bar Q_n^{(a)})(O_k),
+  \]
+  其中，$n_v$ 为验证集 $v$ 中的观测数。
+ \end{enumerate}
+ \item 对每个算法，将 $V$ 折的风险估计取平均。
+ \item 选择交叉验证风险最小的算法。这个算法给出最小的交叉验证方差估计。
+\end{enumerate}
+
+随后，在上文第 13.2 节介绍的 TMLE 算法的步骤 1 中，用所选工作模型初始估计条件结局均值 $\bar Q_0(A,W)$。具体而言，使用全部数据重新拟合所选算法，得到 $\bar Q_n(A,W)$。由于暴露机制被视为已知，且算法库仅包括含有暴露主效应和截距的简单参数工作模型，因此可以跳过更新步骤，即步骤 2。换言之，所选估计量已经是靶向的，满足
+$\bar Q_n(A,W)=\bar Q_n^*(A,W)$，
+可以直接用于步骤 3 的参数估计。
+

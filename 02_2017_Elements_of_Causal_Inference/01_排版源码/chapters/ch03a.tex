@@ -1,0 +1,109 @@
+% 原书第 33—35 页；章首导言、3.1—3.2。
+\chapter{原因—结果模型}
+\label{ch:cause-effect-models}
+
+本章将在因果模型仅包含两个变量的情形下，对一些基本的因果概念作出形式化表述。假设这两个变量之间存在非平凡的关系，而且它们的相依关系并非完全由某个共同原因造成，那么就构成了一个\textbf{原因—结果模型（cause-effect model）}。我们将简要介绍结构因果模型、干预与反事实。第 6 章讨论多元因果模型时，还会重新定义所有这些概念；希望先从两个变量的情形入手，能够使这些思想更容易理解。
+
+\section{结构因果模型}
+\label{sec:ch03-scm}
+
+\textbf{结构因果模型（structural causal model，SCM）}是联系因果陈述与概率陈述的重要工具。
+
+\begin{definition}[结构因果模型]
+一个因果图为 $C\to E$ 的结构因果模型 $\mathfrak{C}$，由以下两个\textbf{赋值（assignment）}组成：
+\begin{equation}
+ C:=N_C,
+ \tag{3.1}
+\end{equation}
+\begin{equation}
+ E:=f_E(C,N_E),
+ \tag{3.2}
+\end{equation}
+其中 $N_E\indep N_C$，即 $N_E$ 与 $N_C$ 相互独立。
+\end{definition}
+
+在这一模型中，我们将随机变量 $C$ 称为\textbf{原因（cause）}，将 $E$ 称为\textbf{结果（effect）}。进一步地，我们说 $C$ 是 $E$ 的\textbf{直接原因（direct cause）}，并将 $C\to E$ 称为\textbf{因果图（causal graph）}。在讨论干预时，例如在例 3.2 中，希望这一表述能够使相关概念更加清晰，并与读者的直觉相吻合。
+
+如果给定函数 $f_E$ 以及噪声分布 $P_{N_C}$ 和 $P_{N_E}$，便可以按如下方式从模型中抽取数据：先抽取噪声值 $N_E$、$N_C$，再依次计算式 (3.1) 和式 (3.2)。因此，这个结构因果模型会导出 $C$ 和 $E$ 的联合分布 $P_{C,E}$；严格证明见命题 6.3。
+
+\section{干预}
+\label{sec:ch03-interventions}
+
+正如第 1.4.2 节所讨论的，我们往往关心系统受到\textbf{干预（intervention）}后的行为。干预后的系统会诱导出另一个分布，这个分布通常不同于观测分布。如果任何一种干预都可以使系统发生任意变化，那么这两个分布之间便没有联系。此时，与其将干预前后的系统放在一起研究，不如将它们视为两个彼此独立的系统。这就引出了一个想法：干预发生后，数据生成过程中只有一部分发生改变。例如，我们可能希望研究这样一种情形：不论 $C$ 取何值，都将变量 $E$ 设为 $4$，但不改变生成 $C$ 的机制 (3.1)。也就是说，用 $E:=4$ 替换赋值 (3.2)。这称为\textbf{（硬）干预（hard intervention）}，记为 $\dox{E:=4}$。替换式 (3.2) 后得到的结构因果模型，会导出 $C$ 上的一个分布，我们将其记为 $P_C^{\dox{E:=4}}$ 或 $P_C^{\mathfrak{C};\dox{E:=4}}$。后一种记法明确指出，我们以结构因果模型 $\mathfrak{C}$ 为出发点。相应的密度记为 $c\mapsto p^{\dox{E:=4}}(c)$；略微放宽记号的严格性，也可直接写作 $p^{\dox{E:=4}}(c)$。\footnote{文献中也常用 $p(c\mid\dox{E:=4})$ 这一记法。我们更倾向于使用 $p^{\dox{E:=4}}$，因为干预与条件化在概念上并不相同，而 $p(c\mid\dox{E:=4})$ 看起来很像通常表示条件化的记法 $p(c\mid E=4)$。}
+不过，对系统的操纵还可以采取更一般的形式。例如，干预
+\[
+ \dox{E:=g_E(C)+\widetilde N_E}
+\]
+保留了对 $C$ 的函数相依关系，却改变了噪声分布。这是\textbf{软干预（soft intervention）}的一个例子。两个方程中的任意一个都可以被替换。
+
+下面的例子说明了为何将这两个变量分别称为“原因”和“结果”。
+
+\begin{example}[对原因和结果的干预]
+假设分布 $P_{C,E}$ 由结构因果模型 $\mathfrak{C}$ 导出：
+\begin{equation}
+ \begin{aligned}
+ C&:=N_C\\
+ E&:=4\cdot C+N_E,
+ \end{aligned}
+ \tag{3.3}
+\end{equation}
+其中 $N_C,N_E\overset{\mathrm{iid}}{\sim}\mathcal{N}(0,1)$，因果图为 $C\to E$。于是，
+\[
+ \begin{aligned}
+ P_E^{\mathfrak{C}}
+ &=\mathcal{N}(0,17)\ne\mathcal{N}(8,1)
+ =P_E^{\mathfrak{C};\dox{C:=2}}=P_{E\mid C=2}^{\mathfrak{C}}\\
+ &\ne\mathcal{N}(12,1)
+ =P_E^{\mathfrak{C};\dox{C:=3}}=P_{E\mid C=3}^{\mathfrak{C}}.
+ \end{aligned}
+\]
+对 $C$ 的干预会改变 $E$ 的分布。另一方面，
+\begin{equation}
+ \begin{aligned}
+ P_C^{\mathfrak{C};\dox{E:=2}}
+ &=\mathcal{N}(0,1)=P_C^{\mathfrak{C}}\\
+ &=P_C^{\mathfrak{C};\dox{E:=314159265}}
+ \quad\left(\ne P_{C\mid E=2}^{\mathfrak{C}}\right).
+ \end{aligned}
+ \tag{3.4}
+\end{equation}
+无论对 $E$ 施加多强的干预，$C$ 的分布都保持不变。模型的这一行为，与“$C$ 导致 $E$”的直觉十分吻合。例如，无论把一个人的牙齿美白到什么程度，都不会影响他的吸烟习惯。（需要强调的是，给定 $E=2$ 时 $C$ 的条件分布，不同于通过干预将 $E$ 设为 $2$ 后 $C$ 的分布。）
+
+原因与结果之间的这种不对称性，也可以表述为独立性陈述。若将赋值 (3.3) 替换为 $E:=\widetilde N_E$（可以把它理解为将 $E$ 随机化），就会切断 $C$ 与 $E$ 之间的相依关系。在分布
+\[
+ P_{C,E}^{\mathfrak{C};\dox{E:=\widetilde N_E}}
+\]
+下，有 $C\indep E$。但将 $C$ 随机化时，这种独立性并不成立。只要 $\Var[\widetilde N_C]\ne0$，在分布
+\[
+ P_{C,E}^{\mathfrak{C};\dox{C:=\widetilde N_C}}
+\]
+下便有 $C\nindep E$；$C$ 与 $E$ 之间的相关仍然非零。
+\end{example}
+
+\par\noindent\begin{minipage}{\linewidth}
+\begin{codesnippet}
+下面的代码从例 3.2 所描述的结构因果模型中抽样。
+\begin{lstlisting}[language=R]
+set.seed(1)
+# 从结构因果模型导出的分布中生成样本
+C <- rnorm(300)
+E <- 4*C + rnorm(300)
+c(mean(E), var(E))
+# [1] 0.1236532 16.1386767
+#
+# 从干预 do(C:=2) 对应的分布中生成样本；
+# 这会改变 E 的分布
+C <- rep(2,300)
+E <- 4*C + rnorm(300)
+c(mean(E), var(E))
+# [1] 7.936917 1.187035
+#
+# 从干预 do(E:=N~) 对应的分布中生成样本；
+# 这会切断 C 与 E 之间的相依关系
+C <- rnorm(300)
+E <- rnorm(300)
+cor.test(C,E)$p.value
+# [1] 0.2114492
+\end{lstlisting}
+\end{codesnippet}
+\end{minipage}\par

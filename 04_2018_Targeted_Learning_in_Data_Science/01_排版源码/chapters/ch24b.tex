@@ -1,0 +1,124 @@
+% 原书分章 PDF 第7—10页：第24.2—24.3节。
+\section{采样策略的收敛与 TMLE 的渐近正态性}
+
+我们必须选择 $\bar Q_{0,Y}$ 的工作模型 $\bar{\mathcal Q}_Y$ 和损失函数 $L_Y$，使 $\bar{\mathcal Q}_Y$ 以及随后得到的工作模型 $L_Y(\bar{\mathcal Q}_Y)\equiv\{L(\bar Q_Y):Q_Y\in\bar{\mathcal Q}_Y\}$ 和 $R(\bar{\mathcal Q}_Y)\equiv\{R(\bar Q_Y):Q_Y\in\bar{\mathcal Q}_Y\}$，相对于经验过程理论中的一个核心复杂度度量而言，具有合理的规模或复杂度（van der Vaart 和 Wellner，1996）。具体而言，必须使 $\bar{\mathcal Q}_Y$、$L(\bar{\mathcal Q}_Y)$、$R(\bar{\mathcal Q}_Y)$ 可分（可数就足够），而且每一个都相对于某个包络函数具有有限的一致熵积分（van der Vaart 和 Wellner，1996，第2.5.1与2.6节）。
+
+引入范数 $\|\cdot\|_{Q_0}$，由 $\|f\|_{Q_0}^2\equiv E_{P_{Q_0,g^b}}(f^2(O))$ 刻画。我们假定 $\bar{\mathcal Q}_Y$ 满足下述假设：
+\begin{description}[leftmargin=3em,labelwidth=2.5em]
+\item[A1.] 存在 $\bar Q_{1,Y}\in\bar{\mathcal Q}_Y$，使从 $\bar{\mathcal Q}_Y$ 到 $\mathbb R$ 的映射 $\bar Q_Y\mapsto E_{P_{Q_0,g^b}}(L_Y(\bar Q_Y)(O))$ 在 $\bar Q_{1,Y}$ 处达到最小值。而且，$\bar Q_{1,Y}$ 具有良好分离性，意思是对所有 $\delta>0$，均有
+\[
+ \begin{aligned}
+ &E_{P_{Q_0,g^b}}\bigl(L_Y(\bar Q_{1,Y})(O)\bigr)\\
+ &\quad<\inf\bigl\{E_{P_{Q_0,g^b}}\bigl(L_Y(\bar Q_Y)(O)\bigr):
+ \bar Q_Y\in\bar{\mathcal Q}_Y,\ \|\bar Q_Y-\bar Q_{1,Y}\|_{Q_0}\geq\delta\bigr\}.
+ \end{aligned}
+\]
+最后，$\bar q_{1,Y}=\bar q_{0,Y}$。
+\end{description}
+最严格的条件是两个处理增益函数相等。
+
+第二个假设涉及 TMLE 构造中的波动或靶向步骤。令 $g_0$ 由下式给出：
+\begin{equation}
+ g_0(1\mid W)=1-g_0(0\mid W)\equiv G(\bar q_{0,Y}(W)).
+ \tag{24.6}
+\end{equation}
+正如 $g_n$ 是 $r_n$ 的近似（见式 (24.3)、(24.4) 及其后的说明），$g_0$ 是最优规则 $r_0$ 的近似。我们很快会看到，$g_0$ 就是 $g_n$ 的极限。对于每个规则 $\rho:\mathcal W\to\{0,1\}$，考虑经过 $\bar Q_{1,Y}$ 的一维回归模型，它对所有 $\epsilon\in\mathbb R$ 由下式刻画：
+\begin{equation}
+ \logit\bigl(\bar Q_{1,Y,\rho}(\epsilon)(A,W)\bigr)
+ \equiv\logit\left(\bar Q_{1,Y}(A,W)+\epsilon\frac{I\{A=\rho(W)\}}{g_0(A\mid W)}\right)
+ \tag{24.7}
+\end{equation}
+我们假定：
+\begin{description}[leftmargin=3em,labelwidth=2.5em]
+\item[A2.] 对每个规则 $\rho:\mathcal W\to\{0,1\}$，实值映射 $\epsilon\mapsto E_{P_{Q_0,g_0}}\bigl(\ell(\bar Q_{1,Y,\rho}(\epsilon))(O)\bigr)$ 在 $\mathbb R$ 上均有唯一的极小点 $\epsilon_0(\rho)\in\mathbb R$。
+\end{description}
+第三个也是最后一个假设涉及 $Q_0$：
+\begin{description}[leftmargin=3em,labelwidth=2.5em]
+\item[A3.] 在 $Q_0$ 下，给定 $W$ 后 $Y(0)$ 和 $Y(1)$ 的条件分布不退化。而且，存在 $\gamma_1,\gamma_2>0$，使对所有 $t\geq0$，都有
+\begin{equation}
+ P_{Q_0}\bigl(0\leq|\bar q_{0,Y}(W)|\leq t\bigr)\leq\gamma_1t^{\gamma_2}.
+ \tag{24.8}
+\end{equation}
+\end{description}
+在式 (24.8) 中取 $t=0$，得到在 $Q_0$ 下 $\bar q_{0,Y}(W)=0$ 的概率为零。换言之，最优动作 $r_0(W)$ 在 $Q_0$ 几乎处处没有歧义。用 Robins（2004）的术语说，$Q_0$ 是非例外的。更一般地，$t>0$ 时的式 (24.8) 称为间隔假设。受奠基性文章 Mammen 和 Tsybakov（1999）的启发，A3 将 $\bar q_{0,Y}(W)$ 在 $0$ 附近的一种可处理的集中性形式化；正是在这里，我们的推断任务最具挑战性。
+
+现在可以陈述结果了。第一个命题说明，当 $n$ 趋于无穷时，采样策略以良好的方式收敛：
+\begin{bookresult}{命题}{24.1}
+在 A1、A2 和 A3 下，当 $n$ 趋于无穷时，$\|\bar Q_{n,Y}-\bar Q_{1,Y}\|_{Q_0}$、$\|\bar q_{n,Y}-\bar q_{0,Y}\|_{Q_0}$、$\|r_n-r_0\|_{Q_0}$、$\|g_n-g_0\|_{Q_0}$ 以及非负数据自适应参数 $\psi_0-\psi_{r_n,0}$，均依概率收敛于零。
+\end{bookresult}
+
+第二个命题确立了 $\sqrt n(\psi_n^*-\psi_{r_n,0})$ 的渐近正态性。引入 $\bar Q_{1,Y}^*\equiv\bar Q_{1,Y,r_0}(\epsilon_0(r_0))$（见式 (24.7) 和 A2），令 $D_1^*$ 为
+\begin{equation}
+ \begin{aligned}
+ D_1^*(O)\equiv{}&\bigl(Y-\bar Q_{1,Y}^*(A,W)\bigr)\frac{I\{A=r_0(W)\}}{g_0(A\mid W)}\\
+ &+\bar Q_{1,Y}^*(r_0(W),W)-\psi_0,
+ \end{aligned}
+ \tag{24.9}
+\end{equation}
+并令 $\sigma_1^2\equiv E_{P_{Q_0,g_0}}\bigl(D_1^*(O)^2\bigr)$。类似地，回顾 $\bar Q_{n,Y}^*\equiv\bar Q_{n,Y}(\epsilon_n)$ 的定义，规定
+\[
+ \begin{aligned}
+ D_{ni}^*(O_i)\equiv{}&\bigl(Y_i-\bar Q_{n,Y}^*(A_i,W_i)\frac{I\{A_i=r_n(W_i)\}}{g_i(A_i\mid W_i)}\\
+ &+\bar Q_{n,Y}^*(r_n(W_i),W_i)-\psi_n^*
+ \qquad(1\leq i\leq n),
+ \end{aligned}
+\]
+然后令 $\sigma_n^2\equiv n^{-1}\sum_{i=1}^nD_{ni}^*(O_i)^2$。
+
+\begin{bookresult}{命题}{24.2}
+在 A1、A2 和 A3 下，$\psi_n^*$ 一致估计 $\psi_{r_n,0}$，从而由命题24.1可知，它也一致估计 $\psi_0$。而且，$\sigma_n^2$ 一致估计正数 $\sigma_1^2$；当 $n$ 趋于无穷时，$\sqrt{n/\sigma_n^2}(\psi_n^*-\psi_{r_n,0})$ 依分布收敛于标准正态分布。
+\end{bookresult}
+
+显然，A3 中的 $\gamma_2$ 越大，$\bar q_{0,Y}(W)$ 在 $Q_0$ 下于零附近的集中程度就越低，我们的推断任务也越容易。若假定 $\gamma_2\geq1$，且 $\bar q_{n,Y}$ 向 $\bar q_{0,Y}$ 收敛得足够快，那么命题24.2的第一个推论表明，$\sqrt n(\psi_n^*-\psi_0)$ 也渐近正态。引入 $\gamma_3\equiv\frac14+\frac1{2(1+\gamma_2)}$。
+
+\begin{bookresult}{推论}{24.1}
+在 A1、A2 和 A3 下，若 $\gamma_2\geq1$，因而 $\gamma_3\in(\frac14,\frac12]$，并且当 $n$ 趋于无穷时，$n^{\gamma_3}\|\bar q_{n,Y}-\bar q_{0,Y}\|_{Q_0}$ 依概率收敛于零，那么数据自适应参数 $\sqrt n(\psi_{r_n,0}-\psi_0)$ 也在 $n$ 趋于无穷时依概率收敛于零。因此，当 $n$ 趋于无穷时，$\sqrt{n/\sigma_n^2}(\psi_n^*-\psi_0)$ 依分布收敛于标准正态分布。
+\end{bookresult}
+
+命题24.1、24.2和推论24.1的证明，依赖于经验过程理论及 TMLE 分析中的典型论证（Chambaz 等，2016）。经验过程背后的鞅结构，再次表明它是独立同分布结构的一种良好扩展。
+
+令 $Q_1^*$ 为 $(W,Y(0),Y(1))$ 的任意分布，满足 $W$ 在 $Q_0$ 与 $Q_1^*$ 下分布相同，且对每个 $a=0,1$，$E_{Q_1^*}(Y(a)\mid W)=\bar Q_{1,Y}^*(a,W)$ 在 $Q_0$ 几乎处处成立。式 (24.9) 中的影响函数 $D_1^*$ 等于 $\Delta_{r_0}(Q_1^*,g_0)$，即 $\Psi_{r_0}$ 在 $P_{Q_1^*,g_0}$ 处的有效影响曲线，见式 (24.5)。因此，$\sigma_1^2=E_{P_{Q_0,g_0}}\bigl(\Delta_{r_0}(Q_1^*,g_0)(O)^2\bigr)$。若 $\bar Q_{1,Y}=\bar Q_{0,Y}$（这比 A1 中的相等条件 $\bar q_{1,Y}=\bar q_{0,Y}$ 更强），则 $\bar Q_{1,Y}^*=\bar Q_{0,Y}$（因为 A2 中的 $\epsilon_0(r_0)$ 等于零），从而 $\sigma_1^2=E_{P_{Q_0,g_0}}\bigl(\Delta_{r_0}(Q_0,g_0)(O)^2\bigr)$：当从 $P_{Q_0,g_0}$ 独立抽样时，$\sqrt n(\psi_n^*-\psi_{r_n,0})$ 的渐近方差，与 $\Psi_{r_0}(P_{Q_0,g_0})=\psi_0$ 任意正则渐近线性估计量的渐近方差所对应的广义 Cramér--Rao 下界一致（Luedtke 和 van der Laan，2016a）。否则，$\sigma_1^2$ 与 $E_{P_{Q_0,g_0}}\bigl(\Delta_{r_0}(Q_0,g_0)(O)^2\bigr)$ 之间的差异，将随 $\bar Q_{1,Y}$ 与 $\bar Q_{0,Y}$ 之间的差异而微妙变化，因而尤其取决于我们的工作模型 $\bar{\mathcal Q}_Y$。
+
+\section{置信区间}
+
+设置信水平为 $\alpha\in]0,1/2[$，并令 $\xi_{1-\alpha/2}$ 为标准正态分布相应的 $1-\alpha/2$ 分位数。由命题24.2和推论24.1，可以用 TMLE 构造数据自适应参数 $\psi_{r_n,0}$ 或 $\psi_0$ 本身的置信区间，正如命题24.2的第二个推论所述：
+
+\begin{bookresult}{推论}{24.2}
+在命题24.2的假设下，当 $n$ 趋于无穷时，
+\begin{equation}
+ \left[\psi_n^*\pm\xi_{1-\alpha/2}\frac{\sigma_n}{\sqrt n}\right]
+ \tag{24.10}
+\end{equation}
+以趋于 $1-\alpha$ 的概率包含 $\psi_{r_n,0}$。而且，在推论24.1的更强假设下，上述置信区间也以趋于 $1-\alpha$ 的概率包含 $\psi_0$。
+\end{bookresult}
+
+由于 $\mathcal R_n$ 的反事实性质，导出它的置信区间并不如此直接。我们需要引入一个新假设：
+\begin{description}[leftmargin=3em,labelwidth=2.5em]
+\item[A4.] 存在一个独立同分布随机变量的无限序列 $(U_n)_{n\geq1}$，它独立于 $(W_n)_{n\geq1}$，且取值于 $\mathcal U$；还存在从 $\{0,1\}\times\mathcal U\times\mathcal W$ 到 $]0,1[$ 的一个确定性（可测）函数 $\bar{\mathbb Q}_{0,Y}$，使对所有 $n\geq1$ 以及 $a=0,1$，均有 $Y_n(a)=\bar{\mathbb Q}_{0,Y}(a,U_n,W_n)$。
+\end{description}
+有了 A4，我们便将当前讨论置于非参数结构方程模型的框架中（Pearl，2009a）。以下等式解释了记号 $\bar{\mathbb Q}_{0,Y}$：
+\[
+ \bar Q_{0,Y}(a,W_n)=E_{Q_0}(Y_n(a)\mid W_n)
+ =E_{Q_0}(\bar{\mathbb Q}_{0,Y}(a,U_n,W_n)\mid W_n).
+\]
+这表明，对于每个 $n\geq1$ 以及 $a=0,1$，给定 $W_n$ 后 $Y_n(a)$ 的条件均值，是对 $\bar{\mathbb Q}_{0,Y}(a,U_n,W_n)$ 中的 $U_n$ 在给定 $W_n$ 下取平均得到的。
+
+引入
+\[
+ \begin{aligned}
+ s_1^2&\equiv E_{P_{Q_0,g_0}}\left(\bigl(D_1^*(O)+\psi_0-\bar Q_{0,Y}(r_0(W),W)\bigr)^2\right),\\
+ s_n^2&\equiv\frac1n\sum_{i=1}^n\bigl(D_{ni}^*(O_i)+\psi_n^0-\bar Q_{n,Y}(r_n(W_i),W_i)\bigr)^2.
+ \end{aligned}
+\]
+后者是前者的经验对应量和估计量。现在可以陈述本章的最后一个结果，它给出 $\mathcal R_n$ 的一个保守置信区间：
+
+\begin{bookresult}{命题}{24.3}
+在 A1、A2、A3 和 A4 下，$s_n^2$ 一致估计正数 $s_1^2$。而且，当 $n$ 趋于无穷时，
+\begin{equation}
+ \left[\psi_n^*-\frac1n\sum_{i=1}^nY_i\pm\xi_{1-\alpha/2}\frac{s_n}{\sqrt n}\right]
+ \tag{24.11}
+\end{equation}
+以收敛于 $(1-\alpha')\geq(1-\alpha)$ 的概率包含 $\mathcal R_n$。
+\end{bookresult}
+
+命题24.3的证明按以下思路展开。与事实相反，假装每一步也观测到了 $U_n$，但并不用它定义 TMLE，因此 TMLE 仍与之前相同；然后调整命题24.2的证明，得到一个类似的 CLT。现在所涉及的标准化因子还依赖于 $U_1,\ldots,U_n$。由此可直接导出 $\mathcal R_n$ 的一个置信区间，其宽度 $\lambda_n$ 也依赖于 $U_1,\ldots,U_n$。幸运的是，我们可以证明，式 (24.11) 中置信区间的宽度总是大于 $\lambda_n$。由于该区间不含 $U_1,\ldots,U_n$，这就得到了所需结果。这一巧妙的证明方案受到 Balzer 等（2016c）的启发。

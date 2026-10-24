@@ -1,0 +1,281 @@
+\section{稳定分布}
+
+尽管极小性原则足以形成一套关于推断因果性的规范理论，它并不保证实际数据生成模型的结构必定是极小的，也不保证在浩繁的极小结构空间中的搜索在计算上是可行的。某些结构可能容许奇特的参数化，使它们与许多结构完全不同的极小模型无法区分。例如，考虑一个二值变量 $C$：当两枚公平硬币（$A$ 与 $B$）的结果相同时取 1，否则取 0。在这一参数化所生成的三变量分布中，每对变量都是边缘独立的，却在给定第三个变量时相依。这样的依赖模式事实上可以由三个极小因果结构生成，每个结构都令其中一个变量因果地依赖于另外两个，但三者之间无从抉择。为排除这类“病态”参数化，我们对分布施加一条限制，称为\emph{稳定性}，也称 DAG 同构性或完美映射性（Pearl 1988b, p.~128）与忠实性（Spirtes et al. 1993）。这一限制所传达的假设是：嵌入 $P$ 中的一切独立关系都是稳定的，即它们由模型 $D$ 的结构所蕴含，因而对参数 $\Theta_D$ 的任何变动保持不变。在上例中，只有正确的结构（即 $A\to C\leftarrow B$）在参数化变动时（比方说，硬币变得略有偏倚）仍保持其独立模式。
+
+\begin{definition}[稳定性]
+设 $I(P)$ 表示 $P$ 中所体现的一切条件独立关系之集。因果模型 $M=\langle D,\Theta_D\rangle$ 生成一个\emph{稳定分布}，当且仅当 $P(\langle D,\Theta_D\rangle)$ 不含多余的独立——即当且仅当对任一参数集 $\Theta'_D$，
+\[
+I\bigl(P(\langle D,\Theta_D\rangle)\bigr)=I\bigl(P(\langle D,\Theta'_D\rangle)\bigr).
+\]
+\end{definition}
+
+稳定性条件说的是：当我们把参数从 $\Theta_D$ 变为 $\Theta'_D$ 时，$P$ 中没有任何独立会被破坏；故名“稳定性”。简言之，若 $P$ 是 $M$ 的稳定分布，则它“映射”了 $M$ 的结构 $D$，即对任意三组变量 $X,Y,Z$，有
+\[
+(X\indep Y\mid Z)_P\iff(X\indep Y\mid Z)_D
+\]
+（见定理 1.2.5）。
+
+极小性与稳定性之间的关系，可用下述类比说明。假设我们看到一张椅子的照片，需要在两个理论之间作出抉择：
+\begin{itemize}
+\item[$T_1$：] 照片中的物体是一把椅子。
+\item[$T_2$：] 照片中的物体或者是一把椅子，或者是两把椅子，其摆放方式使一把遮住了另一把。
+\end{itemize}
+我们偏好 $T_1$ 而非 $T_2$，可由两条原则辩护：一条基于极小性，一条基于稳定性。极小性原则主张 $T_1$ 优于 $T_2$，因为由单个物体构成的场景集是由两个或更少物体构成之场景集的真子集；除非有相反证据，我们应偏好更具体的理论。稳定性原则先天地排除 $T_2$，理由是：两个物体恰好对齐、使一个完全遮住另一个，这相当不可能；这种对齐相对于环境条件或视角的微小变化是不稳定的。
+
+与独立关系的类比是清楚的。有些独立是结构性的，即它们对图的每一种函数—分布参数化都会持续成立；另一些则敏感于函数与分布的具体数值。例如，在结构
+\[
+Z\leftarrow X\to Y,
+\]
+即关系
+\begin{equation}
+z=f_1(x,u_1),\qquad y=f_2(x,u_2) \tag{2.1}
+\end{equation}
+中，变量 $Z$ 与 $Y$ 在给定 $X$ 时对一切函数 $f_1$、$f_2$ 都独立。相反，若在结构中添一条箭头 $Z\to Y$ 并使用线性模型
+\begin{equation}
+z=gx+u_1,\qquad y=\alpha x+\gamma z+u_2, \tag{2.2}
+\end{equation}
+且 $\alpha=-\gamma g$，则 $Y$ 与 $X$ 将独立。然而 $Y$ 与 $X$ 之间的这种独立是不稳定的，因为一旦等式 $\alpha=-\gamma g$ 被违反，它便消失。稳定性假设认定：这类独立不大可能出现在数据中，一切独立都是结构性的。
+
+为进一步说明稳定性与极小性的关系，考虑图 2.1(c) 所描绘的因果结构。极小性原则排斥该结构，理由是它拟合的分布集比结构 (a) 所拟合的更宽。稳定性原则也排斥该结构，理由是：为拟合数据（特别是独立关系 $a\perp b$），由箭头 $a\to b$ 产生的关联必须恰好抵消由路径 $a\to c\leftarrow b$ 产生的关联。如此精确的抵消不可能是稳定的，因为它无法对连接 $a,b,c$ 的一切函数都维持。相比之下，在结构 (a) 中，独立 $a\perp b$ 是稳定的。
+
+\section{恢复 DAG 结构}
+
+有了稳定性这一附加假设，只要不存在隐藏变量，每个分布都有一个唯一的极小因果结构（在 d-分离等价的意义上）。这一唯一性来自定理 1.2.8：两个因果结构等价（即可以相互模拟）当且仅当它们传递相同的依赖信息——即具有相同的骨架与相同的 v 结构集。
+
+在无未测变量时，对极小模型的搜索便归结为：从关于条件独立的查询中重建 DAG $D$ 的结构，并假定这些独立反映了某个未公开的底层 DAG $D_0$ 中的 d-分离条件。自然，由于 $D_0$ 可能有等价结构，重建出的 DAG 不会唯一；我们所能做的最好的事，是为 $D_0$ 的等价类找到一个图形表示。这种图形表示由 Verma and Pearl (1990) 以“模式”（pattern）之名引入。模式是一个部分有向的 DAG，即某些边有向、某些边无向的图。有向边表示该箭头为 $D_0$ 等价类中每个成员所共有；无向边表示两可——在某些等价结构中朝一个方向，在另一些结构中朝另一个方向。
+
+下述算法由 Verma and Pearl (1990) 引入，它以某个底层 DAG $D_0$ 所生成的稳定概率分布 $\hat{P}$ 为输入，输出一个表示 $D_0$ 等价类的模式。\footnote{IC 算法在 Verma and Pearl (1990) 中提出时是为处理潜结构而设计的。为清晰起见，我们在此把算法分成 IC 与 IC* 两部分：IC 仅限于 DAG，IC* 则作用于潜结构。}
+
+\begin{techpoint}[IC 算法（归纳因果，Inductive Causation）]
+\bfseries 输入：\normalfont 变量集 $V$ 上的一个稳定分布 $\hat{P}$。
+
+\bfseries 输出：\normalfont 一个与 $\hat{P}$ 相容的模式 $H$。
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 对 $V$ 中每一对变量 $a$ 与 $b$，寻找一个集合 $S_{ab}$，使得 $(a\indep b\mid S_{ab})$ 在 $\hat{P}$ 中成立——换言之，$a$ 与 $b$ 应在以 $S_{ab}$ 为条件时于 $\hat{P}$ 中独立。构造无向图 $G$，使顶点 $a$ 与 $b$ 之间有边相连，当且仅当找不到这样的集合 $S_{ab}$。
+\item 对每一对具有共同邻居 $c$ 的非邻接变量 $a$ 与 $b$，检查是否有 $c\in S_{ab}$。若是，则继续；若否，则添加指向 $c$ 的箭头（即 $a\to c\leftarrow b$）。
+\item 在所得的部分有向图中，在服从以下两个条件的前提下，尽可能多地给无向边定向：(i) 任何替代定向都会产生新的 v 结构；(ii) 任何替代定向都会产生有向环。
+\end{enumerate}
+\end{techpoint}
+
+IC 算法把第 1 步与第 3 步的细节留而未定，人们提出了若干改进以优化这两步。Verma and Pearl (1990) 指出，在稀疏图中，若从 $\hat{P}$ 的马尔可夫网络出发，搜索可以大幅削减；所谓马尔可夫网络，是只把那些在以其余一切变量为条件时仍相依的变量对相连而成的无向图。在线性高斯模型中，马尔可夫网络可在多项式时间内通过矩阵求逆得到：把边赋予那些对应于协方差矩阵之逆的非零元素的变量对。Spirtes and Glymour (1991) 提出了一种系统的通用办法来搜索第 1 步中的集合 $S_{ab}$：从基数为 0 的集合 $S_{ab}$ 开始，再取基数为 1 的，如此递进；一旦找到分离，就从完全图中递归地删去相应的边。这一改进称为 PC 算法（以其作者 Peter 与 Clark 命名），在有限度的图中具有多项式时间复杂度，因为在每一阶段，对分离集 $S_{ab}$ 的搜索都可限于与 $a$、$b$ 邻接的节点。
+
+IC 算法第 3 步可用多种方式系统化。Verma and Pearl (1992) 表明，从任一模式出发，要获得极大定向的模式，需要下述四条规则。
+
+\begin{description}[leftmargin=2.2em,style=nextline,itemsep=0.2em]
+\item[\textbf{R1：}] 只要有箭头 $a\to b$ 使得 $a$ 与 $c$ 非邻接，就把 $b-c$ 定向为 $b\to c$。
+\item[\textbf{R2：}] 只要存在链 $a\to c\to b$，就把 $a-b$ 定向为 $a\to b$。
+\item[\textbf{R3：}] 只要存在两条链 $a-c\to b$ 与 $a-d\to b$，使得 $c$ 与 $d$ 非邻接，就把 $a-b$ 定向为 $a\to b$。
+\item[\textbf{R4：}] 只要存在两条链 $a-c\to d$ 与 $c\to d\to b$，使得 $c$ 与 $b$ 非邻接且 $a$ 与 $d$ 邻接，就把 $a-b$ 定向为 $a\to b$。
+\end{description}
+
+Meek (1995) 证明这四条规则也是充分的，因此反复施用终将为 $D_0$ 等价类所共有的一切箭头定向。此外，若初始定向仅限于 v 结构，则 R4 并非必需。
+
+另一种系统化方法由 Dor and Tarsi (1992) 给出：它（在多项式时间内）检验一个给定的部分有向无环图能否在不产生新 v 结构、也不产生有向环的前提下被完全定向。检验基于递归地删除满足以下两条性质的顶点 $y$：
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 没有从 $y$ 向外的边；
+\item $y$ 的每个经无向边与 $y$ 相连的邻居，也与 $y$ 的其他一切邻居邻接。
+\end{enumerate}
+一个部分有向无环图在某个 DAG 中具有可容许的扩充，当且仅当其所有顶点都能按此方式删除。于是，为求得极大定向的模式，我们可以 (i) 对每条无向边 $a-b$ 分别尝试 $a\to b$ 与 $a\leftarrow b$ 两种定向，(ii) 检验两种定向、或仅其中一种，是否具有扩充。可唯一定向的箭头之集便构成所求的极大定向模式。更多的改进可见 Chickering (1995)、Andersson 等 (1997) 与 Moole (1997)。
+
+然而，潜结构需要特殊处理，因为潜结构对分布所施加的约束无法由任何一组条件独立陈述完全刻画。幸运的是，其中某些独立约束集可以被识别出来（Verma and Pearl 1990），这使我们能够恢复潜结构的有效片段。
+
+\section{恢复潜结构}
+
+当自然决定“隐藏”某些变量时，被观测分布 $\hat{P}$ 相对于可观测集 $O$ 便不再必然是稳定的。也就是说，我们不再能保证：在与 $\hat{P}$ 相容的极小潜结构之中，存在一个具有 DAG 结构的。所幸，不必在无界的潜结构空间中搜索，搜索可以被限制在具有有限且良定义结构的图之内。对每个潜结构 $L$，都存在一个依赖等价的潜结构（即 $L$ 在 $O$ 上的\emph{投影}），其中每个未观测节点都是恰有两个被观测子节点的根节点。我们把这个概念显式刻画如下。
+
+\begin{definition}[投影]
+潜结构 $L[O]=\langle D[O],O\rangle$ 是另一潜结构 $L$ 的\emph{投影}，当且仅当：
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item $D[O]$ 的每个不可观测变量都是恰好两个非邻接可观测变量的无父共同原因；且
+\item 对 $L$ 所生成的每个稳定分布 $P$，都存在 $L[O]$ 所生成的稳定分布 $P'$，使得 $I(P[O])=I(P'[O])$。
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Verma 1993]
+任何潜结构都至少有一个投影。
+\end{theorem}
+
+用只以被观测变量为顶点的双向图来表示投影是方便的（即把隐藏变量留作隐含）。这种图中的每条双向连线表示连线两端点所对应变量的共同隐藏原因。
+
+定理 2.6.2 使我们的推断因果性定义（定义 2.3.6）成为可操作的；可以证明（Verma 1993），在 $\hat{P}$ 的任一极小模型的某个特定投影中，某类连线的存在必定意味着在 $\hat{P}$ 的每个极小模型中都存在一条因果路径。于是，我们的搜索归结为：找出 $\hat{P}$ 的任一极小模型的特定投影，并识别出相应的连线。值得注意的是，这些连线可以由 IC 算法的一个简单变体——此处称为 IC*——识别出来；它以稳定分布 $\hat{P}$ 为输入，返回一个\emph{带标记的模式}，即含有四类边的部分有向无环图：
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 带标记的箭头 $a\xrightarrow{*}b$，表示底层模型中存在从 $a$ 到 $b$ 的有向路径；
+\item 不带标记的箭头 $a\to b$，表示底层模型中或者存在从 $a$ 到 $b$ 的有向路径，或者存在潜共同原因 $a\leftrightarrow L\to b$；
+\item 双向边 $a\leftrightarrow b$，表示底层模型中存在潜共同原因 $a\leftarrow L\to b$；
+\item 无向边 $a-b$，表示底层模型中或者是 $a\to b$，或者是 $a\leftarrow b$，或者是 $a\leftrightarrow b$。\footnote{Spirtes 等 (1993) 用 $a\overset{o}{\to}b$ 表示节点 $a$ 处箭头的不确定性。IC* 原证明中的若干错误由 Peter Spirtes 向我们指出，并在 Verma (1993) 中得到修正。Spirtes 等 (1993) 给出了正确性的替代证明以及算法的改进。}
+\end{enumerate}
+
+\begin{techpoint}[IC* 算法（含潜变量的归纳因果）]
+\bfseries 输入：\normalfont 一个（相对于某个潜结构）稳定的分布 $\hat{P}$。
+
+\bfseries 输出：\normalfont 一个带标记的模式（核心 $\hat{P}$）。
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 对每一对变量 $a$ 与 $b$，寻找一个集合 $S_{ab}$，使得 $a$ 与 $b$ 在以 $S_{ab}$ 为条件时于 $\hat{P}$ 中独立。若不存在这样的 $S_{ab}$，则在两变量之间放置一条无向连线 $a-b$。
+\item 对每一对具有共同邻居 $c$ 的非邻接变量 $a$ 与 $b$，检查是否有 $c\in S_{ab}$。若是，则继续；若否，则添加指向 $c$ 的箭头（即 $a\to c\leftarrow b$）。
+\item 在所得的部分有向图中，按以下两条规则（递归地）尽可能多地添加箭头、并尽可能多地给边加标记：
+\begin{description}[leftmargin=1.6em,style=nextline,itemsep=0.15em]
+\item[R1：] 对每一对具有共同邻居 $c$ 的非邻接节点 $a$ 与 $b$，若 $a$ 与 $c$ 之间的连线在 $c$ 端有箭头、而 $c$ 与 $b$ 之间的连线在 $c$ 端没有箭头，则在 $c$ 与 $b$ 之间的连线上添加指向 $b$ 的箭头，并给该连线加标记，得到 $c\xrightarrow{*}b$。
+\item[R2：] 若 $a$ 与 $b$ 邻接，且存在一条（完全由带标记连线构成的）从 $a$ 到 $b$ 的有向路径（如图 2.2），则在 $a$ 与 $b$ 之间的连线上添加指向 $b$ 的箭头。
+\end{description}
+\end{enumerate}
+\end{techpoint}
+
+IC* 的第 1、2 步与 IC 相同，但第 3 步的规则不同：它们不为边定向，而是给边的各个端点添加箭头，从而容纳双向边。
+
+图 2.3 展示了 IC* 算法在图 1.2 洒水器例子上的运作（该结构示意于图 2.3(a)）。
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 该结构所蕴含的条件独立可用 d-分离准则（定义 1.2.3）读出，对应于这些独立的最小条件集为 $S_{ad}=\{b,c\}$、$S_{ae}=\{d\}$、$S_{bc}=\{a\}$、$S_{be}=\{d\}$、$S_{ce}=\{d\}$。于是 IC* 的第 1 步产生图 2.3(b) 的无向图。
+\item 三元组 $(b,d,c)$ 是唯一满足第 2 步条件的三元组，因为 $d\notin S_{bc}$。据此得到图 2.3(c) 的部分有向图。
+\item 第 3 步的规则 R1 适用于三元组 $(b,d,e)$（以及 $(c,d,e)$），因为 $b$ 与 $e$ 非邻接，且在 $d$ 处有来自 $b$ 的箭头而没有来自 $e$ 的箭头。因此我们在 $e$ 处添加箭头，并给该连线加标记，得到图 2.3(d)。这也就是 IC* 的最终输出，因为 R1 与 R2 已不再适用。
+\end{enumerate}
+
+$a-b$ 与 $a-c$ 上没有箭头、$b\to d$ 与 $c\to d$ 上没有标记，这些正确地表示了 $\hat{P}$ 所带来的歧义。确实，图 2.4 所示的每个潜结构都与图 2.3(a) 观测等价。在图 2.3(d) 中给连线 $d\to e$ 加标记，则表明：在与图 2.3(a) 独立等价的每一个潜结构中，都存在一条有向连线 $d\to e$。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=1.0,every node/.style={transform shape}]
+  % (a)
+  \begin{scope}
+    \node[circle,fill,inner sep=1.3pt] (a) at (0,0) {};  \node[font=\small,below=0.6mm] at (0,0) {$a$};
+    \node[circle,fill,inner sep=1.3pt] (b) at (3.0,0) {}; \node[font=\small,below=0.6mm] at (3.0,0) {$b$};
+    \node[circle,fill,inner sep=1.3pt] (s) at (1.5,1.1) {}; \node[font=\small,above=0.3mm] at (1.5,1.1) {$*$};
+    \draw (a)--(b);
+    \draw[edd] (a) to[bend left=12] (s);
+    \draw[edd] (s) to[bend left=12] (b);
+    \node[font=\small] at (1.5,-1.0) {(a)};
+  \end{scope}
+  \draw[->,thick] (4.0,0.4)--(4.9,0.4);
+  % (b)
+  \begin{scope}[xshift=6.2cm]
+    \node[circle,fill,inner sep=1.3pt] (a2) at (0,0) {};  \node[font=\small,below=0.6mm] at (0,0) {$a$};
+    \node[circle,fill,inner sep=1.3pt] (b2) at (3.0,0) {}; \node[font=\small,below=0.6mm] at (3.0,0) {$b$};
+    \node[circle,fill,inner sep=1.3pt] (s2) at (1.5,1.1) {}; \node[font=\small,above=0.3mm] at (1.5,1.1) {$*$};
+    \draw[ed] (a2)--(b2);
+    \draw[edd] (a2) to[bend left=12] (s2);
+    \draw[edd] (s2) to[bend left=12] (b2);
+    \node[font=\small] at (1.5,-1.0) {(b)};
+  \end{scope}
+\end{tikzpicture}
+\caption{IC* 算法第 3 步中规则 R2 的示意。}
+\label{fig:2.2}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,every node/.style={transform shape}]
+  % ---- (a) 底层结构 ----
+  \begin{scope}
+    \node[circle,fill,inner sep=1.5pt] (a1) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b1) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c1) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d1) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e1) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw[ed] (a1)--(b1); \draw[ed] (a1)--(c1);
+    \draw[ed] (b1)--(d1); \draw[ed] (c1)--(d1);
+    \draw[ed] (d1)--(e1);
+    \node[font=\small] at (0,-3.0) {(a)};
+  \end{scope}
+  % ---- (b) 第 1 步之后 ----
+  \begin{scope}[xshift=4.8cm]
+    \node[circle,fill,inner sep=1.5pt] (a2) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b2) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c2) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d2) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e2) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw (a2)--(b2); \draw (a2)--(c2);
+    \draw (b2)--(d2); \draw (c2)--(d2);
+    \draw (d2)--(e2);
+    \node[font=\small] at (0,-3.0) {(b)};
+  \end{scope}
+  % ---- (c) 第 2 步之后 ----
+  \begin{scope}[yshift=-5.2cm]
+    \node[circle,fill,inner sep=1.5pt] (a3) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b3) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c3) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d3) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e3) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw (a3)--(b3); \draw (a3)--(c3);
+    \draw[ed] (b3)--(d3); \draw[ed] (c3)--(d3);
+    \draw (d3)--(e3);
+    \node[font=\small] at (0,-3.0) {(c)};
+  \end{scope}
+  % ---- (d) IC* 输出 ----
+  \begin{scope}[yshift=-5.2cm,xshift=4.8cm]
+    \node[circle,fill,inner sep=1.5pt] (a4) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b4) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c4) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d4) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e4) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw (a4)--(b4); \draw (a4)--(c4);
+    \draw[ed] (b4)--(d4); \draw[ed] (c4)--(d4);
+    \draw[ed] (d4)--(e4);
+    \node[font=\footnotesize,left=1.0mm] at (0,-1.7) {$*$};
+    \node[font=\small] at (0,-3.0) {(d)};
+  \end{scope}
+\end{tikzpicture}
+\caption{IC* 算法构造的图。(a) 底层结构。(b) 第 1 步之后。(c) 第 2 步之后。(d) IC* 的输出。}
+\label{fig:2.3}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,every node/.style={transform shape}]
+  % (a) b<->d
+  \begin{scope}
+    \node[circle,fill,inner sep=1.5pt] (a1) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b1) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c1) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d1) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e1) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw[ed] (a1)--(b1); \draw[ed] (a1)--(c1);
+    \draw[bid,dashed] (b1) to[bend left=32] (d1);
+    \draw[ed] (c1)--(d1); \draw[ed] (d1)--(e1);
+    \node[font=\small] at (0,-3.0) {(a)};
+  \end{scope}
+  % (b) c<->d
+  \begin{scope}[xshift=4.8cm]
+    \node[circle,fill,inner sep=1.5pt] (a2) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b2) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c2) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d2) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e2) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw[ed] (a2)--(b2); \draw[ed] (a2)--(c2);
+    \draw[ed] (b2)--(d2);
+    \draw[bid,dashed] (c2) to[bend right=32] (d2);
+    \draw[ed] (d2)--(e2);
+    \node[font=\small] at (0,-3.0) {(b)};
+  \end{scope}
+  % (c) 两条潜弧
+  \begin{scope}[yshift=-5.2cm]
+    \node[circle,fill,inner sep=1.5pt] (a3) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b3) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c3) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d3) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e3) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw[ed] (a3)--(b3); \draw[ed] (a3)--(c3);
+    \draw[bid,dashed] (b3) to[bend left=32] (d3);
+    \draw[bid,dashed] (c3) to[bend right=32] (d3);
+    \draw[ed] (d3)--(e3);
+    \node[font=\small] at (0,-3.0) {(c)};
+  \end{scope}
+  % (d) a<->b
+  \begin{scope}[yshift=-5.2cm,xshift=4.8cm]
+    \node[circle,fill,inner sep=1.5pt] (a4) at (0,1.15) {};  \node[font=\footnotesize,above=0.3mm] at (0,1.15) {$a$};
+    \node[circle,fill,inner sep=1.5pt] (b4) at (-1.15,0) {}; \node[font=\footnotesize,left=0.4mm] at (-1.15,0) {$b$};
+    \node[circle,fill,inner sep=1.5pt] (c4) at (1.15,0) {};  \node[font=\footnotesize,right=0.4mm] at (1.15,0) {$c$};
+    \node[circle,fill,inner sep=1.5pt] (d4) at (0,-1.15) {}; \node[font=\footnotesize,right=0.5mm] at (0,-1.15) {$d$};
+    \node[circle,fill,inner sep=1.5pt] (e4) at (0,-2.30) {}; \node[font=\footnotesize,below=0.3mm] at (0,-2.30) {$e$};
+    \draw[ed] (a4)--(c4);
+    \draw[ed] (b4)--(d4); \draw[ed] (c4)--(d4); \draw[ed] (d4)--(e4);
+    \draw[bid,dashed] (a4) to[bend left=30] (b4);
+    \node[font=\small] at (0,-3.0) {(d)};
+  \end{scope}
+\end{tikzpicture}
+\caption{与图 2.3(a) 等价的潜结构。}
+\label{fig:2.4}
+\end{figure}

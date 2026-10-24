@@ -1,0 +1,25 @@
+\begin{tikzpicture}[causal,x=1.65cm,y=1.2cm,every node/.style={inner sep=2pt,font=\small}]
+\node (ch16lo) at (0,1.8) {$L(t-j)$};
+\node (ch16lt) at (4.5,1.8) {$L(t)$};
+\node (ch16ln) at (6.6,1.8) {$L(t+1)$};
+\node at (2.3,1.8) {$\cdots$};
+\node (ch16ao) at (1.35,0) {$A(t-j)$};
+\node (ch16ap) at (3.65,0) {$A(t-1)$};
+\node (ch16at) at (5.5,0) {$A(t)$};
+\node at (2.3,0) {$\cdots$};
+\draw[ed] (ch16lo.north east) to[out=20,in=160] (ch16lt.north west);
+\draw[ed] ([yshift=4pt]ch16lo.north east) to[out=23,in=157] (ch16ln.north west);
+\draw[ed] (ch16lo.south east) -- (ch16ao.north west);
+\draw[ed] (ch16lo.east) to[out=-7,in=145] (ch16ap.north west);
+\draw[ed] ([yshift=2pt]ch16lo.east) to[out=0,in=150] (ch16at.north west);
+\draw[ed] (ch16ao.north east) to[out=40,in=195] (ch16lt.west);
+\draw[ed] (ch16ao.east) to[out=15,in=165] (ch16ap.west);
+\draw[ed] (ch16ao.south east) to[out=-12,in=192] (ch16at.south west);
+\draw[ed] ([yshift=-4pt]ch16ao.south east) to[out=-30,in=-90] (ch16ln.south);
+\draw[ed] (ch16ap.north east) -- (ch16lt.south west);
+\draw[ed] (ch16ap.east) -- (ch16at.west);
+\draw[ed] ([yshift=3pt]ch16ap.north east) -- (ch16ln.south west);
+\draw[ed] (ch16lt.east) -- (ch16ln.west);
+\draw[ed] (ch16lt.south east) -- (ch16at.north);
+\draw[ed] (ch16at.north east) -- ([xshift=8pt]ch16ln.south west);
+\end{tikzpicture}

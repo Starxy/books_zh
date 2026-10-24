@@ -1,0 +1,135 @@
+% 原书分章 PDF 第1—6页：章首导言与第24.1节。
+% 长章名在章号后换行；随后恢复共享默认间距。
+\ctexset{chapter/aftername=\par}
+\chapter{简单统计多臂老虎机问题的靶向估计}
+\ctexset{chapter/aftername=\quad}
+\label{ch:simple-statistical-bandit}
+\chapterauthors{Antoine Chambaz、Wenjing Zheng 与 Mark J. van der Laan}
+\chapteraffiliations{%
+A. Chambaz（通讯作者）：法国巴黎笛卡尔大学 MAP5（UMR CNRS 8145），45 rue des Saints-Pères, 75270 Paris cedex 06, France；电子邮箱：\href{mailto:antoine.chambaz@parisdescartes.fr}{antoine.chambaz@parisdescartes.fr}。\\
+W. Zheng：美国奈飞公司（Netflix），100 Winchester Circle, Los Gatos, CA 95032, USA；电子邮箱：\href{mailto:wzheng@netflix.com}{wzheng@netflix.com}。\\
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_24}。}
+
+\begin{sourcebox}
+\textbf{统计挑战。}从共同分布 $Q_0$ 抽取的无限独立同分布（independent and identically distributed，i.i.d.）随机变量序列 $(W_n,Y_n(0),Y_n(1))_{n\geq1}$，将在一项受控实验中依次、部分地向我们揭示。第一分量 $W_n$ 描述第 $n$ 个情境（context），我们需要在这一情境中执行两个动作之一，分别记为 $a=0$ 和 $a=1$。第二、第三分量 $Y_n(0)$ 和 $Y_n(1)$，是执行动作 $a=0$ 和 $a=1$ 分别能够获得的奖励（reward）。情境集合 $\mathcal W$ 可能是高维的。奖励取值于 $]0,1[$。
+\end{sourcebox}
+
+受控实验按如下方式展开。我们依次获知新的情境 $W_n$，然后执行一个随机化动作 $A_n\in\{0,1\}$：以概率 $g_n(1\mid W_n)$ 选择动作 $a=1$，以概率 $g_n(0\mid W_n)\equiv1-g_n(1\mid W_n)$ 选择动作 $a=0$。我们依据实验至今积累的观测 $O_1,\ldots,O_{n-1}$ 确定 $g_n(\cdot\mid W_n)$。随后，我们获得已执行动作对应的奖励 $Y_n\equiv Y_n(A_n)$，而另一动作的奖励仍不向我们揭示，由此得到第 $n$ 个观测 $O_n\equiv(W_n,A_n,Y_n)$。这是机器学习文献中最简单的多臂老虎机设定之一，因而本章标题使用了“简单多臂老虎机问题”这一表述。
+
+我们的目标解释了为何更确切的表述是“简单统计多臂老虎机问题”（simple statistical bandit problem）。具体而言，我们要用 $r_n$ 推断最优规则
+\[
+ r_0(W)\equiv\argmax_{a=0,1}E_{Q_0}\bigl(Y(a)\mid W\bigr)
+\]
+（约定在相等时取 $r_0(W)=1$），并推断 $r_0$ 下的平均奖励
+\[
+ \psi_0\equiv E_{Q_0}\bigl(Y(r_0(W))\bigr),
+\]
+力求得到 $\psi_0$ 的一个较窄置信区间（confidence interval，CI），并通过估计以下遗憾（regret），了解我们依次确定动作的表现如何：
+\[
+ \mathcal R_n\equiv\frac1n\sum_{i=1}^n Y_i(r_n(W_i))-Y_i.
+\]
+遗憾是多臂老虎机文献中最核心的概念之一。这里将 $\mathcal R_n$ 看作数据自适应参数，它比较截至第 $n$ 步实际获得奖励的平均值 $n^{-1}\sum_{i=1}^nY_i$，与反事实奖励平均值 $n^{-1}\sum_{i=1}^nY_i(r_n(W_i))$；后者是指，如果从实验开始就一直使用 $r_n$ 来决定连续 $n$ 步中的动作，那么截至第 $n$ 步我们本会获得的平均奖励。我们强调，前一个平均值是已知的，后一个却未知。事实上，对某个 $1\leq i\leq n$，可能有 $A_i\ne r_n(W_i)$，此时 $Y_i(r_n(W_i))$ 就是在第 $i$ 步未向我们揭示的奖励。如果全部动作 $A_i$ 都与 $r_n(W_i)$ 一致（$1\leq i\leq n$），那么 $\mathcal R_n=0$，但这是一件极不可能发生的事。一般而言，$n\mathcal R_n$ 等于
+\[
+ \sum_{\substack{1\leq i\leq n\\A_i\ne r_n(W_i)}}Y_i(1-A_i)-Y_i(A_i).
+\]
+这一替代表达式说明：在那些随机化动作 $A_i$ 不同于依据第 $n$ 步最优规则估计所确定的最优动作 $r_n(W_i)$ 的步骤 $i$，$n\mathcal R_n$ 是两个可能奖励之差的反事实总和。最优动作是给定情境后条件均值较大的动作，而不一定是实际奖励较大的动作，因此不能保证 $\mathcal R_n$ 非负。
+
+数据自适应参数的推断是本章的核心。我们将由第二个数据自适应参数
+\[
+ \psi_{r_n,0}\equiv E_{Q_0}\bigl(Y(r_n(W))\bigr),
+\]
+即 $r_n$ 下平均奖励的靶向最小损失估计量（targeted minimum loss estimator，TMLE；这一缩写也表示靶向最小损失估计），导出 $\psi_0$ 以及我们首先引入的数据自适应参数 $\mathcal R_n$ 的置信区间。这样，本章标题便得到了完整解释。$\psi_{r_n,0}$ 的意义远不止于为 $\psi_0$ 的推断提供方便的替代量。事实上，我们可以认为，$\psi_{r_n,0}$ 比 $\psi_0$ 本身更有意义，因为它是在我们已知且能够实际使用的规则 $r_n$ 下的平均奖励。正是同样的理由，促使我们选择遗憾 $\mathcal R_n$，而非将其中的 $r_n$ 换成 $r_0$ 所得的对应量。
+
+\paragraph*{精准医学。}
+以上的一般叙述可以置于精准医学的语境中。精准医学是一个蓬勃发展的领域，其总体目标是依据遗传、环境及生活方式因素，识别哪些治疗和预防措施对哪些患者有效。为此，设想每个随机变量 $(W_n,Y_n(0),Y_n(1))$ 都对应一名患者：$W_n$ 是在她身上测得的一组基线协变量；$Y_n(0)$ 是治疗 $a=0$ 的潜在结局，$Y_n(1)$ 是治疗 $a=1$ 的潜在结局。规则定义了一个个体化治疗策略，患者的治疗分配由其测得的基线协变量决定。我们只能观测一个潜在结局 $Y_n$，它对应分配的治疗 $A_n$。规则 $r_0$ 在使所分配治疗的结局均值最大这一意义下是最优的。
+
+在这一语境中，设计方案的靶向序贯构建及其基础上的推断程序，由两个目标推动。第一个目标是通过构造靶向的、较窄的置信区间，提高统计推断的稳健性和效率。这对研究者很有吸引力。第二个目标是提高这样一种可能性：根据迄今积累的数据，为每名入组患者分配对她更有利的治疗。这对入组患者及其医生很有吸引力。为了理解其原因，我们比较一下依据我们设计方案的试验与传统随机对照试验（RCT）。在 RCT 中，临床医生必须向每名潜在患者承认，目前并不知道哪种治疗对她最好，这可能损害医患关系。此外，他们还应相信，这些治疗在患者可能获得的益处方面是等同的，许多医生对此感到不安（Stanley，2007）。在依据我们设计方案的试验中，这两个缺点将分别大为减轻和不再相关，代价是实施更为复杂。此外，我们可以期待依从性的提高。
+
+\paragraph*{文献简要回顾。}
+Chakraborty 和 Moodie（2013）对最优规则的估计作了出色而统一的综述。他们重点讨论动态规则，即依据随时间变化的情境，在连续时点规定连续动作的规则。基于独立同分布观测的最优规则估计已得到广泛研究，近期的兴趣之一是利用机器学习算法实现这一目标（Qian 和 Murphy，2011；Zhao 等，2012，2015；Zhang 等，2012a，b；Rubin 和 van der Laan，2012；Luedtke 和 van der Laan，2016b）。估计最优规则下的平均奖励更具挑战性。Zhao 等（2012，2015）使用评价最优规则估计量统计表现的理论风险界，来衡量由此得到的最优规则下平均奖励估计量的统计表现。然而，这一方法不能给出置信区间。
+
+已知，如果存在一个情境层，其中任何动作都不优于另一个动作，那么构造最优规则下平均奖励的置信区间就更困难（如果动作表示治疗，则没有治疗是有益的，也没有治疗是有害的）（Robins，2004）。在这一所谓的“例外”（exceptional）情形下，需要消除最优规则定义中的歧义。假定非例外性，Zhang 等（2012a）对一个（次）最优规则下的平均奖励导出了置信区间；该规则定义为某个参数化候选规则类中的最优规则。van der Laan 和 Luedtke（2015）对真正最优规则下的平均奖励导出了置信区间。在允许发生例外性的更一般情形中，人们考虑了不同方法（Chakraborty 等，2014；Goldberg 等，2014；Laber 等，2014b；Luedtke 和 van der Laan，2016a）。这里，我们聚焦于满足一个配套间隔假设（margin assumption）的非例外情形（Mammen 和 Tsybakov，1999）。
+
+我们已说明，本章的核心 TMLE 实际上被设计为当前最优规则估计下平均奖励的估计量。这一数据自适应统计参数本身就值得研究，Chakraborty 等（2014）、Laber 等（2014a，b）、van der Laan 和 Luedtke（2015）以及 Luedtke 和 van der Laan（2016a）也考虑过它或类似参数。我们的主要结果是一个中心极限定理（central limit theorem，CLT），它使多种置信区间的构造成为可能。这里的分析（本章省略的证明见完整论述 Chambaz 等，2016），建立在此前关于靶向、协变量调整、响应自适应试验的构造与统计分析研究之上，这些试验也以 TMLE 为基础（Chambaz 和 van der Laan，2014；Zheng 等，2015；Chambaz 等，2015）。CLT 中的渐近方差表现为极限分布处一个有效影响曲线的方差，由此可以讨论推断的效率。这一理论研究的基石之一，是一个关于一致熵积分的新的鞅最大不等式。它通过解耦（decoupling）（de la Peña 和 Giné，1999）、对称化和链式法证明，并用来控制若干由随机函数索引的经验过程。
+
+\section{采样策略与 TMLE}
+
+先引入一些记号。用 $\bar Q_{0,Y}$ 和 $\bar q_{0,Y}$ 分别表示真实条件期望 $\bar Q_{0,Y}(a,W)\equiv E_{Q_0}(Y(a)\mid W)$（$a=0,1$）及其相应的“处理增益函数”（blip function）$\bar q_{0,Y}(W)\equiv\bar Q_{0,Y}(1,W)-\bar Q_{0,Y}(0,W)$。更一般地，从 $\{0,1\}\times\mathcal W$ 到 $]0,1[$ 的每个（可测）函数 $\bar Q_Y$，都对应一个处理增益函数 $\bar q_Y(W)\equiv\bar Q_Y(1,W)-\bar Q_Y(0,W)$。因此，
+\begin{equation}
+ r_0(W)=\argmax_{a=0,1}\bar Q_{0,Y}(a,W)
+ =I\{\bar q_{0,Y}(W)\geq0\}\equiv R(\bar Q_{0,Y})(W)
+ \tag{24.1}
+\end{equation}
+回顾，若两者相等，则取 $r_0(W)=1$。按上述定义，$\psi_0$ 可写为 $E_{Q_0}(\bar Q_{0,Y}(r_0(W),W))$，而 $\psi_{r_n,0}$ 可写为 $E_{Q_0}(\bar Q_{0,Y}(r_n(W),W))$。
+
+自适应采样策略和 TMLE 依赖于 $\bar Q_{0,Y}$ 的一个工作模型 $\bar{\mathcal Q}_Y$ 和一个损失函数 $L_Y$；我们在受控实验开始前确定二者。第24.2节将给出对 $\bar{\mathcal Q}_Y$ 复杂度的要求。它们还依赖于从 $[-1,1]$ 到 $[0,1]$ 的一个非递减 Lipschitz 函数 $G$，满足 $G(0)=1/2$，并且对于某两个固定且较小的实数 $p,\xi>0$，当 $|x|>\xi$ 时，若 $x<0$ 则 $G(x)=p$，若 $x>0$ 则 $G(x)=1-p$。函数 $G$ 是从 $[-1,1]$ 到 $\{0,1\}$ 的映射 $x\mapsto I\{x\geq0\}$ 的一个光滑近似。我们将用它定义 $r_n$ 的近似 $g_{n+1}$；二者都由处理增益函数 $\bar q_{0,Y}$ 的估计量 $\bar q_{n,Y}$ 导出，见式 (24.3)。
+
+\subsection{采样策略}
+
+最初的 $n_0$ 个随机化动作 $A_1,\ldots,A_{n_0}$ 来自参数为 $1/2$ 的 Bernoulli 分布。换言之，对 $i=1,\ldots,n_0$，设 $g_i=g^b$，其中 $g^b(1\mid W)=1-g^b(0\mid W)\equiv1/2$；也就是说，只要认为有必要，在开始利用积累的观测估计 $\bar Q_{0,Y}$ 之前，都给予每个动作相同的执行概率。现在假定已观测到 $O_1,\ldots,O_{n-1}$。说明下一个观测如何获得，就能完成对采样策略的描述。
+
+我们用下式估计 $\bar Q_{0,Y}$：
+\begin{equation}
+ \bar Q_{n,Y}\in\argmin_{\bar Q_Y\in\bar{\mathcal Q}_Y}
+ \frac1{n-1}\sum_{i=1}^{n-1}L_Y(\bar Q_Y)(O_i)
+ \frac{g^b(A_i\mid W_i)}{g_i(A_i\mid W_i)}.
+ \tag{24.2}
+\end{equation}
+权重 $g^b(A_i\mid W_i)/g_i(A_i\mid W_i)$（$i=1,\ldots,n$）补偿了观测并非同分布这一事实。以上估计量对应于处理增益函数 $\bar q_{n,Y}$ 及规则 $r_n\equiv R(\bar Q_{n,Y})(W)\equiv I\{\bar q_{n,Y}(W)\geq0\}$。它们分别是 $\bar q_{0,Y}$ 和 $r_0$ 的代入估计量。现在定义
+\begin{equation}
+ g_{n+1}(1\mid W)=1-g_{n+1}(0\mid W)\equiv G(\bar q_{n,Y})(W),
+ \tag{24.3}
+\end{equation}
+于是可以抽取 $O_{n+1}$：我们要求揭示 $W_{n+1}$，从参数为 $g_{n+1}(1\mid W_{n+1})$ 的 Bernoulli 分布抽取 $A_{n+1}$，执行动作 $A_{n+1}$，获得奖励 $Y_{n+1}=Y_{n+1}(A_{n+1})$，并形成 $O_{n+1}\equiv(W_{n+1},A_{n+1},Y_{n+1})$。
+
+随机化动作 $A_{n+1}$ 很少不同于确定性动作 $r_n(W_{n+1})$，其含义是
+\begin{equation}
+ \bigl|g_{n+1}(1\mid W_{n+1})-r_n(W_{n+1})\bigr|
+ I\{|\bar q_{n,Y}(W_{n+1})|>\xi\}=p:
+ \tag{24.4}
+\end{equation}
+如果 $|\bar q_{n,Y}(W_{n+1})|$ 与 $0$ 足够远，即我们有把握相信一个动作优于另一个，那么 $A_{n+1}$ 以（较大的）概率 $1-p$ 等于 $r_n(W_{n+1})$。相反，如果 $|\bar q_{n,Y}(W_{n+1})|$ 很小，即尚不清楚一个动作是否优于另一个，那么 $A_{n+1}$ 等于 $r_n(W_{n+1})$ 的概率介于 $1-t$ 与 $1/2$ 之间，并且随着 $|\bar q_{n,Y}(W_{n+1})|$ 越来越接近 $0$，这一概率连续地趋近 $1/2$。
+
+\subsection{TMLE}
+
+$\psi_{r_n,0}$ 的初始代入估计量
+\[
+ \psi_n^0\equiv\frac1n\sum_{i=1}^n\bar Q_{n,Y}(r_n(W_i),W_i),
+\]
+可能不具有 $\sqrt n$ 一致性，因此必须改进。幸运的是，我们可以采用 TMLE。事实上，与任意固定规则 $\rho:\mathcal W\to\{0,1\}$ 对应的映射 $\Psi_\rho:P_{Q,g}\mapsto E_Q(Y(\rho(W)))$ 一样，数据自适应映射 $\Psi_{r_n}$ 也从非参数集合到 $[0,1]$ 路径可微；这个非参数集合由 $O\equiv(W,A,Y)$ 所有可能的数据生成分布 $P_{Q,g}$ 组成，其中 $g$ 一致远离 $0$（van der Laan 和 Luedtke，2015；Luedtke 和 van der Laan，2016a）。它在 $P_{Q,g}$ 处的有效影响曲线为 $\Delta_{r_n}(Q,g)$，其中对于每个规则 $\rho:\mathcal W\to\{0,1\}$，$\Delta_\rho(Q,g)$ 由下式刻画：
+\begin{equation}
+ \begin{aligned}
+ \Delta_\rho(Q,g)(O)={}&\bigl(Y-\bar Q_Y(\rho(W),W)\bigr)
+ \frac{I\{A=\rho(W)\}}{g(A\mid W)}\\
+ &+\bar Q_Y(\rho(W),W)-\Psi_\rho(P_{Q,g}).
+ \end{aligned}
+ \tag{24.5}
+\end{equation}
+用 $\ell$ 表示拟负对数似然损失函数，它由下式刻画：
+\[
+ -\ell(\bar Q_Y)(O)\equiv Y\log(\bar Q_Y(A,W))
+ +(1-Y)\log(1-\bar Q_Y(A,W)),
+\]
+并引入经过 $\bar Q_{n,Y}$ 的一维回归模型，对所有 $\epsilon\in\mathbb R$，规定
+\[
+ \logit\bigl(\bar Q_{n,Y}(\epsilon)(A,W)\bigr)
+ \equiv\logit\bigl(\bar Q_{n,Y}(A,W)\bigr)
+ +\epsilon\frac{I\{A=r_n(W)\}}{g_n(A\mid W)}.
+\]
+它专为估计 $\psi_{r_n,0}=\Psi_{r_n}(P_{Q_0,g_n})$ 而构造，因为
+\[
+ \left.\frac{\partial}{\partial\epsilon}\ell(\bar Q_{n,Y}(\epsilon))(O)\right|_{\epsilon=0}
+ =-(Y-\bar Q_{n,Y}(A,W))\frac{I\{A=r_n(W)\}}{g_n(A\mid W)}.
+\]
+换言之，其广义得分等于 $\Delta_{r_n}(Q_n,g_n)$ 中与下述集合正交的分量：关于 $P_{Q_n,g_n}$ 平方可积且中心化的 $W$ 的函数集合。这里，$Q_n$ 表示 $(W,Y(0),Y(1))$ 的任意分布，满足对每个 $a=0,1$，均有 $E_{Q_n}(Y(a)\mid W)=\bar Q_{n,Y}(a,W)$，$Q_n$ 几乎处处成立。
+
+最优波动参数为
+\[
+ \epsilon_n\in\argmin_{\epsilon\in\mathbb R}\frac1n\sum_{i=1}^n
+ \ell(\bar Q_{n,Y}(\varepsilon))(O_i)\frac{g_n(A_i\mid W_i)}{g_i(A_i\mid W_i)}.
+\]
+令 $\bar Q_{n,Y}^*\equiv\bar Q_{n,Y}(\epsilon_n)$，则 $\psi_{r_n,0}$ 的 TMLE 最终写为
+\[
+ \psi_n^*\equiv\frac1n\sum_{i=1}^n\bar Q_{n,Y}^*(r_n(W_i),W_i).
+\]

@@ -1,0 +1,173 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.08cm}
+\def\bsep{2.5cm}
+
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=0.6cm,inner sep=2pt,draw,fill=white,rounded corners=0pt];
+\tikzstyle{snode} = [minimum width=1.2cm,minimum height=0.4cm,inner sep=1pt,draw,thin];
+
+
+% illustration of the two sequences in a batch
+\begin{scope}
+
+\node [snode,anchor=west] (x00) at (0,0) {\scriptsize{$\langle \mathrm{SOS} \rangle$}};
+\node [snode,anchor=west] (x01) at ([xshift=0.5pt]x00.east) {\scriptsize{I}};
+\node [snode,anchor=west] (x02) at ([xshift=0.5pt]x01.east) {\scriptsize{think}};
+\node [snode,anchor=west] (x03) at ([xshift=0.5pt]x02.east) {\scriptsize{this}};
+\node [snode,anchor=west] (x04) at ([xshift=0.5pt]x03.east) {\scriptsize{movie}};
+\node [snode,anchor=west] (x05) at ([xshift=0.5pt]x04.east) {\scriptsize{is}};
+\node [snode,anchor=west] (x06) at ([xshift=0.5pt]x05.east) {\scriptsize{better}};
+\node [snode,anchor=west] (x07) at ([xshift=0.3cm]x06.east) {\scriptsize{than}};
+
+\node [snode,anchor=north west] (x10) at ([yshift=-1pt]x00.south west) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north west] (x11) at ([yshift=-1pt]x01.south west) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north west] (x12) at ([yshift=-1pt]x02.south west) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north west] (x13) at ([yshift=-1pt]x03.south west) {\scriptsize{$\langle \mathrm{SOS} \rangle$}};
+\node [snode,anchor=north west] (x14) at ([yshift=-1pt]x04.south west) {\scriptsize{I}};
+\node [snode,anchor=north west] (x15) at ([yshift=-1pt]x05.south west) {\scriptsize{really}};
+\node [snode,anchor=north west] (x16) at ([yshift=-1pt]x06.south west) {\scriptsize{like}};
+\node [snode,anchor=north west] (x17) at ([yshift=-1pt]x07.south west) {\scriptsize{reading}};
+
+\node [anchor=east] (seq1label) at (x00.west) {\scriptsize{Sequence 1}};
+\node [anchor=east] (seq2label) at (x10.west) {\scriptsize{Sequence 2}};
+
+\draw [decoration={brace,amplitude=4pt},decorate,thin] ([xshift=0.1cm,yshift=0.2cm]x00.north west) -- ([xshift=-0.1cm,yshift=0.2cm]x06.north east) node [pos=0.5,above,yshift=0.2cm] (kvcachelabel) {\footnotesize{KV Cache}};
+
+\draw [->] ([yshift=0.3cm]x07.north) .. controls +(north:1.8cm) and +(north:1.0cm) .. (kvcachelabel.north) node [pos=0.5,below,yshift=-0.0cm] {\scriptsize{attend}};
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm]x13.south) {\small{(a) Two sequences in a batch}};
+
+\end{scope}
+
+% standard memory allocation for self-attention
+\begin{scope}[yshift=-3.5cm]
+
+\node [snode,anchor=west,draw=red] (key1) at (0,0) {\scriptsize{than}};
+\node [snode,anchor=north,draw=blue] (key2) at ([yshift=-3pt]key1.south) {\scriptsize{reading}};
+
+\node [snode,anchor=west] (m00) at ([xshift=3.9cm]key1.east) {};
+\node [snode,anchor=west] (m01) at ([xshift=1pt]m00.east) {};
+\node [snode,anchor=west,pattern=north east lines] (m02) at ([xshift=1pt]m01.east) {};
+\node [snode,anchor=west,pattern=north east lines] (m03) at ([xshift=1pt]m02.east) {};
+\node [snode,anchor=north] (m10) at ([yshift=-3pt]m00.south) {};
+\node [snode,anchor=north] (m11) at ([yshift=-3pt]m01.south) {};
+\node [snode,anchor=north] (m12) at ([yshift=-3pt]m02.south) {};
+\node [snode,anchor=north] (m13) at ([yshift=-3pt]m03.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m20) at ([yshift=-3pt]m10.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m21) at ([yshift=-3pt]m11.south) {};
+\node [snode,anchor=north] (m22) at ([yshift=-3pt]m12.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m23) at ([yshift=-3pt]m13.south) {};
+\node [snode,anchor=north] (m30) at ([yshift=-3pt]m20.south) {};
+\node [snode,anchor=north] (m31) at ([yshift=-3pt]m21.south) {};
+\node [snode,anchor=north] (m32) at ([yshift=-3pt]m22.south) {};
+\node [snode,anchor=north] (m33) at ([yshift=-3pt]m23.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m40) at ([yshift=-3pt]m30.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m41) at ([yshift=-3pt]m31.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m42) at ([yshift=-3pt]m32.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m43) at ([yshift=-3pt]m33.south) {};
+\node [snode,anchor=north] (m50) at ([yshift=-3pt]m40.south) {\scriptsize{$\langle \mathrm{SOS} \rangle$}};
+\node [snode,anchor=north] (m51) at ([yshift=-3pt]m41.south) {\scriptsize{I}};
+\node [snode,anchor=north] (m52) at ([yshift=-3pt]m42.south) {\scriptsize{think}};
+\node [snode,anchor=north] (m53) at ([yshift=-3pt]m43.south) {\scriptsize{this}};
+\node [snode,anchor=north] (m60) at ([yshift=-3pt]m50.south) {\scriptsize{movie}};
+\node [snode,anchor=north] (m61) at ([yshift=-3pt]m51.south) {\scriptsize{is}};
+\node [snode,anchor=north] (m62) at ([yshift=-3pt]m52.south) {\scriptsize{better}};
+\node [snode,anchor=north] (m63) at ([yshift=-3pt]m53.south) {};
+\node [snode,anchor=north] (m70) at ([yshift=-3pt]m60.south) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north] (m71) at ([yshift=-3pt]m61.south) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north] (m72) at ([yshift=-3pt]m62.south) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north] (m73) at ([yshift=-3pt]m63.south) {\scriptsize{$\langle \mathrm{SOS} \rangle$}};
+\node [snode,anchor=north] (m80) at ([yshift=-3pt]m70.south) {\scriptsize{I}};
+\node [snode,anchor=north] (m81) at ([yshift=-3pt]m71.south) {\scriptsize{really}};
+\node [snode,anchor=north] (m82) at ([yshift=-3pt]m72.south) {\scriptsize{like}};
+\node [snode,anchor=north] (m83) at ([yshift=-3pt]m73.south) {};
+
+\node [anchor=south] (memlabel) at (m01.north east) {\footnotesize{Physical Memory Blocks}};
+
+\node [anchor=south] (usedlabel) at ([yshift=0.1cm,xshift=0.4cm]m03.north) {\tiny{used}};
+\draw [-] ([yshift=0.1cm]usedlabel.south) -- ([xshift=0.15cm,yshift=0.1cm]m03.center);
+
+\draw [decoration={brace,amplitude=4pt},decorate,thin] ([xshift=0.1cm,yshift=0cm]m03.north east) -- ([xshift=0.1cm,yshift=0cm]m43.south east) node [pos=0.5,right,rotate=90,xshift=-1.3cm,yshift=-0.4cm] (fragmem) {\scriptsize{fragmented memory}};
+
+\begin{pgfonlayer}{background}
+\node [draw,inner sep=1pt,red] [fit=(m50) (m63)] (memblock1) {};
+\node [draw,inner sep=1pt,blue] [fit=(m70) (m83)] (memblock2) {};
+\end{pgfonlayer}
+
+\draw [->,red] ([xshift=1pt,yshift=0.1cm]key1.east) -- ([xshift=-1pt,yshift=-0.15cm]memblock1.west);
+\draw [->,blue] ([xshift=1pt,yshift=-0.1cm]key2.east) -- ([xshift=-1pt,yshift=0.15cm]memblock2.west);
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm,xshift=-1.3cm]m80.south) {\small{(b) Memory allocation for KV caching in standard self-attention}};
+
+\end{scope}
+
+% standard memory allocation for paged attention
+\begin{scope}[yshift=-10.5cm]
+
+\node [snode,anchor=west,draw=red] (key1) at (0,0) {\scriptsize{than}};
+\node [snode,anchor=north,draw=blue] (key2) at ([yshift=-3pt]key1.south) {\scriptsize{reading}};
+
+\node [snode,anchor=west] (m00) at ([xshift=3.9cm]key1.east) {};
+\node [snode,anchor=west] (m01) at ([xshift=1pt]m00.east) {};
+\node [snode,anchor=west,pattern=north east lines] (m02) at ([xshift=1pt]m01.east) {};
+\node [snode,anchor=west,pattern=north east lines] (m03) at ([xshift=1pt]m02.east) {};
+\node [snode,anchor=north] (m10) at ([yshift=-3pt]m00.south) {\scriptsize{$\langle \mathrm{SOS} \rangle$}};
+\node [snode,anchor=north] (m11) at ([yshift=-3pt]m01.south) {\scriptsize{I}};
+\node [snode,anchor=north] (m12) at ([yshift=-3pt]m02.south) {\scriptsize{think}};;
+\node [snode,anchor=north] (m13) at ([yshift=-3pt]m03.south) {\scriptsize{this}};
+\node [snode,anchor=north,pattern=north east lines] (m20) at ([yshift=-3pt]m10.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m21) at ([yshift=-3pt]m11.south) {};
+\node [snode,anchor=north] (m22) at ([yshift=-3pt]m12.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m23) at ([yshift=-3pt]m13.south) {};
+\node [snode,anchor=north] (m30) at ([yshift=-3pt]m20.south) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north] (m31) at ([yshift=-3pt]m21.south) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north] (m32) at ([yshift=-3pt]m22.south) {\scriptsize{$\langle \mathrm{pad} \rangle$}};
+\node [snode,anchor=north] (m33) at ([yshift=-3pt]m23.south) {\scriptsize{$\langle \mathrm{SOS} \rangle$}};
+\node [snode,anchor=north,pattern=north east lines] (m40) at ([yshift=-3pt]m30.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m41) at ([yshift=-3pt]m31.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m42) at ([yshift=-3pt]m32.south) {};
+\node [snode,anchor=north,pattern=north east lines] (m43) at ([yshift=-3pt]m33.south) {};
+\node [snode,anchor=north] (m50) at ([yshift=-3pt]m40.south) {\scriptsize{movie}};
+\node [snode,anchor=north] (m51) at ([yshift=-3pt]m41.south) {\scriptsize{is}};
+\node [snode,anchor=north] (m52) at ([yshift=-3pt]m42.south) {\scriptsize{better}};
+\node [snode,anchor=north] (m53) at ([yshift=-3pt]m43.south) {};
+\node [snode,anchor=north] (m60) at ([yshift=-3pt]m50.south) {\scriptsize{I}};
+\node [snode,anchor=north] (m61) at ([yshift=-3pt]m51.south) {\scriptsize{really}};
+\node [snode,anchor=north] (m62) at ([yshift=-3pt]m52.south) {\scriptsize{like}};
+\node [snode,anchor=north] (m63) at ([yshift=-3pt]m53.south) {};
+\node [snode,anchor=north] (m70) at ([yshift=-3pt]m60.south) {};
+\node [snode,anchor=north] (m71) at ([yshift=-3pt]m61.south) {};
+\node [snode,anchor=north] (m72) at ([yshift=-3pt]m62.south) {};
+\node [snode,anchor=north] (m73) at ([yshift=-3pt]m63.south) {};
+\node [snode,anchor=north] (m80) at ([yshift=-3pt]m70.south) {};
+\node [snode,anchor=north] (m81) at ([yshift=-3pt]m71.south) {};
+\node [snode,anchor=north] (m82) at ([yshift=-3pt]m72.south) {};
+\node [snode,anchor=north] (m83) at ([yshift=-3pt]m73.south) {};
+
+\node [anchor=south] (memlabel) at (m01.north east) {\footnotesize{Physical Memory Blocks}};
+
+\node [anchor=south] (usedlabel) at ([yshift=0.1cm,xshift=0.4cm]m03.north) {\tiny{used}};
+\draw [-] ([yshift=0.1cm]usedlabel.south) -- ([xshift=0.15cm,yshift=0.1cm]m03.center);
+
+\begin{pgfonlayer}{background}
+\node [draw,inner sep=1pt,red] [fit=(m10) (m13)] (memblock1) {};
+\node [draw,inner sep=1pt,blue] [fit=(m30) (m33)] (memblock2) {};
+\node [draw,inner sep=1pt,red] [fit=(m50) (m53)] (memblock3) {};
+\node [draw,inner sep=1pt,blue] [fit=(m60) (m63)] (memblock4) {};
+\end{pgfonlayer}
+
+\draw [->,red] ([xshift=1pt,yshift=0.1cm]key1.east) -- ([xshift=-1pt]memblock1.west);
+\draw [->,red] ([xshift=1pt,yshift=-0.1cm]key1.east) -- ([xshift=-1pt]memblock3.west);
+\draw [->,blue] ([xshift=1pt,yshift=0.1cm]key2.east) -- ([xshift=-1pt]memblock2.west);
+\draw [->,blue] ([xshift=1pt,yshift=-0.1cm]key2.east) -- ([xshift=-1pt]memblock4.west);
+
+\node [anchor=north] (caption) at ([yshift=-0.3cm,xshift=-1.3cm]m80.south) {\small{(c) Memory allocation for KV caching in PagedAttention}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

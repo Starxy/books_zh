@@ -1,0 +1,70 @@
+% 原书分章PDF第7—9页：例27.2的敏感性界及解释。
+\begin{bookresult}{例}{27.2（续）}
+与上一例不同，这里将因果参数定义为
+\[
+ \psi_0=E\{E(Y\mid A=1,W)-E(Y\mid A=0,W)\},
+\]
+它是在条件（a）—（c）下识别 $\psi_{\mathrm{causal}}$ 的参数。van der Laan 和 Robins（2003）以及 van der Laan 和 Rose（2011）分别给出了 $\psi_0$ 的双重稳健估计方程估计量与靶向最小损失估计量。当结局回归和处理机制均被一致地估计，且收敛速度足够快时，这些估计量的影响曲线为
+\[
+ \mathrm{IC}_{\hat\Psi}(O)
+ =\frac{2A-1}{P_0(A\mid W)}\{Y-E(Y\mid A,W)\}+E(Y\mid A,W)-\psi_0.
+\]
+在实践中，要求结局回归和处理机制都得到足够好的估计，可能难以实现。近期一项工作给出了一种估计量：只要这两个对象中的一个得到良好估计，它就具有渐近线性，并能进行有效推断（van der Laan，2014b）。这一方法可以纳入敏感性分析，但这里不作讨论。
+
+现在寻找区间 $(L_{\mathrm{causal}}(\delta),U_{\mathrm{causal}}(\delta))$，使其在条件 $\delta$ 下包含 $\psi_{\mathrm{causal}}$。与上一例不同，这些界满足：如果可识别性假设成立，则 $L_{\mathrm{causal}}(\delta)=U_{\mathrm{causal}}(\delta)=0$。我们先推导 $E(Y_1)$ 的界，再将其推广到 $\psi_{\mathrm{causal}}=E(Y_1-Y_0)$。注意，
+\begin{equation}
+ \begin{aligned}
+ E(Y_1)=E\bigl\{&E(Y_1\mid A=0,W)P_0(A=0\mid W)\\
+ &+E(Y\mid A=1,W)P_0(A=1\mid W)\bigr\}.
+ \end{aligned}
+ \tag{27.5}
+\end{equation}
+假定，对于某个 $\delta>0$，下式关于协变量 $W$ 的抽取以概率1成立：
+\[
+ \begin{aligned}
+ -\delta E(Y\mid A=1,W)
+ &\leq E(Y_1\mid A=0,W)-E(Y\mid A=1,W)\\
+ &\leq\delta\{1-E(Y\mid A=1,W)\}.
+ \end{aligned}
+\]
+考虑下界。给定 $E(Y\mid A=1,W)>0$，上述条件表明，对于某个 $\delta>0$，有 $\frac{E(Y_1\mid A=0,W)}{E(Y\mid A=1,W)}\geq1-\delta$；也就是说，在每一个协变量层内，未处理者相对于已处理者发生 $Y_1=1$ 的相对风险至少为 $1-\delta$。类似地，上述条件还表明 $\frac{E(1-Y_1\mid A=0,W)}{E(1-Y\mid A=1,W)}\geq1-\delta$，这是一个类似的相对风险界，但此时针对的是 $Y_1=0$ 的风险。当 $\delta=1$ 时，上述条件重现了结局的已知界。对于罕见或极常见的结局，可以考虑在上述表达式中使用二维参数 $\delta$，其中一维对应下界，另一维对应上界。不过，为简单起见，这里不作探讨。将上述界代入式 (27.5)，可得
+\begin{equation}
+ \begin{aligned}
+ -\delta E\{E(Y\mid A=1,W)P_0(A=0\mid W)\}
+ &\leq E(Y_1)-E\{E(Y\mid A=1,W)\}\\
+ &\leq\delta E\{E(1-Y\mid A=1,W)P_0(A=0\mid W)\}.
+ \end{aligned}
+ \tag{27.6}
+\end{equation}
+
+现在回到 $\psi_{\mathrm{causal}}$ 的界。我们使用二维敏感性参数（sensitivity parameter）$\delta=(\delta^-,\delta^+)$，其中 $\delta^-$ 和 $\delta^+$ 均属于 $(0,1)$。如果以下两个不等式关于协变量 $W$ 的抽取以概率1成立，则条件 $\delta$ 得到满足：
+\[
+ \begin{aligned}
+ -\delta^-E(Y\mid A=0,W)
+ &\leq E(Y_0\mid A=1,W)-E(Y\mid A=0,W)\\
+ &\leq\delta^+E(1-Y\mid A=0,W),\\[2pt]
+ -\delta^-E(Y\mid A=1,W)
+ &\leq E(Y_1\mid A=0,W)-E(Y\mid A=1,W)\\
+ &\leq\delta^+E(1-Y\mid A=1,W).
+ \end{aligned}
+\]
+将式 (27.6) 直接推广即可表明，在条件 $\delta$ 下，
+\begin{equation}
+ \begin{aligned}
+ L_{\mathrm{causal}}(\delta)=-E\bigl\{&\delta^-E(Y\mid A=1,W)P_0(A=0\mid W)\\
+ &+\delta^+E(1-Y\mid A=0,W)P_0(A=1\mid W)\bigr\},\\
+ U_{\mathrm{causal}}(\delta)=E\bigl\{&\delta^+E(1-Y\mid A=1,W)P_0(A=0\mid W)\\
+ &+\delta^-E(Y\mid A=0,W)P_0(A=1\mid W)\bigr\}.
+ \end{aligned}
+ \tag{27.7}
+\end{equation}
+
+下文将观测人群中吸烟的个体称为“自然吸烟者”（natural smokers），将观测人群中不吸烟的人称为“自然不吸烟者”（natural nonsmokers）。我们还将风险比（risk ratio）简称为 RR。条件 $\delta$ 意味着，在协变量的每一层内，下列四个不等式成立：
+\begin{enumerate}
+\item $\dfrac{E(Y_1\mid A=0,W)}{E(Y\mid A=1,W)}\geq1-\delta^-$：如果违背事实而对所有人施加干预，使其均成为吸烟者，那么自然不吸烟者相对于自然吸烟者发生冠心病事件的 RR 至多为 $1-\delta^-$。
+\item $\dfrac{E(Y_0\mid A=1,W)}{E(Y\mid A=0,W)}\geq1-\delta^-$：如果违背事实而对所有人施加干预，使其均不吸烟，那么自然吸烟者相对于自然不吸烟者发生冠心病事件的 RR 至多为 $1-\delta^-$。
+\item $\dfrac{E(1-Y_1\mid A=0,W)}{E(1-Y\mid A=1,W)}\geq1-\delta^+$：如果违背事实而对所有人施加干预，使其均成为吸烟者，那么自然不吸烟者相对于自然吸烟者不发生冠心病事件的 RR 至多为 $1-\delta^+$。
+\item $\dfrac{E(1-Y_0\mid A=1,W)}{E(1-Y\mid A=0,W)}\geq1-\delta^+$：如果违背事实而对所有人施加干预，使其均不吸烟，那么自然吸烟者相对于自然不吸烟者不发生冠心病事件的 RR 至多为 $1-\delta^+$。
+\end{enumerate}
+下界 $L_{\mathrm{causal}}(\delta)$ 的有效性仅依赖于第1条和第4条。在第1条下，自然不吸烟者不会因某个未测量原因而得到过强的冠心病事件保护作用；在第4条下，吸烟者不会因某个未测量原因而过于容易发生冠心病事件。本数据集中的冠心病事件发生比例较低（$257/3154\approx0.08$），因此，较大的 $\delta^-$ 值应当比同样较大的 $\delta^+$ 值更合理。由于区间 $(L_{\mathrm{causal}}(\delta),U_{\mathrm{causal}}(\delta))$ 依赖于 $P_0$，就必须估计它，并将其估计的不确定性纳入区间 (27.4)。下一节将给出这一修改。
+\end{bookresult}

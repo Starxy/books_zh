@@ -1,0 +1,102 @@
+% 原书分章PDF第11—14页：18.4及三个小节，V个排序、仿照V折、定理18.3及原书证明省略说明。
+\section{独立同分布观测的特殊在线交叉验证选择器}
+
+本节考虑观测 $O(1),\ldots,O(n)$ 独立同分布的情形。此时，$P_{\theta_0,t,z}=\bar P_0$ 是一个不随时点 $t$ 改变的共同概率分布，不依赖于观测到的过去数据的汇总量，并属于某个模型 $\mathcal M$。在这种情形下，可以定义一个对不同排序取平均的交叉验证风险，从而提高相应交叉验证选择器的精度。本节给出这一小幅推广及其对应的预言不等式。
+
+\subsection{在线交叉验证选择器}
+
+考虑一个初始排序 $O(1),\ldots,O(n)$。一个一一对应且满射的置换 $\pi:\{1,\ldots,n\}\to\{1,\ldots,n\}$，定义了新的排序 $O(\pi(1)),\ldots,O(\pi(n))$。考虑 $V$ 个这样的置换 $\pi_1,\ldots,\pi_V$。令 $\widehat\Psi_k$ 为候选估计量，它们可以应用于由 $O(i)$ 组成的数据集，其中 $i$ 取遍 $\{1,\ldots,n\}$ 的某个子集，$k=1,\ldots,K(n)$。令 $P_{v,t_0}$ 为基于 $O(\pi_v(1)),\ldots,O(\pi_v(t_0))$ 的经验分布。给定候选估计量 $\widehat\Psi_k$，将其在线交叉验证风险定义为
+\[
+ R_{CV,n}(\widehat\Psi_k)
+ \equiv\frac{1}{V}\sum_{v=1}^{V}\frac{1}{n-n_l+1}
+ \sum_{t_0=n_l+1}^{n}
+ L(\widehat\Psi_k(P_{v,t_0-1}))(O(\pi_v(t_0))).
+\]
+相应的在线交叉验证选择器定义为
+\[
+ k_n=\argmin_k R_{CV,n}(\widehat\Psi_k).
+\]
+在线超级学习器定义为
+\[
+ \widehat\Psi(P_t)=\widehat\Psi_{k_t}(P_t),\qquad t=n_l,\ldots,.
+\]
+因此，在已有 $t$ 个观测时，它使用下标为 $k=k_t$ 的估计量 $\widehat\Psi_k$。
+
+\subsection{仿照 $V$ 折交叉验证}
+
+假设将 $n$ 个观测划分成 $V$ 个观测子组，并将置换 $\pi_v$ 定义为 $n$ 个观测的一种排序，使其中最后 $n/V$ 个观测属于第 $v$ 个子组，$v=1,\ldots,V$。此外，可以令 $n_l=n(1-p)$，其中 $p=1/V$。此时，在线交叉验证风险对应于如下性能评价：在各个 $V$ 种排序下，候选估计量在大小至少为 $n(1-p)$ 的特定于 $v$ 的训练样本上训练后，应用于相应的、特定于 $v$ 的验证样本中的每个观测。因此，在这种情形下，在线交叉验证风险与 $V$ 折交叉验证的交叉验证风险十分相似。
+
+\subsection{在线预言选择器}
+
+注意，在线交叉验证风险估计的是如下在线交叉验证真实风险：
+\[
+ \widetilde R_{CV,n}(\widehat\Psi_k)
+ =\frac{1}{V}\sum_{v=1}^{V}\frac{1}{n-n_l+1}
+ \sum_{t_0=n_l+1}^{n}\bar P_0L(\widehat\Psi_k(P_{v,t_0-1})),
+\]
+它在 $\psi_0$ 处取到最小值。$\widetilde R_{CV,n}(\widehat\Psi_k)$ 与 $\widetilde R_{CV,n}(\psi_0)$ 的差定义了候选估计量 $\widehat\Psi_k$ 与真实目标 $\psi_0$ 之间基于损失的差异度：
+\[
+ d_{0n}(\widehat\Psi_k,\psi_0)
+ =\frac{1}{V}\sum_{v=1}^{V}\frac{1}{n-n_l+1}
+ \sum_{t_0=n_l+1}^{n}
+ \bar P_0\{L(\widehat\Psi_k(P_{v,t_0-1}))-L(\psi_0)\}.
+\]
+在线预言选择器定义为使这一基于损失的差异度最小的选择：
+\[
+ \widetilde k_n=\argmin_k d_{0n}(\widehat\Psi_k,\psi_0).
+\]
+
+只要使用上述 $d_{0n}(\widehat\Psi_k,\psi_0)$ 的定义，并注意到此时 $Z(i)$ 为空，就可以直接照搬前面的定理18.1和18.2。为完整起见，我们在此给出定理18.1的对应结果。
+
+\begin{bookresult}{定理}{18.3}
+考虑前述关于 $O^n=(O(1),\ldots,O(n))$ 的分布 $P_0^n$ 的模型 $\mathcal M^n$，其中 $O(i)\sim_{\mathrm{iid}}\bar P_0$；目标参数 $\Psi^n:\mathcal M^n\to\bm{\Psi}$ 定义为 $\Psi^n(P^n)=\Psi(\bar P)$，其中 $\Psi:\mathcal M\to\bm{\Psi}$；并考虑 $\psi_0=\Psi(\bar P_0)$ 的损失函数 $L(\psi)(O)$。同时考虑前面定义的在线交叉验证选择器 $k_n$、在线预言选择器 $\widetilde k_n$，以及独立同分布数据的差异度 $d_{0n}(\widehat\Psi_k,\psi_0)$；该差异度通过对 $O^n$ 的 $V$ 个置换取平均来定义。
+
+\noindent\textbf{假设。}
+\begin{enumerate}[label=A\arabic*.,leftmargin=2.8em]
+\item 存在 $M_1<\infty$，使得
+\[
+ \sup_{\psi\in\bm{\Psi}}\sup_{i,O(i)}
+ \bigl|L(\psi)(O(i))-L(\psi_0)(O(i))\bigr|\le M_1,
+\]
+其中对 $O(i)$ 的上确界取遍分布 $\bar P_0$ 的某个支撑集。
+\item 存在 $M_2<\infty$，使得以概率1有
+\[
+ \sup_{\psi\in\bm{\Psi}}
+ \frac{\bar P_0\{L(\psi)-L(\psi_0)\}^2}
+ {\bar P_0\{L(\psi)-L(\psi_0)}
+ \le M_2<\infty.
+\]
+\item 假设存在一个可能递增的序列 $M_{3n}<\infty$（例如 $M_{3n}=\log n$），使得以趋于1的概率有
+\[
+ \frac{1}{M_{3n}}
+ <\frac{d_{0n}(\widehat\Psi_k,\psi_0)}
+ {E_0d_{0n}(\widehat\Psi_k,\psi_0)}
+ <M_{3n},\qquad \text{对所有 }k=1,\ldots,K(n).
+\]
+\item
+\[
+ nM_{3n}^{-3}\min_k E_0d_{0n}(\widehat\Psi_k,\psi_0)
+ \longrightarrow\infty,\qquad n\to\infty.
+\]
+\end{enumerate}
+
+\noindent\textbf{有限样本结果。}对于任意 $\delta>0$，存在通用常数 $C(\delta,M_1,M_2)<\infty$（即对 $n$ 及候选估计量的选择均通用），使得
+\[
+ d_{0n}(\widehat\Psi_{k_n},\psi_0)
+ \le(1+2\delta)d_{0n}(\widehat\Psi_{\widetilde k_n},\psi_0)+Z_n,
+\]
+其中 $Z_n=Z_{n1}+Z_{n2}$，当 $n\to\infty$ 时 $P_0^n(Z_{n2}=0)\to1$，且存在某个 $n_1<\infty$，使得对 $n>n_1$ 有
+\[
+ E_0Z_{n1}
+ \le C(\delta,M_1,M_2)\frac{M_{3n}^2(1+\log(K(n)))}{n}.
+\]
+若假设A4不成立，则有
+\[
+ d_{0n}(\widehat\Psi_{k_n},\psi_0)
+ =o_P(n^{-1}M_{3n}^3)+o_P(n^{-1}M_{3n}^2(1+\log K(n))).
+\]
+\end{bookresult}
+
+\begin{proof}
+本定理的证明与定理18.1的证明完全类似，因此省略。唯一的新观察是，本证明中的项 $R_{n,k},T_{n,k}$ 现在涉及对 $V$ 个项 $R_{n,k,v},T_{n,k,v}$（$v=1,\ldots,V$）取平均；对于每个 $v$，都可以对 $R_{n,k,v}$ 应用相同的证明。
+\end{proof}

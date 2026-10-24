@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1.5cm,y=1cm,>=Stealth,
+ch02v/.style={ellipse,draw=inkblue,minimum width=10mm,minimum height=8mm,font=\small},
+ch02target/.style={ch02v,fill=red!90}]
+\node[ch02v](ch0208n1)at(0,3){1};
+\node[ch02v](ch0208n2)at(2,3){2};
+\node[ch02target](ch0208n3)at(0,1.5){3};
+\node[ch02v](ch0208n4)at(2,1.5){4};
+\node[ch02target](ch0208n5)at(1,0){5};
+\draw[->,green!60!black](ch0208n1)--(ch0208n3);
+\draw[->,green!60!black](ch0208n2)--(ch0208n3);
+\draw[->,green!60!black](ch0208n2)--(ch0208n4);
+\draw[->,green!60!black](ch0208n4)--(ch0208n3);
+\draw[->,green!60!black](ch0208n3)--(ch0208n5);
+\end{tikzpicture}

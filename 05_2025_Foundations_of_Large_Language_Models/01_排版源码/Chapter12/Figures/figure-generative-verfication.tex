@@ -1,0 +1,60 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\ssep{0.3cm}
+
+\tikzstyle{lnode} = [minimum width=5.0cm,minimum height=1.7cm,draw,thick,inner sep=2pt]
+
+%%% scalar verifier
+\begin{scope}
+
+\node [lnode,anchor=west] (llm) at (0,0) {};
+\node [anchor=south] (llmlabel) at ([yshift=0.4cm]llm.south) {\large{LLM}};
+
+\node [anchor=center] (z) at ([xshift=0.3cm,yshift=-0.9cm]llm.south west) {$\mathbf{z}$};
+\node [anchor=center] (steps) at ([xshift=0.9cm]z.center) {$\bar{\mathbf{y}}_{\le t}$};
+%\node [anchor=center] (c) at ([xshift=0.9cm]steps.center) {$\mathbf{c}$};
+
+\draw [->,thick] ([yshift=0.3cm]z.center) -- ([yshift=0.8cm]z.center);
+\draw [->,thick] ([yshift=0.3cm]steps.center) -- ([yshift=0.8cm]steps.center);
+%\draw [->,thick] ([yshift=0.3cm]c.center) -- ([yshift=0.8cm]c.center);
+
+\node [anchor=north east,draw,dashed,minimum width=2.5cm,inner sep=2pt] (hidden) at ([xshift=-0.2cm,yshift=-0.2cm]llm.north east) {\scriptsize{最后隐层}};
+
+\node [anchor=south,draw,thick,minimum width=2.5cm] (classification) at ([yshift=0.9cm]hidden.north) {\scriptsize{分类头}};
+\draw [->,thick] ([yshift=0.05cm]hidden.north) -- ([yshift=-0.1cm]classification.south);
+
+\node [anchor=south,align=left] (prediction) at ([yshift=0.7cm]classification.north) {\footnotesize{以下结果的概率}\\[-0.1cm] \scriptsize{``Correct''}};
+\draw [->,thick] ([yshift=0.1cm]classification.north) -- (prediction.south);
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm]llm.south) {(a) 判别式验证器};
+
+\end{scope}
+
+%%% generative verifier
+\begin{scope}[xshift=7.5cm]
+
+\node [lnode,anchor=west] (llm) at (0,0) {};
+\node [anchor=south] (llmlabel) at ([yshift=0.4cm]llm.south) {\large{LLM}};
+
+\node [anchor=center] (z) at ([xshift=0.3cm,yshift=-0.9cm]llm.south west) {$\mathbf{z}$};
+\node [anchor=center] (steps) at ([xshift=0.9cm]z.center) {$\bar{\mathbf{y}}_{\le t}$};
+\node [anchor=center] (c) at ([xshift=0.9cm]steps.center) {$\mathbf{c}$};
+
+\draw [->,thick] ([yshift=0.3cm]z.center) -- ([yshift=0.8cm]z.center);
+\draw [->,thick] ([yshift=0.3cm]steps.center) -- ([yshift=0.8cm]steps.center);
+\draw [->,thick] ([yshift=0.3cm]c.center) -- ([yshift=0.8cm]c.center);
+
+\node [anchor=south] (critique) at ([xshift=-1.5cm,yshift=0.7cm]llm.north east) {\footnotesize{文本评议}};
+
+\draw [->,thick] ([yshift=-0.6cm]critique.south) -- ([yshift=-0.0cm]critique.south);
+
+
+\node [anchor=north] (caption) at ([yshift=-1.4cm]llm.south) {(b) 生成式验证器};
+
+
+\end{scope}
+	
+\end{tikzpicture}

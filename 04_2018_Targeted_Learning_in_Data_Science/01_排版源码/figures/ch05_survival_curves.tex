@@ -1,0 +1,43 @@
+% 图 5.1：完整保留原 PDF 六面板的矢量曲线、坐标与数值刻度；仅替换文字。
+\begin{tikzpicture}[x=.45mm,y=-.45mm]
+ \node[anchor=north west,inner sep=0pt] at (0,0)
+  {\includegraphics[width=142.2mm,height=220.95mm]{figures/ch05_survival_data.pdf}};
+ \node[font=\small\bfseries] at (87.9419,5.3762) {模拟 I};
+ \node[font=\footnotesize] at (87.5095,145.8763) {时间};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (118.5920,19.9610) {真值};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (118.5920,25.0130) {KM($A=1$)};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (118.5920,30.9341) {迭代 TMLE};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (118.5920,36.8519) {一步曲线};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (118.5920,41.9049) {初始拟合};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (280.8750,19.9610) {真值};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (280.8750,25.0130) {KM($A=1$)};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (280.8750,30.9341) {迭代 TMLE};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (280.8750,36.8519) {一步曲线};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (280.8750,41.9049) {初始拟合};
+ \node[font=\small\bfseries] at (249.9143,5.3762) {模拟 II};
+ \node[font=\small\bfseries] at (88.3520,171.9931) {模拟 I};
+ \node[font=\footnotesize,rotate=90] at (6.0087,235.6567) {相对效率};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,186.0019) {KM};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,191.3267) {初始拟合};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,196.6499) {一步生存曲线};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,201.9739) {迭代 TMLE};
+ \node[font=\small\bfseries] at (250.3253,171.9931) {模拟 II};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,186.0019) {KM};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,191.3267) {初始拟合};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,196.6499) {一步生存曲线};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,201.9739) {迭代 TMLE};
+ \node[font=\small\bfseries] at (89.0742,339.0281) {模拟 I};
+ \node[font=\footnotesize,rotate=90] at (5.4304,405.8917) {均方误差};
+ \node[font=\footnotesize,rotate=90] at (168.2678,405.8917) {均方误差};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,356.2309) {KM};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,361.5548) {初始拟合};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,366.8797) {一步生存曲线};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (102.9410,372.2020) {迭代 TMLE};
+ \node[font=\footnotesize] at (250.3239,145.8763) {时间};
+ \node[font=\footnotesize,rotate=90] at (168.2678,235.6568) {相对效率};
+ \node[font=\small\bfseries] at (251.0453,339.0281) {模拟 II};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,356.2309) {KM};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,361.5548) {初始拟合};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,366.8797) {一步生存曲线};
+ \node[anchor=west,font=\fontsize{6.2}{6.5}\selectfont] at (264.9110,372.2020) {迭代 TMLE};
+\end{tikzpicture}

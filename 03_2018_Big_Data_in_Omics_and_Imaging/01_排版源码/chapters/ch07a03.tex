@@ -1,0 +1,245 @@
+% 原书PDF第13页7.1.4.2至第19页7.1.4.3标题前。
+\subsubsection{信息几何中的因果推断表述}
+首先介绍随机变量变换的分布理论；它可用于推导信息几何中许多统计量的分布（Ross 2014）。
+
+\begin{booktheorem}{7.1}
+\textbf{随机变量函数的分布。}设 $P_X(x_1,\ldots,x_n)$ 为 $n$ 个随机变量 $X_1,\ldots,X_n$ 的联合密度函数，$Y_1,\ldots,Y_n$ 是它们的函数，定义为
+\begin{equation}
+\begin{aligned}
+Y_1&=f_1(X_1,\ldots,X_n),\\
+Y_2&=f_2(X_1,\ldots,X_n),\\
+&\hspace{3em}\vdots\\
+Y_n&=f_n(X_1,\ldots,X_n).
+\end{aligned}
+\tag{7.30}
+\end{equation}
+假设函数 $f_i$ 的偏导数连续，其Jacobian行列式在所有点上均非零，即
+\[
+J(x_1,\ldots,x_n)\ne0.
+\]
+其中
+\[
+J(x_1,\ldots,x_n)=\begin{vmatrix}
+\dfrac{\partial f_1}{\partial x_1}&\dfrac{\partial f_1}{\partial x_2}&\cdots&\dfrac{\partial f_1}{\partial x_n}\\[5pt]
+\dfrac{\partial f_2}{\partial x_1}&\dfrac{\partial f_2}{\partial x_2}&\cdots&\dfrac{\partial f_2}{\partial x_n}\\
+\vdots&\vdots&\vdots&\vdots\\
+\dfrac{\partial f_n}{\partial x_1}&\dfrac{\partial f_n}{\partial x_2}&\cdots&\dfrac{\partial f_n}{\partial x_n}
+\end{vmatrix}.
+\]
+再假设所有函数 $f_i$ 均可逆，式 (7.30) 的解唯一：
+\begin{equation}
+\begin{aligned}
+x_1&=g_1(y_1,\ldots,y_n),\\
+x_2&=g_2(y_1,\ldots,y_n),\\
+&\hspace{3em}\vdots\\
+x_n&=g_n(y_1,\ldots,y_n).
+\end{aligned}
+\tag{7.31}
+\end{equation}
+则随机变量 $Y_1,Y_2,\ldots,Y_n$ 的联合密度函数为
+\begin{equation}
+P_Y(y_1,\ldots,y_n)=\frac{P_X(x_1,\ldots,x_n)}{|J(x_1,\ldots,x_n)|}.
+\tag{7.32}
+\end{equation}
+\end{booktheorem}
+
+\begin{bookexample}{7.9}
+设随机变量 $X$ 在 $[0,1]$ 上均匀分布，密度函数为 $p_X(x)=1$，且 $Y=e^X$。则 $Y$ 的密度函数为
+\[
+P_Y(y)=\frac1{e^x}=\frac1y.
+\]
+\end{bookexample}
+
+下面讨论如何用信息几何理论评估因果关系（Daniusis et al. 2010；Janzing et al. 2012, 2014）。考虑两个变量 $X$ 与 $Y$，假设不存在共同原因，目标是判断 $X$ 导致 $Y$ 还是 $Y$ 导致 $X$。原因与结果的不对称性在于：若 $X$ 导致 $Y$，则自然界中产生分布 $P(X)$ 与条件分布 $P(Y\mid X)$ 的机制彼此独立，二者不含关于对方的信息。这是仅根据两个观测变量推断因果关系的基本公设（Janzing and Schölkopf 2010；Lemeire and Janzing 2012；Janzing et al. 2014）。本节只考虑两个变量之间的确定性关系：
+\begin{equation}
+Y=f(X).
+\tag{7.33}
+\end{equation}
+进一步假定 $f$ 单调递增。两个变量因果推断的基本原理，是下列公设，即输入与函数的机制独立。
+
+\par\medskip\Needspace{4\baselineskip}\noindent\textbf{公设7.1}\par
+若 $X\to Y$，则 $X$ 的分布独立于将 $X$ 映射到 $Y$ 的函数 $f$。
+
+这一公设尚未形式化。问题是如何形式化地度量一个分布与一个函数之间的相依性。在信息几何中，$f$ 散度（$f$-divergence）是两个分布或函数差异程度的非负度量（Gibbs and Su 2002）。可用于量化分布间差异或距离的度量很多，包括总变差距离 $|P-Q|$、K–L距离 $D(P\Vert Q)$、$\chi^2$ 散度 $\chi^2(P\Vert Q)$、Hellinger散度 $H_\alpha(P\Vert Q)$ 及Rényi散度 $D_\alpha(P\Vert Q)$（Sason and Verdú 2016）。K–L距离是广泛使用的分布距离度量，这里将用它评估两个变量之间的因果关系。
+
+为说明因果推断信息几何方法的基本思想，先进一步研究指数族的信息几何（Amari 2011）。考虑指数族的密度函数
+\begin{equation}
+P(x,\theta)=\exp\left\{\sum_i\theta_iT_i(x)-\psi(\theta)\right\}.
+\tag{7.34}
+\end{equation}
+定义
+\begin{equation}
+\eta_i=E[T_i(x)].
+\tag{7.35}
+\end{equation}
+Legendre变换及其逆变换为（习题5）
+\begin{equation}
+\eta_i=\frac{\partial\psi(\theta)}{\partial\theta_i}
+\tag{7.36}
+\end{equation}
+和
+\begin{equation}
+\theta_i=\frac{\partial\phi(\eta)}{\partial\eta_i},
+\tag{7.37}
+\end{equation}
+其中
+\begin{equation}
+\phi(\eta)=E[\log p(x,\theta)]
+\tag{7.38}
+\end{equation}
+为负熵。由式 (7.34) 与式 (7.38) 可得
+\begin{equation}
+\begin{aligned}
+\phi(\eta)&=E\left[\sum_i\theta_iT_i(x)-\psi(\theta)\right]\\
+&=\sum_i\theta_iE[T_i(x)]-\psi(\theta)\\
+&=\sum_i\theta_i\eta_i-\psi(\theta).
+\end{aligned}
+\tag{7.39}
+\end{equation}
+熵度量随机性的程度。最大熵原理通过最大化熵或不确定性进行统计推断（Stein et al. 2015）。换言之，所估计的分布应为均匀分布：它最好地刻画全部已知信息，同时不对未知信息作任何假设。由式 (7.37)，最大化熵意味着
+\begin{equation}
+\theta_i=\frac{\partial\varphi(\eta)}{\partial\eta_i}=0.
+\tag{7.40}
+\end{equation}
+式 (7.34) 与式 (7.40) 表明，若分布属于指数族，则由最大熵确定的分布为
+\begin{equation}
+P(x,0)=\exp[-\psi(0)],
+\tag{7.41}
+\end{equation}
+即均匀分布。分布 $P(x,\theta)$ 与均匀分布 $P(x,0)$ 之间的K–L距离为
+\begin{equation}
+D(P(x,\theta)\Vert P(x,0))=-H(\theta)+\psi(0).
+\tag{7.42}
+\end{equation}
+
+设原因 $X$ 的密度函数为 $P(x,\theta)$。没有任何额外信息时，可用 $P(x,\theta)$ 的最大熵推断最接近它的分布。式 (7.41) 表明，推断得到的分布是均匀分布 $P(x,0)$。为便于表述，令 $u(x)$ 表示原因 $X$ 在 $[0,1]$ 上的均匀分布；令 $Y=f(x)$、$x=f^{-1}(y)=g(y)$，$v(y)$ 表示 $Y$ 在 $[0,1]$ 上的均匀分布。显然，
+\[
+\frac{df^{-1}(y)}{dy}=g'(y)=\frac1{f'(x)}.
+\]
+再设 $u_f$ 为 $X$ 在 $f$ 下的像，$v_g$ 为 $Y$ 在 $g$ 下的像（图7.1b）。由定理7.1，二者的密度函数分别为
+\begin{equation}
+u_f(y)=\frac{u(x)}{f'(x)}=u(f^{-1}(y))g'(y)=g'(y)
+\tag{7.43}
+\end{equation}
+和
+\begin{equation}
+v_g(x)=\frac{v(y)}{g'(y)}=\frac{v(f(x))}{1/f'(x)}=f'(x).
+\tag{7.44}
+\end{equation}
+
+公设7.1指出，分布 $P(x,\theta)$ 独立于函数 $f$。因此，在信息几何中，连接 $P(X)$ 与 $U(x)$ 两点的线，正交于连接 $U(x)$ 与映射 $f$ 下的像 $V_g(x)$ 的线（图7.1b）。由勾股定理，得到结论7.4。
+\input{figures/ch07a_fig01}
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.4：信息几何中的因果表述}\par
+若 $X\to Y$，则下列勾股定理成立：
+\begin{equation}
+D\bigl(P(X)\Vert V_g(X)\bigr)
+=D(P(X)\Vert U(X))+D\bigl(U(x)\Vert V_g(X)\bigr),
+\tag{7.45}
+\end{equation}
+其中 $P(x)$ 为原因 $X$ 的密度函数，$U(x)$ 为 $X$ 的均匀分布密度函数，$V_g(x)$ 为 $Y$ 在映射 $g$ 下的像的密度函数。可以证明，结论7.4蕴含Daniušis et al.（2010）论文中的条件（2）。
+
+\par\medskip\Needspace{4\baselineskip}\noindent\textbf{结论7.5}\par
+式 (7.45) 的勾股定理要求
+\begin{equation}
+\int_0^1\log f'(x)P(x)\,dx=\int_0^1\log f'(x)\,dx.
+\tag{7.46}
+\end{equation}
+\begin{bookproof}
+根据定义，
+\[
+\begin{aligned}
+D(P(x)\Vert V_g(x))
+&=\int_0^1P(x)\log\frac{P(x)}{f'(x)}\,dx\\
+&=\int_0^1P(x)\log P(x)\,dx-\int_0^1P(x)\log f'(x)\,dx,\\
+D(P(x)\Vert U(x))&=\int P(x)\log P(x)\,dx=\int_0^1P(x)\log P(x)\,dx,\\
+D(U(x)\Vert V_g(x))&=\int_0^1\log\frac1{f'(x)}\,dx=-\int_0^1\log f'(x)\,dx.
+\end{aligned}
+\]
+上述等式清楚地表明，结论7.4与结论7.5等价。
+\end{bookproof}
+
+\begin{bookexample}{7.10}
+若 $P(x)$ 为均匀分布，则对任意函数 $f(x)$，式 (7.45) 与式 (7.46) 都成立。
+\end{bookexample}
+
+\begin{bookexample}{7.11}
+假设 $P(x)=N(0,\sigma^2)$，且 $f(x)=e^x$。则
+\[
+V_g(x)=e^x,
+\]
+\[
+\begin{aligned}
+D(P(X)\Vert V_g(X))&=\int P(x)\log P(x)\,dx-E[X]\\
+&=\int P(x)\log P(x)\,dx-0=\int P(x)\log P(x)\,dx,\\
+D(P(X)\Vert U(X))&=\int P(x)\log P(x)\,dx,\\
+D(U(X)\Vert V_g(X))&=\int\log\frac1{e^x}\,dx=-\int x\,dx.
+\end{aligned}
+\]
+显然，
+\[
+D(P(X)\Vert V_g(X))\ne D(P(X)\Vert U(X))+D(U(X)\Vert V_g(X)).
+\]
+这表明，当非线性映射为指数函数时，结论7.4和结论7.5没有检出因果关系的功效。类似于概率空间中的勾股定理（图7.1a），可用结论7.5证明结论7.6。
+\end{bookexample}
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.6}\par
+若 $X\to Y$ 且 $Y=f(X)$，则
+\begin{equation}
+\Cov_U\left(\log\frac{P(X)}{U(X)},\log\frac{U(X)}{V_g(X)}\right)=0.
+\tag{7.47}
+\end{equation}
+事实上，根据定义，
+\[
+\begin{aligned}
+\Cov_U\left(\frac{P(X)}{U(X)},\log\frac{V_g(X)}{U(X)}\right)
+&=\int P(x)\log f'(x)\,dx\\
+&\hspace{1em}-\int P(x)\,dx\int\log f'(x)\,dx\\
+&=\int P(x)\log f'(x)\,dx-\int\log f'(x)\,dx=0.
+\end{aligned}
+\]
+
+下面考察分布 $P(Y)$、$V(Y)$ 与 $U_f(Y)$ 是否满足勾股定理。假设 $X$ 均匀分布，由定理7.1，$Y=f(X)$ 的分布为
+\begin{equation}
+P(y)=\frac{P(x)}{f'(x)}=\frac1{f'(x)}=g'(y).
+\tag{7.48}
+\end{equation}
+再计算这三个分布之间的两两K–L距离：
+\begin{equation}
+\begin{aligned}
+D(P(Y)\Vert V(Y))&=\int P(y)\log\frac{P(y)}{V(y)}\,dy\\
+&=\int P(y)\log P(y)\,dy\\
+&=\int g'(y)\log g'(y)\,dy.
+\end{aligned}
+\tag{7.49}
+\end{equation}
+由式 (7.43)，有
+\begin{equation}
+D(V(Y)\Vert U_f(Y))=\int\log\frac1{g'(y)}\,dy,
+\tag{7.50}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+D(P(Y)\Vert U_f(Y))&=\int P(y)\log\frac{P(y)}{g'(y)}\,dy\\
+&=\int g'(y)\log\frac{g'(y)}{g'(y)}\,dy=0.
+\end{aligned}
+\tag{7.51}
+\end{equation}
+由于 $P\ne V$ 且 $V\ne U_f$，结论7.3蕴含
+\begin{equation}
+D(P(Y)\Vert V(Y))>0
+\tag{7.52}
+\end{equation}
+和
+\begin{equation}
+D(V(Y)\Vert U_f(Y))>0.
+\tag{7.53}
+\end{equation}
+结合式 (7.51)—(7.53)，可得
+\begin{equation}
+D(P(Y)\Vert V(Y))+D(V(Y)\Vert U_f(Y))>D(P(Y)\Vert U_f(Y)).
+\tag{7.54}
+\end{equation}
+这表明，若 $Y$ 不导致 $X$，则分布 $P(Y)$、$V(Y)$ 和 $U_f(Y)$ 不满足勾股定理。
+\FloatBarrier

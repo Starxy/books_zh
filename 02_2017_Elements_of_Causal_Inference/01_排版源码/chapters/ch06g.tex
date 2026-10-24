@@ -1,0 +1,173 @@
+% 原书第 113—118 页；6.6 后半。
+\begin{remark}[不变条件分布的刻画]
+考虑结构赋值为
+\[
+ X_j:=f_j(\PA_j,N_j)
+\]
+的结构因果模型 $\mathfrak C$，以及干预 $\dox{X_k:=x_k}$。与 Pearl［2009，第 3.2.2 节］等文献中的做法相似，可以构造一个新模型 $\mathfrak C^*$：它与 $\mathfrak C$ 相同，但多一个指示干预是否发生的变量 $I$（另见第 6.3 节“干预变量”一段，原书第 95 页）。更准确地说，$I$ 是 $X_k$ 的父节点，除此之外没有其他相邻节点。对应的结构赋值为
+\[
+ \begin{aligned}
+ I&:=N_I,\\
+ X_j&:=f_j(\PA_j,N_j),\qquad j\ne k,\\
+ X_k&:=\begin{cases}
+ f_k(\PA_k,N_k),&I=0,\\
+ x_k,&\text{否则},
+ \end{cases}
+ \end{aligned}
+\]
+其中，例如可以令 $N_I$ 服从满足 $P(I=0)=P(I=1)=0.5$ 的 Bernoulli 分布，其他分布也可以。因此，$I=0$ 对应观测情形，$I=1$ 对应干预情形。更准确地说，由式 (6.10)，有
+\[
+ \begin{aligned}
+ p^{\mathfrak C^*}(x_1,\ldots,x_d\mid I=0)
+ &=p^{\mathfrak C^*;\dox{I:=0}}(x_1,\ldots,x_d)\\
+ &=p^{\mathfrak C}(x_1,\ldots,x_d),
+ \end{aligned}
+\]
+类似地，
+\begin{equation}
+ p^{\mathfrak C^*}(x_1,\ldots,x_d\mid I=1)
+ =p^{\mathfrak C;\dox{X_k:=x_k}}(x_1,\ldots,x_d).
+ \tag{6.16}
+\end{equation}
+对 $\mathfrak C^*$ 使用马尔可夫条件，对于变量 $A$ 和变量集 $\mathbf B$，于是有
+\[
+ \begin{aligned}
+ A\indep_{\mathcal G^*}I\mid\mathbf B
+ &\Longrightarrow
+ p^{\mathfrak C^*}(a\mid\mathbf b,I=0)
+ =p^{\mathfrak C^*}(a\mid\mathbf b,I=1)\\
+ &\Longrightarrow
+ p^{\mathfrak C}(a\mid\mathbf b)
+ =p^{\mathfrak C;\dox{X_k:=x_k}}(a\mid\mathbf b).
+ \end{aligned}
+\]
+右侧说明：给定 $\mathbf B$ 后 $A$ 的条件分布 $P_{A\mid\mathbf B}$，在对 $X_k$ 的干预下保持不变。
+\end{remark}
+
+现在可以继续前面的论证。只要集合 $\mathbf Z$ 满足
+\begin{equation}
+ Y\indep_{\mathcal G^*}I\mid X,\mathbf Z,
+ \qquad \mathbf Z\indep_{\mathcal G^*}I,
+ \tag{6.17}
+\end{equation}
+式 (6.15) 就成立。下标 $\mathcal G^*$ 表示，要求 d-分离陈述在 $\mathcal G^*$ 中成立。上述讨论立即给出下面命题的前两项。
+
+\input{figures/ch06_05}
+
+\begin{proposition}[有效调整集]
+考虑变量 $\mathbf X$ 上的结构因果模型，其中 $X,Y\in\mathbf X$，且 $Y\notin\PA_X$。以下三项成立。
+\begin{enumerate}[label=(\roman*)]
+ \item \textbf{父节点调整（parent adjustment）：}集合 $\mathbf Z:=\PA_X$ 是 $(X,Y)$ 的有效调整集。
+ \item \textbf{后门准则（backdoor criterion）：}任意集合 $\mathbf Z\subseteq\mathbf X\setminus\{X,Y\}$，如果同时满足下列条件，就是 $(X,Y)$ 的有效调整集：
+ \begin{itemize}
+ \item $\mathbf Z$ 不包含 $X$ 的任何后代节点；
+ \item $\mathbf Z$ 阻断所有从“后门”进入 $X$ 的、从 $X$ 到 $Y$ 的路径，即以 $X\leftarrow\cdots$ 开始的路径，见图 6.5。
+ \end{itemize}
+ \item \textbf{向必要条件推进：}任意集合 $\mathbf Z\subseteq\mathbf X\setminus\{X,Y\}$，如果同时满足下列条件，就是 $(X,Y)$ 的有效调整集：
+ \begin{itemize}
+ \item $\mathbf Z$ 不包含从 $X$ 到 $Y$ 的有向路径上任何节点的后代节点；但允许那些不位于任何从 $X$ 到 $Y$ 的有向路径上的 $X$ 的后代节点；
+ \item $\mathbf Z$ 阻断所有从 $X$ 到 $Y$ 的非有向路径。
+ \end{itemize}
+\end{enumerate}
+\end{proposition}
+\begin{quote}\small
+\textbf{译注：}第 (iii) 项原文括号中的例外，应理解为允许 $X$ 的某些旁支后代，而不能据此允许有向因果路径上其他节点的后代。例如图 6.5 中的 $F$ 可以纳入，但不能据此将 $D$ 的后代 $G$ 或 $Y$ 的后代 $H$ 纳入。这一限定避免将“$X$ 的后代”这一例外作过宽解读。
+\end{quote}
+
+只有第三项［Shpitser et al., 2010；Perkovic et al., 2015］需要进一步解释。先取一个有效调整集 $\mathbf Z$，例如由后门准则得到的集合。可以向其中加入任意满足 $Z_0\indep Y\mid X,\mathbf Z$ 的节点 $Z_0$，因为此时
+\[
+ \begin{aligned}
+ \sum_{\mathbf z,z_0}p(y\mid x,\mathbf z,z_0)p(\mathbf z,z_0)
+ &=\sum_{\mathbf z}p(y\mid x,\mathbf z)\sum_{z_0}p(\mathbf z,z_0)\\
+ &=\sum_{\mathbf z}p(y\mid x,\mathbf z)p(\mathbf z).
+ \end{aligned}
+\]
+事实上，命题 6.41 的第 (iii) 项刻画了所有有效调整集［Shpitser et al., 2010］。
+
+\begin{example}[线性高斯系统中的调整]
+考虑变量集 $\mathbf V$ 上的结构因果模型 $\mathfrak C$，其中 $\{X,Y\},\mathbf Z\subseteq\mathbf V$。有时，我们希望用一个实数概括从 $X$ 到 $Y$ 的因果效应，而不是考察所有 $x$ 对应的 $p^{\mathfrak C;\dox{X:=x}}(y)$。二值治疗 $X$ 的情形已经给出一个例子，见式 (6.12)。若随机变量连续，又该怎么办？作为一阶近似，可以考察这一分布的期望，再对 $x$ 求导：
+\begin{equation}
+ \frac{\partial}{\partial x}\EE^{\mathfrak C;\dox{X:=x}}[Y].
+ \tag{6.18}
+\end{equation}
+一般而言，它仍是 $x$ 的函数。但在线性高斯系统中，这个函数是常数。假设 $\mathbf Z$ 是 $(X,Y)$ 的有效调整集。若 $\mathbf V$ 服从高斯分布，则 $Y\mid X=x,\mathbf Z=\mathbf z$ 也服从高斯分布，其均值为
+\begin{equation}
+ \EE[Y\mid X=x,\mathbf Z=\mathbf z]=ax+\mathbf b^{\mathsf t}\mathbf z,
+ \tag{6.19}
+\end{equation}
+其中 $a$、$\mathbf b$ 是某些系数。由式 (6.13) 可得（见习题 6.63）：
+\begin{equation}
+ \frac{\partial}{\partial x}\EE^{\mathfrak C;\dox{X:=x}}[Y]=a.
+ \tag{6.20}
+\end{equation}
+式 (6.19) 中的 $a$ 可以通过两种方法求得。（1）使用路径系数法：若从 $X$ 到 $Y$ 恰好有一条有向路径，$a$ 就等于这条路径上的系数之积；若不存在有向路径，$a=0$；若存在多条路径，则可用 Wright 公式［Wright, 1934］计算 $a$。（2）直接计算条件均值 (6.19)。若并不知道联合分布，而只知道从中抽取的样本，则可以将 $Y$ 对 $X$ 与 $\mathbf Z$ 回归，读取 $X$ 的回归系数，以此估计式 (6.20)；另见代码片段 6.43。
+\end{example}
+\begin{quote}\small
+\textbf{译注：}原式 (6.19) 隐含变量已中心化或截距为零。对于一般非中心化高斯分布，条件均值还包含常数截距；它不影响式 (6.20) 的导数结论。
+\end{quote}
+
+\par\noindent\begin{minipage}{\linewidth}
+\begin{codesnippet}
+下面的代码从图 6.5 所示结构的结构因果模型中，生成容量为 $n=100$ 的独立同分布样本；系数见代码。因为已知背后的模型，量 (6.20) 的真值可通过将路径 $X\to D\to Y$ 上的系数相乘得到，本例为 $(-2)\cdot(-1)=2$，见代码第 8、10 行。现在假装不知道结构赋值的精确形式，即不知道系数，只给定样本和图结构（见图 6.5）。那么，将 $Y$ 对 $X$ 与调整集 $\mathbf Z$ 回归，就能估计式 (6.20)。如果 $\mathbf Z$ 是有效调整集，就得到无偏估计量。代码中，$\mathbf Z=\varnothing$ 导致有偏估计，见第 15 行；只有 $\mathbf Z=\{K\}$ 与 $\mathbf Z=\{F,C,K\}$ 是有效调整集，分别见第 19、23 行。
+\begin{lstlisting}[language=R]
+# 从结构因果模型导出的分布中生成样本
+set.seed(1); n <- 100
+C <- rnorm(n)
+A <- 0.8*rnorm(n)
+K <- A + 0.1*rnorm(n)
+X <- C - 2*A + 0.2*rnorm(n)
+F <- 3*X + 0.8*rnorm(n)
+D <- -2*X + 0.5*rnorm(n)
+G <- D + 0.5*rnorm(n)
+Y <- 2*K - D + 0.2*rnorm(n)
+H <- 0.5*Y + 0.1*rnorm(n)
+#
+lm(Y~X)$coefficients
+# (Intercept)---------X
+# 0.09724282 1.27941073
+#
+lm(Y~X+K)$coefficients
+# (Intercept)---------X----------K
+# 0.01428974 2.07038809 2.16964827
+#
+lm(Y~X+F+C+K)$coefficients
+# (Intercept)---------X----------F-----------C----------K
+# 0.01687018 1.90495456 0.05901385 -0.02260164 2.18276488
+\end{lstlisting}
+\end{codesnippet}
+\end{minipage}\par
+
+下面简要讨论\textbf{倾向评分匹配（propensity score matching）}［Rosenbaum and Rubin, 1983］。接下来的注复述 Pearl［2009，第 11.3.5 节］的论证。
+
+\begin{remark}[倾向评分匹配]
+考虑变量 $\mathbf X=(X,Y,\mathbf Z)$ 上的结构因果模型，其中 $\mathbf Z=(Z_1,Z_2,Z_3)$，图结构如下。
+\input{figures/ch06_propensity}
+例如，由父节点调整（命题 6.41）可知，集合 $\{Z_1,Z_2,Z_3\}$ 是一个有效调整集，即
+\begin{equation}
+ p^{\mathfrak C;\dox{X:=x}}(y)
+ =\sum_{z_1,z_2,z_3}p^{\mathfrak C}(y\mid x,z_1,z_2,z_3)
+ p^{\mathfrak C}(z_1,z_2,z_3).
+ \tag{6.21}
+\end{equation}
+不过，有时 $X$ 的值并不“直接”依赖 $\mathbf Z$，而只通过一个实值的\textbf{倾向评分（propensity score）}$L:=L(\mathbf Z)=L(Z_1,Z_2,Z_3)$ 依赖于它。这意味着“$X\indep\mathbf Z\mid L(\mathbf Z)$”；更形式化地说，对于所有 $\mathbf z,x$ 以及 $\ell=L(\mathbf z)$，有
+\[
+ p(\mathbf z\mid\ell,x)=p(\mathbf z\mid\ell).
+\]
+若 $X$ 是表示治疗或不治疗的二值选择，例如可以取 $L(\mathbf z)=p(x=1\mid\mathbf Z=\mathbf z)$。于是，由式 (6.21)，
+\begin{equation}
+ \begin{aligned}
+ p^{\mathfrak C;\dox{X:=x}}(y)
+ &=\sum_{\mathbf z}p^{\mathfrak C}(y\mid x,\mathbf z)p^{\mathfrak C}(\mathbf z)\\
+ &=\sum_{\mathbf z}\sum_{\ell}p^{\mathfrak C}(y\mid x,\mathbf z)
+ p^{\mathfrak C}(\ell)p^{\mathfrak C}(\mathbf z\mid\ell)\\
+ &=\sum_{\mathbf z}\sum_{\ell}p^{\mathfrak C}(y\mid\ell,x,\mathbf z)
+ p^{\mathfrak C}(\ell)p^{\mathfrak C}(\mathbf z\mid\ell,x)\\
+ &=\sum_{\ell}p^{\mathfrak C}(y\mid\ell,x)p^{\mathfrak C}(\ell).
+ \end{aligned}
+ \tag{6.22}
+\end{equation}
+在总体层面，式 (6.21) 和式 (6.22) 都能正确计算干预分布。关键在于，数据有限时，式 (6.22) 可能给出比式 (6.21) 更好的估计：虽然需要估计函数 $L$，但所得条件分布 $p^{\mathfrak C}(y\mid x,\ell)$ 的维数，可能低于 $p^{\mathfrak C}(y\mid x,\mathbf z)$。实际中，往往将 $\ell$ 值“相似”的样本进行匹配，以计算式 (6.22)。函数 $L$ 的估计与匹配过程，是重要的实践细节。这一思想适用于任意数量的协变量。
+
+从这个意义上说，倾向评分匹配可以是一种有用的技巧，能够改善统计表现；而在总体层面的考察中，它并不改变问题。
+\end{remark}
+\FloatBarrier

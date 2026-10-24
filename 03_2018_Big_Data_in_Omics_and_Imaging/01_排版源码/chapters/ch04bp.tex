@@ -1,0 +1,111 @@
+% 原PDF181—183页全部14道习题；184页为出版社标识页。
+\clearpage
+\section*{习题}
+\addcontentsline{toc}{section}{习题}
+\markright{习题}
+
+\begin{enumerate}[label=\textbf{习题\arabic*.},leftmargin=5em]
+\item 考虑例4.1的原始计数数据。假设 $P=0.75$，使用上分位数标准化计算标准化因子和标准化后的计数。
+
+\item 证明
+\[
+\operatorname{var}(M_g(j,r))=\frac{D_j-n_{gj}}{D_jn_{gj}}+
+\frac{D_r-n_{gr}}{D_rn_{gr}}.
+\]
+\item 考虑例4.1的原始计数数据。使用M值截尾均值计算标准化因子和标准化后的计数。
+
+\item 证明优化问题（4.1A49）
+\[
+\begin{aligned}
+\max_{q_\theta(\theta)}\quad&F(q_z^{(u+1)}(Z),q_\theta(\theta))\\
+\text{约束为}\quad&\int q_\theta(\theta)\,d\theta=1
+\end{aligned}
+\]
+的解为
+\[
+q_\theta^{(u+1)}(\theta)=\frac1{C_\theta}P(\theta^{(u)})
+\exp\left[\int q_z(Z^{(u+1)})\log P(Z,R,Q\mid\theta^{(u)})\,dZ\right],
+\]
+其中
+\[
+C_\theta=\int P(\theta^{(u)})\exp\left[
+\int q_z(Z^{(u+1)})\log P(Z,R,Q\mid\theta^{(u)})\,dZ\right].
+\]
+\item 证明
+\[
+\E_\theta[\log\theta_i]=\psi(\alpha_i)-\psi\left(\sum_{j=1}^{M}\alpha_j\right),
+\qquad\psi(\alpha)=\frac{d\Gamma(\alpha)/d\alpha}{\Gamma(\alpha)},
+\]
+其中 $\theta$ 服从Dirichlet分布。
+
+\item 证明Dirichlet分布（式（4.A64））的均值为
+\[
+\E_\theta[\theta_i^{(u+1)}]=\frac{\alpha_i^{(u+1)}}{\sum_{i=0}^{M}\alpha_i^{(u+1)}}.
+\]
+\item 证明结论4.4，即有缺口比对RNA测序数据的变分贝叶斯算法。
+
+\item 证明Beta分布的均值为
+\[
+\E[\phi]=\frac{\beta_{i1}}{\beta_{i1}+\beta_{i2}}.
+\]
+\item 证明具有泊松分布的对数线性模型，其对数似然取得极大值的必要条件为
+\[
+\frac{\partial l(N_{ig}\mid\alpha_g)}{\partial\alpha_g}
+=\sum_i[N_{ig}y_i-N_{ig}^{(0)}y_i\exp(y_i\alpha_g)]=0,
+\]
+\[
+\begin{aligned}
+\frac{\partial l(N_{ig}\mid\alpha_{gm})}{\partial\alpha_{gm}}
+&=\sum_i\left[N_{ig}I_{(i\in C_m)}-N_{ig}^{(0)}I_{(i\in C_m)}
+\exp\left(\sum_m\alpha_{gm}I_{(i\in C_m)}\right)\right]\\
+&=0.
+\end{aligned}
+\]
+\item 证明
+\[
+\E[U(\theta)]=0,
+\]
+以及
+\[
+\operatorname{var}(U(\theta))=-\E\left[
+\frac{\partial^2U}{\partial\theta\,\partial\theta^T}\right]=I(\theta).
+\]
+\item 证明检验基因 $g$ 与二分类或多分类结局关联的得分统计量为
+\[
+S_{cg}=\sum_{m=1}^{M}\frac{
+\left[\sum_{i\in C_m}(N_{ig}-N_{ig}^{(0)})\right]^2}{
+\sum_{i\in C_m}N_{ig}^{(0)}}.
+\]
+\item 证明：若 $y_{gi}\sim\mathrm{NB}(r_i,p)$，则
+$n_{gA}\sim\mathrm{NB}(\sum_{i=1}^{m_A}r_i,p)$。
+
+\item 证明
+\[
+\|U\Lambda V^T-U\Sigma V^T\|_F^2=\|\Lambda-\Sigma\|_F^2.
+\]
+\item 证明以下两个优化问题等价：
+\[
+\begin{aligned}
+L(\delta_i,b^i,Z)={}&\frac12f(\delta_i,b^i)\\
+&{}+\lambda_1\left(\sum_{j=1}^{i-1}\|Z_j^1\|_2+\sum_{j=i+1}^{K}\|Z_j^1\|_2\right)\\
+&{}+\lambda_2\sum_{l=1}^{r_i}\|Z_l^2\|_2
++\sum_{j=1}^{i-1}\mu_j^T(\delta_{ji}-Z_j^1)\\
+&{}+\sum_{j=i+1}^{K}\mu_j^T(\delta_{ji}-Z_j^1)\\
+&{}+\frac{\rho_1}{2}\left(\sum_{j=1}^{i-1}\|\delta_{ji}-Z_j^1\|_2^2
++\sum_{j=i+1}^{K}\|\delta_{ji}-Z_j^1\|_2^2\right)\\
+&{}+\sum_{l=1}^{r_i}\pi_l^T(b_l^i-Z_l^2)
++\frac{\rho_2}{2}\sum_{l=1}^{r_i}\|b_l^i-Z_l^2\|_2^2,
+\end{aligned}
+\]
+以及
+\[
+\begin{aligned}
+L(\delta_i,b^i,Z)={}&\frac12f(\delta_i,b^i)\\
+&{}+\lambda_1\left(\sum_{j=1}^{i-1}\|Z_j^1\|_2+\sum_{j=i+1}^{K}\|Z_j^1\|_2\right)
++\lambda_2\sum_{l=1}^{r_i}\|Z_l^2\|_2\\
+&{}+\frac{\rho_1}{2}\left(\sum_{j=1}^{i-1}\|\delta_{ji}-Z_j^1+u_j\|_2^2
++\sum_{j=i+1}^{K}\|\delta_{ji}-Z_j^1+u_j\|_2^2\right)\\
+&{}+\frac{\rho_2}{2}\sum_{l=1}^{r_i}\|b_l^i-Z_l^2+v_l\|_2^2.
+\end{aligned}
+\]
+\end{enumerate}

@@ -1,0 +1,277 @@
+% 原书分章 PDF 第 9—12 页：第 25.3.2 节，完整定理与引理证明。
+\subsection{CV-TMLE 的渐近正态性}
+
+下面的定理在不对 $P_0$ 作光滑性假设的情况下，沿序列 $h_n\to0$ 建立
+$\Psi_{h_n}(P_0)$ 的 CV-TMLE
+$\psi^*_{n,h_n}=E_{B_n}\Psi_{h_n}(\mathbf P^*_{n,B_n,h_n})$
+的渐近正态性。
+
+\begin{bookresult}{定理}{25.1}
+作如下假设。
+\begin{itemize}
+\item 令 $r(n)$ 为趋于零的速率，使对某个
+$P_1\in\mathcal M$，所有 $h>0$ 都有 $R_h(P_1,P_0)=0$，且
+\begin{equation}
+ \|D_h^*(\mathbf P^*_{n,B_n,h})-D_h^*(P_1)\|_{P_0}
+ =O_P(h^{-d/2}r(n)).
+\tag{25.3}
+\end{equation}
+\item 令 $h_n\to_p0$，
+$r(n)\{1-\log(h_n^{d/2}r(n))\}\to0$，且
+\begin{equation}
+ \lim_{h\to0}h^dP_0\{D_h^*(P_1)\}^2=\sigma_0^2.
+\tag{25.4}
+\end{equation}
+\item 存在确定性序列 $\tilde h_n$，使 $h_n/\tilde h_n\to_p1$。
+\item 考虑函数类
+\[
+ \mathcal F_n=
+ \{D(K_{1,h,x_0},P_{n,B_n,\epsilon,h})
+  -D(K_{1,h,x_0},P_1):h,\epsilon\},
+\]
+并令 $F_n$ 为其包络函数。假定对某个整数 $p>0$，
+\[
+ \sup_\Lambda N(\delta|F_n|,\mathcal F_n,L^2(\Lambda)
+ =O(\delta^{-p}).
+\]
+\item
+\begin{equation}
+ \sqrt{nh_n^d}\,E_{B_n}\int_y
+ K(y)R_{x_0+h_ny}(\mathbf P^*_{n,B_n,h_n},P_0)\,dy=o_P(1).
+\tag{25.5}
+\end{equation}
+\end{itemize}
+则
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\bigl(
+ E_{B_n}\Psi_{h_n}(\mathbf P^*_{n,B_n,h_n})-\Psi_{h_n}(P_0)\bigr)\\
+ &\quad=\sqrt{nh_n^d}(P_n-P_0)D_{h_n}^*(P_1)+o_P(1)\\
+ &\qquad+\sqrt{nh_n^d}\,E_{B_n}\int_y
+ K(y)R_{x_0+h_ny}(\mathbf P^*_{n,B_n,h_n},P_0)\,dy,
+\end{aligned}
+\]
+且
+\[
+ \sqrt{nh_n^d}\bigl(
+ E_{B_n}\Psi_{h_n}(\mathbf P^*_{n,B_n,h_n})-\Psi_{h_n}(P_0)\bigr)
+ \Rightarrow_dN(0,\sigma_0^2)).
+\]
+\end{bookresult}
+
+回顾 $D_h^*(P)=D(K_{h,x_0},P)$，其中 $K\mapsto D(K,P)$ 关于 $K$ 线性。
+例如，$O=(X,O_1)$，且
+\[
+ D_h^*(P)=K_{h,x_0}D_1(P)
+ +\int K_{h,x_0}(X)D_2(P)(x,O_1)\,dx,
+\]
+其中
+\[
+ \int K_{h,x_0}(x)D_2(P)(x,O_1)\,dx
+ =\int K(y)D_2(P)(x_0+hy,O_1)\,dy.
+\]
+此时，式 (25.3) 左端通常由
+$\|K_{h,x_0}D_1(\mathbf P^*_{n,B_n,h})-K_{h,x_0}D_1(P_1)\|_{P_0}$
+控制，可选择 $r(n)$ 使
+\[
+\begin{aligned}
+ \biggl(\int_y K^2(y)E_0\bigl(
+ &\{D_1(\mathbf P^*_{n,B_n,h_n})-D_1(P_1)\}^2
+ \mid X=x_0+h_ny\bigr)\\
+ &\quad p_{0,X}(x_0+h_ny)\,dy\biggr)^{0.5}
+ =O_P(r(n)).
+\end{aligned}
+\]
+
+满足 $R_{20}(P_1,P_0)=0$ 的最简单情形是 $P_1=P_0$。
+在许多问题中，有双重稳健结构
+\[
+\begin{aligned}
+ R_x(P,P_0)=\int_y
+ &(H_1(P)-H_1(P_0))(x,y)\\
+ &\quad(H_2(P)-H_2(P_0))(x,y)H_3(P,P_0)(x,y)\,d\mu(y).
+\end{aligned}
+\]
+此时，只要 $H_1(P_1)=H_1(P_0)$ 或 $H_2(P_1)=H_2(P_0)$ 之一成立，
+$R_x(P,P_1)$ 就等于零。例如，考虑 $H_2(P_1)=H_2(P_0)$ 的情形。有如下分解：
+\[
+\begin{aligned}
+ R_x(\mathbf P_n,P_0)
+ &=\int_y(H_1(\mathbf P_n)-H_1(P_1))
+   (H_2(\mathbf P_n)-H_2(P_0))(x,y)\\
+ &\qquad\qquad H_3(\mathbf P_n,P_0)(x,y)\,d\mu(y)\\
+ &\quad+\int_y(H_1(P_1)-H_1(P_0))
+   (H_2(\mathbf P_n)-H_2(P_0))(x,y)\\
+ &\qquad\qquad H_3(\mathbf P_n,P_0)(x,y)\,d\mu(y).
+\end{aligned}
+\]
+因此，若右端两项都为 $o_P((nh^d)^{-0.5})$，就满足条件 (25.9)。
+这将要求 $H_2(\mathbf P_n)$ 以快于 $(nh^d)^{-0.5}$ 的速率收敛到 $H_2(P_0)$。
+
+\begin{proof}[定理 25.1 的证明]
+我们有
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\bigl(
+ E_{B_n}\Psi_{h_n}(\mathbf P^*_{n,B_n,h_n})-\Psi_{h_n}(P_0)\bigr)\\
+ &\quad=\sqrt{nh^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ D_{h_n}^*(\mathbf P^*_{n,B_n,h_n})\\
+ &\qquad+\sqrt{nh_n^d}\,E_{B_n}
+ R_{h_n}(\mathbf P^*_{n,B_n,h_n},P_0).
+\end{aligned}
+\]
+考虑主导经验过程项。令
+$f_{n,B_n}\equiv
+D_{h_n}^*(\mathbf P^*_{n,B_n,h_n})-D_{h_n}^*(P_1))$。
+令 $K_{1,h,x_0}(x)=K((x-x_0)/h)$，从而
+$K_{h,x_0}=h^{-d}K_{1,h,x_0}$。
+注意，$f_{n,B_n}=h_n^{-d}g_{n,B_n}$，其中
+$g_{n,B_n}=D(K_{1,h_n,x_0},P^*_{n,B_n,h_n})
+-D(K_{1,h_n,x_0},P_1)$。
+令 $p=\sum_{i=1}^{n}B_n(i)/n$。有
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ \bigl(D_{h_n}^*(\mathbf P^*_{n,B_n,h_n}-D_{h_n}^*(P_1)\bigr)\\
+ &\quad=\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)f_{n,B_n}\\
+ &\quad=\sqrt{nh_n^d}\,h_n^{-d}E_{B_n}
+ (P^1_{n,B_n}-P_0)g_{n,B_n}\\
+ &\quad=p^{-0.5}h_n^{-0.5d}\sqrt{np}\,E_{B_n}
+ (P^1_{n,B_n}-P_0)g_{n,B_n}.
+\end{aligned}
+\]
+对于给定的 $B_n$，以 $P^0_{n,B_n}$ 为条件，将下面的引理 25.2 应用于
+$\sqrt{np}(P^1_{n,B_n}-P_0)g_{n,B_n}$。
+其中，$g_{n,B_n}$ 仅通过 $\theta_n=(\epsilon_n,h_n)$ 具有随机性。
+为简化记号，将该函数 $g_{n,B_n}$ 记为 $g_{n,\theta_n}$。
+由于 $g_{n,\theta_n}\in\mathcal F_n=\{g_{n,\theta}:\theta\}$，
+$\mathcal F_n$ 的确如引理 25.2 中那样是有限维的。
+此外，根据 $D_{h_n}^*(P)$ 关于 $o$ 和 $P\in\mathcal M$ 一致地被
+$Ch_n^{-d}$ 控制的假设，$\mathcal F_n$ 中任意函数都被统一常数 $C$ 控制。
+因此，对于某个 $C<\infty$，$\mathcal F_n$ 的包络函数 $F_n$ 满足
+$\|F_n\|_{P_0}<C<\infty$。
+由假设，$\|g_{n,\theta_n}\|_{P_0}=O_P(h_n^{d/2}r(n))$。
+应用引理 25.2 得
+\[
+ \sqrt{np}(P^1_{n,B_n}-P_0)g_{n,\theta_n}
+ =O_P\bigl(h_n^{d/2}r(n)\{1-\log(h_n^{d/2}r(n))\}\bigr).
+\]
+由于 $B_n$ 只有有限多个实现，这证明了
+\[
+ \sqrt{np}\,E_{B_n}(P^1_{n,B_n}-P_0)g_{n,B_n}
+ =O_P\bigl(h_n^{d/2}r(n)\{1-\log(h_n^{d/2}r(n))\}\bigr).
+\]
+由此可见，
+\[
+\begin{aligned}
+ &p^{-0.5}h_n^{-0.5d}\sqrt{np}\,E_{B_n}
+ (P^1_{n,B_n}-P_0)g_{n,B_n}\\
+ &\qquad=O_P\bigl(r(n)\{1-\log(h_n^{d/2}r(n))\}\bigr).
+\end{aligned}
+\]
+由假设，右端为 $o_P(1)$。因此，我们已证明
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ \bigl(D_{h_n}^*(\mathbf P^*_{n,B_n,h_n})-D_{h_n}^*(P_1)\bigr)\\
+ &\qquad=o_P\bigl(r(n)\{1-\log(h_n^{d/2}r(n))\}\bigr)=o_P(1).
+\end{aligned}
+\]
+现在得到
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\bigl(
+ E_{B_n}\Psi_{h_n}(\mathbf P^*_{n,B_n,h_n})-\Psi_{h_n}(P_0)\bigr)\\
+ &\quad=\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)D_{h_n}^*(P_1)+o_P(1)\\
+ &\qquad+\sqrt{nh_n^d}\,E_{B_n}\int_x K_{h_n,x_0}(x)
+ R_x(\mathbf P^*_{n,B_n,h_n},P_0)\,dx.
+\end{aligned}
+\]
+利用假设 (25.4)，由三角阵列的 Lindeberg 定理可知，对于确定性序列 $\tilde h_n$，
+\[
+ \sqrt{n\tilde h_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ D_{\tilde h_n}^*(P_1)\Rightarrow_dN(0,\sigma_0^2).
+\]
+由假设，存在确定性序列 $\tilde h_n$，使 $h_n/\tilde h_n\to_p1$。有
+\[
+\begin{aligned}
+ &\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)D_{h_n}^*(P_1)\\
+ &\quad-\sqrt{n\tilde h_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ D_{\tilde h_n}^*(P_1)\\
+ &=n^{0.5}\{\sqrt{h_n^d}-\sqrt{\tilde h_n^d}\}
+ E_{B_n}(P^1_{n,B_n}-P_0)D_{\tilde h_n}^*(P_1)\\
+ &\quad+\sqrt{nh_n^d}\,E_{B_n}(P^1_{n,B_n}-P_0)
+ \{D_{h_n}^*(P_1)-D_{\tilde h_n}^*(P_1)\}.
+\end{aligned}
+\]
+第一项可写为 $\sqrt{h_n^d/\tilde h_n^d}-1$ 乘以
+$(n\tilde h_n^d)^{0.5}E_{B_n}(P^1_{n,B_n}-P_0)D_{\tilde h_n}^*(P_1)$。
+由于该标量趋于零，且经验过程项收敛到 $N(0,\sigma_0^2)$，第一项为 $o_P(1)$。
+第二项可按上述经验过程项的方法分析，因此也为 $o_P(1)$。
+现在考虑二阶余项
+$\sqrt{nh_n^d}\,E_{B_n}R_{h_n}(\mathbf P^*_{n,B_n,h_n},P_0)$。
+它等于
+\[
+ \sqrt{nh_n^d}\,E_{B_n}\int_y K(y)
+ R_{x_0+hy}(\mathbf P^*_{n,B_n,h},P_0)\,dy.
+\]
+由假设 (25.5)，后者为 $o_P(1)$。定理得证。
+\end{proof}
+
+证明中使用了以下引理。
+
+\begin{bookresult}{引理}{25.2}
+令 $G_n(f)=\sqrt n(P_n-P_0)f$ 为 $f(O_i)$ 的标准化经验均值。
+令 $f_{n,\epsilon_n}\in\mathcal F_n=\{f_{n,\epsilon}:\epsilon\}$，
+其中 $\epsilon$ 在 $\mathbb R^p$ 的一个有界集合中变化，$f_{n,\epsilon}$ 为非随机函数，即不基于数据 $O_1,\ldots,O_n$。
+假定 $\|f_{n,\epsilon_n}\|_{P_0}=o_P(r_n)$，
+其中速率 $r_n$ 满足 $r_n\log r_n^{-1}\to0$ 和 $r_nn^{0.5}\to\infty$。
+假定 $\mathcal F_n$ 的包络函数 $F_n$ 满足 $\|F_n\|_{P_0}\leq M_n$。
+假定对某个整数 $p>0$，
+\[
+ \sup_\Lambda N(\delta|F_n|,\mathcal F_n,L^2(\Lambda)=O(\delta^{-p}).
+\]
+则
+\[
+ E_0|G_n(f_{n,\epsilon_n})|
+ =O\bigl(M_nr_n(1+\log r_n^{-1})\bigr).
+\]
+因此，若 $r_n=o(1)$ 且 $M_n<M<\infty$，则
+$G_n(f_{n,\epsilon_n})=o_P(1)$。
+\end{bookresult}
+
+\begin{proof}
+为简化记号，将 $f_{n,\epsilon_n}$ 记为 $f_n$。
+应用 van der Vaart 和 Wellner（2011）的定理，得到
+\begin{equation}
+ E_0|G_n(f_n)|
+ \leq J(\delta_n,\mathcal F_n)
+ \left(1+\frac{J(\delta_n,\mathcal F_n)}
+ {\delta_n^2n^{0.5}\|F_n\|_{P_0}}\right)\|F_n\|_{P_0},
+\tag{25.6}
+\end{equation}
+其中可选择 $\delta_n=r_n$。
+利用一致覆盖数的上界 $\epsilon^{-p}$，可得
+$J(\delta_n,\mathcal F_n)
+=-p^{0.5}\int_0^{\delta_n}(\log\epsilon)^{0.5}\,d\epsilon$。
+我们可以保守地用 $\log\epsilon$ 控制 $(\log\epsilon)^{0.5}$，并利用
+\[
+ \int_0^{\delta_n}\log\epsilon\,d\epsilon
+ =\delta_n-\delta\log\delta_n
+ =\delta(1+\log(\delta_n^{-1})).
+\]
+这表明 $J(\delta,\mathcal F_n)\leq\delta_n(1+\log\delta_n^{-1})$。
+若 $J(\delta_n,\mathcal F_n)=O(\delta_n^2n^{0.5})$，
+则式 (25.6) 的主导项为
+$J(\delta_n,\mathcal F_n)\|F_n\|_{P_0}$。
+利用上述 $J(\delta_n,\mathcal F_n)$ 的界可知，只要
+$\delta_n(1+\log\delta_n^{-1})=O(\delta_n^2n^{0.5})$，
+或等价地，$\delta_n(1+\log\delta_n^{-1})=O(\delta_nn^{0.5})$，
+这一点就成立。由假设，
+$\delta_nn^{0.5}\to\infty$ 且 $\delta_n\log\delta_n^{-1}\to0$，
+因此它总是成立。由此得到
+\[
+ E_0|G_n(f_n)|=O(M_nr_n(1+\log r_n^{-1})),
+\]
+即所述的界。
+\end{proof}

@@ -1,0 +1,73 @@
+% 原书分章PDF第1—4页：完整章首导言及21.1.1。
+\begingroup
+\raggedbottom
+\lstset{numbers=none,frame=none}
+\chapter{网络相依数据中的单时点干预}
+\chapterauthors{Oleg Sofrygin、Elizabeth L. Ogburn 和 Mark J. van der Laan}
+\chapteraffiliations{O. Sofrygin（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部，101 Haviland Hall，\#7358，Berkeley，CA 94720；邮箱：\texttt{sofrygin@berkeley.edu}。\\
+E. L. Ogburn：美国约翰斯·霍普金斯大学布隆伯格公共卫生学院生物统计学系，615 N. Wolfe Street，Baltimore，MD 21230；邮箱：\texttt{eogburn@jhu.edu}。\\
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部与统计学系，101 Haviland Hall，\#7358，Berkeley，CA 94720；邮箱：\texttt{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_21}。}
+
+考虑一项研究，我们收集由社交网络连接的 $N$ 个单位的数据。对于每个单位 $i=1,\ldots,N$，记录基线协变量（$W_i$）、暴露（$A_i$）和感兴趣的结局（$Y_i$）信息。我们还观察集合 $F_i$，其中包含 $\{1,\ldots,N\}\setminus\{i\}$ 中与单位 $i$ 相连、且可能影响 $i$ 的单位。集合 $F_i$ 构成“$i$ 的朋友”。我们允许 $i$ 的朋友总数 $|F_i|$ 随 $i$ 而异。此外，假定 $|F_i|$ 经 $1/N$ 缩放后趋于零。例如，$F_i$ 可以表示社交网络中 $i$ 的所有朋友，也可以表示在研究尽早启动 HIV 治疗的效果时，$i$ 的所有性伴侣。
+
+本章允许下列类型的单位间相依性：（a）每个单位的暴露可以依赖其自身的基线协变量，也可以依赖 $F_i$ 中其他单位的基线协变量；（b）每个单位的结局可以依赖其自身的基线协变量和暴露协变量，也可以依赖 $F_i$ 中其他单位的这些协变量。我们建模方法中的一个重要要素是，假定单位间的任何相依性都由已知网络完整描述。具体而言，假定 $i$ 的暴露和结局对其他单位的依赖，仅限于 $i$ 的朋友集合。
+
+\begin{sourcebox}
+此外，本章重点估计由社交网络连接的单位在单时点随机干预下的样本平均处理效应。我们首先提出一个半参数统计模型，然后定义一般的单时点干预，其中可以包括针对 $N$ 个暴露的多种静态、动态或随机干预。接着说明，如何利用靶向最小损失估计（targeted minimum loss-based estimation，TMLE）框架，估计这些干预的样本平均处理效应。最后，我们介绍一项模拟研究，展示这一估计框架在现实世界中的潜在应用。
+\end{sourcebox}
+
+\section{网络数据建模}
+
+设 $P_0^N$ 为所观察的、相互连接的 $N$ 个单位的真实数据生成分布。$\bm O=(\bm W,\bm A,\bm Y)\sim P_0^N$ 表示这 $N$ 个单位的随机向量，且对 $i=1,\ldots,N$，有 $O_i=(W_i,A_i,Y_i)$。假定网络结构信息（network profile）$\bm F=(F_1,\ldots,F_N)$ 已在基线记录，即 $\bm F\in\bm W$。另假定所有 $Y_i$ 均为有界随机变量。全部 $N$ 个单位之间都可能存在相依性，这意味着一般只能观察到从 $P_0^N$ 抽取的一次实现 $\bm O$。因此，为估计 $P_0^N$，需要作出额外假设。
+
+\subsection{统计模型}
+
+令 $\mathcal M$ 表示包含 $P_0^N$ 的统计模型。要从一次抽样中学习 $\bm O$ 的真实分布，需要一系列统计假设。这些假设对属于 $\mathcal M$ 的可能分布集合施加限制。随后，感兴趣的统计量（目标参数）便可以定义为从 $\mathcal M$ 到实数轴 $\RR$ 的映射 $\Psi$。具体而言，对任意 $P_0^N\in\mathcal M$，假定：
+\begin{enumerate}[label=\textbf{A\arabic*.},leftmargin=2.8em]
+\item 给定 $\bm F$ 后，每个 $W_i$ 至多依赖于 $\bm W=(W_1,\ldots,W_N)$ 中另外 $K$ 个观测。形式化地，若 $(W_j:j\in F_i)$ 为所有与 $W_i$ 相依的观测集合，则有 $\max_i|F_i|\le K$，且 $K$ 不得依赖于 $N$。\footnote{这一假设也称为 $\bm W$ 的弱相依性。}
+\item 给定 $\bm W$ 后，$\bm A=(A_1,\ldots,A_N)$ 中各分量彼此独立；
+\item 给定 $(\bm A,\bm W)$ 后，$(Y_1,\ldots,Y_N)$ 彼此独立。
+\item 记 $F_i^*=F_i\cup\{i\}$。对每个 $i=1,\ldots,N$，条件分布 $P(Y_i\mid\cdot)$ 仅通过 $(A_j,W_j:j\in F_i^*)$ 依赖于 $(\bm W,\bm A)$。类似地，对每个 $i=1,\ldots,N$，条件分布 $P(A_i\mid\cdot)$ 仅通过 $(W_j:j\in F_i^*)$ 依赖于 $\bm W$。
+\end{enumerate}
+
+为简化记号，并进一步控制各个 $P(Y_i\mid\cdot)$ 和 $P(A_i\mid\cdot)$ 的维度，我们再假定以下限制：
+\begin{description}[leftmargin=2.8em,labelsep=.6em]
+\item[B1.] 每个 $P(Y_i\mid\cdot)$ 均为某些已知汇总量 $a_i^s((A_j,W_j):j\in F_i^*)$ 和 $w_i^s(W_j:j\in F_i^*)$ 的函数。每个 $P(A_i\mid\cdot)$ 均为汇总量 $w_i^s(W_j:j\in F_i^*)$ 的函数。假定 $w_i^s(\cdot)$ 与 $a_i^s(\cdot)$ 是某些已知函数，映射到维度不随 $i$ 改变、也不依赖于 $N$ 的欧氏集合，其中 $a_i^s$ 映射到某个共同空间 $\mathcal A^s$，$w_i^s$ 映射到某个共同空间 $\mathcal W^s$。
+\end{description}
+我们对上述汇总量采用下列简记：
+\begin{equation}
+ \begin{aligned}
+ W_i^s&=w_i^s(\bm W)=w_i^s(W_j:j\in F_i^*)\in\mathcal W^s,\\
+ A_i^s&=a_i^s(\bm A,\bm W)=a_i^s((A_j,W_j):j\in F_i^*)\in\mathcal A^s,
+ \end{aligned}
+ \tag{21.1}
+\end{equation}
+注意，只要维度固定、对所有 $i$ 相同且不依赖于 $N$，$A_i^s$ 和 $W_i^s$ 就可以是单位朋友数据的任意函数。第21.5和21.4节讨论网络数据的模拟与分析时，将给出这类汇总量的例子。
+
+将汇总量应用于观测数据 $\bm O$，得到如下似然：
+\begin{equation}
+ p^N(\bm O)
+ =\left[\prod_{i=1}^N p(Y_i\mid A_i^s,W_i^s)\right]
+  \left[\prod_{i=1}^N p(A_i\mid W_i^s)\right]p(\bm W).
+ \tag{21.2}
+\end{equation}
+
+现在对 $\mathcal M$ 作出最后一项限制：
+\begin{description}[leftmargin=2.8em,labelsep=.6em]
+\item[C1.] 假定给定汇总量 $(A_i^s,W_i^s)$ 的固定取值后，所有 $Y_i$ 均从同一个分布 $Q_Y$ 抽取，其密度为 $q_Y(Y_i\mid a^s,w^s)$，$i=1,\ldots,N$。类似地，假定给定汇总量 $W_i^s=w^s$ 的某个固定取值后，所有 $A_i$ 均从密度为 $g(A_i\mid w^s)$ 的同一个分布抽取，$i=1,\ldots,N$。
+\end{description}
+上述假设意味着，若两个单位 $i$ 和 $j$ 的基线汇总量 $W_i^s$ 与 $W_j^s$ 取值相同，暴露汇总量 $A_i^s$ 与 $A_j^s$ 的取值也相同，那么抽取 $i$ 和 $j$ 的暴露与结局时，就会使用相同的条件分布。
+
+将给定 $\bm W$ 时网络暴露 $\bm A$ 的联合条件密度记为 $\bm g(\bm A\mid\bm W)=\prod_{i=1}^N g(A_i\mid W_i^s)$。另外，将 $\bm W$ 的联合分布记为 $\bm Q_{\bm W}(\bm W)$，不对 $\bm W=(W_1,\ldots,W_N)$ 各分量之间的独立性作额外假设，并假定 $\bm q_{\bm W}$ 是 $\bm Q_{\bm W}$ 相对于某个控制测度定义良好的密度。最后，引入记号 $P=P_{\bm Q,\bm G}$，其中 $\bm Q\equiv(\bm Q_{\bm W},Q_Y)$；除上述建模限制外，不对分布 $\bm Q_{\bm W}$ 与 $Q_Y$ 作进一步规定。还需指出，可以对观测暴露模型 $\bm G$ 施加限制，纳入关于真实条件处理分配的现实知识；例如，在随机临床试验中，对所有 $i$ 共同的密度 $g(A_i\mid W_i^s)$ 可能已知。
+
+由此，建模限制A1—A4、B1和C1定义了统计模型 $\mathcal M$。具体而言，现在用分布 $\bm Q$ 和 $\bm G$ 定义 $\bm O$ 的数据生成分布的统计参数化，相应的统计模型为 $\mathcal M=\{P_{\bm Q,\bm G}:\bm Q\in\mathcal Q,\bm G\in\mathcal G\}$，其中 $\mathcal Q$ 和 $\mathcal G$ 分别表示 $\bm Q$ 与 $\bm G$ 的参数空间。例如，用 $\bm Q_0$ 表示在 $P_0^N$ 处取值的 $\bm Q$。
+
+最后，使用新引入的记号，可以将式（21.2）的似然改写为
+\begin{equation}
+ p^N(\bm O)
+ =\left[\prod_{i=1}^N q_Y(Y_i\mid A_i^s,W_i^s)\right]
+  \left[\prod_{i=1}^N g(A_i\mid W_i^s)\right]\bm q_{\bm W}(\bm W).
+ \tag{21.3}
+\end{equation}
+有了上述建模限制，估计问题就已得到明确定义。当 $N\to\infty$ 时，便可以从一次规模不断增大的抽样实现 $\bm O$ 中，学习对所有 $i$ 共同的密度 $q_Y$ 和 $g$。

@@ -1,0 +1,70 @@
+% 原书分章 PDF 第 1—3 页：章首与第 23.1 节。
+\chapter{有限资源下的最优个体化处理}
+\label{ch:resource-constrained-treatment}
+\chapterauthors{Alexander R. Luedtke 与 Mark J. van der Laan}
+\chapteraffiliations{%
+A. R. Luedtke（通讯作者）：美国 Fred Hutchinson 癌症研究中心疫苗与传染病部，1100 Fairview Ave, Seattle, WA 98109, USA；电子邮箱：\href{mailto:aluedtke@fredhutch.org}{aluedtke@fredhutch.org}。\\
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_23}。}
+
+\begin{sourcebox}
+本章考虑一种资源约束：总体中可接受处理的人口比例存在一个上限。在这一约束下，我们为最优资源约束（resource-constrained，R-C）价值构造一个具有 $\sqrt n$ 收敛速率的估计量及其相应的置信区间。我们证明，在一定条件下，该估计量在非参数模型 $\mathcal M$ 中所有正则且渐近线性的估计量之中是有效的。当基线协变量连续且资源约束起作用时，即最优 R-C 价值小于最优无约束价值时，这些条件比第 22 章所讨论的、正则估计最优无约束价值所需的非例外分布假设更为合理。
+\end{sourcebox}
+
+\section{最优资源约束规则与价值}
+
+假定我们观测到单时间点数据结构 $(W,A,Y)\sim P_0$ 的 $n$ 个独立同分布观测，其中协变量向量 $W$ 的支持集为 $\mathcal W$，处理 $A$ 的支持集为 $\{0,1\}$，结局 $Y$ 的支持集包含于闭单位区间。对 $Y$ 作此有界性限制并不会损失多少一般性，因为任何有界的连续结局都可以通过线性变换缩放到单位区间。除可能已知处理机制（即给定协变量时的处理概率）之外，我们的统计模型是非参数的。假定处理资源有限，使得总体中最多只有 $\kappa\in(0,1)$ 的比例能够接受处理 $A=1$。确定性处理规则 $\tilde d$ 以协变量向量 $w\in\mathcal W$ 为输入，输出一个二元处理决策 $\tilde d(w)$。本章考虑的随机处理规则是从 $\mathcal U\times\mathcal W$ 到 $\{0,1\}$ 的映射，其中 $\mathcal U$ 是某个随机变量 $U\sim P_U$ 的支持集。如果 $d$ 是随机规则且固定 $u\in\mathcal U$，那么 $d(u,\cdot)$ 就表示一个确定性处理规则。本章始终令 $U$ 独立于所有从 $P_0$ 抽取的观测。我们统一使用波浪号表示确定性规则，不加波浪号则表示随机规则；因此，全文中 $\tilde d:\mathcal W\to\mathbb R$，$d:\mathcal U\times\mathcal W\to\mathbb R$。
+
+对于分布 $P$，令 $\bar Q_P(a,w)\triangleq\E_P[Y\mid A=a,W=w]$。为简化记号，令 $\bar Q_0\triangleq\bar Q_{P_0}$。令 $\tilde d$ 为确定性处理策略。对于分布 $P$，令
+$\tilde\Psi_{\tilde d}\triangleq\E_{P_0}[\bar Q_P(\tilde d(V),W)]$
+表示 $\tilde d$ 的价值。在因果假设下，这个量等于在人群中实施规则 $\tilde d$（可能与事实相反）时的反事实平均结局（Robins，1986）。$P$ 下的最优 R-C 确定性策略，定义为求解下列优化问题的确定性策略 $\tilde d$：
+\begin{equation}
+ \text{最大化 }\Psi_{\tilde d}(P)\quad\text{使得 }\E_0[\tilde d(W)]\leq\kappa.
+\tag{23.1}
+\end{equation}
+对于随机策略 $d$，令 $\Psi_d(P)\triangleq\E_{P_U}[\tilde\Psi_{d(U,\cdot)}(P)]$ 表示 $d$ 的价值。在因果假设下，这个量等于在人群中实施随机规则 $d$（可能与事实相反）时的反事实平均结局（类似的可识别性结果见 Díaz 与 van der Laan，2013b）。$P$ 下的最优 R-C 随机策略，定义为求解下列优化问题的随机处理策略 $d$：
+\begin{equation}
+ \text{最大化 }\Psi_d(P)\quad\text{使得 }\E_{P_U\times P}[d(U,W)]\leq\kappa.
+\tag{23.2}
+\end{equation}
+我们把 R-C 随机策略下的最优价值记为 $\Psi(P)$。由于任意确定性策略都可以写成不依赖随机机制 $U$ 的随机策略，所以有 $\Psi(P)\geq\tilde\Psi(P)$。令 $S_P$ 表示处理增益函数（blip function）$\bar Q_{b,P}(\cdot)\triangleq\bar Q_P(1,\cdot)-\bar Q_P(0,\cdot)$ 的生存函数，即 $\tau\mapsto P(\bar Q_{b,P}(W)>\tau)$。令
+\begin{equation}
+\begin{aligned}
+ \eta_P&\triangleq\inf\{\tau:S_P(\tau)\leq\kappa\},\\
+ \tau_P&\triangleq\max\{\eta_P,0\}.
+\end{aligned}
+\tag{23.3}
+\end{equation}
+为简化记号，令 $S_0\triangleq S_{P_0}$、$\eta_0\triangleq\eta_{P_0}$、$\tau_0\triangleq\tau_{P_0}$。
+
+把确定性处理规则 $\tilde d_P$ 定义为 $w\mapsto I(\bar Q_{b,P}(w)>\tau_P)$；为简化记号，令 $\tilde d_0\triangleq\tilde d_{P_0}$。我们有下列结果。
+
+\begin{bookresult}{定理}{23.1}
+如果 $P(\bar Q_{b,P}(W)=\tau_P)=0$，那么 $\tilde d_P$ 是满足资源约束的最优确定性规则，即 $\Psi_{\tilde d_P}(P)$ 达到式 (23.1) 所描述的最大值。
+\end{bookresult}
+
+事实上，可以证明在所给条件下，$\tilde d_P$ 是 $P$ 几乎处处唯一的最优确定性策略。我们不讨论确定性策略中 $P(\bar Q_{b,P}(W)=\tau_P)>0$ 的情形，因为这时式 (23.1) 是一个更具挑战的问题：对于离散 $W$，如果所有分层中的处理效应均为正，那么式 (23.1) 是 0--1 背包问题的一个特例。该问题是 NP 难的，不过被认为是这一类中较容易的问题之一（Karp，1972；Korte 与 Vygen，2012）。背包问题中有一组物品，每个物品都有一个价值和一个重量。给定一个只能承载有限重量的背包，目标是在满足重量限制的同时，选择携带哪些物品，使背包内物品的价值最大。对随机策略而非确定性策略求解优化问题，就得到分数背包问题；已知它可以在多项式时间内求解（Dantzig，1957；Korte 与 Vygen，2012）。分数背包问题与 0--1 背包问题的区别在于，可以装入物品的一部分，且这部分物品的价值与装入的比例成正比。
+
+通过随机变量在 $P_U$ 下所诱导的分布，定义随机处理规则 $d_P$：
+\[
+ P_U(d_P(U,w)=1)=
+ \begin{cases}
+ \dfrac{\kappa-S_P(\tau_P)}{\Pr_P(\bar Q_{b,P}(W)=\tau_P)},
+ &\text{若 }\bar Q_{b,P}(w)=\tau_P\text{ 且 }\tau_P>0,\\[6pt]
+ I(\bar Q_{b,P}(w)>\tau_P),&\text{其他情形。}
+ \end{cases}
+\]
+如果 $\Pr_P(\bar Q_{b,P}(W)=\tau_P)=0$，那么第一种情形出现的概率为零，所以除以这个量不会造成问题。令 $d_0\triangleq d_{P_0}$。注意，如果 $P(\bar Q_{b,P}(W)=\tau_P)=0$ 或 $\tau_P\leq0$，那么 $\tilde d_P(W)$ 与 $d_P(U,W)$ 在 $P_U\times P$ 下几乎处处相等，因此在这些情形下有相同的价值。容易证明，
+\begin{equation}
+ \E_{P_U\times P}[d_P(U,W)]=\kappa\quad\text{若 }\tau_P>0.
+\tag{23.4}
+\end{equation}
+下列定理确立了资源有限情形下随机规则 $d_P$ 的最优性。
+
+\begin{bookresult}{定理}{23.2}
+式 (23.2) 中的最大值在 $d=d_P$ 时达到，即 $d_P$ 是一个最优随机规则。
+\end{bookresult}
+
+注意，上述定理并未断言 $d_P$ 是唯一的最优随机策略。对于离散 $W$，上述定理可直接由 Dantzig（1957）对背包问题的讨论得到。
+
+本章重点研究最优随机规则的价值。尽管如此，本章介绍的技术只会在下列情形给出有效推断：数据由满足 $P_0(\bar Q_{b,0}(W)=\tau_0)=0$ 的分布 $P_0$ 生成。这类似于资源不受限情形下的非例外分布假设（Robins，2004；Luedtke 与 van der Laan，2016a），不过我们指出，对于连续协变量 $W$，当 $\tau_0>0$ 时，这一假设成立的可能性大得多。在某个具有正概率的协变量分层中，处理效应恰好集中在某个任意的（由约束 $\kappa$ 决定的）数值 $\tau_0$ 上，似乎不太可能。

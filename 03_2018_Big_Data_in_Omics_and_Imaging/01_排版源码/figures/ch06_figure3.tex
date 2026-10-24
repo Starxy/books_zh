@@ -1,0 +1,33 @@
+% 按原页可见稀疏箭头逐项重绘；不将该示意补成全连接。
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1.05cm,y=.86cm,>=Stealth,
+ chSixFthreeN/.style={ellipse,draw=blue!60!black,minimum width=5mm,minimum height=4mm,inner sep=0pt},
+ chSixFthreeE/.style={->,thin,blue!60!black}]
+\foreach \xx/\nn in {0/1,1.2/2,2.4/3} {
+ \node[chSixFthreeN,fill=blue!60] (chSixF3i\nn) at (\xx,0) {};
+ \node[chSixFthreeN,fill=white] (chSixF3o\nn) at (\xx,2.4) {};
+ \node[chSixFthreeN,fill=white] (chSixF3t\nn) at (\xx,6.2) {};
+}
+\node[chSixFthreeN,fill=blue!60] (chSixF3h1) at (.5,1.2) {};
+\node[chSixFthreeN,fill=blue!60] (chSixF3h2) at (1.9,1.2) {};
+\node[chSixFthreeN,fill=blue!60] (chSixF3u1) at (.5,5) {};
+\node[chSixFthreeN,fill=blue!60] (chSixF3u2) at (1.9,5) {};
+\foreach \aa/\bb in {i1/h1,i1/h2,i2/h1,i3/h2,h1/o1,h1/o3,h2/o2,h2/o3,u1/t1,u1/t3,u2/t2,u2/t3}
+ \draw[chSixFthreeE] (chSixF3\aa)--(chSixF3\bb);
+\foreach \yy in {3.2,3.6,4} {\node at (-.45,\yy) {$\cdot$};\node at (4.7,\yy) {$\cdot$};}
+\foreach \xx/\nn in {5.3/1,7.7/2} {
+ \node[chSixFthreeN,fill=red] (chSixF3rt\nn) at (\xx,5) {};
+ \node[chSixFthreeN,fill=red] (chSixF3ra\nn) at (\xx,2.4) {};
+ \node[chSixFthreeN,fill=red] (chSixF3rb\nn) at (\xx,1.2) {};
+}
+\foreach \xx/\nn in {5.3/1,6.5/2,7.7/3}
+ \node[chSixFthreeN,fill=red] (chSixF3rc\nn) at (\xx,0) {};
+\foreach \aa/\bb in {ra1/rb1,ra1/rb2,ra2/rb1,ra2/rb2,rb1/rc1,rb1/rc2,rb1/rc3,rb2/rc1,rb2/rc3}
+ \draw[chSixFthreeE] (chSixF3\aa)--(chSixF3\bb);
+\draw[blue!60!black,thin] (chSixF3t2.north)--(1.2,6.7)--(5.3,6.7);
+\draw[chSixFthreeE] (5.3,6.7)--(chSixF3rt1);
+\draw[chSixFthreeE] (5.3,6.7)--(chSixF3rt2);
+\end{tikzpicture}
+\origfig{3}{堆叠自编码器与解码器。}
+\end{figure}

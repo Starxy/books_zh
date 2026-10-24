@@ -1,0 +1,24 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.4cm,y=1.25cm]
+ \node[vtx] (ch06adj-c) at (-1,1) {$C$};
+ \node[vtx] (ch06adj-a) at (1,1) {$A$};
+ \node[vtx] (ch06adj-k) at (3,1) {$K$};
+ \node[vtx] (ch06adj-x) at (0,0) {$X$};
+ \node[vtx] (ch06adj-d) at (2,0) {$D$};
+ \node[vtx] (ch06adj-y) at (4,0) {$Y$};
+ \node[vtx] (ch06adj-f) at (0,-1) {$F$};
+ \node[vtx] (ch06adj-g) at (2,-1) {$G$};
+ \node[vtx] (ch06adj-h) at (4,-1) {$H$};
+ \draw[ed] (ch06adj-c)--(ch06adj-x);
+ \draw[ed] (ch06adj-a)--(ch06adj-x);
+ \draw[ed] (ch06adj-a)--(ch06adj-k);
+ \draw[ed] (ch06adj-k)--(ch06adj-y);
+ \draw[ed] (ch06adj-x)--(ch06adj-d);
+ \draw[ed] (ch06adj-d)--(ch06adj-y);
+ \draw[ed] (ch06adj-x)--(ch06adj-f);
+ \draw[ed] (ch06adj-d)--(ch06adj-g);
+ \draw[ed] (ch06adj-y)--(ch06adj-h);
+\end{tikzpicture}
+\caption{只有路径 $X\leftarrow A\to K\to Y$ 是从 $X$ 到 $Y$ 的“后门路径”。集合 $\mathbf Z=\{K\}$ 满足后门准则，见命题 6.41 的第 (ii) 项；不过，$\mathbf Z=\{F,C,K\}$ 也是 $(X,Y)$ 的有效调整集，见命题 6.41 的第 (iii) 项。}
+\end{figure}

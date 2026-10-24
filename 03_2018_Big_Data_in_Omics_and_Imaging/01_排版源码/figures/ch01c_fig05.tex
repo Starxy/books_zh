@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,every node/.style={font=\small,inner sep=2pt}]
+\node (c05x) at (0,3.7) {$X$};
+\node[circle,draw=blue!60!black,fill=blue!45,minimum size=4mm] (c05a) at (-1.5,2.4) {};
+\node[circle,draw=blue!60!black,fill=blue!45,minimum size=4mm] (c05b) at (1.45,1.8) {};
+\node[circle,draw=blue!60!black,fill=blue!45,minimum size=4mm] (c05d) at (1.1,.7) {};
+\node (c05y) at (0,-.3) {$Y$};
+\draw[->,blue!65!black] (c05x) -- node[above left] {$a$} (c05a);
+\draw[->,blue!65!black] (c05a) -- node[left] {$g$} (c05y);
+\draw[->,blue!65!black] (c05x) -- node[left] {$b$} (c05b);
+\draw[->,blue!65!black] (c05x) to[bend left=30] node[right] {$c$} (c05b);
+\draw[->,blue!65!black] (c05b) -- node[right] {$d$} (c05d);
+\draw[->,blue!65!black] (c05d) -- node[below right] {$h$} (c05y);
+\end{tikzpicture}
+\origfig{5}{总效应。}
+\label{fig:ch01c-05}
+\end{figure}

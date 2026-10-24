@@ -1,0 +1,35 @@
+
+% 附录源 PDF 第 17—18 页；A.3.4。
+\subsection{在线估计文献简述}
+
+考虑参数模型和独立同分布的回归情形，假设给定 $W$ 时 $Y$ 的条件均值可由线性模型
+$\psi_\beta(W)=\beta'W$ 描述。在线学习文献已对这一情形作了广泛研究：Zinkevich (2003)、Crammer et al. (2006)、Bottou (2010) 和 Shalev-Shwartz (2011)。令
+$\psi_0(W)=E_0(Y\mid W)=\beta_0^\top W$ 为目标参数。
+令 $L(\psi_\beta)(Y,W)$ 为平方误差损失函数，$\widehat\beta_n$ 为最小二乘估计量，即损失函数经验均值的最小化者：
+\[
+\widehat\beta_n=\argmin_\beta\frac1n\sum_{i=1}^nL(\psi_\beta)(O(i)).
+\]
+更一般地，$\{p_\beta:\beta\}$ 可以是参数模型，$L(\psi_\beta)=-\log p_\beta$ 为对数似然损失，$\widehat\beta_n$ 为 $\beta_0$ 的极大似然估计量。
+
+随机梯度下降（stochastic gradient descent，SGD）是一种旨在近似极大似然估计量 $\widehat\beta_n$ 的在线算法。考虑如下更新步骤：
+\begin{equation}
+\beta_{t+1}=\beta_t-\gamma_t\Gamma_t\frac{\mathrm d}{\mathrm d\beta_t}
+ L(\psi_{\beta,t})(O(t)),
+\tag{A.10}
+\end{equation}
+其中 $\gamma_t$ 是标量步长或学习率，$\Gamma_t$ 是 $d\times d$ 矩阵，$O(t)$ 为第 $t$ 步使用的观测（Bottou 2010）。由此定义了 $\widehat\beta_n$ 的近似 $\widetilde\beta_n$。
+在一阶 SGD 中，$\Gamma_t$ 为单位矩阵的某个常数倍；其他变体则以适当的对角矩阵代替 $\Gamma_t$，例如，取所估计的 Hessian 逆矩阵的对角元素（Duchi et al. 2011；Zeiler 2012）。
+二阶 SGD 使用近似 Hessian 逆矩阵的 $\Gamma_t$，从而考虑损失函数的曲率（Murata 1998）。然而，当维数 $d$ 很高时，计算和存储该矩阵的估计值通常代价很大。因此，尽管二阶 SGD 具有最优性，实践中却很少采用。
+还有许多在线优化方法用于不同情境（Polyak and Juditsky 1992；Xu 2011），其中也包括带正则化损失函数的情形，如 Lasso 回归和支持向量机（Fu 1998；Langford et al. 2009；Kivinen et al. 2004；Balakrishnan and Madigan 2008；Shalev-Shwartz et al. 2011）。
+
+有
+\[
+\begin{aligned}
+d_{0n}(\psi_{\widetilde\beta_n},\psi_0)
+={}&d_{0n}(\psi_{\beta,0},\psi_0)
+ +d_{0n}(\psi_{\widehat\beta,n},\psi_{\beta,0})\\
+&+d_{0n}(\psi_{\widetilde\beta_n},\psi_{\widehat\beta_n}),
+\end{aligned}
+\]
+其中前两项分别为逼近误差和估计误差，第三项则是使用 $\widetilde\beta_n$ 代替真正的最小化者 $\widehat\beta_n$ 所产生的优化误差。
+在线学习文献的已有结果表明，在大数据情形下，估计误差和优化误差都较小（Shalev-Shwartz 2011）。因此，在线估计量的性能主要取决于逼近误差。为了尽可能减小逼近误差，我们采用在线超级学习框架。

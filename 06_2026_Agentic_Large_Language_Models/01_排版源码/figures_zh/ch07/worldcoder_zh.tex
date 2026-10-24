@@ -1,0 +1,19 @@
+% 原图的全部方向关系保留；框中的 Python 标识符与代码保持英文。
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[font=\small,flow/.style={-{Stealth[length=2mm]},line width=.8pt},box/.style={draw,fill=white,align=center,inner sep=4pt}]
+\node[circle,draw,minimum size=1.3cm] (world) at (0,0) {世界};
+\node[align=center] (feedback) at (2.2,1.3) {状态、\\奖励、目标};
+\node[box] (plan) at (3.8,0) {规划器};
+\node[box,fill=black,text=white,font=\ttfamily\footnotesize,align=left] (program) at (7.6,0) {\# world\_model.py\\def update(state, action, goal):\\\quad ...............................\\\quad return new\_state, reward};
+\node[box] (llm) at (11.7,0) {LLM};
+\node[box,rounded corners=5pt] (replay) at (13.6,0) {经验回放\\缓冲区};
+\draw[flow] (world.north) to[out=70,in=180] (feedback.west);
+\draw[flow] (feedback.east) to[out=0,in=90] (plan.north);
+\draw[flow] (feedback.east) .. controls (10.5,1.5) and (13.6,1.6) .. (replay.north);
+\draw[flow] (plan.south) .. controls (3,-1.0) and (.5,-1.2) .. node[below] {动作} (world.south);
+\draw[flow] (program.west) -- (plan.east);
+\draw[<->,>=Stealth,line width=.8pt] (program.east) -- (llm.west);
+\draw[flow] (replay.west) -- (llm.east);
+\draw[flow] (plan.south) .. controls (5,-1.2) and (13.6,-1.2) .. (replay.south);
+\end{tikzpicture}%
+}

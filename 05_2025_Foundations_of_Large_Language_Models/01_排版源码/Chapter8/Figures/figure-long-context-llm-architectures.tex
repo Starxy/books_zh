@@ -1,0 +1,149 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.80cm}
+
+\tikzstyle{snode} = [minimum width=1*\ssep,minimum height=1*\ssep,inner sep=0pt,draw,very thin]
+
+%%% sub-figure 1: standard self-attention
+\begin{scope}
+
+\node [snode,anchor=west,draw,thick] (qi) at (0,0) {\normalsize{$\mathbf{q}_i$}};
+
+\node [snode,anchor=east,fill=blue!30] (kim0) at ([xshift=-2*\ssep]qi.west) {\footnotesize{$\mathbf{k}_{i}$}};
+\node [snode,anchor=east,fill=blue!30] (kim1) at ([xshift=-1*\ssep]kim0.west) {\footnotesize{$\mathbf{k}_{i-1}$}};
+\node [snode,anchor=east,fill=blue!30] (kim2) at ([xshift=-1*\ssep]kim1.west) {\footnotesize{$\mathbf{k}_{i-2}$}};
+\node [anchor=east] (kdots) at ([xshift=-0.7*\ssep]kim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=east,fill=blue!30] (k1) at ([xshift=-0.7*\ssep]kdots.west) {\footnotesize{$\mathbf{k}_{1}$}};
+\node [snode,anchor=east,fill=blue!30] (k0) at ([xshift=-1*\ssep]k1.west) {\footnotesize{$\mathbf{k}_{0}$}};
+
+\node [snode,anchor=north,fill=blue!30] (vim0) at ([yshift=-0.1cm]kim0.south) {\footnotesize{$\mathbf{v}_{i}$}};
+\node [snode,anchor=north,fill=blue!30] (vim1) at ([yshift=-0.1cm]kim1.south) {\footnotesize{$\mathbf{v}_{i-1}$}};
+\node [snode,anchor=north,fill=blue!30] (vim2) at ([yshift=-0.1cm]kim2.south) {\footnotesize{$\mathbf{v}_{i-2}$}};
+\node [anchor=east] (vdots) at ([xshift=-0.7*\ssep]vim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=north,fill=blue!30] (v1) at ([yshift=-0.1cm]k1.south) {\footnotesize{$\mathbf{v}_{1}$}};
+\node [snode,anchor=north,fill=blue!30] (v0) at ([yshift=-0.1cm]k0.south) {\footnotesize{$\mathbf{v}_{0}$}};
+
+\draw [->] ([xshift=-0.4cm,yshift=0.1em]qi.north) .. controls +(north:0.2cm) and +(north:0.5cm) .. ([yshift=0.1em]kim0.north);
+\draw [->] ([xshift=-0.3cm,yshift=0.1em]qi.north) .. controls +(north:0.5cm) and +(north:0.7cm) .. ([yshift=0.1em]kim1.north);
+\draw [->] ([xshift=-0.2cm,yshift=0.1em]qi.north) .. controls +(north:0.8cm) and +(north:0.9cm) .. ([yshift=0.1em]kim2.north);
+\draw [->] ([xshift=-0.1cm,yshift=0.1em]qi.north) .. controls +(north:1.1cm) and +(north:1.1cm) .. ([yshift=0.1em]k1.north);
+\draw [->] ([xshift=-0.0cm,yshift=0.1em]qi.north) .. controls +(north:1.4cm) and +(north:1.3cm) .. ([yshift=0.1em]k0.north);
+
+\node [anchor=south] (attention) at ([yshift=0.8cm,xshift=0.6cm]qi.north) {\small{$\mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i})$}};
+
+\node [anchor=north] (caption) at ([yshift=-0.4cm,xshift=-0.3cm]vim1.south) {\small{（a）标准自注意力}};
+
+\end{scope}
+
+%%% sub-figure 2: spase attention
+\begin{scope}[yshift=-4.5cm]
+
+\node [snode,anchor=west,draw,thick] (qi) at (0,0) {\normalsize{$\mathbf{q}_i$}};
+
+\node [snode,anchor=east,fill=blue!30] (kim0) at ([xshift=-2*\ssep]qi.west) {\footnotesize{$\mathbf{k}_{i}$}};
+\node [snode,anchor=east,fill=gray!20,dotted,draw=white] (kim1) at ([xshift=-1*\ssep]kim0.west) {\color{gray} \footnotesize{$\mathbf{k}_{i-1}$}};
+\node [snode,anchor=east,fill=gray!20,dotted,draw=white] (kim2) at ([xshift=-1*\ssep]kim1.west) {\color{gray} \footnotesize{$\mathbf{k}_{i-2}$}};
+\node [anchor=east] (kdots) at ([xshift=-0.7*\ssep]kim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=east,fill=blue!30] (k1) at ([xshift=-0.7*\ssep]kdots.west) {\footnotesize{$\mathbf{k}_{1}$}};
+\node [snode,anchor=east,fill=gray!20,dotted,draw=white] (k0) at ([xshift=-1*\ssep]k1.west) {\color{gray} \footnotesize{$\mathbf{k}_{0}$}};
+
+\node [snode,anchor=north,fill=blue!30] (vim0) at ([yshift=-0.1cm]kim0.south) {\footnotesize{$\mathbf{v}_{i}$}};
+\node [snode,anchor=north,fill=gray!20,dotted,draw=white] (vim1) at ([yshift=-0.1cm]kim1.south) {\color{gray} \footnotesize{$\mathbf{v}_{i-1}$}};
+\node [snode,anchor=north,fill=gray!20,dotted,draw=white] (vim2) at ([yshift=-0.1cm]kim2.south) {\color{gray} \footnotesize{$\mathbf{v}_{i-2}$}};
+\node [anchor=east] (vdots) at ([xshift=-0.7*\ssep]vim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=north,fill=blue!30] (v1) at ([yshift=-0.1cm]k1.south) {\footnotesize{$\mathbf{v}_{1}$}};
+\node [snode,anchor=north,fill=gray!20,dotted,draw=white] (v0) at ([yshift=-0.1cm]k0.south) {\color{gray} \footnotesize{$\mathbf{v}_{0}$}};
+
+\draw [->] ([xshift=-0.4cm,yshift=0.1em]qi.north) .. controls +(north:0.2cm) and +(north:0.5cm) .. ([yshift=0.1em]kim0.north);
+%\draw [->] ([xshift=-0.3cm,yshift=0.1em]qi.north) .. controls +(north:0.5cm) and +(north:0.7cm) .. ([yshift=0.1em]kim1.north);
+%\draw [->] ([xshift=-0.2cm,yshift=0.1em]qi.north) .. controls +(north:0.8cm) and +(north:0.9cm) .. ([yshift=0.1em]kim2.north);
+\draw [->] ([xshift=-0.1cm,yshift=0.1em]qi.north) .. controls +(north:1.1cm) and +(north:1.1cm) .. ([yshift=0.1em]k1.north);
+%\draw [->] ([xshift=-0.0cm,yshift=0.1em]qi.north) .. controls +(north:1.4cm) and +(north:1.3cm) .. ([yshift=0.1em]k0.north);
+
+\node [anchor=south] (attention) at ([yshift=0.8cm,xshift=0.0cm]qi.north) {\small{$\mathrm{Att}_{\mathrm{qkv}}(\mathbf{q}_i,\{\mathbf{k}_{1},\mathbf{k}_{i}\},\{\mathbf{v}_{1},\mathbf{v}_{i}\})$}};
+
+\node [anchor=north] (caption) at ([yshift=-0.4cm,xshift=-0.3cm]vim1.south) {\small{（b）稀疏注意力}};
+
+\end{scope}
+
+%%% sub-figure 3: linear attention
+\begin{scope}[yshift=-9.5cm]
+
+\node [snode,anchor=west,draw,thick] (qi) at (0,0) {\normalsize{$\mathbf{q}_i$}};
+
+\node [snode,anchor=east] (kim0) at ([xshift=-2*\ssep]qi.west) {\footnotesize{$\mathbf{k}_{i}$}};
+\node [snode,anchor=east] (kim1) at ([xshift=-1*\ssep]kim0.west) {\footnotesize{$\mathbf{k}_{i-1}$}};
+\node [snode,anchor=east] (kim2) at ([xshift=-1*\ssep]kim1.west) {\footnotesize{$\mathbf{k}_{i-2}$}};
+\node [anchor=east] (kdots) at ([xshift=-0.7*\ssep]kim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=east] (k1) at ([xshift=-0.7*\ssep]kdots.west) {\footnotesize{$\mathbf{k}_{1}$}};
+\node [snode,anchor=east] (k0) at ([xshift=-1*\ssep]k1.west) {\footnotesize{$\mathbf{k}_{0}$}};
+
+\node [snode,anchor=north] (vim0) at ([yshift=-0.1cm]kim0.south) {\footnotesize{$\mathbf{v}_{i}$}};
+\node [snode,anchor=north] (vim1) at ([yshift=-0.1cm]kim1.south) {\footnotesize{$\mathbf{v}_{i-1}$}};
+\node [snode,anchor=north] (vim2) at ([yshift=-0.1cm]kim2.south) {\footnotesize{$\mathbf{v}_{i-2}$}};
+\node [anchor=east] (vdots) at ([xshift=-0.7*\ssep]vim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=north] (v1) at ([yshift=-0.1cm]k1.south) {\footnotesize{$\mathbf{v}_{1}$}};
+\node [snode,anchor=north] (v0) at ([yshift=-0.1cm]k0.south) {\footnotesize{$\mathbf{v}_{0}$}};
+
+\draw [decoration={brace,amplitude=7pt},decorate] ([yshift=0.1cm]k0.north west) --  ([yshift=0.1cm]kim0.north east) node [pos=0.5,above,yshift=0.3cm] (nui) {\small{$\nu_i = \nu_{i-1} + \mathbf{k'}_{i}^{\mathrm{T}}$}};
+\node [anchor=south west] (mui) at (nui.north west) {\small{$\mu_i = \mu_{i-1} + \mathbf{k'}_{i}^{\mathrm{T}} \mathbf{v}_{i}$}};
+
+\node [snode,anchor=west,minimum width=0.6*\ssep,minimum height=0.6*\ssep,fill=blue!30] (nuibox) at ([xshift=1.5cm]nui.east) {\footnotesize{$\nu_i$}};
+\node [snode,anchor=south,minimum width=0.6*\ssep,minimum height=0.6*\ssep,fill=blue!30] (muibox) at ([yshift=0.2cm]nuibox.north) {\footnotesize{$\mu_i$}};
+
+\node [anchor=east] (muarrow) at ([xshift=-0.4cm]muibox.west) {\small{$\Rightarrow$}};
+\node [anchor=east] (nuarrow) at ([xshift=-0.4cm]nuibox.west) {\small{$\Rightarrow$}};
+
+\begin{pgfonlayer}{background}
+\node [draw,dotted] [fit = (nuibox) (muibox)] (numubox) {};
+\end{pgfonlayer}
+
+\draw [->] ([xshift=-0.0cm,yshift=0.1em]qi.north) .. controls +(north:0.7cm) and +(east:1cm) .. ([yshift=0.3cm,xshift=2pt]numubox.south east);
+
+\node [anchor=south] (attention) at ([yshift=0.8cm,xshift=-0.1cm]qi.north) {\small{$\mathrm{Att}_{\mathrm{linear}}(\mathbf{q}_i,\mathbf{K}_{\le i},\mathbf{V}_{\le i}) = \frac{\mathbf{q}'_{i} \mu_i}{\mathbf{q}'_{i} \nu_i}$}};
+
+\node [anchor=north] (caption) at ([yshift=-0.4cm,xshift=-0.3cm]vim1.south) {\small{（c）线性注意力}};
+
+\end{scope}
+
+%%% sub-figure 4: recurrent models
+\begin{scope}[yshift=-13.5cm]
+
+\node [snode,anchor=west,draw,thick] (qi) at (0,0) {\normalsize{$\mathbf{h}_i$}};
+
+\node [snode,anchor=east,fill=blue!30] (kim0) at ([xshift=-2*\ssep]qi.west) {\footnotesize{$\mathbf{h}_{i-1}$}};
+\node [snode,anchor=east] (kim1) at ([xshift=-1*\ssep]kim0.west) {\footnotesize{$\mathbf{h}_{i-2}$}};
+\node [snode,anchor=east] (kim2) at ([xshift=-1*\ssep]kim1.west) {\footnotesize{$\mathbf{h}_{i-3}$}};
+\node [anchor=east] (kdots) at ([xshift=-0.7*\ssep]kim2.west) {\footnotesize{$\cdots$}};
+\node [snode,anchor=east] (k1) at ([xshift=-0.7*\ssep]kdots.west) {\footnotesize{$\mathbf{h}_{1}$}};
+\node [snode,anchor=east] (k0) at ([xshift=-1*\ssep]k1.west) {\footnotesize{$\mathbf{h}_{0}$}};
+
+\draw [->] ([xshift=-0.4*\ssep]k0.west) -- ([xshift=-1pt]k0.west);
+\draw [->] ([xshift=1pt]k0.east) -- ([xshift=-1pt]k1.west);
+\draw [->] ([xshift=1pt]k1.east) -- ([xshift=0.4*\ssep]k1.east);
+\draw [->] ([xshift=-0.4*\ssep]kim2.west) -- ([xshift=-1pt]kim2.west);
+\draw [->] ([xshift=1pt]kim2.east) -- ([xshift=-1pt]kim1.west);
+\draw [->] ([xshift=1pt]kim1.east) -- ([xshift=-1pt]kim0.west);
+\draw [->] ([xshift=1pt]kim0.east) -- ([xshift=-1pt]qi.west);
+
+\draw [->] ([yshift=-0.4*\ssep]k0.south) -- ([yshift=-1pt]k0.south);
+\draw [->] ([yshift=-0.4*\ssep]k1.south) -- ([yshift=-1pt]k1.south);
+\draw [->] ([yshift=-0.4*\ssep]kim2.south) -- ([yshift=-1pt]kim2.south);
+\draw [->] ([yshift=-0.4*\ssep]kim1.south) -- ([yshift=-1pt]kim1.south);
+\draw [->] ([yshift=-0.4*\ssep]kim0.south) -- ([yshift=-1pt]kim0.south);
+\draw [->] ([yshift=-0.4*\ssep]qi.south) -- ([yshift=-1pt]qi.south);
+
+\node [anchor=north] (qinput) at ([yshift=-0.3cm]qi.south) {\small{$\mathbf{input}_i$}};
+
+\node [anchor=south] (attention) at ([yshift=0.4cm,xshift=-0.1cm]qi.north) {\small{$\mathbf{h}_i = f(\mathbf{h}_{i-1},\mathbf{input}_i)$}};
+
+\node [anchor=north] (caption) at ([yshift=-0.7cm,xshift=-0.3cm]kim1.south) {\small{（d）循环模型}};
+
+\end{scope}
+	
+\end{tikzpicture}
+\end{center}

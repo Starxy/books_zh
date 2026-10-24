@@ -1,0 +1,217 @@
+% 原书PDF第8页7.1.4至第13页7.1.4.2之前。
+\subsection{信息几何方法}
+第2.5节讨论了区分原因与结果的加性噪声模型。本节介绍信息几何方法（information geometry approach），利用原因与结果之间的不对称性，推断因果方向（Janzing et al. 2010, 2012；Mooij et al. 2016）。考虑两个变量 $X$ 与 $Y$。判断 $X$ 是否导致 $Y$，就是判断原因分布 $P(X)$ 与将原因映射到结果的条件分布 $P(Y\mid X)$ 之间的独立性。显然，传统的变量间相关系数，不能用于度量两个分布之间的相依关系。相关系数的一个自然扩展，是分布 $P(X)$ 与 $P(Y\mid X)$ 之间的Kullback–Leibler距离，简称K–L距离。K–L距离具有一个良好性质：两个分布独立，对应于它们的K–L距离为零。因此，基于K–L距离的信息几何可用于因果推断。
+
+\subsubsection{信息几何基础}
+先介绍信息论的几个概念（Cover and Thomas, 1991）。式 (7.10) 曾提及微分熵，但没有给出定义，现在给出其严格的数学定义。
+
+\begin{bookdefinition}{7.2}
+\textbf{微分熵。}设 $f(x)$ 为连续变量 $X$ 的密度函数。支撑集为 $S$ 的连续变量 $X$ 的微分熵（differential entropy）$S(f)$ 定义为
+\begin{equation}
+S(f)=-\int_S f(x)\log f(x)\,dx,
+\tag{7.12}
+\end{equation}
+其中 $\log$ 为自然对数。
+\end{bookdefinition}
+
+\begin{bookexample}{7.2}
+\textbf{均匀分布。}考虑支撑集为 $S=[a,b]$、密度函数为 $u(x)=1/(b-a)$ 的均匀分布。其微分熵为
+\begin{equation}
+S(u)=-\int_a^b\frac1{b-a}\log\frac1{b-a}\,dx=\log(b-a).
+\tag{7.13}
+\end{equation}
+\end{bookexample}
+
+\begin{bookexample}{7.3}
+\textbf{指数分布。}考虑指数分布 $f(x)=\lambda e^{-\lambda x}$，$x\ge0$。其微分熵为
+\begin{equation}
+\begin{aligned}
+S(e)&=-\int_0^\infty\lambda e^{-\lambda x}\log(\lambda e^{-\lambda x})\,dx\\
+&=-\log\lambda\int_0^\infty\lambda e^{-\lambda x}
++\lambda\int_0^\infty x\lambda e^{-\lambda x}\,dx\\
+&=-\log\lambda+1.
+\end{aligned}
+\tag{7.14}
+\end{equation}
+\end{bookexample}
+
+\begin{bookexample}{7.4}
+\textbf{正态分布。}考虑正态密度
+\[
+\phi(x)=\frac1{\sqrt{2\pi\sigma^2}}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}.
+\]
+其微分熵可按下式计算：
+\begin{equation}
+\begin{aligned}
+S(\phi)&=-\int_{-\infty}^\infty\frac1{\sqrt{2\pi\sigma^2}}
+\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}\\
+&\hspace{3em}\cdot\log\frac1{\sqrt{2\pi\sigma^2}}
+\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}\,dx\\
+&=\frac12\log(2\pi\sigma^2)\int_{-\infty}^\infty\frac1{\sqrt{2\pi\sigma^2}}
+\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}\,dx\\
+&\hspace{3em}+E\left[\frac{(x-\mu)^2}{2\sigma^2}\right]\\
+&=\frac12\log(2\pi\sigma^2)+\frac12
+=\frac12\log(2\pi e\sigma^2).
+\end{aligned}
+\tag{7.15}
+\end{equation}
+\end{bookexample}
+
+\begin{bookexample}{7.5}
+\textbf{Gamma分布。}设 $f(x)=\beta^\alpha x^{\alpha-1}e^{-\beta x}/\Gamma(\alpha)$，$x>0$，为Gamma分布的密度函数。先计算积分
+\begin{equation}
+J(\alpha,\beta)=\frac d{d\alpha}\int_0^\infty x^{\alpha-1}e^{-\beta x}\,dx
+=\int_0^\infty x^{\alpha-1}e^{-\beta x}\log x\,dx.
+\tag{7.16}
+\end{equation}
+显然，
+\begin{equation}
+\begin{aligned}
+\int_0^\infty x^{\alpha-1}e^{-\beta x}\,dx
+&=\int_0^\infty\frac{t^{\alpha-1}}{\beta^{\alpha-1}}e^{-y}\frac{dy}\beta\\
+&=\int_0^\infty\frac{t^{\alpha-1}}{\beta^\alpha}e^{-y}\,dy
+=\frac{\Gamma(\alpha)}{\beta^\alpha}.
+\end{aligned}
+\tag{7.17}
+\end{equation}
+将式 (7.17) 代入式 (7.16)，得到
+\begin{equation}
+\begin{aligned}
+J(\alpha,\beta)&=\frac{\Gamma(\alpha)}{\beta^\alpha}\frac d{d\alpha}
+\log\left(\frac{\Gamma(\alpha)}{\beta^\alpha}\right)\\
+&=\frac{\Gamma(\alpha)}{\beta^\alpha}\frac d{d\alpha}
+(\log(\Gamma(\alpha)-\alpha\log\beta)\\
+&=\frac{\Gamma(\alpha)}{\beta^\alpha}\left(\frac{\Gamma'(\alpha)}{\Gamma(\alpha)}-\log\beta\right)\\
+&=\frac{\Gamma(\alpha)}{\beta^\alpha}(\psi(\alpha)-\log(\beta)),
+\end{aligned}
+\tag{7.18}
+\end{equation}
+其中 $\psi(\alpha)=[d\Gamma(\alpha)/d\alpha]/\Gamma(\alpha)$ 为双伽马函数。
+
+现在计算Gamma分布的微分熵。根据定义，
+\begin{equation}
+\begin{aligned}
+S(g)&=-\int_0^\infty\frac{\beta^\alpha x^{\alpha-1}e^{-\beta x}}{\Gamma(\alpha)}
+\log\frac{\beta^\alpha x^{\alpha-1}e^{-\beta x}}{\Gamma(\alpha)}\,dx\\
+&=-\int_0^\infty\frac{\beta^\alpha x^{\alpha-1}e^{-\beta x}}{\Gamma(\alpha)}
+[\alpha\log\beta+(\alpha-1)\log x-\beta x-\log\Gamma(\alpha)]\,dx\\
+&=-\alpha\log\beta+\log\Gamma(\alpha)
++(1-\alpha)\int_0^\infty\frac{\beta^\alpha x^{\alpha-1}e^{-\beta x}}{\Gamma(\alpha)}\log(x)\,dx\\
+&\hspace{3em}+\int_0^\infty\frac{\beta^{\alpha+1}x^\alpha e^{-\beta x}}{\Gamma(\alpha)}\,dx\\
+&=-\alpha\log\beta+\log\Gamma(\alpha)+(1-\alpha)\frac{\beta^\alpha}{\Gamma(\alpha)}J(\alpha,\beta)\\
+&\hspace{3em}+\alpha\int_0^\infty\frac{\beta^{\alpha+1}x^\alpha e^{-\beta x}}{\Gamma(\alpha+1)}\,dx.
+\end{aligned}
+\tag{7.19}
+\end{equation}
+将式 (7.18) 代入式 (7.19)，得到Gamma函数的微分熵：
+\begin{equation}
+\begin{aligned}
+S(g)&=-\alpha\log\beta+\log\Gamma(\alpha)
++(1-\alpha)\frac{\beta^\alpha}{\Gamma(\alpha)}\frac{\Gamma(\alpha)}{\beta^\alpha}[\psi(\alpha)-\log\beta]+\alpha\\
+&=\log\frac{\Gamma(\alpha)}\beta+(1-\alpha)\psi(\alpha)+\alpha.
+\end{aligned}
+\tag{7.20}
+\end{equation}
+\end{bookexample}
+
+\begin{bookdefinition}{7.3}
+\textbf{联合微分熵。}设 $f(x_1,\ldots,x_k)$ 为连续变量 $x_1,\ldots,x_k$ 的联合密度函数。它们的联合微分熵定义为
+\begin{equation}
+S(X_1,\ldots,X_k)=-\int f(x_1,\ldots,x_k)\log f(x_1,\ldots,x_k)\,dx_1dx_2\cdots dx_n.
+\tag{7.21}
+\end{equation}
+\end{bookdefinition}
+
+\begin{bookdefinition}{7.4}
+\textbf{条件微分熵。}设 $X=(X_1,\ldots,X_k)$、$Y=(Y_1,\ldots,Y_m)$ 的联合密度函数为 $f(x,y)$，则给定 $Y$ 时 $X$ 的条件微分熵为
+\begin{equation}
+S(X\mid Y)=-\int f(x,y)\log f(x\mid y)\,dxdy.
+\tag{7.22}
+\end{equation}
+\end{bookdefinition}
+
+\begin{bookexample}{7.6}
+\textbf{多元正态分布。}设 $X$ 服从多元正态分布 $N(\mu,\Sigma)$，其密度函数为
+\begin{equation}
+f(x)=\frac1{(\sqrt{2\pi})^n|\Sigma|^{1/2}}
+\exp\left\{-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\right\}.
+\tag{7.23}
+\end{equation}
+多元正态分布的微分熵为
+\begin{equation}
+\begin{aligned}
+S(\mathrm{mn})&=-\int f(x)\log\left[\frac1{(\sqrt{2\pi})^n|\Sigma|^{1/2}}
+\exp\left\{-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\right\}\right]\,dx\\
+&=-\int f(x)\left[-\frac12\log(2\pi)^n|\Sigma|-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\right]\\
+&=\frac12\log(2\pi)^n|\Sigma|+\frac n2\\
+&=\frac12\log(2\pi e)^n|\Sigma|.
+\end{aligned}
+\tag{7.24}
+\end{equation}
+\end{bookexample}
+
+\begin{bookexample}{7.7}
+\textbf{多元均匀分布。}多元均匀分布的密度函数为
+\begin{equation}
+f(x)=\frac1{a^k},\qquad 0\le x_1\le a,\ldots,0\le x_k\le a.
+\tag{7.25}
+\end{equation}
+其微分熵为
+\begin{equation}
+\begin{aligned}
+S(\mathrm{mu})&=-\int_0^a\cdots\int_0^a\frac1{a^k}\log\frac1{a^k}\,dx_1\cdots dx_k\\
+&=k\log a.
+\end{aligned}
+\tag{7.26}
+\end{equation}
+\end{bookexample}
+
+下面介绍用于度量两个分布相似性的K–L距离。
+
+\begin{bookdefinition}{7.5}
+\textbf{K–L距离。}设 $f(x)$、$g(x)$ 为两个密度函数，其K–L距离定义为
+\begin{equation}
+D(f\Vert g)=\int f(x)\log\frac{f(x)}{g(x)}\,dx,
+\tag{7.27}
+\end{equation}
+其中 $f(x)$ 的支撑集包含于 $g(x)$ 的支撑集，并约定 $0\log(0/0)=0$。
+\end{bookdefinition}
+
+\begin{bookexample}{7.8}
+\textbf{两个正态分布之间的K–L距离。}考虑两个维数均为 $n$ 的多元正态分布 $N(\mu_0,\Sigma_0)$ 和 $N(\mu_1,\Sigma_1)$。二者的K–L距离为
+\begin{equation}
+\begin{aligned}
+D(N_0\Vert N_1)
+&=\int f_0(x)\log\frac{
+\dfrac1{(\sqrt{2\pi})^n|\Sigma_0|^{1/2}}
+\exp\left\{-\dfrac12(x-\mu_0)^T\Sigma_0^{-1}(x-\mu_0)\right\}}
+{\dfrac1{(\sqrt{2\pi})^n|\Sigma_1|^{1/2}}
+\exp\left\{-\dfrac12(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1)\right\}}\,dx\\
+&=\frac12\log\frac{|\Sigma_1|}{|\Sigma_0|}
+-\frac12E_0\Bigl[\Tr\bigl(\Sigma_0^{-1}(x-\mu_0)(x-\mu_0)^T\bigr)\\
+&\hspace{9em}-\Tr\bigl(\Sigma_1^{-1}(x-\mu_1)(x-\mu_1)^T\bigr)\Bigr]\\
+&=\frac12\log\frac{|\Sigma_1|}{|\Sigma_0|}-\frac12n
++\frac12E_0\Bigl[\Tr\Bigl(\Sigma_1^{-1}(x-\mu_0+\mu_0-\mu_1)\\
+&\hspace{13em}\cdot(x-\mu_0+\mu_0-\mu_1)^T\Bigr)\Bigr]\\
+&=\frac12\Biggl(\log\frac{|\Sigma_1|}{|\Sigma_0|}-n+\Tr(\Sigma_1^{-1}\Sigma_0)
++(\mu_0-\mu_1)^T\Sigma_1^{-1}(\mu_0-\mu_1)\Biggr).
+\end{aligned}
+\tag{7.28}
+\end{equation}
+\end{bookexample}
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.3：熵与K–L距离的性质}\par
+K–L距离总是非负：
+\begin{equation}
+D(f\Vert g)\ge0,
+\tag{7.29}
+\end{equation}
+等号成立当且仅当 $f=g$。事实上，
+\[
+\begin{aligned}
+-D(f\Vert g)&=\int f\log\frac gf\,dx\\
+&\le\log\int f\frac gf\,dx\\
+&=\log\int g\,dx=\log1=0,
+\end{aligned}
+\]
+故 $D(f\Vert g)\ge0$。

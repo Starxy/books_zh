@@ -1,0 +1,23 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.2cm,y=1cm,every node/.style={ellipse,draw=inkblue,fill=white,text=black,minimum width=.7cm,minimum height=.5cm,inner sep=1pt,font=\small}]
+\node (chSevenBf8aX) at (0,1.3) {$X$};
+\node (chSevenBf8aY) at (1.8,1.3) {$Y$};
+\node (chSevenBf8aZ) at (1.8,0) {$Z$};
+\node (chSevenBf8aW) at (0,0) {$W$};
+\draw[->,blue!70] (chSevenBf8aX)--node[above,draw=none] {$a$}(chSevenBf8aY);
+\draw[->,blue!70] (chSevenBf8aY)--node[right,draw=none] {$b$}(chSevenBf8aZ);
+\draw[->,blue!70] (chSevenBf8aZ)--node[above,draw=none] {$c$}(chSevenBf8aW);
+\draw[->,blue!70] (chSevenBf8aX)--node[left,draw=none] {$d$}(chSevenBf8aW);
+\node[draw=none] at (-.1,-.7) {(a)};
+\node (chSevenBf8bX) at (3.8,1.3) {$X$};
+\node (chSevenBf8bY) at (5.6,1.3) {$Y$};
+\node (chSevenBf8bZ) at (5.6,0) {$Z$};
+\node (chSevenBf8bW) at (3.8,0) {$W$};
+\draw[->,blue!70] (chSevenBf8bX)--node[above,draw=none] {$\widetilde a$}(chSevenBf8bY);
+\draw[->,blue!70] (chSevenBf8bY)--node[right,draw=none] {$\widetilde b$}(chSevenBf8bZ);
+\draw[->,blue!70] (chSevenBf8bW)--node[above,draw=none] {$\widetilde c$}(chSevenBf8bZ);
+\node[draw=none] at (3.7,-.7) {(b)};
+\end{tikzpicture}
+\origfig{8}{忠实性示意。（a）结构方程 (7.197) 的 DAG；（b）结构方程 (7.200) 的 DAG。}
+\end{figure}

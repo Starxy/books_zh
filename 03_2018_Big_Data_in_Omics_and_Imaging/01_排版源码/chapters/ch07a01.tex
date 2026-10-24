@@ -1,0 +1,185 @@
+% 原书PDF第1—8页，止于7.1.4标题之前。
+\chapter{从关联分析到整合因果推断}
+\label{ch:integrated-causal}
+
+新一代基因组、表观基因组、传感与影像技术，正在产生越来越深入的多组学、生理、影像、环境与表型数据，其中包含数百万个特征。分析规模不断扩大、层次不断深入的组学与表型数据，为全面揭示疾病的遗传结构及开展精准医学提供了宝贵信息。当前基因组分析方法的广度与深度仍不足：广度指一次分析的变量数，深度指遗传变异跨越基因组与分子层面、最终影响临床结局所经历的步骤数。现有分析范式仍以关联与相关分析为主。尽管关联分析在解析复杂疾病遗传架构方面取得了显著进展，复杂疾病的病因与机制仍不清楚。将关联分析作为复杂疾病遗传研究的主要分析平台，是阻碍基因组科学理论发展及实际应用的一个关键问题。
+
+因果推断是发现疾病机制的重要环节。许多研究者主张从关联走向因果（Clyde 2017）。因果推断可能在改善复杂疾病的预防、管理和治疗方面发挥很大作用（Peters et al. 2017；Orho-Melander 2015），但多数基因组、表观基因组与影像数据都是观测数据，许多混杂变量没有或无法测量。未测量的混杂变量会使大多数传统因果推断分析失效。因果推断的金标准是开展随机对照试验，以控制混杂效应（Statnikov et al. 2012）。然而，许多情况下，实验不符合伦理或无法实施。多数遗传研究只能依据观测数据推断因果关系。尽管因果推断在科学、工程与生物医学中发挥着基础作用（Granger 1969；Sims 1972；The Prize in Economic Sciences, 2011），仅依赖观测数据的传统因果推断，仍无法识别变量之间唯一的因果关系。这些不唯一的因果解，严重限制了其转化应用（Nowzohour and Bühlmann 2016）。
+
+过去十年间，因果推断理论正经历深刻而令人振奋的变化：从最多只能发现马尔可夫等价类，转向识别唯一的因果结构。本章介绍学习因果模型所需的假设，以及用于定性和定量性状因果发现的加性噪声模型（Peters et al. 2012；Mooij et al. 2016；Peters and Bühlman 2014；Peters et al. 2017）。
+
+在因果分析中，没有测量或记录的变量称为隐藏变量或混杂因子。隐藏变量常会引起严重的复杂问题（Spirtes 1999），因此因果分析还要求深入的遗传与分子分析。然而，用于深入遗传与分子分析的因果模型尚未得到充分发展。当前，利用因果推断揭示复杂疾病机制，面临两大挑战。第一，需要发展具有创新性、能够改变现有范式的分析平台，通过对全基因组测序（WGS）、其他组学、环境、影像与临床数据的整合分析，将多层次遗传、分子与表型数据集有效整合为多层次组学网络，揭示疾病机制背后的深层因果链。跨越多个分析层次、基础扎实且信息丰富的因果模型仍很少，亟须发展利用多类分子进行跨层次联合因果分析的方法。第二，需要发展能够构建含大量变量的有向无环图（DAG）的搜索算法。本章将讨论如何把异质的基因组、表观基因组、环境、影像和表型数据整合为与疾病及健康有关的多层网络。当前遗传分析范式应从同质人群中的浅层关联分析，转向异质人群中的深层因果推断。
+
+\section{全基因组因果研究}
+在基因组与表观基因组数据分析中，通常考虑四类关联：（1）离散变量（DNA变异）与连续变量（表型、基因表达、甲基化、影像信号和生理性状）的关联；（2）连续变量（表达、甲基化和影像信号）与连续变量（基因表达、影像信号、表型和生理性状）的关联；（3）离散变量（DNA变异）与二分类性状（疾病状态）的关联；（4）连续变量（基因表达、甲基化、表型和影像信号）与二分类性状（疾病状态）的关联。本节将这四类关联扩展为四类因果关系。
+
+\subsection{因果分析的数学表述}
+关联与因果都刻画两个变量之间的相依关系。变量 $X$ 与 $Y$ 之间的关联包括：（1）$X$ 导致 $Y$，即 $X\to Y$；（2）$Y$ 导致 $X$，即 $Y\to X$；（3）$X$ 与 $Y$ 都由第三个变量引起，即 $X\leftarrow Z\to Y$。为简化问题，暂时假定不存在混杂，也就是本节不研究第三种情况，后续章节再放宽这一条件。在线性关系下，若 $X$、$Y$ 均为连续变量，可用回归研究二者的关联：
+\[
+Y=\alpha X+\varepsilon\qquad\text{或}\qquad X=\beta Y+\varepsilon.
+\]
+回归参数可估计为
+\[
+\alpha=r\sqrt{\frac{\operatorname{var}(Y)}{\operatorname{var}(X)}},\qquad
+\beta=r\sqrt{\frac{\operatorname{var}(X)}{\operatorname{var}(Y)}},
+\]
+其中相关系数为
+\[
+r=\frac{\operatorname{cov}(X,Y)}{\sqrt{\operatorname{var}(X)\operatorname{var}(Y)}}.
+\]
+两个回归可以反转，其回归系数均依赖于相关系数。因果蕴含关联，但关联未必表示因果；一个关联具有两个潜在因果方向。因此，在因果推断中，应先检验两个变量之间的关联，再排除其中一个因果方向。
+
+本节仅针对两个变量，形式化地给出因果关系的基本概念与数学模型。第2.5.1.1节曾讨论两个连续变量的双变量因果发现加性噪声模型，现在给出定义因果关系的更一般模型。考虑两个随机变量 $X$ 与 $Y$，例如 $X$ 表示基因表达，$Y$ 表示血压。假设基因表达引起血压变化，则下列函数型结构方程模型，通过编码数据生成过程，给出因果关系的形式化定义（Peters et al. 2017）。
+
+\begin{bookdefinition}{7.1}
+\textbf{因果关系。}用下列函数型结构方程模型（SEM）定义因果关系：
+\begin{equation}
+\begin{aligned}
+X&=f_x(\varepsilon_x),\\
+Y&=f_y(X,\varepsilon_y),
+\end{aligned}
+\tag{7.1}
+\end{equation}
+其中 $\varepsilon_x,\varepsilon_y$ 为噪声变量，$\varepsilon_y$ 与 $X$ 独立。随机变量 $X$ 称为原因，随机变量 $Y$ 称为结果，记作 $X\to Y$。
+\end{bookdefinition}
+
+SEM量化每个变量的边缘分布与其直接效应分布之间的关系。函数 $f_y$ 表示因果机制，使变量 $X$ 与 $Y$ 之间的关系具有不对称性（Ernest 2016）。
+
+\begin{bookexample}{7.1}
+假设 $\varepsilon_x,\varepsilon_y$ 均服从正态分布 $N(0,1)$。考虑SEM：
+\[
+\begin{aligned}X&=\varepsilon_x,\\Y&=3X+\varepsilon_y.\end{aligned}
+\]
+则 $X$ 与 $Y$ 分别服从 $N(0,1)$ 和 $N(0,10)$。若将变量 $X$ 设为3，则结果变量 $Y$ 的分布为 $N(1,9)$。若将 $Y$ 设为5，式 (7.1) 中的SEM变为
+\[
+\begin{aligned}X&=f_x(\varepsilon_x),\\Y&=5.\end{aligned}
+\]
+\end{bookexample}
+
+\subsection{基本因果假设}
+式 (7.1) 的SEM过于一般，无法找到唯一的因果解（Ernest 2016）。为得到更好的因果解，需要限制SEM并引入假设（Peters et al. 2017）。给定两个随机变量 $X$ 与 $Y$ 的联合分布，SEM不能判定究竟是 $X\to Y$ 还是 $Y\to X$。已有研究表明（Peters 2012；Peters et al. 2017），对任意联合分布 $P(x,y)$，总能构造与之相容的SEM：
+\[
+Y=f_Y(X,\varepsilon_Y),\qquad X\text{ 与 }\varepsilon_Y\text{ 独立},
+\]
+或
+\[
+X=f_X(Y,\varepsilon_X),\qquad Y\text{ 与 }\varepsilon_X\text{ 独立}.
+\]
+事实上，定义SEM
+\begin{equation}
+Y=\frac{\varepsilon_Y}{P_{Y\mid X}(y)},
+\tag{7.2}
+\end{equation}
+其中 $\varepsilon_Y$ 假定在 $[0,1]$ 上均匀分布，$P_{Y\mid X}(y)$ 为给定 $X$ 时 $Y$ 的条件密度函数。作变换
+\[
+X=X,\qquad Y=\frac{\varepsilon_Y}{P_{Y\mid X}(y)}.
+\]
+其Jacobian矩阵的行列式为
+\[
+J(X,\varepsilon_Y)=\frac1{P_{Y\mid X}(y)}.
+\]
+于是，变量 $X$ 与 $Y$ 的联合密度函数为（Ross 2014）
+\[
+P(x,y)=P_X(x)P_{Y\mid X}(y).
+\]
+类似地，可证明SEM $X=f_X(Y,\varepsilon_X)$ 导出联合分布 $P(x,y)=P_Y(y)P_{X\mid Y}(x)$。
+
+这表明，仅用SEM不能识别两个变量之间的因果结构。为利用观测数据与联合分布区分原因和结果，需要对SEM施加限制，并引入额外假设。若限制定义式 (7.2) 中的函数与噪声，使两个方向 $X\to Y$ 和 $Y\to X$ 不可能诱导相同的联合分布 $P(X,Y)$，便可进行区分。令 $C$ 表示原因变量，例如基因表达，其分布为 $P_C$；令 $E$ 表示结果变量，例如血压，其边缘分布为 $P_E$。直观而言，若基因表达引起血压变化，则给定原因 $C$（基因表达）时结果 $E$（血压）的条件分布 $P_{E\mid C}$，不会随原因 $C$ 的改变而改变。换言之，条件分布 $P_{E\mid C}$ 不包含原因边缘分布 $P_C$ 的信息。若把 $P_{E\mid C}$ 视为因果机制，上述陈述就表示原因独立于机制。
+
+在SEM (7.1) 中，函数 $f_Y$ 与噪声分布 $\varepsilon_Y$ 可视为机制。函数 $f_Y$ 和分布 $P_{\varepsilon_Y}$ 不包含关于分布 $P_X$ 的信息。就SEM而言，原因与机制独立，意味着原因 $X$ 的分布应独立于模型中的函数及噪声分布 $\varepsilon_Y$（Peters et al. 2017）。加性噪声模型可以实现这一假设。具有非高斯分布的线性SEM与函数型加性SEM，都可用于因果推断。
+
+\subsection{具有非高斯噪声的线性加性SEM}
+设 $X$、$Y$ 为两个观测随机变量，$u$ 为协变量。模型可以扩展到多个协变量；为便于表述，这里只考虑单个协变量。假设 $X$ 与 $Y$ 均已标准化为均值零、方差一。在线性非高斯无环模型（linear non-Gaussian acyclic model，LiNGAM）下，推断 $X$、$Y$ 之间因果关系的常用方法，包括基于独立成分分析（independent component analysis，ICA）的方法（Shimizu et al. 2006, 2011；Moneta et al. 2013），以及基于似然比的方法（Hyvärinen and Smith 2013）。第一个潜在因果模型记作 $X\to Y$，定义为
+\begin{equation}
+\begin{aligned}X&=\alpha u+\varepsilon_x,\\Y&=\rho X+\beta u+\varepsilon_y,\end{aligned}
+\tag{7.3}
+\end{equation}
+其中残差 $\varepsilon_x$ 与 $\varepsilon_y$ 独立，且 $\varepsilon_y$ 独立于 $X$。第二个潜在因果模型记作 $Y\to X$，定义为
+\begin{equation}
+\begin{aligned}Y&=\beta u+\varepsilon_y,\\X&=\rho Y+\alpha u+\varepsilon_x,\end{aligned}
+\tag{7.4}
+\end{equation}
+其中残差 $\varepsilon_x$ 与 $\varepsilon_y$ 独立，且 $\varepsilon_x$ 独立于 $Y$。在回归方程 (7.3) 中，回归系数估计为
+\begin{equation}
+\rho=\frac{\operatorname{cov}(Y,X)}{\operatorname{var}(X)}
+=\operatorname{cov}(Y,X)=\operatorname{corr}(Y,X).
+\tag{7.5}
+\end{equation}
+类似地，回归方程 (7.4) 的系数也由相关系数 $\rho$ 估计。因此，两模型中的回归系数相同，均等于相关系数 $\rho$。
+
+可根据观测数据，用似然比区分两个模型（Hyvärinen and Smith 2013）。令 $L(X\to Y)$ 表示方向为 $X\to Y$ 的LiNGAM似然，$L(Y\to X)$ 表示方向为 $Y\to X$ 的LiNGAM似然。平均对数似然比定义为
+\begin{equation}
+R=\frac1n\log L(X\to Y)-\frac1n\log L(Y\to X).
+\tag{7.6}
+\end{equation}
+可推导出结论7.1（Hyvärinen and Smith 2013；附录7.A）。
+
+\par\medskip\Needspace{6\baselineskip}\noindent\textbf{结论7.1：因果方向的似然比检验}\par
+平均对数似然比为
+\begin{equation}
+\begin{aligned}
+R&=\frac1nl(X\to Y)-\frac1nl(Y\to X)\\
+&=\frac1n\sum_{i=1}^n\Biggl[G_x(x_i)
++G_d\left(\frac{y_i-\rho x_i-\beta u_i}{\sqrt{1-\rho^2}}\right)\\
+&\hspace{7em}-G_y(y_i)-G_e\left(\frac{x_i-\rho y_i-\alpha u_i}{\sqrt{1-\rho^2}}\right)\Biggr].
+\end{aligned}
+\tag{7.7}
+\end{equation}
+若 $R$ 为正，推断因果方向为 $X\to Y$；若为负，则推断方向为 $Y\to X$。进一步可证明（附录7.A），对数似然比可近似为
+\begin{equation}
+R\approx R_{\mathrm{NC}}+R_C,
+\tag{7.8}
+\end{equation}
+其中
+\[
+\begin{aligned}
+R_{\mathrm{NC}}&=\rho\widehat E[x\tanh(y)-y\tanh(x)],\\
+R_C&=\beta\widehat E[u\tanh(y_i)]-\alpha\widehat E[u\tanh(x)].
+\end{aligned}
+\]
+$\widehat E$ 表示样本均值，且 $\tanh(t)=(e^t-e^{-t})/(e^t+e^{-t})$。没有协变量或混杂因子时，式 (7.8) 变为
+\begin{equation}
+R\approx\rho\widehat E[x\tanh(y)-y\tanh(x)].
+\tag{7.9}
+\end{equation}
+式 (7.8) 表明，对数似然比由 $R_{\mathrm{NC}}$ 与 $R_C$ 两部分组成。若只考虑变量 $X$、$Y$，则 $R\approx R_{\mathrm{NC}}$。由混杂因子引起的对数似然比 $R_C$ 可正可负，因此会影响 $R$ 的符号及因果方向的结论。
+
+对数似然比的渐近极限为（Hyvärinen and Smith 2013；附录7.A）
+\begin{equation}
+R\to-H(x)-H\left(\frac{\widehat\varepsilon_y}{\sigma_{\varepsilon_y}}\right)
++H(y)+H\left(\frac{\widehat\varepsilon_x}{\sigma_e}\right),
+\tag{7.10}
+\end{equation}
+其中 $H$ 表示微分熵。对对数似然比作Taylor展开，可得结论7.2。
+
+\par\medskip\Needspace{6\baselineskip}\noindent\textbf{结论7.2：对数似然比的微分熵近似}\par
+式 (7.10) 中的 $R$ 可近似为
+\begin{equation}
+R\approx R_0+\left[\frac\beta{\sigma_{\varepsilon_y}}
+h\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)
+-\frac\alpha{\sigma_{\varepsilon_x}}h\left(\frac{\varepsilon_x^0}{\sigma_{\varepsilon_x}}\right)\right]E[u],
+\tag{7.11}
+\end{equation}
+其中
+\[
+\begin{aligned}
+R_0&=-H(x)-H\left(\frac{\varepsilon_y^0}{\sigma_{\varepsilon_y}}\right)
++H(y)+H\left(\frac{\varepsilon_x^0}{\sigma_e}\right),\\
+\varepsilon_x^0&=X-\rho Y,\qquad \varepsilon_y^0=Y-\rho X,
+\end{aligned}
+\]
+\[
+\begin{aligned}
+h(z)={}&-2k_1\{E[\log\cosh(z)]-\gamma\}E[\tanh(z)]\\
+&-2k_2E[ze^{-z^2/2}]E[(1-z^2)e^{-z^2/2}],
+\end{aligned}
+\]
+微分熵可近似为
+\[
+\widetilde H(z)=H(u)-k_1\{E[\log\cosh(z)]-\gamma\}^2
+-k_2\left\{E\left[ze^{-z^2/2}\right]\right\}^2,
+\]
+\[
+H(u)=\frac12(1+2\pi),\quad k_1\approx79.047,\quad k_2\approx7.4129,\quad\gamma\approx0.37457.
+\]
+对数似然比的熵近似同样由两部分组成：第一部分是不考虑混杂变量的对数似然比熵近似，第二部分由混杂变量引起。第二部分可能改变第一部分 $R_0$ 的符号，进而影响因果方向的结论。在对数似然比中纳入混杂变量，将提高因果方向推断的准确性。

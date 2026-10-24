@@ -1,0 +1,203 @@
+% 原书PDF第33—38页，止于4.2.2标题之前。
+\Needspace{9\baselineskip}
+\subsubsection{负二项分布}
+\bookdeepheading{paragraph}{4.2.1.2.1}{用负二项分布对 RNA-seq 计数数据建模}
+
+用泊松分布对计数数据建模时，假定均值与方差相等。然而，实际 RNA-seq 数据往往具有异质性，观测计数的方差大于均值。这表明，需要修改用于测序读段建模的泊松分布。我们考虑计数数据中的技术变异与生物学变异，并在统计模型中同时纳入这两类变异（McCarthy 2012）。
+
+先考虑技术变异。假设对同一个生物学样本反复测序多次。设 $\pi_{gi}$ 为样本 $i$ 的全部 cDNA 片段中抽自基因 $g$ 的比例，该比例在重复之间有所不同。以 $\sqrt{\phi_g}$ 表示重复之间 $\pi_{gi}$ 的变异系数（coefficient of variation，CV），即其标准差除以均值。样本 $i$ 中比对上的读段总数与比对到基因 $g$ 的读段数，分别记为 $N_i$ 与 $y_{gi}$。显然，
+\begin{equation}
+E[y_{gi}]=\mu_{gi}=N_i\pi_{gi}.
+\tag{4.93}
+\end{equation}
+可以证明（附录4.B），基因 $g$ 的读段计数 $y_{gi}$ 的方差为
+\begin{equation}
+\Var(y_{gi})=\mu_{gi}+\phi_g\mu_{gi}^2,
+\tag{4.94}
+\end{equation}
+其中 $\phi_g$ 通常称为离散度（dispersion）。式 (4.94) 表明，$y_{gi}$ 的方差大于均值。
+
+现在考虑均值为 $Z$ 的复合泊松过程。均值 $Z$ 本身也是随机变量，服从形状参数 $\alpha=1/\phi_g$、率参数 $\beta=1/(\phi_g\mu_{gi})$ 的 Gamma 分布。附录4.B将证明，该复合泊松过程的边缘概率 $P(Y=y_{gi})$ 为
+\begin{equation}
+P(Y=y_{gi})=\frac{\Gamma(y_{gi}+\alpha)}{y_{gi}!\,\Gamma(\alpha)}
+\left(\frac1{1+\beta}\right)^{y_{gi}}
+\left(\frac\beta{1+\beta}\right)^\alpha,
+\tag{4.95}
+\end{equation}
+也可写为
+\begin{equation}
+P(Y=y_{gi})=\frac{\Gamma(y_{gi}+\alpha)}{y_{gi}!\,\Gamma(\alpha)}
+p^{y_{gi}}(1-p)^\alpha,
+\tag{4.96}
+\end{equation}
+其中 $p=1/(1+\beta)$。负二项分布通常记为 $\operatorname{NB}(\alpha,p)$，其均值与方差为
+\[
+E[y_{gi}]=\mu_{gi},\qquad
+\Var(y_{gi})=\mu_{gi}(1+\phi_g\mu_{gi}).
+\]
+
+\bookdeepheading{paragraph}{4.2.1.2.2}{对数线性模型}
+假设用下列对数线性模型检验差异表达（McCarthy et al. 2012）：
+\begin{equation}
+\log\mu_{gi}=\mathbf x_i^T\gamma_g+\log N_i,
+\tag{4.97}
+\end{equation}
+其中 $\mathbf x_i$ 为协变量向量，表示 RNA 样本 $i$ 的状态或施加于该样本的处理条件；$\gamma_g$ 为与基因 $g$ 对应的 $q$ 维回归系数向量。对数似然正比于
+\begin{equation}
+\begin{aligned}
+l(\gamma_g,\phi_g)\approx{}&\left(\sum_{i=1}^{n}y_{gi}\right)\log\phi_g\\
+&+\sum_{i=1}^{n}\biggl[y_{gi}(\mathbf x_i^T\gamma_g+\log N_i)\\
+&\hspace{24mm}-\left(y_{gi}+\frac1{\phi_g}\right)
+\log(1+\phi_gN_i e^{X_i^T\gamma_g})\biggr].
+\end{aligned}
+\tag{4.98}
+\end{equation}
+参数 $\gamma_g$ 的极大似然估计可用 Newton–Raphson 迭代求得（附录4.B）：
+\begin{equation}
+\gamma_g^{\mathrm{new}}=\gamma_g^{\mathrm{old}}+(XWX^T)^{-1}X\mathbf z_g,
+\tag{4.99}
+\end{equation}
+其中
+\[
+\begin{gathered}
+X=[\mathbf x_1,\ldots,\mathbf x_n],\qquad
+z_{gi}=\frac{y_{gi}-\mu_{gi}}{1+\phi_g\mu_{gi}},\\
+\mu_{gi}=N_i e^{\mathbf x_i^T\gamma_g},\quad i=1,\ldots,n,\qquad
+\mathbf z_g=[z_{g1},\ldots,z_{gn}]^T,
+\end{gathered}
+\]
+以及
+\[
+W=\begin{bmatrix}
+\dfrac{\mu_{g1}y_{g1}\phi_g}{(1+\phi_g\mu_{g1})^2}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{\mu_{gn}y_{gn}\phi_g}{(1+\phi_g\mu_{gn})^2}
+\end{bmatrix}.
+\]
+
+一般而言，迭代会增大似然函数，但实际计算中也可能得到使似然下降的解。为保证每次迭代都使似然增大，可以用线搜索修改式 (4.99)。令 $\delta=(XWX^T)^{-1}X\mathbf z_g$，定义新的迭代过程：
+\begin{equation}
+\gamma_g^{\mathrm{new}}=\gamma_g^{\mathrm{old}}+\alpha\delta,
+\tag{4.100}
+\end{equation}
+其中 $\alpha$ 为步长常数。以 $\delta$ 为搜索方向，通过线搜索确定步长 $\alpha$，保证每次迭代都使似然增大。为简化搜索方向 $\delta$ 的计算，式 (4.100) 可化为
+\begin{equation}
+\gamma_g^{\mathrm{new}}=\gamma_g^{\mathrm{old}}+\alpha_0X\mathbf z_g,
+\tag{4.101}
+\end{equation}
+其中常数 $\alpha_0$ 用于确定每次迭代的步长。同样可以用线搜索，保证似然随迭代增大。
+
+\bookdeepheading{paragraph}{4.2.1.2.3}{Cox–Reid 调整剖面似然}
+大多数统计推断基于观测似然函数。当存在干扰参数时，可通过调整剖面似然函数进行推断。第4.2.1.2.2节假定离散度参数已知，但实际中往往需要估计。本节介绍 Cox–Reid 调整剖面似然，并给出离散度参数 $\phi$ 的估计方法。
+
+$\phi_g$ 的调整剖面似然（adjusted profile likelihood，APL）定义为惩罚对数似然
+\[
+\operatorname{APL}_g(\phi_g,\hat\gamma_g)
+=l(\phi_g;\mathbf y_g,\hat\gamma_g)-\frac12\log|I_g|,
+\]
+其中
+\[
+I_g=XWX,
+\]
+以及
+\[
+\begin{aligned}
+l(\phi_g;\mathbf y_g,\hat\gamma_g)
+=\sum_{i=1}^{n}\biggl[{}&\sum_{l=1}^{y_{gi}-1}\log(1+l\phi_g)
+-y_{gi}\log\phi_g-\log y_{gi}!\\
+&+y_{gi}\log(\phi_g\mu_{gi})
+-\left(y_{gi}+\frac1{\phi_g}\right)\log(1+\phi_g\mu_{gi})\biggr].
+\end{aligned}
+\]
+离散度参数 $\phi_g$ 可用 Newton–Raphson 算法估计：
+\begin{equation}
+\begin{aligned}
+\phi_g^{(\mathrm{new})}
+&=\phi_g^{(\mathrm{old})}
+-\frac{\left.\dfrac{\partial\operatorname{APL}(\phi_g)}{\partial\phi_g}\right|_{\phi_g^{(\mathrm{old})}}}
+{\left.\dfrac{\partial^2\operatorname{APL}(\phi_g)}{\partial\phi_2^2}\right|_{\phi_g^{\mathrm{old}}}}\\
+&=\phi_g^{(\mathrm{old})}+\delta,
+\end{aligned}
+\tag{4.102}
+\end{equation}
+其中 $\delta$ 的表达式见附录4.B。
+
+Newton–Raphson 算法通常会使似然函数增大，但也可能使其下降。为保证每次迭代都使似然增大，再引入一个松弛常数，将式 (4.102) 化为
+\begin{equation}
+\phi_g^{(\mathrm{new})}=\phi_g^{(\mathrm{old})}+\alpha\delta,
+\tag{4.103}
+\end{equation}
+其中 $\alpha$ 为松弛常数。通过线搜索找到 $\alpha$，使
+\[
+\operatorname{APL}_g(\phi_g^{(\mathrm{new})})\ge
+\operatorname{APL}_g(\phi_g^{(\mathrm{old})}).
+\]
+式 (4.100) 与 (4.102) 都假定已有估计量 $\hat\gamma_g$，但估计 $\gamma_g$ 又需要离散度参数 $\phi_g$，因此必须在 $\gamma_g$ 与 $\phi_g$ 之间交替迭代。
+
+\bookdeepheading{paragraph}{4.2.1.2.3}{检验统计量}
+我们关心对数线性模型中系数 $\gamma_g$ 的显著性。原假设为
+\[
+H_0:\gamma_g=0.
+\]
+定义如下检验统计量（Huang et al. 2015）。不存在过度离散时，检验 $H_0:\gamma_g=0$ 的似然比统计量定义为
+\begin{equation}
+\operatorname{LR}_g=2\left[l(\hat\gamma_g,\hat\phi_g)-l(\gamma_g^0,\hat\phi_g)\right],
+\tag{4.104}
+\end{equation}
+其中
+\[
+\begin{aligned}
+l(\hat\gamma_g,\phi_g)\approx{}&\left(\sum_{i=1}^{n}y_{gi}\right)\log\phi_g\\
+&+\sum_{i=1}^{n}\biggl[y_{gi}(\mathbf x_i^T\hat\gamma_g+\log N_i)\\
+&\hspace{24mm}-\left(y_{gi}+\frac1{\phi_g}\right)
+\log(1+\phi_gN_i e^{\mathbf x_i^T\hat\gamma_g})\biggr].
+\end{aligned}
+\]
+存在过度离散时，检验同一原假设的似然比统计量定义为
+\begin{equation}
+\operatorname{LR}_{gd}
+=\frac{2\left[l(\hat\gamma_g,\hat\phi_g)-l(\gamma_g^0,\hat\phi_g)\right]}{\hat\phi_g}.
+\tag{4.105}
+\end{equation}
+在原假设 $H_0:\gamma_g=0$ 下，$\operatorname{LR}_g$ 与 $\operatorname{LR}_{gd}$ 分别渐近服从中心 $\chi^2_{(q)}$ 分布与 $F_{(q,n-q-1)}$ 分布。
+
+检验差异表达的一个自然思路，是比较病例与对照的表达差异。考虑 $A$ 组（病例）与 $B$ 组（对照）。以 $n_{gA}$、$n_{gB}$ 分别表示两组中基因 $g$ 的读段数，以 $n_A$、$n_B$ 分别表示两组的读段总数，则 $n_A-n_{gA}$、$n_B-n_{gB}$ 分别为两组中其余基因的读段数。设 $\mu_{gA}$、$\mu_{gB}$ 为两组中基因 $g$ 的平均读段数。基因 $g$ 在两组间无表达差异的原假设为
+\[
+H_0:\mu_{gA}=\mu_{gB}.
+\]
+可采用类似 Fisher 精确检验的方法检验差异表达。考虑表4.6的 $2\times2$ 列联表，其中 $n_g=n_{gA}+n_{gB}$ 为基因 $g$ 的行边缘合计，$n=n_A+n_B$ 为总计。假设从两组分别抽取 $m_A$ 与 $m_B$ 名研究对象。令 $n_{gA}=a$、$n_{gB}=b$，对于任意数对 $a,b$，以 $p(a,b)$ 表示观察到这两个事件的概率。在总和为 $n_g$ 的条件下，观测读段数对 $(n_{gA}^*,n_{gB}^*)$ 的 $P$ 值 $P_g$，定义为所有不大于 $p(n_{gA}^*,n_{gB}^*)$ 的概率 $p(a,b)$ 之和（Gonzalez 2014）：
+\begin{equation}
+P_g=\sum_{\substack{a+b=n_g\\p(a,b)\le p(n_{gA}^*,n_{gB}^*)}}p(a,b),
+\tag{4.106}
+\end{equation}
+\begin{table}[htbp]
+\centering
+\origtable{6}{基因 $g$ 的 $2\times2$ 列联表}
+\begin{tabular}{lccc}
+\toprule
+&$A$ 组&$B$ 组&合计\\
+\midrule
+基因 $g$&$n_{gA}$&$n_{gB}$&$n_g$\\
+其余基因&$n_A-n_{gA}$&$n_B-n_{gB}$&$n-n_g$\\
+合计&$n_A$&$n_B$&$n$\\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+其中 $a,b=0,1,\ldots,n_g$，且 $p(a,b)=p(n_{gA}=a)p(n_{gB}=b)$。附录4.B证明，$P(n_{gA}=a)$ 与 $P(n_{gB}=b)$ 可按下式计算：
+\begin{equation}
+P(n_{gA}=a)=\frac{\Gamma\left(a+\dfrac{m_A}{\phi_{gA}}\right)}
+{a!\,\Gamma\left(\dfrac{m_A}{\phi_{gA}}\right)}
+(\phi_{gA}\mu_{gA})^a
+\left(\frac1{1+\phi_{gA}\mu_{gA}}\right)^{a+\frac{m_A}{\phi_{gA}}},
+\tag{4.107}
+\end{equation}
+以及
+\begin{equation}
+P(n_{gB}=b)=\frac{\Gamma\left(b+\dfrac{m_B}{\phi_{gB}}\right)}
+{b!\,\Gamma\left(\dfrac{m_B}{\phi_{gB}}\right)}
+(\phi_{gB}\mu_{gB})^b
+\left(\frac1{1+\phi_{gB}\mu_{gB}}\right)^{b+\frac1{\phi_{gB}}}.
+\tag{4.108}
+\end{equation}
+\FloatBarrier

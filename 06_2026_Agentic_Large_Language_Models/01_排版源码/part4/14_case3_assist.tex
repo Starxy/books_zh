@@ -1,0 +1,185 @@
+\chapter[案例研究 3：多智能体诊断]{案例研究 3：构建多智能体诊断框架}
+
+\begin{learningbox}
+在本案例研究中，你将获得为高风险应用领域构建多智能体系统（multi-agent system）的实践经验。
+具体而言，学完本章后，你将能够：
+\begin{itemize}[leftmargin=*, nosep]
+    \item 实现一个{\em 医院诊断流程}，让规划智能体（planner agent）与执行智能体（executor agent）通过共享上下文（shared context）进行通信。
+    \item 将训练好的机器学习（machine learning，ML）{\em 分类器作为工具}，集成到智能体流程中。
+    \item 用大语言模型（large language model，LLM）替换基于规则的规划器，并{\em 评估}这种替换对路由和诊断准确率的影响。
+    \item 使用分类指标与路由指标评估系统性能，区分规划器错误与执行器错误。
+    \item 批判性地反思在医疗场景中部署智能体系统的{\em 局限、风险与伦理}问题。
+\end{itemize}
+\end{learningbox}
+
+
+\section{场景概览}
+
+本案例研究围绕一个简化的多智能体医院模拟展开，你将构建并扩展这一模拟系统。系统采用共享上下文，其设计受到模型上下文协议（Model Context Protocol，MCP，第~\ref{sec:tools}~章）的启发 \citep{xinyi2026mcp}。本案例旨在帮助你获得在高风险领域中使用智能体架构的实践经验，重点关注协调、规划、评估与安全问题。
+
+你将模拟医院场景中的诊断流程。患者病例由智能体处理，智能体之间仅通过共享上下文交互：
+\begin{itemize}
+    \item \textit{规划智能体}决定应当采用哪一条或哪几条诊断路径（diagnostic pathway）。
+    \item \textit{执行智能体}使用训练好的机器学习分类器给出诊断。
+    \item \textit{共享上下文}存储病例、任务、中间决策与结果。
+\end{itemize}
+模拟按离散步骤运行，并记录病例如何在系统中流转。与前面的案例研究一样，我们的目标\emph{不是}构建具有临床有效性的系统，而是让你理解智能体架构在高风险领域中的行为：智能体如何通过共享状态（shared state）进行协调，大语言模型在承担分诊（triage）角色时表现如何，以及这种系统会在哪些环节暴露局限与安全隐患。\footnote{本案例研究部分基于 Ayushman Pranav 的教程 \emph{Modeling Hospital Intelligence with MCP: A Multi-Agent Diagnostic Simulation}，教程地址为 \url{https://medium.com/@AyushmanPranav/modeling-hospital-intelligence-with-mcp-a-multi-agent-diagnostic-simulation-afeff0dd885d}。}
+
+
+\section{环境配置}
+\label{sec:case3-setup}
+
+与前面的案例研究一样，我们建议使用 Python 3.10 或更高版本，在专用虚拟环境中开展实践（配置说明见代码~\ref{lst:case3-setup}）。
+
+\begin{listing}[!ht]
+\begin{minted}[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.0,
+fontsize=\footnotesize,
+linenos
+]{bash}
+# create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+# install dependencies
+pip install -r requirements.txt
+\end{minted}
+\caption{配置案例研究 3 的环境}
+\label{lst:case3-setup}
+\end{listing}
+
+\begin{tcolorbox}[
+    colback=blue!10!white,
+    colframe=blue!85!black,
+    title={\faRocket\quad 在 GitHub 上查看！},
+    fonttitle=\bfseries,
+    coltitle=white,
+    boxrule=1pt,
+    arc=4pt,
+    left=5pt,
+    right=5pt,
+    top=5pt,
+    bottom=5pt,
+    enhanced
+]
+基线代码、数据文件与训练好的模型可在以下 GitHub 页面获取：\\
+\href{https://github.com/Agentic-LLMs/Agentic-AI-tutorials/tree/main/case3}{\faCode\quad \textbf{作业 3}\footnote{https://github.com/Agentic-LLMs/Agentic-AI-tutorials/tree/main/case3}}
+\end{tcolorbox}
+
+
+\section{实现步骤}
+\label{sec:case3-implementation}
+
+\subsection{步骤 0：训练诊断模型}
+
+我们提供了脚本 \texttt{0\_train\_models.py}，用于在三个公开数据集上训练简单分类器（随机森林，random forest）：
+
+\begin{itemize}
+    \item \textbf{糖尿病}——Pima Indians Diabetes 数据集。
+    \item \textbf{乳腺癌}——Wisconsin breast cancer 数据集，可直接通过 \texttt{sklearn.datasets} 获取。
+    \item \textbf{心脏病}——UCI heart disease 数据集。
+\end{itemize}
+执行所提供的训练脚本，并保存生成的模型，以便后续使用；步骤 1 和步骤 2 中的执行智能体会将这些训练好的模型作为工具加载，而不是在每次运行时重新训练。
+
+\paragraph{交付要求} 三种疾病对应的训练模型文件，或者能够重新生成这些模型的清晰、可复现脚本。
+
+
+\subsection{步骤 1：理解并运行基线}
+
+基线实现 \texttt{1\_basic\_mcp.py} 使用三个基于规则的规划智能体，每个智能体都被硬编码为处理一种特定疾病。在运行任何内容之前，请先仔细阅读代码。它实现了贯穿本案例研究的三个组件：
+
+\begin{itemize}
+    \item \textbf{共享上下文（类似 MCP 的层）。} 一个中央数据结构，用于存储新到达的患者病例、已分配的诊断任务与诊断结果。所有智能体\emph{仅}通过这一共享上下文交互，彼此之间从不直接交互；这体现了第~\ref{sec:tools}~节介绍模型上下文协议时所讨论的共享状态协调模式。
+    \item \textbf{规划智能体。} 每个基于规则的规划器读取尚未分配的病例，使用固定规则判断病例是否属于其疾病领域，并在共享上下文中创建任务。
+    \item \textbf{执行智能体。} 每个执行器读取分配给其专科的任务，运行步骤 0 中训练好的相应机器学习分类器，生成预测，并将结果写回共享上下文。
+\end{itemize}
+
+运行基线模拟，观察单个患者病例如何在系统中流转：从病例到达，经由规划与任务创建，到任务执行和结果记录。
+
+\paragraph{分析问题} 评估这一基线设置的真实性。其性能评估做得如何？系统处理患者与诊断的方式隐含了哪些假设？
+
+
+
+\subsection[步骤 2：替换基于规则的规划器]{步骤 2：用大语言模型智能体替换基于规则的规划器}
+
+在第二部分 \texttt{2\_llm\_mcp.py} 中，三个基于规则的规划器被单个基于大语言模型的规划智能体替代。这给规划器带来了难度大得多的任务：现在，每个患者病例都将来自\emph{全部三个}数据集的特征合并到一条记录中，再使用所提供的 \texttt{make\_case\_text} 函数将其转换为文本描述；你不得修改这个函数。大语言模型规划器必须阅读这一合并后的病例文本描述，在没有硬编码规则的情况下，决定应当采用哪一条或哪几条诊断路径。
+
+你的任务包括：
+\begin{itemize}
+    \item 实现一个调用真实大语言模型的函数（例如通过 Ollama 调用本地模型，或者使用 OpenAI 或 Gemini API），获取规划器针对给定病例的决策；
+    \item 实现 \texttt{LLMPlannerAgent} 的 \texttt{step()} 方法，使其为每个病例选择一条或多条诊断路径，并给出一个主要诊断（primary diagnosis）；
+    \item 妥善处理格式错误或无法解析的大语言模型输出，避免一次有问题的响应就使模拟崩溃；
+    \item 记录规划器的每次决策及其对应病例，以便在运行结束后分析规划器行为。
+\end{itemize}
+由于规划器现在必须从非结构化文本中推理出相关性，而不是依据固定规则做判断，这一步将让你直接体验大语言模型承担决策角色时出现的可靠性问题：解析失败、格式不一致，以及大语言模型的路由决策（routing decision）与数据集真值标签（ground-truth label）不一致。
+
+\paragraph{交付要求} 一个能够正常工作的 \texttt{LLMPlannerAgent}，一份简要说明，写明你使用了哪个大语言模型以及如何访问它（本地或 API），以及一次完整模拟运行中记录的规划器决策。
+
+
+\section{评估}
+\label{sec:case3-evaluation}
+
+你必须评估系统的两个组成部分，并将两项评估分开：
+
+\begin{itemize}
+    \item 模型（执行器）性能：针对每种疾病，使用混淆矩阵（confusion matrix）与标准分类指标——准确率（accuracy）、精确率（precision）、召回率（recall）、F1——评估执行器的预测。
+    \item 规划器性能：通过路由决策的精确率和召回率（病例是否被送往正确的一条或多条疾病诊断路径？），以及主要诊断准确率（规划器是否正确识别了主要问题？），评估大语言模型的分诊质量。
+\end{itemize}
+在报告中，应明确区分路由不正确造成的错误（规划器错误）和模型预测不正确造成的错误（执行器错误）。这两类原因都可能独立导致病例处理失败：即使路由正确，执行器仍可能将病例分类错误；即使某个病例本来可以被正确分类，也可能因为规划器从未将它送往正确的诊断路径而被完全遗漏。只报告一个端到端准确率数值会掩盖这一区别，无法满足本案例研究的要求。
+
+
+\section{反思问题}
+\label{sec:case3-reflection}
+
+以下问题用于指导你撰写一份关于实现情况的简短报告。你不必写成长篇叙述文章；简洁、直接地回答即可，同时应准备好口头详细说明自己的推理。
+
+\paragraph{A. 基线架构}
+\begin{itemize}
+    \item 用不超过五句话，描述单个患者病例在基线系统中的流转过程。
+    \item 每个基线病例都从某个数据集中采样而来，因此按构造方式，它恰好只属于一个疾病领域。这意味着基于规则的规划器究竟是如何“决策”的？这种分诊模型符合现实吗？
+    \item 步骤 0 中分类器训练和评估所用的数据分布，与生成模拟病例所用的数据分布相同。为什么这在方法学上存在问题？怎样的评估方案会更公平？
+\end{itemize}
+
+\paragraph{B. 大语言模型规划器设计}
+\begin{itemize}
+    \item 你使用了哪个大语言模型，如何访问它（本地模型、API）？请简要说明选择理由。
+    \item \texttt{make\_case\_text} 函数将从三个独立且互不相关的数据集中提取的特征组合起来，作为一个患者的描述。为什么这不符合医学现实？就本练习的目的而言，这一点是否重要？
+    \item 描述你在 \texttt{step()} 实现中作出的一项具体设计选择，例如如何处理解析失败、拒绝决策（abstention），或将病例路由至多种疾病诊断路径的情况，并解释你为什么这样设计。
+\end{itemize}
+
+\paragraph{C. 结果}
+\begin{itemize}
+    \item 报告每种疾病的分诊精确率与召回率，以及执行器模型的混淆矩阵。这些数值说明整个系统的效果如何？
+    \item 大语言模型规划器可以将单个病例同时路由至多种疾病的诊断路径。请分别举出一个这样做有益的场景和一个可能有害的场景。
+\end{itemize}
+
+\paragraph{D. 反思}
+\begin{itemize}
+    \item 指出在医疗分诊场景中使用大语言模型作为规划器所特有的一项安全风险，并描述如何缓解这一风险。
+    \item 将大语言模型的路由决策与原始单疾病数据集的真值标签进行比较，以此评估分诊性能，是否公平？请说明你对此有哪些保留意见。
+\end{itemize}
+
+
+\subsection*{可选扩展}
+
+作为额外练习，你可以通过使患者采样更符合现实来扩展系统，例如使用依据更充分的先验分布，对混合病例或共病病例进行采样。你也可以添加 UCI 仓库中的另一种疾病，或者引入一个评估者智能体或验证者智能体，在规划器的决策送达执行器之前进行检查。另一个思路是模拟人在回路中（human-in-the-loop）的决策，或者引入不确定性阈值与拒绝决策机制，使规划器在缺乏信心时可以拒绝为病例选择路由。最后，你还可以整合从外部知识源进行的检索（第~\ref{sec:rag}~章），让规划器以临床参考资料为依据作出路由决策，而不是纯粹依赖参数化知识。
+
+
+\subsection*{说明}
+
+本作业用于教学，不用于临床。不要声称你在这里构建的任何系统具有医学有效性。重点在于清晰性、可复现性与批判性反思，而非单纯追求性能。在这一情境下，一个谨慎选择路由、在不确定时拒绝决策，并透明地说明自身局限的系统，比一个将准确率最大化却掩盖失效模式的系统更可取。
+
+
+\section{结语}
+
+本案例研究将前文的几条线索结合起来：智能体角色与协调（第三部）、工具使用与模型上下文协议（第~\ref{sec:tools}~章），以及在复合智能体系统中区分规划错误与执行错误所需的评估方法。通过先构建基于规则的基线，再用单个基于大语言模型的规划器替换原有规划器，你已经直接看到：一旦规划依赖大语言模型对非结构化病例文本描述的解读，而不是固定规则，规划任务就会变得困难得多。
+
+我们有意选择医疗作为背景：在这一领域，过度自信且无法解释的错误会带来高昂代价，拒绝决策、人工监督与可审计性也是核心设计要求。同样的协调模式远不只适用于医疗领域；对于任何由语言模型负责路由决策，再由其他更专业的组件据此行动的智能体系统，都可以采用这一模式。
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{agenticbook,refs,case,synthetic}
+

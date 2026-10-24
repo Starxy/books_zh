@@ -1,0 +1,34 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,line join=round,line cap=round]
+% 左：普通视点下可见前后分离的部件；右：投影恰好对齐。
+\begin{scope}
+\fill[gray!10] (-.1,-.2)--(5.5,-.2)--(4.4,3.4)--(.8,3.4)--cycle;
+\draw[gray!35] (-.1,-.2)--(5.5,-.2);
+\begin{scope}[yshift=.4cm]
+\filldraw[fill=gray!30,draw=gray!60] (1.05,2.2)--(2.8,2.35)--(3.3,1.93)--(1.45,1.75)--cycle;
+\draw[line width=2.2pt,draw=brown!65!black] (2.25,2.29)--(2.32,4.18)--(2.95,4.07)--(2.87,2.06);
+\draw[line width=1.8pt,draw=brown!65!black] (2.30,3.74)--(2.93,3.62);
+\end{scope}
+\filldraw[fill=gray!20,draw=gray!50] (.75,.1)--(3.85,.2)--(4.75,-.13)--(1.45,-.35)--cycle;
+\foreach \x/\y in {1.6/.1,2.35/-.02,3.1/.18,3.7/.05}{
+ \draw[line width=2.5pt,draw=brown!65!black] (\x,\y)--++(0,1.72);}
+\draw[line width=2pt,draw=brown!65!black] (1.6,1.03)--(2.35,.91)--(3.7,.98)--(3.1,1.10)--cycle;
+\node[font=\small,align=center] at (2.6,-.85){一般视点：各部件彼此分离};
+\end{scope}
+\begin{scope}[xshift=7cm]
+\fill[gray!10] (-.1,-.2)--(5.2,-.2)--(4.3,3.4)--(.6,3.4)--cycle;
+\draw[gray!35] (-.1,-.2)--(5.2,-.2);
+\filldraw[fill=gray!20,draw=gray!50] (1.15,-.1)--(3.6,.08)--(4.12,-.35)--(1.65,-.55)--cycle;
+\foreach \x/\y in {1.55/-.12,2.05/-.35,3.15/.00,3.65/-.23}{
+ \draw[line width=2.5pt,draw=brown!65!black] (\x,\y)--++(0,2.12);}
+\draw[line width=2pt,draw=brown!65!black] (1.55,1.07)--(2.05,.84)--(3.65,.96)--(3.15,1.19)--cycle;
+\filldraw[fill=gray!30,draw=gray!60] (1.49,2.03)--(3.20,2.16)--(3.74,1.92)--(2.01,1.78)--cycle;
+\draw[line width=2.2pt,draw=brown!65!black] (2.85,2.13)--(2.92,4.15)--(3.43,4.03)--(3.35,1.99);
+\draw[line width=1.8pt,draw=brown!65!black] (2.90,3.69)--(3.41,3.58);
+\node[font=\small,align=center] at (2.5,-.85){特殊视点：投影呈现完整椅子};
+\end{scope}
+\end{tikzpicture}
+\caption{左图展示了从一般视点看到的 Beuchet 椅的各个（彼此分离的）部件。右图展示了从一个极为特殊的视点观察这些部件时产生的椅子错觉。从这一偶然视点看去，我们会知觉到一把椅子。原照片由 Markus Elsholz 提供；此处以 TikZ 示意重绘两种视点下的结构关系。}
+\label{fig:ch02-beuchet-chair}
+\end{figure}

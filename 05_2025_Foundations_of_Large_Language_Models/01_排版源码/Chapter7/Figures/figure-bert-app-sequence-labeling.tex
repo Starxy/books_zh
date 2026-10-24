@@ -1,0 +1,75 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\vstep{1.3cm}
+\def\ssep{1.0cm}
+
+\tikzstyle{enode} = [minimum width=9*\nodestep,minimum height=1.4*\nodestep,inner sep=2pt,draw,thick]
+
+\begin{scope}
+
+%%%%%% train the encoder
+
+\node [anchor=west] (w0) at (0,0) {\footnotesize{$[\mathrm{CLS}]$}};
+\node [anchor=center] (w1) at ([xshift=\ssep]w0.center) {\footnotesize{$x_1$}};
+\node [anchor=center] (w2) at ([xshift=\ssep]w1.center) {\footnotesize{$x_2$}};
+\node [anchor=center] (w3) at ([xshift=\ssep]w2.center) {\footnotesize{$...$}};
+\node [anchor=center] (w4) at ([xshift=\ssep]w3.center) {\footnotesize{$x_m$}};
+\node [anchor=center] (w5) at ([xshift=\ssep]w4.center) {\footnotesize{$[\mathrm{SEP}]$}};
+
+\node [anchor=center] (e0) at ([yshift=0.7*\ssep]w0.center) {\footnotesize{$\mathbf{e}_{\mathrm{cls}}$}};
+\node [anchor=center] (e1) at ([yshift=0.7*\ssep]w1.center) {\footnotesize{$\mathbf{e}_1$}};
+\node [anchor=center] (e2) at ([yshift=0.7*\ssep]w2.center) {\footnotesize{$\mathbf{e}_2$}};
+\node [anchor=center] (e3) at ([yshift=0.7*\ssep]w3.center) {\footnotesize{$...$}};
+\node [anchor=center] (e4) at ([yshift=0.7*\ssep]w4.center) {\footnotesize{$\mathbf{e}_{m}$}};
+\node [anchor=center] (e5) at ([yshift=0.7*\ssep]w5.center) {\footnotesize{$\mathbf{e}_{m+1}$}};
+
+\draw [->] (w0.north) -- (e0.south);
+\draw [->] (w1.north) -- (e1.south);
+\draw [->] (w2.north) -- (e2.south);
+%\draw [->] (w3.north) -- (e3.south);
+\draw [->] (w4.north) -- (e4.south);
+\draw [->] (w5.north) -- (e5.south);
+
+\draw [->] (e0.north) -- ([yshift=0.2*\ssep]e0.north);
+\draw [->] (e1.north) -- ([yshift=0.2*\ssep]e1.north);
+\draw [->] (e2.north) -- ([yshift=0.2*\ssep]e2.north);
+%\draw [->] (e3.north) -- ([yshift=0.2*\ssep]e3.north);
+\draw [->] (e4.north) -- ([yshift=0.2*\ssep]e4.north);
+\draw [->] (e5.north) -- ([yshift=0.2*\ssep]e5.north);
+
+\node [anchor=south,minimum width=7*\ssep,minimum height=1.2*\ssep,draw,thick] (encoder) at ([yshift=1.0*\ssep,xshift=0.5*\ssep]w2.north) {};
+
+\node [anchor=center] (h0) at ([yshift=2.1*\ssep]w0.center) {\footnotesize{$\mathbf{h}_{\mathrm{cls}}$}};
+\node [anchor=center] (h1) at ([yshift=2.1*\ssep]w1.center) {\footnotesize{$\mathbf{h}_1$}};
+\node [anchor=center] (h2) at ([yshift=2.1*\ssep]w2.center) {\footnotesize{$\mathbf{h}_2$}};
+\node [anchor=center] (h3) at ([yshift=2.1*\ssep]w3.center) {\footnotesize{$...$}};
+\node [anchor=center] (h4) at ([yshift=2.1*\ssep]w4.center) {\footnotesize{$\mathbf{h}_m$}};
+\node [anchor=center] (h5) at ([yshift=2.1*\ssep]w5.center) {\footnotesize{$\mathbf{h}_{m+1}$}};
+
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em,draw,fill=gray!70] (s1) at ([yshift=0.4*\ssep]h1.north) {};
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em,draw,fill=gray!70] (s2) at ([yshift=0.4*\ssep]h2.north) {};
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em,draw,fill=gray!70] (s4) at ([yshift=0.4*\ssep]h4.north) {};
+
+\draw [->] ([yshift=-3pt]h1.north) -- ([yshift=-2pt]s1.south);
+\draw [->] ([yshift=-3pt]h2.north) -- ([yshift=-2pt]s2.south);
+\draw [->] ([yshift=-3pt]h4.north) -- ([yshift=-2pt]s4.south);
+
+\node [anchor=south] (o1) at ([yshift=0.4*\ssep]s1.north) {\tiny{$\{\mathrm{B},\mathrm{I},\mathrm{O}\}$}};
+\node [anchor=south] (o2) at ([yshift=0.4*\ssep]s2.north) {\tiny{$\{\mathrm{B},\mathrm{I},\mathrm{O}\}$}};
+\node [anchor=south] (o4) at ([yshift=0.4*\ssep]s4.north) {\tiny{$\{\mathrm{B},\mathrm{I},\mathrm{O}\}$}};
+\node [anchor=south] (oo1) at ([yshift=-0.15cm]o1.north) {\footnotesize{标签}};
+\node [anchor=south] (oo2) at ([yshift=-0.15cm]o2.north) {\footnotesize{标签}};
+\node [anchor=south] (oo4) at ([yshift=-0.15cm]o4.north) {\footnotesize{标签}};
+
+\draw [->] ([yshift=2pt]s1.north) -- ([yshift=0.4*\ssep-2pt]s1.north);
+\draw [->] ([yshift=2pt]s2.north) -- ([yshift=0.4*\ssep-2pt]s2.north);
+\draw [->] ([yshift=2pt]s4.north) -- ([yshift=0.4*\ssep-2pt]s4.north);
+
+\node [anchor=south] (encodercaption) at ([yshift=0.1cm]encoder.south) {\large{BERT}};
+
+\end{scope}
+	
+\end{tikzpicture}

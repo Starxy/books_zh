@@ -1,0 +1,49 @@
+% 原书分章 PDF 第 16—17 页：引理 23.1 的完整证明与本章末尾。
+\begin{proof}[证明（引理 23.1）]
+我们将证明 $\eta_n\to\eta_0$ 依概率成立，再由连续映射定理得到 $\tau_n$ 的一致性。由 23.3，存在一个包含 $\eta_0$ 的开区间 $\mathcal N$，使 $S_0$ 在其上连续。固定 $\eta\in\mathcal N$。由于 $\bar Q_{b,n}$ 以趋于 1 的概率属于一个 Glivenko--Cantelli 类，有
+\begin{equation}
+\begin{aligned}
+ |S_n(\eta)-S_0(\eta)|
+ &=|P_nI(\bar Q_{b,n}>\eta)-P_0I(\bar Q_{b,0}>\eta)|\\
+ &\leq\left|P_0\bigl(I(\bar Q_{b,n}>\eta)-I(\bar Q_{b,0}>\eta)\bigr)\right|\\
+ &\quad+|(P_n-P_0)I(\bar Q_{b,n}>\eta)|\\
+ &\leq\underbrace{\left|P_0\bigl(I(\bar Q_{b,n}>\eta)-I(\bar Q_{b,0}>\eta)\bigr)\right|}_{\triangleq T_n(\eta)}
+ +o_{P_0}(1),
+\end{aligned}
+\tag{23.12}
+\end{equation}
+\Needspace{4\baselineskip}
+其中，对任意分布 $P$ 与函数 $f$，采用记号 $Pf=\E_P[f(O)]$。令
+$Z_n(\eta)(w)\triangleq\bigl(I(\bar Q_{b,n}(w)>\eta)-I(\bar Q_{b,0}(w)>\eta)\bigr)^2$。
+对所有 $q>0$，有下列各式：
+\begin{align}
+ T_n(\eta)&\leq P_0Z_n(\eta)\nonumber\\
+ &=P_0Z_n(\eta)I(|\bar Q_{b,0}-\eta|>q)
+ +P_0Z_n(\eta)I(|\bar Q_{b,0}-\eta|\leq q)\nonumber\\
+ &=P_0Z_n(\eta)I(|\bar Q_{b,0}-\eta|>q)
+ +P_0Z_n(\eta)I(0<|\bar Q_{b,0}-\eta|\leq q)\tag{23.13}\\
+ &\leq P_0Z_n(\eta)I(|\bar Q_{b,n}-\bar Q_{b,0}|>q)
+ +P_0Z_n(\eta)I(0<|\bar Q_{b,0}-\eta|\leq q)\tag{23.14}\\
+ &\leq P_0(|\bar Q_{b,n}-\bar Q_{b,0}|>q)
+ +P_0(0<|\bar Q_{b,0}-\eta|\leq q)\nonumber\\
+ &\leq\frac{P_0|\bar Q_{b,n}-\bar Q_{b,0}|}{q}
+ +P_0(0<|\bar Q_{b,0}-\eta|\leq q).\nonumber
+\end{align}
+上式中，式 (23.13) 成立是因为 23.3 蕴含 $P_0(\bar Q_{b,0}=\eta)=0$；式 (23.14) 成立是因为 $Z_n(\eta)=1$ 蕴含
+$|\bar Q_{b,n}-\bar Q_{b,0}|\geq|\bar Q_{b,0}-\eta|$；最后一个不等式由 Markov 不等式成立。引理假定 $\E_0|\bar Q_{b,n}-\bar Q_{b,0}|=o_{P_0}(1)$，因此可以选择一个序列 $q_n\downarrow0$，使得
+\[
+ T_n(\eta)\leq P_0(0<|\bar Q_{b,0}-\eta|\leq q_n)+o_{P_0}(1).
+\]
+为说明右侧第一项为 $o(1)$，注意，$P_0(\bar Q_{b,0}=\eta)=0$ 与 $S_0$ 在 $\mathcal N$ 上的连续性共同给出：对于足够大的 $n$，
+\[
+ P_0(0<|\bar Q_{b,0}-\eta|\leq q_n)=S_0(-q_n+\eta)-S_0(q_n+\eta).
+\]
+右侧为 $o(1)$，因此 $T_n(\eta)=o_{P_0}(1)$。代入式 (23.12)，可知 $S_n(\eta)\to S_0(\eta)$ 依概率成立。回顾 $\eta\in\mathcal N$ 是任意的。
+
+固定 $\gamma>0$。当 $\gamma$ 足够小时，$\eta_0-\gamma$ 和 $\eta_0+\gamma$ 均包含于 $\mathcal N$。于是，
+$S_n(\eta_0-\gamma)\to S_0(\eta_0-\gamma)$ 和 $S_n(\eta_0+\gamma)\to S_0(\eta_0+\gamma)$ 依概率成立。
+此外，由 $\eta_0$ 的定义，$S_0(\eta_0-\gamma)>\kappa$；由条件 23.3，$S_0(\eta_0+\gamma)<\kappa$。
+因此，以趋于 1 的概率，有 $S_n(\eta_0-\gamma)>\kappa$ 且 $S_n(\eta_0+\gamma)<\kappa$。
+但是，$|\eta_n-\eta_0|>\gamma$ 蕴含 $S_n(\eta_0-\gamma)\leq\kappa$ 或 $S_n(\eta_0+\gamma)>\kappa$，所以以趋于 1 的概率有 $|\eta_n-\eta_0|\leq\gamma$。
+于是 $\eta_n\to\eta_0$ 依概率成立；由连续映射定理，$\tau_n\to\tau_0$。
+\end{proof}

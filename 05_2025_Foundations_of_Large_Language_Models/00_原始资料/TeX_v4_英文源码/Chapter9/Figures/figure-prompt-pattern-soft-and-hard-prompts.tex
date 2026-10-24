@@ -1,0 +1,60 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.15cm}
+\def\bsep{2.0cm}
+
+\tikzstyle{tnode} = [minimum width=0.85cm,minimum height=0.3cm,inner sep=2pt];
+\tikzstyle{lnode} = [minimum width=3.8cm,minimum height=0.7cm,inner sep=2pt];
+
+\begin{scope}
+
+% embeddings
+\node [tnode,anchor=west] (h1) at (0,0) {$\mathbf{p}_0$};
+\node [tnode,anchor=west] (h2) at ([xshift=\ssep]h1.east) {$\mathbf{p}_1$};
+\node [tnode,anchor=west] (h3) at ([xshift=\ssep]h2.east) {$\cdots$};
+\node [tnode,anchor=west] (h4) at ([xshift=\ssep]h3.east) {$\mathbf{p}_n$};
+\node [tnode,anchor=west] (h5) at ([xshift=\ssep]h4.east) {$\mathbf{q}_0$};
+\node [tnode,anchor=west] (h6) at ([xshift=\ssep]h5.east) {$\mathbf{q}_1$};
+\node [tnode,anchor=west] (h7) at ([xshift=\ssep]h6.east) {$\cdots$};
+\node [tnode,anchor=west] (h8) at ([xshift=\ssep]h7.east) {$\mathbf{q}_{m'}$};
+\node [tnode,anchor=west] (h9) at ([xshift=\ssep]h8.east) {$\mathbf{e}_0$};
+\node [tnode,anchor=west] (h10) at ([xshift=\ssep]h9.east) {$\mathbf{e}_1$};
+\node [tnode,anchor=west] (h11) at ([xshift=\ssep]h10.east) {$\cdots$};
+\node [tnode,anchor=west] (h12) at ([xshift=\ssep]h11.east) {$\mathbf{e}_{m}$};
+
+\draw [<-,thin] ([yshift=-0.25cm+1pt]h5.center) -- ([yshift=-0.30*\bsep-0.25cm]h5.center);
+\draw [<-,thin] ([yshift=-0.25cm+1pt]h6.center) -- ([yshift=-0.30*\bsep-0.25cm]h6.center);
+%\draw [<-,thin] ([yshift=-0.25cm+1pt]h7.center) -- ([yshift=-0.30*\bsep-0.25cm]h7.center);
+\draw [<-,thin] ([yshift=-0.25cm+1pt]h8.center) -- ([yshift=-0.30*\bsep-0.25cm]h8.center);
+\draw [<-,thin] ([yshift=-0.25cm+1pt]h9.center) -- ([yshift=-0.30*\bsep-0.25cm]h9.center);
+\draw [<-,thin] ([yshift=-0.25cm+1pt]h10.center) -- ([yshift=-0.30*\bsep-0.25cm]h10.center);
+%\draw [<-,thin] ([yshift=-0.25cm+1pt]h11.center) -- ([yshift=-0.30*\bsep-0.25cm]h11.center);
+\draw [<-,thin] ([yshift=-0.25cm+1pt]h12.center) -- ([yshift=-0.30*\bsep-0.25cm]h12.center);
+
+\node [tnode,anchor=center] (ha5) at ([yshift=-0.55*\bsep]h5.center) {$c_0$};
+\node [tnode,anchor=center] (ha6) at ([yshift=-0.55*\bsep]h6.center) {$c_1$};
+\node [tnode,anchor=center] (ha7) at ([yshift=-0.55*\bsep]h7.center) {$\cdots$};
+\node [tnode,anchor=center] (ha8) at ([yshift=-0.55*\bsep]h8.center) {$c_{m'}$};
+\node [tnode,anchor=center] (ha9) at ([yshift=-0.55*\bsep]h9.center) {$z_0$};
+\node [tnode,anchor=center] (ha10) at ([yshift=-0.55*\bsep]h10.center) {$z_1$};
+\node [tnode,anchor=center] (ha11) at ([yshift=-0.55*\bsep]h11.center) {$\cdots$};
+\node [tnode,anchor=center] (ha12) at ([yshift=-0.55*\bsep]h12.center) {$z_m$};
+
+\begin{pgfonlayer}{background}
+\node [lnode,anchor=south west,fill=red!20] (soft) at ([xshift=-0.00cm,yshift=-0.1cm]h1.south west) {};
+\node [lnode,anchor=south west,fill=ugreen!20] (hard) at ([xshift=-0.00cm,yshift=-0.1cm]h5.south west) {};
+\node [lnode,anchor=south west,fill=blue!20] (input) at ([xshift=-0.00cm,yshift=-0.1cm]h9.south west) {};
+\end{pgfonlayer}
+
+\node [anchor=south] (softlabel) at (soft.north) {\small{Soft Prompt}};
+\node [anchor=south] (hardlabel) at (hard.north) {\small{Hard Prompt}};
+\node [anchor=south] (inputlabel) at (input.north) {\small{User Input and Response}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

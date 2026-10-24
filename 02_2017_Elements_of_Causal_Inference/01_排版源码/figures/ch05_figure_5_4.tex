@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\begin{scope}
+\draw[thin] (0,2.4)--(0,0)--(6,0);
+\input{data/ch05_fig54_curve_1}
+\node[below] at (3,-.05){$x$};
+\node[rotate=90] at (-.42,1.2){$p(x)$};
+\end{scope}
+\begin{scope}[xshift=7.4cm]
+\draw[thin] (0,2.4)--(0,0)--(6,0);
+\input{data/ch05_fig54_curve_2}
+\node[below] at (3,-.05){$x$};
+\node[rotate=90] at (-.42,1.2){$p'(x)$};
+\end{scope}
+\end{tikzpicture}
+\caption{$P_X$ 变为 $P'_X$ 的一种情形：这种变化提示，$P_Y$ 已改变，而 $P_{X\mid Y}$ 保持不变。当已知二元变量 $Y$ 是 $X$ 的原因时，观测到 $P_X$ 为两个高斯分布的混合，会使我们有理由认为，两个峰分别对应不同的标签 $y=0,1$。于是，$Y$ 对 $X$ 的影响只是平移高斯分布的均值，这就构成加性噪声模型，见第 4.1.4 节。这无疑为联合分布提供了简单解释。如果进一步观测到，混合权重在两个数据集之间发生了变化，那么这一变化就很可能是由 $P_Y$ 的变化造成的。}
+\label{fig:ch05-changing-mixture}
+\end{figure}

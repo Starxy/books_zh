@@ -1,0 +1,84 @@
+% 原书第151—154页：7.2.3—7.2.5及代码片段7.11。
+\subsection{加性噪声模型}
+
+可以结合基于得分的方法与贪心搜索技术，学习加性噪声模型。这一思路已用于误差方差相等的线性高斯模型，第7.1.3节，以及非线性高斯加性噪声模型，第7.1.5节［见 Peters and Bühlmann, 2014；Bühlmann et al., 2014］。例如，在非线性高斯情形下，可以仿照二元情形处理，见式 (4.18)、(4.19)。对于给定图结构 $\mathcal G$，将每个变量关于其父节点回归，得到得分
+\[
+ \log p(D\mid\mathcal G)
+ =\sum_{j=1}^d-\log\widehat{\operatorname{var}}[R_j];
+\]
+\chseventnote{原书用 $\log p(D\mid\mathcal G)$ 记这个得分。严格的高斯最大化对数似然，还含有共同的正比例系数 $n/2$ 及与图无关的加法常数；在相同数据集上比较图时，省略这些项不改变排序。}
+这里，$\widehat{\operatorname{var}}[R_j]$ 是将变量 $X_j$ 关于其父节点回归后，所得残差 $R_j$ 的经验方差。直观地说，模型越能拟合数据，残差方差就越小，得分也就越高。从形式上看，这一过程属于最大似然方法的一种，并且可以证明具有一致性［Bühlmann et al., 2014］。
+
+在计算上，同样可以利用得分能够按节点分解的性质。如果某个邻近图只改变了一个变量的父节点集合，那么计算它的得分时，只需更新相应的那个加和项。如果不能假设噪声服从高斯分布，例如，可以估计噪声分布［Nowzohour and Bühlmann, 2016］，得到类似于熵的得分。
+
+另一种选择是利用独立性检验，迭代地估计结构。Mooij et al.［2009］和 Peters et al.［2014］提出了\textbf{回归后进行独立性检验（regression with subsequent independence test，RESIT）}。这种方法利用了噪声变量与所有先行变量独立的性质。对于线性非高斯模型，第7.1.4节，Shimizu et al.［2006］给出了基于独立成分分析的实用方法［Comon, 1994；Hyvärinen et al., 2001］，能够用于有限数据。随后，Shimizu et al.［2011］又提出了这一方法的改进版本。
+
+\subsection{已知因果排序}
+
+要找到底层因果模型的\textbf{因果排序（causal ordering）}，见附录B，往往很困难。不过，一旦给定因果排序，估计图就化为“经典”的变量选择问题。例如，假设
+\[
+ \begin{aligned}
+  X&:=N_X,\\
+  Y&:=f(X,N_Y),\\
+  Z&:=g(X,Y,N_Z),
+ \end{aligned}
+\]
+其中，$f,g,N_X,N_Y,N_Z$ 均未知。判断 $f$ 是否依赖于 $X$，以及 $g$ 是否依赖于 $X$ 和／或 $Y$，参见注6.6中的结构极小性假设，就成为“传统”统计学中已经充分研究的显著性问题。特别是，如果再施加线性之类的结构假设，就可以采用标准方法［例如 Hastie et al., 2009；Bühlmann and van de Geer, 2011］。
+
+这一观察此前就已提出［例如 Teyssier and Koller, 2005；Shojaie and Michailidis, 2010］。因此，有人建议，与其直接在有向无环图空间中搜索，不如先搜索因果排序，再进行变量选择，这样可能更有利［例如 Teyssier and Koller, 2005；Bühlmann et al., 2014］。
+
+\subsection{观测数据与实验数据}
+
+第7.1.6节介绍了当我们在不同条件，即不同“环境”下观测系统时，因果结构如何获得可识别性。现在讨论如何在实际中利用这些结果，也就是只有有限数据时该怎样做。为此，假设对每个环境 $e\in\mathcal E$，都获得一个样本 $X^e_{n_e}$；也就是说，在每个环境下观测到 $n_e$ 个独立同分布数据点。
+
+\paragraph{已知干预目标}
+这里，每个设定都对应一次干预实验，并且我们还知道干预目标 $I^e\subseteq\{1,\ldots,p\}$。Cooper and Yoo［1999］将干预效应作为机制变化，纳入贝叶斯框架。对于完美干预，Hauser and Bühlmann［2015］考虑了线性高斯结构因果模型，并提出\textbf{贪心干预等价搜索（greedy interventional equivalence search，GIES）}。它是第7.2.2节简要介绍的 GES 算法的修改版本。
+
+有时，我们无法在每次实验中测量所有变量，甚至所有实验均为观测研究时也可能如此，但仍希望综合现有数据中的信息。基于 SAT 的方法已经研究了这个问题［例如 Triantafillou and Tsamardinos, 2015；Tillman and Eberhardt, 2014，及其中引用文献］。
+
+\paragraph{未知干预目标}
+Eaton and Murphy［2007］不假定各项干预的目标已知。相反，对于每个环境 $e\in\mathcal E$，他们引入一个没有入边的干预节点 $I_e$，见原书第95页“干预变量”的讨论；对每个数据点，都只有一个干预节点处于激活状态。随后，在包含 $d+\#\mathcal E$ 个变量的扩展模型上应用标准方法，同时施加“干预节点没有父节点”的约束。
+
+Tian and Pearl［2001］建议检验边缘分布是否在不同设定中发生变化，并利用这一信息推断部分图结构。他们还将这一方法与基于独立性的方法相结合。
+
+\paragraph{不同环境}
+第7.1.6节还考虑了从 $d$ 个预测变量构成的集合 $X$ 中，估计目标变量 $Y$ 的因果父节点的问题。为此，将所有满足不变预测的集合 $S\subseteq\{1,\ldots,d\}$ 构成的集合族记为 $\mathcal S$；也就是说，对于这些集合，$P_{Y^e\mid S^e}$ 在所有环境 $e\in\mathcal E$ 中保持不变，见式 (7.4)。
+
+实际中，可以在水平 $\alpha$ 下检验不变预测假设，并将所有通过检验的集合 $S$ 收集起来，作为 $\mathcal S$ 的估计 $\widehat{\mathcal S}$。由于真实父节点集合 $\PA_Y\subseteq X$ 以 $1-\alpha$ 的高概率属于 $\widehat{\mathcal S}$，因此，可以得到如下覆盖保证：
+\begin{equation}
+ \bigcap_{S\in\widehat{\mathcal S}}S\subseteq\PA_Y,
+ \tag{7.8}
+\end{equation}
+它以 $1-\alpha$ 的高概率成立。式 (7.8) 的左端，是一种称为\textbf{不变因果预测（invariant causal prediction）}的方法的输出［Peters et al., 2016］。代码片段7.11给出了一个环境对应不同干预的例子；但这一对应关系并不是该方法的要求。要获得式 (7.8) 意义下的正确覆盖，只需对给定 $\PA_Y$ 时 $Y$ 的条件分布建模；特别地，不必对 $d$ 个预测变量 $X$ 的分布作出任何假设。这与 Eaton and Murphy［2007］提出的方法不同，见前面“未知干预目标”的讨论；后者还试图估计完整的因果结构。
+
+\Needspace{14cm}
+\begin{codesnippet}
+下面的代码展示了两个环境中的一个因果系统。在真实的底层结构中，$X_1$ 和 $X_2$ 导致 $Y$，而 $Y$ 又导致 $X_3$。在合并数据上拟合的线性模型中，见代码第12行、输出从第13行开始，$X_1,X_2,X_3$ 都高度显著，因为它们都是 $Y$ 的良好预测变量。不过，这种模型并不具有不变性。在两个环境中，将 $Y$ 关于 $X_1,X_2,X_3$ 回归，得到的系数分别为 $-0.15,1.09,-0.39$ 和 $-0.32,1.62,-0.54$。
+
+不变因果预测方法只输出 $Y$ 的因果父节点，也就是 $X_1$ 和 $X_2$。在本例中，$\{1,2\}$ 是唯一能得到不变模型的集合，即 $\widehat{\mathcal S}=\{\{1,2\}\}$。
+\begin{lstlisting}[language=R]
+library(InvariantCausalPrediction)
+#
+# generate data from two environments
+env <- c(rep(1,400),rep(2,700))
+n <- length(env)
+set.seed(1)
+X1 <- rnorm(n)
+X2 <- 1*X1 + c(rep(0.1,400), rep(1.0,700))*rnorm(n)
+Y <- -0.7*X1 + 0.6*X2 + 0.1*rnorm(n)
+X3 <- c(rep(-2,400),rep(-1,700))*Y + 2.5*X2 + 0.1*rnorm(n)
+#
+summary(lm(Y~-1+X1+X2+X3))
+# Coefficients:
+# ----Estimate Std.Error t.val. Pr(>|t|)
+# X1 -0.396212 0.008667 -45.71 <2e-16 ***
+# X2 +1.381497 0.021377 +64.63 <2e-16 ***
+# X3 -0.410647 0.011152 -36.82 <2e-16 ***
+#
+ICP(cbind(X1,X2,X3),Y,env)
+#lower bd upper bd p-value
+# X1 -0.71 -0.68 3.7e-06 ***
+# X2 +0.59 +0.61 0.0092 **
+# X3 -0.00 +0.00 0.2972
+\end{lstlisting}
+\end{codesnippet}

@@ -1,0 +1,407 @@
+{
+  "chapter": "ch04",
+  "title": "学习原因—结果模型",
+  "status": "complete",
+  "source_pages": 28,
+  "source_book_pages": "43–70",
+  "translated_pages": 20,
+  "project_root": "02_2017_Elements_of_Causal_Inference/01_排版源码",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch04.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch04a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch04b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch04c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch04d.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch04e.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch04_01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch04_02.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch04_03.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch04_04.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch04_05.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch04_06.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch04_02_density_1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch04_02_density_2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch04_03_source_markers.csv",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch04_05_source_markers.csv",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch04_06_source_markers.csv"
+  ],
+  "test_pdf": "work/elements_book/build/ch04/driver.pdf",
+  "structure": {
+    "chapters": 1,
+    "sections": 3,
+    "subsections": 13,
+    "section_4_1_subsections": 9,
+    "section_4_2_subsections": 4,
+    "outline": [
+      [
+        1,
+        "第四章  学习原因—结果模型",
+        1
+      ],
+      [
+        2,
+        "4.1 结构可识别性",
+        1
+      ],
+      [
+        3,
+        "4.1.1 为什么需要额外假设",
+        1
+      ],
+      [
+        3,
+        "4.1.2 假设类型概览",
+        2
+      ],
+      [
+        3,
+        "4.1.3 具有非高斯加性噪声的线性模型",
+        4
+      ],
+      [
+        3,
+        "4.1.4 非线性加性噪声模型",
+        5
+      ],
+      [
+        3,
+        "4.1.5 离散加性噪声模型",
+        7
+      ],
+      [
+        3,
+        "4.1.6 后非线性模型",
+        9
+      ],
+      [
+        3,
+        "4.1.7 信息几何因果推断",
+        9
+      ],
+      [
+        3,
+        "4.1.8 迹方法",
+        11
+      ],
+      [
+        3,
+        "4.1.9 算法信息论作为一种可能的基础",
+        12
+      ],
+      [
+        2,
+        "4.2 结构识别方法",
+        14
+      ],
+      [
+        3,
+        "4.2.1 加性噪声模型",
+        15
+      ],
+      [
+        3,
+        "4.2.2 信息几何因果推断",
+        18
+      ],
+      [
+        3,
+        "4.2.3 迹方法",
+        18
+      ],
+      [
+        3,
+        "4.2.4 监督学习方法",
+        19
+      ],
+      [
+        2,
+        "4.3 习题",
+        19
+      ]
+    ]
+  },
+  "counts": {
+    "numbered_equations": 20,
+    "equation_tags": [
+      "4.1",
+      "4.2",
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6",
+      "4.7",
+      "4.8",
+      "4.9",
+      "4.10",
+      "4.11",
+      "4.12",
+      "4.13",
+      "4.14",
+      "4.15",
+      "4.16",
+      "4.17",
+      "4.18",
+      "4.19",
+      "4.20"
+    ],
+    "figures": 6,
+    "figure_numbers": [
+      "4.1",
+      "4.2",
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6"
+    ],
+    "tables": 0,
+    "shared_result_environments": 14,
+    "shared_result_sequence": [
+      {
+        "number": "4.1",
+        "environment": "proposition"
+      },
+      {
+        "number": "4.2",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.3",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.4",
+        "environment": "definition"
+      },
+      {
+        "number": "4.5",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.6",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.7",
+        "environment": "definition"
+      },
+      {
+        "number": "4.8",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.9",
+        "environment": "definition"
+      },
+      {
+        "number": "4.10",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.11",
+        "environment": "definition"
+      },
+      {
+        "number": "4.12",
+        "environment": "theorem"
+      },
+      {
+        "number": "4.13",
+        "environment": "principle"
+      },
+      {
+        "number": "4.14",
+        "environment": "codesnippet"
+      }
+    ],
+    "proofs": 3,
+    "source_footnotes": 11,
+    "translator_notes": 8,
+    "problems": 2,
+    "problem_numbers": [
+      "4.15",
+      "4.16"
+    ],
+    "problem_subparts": 4,
+    "code_snippets": 1,
+    "code_lines": 23,
+    "numbered_algorithm_steps": 4
+  },
+  "new_terms_en_zh": {
+    "linear non-Gaussian acyclic model": "线性非高斯无环模型",
+    "independent component analysis": "独立成分分析",
+    "non-degenerate random variable": "非退化随机变量",
+    "smooth additive noise model": "光滑加性噪声模型",
+    "support": "支撑集",
+    "post-nonlinear model": "后非线性模型",
+    "information-geometric causal inference": "信息几何因果推断",
+    "diffeomorphism": "微分同胚",
+    "trace condition": "迹条件",
+    "renormalized trace": "归一化迹",
+    "rotation-invariant prior": "旋转不变先验",
+    "algorithmic mutual information": "算法互信息",
+    "Kolmogorov complexity": "Kolmogorov 复杂度",
+    "conditional algorithmic information": "条件算法信息",
+    "algorithmically independent conditionals": "算法独立的条件分布",
+    "minimum description length principle": "最小描述长度原理",
+    "regression with subsequent independence test": "回归后进行独立性检验",
+    "tracial dependency ratio": "迹相依比",
+    "free probability theory": "自由概率论",
+    "unsupervised inverse regression": "无监督逆回归",
+    "time-reversibility": "时间可逆性"
+  },
+  "source_anomalies": [
+    {
+      "source_book_page": 48,
+      "source_pdf_page": 6,
+      "location": "定理4.2",
+      "original": "未明确排除 alpha=0",
+      "suggested_reading": "在 alpha 非零的线性作用下理解；alpha=0 时可直接构造任意分布的反向独立噪声模型。",
+      "treatment": "保留定理主文，译注1说明。"
+    },
+    {
+      "source_book_page": 51,
+      "source_pdf_page": 9,
+      "location": "式(4.7)",
+      "original": "p(x,y)=p_{N_X}(x)p_{N_Y}(y-f_Y(x))；下一式第一项却为p_X",
+      "suggested_reading": "第一项通常应为 p_X(x)。",
+      "treatment": "保留原公式，译注2说明。"
+    },
+    {
+      "source_book_page": 51,
+      "source_pdf_page": 9,
+      "location": "定理4.5证明末段",
+      "original": "f_X、p_{N_E}、log p_{N_X} 的导数与模型方向记号混杂",
+      "suggested_reading": "给定 f_Y、p_{N_Y}，对 log p_X 建立三阶微分方程，以 log p_X 在 nu 处的零阶、一阶、二阶值作自由参数。",
+      "treatment": "保留印刷符号，译注3集中说明。"
+    },
+    {
+      "source_book_page": 58,
+      "source_pdf_page": 16,
+      "location": "迹方法定理4.12之后",
+      "original": "文字定义A_X用于X到Y、A_Y用于Y到X，但后式A_X Sigma_YY A_X^T及4.2.3使用相反约定",
+      "suggested_reading": "统一使用 A_Y 对应 X到Y，A_X 对应 Y到X。",
+      "treatment": "保留原文字与公式，译注4说明。"
+    },
+    {
+      "source_book_page": 59,
+      "source_pdf_page": 17,
+      "location": "4.1.9开头",
+      "original": "将PE与P_{C|E}表述为要形式化独立性的对象",
+      "suggested_reading": "本章因果机制独立性针对 PC 与 P_{E|C}。",
+      "treatment": "保留原符号，译注5说明。"
+    },
+    {
+      "source_book_page": 61,
+      "source_pdf_page": 19,
+      "location": "ANM与算法独立性论证",
+      "original": "仅凭存在从Y到X的ANM而拒绝Y到X",
+      "suggested_reading": "结合上文应理解为存在从X到Y的ANM，用其排除反向因果解释。",
+      "treatment": "保留原方向，译注6说明。"
+    },
+    {
+      "source_book_page": 67,
+      "source_pdf_page": 25,
+      "location": "4.2.2基于熵的方法",
+      "original": "H(X)<=H(Y)，却说熵较大者为原因",
+      "suggested_reading": "在给出的IGCI条件下应为 H(Y)<=H(X)。",
+      "treatment": "保留主公式，译注7用变量变换公式和Jensen不等式说明。"
+    },
+    {
+      "source_book_page": 69,
+      "source_pdf_page": 27,
+      "location": "习题4.16(a)",
+      "original": "噪声均值允许mu_NY，却要求f(x)=E[Y|X=x]",
+      "suggested_reading": "一般应为 f(x)+mu_NY；题述等式需要零均值噪声或把均值吸入函数。",
+      "treatment": "保留原题，译注8说明。"
+    },
+    {
+      "source_book_page": 57,
+      "source_pdf_page": 15,
+      "location": "式(4.12)",
+      "original": "噪声写N_X而非之前采用的N_Y",
+      "suggested_reading": "仅命名差异，符号按原书保留。",
+      "treatment": "保留，未另加译注。"
+    },
+    {
+      "source_book_page": 69,
+      "source_pdf_page": 27,
+      "location": "PDF书签",
+      "original": "4.3 Problems后另有一个重复Problems书签",
+      "suggested_reading": "只存在一个实际习题节。",
+      "treatment": "仅保留4.3习题。"
+    }
+  ],
+  "figures": [
+    {
+      "source_pdf_page": 7,
+      "figure": "4.1",
+      "vector_paths": 26,
+      "source_circle_markers": 0,
+      "density_rectangles": 0
+    },
+    {
+      "source_pdf_page": 10,
+      "figure": "4.2",
+      "vector_paths": 22,
+      "source_circle_markers": 0,
+      "density_rectangles": 4472
+    },
+    {
+      "source_pdf_page": 12,
+      "figure": "4.3",
+      "vector_paths": 63,
+      "source_circle_markers": 48,
+      "density_rectangles": 0
+    },
+    {
+      "source_pdf_page": 14,
+      "figure": "4.4",
+      "vector_paths": 14,
+      "source_circle_markers": 0,
+      "density_rectangles": 0
+    },
+    {
+      "source_pdf_page": 21,
+      "figure": "4.5",
+      "vector_paths": 2041,
+      "source_circle_markers": 2000,
+      "density_rectangles": 0
+    },
+    {
+      "source_pdf_page": 23,
+      "figure": "4.6",
+      "vector_paths": 374,
+      "source_circle_markers": 348,
+      "density_rectangles": 0
+    }
+  ],
+  "intentional_layout_differences": [
+    "A4中文排版，非原书逐页复刻；译文20页，英文原章28页。已逐段覆盖原章全部正文、证明、原脚注、公式、代码及习题。",
+    "图4.1、4.3、4.4、4.5、4.6的矢量路径和点形来自原PDF，转为TikZ重排；英文轴标题译为中文，数值和符号保持。",
+    "图4.2原书密度层为两幅栅格图。按原灰度分成21档、合并同色像素面域，以4472个TikZ矩形重建；轴线、两方向函数采用原PDF矢量路径，不重新估计密度。",
+    "图4.3/4.5/4.6分别保留48/2000/348个原印刷圆点，并附PDF点坐标CSV；CSV不是声称恢复了原始观测数据。",
+    "纵轴数字改为水平排印；中文纵轴标题仍保持纵向。",
+    "图4.5紧接四步算法放置，以避免整页孤立浮图；代码片段保持23行且不跨页。",
+    "8条译注另用“译注1—8”标识，不改变原书脚注1—11的顺序。"
+  ],
+  "unresolved_items": [],
+  "validation": {
+    "compile_script_runs": 2,
+    "xelatex_passes_total": 4,
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "all_source_pages_rendered_and_reviewed": true,
+    "all_translated_pages_rendered_and_reviewed": true,
+    "numbered_equations_checked_against_rendered_source": true,
+    "source_sha256": "8c00eaafef9cddb02a01c1a8d078d30ea0a0c7c3c087e39468714483375ad9d1",
+    "pdf_sha256": "9b6aa4ea1d345323df9c15c6aadc050ea9f7d988d5abd0180c2bec4743d0e5e1"
+  },
+  "local_macros": [
+    "chfouraeq",
+    "chfouraleq",
+    "chfourtnote",
+    "chfourtransnote counter"
+  ],
+  "remarks": "未改动 main.tex、preamble.tex、其他章或术语表；未包含阅读批注、高亮、划线。"
+}

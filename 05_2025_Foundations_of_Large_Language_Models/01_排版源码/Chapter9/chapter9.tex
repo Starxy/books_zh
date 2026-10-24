@@ -1,0 +1,3067 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+%----------------------------------------------------------------------------------------
+% Natural Language Processing: Neural Networks and Large Language Models
+%
+% Copyright 2021-2026
+% Tong Xiao (xiaotong@mail.neu.edu.cn) and Jingbo Zhu (zhujingbo@mail.neu.edu.cn)
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%    CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+%\setcounter{chapter}{8}
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 9
+%----------------------------------------------------------------------------------------
+
+\chapter{提示方法}
+
+\thispagestyle{chapterurl} % add urls to the header
+
+\noindent \textit{提示方法}（prompting）是指向大语言模型提供特定输入或线索，以生成期望输出或完成某项任务的过程。例如，如果希望大语言模型将一个句子从英语翻译成中文，可以使用如下提示：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{2em} 请将文本从英语翻译成中文。
+
+\vspace{0.2cm}
+
+\hspace{2em} 文本：The early bird catches the worm.
+
+\vspace{0.2cm}
+
+\hspace{2em} 译文：\underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 提示方法对大语言模型至关重要，因为它直接影响模型理解和回应用户问题的效果。精心设计的提示能够引导大语言模型生成更准确、更切题、更符合上下文的回答。此外，这一过程还可以反复改进：用户分析大语言模型的回答后，可以调整提示，使其更贴合自己的具体需求。鉴于提示方法在大语言模型应用中的重要性，提示设计已成为使用和开发大语言模型的一项必备技能。提示设计日益重要，也催生了一个活跃的研究领域，即\mindex{提示工程}（prompt engineering）。这一领域研究如何设计有效的提示，以便更好地利用大语言模型，提高其在实际应用中的实用价值。
+
+与提示方法密切相关的一个重要概念是\mindex{上下文学习}（in-context learning，ICL）。向大语言模型提供提示时，可以在上下文中加入新的信息，例如解决问题的示例。这样，大语言模型就能够从上下文中学习如何解决问题。下面的例子通过若干示例，提示大语言模型按情感极性对文本进行分类。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+\hspace{2em} 下面给出一些文本分类示例。
+
+\vspace{0.3em}
+
+\hspace{2em} 示例 1：我们一起吃了一顿愉快的晚餐。$\to$ 标签：Positive
+
+\vspace{0.2em}
+
+\hspace{2em} 示例 2：这些延误让我很沮丧。$\to$ 标签：Negative
+
+\vspace{0.3em}
+
+\hspace{2em} “那句话很伤人。”的标签是什么？
+
+\vspace{0.2em}
+
+\hspace{2em} 标签：\underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+上下文学习通常被视为大语言模型在预训练后涌现的一种能力。虽然也可以通过训练或调优让大语言模型执行新任务，但上下文学习无需任何训练或调优，就能十分高效地使模型适应新任务。这也许是大语言模型最显著的特点之一：它们确实在预训练期间学到了有关世界和语言的一般知识，而我们能够轻松地将这些知识用于应对新的挑战。此外，上下文学习也体现了人工智能系统向更强泛化能力和更易使用方向发展的整体趋势。用户可以更直观地与大语言模型交互，按需提供示例或调整上下文，而不必要求专业工程师针对每一项独特任务微调模型。
+
+本章重点讨论大语言模型中的提示技术。首先介绍提示工程中几种有代表性的常用提示设计，然后讨论对这些方法的一系列改进，最后探讨自动化提示设计的方法。
+
+\vspace{0.5em}
+
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{通用提示设计}
+
+\noindent 本节介绍提示设计的基本概念，并举例说明如何提示大语言模型完成各种自然语言处理（natural language processing，NLP）任务。由于提示的效果在很大程度上取决于所使用的大语言模型，不同模型往往需要不同的提示，因此很难给出一份涵盖所有大语言模型和下游任务的完整提示清单。本节不针对任何特定的大语言模型，而是旨在提供提示设计的指导原则。
+
+\subsection{基础概念}
+
+\noindent “提示”（prompt）一词有多种用法。本章将提示定义为输入大语言模型的文本，记为 $\mathbf{x}$。大语言模型生成输出 $\mathbf{y}$，所依据的条件概率为 $\Pr(\mathbf{y}|\mathbf{x})$。在这一生成过程中，提示是进行预测所依据的条件，可以包含任何有助于描述和解决问题的信息。
+
+提示可以通过提示模板（prompt template，简称模板）获得~\cite{liu-etal:2023pre}。模板是一段包含占位符或变量的文本，每个占位符都可以填入具体信息。下面给出两个向大语言模型征求周末活动建议的模板。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} 请给我一些建议，让我度过一个愉快的周末。
+
+\hspace{2em} \underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} 如果 $\{*\mathrm{premise}*\}$，你对愉快度过周末有什么建议？
+
+\hspace{2em} \underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+第一个模板只是要求大语言模型给出一些建议，因此它是一段不含变量的文本。第二个模板中的变量 $\{*\mathrm{premise}*\}$ 则需要由用户指定，为提出建议提供一个前提。例如，如果输入
+\begin{eqnarray}
+\mathrm{premise} & = & \textrm{the weather is nice this weekend},
+\end{eqnarray}
+
+\noindent 就能生成如下提示：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} 如果这个周末天气很好，
+
+\hspace{2em} 你会建议怎样度过一个愉快的周末？
+
+\hspace{2em} \underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+也可以设计包含多个变量的模板。下面的例子用于比较两个句子之间的语义相似度。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} 这里有一个句子：
+
+\hspace{2em} $\{*\mathrm{sentence1}*\}$
+
+\hspace{2em} 这里还有另一个句子：
+
+\hspace{2em} $\{*\mathrm{sentence2}*\}$
+
+\vspace{0.3em}
+
+\hspace{2em} 请计算这两个句子的语义相似度。
+
+\hspace{2em} \underline{\hspace{2em}}
+\end{tcolorbox}
+\vspace{0.5em}
+
+一种常见的提示格式是将每项输入或输出写成“名称：内容”的形式。例如，可以描述 John 和 David 两个人之间的一段对话，再让大语言模型续写。下面给出这类提示的一个模板。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} John: $\{*\mathrm{utterance1}*\}$
+
+\hspace{2em} David: $\{*\mathrm{utterance2}*\}$
+
+\hspace{2em} John: $\{*\mathrm{utterance3}*\}$
+
+\hspace{2em} David: $\{*\mathrm{utterance4}*\}$
+
+\hspace{2em} John: $\{*\mathrm{utterance5}*\}$
+
+\hspace{2em} David: $\{*\mathrm{utterance6}*\}$
+
+\hspace{2em} John: $\{*\mathrm{utterance7}*\}$
+
+\hspace{2em} David: \underline{\hspace{2em}}
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+“名称：内容”的格式可以用来定义希望大语言模型执行的任务。例如，由于“Q”和“A”通常分别是“Question”（问题）和“Answer”（回答）的缩写，可以使用下面的模板完成问答任务。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} Q: $\{*\mathrm{question}*\}$
+
+\hspace{2em} A: \underline{\hspace{2em}}
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+这一格式还可以描述更复杂的任务。例如，下面给出了一份翻译任务的说明：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\hspace{2em} 任务：翻译
+
+\hspace{2em} 源语言：英语
+
+\hspace{2em} 目标语言：中文
+
+\hspace{2em} 风格：正式文本
+
+\hspace{2em} 模板：请翻译下列句子：$\{*\mathrm{sentence}*\}$
+
+\hspace{2em} \underline{\hspace{2em}}
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 在实际系统中，通常使用键值对来表示和存储这类数据，例如采用 JSON 格式\footnote{
+相应的 JSON 表示为
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\{
+
+\hspace{2em} "任务": "翻译",
+
+\hspace{2em} "源语言": "英语",
+
+\hspace{2em} "目标语言": "中文",
+
+\hspace{2em} "风格": "正式文本",
+
+\hspace{2em} "模板": "请翻译下列句子：$\{*\mathrm{sentence}*\}$",
+
+\}
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+}。
+
+如果问题难以通过属性来描述，更常见的做法是给出清晰、详细的说明来指导大语言模型。实现方式有很多，其中一种是为大语言模型指定角色，并提供充分的上下文。下面的模板要求大语言模型扮演一位专家，回答儿童提出的问题。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+你是一位在深度学习领域知识渊博的计算机科学家。
+
+\vspace{0.3em}
+
+请向一个 10 岁左右的孩子解释下列计算机相关概念，并尽可能使用简单的例子。
+
+\vspace{0.3em}
+
+$\{*\mathrm{concept}*\}$
+
+\vspace{0.3em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 其中，“你是一位在深度学习领域知识渊博的计算机科学家”这段文字有时称为系统提示（system prompt）或系统信息，用来帮助大语言模型理解所执行任务的背景或约束。
+
+\subsection{上下文学习}
+
+\noindent 大语言模型也可以在推理（inference）过程中学习。上下文学习就是其中一种方法：提示中包含解决问题的示例，大语言模型能够从这些示例中学习如何解决新问题。由于这一过程不更新模型参数，上下文学习可以视为一种高效激活预训练所学知识的方式，无需额外训练或微调。这使大语言模型能够迅速适应新问题，并在不做任务特定调整的情况下拓展预训练模型的能力。
+
+可以通过比较零样本学习（zero-shot learning）、单样本学习（one-shot learning）和少样本学习（few-shot learning）来说明上下文学习。顾名思义，零样本学习不涉及传统的“学习”过程，而是直接用大语言模型处理训练时未见过的新问题。在实践中，可以反复调整提示，引导大语言模型生成更好的回答，而不展示解题步骤或提供示例。考虑下面的例子：假设希望将大语言模型用作帮助纠正英语句子的助手，相应的零样本学习提示如下。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \footnotesize{系统}} & 你是一位乐于助人的助手，擅长语法纠错。 \\ [0.2cm]
+{\color{gray} \footnotesize{用户}}  & 下面将给出一个英语句子，任务是 \\
+ & 输出正确的句子。 \\ [0.1cm]
+ & 输入：She don't like going to the park. \\
+ & 输出：\underline{\hspace{2em}}
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里用灰色文字标示提示中的不同字段。
+
+在单样本学习中，我们在这一提示中加入一个句子纠错示例，使大语言模型能够从新加入的经验中学习。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \footnotesize{系统}} & 你是一位乐于助人的助手，擅长语法纠错。 \\ [0.2cm]
+{\color{gray} \footnotesize{示例}}  & 下面将给出一个英语句子，任务是 \\
+ & 输出正确的句子。 \\ [0.1cm]
+ & 输入：There is many reasons to celebrate. \\
+ & 输出：There are many reasons to celebrate. \\ [0.2cm]
+{\color{gray} \footnotesize{用户}}  & 下面将给出一个英语句子，任务是 \\
+ & 输出正确的句子。 \\ [0.1cm]
+ & 输入：She don't like going to the park. \\
+ & 输出：\underline{\hspace{2em}}
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+还可以进一步增加示例，开展少样本学习。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r l}
+{\color{gray} \footnotesize{系统}} & 你是一位乐于助人的助手，擅长语法纠错。 \\ [0.2cm]
+{\color{gray} \footnotesize{示例 1}}  & 下面将给出一个英语句子，任务是 \\
+ & 输出正确的句子。 \\ [0.1cm]
+ & 输入：There is many reasons to celebrate. \\
+ & 输出：There are many reasons to celebrate. \\ [0.2cm]
+{\color{gray} \footnotesize{示例 2}}  & 下面将给出一个英语句子，任务是 \\
+ & 输出正确的句子。 \\ [0.1cm]
+ & 输入：Me and my friend goes to the gym every day. \\
+ & 输出：My friend and I go to the gym every day. \\ [0.2cm]
+{\color{gray} \footnotesize{用户}}  & 下面将给出一个英语句子，任务是 \\
+ & 输出正确的句子。 \\ [0.1cm]
+ & 输入：She don't like going to the park. \\
+ & 输出：\underline{\hspace{2em}}
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+在少样本学习中，我们实际上提供了一种将若干输入映射到相应输出的模式。只要提示中包含足够数量的示例（通常只需少量示例），大语言模型就会尝试遵循这种模式进行预测。也可以用更简单的模式实现这一目的。例如，下面的少样本学习提示可用于将中文词语翻译成英语。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r r c l}
+\hspace{0.5em} {\color{gray} \footnotesize{示例}} & \begin{CJK*}{UTF8}{gbsn} 现在 \end{CJK*} & $\to$ & now \\
+& \begin{CJK*}{UTF8}{gbsn} 来 \end{CJK*} & $\to$ & come\\
+& \begin{CJK*}{UTF8}{gbsn} 去 \end{CJK*} & $\to$ & go\\
+& \begin{CJK*}{UTF8}{gbsn} 男孩 \end{CJK*} & $\to$ & boy\\
+{\color{gray} \footnotesize{用户}} & \begin{CJK*}{UTF8}{gbsn} 女孩 \end{CJK*} & $\to$ & \underline{\hspace{2em}}\\
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+如果大语言模型足够强，少样本学习还可以使其处理数学推理等复杂问题。例如，考虑下面的任务：先求两个数的和，再用它们的乘积去除这个和。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{r r c l}
+\hspace{0.5em} {\color{gray} \footnotesize{示例}} & $12\ \ 5$ & $\to$ & $(12 + 5)/(12 \times 5) = 0.283$ \\
+& $3\ \ 1$ & $\to$ & $(3 + 1)/(3 \times 1) = 1.33$ \\
+& $-9\ \ 4$ & $\to$ & $(-9 + 4)/(-9 \times 4) = 0.138$ \\
+& $15\ \ 15$ & $\to$ & $(15 + 15)/(15 \times 15) = 0.133$ \\
+{\color{gray} \footnotesize{用户}} & $19\ \ 73$ & $\to$ & \underline{\hspace{2em}}\\
+\end{tabular}
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+在许多实际应用中，上下文学习的效果在很大程度上取决于提示的质量和预训练大语言模型的基本能力。一方面，需要投入大量提示工程工作，开发合适的提示，帮助大语言模型更有效地从示例中学习。另一方面，能力更强的大语言模型能够更好地利用上下文学习完成新任务。例如，假设希望用大语言模型将因纽特语词语翻译成英语。如果模型没有在因纽特语数据上接受过预训练，它对这种语言的理解就会很弱，无论怎样提供提示，都很难获得良好的翻译效果。在这种情况下，需要用更多因纽特语数据继续训练大语言模型，而不是设法寻找更好的提示。
+
+上下文学习如何在预训练期间涌现，以及为什么能在推理时发挥作用，也是值得探究的问题。一种直观解释是，大语言模型虽然在预训练中获得了解决问题的知识，但由于输出空间庞大，面对新任务时很难选出正确预测。提供示例能够引导大语言模型沿着“正确”的路径前进。此外，也有研究者尝试从不同角度解释上下文学习，包括贝叶斯推理~\cite{xie-etal:2022an}、梯度下降~\cite{dai-etal:2023can,von-etal:2023transformers}、线性回归~\cite{akyurek-etal:2023what}、元学习~\cite{garg-etal:2022can}等。
+
+\subsection{提示工程策略}
+
+\noindent 提示设计具有很强的经验性。一般而言，提示大语言模型执行同一任务可以有许多方式，往往需要经过多轮试错，才能找到满意的提示。为了更高效地编写良好提示，可以遵循一些策略。常见的提示原则包括：
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{尽可能清楚地描述任务}。使用大语言模型解决问题时，需要准确、具体、清晰地描述问题，并指示大语言模型按预期方式行动。当希望模型输出满足某些特定要求时，这一点尤为重要。例如，假设我们想了解气候变化，可以用下面这个简单提示要求大语言模型提供相关信息：
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \hspace{2em} 请介绍一下气候变化。
+
+    \hspace{2em} \underline{\hspace{2em}}
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    由于这一指令过于宽泛，大语言模型可能从气候变化的任意一个方面作答，而这未必符合我们的具体兴趣。此时，可以改用更具体、详细的提示，例如：
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    请详细解释气候变化的原因和影响，包括它对全球气温、天气模式和海平面的影响。另外，请讨论减轻这些影响的潜在解决办法，以及当前正在采取的行动。
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    现在，假设希望向一个 10 岁的孩子解释气候变化，可以进一步调整上述提示。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    请向一个 10 岁的孩子解释气候变化的原因和影响。谈谈它如何影响天气、海平面和气温，并提及人们正在采取的一些应对措施。请尽量使用简单的语言，篇幅不要超过 500 词。
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+\item \vspace{0.3em} \textbf{引导大语言模型思考}。大语言模型已经表现出令人惊讶的强大“思考”能力。一个常见例子是，发展成熟的大语言模型在公认具有挑战性的数学推理任务中取得了出色表现。在提示工程中，需要通过适当的提示来激活大语言模型的思考能力，对于需要大量推理的问题尤其如此。在许多情况下，要求大语言模型“思考”与要求同一模型直接执行任务，会得到完全不同的结果。例如，\citet{kojima-etal:2022large} 发现，只需在每条提示末尾添加“Let's think step by step”（让我们一步一步地思考），就能提高大语言模型在多项推理任务上的表现。引导大语言模型“思考”的方法有很多。一种方法是要求模型在得出最终答案之前，先生成针对问题的推理步骤。例如，考虑求解数学问题的任务，下面是一个简单提示。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    你是一位数学家。下面将给出一道数学题，请解答这道题。
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    求解数学问题需要详细的推理过程，如果大语言模型试图直接算出答案，就可能犯错。因此，可以明确要求大语言模型在得出结论之前，先遵循给定的推理过程。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    你是一位数学家。解答数学题时，你将遵循以下详细推理步骤。
+
+    \vspace{0.5em}
+
+    步骤 1：理解题意。
+
+    数学家仔细倾听你的问题，理解所提出数学难题的各种细节。
+
+    \vspace{0.5em}
+
+    步骤 2：制定策略。
+
+    数学家凭借丰富的知识，针对题目类型（无论是代数、微积分还是几何）选择最有效的解题策略。
+
+    \vspace{0.5em}
+
+    步骤 3：详细计算。
+
+    数学家以严谨的态度和专业知识，遵循所有数学原理，一步一步地完成必要的计算。
+
+    \vspace{0.5em}
+
+    步骤 4：检查解答。
+
+    给出最终答案之前，数学家仔细检查计算是否准确，并简要解释解题过程或依据。
+
+    \vspace{0.5em}
+
+    下面将给出一道数学题，请解答这道题。
+
+    \vspace{0.5em}
+
+    $\{*\mathrm{problem}*\}$
+
+    \vspace{0.5em}
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    另一种引导大语言模型“思考”的方式是与模型进行多轮交互。例如，第一步可以要求模型直接求解问题：
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    下面将给出一道数学题，请解答这道题。
+
+    \vspace{0.3em}
+
+    $\{*\mathrm{problem}*\}$
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    这样就得到了问题的初步答案。第二步，再提示大语言模型评估答案是否正确，必要时重新求解，以得到更好的解答。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    下面将给出一道数学题及其解答。请评估解答是否正确，若存在错误，请指出。然后给出你自己的解答。
+
+    \vspace{0.3em}
+
+    题目：$\{*\mathrm{problem}*\}$
+
+    \vspace{0.5em}
+
+    解答：$\{*\mathrm{solution}*\}$
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    这里给出的提示与大语言模型推理问题领域的一系列长期研究密切相关。由于这一主题涵盖大量方法，无法在此完整讨论所有相关问题。第~\ref{sec:advanced-prompting} 节将较为详细地讨论如何通过更多推理来改进提示。
+
+\item \vspace{0.3em} \textbf{提供参考信息}。如前一节所述，可以在提示中加入示例，让大语言模型通过上下文学习，从这些示例中学会如何执行任务。事实上，凭借大语言模型出色的语言理解能力，可以在提示中加入任意类型的文本，使模型基于更丰富的上下文进行预测。在许多应用中，我们拥有各种与用户问题有关的信息。通常，我们希望大语言模型的输出以相关文本为依据，而不是不受约束地进行预测。检索增强生成（retrieval-augmented generation，RAG）就是这样一个例子：先利用信息检索（information retrieval，IR）系统检索与用户问题相关的文本，再提示大语言模型依据这些文本生成回答。下面给出一个示例提示。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    你是一位能够回答输入问题的专家。现在给出一个问题及其相应上下文信息，请根据这些上下文信息生成答案。请注意，要用自己的语言回答，不要直接照抄所提供的上下文。
+
+    \vspace{0.5em}
+
+    上下文信息：$\{*\mathrm{IR\textrm{-}result}*\}$
+
+    \vspace{0.3em}
+
+    问题：$\{*\mathrm{query}*\}$
+
+    \vspace{0.3em}
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    如果上下文信息高度可靠，甚至可以限制大语言模型仅使用所提供的文本作答。示例提示如下：
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    你是一位负责回答输入问题的专家。现在给出一个问题及其相应上下文信息。上下文信息组织为一张表，每行代表一条有用的记录。请仅使用这些上下文信息生成答案，并确保用自己的语言作答。
+
+    \vspace{0.5em}
+
+    上下文信息：$\{*\mathrm{table}*\}$
+
+    \vspace{0.3em}
+
+    问题：$\{*\mathrm{query}*\}$
+
+    \vspace{0.3em}
+
+    \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    处理现实问题时，我们往往拥有有关问题的先验知识和补充信息，这些信息有助于生成更好的答案。在提示中考虑这些信息，通常有助于改善结果。
+
+\item \vspace{0.3em} \textbf{注意提示格式}。一般而言，大语言模型的表现对输入提示十分敏感。有时，对提示的一处微小修改就会使模型输出发生很大变化。一个有趣的例子是，改变提示中句子的顺序，就可能使大语言模型生成不同结果。为了使提示易于阅读并减少歧义，通常会采用有助于清晰表达的格式。例如，可以为提示定义若干字段，在各个字段中填写不同信息。又如，对于能够理解并生成自然语言和代码的大语言模型，可以使用代码风格的提示。下面给出一个用于翻译的代码风格提示，其中包含一个示例。
+
+    \vspace{0.5em}
+    \begin{tcolorbox}[frame empty]
+
+    \begingroup
+    \setlength{\leftskip}{2em}
+    \setlength{\rightskip}{2em}
+
+    [English] = [I have an apple.]
+
+    \vspace{0.3em}
+
+    [German] = [Ich habe einen Apfel.]
+
+    \vspace{0.3em}
+
+    [English] = [I have an orange.]
+
+    \vspace{0.3em}
+
+    [German] = \underline{\hspace{2em}}
+
+    \endgroup
+
+    \end{tcolorbox}
+    \vspace{0.5em}
+
+    大语言模型能够接收多种格式的文本，因此我们可以利用控制字符、XML 标签和特定格式来表示复杂数据。此外，明确规定输入和输出的格式或结构也很有帮助。例如，可以用引号划定文本片段，并据此提示大语言模型（如在提示中加入“the input text is delimited by double quotes”，即“输入文本以双引号界定”这样的句子）。
+
+\end{itemize}
+\vspace{0.5em}
+
+上面只讨论了编写良好提示的几种策略。当然，这类方法还有很多，需要通过实践形成适合自己的方法。感兴趣的读者可以查阅各种在线文档，了解更多信息，例如 OpenAI 关于 GPT 系列模型的手册\footnote{参见 \url{https://platform.openai.com/docs/guides/prompt-engineering/six-strategies-for-getting-better-results}。}。
+
+\subsection{更多示例}
+
+\noindent 本小节给出更多提示大语言模型完成各种 NLP 任务的例子。这里的目的不是为这些任务提供标准提示，而是通过简单示例说明如何提示大语言模型处理 NLP 问题。
+
+\subsubsection{文本分类}
+
+\noindent 文本分类或许是 NLP 中最常见的问题之一。许多任务都可以广义地归结为：给定一段文本，为其分配预先定义的标签。这里以情感分析中的极性分类问题为例。选择它进行说明，是因为它是最常用、定义也最明确的文本分类任务之一。通常，极性分类的目标是将给定文本分为负面、正面或中性三类之一。下面给出一个简单提示（为便于阅读，提示中的任务描述已用颜色突出显示）。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请分析以下文本的情感极性，将其分为 positive、negative 或 neutral。}
+
+\vspace{0.7em}
+
+文本：
+
+这家餐厅的服务比预期更慢，让人有些沮丧。
+
+\vspace{0.7em}
+
+\underline{该文本的情感极性可归为 negative。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 为使示例完整，还给出了大语言模型生成的回答（以下划线标示）。
+
+尽管答案正确，大语言模型给出的却是一个描述性句子，而非离散标签。这一问题源于大语言模型本身是为生成文本而设计的，而不是用于分配离散标签。因此，分类被当作文本生成问题来处理。这样一来，就需要另一个系统将大语言模型的输出映射到标签空间，这一过程称为\mindex{标签映射}（label mapping）。例如，从“该文本的情感极性可归为 negative”中提取“negative”。多数情况下，这很简单，因为可以用简单的启发式规则识别标签词。但有时大语言模型并不使用这些标签词来表达分类结果，此时问题就会更复杂，因为需要建立生成文本到预定义标签之间的映射。
+
+一种让大语言模型输出标签的方法，是将问题改写为完形填空任务。例如，下面给出了用于极性分类的填空式提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请分析以下文本的情感极性，将其分为 positive、negative 或 neutral。}
+
+\vspace{0.7em}
+
+文本：
+
+这家餐厅的服务比预期更慢，让人有些沮丧。
+
+\vspace{0.7em}
+
+该文本的情感极性为 \underline{negative}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 可以使用大语言模型补全文本，在空白处填入最合适的词。理想情况下，填入的词应为 $\mathrm{positive}$、$\mathrm{negative}$ 或 $\mathrm{neutral}$。然而，大语言模型并不保证一定生成这些标签词。一种解决方法是将输出空间限制为标签词集合，再选择概率最高的词。于是，输出标签为
+\begin{eqnarray}
+\mathrm{label} & = & \argmax_{y \in Y} \Pr(y|\mathbf{x}),
+\end{eqnarray}
+
+\noindent 其中，$y$ 表示填入空白处的词元或词，$Y$ 表示标签词集合\\ $\{\mathrm{positive}, \mathrm{negative}, \mathrm{neutral}\}$。
+
+另一种让大语言模型生成标签的方法，是通过提示约束输出。例如，可以提示模型从预定义标签集合中进行预测。下面给出一个例子。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请分析以下文本的情感极性，将其分为 positive、negative 或 neutral。}
+
+\vspace{0.7em}
+
+文本：
+
+这家餐厅的服务比预期更慢，让人有些沮丧。
+
+\vspace{0.7em}
+
+这段文本的情感极性是什么？
+
+\vspace{0.3em}
+
+只需回答：positive、negative 或 neutral。
+
+\vspace{0.7em}
+
+\underline{Negative}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+情感分析是一个常见的 NLP 问题，大语言模型通常已经通过预训练或微调较好地掌握了这一任务，因此可以用简单指令提示模型执行。不过，对于新的分类问题，可能需要提供任务的更多细节，例如分类标准，模型才能正确执行。为此，可以在提示中加入更详细的任务描述，也可以提供分类示例，或者同时采用两者。考虑下面的例子。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请分析以下文本的情感极性，将其分为 positive、negative 或 neutral。各类别的含义如下：}
+
+\vspace{0.5em}
+
+\ctext[RGB]{154, 245, 175}{Positive：表示文本传达了积极的情绪或态度。例如，表达快乐、满意、兴奋或赞赏的文本均属于正面类别。}
+
+\vspace{0.3em}
+
+\ctext[RGB]{154, 245, 175}{Negative：表示文本表达了消极的情绪或态度，包括悲伤、愤怒、沮丧或批评等情感。}
+
+\vspace{0.3em}
+
+\ctext[RGB]{154, 245, 175}{Neutral：用于描述没有表现出明显积极或消极情绪，而是传达信息、陈述事实或语气冷淡的文本。}
+
+\vspace{0.7em}
+
+文本：
+
+这家餐厅的服务比预期更慢，让人有些沮丧。
+
+\vspace{0.7em}
+
+这段文本的情感极性是什么？
+
+\vspace{0.7em}
+
+\underline{Negative}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+虽然用大语言模型解决分类问题看起来很直接，但仍有一些问题尚未得到妥善解决。例如，当类别数量很多时，如何有效地提示大语言模型仍然是一个挑战。需要注意，如果面临特别困难的分类问题，同时拥有一定数量的标注数据，那么微调大语言模型，或者采用类似“BERT + 分类器”的架构，也是可取的方案。
+
+\subsubsection{信息抽取}
+
+\noindent 许多 NLP 任务都可以表述为信息抽取问题，即从非结构化文本中识别并提取特定信息。这些信息包括命名实体、关系、事件以及其他相关数据项。信息抽取的目标是将原始数据转换为结构化形式，以便于分析，并用于各种下游应用。
+
+信息抽取涵盖的问题十分广泛，这里无法逐一讨论。下面先从命名实体识别（named entity recognition，NER）入手，这一任务长期以来一直是 NLP 的核心研究方向。命名实体识别旨在识别文本中的命名实体，并对其分类。这些实体通常包括专有名词，以及日期、金额、百分比等表达。首先考虑一个从给定文本中抽取人名的简单例子\footnote{文本来自 \url{https://edition.cnn.com/travel}。}。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请识别所提供文本中的所有人名。}
+
+\vspace{0.7em}
+
+文本：
+
+UK 的表现真的那么差，还是疫情后的旅游趋势发生了变化？对 European Tourism Organisation 的首席执行官 Tom Jenkins 来说，答案是后者。谈到 2024 年，他说：“我认为 UK 的表现相当好，但我们会看到更多人前往 Europe。”他还补充道：“据说，美国游客对 UK 的需求略微进入了平台期。”
+
+\vspace{0.7em}
+
+\underline{在所提供文本中识别出的人名是：}
+
+\vspace{0.3em}
+
+\underline{Tom Jenkins}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+接下来，可以扩大抽取范围，提取所有命名实体。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请识别所提供文本中的所有命名实体，并将其分为人名、地点、日期、组织机构等类别。每行列出一个实体及其类型。}
+
+\vspace{0.7em}
+
+文本：
+
+UK 的表现真的那么差，还是疫情后的旅游趋势发生了变化？对 European Tourism Organisation 的首席执行官 Tom Jenkins 来说，答案是后者。谈到 2024 年，他说：“我认为 UK 的表现相当好，但我们会看到更多人前往 Europe。”他还补充道：“据说，美国游客对 UK 的需求略微进入了平台期。”
+
+\vspace{0.7em}
+
+\underline{1. Tom Jenkins——人名}
+
+\vspace{0.3em}
+
+\underline{2. European Tourism Organisation——组织机构}
+
+\vspace{0.3em}
+
+\underline{3. UK——地点}
+
+\vspace{0.3em}
+
+\underline{4. Europe——地点}
+
+\vspace{0.3em}
+
+\underline{5. 2024——日期}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+识别出这些命名实体后，还可以对文本执行其他信息抽取任务。例如，可以识别这些命名实体之间的关系，这称为\mindex{关系抽取}（relation extraction）。相应提示如下。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{给定一段文本及从中识别出的命名实体列表，请分析并描述这些实体之间的关系，说明各个实体在上下文中与其他实体的联系。}
+
+\vspace{0.7em}
+
+文本：
+
+UK 的表现真的那么差，还是疫情后的旅游趋势发生了变化？对 European Tourism Organisation 的首席执行官 Tom Jenkins 来说，答案是后者。谈到 2024 年，他说：“我认为 UK 的表现相当好，但我们会看到更多人前往 Europe。”他还补充道：“据说，美国游客对 UK 的需求略微进入了平台期。”
+
+\vspace{0.7em}
+
+命名实体：
+
+Tom Jenkins, European Tourism Organisation, UK, Europe, 2024
+
+\vspace{0.7em}
+
+\uline{Tom Jenkins——European Tourism Organisation：Tom Jenkins 是 European Tourism Organisation 的首席执行官。这表明两者具有职业上的关联，Tom Jenkins 很可能在指导该组织的活动方面发挥重要作用，尤其是与 Europe 旅游有关的活动。}
+
+\vspace{0.3em}
+
+\uline{...}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+如果大语言模型已经经过遵循指令的微调，那么使其适应各种信息抽取任务就比较直接。例如，下面给出一个通用的信息抽取提示模板。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{下面将给出一段文本。你的任务是：$\{*\mathrm{task\textrm{-}description}*\}$}
+
+\vspace{0.7em}
+
+文本：$\{*\mathrm{text}*\}$
+
+\vspace{0.7em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 其中，$\mathrm{task\textrm{-}description}$ 是任务指令。例如，可以使用以下指令：
+
+\vspace{0.3em}
+\hspace{2em} \textit{从文本中抽取关键词。}
+
+\vspace{0.3em}
+\hspace{2em} \textit{从文本中抽取关键事件。}
+
+\vspace{0.3em}
+\hspace{2em} \textit{检测文本中实体之间的共指和回指关系。}
+
+\vspace{0.3em}
+
+\noindent 通常，任务描述越详细，大语言模型给出的回答就越准确。
+
+\subsubsection{文本生成}
+
+\noindent 在 NLP 中，\textit{文本生成}一词的含义很广，涵盖许多问题，其中不少都侧重于根据输入生成新内容。这些问题大致可分为两类：1）接着初始输入文本继续生成，称为\mindex{文本补全}（text completion）；2）将输入文本转换成另一段文本，称为\mindex{文本转换}（text transformation）。这里先给出前一类任务的提示示例，后一类留待后文讨论。
+
+文本补全的一个简单例子是从几个开头句子出发，继续写一个故事。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{你是一位擅长写故事的作家。下面给出故事开头的几个句子，请接着这些句子续写故事。}
+
+\vspace{0.7em}
+
+故事开头：
+
+一个阳光明媚的下午，Lily 在自家后院的一块石头下面发现了一把小小的金钥匙。她好奇地捡起钥匙，琢磨着它能打开什么。就在这时，她的猫 Whiskers 兴奋地叫了起来，带着她走向花园边缘的那棵老橡树。
+
+\vspace{0.7em}
+
+\uline{Lily 跟着 Whiskers，心里既兴奋又有些紧张，怦怦直跳。在她眼中，那棵老橡树一直很神秘；即使在最晴朗的日子里，树上盘曲的枝干也会投下长长的阴影。他们来到树前时，Whiskers 突然蹿到前面，用爪子扒起一堆秋叶下面埋着的东西……}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+类似地，也可以根据对话上下文补全一段对话。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{下面给出一位游客和一位出租车司机的对话，请补全这段对话。}
+
+\vspace{0.7em}
+
+游客：请送我去市中心的博物馆，好吗？
+
+\vspace{0.3em}
+
+出租车司机：当然！第一次来这座城市吗？
+
+\vspace{0.3em}
+
+游客：是的，这附近有什么必看的地方吗？
+
+\vspace{0.3em}
+
+出租车司机：逛完博物馆后，一定要去植物园看看。它就在附近，非常漂亮。
+
+\vspace{0.3em}
+
+\uline{游客：太好了，谢谢你的建议！}
+
+\vspace{0.3em}
+
+\uline{出租车司机：不客气。祝你玩得开心！}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+除了简单续写，这一范式还可以扩展到指令驱动的生成任务：模型依据用户要求“补全”回答。这些要求可以规定期望的风格、语气、长度和内容。例如，用户可能要求生成正式报告、创意故事或程序代码。下面给出一个根据预先规定的约束生成诗歌的提示示例。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{你是一位诗人，请根据以下要求写一首诗。}
+
+\vspace{0.7em}
+
+主题：春日复苏
+
+\vspace{0.3em}
+
+结构：四行诗，节奏一致
+
+\vspace{0.3em}
+
+情感：通过生动的春日意象，传达快乐和万物新生之感。
+
+\vspace{1.0em}
+
+\underline{春天在金色的阳光下苏醒}
+
+\vspace{0.7em}
+
+\underline{新绽的花朵与晨光共舞}
+
+\vspace{0.3em}
+
+\underline{绿色田野低吟轻柔的欢歌}
+
+\vspace{0.3em}
+
+\underline{新的希望随每一缕春风升起}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+此外，如果大语言模型在同时包含自然语言和编程语言的语料库上接受过预训练或微调，就可以提示它完成文本到代码的生成任务。此时，模型只是将自然语言指令转换成可执行相应功能的代码。下面的例子展示了如何提示大语言模型编写一个 Python 函数。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请编写一个 Python 函数，计算一个数值列表的平均值。}
+
+\vspace{0.7em}
+
+
+\uline{def calculate\_average(numbers):}
+
+\hspace{2em} \uline{if numbers:\ \ \ \ \ \# 检查列表是否非空}
+
+\hspace{2em} \hspace{2em} \uline{return sum(numbers) / len(numbers)}
+
+\hspace{2em} \uline{else:}
+
+\hspace{2em} \hspace{2em} \uline{return 0\ \ \ \# 若列表为空则返回 0}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\subsubsection{文本转换}
+
+\noindent 典型的文本转换任务包括机器翻译、摘要生成、文本风格迁移等。执行这些任务的提示与前面介绍的提示没有明显区别。下面通过几个例子加以说明。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请将以下文本从英语翻译成西班牙语。}
+
+\vspace{0.7em}
+
+文本：
+\vspace{0.3em}
+
+The quick brown fox jumps over the lazy dog.
+
+\vspace{0.7em}
+
+\underline{El r{\'a}pido zorro marr{\'o}n salta sobre el perro perezoso.}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请用不超过 50 词概括下面这篇文章：}
+
+\vspace{0.7em}
+
+文章：
+\vspace{0.3em}
+
+近年来，城市地区在可持续发展和环境管理方面面临严峻挑战。城市的污染水平不断上升，交通拥堵加剧，对基础设施的需求也越来越大。这种增长引发了诸多环境问题，包括空气和水污染加重、垃圾产生量增加，以及公共服务不堪重负……
+
+\vspace{0.7em}
+
+\uline{城市地区正努力应对可持续发展挑战，例如污染加剧、交通拥堵，以及对基础设施的需求不断增长……}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+\ctext[RGB]{154, 245, 175}{请用正式语气改写这段文本。}
+
+\vspace{0.7em}
+
+文本：
+\vspace{0.3em}
+
+嘿，最近怎么样？好久不见！
+
+\vspace{0.7em}
+
+\uline{你好，近来可好？我们已有很长时间未曾见面了！}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\subsubsection{问答}
+
+\noindent 在问答任务中，系统接收一个问题，并需要给出恰当回答。通用问答任务可以采用以下提示模板：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+$\{*\mathrm{question}*\}$
+
+\vspace{0.3em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问题：$\{*\mathrm{question}*\}$
+
+\vspace{0.3em}
+
+回答：\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+Q: $\{*\mathrm{question}*\}$
+
+\vspace{0.3em}
+
+A: \underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+问答在 NLP 中很重要，因为许多问题都可以表述为问答任务。特别是，近年来的许多推理任务都是以问答形式定义的。例如，在 MMLU 基准~\cite{hendrycks-etal:2021measuring} 中，每个样例都由一道多项选择题构成，大语言模型需要选出正确答案。下面给出一个用于回答该数据集中问题的示例提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+$(\mathbb{Z},*)$ 是一个群，满足 $a*b = a+b+1$，其中 $a$、$b$ 是 $\mathbb{Z}$ 中任意元素。$a$ 的逆元为
+
+\vspace{0.5em}
+
+(A)\ \ \ $0$
+
+\vspace{0.3em}
+
+(B)\ \ \ $-2$
+
+\vspace{0.3em}
+
+(C)\ \ \ $a-2$
+
+\vspace{0.3em}
+
+(D)\ \ \ $(2+a)*-1$
+
+\vspace{0.5em}
+
+\underline{D}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+另一个广泛使用的基准是 GSM8K 数据集~\cite{cobbe-etal:2021training}，其中包含数千道小学数学应用题。对于每道题，使用大语言模型生成自然语言解答。例如，下面给出了一个用于求解 GSM8K 题目的提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{0em}
+\setlength{\rightskip}{2em}
+
+\begin{tabular}{r l l}
+{\color{gray} \footnotesize{示例}} &
+\multicolumn{2}{p{0.8\textwidth}}{
+问：Jerry 的两个女儿在不同的球队打垒球。她们本赛季各有 8 场比赛。每场比赛前，每支球队都要训练 4 小时。如果每场比赛持续 2 小时，Jerry 在球场观看两个女儿比赛和训练，总共需要花多少小时？
+
+\vspace{0.3em}
+
+答：Jerry 观看一个女儿比赛需要 $8$ 场比赛 * 每场 $2$ 小时 = $\ll 8*2=16 \gg 16$ 小时。观看两个女儿比赛需要 $16 * 2 = \ll 16*2=32 \gg 32$ 小时。观看一个女儿训练需要 $8$ 场比赛 * $4$ 小时训练 = $\ll 8*4=32 \gg 32$ 小时。观看两个女儿训练需要 $32 * 2 = \ll 32*2=64 \gg 64$ 小时。因此，总共需要花 $32$ 小时看比赛 + $64$ 小时看训练 $= \ll 32+64=96 \gg 96$ 小时。\#\#\#\# $96$
+
+\vspace{0.7em}
+
+问：Mary 从商店买了六个苹果。她每吃掉一个苹果，就用剩余的苹果种出两棵树。Mary 吃了几个苹果？
+
+\vspace{0.3em}
+
+答：她种了八棵树。这意味着她用掉的苹果数是树数的一半，即 $8$ 棵树 $/ 2$ 棵树/个苹果 $= \ll 8/2=4 \gg 4$ 个苹果。也就是说，买来的六个苹果中有四个用于种树，只剩 $6$ 个苹果 $-$ $4$ 个苹果 $= \ll 6-4=2 \gg 2$ 个苹果被吃掉。\#\#\#\# $2$
+
+\vspace{0.7em}
+} \\
+{\color{gray} \footnotesize{用户}} &
+\multicolumn{2}{p{0.8\textwidth}}{
+问：Boris 有 100 个苹果。Beck 的苹果比 Boris 少 23 个。如果 Boris 给 Beck 10 个苹果，现在 Beck 的苹果比 Boris 少多少个？
+\vspace{0.3em}
+
+答：\uline{Boris 最初有 $100$ 个苹果，给 Beck $10$ 个后，还剩 $100$ 个苹果 $- 10$ 个苹果 $= \ll 100-10=90 \gg 90$ 个苹果。起初，Beck 的苹果比 Boris 少 $23$ 个，因此他最初有 $100 - 23 = \ll 100-23=77 \gg 77$ 个苹果。收到 Boris 给的 $10$ 个苹果后，Beck 总共有 $77$ 个苹果 $+ 10$ 个苹果 $= \ll 77+10=87 \gg 87$ 个苹果。因此，现在 Beck 的苹果比 Boris 少 $90 - 87 = \ll 90-87=3 \gg 3$ 个。\#\#\#\# 3}
+}
+\end{tabular}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里采用少样本提示。大语言模型从这些“问题—解答”示例中，不仅学习如何求解问题，也学习如何组织输出格式。例如，最终计算结果出现在 \#\#\#\# 词元之后，$\ll \cdots \gg$ 用于标注详细计算步骤，称为\mindex{计算标注}（calculation annotation）\footnote{预测过程中，遇到 $\ll \cdots \gg$ 时会调用计算器。更具体地说，一旦大语言模型遇到“$=$”（位于 $\ll \cdots \gg$ 中），计算器就会计算“=”左侧的表达式。这一方法有助于减少大语言模型的计算错误。}。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{进阶提示方法}
+\label{sec:advanced-prompting}
+
+\noindent 本章前面介绍了大语言模型提示方法的基本概念，并给出了许多用于 NLP 任务的提示。下面进一步讨论几种提高提示效果的技术。
+
+\subsection{思维链}
+\label{sec:chain-of-thought}
+
+\noindent 本章及前面章节已经多次提到\mindex{思维链}（chain of thought，\mindex{CoT}）的概念~\cite{wei-etal:2022chain,chowdhery-etal:2022palm}。思维链方法提供了一种简单方式，能够提示大语言模型针对复杂问题生成逐步推理过程，从而以更接近人类的方式处理任务。思维链方法不要求模型直接得出结论，而是让模型生成推理步骤，或者从详细推理过程的示例中学习。为了说明思维链，我们考虑文献中常见的代数计算问题。假设给定如下题目：
+
+\vspace{0.8em}
+
+\hspace{5em} \textit{计算 2、4、9 这几个数的平均值。}
+
+\vspace{0.8em}
+
+\noindent 可以将其写成一个问题来提示大语言模型。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：请计算 $2$、$4$、$9$ 这几个数的平均值。
+
+\vspace{0.3em}
+
+答：\underline{答案是 $6$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+对于并不简单的推理任务，直接提示大语言模型未必总能得到正确答案。一种简单的改进是在提示中加入类似问题的示例，让模型从中学习。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：请计算 $1$、$3$、$5$、$7$ 这几个数的平均值。
+
+\vspace{0.3em}
+
+答：答案是 $4$。
+
+\vspace{0.7em}
+
+问：请计算 $2$、$4$、$9$ 这几个数的平均值。
+
+\vspace{0.3em}
+
+答：\underline{答案是 $7$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+这里的问题是，尽管已经给出了一个相似的问答对，大语言模型仍然难以推导出正确答案。在思维链中，模型不仅从问题与答案的对应关系中学习，还能够利用推导答案所需的详细解题步骤。为此，可以在提示中加入一些推理步骤，得到思维链提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：请计算 1、3、5、7 这几个数的均方值。
+
+\vspace{0.3em}
+
+答：\ctext[RGB]{154, 245, 175}{先计算每个数的平方：$1^2 = 1$、$3^2=9$、$5^2=25$、$7^2=49$。将这些平方相加，$1+9+25+49=84$。一共有 $4$ 个数，用平方和除以数的个数，$84 / 4 = 21$。}答案是 $21$。
+
+\vspace{0.7em}
+
+问：请计算 $2$、$4$、$9$ 这几个数的平均值。
+
+\vspace{0.3em}
+
+答：\underline{\ctext[RGB]{154, 245, 175}{计算 $2 + 4 + 9$，结果为 $15$。一共有三个数。}}
+
+\underline{\ctext[RGB]{154, 245, 175}{将总和除以个数，得到 $15/3=5$。}答案是 $5$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里用绿色突出显示推理步骤。提供详细的推理示例，能够促使大语言模型生成中间步骤，进而得到正确答案。
+
+使用思维链提示有多方面好处。第一，思维链允许大语言模型将复杂问题分解为更小、依次展开的推理步骤。这类似于人类逐步解决复杂问题的方式，因此对于需要详细、多步推理的任务尤其有效。第二，思维链使推理过程更加透明、更易解释。由于中间推理步骤可见，我们能够更好地理解结论是如何得出的。第三，如果用户能够理解推理过程背后的逻辑，就更有可能信任大语言模型的预测。在医疗、教育和金融等领域应用大语言模型时，这一点尤其重要。第四，思维链是一种上下文学习方法，因此适用于大多数训练充分、可以直接使用的大语言模型。此外，思维链还提供了让模型高效适应不同问题类型的方法。它甚至可以通过探索多种备选推理路径，启发更有创造性的解法，而这些路径在直接得出结论时可能并不明显。
+
+上述方法需要提供一个或多个思维链推理示例，通常称为少样本思维链方法。零样本思维链方法则不需要这些示例，而是在提示中加入特定指令，要求大语言模型逐步推理。例如，下面给出一个零样本思维链提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：请计算 $2$、$4$、$9$ 这几个数的平均值。
+
+\vspace{0.3em}
+
+答：\ctext[RGB]{154, 245, 175}{让我们一步一步地思考。}
+
+\vspace{0.3em}
+
+\uline{这里有三个数：$2$、$4$、$9$。将它们相加，$2+4+9=15$。确定数的个数，这里是三个。平均值通过总和除以元素个数得到，计算可得 $15/3 = 5$。因此答案是 $5$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+“Let's think step by step”（让我们一步一步地思考）这条指令会提示大语言模型生成详细的推理步骤。正如 \citet{kojima-etal:2022large} 所讨论的，用这类指令提示模型，可能只得到推理步骤，而没有明确结论。此时，可以通过第二轮提示，从这些推理步骤中提取答案。例如，\citet{kojima-etal:2022large} 将第一轮提示的输入和输出组合起来，构造第二个提示。基于组合后的输入，大语言模型可以继续推理，进而生成正确答案。此外，还可以使用“Let's think step by step”以外的指令提示模型推理，例如“Let's think logically”（让我们按逻辑思考）和“Please show me your thinking steps first”（请先展示你的思考步骤）。
+
+虽然这里用代数推理问题说明思维链方法，但这些方法适用于多种问题。典型应用包括数学推理、逻辑推理、常识推理、符号推理、代码生成等。图~\ref{fig:cot-application-examples} 给出了将思维链用于不同任务的更多示例。
+
+\begin{figure}[!t]
+\centering
+\begin{tabular}{c c}
+\begin{tcolorbox}[width=0.45\textwidth,height=8cm,valign=top]
+\footnotesize{
+问：什么家用娱乐设备需要有线连接？
+
+备选答案：(a) 无线电室 (b) 变电站 (c) 电视机 (d) 柜子
+
+\vspace{0.2em}
+
+答：\ctext[RGB]{154, 245, 175}{答案必须需要有线连接。在上述选项中，只有电视机需要有线连接。}所以答案是 (c)。
+
+\vspace{0.5em}
+
+问：哪类人通常容易患病？
+
+备选答案：(a) 医院 (b) 头部 (c) 病人 (d) 老年人 (e) 医生办公室
+
+\vspace{0.2em}
+
+答：\underline{\ctext[RGB]{154, 245, 175}{答案必须是容易患病的人。}} \underline{\ctext[RGB]{154, 245, 175}{在这些选项中，}} \underline{\ctext[RGB]{154, 245, 175}{“老年人”是正确的，}} \underline{\ctext[RGB]{154, 245, 175}{因为他们的免疫系统通常较弱。}} \underline{所以答案是 (d)。}
+}
+\end{tcolorbox}
+&
+\begin{tcolorbox}[width=0.45\textwidth,height=8cm,valign=top]
+\footnotesize{
+问：仓鼠会成为某些动物的食物吗？
+
+\vspace{0.2em}
+
+答：\ctext[RGB]{154, 245, 175}{仓鼠是被捕食的动物。猎物是捕食者的食物。因此，仓鼠会成为某些动物的食物。}所以答案是“是”。
+
+\vspace{0.5em}
+
+问：没有互联网时，可以使用 Microsoft Office 吗？
+
+\vspace{0.2em}
+
+答：\underline{\ctext[RGB]{154, 245, 175}{可以使用 Microsoft Office 应用程序，}}
+
+\underline{\ctext[RGB]{154, 245, 175}{不过云存储和在线协作}}
+
+\underline{\ctext[RGB]{154, 245, 175}{等功能需要}}
+
+\underline{\ctext[RGB]{154, 245, 175}{互联网。}} \underline{所以答案是“可以”。}
+}
+\end{tcolorbox}\\
+\small{(a) CSQA} & \small{(b) StrategyQA} \\
+\\
+\begin{tcolorbox}[width=0.45\textwidth,height=8cm,valign=top]
+\footnotesize{
+问：请补全序列剩余部分，确保括号正确闭合。输入：$[$ $\{$
+
+\vspace{0.2em}
+
+答：\ctext[RGB]{154, 245, 175}{让我们一步一步地思考。}
+
+\vspace{0.1em}
+
+0：空栈
+
+\vspace{0.1em}
+
+1：$[$；栈：$[$
+
+\vspace{0.1em}
+
+2：$\{$；栈：$[$ $\{$
+
+\vspace{0.1em}
+
+所以答案是 $\}$ $]$。
+
+\vspace{0.5em}
+
+问：请补全序列剩余部分，确保括号正确闭合。输入：$<$ $[$ $[$
+
+\vspace{0.2em}
+
+答：\underline{\ctext[RGB]{154, 245, 175}{让我们一步一步地思考。}}
+
+\vspace{0.1em}
+
+\underline{0：空栈}
+
+\vspace{0.1em}
+
+\underline{1：$<$；栈：$<$}
+
+\vspace{0.1em}
+
+\underline{2：$[$；栈：$<$ $[$}
+
+\vspace{0.1em}
+
+\underline{3：$[$；栈：$<$ $[$ $[$}
+
+\vspace{0.1em}
+
+\underline{所以答案是 $]$ $]$ $>$。}
+}
+\end{tcolorbox}
+&
+\begin{tcolorbox}[width=0.45\textwidth,height=8cm,valign=top]
+\footnotesize{
+问：取“Elon Musk”中各个单词的最后一个字母，并将它们拼接起来。
+
+\vspace{0.2em}
+
+答：\ctext[RGB]{154, 245, 175}{“Elon”的最后一个字母是“n”，“Musk”的最后一个字母是“k”，将它们拼接得到“nk”。}答案是 nk。
+
+\vspace{0.5em}
+
+问：取“Renata Mariela Mona Kristin”中每个单词的最后一个字母，并将它们拼接起来。
+
+\vspace{0.2em}
+
+答：\underline{\ctext[RGB]{154, 245, 175}{“Renata”的最后一个字母是“a”。}}
+
+\underline{\ctext[RGB]{154, 245, 175}{“Mariela”的最后一个字母是“a”。}}
+
+\underline{\ctext[RGB]{154, 245, 175}{“Mona”的最后一个字母是“a”。}}
+
+\underline{\ctext[RGB]{154, 245, 175}{“Kristin”的最后一个字母是“n”。}}
+
+\underline{\ctext[RGB]{154, 245, 175}{将它们拼接得到“aaan”。}} \underline{答案是 aaan。}
+
+}
+\end{tcolorbox}\\
+\small{(c) Dyck 语言} & \small{(d) 末字母拼接}
+\end{tabular}
+\caption{思维链在 CSQA、StrategyQA、Dyck 语言和末字母拼接四种不同推理任务中的应用。思维链部分用绿色突出显示。}
+\label{fig:cot-application-examples}
+\end{figure}
+
+思维链是提示工程中最活跃的研究主题之一。它不仅改善了大语言模型提示方法的效果，还推动了大量有关评估和验证模型推理能力的研究。本节重点介绍了思维链的基本思想，但仍有多种方式可以进一步改进。例如，可以将推理过程视为在许多可能路径中搜索的问题，每条路径可能包含多个中间状态，即推理步骤。一般而言，我们希望搜索空间定义明确且足够大，从而更有可能找到最优结果。因此，当前大语言模型研究的一个方向是设计更好的推理过程表示结构，使模型能够应对更复杂的推理挑战。这些结构包括树结构~\cite{yao-etal:2024tree}、图结构~\cite{besta-etal:2024graph}等。利用这些对推理路径的紧凑表示，大语言模型可以探索更广泛的决策路径，类似于系统 2 思维\footnote{\citet{kahneman:2011thinking} 所描述的系统 1 思维和系统 2 思维代表两种不同的认知处理模式。系统 1 快速、自动、直觉化且富有情绪色彩。这种思维模式无需费力，运行迅速，通常引导着我们日常的决策、判断和印象。系统 2 缓慢、审慎且具有分析性，当需要进行复杂计算时才会被激活。}。另一类研究关注通过多轮交互来提示大语言模型，包括将复杂问题分解为子问题、验证和改进模型输出、采用模型集成等。需要注意，这些方法及其涉及的问题并不限于思维链。事实上，它们常被用作改进大语言模型的更通用方法，而思维链则可以视为检验模型能力的一种方式。下面几个小节将讨论其中的一些问题。
+
+结束对思维链的讨论之前，还应考虑其实际局限。一个主要局限是，少样本思维链需要详细的多步推理示例，而无论自动生成还是人工编写，这些示例都可能难以获得。此外，如何将复杂问题分解为更简单的解题步骤，并没有标准方法，往往在很大程度上依赖用户经验。中间步骤中的错误也会影响最终结论的准确性。关于思维链优缺点的进一步讨论，感兴趣的读者可以参考近期相关综述~\cite{chu-etal:2023survey,yu-etal:2023towards,zhang-etal:2023igniting}。
+
+\subsection{问题分解}
+\label{sec:problem-decomposition}
+
+\noindent 前面已经看到，将复杂问题拆分为更简单的子问题，可以帮助大语言模型求解。这种方法可以视为\mindex{问题分解}（problem decomposition）这一更广泛范式的一个实例；心理学和计算机科学都对该范式进行了深入探索和讨论。从心理学角度看，复杂问题求解是借助知识克服问题障碍的过程\footnote{\citet{frensch-and-funke:2014complex} 的书中给出了一个较正式的定义：\textit{复杂问题求解是通过行为和（或）认知层面的多步活动，克服给定状态与期望目标状态之间障碍的过程}。}。解决复杂问题往往没有清晰路径，但采用问题分解策略通常有益，因为这样可以用较少精力处理相应的子问题。例如，考虑撰写一篇关于人工智能风险的博客。如果只是用“请写一篇关于人工智能风险的博客”来提示大语言模型，模型生成文章的结构和写作风格可能都很随意。更好的方法可能是先拟定提纲，并提供各节的详细信息。考虑下面的提示：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+你是一位博客作者。请按照下面的提纲，撰写一篇关于人工智能风险的博客。
+
+\vspace{0.5em}
+
+\begin{itemize}
+\item 引言\\
+介绍人工智能、它与生活的关联，以及青少年了解其风险的重要性。
+\item 隐私问题\\
+讨论人工智能如何通过线上交互损害个人隐私。
+\item 错误信息\\
+探讨人工智能在传播错误信息、影响年轻人决策方面的作用。
+\item 网络欺凌\\
+重点说明人工智能工具如何被用于网络欺凌，以及这对心理健康的影响。
+\item 安全使用人工智能的建议\\
+提供负责任使用人工智能的指导，并倡导批判性思考。
+\item 结语\\
+回顾要点，鼓励积极参与人工智能伦理相关活动。
+\end{itemize}
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里给出了各节标题及主要内容。大语言模型可以据此分解写作任务，为各节填充内容。需要注意，博客的组织结构既可以由人提供，也可以自动生成。例如，可以先用大语言模型生成提纲，再要求模型按照提纲完成写作。
+
+在计算机科学中，分解复杂问题是软硬件系统设计的常用策略。一个著名例子是分治范式，它常用于设计求解计算问题的算法，将原问题归约为更简单、更易处理的问题。例如，考虑判断一篇文档是否讨论了人工智能风险的任务，可以用下面的提示指导大语言模型。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+下面给出一段文本，请判断其中是否讨论了人工智能的风险。
+
+\vspace{0.5em}
+
+$\{*\mathrm{document}*\}$
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+如果文档很长，推理的计算开销就可能很大。另一种做法是将文档分割成较短的片段，对每个片段执行同一任务。这些片段可以并行处理，进一步降低计算成本。接着，判断各片段与人工智能风险主题的相关性。最后，再使用另一个提示生成最终输出。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+你的任务是判断一段文本是否讨论了人工智能的风险。这段文本已被分成多个片段，你已经获得了各片段与人工智能风险主题的相关性。请据此给出最终结果。
+
+\vspace{0.5em}
+
+片段 1：$\{*\mathrm{relevance\textrm{-}to\textrm{-}the\textrm{-}topic1}*\}$
+
+\vspace{0.3em}
+
+片段 2：$\{*\mathrm{relevance\textrm{-}to\textrm{-}the\textrm{-}topic2}*\}$
+
+\vspace{0.3em}
+
+片段 3：$\{*\mathrm{relevance\textrm{-}to\textrm{-}the\textrm{-}topic3}*\}$
+
+\vspace{0.3em}
+
+...
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+现在回到提示方法中问题分解的一般讨论。虽然问题分解适用于多种 NLP 问题，但近年来，它在推理任务中得到了更多讨论和检验。对于复杂推理任务，通常需要多步推理路径才能得出正确结论。可以用三种方式让大语言模型完成这类推理。第一，模型直接得出结论。换言之，模型不展示显式推理过程就进行预测，其背后的推理过程隐含且不可解释。第二，提示模型生成通向结论的多步推理路径，如思维链。不过，这种方式只运行大语言模型一次，所有中间推理步骤都在一次预测中生成。第三，将原问题拆分成若干子问题，分别运行大语言模型来处理，或者交由其他系统求解。这里重点讨论与问题分解密切相关的第三种方式。不过，更全面的讨论应涵盖以上所有方式，而前两种已经在本章中有所涉及。
+
+一般的问题分解框架包含两个要素。
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{子问题生成}（sub-problem generation）：将输入问题分解为若干子问题。
+\item \vspace{0.3em} \mindex{子问题求解}（sub-problem solving）：求解各个子问题，并通过推理得到中间结论和最终结论。
+\end{itemize}
+\vspace{0.5em}
+
+这两项任务可以采用不同的建模方式，从而得到不同的问题分解方法。一种方式是将两者分开，按两步执行。例如，考虑本小节开头的博客写作任务：第一步，一次性将整个问题分解为子问题，即拟定博客提纲；第二步，依次或按照其他顺序求解子问题，即按需填充各节内容。最后，组合各个子问题的求解结果，形成输出。虽然这一方法简单直接，但它假设问题具有可组合性，因此更适合写作和代码生成等任务。
+
+然而，许多现实问题需要复杂推理。这类问题的一个关键特征是，推理路径并非预先固定，而可能依赖推理过程中得到的中间结果。在这种情况下，不宜事先固定子问题的生成方式，而应根据输入问题动态生成子问题；如果可能，还应在推理过程中即时生成。因此，与设计分治算法相比，问题分解更具挑战。理想情况下，我们希望联合设计子问题生成系统和求解系统。但更实用、也更常见的方式，是分别为两项任务采用独立模型。一个直接的实现办法，是通过提示或调优，使大语言模型适应这两项任务。
+
+这里介绍一种基于上述思想的方法，称为\mindex{由简到繁提示}（least-to-most prompting）~\cite{zhou-etal:least}。这一方法源于求解困难推理问题时面临的挑战：这类问题无法仅靠从少量示例中泛化来解决。更有效的策略是沿着由浅入深的子问题序列推进，系统地导向最终结论。具体而言，由简到繁提示通过包含指令和（或）示例的提示，让大语言模型生成子问题。例如，下面给出一个包含两个示例的子问题生成提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{0em}
+\setlength{\rightskip}{2em}
+
+\begin{tabular}{r l l}
+{\color{gray} \footnotesize{任务}} & \multicolumn{2}{p{0.83\textwidth}}{
+你的任务是将一个问题分解为若干子问题。下面给出一些示例，说明如何完成这一任务。
+\vspace{0.5em}
+} \\
+{\color{gray} \footnotesize{示例}} &
+\multicolumn{2}{p{0.83\textwidth}}{
+问：一个社区的人口中，婴儿占 5\%，儿童占 15\%，成年人占 40\%，老年人占 40\%。哪个群体占人口的比例最大？
+
+\vspace{0.3em}
+
+答：要回答“哪个群体占人口的比例最大？”，需要知道：“\ctext[RGB]{154, 245, 175}{婴儿占百分之几？}”“\ctext[RGB]{154, 245, 175}{儿童占百分之几？}”“\ctext[RGB]{154, 245, 175}{成年人占百分之几？}”“\ctext[RGB]{154, 245, 175}{老年人占百分之几？}”
+
+
+\vspace{0.5em}
+
+问：Alice、Bob 和 Charlie 带了珠子，准备用于手工课上的小组作品。Alice 的珠子数是 Bob 的两倍，Bob 的珠子数是 Charlie 的五倍。如果 Charlie 有 6 颗珠子，他们总共可以用多少颗珠子制作作品？
+
+\vspace{0.3em}
+
+答：要回答“他们总共可以用多少颗珠子制作作品？”，需要知道：“\ctext[RGB]{154, 245, 175}{Bob 有多少颗珠子？}”“\ctext[RGB]{154, 245, 175}{Alice 有多少颗珠子？}”
+\vspace{0.5em}
+} \\
+{\color{gray} \footnotesize{用户}} &
+\multicolumn{2}{p{0.83\textwidth}}{
+问：2015 年至 2020 年开展的一项环境研究发现，该地区的平均气温上升了 2.3 摄氏度。这项环境研究持续了多久？
+
+\vspace{0.3em}
+
+答：\underline{要回答“\ctext[RGB]{241, 148, 138}{这项环境研究}}
+
+\underline{\ctext[RGB]{241, 148, 138}{持续了多久？}”，需要知道：“\ctext[RGB]{153, 202, 240}{这项环境研究何时开始？}”}
+
+\underline{“\ctext[RGB]{237, 196, 107}{这项环境研究何时结束？}”}
+}
+\end{tabular}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+通过从示例中学习，大语言模型能够生成两个子问题（分别以蓝色和橙色突出显示），用于回答新问题“这项环境研究持续了多久？”。得到子问题后，依次求解。对每个子问题，都将此前生成的全部问答对作为上下文，再生成答案。在上面的例子中，首先需要通过下面这样的提示，让模型回答第一个子问题：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{0em}
+\setlength{\rightskip}{2em}
+
+\begin{tabular}{r l l}
+& \multicolumn{2}{p{0.78\textwidth}}{
+2015 年至 2020 年开展的一项环境研究发现，该地区的平均气温上升了 2.3 摄氏度。
+\vspace{0.5em}
+} \\
+{\color{gray} \footnotesize{子问题 1}} &
+\multicolumn{2}{p{0.78\textwidth}}{
+问：\ctext[RGB]{153, 202, 240}{这项环境研究何时开始？}
+
+\vspace{0.3em}
+
+答：\underline{这项环境研究于 \ctext[RGB]{153, 202, 240}{2015} 年开始。}
+}
+\end{tabular}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+得到第一个子问题的答案后，再处理第二个子问题。这一次，将第一个子问题及其相应答案一同纳入输入。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{0em}
+\setlength{\rightskip}{2em}
+
+\begin{tabular}{r l l}
+& \multicolumn{2}{p{0.78\textwidth}}{
+2015 年至 2020 年开展的一项环境研究发现，该地区的平均气温上升了 2.3 摄氏度。
+ \vspace{0.5em}
+} \\
+{\color{gray} \footnotesize{子问题 1}} &
+\multicolumn{2}{p{0.78\textwidth}}{
+问：\ctext[RGB]{153, 202, 240}{这项环境研究何时开始？}
+
+\vspace{0.2em}
+
+答：这项环境研究于 \ctext[RGB]{153, 202, 240}{2015} 年开始。
+\vspace{0.5em}
+}\\
+{\color{gray} \footnotesize{子问题 2}} &
+\multicolumn{2}{p{0.78\textwidth}}{
+问：\ctext[RGB]{237, 196, 107}{这项环境研究何时结束？}
+
+\vspace{0.2em}
+
+答：\underline{这项环境研究于 \ctext[RGB]{237, 196, 107}{2020} 年结束。}
+}
+\end{tabular}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+最后，根据所有子问题的答案，用大语言模型求解原问题。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{0em}
+\setlength{\rightskip}{2em}
+
+\begin{tabular}{r l l}
+& \multicolumn{2}{p{0.78\textwidth}}{
+2015 年至 2020 年开展的一项环境研究发现，该地区的平均气温上升了 2.3 摄氏度。
+ \vspace{0.5em}
+} \\
+{\color{gray} \footnotesize{子问题 1}} &
+\multicolumn{2}{p{0.78\textwidth}}{
+问：\ctext[RGB]{153, 202, 240}{这项环境研究何时开始？}
+
+\vspace{0.3em}
+
+答：这项环境研究于 \ctext[RGB]{153, 202, 240}{2015} 年开始。
+\vspace{0.5em}
+}\\
+{\color{gray} \footnotesize{子问题 2}} &
+\multicolumn{2}{p{0.78\textwidth}}{
+问：\ctext[RGB]{237, 196, 107}{这项环境研究何时结束？}
+
+\vspace{0.2em}
+
+答：这项环境研究于 \ctext[RGB]{237, 196, 107}{2020} 年结束。
+\vspace{0.5em}
+}\\
+{\color{gray} \footnotesize{最终问题}} &
+\multicolumn{2}{p{0.78\textwidth}}{
+问：\ctext[RGB]{241, 148, 138}{这项环境研究持续了多久？}
+
+\vspace{0.2em}
+
+答：\underline{这项环境研究持续了 \ctext[RGB]{241, 148, 138}{5 年}}。
+}
+\end{tabular}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+由简到繁方法提供了一种基本方式，分别提示大语言模型生成和求解子问题。还可以从多个方面加以改进。一种简单的改进是采用各种进阶提示技术，而无需改变问题分解框架。例如，可以在提示中引入思维链，提高子问题生成和求解时的推理表现。
+
+另一种改进是探索更好的问题分解和解题路径组织方法。为了描述这些方法，用符号 $p_0$ 表示输入问题，用 $\{p_1,\cdots,p_n \}$ 表示与 $p_0$ 对应的子问题。在由简到繁提示中，将 $p_0$ 分解为 $\{p_1,\cdots,p_n \}$，即
+\begin{eqnarray}
+\{p_1,\cdots,p_n \} & = & G(p_0), \label{eq:least-to-most-problem-decomposition}
+\end{eqnarray}
+
+\noindent 其中，$G(\cdot)$ 表示子问题生成函数。然后，依次求解子问题 $\{p_1,\cdots,p_n\}$，得到答案序列 $\{a_1,\cdots,a_n\}$。回答第 $i$ 个子问题 $p_i$ 时，将原问题 $p_0$ 以及此前生成的所有问题—答案对都纳入预测所用的上下文。答案 $a_i$ 为
+\begin{eqnarray}
+a_i & = & S_i(p_i,\{p_0,p_{<i},a_{<i}\}), \label{eq:least-to-most-answer-i}
+\end{eqnarray}
+
+\noindent 其中，$p_{<i}=\{p_1,\cdots,p_{i-1}\}$，$a_{<i}=\{a_1,\cdots,a_{i-1}\}$。$S_i(\cdot)$ 表示求解子问题 $p_i$ 的函数，求解时的给定上下文为 $\{p_0,p_{<i},a_{<i}\}$。最后一步生成原问题 $p_0$ 的答案，可以用类似式~(\ref{eq:least-to-most-answer-i}) 的形式表示：
+\begin{eqnarray}
+a_0 & = & S_0(p_0,\{p_{\le n},a_{\le n}\}).
+\end{eqnarray}
+
+改进这一模型的一种方式是修改 $G(\cdot)$ 函数，使模型能够动态生成答案。不必一次生成全部子问题，而可以在求解过程中逐个生成~\cite{dua-etal:2022successive}。为此，将式~(\ref{eq:least-to-most-problem-decomposition}) 替换为
+\begin{eqnarray}
+p_i & = & G_i(p_0,\{p_{<i},a_{<i}\}).
+\end{eqnarray}
+
+\noindent 这样就得到一个逐步运行的子问题生成模型。在第 $i$ 步，首先将原问题 $p_0$ 和此前的推理历史 $\{p_{<i},a_{<i}\}$ 一同作为提示，让大语言模型生成新子问题 $p_i$；再在相同上下文条件下，使用同一个或另一个大语言模型求解该子问题，见式~(\ref{eq:least-to-most-answer-i})。允许大语言模型在中间推理步骤动态生成和求解子问题，能够有效扩展其推理能力。这样，推理路径就不必预先固定，模型可以在求解过程中选择和调整推理策略。
+
+另一种改进方式是重点开发更好的子问题求解器。前面的讨论将 $S_i(\cdot)$ 限定为通过提示求解子问题 $p_i$ 的大语言模型。事实上，这一函数可以扩展为任何能够处理该子问题的系统。例如，$S_i(\cdot)$ 可以调用信息检索系统，从而获取更广泛的数据来解决问题；又如，可以将 $S_i(\cdot)$ 用作计算器，在数学问题求解中准确计算结果。如果子问题 $p_i$ 很复杂，需要多个中间解题步骤，还可以将 $p_i$ 进一步分解为更小的子问题。例如，将 $S_i(\cdot)$ 定义为生成并求解子问题的递归程序。这样就在问题求解中引入了递归，可以通过反复分解来处理问题，从而形成一种层次化的问题求解结构~\cite{khot2023:decomposed}。
+
+对这一形式化描述的进一步推广，是将其视为强化学习问题。一种典型方法是将问题求解过程建模为决策过程：每一步都根据当前状态采取一个动作。这些动作可以包括所有子问题生成和求解函数，即 $G_i(\cdot)$ 和 $S_i(\cdot)$。因此，动作序列就对应一条解题路径。由于强化学习问题超出了本章范围，这里不对该学习任务作精确定义。不过，开发一个智能体或控制器来决定何时以及如何生成和求解子问题，也是自然的选择。
+
+在 NLP 中，问题分解与多跳问答（multi-hop question answering）领域长期以来的研究密切相关~\cite{mavi-etal:2024multi}。这一任务要求系统从多段文本中收集并组合信息，准确回答复杂问题。例如，要回答“Albert Einstein 出生国的首都是哪里？”，需要先知道“Albert Einstein 出生在哪里？”以及“德国的首都是哪里？”。这一领域及相关领域的早期研究已经探讨过问题分解，尽管所用方法未必基于大语言模型。例如，一种常用方法是额外开发一个神经模型，生成针对原问题不同方面的简单问题~\cite{andreas-etal:2016neural,talmor-etal:2018web,min-etal:2019multi}。这一问题生成器既可以批量生成问题，也可以按顺序逐个生成。
+
+广义而言，问题分解也与 NLP 中的组合性问题有关~\cite{drozdov-etal:2022compositional,press-etal:2023measuring}。例如，在语义分析中，通过将自然语言句子拆分为组成部分，再根据各部分的含义以及组合规则理解句子，将其映射为结构化的语义表示。在这一领域的早期研究中，组合性较强的句子被视为较容易的系统评测样例，因为分解这类句子并组合各部分含义相对直接。然而，当对新数据的组合性建模需要更强的泛化能力时，任务就会困难得多。此时，希望系统具备更好的\mindex{组合泛化}（compositional generalization）能力。在较新的大语言模型研究中，这一问题经常出现在 SCAN 等组合推理任务的讨论中\footnote{SCAN 任务（CommAI 导航任务的简化版本）用于评估大语言模型的组合泛化能力~\cite{lake-etal:2018generalization}，要求将自然语言指令翻译成动作序列。例如，指令“jump opposite left and walk thrice”可以翻译为动作序列“LTURN LTURN JUMP WALK WALK WALK”。}，因为它被认为是检验大语言模型语言理解和推理能力的一个重要方面。这也为开发和检验问题分解方法提出了新任务。
+
+在大语言模型中，工具使用是问题分解的一项有趣应用。在某些情况下，需要为模型集成外部工具，以获取训练或微调时无法得到的准确数据。例如，大语言模型可以对接 API，获取天气更新、股票价格或新闻信息流等实时数据，从而根据最新信息回答用户问题。使用工具时，模型预测中可能包含标记，指明在何处以及如何调用外部 API。这需要将问题分解为子问题，一部分由大语言模型处理，另一部分由外部工具处理。第~\ref{sec:rag-and-tool-use} 节将进一步讨论这一主题。
+
+\subsection{自我改进}
+\label{sec:self-refinement}
+
+\noindent 在许多情况下，大语言模型的预测可能不准确或存在缺陷。鉴于当前大语言模型能够执行修改和纠错等任务，探索让模型自行改进输出的方法很有价值。自我改进（self-refinement）是人类认知过程和日常行为中的常见现象。例如，设计产品时，设计师可能先制作一个基本原型，再经过评估和测试改进设计，以提升用户体验和功能。这一改进过程可以反复进行，直到设计令人满意。“先预测、后改进”的范式在 NLP 中历史悠久。一个早期例子是 Brill 标注器~\cite{brill:1992simple}：它通过基于规则的系统，反复改进句子的初始词性标注结果。在深度学习时代，大量关于语法纠错、文本改写等序列到序列问题的研究，也可以视为这一范式的实例。
+
+可以通过提示让大语言模型进行自我改进。考虑一个简单例子：先用大语言模型将文本从中文翻译成英语，再用同一个模型改进译文。翻译提示可以这样写：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+请将以下文本从中文翻译成英语：
+
+\vspace{0.5em}
+
+中文：
+
+\vspace{0.2em}
+
+\begin{CJK*}{UTF8}{gbsn}
+一系列考古发现奠定红山文化在中华文明起源研究中的重要地位。最新公布的研究成果认为，大约从距今5800年开始，中华大地上各个区域相继出现较为明显的社会分化，进入文明起源的加速阶段。
+\end{CJK*}
+
+\vspace{0.5em}
+
+英语：
+
+\vspace{0.2em}
+
+\uline{A series of discoveries have cemented the significant role of the Hongshan culture in studies on the origins of Chinese civilization. The latest research findings suggest that, starting from around 5800 years ago, many regions across China began to experience noticeable social differentiations, entering an accelerated phase in the origin of civilization.}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+然后，可以提示模型改进译文：
+
+\vfill
+
+{\color{white} NiuTrans}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+下面给出一段中文文本及其英语译文。必要时请修改译文，提高其准确性和流畅度。\vfill
+
+\vspace{0.5em}
+
+中文：
+
+\vspace{0.2em}
+
+\begin{CJK*}{UTF8}{gbsn}
+一系列考古发现奠定红山文化在中华文明起源研究中的重要地位。最新公布的研究成果认为，大约从距今5800年开始，中华大地上各个区域相继出现较为明显的社会分化，进入文明起源的加速阶段。
+\end{CJK*}
+
+\vspace{0.5em}
+
+英语：
+
+\vspace{0.2em}
+
+A series of discoveries have cemented the significant role of the Hongshan culture in studies on the origins of Chinese civilization. The latest research findings suggest that, starting from around 5800 years ago, many regions across China began to experience noticeable social differentiations, entering an accelerated phase in the origin of civilization.
+
+\vspace{0.5em}
+
+修改后的译文：
+
+\vspace{0.2em}
+
+\underline{A series of \ctext[RGB]{154, 245, 175}{archaeological} discoveries have cemented the significant role} \underline{of the Hongshan culture in studies on the origins of Chinese civilization.} \underline{The latest research findings \ctext[RGB]{154, 245, 175}{suggest} that, starting from around 5800 years} \underline{ago, \ctext[RGB]{154, 245, 175}{various} regions across China began to experience noticeable social} \underline{differentiations, entering an accelerated phase in the origin of civilization.}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里用绿色标出对输入译文的修改。这个过程可以迭代进行：每一步都以上一步的译文为输入，提示大语言模型生成可能更好的译文。
+
+在上述例子中，只需用“请改进它！”这样的简单指令提示大语言模型，就能修改模型的初始输出。不过，这种改进完全依赖模型的指令遵循能力，模型并未获得关于如何修改、修改何处的指导或监督。更有效的方法是考虑针对具体待改进方面的反馈。例如，可以用“请纠正译文中的所有语法错误”来提示大语言模型，使其在修改时更专注于语法纠错。
+
+利用大语言模型进行自我改进的一般框架包括三个步骤~\cite{madaan-etal:2024self}。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{预测}：使用大语言模型生成初始输出。
+\item \vspace{0.2em} \textbf{收集反馈}：获取对模型输出的反馈。
+\item \vspace{0.2em} \textbf{改进}：使用大语言模型根据反馈修改输出。
+\end{itemize}
+\vspace{0.5em}
+
+最后两个步骤可以重复多次，形成迭代式自我改进过程。在这一框架中，准确、详细的反馈至关重要，因为它指导后续修改。一般而言，反馈可以通过多种方式获得~\cite{fernandes-etal:2023bridging,pan-etal:2024automatically}。可以人工检查模型预测，找出问题；也可以使用反馈模型自动生成反馈。例如，在标注数据上训练的奖励模型，可以帮助评估模型输出，并返回表示其质量的分数。
+
+由于本章重点讨论大语言模型的提示方法，这里考虑用大语言模型提供反馈。下面以针对用户问题生成良好回答为例说明：
+
+\begin{itemize}
+\item \vspace{0.5em} 首先，照常提示大语言模型回答输入问题。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+请回答问题：“当今有哪些主要环境问题？”
+
+\vspace{0.5em}
+
+回答：
+
+\vspace{0.2em}
+
+\uline{当今的主要环境问题包括气候变化、空气和水污染、森林砍伐、生物多样性丧失，以及海洋环境退化。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\item 然后，使用下面的提示再次提示同一个大语言模型，获取对所生成回答的反馈。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+下面将给出一个问题及相应回答。请评估回答的准确性和深度，指出事实错误，或说明哪些地方可以补充细节，以增进理解。
+
+\vspace{0.5em}
+
+问题：
+
+\vspace{0.2em}
+
+当今有哪些主要环境问题？
+
+\vspace{0.5em}
+
+回答：
+
+\vspace{0.2em}
+
+当今的主要环境问题包括气候变化、空气和水污染、森林砍伐、生物多样性丧失，以及海洋环境退化。
+
+\vspace{0.5em}
+
+反馈：
+
+\vspace{0.2em}
+
+\uline{给出的回答是准确的，也突出了主要环境问题。不过，如果对这些问题作更具体、详细的描述，回答会更好。改进建议如下：}
+
+\vspace{0.2em}
+
+\hspace{1em} \uline{1. 加入环境问题的具体实例。}
+
+\vspace{0.1em}
+
+\hspace{1em} \uline{2. 补充主要污染物的信息。}
+
+\vspace{0.1em}
+
+\hspace{1em} \uline{3. 指出受影响最严重的地区。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+
+\item 根据大语言模型给出的反馈，提示模型修改回答。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+下面将给出一个问题、相应回答，以及对该回答的一些反馈。
+
+\vspace{0.5em}
+
+问题：
+
+\vspace{0.2em}
+
+当今有哪些主要环境问题？
+
+\vspace{0.5em}
+
+回答：
+
+\vspace{0.2em}
+
+当今的主要环境问题包括气候变化、空气和水污染、森林砍伐、生物多样性丧失，以及海洋环境退化。
+
+\vspace{0.5em}
+
+反馈：
+
+\vspace{0.2em}
+
+给出的回答是准确的，也突出了主要环境问题。不过，如果对这些问题作更具体、详细的描述，回答会更好。改进建议如下：
+
+\vspace{0.2em}
+
+\hspace{1em} 1. 加入环境问题的具体实例。
+
+\vspace{0.1em}
+
+\hspace{1em} 2. 补充主要污染物的信息。
+
+\vspace{0.1em}
+
+\hspace{1em} 3. 指出受影响最严重的地区。
+
+\vspace{0.5em}
+
+现在，请根据所提供的反馈修改回答。
+
+\vspace{0.2em}
+
+修改后的回答：
+
+\vspace{0.2em}
+
+\uline{主要环境问题包括：气候变化，表现为全球气温上升和恶劣天气模式；城市和工业地区严重的空气和水污染；亚马孙等地区猖獗的森林砍伐，导致生物多样性丧失；以及海洋环境退化，其突出表现是珊瑚礁白化和广泛的过度捕捞。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\end{itemize}
+
+理想情况下，如果采用能力强大的大语言模型，希望无需额外训练就能让它完成全部三个步骤。另一方面，如果目标任务有足够的标注数据，可以用监督学习提高模型表现。例如，可以通过微调，让大语言模型更好地适应修改任务，也可以改用不一定基于大语言模型的任务专用模型~\cite{welleck-etal:2023generating,schick-etal:2023peer}。从更广泛的角度看，提高大语言模型在自我改进任务中的表现，可以视为一个对齐问题。例如，有研究发现，基于人类反馈的强化学习（reinforcement learning from human feedback，RLHF）能够激活某些自我纠错能力~\cite{ganguli-etal:2023capacity}。不过，这些问题超出了本章的讨论范围，进一步讨论见第 \ChapterLLMTuning 章。
+
+在大语言模型的语境中，自我改进与模拟高级推理能力的多个概念有关，例如自我反思能力。一种观点认为，赋予模型自我反思能力，可以使其作出更准确的预测并表现出自我纠错行为。这种反思能力可以用多种方式激活，例如提示模型进行审慎、逐步的推理，或提供上下文示例，让模型从中学习和调整。下面以 \citet{li2023-etal:deliberate} 提出的\mindex{先思考后生成}（deliberate-then-generate，\mindex{DTG}）方法为例。该方法明确提示大语言模型进行斟酌。在 DTG 框架中，给定可能有缺陷的初始模型输出，先提示模型识别具体错误类型，再给出改进后的版本。下面是用于中译英任务的 DTG 提示模板。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+给定中文句子：$\{*\mathrm{source}*\}$
+
+\vspace{0.2em}
+
+英语译文为：$\{*\mathrm{target}*\}$
+
+
+\vspace{0.5em}
+
+请先识别错误类型，再修改译文。
+
+\vspace{0.2em}
+
+错误类型：\underline{\ctext[RGB]{241, 148, 138}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }}
+
+\vspace{0.2em}
+
+\underline{\ctext[RGB]{153, 202, 240}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+
+这里的目标是先预测错误类型（红色），再生成修改后的译文（蓝色）。“请先识别错误类型，再修改译文”这一指令引导模型进行斟酌，鼓励模型先认真分析，再给出更好的结果。由于错误类型预测与修改都在大语言模型的一次运行中完成，这一方法将反馈和改进两个步骤合并为一个过程。
+
+上述提示假定，所用大语言模型能够审查输入译文，并正确识别其错误类型。然而，这也带来了新的困难：模型可能不擅长找出翻译错误，从而需要额外微调或提示工程工作。因此，一种更简单的方法是减轻错误识别负担，仅使用模型进行斟酌。为此，可以将输入译文替换为随机译文，并指定默认错误类型。下面给出一个这样的提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+给定中文句子：
+
+\vspace{0.2em}
+
+\begin{CJK*}{UTF8}{gbsn}一系列考古发现奠定红山文化在中华文明起源研究中的重要地位。\end{CJK*}
+
+\vspace{0.2em}
+
+英语译文为：
+
+\vspace{0.2em}
+
+\ctext[RGB]{154, 245, 175}{A variety of innovative techniques have redefined the importance of modern art in contemporary cultural studies.}
+
+\vspace{0.5em}
+
+请先识别错误类型，再修改译文。
+
+\vspace{0.2em}
+
+错误类型：\ctext[RGB]{241, 148, 138}{翻译错误}
+
+\vspace{0.2em}
+
+\underline{\ctext[RGB]{153, 202, 240}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+在这个例子中，输入译文不是由大语言模型生成，而是从数据集中随机抽取的。因此，对于源句而言，它就是一个错误译文，可以据此设置错误类型。接着，模型将源句和错误译文一同作为输入，生成新的译文。这种提示设计也可以视为通过“负面证据”激活大语言模型的学习能力~\cite{marcus-etal:1993negative}，使其通过对比分析进行反思，得到更好的结果。不过，该方法不依赖任何反馈，只需简单提示，就能提高大语言模型单次预测的效果。
+
+需要注意，虽然 DTG 是非迭代的，但迭代学习和改进在 NLP 中十分常见。这类迭代方法的一个优点是模拟了人类学习和解决问题的过程，通过持续反馈与调整，逐步改善结果。迭代方法可用于多种大语言模型提示问题。例如，在问题分解中，可以在每一步将新的子问题及其解答加入上下文，使模型逐步接近原问题的解答。另一方面，迭代方法也带来了非迭代方法中不存在的问题。例如，早期步骤的错误可能对后续求解产生不利影响，而确定何时停止迭代往往需要额外的工程工作。
+
+\subsection{集成}
+
+\noindent NLP 文献已广泛讨论用于文本生成的模型集成（model ensembling）。其思想是组合两个或多个模型的预测，生成质量更好的最终输出。这项技术可以直接用于大语言模型。例如，可以准备一组大语言模型，让每个模型处理同一输入，再组合这些模型的预测，得到最终输出。
+
+对于大语言模型的提示方法，还可以通过组合不同提示所产生的预测来改善表现。假设有一个大语言模型，以及一组针对同一任务的提示。可以分别用每个提示运行这一模型，再组合预测结果。例如，下面给出用于文本简化的三个不同提示模板。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+请让这段文本更简单。
+
+\vspace{0.2em}
+
+$\{*\mathrm{text}*\}$
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+请压缩并简化这段文本。
+
+\vspace{0.2em}
+
+$\{*\mathrm{text}*\}$
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+请改写文本，使其易于阅读。
+
+\vspace{0.2em}
+
+$\{*\mathrm{text}*\}$
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 每个提示都会得到不同预测，可以将这三个预测组合成最终输出。
+
+形式化地，令 $\{\mathbf{x}_1,\cdots,\mathbf{x}_K\}$ 表示完成同一任务的 $K$ 个提示。给定大语言模型 $\Pr(\cdot|\cdot)$，对于每个 $\mathbf{x}_i$，使用 $\hat{\mathbf{y}}_i= \argmax_{\mathbf{y}_i} \Pr(\mathbf{y}_i|\mathbf{x}_i)$ 找到其最可能的预测。将这些预测组合起来，即可形成一个“新”预测：
+\begin{eqnarray}
+\hat{\mathbf{y}} & = & \mathrm{Combine}(\hat{\mathbf{y}}_1,\cdots,\hat{\mathbf{y}}_K). \label{eq:llm-combination-with-diff-prompts}
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Combine}(\cdot)$ 是组合模型，可以采用多种方式设计。例如，可以通过投票选择最佳预测，也可以选择与其他预测重叠最多的那个。另一种方式是在解码过程中组合词元级概率分数。令 $\hat{y}_{j}$ 表示模型组合在第 $j$ 步预测的词元，预测词元 $\hat{y}_{j}$ 为
+\begin{eqnarray}
+\hat{y}_{j} & = & \argmax_{y_j} \sum_{k=1}^{K} \log \Pr(y_j|\mathbf{x}_k,\hat{y}_1,\cdots,\hat{y}_{j-1}).
+\end{eqnarray}
+
+在大语言模型的提示集成中，采用多样化提示通常更有利，因为组合结果能够涵盖更广泛的潜在回答。这也是集成学习中的常见做法：多样性有助于抵消某个模型或配置特有的偏差和错误。从贝叶斯角度看，可以将提示 $\mathbf{x}$ 视为给定目标问题 $p$ 时的潜变量。这样，$\mathbf{y}$ 在给定 $p$ 时的预测分布，就可以写成对全部可能提示边缘化后的分布 $\Pr(\mathbf{y}|\mathbf{x})$：
+\begin{eqnarray}
+\Pr(\mathbf{y}|p) & = & \int \Pr(\mathbf{y}|\mathbf{x}) \Pr(\mathbf{x}|p) d \mathbf{x}.
+\end{eqnarray}
+
+\noindent 这一积分计算 $\mathbf{y}$ 的总概率：考虑 $\mathbf{x}$ 的全部可能取值，并按它们在给定 $p$ 时的概率加权。其中，$\Pr(\mathbf{y}|\mathbf{x})$ 由大语言模型给出，$\Pr(\mathbf{x}|p)$ 则是针对该问题的提示先验分布。这种形式的好处在于，积分考虑了选择 $\mathbf{x}$ 的不确定性，因此最终预测分布 $\Pr(\mathbf{y}|p)$ 对单个提示的变化和偏差更稳健。然而，由于 $\mathbf{x}$ 的空间可能是无限的，直接计算积分在计算上可能不可行。一种解决办法是使用蒙特卡洛采样等方法，以数量可控的有限个提示来近似这一积分。
+
+虽然贝叶斯处理方式在数学上定义明确，但 NLP 实践中通常假定无信息先验或均匀先验，转而重点构造一组多样化提示。因此，可以用式~(\ref{eq:llm-combination-with-diff-prompts}) 所示的简单组合模型计算输出。如何创建高质量、多样化提示，已在思维链及其他上下文学习领域受到研究。多数研究关注在不同提示中纳入多种示例。下面列出其中一些方法。
+
+\begin{itemize}
+\item \vspace{0.5em} 给定一个问题，人工编写若干示例，并在不同提示中使用不同示例。
+\item \vspace{0.2em} 给定一个问题，使用大语言模型自动生成示例和提示。
+\item \vspace{0.2em} 给定一个提示，改变其中示例的顺序，得到不同提示。
+\item \vspace{0.2em} 给定一个提示，使用大语言模型生成若干相似提示。
+\item \vspace{0.2em} 给定一个提示，将其转换为其他形式，例如翻译成其他语言。
+\end{itemize}
+\vspace{0.5em}
+
+当然，在实践中可以组合这些方法，获得更高的多样性。这里隐含的假设是，多样化提示能够产生多样化模型输出。对于较新、较复杂的问题，这一点尤其成立。对于能力更强、更稳健的大语言模型，相似提示所产生输出的差异可能不大，此时使用多个提示的收益可能有限。
+
+除了向模型提供多样化提示，还可以利用大语言模型输出本身的变化性。一种简单做法是从假设空间中采样多个输出。对大语言模型来说，这很直接，因为其搜索算法天然适合生成多个结果。例如，使用束搜索时，可以轻松收集束中所有已完成的假设，得到多个候选输出。还可以修改搜索算法，实现更强的采样方法，探索更广泛的高质量假设。
+
+接下来的问题是，如何组合多样化的模型预测。这又回到了式~(\ref{eq:llm-combination-with-diff-prompts}) 所描述的模型组合问题。这里介绍\mindex{自一致性}（self-consistency）方法，它输出的不一定是概率最高的预测，而是与其他预测最一致的预测~\cite{wang-etal:2022rationale,wang-etal:2023self}。首先，照常用思维链提示大语言模型，通过采样生成多条推理路径。然后，统计各答案在这些路径中出现的次数，选择出现最频繁的答案作为最终输出。下面给出用思维链提示大语言模型所生成的三个不同预测。
+
+\vspace{0.5em}
+预测 1（正确）：
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：三个朋友玩一个抛公平硬币的游戏，每人抛一次。恰好只有一个人抛出正面的概率是多少？
+
+\vspace{0.5em}
+
+答：让我们一步一步地思考。
+
+\vspace{0.2em}
+
+\uline{每次抛硬币都是独立事件，有 $50\%$ 的概率为正面（H），$50\%$ 的概率为反面（T）。考虑三次抛掷的所有可能结果：HHH、HHT、HTH、HTT、THH、THT、TTH、TTT。其中，只有 HHH、HHT、HTH 和 THH 是相关的。我们只关注恰好出现一个正面的情况：HTT、THT 和 TTH。共有 $3$ 种这样的结果，全部结果有 $8$ 种，因此概率是 $3/8$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+预测 2（正确）：
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：三个朋友玩一个抛公平硬币的游戏，每人抛一次。恰好只有一个人抛出正面的概率是多少？
+
+\vspace{0.5em}
+
+答：让我们一步一步地思考。
+
+\vspace{0.2em}
+
+\uline{使用二项概率公式，其中 $p$（成功，即正面）为 $0.5$，$3$ 次试验（抛掷）彼此独立，要求恰好成功一次，即出现一个正面。恰好成功 $k$ 次、试验总数为 $n$ 时的概率，由含二项式系数的公式 $\binom{n}{k} p^k (1-p)^{n-k}$ 给出。代入数值得 $\binom{3}{1} (0.5)^1 (0.5)^{3-1} = 3 \cdot 0.5 \cdot 0.25 = 0.375$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\vspace{0.5em}
+预测 3（错误）：
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+问：三个朋友玩一个抛公平硬币的游戏，每人抛一次。恰好只有一个人抛出正面的概率是多少？
+
+\vspace{0.5em}
+
+答：让我们一步一步地思考。
+
+\vspace{0.2em}
+
+\uline{每次抛硬币有 $50\%$ 的概率为正面，有 $50\%$ 的概率为反面。我们要求三次抛掷中只有一次出现正面，可能一开始会认为，这只是选择哪一次为正面的问题。因为一共抛三次，有人可能错误地假定，选中特定一次结果的概率就是 $1$ 除以 $3$。因此，他们可能得出结论：恰好出现一个正面的概率为 $1/3=33.3\%$。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+预测 1 和预测 2 都正确识别了恰好出现一个正面的三种情况，得到的概率均为 37.5\%。预测 3 的推理没有考虑三次抛掷的可能结果总数，因此给出了 33.3\% 的错误答案。所以，选择达成一致的 37.5\% 作为最终答案。
+
+自一致性提供了从候选集合中确定最佳预测的准则。由于这一方法中的提示和模型都固定，严格来说，它并不是提示集成，而可以视为输出集成方法的一个实例。输出集成也称为假设选择方法，NLP 领域长期以来一直在探索这类方法，尤其是在文本生成问题中~\cite{xiao-etal:2013bagging}。这些方法通过改变模型架构或参数生成多个输出，再按某种准则给各输出打分，并依据分数重新排序。评分函数有多种定义方式，例如衡量一个输出与其他输出的一致程度，或用更强的模型为各输出重新评分\footnote{自一致性可以解释为一种最小贝叶斯风险搜索过程，通过最小化贝叶斯风险来寻找最佳输出。具体而言，定义风险函数 $R(\mathbf{y},\mathbf{y}_r)$，作用于每一对输出（记为 $(\mathbf{y},\mathbf{y}_r)$），表示将 $\mathbf{y}$ 替换为 $\mathbf{y}_r$ 的代价。给定输出集合 $\varOmega$，输出 $\mathbf{y} \in \varOmega$ 的风险为
+\begin{eqnarray}
+\mathrm{Risk}(\mathbf{y}) & = & \mathbb{E}_{\mathbf{y}_r \sim \Pr(\mathbf{y}_r|\mathbf{x})} R(\mathbf{y},\mathbf{y}_r) \nonumber \\
+                          & = & \sum_{\mathbf{y}_r \in \varOmega} R(\mathbf{y},\mathbf{y}_r) \cdot \Pr(\mathbf{y}_r|\mathbf{x}).
+\end{eqnarray}
+
+}。图~\ref{fig:llm-ensembling-comparison} 比较了大语言模型的不同集成方法。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-ensembling-methods}
+\caption{大语言模型的集成方法。在标准模型集成 (a) 中，使用多个架构或参数不同的大语言模型。每个模型接收同一提示并产生一个预测，再组合这些预测，生成最终预测。在提示集成 (b) 中，使用一个大语言模型和多个提示。模型针对每个提示产生一个预测，再照常组合这些预测。在输出集成 (c) 中，给定一个提示，模型在预测空间中采样多个预测，可将其视为增强模型自身表现的方法。这些集成方法可以相互结合，提高预测的多样性。例如，可以同时使用提示集成和输出集成，得到更多样化的预测。}
+\label{fig:llm-ensembling-comparison}
+\end{figure}
+
+现在简要回顾本节已讨论的问题分解、自我改进等方法。显然，这些方法通过在推理过程中引入更多“选择”，增强了决策能力。在某种程度上，它们都涉及评估大语言模型结果并提供反馈。例如，在自我改进中，需要对改进模型预测提出建议；在输出集成中，则要从候选集合中选出最优输出。从这个意义上说，这些方法都属于更广泛的“先预测、后验证”方法：先作出预测，再验证并改进。这里的根本问题，是验证和评估推理结果或中间步骤。这与 RLHF 中的奖励模型训练问题有一定关联，尽管 RLHF 关注的是另一个方面。事实上，大语言模型推理领域已经探索并应用了验证器。多数研究关注通过监督学习训练验证器，而不是开发基于启发式规则的推理时算法。一种直接的方法是将验证器训练为二分类器，例如判断答案正确或错误；不过，这些验证器通常用作评分模型。给定某个问题的一条推理路径，验证器可以为整条路径评分，称为基于结果的方法~\cite{cobbe-etal:2021training}；也可以为每个推理步骤分别评分，称为基于过程的方法~\cite{uesato-etal:2022solving,lightman-etal:2024lets}。
+
+\subsection{检索增强生成与工具使用}
+\label{sec:rag-and-tool-use}
+
+\noindent 当标准大语言模型的事实准确性不足，或无法获取最新知识时，通常会采用 RAG。借助外部数据库和文档，RAG 能够显著提高回答与上下文的相关性，并增强其事实依据。这种方法尤其适合复杂问答等对事实准确性和信息时效性要求较高的场景。
+
+前面章节已经介绍过 RAG。为使讨论完整，这里简要列出其核心步骤。
+
+\begin{itemize}
+\item \vspace{0.5em} 准备一组文本，作为外部知识源。
+\item \vspace{0.3em} 针对给定查询，检索相关文本。
+\item \vspace{0.3em} 将检索到的文本和查询一同输入大语言模型，提示模型生成最终预测。
+\end{itemize}
+\vspace{0.5em}
+
+步骤 1 和步骤 2 可以通过外部信息检索系统实现。例如，可以将文本集合存入向量数据库，再利用基于向量的搜索技术检索相关文本。由于信息检索不是本章重点，这里假定已有可直接使用的系统，并直接调用。
+
+下面介绍如何提示大语言模型利用检索文本。考虑使用模型回答以下问题的例子。
+
+\begin{center}
+\textit{2028 年奥运会将在哪里举办？}
+\end{center}
+
+只需将这一问题输入在线搜索引擎，搜索引擎就会返回互联网上找到的相关文本片段，例如：
+
+\begin{flushleft}
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+（Wikipedia）
+
+\textit{2028 年夏季奥运会的正式名称为第三十四届奥林匹克运动会，通常称为 Los Angeles 2028 或 LA28，是一项即将举行的国际综合性体育赛事，计划于 2028 年 7 月 14 日至 30 日在美国举办。……}
+
+\vspace{0.5em}
+（The Sporting News）
+
+\textit{继 1932 年和 1984 年举办夏季奥运会之后，洛杉矶将于 2028 年成为继伦敦、巴黎之后第三座三次举办奥运会的城市。这也将是美国自 2002 年盐湖城冬奥会以来，首次举办奥运会。……}
+
+\vspace{0.5em}
+
+...
+
+\endgroup
+\end{flushleft}
+
+可以将这些检索到的文本作为补充上下文，提示大语言模型据此生成回答。下面给出一个 RAG 提示示例。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+你的任务是回答下面的问题。这里提供了相关文本作为帮助，请根据这些文本作答。
+
+\vspace{0.5em}
+
+问题：
+
+\vspace{0.2em}
+
+2028 年奥运会将在哪里举办？
+
+\vspace{0.5em}
+
+相关文本 1：
+
+\vspace{0.2em}
+
+2028 年夏季奥运会的正式名称为第三十四届奥林匹克运动会，通常称为 Los Angeles 2028 或 LA28……
+
+\vspace{0.5em}
+
+相关文本 2：
+
+2028 年，洛杉矶将成为继伦敦、巴黎之后第三座三次举办奥运会的城市，此前……
+
+\vspace{0.2em}
+
+...
+
+\vspace{0.5em}
+
+\underline{2028 年奥运会将在洛杉矶举办。}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+这一提示假定所提供的文本与问题相关，并期望大语言模型依据文本生成忠实的回答。然而，信息检索系统有时会提供不相关或错误文本，可能导致模型给出错误答案。一种直接的解决办法是提高信息检索系统的准确性。不过，与大多数人工智能系统一样，错误仍然可能发生。因此，也需要增强大语言模型的稳健性，使其即使在输入不准确时，也能作出合理预测。下面的新提示要求模型更忠于事实，并允许其在所提供信息不准确时选择不回答。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+你的任务是回答下面的问题。这里提供了相关文本作为帮助，请根据这些文本作答。
+
+\vspace{0.2em}
+
+\ctext[RGB]{154, 245, 175}{请注意，答案应尽可能准确并忠于事实。如果所提供的信息不足以支持准确回答，可以直接输出“无法回答！”。}
+
+\vspace{0.5em}
+
+问题：
+
+\vspace{0.2em}
+
+2028 年奥运会将在哪里举办？
+
+\vspace{0.5em}
+
+相关文本 1：
+
+\vspace{0.2em}
+
+2024 年夏季奥运会的正式名称为第三十三届奥林匹克运动会，以 Paris 2024 为品牌名称，是一项国际综合性体育赛事……
+
+\vspace{0.5em}
+
+...
+
+\vspace{0.5em}
+
+\underline{\ctext[RGB]{154, 245, 175}{无法回答！}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 在这个例子中，所提供的信息不足且与问题无关，因此大语言模型拒绝回答。
+
+RAG 和微调都是利用任务特定数据使大语言模型适应任务的常用方法。标准 RAG 无需训练，可以直接用于大语言模型。为了进一步改进 RAG，也可以微调模型，不过这需要一定训练工作。例如，可以用人工标注数据微调模型，监督它学习拒绝回答。需要注意，虽然上面的例子看起来简单，但 RAG 并不容易。从提示工程角度看，不同使用场景可能需要不同提示，尽管更广泛的目标是开发能跨任务泛化的提示策略。在许多情况下，需要控制预测对检索上下文的依赖程度。有时，模型必须严格依据所提供文本生成回答；另一些时候，当文本信息不足时，则可能需要利用已有知识作答。RAG 涉及许多方面，例如检索系统的改进，本章无法一一涵盖。感兴趣的读者可以参考 RAG 技术综述，了解更多信息~\cite{li-etal:2022survey,gao-etal:2023retrieval}。
+
+这里讨论 RAG 的一个原因是，它可以广义地视为一般问题分解框架的一个实例，见第~\ref{sec:problem-decomposition} 节。RAG 将问题求解分成两步：第一步，针对给定查询，从各种知识源收集相关、具有支撑作用的信息；第二步，使用大语言模型根据收集的信息生成回答。进一步拓展问题分解的概念，会发现许多需要外部系统或工具的任务都可以看作类似问题。大语言模型的工具使用就是一个例子。在许多应用中，模型需要借助外部数据库、API，甚至仿真工具，才能生成准确回答。例如，模型可以访问金融市场的实时数据以提供金融信息，或访问医学知识库以提供个性化医学信息。这种集成通过允许大语言模型与外部系统交互，并在某些情况下影响或控制外部系统，扩展了模型的能力。因此，大语言模型可以充当简单的自主智能体，而不再只是文本生成器~\cite{franklin-and-graesser:1996agent}。
+
+工具使用是一个广泛的研究领域。这里将讨论限定在通过调用外部 API 求解部分子问题、从而有助于完成的任务上~\cite{parisi-etal:2022talm,gao-etal:2023pal}。再次考虑让大语言模型回答“2028 年奥运会将在哪里举办？”的例子。假设模型可以访问网络搜索工具，就可以用如下提示要求模型借助网络搜索作答：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+你的任务是回答下面的问题。可以使用网络搜索等外部工具来辅助作答。
+
+\vspace{0.5em}
+
+问题：
+
+\vspace{0.2em}
+
+2028 年奥运会将在哪里举办？
+
+\vspace{0.5em}
+
+\underline{有关这一问题的信息如下：}
+
+\vspace{0.2em}
+
+\underline{\ctext[RGB]{154, 245, 175}{\texttt{\{tool: web-search, query: "2028 Olympics"\}}}}
+
+\vspace{0.2em}
+
+\underline{所以答案是：洛杉矶}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 其中，\texttt{{tool: web-search, query: "2028 Olympics"}} 表示向网络搜索系统发出请求，查询内容为“2028 Olympics”。外部系统会截获生成的工具命令，执行相应工具，并将返回结果追加到上下文中。更新后的上下文再次送入大语言模型，用于后续预测，模型因而能够利用检索信息生成正确答案。
+
+再考虑一个让大语言模型求解数学问题的例子。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+题目：
+
+\vspace{0.2em}
+
+一个游泳池需要注满水。泳池长 10 米、宽 4 米、深 2 米。请计算泳池的体积，单位为立方米，再确定注满泳池需要多少升水（已知 1 立方米等于 1000 升）。
+\vspace{0.5em}
+
+解答：
+
+\underline{为解决这道题，大语言模型首先需要计算泳池的体积，}
+
+\underline{使用长方体的体积公式：$\text{长} \times$}
+
+\underline{$\text{宽} \times \text{深}.$ 因此，体积为 $10 \, \text{m} \times 4 \, \text{m} \times 2 \, \text{m} =$ \ctext[RGB]{154, 245, 175}{\texttt{\{tool:}}}
+
+\ctext[RGB]{154, 245, 175}{\texttt{calculator, expression: 10 * 4 * 2\}}} $\text{m}^3$。\underline{接下来，为确定}
+
+\underline{需要多少升水，大语言模型将以立方米为单位的体积}
+
+\underline{乘以 1000（因为 1 立方米等于 1000 升）。因此，\ctext[RGB]{154, 245, 175}{$80$} $ \times 1000$}
+
+\underline{$= $ \ctext[RGB]{153, 202, 240}{\texttt{\{tool: calculator, expression: 80*1000\}}} $\, \text{升}.$}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里，字符串 \texttt{\{tool: calculator, expression: 10 * 4 * 2\}} 会触发数学解释器的调用，计算表达式的结果。需要注意，结果（即 80）会替换 \texttt{\{tool: calculator, expression: 10 * 4 * 2\}}，并可供后续词元预测引用。例如，在求解的最后一步，使用的是 80，而不是 \texttt{\{tool: calculator, expression: 10 * 4 * 2\}}。
+
+这里的工具使用示例与前面 RAG 示例的一个关键差别是：工具使用允许在推理过程中调用外部函数，而在 RAG 中，检索文本是在预测开始之前提供的。不过，从语言建模角度看，两者是相似的：在生成最终结果之前，都通过人工或自动调用外部工具，获取充分且相关的上下文。更高层次的理解是，这两种方法都依赖一个“智能体”，由它决定在何处以及如何调用外部函数，生成预测所需的上下文。
+
+工具使用面临的一个问题是，原始大语言模型并未经过生成必要工具标记的训练，因此需要微调模型，使其适应这类任务~\cite{schick-etal:2024toolformer}。由于本章重点是提示方法，这里不介绍微调过程的细节。简单来说，首先需要标注数据：对每个微调样例，将输出中需要外部工具的部分替换为预定义命令或标记。然后，照常用这些标注数据微调模型参数。这样，模型就能够学会生成调用外部工具的命令。在推理时，可以执行模型输出中的工具命令，获得外部工具的帮助。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{学习如何提示}
+
+\noindent 本章到目前为止讨论了若干基本提示策略及其各种改进，但所有提示都是人工设计的。这带来了几个问题。第一，高质量提示难以设计，往往需要大量实验才能找到有效提示。不同大语言模型对提示风格的敏感程度可能不同，因此开发能在不同模型之间良好泛化的提示，会耗费大量资源。第二，人工提示设计严重依赖人的专业知识，可能限制方法的多样性，忽略一些对人而言并不直观、却可能有效的提示。第三，人编写的提示可能复杂冗长，导致模型输入更长、计算成本更高。
+
+本节讨论自动化提示技术。这些方法旨在自动创建、优化和表示提示，使下游任务能够得到更有效、更高效的处理。具体考虑以下三个问题。
+
+\begin{itemize}
+\item \vspace{0.5em} 如何自动设计和优化大语言模型的提示？
+\item \vspace{0.3em} 除了纯文本字符串，还能用什么方式表示提示，如何学习这些表示？
+\item \vspace{0.3em} 如何使提示更加简洁、紧凑，从而降低其复杂度和长度？
+\end{itemize}
+\vspace{0.5em}
+
+需要注意，这些问题可以在多种设定下研究。例如，可以针对特定大语言模型优化提示，也可以设计能在不同模型之间泛化的提示。这些设定可能产生不同方法和应用场景，但方法之间也可能有所重叠。下面将介绍几种不同场景，并讨论各种方法之间的联系。
+
+\subsection{提示优化}
+
+\noindent 提示设计需要投入大量人工，因此希望利用机器学习模型寻找特定任务的最优提示，这称为\mindex{自动提示设计}（automatic prompt design）或\mindex{提示优化}（prompt optimization）。广义而言，这一方法可以视为\mindex{自动化机器学习}（automated machine learning，\mindex{AutoML}）的一个实例。自动化机器学习旨在减少或消除机器学习模型设计中对专家人工工作的依赖。虽然这里关注的是提示设计，但提示本身也是离散结构，因此提示优化类似于机器学习中对离散模型架构的搜索。一个密切相关的领域是\mindex{神经架构搜索}（neural architecture search，\mindex{NAS}），它通过探索可能的神经网络空间来确定最优网络~\cite{zoph-and-Le:2016neural,elsken-etal:2019nas}。如果将提示优化视为搜索过程，就可以将其一般框架描述为以下几个组成部分：
+
+\begin{itemize}
+\item \vspace{0.5em} \mindex{提示搜索空间}（prompt search space）：定义算法可以探索的所有可能提示。例如，可以编辑一些种子提示，生成一组多样化候选提示。
+\item \vspace{0.3em} \mindex{性能估计}（performance estimation）：选定一个提示后，需要评估其效果。例如，一种直接做法是将提示输入大语言模型，在验证集上衡量表现。
+\item \vspace{0.3em} \textbf{搜索策略}：搜索过程通常与许多人工智能系统采用的过程相同。每一步，系统都探索搜索空间中一组有希望的提示，并进行评估；随着更多提示被探索，这一过程不断推进。搜索的结果是停止之前所遇到的最佳提示。
+\end{itemize}
+\vspace{0.5em}
+
+这是一个非常通用的框架，不同提示优化系统对各组成部分的设计可能不同。一种广泛使用的方法是以大语言模型为基础来开发这些部分。首先，提供少量提示。然后反复执行以下过程，直到满足停止条件：1）在验证集上评估提示；2）仅保留最有希望的提示，维护候选池；3）利用大语言模型从候选池中推导相似提示，创建新提示。这一方法的一个好处是，可以使用现成大语言模型完成上述任务，而无需开展大量系统开发。为此，可以通过提示或微调，让大语言模型适应这些任务。下面以 \citet{zhou-etal:2023large} 的方法说明基于大语言模型的提示优化，其步骤如下。
+
+\begin{itemize}
+\item \vspace{0.5em} \textbf{初始化}：令 $C$ 表示待探索的候选提示池。第一步是将初始提示加入 $C$，实现方式有多种。一个简单方法是针对给定任务人工编写提示。不过，在许多情况下，人们对如何为任务编写有效提示了解有限，因此难以开发提示。这时，希望使用大语言模型生成提示。例如，可以提供任务描述，直接要求大语言模型生成提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+现有一项需要用大语言模型完成的任务。请编写一个提示来指导大语言模型。
+
+\vspace{0.5em}
+
+$\{*\mathrm{task\textrm{-}description}*\}$
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+    这一方法很直接，但仍需要人提供任务描述。另一种方法是给出任务的输入输出示例，让大语言模型生成提示。提示模板如下。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+下面给出某项任务的若干输入输出对，请编写一条执行该任务的指令。
+
+\vspace{0.5em}
+
+输入：$\{*\mathrm{input}1*\}$\ \ \ 输出：$\{*\mathrm{output}1*\}$
+
+\vspace{0.2em}
+
+输入：$\{*\mathrm{input}2*\}$\ \ \ 输出：$\{*\mathrm{output}2*\}$
+
+...
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+这样，大语言模型就能根据所提供的输入和输出，推导出任务对应的指令。
+
+\item \vspace{0.3em} \textbf{评估}：得到候选池 $C$ 后，需要评估 $C$ 中的提示。一种方法是将每个提示输入大语言模型，评估其在下游任务上的结果。例如，可以用预定义指标评价模型在给定输入下的输出，也可以用输出的对数似然衡量提示质量。
+
+\item \vspace{0.3em} \textbf{剪枝}：如果 $C$ 中包含大量提示，可以对其中没有希望的提示进行剪枝，减轻后续步骤的计算负担。这是一个标准剪枝问题。给定各提示的评估分数，一种简单方法是仅保留一定比例的提示，丢弃其余部分。
+
+\item \vspace{0.3em} \textbf{扩展}：扩展是搜索算法中探索搜索空间不同状态的关键操作。这里可将扩展操作定义为一个函数：
+    \begin{eqnarray}
+    C' & = & \mathrm{Expand}(C, f),
+    \end{eqnarray}
+
+    \noindent 其中，$C'$ 是从 $C$ 使用模型 $f$ 生成的新提示集合。如果将 $f$ 视为一个大语言模型，就可以要求 $f$ 根据 $C$ 生成新的相关提示，从而完成扩展操作。下面给出一个例子。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+下面给出一个用于大语言模型的提示，请提供一些执行同一任务的新提示。
+
+\vspace{0.5em}
+
+输入：$\{*\mathrm{prompt}*\}$
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+然后，将 $C$ 替换为 $C'$。重复评估、剪枝和扩展步骤，就能逐步探索更广泛的提示。
+
+\end{itemize}
+\vspace{0.5em}
+
+在提示优化中，扩展步骤起着关键作用，因为它定义了如何探索搜索空间，而目标是以尽可能少的工作找到最优结果。改进这一环节的一种方式，是将其视为释义改写任务。一个简单方法是使用现成的释义改写系统（无论基于大语言模型还是其他模型），将输入提示转换为语义等价的形式~\cite{jiang-etal:2020can}。也可以为每个词元定义插入、修改等具体编辑操作，再通过这些操作将给定提示改成新提示~\cite{prasad-etal:2023grips}。还可以进一步评估和剪枝，滤除低质量提示。除了将提示生成视为释义改写问题，还可以通过从反馈中学习，提高扩展时的提示质量~\cite{pryzant-etal:2023automatic}。这与第~\ref{sec:self-refinement} 节讨论的自我改进问题有一定联系：可以用大语言模型生成对输入提示的反馈，再依据反馈修改提示。这种反馈—修改循环可以重复多次，直到结果收敛或达到预期目标。
+
+提示优化的另一种思路是采用经典优化技术。例如，可以将其表述为进化计算问题，把提示视为候选个体，随着优化推进，一代一代地演化~\cite{guo-etal:2024connecting}。相关领域已开发出许多强大的优化算法，可以直接用于这一问题。
+
+实践中，我们可能倾向于使用现有大语言模型 API 实现上述步骤。不过，这种方式高度依赖模型的推理和上下文学习能力。如果模型能力不足，又未针对任务进行适配，就可能在搜索中引入错误，例如在扩展时生成错误提示。在这种情况下，更好的做法是训练更适合任务的模型。这一研究方向中的一种方法采用强化学习，它已被广泛用于离散决策和优化问题。例如，\citet{deng-etal:2022rlprompt} 在大语言模型中加入一个基于前馈网络（feed-forward network，FFN）的适配器，开发了提示生成器。该生成器按典型策略网络的方式训练，但仅更新适配器参数，模型其他参数保持不变。训练时，用另一个大语言模型测试生成的提示以获得奖励，这与上述评估方法类似。训练完成后，再用提示生成器产生新提示。
+
+需要注意，这里的讨论只是将提示视为词元序列，提示优化的输出也是这样的序列。但严格来说，提示往往包含指令、示例和用户输入等多个部分。虽然上述方法大多具有通用性，但提示优化中的许多研究重点是学习更好的指令，目的是根据给定任务生成能够有效引导大语言模型的指令。当然，提示优化也可以扩展为学习提示的其他部分。例如，如何学习选择或生成思维链示例，就受到了广泛研究~\cite{liu-etal:2022makes,rubin-etal:2022learning,zhang-etal:2023automatic}。学习指令与学习示例的一个差别是，利用大语言模型生成高质量示例相对容易，因此示例学习通常关注如何从候选池中采样合适示例。相比之下，指令学习的部分困难在于，预训练大语言模型不适于预测指令质量，而在下游任务中测试这些指令又十分耗费计算。这使优化方法应用成本很高，也使探索大量不同指令面临重大挑战。
+
+\subsection{软提示}
+
+\noindent 以人工或自动方式编写自然语言提示，是一种直接且广泛采用的方法，但也存在一些问题。一方面，自然语言提示可能复杂冗长，给大语言模型带来较大计算负担。在许多应用中，用户需要反复执行同一任务，多次将相同的长提示输入模型，显然效率不高。另一方面，在常规模型输入中，提示通常表示为离散词元序列，称为\mindex{硬提示}（hard prompts），但大语言模型会将其编码为连续向量。因此，一个自然的问题是：是否存在更紧凑、更高效的提示表示方式？
+
+本小节介绍\mindex{软提示}（soft prompts）的概念，可以将其视为提示的隐式分布式表示。提示大语言模型时，我们希望传达任务或问题，以获得期望的回答。硬提示可以定义为用户直接输入模型、用于引导回答的显式预定义文本序列。相比之下，软提示可以看作在模型连续隐空间中表示的、隐式且可调整的提示模式。硬提示以自然语言表达，应当让人能够理解；软提示则编码为更适于模型理解、而非人类理解的形式。考虑下面这个简单提示：
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+Translate the sentence into Chinese.
+
+\vspace{0.5em}
+
+Consider it done!
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+\noindent 这里，指令“Translate the sentence into Chinese”（将句子翻译成中文）可以视为一个硬提示，记作词元序列 $c_1 \cdots c_5$。将这些词元输入大语言模型后，会转换成实值向量序列 $\mathbf{h}_1 \cdots \mathbf{h}_5$，每个向量对应一个词元。可以用 $\mathbf{h}_1 \cdots \mathbf{h}_5$ 直观说明软提示，如图~\ref{fig:hard-and-soft-prompt-examples} 所示。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-hard-prompt-and-soft-prompt}
+\caption{硬提示与软提示示意图。硬提示是为执行任务而输入大语言模型的指令。模型照常编码这一指令，与指令对应的中间表示可以视为某种软提示。}
+\label{fig:hard-and-soft-prompt-examples}
+\end{figure}
+
+虽然上述例子表明，可以通过转换硬提示生成软提示，但两者之间不一定存在直接对应关系。事实上，甚至不必用有意义的文本解释软提示，而是将其表示为大语言模型隐空间中的连续向量，并直接作为可学习参数优化。这样，就能够探索文本之外的提示方法。软提示还有一个好处：它为编码如何引导模型生成特定输出提供了稠密、可学习的表示。训练和应用这些表示所需的计算成本，远低于处理长硬提示的成本。对于需要反复使用同一提示的大语言模型推理应用，这种方式很有实用价值。
+
+\subsubsection{使大语言模型适应简化提示}
+
+\noindent 使大语言模型适应某项任务的一种显而易见的方法，就是用标注数据微调模型。这产生了监督微调等多种大语言模型对齐方法：通过使给定提示下的回答与监督信号对齐，更新模型参数。微调后的模型将任务相关信息编码在参数中，因此，面对与微调阶段相似的提示时，能够正确回应。
+
+进一步延伸这一思想，可以期望大语言模型在微调时尽可能吸收有关某项任务提示方式的知识。这样，部分提示信息就会被模型参数捕获，微调后的模型只需较少的提示即可执行任务。这里考虑一种简单提示，仅包含一条指令（记为 $\mathbf{c}$）和一个用户输入（记为 $\mathbf{z}$）。提示可以表示为以下元组：
+\begin{eqnarray}
+\mathbf{x} & = & (\mathbf{c}, \mathbf{z}).
+\end{eqnarray}
+
+给定提示—回答对集合 $\mathcal{D}=\{(\mathbf{x},\mathbf{y})\}$，微调的目标是最小化这一集合上的总损失。一种常用方法是对模型参数 $\theta$ 最小化负对数似然，即最大化对数似然：
+\begin{eqnarray}
+\hat{\theta} & = & \argmax_{\theta} \sum_{(\mathbf{x},\mathbf{y}) \in \mathcal{D}} \log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{x}) \nonumber \\
+             & = & \argmax_{\theta} \sum_{(\mathbf{x},\mathbf{y}) \in \mathcal{D}} \log \mathrm{Pr}_{\theta}(\mathbf{y}|\mathbf{c}, \mathbf{z}),
+\end{eqnarray}
+
+\noindent 其中，$\mathrm{Pr}_{\theta}(\cdot|\cdot)$ 是参数为 $\theta$ 的大语言模型预测的概率\footnote{实践中，用预训练所得参数初始化 $\theta$，然后适度调整 $\theta$，确保微调后的结果不会过度偏离预训练结果。}。
+
+通常，每个微调样例的指令都应遵循提示设计原则。例如，好的指令应尽可能清楚，并详细描述任务。不过，上式的方法不限制指令的具体形式。这种灵活性使我们可以按自己的意愿，用任意方式指导大语言模型。考虑让模型将英语句子翻译成中文的例子。如本章前面所述，当然可以使用下面的指令：
+
+\vspace{1em}
+\hspace{4em} \textit{请将下面的句子从英语翻译成中文。}
+\vspace{1em}
+
+\noindent 如果希望指令更简洁，可以改写为：
+
+\vspace{1em}
+\hspace{4em} \textit{请把它翻译成中文。}
+\vspace{1em}
+
+\noindent 甚至可以将指令定义为一个短语：
+
+\vspace{1em}
+\hspace{4em} \textit{翻译！}
+\vspace{1em}
+
+通过微调，可以让大语言模型适应上述任意指令。从提示效率角度看，简化提示中的指令具有计算优势。例如，可以用“翻译！”这样的简单指令，执行通常需要更复杂、详细指令的任务，使随后推理时的提示过程容易得多。另一方面，用过度简化的指令微调模型，可能损害模型的泛化能力。简化指令会造成信息丢失，因此模型更容易对微调数据过拟合，无法泛化到这些指令之外。如果微调时同时包含复杂指令和简化指令，这一问题会更加突出，因为可用标注数据通常不足以覆盖丰富的指令变体。
+
+另一种使大语言模型适应简化指令的方式是知识蒸馏（knowledge distillation）。这里以上下文蒸馏（context distillation）方法为例~\cite{snell-etal:2022learning}。其目标是从一个训练充分、能够遵循指令的教师模型中，学习得到能够利用简化指令的学生模型。图~\ref{fig:context-distillation} 展示了这一方法。教师模型通过标准微调过程构建：先收集一定数量包含指令、用户输入和正确回答的数据，再在这一数据集上继续训练预训练模型。构建学生模型时，需要准备新的数据集 $\mathcal{D}'$，每个样本都是由指令、相应简化指令和用户输入构成的元组，记为 $\mathbf{x}' = (\mathbf{c}, \mathbf{c}', \mathbf{z})$。通过最小化教师模型和学生模型输出之间定义的损失函数，完成知识蒸馏：
+\begin{eqnarray}
+\hat{\theta} & = & \argmin_{\theta} \sum_{\mathbf{x}' \in \mathcal{D}'} \mathrm{Loss}(\mathrm{Pr}^{t}(\cdot|\cdot),\ \mathrm{Pr}_{\theta}^{s}(\cdot|\cdot),\ \mathbf{x}'),
+\end{eqnarray}
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-contex-distillation}
+\caption{上下文蒸馏示意图~\cite{snell-etal:2022learning}。教师模型是一个标准大语言模型，将上下文和用户输入一同作为模型输入，生成预测作为模型输出。然后，简化上下文（例如简化提示中的指令），让学生模型依据简化后的上下文和用户输入进行预测。训练学生模型时，最小化两个模型预测之间的损失。}
+\label{fig:context-distillation}
+\end{figure}
+
+\noindent 其中，$\mathrm{Pr}^{t}(\cdot|\cdot)$ 表示预训练教师模型，$\mathrm{Pr}_{\theta}^{s}(\cdot|\cdot)$ 表示参数为 $\theta$ 的学生模型。为简化记号，下面将 $\mathrm{Loss}(\mathrm{Pr}^{t}(\cdot|\cdot),\ \mathrm{Pr}_{\theta}^{s}(\cdot|\cdot),\ \mathbf{x}')$ 简写为 $\mathrm{Loss}$。一种常用损失是序列级损失，基本形式为
+\begin{eqnarray}
+\mathrm{Loss} & = & -\sum_{\mathbf{y}} \mathrm{Pr}^{t}(\mathbf{y}|\mathbf{c},\mathbf{z}) \log \mathrm{Pr}_{\theta}^{s}(\mathbf{y}|\mathbf{c}',\mathbf{z}).
+\end{eqnarray}
+
+但这一函数在计算上不可行，因为需要对数量呈指数增长的所有可能输出序列求和。一种变体是用教师模型生成的输出训练学生模型。对每个样本，先由教师模型产生输出 $\hat{\mathbf{y}} = \argmax_{\mathbf{y}} \log \mathrm{Pr}^{t}(\mathbf{y}|\mathbf{c},\mathbf{z})$，再将 $\hat{\mathbf{y}}$ 作为学习目标，此时损失函数为
+\begin{eqnarray}
+\mathrm{Loss} & = & -\log \mathrm{Pr}_{\theta}^{s}(\hat{\mathbf{y}}|\mathbf{c}', \mathbf{z}). \label{eq:context-distillation-simple}
+\end{eqnarray}
+
+也可以最小化两个模型所生成概率分布之间的距离~\cite{askell-etal:2021general}。例如，可将损失定义为两个输出分布之间的 KL 散度：
+\begin{eqnarray}
+\mathrm{Loss} & = & \mathrm{D}_{\mathrm{KL}}(\mathrm{P}^{t} \,\|\, \mathrm{P}_{\theta}^{s}), \label{eq:context-distillation-kl}
+\end{eqnarray}
+
+\noindent 其中
+\begin{eqnarray}
+\mathrm{P}^t & = & \mathrm{Pr}^{t}(\cdot|\mathbf{c},\mathbf{z}), \\
+\mathrm{P}^s_{\theta} & = & \mathrm{Pr}_{\theta}^{s}(\cdot|\mathbf{c}', \mathbf{z}).
+\end{eqnarray}
+
+通过微调或蒸馏简化提示，不一定会产生通常意义上的显式软提示。不过，这些方法具有共同的直观思想：任务特定的提示行为，可以逐步被模型内部紧凑的连续表示吸收。
+
+虽然这里只讨论了指令的知识蒸馏，但上述方法具有通用性。通过学习教师模型的输出，可以将提示中的知识蒸馏到学生模型参数中。因此，可以认为蒸馏后的模型在参数中隐式编码了任务特定的提示行为。这一方法还可以用于提示学习中的许多其他问题，例如压缩长上下文，以及将软提示学成大语言模型中的特定组成部分。
+
+\subsubsection{为参数高效微调学习软提示}
+
+\noindent 更新全部模型参数的全量微调，是使大语言模型适应下游任务的一种常用方法。虽然微调的计算开销远低于预训练，但在实际应用中仍然成本不低。为此，研究者开发了参数高效微调（parameter-efficient fine-tuning，PEFT）方法，旨在尽量减少需要更新的参数数量。
+
+一种称为\mindex{前缀微调}（prefix fine-tuning）的方法，会在每个 Transformer 层的输入开头加入一组可训练向量，即前缀~\cite{li-liang:2021prefix}。这些前缀可以视为软提示，充当额外上下文，指导模型在特定任务下的行为。微调时，只需学习前缀，将任务特定知识编码其中。因此，这一方法只修改模型的一小部分，而不调整全部参数，效率较高。
+
+具体而言，将深度为 $l$ 的层的输入记为 $\mathbf{H}^l = \mathbf{h}_0^l \mathbf{h}_1^l \cdots \mathbf{h}_m^l$，该层的输出可表示为：
+\begin{eqnarray}
+\mathbf{H}^{l+1} & = & \mathrm{Layer}(\mathbf{H}^{l}).
+\end{eqnarray}
+
+在前缀微调中，扩展序列 $\mathbf{h}_0^l \mathbf{h}_1^l \cdots \mathbf{h}_m^l$，在其开头加入若干向量，记为 $\mathbf{p}_0^l \mathbf{p}_1^l \cdots \mathbf{p}_n^l$。于是，$\mathbf{H}^l$ 可以写成：
+\begin{eqnarray}
+\mathbf{H}^l = \underbrace{\mathbf{p}_0^l\ \mathbf{p}_1^l\ \cdots\ \mathbf{p}_n^l}_{\text{可训练}} \underbrace{\mathbf{h}_0^l\ \mathbf{h}_1^l\ \cdots\ \mathbf{h}_m^l}_{\text{上一层输出}}. \label{eq:prefix-finetuning-layer-input}
+\end{eqnarray}
+
+\noindent 仅保留最后 $m+1$ 个表示，作为传递至下一层的隐状态：
+\begin{eqnarray}
+\overline{\mathbf{H}}^{l+1} & = & \mathrm{Layer}(\mathbf{H}^{l})[-m-1:\ ] \nonumber \\
+                       & = & \mathbf{h}_0^{l+1}\mathbf{h}_1^{l+1}\cdots\ \mathbf{h}_m^{l+1},
+\end{eqnarray}
+
+\noindent 其中，$[-m-1:\ ]$ 表示切片操作，提取序列的最后 $m+1$ 个元素。给定 $\overline{\mathbf{H}}^{l+1}$，下一层输入可以写成与式~(\ref{eq:prefix-finetuning-layer-input}) 相同的形式：
+\begin{eqnarray}
+\mathbf{H}^{l+1} & = & \mathbf{p}_0^{l+1}\ \mathbf{p}_1^{l+1}\ \cdots\ \mathbf{p}_n^{l+1}\ \overline{\mathbf{H}}^{l+1} \nonumber \\
+                 & = & \mathbf{p}_0^{l+1}\ \mathbf{p}_1^{l+1}\ \cdots\ \mathbf{p}_n^{l+1} \mathbf{h}_0^{l+1}\mathbf{h}_1^{l+1}\cdots \mathbf{h}_m^{l+1}.
+\end{eqnarray}
+
+\noindent 这里，每个 $\mathbf{p}_i \in \mathbb{R}^d$ 都可以视为可学习参数。训练时，照常训练 $\mathbf{p}_0^l \mathbf{p}_1^l \cdots\mathbf{p}_n^l$，原 Transformer 模型的参数保持固定。
+
+图~\ref{fig:prefix-finetuning} 展示了将前缀微调用于翻译任务的例子。这里，仅通过输出层（即中文译文）反向传播的梯度更新前缀向量 $\mathbf{p}_0^l$ 和 $\mathbf{p}_1^l$。针对翻译任务调整这些向量后，模型也相应适应该任务。因此，$\mathbf{p}_0^l$ 和 $\mathbf{p}_1^l$ 起到提示作用，激活大语言模型执行任务，无需“请将下面的句子从英语翻译成中文”这样的显式输入提示。测试时，只需在层输入开头加入优化后的 $\mathbf{p}_0^l$ 和 $\mathbf{p}_1^l$，模型就会翻译输入句子。需要注意，前缀微调增加了 $L \times n \times d$ 个参数，其中 $L$ 为层数，$n$ 为前缀数量，$d$ 为每个前缀的维度。不过，这一数量远小于模型的总参数量，因此微调过程十分高效。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-prefix-finetuning}
+\caption{用于翻译任务的前缀微调示意图（Look out! $\to$ \begin{CJK*}{UTF8}{gbsn} 小心 \end{CJK*}!）。在每层输入开头加入两个前缀 $\mathbf{p}_0^l$ 和 $\mathbf{p}_1^l$。训练大语言模型时，最小化给定输入下的预测损失。在这一过程中，只优化前缀，其余参数保持固定，因此只需少量可训练参数，就能使模型适应任务。推理时，大语言模型使用优化后的前缀，无需显式硬提示即可执行任务。}
+\label{fig:prefix-finetuning}
+\end{figure}
+
+前缀微调虽然简单，但仍需要修改大语言模型。另一种方式是将软提示与模型分离，保留原始模型架构，无需调整核心模型，就能更高效地部署到不同任务。一种这样的方法是提示微调（prompt tuning）~\cite{lester-etal:2021power}。与前缀微调相同，提示微调引入可训练向量，通过调整这些向量，使大语言模型适应给定任务。不过，提示微调只修改嵌入层，这是两者的区别。
+
+回顾大语言模型的输入表示：每个输入词元 $z_i$ 都由嵌入 $\mathbf{e}_i$ 表示。这些嵌入通常通过词元嵌入模型学习得到，再替代符号形式的词元，作为模型的实际输入。在提示微调中，在词元嵌入序列的开头加入若干伪嵌入 $\mathbf{p}_0 \cdots \mathbf{p}_n$，因此模型的实际输入可以表示为：
+\begin{equation}
+\underbrace{\mathbf{p}_0\ \mathbf{p}_1\ \cdots\ \mathbf{p}_n}_{\text{可训练}}\ \underbrace{\mathbf{e}_0\ \mathbf{e}_1\ \cdots\ \mathbf{e}_m}_{\text{词元嵌入}}.
+\end{equation}
+
+\noindent 需要注意，伪嵌入不必对应任何自然语言词元，而可以视为对大语言模型施加条件的“软提示嵌入”。在任务特定数据上训练这些嵌入后，它们会学会与词元嵌入 $\mathbf{e}_0 \cdots \mathbf{e}_m$ 自适应交互，引导模型行为。由于提示微调不改变预训练大语言模型的基础参数，因此被视为一种轻量、高效的微调方法，既提高特定任务的表现，又保持模型的泛化能力。提示微调示意图见图~\ref{fig:prefix-prompt-tuning}。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-prompt-tuning}
+\caption{用于翻译任务的提示微调示意图（Look out! $\to$ \begin{CJK*}{UTF8}{gbsn} 小心 \end{CJK*}!）。软提示是加入嵌入序列开头的可学习嵌入，替代了固定文本提示。微调时，只优化这些提示嵌入，使大语言模型高效适应给定任务。优化完成后，每当新数据到来，就用提示嵌入指导模型执行任务。}
+\label{fig:prefix-prompt-tuning}
+\end{figure}
+
+由于 $\mathbf{p}_0\ \mathbf{p}_1\ \cdots\ \mathbf{p}_n$ 本身也是序列，可以使用序列模型更好地表示它。例如，用一个 Transformer 模型编码这一序列，再将得到的表示输入大语言模型。换言之，可以额外开发一个模型来编码软提示。另一种改进方式是组合软提示和硬提示，发挥两者的优势~\cite{liu-etal:2023gpt}。在嵌入序列中，可以对这些提示进行排列或交错放置，从而得到不同提示模式。例如，图~\ref{fig:prompt-pattern-soft-and-hard-prompts} 给出了一种组合两类提示的简单模式。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-prompt-pattern-soft-and-hard-prompts}
+\caption{组合软提示、硬提示和用户输入的提示模式。其中，$c_0 \cdots c_{m'}$ 表示硬提示，$\mathbf{q}_0 \cdots \mathbf{q}_{m'}$ 表示相应的嵌入序列。}
+\label{fig:prompt-pattern-soft-and-hard-prompts}
+\end{figure}
+
+这里介绍了在大语言模型中插入软提示的方法，但略去了训练软提示的细节，并假定读者熟悉标准监督学习过程，即在给定模型输入时，最大化正确模型输出的似然。事实上，学习软提示与大语言模型微调中的许多问题有关。例如，如果将其视为上下文压缩问题，就可以使用前面介绍的知识蒸馏方法。在 \citet{mu-etal:2024learning} 的研究中，提示被压缩并表示为少量伪词元，追加到每个输入序列中。通过优化这些伪词元的嵌入，模仿使用标准提示的模型所产生的预测。换言之，将提示知识从教师模型蒸馏到伪词元中。
+
+广义而言，许多参数高效微调方法都可以视为学习某种软提示~\cite{lialin-etal:2023scaling}。为某项任务微调模型的一部分，本质上可以视为向模型这一特定部分注入任务相关的提示信息。另一种常用的参数高效微调方法，是在已有模型层之间加入适配器层。这种方式只需针对特定任务微调适配器层，无需改变基础架构或重新训练整个模型。从这个意义上说，适配器层可以视为编码提示信息和任务相关信息的软提示，通过与原大语言模型交互，帮助模型适应任务。图~\ref{fig:comparison-of-soft-prompts-in-llms} 汇总比较了在大语言模型中使用软提示的不同方法。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-soft-prompts-in-llms}
+\caption{在大语言模型中使用软提示的示意图。可调节的软提示以蓝色表示，微调时参数固定的部分以灰色表示。子图 (a) 中，软提示是加入模型每层的前缀；子图 (b) 中，软提示用作模型的输入嵌入；子图 (c) 和 (d) 中，软提示被广义地视为为适应任务而微调的模型组成部分。}
+\label{fig:comparison-of-soft-prompts-in-llms}
+\end{figure}
+
+\subsubsection{通过压缩学习软提示}
+
+\noindent 学习软提示的另一种方式是将其表述为压缩问题。作为一个简单例子，考虑用连续表示近似长上下文的问题~\cite{wingate-etal:2022prompt}。假设给定用户输入 $\mathbf{z}$ 及其上下文 $\mathbf{c}$（如长指令和示例），现在希望学习上下文的压缩表示，记为 $\sigma$，使在 $\mathbf{z}$ 和 $\sigma$ 条件下的预测
+尽可能接近在 $\mathbf{z}$ 和 $\mathbf{c}$ 条件下的预测。这一目标可以大致表述为
+\begin{eqnarray}
+\hat{\sigma} & = & \argmin_{\sigma} s(\hat{\mathbf{y}},\hat{\mathbf{y}}_{\sigma}),
+\end{eqnarray}
+
+\noindent 其中，$\hat{\mathbf{y}} = \argmax_{\mathbf{y}} \Pr(\mathbf{y}|\mathbf{c},\mathbf{z})$ 和 $\hat{\mathbf{y}}_{\sigma} = \argmax_{\mathbf{y}} \Pr(\mathbf{y}|\sigma,\mathbf{z})$ 分别是在完整上下文和压缩上下文条件下得到的大语言模型预测。函数 $s(\cdot,\cdot)$ 衡量两个预测之间的差异。
+
+实现这一目标的一般框架是知识蒸馏，可以将 $\hat{\mathbf{y}}$ 和 $\hat{\mathbf{y}}_{\sigma}$ 分别视为教师模型和学生模型的预测。这种形式化描述，将这里的讨论与前面的上下文蒸馏问题联系起来。训练目标可以仿照式~(\ref{eq:context-distillation-simple}) 和式~(\ref{eq:context-distillation-kl}) 定义。例如，一个直接的最大似然目标为
+\begin{eqnarray}
+\hat{\sigma} & = & \argmax_{\sigma} \log \Pr(\hat{\mathbf{y}}|\sigma, \mathbf{z}).
+\end{eqnarray}
+
+\noindent 也可以最小化两个输出分布之间的 KL 散度，得到
+\begin{eqnarray}
+\hat{\sigma} & = & \argmin_{\sigma} \mathrm{D}_{\mathrm{KL}}(\Pr(\cdot|\mathbf{c},\mathbf{z}) \,\|\, \Pr(\cdot|\sigma,\mathbf{z})).
+\end{eqnarray}
+
+\noindent 与式~(\ref{eq:context-distillation-simple}) 和式~(\ref{eq:context-distillation-kl}) 中模型的区别在于，这里的压缩上下文表示为实值向量，称为\mindex{提示嵌入}（prompt embeddings），而不是普通词元。应用上述方法，就能将上下文从词元序列 $\mathbf{c}$ 蒸馏到嵌入 $\sigma$ 中。需要注意，教师模型 $\Pr(\cdot|\mathbf{c},\mathbf{z})$ 和学生模型 $\Pr(\cdot|\sigma,\mathbf{z})$ 可以使用不同架构或模型设置。实践中，通常希望教师模型更强，而学生模型更小、更高效。
+
+虽然将完整上下文压缩为连续表示，是学习软提示的一种直接方式，但它要求教师模型能够处理长输入序列。然而，许多情况下上下文过长，应用大语言模型的成本太高，甚至不可行。长输入序列建模属于长上下文大语言模型高效方法的广泛范畴，研究者已经开发出许多技术来解决这一问题。例如，推理时可以使用固定大小的键值缓存（key-value cache，KV 缓存），在每一步存储历史信息。本书已广泛讨论高效 Transformer 架构和长上下文大语言模型，更详细的讨论见第 \ChapterLLM 章。
+
+还有一些方法专门用于将长序列压缩为软提示。这里以 \citet{chevalier-etal:2023adapting} 的方法为例，其基本思想是将输入序列逐步压缩为固定大小的表示，学习得到软提示。为简单起见，用 $\mathbf z$ 表示待压缩的整个输入序列。给定一个长输入序列，首先将其分成多个片段 $\{\mathbf{z}^1, \cdots, \mathbf{z}^K\}$。然后，按顺序处理这些片段，每次生成截至当前已处理输入的表示，记为 $\sigma^{<i+1}$。为此，引入若干摘要词元 ${\langle \mathrm{g}_1 \rangle, \cdots, \langle \mathrm{g}_{\kappa} \rangle}$。每一步，将片段 $\mathbf{z}^i = z_1^{i} \cdots z_{m_i}^{i}$、此前的压缩表示 $\sigma^{<i}$，以及摘要词元 $\langle \mathrm{g}_1 \rangle, \cdots, \langle \mathrm{g}_{\kappa} \rangle$ 一同作为输入，使用大语言模型生成最后一个 Transformer 层对应的隐表示序列。图~\ref{fig:compressing-context-with-summary-tokens} 展示了这一过程的例子。
+
+\begin{figure}[!t]
+\centering
+\input{./Chapter9/Figures/figure-compressing-context-with-summary-tokens}
+\caption{将一个上下文片段压缩为软提示的示意图（$\kappa = 2$、$m_i = 4$）。模型输入包括上一步的软提示（$\sigma^{<i}_1$ 和 $\sigma^{<i}_2$）、片段词元（$z_1, z_2, z_3,$ 和 $z_4$），以及摘要词元（$\langle \mathrm{g}_1 \rangle$ 和 $\langle \mathrm{g}_2 \rangle$）。给定这些输入，大语言模型照常运行。随后，提取最后一个 Transformer 层中与摘要词元对应的输出；这些输出可以视为累积到当前片段为止的软提示。}
+\label{fig:compressing-context-with-summary-tokens}
+\end{figure}
+
+这里，$\sigma^{<i}$ 本质上是一种记忆。模型按照循环神经网络（recurrent neural network，RNN）的方式运行，每次取一个片段，通过同时编码先前记忆状态和当前片段来更新记忆。因此，在最后一个片段处产生的 $\sigma^{<i}$，就是整个上下文序列的表示。学习这些表示的 Transformer 模型可以是标准大语言模型，但需要微调，使其适应上下文表示任务。
+
+需要注意，这里只是将\textit{提示}和\textit{上下文}作为含义相近的术语处理，两者并不相同。虽然这里广义地使用\textit{提示}一词，将提供给模型的上下文信息也包括在内，但通常可以将提示视为一种上下文。从这一角度看，这里讨论的方法也适用于一般的文本压缩问题。
+
+\subsection{缩短提示长度}
+
+软提示虽然提供了稠密的隐表示，但通常不能直接解释。这种可解释性的缺失，使用户难以理解提示如何影响模型输出。此外，修改软提示往往需要额外微调，限制了其在提示频繁变化的动态环境中的实用性。
+
+另一种提高提示效率的方法，是直接简化提示文本。简化后的文本提示仍具有可解释性，用户可以直接修改。例如，下面是一个用于回答医疗和金融领域问题的提示。
+
+\vspace{0.5em}
+\begin{tcolorbox}[frame empty]
+
+\begingroup
+\setlength{\leftskip}{2em}
+\setlength{\rightskip}{2em}
+
+这项任务需要开发一个语言模型，能够理解和回答各个领域的用户问题，尤其关注医疗和金融。考虑到潜在问题范围很广，从具体医学诊断到金融监管的细微差别，模型必须确保全面理解并准确回答。
+
+\vspace{0.5em}
+
+问题：
+
+\vspace{0.2em}
+
+使用人工智能诊断心血管疾病的最佳实践有哪些？
+
+\vspace{0.5em}
+
+\underline{\hspace{2em}}
+
+\endgroup
+
+\end{tcolorbox}
+\vspace{0.5em}
+
+可以删除不重要的部分，简化任务描述。
+
+\vspace{0.5em}
+
+\begin{center}
+\parbox{0.8\linewidth}{
+\textit{这项任务需要开发一个语言模型，能够理解和回答用户{\color{gray} \sout{在各个领域的问题，尤其关注}}关于医疗和金融的问题。{\color{gray} \sout{考虑到潜在问题范围很广，从具体医学诊断到金融监管的细微差别，}}模型必须确保全面理解并准确回答。}
+}
+\end{center}
+
+\vspace{0.5em}
+
+也可以通过释义改写，将其变为更短的文本。
+
+\vspace{0.5em}
+
+\begin{center}
+\parbox{0.8\linewidth}{
+\textit{这项任务需要开发一个专注于医疗和金融的语言模型，能够理解并准确回答各种用户问题。}
+}
+\end{center}
+
+\vspace{0.5em}
+
+这一问题可以视为标准 NLP 任务——文本简化。因此，文本简化方法普遍适用，并不限于提示简化。实现方式有很多。一种简单方法是定义若干启发式规则，找出可以删除、又不损失关键信息的冗余词。例如，可以考察序列中每个词元对整体含义的贡献，删除价值很小的词元~\cite{li-etal:2023compressing,jiang-etal:2023llmlingua}。另一种方法是将其表述为序列到序列任务：给定文本简化的标注数据，训练编码器—解码器模型，将每段输入文本转换为简化形式。此外，许多大语言模型已经通过微调和对齐，能够执行文本简化任务，因此直接使用这些模型简化提示也很容易。例如，可以提示模型在满足长度限制等约束的同时简化提示。
+
+%----------------------------------------------------------------------------------------
+% NEW SECTION
+%----------------------------------------------------------------------------------------
+
+\section{小结}
+
+\noindent 本章讨论了与大语言模型提示方法有关的多个主题，主要集中在两个方面：
+
+\begin{itemize}
+\item \vspace{0.5em} 如何设计基本提示来引导大语言模型的预测，并进一步改进提示，使问题求解更有效、更高效？
+\item \vspace{0.3em} 如何自动设计和表示提示？
+\end{itemize}
+\vspace{0.3cm}
+
+\noindent 解决这些问题既涉及通用提示设计，也涉及思维链、提示学习等更进阶的技术，近年来的研究已对这些技术进行了广泛探索。
+
+在 NLP 中，提示方法可以视为随大语言模型共同演进的一项技术。从某种意义上说，它为这些模型打开了通往广泛问题领域实际应用的大门。事实上，如果适当拓展提示的概念，它可以追溯到机器学习和 NLP 的早期。例如，许多 NLP 系统使用人工设计的特征和模板来“提示”特定任务。设想设计一个特征，表示文本是正式的还是非正式的，再将该特征输入机器翻译系统，使翻译以输入文本类型为条件。
+
+现代提示概念的广泛使用，始于大型预训练模型在 NLP 领域的兴起。最初，BERT 等模型主要通过微调适应特定下游任务。但研究者很快发现，只需设计特定“提示”——在输入中添加某些词或句子——就能触发模型完成特定任务，无需大量微调。这推动 NLP 社区开发和应用通用基础模型，使其能够通过提示处理各种任务，而不必改变基础架构和预训练过程。
+
+提示方法最初在较小模型上开展实验，随后在 GPT-3 等大模型上展现出令人瞩目的能力：仅凭简单提示，就能针对多种任务生成高质量文本。随着提示技术演进，提示工程成为一个重要研究领域。如本章所述，它广义上涉及设计有效提示，以最大限度提高模型表现，既包括人工编写的提示，也包括自动生成的提示。较新的研究探索了如何通过少样本学习、零样本学习和思维链推理等技术增强提示效果，使大语言模型能够有效适用于多种场景。提示方法的一般讨论范围非常广，本章无法涵盖所有细节。关于更进阶的提示技术，读者可以参考近期综述，相关主题包括上下文学习~\cite{li:2023practical,dong-etal:2022survey}、思维链~\cite{chu-etal:2023survey,yu-etal:2023towards,zhang-etal:2023igniting}、高效提示~\cite{chang-etal:2024efficient}和通用提示工程~\cite{liu2023-etal:prompting,chen-etal:2023unleashing}。
+
+需要注意，虽然理想情况下希望开发无需调整模型架构和参数的通用提示方法，但提示结果通常在很大程度上依赖于给定大语言模型的质量和规模。对于商业化在线大语言模型等能力较强的模型，简单提示可能就足以指导模型正确执行任务。此时，提示工程相对容易，尽管仍需仔细改进提示。相比之下，对于能力较弱或规模较小的模型，可能需要精心设计提示，才能得到预期结果。许多情况下，仍然有必要微调模型，使其适应复杂的提示策略。
+

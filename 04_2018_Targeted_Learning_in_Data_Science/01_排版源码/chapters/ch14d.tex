@@ -1,0 +1,70 @@
+% 原书分章 PDF 第 12—15 页；第 14.4—14.5 节。
+\section{初始估计量}
+
+要使 TMLE $\hat\psi$ 具有一致性、渐近正态性和局部有效性，就需要 $R(\hat P,P_0)$ 按式 (14.9) 的意义收敛于零。若已知 $g_0$ 和 $\bar Q_0$ 属于某个参数函数族，并使用极大似然或其他类型的 M 估计量进行估计，那么条件 (14.9) 很容易满足。然而，在处理高维观察性数据时，人们早已认识到，除了少数罕见且往往十分简单的情形外，参数模型很少能够正确设定。模型设定错误就会导致条件 (14.9) 不成立，根据上一节的论述，这将使 $\psi_0$ 的估计量不具一致性。由于这会使一项精心设计和实施的研究的结果失效，我们不建议采用基于参数模型的估计量，除非能够根据相关领域的科学知识确立模型的正确性。
+
+另一种方法，是使用统计学习领域发展的方法来估计 $\bar Q_0$ 和 $g_0$。统计学习方法力求找到尽可能接近真实数据生成函数的估计，因此与参数模型相比，它们更有可能得到一致估计量。我们建议采用集成学习器，因为它们能够同时利用候选估计算法库中各算法的优点。特别是，第 3 章讨论的超级学习（super learning），其最优性质已在理论和经验研究中得到证明。对于 $\bar Q_0$ 这样的条件期望，已有大量关于超级学习的讨论，例如本书第 3 章所列文献，以及《靶向学习》（2011）第 3 章。本节余下部分将讨论连续变量 $A$ 的条件概率密度函数 $g_0(a\mid w)$ 的估计问题。统计学习研究界对这一问题的关注相对少得多。
+
+\subsection{条件密度的超级学习}
+
+若 $A$ 连续，则可将条件密度 $g_0$ 定义为负对数似然损失函数的最小化解，即 $g_0=\argmin_{f\in\mathcal F}R(f,p_0)$，其中，$\mathcal F$ 是由所有满足 $\int f(a,w)\,da=1$ 的 $(a,w)$ 的非负函数所构成的空间，且 $R(f)=-\int\log f(a,w)\,dP_0(o)$。这里，将估计量 $\hat g$ 看作一种算法：以训练样本 $\mathcal T\subseteq\{O_i:i=1,\ldots,n\}$ 为输入，输出估计函数 $g_n(a,w)$。
+
+我们用交叉验证构造风险 $R(g_{n,k})$ 的估计值 $R_n(g_{n,k})$，具体如下。令 $\mathcal V_1,\ldots,\mathcal V_J$ 表示将指标集 $\{1,\ldots,n\}$ 随机划分成的 $J$ 个大小近似相等的验证集。也就是说，$\mathcal V_j\subset\{1,\ldots,n\}$，$\bigcup_{j=1}^J\mathcal V_j=\{1,\ldots,n\}$，且 $\mathcal V_j\cap\mathcal V_{j'}=\varnothing$。此外，对每个 $j$，相应的训练样本为 $\mathcal T_j=\{1,\ldots,n\}\setminus\mathcal V_j$。记 $\hat g_{\mathcal T_j}$ 为只使用样本 $\mathcal T_j$ 中的数据训练算法后得到的密度函数估计。估计密度 $g_n$ 的交叉验证风险定义为
+\begin{equation}
+ R_n(g_n)=-\frac1J\sum_{j=1}^J\frac1{|\mathcal V_j|}
+ \sum_{i\in\mathcal V_j}\log g_{n,\mathcal T_j}(A_i,W_i).
+ \tag{14.10}
+\end{equation}
+现在考虑 $g_0$ 的一个有限候选估计量集合 $\mathcal L=\{g_{n,k}:k=1,\ldots,K_n\}$，我们将其称为算法库（library）。将堆叠预测器（stacked predictor）定义为算法库中各预测器的凸组合：
+\[
+ g_{n,\alpha}(a\mid w)=\sum_{k=1}^{K_n}\alpha_k g_{n,k}(a\mid w),
+\]
+并通过最小化交叉验证风险来估计权重 $\alpha$，即在约束 $\sum_{k=1}^{K_n}\alpha_k=1$ 下，令 $\hat\alpha=\argmin R_n(g_{n,\alpha})$。最终估计量定义为 $g_{n,\hat\alpha}$。
+
+\subsection{算法库的构造}
+
+考虑利用一列数值 $\beta_0<\cdots<\beta_k$，将 $A$ 的取值范围划分为 $k$ 个组。考虑下列用于估计 $g_0(a\mid w)$ 的候选估计量：
+\begin{equation}
+ g_{n,\beta}(a\mid w)=
+ \frac{\widehat{\Pr}(A\in[\beta_{t-1},\beta_t)\mid W=w)}{\beta_t-\beta_{t-1}},
+ \qquad \beta_{t-1}\leq a<\beta_t.
+ \tag{14.11}
+\end{equation}
+这里，$\widehat{\Pr}$ 表示真实概率 $\Pr_0(A\in[\beta_{t-1},\beta_t)\mid W=w)$ 的估计量；它通过风险函数设定，并在重复测量数据集中估计一个二元变量的期望而得到，具体如下。考虑分解
+\[
+\begin{aligned}
+ &\Pr(A\in[\beta_{t-1},\beta_t)\mid W=w)\\
+ &\quad=\Pr(A\in[\beta_{t-1},\beta_t)\mid A\geq\beta_{t-1},W=w)\\
+ &\qquad{}\times\prod_{j=1}^{t-1}
+ \{1-\Pr(A\in[\beta_{j-1},\beta_j)\mid A\geq\beta_{j-1},W=w)\}.
+\end{aligned}
+\]
+模型 (14.11) 的似然正比于
+\[
+\begin{aligned}
+ &\prod_{i=1}^n\Pr(A_i\in[\beta_{t-1},\beta_t)\mid W)\\
+ &\quad=\prod_{i=1}^n\left[\prod_{j=1}^{t-1}
+ \{1-\Pr(A_i\in[\beta_{j-1},\beta_j)\mid A_i\geq\beta_{j-1},W_i)\}\right]\\
+ &\qquad{}\times\Pr(A_i\in[\beta_{t-1},\beta_t)\mid A_i\geq\beta_{t-1},W_i),
+\end{aligned}
+\]
+它对应于重复测量数据集中二元变量 $I(A_i\in[\beta_{j-1},\beta_j))$ 的期望所对应的似然。在该数据集中，以事件 $A_i\geq\beta_{j-1}$ 为条件，将研究对象 $i$ 的观测重复 $k$ 次。
+
+因此，$g_0$ 的每个候选估计量由两项选择来索引：数值序列 $\beta_0<\cdots<\beta_k$，以及用于估计概率 $\Pr_0(A_i\in[\beta_{t-1},\beta_t)\mid A_i\geq\beta_{t-1},W_i)$ 的算法。后者只是一个条件概率，因而可以采用任何标准预测算法作为候选。本节余下部分着重讨论由 $\beta_j$ 的取值所决定的组界位置与组数的选择。
+
+Denby 和 Mallows（2009）将直方图描述为一种图形化描述工具：考虑一组与经验累积分布函数（empirical cumulative distribution function，ECDF）图像相交的平行直线，就可以刻画各组的位置。具体而言，给定组数 $k$，等面积直方图（equal-area histogram）可以看成用 $k+1$ 条等距且平行于 $x$ 轴的直线切割 ECDF 图像而得到的工具。通常的等组距直方图（equal-bin-width histogram），则对应于画出同样数量、平行于 $y$ 轴的直线。在两种情形下，各组分界点的位置都由这些直线与 ECDF 的交点的 $x$ 值来确定。正如两位作者所指出的，等面积直方图能够发现密度中的尖峰，但会对尾部过度平滑，无法显示单个离群值。另一方面，等组距直方图会对高密度区域过度平滑，对数据中的尖峰反应不佳，但对于识别离群值和描述密度尾部十分有用。
+
+为了在这两种方法之间取得折中，两位作者提出一种新的直方图，使用直线 $x+cy=bh$，$b=1,\ldots,k+1$ 切割 ECDF，其中参数 $c$ 和 $h$ 分别定义斜率以及直线之间的距离。参数 $h$ 确定组数 $k$。作者指出，$c=0$ 给出通常的直方图，而 $c\to\infty$ 对应于等面积直方图。
+
+于是，我们可以通过对 $c$ 和 $k$ 作出不同选择来确定向量 $\beta$ 的取值，并结合一个条件概率估计算法库，按照式 (14.11) 定义条件密度的候选估计量库。具体而言，该算法库由以下笛卡尔积给出：
+\[
+ \mathcal L=\{c_1,\ldots,c_{m_c}\}\times\{k_1,\ldots,k_{m_k}\}
+ \times\{\widehat{\Pr}_1,\ldots,\widehat{\Pr}_{m_P}\},
+\]
+其中，第一个集合包含 $c$ 的 $m_c$ 个候选值，第二个集合包含 $k$ 的 $m_k$ 个候选值，第三个集合包含概率估计算法的 $m_P$ 个候选。通过这一方法得到的估计量，既能识别高密度区域，也能很好地描述密度的尾部和离群值。纳入多种概率估计量，还允许算法发现数据中可能存在的非线性和高阶交互作用。我们还可考虑加入任何其他估计量，以扩充所提出的算法库。例如，根据专家知识，我们可能认为，具有线性条件期望的正态分布或其他某种分布能够拟合这些数据。此时，可以将一个通过极大似然估计该密度的候选算法加入库中。这一算法最早由 Díaz 和 van der Laan（2011）提出；对更多细节和应用有兴趣的读者，可查阅原始研究论文。
+
+\section{注记与延伸阅读}
+
+本章内容以 Díaz 和 van der Laan（2011，2012）及 Díaz 和 van der Laan（2013a）的既有工作为基础，并纳入了 Haneuse 和 Rotnitzky（2013）提出的一些改进。对于真实数据应用和进一步讨论，有兴趣的读者可查阅原始研究论文。关于随机干预一般理论的更多讨论，读者可参阅 Robins 等（2004）、Korb 等（2004）、Eberhardt 和 Scheines（2006）、Pearl（2009b）、Dawid 和 Didelez（2010）等文献。
+
+如本章导言中简要提及的，随机策略还可用于处理标准因果推断问题。例如，van der Laan（2014a）讨论了如何使用随机策略定义和估计因果网络中的因果效应。Sapp 等（2014）展示了随机策略的一个应用：对具有区间删失结局的变量重要性度量进行估计。关于在中介情形下利用随机干预进行因果推断的应用，可参阅 Naimi 等（2014）以及 Zheng 和 van der Laan（2012a）。后两位作者给出了一个重要结果：在自然直接效应（NDE）的情形下，采用随机干预方法可以使可识别性条件更弱。因此，用随机策略来解释 NDE 可能是有益的，因为相较于标准方法，所估计的参数在一个更大的因果模型中都代表因果效应（van der Laan 等，2014）。更多讨论及其他应用见 Young 等（2014）和 van der Laan 等（2014）。

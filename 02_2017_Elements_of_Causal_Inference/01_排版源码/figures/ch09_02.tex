@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.65cm,y=1.3cm]
+ \node[vtx] (ch09f2az) at (0,0) {$Z$};
+ \node[vtx] (ch09f2ax) at (1.5,0) {$X$};
+ \node[vtx] (ch09f2ay) at (3,0) {$Y$};
+ \node[latent] (ch09f2ah) at (2.25,1.35) {$H$};
+ \draw[ed] (ch09f2az)--node[above] {$\beta$} (ch09f2ax);
+ \draw[ed] (ch09f2ax)--node[above] {$\alpha$} (ch09f2ay);
+ \draw[ed] (ch09f2ah)--node[left] {$\gamma$} (ch09f2ax);
+ \draw[ed] (ch09f2ah)--node[right] {$\delta$} (ch09f2ay);
+ \node[vtx] (ch09f2bz1) at (5,1.9) {$Z_1$};
+ \node[vtx] (ch09f2bz2) at (6.5,1.9) {$Z_2$};
+ \node[vtx] (ch09f2bx) at (5.75,.95) {$X$};
+ \node[vtx] (ch09f2by) at (5.75,0) {$Y$};
+ \draw[ed] (ch09f2bz1)--(ch09f2bx);
+ \draw[ed] (ch09f2bz2)--(ch09f2bx);
+ \draw[ed] (ch09f2bx)--(ch09f2by);
+\end{tikzpicture}
+\caption{左：工具变量的设定，见第9.3节。一个著名的例子是存在不依从的随机临床试验：$Z$ 表示分配的治疗，$X$ 表示实际接受的治疗，$Y$ 表示结局。右：Y结构，见第9.4.1节。}
+\label{fig:ch09-2}
+\end{figure}

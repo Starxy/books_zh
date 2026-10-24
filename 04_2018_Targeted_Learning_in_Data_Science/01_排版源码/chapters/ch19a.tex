@@ -1,0 +1,176 @@
+% 原书分章 PDF 第 1—8 页：章首与第 19.1 节。
+\chapter{时间序列的在线靶向学习}
+\label{ch:online-targeted-learning-time-series}
+\chapterauthors{Mark J. van der Laan、Antoine Chambaz 与 Sam Lendle}
+\chapteraffiliations{%
+M. J. van der Laan（通讯作者）：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+A. Chambaz：法国巴黎笛卡尔大学 MAP5（UMR CNRS 8145），45 rue des Saints-Pères, 75270 Paris cedex 06, France；电子邮箱：\href{mailto:antoine.chambaz@parisdescartes.fr}{antoine.chambaz@parisdescartes.fr}。\\
+S. Lendle：美国 Pandora Media 公司，2100 Franklin St, Suite 600, Oakland, CA 94612, USA；电子邮箱：\href{mailto:sam.lendle@gmail.com}{sam.lendle@gmail.com}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_19}。}
+
+我们考虑观测一个时间序列的情形：在每个时点，按时间顺序依次观测协变量向量、处理和结局。我们假设，给定既往历史时，这一时点特定数据结构的条件概率分布，仅通过维数不随时间改变的一个汇总量依赖于历史；该条件分布由一个不随时间改变的机制描述，并且已知该机制属于某个模型空间，例如完全不指定其形式。我们提出一个与此统计模型相容的因果模型，通过对部分处理节点施加随机干预，定义这些干预对未来结局的一族因果效应，并建立从观测数据分布识别这些效应的结果。
+
+这一统计估计问题的一般表述涵盖许多重要的估计问题。例如，将历史汇总量选为空集，就包含基于独立同分布数据的因果效应靶向估计（Bickel 等，1997b；Robins 和 Rotnitzky，1992；van der Laan 和 Rubin，2006；van der Laan，2008a；van der Laan 和 Rose，2011）。对条件密度选择参数模型，则包含经典时间序列模型。它还包含分组序贯自适应设计，其中下一名受试者的处理分配，依据此前已招募受试者的观测信息决定（van der Laan，2008a；Chambaz 和 van der Laan，2011a,b）。在后一种情形中，$t$ 索引入组试验的第 $t$ 名受试者。此外，它还包含文献尚未讨论的全新问题，例如：只观测单个单位或指定的一组单位的一条时间序列，在平稳性和马尔可夫型假设下估计因果效应，而不指定函数形式。
+
+\begin{sourcebox}
+本章估计问题的一个关键特征是数据具有顺序，统计推断基于时间维度的渐近分析。因此，我们提出的估计量的一个主要特征，是它们属于在线估计量（online estimator）：可以随时间持续更新，同时保持计算可行性。这类似于计算机科学文献中用于拟合参数模型的随机梯度下降算法，例如 Bottou（2012）。本章推广并扩充了我们先前关于独立同分布数据在线靶向学习的技术报告（van der Laan 和 Lendle，2014）。
+\end{sourcebox}
+
+\section{估计问题的统计表述}
+
+假设我们观测按时间排序的数据结构 $O^N=(W(t),A(t),Y(t):t=1,\ldots,N)$，其中 $W(t)$ 先于 $A(t)$ 发生，$A(t)$ 又先于 $Y(t)$ 发生。令 $A(t)$ 表示暴露或处理，$Y(t)$ 表示时点 $t$ 感兴趣的结局。将 $O^N$ 的真实概率分布记为 $P_0^N$。令 $O(t)=(W(t),A(t),Y(t))$ 为时点 $t$ 特定的纵向数据结构，于是 $O^N=(O(t):t=1,\ldots,N)$。相对于适当的控制测度，数据 $O^N$ 的概率密度可按时间顺序分解为
+\[
+\begin{aligned}
+ p_0^N(o)
+ &=\prod_{t=1}^N q_{w(t)}(w(t)\mid\bar o(t-1))
+ \prod_{t=1}^N g_{a(t)}(a(t)\mid\bar o(t-1),w(t))\\
+ &\quad\times\prod_{t=1}^N q_{y(t)}(y(t)\mid\bar o(t-1),w(t),a(t))\\
+ &=\prod_{t=1}^N q_{w(t)}(w(t)\mid w^-(t))
+ \prod_{t=1}^N g_{a(t)}(a(t)\mid a^-(t))
+ \prod_{t=1}^N q_{y(t)}(y(t)\mid y^-(t)).
+\end{aligned}
+\]
+这里定义 $W^-(t)=\bar O(t-1)$、$A^-(t)=(\bar O(t-1),W(t))$ 和 $Y^-(t)=(\bar O(t-1),W(t),A(t))$，分别为 $W(t)$、$A(t)$ 和 $Y(t)$ 的历史。$q_{w(t)}$、$g_{a(t)}$、$q_{y(t)}$ 分别表示给定 $W^-(t)$ 时 $W(t)$、给定 $A^-(t)$ 时 $A(t)$，以及给定 $Y^-(t)$ 时 $Y(t)$ 的条件概率密度。令 $\mu_w$、$\mu_a$ 和 $\mu_y$ 为相应的控制测度。
+
+\subsection{统计模型：平稳性与马尔可夫假设}
+
+\paragraph{平稳性假设。}
+我们假设，每个条件密度 $q_{w(t)}$、$q_{y(t)}$、$g_{a(t)}$ 都通过一个固定维数的汇总量依赖于历史，并分别由一个跨时点 $t$ 共同的参数 $\bar q_w$、$\bar q_y$、$\bar g$ 确定：
+\[
+\begin{aligned}
+ q_{w(t)}(w(t)\mid w^-(t))&=q_{t,\bar q_w}(w(t)\mid c_{w,t}(w^-(t))),\\
+ g_{a(t)}(a(t)\mid a^-(t))&=g_{t,\bar g}(a(t)\mid c_{a,t}(a^-(t))),\\
+ q_{y(t)}(y(t)\mid y^-(t))&=q_{t,\bar q_y}(y(t)\mid c_{y,t}(y^-(t))).
+\end{aligned}
+\]
+这里的函数分别为 $(w,c)\to\bar q_w(w,c)$，$(w,c)\in\RR^{k_1}$；$(a,c)\to\bar g(a\mid c)$，$(a,c)\in\RR^{k_2}$；以及 $(y,c)\to\bar q_y(y\mid c)$，$(y,c)\in\RR^{k_2}$。函数 $c_{w,t}()$、$c_{a,t}()$ 和 $c_{y,t}()$，分别将历史 $w^-(t)$、$a^-(t)$ 和 $y^-(t)$ 映射到维数为 $k_1$、$k_2$ 和 $k_3$ 的向量，这些维数固定，不依赖于 $t$。
+
+\paragraph{马尔可夫型假设。}
+一种具体的历史汇总量，是从完整历史中抽取固定维数的近期历史：
+\[
+\begin{aligned}
+ c_{w,t}(w^-(t))&=(o(t-l_w:t-1)),\\
+ c_{a,t}(a^-(t))&=(o(t-l_a:t-1),w(t)),\\
+ c_{y,t}(y^-(t))&=(o(t-l_y:t-1),w(t),a(t)).
+\end{aligned}
+\]
+这里使用记号 $O(s:t)=(O(s),\ldots,O(t))$。后文将说明，为建立估计量的渐近性质，历史汇总量仅覆盖有限历史十分重要；这使时间序列具有对所有时点均有限的记忆。
+
+这些模型假设使我们能够应对维数灾难，以及仅观测到一条时间序列这一事实。我们还使用记号 $C_w(t)=c_{w,t}(W^-(t))$、$C_a(t)=c_{a,t}(A^-(t))$ 和 $C_y(t)=c_{y,t}(Y^-(t))$，分别表示 $W(t)$、$A(t)$ 和 $Y(t)$ 的上述历史汇总量所对应的随机变量。
+
+\paragraph{汇总量的嵌套假设。}
+假设对所有 $t$，$c_w(t)$ 是 $c_y(t-1)$ 和 $y(t-1)$ 的函数；$c_a(t)$ 是 $c_w(t)$ 和 $w(t)$ 的函数；$c_y(t)$ 是 $c_a(t)$ 和 $a(t)$ 的函数。也就是说，对于任一变量，其父节点都是有序变量序列中前一个变量的父节点及该变量自身的函数。后文将解释，这一假设能显著简化估计量的计算，但它并非介绍估计量及建立其渐近性质所必需。这一假设要求时点 $t$ 的汇总量包含全部既往信息中，与时点 $t$ 之后时间序列的未来有关的信息。
+
+\paragraph{时间序列的起始值。}
+我们假设 $W^-(0)$、$A^-(0)$ 和 $Y^-(0)$ 已给定，且维数已经分别为 $k_1$、$k_2$ 和 $k_3$。因此，最初几个条件分布已经以足够的历史为条件，可以由共同机制 $\bar q_w$、$\bar g$ 和 $\bar q_y$ 定义。
+
+\paragraph{统计模型。}
+尽管条件密度 $q_{w(t)}$、$q_{y(t)}$ 和 $g_{a(t)}$ 由 $\bar q_w$、$\bar q_y$ 和 $\bar g$ 确定，为简化记号，我们常省略这一依赖关系。$O^N$ 的真实概率密度 $p_0^N$ 的统计模型定义为
+\[
+ \mathcal M^N=\Bigl\{p^N=\prod_t q_{w(t)}g_{a(t)}q_{y(t)}:
+ \bar q_w\in\mathcal Q_w,\bar q_y\in\mathcal Q_y,\bar g\in\mathcal G\Bigr\}.
+\]
+其中，$\mathcal Q_w$、$\mathcal Q_y$ 和 $\mathcal G$ 分别是 $\bar q_w$、$\bar q_y$ 和 $\bar g$ 的参数空间。我们考虑 $\mathcal Q_w$ 和 $\mathcal Q_y$ 为非参数空间，而 $\bar g_a$ 的参数空间 $\mathcal G$ 可能受限的情形。为了给出有效影响曲线和所提出在线估计量的具体结果，我们将考虑 $q_{w(t)}=\bar q_w$、$q_{y(t)}=\bar q_y$、$g_{a(t)}=\bar g$，且所有参数空间均为非参数空间的情形。大部分工作都易于推广到其他参数化方式，即分别用 $\bar q_w$、$\bar q_y$ 和 $\bar g$ 对时点特定机制 $q_{w(t)}$、$q_{y(t)}$ 和 $g_{a(t)}$ 参数化。统计模型 $\mathcal M$ 依赖于时间序列的起始值 $W^-(0)$、$A^-(0)$、$Y^-(0)$，因为时点 $t=1$ 的最初条件密度依赖于这些值；但记号中省略了这一依赖。
+
+\subsection{底层因果模型与目标量}
+
+假设结构因果模型为
+\[
+\begin{aligned}
+ W(t)&=f_{w(t)}(W^-(t),U_{w(t)}),\\
+ A(t)&=f_{a(t)}(A^-(t),U_{a(t)}),\\
+ Y(t)&=f_{y(t)}(Y^-(t),U_{y(t)}),\qquad t=1,\ldots,N.
+\end{aligned}
+\]
+其中，$(f_{w(t)},f_{a(t)},f_{y(t)}:t=1,\ldots,N)$ 为某些确定性函数，随机外生误差 $U=(U_{w(t)},U_{a(t)},U_{y(t)}:t=1,\ldots,N)$ 服从某个概率分布 $P_{u,0}$。令 $\mathcal I\subset\{1,\ldots,N\}$ 是由 $K$ 个时点组成的有限集合，$(A(t):t\in\mathcal I)$ 是相应的干预节点向量。令 $g^*=(g_t^*:t\in\mathcal I)$ 表示这些干预节点上，给定 $A^-(i)$ 时 $A(i)$ 的一组条件分布。令 $\tau_{g^*}\geq\max\{i:i\in\mathcal I\}$ 为不早于最后一个干预节点的时点。我们将 $g^*$ 称为感兴趣的随机干预，关注估计该随机干预对结局 $Y(\tau_{g^*})$ 的因果效应。
+
+为此，通过修改方程组定义反事实随机变量 $O_{g^*}^N$：把 $t\in\mathcal I$ 时的 $A(t)$ 方程，替换为所需随机干预 $g^*$：
+\[
+\begin{aligned}
+ W_{g^*}(t)&=f_{w(t)}(W^-_{g^*}(t),U_{w(t)}),\\
+ A_{g^*}(t)&=f_{a(t)}(A^-_{g^*}(t),U_{a(t)}),\qquad t\notin\mathcal I,\\
+ A_{g^*}(t)&\sim g_t^*(\cdot\mid A^-_{g^*}(t)),\qquad t\in\mathcal I,\\
+ Y_{g^*}(t)&=f_{y(t)}(Y^-_{g^*}(t),U_{y(t)}),\qquad t=1,\ldots,N.
+\end{aligned}
+\]
+这里，$W^-_{g^*}(t)$ 和 $Y^-_{g^*}(t)$ 与 $W^-(t)$ 和 $Y^-(t)$ 是历史的相同函数，但现在应用于新的随机变量 $O_{g^*}^N=(W_{g^*}(t),A_{g^*}(t),Y_{g^*}(t):t=1,\ldots,N)$。反事实 $O_{g^*}^N$ 的概率分布 $P_{g^*}^N$ 称为干预后概率分布：如果实际上将 $(A(t):t\in\mathcal I)$ 按随机干预 $g^*$ 而非观测数据中的实际分布 $g_{a(t)}$ 分配，我们本会观测到这一分布。
+
+\subsection{干预后分布的 g 计算公式}
+
+序贯随机化假设要求，对所有 $t\in\mathcal I_{g^*}$，给定 $A^-(t)$ 后，$A(t)$ 与 $Y_{g^*}(\tau_{g^*})$ 独立。再加上正值性假设，即要求下述 g 计算公式中的条件概率分布定义良好，则 $O_{g^*}^N$ 的这一概率分布等于密度如下的概率分布 $P_{g^*}^N$：
+\[
+\begin{aligned}
+ p_{g^*}^N(o)
+ &=\prod_{t=1}^N q_{w(t)}(w(t)\mid w^-(t))
+ \prod_{t\notin\mathcal I}g_{a(t)}(a(t)\mid a^-(t))\\
+ &\quad\times\prod_{t\in\mathcal I}g_t^*(a(t)\mid a^-(t-1))
+ \prod_{t=1}^N q_{y(t)}(y(t)\mid y^-(t)).
+\end{aligned}
+\]
+这一密度在因果推断中称为 g 计算公式（g-computation formula；Robins，1986）。注意，$p_{g^*}^N$ 可由数据 $O^N$ 的概率分布 $P^N$ 识别。
+
+\subsection{统计估计目标：特定干预下的反事实均值}
+
+识别反事实均值 $EY_{g^*}(\tau_{g^*})$ 的统计目标参数，定义为上述分布 $P_{g^*}^N$ 下 $Y_{g^*}(\tau_{g^*})$ 的期望。形式上，它是映射 $\Psi_{g^*}^N:\mathcal M^N\to\RR^d$：
+\[
+ \Psi_{g^*}^N(P^N)=E_{P_{g^*}}Y_{g^*}(\tau_{g^*}).
+\]
+这里允许 $Y(t)$ 是 $d$ 维向量。该统计目标参数可表示为
+\[
+ \Psi_{g^*}^N(P^N)=\int_{o(1),\ldots,o(\tau)}
+ y(\tau)\,dP_{g^*}^N(o(1),\ldots,o(\tau))
+ \equiv\Psi_{g^*}(\bar q_w,\bar q_y,\bar g).
+\]
+后一记号强调，根据模型假设，$\Psi_{g^*}^N$ 仅通过 $(\bar q_w,\bar q_y,\bar g)$ 依赖于 $P^N$。
+
+\subsection{反事实均值的序贯回归表示}
+
+令
+\[
+ Q_{y(t)}f=\int_{y(t)}f(y(t),y^c(t))\,dQ_{y(t)}(y(t)\mid c_y(t))
+\]
+表示对 $f(O^N)$ 中的 $Y(t)$，相对于给定 $C_y(t)$ 时 $Y(t)$ 的条件密度 $q_{y(t)}$ 求条件期望，而保持 $f$ 所依赖的其他全部变量 $y^c(t)$ 固定。同样，定义
+\[
+\begin{aligned}
+ G_{a(t)}f&=\int_{a(t)}f(a(t),a^c(t))\,dG_{a(t)}(a(t)\mid c_a(t)),\\
+ Q_{w(t)}f&=\int_{w(t)}f(w(t),w^c(t))\,dQ_{w(t)}(w(t)\mid c_w(t)),
+\end{aligned}
+\]
+分别为 $f(O^N)$ 相对于条件密度 $g_{a(t)}$ 和 $q_{w(t)}$ 的条件期望。对随机干预 $g^*$，还定义
+\[
+ G^*_{a(t)}f=\int_{a(t)}f(a(t),a^c(t))\,dG^*_{a(t)}(a(t)\mid C^*_{a(t)}).
+\]
+我们将 $Y(\tau_{g^*})=Y(\tau_{g^*})(O^N)$ 视为把 $O^N$ 映射到 $Y(\tau_{g^*})$ 的函数。注意，
+\[
+ \Psi_{g^*}^N(\bar q_w,\bar q_y,\bar g)
+ =\left(\prod_{t=1}^{\tau}Q_{w(t)}G_{a(t)}^{*I(t\in\mathcal I)}
+ G_{a(t)}^{I(t\notin\mathcal I)}Q_{y(t)}\right)Y(\tau_{g^*}).
+\]
+也就是说，$E_{P^N_{g^*}}Y_{g^*}(\tau)$ 可表示为序贯回归。先对 $Y(\tau)$ 给定 $C_y(\tau)$，即给定已观测历史，求条件期望；随后根据 $\tau$ 是否为干预节点，对 $A^*(\tau)$ 或 $A(\tau)$ 给定已观测历史求条件期望；再对 $W(\tau)$ 给定 $C_w(\tau)$ 求条件期望；然后从时点 $\tau$ 逆向递推至 $t=1$，得到给定 $W(1)$ 的条件期望，最后再对 $W(1)$ 求期望。在时点 $t=1$ 的最后一个条件期望中，我们以起始值 $W^-(0)$、$A^-(0)$、$Y^-(0)$ 为条件。由于每次对 $Y(t)$、$W(t)$ 和 $A(t)$ 求条件期望时，所用分布分别由共同的 $\bar q_y$、$\bar q_w$ 和 $\bar g$ 确定，因而这一序贯回归公式确实只依赖于共同参数 $(\bar q_y,\bar q_w,\bar g)$。
+
+\subsection{一般的目标参数类}
+
+为简化记号，后文常省略 $P^N$、$P_{g^*}^N$ 和 $\Psi_{g^*}^N$ 等量对 $N$ 的依赖。在讨论估计问题之前，先进一步推广这一目标参数类。令 $(\mathcal I_1,\tau_1),\ldots,(\mathcal I_J,\tau_J)$ 表示 $J$ 个干预节点集合及相应结局时点，令 $g_j^*$ 为对 $(A(t):t\in\mathcal I_j)$ 的随机干预，$j=1,\ldots,J$。由此可定义更一般的参数类：
+\[
+ \Psi_J(P)=\frac1J\sum_{j=1}^J E_{P^N_{g_j^*}}Y(\tau_j)
+ =\frac1J\sum_{j=1}^J\Psi_{g_j^*}(P).
+\]
+例如，可以取 $\mathcal I_j=\{j\}$、$\tau_j=j$。此时，该参数等于 $J$ 个反事实均值的平均：对先于结局的处理节点 $A(j)$ 施加单时点干预 $g_j^*$，得到时点 $j$ 的反事实结局 $Y_{g_j^*}(j)$，$j=1,\ldots,J$。还可以令 $J=J(N)=N$，使目标参数对所有处理节点上的这种单时点干预求平均，直至对 $A(N)$ 干预后 $Y(N)$ 的反事实均值。同样，可以取 $\mathcal I_j=\{j,j+1\}$、$\tau_j=j+1$，使参数 $\Psi_J(P)$ 等于 $J$ 个反事实均值的平均：对先于结局的两个处理节点 $A(j)$、$A(j+1)$ 施加两时点干预 $g_j^*$，得到反事实结局 $Y_{g_j^*}(j+1)$，$j=1,\ldots,J$。上文 $\Psi_{g_j^*}(P)$ 的序贯回归表示表明，$\Psi_J(P)$ 是对 $j=1,\ldots,J$ 的各个 $j$ 特定序贯回归表示求平均。
+
+人们常关注相对于基线处理方案的因果效应对比。为此，可以定义
+\[
+ \Psi_J^c(P)=\frac1J\sum_{j=1}^J
+ (\Psi_{g_j^*}-\Psi_{g_{0j}^*})(P),
+\]
+其中，$g_{0j}^*$ 是干预节点 $(A(t):t\in\mathcal I_j)$ 上的基线处理方案。我们聚焦于目标参数 $\Psi_J:\mathcal M^N\to\RR$，因为对比参数是两个此类目标参数之差。对单一 $g^*$ 的 $\Psi_{g^*}$ 所得结果，将自然蕴含 $\Psi_J$ 的相应结果。
+
+\subsection{统计估计问题}
+
+我们的目标是构造 $\bar q_0=(\bar q_{w,0},\bar q_{y,0})$ 的估计量 $\bar q_N^*=(\bar q_{w,N}^*,\bar q_{y,N}^*)$，以及 $\bar g_0$ 的估计量 $\bar g_N^*$，使 $\Psi_J(\bar q_N^*,\bar g_N^*)$ 一致，且满足
+\[
+ \sqrt N(\Psi_J(\bar q_N^*,\bar g_N^*)-\Psi_J(\bar q_0,\bar g_0))
+ \xrightarrow{d}N(0,\Sigma_0),\qquad N\to\infty.
+\]
+我们希望，在全部数据离散这一特殊情形下，这个正态极限分布与极大似然估计量的正态极限分布一致，从而保证所提出的 $\Psi_J(\bar q_0,\bar g_0)$ 估计量渐近有效。正态极限分布还使我们能够给出置信区间，并计算检验原假设的 $p$ 值。特别是，为使计算可扩展，我们希望这些估计量 $\bar q_N^*$、$\bar g_N^*$ 是在线估计量。
+
+要刻画这一有效的正态极限分布，需要计算目标参数映射 $\Psi^J:\mathcal M^N\to\RR^d$ 的典范梯度／有效影响曲线。为得到具体的有效影响曲线和靶向极大似然估计量（targeted maximum likelihood estimator，TMLE），我们考虑 $q_{w(t)}=\bar q_w$、$q_{y(t)}=\bar q_y$、$g_{a(t)}=\bar g$，且这些函数完全不作指定这一重要情形。对于用 $\bar q_w$、$\bar q_y$ 和 $\bar g$ 对 $q_{w(t)}$、$q_{y(t)}$ 和 $g_{a(t)}$ 进行的任何具体参数化，以及任何模型空间 $\mathcal Q_w$、$\mathcal Q_y$、$\mathcal G$，以下各节也可视为一条路线图：计算有效影响曲线，并据此定义相应的一步估计量和靶向极大似然估计量。

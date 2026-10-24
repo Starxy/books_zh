@@ -1,0 +1,196 @@
+% 原书分章 PDF 第 11—16 页：第 8.5 节。
+\section{二值处理对区间删失事件发生时间的因果效应}
+
+设 $O=(W,A,C_m,\Delta_m=I(T\leq C_m):m=1,\ldots,M)$ 为一般的区间删失数据结构，其中 $T$ 为事件发生时间，$C=(C_1,\ldots,C_M)$ 为连续取值的监测时间向量，$W$ 为基线协变量，$A$ 为二值处理。令 $\Delta=(\Delta_1,\ldots,\Delta_M)$。假定各监测时间与 $T$ 均大于 0，且给定 $A,W$ 时，$T$ 与 $C$ 独立。令
+$F(t\mid A,W)=P(T\leq t\mid A,W)$
+为给定 $A,W$ 时 $T$ 的累积分布函数，$G_c(\cdot\mid A,W)$ 与 $g_c(\cdot\mid A,W)$ 分别为给定 $A,W$ 时 $C$ 的条件概率分布与密度。令
+$g(a\mid W)=P(A=a\mid W)$
+为给定 $W$ 时 $A=a$ 的条件概率，$Q_W$ 为 $W$ 的概率分布。令 $Q=(Q_W,F)$，$G=(G_c,g)$。注意，$O$ 的概率分布 $P=P_{Q,G}$ 分别由 $Q$ 和 $G$ 索引。统计模型为
+$\mathcal M=\{P_{Q,G}:Q,G\in\mathcal G\}$：
+对 $Q$ 不作限定，而关于给定 $A,W$ 时 $C$ 的条件分布、以及给定 $W$ 时 $A$ 的条件分布，可能具备由集合 $\mathcal G$ 表示的限制或知识。设
+\[
+ \Psi_a^f(Q)=\int r(t)\bar F_a(t)\,dt,\qquad
+ \bar F_a(t)=E_PP(T>t\mid A=a,W)
+\]
+为感兴趣的完整数据参数。在对 $g_c,g$ 作出某些支撑集条件的假设下，该参数可由 $P$ 识别，因此 $\Psi:\mathcal M\to\mathbb R$ 满足
+$\Psi(P_{Q,G})=\Psi^f(Q)$。
+令 $D^*(Q,G)$ 为 $\Psi$ 在 $P_{Q,G}$ 处的典范梯度。
+
+$P_{Q,G}$ 的密度为
+\[
+ p_{Q,G}(o)=q_W(w)g(a\mid w)g_c(c\mid A,W)F(\mathcal C(o)\mid a,w),
+\]
+其中，$\mathcal C(o)$ 为 $O=o$ 所隐含的 $T$ 的粗化集，且
+$F(\mathcal C(o)\mid a,w)=P(T\in\mathcal C(o)\mid A=a,W=w)$。
+因此，$\mathcal C(o)=(L(o),R(o)]$ 是一个区间，$L(O)$ 为满足 $\Delta_j=0$ 的最大监测时间 $C_j$，$R(O)$ 为满足 $\Delta_j=1$ 的最小监测时间 $C_j$。若 $\Delta_1=1$，定义 $L(O)=0$；若 $\Delta_M=0$，则 $R(O)=\infty$。所以，$O$ 的密度分解为一个 $Q$ 因子与一个 $G$ 因子；模型 $\mathcal M$ 中的有效影响曲线，与 $G=(G_c,g)$ 已知的模型 $\mathcal M(G)=\{P_{Q,G}:Q\}\subset\mathcal M$ 中的有效影响曲线相同。
+
+首先要确定模型 $\mathcal M(G)$ 中的初始梯度 $D(Q,G)$。为此，定义随机变量 $\bar C$ 为以下试验的结果：生成 $C$，再从 $M$ 个监测时间中随机抽取一个，每个被抽中的概率均为 $1/M$。令 $\bar\Delta=I(T\leq\bar C)$。设
+\[
+ \bar g_c(\bar c\mid a,w)=\frac1M\sum_{m=1}^M g_{c,m}(\bar c\mid a,w)
+\]
+为给定 $A=a,W=w$ 时 $\bar C$ 的一元密度，其中 $g_{c,m}(\cdot\mid A,W)$ 为给定 $A,W$ 时 $C_m$ 的条件密度。$\Psi_a^f(Q)$ 的一个初始估计量为 IPCW 估计量
+\[
+ \frac1n\sum_{i=1}^n(1-\bar\Delta_i)r(\bar C_i)
+ \frac{I(A_i=a)}{\bar g_c(\bar C_i\mid A_i,W_i)g(A_i\mid W_i)},
+\]
+它基于简化的现状数据结构
+$(W,A,\bar C,\bar\Delta=I(T\leq\bar C)$。
+该估计量的影响曲线为
+\[
+ \frac{(1-\bar\Delta)r(\bar C)I(A=a)}
+ {\bar g_c(\bar C\mid A,W)g(A\mid W)}-\Psi_a(Q).
+\]
+严格来说，这并不是影响曲线，因为它不只依赖 $O$，还依赖选取 $\bar C$ 时的随机抽取。因此，取给定 $O$ 时这条影响曲线的条件期望，得到初始梯度
+\[
+ D(Q,G)(O)=\frac1M\sum_{m=1}^M(1-\Delta_m)r(C_m)
+ \frac{I(A=a)}{\bar g_c(C_m\mid A,W)g(A\mid W)}-\Psi_a(Q).
+\]
+
+$Q_W$ 的切空间为 $T_{Q_W}(P)=L_0^2(Q_W)$，且
+\[
+ \Pi(D(Q,G)\mid T_{Q_W}(P))
+ =\int r(t)\{\bar F(t\mid a,W)-\bar F_a(t)\}\,dt
+ \equiv D_W^*(Q).
+\]
+因此，还需把 $D(Q,G)$ 投影到参数 $F(\cdot\mid A,W)$ 生成的切空间。用 $L_0^2(F)$ 表示由 $(W,A,T)$ 的函数组成、给定 $W,A$ 时条件均值为零的 Hilbert 空间。在模型 $\mathcal M(G)$ 中，得分算子
+$A_F:L_0^2(F)\to L_0^2(P_{Q,G})$
+将 $dF_{\epsilon,h}(t\mid A,W)=(1+\epsilon h(t\mid A,W))dF(t\mid A,W)$ 的得分 $h\in L_0^2(F)$，映射为 $\{P_{Q_W,F_{\epsilon,h},G}:\epsilon\}$ 的得分，具体为
+\[
+ \begin{aligned}
+ A_F(h)(O)
+ &=E_F\bigl(h(T\mid A,W)\mid A,W,T\in(L(O),R(O)]\bigr)\\
+ &=\frac{\int_{L(O)}^{R(O)}h(t\mid A,W)\,dF(t\mid A,W)}
+ {F(R(O)\mid A,W)-F(L(O)\mid A,W)}.
+ \end{aligned}
+\]
+所以，$F$ 生成的切空间 $T_F(P)$ 为 $\overline R(A_F)$，即这一得分算子
+$A_F:L_0^2(F)\to L_0^2(P_{Q,G})$
+值域的闭包。令
+$Fh=E(h\mid A,W)=\int h(t\mid A,W)\,dF(t\mid A,W)$，
+并用某个 $h\in L^2(F)$ 的 $h-Fh$ 来表示 $L_0^2(F)$ 中的函数。
+
+有效影响曲线 $D^*(P)=D^*(Q,G)$，等于 $D(Q,G)$ 在 $T_{Q_W}(P)$ 上的投影 $D_W^*(P)$，加上 $D(P)$ 在 $\overline R(A_F)$ 上的投影 $D_T^*(P)$。因此，它是正交和
+$D^*(Q,G)=D_W^*(Q)+D_T^*(Q,G)$。
+由于 $\overline R(A_F)$ 嵌入于给定 $A,W$ 时条件均值为零的 $O$ 的函数空间，$D_T^*(P)$ 也是
+$D_1(P)\equiv D(P)-E(D(P)\mid A,W)$
+在 $\overline R(A_F)$ 上的投影。也将 $D_1(P)$ 记为 $D_1(Q,G)$。有 $D_T^*(Q,G)=A_F(h^*)$，其中
+\[
+ h^*(P)=\argmin_{h\in L^2(F)}P\{D_1(Q,G)-A_F(h)+Fh\}^2.
+\]
+回顾，对于函数 $h(O)$，$Fh=E(h\mid A,W)$ 依赖于 $A,W$。可以在 $T$ 的所有函数中，最小化给定 $(A,W)$ 时平方误差损失的条件期望，从而得到这一最小值。这定义了最优函数 $T\mapsto h^*(T\mid A,W)$。对 $(A,W)$ 的所有可能取值分别这样处理，就得到完整解
+$(T,A,W)\mapsto h^*(P)(T\mid A,W)$。
+将这一特定于 $(A,W)$ 的极小化问题的最优函数 $T\mapsto h(T)$ 记为 $h^*(P\mid A,W)$，注意
+$h^*(P)(T\mid A,W)=h^*(P\mid A,W)$：
+\[
+ h^*(P\mid A,W)=\argmin_{h\in L^2(F_T)}
+ E_P\bigl(\{D_1(Q,G)-A_F(h)+Fh\}^2\mid A,W\bigr).
+\]
+这里，将 $L^2(F_T)$ 定义为只依赖 $T=(T_1,T_2)$ 的函数 $T\mapsto h(T)$ 的空间。注意，对于给定 $A,W$，现在把
+$A_F:L^2(F_T)\to L^2(P_{Q,G\mid A,W})$
+视为从 $L^2(F_T)$（$T$ 的函数）到 $(\widetilde T,\Delta)$ 的函数空间的线性算子。
+
+可以表示
+$h(t)=h(0)+\int I(t\geq x)\,dh(x)=h(0)+\int\phi_x(t)\,dh(x)$，
+其中 $\phi_x(t)=I(t\geq x)$。由此，
+$Fh=h(0)+\int\bar F(x\mid A,W)\,dh(x)$。
+把这一 $h\in L^2(F_T)$ 的表示代入上述 $h^*$ 的定义，得到
+\[
+ \begin{aligned}
+ h^*&=\argmin_h E_P\left(
+ \left\{D_1(Q,G)-\int A_F(\phi_x)\,dh(x)
+ +\int\bar F(x\mid A,W)\,dh(x)\right\}^2
+ \,\middle|\,A,W\right)\\
+ &=\argmin_h E_P\left(
+ \left\{D_1(Q,G)-\int
+ \{\bar F(x\mid\cdot)-\bar F(x\mid A,W)\}\,dh(x)\right\}^2
+ \,\middle|\,A,W\right),
+ \end{aligned}
+\]
+其中 $\bar F(x\mid O)=P(T>x\mid T\in(L(O),R(O)],A,W)$。
+
+设 $(C_1,\Delta_1),\ldots,(C_n,\Delta_n)\sim_{\mathrm{iid}}P_{Q,G\mid A,W}$，
+为来自给定 $A,W$ 时 $O$ 的条件分布 $P_{Q,G\mid A,W}$ 的样本。用
+$O_i=(C_i,\Delta_i,A,W)$，$i=1,\ldots,n$，
+表示得到的 $n$ 个观测。可以用下式估计 $h^*(P\mid A,W)$：
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \left\{D_1(Q,G)(O_i)-\int
+ \{\bar F(x\mid O_i)-\bar F(x\mid A_i,W_i)\}\,dh(x)\right\}^2.
+\]
+令 $\{x_1,\ldots,x_J\}$ 为在 $n$ 个粗化区间
+$(L(O_i),R(O_i)]$（$i=1,\ldots,n$）中，作为 $L(O_i)$ 或 $R(O_i)$ 出现的监测时间的集合。注意，$J=J(n)$ 至多为 $2n$；若有粗化区间以 0 为左端点，或以 $\infty$ 为右端点，则会略小于 $2n$。我们认为，对所有 $M$，最小值 $h_{n,M}^*\in L^2(F_T)$ 都可由只在 $\{x_1,\ldots,x_J\}$ 上放置质量的离散测度 $dh$ 达到：
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \left\{D_1(Q,G)(O_i)-\sum_{j=1}^J
+ \{\bar F(x_j\mid O_i)-\bar F(x_j\mid A,W)\}\,dh(x_j)\right\}^2.
+\]
+令 $\beta_j=dh(x_j)$，$\|\beta\|_1=\sum_{j=1}^n|\beta_j|$，并定义
+\[
+ \beta_{n,M}(A,W)=\argmin_{\beta,\|\beta\|_1<M}\frac1n\sum_{i=1}^n
+ \left\{D_1(Q,G)(O_i)-\sum_{j=1}^J
+ \beta_j\{\bar F(x_j\mid O_i)-\bar F(x_j\mid A,W)\}\right\}^2.
+\]
+这是一个标准的 Lasso 最小二乘线性回归估计量，$L_1$ 约束设为 $M$，结局为 $D_1(Q,G)(O_i)$，$J$ 个主项为
+$\bar F(x_j\mid O_i)-\bar F(x_j)$，$j=1,\ldots,J$。
+设 $M_n$ 为交叉验证选择器，并定义 $\beta_n(A,W)=\beta_{n,M_n}(A,W)$。那么，有效影响曲线
+$(C,\Delta)\mapsto D_T^*(Q,G)(C,\Delta,A,W)$
+的估计量为
+\[
+ D_{T,n}^*(Q,G)(C,\Delta,A,W)
+ =\sum_{j=1}^J\beta_{n,j}(A,W)
+ \{\bar F(x_j\mid C,\Delta,A,W)-\bar F(x_j\mid A,W)\}.
+\]
+根据定理 8.1，对于每个 $A,W$，该估计量在 $L^2(P_{Q,G\mid A,W})$ 范数下，以快于 $n^{-1/4}$ 的速率收敛到
+\[
+ (C,\Delta)\mapsto D_T^*(Q,G)(C,\Delta,A,W).
+\]
+
+因此，对于给定 $A,W$，上述方法通过拟合一个具有约 $n$ 个协变量的 Lasso 线性最小二乘回归，即可估计函数
+$(C,\Delta)\mapsto D^*(P)(C,\Delta,A,W)$。
+在计算一步估计量（one-step estimator）、靶向最小损失估计量（targeted minimum loss-based estimator，TMLE），或此类有效估计量基于影响曲线的方差估计量时，通常只需知道实际观测 $O_i\sim P_0$ 处的有效影响曲线。因此，对每个观测 $i$，都需要运行上述过程，估计这一 $O_i$ 处的有效影响曲线 $D^*(P)$。许多 TMLE 需要把整个得分
+$(C,\Delta)\mapsto D_T^*(P)(C,\Delta,A,W)$
+作为函数求值。幸运的是，上述过程无需额外工作就能同时给出它。
+
+\paragraph{无条件极大化方法。}
+由上文，$D_T^*(Q,G)=A_F(h^*)$，其中
+\[
+ h^*(P)=\argmin_{h\in L^2(F)}P\{D_1(Q,G)-A_F(h)+Fh\}^2.
+\]
+上文采用的方法，是对每个 $A,W$ 分别最小化给定 $A,W$ 时的条件期望。这里则改为直接最小化。设 $d$ 为 $(W,A,T)$ 的维数。考虑表示
+\[
+ h(x)=\sum_{S\subset\{1,\ldots,d\}}\int\phi_{x_S}(u_S)\,dh_S(u_S).
+\]
+令
+$H(u_S,A,W)=E(\phi_{(W,A,T)_S}(u_S)\mid W,A)$，
+即给定 $W,A$ 时 $(W,A,T)_S>u_S$ 的条件概率。利用这一表示，
+$Fh=h(0)+\sum_S\int H(u_S,A,W)\,dh(u)$。
+将这一 $h\in L^2(F)$ 的表示代入上述 $h^*$ 的定义，得到
+\[
+ h^*=\argmin_h P\left\{D_1(Q,G)-\sum_S\int
+ \{E(\phi_{(T,A,W)_S}(u_S)\mid O)-H(u_S,A,W)\}\,dh_S(u_S)
+ \right\}^2.
+\]
+设 $O_i=(C_i,\Delta_i,A,W)$，$i=1,\ldots,n$，
+为来自 $P_{Q,G}$ 的独立同分布样本。可以用 $h_{n,M}^*$ 估计 $h^*(P\mid A,W)$；它定义为在 $\|h\|_v<M$ 的所有 $h$ 上，最小化
+\[
+ \frac1n\sum_{i=1}^n\left\{D_1(Q,G)(O_i)-\sum_S\int
+ \{E(\phi_{(T_i,A_i,W_i)_S}(u_S)\mid O_i)-H(u_S,A_i,W_i)\}
+ \,dh_S(u_S)\right\}^2
+\]
+所得的函数。假定 $h_{n,M}^*$ 为离散测度，使对每个 $S\subset\{1,\ldots,d\}$，
+$dh_{n,M,S}^*$ 只在 $u_{S,j}$（$j=1,\ldots,J_S$）上放置正质量，例如对应于上一节中的 $2n$ 个支撑点。令
+\[
+ X(S,j)(O_i)\equiv
+ E(\phi_{(T_i,A_i,W_i)_S}(u_{S,j})\mid O_i)-H(u_{S,j},A_i,W_i),
+\]
+并令 $\beta_{S,j}=dh_S(u_{S,j})$。与一般表述相同，得到
+$A_F(h_{n,M_n})=\sum_S\sum_j\beta_{n,S,j}^*X(S,j)(O)$，
+其中 $\beta_n=\beta_{n,M_n}$，
+\[
+ \beta_{n,M}=\argmin_{\beta,\|\beta\|_1<M}\frac1n\sum_{i=1}^n
+ \left\{D_1(Q,G)(O_i)-\sum_S\sum_{j=1}
+ X(S,j)(O_i)\beta_{S,j}\right\}^2,
+\]
+且 $M_n$ 为交叉验证选择器。
+
+当 $W$ 的维数较大时，上述方法的计算将难以处理。如 van der Laan 等（2015）所示，往往可以对 $O$ 以及相应模型与目标参数作降维，使 $P$ 处的有效影响曲线仍与原来表述下相同。在这种情况下，上述方法仍然可行。

@@ -1,0 +1,17 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.2cm,y=1.0cm,every node/.style={circle,draw=inkblue,fill=white,minimum size=.7cm,inner sep=1pt}]
+\node (chSevenBf61) at (0,3) {1};
+\node (chSevenBf62) at (-1.5,2.1) {2};
+\node (chSevenBf64) at (1.5,2.1) {4};
+\node (chSevenBf63) at (0,1.1) {3};
+\node (chSevenBf65) at (0,-.5) {5};
+\draw[->] (chSevenBf61)--(chSevenBf62);
+\draw[->] (chSevenBf61)--(chSevenBf63);
+\draw[->] (chSevenBf61)--(chSevenBf64);
+\draw[->] (chSevenBf62)--(chSevenBf63);
+\draw[->] (chSevenBf64)--(chSevenBf63);
+\draw[->] (chSevenBf63)--(chSevenBf65);
+\end{tikzpicture}
+\origfig{6}{马尔可夫条件示意图。}
+\end{figure}

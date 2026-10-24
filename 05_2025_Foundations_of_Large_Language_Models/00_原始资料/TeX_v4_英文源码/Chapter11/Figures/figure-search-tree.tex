@@ -1,0 +1,168 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.6cm}
+
+\tikzstyle{lnode} = [minimum width=1.4cm,minimum height=0.6cm,inner sep=0pt,draw,fill=white,rounded corners=0pt];
+\tikzstyle{snode} = [minimum width=0.4cm,minimum height=0.2cm,inner sep=0pt,draw,fill=white];
+
+\begin{scope}
+
+% layer 0
+\node [lnode,anchor=west,draw=blue] (node0) at (0,0) {\color{blue} \scriptsize{root}};
+
+\node [snode,anchor=center,draw=blue] (label0) at ([xshift=0.16cm,yshift=-0.04cm]node0.north west) {\color{blue} \tiny{$0$}};
+
+% layer 1
+\node [lnode,anchor=west,draw=blue] (node13) at ([xshift=\ssep]node0.east) {\color{blue} \scriptsize{cats}};
+\node [lnode,anchor=south west] (node12) at ([yshift=0.3cm]node13.north west) {\scriptsize{.}};
+\node [lnode,anchor=south west] (node11) at ([yshift=0.3cm]node12.north west) {\scriptsize{playful}};
+\node [lnode,anchor=north west] (node14) at ([yshift=-0.3cm]node13.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node15) at ([yshift=-0.3cm]node14.south west) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label11) at ([xshift=0.16cm,yshift=-0.04cm]node11.north west) {\tiny{$1$}};
+\node [snode,anchor=center] (label12) at ([xshift=0.16cm,yshift=-0.04cm]node12.north west) {\tiny{$2$}};
+\node [snode,anchor=center,draw=blue] (label13) at ([xshift=0.16cm,yshift=-0.04cm]node13.north west) {\color{blue} \tiny{$3$}};
+\node [snode,anchor=center] (label14) at ([xshift=0.16cm,yshift=-0.04cm]node14.north west) {\tiny{$4$}};
+\node [snode,anchor=center] (label15) at ([xshift=0.16cm,yshift=-0.04cm]node15.north west) {\tiny{$5$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node0.east) -- ([xshift=-2pt]node11.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node0.east) -- ([xshift=-2pt]node12.west);
+\draw [->,blue] ([xshift=2pt,yshift=0pt]node0.east) -- ([xshift=-2pt]node13.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node0.east) -- ([xshift=-2pt]node14.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node0.east) -- ([xshift=-2pt]node15.west);
+
+% layer 2
+\node [lnode,anchor=west] (node23) at ([xshift=\ssep]node13.east) {\scriptsize{cats}};
+\node [lnode,anchor=south west] (node22) at ([yshift=0.3cm]node23.north west) {\scriptsize{.}};
+\node [lnode,anchor=south west] (node21) at ([yshift=0.3cm]node22.north west) {\scriptsize{playful}};
+\node [lnode,anchor=north west,draw=blue] (node24) at ([yshift=-0.3cm]node23.south west) {\color{blue} \scriptsize{are}};
+\node [lnode,anchor=north west] (node25) at ([yshift=-0.3cm]node24.south west) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label21) at ([xshift=0.16cm,yshift=-0.04cm]node21.north west) {\tiny{$6$}};
+\node [snode,anchor=center] (label22) at ([xshift=0.16cm,yshift=-0.04cm]node22.north west) {\tiny{$7$}};
+\node [snode,anchor=center] (label23) at ([xshift=0.16cm,yshift=-0.04cm]node23.north west) {\tiny{$8$}};
+\node [snode,anchor=center,draw=blue] (label24) at ([xshift=0.16cm,yshift=-0.04cm]node24.north west) {\color{blue} \tiny{$9$}};
+\node [snode,anchor=center] (label25) at ([xshift=0.16cm,yshift=-0.04cm]node25.north west) {\tiny{$10$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node13.east) -- ([xshift=-2pt]node21.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node13.east) -- ([xshift=-2pt]node22.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node13.east) -- ([xshift=-2pt]node23.west);
+\draw [->,blue] ([xshift=2pt,yshift=-2pt]node13.east) -- ([xshift=-2pt]node24.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node13.east) -- ([xshift=-2pt]node25.west);
+
+\draw [->] ([yshift=2pt]node11.east) -- ([yshift=0.2cm,xshift=0.2cm]node11.east);
+\draw [->] ([yshift=0pt]node11.east) -- ([yshift=0.0cm,xshift=0.2cm]node11.east);
+\draw [->] ([yshift=-2pt]node11.east) -- ([yshift=-0.2cm,xshift=0.2cm]node11.east);
+
+\draw [->] ([yshift=2pt]node12.east) -- ([yshift=0.2cm,xshift=0.2cm]node12.east);
+\draw [->] ([yshift=0pt]node12.east) -- ([yshift=0.0cm,xshift=0.2cm]node12.east);
+\draw [->] ([yshift=-2pt]node12.east) -- ([yshift=-0.2cm,xshift=0.2cm]node12.east);
+
+\draw [->] ([yshift=2pt]node14.east) -- ([yshift=0.2cm,xshift=0.2cm]node14.east);
+\draw [->] ([yshift=0pt]node14.east) -- ([yshift=0.0cm,xshift=0.2cm]node14.east);
+\draw [->] ([yshift=-2pt]node14.east) -- ([yshift=-0.2cm,xshift=0.2cm]node14.east);
+
+\draw [->] ([yshift=2pt]node15.east) -- ([yshift=0.2cm,xshift=0.2cm]node15.east);
+\draw [->] ([yshift=0pt]node15.east) -- ([yshift=0.0cm,xshift=0.2cm]node15.east);
+\draw [->] ([yshift=-2pt]node15.east) -- ([yshift=-0.2cm,xshift=0.2cm]node15.east);
+
+% layer 3
+\node [lnode,anchor=west] (node33) at ([xshift=\ssep]node24.east) {\scriptsize{cats}};
+\node [lnode,anchor=south west] (node32) at ([yshift=0.3cm]node33.north west) {\scriptsize{.}};
+\node [lnode,anchor=south west,draw=blue] (node31) at ([yshift=0.3cm]node32.north west) {\color{blue} \scriptsize{playful}};
+\node [lnode,anchor=north west] (node34) at ([yshift=-0.3cm]node33.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node35) at ([yshift=-0.3cm]node34.south west) {\scriptsize{is}};
+
+\node [snode,anchor=center,draw=blue] (label31) at ([xshift=0.16cm,yshift=-0.04cm]node31.north west) {\color{blue} \tiny{$11$}};
+\node [snode,anchor=center] (label32) at ([xshift=0.16cm,yshift=-0.04cm]node32.north west) {\tiny{$12$}};
+\node [snode,anchor=center] (label33) at ([xshift=0.16cm,yshift=-0.04cm]node33.north west) {\tiny{$13$}};
+\node [snode,anchor=center] (label34) at ([xshift=0.16cm,yshift=-0.04cm]node34.north west) {\tiny{$14$}};
+\node [snode,anchor=center] (label35) at ([xshift=0.16cm,yshift=-0.04cm]node35.north west) {\tiny{$15$}};
+
+\draw [->,blue] ([xshift=2pt,yshift=4pt]node24.east) -- ([xshift=-2pt]node31.west);
+\draw [->] ([xshift=2pt,yshift=2pt]node24.east) -- ([xshift=-2pt]node32.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node24.east) -- ([xshift=-2pt]node33.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node24.east) -- ([xshift=-2pt]node34.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node24.east) -- ([xshift=-2pt]node35.west);
+
+\draw [->] ([yshift=2pt]node21.east) -- ([yshift=0.2cm,xshift=0.2cm]node21.east);
+\draw [->] ([yshift=0pt]node21.east) -- ([yshift=0.0cm,xshift=0.2cm]node21.east);
+\draw [->] ([yshift=-2pt]node21.east) -- ([yshift=-0.2cm,xshift=0.2cm]node21.east);
+
+\draw [->] ([yshift=2pt]node22.east) -- ([yshift=0.2cm,xshift=0.2cm]node22.east);
+\draw [->] ([yshift=0pt]node22.east) -- ([yshift=0.0cm,xshift=0.2cm]node22.east);
+\draw [->] ([yshift=-2pt]node22.east) -- ([yshift=-0.2cm,xshift=0.2cm]node22.east);
+
+\draw [->] ([yshift=2pt]node23.east) -- ([yshift=0.2cm,xshift=0.2cm]node23.east);
+\draw [->] ([yshift=0pt]node23.east) -- ([yshift=0.0cm,xshift=0.2cm]node23.east);
+\draw [->] ([yshift=-2pt]node23.east) -- ([yshift=-0.2cm,xshift=0.2cm]node23.east);
+
+\draw [->] ([yshift=2pt]node25.east) -- ([yshift=0.2cm,xshift=0.2cm]node25.east);
+\draw [->] ([yshift=0pt]node25.east) -- ([yshift=0.0cm,xshift=0.2cm]node25.east);
+\draw [->] ([yshift=-2pt]node25.east) -- ([yshift=-0.2cm,xshift=0.2cm]node25.east);
+
+% layer 4
+\node [lnode,anchor=west] (node43) at ([xshift=\ssep]node31.east) {\scriptsize{cats}};
+\node [lnode,anchor=south west,draw=blue] (node42) at ([yshift=0.3cm]node43.north west) {\color{blue} \scriptsize{.}};
+\node [lnode,anchor=south west] (node41) at ([yshift=0.3cm]node42.north west) {\scriptsize{playful}};
+\node [lnode,anchor=north west] (node44) at ([yshift=-0.3cm]node43.south west) {\scriptsize{are}};
+\node [lnode,anchor=north west] (node45) at ([yshift=-0.3cm]node44.south west) {\scriptsize{is}};
+
+\node [snode,anchor=center] (label41) at ([xshift=0.16cm,yshift=-0.04cm]node41.north west) {\tiny{$16$}};
+\node [snode,anchor=center,draw=blue] (label42) at ([xshift=0.16cm,yshift=-0.04cm]node42.north west) {\color{blue} \tiny{$17$}};
+\node [snode,anchor=center] (label43) at ([xshift=0.16cm,yshift=-0.04cm]node43.north west) {\tiny{$18$}};
+\node [snode,anchor=center] (label44) at ([xshift=0.16cm,yshift=-0.04cm]node44.north west) {\tiny{$19$}};
+\node [snode,anchor=center] (label45) at ([xshift=0.16cm,yshift=-0.04cm]node45.north west) {\tiny{$20$}};
+
+\draw [->] ([xshift=2pt,yshift=4pt]node31.east) -- ([xshift=-2pt]node41.west);
+\draw [->,blue] ([xshift=2pt,yshift=2pt]node31.east) -- ([xshift=-2pt]node42.west);
+\draw [->] ([xshift=2pt,yshift=0pt]node31.east) -- ([xshift=-2pt]node43.west);
+\draw [->] ([xshift=2pt,yshift=-2pt]node31.east) -- ([xshift=-2pt]node44.west);
+\draw [->] ([xshift=2pt,yshift=-4pt]node31.east) -- ([xshift=-2pt]node45.west);
+
+\draw [->] ([yshift=2pt]node32.east) -- ([yshift=0.2cm,xshift=0.2cm]node32.east);
+\draw [->] ([yshift=0pt]node32.east) -- ([yshift=0.0cm,xshift=0.2cm]node32.east);
+\draw [->] ([yshift=-2pt]node32.east) -- ([yshift=-0.2cm,xshift=0.2cm]node32.east);
+
+\draw [->] ([yshift=2pt]node33.east) -- ([yshift=0.2cm,xshift=0.2cm]node33.east);
+\draw [->] ([yshift=0pt]node33.east) -- ([yshift=0.0cm,xshift=0.2cm]node33.east);
+\draw [->] ([yshift=-2pt]node33.east) -- ([yshift=-0.2cm,xshift=0.2cm]node33.east);
+
+\draw [->] ([yshift=2pt]node34.east) -- ([yshift=0.2cm,xshift=0.2cm]node34.east);
+\draw [->] ([yshift=0pt]node34.east) -- ([yshift=0.0cm,xshift=0.2cm]node34.east);
+\draw [->] ([yshift=-2pt]node34.east) -- ([yshift=-0.2cm,xshift=0.2cm]node34.east);
+
+\draw [->] ([yshift=2pt]node35.east) -- ([yshift=0.2cm,xshift=0.2cm]node35.east);
+\draw [->] ([yshift=0pt]node35.east) -- ([yshift=0.0cm,xshift=0.2cm]node35.east);
+\draw [->] ([yshift=-2pt]node35.east) -- ([yshift=-0.2cm,xshift=0.2cm]node35.east);
+
+\draw [->] ([yshift=2pt]node41.east) -- ([yshift=0.2cm,xshift=0.2cm]node41.east);
+\draw [->] ([yshift=0pt]node41.east) -- ([yshift=0.0cm,xshift=0.2cm]node41.east);
+\draw [->] ([yshift=-2pt]node41.east) -- ([yshift=-0.2cm,xshift=0.2cm]node41.east);
+
+\draw [->] ([yshift=2pt]node42.east) -- ([yshift=0.2cm,xshift=0.2cm]node42.east);
+\draw [->] ([yshift=0pt]node42.east) -- ([yshift=0.0cm,xshift=0.2cm]node42.east);
+\draw [->] ([yshift=-2pt]node42.east) -- ([yshift=-0.2cm,xshift=0.2cm]node42.east);
+
+\draw [->] ([yshift=2pt]node43.east) -- ([yshift=0.2cm,xshift=0.2cm]node43.east);
+\draw [->] ([yshift=0pt]node43.east) -- ([yshift=0.0cm,xshift=0.2cm]node43.east);
+\draw [->] ([yshift=-2pt]node43.east) -- ([yshift=-0.2cm,xshift=0.2cm]node43.east);
+
+\draw [->] ([yshift=2pt]node44.east) -- ([yshift=0.2cm,xshift=0.2cm]node44.east);
+\draw [->] ([yshift=0pt]node44.east) -- ([yshift=0.0cm,xshift=0.2cm]node44.east);
+\draw [->] ([yshift=-2pt]node44.east) -- ([yshift=-0.2cm,xshift=0.2cm]node44.east);
+
+\draw [->] ([yshift=2pt]node45.east) -- ([yshift=0.2cm,xshift=0.2cm]node45.east);
+\draw [->] ([yshift=0pt]node45.east) -- ([yshift=0.0cm,xshift=0.2cm]node45.east);
+\draw [->] ([yshift=-2pt]node45.east) -- ([yshift=-0.2cm,xshift=0.2cm]node45.east);
+
+\node [anchor=south west,align=left] (pathdescription) at ([yshift=1cm,xshift=-0.15cm]node11.north west) {\small{Path: node $0$ $\to$ node $3$ $\to$ node $9$ $\to$ node $11$ $\to$ node $17$}\\[-2pt] \small{Output: cats are playful.}\\[2pt] \small{Probability:}\\[-2pt] \small{$\text{node}\ 0 \to 0$} \\[-2pt] \small{$\text{node}\ 3 \to \log \Pr(\text{"cats"}|\mathbf{x})$}\\[-2pt] \small{$\text{node}\ 9 \to \log \Pr(\text{"are"}|\mathbf{x},\text{"cats"})$}\\[-2pt] \small{$\text{node}\ 11 \to \log \Pr(\text{"playful"}|\mathbf{x},\text{"cats are"})$}\\[-2pt] \small{$\text{node}\ 17 \to \log \Pr(\text{"."}|\mathbf{x},\text{"cats are playful"})$}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,145 @@
+\chapter{概率论与统计学补充}
+\label{app:probability}
+\section{基本定义}
+\begin{enumerate}[label=(\roman*),leftmargin=2.7em]
+\item 底层概率空间记为 $(\Omega,\mathcal F,P)$。其中，$\Omega$、$\mathcal F$ 和 $P$ 分别为集合、$\sigma$-代数和概率测度。
+\item 实值随机变量用大写字母表示。例如，$X\colon(\Omega,\mathcal F)\to(\mathbb R,\mathcal B_{\mathbb R})$ 是关于 Borel $\sigma$-代数的可测函数。随机向量是可测函数 $\mathbf X\colon(\Omega,\mathcal F)\to(\mathbb R^d,\mathcal B_{\mathbb R^d})$。如果不存在 $\mathbf c\in\mathbb R^d$ 使得 $P(\mathbf X=\mathbf c)=1$，则称 $\mathbf X$ 是非退化的（non-degenerate）。关于测度论的介绍，可参见 Dudley [2002] 等文献。
+\item 向量通常用粗体字母表示。略微滥用记号，我们也将变量集合 $\mathbf B\subseteq\mathbf X$ 视为单个多元变量。
+\item $P_{\mathbf X}$ 表示 $d$ 维随机向量 $\mathbf X$ 的分布，即 $(\mathbb R^d,\mathcal B_{\mathbb R^d})$ 上的概率测度。
+\item 密度记为 $\mathbf x\mapsto p_{\mathbf X}(\mathbf x)$，或简记为 $\mathbf x\mapsto p(\mathbf x)$。这里的密度是 $P_{\mathbf X}$ 关于某个乘积测度的 Radon--Nikodym 导数。我们有时会隐含地假定密度存在或连续。
+\item 如果对所有 $x,y$ 均有
+\begin{equation}p(x,y)=p(x)p(y),\tag{A.1}\end{equation}
+则称 $X$ 与 $Y$ 独立，记为 $X\indep Y$；反之，称二者相依，记为 $X\nindep Y$。
+\item 如果对所有 $x_1,\ldots,x_d$ 均有
+\begin{equation}p(x_1,\ldots,x_d)=p(x_1)\cdot\ldots\cdot p(x_d),\tag{A.2}\end{equation}
+则称 $X_1,\ldots,X_d$ 相互独立（jointly independent，也称 mutually independent）。若 $X_1,\ldots,X_d$ 相互独立，则任意两个不同的变量 $X_i$ 和 $X_j$ 也独立。反过来一般不成立：两两独立并不意味着相互独立。
+\item 如果对所有满足 $p(z)>0$ 的 $x,y,z$ 均有
+\begin{equation}p(x,y\mid z)=p(x\mid z)p(y\mid z),\tag{A.3}\end{equation}
+则称给定 $Z$ 时 $X$ 与 $Y$ 条件独立，记为 $X\indep Y\mid Z$；反之，称二者给定 $Z$ 时条件相依，记为 $X\nindep Y\mid Z$。
+\item 条件独立关系满足以下重要规则［例如 Pearl, 2009，第 1.1.5 节］：
+\begin{align*}
+X\indep Y\mid Z&\Rightarrow Y\indep X\mid Z &&\text{（对称性）},\\
+X\indep Y,W\mid Z&\Rightarrow X\indep Y\mid Z &&\text{（分解性）},\\
+X\indep Y,W\mid Z&\Rightarrow X\indep Y\mid W,Z &&\text{（弱联合性）},\\
+\left. \begin{aligned}X\indep Y\mid Z\\X\indep W\mid Y,Z\end{aligned}\right\}
+&\Rightarrow X\indep Y,W\mid Z &&\text{（收缩性）},\\
+\left. \begin{aligned}X\indep Y\mid W,Z\\X\indep W\mid Y,Z\end{aligned}\right\}
+&\Rightarrow X\indep Y,W\mid Z &&\text{（交性）}.
+\end{align*}
+严格正的密度存在，是交性成立的充分条件。离散情形的充要条件见 Drton et al. [2009b，习题 6.6] 和 Fink [2011]；连续情形见 Peters [2014]。
+\item 若 $\mathbb E[X^2]<\infty$，则随机变量 $X$ 的方差定义为
+\[\mathrm{var}[X]:=\mathbb E\big[(X-\mathbb E[X])^2\big]
+=\mathbb E[X^2]-\mathbb E[X]^2.\]
+\item 如果 $\mathbb E[X^2],\mathbb E[Y^2]<\infty$，并且
+\[\mathbb E[XY]=\mathbb E[X]\mathbb E[Y],\]
+即
+\[\rho_{X,Y}:=\frac{\mathbb E[XY]-\mathbb E[X]\mathbb E[Y]}
+{\sqrt{\mathrm{var}[X]\mathrm{var}[Y]}}=0,\]
+则称 $X$ 与 $Y$ 不相关。否则，即当 $\rho_{X,Y}\ne0$ 时，称二者相关。$\rho_{X,Y}$ 称为 $X$ 与 $Y$ 的相关系数（correlation coefficient）。
+\item 若 $X$ 与 $Y$ 独立，则二者不相关：
+\[X\indep Y\Rightarrow\rho_{X,Y}=0.\]
+反向推论未必成立，见代码片段 A.1。只有在二元高斯分布或二元取值变量等特殊情形下，反向推论才成立。
+\item 如果
+\[\rho_{X,Y\mid Z}:=\frac{\rho_{X,Y}-\rho_{X,Z}\rho_{Z,Y}}
+{\sqrt{(1-\rho_{X,Z}^2)(1-\rho_{Z,Y}^2)}}=0,\]
+则称给定 $Z$ 时 $X$ 与 $Y$ 偏不相关。偏相关（partial correlation）有一个重要解释：$\rho_{X,Y\mid Z}$ 等于将 $X$ 对 $Z$、$Y$ 对 $Z$ 分别作线性回归后，两组残差之间的相关系数。
+\item 一般而言，以下两个推论均不成立，见例 7.9：
+\[\rho_{X,Y\mid Z}=0\not\Longrightarrow X\indep Y\mid Z,\]
+以及
+\[\rho_{X,Y\mid Z}=0\not\Longleftarrow X\indep Y\mid Z.\]
+\item 在回归估计（regression estimation）中，通常给定从联合分布 $P_{\mathbf X,Y}$ 抽取的独立同分布样本 $(\mathbf X_1,Y_1),\ldots,(\mathbf X_n,Y_n)$，目标是根据协变量或预测变量 $\mathbf X$ 预测目标变量 $Y$。例如，在最小二乘回归中，我们寻找函数 $\widehat f$，使得
+\[\widehat f=\underset{f\in\mathcal F}{\arg\min}\sum_{i=1}^n\big(Y_i-f(\mathbf X_i)\big)^2.\]
+这里的优化是在函数类 $\mathcal F$ 上进行的，见第 A.3 节。不同回归技术采用不同的函数类。在线性回归中，只考虑线性函数 $f$；示例见代码片段 6.43。非线性回归技术的示例见代码片段 4.14。
+\item 离散随机变量集 $\mathbf X$ 与 $\mathbf Y$ 之间的相依程度，可以用 Shannon 互信息（Shannon mutual information）衡量 [Cover and Thomas, 1991]：
+\[I(\mathbf X:\mathbf Y):=\sum_{\mathbf x,\mathbf y}p(\mathbf x,\mathbf y)
+\log\frac{p(\mathbf x,\mathbf y)}{p(\mathbf x)p(\mathbf y)}.\]
+\item 给定变量集 $\mathbf Z$ 时，离散随机变量集 $\mathbf X$ 与 $\mathbf Y$ 的条件相依程度，用条件 Shannon 互信息衡量 [Cover and Thomas, 1991]：
+\[I(\mathbf X:\mathbf Y\mid\mathbf Z):=\sum_{\mathbf x,\mathbf y,\mathbf z}p(\mathbf x,\mathbf y,\mathbf z)
+\log\frac{p(\mathbf x,\mathbf y\mid\mathbf z)}{p(\mathbf x\mid\mathbf z)p(\mathbf y\mid\mathbf z)}.\]
+\item 对连续变量，将求和替换为积分：
+\[I(\mathbf X:\mathbf Y):=\int p(\mathbf x,\mathbf y)
+\log\frac{p(\mathbf x,\mathbf y)}{p(\mathbf x)p(\mathbf y)}\,\mathrm d\mathbf x\,\mathrm d\mathbf y,\]
+以及
+\[I(\mathbf X:\mathbf Y\mid\mathbf Z):=\int p(\mathbf x,\mathbf y,\mathbf z)
+\log\frac{p(\mathbf x,\mathbf y\mid\mathbf z)}{p(\mathbf x\mid\mathbf z)p(\mathbf y\mid\mathbf z)}
+\,\mathrm d\mathbf x\,\mathrm d\mathbf y\,\mathrm d\mathbf z.\]
+\end{enumerate}
+
+\section{独立性与条件独立性检验}
+实际中，我们得到的是有限样本 $(X_1,Y_1),\ldots,(X_n,Y_n)\overset{\mathrm{iid}}{\sim}P_{X,Y}$，并希望判断背后的随机变量是否独立。经验相关系数或其他独立性度量通常不会恰好等于零，因此必须考虑相依度量的随机波动。统计假设检验可以解决这一问题。其思路是考虑原假设 $H_0\colon X\indep Y$ 和备择假设 $H_A\colon X\nindep Y$。通常先构造检验统计量 $T_n$，将任意有限样本映射为实数，再依据下式作出判断：
+\[(x_1,y_1),\ldots,(x_n,y_n)\longmapsto
+\begin{cases}H_0,&T_n\le c,\\H_A,&T_n>c.\end{cases}\]
+这里，$T_n$ 是 $T_n((x_1,y_1),\ldots,(x_n,y_n))$ 的简写。选择阈值 $c\in\mathbb R$，是为了控制第一类错误（type I error）：对任何满足 $H_0$ 的分布 $P$，都有 $P(T_n>c)\le\alpha$，其中 $\alpha$ 是由使用者指定的检验显著性水平（significance level）。实际操作时，根据数据计算 $T_n$。若 $T_n>c$，就拒绝原假设，此时我们对这一判断相对有信心；否则，不拒绝原假设，但这一结果本身未必能说明很多问题，例如样本量 $n$ 可能太小，尚不足以检出 $X$ 与 $Y$ 之间的相依关系。检验的 $p$ 值（$p$-value）是使该检验拒绝原假设的最小显著性水平。
+
+下面简要介绍几种 $T_n$ 的选择。除此之外还有许多检验方法，以下列举也不意味着这些方法最优。实际示例见代码片段 A.1。
+\begin{enumerate}[label=(\roman*)]
+\item 检验相关系数是否为零，可以使用经验相关系数，再结合 $t$ 检验（适用于高斯变量）或 Fisher 的 $z$ 变换，例如 R Core Team [2016] 中的 \texttt{cor.test}。
+\item 对离散数据或经过离散化的数据，可以采用 $\chi^2$ 检验作为独立性检验，例如 R Core Team [2016] 中的 \texttt{chisq.test}。
+\item 一般非参数独立性检验的一个例子是 Hilbert--Schmidt 独立性准则（Hilbert--Schmidt independence criterion，HSIC）［见 Gretton et al., 2008］。它的思路是利用到再生核 Hilbert 空间（reproducing kernel Hilbert space，RKHS）的单射映射 [Schölkopf and Smola, 2002]。给定正定核，可以将概率分布映射到相应 RKHS $\mathcal H$，即 $P_{X,Y}\mapsto\mu(P_{X,Y})\in\mathcal H$。对所谓的特征核（characteristic kernel），例如高斯核，这一映射是单射。特别地，
+\[\mu(P_{X,Y})=\mu(P_X\otimes P_Y)\quad\Longleftrightarrow\quad P_{X,Y}=P_X\otimes P_Y,\]
+而后一个等式成立，当且仅当 $X$ 与 $Y$ 独立。HSIC 定义为联合分布与边缘分布乘积在 RKHS 中的距离平方：
+\[\mathrm{HSIC}(P_{X,Y}):=\lVert\mu(P_{X,Y})-\mu(P_X\otimes P_Y)\rVert_{\mathcal H}^2.\]
+因此，可以将 $\mathrm{HSIC}(P_{X,Y})$ 的一个估计量作为检验统计量 $T_n$。若 $X$ 与 $Y$ 独立，HSIC 为零，因而预期其估计量 $T_n$ 较小。Gretton et al. [2008] 给出了选择阈值 $c$ 的方法。
+
+另一种表述是将 HSIC 写成协方差算子 $C_{XY}$ 的 Hilbert--Schmidt 范数。该算子定义为：对于属于相应 RKHS 的任意 $f$ 和 $g$，均有
+\[\langle f,C_{XY}g\rangle=\mathbb E[f(X)g(Y)]-\mathbb E[f(X)]\,\mathbb E[g(Y)].\]
+互协方差算子因此推广了协方差矩阵。若 $X$ 为 $d_X$ 维、$Y$ 为 $d_Y$ 维，并且相应 RKHS 分别同构于 $\mathbb R^{d_X}$ 和 $\mathbb R^{d_Y}$，则 $C_{XY}$ 可以用一个 $d_X\times d_Y$ 的互协方差矩阵表示。当然，协方差矩阵为零，并不意味着 $X$ 与 $Y$ 独立。但对于特征核，相应 RKHS 是无限维的，不同构于 $\mathbb R^d$；此时，互协方差算子的范数为零，当且仅当 $X$ 与 $Y$ 独立。
+
+Pfister et al. [2017] 将这一方法推广到 $d$ 个变量的相互独立性检验。例如，检验噪声变量是否相互独立，就需要这样的推广。他们提供了二元和多元检验的代码，见 R 程序包 \texttt{dHSIC}。
+
+实际使用时，通常需要选择核参数。对高斯核，许多实现采用通常所称的中位数启发法（median heuristic）选择带宽 $\sigma$［例如 Gretton et al., 2008］。
+\item \textbf{条件独立性检验。}条件独立性检验是一个困难问题，尤其当条件变量集很大时更是如此。如何精确地形式化这一判断，目前仍是研究课题；下面的例子可以说明其困难所在。若 $Z_1,\ldots,Z_d$ 都是二元取值变量，则
+\[\begin{aligned}
+&X\indep Y\mid Z_1,\ldots,Z_d\\
+&\quad\Longleftrightarrow\quad
+\forall(z_1,\ldots,z_d)\in\{0,1\}^d\colon
+X\indep Y\mid Z_1=z_1,\ldots,Z_d=z_d.
+\end{aligned}\]
+如果无法对 $X,Y$ 依赖这些 $Z$ 变量的方式作出任何假设，就必须针对 $2^d$ 种赋值分别进行一次无条件独立性检验。例如，$Z_d$ 可能是 $X$ 与 $Y$ 的共同子节点，而这种相依关系只有在其余 $Z_1,\ldots,Z_{d-1}$ 取某一特定组合时才能检出。
+
+对于连续变量，已有一些 HSIC 检验的扩展。Fukumizu et al. [2008] 将这一思路推广到条件互协方差算子，得到条件独立性检验。Zhang et al. [2011] 在此基础上进一步发展，并给出了原假设成立时检验统计量分布的近似。
+\end{enumerate}
+
+\Needspace{7.5cm}
+\begin{codesnippet}
+以下代码从两个不相关但相依的变量的联合分布中生成样本。
+\end{codesnippet}
+\begin{lstlisting}[language=R]
+library(dHSIC)
+#
+# generates a sample from two uncorrelated but dependent random variables
+set.seed(1)
+A <- runif(200)-0.5
+B <- runif(200)-0.5
+X <- t( c(cos(pi/4), -sin(pi/4)) %*% rbind(A, B) )
+Y <- t( c(sin(pi/4), cos(pi/4)) %*% rbind(A, B) )
+#
+# performs the statistical test
+cor.test(X,Y)$p.value
+# 0.3979561
+dhsic.test(X,Y)$p.value
+# 1.970705e-08
+\end{lstlisting}
+
+\section{函数类的容量}
+本节讨论这样一个问题：使经验风险 (1.3) 最小化的函数序列，是否会收敛到同样使风险 (1.2) 最小化的函数？见第 1.2 节。由大数定律可知，对任意固定的 $f\in\mathcal F$ 和 $\varepsilon>0$，
+\begin{equation}
+\lim_{n\to\infty}P\left(\big|R[f]-R_{\mathrm{emp}}^n[f]\big|>\varepsilon\right)=0,
+\tag{A.4}
+\end{equation}
+其收敛速度为指数级，可以用 Chernov 界描述［例如 Vapnik, 1998］。然而，这并不意味着经验风险最小化具有一致性。原因在于，我们是通过最小化式 (1.3) 来选择函数 $f$ 的。因此，即使 $(x_i,y_i)$ 相互独立，相应误差或损失 $\frac12|f(x_i)-y_i|$ 也不独立，通常形式的大数定律就无法直接适用。要得到一致性，需要一致大数定律（uniform law of large numbers）[Vapnik, 1998]，即对所有 $\varepsilon>0$，均有
+\begin{equation}
+\lim_{n\to\infty}P\left(\sup_{f\in\mathcal F}\big(R[f]-R_{\mathrm{emp}}^n[f]\big)>\varepsilon\right)=0.
+\tag{A.5}
+\end{equation}
+这一性质取决于函数类 $\mathcal F$。
+
+如果选择 $\mathcal F=\mathcal Y^{\mathcal X}$，即从 $\mathcal X$ 到 $\mathcal Y$ 的所有函数，情况会怎样？遗憾的是，式 (A.5) 不会因此成立。理由如下：假设根据已有样本 (1.1)，我们认定 $f^*$ 是一个良好解，例如它对所有 $i$ 都满足 $f(x_i)=y_i$。此时可以构造另一个函数 $f^{**}$，使它在样本点上与 $f^*$ 相同，而在其余所有地方均不同。若分布 $P_{X,Y}$ 存在密度，那么未来恰好再次遇到任一训练样本点的概率为零。因此，$f^*$ 与 $f^{**}$ 几乎总是给出不同的结果；但仅凭训练集，却无法在二者之间作出选择。类似地，在式 (A.5) 中，每当找到一个使 $R[f^*]-R_{\mathrm{emp}}^n[f^*]$ 恰好很小的函数 $f^*$，都可以构造另一个函数 $f^{**}$，使 $R[f^{**}]-R_{\mathrm{emp}}^n[f^{**}]$ 很大。因此，在这里所考虑的 $\mathcal F=\mathcal Y^{\mathcal X}$ 的情形下，一致收敛 (A.5) 不可能实现。
+
+另一方面，缩小 $\mathcal F$，式 (A.5) 的条件就会减弱。如何度量 $\mathcal F$ 的大小或容量，超出了本书范围。不过，在不依赖底层分布的情况下，只需一个数就足以概括其大小，这个数称为 $\mathcal F$ 的 VC（Vapnik--Chervonenkis）维。有时它等于自由参数的数量，但有时二者也会相差很大。若 VC 维有限，那么对任意 $P_{X,Y}$，经验风险最小化都具有一致性 [Vapnik, 1998]。VC 维还与可否证性以及 Popper 关于理论维数的概念有关 [Corfield et al., 2009]。统计学习理论中一个典型的风险界指出：对所有 $\delta>0$，以至少 $1-\delta$ 的概率，对所有 $f\in\mathcal F$ 都有
+\begin{equation}
+R[f]\le R_{\mathrm{emp}}^n[f]+
+\sqrt{\frac{h\big(\log(2n/h)+1\big)-\log(\delta/4)}{n}},
+\tag{A.6}
+\end{equation}
+其中 $h$ 为函数类 $\mathcal F$ 的 VC 维。这意味着，如果能够找到一个 VC 维较小、同时又包含足够适合当前任务的函数的函数类，使这些函数能够达到较小的 $R_{\mathrm{emp}}^n[f]$，就可以以高概率保证它们在未来来自同一分布的数据上也有较小的期望误差。这里存在一个并不简单的权衡：一方面，希望采用较大的函数类，以便取得较小的经验风险；另一方面，又希望函数类足够小，以控制 $h$。

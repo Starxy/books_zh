@@ -1,0 +1,36 @@
+% 原书分章PDF第17—18页：第29.6.3节完整证明概要。
+\subsection{命题29.3的证明}
+
+先陈述所谓的Soshnikov条件（Soshnikov，2000）。从 $P_0$ 中抽取的 $O$ 的函数 $f$，若满足以下条件，就称其满足Soshnikov条件：
+\begin{equation}
+N^2\operatorname{Var}_{P^{sK}}\!\left[P_n^{\mathrm{HT}}f\right]
+\quad\text{趋于无穷},
+\tag{29.17}
+\end{equation}
+\begin{equation}
+\max_{1\le i\le N}K_{ii}^{-1}f(O_i)
+=o\!\left(N^2\operatorname{Var}_{P^{sK}}\!\left[P_n^{\mathrm{HT}}f\right]\right)^\epsilon
+\quad\text{对所有 }\epsilon>0,
+\tag{29.18}
+\end{equation}
+\begin{equation}
+N\mathbb E_{P^{sK}}\!\left[P_n^{\mathrm{HT}}|f|\right]
+=O\!\left(N^2\operatorname{Var}_{P^{sK}}\!\left[P_n^{\mathrm{HT}}f\right]\right)^\delta
+\quad\text{对某个 }\delta>0.
+\tag{29.19}
+\end{equation}
+条件 (29.17)、(29.18) 和 (29.19)，以从 $P_0$ 中抽取的相互独立随机变量的一条轨迹 $(O_i)_{i\ge1}$ 为条件来表述。以 $\Omega(f)$ 表示满足这些条件的轨迹集合。根据假定，对所有 $f\in\mathcal F'$，都有 $P_0(\Omega(f))=1$。应强调，这一假定可能隐含地要求比值 $n/N$ 以足够慢的速度趋于零，命题29.4的证明概要会清楚地表明这一点。由于 $\mathcal F'$ 可数，$\Omega\equiv\bigcap_{f\in\mathcal F'}\Omega(f)$ 也满足 $P_0(\Omega)=1$。固定 $f\in\mathcal F'$，并定义
+\[
+Z_N(f)\equiv
+\left(\operatorname{Var}_{P^s}\!\left[P_n^{\mathrm{HT}}f\right]\right)^{-1/2}
+(P_n^{\mathrm{HT}}-P_0)f.
+\]
+在 $\Omega$ 上，特征函数 $t\mapsto\mathbb E_{P^{sK}}[e^{itZ_N(f)}]$ 逐点收敛于 $t\mapsto e^{-t^2/2}$。因此，$t\mapsto\mathbb E_{P_0}[\mathbb E_{P^{sK}}[e^{itZ_N(f)}]I\{\Omega\}]$ 也如此。由于 $P_0(\Omega)=1$，这意味着 $Z_N(f)$ 依分布收敛于标准正态分布。因此，由Slutsky引理，$\sqrt n(P_n^{\mathrm{HT}}-P_0)f$ 依分布收敛于均值为零的高斯分布，其方差等于 $n\operatorname{Var}_{P^{sK}}[P_n^{\mathrm{HT}}f]$ 的概率极限。由此得到 $\sqrt n(P_n^{\mathrm{HT}}-P_0)f$ 的渐近紧性。最后，应用Cramér--Wold方法，可以得到对所有 $f_1,\ldots,f_M\in\mathcal F'$，边际量 $\sqrt n(P_n^{\mathrm{HT}}-P_0)(f_1,\ldots,f_M)$ 收敛于均值为零的多元高斯分布。
+
+证明的第二步依赖以下集中不等式（Pemantle 和 Peres，2014，定理3.1）：若 $C(f)\equiv\max_{1\le i\le N}|K_{ii}^{-1}f(O_i)|$，则对所有 $t>0$，
+\begin{equation}
+P^{sK}\!\left[|(P_n^{\mathrm{HT}}-P_0)f|\ge t\right]
+\le2\exp\left(-nt^2/8C(f)^2\right).
+\tag{29.20}
+\end{equation}
+这一陈述以 $O_1,\ldots,O_N$ 为条件。注意，所有 $C(f)$ 都有一个确定的上界，因为 $\mathcal F'$ 一致有界，且一阶包含概率关于 $N$ 一致远离0。通过发展经验过程理论中典型的所谓链式论证，我们从所有边际量的收敛，过渡到\textbf{A1}。这一论证建立在式 (29.20) 以及 $\mathcal F'$ 关于上确界范数的括号熵有限这一假定之上。这就完成了证明概要。

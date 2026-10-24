@@ -1,0 +1,39 @@
+\begin{table}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw (0,0) rectangle (11.2,.9);
+ \foreach \xx in {.7,1.7,4.3,6.9}{\draw (\xx,0)--(\xx,.9);}
+ \node[align=center] at (.35,.45) {单位\\$u$};
+ \node[align=center] at (1.2,.45) {治疗\\$T$};
+ \node[align=center] at (3,.45) {潜在结局\\$B_u(t=0)$};
+ \node[align=center] at (5.6,.45) {潜在结局\\$B_u(t=1)$};
+ \node[align=center] at (9.05,.45) {单位层面的因果效应\\$B_u(t=1)-B_u(t=0)$};
+ \foreach \u/\tt/\bz/\bo/\ee/\rr in
+ {1/1/1/0/-1/1,2/0/1/0/-1/2,3/1/1/0/-1/3,
+ 43/1/1/0/-1/5,44/0/0/1/1/6,45/0/1/0/-1/7,
+ 119/1/1/0/-1/9,120/1/0/1/1/10,121/0/1/0/-1/11,
+ 200/0/1/0/-1/13}{
+  \pgfmathsetmacro{\yy}{-.45*\rr}
+  \fill[gray!25] (.7,\yy) rectangle (1.7,\yy+.45);
+  \ifnum\tt=1
+   \fill[gray!25] (4.3,\yy) rectangle (6.9,\yy+.45);
+  \else
+   \fill[gray!25] (1.7,\yy) rectangle (4.3,\yy+.45);
+  \fi
+  \draw (0,\yy) rectangle (11.2,\yy+.45);
+  \foreach \xx in {.7,1.7,4.3,6.9}{\draw (\xx,\yy)--(\xx,\yy+.45);}
+  \node at (.35,\yy+.225) {$\u$};
+  \node at (1.2,\yy+.225) {$\tt$};
+  \node at (3,\yy+.225) {$\bz$};
+  \node at (5.6,\yy+.225) {$\bo$};
+  \node at (9.05,\yy+.225) {$\ee$};
+ }
+ \foreach \rr in {4,8,12}{
+  \pgfmathsetmacro{\yy}{-.45*\rr}
+  \draw (0,\yy) rectangle (11.2,\yy+.45);
+  \draw (.7,\yy)--(.7,\yy+.45);
+  \node at (.35,\yy+.225) {$\vdots$};
+ }
+\end{tikzpicture}
+\caption{用潜在结局表示例 3.4。对于每位患者或单位，两个潜在结局中只能观测一个。灰底表示观测到的信息。治疗 $T$ 对几乎所有患者都有益；只有 200 例中的 2 例，治疗会伤害患者并导致失明（$B=1$）。虽然对大多数患者给予治疗（$T=1$）是好选择，但对患者 $u=120$，这恰恰是错误决定。}
+\end{table}

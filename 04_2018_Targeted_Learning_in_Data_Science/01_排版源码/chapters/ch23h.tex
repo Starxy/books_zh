@@ -1,0 +1,153 @@
+% 原书分章 PDF 第 12—15 页：定理 23.3 的完整证明，含四步。
+\noindent\textbf{第 23.3 节的证明}
+
+\begin{proof}[证明（定理 23.3）]
+$\Psi(Q)$ 的路径导数定义为沿路径 $\{P_\epsilon:\epsilon\}\subset\mathcal M$ 的
+$\left.\frac{d}{d\epsilon}\Psi(Q(\epsilon))\right|_{\epsilon=0}$。
+具体而言，选择这些路径使得
+\[
+ dQ_{W,\epsilon}=(1+\epsilon H_W(W))\,dQ_W,
+\]
+其中 $\E H_W(W)=0$，且 $C_W\triangleq\sup_w|H_W(w)|<\infty$；
+\[
+ dQ_{Y,\epsilon}(Y\mid A,W)=(1+\epsilon H_Y(Y\mid A,W))\,dQ_Y(Y\mid A,W),
+\]
+其中 $\E(H_Y\mid A,W)=0$，且 $\sup_{w,a,y}|H_Y(y\mid a,w)|<\infty$。
+参数 $\Psi$ 对 $g_0(a\mid w)=P_0(a\mid w)$ 的波动不敏感，因此不需要波动似然的这个部分。令
+$\bar Q_{b,\epsilon}\triangleq\bar Q_{b,P_\epsilon}$、$\bar Q_\epsilon\triangleq\bar Q_{P_\epsilon}$、
+$d_\epsilon\triangleq d_{P_\epsilon}$、$\eta_\epsilon\triangleq\eta_{P_\epsilon}$、
+$\tau_\epsilon\triangleq\tau_{P_\epsilon}$、$S_\epsilon\triangleq S_{P_\epsilon}$。
+首先注意，
+\begin{equation}
+ \bar Q_{b,\epsilon}(w)=\bar Q_{b,0}(w)+\epsilon h_\epsilon(w)
+\tag{23.7}
+\end{equation}
+对某个 $h_\epsilon$ 成立，且
+\begin{equation}
+ \sup_{|\epsilon|<1}\sup_w|h_\epsilon(w)|\triangleq C_1<\infty.
+\tag{23.8}
+\end{equation}
+注意，23.3 蕴含 $d_0$（几乎处处）是确定性的，即 $d_0(U,\cdot)$ 几乎处处是一个固定函数。令 $\tilde d$ 表示确定性规则 $w\mapsto I(\bar Q_{b,0}(w)>0)$，对所有 $u$，$d(u,\cdot)$（几乎处处）都等于它。由引理 23.2，
+\begin{equation}
+\begin{aligned}
+ \Psi(P_\epsilon)-\Psi(P_0)
+ &=\int_w\bigl(\E_{P_U}[d_\epsilon(U,W)]-\tilde d_0(W)\bigr)
+ \bar Q_{b,\epsilon}\,dQ_{W,\epsilon}\\
+ &\quad+\int_w\tilde d_0(W)\bigl(\bar Q_{b,\epsilon}\,dQ_{W,\epsilon}
+ -\bar Q_{b,0}\,dQ_{W,0}\bigr)\\
+ &\quad+\E_{P_\epsilon}\bar Q_\epsilon(0,W)-\E_0\bar Q_0(0,W)\\
+ &=\int_w\bigl(\E_{P_U}[d_\epsilon(U,W)]-\tilde d_0(W)\bigr)
+ (\bar Q_{b,\epsilon}-\tau_0)\,dQ_{W,\epsilon}\\
+ &\quad+\tau_0\int_w\bigl(\E_{P_U}[d_\epsilon(U,W)]\,dQ_{W,\epsilon}
+ -\tilde d_0(W)\,dQ_{W,0}\bigr)\\
+ &\quad-\tau_0\int_w\tilde d_0(W)(dQ_{W,\epsilon}-dQ_{W,0})\\
+ &\quad+[\Psi_{d_0}(P_\epsilon)-\Psi_{d_0}(P_0)].
+\end{aligned}
+\tag{23.9}
+\end{equation}
+把第四项除以 $\epsilon$，并令 $\epsilon\to0$ 取极限，就得到把 $d_0$ 视为已知的规则下平均结局的路径导数。第三项可写成
+$-\epsilon\tau_0\int_w\tilde d_0(W)H_W\,dQ_{W,0}$，因此该项的路径导数为
+$-\int_w\tau_0\tilde d_0(W)H_W\,dQ_{W,0}$。
+如果 $\tau_0>0$，那么 $\E_{P_U\times P_0}[\tilde d_0(W)]=\kappa$。如果 $\tau_0=0$，该项的路径导数为零。因此，对于所有 $\tau_0$，
+\[
+\begin{aligned}
+ &\lim_{\epsilon\to0}-\frac1\epsilon\tau_0\int_w\tilde d_0(W)(dQ_{W,\epsilon}-dQ_{W,0})\\
+ &\quad=\int_w\bigl(-\tau_0(\tilde d_0(w)-\kappa)\bigr)H_W(w)\,dQ_{W,0}(w).
+\end{aligned}
+\]
+于是，式 (23.9) 的第三项产生典范梯度中的 $w\mapsto-\tau_0(\tilde d_0(w)-\kappa)$ 部分，等价地，也就是 $w\mapsto-\tau_0(\E_{P_U}[d_0(U,w)]-\kappa)$。本证明的其余部分将说明式 (23.9) 的前两项为 $o(\epsilon)$。
+
+\Needspace{4\baselineskip}
+\medskip\noindent\textbf{步骤 1：$\eta_\epsilon\to\eta_0$}
+
+分位数 $P\mapsto\eta_P$ 的定义见式 (23.3)。这一结论由 $S_0$ 在 $\eta_0$ 的一个邻域内连续得到。对于 $\gamma>0$，
+\begin{equation}
+\begin{aligned}
+ |\eta_\epsilon-\eta_0|>\gamma
+ \quad\Longrightarrow\quad&S_\epsilon(\eta_0-\gamma)\leq\kappa\\
+ &\text{或 }S_\epsilon(\eta_0+\gamma)>\kappa.
+\end{aligned}
+\tag{23.10}
+\end{equation}
+对于正常数 $C_1$ 和 $C_W$，
+\[
+\begin{aligned}
+ S_\epsilon(\eta_0-\gamma)
+ &\geq(1-C_W|\epsilon|)P_0(\bar Q_{b,\epsilon}>\eta_0-\gamma)\\
+ &\geq(1-C_W|\epsilon|)S_0(\eta_0-\gamma+C_1|\epsilon|).
+\end{aligned}
+\]
+固定足够小的 $\gamma>0$，使 $S_0$ 在 $\eta_0-\gamma$ 处连续。这时，当 $\epsilon\to0$ 时，
+$S_0(\eta_0-\gamma+C_1|\epsilon|)\to S_0(\eta_0-\gamma)$。
+由 $\eta_0$ 定义中的下确界，知道 $S_0(\eta_0-\gamma)>\kappa$。因此，对所有足够小的 $|\epsilon|$，都有 $S_\epsilon(\eta_0-\gamma)>\kappa$。
+
+类似地，$S_\epsilon(\eta_0+\gamma)\leq(1+C_W|\epsilon|)S_0(\eta_0+\gamma-C_1|\epsilon|)$。
+固定足够小的 $\gamma>0$，使 $S_0$ 在 $\eta_0+\gamma$ 处连续。于是当 $\epsilon\to0$ 时，
+$S_0(\eta_0+\gamma-C_1|\epsilon|)\to S_0(\eta_0+\gamma)$。
+条件 23.3 蕴含 $\bar Q_{b,0}$ 的 $\kappa$ 分位数唯一，从而 $S_0(\eta_0+\gamma)<\kappa$。
+因此，对所有足够小的 $|\epsilon|$，都有 $S_\epsilon(\eta_0+\gamma)<\kappa$。
+结合所有接近零的 $\epsilon$ 下均有 $S_\epsilon(\eta_0-\gamma)>\kappa$ 和
+$S_\epsilon(\eta_0+\gamma)<\kappa$，再利用式 (23.10)，便知当 $\epsilon\to0$ 时，$\eta_\epsilon\to\eta_0$。
+
+\Needspace{4\baselineskip}
+\medskip\noindent\textbf{步骤 2：式 (23.9) 的第二项最终为 0}
+
+如果 $\tau_0=0$，结果立即成立，因此假定 $\tau_0>0$。由上一步，$\eta_\epsilon\to\eta_0$；由最大值函数的连续性，这蕴含 $\tau_\epsilon\to\tau_0>0$。因此，对于足够大的 $\epsilon$，有 $\tau_\epsilon>0$。由式 (23.4)，对于所有充分小的 $|\epsilon|$，有 $\Pr_{P_U\times P_\epsilon}(d_\epsilon(U,W)=1)=\kappa$，且 $P_0(\tilde d_0(W)=1)=\kappa$。于是，对于所有足够小的 $|\epsilon|$，式 (23.9) 的第二项为 0。
+
+\Needspace{4\baselineskip}
+\medskip\noindent\textbf{步骤 3：$\tau_\epsilon-\tau_0=O(\epsilon)$}
+
+注意，$\kappa<S_\epsilon(\eta_\epsilon-|\epsilon|)\leq(1+C_W|\epsilon|)S_0(\eta_\epsilon-(1+C_1)|\epsilon|)$。在 $\eta_0$ 处对 $S_0$ 作 Taylor 展开可得
+\begin{equation}
+\begin{aligned}
+ \kappa&<(1+C_W|\epsilon|)\bigl(S_0(\eta_0)
+ +(\eta_\epsilon-\eta_0-(1+C_1)|\epsilon|)(-f_0(\eta_0)+o(1))\bigr)\\
+ &=\kappa+(\eta_\epsilon-\eta_0-(1+C_1)|\epsilon|)(-f_0(\eta_0)+o(1))+O(\epsilon)\\
+ &=\kappa-(\eta_\epsilon-\eta_0)f_0(\eta_0)+o(\eta_\epsilon-\eta_0)+O(\epsilon).
+\end{aligned}
+\tag{23.11}
+\end{equation}
+$f_0(\eta_0)\in(0,\infty)$ 这一事实表明，$\eta_\epsilon-\eta_0$ 由某个 $O(\epsilon)$ 序列从上方界定。类似地，
+$\kappa\geq S_\epsilon(\eta_\epsilon+|\epsilon|)\geq(1-C_W|\epsilon|)S_0(\eta_\epsilon+(1+C_1)|\epsilon|)$。
+因此，
+\[
+\begin{aligned}
+ \kappa&\geq(1-C_W|\epsilon|)\bigl(S_0(\eta_0)
+ +(\eta_\epsilon-\eta_0+(1+C_1)|\epsilon|)(-f_0(\eta_0)+o(1))\bigr)\\
+ &=\kappa-(\eta_\epsilon-\eta_0)f_0(\eta_0)+o(\eta_\epsilon-\eta_0)+O(\epsilon).
+\end{aligned}
+\]
+由此，$\eta_\epsilon-\eta_0$ 由某个 $O(\epsilon)$ 序列从下方界定。结合这两个界可知 $\eta_\epsilon-\eta_0=O(\epsilon)$，随即推出
+$\tau_\epsilon-\tau_0=\max\{O(\epsilon),0\}=O(\epsilon)$。
+
+\Needspace{4\baselineskip}
+\medskip\noindent\textbf{步骤 4：式 (23.9) 的第一项为 $O(\epsilon)$}
+
+我们知道
+\[
+ \bar Q_{b,0}(W)-\tau_0+O(\epsilon)\leq\bar Q_{b,\epsilon}(W)-\tau_\epsilon
+ \leq\bar Q_{b,0}(W)-\tau_0+O(\epsilon).
+\]
+由 23.3，存在某个 $\delta>0$，使得
+$\sup_{|\epsilon|<\delta}P_0(\bar Q_{b,\epsilon}(W)=\tau_\epsilon)=0$。
+由于 $Q_{W,\epsilon}$ 关于 $Q_{W,0}$ 绝对连续，
+$\sup_{|\epsilon|<\delta}\Pr_{P_\epsilon}(\bar Q_{b,\epsilon}(W)=\tau_\epsilon)=0$。
+因此，对于所有足够小的 $|\epsilon|$ 和几乎所有 $u$，有
+$d_\epsilon(u,w)=I(\bar Q_{b,\epsilon}(w)>\tau_\epsilon)$。于是，
+\[
+\begin{aligned}
+ &\int_w\{\E_{P_U}[d_\epsilon(U,W)]-d_0(W)\}(\bar Q_{b,\epsilon}-\tau_0)\,dQ_{W,\epsilon}\\
+ &=\left|\int_w\bigl(I(\bar Q_{b,\epsilon}>\tau_\epsilon)-I(\bar Q_{b,0}>\tau_0)\bigr)
+ (\bar Q_{b,\epsilon}-\tau_0)\,dQ_{W,\epsilon}\right|\\
+ &\leq\int_w\bigl|I(\bar Q_{b,\epsilon}>\tau_\epsilon)-I(\bar Q_{b,0}>\tau_0)\bigr|
+ (|\bar Q_{b,0}-\tau_0|+C_1|\epsilon|)\,dQ_{W,\epsilon}\\
+ &\leq\int_w I(|\bar Q_{b,0}-\tau_0|\leq|\bar Q_{b,0}-\tau_0-\bar Q_{b,\epsilon}+\tau_\epsilon|)
+ (|\bar Q_{b,0}-\tau_0|+C_1|\epsilon|)\,dQ_{W,\epsilon}\\
+ &=\int_w I(0<|\bar Q_{b,0}-\tau_0|\leq|\bar Q_{b,0}-\tau_0-\bar Q_{b,\epsilon}+\tau_\epsilon|)
+ (|\bar Q_{b,0}-\tau_0|+C_1|\epsilon|)\,dQ_{W,\epsilon}\\
+ &\leq O(\epsilon)\int_w I(0<|\bar Q_{b,0}-\tau_0|\leq O(\epsilon))\,dQ_{W,\epsilon}\\
+ &\leq O(\epsilon)(1+C_W|\epsilon|)P_0(0<|\bar Q_{b,0}-\tau_0|\leq O(\epsilon)),
+\end{aligned}
+\]
+其中倒数第二个不等式由步骤 3 及式 (23.7) 成立。上式最后一行为 $o(\epsilon)$，因为对于任意随机变量 $X$，当 $\epsilon\to0$ 时，都有 $\Pr(0<X\leq\epsilon)\to0$。因此，把上式左侧除以 $\epsilon$，再令 $\epsilon\to0$ 取极限，得到零。
+\end{proof}

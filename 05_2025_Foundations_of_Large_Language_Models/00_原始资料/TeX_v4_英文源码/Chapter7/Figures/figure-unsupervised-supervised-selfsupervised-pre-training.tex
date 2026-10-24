@@ -1,0 +1,90 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\nodewidth{1.8cm}
+\def\nodeheight{0.8cm}
+
+\tikzstyle{enode} = [minimum width=\nodewidth,minimum height=\nodeheight,inner sep=1pt,draw,thick];
+
+%%% unsupervised pre-training
+\begin{scope}
+
+\node [enode,anchor=west,very thick] (unsupervisednode1) at (0,0) {\scriptsize{Unsupervised}};
+\node [enode,anchor=west,very thick] (unsupervisednode2) at ([xshift=0.3cm]unsupervisednode1.east) {\footnotesize{Supervised}};
+
+\draw [->,thick] ([xshift=1pt]unsupervisednode1.east) -- ([xshift=-1pt]unsupervisednode2.west);
+
+\node [anchor=south] (node1label) at (unsupervisednode1.north) {\footnotesize{Pre-training}};
+\node [anchor=south] (node2label) at (unsupervisednode2.north) {\footnotesize{Training}};
+
+\node [enode,anchor=north,minimum height=3.5*\nodeheight,rounded corners=3pt,fill=red!30,align=left] (unsuperviseddata1) at ([yshift=-0.2em]unsupervisednode1.south) {};
+\node [anchor=north] (unsuperviseddata1cap1) at ([yshift=-3pt]unsuperviseddata1.north) {\footnotesize{Unlabeled}};
+\node [anchor=north west] (unsuperviseddata1cap2) at ([yshift=2pt]unsuperviseddata1cap1.south west) {\footnotesize{Data}};
+
+\node [enode,anchor=north,minimum height=1.6*\nodeheight,rounded corners=3pt,fill=ugreen!30,align=left] (unsuperviseddata2) at ([yshift=-0.2em]unsupervisednode2.south) {};
+\node [anchor=north] (unsuperviseddata2cap1) at ([yshift=-3pt]unsuperviseddata2.north) {\footnotesize{Labeled}};
+\node [anchor=north west] (unsuperviseddata2cap2) at ([yshift=2pt]unsuperviseddata2cap1.south west) {\footnotesize{Data}};
+
+\node [anchor=north] (caption) at ([xshift=0.2cm,yshift=-3.2cm]unsupervisednode1.south east) {\footnotesize{(a) Unsupervised Pre-training}};
+
+\end{scope}
+
+%%% supervised pre-training
+\begin{scope}[xshift=4.7cm]
+
+\node [enode,anchor=west,very thick] (supervisednode1) at (0,0) {\footnotesize{Supervised}};
+\node [enode,anchor=west,very thick] (supervisednode2) at ([xshift=0.3cm]supervisednode1.east) {\footnotesize{Supervised}};
+
+\draw [->,thick] ([xshift=1pt]supervisednode1.east) -- ([xshift=-1pt]supervisednode2.west);
+
+\node [anchor=south] (node1label) at (supervisednode1.north) {\footnotesize{Pre-training}};
+\node [anchor=south] (node2label) at (supervisednode2.north) {\footnotesize{Tuning}};
+
+\node [enode,anchor=north,minimum height=2.0*\nodeheight,rounded corners=3pt,fill=blue!30,align=left] (superviseddata1) at ([yshift=-0.2em]supervisednode1.south) {};
+\node [anchor=north] (superviseddata1cap1) at ([yshift=-3pt]superviseddata1.north) {\footnotesize{Labeled}};
+\node [anchor=north west] (superviseddata1cap2) at ([yshift=2pt]superviseddata1cap1.south west) {\footnotesize{Data}};
+\node [anchor=north] (task1) at (superviseddata1.south) {\scriptsize{Task 1}};
+
+\node [enode,anchor=north,minimum height=1.3*\nodeheight,rounded corners=3pt,fill=ugreen!30,align=left] (superviseddata2) at ([yshift=-0.2em]supervisednode2.south) {};
+\node [anchor=north] (superviseddata2cap1) at ([yshift=-3pt]superviseddata2.north) {\footnotesize{Labeled}};
+\node [anchor=north west] (superviseddata2cap2) at ([yshift=2pt]superviseddata2cap1.south west) {\footnotesize{Data}};
+\node [anchor=north] (task2) at (superviseddata2.south) {\scriptsize{Task 2}};
+
+\node [anchor=north] (caption) at ([xshift=0.2cm,yshift=-3.2cm]supervisednode1.south east) {\footnotesize{(b) Supervised Pre-training}};
+
+\end{scope}
+
+%%% self-supervised pre-training
+\begin{scope}[xshift=9.4cm]
+
+\node [enode,anchor=west,very thick] (unsupervisednode1) at (0,0) {};
+\node [anchor=north west] (tlabel) at (unsupervisednode1.north west) {\footnotesize{Self-}};
+\node [anchor=north west] (tlabel2) at ([yshift=4pt]tlabel.south west) {\footnotesize{Supervised}};
+\node [enode,anchor=west,very thick] (unsupervisednode2) at ([xshift=0.3cm]unsupervisednode1.east) {\footnotesize{Supervised}};
+
+\node [enode,anchor=south,very thick] (tuningnode) at ([yshift=0.7cm]unsupervisednode2.north) {};
+\node [anchor=north west] (tprompt) at (tuningnode.north west) {\footnotesize{Zero/Few}};
+\node [anchor=north west] (tprompt2) at ([yshift=4pt]tprompt.south west) {\scriptsize{Shot Learning}};
+
+\draw [->,thick,dashed] ([xshift=1pt]unsupervisednode1.east) -- ([xshift=-1pt]unsupervisednode2.west);
+\draw [->,thick,dashed] ([xshift=1pt,yshift=0.5em]unsupervisednode1.east) .. controls +(east:0.3cm) and +(west:0.3cm) ..  ([xshift=-1pt]tuningnode.west);
+
+\node [anchor=south] (node1label) at (unsupervisednode1.north) {\footnotesize{Pre-training}};
+\node [anchor=south] (node2label) at (unsupervisednode2.north) {\footnotesize{Tuning}};
+\node [anchor=south] (tuningnodelabel) at (tuningnode.north) {\footnotesize{Prompting}};
+
+\node [enode,anchor=north,minimum height=3.5*\nodeheight,rounded corners=3pt,fill=red!30,align=left] (unsuperviseddata1) at ([yshift=-0.2em]unsupervisednode1.south) {};
+\node [anchor=north] (unsuperviseddata1cap1) at ([yshift=-3pt]unsuperviseddata1.north) {\footnotesize{Unlabeled}};
+\node [anchor=north west] (unsuperviseddata1cap2) at ([yshift=2pt]unsuperviseddata1cap1.south west) {\footnotesize{Data}};
+
+\node [enode,anchor=north,minimum height=1.3*\nodeheight,rounded corners=3pt,fill=ugreen!30,align=left] (unsuperviseddata2) at ([yshift=-0.2em]unsupervisednode2.south) {};
+\node [anchor=north] (unsuperviseddata2cap1) at ([yshift=-3pt]unsuperviseddata2.north) {\footnotesize{Labeled}};
+\node [anchor=north west] (unsuperviseddata2cap2) at ([yshift=2pt]unsuperviseddata2cap1.south west) {\footnotesize{Data}};
+
+\node [anchor=north] (caption) at ([xshift=0.2cm,yshift=-3.2cm]unsupervisednode1.south east) {\footnotesize{(c) Self-supervised Pre-training}};
+
+\end{scope}
+	
+\end{tikzpicture}

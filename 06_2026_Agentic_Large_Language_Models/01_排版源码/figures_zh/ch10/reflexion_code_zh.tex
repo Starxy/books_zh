@@ -1,0 +1,28 @@
+% 依照 figures/reflexion-code.png 重排。while 的原条件为 or，按原文保留。
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{minipage}{.94\linewidth}
+\begin{tabularx}{\linewidth}{@{}X@{}}
+\toprule
+\textbf{算法 1}\quad 通过自我反思进行强化 \\
+\midrule
+初始化行动者、评估者与自我反思模型：$M_a,M_e,M_{sr}$ \\
+初始化策略 $\pi_\theta(a_i\mid s_i)$，$\theta=\{M_a,mem\}$ \\
+使用 $\pi_\theta$ 生成初始轨迹 \\
+使用 $M_e$ 评估 $\tau_0$ \\
+使用 $M_{sr}$ 生成初始自我反思 $sr_0$ \\
+设置 $mem\leftarrow[sr_0]$ \\
+设置 $t=0$ \\
+\textbf{当} $M_e$ 未通过 \textbf{或} $t<\text{max trials}$ \textbf{执行} \\
+\hspace*{1.5em}使用 $\pi_\theta$ 生成 $\tau_t=[a_0,o_0,\ldots a_i,o_i]$ \\
+\hspace*{1.5em}使用 $M_e$ 评估 $\tau_t$ \\
+\hspace*{1.5em}使用 $M_{sr}$ 生成自我反思 $sr_t$ \\
+\hspace*{1.5em}将 $sr_t$ 追加至 $mem$ \\
+\hspace*{1.5em}递增 $t$ \\
+\textbf{结束循环} \\
+\textbf{返回} \\
+\bottomrule
+\end{tabularx}
+\end{minipage}
+\endgroup

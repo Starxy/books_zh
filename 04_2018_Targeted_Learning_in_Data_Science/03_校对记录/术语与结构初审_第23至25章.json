@@ -1,0 +1,173 @@
+{
+  "glossary_entries": 516,
+  "glossary_duplicate_keys": [],
+  "new_term_conflicts_between_chapters": [],
+  "local_macro_definitions": [],
+  "chapters": [
+    {
+      "chapter": 23,
+      "files": [
+        "ch23.tex",
+        "ch23a.tex",
+        "ch23b.tex",
+        "ch23c.tex",
+        "ch23d.tex",
+        "ch23e.tex",
+        "ch23f.tex",
+        "ch23g.tex",
+        "ch23h.tex",
+        "ch23i.tex",
+        "ch23j.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "optimal resource-constrained value",
+          "zh": "最优资源约束价值",
+          "note": "在最大可处理人口比例约束下，最优规则的平均结局；本章缩写R-C。"
+        },
+        {
+          "en": "pseudo-nonexceptional law assumption",
+          "zh": "拟非例外分布假设",
+          "note": "第23.6节；处理效应不在正概率分层中集中于资源阈值tau0。首现保留英文。"
+        },
+        {
+          "en": "utilitarian sense",
+          "zh": "功利主义意义",
+          "note": "第23.6节原作者伦理讨论：特定意义下最大化总体平均结局，并非新增译者评价。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 21,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    },
+    {
+      "chapter": 24,
+      "files": [
+        "ch24.tex",
+        "ch24a.tex",
+        "ch24b.tex",
+        "ch24c.tex",
+        "ch24d.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "response-adaptive trial",
+          "zh": "响应自适应试验",
+          "note": "本章根据已积累的响应数据调整后续动作分配的试验。"
+        },
+        {
+          "en": "uniform entropy integral",
+          "zh": "一致熵积分",
+          "note": "经验过程复杂度条件；与一般“熵积分”对应。"
+        },
+        {
+          "en": "envelope function",
+          "zh": "包络函数",
+          "note": "函数类一致熵积分所针对的包络。"
+        },
+        {
+          "en": "decoupling",
+          "zh": "解耦",
+          "note": "本章鞅最大不等式证明使用的概率论技术。"
+        },
+        {
+          "en": "symmetrization",
+          "zh": "对称化",
+          "note": "与解耦、链式法共同控制经验过程。"
+        },
+        {
+          "en": "chaining",
+          "zh": "链式法",
+          "note": "经验过程/最大不等式中的chaining。"
+        },
+        {
+          "en": "generalized score",
+          "zh": "广义得分",
+          "note": "损失关于波动参数的导数，原书的符号及正负号照录。"
+        },
+        {
+          "en": "quasi negative-log-likelihood loss",
+          "zh": "拟负对数似然损失",
+          "note": "适用于取值于]0,1[奖励的TMLE损失ell。"
+        },
+        {
+          "en": "well-separated",
+          "zh": "良好分离",
+          "note": "A1中极小点与给定范数距离之外候选函数的风险严格分离。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 17,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    },
+    {
+      "chapter": 25,
+      "files": [
+        "ch25.tex",
+        "ch25a.tex",
+        "ch25b.tex",
+        "ch25c.tex",
+        "ch25d.tex",
+        "ch25e.tex",
+        "ch25f.tex",
+        "ch25g.tex",
+        "ch25h.tex",
+        "ch25i.tex",
+        "ch25j.tex"
+      ],
+      "new_terms": [
+        {
+          "en": "bandwidth",
+          "zh": "带宽",
+          "note": "平滑调节参数h；与固定h、数据自适应hn及欠平滑hn*区分。"
+        },
+        {
+          "en": "product kernel",
+          "zh": "乘积核",
+          "note": "由一元核K*逐坐标相乘得到。"
+        },
+        {
+          "en": "J-orthogonal kernel",
+          "zh": "J阶正交核",
+          "note": "按本章定义具有1至J阶零矩；保留其原多元矩条件疑点。"
+        },
+        {
+          "en": "kernel density estimator",
+          "zh": "核密度估计量",
+          "note": "一元密度例中CV一步估计量的简化。"
+        },
+        {
+          "en": "kernel density estimation",
+          "zh": "核密度估计",
+          "note": "25.8的历史注记术语。"
+        },
+        {
+          "en": "oversmoothing",
+          "zh": "过度平滑",
+          "note": "25.4末备注，与已有undersmoothing=欠平滑相对。"
+        },
+        {
+          "en": "Euclidean norm",
+          "zh": "欧几里得范数",
+          "note": "25.3向量EIF方程的一维通用最不利子模型所用标准范数。"
+        },
+        {
+          "en": "local polynomial smoothing",
+          "zh": "局部多项式平滑",
+          "note": "因果剂量—反应例引述Kennedy等方法时使用。"
+        },
+        {
+          "en": "augmented IPCW estimator",
+          "zh": "增广逆删失概率加权估计量",
+          "note": "本章印本确写augmented IPCW，按该缩写保留；未替换为IPW。"
+        }
+      ],
+      "term_conflicts": [],
+      "source_anomalies": 43,
+      "unresolved_items": [],
+      "residue_and_term_findings": []
+    }
+  ]
+}

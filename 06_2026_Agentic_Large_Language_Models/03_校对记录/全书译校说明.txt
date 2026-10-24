@@ -1,0 +1,195 @@
+﻿> 当前状态（2026-10-24）：全书中文译稿已编译完成，成品为 `00_books/Agentic_Large_Language_Models_cn_translated.pdf`（382页）。当前源码为 `../01_排版源码/`，构建方法见该目录的 `README_编译说明.txt`。以下为历史制作/校对依据，其中阶段进度、旧文件名及临时路径仅作追溯，不代表当前交付状态。
+
+《智能体大语言模型》全书中文译稿校对说明
+
+原文依据：arXiv-2610.13455v1.tar.gz 中的有效 TeX；未使用旧英文 PDF。
+原始源码包 SHA256：899a3463faf4fe381ee8fa7f36cd9bb2aa55cbbedda48a1380ac59523aa014c4
+完整范围：23 章、7 个分部；合排 382 页。
+全部有效正文、标题、学习框、脚注、例子、表格、代码与按章参考文献均纳入译排。
+inference 与 reasoning 均依用户要求译作“推理”，只在确有歧义时加英文括注。
+
+核验结果：
+章节层级、标签、交叉引用、引文键、数学表达式及代码通过源文对照。
+原始标签编号与源码重编译基线一致；各章 .bbl 文件逐字节保留。
+全书编译无错误、缺字、溢出、未解析引用或引文；目录与分页已收敛。
+从独立目录重编译，页数、书签、逐页文本与 72 dpi 页面像素均与交付 PDF 一致。
+章节内图表页由各章译者检查，主编复核合排后的章首页与重点图表、公式页。
+
+图与源码处理：
+关键关系、流程和算法示意图以中文 LaTeX/TikZ 重新排版，保留原图关系与数值。
+数据曲线、照片和截图沿用源码包素材，必要的中文文字用 LaTeX 标注。
+代码内容按原文保留，仅翻译正文题注；未执行任何教材中的训练、安装或服务命令。
+作者注释、comment 环境与未启用草稿不属于有效正文；原文拼写问题按上下文自然译出。
+
+原文特征与疑点处理（包括刻意的错误示例、原始拼写、表述疑点；保留数学和引用关系）：
+
+第 1 章
+• Training Data subsection：原文将 Thus, in addition to enabling useful applications, 与 another driver... 之间插入空白段落；译文合成完整句子，内容全部保留。
+• Prerequisites and Overview：原文将产品名写作 Huggingface 与 Github；译文沿用源文拼写。
+• source citations and supplied bibliography：部分引用键中的年份与随附 .bbl 显示年份不同，例如 gunasekar2024textbooks 显示 2023、plaat2024reasoning 显示 2025b、chen2025does 显示 2026。引用键和随附文献信息均原样保留。
+
+第 2 章
+• fig:nlp-pipeline：nlp_pipeline.pdf 实为论文整页而非单独的流程图。重绘仅依据其中可核对的原系统图，不将整页英文论文缩入正文。
+• 自回归学习小节：原文将前序样例记作单个词元 \mathbf{x}=x_{t-1}，与通常的完整历史记号有差别；公式原样保留。
+• 循环神经网络小节：原文 BPTT 回溯时间步写为 t_{-1},t_{-2},...，而非 t-1,t-2；记号原样保留。
+• eq:enc-dec-attention：正文称上下文向量为隐藏状态的线性组合，但公式为 c_j=a_1 h_1,...,a_n h_n，未写求和。依要求完整保留源公式，未擅自修正。
+• eq:contextualized-embeddings：原公式 softmax 一项中的括号与 TeX 分组方式不常规；整段数学环境逐字符保留，能够编译。
+• 注意力小节：原文先把 Q/K/V 合称为 attention layer 或 head，随后又说多个 head 组成 layer，层与头的表述有混用；译文保留该论述并在报告提示。
+• fig:transformer 与对应正文：正文称图为原始 Transformer，但随附资产绘制的是预归一化布局；图中只有最终线性层，正文另提 softmax。重绘严格匹配所给资产，没有将其改成其他版本。
+• 仅解码器模型小节：源文把 GPT 全称写作 generalized pretrained transformer，而非通常的 generative pretrained transformer。正文按源文译为“广义预训练 Transformer”并保留英文；交主编决定是否另作原文勘误。
+• RNN 延伸阅读：原文引用 goodfellow2014generative，该键对应 GAN 论文而非通常的深度学习教材；引用键与随附参考文献均原样保留。
+
+第 3 章
+• Pretrain，小节第 2 段：源章讨论仅解码器训练流程，却使用 masked-token cloze-like tasks 描述预训练，并以 preceding context 为条件；原文将掩码填空与自回归目标混合叙述。译文完整保留，不擅自改写为其他训练目标。
+• Equation eq:lm：原文将正的对数似然和称为 language modeling loss，同时称目标为最大化概率；表达式没有通常损失函数的负号。保留原式及“损失”用语，未补负号或修改优化方向。
+• Posttraining Metrics，Pass@K 段：原文写为 the percentage of problems solved correctly on the model's Kth attempt；这一表述与前句“多次尝试中是否包含答案”的含义不一致，也不同于常用至少一次成功的 pass@k 定义。译文按原文保留为“第 K 次尝试”，供主编决定是否另加译注。
+• Open and Closed Models，第 1 段：Gemma 后引用键为 chowdhery2023palm（PaLM 文献）；模型名及引用键均原样保留。
+• Pretrain，稳定性段与 fig:glm-spike：源文称左图展示 336M/752M 的训练损失，并说 switching embedding layers；随附图片左侧实际为 (a)/(b) 架构，训练曲线在右侧，图中改变的是 LayerNorm 位置。译文保留源文论述与整幅原图，不据图替换正文的技术对象。
+• Objective alignment 与 fig:grpo：正文以确定性验证器解释 RLVR/GRPO，而随附比较图仍画出冻结的 Reward Model；中文重绘保留原图奖励模型节点及关系，未自行改为验证器。
+• Pretrain，课程学习段：原文写 trillions of gradient updates（数万亿次梯度更新），不同于词元数这一规模；译文如实保留其量级。
+• Equation eq:bits-per-byte：原文没有在紧邻正文中显式定义分母 B 与求和上限 N；公式和既有说明全部原样保留。
+
+第 4 章
+• Kaplan Scaling Laws：原文出现 rekated 和 N is with becoming 等拼写、语法错误，译文按上下文自然表达其原意，未删去论述。
+• Kaplan Scaling Laws, description of S and B：原文将 S 称为 optimal step size，但脚注 D=B·S 和 S∝C^{0.03} 所用 S 实际是训练步数。译文按数学上下文使用“最优步数”，脚注与所有公式原样保留。
+• Chinchilla Scaling Laws：原文用 a≈0.45、b≈0.55 推述 Dopt/Nopt 跨多个计算量级仍接近常数 20，并明确称这是经验校准；译文完整保留这些限定，不自行修改系数或经验比值。
+• Grokking, paragraph after the figure：原文将固定模加法数据集上增加训练轮次的图描述为 data wall / data running out。译文保留其数据墙说法；它与本图直接展示的训练轮次及泛化迟滞之间存在概念跳转。
+• Reducing Pretraining Cost：原文小小节标题为“降低预训练成本”，其中首个段落却讲述微调阶段的 PEFT/LoRA。标题与段落归属均依原文保留。
+• LoRA figure versus surrounding prose：原图标注 W∈R^{d×d}，正文使用一般的 W0∈R^{d×k}。中文重绘保留图中的方阵特例，不擅自更改原图公式。原图 A=N(0,σ²) 的等号也按源图保留。
+• Mixture-of-Experts figure：原图部分 top-2 路由权重之和并非 1。中文重绘保留原始数值与选择关系，不对图中数值重新归一化。
+• Sustainable Language Models：原文 parameter and quantization count 的后半表述不常见；结合推理内存与量化上下文，译作“参数量与量化位数”，未改变其论述。
+
+第 5 章
+• Building a Chatbot；Background: Pretraining；Task 4 Prompt 3：原文分别给出“48 美元、8 块 H100 约 2 小时”“深度 24、4 块 H100 约 4 小时”以及环境反思题中的“8 块 H100 约 4 小时”，资源／时长口径不完全一致，也未明确是否指同一运行配置。译文逐一保留，未自行统一。
+• Background: Supervised finetuning 之后的词元化器段：原文明确写 Before each training stage，表示每个训练阶段之前都在 20 亿字符上训练词元化器；若各次词表发生变化，将涉及预训练权重与词元 ID 的兼容问题。译文按原文保留此流程表述，不改成“所有训练阶段之前仅训练一次”。
+• Recommended Reading，第 4 项：原文将 CLIMBMix 数据整理方法对应到 Task 2's dataset analysis question；显式“Dataset Analysis”问题实际位于任务 3 的交付内容。保留原任务 2 指向，不擅自更改任务编号。
+• Task 3 Deliverables，Benchmark Scores：该项要求同时比较预训练、中期训练与 SFT 三个阶段的基准得分，但任务 2 没有显式安排 ARC／GSM-8K 基准评估步骤。译文完整保留各任务要求，未补造额外实验步骤。
+• Building a Chatbot，We will take you trough...：源文 trough 为 through 的拼写笔误，中文按“带你走过训练流程”译出。
+
+第 6 章
+• Chain of Thought figure (cot2.pdf)：27 是少样本提示的错误答案，用于与 CoT/PAL 对比，已故意保留。PAL 输出的代码原图写作 anwer = apples - eaten + bought，未擅自改成 answer；提示问句用 Roger，部分回答用 Rogers，译图同样保留这一拼写差异。图中英文语法小错只按原意译出。
+• Self Consistency figure (selfconsistency.pdf)：原图左侧将 3+4=7 个已用蛋误作售出数量，得到 14 美元；第二个采样分支把 $2*(16-4-3) 写成 26 美元。这些错误正是单路径与多数投票对照的一部分，所有错误数值、分支及最终 18 美元答案均保留，未进行计算替换。
+• Multi-step Reasoning Benchmarks / Chain of Thought Prompting：同章先称 GPT-3-175B 在 GSM8K 上准确率约为 15%，后称 CoT 从 16% 提高到 47%；两处原始数值均保留。Romeo 饼干题中的 two dozen batches 原文措辞略含混，译文按随附 4×2×12/16=6 算式表述为每盘两打，算式完整保留。
+• In-Context Learning / Long Context Windows：前文概括上下文窗口通常只有数千词元，后文另谈长上下文与线性架构；译文完整保留这一原始概括，没有按译者所知更新窗口规格。
+• LLMs are Memory-less Functions：原文用 vast model of (K,V)-parameters 描述模型知识存储。译文保留 (K,V) 记号及其原始表述，没有自行改写为权重矩阵或 KV 缓存解释。
+• Retrieval Augmentation and Long Context Windows：原文将 RAG 展开为 retrieval augmentation for generative AI，非术语表常用的 retrieval-augmented generation。译文中文统一用“检索增强生成”，英文括注仍保留原文展开。
+• Tree of Thoughts DFS pseudocode：原图算法签名/输入条件使用 v_th，条件语句使用 v_thres；条件中 V(p_theta,{s'},x) 又出现未列在 DFS 形参中的 x。中文重排保留全部原始标识符与控制流程，供主编判断，不替原作者修正算法。
+• ReAct / Evolving code generation prompts：原文直接把 ReAct 描述为强化学习框架，并用 accuracy improvements 描述 BBOB 上提升 11 个百分点。译文保留原有分类与指标说法；这些表述与提示控制、实际参数训练以及优化基准指标之间的界限，可在科学性复核时进一步确认。
+• Source prose and caption punctuation：原文 caption 中 Chain of Though 拼写、正文 rule of an agentic harness 等措辞，以及基准测试长句中多余右括号，均按上下文自然译出或整理标点，未增删任何方法、任务或引文。
+
+第 7 章
+• LM-Nav / fig:lmnav：原题注称 Three-LLM Architecture，正文则逐项列为 LLM、VLM、VNM 三个预训练模型。题注按原意译作“三大语言模型架构”，正文保留三种实际类型，没有替作者统一为同一类型。
+• WorldGPT / architecture and learning algorithm：正文两处写 Vicuna-7B-v0，随附脚注链接却指向 vicuna-7b-v1.3。型号和 URL 各按原文保留。
+• WebDreamer / architecture and learning algorithm：架构段写 Qwen-70B，学习算法段写 Qwen-2-VL 与 Qwen2-VL-72B，并给出 310 万交互例。原文的型号写法与数值均保留，没有自行改成某个统一型号。
+• π0 / architecture：原文把 π0 作为强调强化学习方法的模型介绍，同时随后说明动作专家通过 flow matching 生成动作；两项陈述均依原文保留，未替作者改写训练范式。
+• Model-free reinforcement learning：原文将马尔可夫决策过程表述为 S、T、A、R 四个函数，S(o) 表示状态、A(s) 返回动作。正文及数学表达式均保持该特殊记号，没有改写成另一个标准元组。
+• figures/magma.png / UI Navigation：源图连续两次列出 Check the Supplier；中文图同样连续两次保留“查看供应商”，没有删成一条。
+• Model predictive control / WebDreamer learning algorithm：原文把 MPC 解释为用于工程控制问题、进行自适应重新训练的强化学习方法。译文保留这一原始分类与措辞，未按译者理解替换为另一种定义。
+
+第 8 章
+• 8.1.1 Deep Learning is Slow：原文 special parallel parallel hardware 中 parallel 连续重复。译文按单次“专用并行硬件”自然译出，不涉及方法或事实变更。
+• 8.2 Inner/Outer Loop，原文内外循环行间公式：源码使用嵌套 argmin 示意内外循环，但外层损失未显式给出跨任务聚合、测试集或对内层最优参数的评价方式。译文完整保留原公式，仅翻译循环文字标注，不补写符号或更改目标。
+• 8.3 LLM and Metalearning，首段：源文直接概括“Metalearning is repeated finetuning”，其范围比前文基于超参数学习的定义更窄；同段还将上下文少样本学习列入这一框架。正文保留作者的概括，没有替换为译者自拟的严格定义。
+• 8.3.1.2 In-Context Learning 与 8.3.2.1 Self-Reflection：作者把静态预训练模型称为内循环或内训练循环，同时明确模型权重不受当前提示影响。这是本章对“学习循环”的广义用法；译文保留原表述，未擅自改写为参数更新过程。
+
+第 9 章
+• 表9.1 A行及9.2.1.1末段；有效源第138、178行：GPT-2对应的引用键两处均为vaswani2017attention，模型名与该引用的对应关系存疑。已原样保留模型名和引用键，未替作者更换参考文献。
+• 表9.1 A行与9.2.1.1末段；有效源第138、175—178行：表中A方式的大语言模型列为pretrained，正文又说明模型经过instruction answering微调。已分别保留两个位置的表述，未改动分类。
+• 9.2.1.5 强化微调控制框架；有效源第290—310行：前文将强化微调称为finetuning at inference-time，后文又说明方式E不在测试/推理阶段(3)进行强化学习，而在微调阶段(2)进行。阶段划分存在解释张力，已逐段完整保留，未统一改写作者定义。
+• 9.3.2.3 显式记忆管理；有效源第386行：原文将MCP表述为为context management设计的一组strategies。按原文译为“一组为上下文管理设计的策略”，未以外部资料重写该定义。
+• 9.3.2.3 显式记忆管理；有效源第383行：A-mem所依循原则在原文写作mailbox principle，已保留为“邮箱原则”，未替作者更换概念。
+• 9.3.2.3 显式记忆管理；有效源第380行：MemoryBank段落的running personality of the interaction events of a user语义不够清晰；译为“根据用户的交互事件持续构建其人格画像”，未补写实现细节。
+
+第 10 章
+• 图10.5 Reflexion伪代码while条件：原文：while M_e not pass or t < max trials do；原条件使用or而非and；照原条件译为“或”，没有替作者修正循环逻辑。
+• 10.2.5 实现自己的推理智能体；代码10.2与10.4：原文：running gently with fewer workers; eval.num_workers=64；正文称使用较少worker，但自定义智能体命令为64，标准评估命令为16；保留正文和全部代码原值。
+• 代码10.2与代码10.4：原文：agent.max_text_history=16 / agent.max_history=16；两条评估命令使用不同历史长度参数名，按原代码保留；未运行示例或访问外部仓库验证。
+• 10.2.2 不同的大语言模型：原文：Especially the open version from OpenAI, Claude, DeepSeek, OLMo and Qwen may work well.；原文将所列模型一并表述为“开放版本”，含OpenAI与Claude；保留原陈述，未联网更新或改写事实。
+• 10.4 自我反思，图10.5后的行号说明：原文：line 3, 5, and 6 (M_a, M_e, and M_sr) and line 9, 11, 12；原图未显示行号；按伪代码逻辑逐行计数时，正文列举的调用行号与评估/反思步骤不完全吻合。译文保留全部原行号，未为图补造行号。
+• 图10.5 Reflexion伪代码：原文：Generate initial trajectory using pi_theta; Evaluate tau_0 using M_e; return；初始轨迹生成行未显式赋值tau_0，策略初始化时mem尚未显式初始化，return未指定返回值；按原图保留这些未展开细节。
+• 10.1 BALROG概览与图10.1：原文：正文BabyAI, Crafter, TextWorld, BabaIsAI, MiniHack, NetHack；图列BabyAI, TextWorld, Crafter, Baba Is AI, MiniHack, NLE；正文由易到难的列举顺序与图的列顺序不同；BabaIsAI/Baba Is AI以及NetHack/NLE的写法也不同。各处均依原文保留，未重排行列或统一图中专名。
+• 10.1.2 BALROG架构、10.4 ReAct及10.5结语等：原文：We wil; promtps; these framework; Does is improve; can performs; fend of; your self；原文存在拼写或语法问题。中文按句意自然译出，不改变论述、科学性陈述或任务要求；此处保留原错误写法作为校对记录。
+
+第 11 章
+• 11.3.2 Computer and Browser Tools：此处公司名原文拼为Antropic，同章MCP节使用Anthropic；译文保留原有拼写，未代作者修正。
+• 11.4 示例及代码11.2—11.3：原文将LangChain上下文总结示例称为MCP简化实现；示例未展示此前所述MCP客户端/服务器及JSON-RPC交互。相关称谓与代码全部按原文保留，未补造协议实现。
+• 11.5 自我纠正与状态感知系统：原文描述Healer并调用wu2024stateflow；随附本章bbl中该键的题名是Stateflow: Enhancing llm task-solving through state-driven workflows。保留原文称谓及引文键。
+
+第 12 章
+• 第12.5.2节；lst:coderag；源文第368行及相应代码：原文称示例使用Python的ast模块提取函数定义与文档字符串，并演示AST结构搜索；代码实际仅导入ast，提取操作使用inspect，未实施AST解析或结构匹配。正文和代码均原样保留其含义与实现。
+• 第12.5.3节“多模态RAG”；源文第433行：原文称用OCR提取文本内容后，将其余内容作为纯文本处理；“其余内容”的指代与处理方式含混。译文保留原表述，未替作者补充转换步骤。
+• 第12.7节检索指标枚举；源文第525行：原文对Recall@k与Precision@k合并使用“前k项中检索到的相关文档比例”这一说明，未在该句区分两者分母。译文保留该句表述，后续两条公式保持原定义。
+• 第12.7节生成指标；eq:faithfulness；源文第562—564行：文字说明按每项论断是否受到支持来衡量忠实性，公式则统计由上下文蕴涵的输出数与输出总数，计量单位未明确对应。公式中的纯文字标签译为中文，其数学结构保持。
+• 第12.7节联合评估与新指标；源文第577行：原文出现“Auepora process”，本章未说明该名称。译文保留Auepora名称，不自行猜改或补定义。
+• 有用性公式标签eq:helpfullness；源文第572行：原标签helpfullness的拼写与正文Helpfulness不同；作为交叉引用键，已原样保留。
+
+第 13 章
+• 13.2 对话助手正文与图13.1题注：正文使用 AssistantGPT，题注使用 AssistGPT；译稿分别保留原名称，未统一改名。
+• 13.4 主要建议，第3项：原句含 expected outputs are evaluation metrics tailored to the domain are necessary，语法连接异常；按上下文译作需要领域任务数据集、提示、预期输出与评估指标，未增改技术论断。
+• 13.7 AI Scientist 段：原文 incorrect implementation if ideas 中 if 疑为 of 的笔误；译为研究构想的实现不正确。
+• 13.8 首段：原文写 software discovery，与随后软件工程任务的表述不一致；正文仍译为软件发现，未替作者改成软件开发。
+• 图13.2 练习场景顶部：源图写 After Initial Diagnosis through Conversion；结合图内问诊对话，Conversion 按疑似 Conversation 的误写译作通过对话完成初步诊断后。
+• 图13.3 源图底部：swe.png 实际为接口概览图，底边有原始裁切留下的极细文字残片；底图原像素保留。源图没有完整任务、代码或终端命令区，未补画或编造这些内容。
+
+第 14 章
+• 步骤 1：理解并运行基线／共享上下文条目：原文使用 Section 引用 sec:tools，而本章其他位置将同一标签称为 Chapter；译文保留该处“节”的称谓及原引用调用，未替作者统一。
+
+第 15 章
+• 15.5.1正文与图15.2统计表：正文称ToMBench包含2860个测试项目；图中任务视角为2470个问题、能力视角为2860个问题。两种口径及全部数据按原文保留，未自行统一。
+• 15.5.1正文与图15.2能力视角：正文称覆盖ATOMS七类心理状态；图中能力视角列出六个数据行。保留原图六行，未补造第七行。
+• 15.5.1 ExploreToM段：原文将准确率提升写为27% (points)，百分比符号与百分点括注并存；译文保留27%及“个百分点”括注。
+• 15.5.3小结：原文称有三点观察，随后在First、Second、Third之后又追加Lastly一段。译文保留这四段及原有措辞关系。
+• 15.5.2心智理论与推理模型、结构化推理段：原文型号拼写为GPT-o3、GPT-o4-mini、GPT-o1、GPT-o3-mini；均按原样保留，未按外部资料改名。
+• 图15.1反事实情境：原图刻意规定剪刀胜石头、布胜剪刀、石头胜布；译图保持该反常规则及原答案选项，不按常见规则改正。
+• 15.5.1非预期结果测试：正文测试名为Unintended Outcome test，图中为Unexpected Outcome Test；中文均译为“非预期结果测试”，英文源名差异保留于本报告。
+
+第 16 章
+• 16.2.1，MAgIC正文与图16.1：正文将GPT-o1列为高分及概率图增强模型，原雷达图/柱线图的模型清单却只有GPT-4-T、GPT-4、GPT-3.5-T、Claude 2、PaLM 2、Cohere和Llama-2-70B，未出现GPT-o1。正文与图均按原文保留。
+• 16.2.2，AucArena段：原文模型名写为LLaMa 2.13b；未自行改写为其他版本或参数规模。
+• 16.3.3，MetaGPT段：原文将SOPs展开为Standard Operation Protocols；照译“标准操作协议”，并保留该英文展开。
+• 16.3.4，SOTOPIA观察列表第2条：原文为“prevented each other from thought generation and other errors”，与前文思维退化讨论不一致，疑将thought degeneration写成thought generation。正文按原文字面保留“思维生成”，未静默修正。
+• 16.3.1，蒸馏交叉引用：原文用Chapter指向标签sec:distillation，单章预置引用将其解析为19.2，因而译文显示“第19.2章”。标签、调用和章表述均按原文保留；主编可在全书校勘中统一处理。
+• 16.3.5，小结首段：原文用sec:strategic引用协调弱点，解析为第15.4节；可能原意是本章sec:strat（16.2节）。按原键保留，没有替作者更改交叉引用。
+• 图16.7，人物卡与说明文字：原图Agent1秘密卡被Agent2卡遮挡，仅露出“n a”残片；该残片原像素保留，不猜补不可见文字。原图另有红色“Text”杂字，译作红色“文字”并略上移以避免与说明正文重叠。
+
+第 17 章
+• 图17.7(a)，第2步：原文：2.Munually Evolve；处理：原图拼写有歧义；结合左侧传统LLM对齐与右侧Self-Evolve的对照，译为“2. 手工演化”。原Value_t→LLM_t箭头方向保持；原字样在本报告明确记录，未静默改成另一个英文词。
+• 图17.5时间引擎内部：原文：上下两组内部队列均标1 pm，旁边的时间轴另有1 pm和2 pm；处理：两组内部标注均忠实译为“下午1时”；不把上方队列改成下午2时。
+• CASA段落：原文：CASA is based on WebArena，原引用键为qi2024webrl；处理：保留该键；未替换为后文介绍WebArena时使用的zhou2023webarena。
+• 有效正文的表面语法/拼写：原文：simulatinos；can be be made；being able for detect；处理：中文以自然语法表达相同含义，不改变论述、数据或引文。
+
+第 18 章
+• 源文行 56；81；113；117；147：背景、实验设置和结语描述在编码时提高负性记忆的重要性评分；架构变体小节则给出独立效价项，并称新增该项是两种变体的唯一区别。；处理：两种说明及检索公式均按原文完整保留，没有代作者统一机制。
+• 源文行 30：课程练习 URL 的仓库名使用原始拼写 agentic-llm-course-excercises。；处理：完整保留 URL；没有访问链接、克隆仓库、安装或运行教材练习。
+
+第 19 章
+• 长标题和可选短标题都以普通星号开头；保留为编号章标题字符，未改为chapter*。
+• 回译一段原文将过程描述为源语言→目标语言→源语言；译文按原叙述保留。
+• 图19.4原纵轴名称为单数Super-Natural Instruction (Test)，而题注使用复数Instructions；轴中保留原专名拼写，只将Test译为测试。
+
+第 20 章
+• 20.1.3 最后一段：原文：The training occurs in two stages.；原文称训练分为两个阶段，但有效正文未进一步说明这两个阶段。译文保留原句，不补造阶段。
+• 20.2.1 第一段：原文：The self-reflection approaches from the previous section；原文将自我反思方法称为前一节内容，但直接在前的内容为循环/递归架构。保留该指代，未自行改写引用位置。
+
+第 21 章
+• 第21.5.1节／式(21.3)：原文：converted into logits y; y = Softmax(LN(h_L) W_U)；原文将 y 称为 logits，但其定义式已包含 Softmax，所得通常是概率分布。；处理：正文及公式按有效 TeX 保留，未自行纠正或补写。
+• 第21.5.1节“Direct Logit Attribution”／式(21.5)：原文：the final logit y is a linear function of the cumulative sum; DLA(l) = LN(Delta h_l) W_U；原文称最终 logit 是层输出累加和的线性函数，同时给出对单层输出单独施加 LN 的 DLA 公式；与前文含 LN／Softmax 的定义有表述张力。；处理：正文及公式按有效 TeX 保留，未自行纠正或补写。
+• 第21.6.1节首段与组合机制段／图21.5：原文：attends to the previous occurrence of [A]; later: attend to the correct historical token [B]；首段表述为关注此前的 [A]，后文 K 组合说明及图示的实际注意力端点则是其后的 [B]／struction。两种说法均按原稿保留。；处理：正文及公式按有效 TeX 保留，未自行纠正或补写。
+• 第21.6.2节评估段：原文：Evaluation: Faithfulness, Completeness, and Minimality；原文段标题列出忠实性、完整性与最小性，正文仅明确定义前两者；没有自行补写最小性的定义。；处理：正文及公式按有效 TeX 保留，未自行纠正或补写。
+
+第 22 章
+• 源文行 204：原文：Citet{yamada2024spatial}；作者疑似漏反斜杠；原文不是有效引用调用。；处理：按源文保真规则及主编明确指示，原样保留裸文本标记，未擅自恢复为引用命令、改键或补文献。PDF 第8页因此显示字面标记 Citetyamada2024spatial。
+• 源文行 359：原文：For agents, the last column of Table ... holds behavioral entries only.；表 tab:levels 的最后一列实际为机制层面，而智能体的行为条目在行为列；原文指称错位。表内还保留意识行的少量表征证据。；处理：忠实译为“对于智能体，表……的最后一列只有行为条目”，未替作者修改论断或表格。
+• 源文行 204：原文：LLM's abilities to represent s；句子在 represent 后只剩孤立字母 s，疑似漏字。；处理：按剩余完整语义译为“大语言模型表征能力的局限”，未补造被表征对象。
+• 源文行 280：原文：Conslusion；小节标题拼写错误。；处理：自然译为“结语”；小节级别与位置不变。
+• 源文行 348：原文：the question at what level---or any form of cognitive functioning---is attributed；英文句法残缺，破折号插入部分缺少明确衔接。；处理：保留关于认知功能归属层面的完整可确定语义，译为“任何形式的认知功能，究竟应归于哪个层面”，未补入原文没有的哲学结论。
+• 源文行 233：原文：\citep[e.g.]{hutto2008folk, vanduijn2016, nicolopoulou2017narrativity}；原文只给 citep 一个可选参数，natbib 将 e.g. 排为引文后注。；处理：保留原调用形式，仅把自然语言后注译为“例如”；因此中文引文中“例如”仍在文献列表之后。
+• 源文行 151；163；201；206；220；237；336；343；351：原文另有 exist of、whether to what degree、arithmatic、but to not、mechanisms is、is regulate、emotions are experiences、systems were consciousness 等语法或拼写不顺。；处理：依据上下文正常译出原有含义；未更新事实、删除论述或替作者修正科学主张。
+
+第 23 章
+• 23.1.1 技术；23.2.2 规模扩展：源文将 RLVR、GRPO 称为用于微调的 inference-time methods，并再次称其使用推理阶段结果进行微调。这种分类与训练／推理阶段概念存在混用。；处理：忠实保留原文论断，未自行纠正或引入新事实。
+• 23.2.3 幻觉与可解释性首段：源文在 stated reasoning may not be causally responsible for the output 之后接 a property known as faithfulness，疑将非忠实情形直接称为忠实性。；处理：保留原有逻辑与忠实性术语；仅在本报告记录疑点，未暗改正文。
+• 23.2.4 情绪行为与意识首段及脚注：源文断言机械装置上执行的算法显然不可能具有目的，并以人类是有机体作对照；脚注又给出鸭子类型／行为主义的不同观点。；处理：完整保留机械／有机体括注、立场与鸭子类型脚注，未借后续事实或其他章立场改写。
+
+原文保留与处理记录共 122 条；每章的图重绘方法、结构数量与目检页详见 03_校对记录。
+本说明区分源文疑点与译排缺陷；所有已知译排阻塞项均已关闭。

@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.0cm,y=1.0cm,
+ ch06box/.style={rounded corners=5pt,fill=gray!20,minimum height=1.1cm,text width=3.1cm,align=center,font=\small}]
+ \node[ch06box,fill=orange!70,text width=2.8cm] (ch06b-model) at (0,0) {因果模型\\例如 SCM $\mathfrak C$};
+ \node[ch06box] (ch06b-graph) at (-4,0) {因果图\\$\mathcal G$};
+ \node[ch06box] (ch06b-obs) at (-2.1,2.25) {观测分布\\$P_{\mathbf X}^{\mathfrak C}$};
+ \node[ch06box] (ch06b-int) at (2.1,2.25) {干预分布\\$P_{\mathbf X}^{\mathfrak C;\dox{\ldots}},\ldots$};
+ \node[ch06box] (ch06b-cf) at (4,0) {反事实\\$P_{\mathbf X}^{\mathfrak C\mid\mathbf X=\mathbf x;\dox{\ldots}},\ldots$};
+ \draw[ed,orange!80!black] (ch06b-model)--(ch06b-graph);
+ \draw[ed,orange!80!black] (ch06b-model)--(ch06b-obs);
+ \draw[ed,orange!80!black] (ch06b-model)--(ch06b-int);
+ \draw[ed,orange!80!black] (ch06b-model)--(ch06b-cf);
+\end{tikzpicture}
+\caption{结构因果模型这类因果模型，不仅对观测分布 $P$ 建模（命题 6.3），也对干预分布（第 6.3 节）和反事实（第 6.4 节）建模。}
+\end{figure}

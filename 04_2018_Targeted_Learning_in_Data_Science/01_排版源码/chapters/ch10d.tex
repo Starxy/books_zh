@@ -1,0 +1,212 @@
+% 原书第 158—160 页；第 10.4 节、完整假设讨论与证明。
+\section{C-TMLE 渐近线性的一般定理}
+\label{sec:ch10-asymptotic-linearity}
+
+下面的定理证明：如果存在某个选择器 $h_{1n}$，使 C-TMLE 具有渐近线性，那么我们提出的采用 $h_n$ 的 C-TMLE 也具有渐近线性。
+
+\begin{bookresult}{定理}{10.1}
+令 $\Psi:\mathcal M\to\mathbb R^d$ 在任意 $P\in\mathcal M$ 处路径可微，其有效影响曲线为
+$D^*(P)=D^*(Q(P),G(P))$，并且 $\Psi(P)$ 只通过 $Q(P)$ 依赖于 $P$。为方便记号，我们也将 $\Psi(P)$ 记为 $\Psi(Q)$。假设
+\[
+ \Psi(Q)-\Psi(Q_0)
+ =-P_0D^*(Q,G)+R_{20}(Q,G,Q_0,G_0),
+\]
+其中，余项 $R_{20}()$ 具有双重稳健结构，使得对所有 $Q\in\mathcal Q(\mathcal M)$，均有
+$R_{20}(Q,G_0,Q_0,G_0)=0$。
+令 $(G_{n,h}:h)$ 是 $G_0$ 的一族候选估计量，以标量 $h$ 为索引；令 $(Q_{n,h}^*:h)$ 是在靶向步骤中使用 $G_{n,h}$ 的一族 TMLE，从而对所有 $h$ 都有
+$P_nD^*(Q_{n,h}^*,G_{n,h})=0$。
+令 $h_n$ 是一个给定的选择器，并令 $Q_n^*=Q_{n,h_n}^*$ 为对应的 TMLE。令 $(Q^*,G_0)$ 为 $(Q_{n,h_n},G_{n,h_n})$ 的极限，使得当 $n\to\infty$ 时，
+\[
+ P_0\{D^*(Q_{n,h_n}^*,G_{n,h_n})-D^*(Q^*,G_0)\}^2
+ \longrightarrow_p0.
+\]
+我们作如下假设。
+
+\noindent\textbf{存在所需的选择器：}
+假设对于一个固定的 $Q^*\in\{Q(P):P\in\mathcal M\}$，存在一个趋于零的序列 $h_{1n}$，满足
+\begin{equation}
+ \begin{aligned}
+ &P_0D^*(Q^*,G_{n,h_{1n}})-P_0D^*(Q^*,G_0)\\
+ &\qquad=(P_n-P_0)D_1(P_0)+o_P(n^{-1/2}).
+ \end{aligned}
+ \tag{10.11}
+\end{equation}
+
+\noindent\textbf{选择器求解关键方程：}
+对于这样的选择器 $h_{1n}$，有
+\begin{equation}
+ \left\{\frac{d}{dh_n}P_nD^*(Q_n^*,G_{n,h_n})\right\}
+ \ast(h_n-h_{1n})=o_P(n^{-1/2}),
+ \qquad Q_n^*=Q_{n,h_n}^*.
+ \tag{10.12}
+\end{equation}
+
+\noindent\textbf{二阶余项可以忽略：}
+\[
+ \begin{aligned}
+ &P_0D^*(Q^*,G_{n,h_{1n}})-P_0D^*(Q^*,G_{n,h_n})\\
+ &\quad-\left\{\frac{d}{dh_n}P_0D^*(Q^*,G_{n,h_n})\right\}
+       \ast(h_{1n}-h_n)=o_P(n^{-1/2}),
+ \end{aligned}
+\]
+\[
+ (P_n-P_0)\{D^*(Q_{n,h_n}^*,G_{n,h_n})-D^*(Q^*,G_0)\}
+ =o_P(n^{-1/2}),
+\]
+\[
+ \left\{(P_n-P_0)\frac{d}{dh_n}D^*(Q^*,G_{n,h_n})\right\}
+ \ast(h_{1n}-h_n)=o_P(n^{-1/2}),
+\]
+\[
+ \begin{aligned}
+ &P_n\left\{\frac{d}{dh_n}
+   \{D^*(Q_n^*,G_{n,h_n})-D^*(Q^*,G_{n,h_n})\}\right\}\\
+ &\qquad\ast(h_{1n}-h_n)=o_P(n^{-1/2}),
+ \end{aligned}
+\]
+\[
+ \begin{aligned}
+ &\{P_0D^*(Q_n^*,G_{n,h_n})-P_0D^*(Q_n^*,G_0)\}\\
+ &\quad-\{P_0D^*(Q^*,G_{n,h_n})-P_0D^*(Q^*,G_0)\}
+ =o_P(n^{-1/2}).
+ \end{aligned}
+\]
+那么，$\Psi(Q_n^*)$ 是 $\Psi(Q_0)$ 在 $P_0\in\mathcal M$ 处的渐近线性估计量，影响曲线为 $D^*(Q,G_0)+D_1(P_0)$：
+% 原书前一句为 Q，下一式为 Q^*，按各自印刷保留。
+\[
+ \Psi(Q_n^*)-\Psi(Q_0)
+ =(P_n-P_0)\{D^*(Q^*,G_0)+D_1(P_0)\}+o_P(n^{-1/2}).
+\]
+\end{bookresult}
+
+\noindent\textbf{关于定理 10.1 假设的讨论。}
+下面说明如何验证这些假设。第一个假设 (10.11) 要求存在序列 $h_{1n}$，使估计足够欠平滑，从而使光滑泛函 $\Phi_{Q^*}(G_n)$ 成为 $\Phi_{Q^*}(G_0)$ 的渐近线性估计量，其中
+$\Phi_{Q^*}(G)=P_0D^*(Q^*,G)$。
+当 $Q^*\ne Q_0$、即 $Q^*$ 设定错误时，这一点可能无法做到。此时，一个值得研究的问题是，能否推广下面的证明，说明即便如此，$\Psi(Q_n^*)$ 的二阶项表现仍然优于不求解关键方程 (10.12) 的标准 TMLE。
+如果 $P_nD^+(Q_n^*,G_{n,h_n})=0$，第二个假设 (10.12) 就成立；但如前所述，我们不要求精确求解。我们的主张是，这个假设归结为要求
+\[
+ \left\{\frac{d}{dh_n}P_nD^*(Q_n^*,G_{n,h_n})\right\}
+ \ast h_n=o_P(n^{-1/2}),
+\]
+因为可以将 $h_{1n}$ 选为仍能保持渐近线性 (10.11) 的最快趋零速率。
+如果 $h\mapsto P_0D^*(Q^*,G_{n,h})$ 二次连续可微，第一个“二阶余项”假设就相当于要求
+$(h_{1n}-h_n)^2=o_P(n^{-1/2})$。
+只要 $h_{1n}^2$ 与 $h_n^2$ 都是 $o_P(n^{-1/2})$，这一条件就成立。因此，按照对 $h_n$ 的偏差解释，$G_{n,h_n}$ 的偏差必须以快于 $n^{-1/4}$ 的速率趋于零。
+假设 $D^*(Q_n^*,G_{n,h_n})$ 以趋于 $1$ 的概率落在某个 $P_0$-Donsker 类中，$D^+(Q_n^*,G_{n,h_n})$ 也以趋于 $1$ 的概率落在某个 $P_0$-Donsker 类中，并且
+\[
+ P_0\{D^*(Q_n^*,G_{n,h_n})-D^*(Q^*,G_0)\}^2
+ \longrightarrow_p0,
+\]
+\[
+ P_0\{D^+(Q_n^*,G_{n,h_n})-D^*(Q^*,G_0)\}^2
+ \longrightarrow_p0.
+\]
+% 原书后一式 D^+ 减去 D^*，并未印成 D^+ 减 D^+。
+那么，由经验过程理论以及 $\max(h_{1n},h_n)\longrightarrow_p0$，可以推出第二、第三和第四个“二阶余项”假设成立。因此，这三个二阶余项假设只依赖于 $(Q_n^*,G_{n,h_n})$ 对 $(Q^*,G_0)$ 的一致性，以及一个 Donsker 类条件。最后，对于某些泛函 $H_1,H_2$ 和 $f$，第五个“二阶余项”假设中的余项一般可以表示为
+\[
+ \begin{aligned}
+ \int &(H_1(Q_n^*)-H_1(Q^*))(H_2(G_{n,h_n})-H_2(G_0))\\
+      &{}\times f(Q_n^*,G_n,Q^*,G_0)\,dP_0.
+ \end{aligned}
+\]
+此时，如果排除奇点，即假设强正值性，那么只要
+\[
+ \|H_1(Q_n^*)-H_1(Q^*)\|_{P_0}\|H_2\|_{P_0}
+ =o_P(n^{-1/2}),
+\]
+这个假设就成立。
+% 原书此范数乘积中 H_2 未带两个 G 的差值，照印刷保留。
+
+\begin{proof}[定理 10.1 的证明]
+有
+\[
+ 0=(P_n-P_0)D^*(Q_{n,h_n}^*,G_{n,h_n})
+   +P_0D^*(Q_{n,h_n}^*,G_{n,h_n}).
+\]
+根据二阶假设，
+\[
+ (P_n-P_0)D^*(Q_{n,h_n}^*,G_{n,h_n})
+ =(P_n-P_0)D^*(Q^*,G_0)+o_P(n^{-1/2}).
+\]
+令 $Q_n^*=Q_{n,h_n}^*$。由
+\[
+ \Psi(Q_n^*)-\Psi(Q_0)
+ =-P_0D^*(Q_n^*,G_0)+R_{20}(Q_n^*,G_0,Q_0,G_0),
+\]
+以及假设 $R_{20}(Q_n^*,G_0,Q_0,G_0)=0$，可得
+\[
+ \begin{aligned}
+ P_0D^*(Q_n^*,G_{n,h_n})
+ ={}&P_0D^*(Q_n^*,G_0)\\
+    &{}+\{P_0D^*(Q_n^*,G_{n,h_n})-P_0D^*(Q_n^*,G_0)\}\\
+ ={}&\Psi(Q_0)-\Psi(Q_n^*)\\
+    &{}+P_0D^*(Q_n^*,G_{n,h_n})-P_0D^*(Q_n^*,G_0).
+ \end{aligned}
+\]
+因此，我们已经证明
+% 原书此式在 D^*(Q^*,G_0) 与 P_0D^*(Q_n^*,G_{n,h_n}) 之间漏印 +；保留相邻乘写。
+\[
+ \begin{aligned}
+ \Psi(Q_n^*)-\Psi(Q_0)
+ ={}&(P_n-P_0)D^*(Q^*,G_0)P_0D^*(Q_n^*,G_{n,h_n})\\
+    &{}-P_0D^*(Q_n^*,G_0)+o_P(n^{-1/2}).
+ \end{aligned}
+\]
+由二阶假设，有
+\[
+ \begin{aligned}
+ &P_0D^*(Q_n^*,G_{n,h_n})-P_0D^*(Q_n^*,G_0)\\
+ &\qquad=P_0D^*(Q^*,G_{n,h_n})-P_0D^*(Q^*,G_0)
+        +o_P(n^{-1/2}).
+ \end{aligned}
+\]
+现在写成
+\[
+ \begin{aligned}
+ &P_0D^*(Q^*,G_{n,h_n})-P_0D^*(Q^*,G_0)\\
+ &\qquad=P_0D^*(Q^*,G_{n,h_n})-P_0D^*(Q^*,G_{n,h_{1n}})\\
+ &\qquad\quad{}+P_0D^*(Q^*,G_{n,h_{1n}})-P_0D^*(Q^*,G_0).
+ \end{aligned}
+\]
+根据“存在所需的选择器”假设，第二项等于
+$(P_n-P_0)D_1(P_0)+o_P(n^{-1/2})$。
+根据二阶假设，还可在 $h_n$ 处作如下 Taylor 展开：
+\[
+ \begin{aligned}
+ &P_0D^*(Q^*,G_{n,h_n})-P_0D^*(Q^*,G_{n,h_{1n}})\\
+ &\qquad=-\left\{\frac{d}{dh_n}P_0D^*(Q^*,G_{n,h_n})\right\}
+          \ast(h_{1n}-h_n)+o_P(n^{-1/2}).
+ \end{aligned}
+\]
+接着，写成
+\[
+ \begin{aligned}
+ &-\left\{\frac{d}{dh_n}P_0D^*(Q^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n)\\
+ &\qquad=\left\{\frac{d}{dh_n}(P_n-P_0)D^*(Q^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n)\\
+ &\qquad\quad{}-P_n\left\{\frac{d}{dh_n}D^*(Q^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n).
+ \end{aligned}
+\]
+根据二阶假设，右端第一项为 $o_P(n^{-1/2})$。对于第二项，写成
+\[
+ \begin{aligned}
+ &P_n\left\{\frac{d}{dh_n}D^*(Q^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n)\\
+ &\qquad=P_n\left\{\frac{d}{dh_n}D^*(Q_n^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n)\\
+ &\qquad\quad{}+P_n\left\{\frac{d}{dh_n}D^*(Q^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n)\\
+ &\qquad\quad{}-P_n\left\{\frac{d}{dh_n}D^*(Q_n^*,G_{n,h_n})\right\}
+        \ast(h_{1n}-h_n).
+ \end{aligned}
+\]
+根据二阶假设，右端第二项为 $o_P(n^{-1/2})$。由选择器 $h_n$ 的关键方程假设，右端第一项也是 $o_P(n^{-1/2})$。因此，我们已经证明
+\[
+ \Psi(Q_n^*)-\Psi(Q_0)
+ =(P_n-P_0)\{D^*(Q^*,G_0)+D_1(P_0)\}+o_P(n^{-1/2}),
+\]
+定理得证。
+\end{proof}
+

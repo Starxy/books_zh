@@ -1,0 +1,162 @@
+% 原书分章 PDF 第 21—24 页：第 25.6 节，完整密度估计例子与定理 25.5。
+\section{例：一元密度的单点估计}
+
+令 $O\sim P_0$，$\mathcal M$ 为非参数模型，
+对于给定点 $x_0$，$\Psi(P_0)=p_0(x_0)$。
+定义 $\Psi_h(P)=\int_tK_{h,x_0}(t)p(t)\,dt$，
+其中 $K$ 为 $J-1$ 阶正交核，
+$K_{h,x_0}(t)=h^{-1}K((t-x_0)/h)$。
+$\Psi_h$ 在 $P$ 处的有效影响曲线为
+$D_h^*(P)=K_{h,x_0}(O)-\Psi_h(P)$。
+它满足恒等式
+$\Psi_h(P)-\Psi_h(P_0)=-P_0D_h^*(P)$，
+因此 $R_{20,h}(P,P_0)=0$。
+令 $\mathbf p_n$ 为 $p_0$ 的初始估计量。
+令 $B_n\in\{0,1\}^n$ 为交叉验证方案，
+$\mathbf p_{n,B_n}$ 为将初始密度估计量应用于训练样本
+$\{O_i:B_n(i)=0\}$ 所得的估计。
+考虑在 $\epsilon=0$ 时经过 $p$ 的局部最不利子模型：
+\[
+ \mathbf p_{\epsilon,h}(o)
+ =(1+\epsilon D_h^*(P)(o))p(o).
+\]
+可以使用这个局部最不利子模型，也可以使用通用最不利子模型
+\[
+ \mathbf p_{\epsilon,h}(o)=p(o)
+ \exp\left(\int_0^\epsilon D_h^*(p_e)(o)\,de\right).
+\]
+令 $\mathbf p_{n,B_n,\epsilon,h}$ 为经过
+$\mathbf p_{n,B_n}$ 的这个最不利子模型。令
+\[
+ \epsilon_n=\argmin_\epsilon
+ E_{B_n}P_{n,B_n}L(\mathbf p_{n,B_n,\epsilon,h}),
+\]
+其中 $L(p)(o)=-\log p(o)$ 为对数似然损失。
+这定义了 $\mathbf p^*_{n,B_n,h}=\mathbf p_{n,B_n,\epsilon_n,h}$，
+从而得到 $\Psi_h(P_0)$ 的 CV-TMLE
+$\psi^*_{h,n}=E_{B_n}\Psi_h(\mathbf P^*_{n,B_n})$。
+将 $h_n$ 定义为下式的一个解：
+\begin{equation}
+ \frac{d}{dh_n}\psi_{h_n,n}
+ +C_n\sigma_n\frac{d}{dh_n}(nh_n)^{-0.5}=0,
+\tag{25.11}
+\end{equation}
+其中将 $\psi_{h,n}$ 定义为 CV 一步估计量：
+\[
+ \psi_{h,n}=E_{B_n}P^1_{n,B_n}K_{h,x_0}
+ =P_nK_{h,x_0}
+ =\frac{1}{nh}\sum_{i=1}^{n}K((x_0-O_i)/h).
+\]
+按照我们对该方法的描述，对于某个序列 $\alpha_n$，可设
+$C_n\in\{-Z_{1-\alpha_n},Z_{1-\alpha_n}\}$。
+此外，$\sigma_n^2=\tilde p_n(x_0)\int K(y)^2\,dy$
+是 $\sigma_0^2=p_0(x_0)\int K(y)^2\,dy$ 的相合估计量。
+这里，$\tilde p_n(x_0)$ 可以替换为任意相合估计量，
+例如采用某个满足 $nh_n^0\to\infty$ 的带宽选择器 $h_n^0$
+得到的 CV-TMLE $\psi^*_{h_n^0,n}$。
+注意，由于 $K_{h,x_0}$ 不依赖在训练样本上估计的干扰参数，
+带宽选择器 $h_n$ 中使用的 CV 一步估计量，
+简化为 $x_0$ 处的标准核密度估计量（kernel density estimator）。
+我们所提议的 CV-TMLE 为 $\psi_n^*=\psi^*_{h_n,n}$。
+
+现在应用定理 25.1。
+假定 $p_0(x_0)>0$，从而在 $t_0$ 的一个小邻域内也远离零。
+先考虑条件 (25.3)。有
+\[
+\begin{aligned}
+ \|D_h^*(\mathbf P_n)-D_h^*(P_0)\|_{P_0}
+ &=|\Psi_h(\mathbf P_n)-\Psi_h(P_0)|\\
+ &=\left|\int_xh^{-1}K((x-x_0)/h)
+ (\mathbf p_n(x)-p_0(x))\,dx\right|\\
+ &=\left|\int K(y)
+ (\mathbf p_n(x_0+hy)-p_0(x_0+hy))\,dy\right|\\
+ &=O\left(h^{-1}\int_{x_0-h}^{x_0+h}
+ |(\mathbf p_n-\mathbf p_0)(x)|\,dx\right).
+\end{aligned}
+\]
+例如，若 $\mathbf p_n-\mathbf p_0$ 在 0 周围的一个小区间上，
+以速率 $r_1(n)$ 一致趋于零，则右端为 $O_P(r_1(n))$。
+也可以利用 Cauchy--Schwarz 不等式，作更保守的控制：
+\[
+ h^{-1}\int I_{(x_0-h,x_0+h)}|\mathbf p_n-p_0|\,dx
+ \leq O\left(h^{-0.5}
+ \left(\int(\mathbf p_n-p_0)^2\,dx\right)^{0.5}\right),
+\]
+其中积分取遍一个包含 $x_0$ 的固定区间。
+此时，只需要对于某个多项式速率，
+$\|\mathbf p_n-p_0\|_{t_0,P_0}=O_P(r(n))$，
+就能得到界 $O_P(h^{-0.5}r(n))$。
+这里，对固定的 $a>0$，定义
+$\|p-p_0\|_{x_0,P_0}^2
+=\int_{x_0-a}^{x_0+a}(p-p_0)^2\,dP_0$。
+这验证了第一个条件 (25.3)。注意，
+\[
+\begin{aligned}
+ hP_0D_h^*(p_0)^2
+ &=hP_0\{K_{h,x_0}-\Psi_h(P_0)\}^2\\
+ &=hP_0K_{h,x_0}^2+O(h)\\
+ &=\int K(y)^2p_0(x_0+hy)\,dy+O(h),
+\end{aligned}
+\]
+它收敛到 $\sigma_0^2=p_0(x_0)\int K(y)^2\,dy$。
+由于 $R_{20,h}=0$，条件 (25.5) 自动成立。
+因此，现在可以应用定理 25.1，证明
+\[
+ \sqrt{nh}(\psi^*_{h,n}-\psi_{h,0})
+ =\sqrt{nh}(P_n-P_0)D_h^*(P_0)+o_P(1)
+ \Rightarrow_dN(0,\sigma_0^2).
+\]
+假定 $p_0$ 在 $x_0$ 处 $J_0$ 次连续可微，并令 $J_0^*=\min(J_0,J)$。
+则有 $h^{-J_0^*}(\psi_{h0}-\psi_0)\to B_0(J_0^*)$，其中
+\begin{equation}
+ B_0(J_0^*)\equiv
+ \psi_0^{J_0^*}(x_0)\int_yK(y)\frac{y^{J_0^*}}{J_0^*!}\,dy.
+\tag{25.12}
+\end{equation}
+应用定理 25.2 可证明，若选择最优速率
+$h_n^*=n^{-1/(2J_0^*+1)}$，则
+\[
+ n^{-J_0^*/(2J_0^*+1)}
+ (\psi^*_{h_n,n}-\psi_0)\Rightarrow_dN(B_0(J_0^*),\sigma_0^2).
+\]
+由于定理 25.2 的条件与定理 25.1 相同，
+只是把 $K_{h,x_0}$ 换成
+$K_{1,h,x_0}=h\frac{d}{dh}K_{h,x_0}$，
+而我们已证明后者是行为类似的核，因此条件的验证与上面相同。
+应用定理 25.3 可证明
+$h_n\sim(C_n^2/n)^{-1/(2J_0^*+1)}$；
+若 $C_n=O_P(1)$，它就达到最优速率。这证明了以下定理。
+
+\begin{bookresult}{定理}{25.5}
+考虑上面定义的 CV-TMLE $\psi^*_{h,n}$，
+以及式 (25.11) 的带宽选择器 $h_n$。
+并考虑 $B_0(J)$ 的定义 (25.12) 与 $\sigma_0^2$。作如下假设。
+\begin{itemize}
+\item $p_0(x_0)>0$。
+\item 对某个未知的 $J_0$，$p_0$ 在 $x_0$ 处 $J_0$ 次连续可微。
+\item 对某个多项式速率，即某个 $p>0$ 对应的 $n^{-p}$，有
+$\|\mathbf p_n-p_0\|_{x_0,P_0}=O_P(r(n))$；
+其中对固定的 $a>0$，
+$\|p-p_0\|_{x_0,P_0}^2
+=\int_{x_0-a}^{x_0+a}(p-p_0)^2\,dP_0$。
+\end{itemize}
+令 $J_0^*=\min(J_0,J)$。有
+$h_n\sim(C_n^2/n)^{-1/(2J_0^*+1)}$；
+并且若 $C_n=O_P(1)$，则
+\[
+ (nh_n^d)^{0.5}(\psi^*_{h_n,n}-\psi_0)
+ \Rightarrow_dN(B_0(J_0^*),\sigma_0^2).
+\]
+假定 $C_n=O_P(1)$，并令 $h_n^*=h_n/\log n$
+为 $h_n$ 的欠平滑版本。
+令 $\psi^*_{h_n^*,n}$ 为相应的 CV-TMLE。则
+\[
+ (nh_n^*)^{-0.5}(\psi^*_{h_n^*,n}-\psi_0)
+ \Rightarrow N(0,\sigma_0^2).
+\]
+特别地，
+\[
+ \psi^*_{h_n^*,n}\pm1.96\sigma_n/(nh_n^*)^{0.5}
+\]
+是 $\psi_0$ 的渐近 $95\%$ 置信区间。
+\end{bookresult}

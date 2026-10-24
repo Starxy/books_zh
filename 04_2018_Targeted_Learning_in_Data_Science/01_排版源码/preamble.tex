@@ -1,0 +1,128 @@
+% 本书共享导言区；第 1 章以原书实际编号为准。
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,backgrounds,shapes.geometric}
+\usepackage{graphicx,booktabs,array,tabularx,enumitem,xcolor,caption,fancyhdr,placeins,needspace}
+\usepackage[a4paper,top=2.6cm,bottom=2.6cm,left=2.6cm,right=2.6cm,headsep=0.7cm,footskip=1.0cm]{geometry}
+\setmainfont{TeX Gyre Termes}
+\definecolor{inkblue}{RGB}{28,62,110}
+\definecolor{plotgray}{RGB}{35,31,32}
+\linespread{1.32}
+\setlength{\parskip}{0.25em}
+\setlength{\emergencystretch}{1.2em}
+\tolerance=2000
+\setlength{\headheight}{15pt}
+\ctexset{
+ chapter={format=\centering\heiti\zihao{2},name={第,章},number=\chinese{chapter},beforeskip=1.2cm,afterskip=1.2cm},
+ section={format=\heiti\zihao{3},beforeskip=1.1ex plus .3ex minus .2ex,afterskip=.8ex plus .2ex},
+ subsection={format=\heiti\zihao{4},beforeskip=1.0ex plus .3ex minus .2ex,afterskip=.6ex plus .2ex},
+ figurename=图,tablename=表
+}
+\captionsetup{font=small,labelsep=quad,labelfont=bf,skip=8pt}
+\captionsetup[figure]{justification=justified,singlelinecheck=false}
+\captionsetup[table]{justification=justified,singlelinecheck=false}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\kaishu\leftmark}
+\fancyhead[RO]{\small\kaishu\rightmark}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\makeatletter
+\renewcommand{\chaptermark}[1]{\markboth{\CTEXthechapter\quad #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\quad #1}}
+\makeatother
+% 原书各类结果按各自的“章.序号”编号；逐条保留源编号时用 bookresult。
+\newtheoremstyle{cnresult}{7pt}{7pt}{\normalfont}{}{\bfseries}{}{0.7em}{}
+\theoremstyle{cnresult}
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{corollary}{推论}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{remark}{注}[chapter]
+\newtheorem{example}{例}[chapter]
+\newtheorem{assumption}{假设}[chapter]
+\newtheorem{conjecture}{猜想}[chapter]
+\newtheorem{algorithm}{算法}[chapter]
+\newtheorem{problem}{习题}[chapter]
+\newenvironment{bookresult}[2]{\par\addvspace{7pt}\noindent\textbf{#1 #2.}\enspace\ignorespaces}{\par\addvspace{7pt}}
+\newcommand{\chapterauthors}[1]{\begin{center}\normalsize #1\end{center}\vspace{.6em}}
+\newcommand{\chapteraffiliations}[1]{\begingroup\footnotesize\noindent #1\par\endgroup\vspace{1em}}
+\renewcommand{\proofname}{证明}
+\newenvironment{remarkenv}{\par\noindent\textbf{注。}\ignorespaces}{\par}
+\newcommand{\PA}{\mathrm{PA}}
+\newcommand{\pa}{\mathrm{pa}}
+\newcommand{\ND}{\mathrm{ND}}
+\newcommand{\AN}{\mathrm{AN}}
+\newcommand{\DE}{\mathrm{DE}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\RR}{\mathbb{R}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\sign}{sign}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,columns=fullflexible,keepspaces=true,
+ breaklines=true,numbers=left,numberstyle=\tiny\color{gray},numbersep=6pt,
+ frame=single,framerule=.3pt,rulecolor=\color{gray!50},showstringspaces=false,
+ tabsize=2,aboveskip=6pt,belowskip=6pt}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{sourcebox}[1][]{enhanced,breakable,colback=gray!3,colframe=gray!50,
+ boxrule=.4pt,arc=0pt,left=7pt,right=7pt,top=5pt,bottom=5pt,title={#1},coltitle=black,
+ colbacktitle=gray!10,fonttitle=\bfseries}
+\usetikzlibrary{decorations.pathreplacing,decorations.markings,fit,patterns}
+\tikzset{
+ vtxb/.style={vtx,very thick},
+ vtxs/.style={vtx,minimum size=5.5mm,font=\footnotesize},
+ lat/.style={latent},
+ edb/.style={->,very thick},
+ bid/.style={<->,semithick},
+ bidd/.style={<->,semithick,dashed}
+}
+
+\newcommand{\indep}{\mathrel{\perp\!\!\!\perp}}
+\newcommand{\nindep}{\mathrel{\not\!\perp\!\!\!\perp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\doop}{do}
+\newcommand{\dox}[1]{\mathrm{do}(#1)}
+\def\doxp(#1){\mathrm{do}(#1)}
+\tikzset{
+ causal/.style={>={Stealth[length=2.1mm,width=1.5mm]},semithick},
+ vtx/.style={circle,draw,inner sep=1pt,minimum size=7mm,font=\small},
+ latent/.style={vtx,dashed},
+ ed/.style={->,semithick},
+ edd/.style={->,semithick,dashed}
+}
+\setlist[enumerate]{leftmargin=2.3em,itemsep=0.35em,topsep=0.4em}
+\renewcommand{\arraystretch}{1.3}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{longtable,multicol}
+\usepackage{url}
+\usepackage[bookmarks=true,bookmarksnumbered=true,unicode=true,colorlinks=true,linkcolor=inkblue,citecolor=inkblue,urlcolor=inkblue]{hyperref}
+\hypersetup{
+ pdftitle={数据科学中的靶向学习：复杂纵向研究的因果推断（中文译稿）},
+ pdfauthor={Mark J. van der Laan; Sherri Rose},
+ pdfsubject={Targeted Learning in Data Science (2018), Chinese translation},
+ pdfkeywords={靶向学习,TMLE,纵向研究,因果推断}
+}
+
+\usepackage{pdflscape,adjustbox,rotating}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\expit}{expit}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\E}{E}
+\DeclareMathOperator{\bias}{Bias}
+\DeclareMathOperator{\MSE}{MSE}
+\newcommand{\1}{\mathbb{I}}
+\newcommand{\Pn}{P_n}
+\newcommand{\Pzero}{P_0}
+\newcommand{\Gbar}{\overline{G}}
+\newcommand{\Qbar}{\overline{Q}}
+\newcommand{\Lbar}{\overline{L}}
+\newcommand{\Abar}{\overline{A}}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{6pt}

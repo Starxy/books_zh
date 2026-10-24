@@ -1,0 +1,25 @@
+% 原书第 107 页的无编号三图。
+\begin{center}
+\begin{tikzpicture}[causal,x=1.15cm,y=1.05cm]
+ \node[vtx] (ch06faith-a-x) at (0,1) {$X$};
+ \node[vtx] (ch06faith-a-z) at (0,-.5) {$Z$};
+ \node[vtx] (ch06faith-a-y) at (1.5,.25) {$Y$};
+ \draw[ed] (ch06faith-a-x)--node[above]{$a$}(ch06faith-a-y);
+ \draw[ed] (ch06faith-a-y)--node[below]{$b$}(ch06faith-a-z);
+ \draw[ed] (ch06faith-a-x)--node[left]{$c$}(ch06faith-a-z);
+ \node at (.75,-1.2) {$\mathcal G_1$};
+ \node[vtx] (ch06faith-b-x) at (3.5,1) {$X$};
+ \node[vtx] (ch06faith-b-z) at (3.5,-.5) {$Z$};
+ \node[vtx] (ch06faith-b-y) at (5,.25) {$Y$};
+ \draw[ed] (ch06faith-b-x)--node[above]{$\widetilde a$}(ch06faith-b-y);
+ \draw[ed] (ch06faith-b-z)--node[below]{$\widetilde b$}(ch06faith-b-y);
+ \node at (4.25,-1.2) {$\mathcal G_2$};
+ \node[vtx] (ch06faith-c-x) at (7,1) {$X$};
+ \node[vtx] (ch06faith-c-z) at (7,-.5) {$Z$};
+ \node[vtx] (ch06faith-c-y) at (8.5,.25) {$Y$};
+ \draw[ed] (ch06faith-c-x)--(ch06faith-c-y);
+ \draw[ed] (ch06faith-c-z)--(ch06faith-c-y);
+ \draw[ed] (ch06faith-c-x)--(ch06faith-c-z);
+ \node at (7.75,-1.2) {$\mathcal H$};
+\end{tikzpicture}
+\end{center}

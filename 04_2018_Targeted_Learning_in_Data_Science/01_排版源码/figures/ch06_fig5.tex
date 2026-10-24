@@ -1,0 +1,17 @@
+% 原始图中各数据点、参照线、刻度和顺序全部保留；仅替换文字标签。
+\resizebox{.88\textwidth}{!}{%
+\begin{tikzpicture}[x=1bp,y=-1bp]
+ \node[anchor=north west,inner sep=0pt] at (0,0) {\includegraphics[width=294bp,height=183bp]{figures/ch06_fig5_source.pdf}};
+ \fill[white] (0,0) rectangle (88,159);
+ \fill[white] (125,172) rectangle (260,183);
+ \node[font=\fontsize{8.0}{9}\selectfont] at (192.1,177.9) {TMLE 的名义 95\% 覆盖率};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,146.739) {径向 SVM};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,125.799) {核回归};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,105.731) {回归树};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,86.550) {GBM};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,65.729) {离散超级学习器};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,46.360) {随机森林};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont] at (85.1,25.615) {超级学习器};
+ \node[anchor=east,inner sep=0pt,font=\fontsize{8.0}{9}\selectfont\bfseries] at (85.1,6.286) {HAL};
+\end{tikzpicture}%
+}

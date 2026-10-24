@@ -1,0 +1,48 @@
+% 原书分章PDF第9—11页：第27.3节及例27.2的最终分析、两图。
+\section{因果偏差的界未知}
+
+假定 $(L_{\mathrm{causal}}(\delta),U_{\mathrm{causal}}(\delta))$ 依赖于观测数据分布 $P_0$。在例27.2中，情况正是如此，见式 (27.6)。注意，此时 $L_{\mathrm{causal}}(\delta)$ 和 $U_{\mathrm{causal}}(\delta)$ 都是以观测数据分布为输入、以一个数为输出的参数。因此，只要 $L_{\mathrm{causal}}(\delta)$ 是路径可微的，就可以合理地期待：对于某个影响曲线 $\mathrm{IC}_{\hat\ell}$，能够构造 $L_{\mathrm{causal}}(\delta)$ 的渐近线性估计量，使其具有下述性质：
+\[
+ \sqrt n\bigl(\ell_{n,\mathrm{causal}}-L_{\mathrm{causal}}(\delta)\bigr)
+ =\frac1{\sqrt n}\sum_{i=1}^n\mathrm{IC}_{\hat\ell}(O_i)+o_P(1).
+\]
+如果 $U_{\mathrm{causal}}(\delta)$ 足够光滑，则可以期待构造一个估计量，使得在上式中，分别将 $\ell_{n,\mathrm{causal}}$、$L_{\mathrm{causal}}(\delta)$ 和 $\mathrm{IC}_{\hat\ell}$ 替换为 $u_{n,\mathrm{causal}}$、$U_{\mathrm{causal}}(\delta)$ 和 $\mathrm{IC}_{\hat u}$ 后，等式仍然成立。将上式与式 (27.2) 合并可得
+\[
+ \begin{aligned}
+ &\sqrt n\bigl\{\psi_n+\ell_{n,\mathrm{causal}}-(\psi_0+L_{\mathrm{causal}}(\delta))\bigr\}\\
+ &\qquad=\frac1{\sqrt n}\sum_{i=1}^n
+ \bigl\{\mathrm{IC}_{\hat\Psi}(O_i)+\mathrm{IC}_{\hat\ell}(O_i)\bigr\}+o_P(1).
+ \end{aligned}
+\]
+右侧收敛于均值为零的正态分布，其方差等于右侧影响曲线之和的方差。类似论证可得，$\psi_0+U_{\mathrm{causal}}(\delta)$ 的影响曲线为 $\mathrm{IC}_{\hat\Psi}+\mathrm{IC}_{\hat u}$。因此，将这两个影响曲线应用于 $O\sim P_0$ 所得的联合分布收敛于均值为零的多元正态分布，其协方差矩阵等于二维随机变量的协方差矩阵，该随机变量的两个坐标分别为 $\mathrm{IC}_{\hat\Psi}(O)+\mathrm{IC}_{\hat\ell}(O)$ 和 $\mathrm{IC}_{\hat\Psi}(O)+\mathrm{IC}_{\hat u}(O)$。
+
+给定协方差矩阵的一致估计 $\Sigma_n$，可进行蒙特卡洛抽样，从 $N(0,\Sigma_n)$ 分布得到 $(Z_L^1,Z_U^1),\allowbreak\ldots,\allowbreak(Z_L^m,Z_U^m)$。给定这些抽样值，可将 $s_n$ 取为观测值 $k\in\{1,\ldots,m\}$ 中 $\max\{Z_L^k,-Z_U^k\}$ 的 $95\%$ 分位数。此时，不确定性区间
+\begin{equation}
+ \left(\psi_n+\ell_{n,\mathrm{causal}}-\frac{s_n}{\sqrt n},
+ \psi_n+u_{n,\mathrm{causal}}+\frac{s_n}{\sqrt n}\right)
+ \tag{27.8}
+\end{equation}
+将在条件 $\delta$ 下，以趋于 $0.95$ 的概率包含因果参数。另一种做法是，分别用 $s_{n,L}$ 和 $s_{n,U}$ 替换下界与上界中的 $s_n$，并选择一个在蒙特卡洛抽样值中经验有效、且使 $s_{n,U}+s_{n,L}$ 最小的不确定性区间。例如，当下界的估计明显比上界容易，而我们希望使区间下界更紧以反映这一点时，这种做法可能有益。
+
+现在用例27.2说明这一过程。
+
+\begin{bookresult}{例}{27.2（续）}
+首先采用 van der Laan 和 Rose（2011）第7章给出的 TMLE 来估计 $\psi_0$。然后，使用网络附录A中描述的 TMLE 算法，估计由式 (27.7) 得到的区间 $(L_{\mathrm{causal}}(\delta),U_{\mathrm{causal}}(\delta))$。鉴于本文关注的范围更广，我们略去对该估计量渐近性质的理论分析；关于如何分析此类估计量的一般范式，读者可参阅 van der Laan 和 Rose（2011）。我们从二元正态分布抽取 $2.5\times10^4$ 个值，以实施第27.3节所述的不确定性界估计程序。
+
+复现分析的代码可在原研究文章中获得（Luedtke 等，2015b）。图27.1展示了 $\delta$ 的不同选择如何影响下界。考虑 $\delta^+=0.02$，并假定在所有协变量层内，不发生冠心病事件的概率至多为 $0.3$（根据我们对 $E(1-Y\mid A=0,W)$ 的估计，不发生冠心病事件的最大概率约为 $0.25$）。此时，只要 $E(Y_0\mid A=1,W0\leq E(Y\mid A=1,W)+0.015$，第4条就得到满足。也就是说，如果在基线时通过干预使所有人均不吸烟，那么在任意协变量层内，自然吸烟者心脏病发作的加性风险至多可以比自然不吸烟者高 $1.5\%$。为了使平均处理效应的下界仍为正，我们还需要 $\delta^-$ 至多约为 $0.4$。不等式2与平均处理效应的下界无关，因此我们关注第1条。它表明，如果在人群中施加干预，使所有人都成为吸烟者，那么在每一个协变量层内，自然不吸烟者相对于自然吸烟者发生心脏病的相对风险不低于 $60\%$。图27.2对下界提供了类似认识，同时也让我们能够看到 $\delta$ 的不同选择下平均处理效应的上界。根据这些敏感性参数的选择，在这一人群中，吸烟对八年半内冠心病事件的平均处理效应似乎不太可能大于 $0.12$。
+
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch27_sensitivity_heatmap}
+ \caption{在若干 $\delta$ 值下，吸烟对冠心病事件的平均处理效应的 $95\%$ 不确定性界。}
+ \label{fig:ch27-sensitivity-heatmap}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \input{figures/ch27_uncertainty_curves}
+ \caption{在一系列连续的 $\delta$ 值下，吸烟对冠心病事件的平均处理效应的 $97.5\%$ 不确定性下界。}
+ \label{fig:ch27-uncertainty-curves}
+\end{figure}
+\end{bookresult}
+\FloatBarrier

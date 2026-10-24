@@ -1,0 +1,493 @@
+% ============================================================
+%  第四章  行动、计划与直接效应  （4.4—4.5）
+% ============================================================
+\section{动态计划的识别}
+
+本节依据 Pearl and Robins (1995)，讨论在存在未测量变量时对计划的概率评估：每个计划由若干同时或序贯的行动构成，每个行动又可能受计划中前序行动的影响。我们建立一个图形准则，用以判定何时可以仅凭对被测变量的被动观测来预测给定计划的效应。当该准则满足时，我们给出计划达成指定目标之概率的闭式表达式。
+
+\subsection{动机}
+
+为引出讨论，考虑 Robins (1993, 附录 2) 讨论过的一个例子，如图 4.4 所示。变量 $X_1$ 与 $X_2$ 表示医生在两个不同时刻给病人开的处理，$Z$ 表示第二位医生为确定 $X_2$ 而查阅的观测，$Y$ 表示病人的存活。隐变量 $U_1$ 与 $U_2$ 分别表示病人病史的一部分与病人得以康复的体质。
+
+这种结构的一个简单实例可以在艾滋病患者中找到，其中 $Z$ 表示 PCP（肺孢子菌肺炎）发作。这是艾滋病患者常见的机会性感染；如图所示，它并不直接影响存活 $Y$（因为它可以被有效治疗），但它是病人潜在免疫状态（$U_2$）的指标，而后者可以导致死亡。$X_1$ 与 $X_2$ 表示 bactrim（复方新诺明），一种预防 PCP（$Z$）、也可能通过其他机制防止死亡的药物。医生依据病人先前的 PCP 病史（$U_1$）来开具 $X_1$，但该病史的取值并未记录，无法用于数据分析。
+
+我们面临的问题如下。假定我们已就许多病人与医生的行为收集了大量数据，并以（估计出的）四个被观测变量 $(X_1,Z,X_2,Y)$ 的联合分布 $P$ 的形式加以概括。现在来了一位新病人，我们希望确定（无条件）计划 $(\doop(x_1),\doop(x_2))$ 对存活的影响，其中 $x_1$ 与 $x_2$ 是两个预先确定的 bactrim 剂量，将在两个预先指定的时刻给药。
+
+一般地，我们的问题相当于通过观察其他“计划者”的表现来评估一个新计划，而这些计划者的决策策略是不可识别的。医生不会描述促使他们开出某种处理的一切输入；他们只是告诉我们：确定 $X_1$ 时咨询了 $U_1$，确定 $X_2$ 时咨询了 $Z$ 与 $X_1$。可惜 $U_1$ 未被记录。在流行病学中，计划评估问题被称为“带时变混杂的时变处理”（Robins 1993）。在人工智能应用中，对此类计划的评估使一个主体能够通过观察另一个主体的表现来学会行动，即便后者的行动以其不可见的因素为依据。若该学习者既被允许行动又被允许观察，任务便容易得多：因果图的拓扑（至少部分地）也可被推断，某些先前不可识别的行动的效应也可被确定。
+
+与行动的识别（第三章）一样，计划识别的主要问题是控制“混杂因子”，即那些触发行动并同时影响响应的未观测因素。然而，计划识别还因下述事实而更为复杂：某些混杂因子（如 $Z$）受控制变量的影响。正如第三章所述，统计实验设计中最致命的罪过之一（Cox 1958, p.~48）就是针对这类变量作调整，因为对一个居于行动与其后果之间的变量作调整，会干扰我们恰恰想要估计的那个量——该行动的总效应。本文所提出的识别方法将绕开这些困难。
+
+图 4.4 还有另外两个特征值得注意。第一，若把控制变量 $X_1$ 与 $X_2$ 当作单个复合变量 $X$，则量 $P(y\mid\hat{x}_1,\hat{x}_2)$ 无法计算。这种复合所对应的图会把 $X$ 与 $Y$ 同时用一条箭头和一条（经由 $U$ 的）曲线弧相连，从而形成弓形模式（见图 3.9），而这正是不可识别的征兆。第二，单独的因果效应 $P(y\mid\hat{x}_1)$ 不可识别，因为 $U_1$ 在连线 $X\to Z$ 周围造成了一个弓形模式，而该连线位于从 $X$ 到 $Y$ 的一条有向路径上（见 \S 3.5 的讨论）。
+
+使 $P(y\mid\hat{x}_1,\hat{x}_2)$ 得以可识别的关键，是 $P(y\mid x_1,z,\hat{x}_2)$ 的可识别性——即单独的行动 $\doop(X_2=x_2)$ 在该行动时刻可获观测条件下的因果效应。这一点可用后门准则验证：$\{X_1,Z\}$ 阻断了 $X_2$ 与 $Y$ 之间的一切后门路径。于是，通过写出
+\begin{align}
+P(y\mid\hat{x}_1,\hat{x}_2) &= P(y\mid x_1,\hat{x}_2) \tag{4.1}\\
+&= \sum_z P(y\mid z,x_1,\hat{x}_2)P(z\mid x_1) \tag{4.2}\\
+&= \sum_z P(y\mid z,x_1,x_2)P(z\mid x_1), \tag{4.3}
+\end{align}
+即可证明 $P(y\mid\hat{x}_1,\hat{x}_2)$ 的可识别性；其中 \textup{(4.1)} 与 \textup{(4.3)} 来自规则 2，\textup{(4.2)} 来自规则 3。允许施用这些规则的子图见图 4.5（\S 4.4.3）。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.5cm,every node/.style={transform shape}]
+  \node[lat]  (u1) at (1.6,2.15) {$U_1$};
+  \node[vtx]  (x1) at (0.1,1.55) {$X_1$};
+  \node[vtx]  (z)  at (1.8,1.25) {$Z$};
+  \node[vtx]  (x2) at (1.15,0.55) {$X_2$};
+  \node[lat]  (u2) at (3.3,1.15) {$U_2$};
+  \node[vtx]  (y)  at (1.15,-0.25) {$Y$};
+  \draw[edd] (u1)--(x1); \draw[edd] (u1)--(z);
+  \draw[ed]  (x1)--(z);  \draw[ed] (x1)--(x2);
+  \draw[ed]  (z)--(x2);  \draw[ed] (x1)--(y);
+  \draw[ed]  (x2)--(y);
+  \draw[edd] (u2)--(z);  \draw[edd] (u2)--(y);
+\end{tikzpicture}
+\caption{由 $X_1$、$Z$、$X_2$ 与 $Y$ 上的非实验数据评估计划 $(\doop(x_1),\doop(x_2))$ 对 $Y$ 之效应的问题。}
+\label{fig:4.4}
+\end{figure}
+
+这一推导也凸显了条件计划如何评估。假定我们希望评估计划 $\{\doop(X_1=x_1),\doop(X_2=g(x_1,z))\}$ 的效应。依照 \S 4.2 的分析，我们写出
+\begin{equation*}
+\begin{aligned}
+P(y\mid\doop(X_1=x_1),\doop(X_2=g(x_1,z))) &= P(y\mid x_1,\doop(X_2=g(x_1,z)))\\
+&= \sum_z P(y\mid z,x_1,\doop(X_2=g(x_1,z)))P(z\mid x_1)\\
+&= \sum_z P(y\mid z,x_1,x_2)P(z\mid x_1)\big|_{x_2=g(x_1,z)}.
+\end{aligned}
+\end{equation*}
+同样，这一条件计划的可识别性取决于表达式 $P(y\mid z,x_1,\hat{x}_2)$ 的可识别性；后者化简为 $P(y\mid z,x_1,x_2)$，因为 $\{X_1,Z\}$ 阻断了 $X_2$ 与 $Y$ 之间的一切后门路径。（另见 \S 11.4.1。）
+
+下一节所建立的准则，将使我们能够一般地、以图形方式判定：一个拟议的计划能否由被观测量的联合分布评估；若能，还应识别出哪些协变量应被测量、以及应如何调整。
+
+\subsection{计划识别：记号与假设}
+
+我们的出发点是因果图形式的知识设定方案，如图 4.4 所示；它定性概括了分析者对相关数据生成过程的理解。\footnote{Robins (1986, 1987) 使用了另一种以反事实依赖为形式的设定方案，如 \S 3.6.4 所述。}
+
+\medskip
+\noindent\textbf{记号}
+
+一个\emph{控制问题}由一个有向无环图（DAG）$G$ 构成，其顶点集 $V$ 划分为四个不相交的集合 $V=\{X,Z,U,Y\}$，其中
+\begin{itemize}
+\item $X$＝控制变量集（暴露、干预、处理等）；
+\item $Z$＝被观测变量集，常称为\emph{协变量}；
+\item $U$＝未观测（潜在）变量集；
+\item $Y$＝结局变量。
+\end{itemize}
+
+我们令控制变量的排序为 $X=X_1,X_2,\dots,X_n$，使得每个 $X_k$ 都是 $X_{k+j}\ (j>0)$ 的非后代；并令结局 $Y$ 是 $X_n$ 的后代。以 $N_k$ 表示那些是集合 $\{X_k,X_{k+1},\dots,X_n\}$ 中任一元素之非后代的被观测节点所成之集。一个\emph{计划}是对控制变量取值指派的有序序列 $(\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$，其中 $\hat{x}_k$ 表示“$X_k$ 被置为 $x_k$”。一个\emph{条件计划}是有序序列 $(\hat{g}_1(z_1),\hat{g}_2(z_2),\dots,\hat{g}_n(z_n))$，其中每个 $g_k$ 是从集合 $Z_k$ 到 $X_k$ 的函数，而 $\hat{g}_k(z_k)$ 表示语句“只要 $Z_k$ 取得值 $z_k$，就把 $X_k$ 置为 $g_k(z_k)$”。每个 $g_k(z_k)$ 函数的支撑 $Z_k$ 不得含有 $G$ 中 $X_k$ 的任何后代。
+
+我们的问题是评估一个无条件计划\footnote{条件计划将在 \S 11.4.1 中通过反复施用定理 4.4.1 来分析。}，即计算 $P(y\mid\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$，它表示计划 $(\hat{x}_1,\dots,\hat{x}_n)$ 对结局变量 $Y$ 的影响。若对每一指派 $(\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$，该表达式都能由被观测变量 $\{X,Y,Z\}$ 的联合分布唯一确定，则称表达式 $P(y\mid\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$ 在 $G$ 中\emph{可识别}。只要 $P(y\mid\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$ 可识别，控制问题就是可识别的。
+
+我们的主要识别准则见定理 4.4.1 与 4.4.6。它们对 $G$ 的各个子图施以序贯后门检验，这些子图删去了指向未来行动的箭头。我们以 $G_{\bar{X}}$（相应地 $G_{\underline{X}}$）表示从 $G$ 中删去一切指向（发自）$X$ 中节点之箭头所得的图。为表示同时删去进入与发出的箭头，我们使用记号 $G_{\bar{X}\underline{Z}}$。最后，表达式
+\[
+P(y\mid\hat{x},z)\triangleq P(y,z\mid\hat{x})\big/P(z\mid\hat{x})
+\]
+表示：在观测到 $Z=z$ 且 $X$ 被保持为常数 $x$ 时，$Y=y$ 的概率。
+
+\subsection{计划识别：序贯后门准则}
+
+\begin{theorem}[Pearl and Robins 1995]
+概率 $P(y\mid\hat{x}_1,\dots,\hat{x}_n)$ 可识别，若对每个 $1\le k\le n$，都存在一个协变量集 $Z_k$ 满足下述（序贯后门）条件：
+\begin{equation}
+Z_k\subseteq N_k, \tag{4.4}
+\end{equation}
+（即 $Z_k$ 由 $\{X_k,X_{k+1},\dots,X_n\}$ 的非后代构成）且
+\begin{equation}
+(Y\indep X_k\mid X_1,\dots,X_{k-1},Z_1,Z_2,\dots,Z_k)_{G_{\underline{X_k},\bar{X}_{k+1},\dots,\bar{X}_n}}. \tag{4.5}
+\end{equation}
+当这些条件满足时，计划的效应由下式给出
+\begin{equation}
+\begin{aligned}
+P(y\mid\hat{x}_1,\dots,\hat{x}_n) &= \sum_{z_1,\dots,z_n}P(y\mid z_1,\dots,z_n,x_1,\dots,x_n)\\
+&\quad\times\prod_{k=1}^{n}P(z_k\mid z_1,\dots,z_{k-1},x_1,\dots,x_{k-1}).
+\end{aligned}\tag{4.6}
+\end{equation}
+\end{theorem}
+
+在给出证明之前，我们先演示如何用定理 4.4.1 检验图 4.4 所示控制问题的可识别性。首先，我们将说明：若不测量 $Z$，则 $P(y\mid\hat{x}_1,\hat{x}_2)$ 无法识别；换言之，序列 $Z_1=\varnothing$、$Z_2=\varnothing$ 不满足条件 \textup{(4.4)}—\textup{(4.5)}。\textup{(4.5)} 所编码的两个 d-分离检验是
+\[
+(Y\indep X_1)_{G_{\underline{X_1},\bar{X_2}}}\qquad\text{与}\qquad (Y\indep X_2\mid X_1)_{G_{\underline{X_2}}}.
+\]
+与这两个检验相联系的子图见图 4.5。我们看到，$(Y\indep X_1)$ 在 $G_{\underline{X_1},\bar{X_2}}$ 中成立，但 $(Y\indep X_2\mid X_1)$ 在 $G_{\underline{X_2}}$ 中不成立。因此，为通过检验，我们必须取 $Z_1=\{Z\}$ 或 $Z_2=\{Z\}$；由于 $Z$ 是 $X_1$ 的后代，只有第二种选择满足 \textup{(4.4)}。适用于序列 $Z_1=\varnothing$、$Z_2=\{Z\}$ 的检验是 $(Y\indep X_1)_{G_{\underline{X_1},\bar{X_2}}}$ 与 $(Y\indep X_2\mid X_1,Z)_{G_{\underline{X_2}}}$。图 4.5 表明，如今两个检验都满足，因为 $\{X_1,Z\}$ 在 $G_{\underline{X_2}}$ 中把 $Y$ 与 $X_2$ d-分离。条件 \textup{(4.4)}—\textup{(4.5)} 既已满足，式 \textup{(4.6)} 便给出计划 $(\hat{x}_1,\hat{x}_2)$ 对 $Y$ 之效应的公式：
+\begin{equation}
+P(y\mid\hat{x}_1,\hat{x}_2)=\sum_z P(y\mid z,x_1,x_2)P(z\mid x_1), \tag{4.7}
+\end{equation}
+它与 \textup{(4.3)} 一致。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.5cm,every node/.style={transform shape}]
+  % ---- (a) G_{X1,X2} ----
+  \begin{scope}
+    \node[lat] (u1a) at (1.5,2.15) {$U_1$};
+    \node[vtx] (x1a) at (0.1,1.55) {$X_1$};
+    \node[vtx] (za)  at (1.7,1.2) {$Z$};
+    \node[vtx] (x2a) at (1.05,0.5) {$X_2$};
+    \node[lat] (u2a) at (3.2,1.1) {$U_2$};
+    \node[vtx] (ya)  at (1.05,-0.3) {$Y$};
+    \draw[edd] (u1a)--(x1a); \draw[edd] (u1a)--(za);
+    \draw[ed]  (x2a)--(ya);
+    \draw[edd] (za)--(u2a);  \draw[edd] (u2a)--(ya);
+    \node[draw,font=\small] at (1.6,-1.1) {$G_{\underline{X_1},\bar{X_2}}$};
+    \node[font=\small] at (1.6,-1.75) {(a)};
+  \end{scope}
+  % ---- (b) G_{X2} ----
+  \begin{scope}[xshift=6.6cm]
+    \node[lat] (u1b) at (1.5,2.15) {$U_1$};
+    \node[vtx] (x1b) at (0.1,1.55) {$X_1$};
+    \node[vtx] (zb)  at (1.7,1.2) {$Z$};
+    \node[vtx] (x2b) at (1.05,0.5) {$X_2$};
+    \node[lat] (u2b) at (3.2,1.1) {$U_2$};
+    \node[vtx] (yb)  at (1.05,-0.3) {$Y$};
+    \draw[edd] (u1b)--(x1b); \draw[edd] (u1b)--(zb);
+    \draw[ed]  (x1b)--(zb);  \draw[ed] (x1b)--(x2b); \draw[ed] (x1b)--(yb);
+    \draw[ed]  (zb)--(x2b);
+    \draw[edd] (zb)--(u2b);  \draw[edd] (u2b)--(yb);
+    \node[draw,font=\small] at (1.6,-1.1) {$G_{\underline{X_2}}$};
+    \node[font=\small] at (1.6,-1.75) {(b)};
+  \end{scope}
+\end{tikzpicture}
+\caption{用于检验图 4.4 中计划 $(\hat{x}_1,\hat{x}_2)$ 可识别性的两个 $G$ 的子图。}
+\label{fig:4.5}
+\end{figure}
+
+自然会产生这样的问题：序列 $Z_1=\varnothing$、$Z_2=\{Z\}$ 能否不经穷举搜索而被识别？推论 4.4.5 与定理 4.4.6 将回答这一问题。
+
+\medskip
+\noindent\textbf{定理 4.4.1 的证明}\quad
+这里的证明基于 do 演算的推理规则（定理 3.4.1），这些规则便于把因果效应公式化简为无帽表达式。另一种证明使用潜变量消去法，见 Pearl and Robins (1995)。
+
+\emph{第一步}。条件 $Z_k\subseteq N_k$ 蕴涵 $Z_k\subseteq N_j$ 对一切 $j\ge k$ 成立。因此有
+\begin{equation*}
+\begin{aligned}
+&P(z_k\mid z_1,\dots,z_{k-1},x_1,\dots,x_{k-1},\hat{x}_k,\hat{x}_{k+1},\dots,\hat{x}_n)\\
+&\qquad = P(z_k\mid z_1,\dots,z_{k-1},x_1,\dots,x_{k-1}).
+\end{aligned}
+\end{equation*}
+之所以如此，是因为 $\{Z_1,\dots,Z_k,X_1,\dots,X_{k-1}\}$ 中没有任何节点能是 $\{X_k,\dots,X_n\}$ 中任何节点的后代。于是规则 3 允许我们从表达式中删去帽变量。
+
+\emph{第二步}。\textup{(4.5)} 中的条件使我们得以援引规则 2，写出
+\begin{equation*}
+\begin{aligned}
+&P(y\mid z_1,\dots,z_k,x_1,\dots,x_{k-1},\hat{x}_k,\hat{x}_{k+1},\dots,\hat{x}_n)\\
+&\qquad = P(y\mid z_1,\dots,z_k,x_1,\dots,x_{k-1},x_k,\hat{x}_{k+1},\dots,\hat{x}_n).
+\end{aligned}
+\end{equation*}
+于是我们有
+\begin{equation*}
+\begin{aligned}
+P(y\mid\hat{x}_1,\dots,\hat{x}_n)
+&= \sum_{z_1}P(y\mid z_1,\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)P(z_1\mid\hat{x}_1,\dots,\hat{x}_n)\\
+&= \sum_{z_1}P(y\mid z_1,x_1,\hat{x}_2,\dots,\hat{x}_n)P(z_1)\\
+&= \sum_{z_2}\sum_{z_1}P(y\mid z_1,z_2,x_1,\hat{x}_2,\dots,\hat{x}_n)P(z_1)P(z_2\mid z_1,x_1,\hat{x}_2,\dots,\hat{x}_n)\\
+&= \sum_{z_2}\sum_{z_1}P(y\mid z_1,z_2,x_1,x_2,\hat{x}_3,\dots,\hat{x}_n)P(z_1)P(z_2\mid z_1,x_1)\\
+&\ \ \vdots\\
+&= \sum_{z_n}\cdots\sum_{z_2}\sum_{z_1}P(y\mid z_1,\dots,z_n,x_1,\dots,x_n)\\
+&\qquad\times P(z_1)P(z_2\mid z_1,x_1)\cdots P(z_n\mid z_1,x_1,z_2,x_2,\dots,z_{n-1},x_{n-1})\\
+&= \sum_{z_1,\dots,z_n}P(y\mid z_1,\dots,z_n,x_1,\dots,x_n)\prod_{k=1}^{n}P(z_k\mid z_1,\dots,z_{k-1},x_1,\dots,x_{k-1}).
+\end{aligned}
+\end{equation*}
+\hfill$\blacksquare$
+
+\begin{definition}[可容许序列与 G-可识别性]
+任何满足 \textup{(4.4)}—\textup{(4.5)} 中条件的协变量序列 $Z_1,\dots,Z_n$ 都称为\emph{可容许的}；任何按定理 4.4.1 的准则可识别的表达式 $P(y\mid\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$ 都称为\emph{G-可识别的}。\footnote{注意，可容许性 \textup{(4.5)} 要求每个子序列 $X_1,\dots,X_{k-1},Z_1,\dots,Z_k$ 阻断从 $X_k$ 到 $Y$ 的每一条“避开行动的”后门路径（见第 103 页）。}
+\end{definition}
+
+下述推论是直接的。
+
+\begin{corollary}
+一个控制问题 G-可识别，当且仅当它有一个可容许序列。
+\end{corollary}
+
+注意，尽管 do 演算具有完备性，G-可识别性对于 \S 4.4.2 所定义的一般计划可识别性而言只是充分的，并非必要。原因在于 \textup{(4.6)} 化简中的第 $k$ 步拒绝针对 $X_k$ 的后代变量 $Z_k$ 取条件——即那些可能受行动 $\doop(X_k=x_k)$ 影响的变量。在某些因果结构中，因果效应的可识别性恰恰要求我们对这类变量取条件，前门准则（定理 3.3.4）即是证明。
+
+\subsection{计划识别：一个程序}
+
+定理 4.4.1 给出了计划可识别性的一个陈述性条件。它可用来认可某个公式对给定计划有效，却不能提供导出这类公式的有效程序，因为每个 $Z_k$ 的选取并未按程序言明。可能存在这样的情况：某个满足 \textup{(4.4)} 与 \textup{(4.5)} 的不幸选择 $Z_k$ 会妨碍我们继续化简，尽管另一条化简序列本可行。
+
+图 4.6 即说明了这一点。这里 $W$ 是 $Z_1$ 的一个可容许选择，但若作此选择，我们便无法完成化简，因为找不到任何满足条件 \textup{(4.5)} 的集合 $Z_2$：$(Y\indep X_2\mid X_1,W,Z_2)_{G_{\underline{X_2}}}$。在此例中，更明智的选择是 $Z_1=Z_2=\varnothing$，它同时满足 $(Y\indep X_1\mid\varnothing)_{G_{\underline{X_1},\bar{X_2}}}$ 与 $(Y\indep X_2\mid X_1,\varnothing)_{G_{\underline{X_2}}}$。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.5cm,every node/.style={transform shape}]
+  \node[vtx] (x1) at (0.1,2.3) {$X_1$};
+  \node[vtx] (x2) at (0.25,1.35) {$X_2$};
+  \node[vtx] (y)  at (0.85,-0.1) {$Y$};
+  \node[vtx] (w)  at (2.05,1.25) {$W$};
+  \node[lat] (u1) at (1.6,2.35) {$U_1$};
+  \node[lat] (u2) at (3.15,1.6) {$U_2$};
+  \draw[ed]  (x1)--(x2); \draw[ed] (x2)--(y);
+  \draw[edd] (u1)--(x2); \draw[edd] (u1)--(w);
+  \draw[edd] (w)--(u2);  \draw[edd] (u2)--(y);
+\end{tikzpicture}
+\caption{一个可容许的选择 $Z_1=W$，它排除了 $Z_2$ 的任何可容许选择。选择 $Z_1=\varnothing$ 则容许构造可容许序列 $(Z_1=\varnothing,\,Z_2=\varnothing)$。}
+\label{fig:4.6}
+\end{figure}
+
+避免图 4.6 所示那种坏选择的显然办法，是坚持总选取“极小”的 $Z_k$，即一个满足 \textup{(4.5)}、且其任何真子集都不满足 \textup{(4.5)} 的协变量集。然而，这样的极小集通常很多（见图 4.7），于是问题仍然存在：是否每个极小 $Z_k$ 的选取都是“安全的”？能否保证：当某个可容许序列 $Z_1^*,\dots,Z_n^*$ 存在时，任何极小后序子列 $Z_1,\dots,Z_k$ 的选取都不会妨碍我们找到可容许的 $Z_{k+1}$？
+
+下述结果保证每个极小后序子列 $Z_1,\dots,Z_k$ 都是安全的，从而为 G-可识别性提供了一个有效检验。
+
+\begin{theorem}
+若存在可容许序列 $Z_1^*,\dots,Z_n^*$，则对每个极小可容许的后序子列 $Z_1,\dots,Z_{k-1}$，都必有可容许的 $Z_k$。
+\end{theorem}
+
+其证明见 Pearl and Robins (1995)。
+
+定理 4.4.4 于是给出一个检验 G-可识别性的有效判定程序，如下。
+
+\begin{corollary}
+一个控制问题 G-可识别，当且仅当下述算法以成功退出。
+\begin{enumerate}[label=\arabic*.,leftmargin=2.2em]
+\item 置 $k=1$。
+\item 选取任一满足 \textup{(4.5)} 的极小 $Z_k\subseteq N_k$。
+\item 若不存在这样的 $Z_k$，则以失败退出；否则置 $k=k+1$。
+\item 若 $k=n+1$，则以成功退出；否则返回步骤 2。
+\end{enumerate}
+\end{corollary}
+
+定理 4.4.4 还可表述为另一个变体，以避免搜索极小集 $Z_k$。这源于如下认识：若存在可容许序列，我们便可把定理 4.4.1 改写成由一列显式协变量 $W_1,W_2,\dots,W_n$ 表达的形式，而这些协变量在 $G$ 中很容易识别。
+
+\begin{theorem}
+概率 $P(y\mid\hat{x}_1,\dots,\hat{x}_n)$ 是 G-可识别的，当且仅当对每个 $1\le k\le n$ 下述条件成立：
+\[
+(Y\indep X_k\mid X_1,\dots,X_{k-1},W_1,W_2,\dots,W_k)_{G_{\underline{X_k},\bar{X}_{k+1},\dots,\bar{X}_n}},
+\]
+其中 $W_k$ 是 $G$ 中满足下述条件的全部协变量之集：它们既是 $\{X_k,X_{k+1},\dots,X_n\}$ 的非后代，又在 $G_{\underline{X_k},\bar{X}_{k+1},\dots,\bar{X}_n}$ 中以 $Y$ 或 $X_k$ 为后代。此外，若该条件满足，则计划可评估为
+\begin{equation}
+\begin{aligned}
+P(y\mid\hat{x}_1,\dots,\hat{x}_n) &= \sum_{w_1,\dots,w_n}P(y\mid w_1,\dots,w_n,x_1,\dots,x_n)\\
+&\quad\times\prod_{k=1}^{n}P(w_k\mid w_1,\dots,w_{k-1},x_1,\dots,x_{k-1}).
+\end{aligned}\tag{4.8}
+\end{equation}
+\end{theorem}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.5cm,every node/.style={transform shape}]
+  \node[lat] (u) at (3.15,2.4) {$U$};
+  \node[vtx] (x1) at (0.1,2.0) {$X_1$};
+  \node[vtx] (z1) at (1.45,2.25) {$Z_1$};
+  \node[vtx] (x2) at (0.35,1.15) {$X_2$};
+  \node[vtx] (z1p) at (1.75,0.95) {$Z_1'$};
+  \node[vtx] (y) at (0.9,-0.25) {$Y$};
+  \draw[ed] (u)--(x1); \draw[ed] (u)--(z1); \draw[ed] (u)--(z1p);
+  \draw[ed] (x1)--(x2); \draw[ed] (z1)--(x2); \draw[ed] (z1p)--(x2);
+  \draw[ed] (x2)--(y);
+\end{tikzpicture}
+\caption{极小可容许集的不唯一性：$Z_1$ 与 $Z_1'$ 各自都是极小且可容许的，因为 $(Y\indep X_1\mid Z_1)$ 与 $(Y\indep X_1\mid Z_1')$ 在 $G_{\underline{X_1},\bar{X_2}}$ 中都成立。（原扫描件中 $U$ 与 $X_2$ 之间是否另有直连箭头不可辨，未绘出。）}
+\label{fig:4.7}
+\end{figure}
+
+定理 4.4.6 的证明以及若干推广，见 Pearl and Robins (1995) 与 Robins (1997)。G-可识别性的各种扩展见 Kuroki（与 Miyakawa 1999a,b, 2003; 与 et al.~2003; 与 Cai 2004）。
+
+读者应注意到，推论 4.4.5 与定理 4.4.6 虽然在提供系统检验的意义上是程序性的，却仍然\emph{依赖于次序}。完全可能：控制变量的某一种排序存在可容许序列，而另一种排序（两种排序都与 $G$ 中的箭头相容）却不存在。图 4.8 中的图 $G$ 即为例证。它由 4.4 图删去箭头 $X_1\to Z$ 与 $X_1\to X_2$ 而得，故两个控制变量（$X_1$ 与 $X_2$）可任意排序。排序 $(X_1,X_2)$ 仍如以前容许可容许序列 $(\varnothing,Z)$，但对排序 $(X_2,X_1)$ 却找不到任何可容许序列。从图 $G_{\underline{X_1}}$ 立即可见：按 \textup{(4.5)}（取 $k=1$），我们需要找到一个集合 $Z$，使 $\{X_2,Z\}$ 把 $Y$ 与 $X_1$ d-分离。而这样的集合并不存在。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.5cm,every node/.style={transform shape}]
+  % ---- (a) G ----
+  \begin{scope}
+    \node[lat] (u1a) at (1.5,2.15) {$U_1$};
+    \node[vtx] (x1a) at (0.1,1.55) {$X_1$};
+    \node[vtx] (za)  at (1.7,1.2) {$Z$};
+    \node[vtx] (x2a) at (1.05,0.5) {$X_2$};
+    \node[lat] (u2a) at (3.2,1.1) {$U_2$};
+    \node[vtx] (ya)  at (1.35,-0.3) {$Y$};
+    \draw[edd] (u1a)--(x1a); \draw[edd] (u1a)--(za);
+    \draw[ed]  (x1a)--(ya);  \draw[ed] (za)--(x2a); \draw[ed] (x2a)--(ya);
+    \draw[edd] (za)--(u2a);  \draw[edd] (u2a)--(ya);
+    \node[draw,font=\small] at (1.6,-1.05) {$G$};
+    \node[font=\small] at (1.6,-1.7) {(a)};
+  \end{scope}
+  % ---- (b) G_{X1} ----
+  \begin{scope}[xshift=6.6cm]
+    \node[lat] (u1b) at (1.5,2.15) {$U_1$};
+    \node[vtx] (x1b) at (0.1,1.55) {$X_1$};
+    \node[vtx] (zb)  at (1.7,1.2) {$Z$};
+    \node[vtx] (x2b) at (1.05,0.5) {$X_2$};
+    \node[lat] (u2b) at (3.2,1.1) {$U_2$};
+    \node[vtx] (yb)  at (1.35,-0.3) {$Y$};
+    \draw[edd] (u1b)--(x1b); \draw[edd] (u1b)--(zb);
+    \draw[ed]  (zb)--(x2b);  \draw[ed] (x2b)--(yb);
+    \draw[edd] (zb)--(u2b);  \draw[edd] (u2b)--(yb);
+    \node[draw,font=\small] at (1.6,-1.05) {$G_{\underline{X_1}}$};
+    \node[font=\small] at (1.6,-1.7) {(b)};
+  \end{scope}
+\end{tikzpicture}
+\caption{因果图 $G$：控制变量 $X_1$ 与 $X_2$ 的恰当排序在此至关重要。}
+\label{fig:4.8}
+\end{figure}
+
+这种次序敏感性的含义是：只要 $G$ 容许控制变量的若干种排序，我们就必须考察所有排序，才能确信一个计划不是 G-可识别的。Shpitser and Pearl (2006b) 的图形准则绕开了这一搜索。
+
+\section{直接效应与间接效应}
+
+\subsection{直接效应与总效应}
+
+我们迄今所分析的因果效应 $P(y\mid\hat{x})$，度量的是一个变量（或一组变量）$X$ 对响应变量 $Y$ 的\emph{总效应}。在许多情况下，这个量并不能恰当代表研究的目标，注意力反而转向 $X$ 对 $Y$ 的\emph{直接效应}。“直接效应”一词意在量化一种不经模型中其他变量中介的效应；更准确地说，是在分析中其他一切因素保持不变时，$Y$ 对 $X$ 变化的敏感性。自然地，保持那些因素不变会切断从 $X$ 到 $Y$ 的一切因果路径，唯余不被任何中介截断的直接连线 $X\to Y$。
+
+直接效应无处不在，一个经典例子（见 Hesslow 1976; Cartwright 1989）讲的是避孕药：它被怀疑会导致女性血栓形成，同时又通过降低怀孕率（已知怀孕会促进血栓形成）而对血栓形成产生负面的间接效应。在此例中，人们关注的是避孕药的直接效应，因为它代表一种稳定的生物学关系——与总效应不同，它对婚姻状况以及其他可能影响女性受孕或维持妊娠机会的社会因素保持不变。
+
+另一类例子涉及招聘中种族或性别歧视的法律纠纷。这里，无论是性别或种族对求职者资格的影响，还是资格对录用的影响，都不是诉讼的目标。相反，被告必须证明：性别与种族并不直接影响录用决定，无论它们可能通过求职者资格对录用产生何种间接效应。
+
+在所有这些例子中，“保持中介变量不变”这一要求都必须解释为（在假设意义上）通过物理干预把这些变量置为常数，而不是通过取条件或调整——后者是一种可追溯到 Fisher (1935) 的错误习惯。例如，分别在怀孕与未怀孕女性中测量避孕药与血栓形成的关联、再把结果汇总，是不够的。相反，我们必须在服药之前就已怀孕的女性中、以及在用药物以外的手段避孕的女性中进行研究。原因在于：对中介变量（例中即怀孕）取条件，可能即使在 $X$ 对 $Y$ 没有直接效应时，也造出 $X$ 与 $Y$ 之间的虚假关联。这在模型 $X\to Z\leftarrow U\to Y$ 中很容易说明，其中 $X$ 对 $Y$ 没有直接效应。物理地保持 $Z$ 不变，会使 $X$ 与 $Y$ 之间不存在任何关联——删去一切进入 $Z$ 的箭头即可看出。但若我们对 $Z$ 取条件，就会通过（未观测的）$U$ 造出一种虚假关联，它可能被误认为 $X$ 对 $Y$ 的直接效应。
+
+\subsection{直接效应：定义与识别}
+
+控制一个问题的所有变量显然是一项浩大工程，甚至不可能。识别分析告诉我们：在什么条件下，即便没有这种控制，也能从非实验数据估计直接效应。用我们的 $\doop(x)$ 记号（或简写 $\hat{x}$），可把直接效应表述如下。
+
+\begin{definition}[直接效应]
+$X$ 对 $Y$ 的直接效应由 $P(y\mid\hat{x},\hat{s}_{XY})$ 给出，其中 $S_{XY}$ 是系统中除 $X$ 与 $Y$ 之外的一切内生变量之集。
+\end{definition}
+
+我们看到，直接效应的测量被归诸一个理想实验室：科学家控制一切可能的条件 $S_{XY}$，且不必知道图的结构，也不必知道哪些变量才是 $X$ 与 $Y$ 之间真正的中介。然而，若我们知道图的结构，大部分实验控制都可省去。首先，并不需要真的保持其他一切变量不变；只需保持 $Y$ 的直接父节点（$X$ 除外）不变便已足够。于是得到下述等价的直接效应定义。
+
+\begin{corollary}
+$X$ 对 $Y$ 的直接效应由 $P(y\mid\hat{x},\widehat{\pa}_{Y\backslash X})$ 给出，其中 $\pa_{Y\backslash X}$ 表示 $Y$ 的父节点（$X$ 除外）的任一取值实现。
+\end{corollary}
+
+显然，若 $X$ 不出现在 $Y$ 的方程中（等价地，若 $X$ 不是 $Y$ 的父节点），则 $P(y\mid\hat{x},\widehat{\pa}_{Y\backslash X})$ 定义了 $Y$ 上一个与 $x$ 无关的常值分布，这与我们对“没有直接效应”的理解相符。一般地，假定 $X$ 是 $Y$ 的父节点，推论 4.5.2 表明：只要 $P(y\mid\widehat{\pa}_Y)$ 可识别，$X$ 对 $Y$ 的直接效应就可识别。此外，由于该表达式的条件化部分对应于一个以 $Y$ 的父节点为控制变量的计划，我们得出结论：只要相应父节点计划的效应可识别，直接效应就可识别。现在可以用 \S 4.4 的分析，把定理 4.4.1 与 4.4.6 的图形准则用于直接效应的分析。特别地，我们可以陈述下一个定理。
+
+\begin{theorem}
+设 $\PA_Y=\{X_1,\dots,X_k,\dots,X_m\}$。只要推论 4.4.5 的条件对计划 $(\hat{x}_1,\hat{x}_2,\dots,\hat{x}_m)$ 在变量的某个可容许排序下成立，任一 $X_k$ 对 $Y$ 的直接效应就可识别。此时直接效应由 \textup{(4.8)} 给出。
+\end{theorem}
+
+定理 4.5.3 意味着：若 $Y$ 的某一个父节点的效应可识别，则 $Y$ 的每一个父节点的效应也都可识别。当然，如 \textup{(4.8)} 所示，效应的大小会因父节点而异。
+
+下述推论是直接的。
+
+\begin{corollary}
+设 $X_j$ 是 $Y$ 的一个父节点。若存在一条跨接任一连线 $X_k\to Y$ 的混杂弧，则 $X_j$ 对 $Y$ 的直接效应一般不可识别。
+\end{corollary}
+
+\subsection{例：大学录取中的性别歧视}
+
+为说明这一结果的用法，考虑关于伯克利研究生录取中所谓性别偏见的著名研究（Bickel et al. 1975）：数据显示，总体上男性申请者的录取率更高，但按系分解后，却略微偏向女性申请者。解释是：女性申请者倾向于申请竞争更激烈的系，那里拒绝率很高；基于这一发现，伯克利免于歧视指控。这类逆转（即辛普森悖论）的哲学面向将在第六章更充分地讨论。这里我们聚焦于：在评估大学录取中的性别歧视时，针对“系”作调整是否恰当。流行看法认为这种调整是恰当的，因为“我们知道，申请一个热门系（申请人数远多于名额的系）正是导致被拒的那类事情”（Cartwright 1983, p.~38）；但我们很快就会看到，还应考虑其他因素。
+
+我们假定伯克利例子中的相关因素如图 4.9 配置，各变量的含义如下：
+\begin{itemize}
+\item $X_1$＝申请者的性别；
+\item $X_2$＝申请者所选择的系；
+\item $Z$＝申请者（入学前）的职业目标；
+\item $Y$＝录取结果（录取/拒绝）；
+\item $U$＝申请者的能力（未记录）。
+\end{itemize}
+注意，$U$ 既影响申请者的职业目标，也影响录取结果 $Y$（比如说，通过未记录的语言能力）。
+
+对“系”的选择作调整，相当于计算下述表达式：
+\begin{equation}
+E_{x_2}P(y\mid\hat{x}_1,x_2)=\sum_{x_2}P(y\mid x_1,x_2)P(x_2). \tag{4.9}
+\end{equation}
+相反，$X_1$ 对 $Y$ 的直接效应，如 \textup{(4.7)} 所给出者，读作
+\begin{equation}
+P(y\mid\hat{x}_1,\hat{x}_2)=\sum_z P(y\mid z,x_1,x_2)P(z\mid x_1). \tag{4.10}
+\end{equation}
+
+显然，两个表达式可能相差甚远。前者度量的是性别在申请某一给定系者当中对录取的（平均）效应；这个量对下述事实很敏感：某些性别—系组合之所以可能与高录取率相关联，仅仅因为这类组合指示了某种未被记录的（$U$ 所代表的）能力。后者则通过在两个性别组中分别针对职业目标（$Z$）作调整，消除了这类虚假关联。
+
+为验证 \textup{(4.9)} 并未恰当度量 $X_1$ 对 $Y$ 的直接效应，我们注意到：即便在 $X_1$ 与 $Y$ 之间的箭头并不存在的情形下，该表达式仍依赖于 $X_1$ 的取值。反之，\textup{(4.10)} 在那种情形下对 $x_1$ 变得不敏感——这一练习留给读者验证。\footnote{提示：利用图中的独立关系分解 $P(y,u,z\mid\hat{x}_1,\hat{x}_2)$，并如导出 \textup{(3.27)} 那样消去 $u$。流行病学中的例子见 Cole and Hernán (2002)。}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.5cm,every node/.style={transform shape}]
+  \node[vtx] (x1) at (0.1,2.3) {$X_1$};
+  \node[vtx] (z)  at (2.3,1.95) {$Z$};
+  \node[vtx] (x2) at (1.05,1.4) {$X_2$};
+  \node[vtx] (y)  at (0.95,-0.15) {$Y$};
+  \node[lat] (u)  at (3.5,2.5) {$U$};
+  \draw[ed]  (x1)--(z);  \draw[ed] (x1)--(x2); \draw[ed] (x1)--(y);
+  \draw[ed]  (x2)--(y);
+  \draw[edd] (u)--(z);   \draw[edd] (u)--(y);
+\end{tikzpicture}
+\caption{与伯克利性别歧视研究相关的因果关系。在估计性别对录取的直接效应时，针对系的选择（$X_2$）或职业目标（$Z$）（或二者）作调整都是不恰当的。恰当的调整由 \textup{(4.10)} 给出。}
+\label{fig:4.9}
+\end{figure}
+
+为把这一分析置于具体的数值情境中，设想一所由 A、B 两个系组成的学院，两系都仅凭资格 $Q$ 录取学生。再假定 (i) 申请者池由 100 名男性与 100 名女性组成；(ii) 每种性别各有 50 名申请者资格高（因而被录取）、50 名资格低（因而被拒）。显然，这所学院不可能被指控性别歧视。
+
+然而，若我们在忽略资格的情况下针对系作调整——即用 \textup{(4.9)} 估计性别对录取的效应——就会出现另一番结果。假定两系的性质使得：所有且仅有合格的男性申请者申请 A 系，而所有女性都申请 B 系（见表 4.1）。
+
+\begin{table}[htbp]
+\centering
+\caption{各系中男性与女性的录取率}
+\label{tab:4.1}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{男性} & \multicolumn{2}{c}{女性} & \multicolumn{2}{c}{合计} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+& 录取 & 申请 & 录取 & 申请 & 录取 & 申请 \\
+\midrule
+A 系 & 50 & 50 & 0 & 0 & 50 & 50 \\
+B 系 & 0 & 50 & 50 & 100 & 50 & 150 \\
+未调整 & \multicolumn{2}{c}{50\%} & \multicolumn{2}{c}{50\%} & \multicolumn{2}{c}{50\%} \\
+调整后 & \multicolumn{2}{c}{25\%} & \multicolumn{2}{c}{37.5\%} & \multicolumn{2}{c}{} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+从表中可见，针对系作调整会错误地显示出一个偏向女性申请者的 $37.5:25\;(=3:2)$ 的偏倚。而未经调整（有时称为“粗”）的分析在此例中恰巧给出正确结果——男性与女性的录取率同为 50\%——从而使该校免于性别歧视的指控。
+
+我们的分析并不意味着 Bickel 等 (1975) 的伯克利研究有缺陷，也不意味着该研究中针对系作调整没有道理。其用意在于强调：除非仔细检视确保识别的因果假设，否则没有任何调整能保证给出直接效应或间接效应的无偏估计。定理 4.5.3 使我们理解这些假设，并提供了表达它们的数学手段。我们注意到：若申请者的资格未记录在数据中，则性别对录取的直接效应不可识别，除非我们能测量某个代理变量，它与 $Q$ 的关系正如 $Z$ 之于图 4.9 中的 $U$。
+
+\subsection{自然直接效应}
+
+熟悉结构方程模型（SEM）的读者会注意到：在线性系统中，直接效应 $E(Y\mid\hat{x},\widehat{\pa}_{Y\backslash X})$ 完全由连线上 $X\to Y$ 的路径系数确定；因此直接效应与我们在其中保持 $Y$ 其他父节点的那些取值 $\pa_{Y\backslash X}$ 无关。在非线性系统中，这些取值一般会改变 $X$ 对 $Y$ 的效应，因而应审慎选取，以代表所分析的目标政策。例如，避孕药对血栓形成的直接效应在怀孕与未怀孕女性中很可能不同。流行病学家把这类差异称为“效应修饰”，并坚持在各子群体中分别报告效应。
+
+尽管直接效应对我们在其中保持结局变量之父节点的那些水平很敏感，有时把直接效应在这些水平上取平均是有意义的。例如，若我们希望评估某所学校中歧视的程度而不涉及具体的系，就应当把控制差
+\[
+E(Y\mid\hat{x},\widehat{\pa}_{Y\backslash X}),
+\]
+即
+\[
+P(\text{录取}\mid\text{男},\text{系})-P(\text{录取}\mid\text{女},\text{系}),
+\]
+替换为它在各系上的某种平均。这个平均应当度量的是下述假想实验中的录取率增量：在实验中，我们让所有女性申请者保留其系列偏好，但把（申请表上的）性别标识由女改为男。
+
+概念上，我们可以把平均直接效应 $DE_{x,x'}(Y)$ 定义为：把 $X$ 从 $x$ 改为 $x'$、同时把所有中介因素保持在它们在 $\doop(x)$ 下本会取得的取值上，所引起的 $Y$ 的期望变化。这一假设性的变化，Robins and Greenland (1991) 称之为“纯”效应，Pearl (2001c) 称之为“自然”效应，正是立法者在种族或性别歧视案件中所指示我们考虑的东西：“任何雇佣歧视案件的核心问题是：倘若雇员属于另一族裔（年龄、性别、宗教、国籍等），而其他一切保持不变，雇主是否本会采取同样的行动。”（Carson 诉 Bethlehem Steel Corp., 70 FEP Cases 921, 7th Cir. (1996)）
+
+借用式 3.51 的括号记号，Pearl (2001c) 给出了“自然直接效应”的如下定义：
+\begin{equation}
+DE_{x,x'}(Y)=E\big[Y(x',Z(x))\big]-E\big[Y(x)\big]. \tag{4.11}
+\end{equation}
+这里 $Z$ 表示 $Y$ 的全部父节点（$X$ 除外），而表达式 $Y(x',Z(x))$ 表示：在把 $X$ 置为 $x'$、同时把 $Z$ 置为它在 $X=x$ 之下本会取得的取值这一联合操作下，$Y$ 所会取得的取值。我们看到，$DE_{x,x'}(Y)$——从 $x$ 到 $x'$ 之转变的自然直接效应——涉及嵌套反事实的概率，无法用 $\doop(x)$ 算子写出。因此，自然直接效应一般不可识别，即便借助理想的受控实验也是如此（直观解释见 Robins and Greenland 1992 与 \S 7.1）。尽管如此，Pearl (2001c) 已证明：若某些“无混杂”假设被认为有效，\footnote{一个充分条件是：对某组被测协变量 $W$，有 $Z(x)\indep Y(x',z)\mid W$ 成立。细节与图形准则见 Pearl (2001c, 2005a) 以及 Petersen et al. (2006)。}则自然直接效应可化简为
+\begin{equation}
+DE_{x,x'}(Y)=\sum_z\big[E(Y\mid\doop(x'),z)-E(Y\mid\doop(x),z)\big]P(z\mid\doop(x)). \tag{4.12}
+\end{equation}
+其直觉很简单：自然直接效应是控制直接效应的加权平均，权函数为因果效应 $P(z\mid\doop(x))$。在这些假设下，\S 4.4 为识别特定控制之计划而发展的序贯后门准则 $P(y\mid\hat{x}_1,\hat{x}_2,\dots,\hat{x}_n)$ 便可适用。
+
+特别地，表达式 \textup{(4.12)} 在马尔可夫模型中既有效又可识别——在马尔可夫模型中，一切 do 算子都可用推论 3.2.6 消去；例如
+\begin{equation}
+P(z\mid\doop(x))=\sum_t P(z\mid x,\pa_X=t)P(\pa_X=t). \tag{4.13}
+\end{equation}
+
+\subsection{间接效应与中介公式}
+
+值得注意的是，自然直接效应 \textup{(4.11)} 的定义可以很容易地反过来，为\emph{间接效应}提供一个可操作的定义——后者是一个笼罩在神秘与争议之中的概念，因为用 $\doop(x)$ 算子不可能切断从 $X$ 到 $Y$ 的直接连线，从而使 $X$ 仅经由间接路径影响 $Y$。
+
+从 $x$ 到 $x'$ 之转变的自然间接效应 $IE$，定义为：把 $X$ 保持为常数 $X=x$，同时把 $Z$ 改为倘若 $X$ 被置为 $X=x'$ 时它本会取得的取值，由此引起的 $Y$ 的期望变化。形式上，这读作（Pearl 2001c）：
+\begin{equation}
+IE_{x,x'}(Y)\triangleq E\big[Y(x,Z(x'))\big]-E\big[Y(x)\big]. \tag{4.14}
+\end{equation}
+我们看到，一般地，一次转变的总效应 $TE$ 等于该转变的直接效应与反向转变的间接效应之差：
+\begin{equation}
+TE_{x,x'}(Y)\triangleq E(Y(x'))-E(Y(x))=DE_{x,x'}(Y)-IE_{x',x}(Y). \tag{4.15}
+\end{equation}
+在线性模型中，转变的反向相当于把其效应的符号取反，于是 \textup{(4.15)} 为标准的加法公式提供了形式上的依据：
+\begin{equation}
+TE_{x,x'}(Y)=DE_{x,x'}(Y)+IE_{x,x'}(Y). \tag{4.16}
+\end{equation}
+在中介变量无混杂的简单情形中，自然直接效应与自然间接效应可通过两个回归方程估计，这两个方程称为\emph{中介公式}（Mediation Formula）：
+\begin{equation}
+DE_{x,x'}(Y)=\sum_z\big[E(Y\mid x',z)-E(Y\mid x,z)\big]P(z\mid x), \tag{4.17}
+\end{equation}
+\begin{equation}
+IE_{x,x'}(Y)=\sum_z E(Y\mid x,z)\big[P(z\mid x')-P(z\mid x)\big]. \tag{4.18}
+\end{equation}
+这两个公式提供了两种广泛使用的中介效应度量，适用于任何非线性系统、任何分布与任何类型的变量（Pearl 2009b, 2010b）。
+
+注意，间接效应具有明确的政策含义。例如：在存在招聘歧视的环境中，政策制定者可能关心这样的预测——若消除性别偏见、所有申请者都受到平等对待（比如说，都按目前对待男性的方式对待），那么劳动力中的性别构成将会如何。这个量将由性别对录用（经教育、能力等可能依赖性别之因素中介）的间接效应给出。更多的例子见 Pearl (2001c, 2010b)。
+
+更一般地，政策制定者可能关心激励某一选定的下属员工群体的效应，或控制一个由相互作用的行动主体构成的网络中消息路由的效应。这类应用促成了对\emph{路径特定效应}的分析，即 $X$ 经由某一选定路径集对 $Y$ 的效应（Avin et al. 2005）。
+
+在所有这些情形中，政策干预所涉及的是选择要被感知的信号，而不是选择要被固定的变量。因此 Pearl (2001c) 提出：信号感知之于因果概念，比操纵更为基本；后者不过是在实验装置中刺激前者的一种粗糙方式（见 \S 11.4.5）。对可经验检验的反事实的一般刻画，见第七、九、十一章以及 Shpitser and Pearl (2007)。

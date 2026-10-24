@@ -1,0 +1,108 @@
+% 原书第139—142页：7.1.3—7.1.6。
+\subsection{误差方差相等的线性高斯模型}
+
+还有一种偏离通常线性高斯结构方程模型的方式，可以使图具有可识别性。Peters and Bühlmann［2014］表明，只需限制各个噪声变量具有相同方差，就足以恢复图结构。证明可参见 Peters and Bühlmann［2014］。
+
+\begin{proposition}[误差方差相等时的可识别性]
+考虑一个图为 $\mathcal G^0$、具有下列赋值的结构因果模型：
+\[
+ X_j:=\sum_{k\in\PA_j^{\mathcal G^0}}\beta_{jk}X_k+N_j,
+ \qquad j=1,\ldots,d,
+\]
+其中，所有 $N_j$ 都独立同分布，且服从高斯分布。特别地，噪声方差 $\sigma^2$ 不依赖于 $j$。此外，对于每个 $j\in\{1,\ldots,p\}$，\chseventnote{原书在本命题、定理7.6及第7.2.5节中将指标上限写为 $p$，而同一模型定义了 $d$ 个变量。这里的 $p$ 应按 $d$ 理解；正文保留原书记号。}
+要求对所有 $k\in\PA_j^{\mathcal G^0}$，都有 $\beta_{jk}\neq0$。那么，图 $\mathcal G^0$ 可以从联合分布中识别。
+\end{proposition}
+
+为估计系数 $\beta_{jk}$，从而估计图结构，Peters and Bühlmann［2014］建议采用基于\textbf{贝叶斯信息准则（Bayesian information criterion，BIC）}的惩罚最大似然得分，另见第7.2.2节，并在有向无环图空间中使用贪心搜索算法。重新缩放变量会改变误差项的方差。因此，在许多应用中，模型 (7.2) 并不能合理地适用。不过，BIC 可以把该方法的得分，与一个使用更多参数、不假定误差等方差的线性高斯结构因果模型的得分进行比较。
+
+\subsection{线性非高斯无环模型}
+
+Shimizu et al.［2006］利用独立成分分析［Comon, 1994，定理11］证明了下面的结论；独立成分分析本身的证明则使用 Darmois--Skitovič 定理。
+
+\begin{theorem}[LiNGAM的可识别性]
+考虑一个图为 $\mathcal G^0$、具有下列赋值的结构因果模型：
+\begin{equation}
+ X_j:=\sum_{k\in\PA_j^{\mathcal G^0}}\beta_{jk}X_k+N_j,
+ \qquad j=1,\ldots,d,
+ \tag{7.2}
+\end{equation}
+其中，所有 $N_j$ 相互独立，均服从具有严格正密度的非高斯分布。\footnote{严格正密度条件可以放宽，详见独立成分分析证明中的细节；不过，例如噪声变量非退化这样的假设，肯定是必要的。}
+此外，对于每个 $j\in\{1,\ldots,p\}$，要求对所有 $k\in\PA_j^{\mathcal G^0}$ 都有 $\beta_{jk}\neq0$。那么，图 $\mathcal G^0$ 可以从联合分布中识别。
+\end{theorem}
+
+作者将这种模型称为\textbf{线性非高斯无环模型（linear non-Gaussian acyclic model，LiNGAM）}。正如第4.1.3节提到的，定理7.6还有另一种证明：Peters et al.［2014］的定理28将定理4.2之类的二元可识别性结果推广到了多元情形。同样的技巧也用于非线性加性模型，即推广定理4.5。
+
+\subsection{非线性高斯加性噪声模型}
+
+我们已经看到，当赋值为线性、噪声变量为非高斯时，加性噪声模型的图结构具有可识别性。另一种选择是利用非线性。在高斯噪声情形下，结论最容易陈述。
+
+\begin{theorem}[非线性高斯加性噪声模型的可识别性]
+\begin{enumerate}[label=(\roman*)]
+ \item 设 $P_X=P_{X_1,\ldots,X_d}$ 由下列结构因果模型诱导：
+ \[
+  X_j:=f_j(\PA_j)+N_j,
+ \]
+ 其中，噪声变量服从正态分布 $N_j\sim\mathcal N(0,\sigma_j^2)$，函数 $f_j$ 三次可微，且在以下意义下对任何分量都不是线性的。将 $X_j$ 的父节点 $\PA_j$ 记为 $X_{k_1},\ldots,X_{k_\ell}$，则假定对于每个 $a$，都存在一些
+ \[
+  (x_{k_1},\ldots,x_{k_{a-1}},x_{k_{a+1}},\ldots,x_{k_\ell})
+  \in\RR^{\ell-1},
+ \]
+ 使得函数
+ \[
+  f_j(x_{k_1},\ldots,x_{k_{a-1}},\cdot,
+      x_{k_{a+1}},\ldots,x_{k_\ell})
+ \]
+ 是非线性的。
+ \item 作为一个特例，设 $P_X=P_{X_1,\ldots,X_d}$ 由下列结构因果模型诱导：
+ \begin{equation}
+  X_j:=\sum_{k\in\PA_j}f_{j,k}(X_k)+N_j,
+  \tag{7.3}
+ \end{equation}
+ 其中，噪声变量服从正态分布 $N_j\sim\mathcal N(0,\sigma_j^2)$，函数 $f_{j,k}$ 三次可微且非线性。这种模型称为\textbf{因果加性模型（causal additive model，CAM）}。
+\end{enumerate}
+在（i）和（ii）两种情形中，都可以从分布 $P_X$ 识别相应的图 $\mathcal G^0$。如果允许源节点，即没有父节点的节点，其噪声具有在整条实线 $\RR$ 上全支撑的非高斯密度，结论仍然成立，而且证明不变。
+\end{theorem}
+
+证明可见 Peters et al.［2014，推论31］。
+
+\subsection{观测数据与实验数据}
+
+第6.3节已经说明，当底层分布变化时，掌握因果关系有助于改善预测。现在将这一思路反过来，说明如何通过在不同环境下观测系统，学习因果关系。为此，考虑如下设定：在不同环境 $e\in\mathcal E$ 中观测数据，相应的模型为
+\[
+ X^e=(X_1^e,\ldots,X_d^e)\sim P^e,
+\]
+其中，每个变量 $X_j^e$ 都表示在环境 $e\in\mathcal E$ 中测量的同一个物理量。以下会把它们称作“不同环境中的变量 $X_j$”，这是对记号的轻微简化。
+
+\paragraph{已知干预目标}
+第一类方法假定，不同环境来自不同的干预设定。当干预目标 $I^e\subseteq\{1,\ldots,d\}$ 已知时，已有多种方法被提出。例如，Tian and Pearl［2001］和 Hauser and Bühlmann［2012］假定忠实性成立，分别考虑机制变化与随机干预。他们定义并刻画了图的干预等价类，也就是能够解释给定分布的图所构成的类。
+
+以机制变化为例，可以在模型中加入一个干预节点，并将受到干预的变量设为它的子节点。这样就增加了 v 结构的数量。两个图相对于给定分布干预等价，当且仅当它们具有相同的骨架与 v 结构，并且受到干预的节点具有相同的父节点，参见 Tian and Pearl［2001，定理2］。Eberhardt et al.［2010］则在存在有向环时，也允许硬干预和随机干预。
+
+Hyttinen et al.［2012］分析了使图具有可识别性所需的干预条件。Eberhardt et al.［2005］以及 Hauser and Bühlmann［2014］研究了在最坏情况下，需要多少次干预实验才能识别图。
+
+\paragraph{不同环境}
+现在转向一个略有不同的设定：我们不再试图学习完整的因果结构，而是考虑一个目标变量 $Y$ 和由 $d$ 个预测变量构成的集合 $X$，并尝试学习哪些预测变量是 $Y$ 的因果父节点。$X$ 与 $Y$ 都在不同环境 $e\in\mathcal E$ 中被观测；这些环境可以是干预目标未知的干预设定。也就是说，对 $e\in\mathcal E$，有
+\[
+ (X^e,Y^e)\sim P_{X^e,Y^e}=:P^e.
+\]
+关键假设是：存在一个未知集合 $\PA_Y\subseteq\{1,\ldots,d\}$，可以将其理解为 $Y$ 的直接原因集合，使得给定 $\PA_Y$ 时 $Y$ 的条件分布在所有环境中保持不变。即对所有 $e,f\in\mathcal E$，都有
+\[
+ P_{Y^e\mid\PA_Y^e}=P_{Y^f\mid\PA_Y^f}.
+\]
+如果分布由一个底层结构因果模型诱导，而不同环境对应不同的干预分布，并且这些干预均未作用于 $Y$，那么这一假设成立［Peters et al., 2016］，代码片段7.11给出了例子。不过，这个设定更为一般，环境并不一定要对应干预，甚至不要求存在底层结构因果模型。
+
+可以考虑所有能够实现“不变预测”的变量集合 $S\subseteq\{1,\ldots,d\}$，将其构成的集合族记为 $\mathcal S$。也就是说，对于所有 $e,f\in\mathcal E$ 以及所有 $S\in\mathcal S$，都有
+\begin{equation}
+ P_{Y^e\mid S^e}=P_{Y^f\mid S^f}.
+ \tag{7.4}
+\end{equation}
+这里，$Y^e\mid S^e$ 是 $Y^e\mid X_S^e$ 的简记。不难看出，见习题7.15，在所有这些集合 $S\in\mathcal S$ 中都出现的变量，一定是 $Y$ 的直接原因：
+\begin{equation}
+ \bigcap_{S\in\mathcal S}S\subseteq\PA_Y,
+ \tag{7.5}
+\end{equation}
+其中，约定空指标集上的交集为空集。Peters et al.［2016］将式 (7.5) 的左端作为 $\PA_Y$ 的估计。这样，式 (7.5) 就保证，该方法输出中包含的任何变量，都确实属于 $\PA_Y$。
+
+在结构因果模型与干预这个特例中，已有使 $\PA_Y$ 具有可识别性的充分条件［Peters et al., 2016］；换言之，在这些条件下，式 (7.5) 的包含关系成为等式。值得注意的是，第7.2.5节介绍的方法能够判断数据是否来自这类可识别情形，而不需要预先假定这一点。
+
+Tian and Pearl［2001］也研究了干预目标未知时的可识别性问题。他们不指定目标变量，并着重考察边缘分布的变化，而非条件分布的变化。

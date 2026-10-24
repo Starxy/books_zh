@@ -1,0 +1,68 @@
+% 原分章PDF93页附录7.D标题—94页末，印刷页669—670。
+\section*{附录7.D\quad 反向的M–L距离}
+\addcontentsline{toc}{section}{附录7.D 反向的M–L距离}
+\markright{附录7.D 反向的M–L距离}
+
+利用式（7.66），得到
+\begin{equation}
+D(P_X\parallel U_X)=D(P_X\parallel V_{out}(X))
+ -D(U_X\parallel V_{out}(X)).\tag{7.D.1}
+\end{equation}
+注意
+\begin{equation}
+-D(U_X\parallel V_{out})<D(V_{out}(X)\parallel U_X).\tag{7.D.2}
+\end{equation}
+将式（7.D.2）代入式（7.D.1），得到
+\begin{equation}
+D(P_X\parallel V_{out}(X))+D(V_{out}(X)\parallel U_X)
+ >D(P_X\parallel U_X).\tag{7.D.3}
+\end{equation}
+回顾
+\begin{equation}
+V_{out}(x)=V_Yf'(x),\qquad U_{out}(Y)=\frac{U_X}{f'(x)}.\tag{7.D.4}
+\end{equation}
+利用式（7.D.4），得到
+\begin{equation}
+\begin{aligned}
+D(V_Y\parallel U_{out}(Y))
+ &=\int\log\frac{V_Y}{U_{out}(Y)}V_Y\,dy\\
+ &=\int\log\frac{V_Yf'(x)}{U_X}V_Yf'(x)\,dx\\
+ &=\int\log\frac{V_{out}(X)}{U_X}V_{out}(X)\,dx\\
+ &=D(V_{out}(X)\parallel U_X).
+\end{aligned}\tag{7.D.5}
+\end{equation}
+利用式（7.C.7）、（7.D.5），得到
+\begin{equation}
+\begin{aligned}
+D(P_Y\parallel V_Y)+D(V_Y\parallel U_{out}(Y))
+ ={}&D(P_X\parallel V_{out}(X))\\
+&{}+D(V_{out}(X)\parallel U_X).
+\end{aligned}\tag{7.D.6}
+\end{equation}
+由式（7.C.8）、（7.D.6）及式（7.70），得到
+\begin{equation}
+D(P_Y\parallel V_Y)+D(V_Y\parallel U_{out}(Y))
+ >D(P_Y\parallel U_{out}(Y)),\tag{7.D.7}
+\end{equation}
+从而证明了不等式（7.71）。
+
+现在计算 $\operatorname{cov}_{V_Y}\bigl(\log(U_{out}(Y)/V_Y),P_Y/V_Y\bigr)$。由协方差的定义，有
+\begin{equation}
+\begin{aligned}
+&\operatorname{cov}_{V_Y}\left(\log\frac{U_{out}(Y)}{V_Y},\frac{P_Y}{V_Y}\right)\\
+&\quad=\int\log\frac{U_{out}(Y)}{V_Y}\frac{P_Y}{V_Y}V_Y\,dy\\
+&\qquad\quad{}-\int\log\frac{U_{out}(Y)}{V_Y}V_Y\,dy
+ \int\frac{P_Y}{V_Y}V_Y\,dy\\
+&\quad=\int\log\frac{U_{out}(Y)}{V_Y}P_Y\,dy
+ -\int\log\frac{U_{out}(Y)}{V_Y}V_Y\,dy\\
+&\quad=\int\log\frac{U_{out}(Y)}{P_Y}\frac{P_Y}{V_Y}P_Y\,dy
+ +D(V_Y\parallel U_{out}(Y))\\
+&\quad=D(P_Y\parallel V_Y)-D(P_Y\parallel U_{out}(Y))
+ +D(V_Y\parallel U_{out}(Y)).
+\end{aligned}\tag{7.D.8}
+\end{equation}
+利用不等式（7.D.7），式（7.D.8）表明
+\[
+\operatorname{cov}_{V_Y}\left(\log\frac{U_{out}(Y)}{V_Y},\frac{P_Y}{V_Y}\right)>0.
+\]
+结论7.10中的其他不等式可类似证明。

@@ -1,0 +1,17 @@
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[causal,x=1.5cm,y=1.4cm]
+ \node[vtx] (ch08f85S) at (0,1) {$S$};
+ \node[vtx] (ch08f85A) at (1,2) {$A$};
+ \node[vtx] (ch08f85F) at (1,1) {$F$};
+ \node[latent] (ch08f85H) at (0,0) {$H$};
+ \node[vtx] (ch08f85Y) at (1,0) {$Y$};
+ \draw[ed,color=red,line width=1.1pt] (ch08f85S)--(ch08f85A);
+ \draw[ed] (ch08f85A)--(ch08f85F);
+ \draw[ed] (ch08f85F)--(ch08f85Y);
+ \draw[ed] (ch08f85H)--(ch08f85S);
+ \draw[ed] (ch08f85H)--(ch08f85Y);
+\end{tikzpicture}
+\caption{广告投放的例子。目标变量 $Y$ 表示用户是否点击了所展示的某条广告。$H$（未知）与 $S$（已知）为状态变量，动作 $A$ 对应于主栏保留阈值，这是决定主栏展示多少条广告的实值参数。离散变量 $F$ 表示主栏中投放的广告条数，此数量已知。虽然系统通过条件分布 $p(a\mid s)$ 随机选择动作，但重新加权时可以使用 $p(f\mid s)$，见命题 8.2。}
+\label{fig:ch08-advertisement}
+\end{figure}

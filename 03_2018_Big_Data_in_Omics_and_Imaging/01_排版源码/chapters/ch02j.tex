@@ -1,0 +1,380 @@
+% 分章页78—85，附录2.A.2至式2.A.104；印刷页150—157。
+\subsection*{2.A.2\quad 多变量平滑样条回归}
+\addcontentsline{toc}{subsection}{2.A.2 多变量平滑样条回归}
+
+考虑多变量非线性回归模型：
+\begin{equation}
+y_i=f(\boldsymbol x_i)+\epsilon_i,\qquad i=1,\ldots,n,\tag{2.A.63}
+\end{equation}
+其中 $\boldsymbol x_i=(x_{i1},\ldots,x_{ip})$，$\epsilon_i$ 是均值为零、方差为 $\sigma_\epsilon^2$ 的独立误差。通常，函数的形式未知，因此仍用平滑样条逼近函数 $f$。为了将单变量平滑样条推广到多变量情形，先从各自变量的边际空间的张量积出发。
+
+考虑函数 $f:\chi=\chi_1\times\chi_2\times\cdots\times\chi_p$。假设 $H^{(j)}$ 是定义在域 $\chi_j$ 上、再生核为 $R^{(j)}$ 的再生核希尔伯特空间。张量积再生核希尔伯特空间定义为
+\begin{equation}
+H=H^{(1)}\otimes H^{(2)}\otimes\cdots\otimes H^{(p)},\tag{2.A.64}
+\end{equation}
+相关的再生核定义为
+\begin{equation}
+R(\boldsymbol x,\boldsymbol z)=
+R^{(1)}(x_1,z_1)R^{(2)}(x_2,z_2)\cdots R^{(p)}(x_p,z_p).\tag{2.A.65}
+\end{equation}
+在第2.A.1节中，函数 $f$ 被分解为参数部分 $f_0$ 和平滑分量 $f_1$，即
+\begin{equation}
+f=f_0+f_1.\tag{2.A.66}
+\end{equation}
+多变量平滑样条分析同样基于张量积的分解。分解是平滑样条分析的关键概念。因此，先将单变量边际空间的分解推广到一般情形。
+
+一般的分解以平均算子为基础。如果算子 $A$ 满足 $A^2=A$，则称其为平均算子（averaging operator），也称幂等算子。常用的平均算子为投影算子。
+
+假设模型空间 $H$ 分解为 $H=H_0\oplus H_1$，其中 $H_0$ 是有限维空间，具有一组正交归一基函数 $\varphi_1(x),\ldots,\varphi_p(x)$。设 $A_j$ 为到子空间 $\varphi_j(x)$ 的投影算子，$j=1,\ldots,p$；$A_{p+1}$ 为到 $H_1$ 的投影算子。令 $A=A_1+\cdots+A_p+A_{p+1}$，则函数 $f$ 分解为
+\begin{equation}
+\begin{aligned}
+f=Af&=(A_1+\cdots+A_p+A_{p+1})f\\
+ &=(A_1+\cdots+A_p)f+A_{p+1}f\\
+ &=f_{01}+\cdots+f_{0p}+f_1=f_0+f_1,
+\end{aligned}\tag{2.A.67}
+\end{equation}
+其中 $f_0=f_{01}+\cdots+f_{0p}$。式（2.A.67）说明，函数 $f$ 被分解为参数分量与平滑分量。
+
+\begin{bookexample}{2.A.3：$W_2^m[a,b]$ 的分解}
+$H_0$ 中的基函数为 $\frac{(x-a)^{j-1}}{(j-1)!}$，$j=1,\ldots,m$。函数 $f$ 在基函数 $\frac{(x-a)^{j-1}}{(j-1)!}$ 上的投影记为 $A_jf$，即
+\begin{equation}
+A_jf=\left\langle f,\frac{(x-a)^{j-1}}{(j-1)!}\right\rangle
+ \frac{(x-a)^{j-1}}{(j-1)!},
+\qquad j=1,\ldots,m.\tag{2.A.68}
+\end{equation}
+回顾内积 $\langle f,g\rangle$ 的定义：
+\begin{equation}
+\langle f,g\rangle
+ =\sum_{v=0}^{m-1}f^{(v)}(a)g^{(v)}(a)
+  +\int_a^bf^{(m)}g^{(m)}dx.\tag{2.A.69}
+\end{equation}
+利用式（2.A.68），有
+\begin{equation}
+\begin{aligned}
+\left\langle f,\frac{(x-a)^{j-1}}{(j-1)!}\right\rangle
+ &=\left.\sum_{v=0}^{m-1}f^{(v)}(a)
+   \left[\frac{(x-a)^{j-v-1}}{(j-v-1)!}\right]\right|_a\\
+ &=f^{(j-1)}(a).
+\end{aligned}\tag{2.A.70}
+\end{equation}
+将式（2.A.70）代入式（2.A.68），得到
+\begin{equation}
+A_jf=f^{(j-1)}(a)\frac{(x-a)^{j-1}}{(j-1)!}.\tag{2.A.71}
+\end{equation}
+容易看出，
+\[
+\begin{aligned}
+A_j^2f&=A_j(A_jf)
+ =A_j\left(f^{(j-1)}(a)\frac{(x-a)^{j-1}}{(j-1)!}\right)\\
+ &=f^{(j-1)}(a)A_j\left(\frac{(x-a)^{j-1}}{(j-1)!}\right)\\
+ &=f^{(j-1)}(a)\frac{(x-a)^{j-1}}{(j-1)!}=A_jf,
+\end{aligned}
+\]
+因此 $A_j$ 是平均算子。定义
+\[
+A_{m+1}=I-A_1-\cdots-A_m.
+\]
+分解
+\[
+\begin{aligned}
+f&=A_1f+\cdots+A_mf+A_{m+1}f\\
+ &=\sum_{j=0}^{m-1}f^{(j-1)}(a)\frac{(x-a)^{j-1}}{(j-1)!}
+   +\int_a^bf^{(m)}(u)\frac{(x-u)^{m-1}}{(m-1)!}\,du
+\end{aligned}
+\]
+对应于 Taylor 展开。因此，Sobolev 空间 $W_2^m[a,b]$ 分解为
+\begin{equation}
+W_2^m[a,b]=\{1\}\oplus\{x-a\}\oplus\cdots
+ \oplus\frac{(x-a)^{m-1}}{(m-1)!}\oplus H_1,\tag{2.A.72}
+\end{equation}
+其中
+\[
+H_1=\left\{f:f^{(j)}(a)=0,\ j=0,1,\ldots,m-1,\
+            \int_a^b(f^m(x))^2dx<\infty\right\}.
+\]
+\end{bookexample}
+
+\begin{bookexample}{2.A.4：基于 Bernoulli 多项式的 $W_2^m[a,b]$ 分解}
+在用 Bernoulli 多项式构造 $W_2^m[a,b]$ 时，希尔伯特空间的内积定义为
+\begin{equation}
+\begin{aligned}
+\langle f,g\rangle
+ &=\sum_{v=0}^{m-1}
+  \left(\int_0^1f^{(v)}(x)\,dx\right)
+  \left(\int_0^1g^{(v)}(x)\,dx\right)\\
+ &\quad+\int_0^1f^{(m)}(x)g^{(m)}(x)\,dx.
+\end{aligned}\tag{2.A.73}
+\end{equation}
+先计算函数 $f\in H$ 在 $k_j(x)$ 上的投影。注意，
+\begin{equation}
+\begin{aligned}
+\int_0^1(k_j(x))^{(v)}dx
+ &=\int_0^1\left(\frac{B_j(x)}{j!}\right)^{(v)}dx\\
+ &=\int_0^1(B_0(x))^{v-j}dx
+ =\begin{cases}1&v=j,\\0&v\ne j.\end{cases}
+\end{aligned}\tag{2.A.74}
+\end{equation}
+利用式（2.A.73）与（2.A.74）得到
+\[
+\langle f,k_j(x)\rangle=\int_0^1f^{(j)}(x)\,dx,
+\]
+从而
+\begin{equation}
+A_jf=\left\{\int_0^1f^{(j-1)}(x)\,dx\right\}k_{j-1}(x),
+\qquad j=1,\ldots,m.\tag{2.A.75}
+\end{equation}
+注意，
+\begin{equation}
+\begin{aligned}
+A_jk_{j-1}(x)
+ &=\int_0^1k_{j-1}^{(j-1)}(x)\,dx\,k_{j-1}(x)\\
+ &=\int_0^1\frac{B_j^{(j-1)}(x)}{(j-1)!}\,dx\,k_{j-1}(x)\\
+ &=\int_0^1B_0(x)\,dx\,k_{j-1}(x)\\
+ &=k_{j-1}(x).
+\end{aligned}\tag{2.A.76}
+\end{equation}
+利用式（2.A.76），有
+\begin{equation}
+\begin{aligned}
+A_j^2f&=A_j(A_jf)\\
+ &=A_j\left(\left\{\int_0^1f^{(j-1)}(x)\,dx\right\}k_{j-1}(x)\right)\\
+ &=\int_0^1f^{(j-1)}(x)\,dx\,A_j(k_{j-1}(x))\\
+ &=\int_0^1f^{(j-1)}(x)\,dx\,k_{j-1}(x),\qquad j=1,\ldots,m.
+\end{aligned}\tag{2.A.77}
+\end{equation}
+这再次说明 $A_j$ 是平均算子。具体而言，$A_1f=\int_0^1f(x)\,dx$ 是函数在区间 $[0,1]$ 上的平均值。
+
+令 $A_{m+1}=I-A_1-\cdots-A_m$，得到分解 $f=A_1f+\cdots+A_mf+A_{m+1}f$，对应于 Sobolev 空间的分解
+\begin{equation}
+W_2^m[a,b]=\{k_0(x)\}\oplus\{k_1(x)\}\oplus\cdots
+ \oplus\{k_{m-1}(x)\}\oplus H_1,\tag{2.A.78}
+\end{equation}
+其中
+\[
+H_1=\left\{f:f^{(j)}(a)=0,\ j=0,1,\ldots,m-1,\
+            \int_a^b(f^m(x))^2dx<\infty\right\}.
+\]
+\end{bookexample}
+
+下面讨论张量积分解。考虑 $p$ 个因变量 $\{x_1,\ldots,x_p\}$，以及定义在域 $\chi=\chi_1\times\chi_2\times\cdots\times\chi_p$ 上的张量积 $H=H^{(1)}\otimes H^{(2)}\otimes\cdots\otimes H^{(p)}$。对于每个变量的函数，定义平均算子组 $A_1^{(k)},\ldots,A_{r_k}^{(k)}$，以及函数的单向分解：
+\begin{equation}
+f=A_1^{(k)}f+\cdots+A_{r_k}^{(k)},\qquad k=1,\ldots,p,\tag{2.A.79}
+\end{equation}
+其中 $A_1^{(k)}+\cdots+A_{r_k}^{(k)}=I$。函数 $f(x_1,\ldots,x_p)$ 在张量积上的分解为
+\begin{equation}
+\begin{aligned}
+f&=\left\{A_1^{(1)}+\cdots+A_{r_1}^{(1)}\right\}\cdots
+   \left\{A_1^{(p)}+\cdots+A_{r_p}^{(p)}\right\}f\\
+ &=\sum_{j_1}^{r_1}\cdots\sum_{j_p}^{r_p}
+   A_{j_1}^{(1)}\cdots A_{j_p}^{(p)}f.
+\end{aligned}\tag{2.A.80}
+\end{equation}
+假设再生核希尔伯特空间 $H^{(k)}$ 分解为
+\begin{equation}
+H^{(k)}=H_1^{(k)}\oplus\cdots\oplus H_{r_k}^{(k)},\tag{2.A.81}
+\end{equation}
+其中 $H_{j_k}^{(k)}$ 是再生核为 $R_{j_k}^{(k)}$ 的再生核希尔伯特空间，则 $H$ 的分解为
+\begin{equation}
+\begin{aligned}
+H&=H^{(1)}\otimes\cdots\otimes H^{(p)}\\
+ &=\left(H_1^{(1)}\oplus\cdots\oplus H_{r_1}^{(1)}\right)
+   \otimes\cdots\otimes
+   \left(H_1^{(p)}\oplus\cdots\oplus H_{r_p}^{(p)}\right)\\
+ &=\sum_{j_1=1}^{r_1}\cdots\sum_{j_p=1}^{r_p}
+   H_{j_1}^{(1)}\otimes\cdots\otimes H_{j_p}^{(p)}.
+\end{aligned}\tag{2.A.82}
+\end{equation}
+接着讨论多变量平滑样条的模型选择与参数选择。考虑模型空间
+\begin{equation}
+M=H^0\oplus H^1\oplus\cdots\oplus H^q,\tag{2.A.83}
+\end{equation}
+其中，$H^0$ 是包含所有不受惩罚函数的有限维空间，$H^1,\ldots,H^q$ 是相互正交、再生核分别为 $R^1,\ldots,R^q$ 的再生核希尔伯特空间。令 $P_j$ 为函数到 $H^j$ 的正交投影，$j=0,1,\ldots,q$。定义函数 $f$ 的范数为
+\begin{equation}
+\|f\|^2=\|P_0f\|^2+\sum_{j=1}^q\|P_jf\|^2.\tag{2.A.84}
+\end{equation}
+与单变量平滑样条类似，多变量平滑样条也包含两部分：有限维空间中的函数，以及需要惩罚的平滑分量。考虑多变量平滑样条回归模型（Wang 2011）：
+\begin{equation}
+y_i=L_if+\epsilon_i,\qquad i=1,\ldots,n,\tag{2.A.85}
+\end{equation}
+其中，$L_i$ 是连续泛函，$\epsilon_i$ 是均值为零、方差均为 $\sigma_\epsilon^2$ 的独立随机误差。
+
+现在将模型空间 $M$ 分为两个子空间：
+\begin{equation}
+H_0^*=H^0,\qquad H_1^*=H^1\oplus\cdots\oplus H^q.\tag{2.A.86}
+\end{equation}
+在 $H^0$ 上定义的内积与再生核，也用于 $H_0^*$。下面定义 $H_1^*$ 的内积与再生核。对于任意 $f\in H_1^*$，有
+\[
+f(x)=f_1(x)+\cdots+f_q(x),\qquad f_j\in H^j,\ j=1,\ldots,q.
+\]
+$H_1^*$ 上的内积定义为各 $H^j$ 上内积的加权和：
+\begin{equation}
+\langle f,g\rangle_*=\sum_{j=1}^q\theta_j^{-1}
+ \langle f_j,g_j\rangle,\tag{2.A.87}
+\end{equation}
+其中 $\theta_j$（$j=1,\ldots,q$）为参数。因此，函数 $f$ 的范数为
+\[
+\|f\|_*^2=\sum_{j=1}^q\theta_j^{-1}\|f_j\|^2.
+\]
+定义 $P_1^*=\sum_{j=1}^qP_j$ 为 $M$ 中到 $H_1^*$ 的正交投影，则有
+\begin{equation}
+\|P_1^*f\|_*^2=\sum_{j=1}^q\theta_j^{-1}\|P_jf\|^2.\tag{2.A.88}
+\end{equation}
+$H_1^*$ 的再生核定义为
+\begin{equation}
+R_1^*=\sum_{j=1}^q\theta_jR^j,\tag{2.A.89}
+\end{equation}
+其中 $R^j$ 是 $H^j$ 的再生核。
+
+下面证明，$R_1^*$ 确为 $H_1^*$ 的再生核。根据再生核的定义，有
+\begin{equation}
+\langle R^j(x,\cdot)f_j(\cdot)\rangle=f_j(x).\tag{2.A.90}
+\end{equation}
+显然，对任意 $f\in H_1^*$，利用式（2.A.87）、（2.A.89）和（2.A.90），得到
+\[
+\begin{aligned}
+\langle R_1^*(\boldsymbol x,\cdot),f(\cdot)\rangle_*
+ &={}<\sum_{j=1}^q\theta_j^{-1}
+       \langle\theta_jR^j(\boldsymbol x,\cdot),f_j(\cdot)\rangle\\
+ &=\sum_{j=1}^q\langle R^j(\boldsymbol x,\cdot),f_j(\cdot)\rangle\\
+ &=\sum_{j=1}^qf_j(\boldsymbol x)=f(\boldsymbol x).
+\end{aligned}
+\]
+令 $\varphi_1^{(k)},\ldots,\varphi_{r_k}^{(k)}$ 为空间 $H_0^{(k)}$ 的基函数组。考虑 $H^0$ 的所有可能的基函数组合：
+\begin{equation}
+\begin{aligned}
+&\left\{\varphi_1^{(1)}\oplus\cdots\oplus\varphi_{r_1}^{(1)}\right\}
+ \cdots
+ \left\{\varphi_1^{(p)}\oplus\cdots\oplus\varphi_{r_p}^{(p)}\right\}\\
+ &\quad=\sum_{j_1=1}^{r_1}\cdots\sum_{j_p=1}^{r_p}
+          \varphi_{j_1}^{(1)}\cdots\varphi_{j_p}^{(p)}\\
+ &\quad=\phi_1+\cdots+\phi_r,
+\end{aligned}\tag{2.A.91}
+\end{equation}
+其中 $r=r_1\cdots r_p$，而 $\phi_v$（$v=1,\ldots,r$）是 $\varphi_{j_1}^{(1)}\cdots\varphi_{j_p}^{(p)}$ 中的一个元素。
+
+为估计回归模型（2.A.85）中的平滑样条，最小化
+\begin{equation}
+\min_{f\in M}\frac1n\sum_{i=1}^n(y_i-L_if)^2
+ +\lambda\|P_1^*f\|_*^2,\tag{2.A.92}
+\end{equation}
+其中 $\lambda\|P_1^*f\|_*^2=\sum_{j=1}^q\lambda_j\|P_jf\|^2$，$\lambda_j=\lambda/\theta_j$。
+
+若分别以 $H_1^*$ 和 $P_1^*$ 代替 $H_1$ 和 $P_1$，则式（2.A91）与式（2.A.14）形式相同。为求解该问题，首先须研究函数 $f(x_1,\ldots,x_p)$ 的表示。与式（2.A.26）类似，需要找到基函数以及到 $H_1^*$ 的投影。基函数组已在式（2.A.91）中给出。现在求函数到 $H_1^*$ 的投影。与式（2.A.22）类似，对 $v=1,\ldots,n$ 有
+\begin{equation}
+\begin{aligned}
+\xi_v(\boldsymbol x)&=L_{v(z)}R_1^*(\boldsymbol x,\boldsymbol z)\\
+ &=L_{v(z)}\sum_{j=1}^q\theta_jR^j(\boldsymbol x,\boldsymbol z)\\
+ &=\sum_{j=1}^q\theta_jL_{v(z)}R^j(\boldsymbol x,\boldsymbol z).
+\end{aligned}\tag{2.A.93}
+\end{equation}
+优化问题（2.A.92）的一般解为
+\begin{equation}
+\begin{aligned}
+f(\boldsymbol x)&=\sum_{j=1}^ra_j\phi_j(\boldsymbol x)
+                 +\sum_{v=1}^nb_v\xi_v(\boldsymbol x),\quad\text{或}\\
+f(\boldsymbol x)&=\sum_{j=1}^ra_j\phi_j(\boldsymbol x)
+ +\sum_{v=1}^nb_v\sum_{j=1}^q\theta_jL_{v(z)}R^j(\boldsymbol x,\boldsymbol z).
+\end{aligned}\tag{2.A.94}
+\end{equation}
+与式（2.A.32）类似，有
+\begin{equation}
+\begin{aligned}
+L_{i(x)}f(\boldsymbol x)
+ &=\sum_{j=1}^ra_jL_{i(x)}\phi_j(\boldsymbol x)\\
+ &\quad+\sum_{v=1}^nb_v\sum_{j=1}^q
+   \theta_jL_{i(x)}L_{v(z)}R^j(\boldsymbol x,\boldsymbol z),
+ \qquad i=1,\ldots,n.
+\end{aligned}\tag{2.A.95}
+\end{equation}
+再定义矩阵 $T$：
+\[
+T=\begin{bmatrix}
+L_{1(x)}\phi_1(\boldsymbol x)&\cdots&L_{1(x)}\phi_r(\boldsymbol x)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}\phi_1(\boldsymbol x)&\cdots&L_{n(x)}\phi_r(\boldsymbol x)
+\end{bmatrix},
+\]
+以及矩阵 $\Sigma_j$：
+\[
+\Sigma_j=\begin{bmatrix}
+L_{1(x)}L_{1(z)}R^j(\boldsymbol x,\boldsymbol z)&\cdots&
+ L_{1(x)}L_{n(z)}R^j(\boldsymbol x,\boldsymbol z)\\
+\vdots&\vdots&\vdots\\
+L_{n(x)}L_{1(z)}R^j(\boldsymbol x,\boldsymbol z)&\cdots&
+ L_{n(x)}L_{n(z)}R^j(\boldsymbol x,\boldsymbol z)
+\end{bmatrix},
+\]
+并令 $\Sigma_\theta=\theta_1\Sigma_1+\cdots+\theta_q\Sigma_q$。令
+\[
+L\widehat f=\begin{bmatrix}
+L_{1(x)}\widehat f(\boldsymbol x)\\\vdots\\L_{n(x)}\widehat f(\boldsymbol x)
+\end{bmatrix}.
+\]
+式（2.A.94）可以写成矩阵形式：
+\begin{equation}
+L\widehat f=Ta+\Sigma b,\tag{2.A.96}
+\end{equation}
+其中 $a=[a_1,\ldots,a_r]^T$，$b=[b_1,\ldots,b_n]^T$。
+
+现在计算 $\|P_1^*f\|_*^2$。由式（2.A.94）有
+\begin{equation}
+\begin{aligned}
+P_1^*f&=\sum_{v=1}^nb_v\sum_{j=1}^q
+ \theta_jL_{v(z)}R^j(\boldsymbol x,\boldsymbol z)\\
+ &=\sum_{j=1}^q\theta_j\sum_{v=1}^nb_vL_{v(z)}R^j(\boldsymbol x,\boldsymbol z).
+\end{aligned}\tag{2.A.97}
+\end{equation}
+根据 $H_1^*$ 空间中内积的定义（2.A.87），得到
+\begin{equation}
+\begin{aligned}
+\|P_1^*f\|_*^2
+ &=\sum_{j=1}^q\frac1{\theta_j}
+ \left\langle\theta_j\sum_{v=1}^nb_vL_{v(z)}R^j(\boldsymbol x,\boldsymbol z),
+ \theta_j\sum_{u=1}^nb_uL_{u(z)}R^j(\boldsymbol x,\boldsymbol z)\right\rangle\\
+ &=\sum_{j=1}^q\theta_j\sum_{v=1}^n\sum_{u=1}^nb_vb_u
+ \left\langle L_{v(z)}R^j(\boldsymbol x,\boldsymbol z),
+             L_{u(z)}R^j(\boldsymbol x,\boldsymbol z)\right\rangle.
+\end{aligned}\tag{2.A.98}
+\end{equation}
+由式（2.A.22）、（2.A.27）与（2.A.29）得到
+\begin{equation}
+\begin{aligned}
+&\left\langle L_{v(z)}R^j(\boldsymbol x,\boldsymbol z),
+              L_{u(z)}R^j(\boldsymbol x,\boldsymbol z)\right\rangle\\
+&\qquad=L_{v(z)}L_{u(z)}R^j(\boldsymbol x,\boldsymbol z).
+\end{aligned}\tag{2.A.99}
+\end{equation}
+将式（2.A.98）代入式（2.A.97），得到
+\begin{equation}
+\begin{aligned}
+\|P_1^*f\|_*^2
+ &=\sum_{j=1}^q\theta_j\sum_{v=1}^n\sum_{u=1}^nb_vb_u
+ L_{v(z)}L_{u(z)}R^j(\boldsymbol x,\boldsymbol z)\\
+ &=\sum_{j=1}^q\theta_jb^T\Sigma_jb\\
+ &=b^T\Sigma_\theta b.
+\end{aligned}\tag{2.A.100}
+\end{equation}
+令 $Y=[y_1,\ldots,y_n]^T$，将式（2.A.96）与（2.A.100）代入式（2.A.91），得到
+\begin{equation}
+\min_{a,b}\frac1n\|Y-Ta-\Sigma_\theta b\|^2+b^T\Sigma_\theta b.\tag{2.A.101}
+\end{equation}
+若将矩阵 $\Sigma_\theta$ 替换为矩阵 $\Sigma$，则优化问题（2.A.100）与优化问题（2.A.35）的形式完全相同。因此，向量 $a$ 和 $b$ 为以下方程的解：
+\begin{equation}
+Ta+(\Sigma_b+n\lambda I)b=Y,\tag{2.A.102}
+\end{equation}
+\begin{equation}
+T^Tb=0.\tag{2.A.103}
+\end{equation}
+类似地，利用矩阵 $T$ 的 QR 分解（Wang 2011）
+\[
+T=\begin{bmatrix}Q_1&Q_2\end{bmatrix}\begin{bmatrix}R\\0\end{bmatrix},
+\]
+可得解
+\begin{equation}
+\begin{aligned}
+\widehat a&=R^{-1}Q_1^T
+ \left[I-MQ_2(Q_2^TMQ_2)^{-1}Q_2^T\right]Y,\\
+\widehat b&=Q_2(Q_2^TMQ_2)^{-1}Q_2^TY,
+\end{aligned}\tag{2.A.104}
+\end{equation}
+其中 $M=\Sigma+n\lambda I$。

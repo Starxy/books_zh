@@ -1,0 +1,156 @@
+% 原PDF171页附录4.H标题—174页附录4.I标题之前。
+\section*{附录4.H\quad 动态结构方程模型参数的\texorpdfstring{$L_1$}{L1}惩罚广义最小二乘估计的近端算法}
+\addcontentsline{toc}{section}{附录4.H 动态结构方程模型参数的L1惩罚广义最小二乘估计的近端算法}
+\markright{附录4.H L1惩罚广义最小二乘估计的近端算法}
+
+目标是求解
+\begin{equation}
+\min_{\delta_i}\quad f(\delta_i)+\Omega(\delta_i),\tag{4.H.1}
+\end{equation}
+其中
+\[
+\begin{aligned}
+f(\delta_i)={}&
+(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i)'\Lambda_i^{-1}\\
+&{}\times(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i),
+\end{aligned}
+\]
+\[
+\Lambda_i=W'V_iW,
+\]
+\[
+\begin{gathered}
+\Omega(\delta_i)=\lambda_1\Omega_1(\gamma_i)+\lambda_2\Omega_2(\alpha_i)+\lambda_3\Omega_3(\beta_i),\\
+\Omega_1(\gamma_i)=\|\gamma_i\|_1,\qquad
+\Omega_2(\alpha_i)=\|\alpha_i\|_1,\qquad
+\Omega_3(\beta_i)=\|\beta_i\|_1.
+\end{gathered}
+\]
+与附录4.G类似，应用近端方法的第一步，是对函数 $f(\delta_i)$ 关于 $\delta_i$ 求偏导。再次利用矩阵微积分，得到
+\begin{equation}
+\frac{\partial f}{\partial\gamma_i}=-2Z_{\gamma i}'W\Lambda_i^{-1}
+(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i),\tag{4.H.2}
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial\alpha_i}=-2Z_{\alpha i}'W\Lambda_i^{-1}
+(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i),\tag{4.H.3}
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial\beta_i}=-2Z_{\beta i}'W\Lambda_i^{-1}
+(W'y_i-W'Z_{\gamma i}\gamma_i-W'Z_{\alpha i}\alpha_i-W'Z_{\beta i}\beta_i),\tag{4.H.4}
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial\delta_i}=\begin{bmatrix}
+\dfrac{\partial f}{\partial\gamma_i}\\
+\dfrac{\partial f}{\partial\alpha_i}\\
+\dfrac{\partial f}{\partial\beta_i}
+\end{bmatrix}.\tag{4.H.5}
+\end{equation}
+令
+\[
+\begin{aligned}
+u_{\gamma_i}^k&=\gamma_i^k-\lambda_1^k\left.\frac{\partial f}{\partial\gamma_i}\right|_{\delta_i^k},\\
+u_{\alpha_i}^k&=\alpha_i^k-\lambda_2^k\left.\frac{\partial f}{\partial\alpha_i}\right|_{\delta_i^k},\qquad
+u_{\beta_i}^k=\beta_i^k-\lambda_3^k\left.\frac{\partial f}{\partial\beta_i}\right|_{\delta_i^k},
+\end{aligned}
+\]
+\[
+\delta_i^k=\begin{bmatrix}\gamma_i^k\\\alpha_i^k\\\beta_i^k\end{bmatrix}.
+\]
+$\gamma_i^k,\alpha_i^k,\beta_i^k$ 分别为第 $k$ 次迭代中，时间点 $t,t-1$ 的内生变量与外生变量的结构参数向量。
+
+再次利用式（1.137）（Xiong 2018），得到各近端算子的元素：
+\begin{equation}
+\gamma_{ij}^z=\operatorname{sign}(u_{\gamma ij}^k)(|u_{\gamma ij}^k|-\lambda_1^k)_+,
+\quad j=1,\ldots,m_i,\tag{4.H.6}
+\end{equation}
+\begin{equation}
+\alpha_{ij}^z=\operatorname{sign}(u_{\alpha ij}^k)(|u_{\alpha ij}^k|-\lambda_2^k)_+,
+\quad j=1,\ldots,l_i,\tag{4.H.7}
+\end{equation}
+\begin{equation}
+\beta_{ij}^z=\operatorname{sign}(u_{\beta ij}^k)(|u_{\beta ij}^k|-\lambda_3^k)_+,
+\quad j=1,\ldots,k_i,\tag{4.H.8}
+\end{equation}
+其中 $m_i=\sum_{t=1}^{T}m_i^t$、$l_i=\sum_{t=2}^{T}l_i^t$、$k_i=\sum_{t=1}^{T}k_i^t$。
+$m_i^t,l_i^t,k_i^t$ 分别为第 $i$ 个方程中，时间点 $t,t-1$ 的内生变量和当前时间点 $t$ 的外生变量的数目。令
+\[
+\gamma_i^z=\begin{bmatrix}\gamma_{i1}^z\\\vdots\\\gamma_{im_i}^z\end{bmatrix},\quad
+\alpha_i^z=\begin{bmatrix}\alpha_{i1}^z\\\vdots\\\alpha_{il_i}^z\end{bmatrix},\quad
+\beta_i^z=\begin{bmatrix}\beta_{i1}^z\\\vdots\\\beta_{ik_i}^z\end{bmatrix},\quad
+\delta_i^z=\begin{bmatrix}\gamma_i^z\\\alpha_i^z\\\beta_i^z\end{bmatrix}.
+\]
+现在定义辅助函数，在近端梯度算法中实现主化最小化（majorization-minimization；参见Xiong 2018，\textit{Big Data in Omics and Imaging: Association Analysis}式（1.76））：
+\begin{equation}
+\begin{aligned}
+f_\lambda(\delta_i^z,\delta_i^k)={}&f(\delta_i^z)
++\left(\left.\frac{\partial f}{\partial\delta^i}\right|_{\delta_i^k}\right)^T
+(\delta_i^k-\delta_i^z)
++\frac1{2\lambda_1}\|\gamma_i^k-\gamma_i^z\|_2^2\\
+&{}+\frac1{2\lambda_2}\|\alpha_i^k-\alpha_i^z\|_2^2
++\frac1{2\lambda_3}\|\beta_i^k-\beta_i^z\|_2^2.
+\end{aligned}\tag{4.H.9}
+\end{equation}
+将一般近端梯度算法用于 $L_1$ 惩罚广义最小二乘估计问题，得到以下算法。
+
+\begin{bookalgorithm}{4.H.1：近端梯度算法}
+\textbf{步骤1：}给定 $\delta_i^z,\delta_i^k$、$\lambda_1^{k-1},\lambda_2^{k-1},\lambda_3^{k-1}$，以及参数 $\alpha_1,\alpha_2,\alpha_3\in(0,1)$。设
+$\lambda_1=\lambda_1^{k-1}$、$\lambda_2=\lambda_2^{k-1}$、$\lambda_3=\lambda_3^{k-1}$。
+
+\textbf{步骤2：}重复以下过程。
+\begin{enumerate}
+\item 令
+\[
+\delta_i^z=\begin{bmatrix}\gamma_i^z\\\alpha_i^z\\\beta_i^z\end{bmatrix}
+=\begin{bmatrix}
+\operatorname{Prox}_{\lambda_1\Omega_1}(u_{\gamma_i}^k)\\
+\operatorname{Prox}_{\lambda_2\Omega_2}(u_{\alpha_i}^k)\\
+\operatorname{Prox}_{\lambda_3\Omega_3}(u_{\beta_i}^k)
+\end{bmatrix}.
+\]
+逐元素计算近端算子：
+\[
+\begin{aligned}
+u_{\gamma_i}^k&=\gamma_i^k-\lambda_1^k\left.\frac{\partial f}{\partial\gamma_i}\right|_{\delta_i^k},\\
+u_{\alpha_i}^k&=\alpha_i^k-\lambda_2^k\left.\frac{\partial f}{\partial\alpha_i}\right|_{\delta_i^k},\qquad
+u_{\beta_i}^k=\beta_i^k-\lambda_3^k\left.\frac{\partial f}{\partial\beta_i}\right|_{\delta_i^k},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\gamma_{ij}^z&=\operatorname{sign}(u_{\gamma ij}^k)(|u_{\gamma ij}^k|-\lambda_1^k)_+,
+\quad j=1,\ldots,m_i,\\
+\alpha_{ij}^z&=\operatorname{sign}(u_{\alpha ij}^k)(|u_{\alpha ij}^k|-\lambda_2^k)_+,
+\quad j=1,\ldots,l_i,\\
+\beta_{ij}^z&=\operatorname{sign}(u_{\beta ij}^k)(|u_{\beta ij}^k|-\lambda_3^k)_+,
+\quad j=1,\ldots,k_i.
+\end{aligned}
+\]
+将各元素组装为向量：
+\[
+\gamma_i^z=\begin{bmatrix}\gamma_{i1}^z\\\vdots\\\gamma_{im_i}^z\end{bmatrix},\quad
+\alpha_i^z=\begin{bmatrix}\alpha_{i1}^z\\\vdots\\\alpha_{il_i}^z\end{bmatrix},\quad
+\beta_i^z=\begin{bmatrix}\beta_{i1}^z\\\vdots\\\beta_{ik_i}^z\end{bmatrix},\quad
+\delta_i^z=\begin{bmatrix}\gamma_i^z\\\alpha_i^z\\\beta_i^z\end{bmatrix}.
+\]
+\item 计算辅助函数：
+\[
+\begin{aligned}
+f_\lambda(\delta_i^z,\delta_i^k)={}&f(\delta_i^z)
++\left(\left.\frac{\partial f}{\partial\delta^i}\right|_{\delta_i^k}\right)^T
+(\delta_i^k-\delta_i^z)
++\frac1{2\lambda_1}\|\gamma_i^k-\gamma_i^z\|_2^2\\
+&{}+\frac1{2\lambda_2}\|\alpha_i^k-\alpha_i^z\|_2^2
++\frac1{2\lambda_3}\|\beta_i^k-\beta_i^z\|_2^2.
+\end{aligned}
+\]
+\item 若 $f(\delta_i^z)\le\widehat f_\lambda(\delta_i^z,\delta_i^k)$，则退出循环，转至步骤3。
+\item 更新 $\lambda_1=\alpha_1\lambda_1$、$\lambda_2=\alpha_2\lambda_2$、$\lambda_3=\alpha_3\lambda_3$。
+\end{enumerate}
+\textbf{步骤3：}令 $\lambda_1^k=\lambda_1$、$\lambda_2^k=\lambda_2$、$\lambda_3^k=\lambda_3$、
+$\delta_i^{k+1}=\delta_i^z$，以及
+\[
+\gamma_i^{k+1}=\gamma_i^z,\quad\alpha_i^{k+1}=\alpha_i^z,\quad
+\beta_i^{k+1}=\beta_i^z,\quad k=k+1.
+\]
+\end{bookalgorithm}

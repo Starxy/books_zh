@@ -1,0 +1,35 @@
+% 原分章PDF111页附录7.H，印刷页687；原号7.H3缺H后的句点。
+\section*{附录7.H\quad 关联的刻画}
+\addcontentsline{toc}{section}{附录7.H 关联的刻画}
+\markright{附录7.H 关联的刻画}
+
+众所周知，$Y$ 与 $X$ 之间的关联度量为
+\begin{equation}
+r=\frac1n\sum_{i=1}^n\lambda_i^2=\frac1n\operatorname{Tr}(R^2),\tag{7.H.1}
+\end{equation}
+其中
+\[
+R^2=\Sigma_Y^{-1/2}\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1/2}.
+\]
+由式（7.G.1）、（7.G.2）、（7.G.4），得到
+\begin{equation}
+\begin{aligned}
+r&=\frac1n\operatorname{Tr}(\Sigma_{YX}\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1})\\
+ &=\frac1n\operatorname{Tr}\bigl(A\Sigma_X\Sigma_X^{-1}\Sigma_XA^T
+  (A\Sigma_XA^T+\lambda I)^{-1}\bigr)\\
+ &=\frac1n\operatorname{Tr}\bigl(A\Sigma_XA^T
+  (A\Sigma_XA^T+\lambda I)^{-1}\bigr))\\
+ &=\frac1n\operatorname{Tr}\bigl(\Sigma_X(\Sigma_X+\lambda I)^{-1}\bigr).
+\end{aligned}\tag{7.H.2}
+\end{equation}
+代入式（7.G.4），得到
+\begin{equation}
+\begin{aligned}
+r&=\frac1n\operatorname{Tr}\bigl(\Delta(\Delta+\lambda I)^{-1}\bigr)\\
+ &=\frac1n\sum_{i=1}^n\frac{\mu_i}{\mu_i+\lambda}.
+\end{aligned}\tag{7.H3}
+\end{equation}
+若 $\lambda>0$，则 $\mu_i<\mu_i+\lambda$。因此，有
+\[
+r<1,\qquad\text{且}\quad\log r<0.
+\]

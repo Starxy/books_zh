@@ -1,0 +1,155 @@
+% 原书第 44—47 页；第 4.5—4.6 节。
+\section{TMLE 的分析与推断}
+\label{sec:ch04-analysis-inference}
+
+本节介绍 TMLE 分析与推断的技术细节。部分读者可以选择跳过这些内容。令 $\bar Q^d=(\bar Q_t^d:t=T+1,\ldots,0)$ 表示前面序贯定义的参数。注意，在 $P$ 处的有效影响曲线只通过 $\bar Q^d=\bar Q^d(P)$ 和 $g=g(P)$ 依赖于 $P$。为方便记号，我们也将 $D^{d*}(P)$ 记为 $D^{d*}(\bar Q^d,g)$。令 $\bar Q_n^d$ 和 $g_n$ 分别为 $\bar Q^d(P_0)$ 和 $g_0=g(P_0)$ 的初始估计量。前述 TMLE 算法定义了 TMLE $\bar Q_n^{d*}$。
+
+\subsection{TMLE 求解有效影响曲线方程}
+\label{subsec:ch04-eic-equation}
+
+TMLE 求解以下有效影响曲线方程：
+\[
+ P_nD^{d*}(Q_n^{d*},g_n)=0.
+\]
+
+\subsection{TMLE 的二阶余项}
+\label{subsec:ch04-second-order}
+
+对于任意一个路径可微的（pathwise differentiable）目标参数 $\Psi:\mathcal M\to\mathbb R$，若其在 $P$ 处的典范梯度为 $D^*(P)$，我们可以定义二阶余项（second-order remainder）：
+\[
+ R_2(P,P_0)\equiv\Psi(P)-\Psi(P_0)-(P-P_0)D^*(P),
+\]
+其中可以利用 $PD^*(P)=0$ 这一性质。由此得到 $P\mapsto\Psi(P)$ 在 $P_0$ 处的二阶 Taylor 展开：
+\[
+ \Psi(P)-\Psi(P_0)=-P_0D^*(P)+R_2(P,P_0).
+\]
+将这一一般方法应用于我们的问题，定义二阶余项为
+\[
+ R_2^d(P,P_0)=\Psi^d(P)-\Psi^d(P_0)+P_0D^{d*}(P).
+\]
+
+我们可以得到这个二阶余项的显式表达式。为强调它对 $\bar Q^d$ 和 $g$ 的依赖，也将其记为 $R_{20}^d(\bar Q^d,g,\bar Q_0^d,g_0)$。考察 $R_2^d(P,P_0)$ 的闭式表达式（此处未列出）可以发现，它由一系列积分之和构成；每个积分的被积函数，都是 $g$ 的某个参数与其真值之差，例如 $(g_{0:t}-g_{0,0:t})$，乘以 $\bar Q^d$ 的某个参数与其真值之差，例如 $\bar Q_t^d-\bar Q_{0,t}^d$。因此，二阶余项具有所谓的双重稳健结构，即
+\[
+ R_2^d(\bar Q^d,g,\bar Q_0^d,g_0)=0
+ \quad\text{若 }\bar Q^d=\bar Q_0^d\ \text{或 }g=g_0.
+\]
+更重要的是，利用 Cauchy--Schwarz 不等式
+\[
+ \left(\int fg\,dP_0\right)^2
+ \leq \int f^2\,dP_0\int g^2\,dP_0,
+\]
+$R_{20}()$ 的这一乘积结构，使我们能够用两类差值的 $L^2(P_0)$ 范数的乘积来界定 $R_2^d(P,P_0)$：一类是 $g(d(\bar L(T)),\bar L(T))$ 的某个参数与其真值之差，另一类是 $\bar Q^d$ 的某个参数与其真值之差。具体而言，$R_2^d(P,P_0)$ 可以用若干形如
+$\|\bar Q_{t+1}^d-\bar Q_{t+1}^d(P_0)\|_{P_0}\,
+ \|g_{0:t}-g_{0,0:t}\|_{P_0}$
+的项之和来界定。这个界依赖于正值性假设（positivity assumption）：存在某个 $\delta>0$，使得
+$g_{0,0:T}(d(\bar L(T)),\bar L(T))>\delta>0$。
+我们可以在 TMLE $(\bar Q_n^{d*},g_n)$ 处应用这一二阶展开，得到以下恒等式：
+\[
+ \Psi^d(\bar Q_n^{d*})-\Psi^d(\bar Q_0^d)
+ =-P_0D^{d*}(\bar Q_n^{d*},g_n)
+  +R_{20}(\bar Q_n^{d*},g_n,\bar Q_0^d,g_0).
+\]
+结合 $P_nD^{d*}(Q_n^{d*},g_n)=0$，可得
+\begin{equation}
+ \Psi^d(\bar Q_n^{d*})-\Psi^d(\bar Q_0^d)
+ =(P_n-P_0)D^{d*}(\bar Q_n^{d*},g_n)
+  +R_{20}(\bar Q_n^{d*},g_n,\bar Q_0^d,g_0).
+ \tag{4.1}
+\end{equation}
+
+\subsection{渐近有效性}
+\label{subsec:ch04-asymptotic-efficiency}
+
+这为证明 $\Psi^d(\bar Q_0^d)$ 的 TMLE $\Psi^d(\bar Q_n^{d*})$ 具有渐近有效性提供了理想的基础。首先，假设
+\begin{equation}
+ R_{20}(\bar Q_n^{d*},g_n,\bar Q_0^d,g_0)=o_P(n^{-1/2}).
+ \tag{4.2}
+\end{equation}
+根据前述 Cauchy--Schwarz 界，如果对所有 $t=1,\ldots,T$ 都有
+$\|g_{n,0:t}-g_{0,0:t}\|_{P_0}\,
+ \|\bar Q_{t+1,n}^{d*}-\bar Q_{0,t+1}^{d*}\|_{P_0}
+ =o_P(n^{-1/2})$，
+则式 (4.2) 成立。例如，如果每个干扰参数（nuisance parameter）相对于 $\|\cdot\|_{P_0}$ 范数的估计收敛速率都快于 $n^{-1/4}$，那么上述条件就成立。另一方面，关于 $g_0$ 的已有知识，可能使我们能够以明显快于 $n^{-1/4}$ 的速率估计 $g_0$；此时，便可以用明显慢于 $n^{-1/4}$ 的速率估计 $\bar Q_0^d$，只要两者收敛速率的乘积为比 $n^{-1/2}$ 更小的阶即可。在对 $g_0$ 所知甚少的观察性研究中，为了满足假设 (4.2)，我们需要采用高度自适应的估计量，例如在算法库中包含高度自适应 Lasso 估计量（highly adaptive lasso estimator）的超级学习器（见第 6 章）。
+
+结合式 (4.2) 和式 (4.1)，得到
+\[
+ \Psi^d(\bar Q_n^{d*})-\Psi^d(\bar Q_0^d)
+ =(P_n-P_0)D^{d*}(\bar Q_n^{d*},g_n)+o_P(n^{-1/2}).
+\]
+此外，我们假设
+\begin{equation}
+ D^{d*}(\bar Q_n^{d*},g_n)
+ \text{ 以趋于 }1\text{ 的概率属于一个 }P_0\text{-Donsker 类。}
+ \tag{4.3}
+\end{equation}
+例如，若 $O$ 是一个 $J$ 维向量，可以将 Donsker 类定义为：在多元立方体
+$\prod_{j=1}^J[0,\tau_j]\subset\mathbb R_{\geq0}^J$
+上所有截面变差范数（sectional variation norm）小于某个给定常数 $M<\infty$ 的多元实值右连续且有左极限的函数（càdlàg function）组成的集合（见第 6 章）。在实践中，这对应于避免使用对数据过拟合的估计量。采用交叉验证 TMLE（cross-validated TMLE），可以避开这一 Donsker 类假设（见第 7 章）。给定假设 (4.2)，我们当然预期下列一致性假设成立：
+\begin{equation}
+ \begin{aligned}
+ &P_0\bigl\{D^{d*}(\bar Q_n^{d*},g_n)
+       -D^{d*}(\bar Q_0^d,g_0)\bigr\}^2\to0\\
+ &\hspace{5em}\text{当 }n\to\infty\text{ 时依概率成立。}
+ \end{aligned}
+ \tag{4.4}
+\end{equation}
+
+经验过程理论告诉我们，若 $f_n$ 是一个关于 $O$ 的随机函数，以趋于 $1$ 的概率属于某个 $P_0$-Donsker 类，并且当 $n\to\infty$ 时，$P_0f_n^2$ 依概率趋于 $0$，那么 $(P_n-P_0)f_n=o_P(n^{-1/2})$。应用这一基本的经验过程结果可得
+\[
+ (P_n-P_0)D^{d*}(\bar Q_n^{d*},g_n)
+ =(P_n-P_0)D^{d*}(\bar Q_0^d,g_0)+o_P(n^{-1/2}).
+\]
+现在，我们已经证明了 TMLE 所需的渐近有效性：
+\begin{equation}
+ \Psi^d(\bar Q_n^{d*})-\Psi^d(\bar Q_0^d)
+ =(P_n-P_0)D^{d*}(\bar Q_0^d,g_0)+o_P(n^{-1/2}).
+ \tag{4.5}
+\end{equation}
+可以将其写为以下正式定理。
+
+\begin{bookresult}{定理}{4.1}
+假设式 (4.2)、式 (4.3) 和式 (4.4) 成立。那么，$\Psi^d(\bar Q_n^{d*})$ 是 $\Psi^d(\bar Q_0^d)$ 的一个渐近有效估计量。特别地，
+\[
+ \sqrt n(\psi_n^{d*}-\psi_0^d)\Rightarrow_d N(0,\sigma_0^{d2}),
+\]
+其中，$\sigma_0^{d2}=P_0\{D^{d*}(P_0)\}^2$ 是有效影响曲线的方差。
+\end{bookresult}
+
+\subsection{推断}
+\label{subsec:ch04-inference}
+
+上述渐近线性和有效性的一个直接推论是：
+$\Psi^d(\bar Q_n^{d*})\pm1.96\sigma_n/n^{1/2}$
+是一个渐近 $0.95$ 置信区间（confidence interval），其中，$\sigma_n^{d2}$ 是有效影响曲线方差 $\sigma_0^{d2}$ 的一个一致估计量。我们可以自然地用估计的有效影响曲线 $D^{*d}(\bar Q_n^{d*},g_n)$ 的经验样本方差
+$P_n\{D^{*d}(\bar Q_n^{d*},g_n)\}^2$
+来估计 $\sigma_0^{d2}$。
+
+现在，假设我们希望对一组规则估计 $E(Y^d)$，其中 $d$ 遍历集合 $\mathcal D$。此时，可将向量值目标参数定义为
+$\Psi^{\mathcal D}(P)=(\Psi^d(P):d\in\mathcal D)$。
+令 $\bar Q^{\mathcal D}=(\bar Q^d:d\in\mathcal D)$。在这种情况下，上述分析表明：如果对所有 $d\in\mathcal D$ 都假设式 (4.2)、式 (4.3) 和式 (4.4) 成立，那么，$\psi_0^{\mathcal D}=\Psi^{\mathcal D}(\bar Q_0^{\mathcal D})$ 的 TMLE
+$\psi_n^{\mathcal D*}=\Psi^{\mathcal D}(\bar Q_n^{\mathcal D*})$
+是渐近线性的，其向量值影响曲线为
+$D^{\mathcal D*}(P_0)=(D^{d*}(P_0):d\in\mathcal D)$。
+此时，当 $n\to\infty$ 时，
+$\sqrt n(\psi_n^{\mathcal D*}-\psi_0^{\mathcal D})
+ \Rightarrow_d N(0,\Sigma_0)$；
+正态极限分布的渐近协方差矩阵 $\Sigma_0$，由向量影响曲线的协方差矩阵给出：
+\[
+ \Sigma_0=P_0\{D^{\mathcal D*}(P_0)\}
+                  \{D^{\mathcal D*}(P_0)\}^{\top}.
+\]
+我们可以用经验协方差矩阵一致地估计这一协方差矩阵：
+\[
+ \Sigma_n=P_n\{D_n^{\mathcal D*}\}\{D_n^{\mathcal D*}\}^{\top},
+\]
+其中，$D_n^{\mathcal D*}$ 是 $D^{\mathcal D*}(P_0)$ 的代入估计量，其构造方式与前述单值参数 $\psi_0^d$ 的情形相同。这个结果使我们能够对 $(EY^d:d\in\mathcal D)$ 进行同时推断（simultaneous inference）。例如，
+\[
+ \psi_n^{d*}\pm q_{0.95,n}\sigma_n^d/n^{1/2}
+\]
+是 $\psi_0^d$ 的一个渐近 $0.95$ 同时置信区间，其中，$q_{0.95,n}$ 是 $\max_j|Z(j)|$ 的 $0.95$ 分位数，$Z\sim N(0,\rho_n)$，而 $\rho_n$ 是 $\Sigma_n$ 的相关矩阵。根据 Delta 方法（delta method），$\Psi^{\mathcal D}(P_0)$ 的 TMLE 的渐近线性，还能给出 $(EY^d:d\in\mathcal D)$ 的任意可微函数所对应的代入 TMLE 的影响曲线，从而进行推断。$(EY^d:d\in\mathcal D)$ 的这类可微汇总度量中，有一类例子是将剂量—反应曲线（dose-response curve）$(EY^d:d\in\mathcal D)$ 投影到工作边际结构模型（working marginal structural model）$(m_\beta(d):d\in\mathcal D)$ 上（Petersen et al.，2014）。
+
+\section{注记与延伸阅读}
+\label{sec:ch04-notes}
+
+针对动态干预（dynamic intervention），人们已经发展了许多估计技术（Murphy，2003；Robins，2004；Moodie et al.，2007；van der Laan，2006a；van der Laan and Petersen，2007；Robins et al.，2008b；Bembom and van der Laan，2008；Orellana et al.，2010）。其中，Robins（2000）以及 Bang and Robins（2005）提出了一种序贯回归估计量，用于估计静态规则下的平均结局。此前关于 LTMLE 的发展工作包括 van der Laan and Gruber（2012）以及 Petersen et al.（2014）。本章也受益于与 Susan Gruber、Maya Petersen、Michael Rosenblum、Sharon-Lise Normand 和 Mireille Schnitzer 的讨论及以往合作。
+

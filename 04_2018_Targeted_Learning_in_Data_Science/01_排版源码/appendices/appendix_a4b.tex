@@ -1,0 +1,120 @@
+
+% 附录源 PDF 第 22—24 页；A.4.2。
+\subsection{基于有效影响曲线各分量条件期望的目标参数一阶展开}
+
+有
+\[
+D^N_{g^*}(P)(O^N)=\frac1N\sum_{i=1}^N\bar D_{g^*}(P)(\bar O(i)).
+\]
+将上面的恒等式与解有效影响曲线方程
+$D^N_{g^*}(P_N^*)(O^N)=0$ 的 TMLE 结合，可得
+\[
+\begin{aligned}
+\Psi_{g^*}(P_N^*)-\Psi_{g^*}(P_0)
+={}&\frac1N\sum_{i=1}^N\{\bar D_{g^*}(P_N^*)(\bar O(i))-P_0^N\bar D_{g^*})\}\\
+&+R_{21,g^*}(P_N^*,P_0).
+\end{aligned}
+\]
+利用鞅理论，可以在合理假设下证明
+\[
+\frac1{\sqrt N}\sum_{i=1}^N
+ \{\bar D_{g^*}(P_N^*)(\bar O(i))-P_{0,o(i)}\bar D_{g^*}(P_N^*)\}
+\]
+收敛到正态极限分布。因此，还剩下余项
+\[
+R_{22,g^*,N}(P_N^*,P_0)
+ =\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)\bar D_{g^*}(P_N^*),
+\]
+我们希望证明它是二阶余项，从而可以合理地假设其为 $o_P(N^{-1/2})$。有
+\[
+\bar D_{g^*}(P)=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}\bar D_{g^*,x(s)}(P),
+\]
+其中 $\bar D_{g^*,x(s)}$ 是有效影响曲线中对应于给定 $C_x(s)$ 时 $X(s)$ 条件分布得分的分量。因此，
+\[
+R_{22,g^*,N}(P_N^*,P_0)
+ =\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}R_{22,x(s),g^*,N}(P_N^*,P_0),
+\]
+其中
+\[
+R_{22,x(s),g^*,N}(\theta,\theta_0)
+ =\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)\bar D_{g^*,x(s)}(P).
+\]
+所以，只需研究这个与 $x(s)$ 对应的项。定义
+\[
+\begin{aligned}
+&f_{x(s),g^*}(\theta,\theta_0)(C_x(i))\\
+&\equiv\frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}
+ \int_x\Phi_{x(s)}(x,C_x(i))
+ \,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid C_x(i)),
+\end{aligned}
+\]
+注意，这是 $P$ 与 $P_0$ 之间的一阶差异。另外，
+\[
+\begin{aligned}
+&E_{P_0}f_{x(s),g^*}(\theta,\theta_0)(C_x(i))\\
+&=\int_x\int_c\frac{\bar h_{c_x,0}(c)}{\bar h_{c_x}(c)}
+ \Phi_{x(s)}(x,c)\,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c).
+\end{aligned}
+\]
+有
+\[
+\begin{aligned}
+R_{22,x(s),g^*,N}(\theta,\theta_0)
+=\frac1N\sum_{i=1}^N\Bigl\{
+&f_{x(s),g^*}(\theta,\theta_0)(C_x(i))\\
+&-E_0f_{x(s),g^*}(\theta,\theta_0)(C_x(i))\Bigr\}.
+\end{aligned}
+\]
+因此，$R_{22,x(s),g^*,N}(\theta,\theta_0)$ 是 $N$ 个均值为零的随机变量的平均，并且每个随机变量都在 $P\to P_0$ 时趋于零。它涉及双重差异，所以是二阶余项。结合前面的定理 A.5，得到下列定理。
+
+\begin{bookresult}{定理}{A.4}
+令 $\Phi_{x(s)}(x,c_x)=E(Y_{g^*}(\tau)\mid X(s)=x,C_x(s)=c_x)$。回顾有效影响曲线的表达
+$D^N_{g^*}(P)=N^{-1}\sum_{i=1}^N\bar D_{g^*}(P)(\bar O(i))$。
+有
+\[
+\begin{aligned}
+-\frac1N\sum_{i=1}^NP_{0,o(i)}\bar D_{g^*}(P)
+={}&\Psi_{g^*}(P)-\Psi_{g^*}(P_0)\\
+&+R_{21,g^*}(\theta,\theta_0)+R_{22,g^*,N}(\theta,\theta_0),
+\end{aligned}
+\]
+其中 $R_{21,g^*}(\theta,\theta_0)$ 在定理 A.5 中定义，且
+\[
+R_{22,g^*,N}(\theta,\theta_0)
+ =\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}R_{22,x(s),g^*,N}(\theta,\theta_0),
+\]
+\[
+\begin{aligned}
+R_{22,x(s),g^*,N}(\theta,\theta_0)
+&=\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)\bar D_{g^*,x(s)}(P)\\
+&=\frac1N\sum_{i=1}^Nf^0_{x(s),g^*}(\theta,\theta_0)(C_x(i)),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+&f^0_{x(s),g^*}(\theta,\theta_0)(C_x(i))\\
+&=\{f_{x(s),g^*}(\theta,\theta_0)(C_x(i))-P_0^Nf_{x(s),g^*}(\theta,\theta_0)\},\\
+&f_{x(s),g^*}(\theta,\theta_0)(C_x(i))\\
+&\equiv\frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}
+ \int_x\Phi_{x(s)}(x,C_x(i))
+ \,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid C_x(i)).
+\end{aligned}
+\]
+因此，$R_{22,x(s),g^*,N}(\theta,\theta_0)$ 是 $N$ 个均值为零的随机变量
+$f_i=f^0_{x(s),g^*}(\theta,\theta_0)(C_x(i))$ 的平均
+$X_N=N^{-1}\sum_{i=1}^Nf_i$。这些变量是 $C_x(i)$ 的函数，每一个都在 $P\to P_0$ 时趋于零。
+
+最后，回顾 $\Psi_J(P)=J^{-1}\sum_{j=1}^J\Psi_{g_j^*}(P)$ 和
+$D^N(P)=J^{-1}\sum_{j=1}^JD^N_{g_j^*}(P)$，有
+\[
+\begin{aligned}
+-\frac1N\sum_{i=1}^NP_{0,o(i)}\bar D(P)
+={}&\Psi_J(P)-\Psi_J(P_0)\\
+&+R_{21}(\theta,\theta_0)+R_{22,N}(\theta,\theta_0),
+\end{aligned}
+\]
+其中
+$R_{21}(\theta,\theta_0)=J^{-1}\sum_{j=1}^JR_{21,g_j^*}(\theta,\theta_0)$，
+$R_{22,N}(\theta,\theta_0)=J^{-1}\sum_{j=1}^JR_{22,g_j^*,N}(\theta,\theta_0)$。
+\end{bookresult}

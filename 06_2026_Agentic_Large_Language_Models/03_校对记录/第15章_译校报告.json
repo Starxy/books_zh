@@ -1,0 +1,281 @@
+{
+  "chapter": 15,
+  "title_zh": "研究智能体大语言模型的行为",
+  "status": "complete",
+  "page_count": 24,
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/part5/15_behavior.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch15/egosocialarena_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/figures_zh/ch15/tombench_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch15_25e44b77/agenticbook.pdf",
+    "06_2026_Agentic_Large_Language_Models/03_校对记录/第15章_译校报告.json"
+  ],
+  "coverage": {
+    "source": "work/agentic/active/part5/15_behavior.tex",
+    "source_policy": "仅依据有效TeX与两幅原图；未使用旧英文PDF，未联网更新事实，未执行教材中的动作。",
+    "body": "全章有效正文逐段译出，包含学习目标框、全部层级和段标题、语言与情感例子、博弈、错误信念、道德例子、两条脚注、两幅题注、结语与原bibliography命令。",
+    "source_paragraph_blocks": 96,
+    "translation_paragraph_blocks": 96,
+    "learning_objectives": 4,
+    "footnotes": 2,
+    "figures": 2,
+    "figure_15_1": "8类场景及全部问答、选项、角色资料、回合标签与对话已中文化；保留机器人/人物/地球/纸牌/手势等原画面、全部数字、红色分隔线、选项与故意反转的石头剪刀布规则。局部重绘原文本框以容纳中文。",
+    "figure_15_2": "9个主题、45个外圈情境标签均已中文化；外圈扇区与引线使用原像素，内圈按原图白色径向边界重绘并译出主题。原右侧统计表移到图下，保留6列、16个数据行和全部80项数值。",
+    "bibliography": "保留plainnat样式及agenticbook,refs,case,synthetic四个原引用库，使用项目随附bbl。"
+  },
+  "structure_checks": {
+    "headings": {
+      "match": true,
+      "source_count": 39,
+      "translation_count": 39
+    },
+    "labels": {
+      "match": true,
+      "source_count": 11,
+      "translation_count": 11
+    },
+    "references": {
+      "match": true,
+      "source_count": 25,
+      "translation_count": 25
+    },
+    "citation_keys": {
+      "match": true,
+      "source_count": 93,
+      "translation_count": 93
+    },
+    "environments": {
+      "match": true,
+      "source_count": 9,
+      "translation_count": 9
+    },
+    "bibliography": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "structural_commands": {
+      "match": true,
+      "source_count": 11,
+      "translation_count": 11
+    },
+    "code_blocks": {
+      "match": true
+    },
+    "math_segments": {
+      "match": true,
+      "symbol_multiset_match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "text": {
+      "source_english_words": 8935,
+      "translated_CJK": 14753,
+      "translation_characters": 23644,
+      "source_characters": 61145,
+      "source_paragraph_blocks": 96,
+      "translation_paragraph_blocks": 96
+    },
+    "stray_chapter_counter": false,
+    "stray_part": false,
+    "figure_table_rows": 16,
+    "figure_table_columns": 6,
+    "figure_table_80_numeric_values_match_source": true,
+    "figure_number_sequence": [
+      "15.1",
+      "15.2"
+    ],
+    "figure_number_sequence_verified_in_pdf": true,
+    "automatic_counters_preserved": true,
+    "shared_files_edited": false
+  },
+  "new_terms": {
+    "Computers Are Social Actors (CASA)": "计算机是社会行动者（CASA）",
+    "face": "面子",
+    "Social Chain-of-Thought (SCoT)": "社会思维链（SCoT）",
+    "emotional reactions": "情绪反应",
+    "interpretations (EPITOME)": "理解表达",
+    "explorations (EPITOME)": "探索询问",
+    "thought-tracing": "思维追踪",
+    "sequential Monte Carlo": "序贯蒙特卡洛",
+    "epistemic logic": "认知逻辑",
+    "Unintended Outcome test / Unexpected Outcome Test": "非预期结果测试",
+    "Scalar Implicature Task": "等级含意任务",
+    "Faux-pas Recognition Test": "失言识别测试"
+  },
+  "source_anomalies": [
+    {
+      "location": "15.5.1正文与图15.2统计表",
+      "description": "正文称ToMBench包含2860个测试项目；图中任务视角为2470个问题、能力视角为2860个问题。两种口径及全部数据按原文保留，未自行统一。"
+    },
+    {
+      "location": "15.5.1正文与图15.2能力视角",
+      "description": "正文称覆盖ATOMS七类心理状态；图中能力视角列出六个数据行。保留原图六行，未补造第七行。"
+    },
+    {
+      "location": "15.5.1 ExploreToM段",
+      "description": "原文将准确率提升写为27% (points)，百分比符号与百分点括注并存；译文保留27%及“个百分点”括注。"
+    },
+    {
+      "location": "15.5.3小结",
+      "description": "原文称有三点观察，随后在First、Second、Third之后又追加Lastly一段。译文保留这四段及原有措辞关系。"
+    },
+    {
+      "location": "15.5.2心智理论与推理模型、结构化推理段",
+      "description": "原文型号拼写为GPT-o3、GPT-o4-mini、GPT-o1、GPT-o3-mini；均按原样保留，未按外部资料改名。"
+    },
+    {
+      "location": "图15.1反事实情境",
+      "description": "原图刻意规定剪刀胜石头、布胜剪刀、石头胜布；译图保持该反常规则及原答案选项，不按常见规则改正。"
+    },
+    {
+      "location": "15.5.1非预期结果测试",
+      "description": "正文测试名为Unintended Outcome test，图中为Unexpected Outcome Test；中文均译为“非预期结果测试”，英文源名差异保留于本报告。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/ch15_25e44b77/agenticbook.pdf",
+    "passes": 4,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overflow": 0,
+    "float_too_large": false,
+    "undefined_references": false,
+    "undefined_citations": false,
+    "notes": "单章构建使用共享脚本注入外章编号；日志中的empty target提示对应这些外章占位链接，整书合排由主编解析。无未定义引用或引文。"
+  },
+  "visual_qa": {
+    "source_images_viewed_full_size": [
+      "06_2026_Agentic_Large_Language_Models/01_排版源码/figures/egosocialarena.png",
+      "06_2026_Agentic_Large_Language_Models/01_排版源码/figures/tombench.png"
+    ],
+    "source_atlas_viewed": "work/agentic/source_atlas/chapter15_01.png",
+    "rendered_pages_actually_inspected": [
+      1,
+      2,
+      3,
+      5,
+      7,
+      9,
+      11,
+      14,
+      16,
+      24
+    ],
+    "page_checks": {
+      "1": "章节标题、学习框、正文、脚注与页码。",
+      "2": "方法论限定、构念效度及形式/功能语言能力首现。",
+      "3": "三条语用例子、礼貌理论、引用与中英文混排。",
+      "5": "共情区分、长脚注、段落与参考引文。",
+      "7": "图15.1全部场景、测试选项、反常规则、照片/图标、数字、人物资料、对话、边框与连线。",
+      "9": "心智理论引例、彩色错误信念框、年龄与比例。",
+      "11": "图15.2九主题/45标签与全部统计表；页内可读、题注与页码无碰撞。",
+      "14": "伦理框架、道德测试、段标题与引用。",
+      "16": "结语完整、参考文献起始与页眉。",
+      "24": "参考文献末页、网址断行、页眉页码与末项完整。"
+    },
+    "figure_repairs": "首轮实际渲染发现图内受全局行距影响而越框及少量旧标签边缘；已局部固定行距、重绘文本框和内圈主题，复查受影响图页。后续仅重查修改的第2、5、7页；其余未修改页不重复检查。",
+    "qa_render_directory": "work/agentic/ch15_work/qa",
+    "last_pdf_bookmark": [
+      2,
+      "结语",
+      16
+    ],
+    "result": "通过"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_排版源码/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

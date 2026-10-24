@@ -1,0 +1,119 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.0cm}
+\def\nsep{0.1cm}
+\def\psize{2.5cm}
+\def\rsize{0.7*\psize}
+
+\tikzstyle{snode} = [minimum width=0.65cm,minimum height=0.65cm,inner sep=0pt,draw,thin];
+\tikzstyle{bnode} = [minimum width=0.65cm,minimum height=0.65cm,inner sep=0pt,fill=gray!20];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% sub-figure 1: single-step rotation
+
+\begin{scope}
+
+\draw [-latex,thick] (-\psize,0) -- (\psize,0) node [pos=0.95,below] {\footnotesize{$x_1$}};
+\draw [-latex,thick] (0,-\psize) -- (0,\psize) node [pos=0.95,left] {\footnotesize{$x_2$}};
+
+\node [circle,minimum size=2*\rsize,draw] (helpline) at (0,0) {};
+
+\coordinate (O) at (0,0);
+\coordinate (A) at (0.5*\rsize,0.8660254*\rsize); % angle = 60
+\coordinate (B) at (-0.8660254*\rsize,0.5*\rsize); % angle = 150
+
+\draw [-latex,blue,very thick] (O) -- (A);
+\draw [-latex,blue,very thick] (O) -- (B);
+
+\pic[draw,->,thick,red,"$\theta$", angle eccentricity=1.5] {angle = A--O--B};
+
+\node [anchor=south] (labela) at ([yshift=0.0cm,xshift=0.5cm]A) {\footnotesize{vector $\mathbf{x}$}};
+\node [anchor=south] (labelb) at ([yshift=0.0cm,xshift=-0.3cm]B) {\footnotesize{$\mathbf{x} R_{\theta}$}};
+\node [anchor=south east] (labelb2) at ([yshift=-0.1cm]labelb.north east) {\footnotesize{rotated vector}};
+
+\node [anchor=north] (caption) at (0,-\psize-0.2cm) {\small{(a) Single-step Rotation}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% sub-figure 2: multi-step rotation
+
+\begin{scope}[xshift=7cm]
+
+\draw [-latex,thick] (-\psize,0) -- (\psize,0) node [pos=0.95,below] {\footnotesize{$x_1$}};
+\draw [-latex,thick] (0,-\psize) -- (0,\psize) node [pos=0.95,left] {\footnotesize{$x_2$}};
+
+\node [circle,minimum size=2*\rsize,draw] (helpline) at (0,0) {};
+
+\coordinate (O) at (0,0);
+\coordinate (A) at (0.5*\rsize,0.8660254*\rsize); % angle = 60
+\coordinate (B) at (-0.70711*\rsize,0.70711*\rsize); % angle = 135
+\coordinate (C) at (-0.86603*\rsize,-0.50000*\rsize); % angle = 210
+\coordinate (D) at (0.25882*\rsize,-0.96593*\rsize); % angle = 285
+
+\draw [-latex,blue,very thick] (O) -- (A);
+\draw [-latex,blue,very thick,dotted] (O) -- (B);
+\draw [-latex,blue,very thick,dotted] (O) -- (C);
+\draw [-latex,blue,very thick] (O) -- (D);
+
+\pic[draw,->,thick,red,"$\theta$", angle radius=0.3*\rsize, angle eccentricity=1.5] {angle = A--O--B};
+\pic[draw,->,thick,red,"$\theta$", angle radius=0.4*\rsize,angle eccentricity=1.5] {angle = B--O--C};
+\pic[draw,->,thick,red,"$\theta$", angle radius=0.5*\rsize, angle eccentricity=1.5] {angle = C--O--D};
+
+\node [anchor=south] (labela) at ([yshift=0.0cm,xshift=0.2cm]A) {\footnotesize{$\mathbf{x}$}};
+\node [anchor=south] (labelb) at ([yshift=0.0cm,xshift=-0.3cm]B) {\footnotesize{$\mathbf{x} R_{\theta}$}};
+\node [anchor=east] (labelc) at ([yshift=-0.2cm,xshift=0.1cm]C) {\footnotesize{$\mathbf{x} R_{2\theta}$}};
+\node [anchor=north] (labeld) at ([yshift=-0.1cm,xshift=0.1cm]D) {\footnotesize{$\mathbf{x} R_{3\theta}$}};
+
+\node [anchor=north] (caption) at (0,-\psize-0.2cm) {\small{(b) Multi-step Rotation}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% sub-figure 3: angles between embeddings of different tokens
+
+\begin{scope}[xshift=3.5cm,yshift=-7cm]
+
+\draw [-latex,thick] (-\psize,0) -- (\psize,0) node [pos=0.95,below] {\footnotesize{$x_1$}};
+\draw [-latex,thick] (0,-\psize) -- (0,\psize) node [pos=0.95,left] {\footnotesize{$x_2$}};
+
+\node [circle,minimum size=2*\rsize,draw] (helpline) at (0,0) {};
+\node [circle,minimum size=0.7*2*\rsize,draw] (helpline2) at (0,0) {};
+
+\coordinate (O) at (0,0);
+\coordinate (A) at (0.5*\rsize,0.8660254*\rsize); % angle = 60
+\coordinate (B) at (-0.8660254*\rsize,-0.5*\rsize); % angle = 210
+\coordinate (A2) at (-0.17365*0.7*\rsize,0.98481*0.7*\rsize); % angle = 100
+\coordinate (B2) at (-0.34202*0.7*\rsize,-0.93969*0.7*\rsize); % angle = 210
+
+\pic[draw,->,thick,red,"$7\theta$",angle radius=0.8*\rsize,angle eccentricity=1.15] {angle = A--O--B};
+\pic[draw,->,thick,red,"$7\theta$",angle radius=0.5*\rsize,angle eccentricity=1.25] {angle = A2--O--B2};
+\pic[fill=gray!40,angle radius=0.3*\rsize] {angle = A--O--A2};
+\pic[fill=gray!40,angle radius=0.3*\rsize] {angle = B--O--B2};
+
+\draw [-latex,blue,very thick] (O) -- (A);
+\draw [-latex,blue,very thick] (O) -- (B);
+\draw [-latex,ugreen,very thick] (O) -- (A2);
+\draw [-latex,ugreen,very thick] (O) -- (B2);
+
+\node [anchor=south] (labela) at ([yshift=0.0cm,xshift=0.3cm]A) {\scriptsize{sleeping$_4$}};
+\node [anchor=south] (labelb) at ([yshift=-0.4cm,xshift=-0.6cm]B) {\scriptsize{sleeping$_{11}$}};
+\node [anchor=south,fill=white,inner sep=1pt] (labela2) at ([yshift=-0.4cm,xshift=-0.4cm]A2) {\scriptsize{cat$_2$}};
+\node [anchor=south,fill=white,inner sep=1pt] (labelb2) at ([yshift=-0.4cm,xshift=-0.0cm]B2) {\scriptsize{cat$_9$}};
+
+\node [anchor=south west] (senta) at ([yshift=1cm]A) {\footnotesize{{\color{gray} The$_1$} cat$_2$ {\color{gray} is$_3$} sleeping$_4$ {\color{gray} peacefully$_5$} }};
+\node [anchor=north west] (senta2) at ([yshift=0.1cm]senta.south west) {\footnotesize{{\color{gray} in$_6$ the$_7$ warm$_8$ sunlight$_9$ .$_{10}$}}};
+\node [anchor=north east] (sentb) at ([yshift=-0.5cm]B) {\footnotesize{{\color{gray} Every$_1$ afternoon$_2$ ,$_3$ you$_4$ 'll$_5$ find$_6$ that$_7$}}};
+\node [anchor=north west] (sentb2) at ([yshift=0.1cm]sentb.south west) {\footnotesize{{\color{gray} the$_8$} cat$_9$ {\color{gray} is$_{10}$} sleeping$_{11}$ {\color{gray} on$_{12}$ my$_{13}$ bed$_{14}$ .$_{15}$}}};
+
+\node [anchor=north] (caption) at (0,-\psize-0.2cm) {\small{(c) Angles between embeddings of two tokens at different positions}};
+
+\end{scope}
+
+	
+\end{tikzpicture}
+\end{center}

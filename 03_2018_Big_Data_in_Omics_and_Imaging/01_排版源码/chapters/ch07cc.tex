@@ -1,0 +1,84 @@
+% 原分章PDF91页附录7.C标题—93页附录7.D标题之前，印刷页667—669。
+\section*{附录7.C\quad 正交条件的等价表述}
+\addcontentsline{toc}{section}{附录7.C 正交条件的等价表述}
+\markright{附录7.C 正交条件的等价表述}
+
+首先证明式（7.64）蕴含式（7.66）。由协方差的定义，有
+\begin{equation}
+\begin{aligned}
+\operatorname{cov}_{U_X}\left(\log\frac{V_{out}}{U_X},\frac{P_X}{U_X}\right)
+={}&\int\log\frac{V_{out}}{U_X}\frac{P_X}{U_X}U_X\,dx\\
+&{}-\int\log\frac{V_{out}}{U_X}U_X\,dx
+ \int\frac{P_X}{U_X}U_X\,dx\\
+={}&\int\log\frac{V_{out}}{U_X}P_X\,dx
+ -\int\log\frac{V_{out}}{U_X}U_X\,dx.
+\end{aligned}\tag{7.C.1}
+\end{equation}
+式（7.C.1）的第一项可化为
+\begin{equation}
+\begin{aligned}
+\int\log\frac{V_{out}}{U_X}P_X\,dx
+ &=\int\log\frac{P_X}{U_X}\frac{V_{out}}{P_X}P_X\,dx\\
+ &=\int\log\frac{P_X}{U_X}P_X\,dx
+   +\int\log\frac{V_{out}}{P_X}P_X\,dx\\
+ &=D(P_X\parallel U_X)-D(P_X\parallel V_{out}).
+\end{aligned}\tag{7.C.2}
+\end{equation}
+式（7.C.1）的第二项可以改写为
+\begin{equation}
+\int\log\frac{V_{out}}{U_X}U_X\,dx=-D(U_X\parallel V_{out}).\tag{7.C.3}
+\end{equation}
+将式（7.C.2）、（7.C.3）代入式（7.C.1），得到
+\begin{equation}
+\begin{aligned}
+\operatorname{cov}_{U_X}\left(\log\frac{V_{out}}{U_X},\frac{P_X}{U_X}\right)
+={}&D(P_X\parallel U_X)-D(P_X\parallel V_{out})\\
+&{}+D(U_X\parallel V_{out}).
+\end{aligned}\tag{7.C.4}
+\end{equation}
+因此，式（7.64）蕴含式（7.66）：
+\begin{equation}
+D(P_X\parallel V_{out})=D(P_X\parallel U_X)+D(U_X\parallel V_{out}).\tag{7.C.5}
+\end{equation}
+接下来证明式（7.65）与式（7.66）等价。回顾
+\begin{equation}
+P_Y=\frac{P_X}{f'(x)},\qquad V_{out}=f'(x)V_Y.\tag{7.C.6}
+\end{equation}
+注意
+\begin{equation}
+\begin{aligned}
+D(P_Y\parallel V_Y)
+ &=\int\log\frac{P_Y}{V_Y}P_Y\,dy\\
+ &=\int\log\frac{P_X}{f'(x)V_Y}\frac{P_X}{f'(x)}f'(x)\,dx\\
+ &=\int\log\frac{P_X}{V_{out}}P_X\,dy\\
+ &=D(P_X\parallel V_{out}),
+\end{aligned}\tag{7.C.7}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+D(P_Y\parallel U_{out}(Y))
+ &=\int\log\frac{P_Y}{U_{out}(Y)}P_Y\,dy\\
+ &=\int\log\frac{P_Xf'(x)}{f'(x)U_X}\frac{P_X}{f'(x)}f'(x)\,dx\\
+ &=\int\log\frac{P_X}{U_X}P_X\,dx\\
+ &=D(P_X\parallel U_X),
+\end{aligned}\tag{7.C.8}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+D(U_{out}(Y)\parallel V_Y)
+ &=\int\log\frac{U_{out}(Y)}{V_Y}U_{out}(Y)\,dy\\
+ &=\int\log\frac{U_X}{f'(x)V_Y}\frac{U_X}{f'(x)}f'(x)\,dx\\
+ &=\int\log\frac{U_X}{V_{out}}U_X\,dx\\
+ &=D(U_X\parallel V_{out}).
+\end{aligned}\tag{7.C.9}
+\end{equation}
+结合式（7.C.7）—（7.C.9），可知
+\[
+D(P_Y\parallel V_Y)=D(P_Y\parallel U_{out}(Y))
+ +D(U_{out}(Y)\parallel V_Y)
+\]
+等价于
+\[
+D(P_X\parallel V_{out})=D(P_X\parallel U_X)+D(U_X\parallel V_{out}).
+\]
+通过类似论证，可以证明其他等价关系。

@@ -1,0 +1,20 @@
+\begin{algorithmic}
+         \State 随机初始化 $Q(s,a) \rightarrow \mathbb{R}$
+            \State 随机初始化 $M(s,a) \rightarrow \mathbb{R}\times S$ \Comment{模型}
+            \Repeat
+                \State 随机选择 $s \in S$
+                \State $a \gets \pi(s)$ \Comment{$\pi(s)$ 可以是基于 $Q$ 的
+                  $\epsilon$-贪心策略$(s)$}
+                \State $(s',r) \gets E(s, a)$ \Comment{从环境获得新的
+                  状态与奖励}
+                \State $Q(s, a) \gets  Q(s, a) + \alpha \cdot [r +
+                \gamma \cdot \max_{a'} Q(s', a') - Q(s,a)]$
+                \State $M(s, a) \gets (s', r)$
+                \For{$n = 1, \dots, N$}
+                    \State 随机选择 $\hat{s}$ 和 $\hat{a}$
+                    \State $(s', r) \gets M(\hat{s}, \hat{a})$
+                    \Comment{利用模型规划想象的状态与奖励}
+                    \State $Q(\hat{s}, \hat{a}) \gets  Q(\hat{s}, \hat{a}) + \alpha \cdot [r + \gamma \cdot \max_{a'} Q(s', a')-Q(\hat{s},\hat{a})]$
+                \EndFor
+            \Until{$Q$ 收敛}
+        \end{algorithmic}

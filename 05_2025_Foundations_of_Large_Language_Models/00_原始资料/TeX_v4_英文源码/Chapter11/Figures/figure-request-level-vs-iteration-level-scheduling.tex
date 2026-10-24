@@ -1,0 +1,304 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.08cm}
+\def\bsep{2.5cm}
+
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=0.6cm,inner sep=2pt,draw,fill=white,rounded corners=0pt];
+\tikzstyle{snode} = [minimum width=0.23cm,minimum height=0.23cm,inner sep=0pt,fill=red!30];
+
+
+% request-level scheduling
+\begin{scope}
+
+% prefilling (step 0)
+\node [snode,anchor=north,fill=ugreen!30] (px20) at (0,0) {};
+\node [snode,anchor=west] (px21) at ([xshift=\ssep]px20.east) {\tiny{1}};
+\node [snode,anchor=west] (px22) at ([xshift=\ssep]px21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (px10) at ([yshift=-\ssep]px20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (px11) at ([xshift=\ssep]px10.east) {};
+\node [snode,anchor=west] (px12) at ([xshift=\ssep]px11.east) {\tiny{2}};
+\node [snode,anchor=north] (px00) at ([yshift=-\ssep]px10.south) {\tiny{3}};
+\node [snode,anchor=west] (px01) at ([xshift=\ssep]px00.east) {\tiny{3}};
+\node [snode,anchor=west] (px02) at ([xshift=\ssep]px01.east) {\tiny{3}};
+
+\node [snode,anchor=west,fill=white] (py01) at ([xshift=\ssep]px02.east) {};
+\node [snode,anchor=west,fill=white] (py02) at ([xshift=\ssep]py01.east) {};
+\node [snode,anchor=west,fill=white] (py03) at ([xshift=\ssep]py02.east) {};
+\node [snode,anchor=west,fill=white] (py11) at ([xshift=\ssep]px12.east) {};
+\node [snode,anchor=west,fill=white] (py12) at ([xshift=\ssep]py11.east) {};
+\node [snode,anchor=west,fill=white] (py13) at ([xshift=\ssep]py12.east) {};
+\node [snode,anchor=west,fill=white] (py21) at ([xshift=\ssep]px22.east) {};
+\node [snode,anchor=west,fill=white] (py22) at ([xshift=\ssep]py21.east) {};
+\node [snode,anchor=west,fill=white] (py23) at ([xshift=\ssep]py22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (px00) (py23)] (step0) {};
+\end{pgfonlayer}
+
+% prediction at step 1
+\node [snode,anchor=north,fill=ugreen!30] (ax20) at ([yshift=-\bsep]px20.south) {};
+\node [snode,anchor=west] (ax21) at ([xshift=\ssep]ax20.east) {\tiny{1}};
+\node [snode,anchor=west] (ax22) at ([xshift=\ssep]ax21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (ax10) at ([yshift=-\ssep]ax20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (ax11) at ([xshift=\ssep]ax10.east) {};
+\node [snode,anchor=west] (ax12) at ([xshift=\ssep]ax11.east) {\tiny{2}};
+\node [snode,anchor=north] (ax00) at ([yshift=-\ssep]ax10.south) {\tiny{3}};
+\node [snode,anchor=west] (ax01) at ([xshift=\ssep]ax00.east) {\tiny{3}};
+\node [snode,anchor=west] (ax02) at ([xshift=\ssep]ax01.east) {\tiny{3}};
+
+\node [snode,anchor=west,fill=blue!30] (ay01) at ([xshift=\ssep]ax02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=white] (ay02) at ([xshift=\ssep]ay01.east) {};
+\node [snode,anchor=west,fill=white] (ay03) at ([xshift=\ssep]ay02.east) {};
+\node [snode,anchor=west,fill=blue!30] (ay11) at ([xshift=\ssep]ax12.east) {\tiny{2}};
+\node [snode,anchor=west,fill=white] (ay12) at ([xshift=\ssep]ay11.east) {};
+\node [snode,anchor=west,fill=white] (ay13) at ([xshift=\ssep]ay12.east) {};
+\node [snode,anchor=west,fill=blue!30] (ay21) at ([xshift=\ssep]ax22.east) {\tiny{1}};
+\node [snode,anchor=west,fill=white] (ay22) at ([xshift=\ssep]ay21.east) {};
+\node [snode,anchor=west,fill=white] (ay23) at ([xshift=\ssep]ay22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (ax00) (ay23)] (step1) {};
+\end{pgfonlayer}
+
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (ax00) (ax22)] (step1mask) {};
+
+% prediction at step 2
+\node [snode,anchor=north,fill=ugreen!30] (bx20) at ([yshift=-\bsep]ax20.south) {};
+\node [snode,anchor=west] (bx21) at ([xshift=\ssep]bx20.east) {\tiny{1}};
+\node [snode,anchor=west] (bx22) at ([xshift=\ssep]bx21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (bx10) at ([yshift=-\ssep]bx20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (bx11) at ([xshift=\ssep]bx10.east) {};
+\node [snode,anchor=west] (bx12) at ([xshift=\ssep]bx11.east) {\tiny{2}};
+\node [snode,anchor=north] (bx00) at ([yshift=-\ssep]bx10.south) {\tiny{3}};
+\node [snode,anchor=west] (bx01) at ([xshift=\ssep]bx00.east) {\tiny{3}};
+\node [snode,anchor=west] (bx02) at ([xshift=\ssep]bx01.east) {\tiny{3}};
+
+\node [snode,anchor=west,fill=blue!30] (by01) at ([xshift=\ssep]bx02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (by02) at ([xshift=\ssep]by01.east) {\tiny{3}};
+\node [snode,anchor=west,fill=white] (by03) at ([xshift=\ssep]by02.east) {};
+\node [snode,anchor=west,fill=blue!30] (by11) at ([xshift=\ssep]bx12.east) {\tiny{2}};
+\node [snode,anchor=west,fill=blue!30] (by12) at ([xshift=\ssep]by11.east) {\tiny{2}};
+\node [snode,anchor=west,fill=white] (by13) at ([xshift=\ssep]by12.east) {};
+\node [snode,anchor=west,fill=blue!30] (by21) at ([xshift=\ssep]bx22.east) {\tiny{1}};
+\node [snode,anchor=west,fill=gray!30] (by22) at ([xshift=\ssep]by21.east) {};
+\node [snode,anchor=west,fill=white] (by23) at ([xshift=\ssep]by22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (bx00) (by23)] (step2) {};
+\end{pgfonlayer}
+
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (bx00) (by21)] (step2mask) {};
+
+% prediction at step 3
+\node [snode,anchor=north,fill=ugreen!30] (cx20) at ([yshift=-\bsep]bx20.south) {};
+\node [snode,anchor=west] (cx21) at ([xshift=\ssep]cx20.east) {\tiny{1}};
+\node [snode,anchor=west] (cx22) at ([xshift=\ssep]cx21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (cx10) at ([yshift=-\ssep]cx20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (cx11) at ([xshift=\ssep]cx10.east) {};
+\node [snode,anchor=west] (cx12) at ([xshift=\ssep]cx11.east) {\tiny{2}};
+\node [snode,anchor=north] (cx00) at ([yshift=-\ssep]cx10.south) {\tiny{3}};
+\node [snode,anchor=west] (cx01) at ([xshift=\ssep]cx00.east) {\tiny{3}};
+\node [snode,anchor=west] (cx02) at ([xshift=\ssep]cx01.east) {\tiny{3}};
+
+\node [snode,anchor=west,fill=blue!30] (cy01) at ([xshift=\ssep]cx02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (cy02) at ([xshift=\ssep]cy01.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (cy03) at ([xshift=\ssep]cy02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (cy11) at ([xshift=\ssep]cx12.east) {\tiny{2}};
+\node [snode,anchor=west,fill=blue!30] (cy12) at ([xshift=\ssep]cy11.east) {\tiny{2}};
+\node [snode,anchor=west,fill=gray!30] (cy13) at ([xshift=\ssep]cy12.east) {};
+\node [snode,anchor=west,fill=blue!30] (cy21) at ([xshift=\ssep]cx22.east) {\tiny{1}};
+\node [snode,anchor=west,fill=gray!30] (cy22) at ([xshift=\ssep]cy21.east) {};
+\node [snode,anchor=west,fill=gray!30] (cy23) at ([xshift=\ssep]cy22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (cx00) (cy23)] (step3) {};
+\end{pgfonlayer}
+
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (cx00) (cy22)] (step3mask) {};
+
+% connections
+\draw [->] ([yshift=-1pt]step0.south) -- ([yshift=1pt]step1.north);
+\draw [->] ([yshift=-1pt]step1.south) -- ([yshift=1pt]step2.north);
+\draw [->] ([yshift=-1pt]step2.south) -- ([yshift=1pt]step3.north);
+\draw [->,dotted] ([yshift=0.5cm]step0.north) -- ([yshift=1pt]step0.north) node [pos=0.4,left] (startlabel) {\scriptsize{Begin}};
+\draw [->,dotted] ([yshift=-1pt]step3.south) -- ([yshift=-1.8cm]step3.south) node [pos=0.18,left,xshift=-0.1cm] (endlabel) {\scriptsize{End}};
+
+\node [anchor=south,align=left] (inputrequests) at ([yshift=0.7cm]step0.north) {\scriptsize{Requests }\\[-6pt] \scriptsize{$\mathbf{x}_1$, $\mathbf{x}_2$, $\mathbf{x}_3$ arrived}};
+
+\node [anchor=north,align=left] (newrequest) at ([yshift=-0.3cm,xshift=-0.2cm]step1.south west) {\scriptsize{Request}\\[-6pt] \scriptsize{$\mathbf{x}_4$ arrived}};
+\draw [->] (newrequest.east) -- ([xshift=0.3cm]newrequest.east);
+\draw [->,dotted] ([xshift=-1pt]newrequest.west) -- ([xshift=-0.6cm]newrequest.west) -- ([xshift=-0.6cm,yshift=-5.5cm]newrequest.west) -- ([xshift=1.8cm,yshift=-5.5cm]newrequest.west) node [pos=0.5,below,align=left] {\scriptsize{$\mathbf{x}_4$  is added to}\\[-5pt] \scriptsize{the next batch}};
+
+\node [anchor=east,align=right] (step0label) at (step0.west) {\scriptsize{Iteration 1}\\[-0.15cm] \scriptsize{(prefilling)}};
+\node [anchor=east,align=right] (step1label) at (step1.west) {\scriptsize{Iteration 2}};
+\node [anchor=east,align=right] (step2label) at (step2.west) {\scriptsize{Iteration 3}};
+\node [anchor=east,align=right] (step3label) at (step3.west) {\scriptsize{Iteration 4}};
+
+\node [anchor=center,circle,minimum size=0.12cm,fill=red,inner sep=0] (begincircle) at ([yshift=0.3cm]step0.north) {};
+\node [anchor=center,circle,minimum size=0.12cm,fill=red,inner sep=0] (endcircle) at ([yshift=-0.35cm]step3.south) {};
+\node [anchor=center,circle,minimum size=0.12cm,fill=blue,inner sep=0] (arrivecircle) at ([yshift=-0.29*\bsep]step1.south) {};
+
+\node [anchor=north] (caption) at ([yshift=-3.5cm,xshift=-0.5cm]step3.north) {\small{(a) Request-level Scheduling}};
+
+\end{scope}
+
+% iteration-level scheduling
+\begin{scope}[xshift=6.5cm]
+
+% prefilling (step 0)
+\node [snode,anchor=north,fill=ugreen!30] (px20) at (0,0) {};
+\node [snode,anchor=west] (px21) at ([xshift=\ssep]px20.east) {\tiny{1}};
+\node [snode,anchor=west] (px22) at ([xshift=\ssep]px21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (px10) at ([yshift=-\ssep]px20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (px11) at ([xshift=\ssep]px10.east) {};
+\node [snode,anchor=west] (px12) at ([xshift=\ssep]px11.east) {\tiny{2}};
+\node [snode,anchor=north] (px00) at ([yshift=-\ssep]px10.south) {\tiny{3}};
+\node [snode,anchor=west] (px01) at ([xshift=\ssep]px00.east) {\tiny{3}};
+\node [snode,anchor=west] (px02) at ([xshift=\ssep]px01.east) {\tiny{3}};
+
+\node [snode,anchor=west,fill=white] (py01) at ([xshift=\ssep]px02.east) {};
+\node [snode,anchor=west,fill=white] (py02) at ([xshift=\ssep]py01.east) {};
+\node [snode,anchor=west,fill=white] (py03) at ([xshift=\ssep]py02.east) {};
+\node [snode,anchor=west,fill=white] (py11) at ([xshift=\ssep]px12.east) {};
+\node [snode,anchor=west,fill=white] (py12) at ([xshift=\ssep]py11.east) {};
+\node [snode,anchor=west,fill=white] (py13) at ([xshift=\ssep]py12.east) {};
+\node [snode,anchor=west,fill=white] (py21) at ([xshift=\ssep]px22.east) {};
+\node [snode,anchor=west,fill=white] (py22) at ([xshift=\ssep]py21.east) {};
+\node [snode,anchor=west,fill=white] (py23) at ([xshift=\ssep]py22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (px00) (py23)] (step0) {};
+\end{pgfonlayer}
+
+% prediction at step 1
+\node [snode,anchor=north,fill=ugreen!30] (ax20) at ([yshift=-\bsep]px20.south) {};
+\node [snode,anchor=west] (ax21) at ([xshift=\ssep]ax20.east) {\tiny{1}};
+\node [snode,anchor=west] (ax22) at ([xshift=\ssep]ax21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (ax10) at ([yshift=-\ssep]ax20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (ax11) at ([xshift=\ssep]ax10.east) {};
+\node [snode,anchor=west] (ax12) at ([xshift=\ssep]ax11.east) {\tiny{2}};
+\node [snode,anchor=north] (ax00) at ([yshift=-\ssep]ax10.south) {\tiny{3}};
+\node [snode,anchor=west] (ax01) at ([xshift=\ssep]ax00.east) {\tiny{3}};
+\node [snode,anchor=west] (ax02) at ([xshift=\ssep]ax01.east) {\tiny{3}};
+
+\node [snode,anchor=west,fill=blue!30] (ay01) at ([xshift=\ssep]ax02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=white] (ay02) at ([xshift=\ssep]ay01.east) {};
+\node [snode,anchor=west,fill=white] (ay03) at ([xshift=\ssep]ay02.east) {};
+\node [snode,anchor=west,fill=blue!30] (ay11) at ([xshift=\ssep]ax12.east) {\tiny{2}};
+\node [snode,anchor=west,fill=white] (ay12) at ([xshift=\ssep]ay11.east) {};
+\node [snode,anchor=west,fill=white] (ay13) at ([xshift=\ssep]ay12.east) {};
+\node [snode,anchor=west,fill=blue!30] (ay21) at ([xshift=\ssep]ax22.east) {\tiny{1}};
+\node [snode,anchor=west,fill=white] (ay22) at ([xshift=\ssep]ay21.east) {};
+\node [snode,anchor=west,fill=white] (ay23) at ([xshift=\ssep]ay22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (ax00) (ay23)] (step1) {};
+\end{pgfonlayer}
+
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (ax00) (ax22)] (step1mask) {};
+
+% prediction at step 2
+\node [snode,anchor=north,fill=ugreen!30] (bx20) at ([yshift=-\bsep]ax20.south) {};
+\node [snode,anchor=west] (bx21) at ([xshift=\ssep]bx20.east) {\tiny{1}};
+\node [snode,anchor=west] (bx22) at ([xshift=\ssep]bx21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (bx10) at ([yshift=-\ssep]bx20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (bx11) at ([xshift=\ssep]bx10.east) {};
+\node [snode,anchor=west] (bx12) at ([xshift=\ssep]bx11.east) {\tiny{2}};
+\node [snode,anchor=north] (bx00) at ([yshift=-\ssep]bx10.south) {\tiny{3}};
+\node [snode,anchor=west] (bx01) at ([xshift=\ssep]bx00.east) {\tiny{3}};
+\node [snode,anchor=west] (bx02) at ([xshift=\ssep]bx01.east) {\tiny{3}};
+\node [snode,anchor=north] (bx90) at ([yshift=-\ssep]bx00.south) {\tiny{4}};
+\node [snode,anchor=west] (bx91) at ([xshift=\ssep]bx90.east) {\tiny{4}};
+\node [snode,anchor=west] (bx92) at ([xshift=\ssep]bx91.east) {\tiny{4}};
+9
+\node [snode,anchor=west,fill=blue!30] (by01) at ([xshift=\ssep]bx02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (by02) at ([xshift=\ssep]by01.east) {\tiny{3}};
+\node [snode,anchor=west,fill=white] (by03) at ([xshift=\ssep]by02.east) {};
+\node [snode,anchor=west,fill=blue!30] (by11) at ([xshift=\ssep]bx12.east) {\tiny{2}};
+\node [snode,anchor=west,fill=blue!30] (by12) at ([xshift=\ssep]by11.east) {\tiny{2}};
+\node [snode,anchor=west,fill=white] (by13) at ([xshift=\ssep]by12.east) {};
+\node [snode,anchor=west,fill=blue!30] (by21) at ([xshift=\ssep]bx22.east) {\tiny{1}};
+\node [snode,anchor=west,fill=gray!30] (by22) at ([xshift=\ssep]by21.east) {};
+\node [snode,anchor=west,fill=white] (by23) at ([xshift=\ssep]by22.east) {};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (bx90) (by23)] (step2) {};
+\end{pgfonlayer}
+
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (bx00) (by21)] (step2mask) {};
+
+% prediction at step 3
+\node [snode,anchor=north,fill=ugreen!30] (cx20) at ([yshift=-\bsep]bx20.south) {};
+\node [snode,anchor=west] (cx21) at ([xshift=\ssep]cx20.east) {\tiny{1}};
+\node [snode,anchor=west] (cx22) at ([xshift=\ssep]cx21.east) {\tiny{1}};
+\node [snode,anchor=north,fill=ugreen!30] (cx10) at ([yshift=-\ssep]cx20.south) {};
+\node [snode,anchor=west,fill=ugreen!30] (cx11) at ([xshift=\ssep]cx10.east) {};
+\node [snode,anchor=west] (cx12) at ([xshift=\ssep]cx11.east) {\tiny{2}};
+\node [snode,anchor=north] (cx00) at ([yshift=-\ssep]cx10.south) {\tiny{3}};
+\node [snode,anchor=west] (cx01) at ([xshift=\ssep]cx00.east) {\tiny{3}};
+\node [snode,anchor=west] (cx02) at ([xshift=\ssep]cx01.east) {\tiny{3}};
+\node [snode,anchor=north] (cx90) at ([yshift=-\ssep]cx00.south) {\tiny{4}};
+\node [snode,anchor=west] (cx91) at ([xshift=\ssep]cx90.east) {\tiny{4}};
+\node [snode,anchor=west] (cx92) at ([xshift=\ssep]cx91.east) {\tiny{4}};
+
+\node [snode,anchor=west,fill=blue!30] (cy01) at ([xshift=\ssep]cx02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (cy02) at ([xshift=\ssep]cy01.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (cy03) at ([xshift=\ssep]cy02.east) {\tiny{3}};
+\node [snode,anchor=west,fill=blue!30] (cy11) at ([xshift=\ssep]cx12.east) {\tiny{2}};
+\node [snode,anchor=west,fill=blue!30] (cy12) at ([xshift=\ssep]cy11.east) {\tiny{2}};
+\node [snode,anchor=west,fill=gray!30] (cy13) at ([xshift=\ssep]cy12.east) {};
+\node [snode,anchor=west,fill=blue!30] (cy21) at ([xshift=\ssep]cx22.east) {\tiny{1}};
+\node [snode,anchor=west,fill=gray!30] (cy22) at ([xshift=\ssep]cy21.east) {};
+\node [snode,anchor=west,fill=gray!30] (cy23) at ([xshift=\ssep]cy22.east) {};
+\node [snode,anchor=west,fill=blue!30] (cy91) at ([xshift=\ssep]cx92.east) {\tiny{4}};
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt]  [fit = (cx90) (cy23)] (step3) {};
+\end{pgfonlayer}
+
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (cx00) (cy22)] (step3mask) {};
+\node [inner sep=1pt,fill=white,opacity=0.5]  [fit = (cx90) (cx92)] (step3mask2) {};
+
+% connections
+\draw [->] ([yshift=-1pt]step0.south) -- ([yshift=1pt]step1.north);
+\draw [->] ([yshift=-1pt]step1.south) -- ([yshift=1pt]step2.north);
+\draw [->] ([yshift=-1pt]step2.south) -- ([yshift=1pt]step3.north);
+\draw [->,dotted] ([yshift=0.5cm]step0.north) -- ([yshift=1pt]step0.north) node [pos=0.4,left] (startlabel) {\scriptsize{Begin}};
+\draw [->,dotted] ([yshift=-1pt]step3.south) -- ([yshift=-1.5cm]step3.south) node [pos=0.7,left,xshift=-0.1cm] (endlabel) {\scriptsize{End}};
+
+\node [anchor=south,align=left] (inputrequests) at ([yshift=0.7cm]step0.north) {\scriptsize{Requests }\\[-6pt] \scriptsize{$\mathbf{x}_1$, $\mathbf{x}_2$, $\mathbf{x}_3$ arrived}};
+
+\node [anchor=north,align=left] (newrequest) at ([yshift=-0.3cm,xshift=-0.2cm]step1.south west) {\scriptsize{Request}\\[-6pt] \scriptsize{$\mathbf{x}_4$ arrived}};
+\draw [->] (newrequest.east) -- ([xshift=0.3cm]newrequest.east);
+\draw [->,thin] ([yshift=0.1cm]newrequest.south) .. controls +(south:0.4cm) and +(north:0.6cm) .. ([xshift=-0.6cm,yshift=0.05cm]step2.north);
+
+\begin{pgfonlayer}{background}
+\node [draw,rounded corners=2pt,inner sep=1pt,thin,dotted]  [fit = (bx90) (bx92)] (newprefillingbox) {};
+\node [draw,rounded corners=2pt,inner sep=1pt,thin,dotted]  [fit = (by02) (by22)] (newdecodingbox) {};
+\end{pgfonlayer}
+
+\node [anchor=north east] (newprefillinglabel) at ([xshift=0.2cm,yshift=-0.2cm]newprefillingbox.south) {\tiny{prefilling for $\mathbf{x}_4$}};
+\node [anchor=north west,align=left] (newdecodinglabel) at ([xshift=0.6cm,yshift=0.1cm]newdecodingbox.north east) {\tiny{one decoding step}\\[-0.25cm] \tiny{for $\mathbf{x}_1$, $\mathbf{x}_2$, $\mathbf{x}_3$}};
+\draw [->,very thin] (newprefillingbox.south) -- ([xshift=0.4cm,yshift=-0.1cm]newprefillinglabel.north);
+\draw [->,very thin] (newdecodingbox.east) -- ([xshift=0.1cm,yshift=0.1cm]newdecodinglabel.west);
+
+\node [anchor=east,align=right] (step0label) at (step0.west) {\scriptsize{Iteration 1}\\[-0.15cm] \scriptsize{(prefilling)}};
+\node [anchor=east,align=right] (step1label) at (step1.west) {\scriptsize{Iteration 2}};
+\node [anchor=east,align=right] (step2label) at (step2.west) {\scriptsize{Iteration 3}};
+\node [anchor=east,align=right] (step3label) at (step3.west) {\scriptsize{Iteration 4}};
+\node [anchor=north west] (morestepslabel) at ([xshift=0.1cm,yshift=-0.3cm]step3.south) {\scriptsize{More iterations}};
+
+\node [anchor=center,circle,minimum size=0.12cm,fill=red,inner sep=0] (begincircle) at ([yshift=0.3cm]step0.north) {};
+\node [anchor=center,circle,minimum size=0.12cm,fill=red,inner sep=0] (endcircle) at ([yshift=-1.1cm]step3.south) {};
+\node [anchor=center,circle,minimum size=0.12cm,fill=blue,inner sep=0] (arrivecircle) at ([yshift=-0.29*\bsep]step1.south) {};
+
+\node [anchor=north] (caption) at ([yshift=-3.5cm,xshift=-0.5cm]step3.north) {\small{(b) Iteration-level Scheduling}};
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

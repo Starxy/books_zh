@@ -1,0 +1,33 @@
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth,font=\small,
+  rounded/.style={draw,rounded corners=6pt,thick,align=center},
+  arrow/.style={->,thick}]
+  \path[use as bounding box] (0,0) rectangle (15.60,5.80);
+  \node[draw=blue!60!black,thick,minimum width=2.10cm,minimum height=.90cm,text=blue!60!black]
+    (ev-value) at (1.13,3.15) {$\mathrm{Value}_t$};
+  \node[rounded,minimum width=2.10cm,minimum height=.90cm] (ev-llm) at (4.06,3.15) {$\mathrm{LLM}_t$};
+  \draw[arrow] (ev-llm.north) .. controls (3.82,5.44) and (1.43,5.44) .. (ev-value.north);
+  \node at (2.58,5.37) {1. 对齐};
+  \draw[arrow] (ev-value.south) .. controls (1.44,1.09) and (3.76,1.09) .. (ev-llm.south);
+  \node at (2.58,1.10) {2. 手工演化};
+  \draw[dashed,thick] (5.73,1.05) -- (5.73,5.35);
+  \draw[blue!60!black,thick] (6.30,2.22) rectangle (8.17,4.56);
+  \node[text=blue!60!black] at (7.24,4.30) {$\mathrm{Value}_t$};
+  \node[inner sep=0pt] at (7.24,3.28)
+    {\includegraphics[width=1.37cm]{figures_zh/ch17/evolution_environment}};
+  \node[text=blue!60!black] at (7.24,2.47) {环境};
+  \node[rounded,minimum width=3.65cm,minimum height=2.45cm] (ev-agent) at (11.75,3.42) {};
+  \node at (11.75,4.37) {$\mathrm{Agent}_t$};
+  \node[rounded,minimum width=1.43cm,minimum height=.63cm] at (10.86,3.77) {感知};
+  \node[rounded,minimum width=1.43cm,minimum height=.63cm] at (10.86,2.83) {动作};
+  \node[rounded,minimum width=1.63cm,minimum height=.74cm,font=\bfseries] at (12.58,3.77) {LLM};
+  \node[draw,rounded corners=3pt,minimum width=1.63cm,minimum height=.45cm,font=\fontsize{8.5}{10}\selectfont] at (12.58,3.15) {记忆};
+  \node[draw,rounded corners=3pt,minimum width=1.63cm,minimum height=.45cm,font=\fontsize{8.5}{10}\selectfont] at (12.58,2.70) {规划／推理};
+  \draw[arrow] (8.17,4.00) -- node[above,font=\fontsize{8}{10}\selectfont] {1. 感知} (9.91,4.00);
+  \draw[arrow] (9.91,3.43) -- node[above,font=\fontsize{8}{10}\selectfont] {2. 影响} (8.17,3.43);
+  \draw[arrow] (8.17,2.85) -- node[above,font=\fontsize{8}{10}\selectfont] {3. 反馈} (9.91,2.85);
+  \draw[arrow] (13.58,4.03) to[out=40,in=90] (15.40,3.42)
+    to[out=-90,in=-30] (13.58,2.84);
+  \node[align=center,font=\fontsize{8}{10}\selectfont] at (14.55,3.43) {4. 自我演化};
+  \node[font=\small] at (2.58,.38) {(a) 大语言模型对齐};
+  \node[font=\small] at (10.66,.38) {(b) 智能体对齐};
+\end{tikzpicture}

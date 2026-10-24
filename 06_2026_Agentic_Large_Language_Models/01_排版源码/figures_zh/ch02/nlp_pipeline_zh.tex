@@ -1,0 +1,32 @@
+% 原图为 part1/visuals/nlp_pipeline.pdf 第 1 页中的 CoreNLP 系统示意图。
+% 各分析器与标注对象双向连接；执行流单独向下，不新增分析器间的边。
+\resizebox{.95\linewidth}{!}{%
+\begin{tikzpicture}[
+    font=\small,
+    analyser/.style={draw,rounded corners=2pt,fill=blue!5,minimum width=4.4cm,minimum height=.54cm,align=center},
+    object/.style={draw,rounded corners=5pt,fill=green!6,minimum width=2.2cm,minimum height=7.5cm,align=center},
+    doc/.style={draw,fill=yellow!8,minimum width=1.55cm,minimum height=1cm,align=center},
+    flow/.style={-{Stealth[length=2mm]},line width=.7pt}
+]
+\node[object] (obj) at (6.1,0) {标注对象};
+\foreach \name/\yy/\zh/\code in {
+    tok/3.35/词元化/tokenize,
+    sent/2.4/分句/ssplit,
+    pos/1.45/词性标注/pos,
+    lemma/.5/形态分析/lemma,
+    ner/-.45/命名实体识别/ner,
+    parse/-1.4/句法分析/parse,
+    coref/-2.35/共指消解/dcoref,
+    other/-3.3/其他标注器/{gender, sentiment}}
+{
+    \node[analyser] (\name) at (1.8,\yy) {\zh};
+    \node[font=\ttfamily\scriptsize,anchor=north,inner sep=1pt] at (1.8,\yy-.28) {(\code)};
+    \draw[<->,>=Stealth,line width=.6pt] (\name.east) -- (\name.east -| obj.west);
+}
+\node[doc] (raw) at (9.1,1) {原始文本};
+\node[doc] (annotated) at (9.1,-1.5) {已标注文本};
+\draw[flow] (raw.west) -- (raw.west -| obj.east);
+\draw[flow] (annotated.west -| obj.east) -- (annotated.west);
+\draw[flow] (-.9,3.65) -- node[rotate=90,above,inner sep=4pt] {执行流} (-.9,-3.8);
+\end{tikzpicture}%
+}

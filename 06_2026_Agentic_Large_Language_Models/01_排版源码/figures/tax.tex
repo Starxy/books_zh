@@ -1,0 +1,40 @@
+\tikzset{
+        my node/.style={
+            draw=gray,
+            inner color=gray!5,
+            outer color=gray!10,
+            thick,
+            minimum width=1cm,
+            rounded corners=3,
+            text height=1.5ex,
+            text depth=0ex,
+            font=\sffamily,
+        }
+    }
+    \begin{forest}
+        for tree={
+            my node,
+            l sep+=5pt,
+            grow'=east,
+            edge={gray, thick},
+            parent anchor=east,
+            child anchor=west,
+            if n children=0{tier=last}{},
+            edge path={
+                \noexpand\path [draw, \forestoption{edge}] (!u.parent anchor) -- +(10pt,0) |- (.child anchor)\forestoption{edge label};
+            },
+            if={isodd(n_children())}{
+                for children={
+                    if={equal(n,(n_children("!u")+1)/2)}{calign with current}{}
+                }
+            }{}
+        }
+        [智能体大语言模型
+        [推理
+        [多步][自我反思][检索增强]]
+        [行动
+        [世界模型／VLA][机器人／工具][助手]]
+        [交互
+        [社会能力][基于角色的交互][开放式社会]]
+        ]
+    \end{forest}

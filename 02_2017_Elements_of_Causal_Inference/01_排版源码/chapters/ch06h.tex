@@ -1,0 +1,65 @@
+% 原书第 118—120 页；6.7。
+\section{do 演算}
+\label{sec:ch06-do-calculus}
+
+再次考虑变量 $\mathbf V$ 上的结构因果模型。有时，可以不通过调整公式 (6.13)，而用其他方法计算干预分布 $p^{\mathfrak C;\dox{X:=x}}$。因此，如果干预分布 $p^{\mathfrak C;\dox{X:=x}}(y)$ 能够从观测分布与图结构计算出来，就称其\textbf{可识别（identifiable）}。例如，若 $(X,Y)$ 存在有效调整集，则 $p^{\mathfrak C;\dox{X:=x}}(y)$ 必然可识别。
+
+Pearl［2009，定理 3.4.1］提出了由三条规则组成的\textbf{do 演算（do-calculus）}。给定图 $\mathcal G$ 及两两不相交的子集 $\mathbf X,\mathbf Y,\mathbf Z,\mathbf W$，有以下规则。
+\begin{enumerate}[label=\arabic*.]
+ \item \textbf{插入或删除观测：}
+ \[
+ p^{\mathfrak C;\dox{\mathbf X:=\mathbf x}}(\mathbf y\mid\mathbf z,\mathbf w)
+ =p^{\mathfrak C;\dox{\mathbf X:=\mathbf x}}(\mathbf y\mid\mathbf w),
+ \]
+ 条件是：在删除所有进入 $\mathbf X$ 的边后所得的图中，$\mathbf Y$ 与 $\mathbf Z$ 被 $\mathbf X,\mathbf W$ d-分离。
+ \item \textbf{干预与观测互换：}
+ \[
+ p^{\mathfrak C;\dox{\mathbf X:=\mathbf x,\mathbf Z=\mathbf z}}(\mathbf y\mid\mathbf w)
+ =p^{\mathfrak C;\dox{\mathbf X:=\mathbf x}}(\mathbf y\mid\mathbf z,\mathbf w),
+ \]
+ 条件是：在删除所有进入 $\mathbf X$ 的边及所有从 $\mathbf Z$ 发出的边后所得的图中，$\mathbf Y$ 与 $\mathbf Z$ 被 $\mathbf X,\mathbf W$ d-分离。
+ \item \textbf{插入或删除干预：}
+ \[
+ p^{\mathfrak C;\dox{\mathbf X:=\mathbf x,\mathbf Z=\mathbf z}}(\mathbf y\mid\mathbf w)
+ =p^{\mathfrak C;\dox{\mathbf X:=\mathbf x}}(\mathbf y\mid\mathbf w),
+ \]
+ 条件是：在删除所有进入 $\mathbf X$ 和 $\mathbf Z(\mathbf W)$ 的边后所得的图中，$\mathbf Y$ 与 $\mathbf Z$ 被 $\mathbf X,\mathbf W$ d-分离。这里，$\mathbf Z(\mathbf W)$ 是 $\mathbf Z$ 的一个子集，其节点在从 $\mathcal G$ 删除所有进入 $\mathbf X$ 的边后所得的图中，不是 $\mathbf W$ 中任何节点的祖先节点。
+\end{enumerate}
+
+\begin{theorem}[do 演算]
+以下陈述成立。
+\begin{enumerate}[label=(\roman*)]
+ \item 这些规则是完备的，也就是说，所有可识别的干预分布，都能通过反复应用上述三条规则计算出来［Huang and Valtorta, 2006；Shpitser and Pearl, 2006］。
+ \item 事实上，Tian［2002］提出的一个算法，能够保证找到所有可识别的干预分布［Huang and Valtorta, 2006；Shpitser and Pearl, 2006］。
+ \item 干预分布的可识别性存在一个必要且充分的图判据［Shpitser and Pearl, 2006，推论 3］，它基于所谓的\textbf{篱结构（hedge）}；另见 Huang and Valtorta［2006］。
+\end{enumerate}
+\end{theorem}
+
+作为 do 演算的一个推论，可以得到前门调整，见习题 6.65。
+
+\begin{example}[前门调整]
+设 $\mathfrak C$ 是一个结构因果模型，其对应图为
+\begin{center}
+\begin{tikzpicture}[causal,x=1.3cm,y=1.1cm]
+ \node[latent] (ch06fd-u) at (0,1.2) {$U$};
+ \node[vtx] (ch06fd-x) at (-1.2,0) {$X$};
+ \node[vtx] (ch06fd-z) at (0,0) {$Z$};
+ \node[vtx] (ch06fd-y) at (1.2,0) {$Y$};
+ \draw[ed] (ch06fd-u)--(ch06fd-x);
+ \draw[ed] (ch06fd-u)--(ch06fd-y);
+ \draw[ed] (ch06fd-x)--(ch06fd-z);
+ \draw[ed] (ch06fd-z)--(ch06fd-y);
+\end{tikzpicture}
+\end{center}
+若未观测 $U$，就无法应用后门准则。事实上，此时不存在有效调整集。不过，只要 $p^{\mathfrak C}(x,z)>0$，do 演算仍然给出
+\begin{equation}
+ p^{\mathfrak C;\dox{X:=x}}(y)
+ =\sum_zp^{\mathfrak C}(z\mid x)
+ \sum_{\widetilde x}p^{\mathfrak C}(y\mid\widetilde x,z)p^{\mathfrak C}(\widetilde x).
+ \tag{6.23}
+\end{equation}
+在 $X$、$Y$ 之外额外观测 $Z$，就能揭示因果信息。这很好地说明，我们也可以通过观测从 $X$ 向 $Y$ 传递“信号”的“通道”（这里是 $Z$），来探索因果关系。
+\end{example}
+
+Bareinboim and Pearl［2014］研究了\textbf{可迁移性（transportability）}问题。他们同样关心干预分布，但允许纳入从其他结构因果模型获得的知识，即观测分布与干预分布；这些模型在部分结构赋值上与目标模型一致，在其他赋值上则不同。
+\FloatBarrier

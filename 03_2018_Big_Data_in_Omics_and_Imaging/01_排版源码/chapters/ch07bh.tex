@@ -1,0 +1,81 @@
+% 原章第81页7.3.3.4标题—第83页附录7.A标题之前，含软件续文。
+\subsubsection{利用带混杂因子加性噪声模型识别混杂因子的算法}
+
+现在可以介绍利用 ANMC 识别混杂因子的算法（Janzing et al. 2009）。假设数据分为训练数据集 $D_{train}=\{x_i,y_i,i=1,\ldots,n\}$ 和测试数据集 $D_{test}=\{x_{new_j},y_{new_j},j=1,\ldots,m\}$。在研究混杂因子发现算法之前，先介绍初始化算法。
+
+\Needspace{5\baselineskip}
+\noindent\textbf{结论 7.29\quad 初始化}
+
+\noindent\textbf{步骤1。}利用 Isomap 算法（Izenman 2008），求初始猜测值 $z_k^{(0)}$，$k=1,\ldots,n+m$。令
+\[
+Z_{train}^{(0)}=[z_1^{(0)},\ldots,z_n^{(0)}],\qquad
+Z_{test}^{(0)}=[z_{n+1}^{(0)},\ldots,z_{n+m}^{(0)}].
+\]
+设 $t=0$。
+
+\noindent\textbf{步骤2。}固定 $z_k^{(t)}$，利用结论7.27（或结论7.28），将 $x$、$y$ 分别对 $z$ 回归，得到
+\[
+\widehat x=f(z_{test}^{(t)})=K(z_{test}^{(t)},Z_{Train}^{(t)})^T\widehat\alpha^{(t)},
+\]
+其中
+\[
+\widehat\alpha^{(t)}=\bigl(K(Z_{train}^{(t)},Z_{train}^{(t)})+(\widehat\sigma_n^2)^{(t)}I\bigr)^{-1}x_{train},
+\]
+以及
+\[
+\widehat y=g(z_{test}^{(t)})=K(z_{test}^{(t)},Z_{Train}^{(t)})^T\widehat\alpha^{(t)},
+\]
+其中
+\[
+\widehat\beta^{(t)}=\bigl(K(Z_{train}^{(t)},Z_{train}^{(t)})+(\widehat\sigma_n^2)^{(t)}I\bigr)^{-1}y_{train}.
+\]
+
+\noindent\textbf{步骤3。}固定曲线 $f(z)$ 和 $g(z)$，将每个数据点 $(x_k,y_k)$（$k=1,\ldots,n+m$）投影到曲线上最近的点，寻找满足下式的 $z_k^{(t+1)}$：
+\[
+z_k^{(t+1)}=\argmin_{z^t}\bigl\|(f(z_{test}^{(t)}),g(z_{test}^{(t)})-(x_k,y_k)\bigr\|_2.
+\]
+
+\noindent\textbf{步骤4。}检查收敛。如果 $|z_k^{(t+1)}-z_k^{(t)}|<\varepsilon$，则停止，并令 $z_k\leftarrow z_k^{(t+1)}$；否则令 $z_k^{(t)}\leftarrow z_k^{(t+1)}$，返回步骤2。
+
+利用 ANMC 识别混杂因子的算法概括如下。
+
+\Needspace{5\baselineskip}
+\noindent\textbf{结论 7.30\quad 利用 ANMC 识别混杂因子的算法}
+
+\noindent\textbf{步骤1。}初始化。初始化算法见结论7.29。将估计值集合 $\{z_i,i=1,\ldots,n+m\}$，用作下述投影最小化的初值。
+
+\noindent\textbf{步骤2。}重复。
+
+\noindent\textbf{步骤3。}投影。使用 Nelder–Mead 方法（Lagarias et al. 1998）等直接搜索方法，求解无约束优化问题：
+\[
+\min_Z\quad \frac1{n^2}\operatorname{tr}\bigl(
+K_{\widehat N_X}HK_{\widehat N_Y}H
++K_{\widehat N_X}HK_{\widehat Z}H
++K_{\widehat N_Y}HK_{\widehat Z}H\bigr),
+\]
+其中，核的定义见第7.3.3.2节；噪声 $N_X,N_Y$ 通过 $\widehat N_X=x-f(z)$、$\widehat N_Y=y-g(z)$ 计算；$f(z),g(z)$ 则由高斯过程回归计算（结论7.27或7.28）。
+
+\noindent\textbf{步骤4。}检验独立性。如果 $\widehat N_X,\widehat N_Y,\widehat Z$ 两两独立，则停止，混杂因子已被找到。输出混杂因子在测试数据点处的值 $\widehat z_{n+1},\ldots,\widehat z_{n+m}$ 以及函数 $f(\widehat z_j)$、$g(\widehat z_j)$；否则进入步骤5。
+
+\noindent\textbf{步骤5。}高斯过程回归。利用结论7.27或7.28，以及当前估计的混杂因子 $\widehat Z_*$，进行回归：
+\[
+x=f(z)+N_X\qquad\text{和}\qquad y=g(z)+N_Y.
+\]
+设 $\widehat Z^{(0)}=\widehat Z_*$，返回步骤3。
+
+直到迭代达到预设次数 $T$，停止。这表明，数据不能由带混杂因子的加性噪声模型拟合。
+
+\section*{软件包}
+\addcontentsline{toc}{section}{软件包}
+
+实现基于线性非高斯无环模型的因果发现算法的完整 MATLAB® 代码包，可从以下网址下载：
+\par\noindent\url{https://sites.google.com/site/sshimizu06/lingam}。
+
+实现线性因果模型检验算法的代码包可从以下网址下载：
+\par\noindent\url{http://webdav.tuebingen.mpg.de/causality/}。
+
+CAM 软件包通过拟合因果加性模型（causal additive model，CAM），估计潜在过程的因果结构，可从以下网址下载：
+\par\noindent\texttt{https://cran.r project.org/web/packages/CAM/CAM.pdf}。
+
+R 的 pcalg 软件包可根据观测和／或干预数据，进行因果结构学习与因果效应估计，可从以下网址下载：
+\par\noindent\texttt{https://cran.r project.org/web/packages/pcalg/index.html}。

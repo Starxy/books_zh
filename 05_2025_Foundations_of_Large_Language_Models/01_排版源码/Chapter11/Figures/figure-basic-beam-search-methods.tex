@@ -1,0 +1,256 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.12cm}
+
+\tikzstyle{lnode} = [minimum width=3.0cm,minimum height=0.6cm,inner sep=2pt,draw,fill=white,rounded corners=0pt]
+\tikzstyle{snode} = [minimum width=0.33cm,minimum height=0.33cm,inner sep=0pt,draw,fill=white]
+
+% inference (batch size = 1)
+\begin{scope}
+
+\node [snode,anchor=west,fill=red!30] (x00) at (0,0) {};
+\node [snode,anchor=east,fill=red!30] (x01) at ([xshift=-\ssep]x00.west) {};
+\node [snode,anchor=east,fill=red!30] (x02) at ([xshift=-\ssep]x01.west) {};
+\node [snode,anchor=east,fill=red!30] (x03) at ([xshift=-\ssep]x02.west) {};
+\node [snode,anchor=east,fill=red!30] (x04) at ([xshift=-\ssep]x03.west) {};
+
+\node [snode,anchor=west,fill=blue!30] (y01) at ([xshift=2*\ssep]x00.east) {};
+\node [snode,anchor=west,fill=blue!30] (y02) at ([xshift=\ssep]y01.east) {};
+\node [snode,anchor=west,fill=blue!30] (y03) at ([xshift=\ssep]y02.east) {};
+\node [snode,anchor=west,fill=blue!30] (y04) at ([xshift=\ssep]y03.east) {};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]x04.north west) -- ([yshift=0.1cm,xshift=0.0cm]x00.north east) node [above,pos=0.5,yshift=0.1cm] {\scriptsize{预填充}};
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]y01.north west) -- ([yshift=0.1cm,xshift=0.0cm]y04.north east) node [above,pos=0.5,yshift=0.1cm] {\scriptsize{解码}};
+
+\node [anchor=north] (caption) at ([yshift=-2cm]x00.south east) {\footnotesize{(a) 批大小 $= 1$}};
+
+\end{scope}
+
+% inference (batch size = 4)
+\begin{scope}[xshift=7.5cm]
+
+\node [snode,anchor=west,fill=red!30] (x00) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x01) at ([xshift=-\ssep]x00.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x02) at ([xshift=-\ssep]x01.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x03) at ([xshift=-\ssep]x02.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x04) at ([xshift=-\ssep]x03.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=ugreen!30] (x05) at ([xshift=-\ssep]x04.west) {\tiny{填充}};
+
+\node [snode,anchor=west,fill=blue!30] (y01) at ([xshift=2*\ssep]x00.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y02) at ([xshift=\ssep]y01.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y03) at ([xshift=\ssep]y02.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y04) at ([xshift=\ssep]y03.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=gray!30] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=gray!30] (y06) at ([xshift=\ssep]y05.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x10) at ([yshift=-\ssep]x00.south) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x11) at ([xshift=-\ssep]x10.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x12) at ([xshift=-\ssep]x11.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x13) at ([xshift=-\ssep]x12.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=ugreen!30] (x14) at ([xshift=-\ssep]x13.west) {\tiny{填充}};
+\node [snode,anchor=east,fill=ugreen!30] (x15) at ([xshift=-\ssep]x14.west) {\tiny{填充}};
+
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=2*\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y12) at ([xshift=\ssep]y11.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y13) at ([xshift=\ssep]y12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=gray!30] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=gray!30] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=gray!30] (y16) at ([xshift=\ssep]y15.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x20) at ([yshift=-\ssep]x10.south) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x21) at ([xshift=-\ssep]x20.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x22) at ([xshift=-\ssep]x21.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=ugreen!30] (x23) at ([xshift=-\ssep]x22.west) {\tiny{填充}};
+\node [snode,anchor=east,fill=ugreen!30] (x24) at ([xshift=-\ssep]x23.west) {\tiny{填充}};
+\node [snode,anchor=east,fill=ugreen!30] (x25) at ([xshift=-\ssep]x24.west) {\tiny{填充}};
+
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=2*\ssep]x20.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=gray!30] (y23) at ([xshift=\ssep]y22.east) {};
+\node [snode,anchor=west,fill=gray!30] (y24) at ([xshift=\ssep]y23.east) {};
+\node [snode,anchor=west,fill=gray!30] (y25) at ([xshift=\ssep]y24.east) {};
+\node [snode,anchor=west,fill=gray!30] (y26) at ([xshift=\ssep]y25.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x30) at ([yshift=-\ssep]x20.south) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x31) at ([xshift=-\ssep]x30.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x32) at ([xshift=-\ssep]x31.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x33) at ([xshift=-\ssep]x32.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x34) at ([xshift=-\ssep]x33.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x35) at ([xshift=-\ssep]x34.west) {\scriptsize{4}};
+
+\node [snode,anchor=west,fill=blue!30] (y31) at ([xshift=2*\ssep]x30.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y32) at ([xshift=\ssep]y31.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y33) at ([xshift=\ssep]y32.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y34) at ([xshift=\ssep]y33.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y35) at ([xshift=\ssep]y34.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y36) at ([xshift=\ssep]y35.east) {\scriptsize{4}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]x05.north west) -- ([yshift=0.1cm,xshift=0.0cm]x00.north east) node [above,pos=0.5,yshift=0.1cm] {\scriptsize{预填充}};
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]y01.north west) -- ([yshift=0.1cm,xshift=0.0cm]y06.north east) node [above,pos=0.5,yshift=0.1cm] {\scriptsize{解码}};
+
+\node [anchor=north] (caption) at ([yshift=-2cm]x00.south east) {\footnotesize{(b) 批大小 $= 4$}};
+
+\end{scope}
+
+% inference (batch size = 4, sorted by length)
+\begin{scope}[yshift=-5.3cm]
+
+\node [snode,anchor=west,fill=red!30] (x00) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x01) at ([xshift=-\ssep]x00.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x02) at ([xshift=-\ssep]x01.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x03) at ([xshift=-\ssep]x02.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x04) at ([xshift=-\ssep]x03.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=ugreen!30] (x05) at ([xshift=-\ssep]x04.west) {\tiny{填充}};
+
+\node [snode,anchor=west,fill=blue!30] (y01) at ([xshift=2*\ssep]x00.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y02) at ([xshift=\ssep]y01.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y03) at ([xshift=\ssep]y02.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y04) at ([xshift=\ssep]y03.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y05) at ([xshift=\ssep]y04.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y06) at ([xshift=\ssep]y05.east) {\scriptsize{1}};
+
+\node [snode,anchor=north,fill=red!30] (x10) at ([yshift=-\ssep]x00.south) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x11) at ([xshift=-\ssep]x10.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x12) at ([xshift=-\ssep]x11.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x13) at ([xshift=-\ssep]x12.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x14) at ([xshift=-\ssep]x13.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=ugreen!30] (x15) at ([xshift=-\ssep]x14.west) {\tiny{填充}};
+
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=2*\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y12) at ([xshift=\ssep]y11.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y13) at ([xshift=\ssep]y12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y14) at ([xshift=\ssep]y13.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y15) at ([xshift=\ssep]y14.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=gray!30] (y16) at ([xshift=\ssep]y15.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x20) at ([yshift=-\ssep]x10.south) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x21) at ([xshift=-\ssep]x20.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x22) at ([xshift=-\ssep]x21.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x23) at ([xshift=-\ssep]x22.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x24) at ([xshift=-\ssep]x23.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x25) at ([xshift=-\ssep]x24.west) {\scriptsize{3}};
+
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=2*\ssep]x20.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y23) at ([xshift=\ssep]y22.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y24) at ([xshift=\ssep]y23.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y25) at ([xshift=\ssep]y24.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=gray!30] (y26) at ([xshift=\ssep]y25.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x30) at ([yshift=-\ssep]x20.south) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x31) at ([xshift=-\ssep]x30.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x32) at ([xshift=-\ssep]x31.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x33) at ([xshift=-\ssep]x32.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x34) at ([xshift=-\ssep]x33.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x35) at ([xshift=-\ssep]x34.west) {\scriptsize{4}};
+
+\node [snode,anchor=west,fill=blue!30] (y31) at ([xshift=2*\ssep]x30.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y32) at ([xshift=\ssep]y31.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y33) at ([xshift=\ssep]y32.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y34) at ([xshift=\ssep]y33.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y35) at ([xshift=\ssep]y34.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y36) at ([xshift=\ssep]y35.east) {\scriptsize{4}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]x05.north west) -- ([yshift=0.1cm,xshift=0.0cm]x00.north east) node [above,pos=0.5,yshift=0.1cm] {\scriptsize{预填充}};
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]y01.north west) -- ([yshift=0.1cm,xshift=0.0cm]y06.north east) node [above,pos=0.5,yshift=0.1cm] {\scriptsize{解码}};
+
+\node [anchor=north] (caption) at ([yshift=-2.9cm,xshift=0.1cm]x00.south east) {\footnotesize{(c) 批大小 $= 4$（序列长度相近）}};
+
+\end{scope}
+
+% inference (batch size = 4)
+\begin{scope}[xshift=7.5cm,yshift=-5.3cm]
+
+\node [snode,anchor=west,fill=red!30] (x00) at (0,0) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x01) at ([xshift=-\ssep]x00.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x02) at ([xshift=-\ssep]x01.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x03) at ([xshift=-\ssep]x02.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=red!30] (x04) at ([xshift=-\ssep]x03.west) {\scriptsize{1}};
+\node [snode,anchor=east,fill=ugreen!30] (x05) at ([xshift=-\ssep]x04.west) {\tiny{填充}};
+
+\node [snode,anchor=west,fill=blue!30] (y01) at ([xshift=2*\ssep]x00.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y02) at ([xshift=\ssep]y01.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y03) at ([xshift=\ssep]y02.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=blue!30] (y04) at ([xshift=\ssep]y03.east) {\scriptsize{1}};
+\node [snode,anchor=west,fill=gray!30] (y05) at ([xshift=\ssep]y04.east) {};
+\node [snode,anchor=west,fill=gray!30] (y06) at ([xshift=\ssep]y05.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x10) at ([yshift=-\ssep]x00.south) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x11) at ([xshift=-\ssep]x10.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x12) at ([xshift=-\ssep]x11.west) {\scriptsize{2}};
+\node [snode,anchor=east,fill=red!30] (x13) at ([xshift=-\ssep]x12.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x14) at ([xshift=-\ssep]x13.west) {\scriptsize{3}};
+\node [snode,anchor=east,fill=red!30] (x15) at ([xshift=-\ssep]x14.west) {\scriptsize{3}};
+\draw [-,thick] ([xshift=-0.5*\ssep,yshift=1pt]x12.north west) -- ([xshift=-0.5*\ssep,yshift=-1pt]x12.south west);
+
+\node [snode,anchor=west,fill=blue!30] (y11) at ([xshift=2*\ssep]x10.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y12) at ([xshift=\ssep]y11.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=blue!30] (y13) at ([xshift=\ssep]y12.east) {\scriptsize{2}};
+\node [snode,anchor=west,fill=gray!30] (y14) at ([xshift=\ssep]y13.east) {};
+\node [snode,anchor=west,fill=gray!30] (y15) at ([xshift=\ssep]y14.east) {};
+\node [snode,anchor=west,fill=gray!30] (y16) at ([xshift=\ssep]y15.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x20) at ([yshift=-\ssep]x10.south) {\scriptsize{5}};
+\node [snode,anchor=east,fill=red!30] (x21) at ([xshift=-\ssep]x20.west) {\scriptsize{5}};
+\node [snode,anchor=east,fill=red!30] (x22) at ([xshift=-\ssep]x21.west) {\scriptsize{5}};
+\node [snode,anchor=east,fill=red!30] (x23) at ([xshift=-\ssep]x22.west) {\scriptsize{5}};
+\node [snode,anchor=east,fill=red!30] (x24) at ([xshift=-\ssep]x23.west) {\scriptsize{4}};
+\node [snode,anchor=east,fill=red!30] (x25) at ([xshift=-\ssep]x24.west) {\scriptsize{4}};
+\draw [-,thick] ([xshift=-0.5*\ssep,yshift=1pt]x23.north west) -- ([xshift=-0.5*\ssep,yshift=-1pt]x23.south west);
+
+\node [snode,anchor=west,fill=blue!30] (y21) at ([xshift=2*\ssep]x20.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y22) at ([xshift=\ssep]y21.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y23) at ([xshift=\ssep]y22.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=blue!30] (y24) at ([xshift=\ssep]y23.east) {\scriptsize{3}};
+\node [snode,anchor=west,fill=gray!30] (y25) at ([xshift=\ssep]y24.east) {};
+\node [snode,anchor=west,fill=gray!30] (y26) at ([xshift=\ssep]y25.east) {};
+
+\node [snode,anchor=north,fill=red!30] (x30) at ([yshift=-\ssep]x20.south) {\scriptsize{6}};
+\node [snode,anchor=east,fill=red!30] (x31) at ([xshift=-\ssep]x30.west) {\scriptsize{6}};
+\node [snode,anchor=east,fill=red!30] (x32) at ([xshift=-\ssep]x31.west) {\scriptsize{6}};
+\node [snode,anchor=east,fill=red!30] (x33) at ([xshift=-\ssep]x32.west) {\scriptsize{6}};
+\node [snode,anchor=east,fill=red!30] (x34) at ([xshift=-\ssep]x33.west) {\scriptsize{6}};
+\node [snode,anchor=east,fill=red!30] (x35) at ([xshift=-\ssep]x34.west) {\scriptsize{6}};
+
+\node [snode,anchor=west,fill=blue!30] (y31) at ([xshift=2*\ssep]x30.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y32) at ([xshift=\ssep]y31.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=blue!30] (y33) at ([xshift=\ssep]y32.east) {\scriptsize{4}};
+\node [snode,anchor=west,fill=gray!30] (y34) at ([xshift=\ssep]y33.east) {};
+\node [snode,anchor=west,fill=gray!30] (y35) at ([xshift=\ssep]y34.east) {};
+\node [snode,anchor=west,fill=gray!30] (y36) at ([xshift=\ssep]y35.east) {};
+
+\node [snode,anchor=north,fill=blue!30] (y41) at ([yshift=-\ssep]y31.south) {\scriptsize{5}};
+\node [snode,anchor=west,fill=blue!30] (y42) at ([xshift=\ssep]y41.east) {\scriptsize{5}};
+\node [snode,anchor=west,fill=blue!30] (y43) at ([xshift=\ssep]y42.east) {\scriptsize{5}};
+\node [snode,anchor=west,fill=blue!30] (y44) at ([xshift=\ssep]y43.east) {\scriptsize{5}};
+\node [snode,anchor=west,fill=blue!30] (y45) at ([xshift=\ssep]y44.east) {\scriptsize{5}};
+\node [snode,anchor=west,fill=gray!30] (y46) at ([xshift=\ssep]y45.east) {};
+
+\node [snode,anchor=north,fill=blue!30] (y51) at ([yshift=-\ssep]y41.south) {\scriptsize{6}};
+\node [snode,anchor=west,fill=blue!30] (y52) at ([xshift=\ssep]y51.east) {\scriptsize{6}};
+\node [snode,anchor=west,fill=blue!30] (y53) at ([xshift=\ssep]y52.east) {\scriptsize{6}};
+\node [snode,anchor=west,fill=blue!30] (y54) at ([xshift=\ssep]y53.east) {\scriptsize{6}};
+\node [snode,anchor=west,fill=blue!30] (y55) at ([xshift=\ssep]y54.east) {\scriptsize{6}};
+\node [snode,anchor=west,fill=blue!30] (y56) at ([xshift=\ssep]y55.east) {\scriptsize{6}};
+
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]x05.north west) -- ([yshift=0.1cm,xshift=0.0cm]x00.north east) node [above,pos=0.5,yshift=0.1cm] (prefilllabel) {\scriptsize{预填充}};
+\draw [decoration={brace,amplitude=4pt},decorate] ([yshift=0.1cm,xshift=0.0cm]y01.north west) -- ([yshift=0.1cm,xshift=0.0cm]y06.north east) node [above,pos=0.5,yshift=0.1cm] (decodelabel) {\scriptsize{解码}};
+
+\draw [-] ([xshift=-\ssep,yshift=1cm]y01.north west) -- ([xshift=-\ssep,yshift=-0.2cm]y51.south west);
+
+\node [anchor=south] (device1) at (prefilllabel.north) {\scriptsize{引擎 1}};
+\node [anchor=south] (device2) at (decodelabel.north) {\scriptsize{引擎 2}};
+
+\draw [->] ([yshift=1pt]device1.45) .. controls +(north:0.5cm) and +(north:0.5cm) .. ([yshift=1pt]device2.135) node [pos=0.5,above] {\scriptsize{传输 KV 缓存}};
+
+\node [anchor=north] (caption) at ([yshift=-2.9cm]x00.south east) {\footnotesize{(d) 预填充与解码分离}};
+
+\end{scope}
+
+
+\end{tikzpicture}
+\end{center}

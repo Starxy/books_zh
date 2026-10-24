@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\centering
+\caption{粗估计量和未截断 TMLE 对 12 个季度（$t_0=11$）时六个累积风险差（RD）$\psi^{\theta_1,\theta_2}$ 的推断比较。}
+\label{tab:ch16-one}
+\begingroup\scriptsize
+\setlength{\tabcolsep}{2.0pt}\renewcommand{\arraystretch}{1.2}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}ccrrrrrrrrrrr@{}}
+\toprule
+& & \multicolumn{5}{c}{粗估计} & \multicolumn{6}{c}{TMLE}\\
+\cmidrule(lr){3-7}\cmidrule(l){8-13}
+$\theta_1$ & $\theta_2$ & $\psi_n^{\theta_1,\theta_2}$ & $\Gamma_n^{\theta_1,\theta_2}$ & $\psi_n^{\theta_1,\theta_2,-}$ & $\psi_n^{\theta_1,\theta_2,+}$ & $p$ & $\psi_n^{\theta_1,\theta_2,*}$ & $\Gamma_n^{\theta_1,\theta_2,*}$ & $\psi_n^{\theta_1,\theta_2,*,-}$ & $\psi_n^{\theta_1,\theta_2,*,+}$ & $p^*$ & RE\\
+\midrule
+$8.5$ & $8.0$ & $0.0013$ & $0.0015$ & $-0.0016$ & $0.0042$ & $0.386$ & $0.0070$ & $0.0038$ & $-0.0004$ & $0.0143$ & $0.064$ & $1.07$\\
+$8.5$ & $7.5$ & $0.0028$ & $0.0030$ & $-0.0032$ & $0.0088$ & $0.357$ & $0.0221$ & $0.0065$ & $0.0093$ & $0.0349$ & $0.001$ & $1.09$\\
+$8.5$ & $7.0$ & $0.0335$ & $0.0111$ & $0.0116$ & $0.0553$ & $0.003$ & $0.0386$ & $0.0112$ & $0.0166$ & $0.0606$ & $0.001$ & $1.11$\\
+$8.0$ & $7.5$ & $0.0015$ & $0.0027$ & $-0.0037$ & $0.0068$ & $0.574$ & $0.0151$ & $0.0059$ & $0.0035$ & $0.0267$ & $0.011$ & $1.09$\\
+$8.0$ & $7.0$ & $0.0322$ & $0.0111$ & $0.0105$ & $0.0538$ & $0.004$ & $0.0316$ & $0.0112$ & $0.0097$ & $0.0535$ & $0.005$ & $1.11$\\
+$7.5$ & $7.0$ & $0.0307$ & $0.0108$ & $0.0096$ & $0.0518$ & $0.004$ & $0.0165$ & $0.0103$ & $-0.0038$ & $0.0368$ & $0.110$ & $1.11$\\
+\bottomrule
+\end{tabular}}
+\endgroup
+\par\smallskip\begin{minipage}{\textwidth}\footnotesize
+TMLE 基于干扰参数的 SL 估计量，即 $g^\theta_{n,t,\mathrm{SL}}$ 和 $Q^\theta_{n,\mathrm{SL}}$ 构造；上标 $*$ 用于将其与粗估计量区别。基于 $g_{n,t,\mathrm{SL}}$ 的风险函数 IPW 估计量（见表 16.2）的标准误与 TMLE 标准误之比，记为 RE。
+\end{minipage}
+\end{table}

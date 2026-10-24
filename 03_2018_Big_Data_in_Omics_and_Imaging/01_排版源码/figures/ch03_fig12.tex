@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,every node/.style={font=\small},
+ b/.style={draw=inkblue,align=center,minimum width=2.5cm,minimum height=1.1cm}]
+\node[b] (c312a) at (0,2.4) {线性系统\\$h(n)$};
+\node[b] (c312b) at (0,0) {线性系统\\$h(n)$};
+\node[anchor=east,font=\scriptsize] (c312in1) at (-2.3,2.4)
+ {$x(n)=\displaystyle\sum_{j=-\infty}^{j=\infty}x(j)\delta(n-j)$};
+\node[anchor=east] (c312in2) at (-2.3,0) {$x(n)$};
+\node[anchor=west,font=\scriptsize,align=left] (c312out1) at (2.3,2.4)
+ {$y(n)=\displaystyle\sum_{j=-\infty}^{\infty}x(j)h(n-j)$};
+\node[anchor=west,font=\scriptsize,align=left] (c312out2) at (2.3,0)
+ {$\begin{aligned}y(n)&=\sum_{j=-\infty}^{\infty}x(j)h(n-j)\\&=x(n)*h(n)\end{aligned}$};
+\draw[->,green!55!black] (c312in1.east)--(c312a.west);
+\draw[->,green!55!black] (c312in2.east)--(c312b.west);
+\draw[->,green!55!black] (c312a.east)--(c312out1.west);
+\draw[->,green!55!black] (c312b.east)--(c312out2.west);
+\node[text=red!70!black] at (0,-1) {卷积};
+\end{tikzpicture}
+\origfig{12}{线性系统的冲激响应与卷积。}
+\label{fig:ch03-12}
+\end{figure}

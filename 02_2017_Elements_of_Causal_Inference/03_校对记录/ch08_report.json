@@ -1,0 +1,434 @@
+{
+  "chapter": "ch08",
+  "status": "complete",
+  "title": "与机器学习的联系（二）",
+  "compiled_pdf": "work/elements_book/build/ch08/driver.pdf",
+  "pages": 10,
+  "hanzi": 5788,
+  "pdf_sha256": "4e92976b5a465b0de9dbbcb47ee9f312ff3557d9d866b4ac7a0e68577b706465",
+  "source_pdf": "work/elements_book/pdf_clean/ch08.pdf",
+  "source_pages": 14,
+  "source_content_pages": 13,
+  "source_printed_pages": "157–169；分章第14页为空白页",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch08.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch08a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch08b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch08c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/chapters/ch08d.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch08_figure_8_2_paths.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch08_vector_provenance.json",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch08_figure_8_1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch08_figure_8_2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch08_figure_8_3.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch08_figure_8_4.tex",
+    "02_2017_Elements_of_Causal_Inference/01_排版源码/figures/ch08_figure_8_5.tex"
+  ],
+  "structure": {
+    "chapter_count": 1,
+    "sections": [
+      {
+        "number": "8.1",
+        "title": "半同胞回归"
+      },
+      {
+        "number": "8.2",
+        "title": "因果推断与回合式强化学习",
+        "subsections": [
+          {
+            "number": "8.2.1",
+            "title": "逆概率加权"
+          },
+          {
+            "number": "8.2.2",
+            "title": "回合式强化学习"
+          },
+          {
+            "number": "8.2.3",
+            "title": "二十一点游戏中的状态简化"
+          },
+          {
+            "number": "8.2.4",
+            "title": "广告投放中的加权改进"
+          }
+        ]
+      },
+      {
+        "number": "8.3",
+        "title": "领域适应"
+      },
+      {
+        "number": "8.4",
+        "title": "习题"
+      }
+    ],
+    "numbered_equations": [
+      "8.1",
+      "8.2",
+      "8.3",
+      "8.4",
+      "8.5",
+      "8.6",
+      "8.7"
+    ],
+    "unnumbered_display_groups": 17,
+    "figures": [
+      "8.1",
+      "8.2",
+      "8.3",
+      "8.4",
+      "8.5"
+    ],
+    "tables": [
+      "8.1"
+    ],
+    "table_data_rows": 3,
+    "table_columns": 3,
+    "propositions": [
+      "8.1",
+      "8.2"
+    ],
+    "problems": [
+      "8.3",
+      "8.4",
+      "8.5"
+    ],
+    "problem_8_4_parts": [
+      "a",
+      "b",
+      "c"
+    ],
+    "original_footnotes": 2,
+    "independent_translator_notes": 3,
+    "definitions": 0,
+    "theorems": 0,
+    "lemmas": 0,
+    "code_blocks": 0,
+    "proofs_in_chapter": 0,
+    "proof_cross_references": [
+      "附录 C.11",
+      "附录 C.12"
+    ],
+    "original_boxes": 0
+  },
+  "source_outline": [
+    [
+      1,
+      "Connections to Machine Learning, II",
+      1
+    ],
+    [
+      2,
+      "Half-Sibling Regression",
+      1
+    ],
+    [
+      2,
+      "Causal Inference and Episodic Reinforcement Learning",
+      3
+    ],
+    [
+      2,
+      "Domain Adaptation",
+      11
+    ],
+    [
+      2,
+      "Problems",
+      13
+    ]
+  ],
+  "numbered_formula_visual_verification": [
+    {
+      "number": "8.1",
+      "source_book_page": 158,
+      "source_split_page": 2,
+      "chinese_page": 1,
+      "content": "半同胞回归平方误差=条件方差的期望"
+    },
+    {
+      "number": "8.2",
+      "source_book_page": 161,
+      "source_split_page": 5,
+      "chinese_page": 3,
+      "content": "条件密度比的逆概率加权估计量"
+    },
+    {
+      "number": "8.3",
+      "source_book_page": 161,
+      "source_split_page": 5,
+      "chinese_page": 4,
+      "content": "Horvitz–Thompson 估计量"
+    },
+    {
+      "number": "8.4",
+      "source_book_page": 163,
+      "source_split_page": 7,
+      "chinese_page": 5,
+      "content": "K步回合策略比的乘积"
+    },
+    {
+      "number": "8.5",
+      "source_book_page": 164,
+      "source_split_page": 8,
+      "chinese_page": 6,
+      "content": "R_j 与 S_j 给定 F_j,A_j 条件独立"
+    },
+    {
+      "number": "8.6",
+      "source_book_page": 165,
+      "source_split_page": 9,
+      "chinese_page": 6,
+      "content": "合并状态下的下一状态条件分布相同"
+    },
+    {
+      "number": "8.7",
+      "source_book_page": 167,
+      "source_split_page": 11,
+      "chinese_page": 8,
+      "content": "跨域子集条件分布不变"
+    }
+  ],
+  "unnumbered_math_coverage": [
+    "Qhat=Y−E[Y|X]；中心化信号的均方误差不等式。",
+    "第160页原印do干预式、干预分布下Eell定义、原模型与干预模型的密度分解。",
+    "xi三重积分换测度等式及importance sampling估计式。",
+    "策略映射(a,s)→pi(a|s)=P(At=a|St=s)及return Y=sum_t R_t。",
+    "S3与F3的完整纸牌手牌，红桃K/黑桃5/方块4及庄家方块K。",
+    "argmax最优策略存在式、原印j−1下标的最优策略恒等式与全部量词。",
+    "广告原权重p(A|S)比、新权重p(F|S)比、命题8.2干预与积分恒等式。",
+    "领域泛化预测器f_S*(X_S*^T)与回归定义f_S*(x)。",
+    "习题8.4两行SCM、Gaussian iid噪声、干预do(Z:=Ntilde_Z)及均值/样本数。",
+    "习题8.5三条条件独立关系、集合S/Snew/M全部包含关系。"
+  ],
+  "figure_verification": [
+    {
+      "number": "8.1",
+      "source_book_page": 158,
+      "chinese_page": 1,
+      "method": "中文TikZ重绘",
+      "nodes": 5,
+      "arrows": 4,
+      "retained": "Q,N,R为虚线圆节点，Y,X为实线圆节点；Q→Y,N→Y,N→X,R→X及5类说明均保留。"
+    },
+    {
+      "number": "8.2",
+      "source_book_page": 159,
+      "chinese_page": 2,
+      "method": "原图精确矢量路径转为TikZ，汉化文字",
+      "vector_path_count": 11,
+      "retained": "前后轨道弧、恒星、三个红色行星位置、原光变曲线、坐标轴和箭头全部保留；非随机替代数据。",
+      "provenance": "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch08_vector_provenance.json",
+      "credit_preserved": "Nikola Smolenski, Wikipedia Planetary_transit.svg, CC BY-SA 3.0"
+    },
+    {
+      "number": "8.3",
+      "source_book_page": 162,
+      "chinese_page": 4,
+      "method": "中文TikZ重绘",
+      "nodes": 9,
+      "arrows": 18,
+      "retained": "4状态、3动作、H、Y；3条状态链/3条策略边/3条动作边/H→4状态及Y/4状态→Y；策略边红粗，H虚线。"
+    },
+    {
+      "number": "8.4",
+      "source_book_page": 164,
+      "chinese_page": 6,
+      "method": "中文TikZ重绘",
+      "nodes": 16,
+      "arrows": 24,
+      "retained": "4个S/F/R、3个A和Y，全部24条箭头；Fj→Aj红实线、Sj→Aj红虚线。原图与图注下标不一致单独译注。"
+    },
+    {
+      "number": "8.5",
+      "source_book_page": 166,
+      "chinese_page": 8,
+      "method": "中文TikZ重绘",
+      "nodes": 5,
+      "arrows": 5,
+      "retained": "H→S→A→F→Y与H→Y；S→A红粗，H虚线。"
+    }
+  ],
+  "table_verification": {
+    "number": "8.1",
+    "source_book_page": 167,
+    "chinese_page": 8,
+    "all_rows_preserved": true,
+    "rows": [
+      "领域泛化：T:=D+1",
+      "多任务学习：T∈{1,…,D}",
+      "非对称多任务学习：T:=D"
+    ],
+    "all_training_rows": "(X1,Y1),…,(XD,YD)",
+    "invented_rows": 0
+  },
+  "footnotes": [
+    {
+      "number": 1,
+      "source_book_page": 158,
+      "content": "Kepler spacecraft Wikipedia URL；访问日期2016-07-13"
+    },
+    {
+      "number": 2,
+      "source_book_page": 165,
+      "content": "现实广告拍卖系统更加复杂，广告主竞价影响点击价格。"
+    }
+  ],
+  "new_terms": {
+    "systematic noise": "系统噪声",
+    "denoising": "去噪",
+    "exoplanet": "系外行星",
+    "light curve": "光变曲线",
+    "reinforcement learning": "强化学习",
+    "agent": "智能体",
+    "action": "动作",
+    "state": "状态",
+    "reward": "奖励",
+    "return": "回报",
+    "strategy": "策略",
+    "Markov decision process": "马尔可夫决策过程",
+    "Horvitz–Thompson estimator": "Horvitz–Thompson 估计量",
+    "weighted likelihood estimator": "加权似然估计量",
+    "importance sampling": "重要性抽样",
+    "off-policy evaluation": "异策略评估",
+    "state simplification": "状态简化",
+    "blackjack": "二十一点纸牌游戏",
+    "publisher": "发布商",
+    "mainline": "主栏",
+    "mainline reserve": "主栏保留阈值",
+    "domain generalization": "领域泛化",
+    "multi-task learning": "多任务学习",
+    "asymmetric multi-task learning": "非对称多任务学习",
+    "invariant predictors": "不变预测变量",
+    "adversarial setting": "对抗性设定"
+  },
+  "source_anomalies": [
+    {
+      "source_book_page": 160,
+      "source_split_page": 4,
+      "location": "第8.2.1节未编号do干预式",
+      "issue": "原印f~(X_{PA~_k,N~_k})将噪声N~_k排在X下标内，没有作为函数的独立自变量。",
+      "suggested_reading": "按第6.3节应理解为f~(X_{PA~_k},N~_k)。",
+      "action": "照录原印公式，并以独立“译注”给出应有的两个自变量结构；不改变2条原脚注编号。"
+    },
+    {
+      "source_book_pages": [
+        164,
+        165
+      ],
+      "source_split_pages": [
+        8,
+        9
+      ],
+      "location": "图8.4图注及命题8.1结尾",
+      "issue": "图画F_j→A_j、S_j→A_j，但原图注写F_{j−1}、S_{j−1}；命题结尾的pi_opt(a_j|s_{j−1})也切换至j−1约定。",
+      "suggested_reading": "区分图与前文同下标约定，以及图注和命题结尾的前一状态下标约定。",
+      "action": "原图、原图注和全部公式分别保留；命题后加独立译注准确指出下标差异。"
+    },
+    {
+      "source_book_page": 167,
+      "source_split_page": 11,
+      "location": "第8.3节域集合E及式(8.7)",
+      "issue": "先定义E={1,…,D}为已观测域，随后要求所有e∈E“包括测试域”；而领域泛化的测试域在表8.1中为T=D+1。",
+      "suggested_reading": "对于领域泛化，将不变性假设的适用范围延伸至未见测试域；不声称不变性假设本身错误。",
+      "action": "保留集合定义、表格和式(8.7)，以独立译注解释量词范围及训练域不变性不足以单独保证测试域不变性。"
+    }
+  ],
+  "source_wording_notes": [
+    "第161页“weighted likelihood estimator”沿原文译为加权似然估计量，未将其改写成不同统计术语。",
+    "原书的证明仅以附录C.11和C.12引用形式出现，本章没有另行抄入证明；根任务已有完整附录。",
+    "所有原书“we are not aware of any such result”等表述均作为2017年原著内容翻译，不改成当前研究结论。"
+  ],
+  "layout_differences": [
+    "沿用全书A4中文教材版式，原13页正文排为10页；原分章末尾空白装订页不复刻，正文无删节。",
+    "全部5图以TikZ排版；图8.2的11条原矢量路径保持精确几何，文字汉化。",
+    "表8.1改用三线表，保留3列3数据行及所有数学符号。",
+    "命题8.1末尾的策略恒等式和全称量词换成两行排版，未改变原下标或量词。",
+    "三条独立译注用小字段落标识，不占原脚注序号；使用Needspace避免命题开头和末题孤立断页。",
+    "浮动图随A4分页移动；未要求与原书逐页等长。"
+  ],
+  "completeness_checks": {
+    "all_source_body_pages_read_and_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "all_sections_and_subsections_translated": true,
+    "all_numbered_formulas_checked_against_render": true,
+    "all_figures_and_table_checked_against_render": true,
+    "all_inline_math_and_proposition_quantifiers_checked": true,
+    "all_problems_and_parts_preserved": true,
+    "all_citations_authors_years_and_urls_preserved": true,
+    "source_year_occurrences": 31,
+    "translation_year_occurrences": 31,
+    "year_multisets_equal": true,
+    "year_counts": {
+      "2015": 6,
+      "2016": 8,
+      "2009": 3,
+      "2012": 2,
+      "1952": 1,
+      "2000": 2,
+      "2010": 2,
+      "2002": 1,
+      "1957": 1,
+      "2013": 4,
+      "1956": 1
+    },
+    "only_original_book_no_reader_annotations": true,
+    "source_chapter_optional_title_or_counter_residue": false
+  },
+  "build_checks": {
+    "engine": "xelatex",
+    "passes": 2,
+    "helper": "work/elements_book/compile_chapter.py",
+    "latex_errors": 0,
+    "overfull_boxes": 0,
+    "missing_glyphs": 0,
+    "undefined_references": 0,
+    "rendered_do_operators": 3,
+    "all_pages_visually_checked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "all_figure_labels_arrows_captions_and_formula_pages_checked": true,
+    "last_bookmark": [
+      2,
+      "8.4 习题",
+      9
+    ],
+    "control_characters": [],
+    "shared_files_edited": [],
+    "underfull_hbox_badness": [
+      "1072"
+    ],
+    "visual_layout_result": "图中文字/箭头无碰撞，脚注与页码分离，编号公式全部可见；无溢出。"
+  },
+  "qa_artifacts": {
+    "source_renders": "work/elements_book/ch08_source_render",
+    "output_renders": "work/elements_book/build/ch08/render",
+    "structure_audit": "work/elements_book/build/ch08/ch08_audit.json",
+    "extracted_chinese_text": "work/elements_book/build/ch08/ch08_built_text.txt",
+    "source_vector_provenance": "02_2017_Elements_of_Causal_Inference/01_排版源码/data/ch08_vector_provenance.json"
+  },
+  "unresolved_items": [],
+  "shared_files_edited": []
+}

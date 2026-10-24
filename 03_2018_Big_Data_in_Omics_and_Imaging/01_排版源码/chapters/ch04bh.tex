@@ -1,0 +1,272 @@
+% 原PDF137页4.B.3标题—144页附录4.C标题前。
+\subsection*{4.B.3\quad Cox—Reid调整剖面似然}
+\addcontentsline{toc}{subsection}{4.B.3 Cox—Reid调整剖面似然}
+
+常用统计推断以观测似然函数为基础。存在干扰参数时，通过调整剖面似然函数进行统计推断。第4.2A2节假设离散参数已知，但实际中通常未知，需要估计。本节介绍Cox—Reid调整剖面似然，给出离散参数 $\phi$ 的估计方法。为了方便对 $\phi$ 计算对数似然，先改变负二项分布对数似然的形式。
+
+回顾式（4.B.5），
+\begin{equation}
+\begin{aligned}
+P(Y=y_{gi})
+&=\frac{\Gamma(y_{gi}+\alpha)}{y_{gi}!\Gamma(\alpha)}
+ \left(\frac1{1+\beta}\right)^{y_{gi}}
+ \left(\frac\beta{1+\beta}\right)^\alpha\\
+&=\frac{\Gamma(y_{gi}+1/\phi_g)}{y_{gi}!\Gamma(1/\phi_g)}
+ (\phi_g\mu_{gi})^{y_{gi}}
+ \left(\frac1{1+\phi_g\mu_{gi}}\right)^{y_{gi}+1/\phi_g}.
+\end{aligned}\tag{4.B.27}
+\end{equation}
+注意
+\begin{equation}
+\begin{aligned}
+\frac{\Gamma(y_{gi}+1/\phi_g)}{y_{gi}!\Gamma(1/\phi_g)}
+&=\frac{\begin{gathered}
+ (y_{gi}+1/\phi_g-1)(y_{gi}+1/\phi_g-2)\cdots(1/\phi_g+1)\\
+ {}\times(1/\phi_g)(1/\phi_g-1)(1/\phi_g-2)\cdots
+ \end{gathered}}{
+ y_{gi}!(1/\phi_g-1)(1/\phi_g-2)\cdots}\\
+&=\frac{(y_{gi}+1/\phi_g-1)(y_{gi}+1/\phi_g-2)\cdots(1/\phi_g+1)(1/\phi_g)}{y_{gi}!}\\
+&=\frac{[(y_{gi}-1)\phi_g+1][(y_{gi}-2)\phi_g+1]\cdots[\phi_g+1]}{
+ \phi_g^{y_{gi}}y_{gi}!}.
+\end{aligned}\tag{4.B.28}
+\end{equation}
+将式（4.B.28）代入式（4.B.27），得到
+\begin{equation}
+\begin{aligned}
+P(Y=y_{gi})={}&
+\frac{[(y_{gi}-1)\phi_g+1][(y_{gi}-2)\phi_g+1]\cdots[\phi_g+1]}{
+ \phi_g^{y_{gi}}y_{gi}!}\\
+&{}\times(\phi_g\mu_{gi})^{y_{gi}}
+ \left(\frac1{1+\phi_g\mu_{gi}}\right)^{y_{gi}+1/\phi_g}.
+\end{aligned}\tag{4.B.29}
+\end{equation}
+利用式（4.B.29），得到对数似然
+\begin{equation}
+\begin{aligned}
+l(\phi_g;y_g,\widehat\gamma_g)
+=\sum_{i=1}^{n}\biggl[&\sum_{l=1}^{y_{gi}-1}\log(1+l\phi_g)
+-y_{gi}\log\phi_g-\log y_{gi}!\\
+&{}+y_{gi}\log(\phi_g\mu_{gi})
+-\left(y_{gi}+\frac1{\phi_g}\right)\log(1+\phi_g\mu_{gi})\biggr].
+\end{aligned}\tag{4.B.30}
+\end{equation}
+$\phi_g$ 的调整剖面似然（adjusted profile likelihood，APL）定义为惩罚对数似然
+\begin{equation}
+\mathrm{APL}_g(\phi_g,\widehat\gamma_g)
+=l(\phi_g;y_g,\widehat\gamma_g)-\frac12\log|I_g|.\tag{4.B.31}
+\end{equation}
+为计算极大化 $\mathrm{APL}_g(\phi_g)$ 的一阶最优条件，先计算
+\[
+\frac{\partial l(\phi_g;y_g,\widehat\gamma_g)}{\partial\phi_g}.
+\]
+由式（4.B.30），
+\begin{equation}
+\begin{aligned}
+\frac{\partial l(\phi_g;y_g,\widehat\gamma_g)}{\partial\phi_g}
+&=\sum_{i=1}^{n}\biggl[\sum_{l=1}^{y_{gi}-1}\frac l{1+l\phi_g}
+ -\frac{y_{gi}}{\phi_g}+\frac{y_{gi}}{\phi_g}
+ +\frac{\log(1+\phi_g\mu_g)}{\phi_g^2}\\
+&\hspace{6em}{}-\left(y_{gi}+\frac1{\phi_g}\right)
+ \frac{\mu_{gi}}{1+\phi_g\mu_{gi}}\biggr]\\
+&=\sum_{i=1}^{n}\left[\sum_{l=1}^{y_{gi}-1}\frac l{1+l\phi_g}
+ +\frac{\log(1+\phi_g\mu_g)}{\phi_g^2}
+ -\left(y_{gi}+\frac1{\phi_g}\right)\frac{\mu_{gi}}{1+\phi_g\mu_{gi}}\right].
+\end{aligned}\tag{4.B.32}
+\end{equation}
+接着考虑式（4.B.31）的第二项。利用假设 $y_{gi}\approx\mu_{gi}+1/\phi_g$，得到
+\begin{equation}
+W_1=\frac{\partial W}{\partial\phi_g}=
+-\begin{bmatrix}
+\dfrac{\mu_{g1}^2}{(1+\phi_g\mu_{g1})^2}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{\mu_{gn}^2}{(1+\phi_g\mu_{gn})^2}
+\end{bmatrix}.\tag{4.B.33}
+\end{equation}
+利用Xiong（2018）式（1.160）与链式法则，得到
+\begin{equation}
+\frac{\partial\log|I_g|}{\partial\phi_g}
+=-I_g^{-1}X\frac{\partial W}{\partial\phi_g}X^T
+=-I_g^{-1}XW_1X^T.\tag{4.B.34}
+\end{equation}
+因此，APL关于 $\phi_g$ 的导数为
+\begin{equation}
+\frac{\partial\mathrm{APL}(\phi_g)}{\partial\phi_g}
+=\frac{\partial l(\phi_g;y_g,\widehat\beta_g)}{\partial\phi_g}
++\frac12I_g^{-1}XW_1X^T.\tag{4.B.35}
+\end{equation}
+下面计算APL关于 $\phi_g$ 的二阶导数。对式（4.B.32）两侧求导，得到
+\begin{equation}
+\begin{aligned}
+\frac{\partial^2l(\phi_g;y_g,\widehat\beta_g)}{\partial\phi_g^2}
+={}&\sum_{i=1}^{n}\biggl[-\sum_{l=1}^{y_{gi}-1}\frac{l^2}{(1+l\phi_g)^2}\\
+&\hspace{3em}{}+\frac{\mu_g\phi_g-2(1+\phi_g\mu_g)\log(1+\phi_g\mu_g)}{
+ (1+\phi_g\mu_g)\phi_g^3}\biggr]\\
+&{}+\frac{\mu_{gi}}{(1+\phi_g\mu_g)\phi_{gi}^2}
++(y_{gi}+\phi_g^{-1})\frac{\mu_{gi}^2}{(1+\phi_g\mu_g)^2}.
+\end{aligned}\tag{4.B.36}
+\end{equation}
+利用式（4.B.33），得到
+\begin{equation}
+W_2=\frac{\partial W_1}{\partial\phi_g}=
+\begin{bmatrix}
+\dfrac{2\mu_{g1}^3}{(1+\phi_g\mu_{g1})^3}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{\mu_{gn}^3}{(1+\phi_g\mu_{gn})^3}
+\end{bmatrix}.\tag{4.B.37}
+\end{equation}
+因此，由式（4.B.34）与式（4.B.35），
+\[
+\begin{aligned}
+\frac{\partial^2\mathrm{APL}(\phi_g)}{\partial\phi_2^2}
+={}&\frac{\partial^2l(\phi_g;y_g,\widehat\beta_g)}{\partial\phi_g^2}
+-\frac12\frac{\partial I_g^{-1}}{\partial\phi_g}XW_1X^T
++\frac12I_g^{-1}X\frac{\partial W_1}{\partial\phi_g}X^T\\
+={}&\frac{\partial^2l(\phi_g;y_g,\widehat\beta_g)}{\partial\phi_g^2}
+-\frac12(I_g^{-1}XW_1X^T)^2+\frac12I_g^{-1}XW_2X^T.
+\end{aligned}
+\]
+可以用Newton—Raphson迭代算法估计离散参数 $\phi_g$：
+\begin{equation}
+\begin{aligned}
+\phi_g^{(\mathrm{new})}
+&=\phi_g^{(\mathrm{old})}
+-\frac{\left.\dfrac{\partial\mathrm{APL}(\phi_g)}{\partial\phi_g}
+ \right|_{\phi_g^{(\mathrm{old})}}}{
+ \left.\dfrac{\partial^2\mathrm{APL}(\phi_g)}{\partial\phi_2^2}
+ \right|_{\phi_g^{(\mathrm{old})}}}\\
+&=\phi_g^{(\mathrm{old})}+\delta,
+\end{aligned}\tag{4.B.38}
+\end{equation}
+其中
+\[
+\delta=-\frac{
+\dfrac{\partial l(\phi_g;y_g\widehat\beta_g)}{\partial\phi_g}
++\dfrac12I_g^{-1}XW_1X^T}{
+\dfrac{\partial^2l(\phi_g;y_g\widehat\beta_g)}{\partial\phi_g^2}
+-\dfrac12(I_g^{-1}XW_1X^T)^2+\dfrac12I_g^{-1}XW_2X^T},
+\]
+\[
+\frac{\partial l(\phi_g;y_g,\widehat\beta_g)}{\partial\phi_g}
+=\sum_{i=1}^{n}\left[\sum_{l=1}^{y_{gi}-1}\frac l{1+l\phi_g}
++\frac{\log(1+\phi_g\mu_g)}{\phi_g^2}
+-\left(y_{gi}+\frac1{\phi_g}\right)\frac{\mu_{gi}}{1+\phi_g\mu_{gi}}\right],
+\]
+\[
+I_g=XWX^T,\qquad
+W=\begin{bmatrix}
+\dfrac{\mu_{g1}y_{g1}\phi_g}{(1+\phi_g\mu_{g1})^2}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{\mu_{gn}y_{gn}\phi_g}{(1+\phi_g\mu_{gn})^2}
+\end{bmatrix},
+\]
+\[
+W_1=\frac{\partial W}{\partial\phi_g}=
+-\begin{bmatrix}
+\dfrac{\mu_{g1}^2}{(1+\phi_g\mu_{g1})^2}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{\mu_{gn}^2}{(1+\phi_g\mu_{gn})^2}
+\end{bmatrix},
+\]
+\[
+\begin{aligned}
+\frac{\partial^2l(\phi_g;y_g,\widehat\beta_g)}{\partial\phi_g^2}
+={}&\sum_{i=1}^{n}\biggl[-\sum_{l=1}^{y_{gi}-1}\frac{l^2}{(1+l\phi_g)^2}\\
+&\hspace{3em}{}+\frac{\mu_g\phi_g-2(1+\phi_g\mu_g)\log(1+\phi_g\mu_g)}{
+ (1+\phi_g\mu_g)\phi_g^3}\biggr]\\
+&{}+\frac{\mu_{gi}}{(1+\phi_g\mu_g)\phi_{gi}^2}
++(y_{gi}+\phi_g^{-1})\frac{\mu_{gi}^2}{(1+\phi_g\mu_g)^2},
+\end{aligned}
+\]
+\[
+W_2=\frac{\partial W_1}{\partial\phi_g}=
+\begin{bmatrix}
+\dfrac{2\mu_{g1}^3}{(1+\phi_g\mu_{g1})^3}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{2\mu_{gn}^3}{(1+\phi_g\mu_{gn})^3}
+\end{bmatrix},\qquad
+\mu_{gi}=N_ie^{x_i^T\widehat\gamma_g}.
+\]
+Newton—Raphson算法通常使似然增加，但也可能使似然下降。为了保证每次迭代都增加似然，引入松弛常数，将式（4.B.38）化为
+\begin{equation}
+\phi_g^{(\mathrm{new})}=\phi_g^{(\mathrm{old})}+\alpha\delta,\tag{4.B.39}
+\end{equation}
+其中 $\alpha$ 为松弛常数。通过线搜索确定 $\alpha$，使
+\[
+\mathrm{APL}_g(\phi_g^{(\mathrm{new})})\ge\mathrm{APL}_g(\phi_g^{(\mathrm{old})}).
+\]
+式（4.B.38）、（4.B.39）均假设已经有估计量 $\widehat\gamma_g$，但估计 $\gamma_g$ 又需要离散参数 $\phi_g$，因此需要在二者之间交替迭代。
+
+\subsection*{4.B.4\quad 检验统计量}
+\addcontentsline{toc}{subsection}{4.B.4 检验统计量}
+
+我们关心对数线性模型系数 $\gamma_g$ 的显著性。零假设为
+\[
+H_0:\gamma_g=0.
+\]
+定义检验统计量（Huang et al. 2015）。不存在过度离散时，检验 $H_0:\gamma_g=0$ 的似然比统计量为
+\begin{equation}
+\mathrm{LR}_g=2\bigl[l(\widehat\gamma_g,\widehat\phi_g)
+-l(\gamma_g^0,\widehat\phi_g)\bigr],\tag{4.B.40}
+\end{equation}
+其中
+\[
+\begin{aligned}
+l(\widehat\gamma_g,\phi_g)
+={}&\left(\sum_{i=1}^{n}y_{gi}\right)\log\phi_g\\
+&{}+\sum_{i=1}^{n}\biggl[y_{gi}(x_i^T\widehat\gamma_g+\log N_i)
+-\left(y_{gi}+\frac1{\phi_g}\right)
+\log(1+\phi_gN_ie^{x_i^T\widehat\gamma_g})\biggr].
+\end{aligned}
+\]
+存在过度离散时，检验相同零假设的似然比统计量定义为
+\begin{equation}
+\mathrm{LR}_{gd}=\frac{2\bigl[l(\widehat\gamma_g,\widehat\phi_g)
+-l(\gamma_g^0,\widehat\phi_g)\bigr]}{\widehat\phi_g}.\tag{4.B.41}
+\end{equation}
+在零假设下，$\mathrm{LR}_g,\mathrm{LR}_{gd}$ 分别渐近服从中心 $\chi_{(q)}^2$ 与 $F_{(q,n-q-1)}$ 分布。
+
+检验差异表达的一种自然方法，是比较病例与对照的表达差异。考虑A组（病例）与B组（对照）。令 $n_{gA},n_{gB}$ 分别为两组中基因 $g$ 的读段数，$n_A,n_B$ 为两组的读段总数，$n_A-n_{gA},n_B-n_{gB}$ 为其余基因的读段数。
+令 $\mu_{gA},\mu_{gB}$ 分别为两组中基因 $g$ 的平均读段数。基因 $g$ 在两组间无表达差异的零假设为
+\[
+H_0:\mu_{gA}=\mu_{gB}.
+\]
+可以使用类似Fisher精确检验的方法检验差异表达。考虑表4.6的 $2\times2$ 列联表，其中 $n_g=n_{gA}+n_{gB}$ 为基因 $g$ 的边际行总数，$n=n_A+n_B$ 为总计数。假设从A组抽取 $m_A$ 名受试者，从B组抽取 $m_B$ 名受试者。定义
+\begin{equation}
+n_{gA}=\sum_{i\in A}y_{gi}=\sum_{i=1}^{m_A}y_{gi}\tag{4.B.42}
+\end{equation}
+以及
+\begin{equation}
+n_{gB}=\sum_{j\in B}y_{gj}=\sum_{J=1}^{m_B}y_{gj}.\tag{4.B.43}
+\end{equation}
+可对表4.6发展类似Fisher精确检验的精确检验，但需以负二项分布概率替代超几何概率。
+令 $n_{gA}=a,n_{gB}=b$，以 $p(a,b)$ 表示任意一对数值 $a,b$ 所对应事件的概率。给定总和为 $n_g$ 时，一对实测读段数 $(n_{gA}^*,n_{gB}^*)$ 的 $P$ 值定义为所有不大于实测事件概率 $p(n_{gA}^*,n_{gB}^*)$ 的概率 $p(a,b)$ 之和（Gonzalez 2014）：
+\begin{equation}
+P_g=\sum_{\substack{a+b=n_g\\p(a,b)\le p(n_{gA}^*,n_{gB}^*)}}p(a,b),\tag{4.B.44}
+\end{equation}
+其中 $a,b=0,1,\ldots,n_g$。
+
+现在研究如何计算 $p(a,b)$。无表达差异的零假设下，假设不同样本的计数（表达水平）独立，则
+\[
+p(a,b)=p(n_{gA}=a)p(n_{gB}=b).
+\]
+可以证明，若 $y_{gi}\sim\mathrm{NB}(r_i,p)$，则
+$n_{gA}\sim\mathrm{NB}(\sum_{i=1}^{m_A}r_i,p)$（习题4）。
+回顾 $y_{gi}$ 服从负二项分布
+$\mathrm{NB}(\phi_{gA}^{-1},\phi_{gA}\mu_{gA}/(1+\phi_{gA}\mu_{gA}))$。
+由式（4.B.42）与上述结论，可知 $n_{gA}$ 服从
+$\mathrm{NB}(m_A\phi_{gA}^{-1},\phi_{gA}\mu_{gA}/(1+\phi_{gA}\mu_{gA}))$。
+类似地，$n_{gB}$ 服从
+$\mathrm{NB}(m_B\phi_{gA}^{-1},\phi_{gA}\mu_{gA}/(1+\phi_{gA}\mu_{gA}))$。
+
+利用式（4.B.27），计算得到
+\begin{equation}
+P(n_{gA}=a)=\frac{\Gamma(a+m_A/\phi_{gA})}{a!\Gamma(m_A/\phi_{gA})}
+(\phi_{gA}\mu_{gA})^a
+\left(\frac1{1+\phi_{gA}\mu_{gA}}\right)^{a+m_A/\phi_{gA}},\tag{4.B.45}
+\end{equation}
+以及
+\begin{equation}
+P(n_{gB}=b)=\frac{\Gamma(b+m_B/\phi_{gB})}{b!\Gamma(m_B/\phi_{gB})}
+(\phi_{gB}\mu_{gB})^b
+\left(\frac1{1+\phi_{gB}\mu_{gB}}\right)^{b+1/\phi_{gB}}.\tag{4.B.46}
+\end{equation}

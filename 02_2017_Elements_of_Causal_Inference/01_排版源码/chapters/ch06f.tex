@@ -1,0 +1,168 @@
+% 原书第 109—113 页；6.6 前半。
+\section{通过协变量调整计算干预分布}
+\label{sec:ch06-adjustment}
+
+本节将利用一项看似平凡、却十分有力的不变性陈述。给定结构因果模型 $\mathfrak C$，记 $\pa(j):=\PA_j^{\mathcal G}$。对于任意通过干预某些 $X_k$、但不干预 $X_j$ 而从 $\mathfrak C$ 构造的模型 $\widetilde{\mathfrak C}$，都有
+\begin{equation}
+ p^{\widetilde{\mathfrak C}}(x_j\mid x_{\pa(j)})
+ =p^{\mathfrak C}(x_j\mid x_{\pa(j)}).
+ \tag{6.7}
+\end{equation}
+式 (6.7) 说明，因果关系在干预下具有自主性，因此这一性质有时称为\textbf{自主性（autonomy）}。如果干预某个变量，其他机制则保持不变（见图 2.2 左框）。
+
+由式 (6.7) 可以推出一个公式，它有三个不同的名称：\textbf{截断分解（truncated factorization）}［Pearl, 1993］、\textbf{G 计算公式（G-computation formula）}［Robins, 1986］和\textbf{操纵定理（manipulation theorem）}［Spirtes et al., 2000］。它之所以重要，是因为即使从未见过来自某个干预分布的数据，也能计算关于该分布的陈述。
+
+考虑结构因果模型 $\mathfrak C$，其结构赋值为
+\[
+ X_j:=f_j(X_{\pa(j)},N_j),\qquad j=1,\ldots,d,
+\]
+密度为 $p^{\mathfrak C}$。由马尔可夫性，有\footnote{注意，即使某些 $x_{\pa(j)}$ 满足 $p^{\mathfrak C}(x_{\pa(j)})=0$，也仍可以定义条件分布 $p^{\mathfrak C}(x_j\mid x_{\pa(j)})$。}
+\[
+ p^{\mathfrak C}(x_1,\ldots,x_d)
+ =\prod_{j=1}^d p^{\mathfrak C}(x_j\mid x_{\pa(j)}).
+\]
+现在，考虑在 $\mathfrak C$ 上实施 $\dox{X_k:=\widetilde N_k}$ 后得到的模型 $\widetilde{\mathfrak C}$，其中 $\widetilde N_k$ 具有密度 $\widetilde p$。再次由马尔可夫假设，有
+\begin{equation}
+ \begin{aligned}
+ &p^{\mathfrak C;\dox{X_k:=\widetilde N_k}}(x_1,\ldots,x_d)\\
+ &\quad=\prod_{j\ne k}
+ p^{\mathfrak C;\dox{X_k:=\widetilde N_k}}(x_j\mid x_{\pa(j)})
+ \cdot p^{\mathfrak C;\dox{X_k:=\widetilde N_k}}(x_k)\\
+ &\quad=\prod_{j\ne k}p^{\mathfrak C}(x_j\mid x_{\pa(j)})\widetilde p(x_k).
+ \end{aligned}
+ \tag{6.8}
+\end{equation}
+最后一步利用了有力的不变性 (6.7)。式 (6.8) 使我们能够依据观测量（右侧），计算干预陈述（左侧）。作为特例，有
+\begin{equation}
+ p^{\mathfrak C;\dox{X_k:=a}}(x_1,\ldots,x_d)
+ =\begin{cases}
+ \displaystyle\prod_{j\ne k}p^{\mathfrak C}(x_j\mid x_{\pa(j)}),&x_k=a,\\
+ 0,&\text{否则}.
+ \end{cases}
+ \tag{6.9}
+\end{equation}
+
+条件化与 $\dox{\,}$ 干预通常是不同操作，见例 6.10 后的讨论。现在可以证明，对于没有父节点的变量，两种操作相同。不失一般性，设 $X_1$ 就是这样一个源节点，则
+\begin{equation}
+ \begin{aligned}
+ p^{\mathfrak C}(x_2,\ldots,x_d\mid x_1=a)
+ &=\frac{p(x_1=a)\prod_{j=2}^d p^{\mathfrak C}(x_j\mid x_{\pa(j)})}{p(x_1=a)}\\
+ &=p^{\mathfrak C;\dox{X_1:=a}}(x_2,\ldots,x_d).
+ \end{aligned}
+ \tag{6.10}
+\end{equation}
+式 (6.8)、式 (6.9) 应用范围很广，但有时用起来较为繁琐。接下来介绍一些实用的替代方法。先回顾例 6.16 中的肾结石案例，再将其推广。
+
+\begin{example}[肾结石，续]
+假设真实的结构因果模型具有下图所示的结构：
+\begin{center}
+\begin{tikzpicture}[causal,x=1.3cm,y=1.1cm]
+ \node[vtx] (ch06kid-z) at (0,1) {$Z$};
+ \node[vtx] (ch06kid-t) at (-1,0) {$T$};
+ \node[vtx] (ch06kid-r) at (1,0) {$R$};
+ \draw[ed] (ch06kid-z)--(ch06kid-t);
+ \draw[ed] (ch06kid-z)--(ch06kid-r);
+ \draw[ed] (ch06kid-t)--(ch06kid-r);
+\end{tikzpicture}
+\end{center}
+其中 $Z$ 表示结石大小，$T$ 表示治疗，$R$ 表示康复，三个变量均为二值变量。可见，康复受到治疗和结石大小的影响；治疗选择本身也依赖结石大小，困难病例被分到治疗 $A$ 的比例较大。
+
+再考虑两个结构因果模型 $\mathfrak C_A$ 和 $\mathfrak C_B$，分别通过将 $T$ 的结构赋值替换为 $T:=A$ 和 $T:=B$ 得到。对应的概率分布记为 $P^{\mathfrak C_A}$ 和 $P^{\mathfrak C_B}$。若已确诊肾结石，但尚不知道结石大小，选择治疗时就应比较
+\[
+ \EE^{\mathfrak C_A}R=P^{\mathfrak C_A}(R=1)
+ =P^{\mathfrak C;\dox{T:=A}}(R=1)
+\]
+与
+\[
+ \EE^{\mathfrak C_B}R=P^{\mathfrak C_B}(R=1)
+ =P^{\mathfrak C;\dox{T:=B}}(R=1).
+\]
+给定从 $\mathfrak C$ 获得的观测数据，如何估计这些量？考虑如下计算：
+\begin{equation}
+ \begin{aligned}
+ P^{\mathfrak C_A}(R=1)
+ &=\sum_{z=0}^1P^{\mathfrak C_A}(R=1,T=A,Z=z)\\
+ &=\sum_{z=0}^1P^{\mathfrak C_A}(R=1\mid T=A,Z=z)
+ P^{\mathfrak C_A}(T=A,Z=z)\\
+ &=\sum_{z=0}^1P^{\mathfrak C_A}(R=1\mid T=A,Z=z)
+ P^{\mathfrak C_A}(Z=z)\\
+ &\overset{(6.7)}{=}\sum_{z=0}^1P^{\mathfrak C}(R=1\mid T=A,Z=z)
+ P^{\mathfrak C}(Z=z).
+ \end{aligned}
+ \tag{6.11}
+\end{equation}
+关键思想在最后一步：我们再次利用了不变性 (6.7)。根据表 6.1 中的经验数据，可以估计 $P^{\mathfrak C_A}(R=1)$，得到
+\[
+ P^{\mathfrak C_A}(R=1)\approx0.93\cdot\frac{357}{700}
+ +0.73\cdot\frac{343}{700}=0.832.
+\]
+类似地，
+\[
+ P^{\mathfrak C_B}(R=1)\approx0.87\cdot\frac{357}{700}
+ +0.69\cdot\frac{343}{700}\approx0.782.
+\]
+因此，我们倾向于选择治疗 $A$。（如前所述，这里忽略统计显著性问题；若必须在 $A$、$B$ 之间作出选择，这样做似乎合理。）对于二值治疗，量
+\begin{equation}
+ P^{\mathfrak C_A}(R=1)-P^{\mathfrak C_B}(R=1)
+ \approx0.832-0.782
+ \tag{6.12}
+\end{equation}
+有时称为\textbf{平均因果效应（average causal effect，ACE）}。需要认识到，它不同于简单条件化得到的差异：
+\[
+ P^{\mathfrak C}(R=1\mid T=A)-P^{\mathfrak C}(R=1\mid T=B)
+ =0.78-0.83.
+\]
+本例中，后者甚至与平均因果效应的符号相反。
+\end{example}
+
+这个三节点例子清楚地展示了干预与条件化的区别。用密度表示，就是
+\[
+ \begin{aligned}
+ p^{\mathfrak C;\dox{T:=t}}(r)
+ &=\sum_zp^{\mathfrak C}(r\mid z,t)p^{\mathfrak C}(z)\\
+ &\ne\sum_zp^{\mathfrak C}(r\mid z,t)p^{\mathfrak C}(z\mid t)
+ =p^{\mathfrak C}(r\mid t).
+ \end{aligned}
+\]
+式 (6.11) 称为对变量 $Z$ 进行“调整”。这是实践中经常使用的重要概念，将在定义 6.38 中正式给出。它再次使我们能够从观测量计算干预陈述。注意，调整公式 (6.11) 有时由截断分解 (6.9) 推导；但命题 6.41 将说明，利用不变性 (6.11) 的另一种计算方式，可以很好地推广到更复杂的情形。
+
+\begin{definition}[有效调整集]
+考虑节点为 $\mathbf V$ 的结构因果模型 $\mathfrak C$，设 $Y\notin\PA_X$，否则有 $p^{\mathfrak C;\dox{X:=x}}(y)=p^{\mathfrak C}(y)$。若集合 $\mathbf Z\subseteq\mathbf V\setminus\{X,Y\}$ 满足
+\begin{equation}
+ p^{\mathfrak C;\dox{X:=x}}(y)
+ =\sum_{\mathbf z}p^{\mathfrak C}(y\mid x,\mathbf z)p^{\mathfrak C}(\mathbf z),
+ \tag{6.13}
+\end{equation}
+则称其为有序对 $(X,Y)$ 的\textbf{有效调整集（valid adjustment set）}。这里的求和也可以是积分，其范围是 $\mathbf Z$ 的取值空间，即 $\mathbf Z$ 可能取到的所有 $\mathbf z$。
+\end{definition}
+
+在例 6.37 中，$\mathbf Z=\{Z\}$ 是 $(T,R)$ 的有效调整集。计算平均因果效应时，必须对 $\mathbf Z$ 进行调整；我们已经看到，简单条件化会导致错误结论。换言之，空集不是有效调整集。在这种情况下，我们说从 $T$ 到 $R$ 的因果效应受到了混杂。
+
+\begin{definition}[混杂]
+考虑节点为 $\mathbf V$ 的结构因果模型 $\mathfrak C$，其中 $X,Y\in\mathbf V$，且存在从 $X$ 到 $Y$ 的有向路径。若
+\begin{equation}
+ p^{\mathfrak C;\dox{X:=x}}(y)\ne p^{\mathfrak C}(y\mid x),
+ \tag{6.14}
+\end{equation}
+则称从 $X$ 到 $Y$ 的因果效应\textbf{受到混杂（confounded）}；否则称为“不受混杂”。
+\end{definition}
+
+有时人们认为，为减少潜在混杂因子的影响，应当使调整集尽可能大。不过，例 6.30 中的 Berkson 悖论［Berkson, 1946］说明，这并不总是好主意：并非所有集合都是有效调整集，有时最好不将某个协变量纳入调整集。下面研究哪些集合可以用于调整。采用与例 6.37 相同的思想，对任意集合 $\mathbf Z$ 写出
+\[
+ \begin{aligned}
+ p^{\mathfrak C;\dox{X:=x}}(y)
+ &=\sum_{\mathbf z}p^{\mathfrak C;\dox{X:=x}}(y,\mathbf z)\\
+ &=\sum_{\mathbf z}p^{\mathfrak C;\dox{X:=x}}(y\mid x,\mathbf z)
+ p^{\mathfrak C;\dox{X:=x}}(\mathbf z).
+ \end{aligned}
+\]
+如果
+\begin{equation}
+ \begin{aligned}
+ p^{\mathfrak C;\dox{X:=x}}(y\mid x,\mathbf z)
+ &=p^{\mathfrak C}(y\mid x,\mathbf z),\\
+ p^{\mathfrak C;\dox{X:=x}}(\mathbf z)&=p^{\mathfrak C}(\mathbf z),
+ \end{aligned}
+ \tag{6.15}
+\end{equation}
+那么与前面一样，可知 $\mathbf Z$ 是有效调整集。性质 (6.15) 表示，即使干预 $X$，这些条件分布仍保持不变；我们称其具有不变性。因此，需要回答的问题是：在干预 $\dox{X:=x}$ 下，哪些条件分布保持不变？

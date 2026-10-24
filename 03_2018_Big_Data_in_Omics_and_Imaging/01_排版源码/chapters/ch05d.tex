@@ -1,0 +1,369 @@
+% 原章第26—34页，5.5节起至5.5.1末；式5.56—5.83。
+\FloatBarrier
+\section{用于遗传—甲基化分析的因果网络}
+
+mQTL 分析的线性模型忽略了多个 CpG 位点甲基化之间的相依结构。为将这种结构纳入遗传—甲基化分析，本节介绍因果网络模型。网络是表示变量关系的有力范式，也是揭示复杂生物系统结构的重要工具（Ideker and Nussinov 2017；Wang et al. 2017）。我们考虑三种线性因果网络：（1）变量均为标量的网络；（2）内生变量为标量、外生变量为函数型的网络；（3）内生变量和外生变量均为函数型的网络。标量变量的因果网络已在第 9 章和第 10 章讨论。本节研究其余两种用于遗传—甲基化或 mQTL 分析的线性因果网络，它们也可用于 eQTL 分析。
+
+\subsection{标量内生变量与函数型外生变量的结构方程模型}
+\subsubsection{模型}
+
+考虑 $M$ 个 CpG 位点的标量甲基化水平及下一代测序数据。令 $y_i$ 为第 $i$ 个 CpG 位点的甲基化水平，$x_k(t)$ 为第 $k$ 个基因中基因组位置 $t$ 处 SNP 的基因型函数。$M$ 个 CpG 位点与 $K$ 个基因的结构方程为
+\begin{equation}
+\begin{aligned}
+&y_1r_{11}+y_2r_{21}+\cdots+y_Mr_{M1}\\
+&\qquad+\int_Tx_1(t)\beta_{11}(t)\,dt+\cdots
++\int_Tx_K(t)\beta_{K1}(t)\,dt+e_1=0,\\
+&\hspace{13em}\vdots\\
+&y_1r_{1M}+y_2r_{2M}+\cdots+y_Mr_{MM}\\
+&\qquad+\int_Tx_1(t)\beta_{1M}(t)\,dt+\cdots
++\int_Tx_K(t)\beta_{KM}(t)\,dt+e_M=0,
+\end{aligned}
+\tag{5.56}
+\end{equation}
+其中，$r$ 与 $\beta(t)$ 为 mQTL 分析系统中未知的结构参数，需要从数据估计。为将函数型结构方程模型（FSEM）(5.56) 转化为标准多元结构方程模型，将 $x_k(t)$ 按正交特征函数 $\psi_l(t)$ 展开，得到
+\begin{equation}
+x_k(t)=\sum_{l=1}^L\xi_{kl}\psi_l(t),
+\tag{5.57}
+\end{equation}
+其中，$\psi_l(t)$ 为特征函数，$\xi_{kl}$ 为展开系数。
+
+将展开式 (5.57) 代入函数型结构方程模型 (5.56)，得到
+\begin{equation}
+\begin{aligned}
+&y_1\gamma_{11}+\cdots y_M\gamma_{M1}
++\sum_{l=1}^L\xi_{1l}b_{l1}^{(1)}+\cdots+\sum_{l=1}^L\xi_{Kl}b_{lK}^{(1)}+e_1=0,\\
+&\hspace{13em}\vdots\\
+&y_1\gamma_{1M}+\cdots y_M\gamma_{MM}
++\sum_{l=1}^L\xi_{1l}b_{l1}^{(M)}+\cdots+\sum_{l=1}^L\xi_{Kl}b_{lK}^{(M)}+e_M=0,
+\end{aligned}
+\tag{5.58}
+\end{equation}
+其中
+\[
+b_{lk}^{(m)}(s)=\int_T\beta_{km}(t)\psi_l(t)\,dt,\qquad
+k=1,\ldots,K,\quad m=1,\ldots,M.
+\]
+假定抽取了 $N$ 名个体。令 $x_{nk}(t)$ 为第 $i$ 名个体第 $k$ 个基因的基因型函数，其特征函数展开为
+\begin{equation}
+x_{nk}(t)=\sum_{l=1}^L\xi_{nkl}\psi_l(t),\qquad n=1,\ldots,N,
+\tag{5.59}
+\end{equation}
+其中，$\psi_l(t)$ 为特征函数，$\xi_{nkl}$ 为第 $n$ 名个体第 $k$ 个基因的基因型函数展开系数。
+
+定义甲基化矩阵 $Y$、基因型函数的展开系数矩阵 $X$、结构方程模型中连接 CpG 位点的系数矩阵 $\Gamma$、度量基因型对甲基化水平遗传效应的系数矩阵 $B$，以及误差矩阵 $E$：
+\[
+Y=\begin{bmatrix}y_{11}&\cdots&y_{1M}\\\vdots&\vdots&\vdots\\y_{T1}&\cdots&y_{TM}\end{bmatrix}
+=[y_1,y_2,\ldots,y_M],
+\]
+\[
+X=\begin{bmatrix}
+\xi_{111}&\cdots&\xi_{11L}&\cdots&\xi_{1K1}&\cdots&\xi_{1KL}\\
+\vdots&\vdots&\ddots&\vdots&\ddots&\vdots&\vdots\\
+\xi_{T11}&\cdots&\xi_{T1L}&\cdots&\xi_{TK1}&\cdots&\xi_{TKL}
+\end{bmatrix}=[\xi_1,\ldots,\xi_K],
+\]
+\[
+\xi_K=\begin{bmatrix}\xi_{1k1}&\cdots&\xi_{1kL}\\\vdots&\vdots&\vdots\\\xi_{TK1}&\cdots&\xi_{TkL}\end{bmatrix},
+\]
+\[
+\Gamma=\begin{bmatrix}r_{11}&r_{12}&\cdots&r_{1M}\\\vdots&\vdots&&\vdots\\r_{M1}&r_{M2}&\cdots&r_{MM}\end{bmatrix}
+=[\Gamma_1,\Gamma_2,\ldots,\Gamma_M],
+\]
+\[
+B=\begin{bmatrix}
+b_{11}^{(1)}&\cdots&b_{11}^{(M)}\\
+\vdots&\cdots&\vdots\\
+b_{L1}^{(1)}&\cdots&b_{L1}^{(M)}\\
+\vdots&\cdots&\vdots\\
+b_{1K}^{(1)}&\cdots&b_{1K}^{(M)}\\
+\vdots&\cdots&\vdots\\
+b_{LK}^{(1)}&\cdots&b_{LK}^{(M)}
+\end{bmatrix}=[B_1,\ldots,B_M],
+\]
+以及
+\[
+E=\begin{bmatrix}e_{11}&\cdots&e_{1M}\\\vdots&\vdots&\vdots\\e_{T1}&\cdots&e_{TM}\end{bmatrix}
+=[e_1,e_2,\ldots,e_M].
+\]
+用矩阵记号，变换后的结构方程模型 (5.58) 可写为
+\begin{equation}
+Y\Gamma+XB+E=0,
+\tag{5.60}
+\end{equation}
+或
+\begin{equation}
+Y\Gamma_i+XB_i+e_i=0,\qquad i=1,\ldots,M.
+\tag{5.61}
+\end{equation}
+
+\subsubsection{两阶段最小二乘估计量}
+
+结构方程模型 (5.60) 的参数可用两阶段最小二乘法估计。经过代数变换，式 (5.61) 的第 $i$ 个方程（$i=1,\ldots,M$）可写为
+\begin{equation}
+\begin{aligned}
+y_i&=Y_{-i}\gamma_i+\sum_{l=1}^L\xi_{1L}b_{L1}^{(i)}+\cdots
++\sum_{l=1}^L\xi_{Kl}b_{LK}^{(i)}+e_i\\
+&=Y_{-i}\gamma_i+XB_i+e_i\\
+&=W_i\Delta_i+e_i,
+\end{aligned}
+\tag{5.62}
+\end{equation}
+其中，$Y_{-i}$ 为去除变量 $y_i$ 后的内生（甲基化）变量向量，$\gamma_i$ 为与 $Y_{-i}$ 相应的路径系数向量，$W_i=[Y_{-i}\ X]$，$\Delta_i=[\gamma_i^T\ B_i^T]^T$。在式 (5.62) 两边左乘矩阵 $X^T$，得到
+\[
+\begin{aligned}
+X^Ty_i={}&X^TY_{-i}\gamma_i
++X^T\left(\sum_{l=1}^L\xi_{1L}b_{L1}^{(i)}+\cdots
++\sum_{l=1}^L\xi_{Kl}b_{LK}^{(i)}\right)+X^Te_i,
+\end{aligned}
+\]
+或
+\begin{equation}
+X^Ty_i=X^TY_{-1}\gamma_i+X^TXB_i+X^Te_i,
+\tag{5.63}
+\end{equation}
+其中，$\gamma_i=[\gamma_{1i},\ldots,\gamma_{Mi}]^T$。已知
+\[
+\mathrm{cov}(X^Te_i,X^Te_i)=X^TX\sigma_{ii}.
+\]
+定义目标函数：
+\begin{equation}
+\begin{aligned}
+f(\Delta_i)
+={}&\frac12(X^Ty_i-X^TY_{-i}\gamma_i-X^TXB_i)^T[\sigma_{ii}X^TX]^{-1}\\
+&\qquad\times(X^Ty_i-X^TY_{-i}\gamma_i-X^TXB_i)\\
+={}&\frac12(X^Ty_i-X^TW_i\Delta_i)^T[\sigma_{ii}X^TX]^{-1}
+(X^Ty_i-X^TW_i\Delta_i).
+\end{aligned}
+\tag{5.64}
+\end{equation}
+广义最小二乘估计 $\widehat\Delta_i$ 为
+\begin{equation}
+\begin{aligned}
+\widehat\Delta_i
+&=[W_i^TX(\sigma_i^2X^TX)^{-1}X^TW_i]^{-1}
+W_i^TX(\sigma_i^2X^TX)^{-1}X^Ty_i\\
+&=[W_i^TX(X^TX)^{-1}X^TW_i]^{-1}
+W_i^TX(X^TX)^{-1}X^Ty_i.
+\end{aligned}
+\tag{5.65}
+\end{equation}
+这一广义最小二乘估计可以解释为两阶段最小二乘估计（Judge et al. 1982；第 1.2.3 节）。估计量 $\widehat\Delta_i$ 的方差—协方差矩阵为
+\begin{equation}
+\Lambda_i=\mathrm{var}(\widehat\Delta_i)
+=N\widehat\sigma_i^2[W_i^TX(X^TX)^{-1}X^TW_i]^{-1},
+\tag{5.66}
+\end{equation}
+其中，$\widehat\sigma_i^2$ 估计为
+\begin{equation}
+\widehat\sigma_i^2=\frac1{N-m_i+1-k_i}
+(y_i-W_i\widehat\Delta_i)^T(y_i-W_i\widehat\Delta_i),
+\tag{5.67}
+\end{equation}
+$m_i$ 与 $k_i$ 分别为第 $i$ 个方程中出现的内生变量和外生变量个数。
+
+在相当一般的条件下，$\sqrt N(\widehat\Delta_i-\Delta_i)$ 渐近服从正态分布 $N(0,\Lambda_i)$。
+
+可以检验一条有向边是否存在。假定要检验第 $j$ 个 CpG 位点的甲基化水平 $y_j$，是否引起第 $i$ 个 CpG 位点甲基化水平 $y_i$ 的变化，即检验参数 $\gamma_{ji}$ 是否为零。令 $\Lambda_{ji}$ 为方差—协方差矩阵 $\Lambda_i$ 中与估计量 $\widehat\gamma_{ji}$ 方差相应的元素。如果 $j<i$，则 $\Lambda_{ji}$ 为矩阵 $\Lambda_i$ 的第 $j$ 个对角元；如果 $j>i$，则为第 $j-1$ 个对角元。定义检验统计量
+\begin{equation}
+T_\gamma=n\frac{\widehat\gamma_{ji}^{\,2}}{\Lambda_{ji}}.
+\tag{5.68}
+\end{equation}
+在不存在从 $y_j$ 到 $y_i$ 的有向连接的零假设下，统计量 $T_y$ 渐近服从中心 $\chi^2_{(1)}$ 分布。
+
+\subsubsection{稀疏函数型结构方程模型}
+
+一般而言，基因型—甲基化网络是稀疏的，因此 $\Gamma$ 和 $B$ 都是稀疏矩阵。我们用 $l_1$ 范数惩罚连接 CpG 位点的参数 $r$，以基因为组，用组套索惩罚连接基因与 CpG 位点的参数 $b$。因此，稀疏函数型结构方程模型可表述为如下优化问题：
+\begin{equation}
+\min\quad f(\Delta_i)+\lambda\left[\lVert Z_{\gamma i}\rVert_1
++\sqrt L\sum_{k=1}^K\lVert Z_{ki}\rVert_2\right],
+\tag{5.69}
+\end{equation}
+约束为 $\Delta_i-Z_i=0$，其中
+\[
+B_i=\begin{bmatrix}b_{11}^{(i)}\\\vdots\\b_{L1}^{(i)}\\\vdots\\b_{1K}^{(i)}\\\vdots\\b_{LK}^{(i)}\end{bmatrix},\qquad
+\Delta_i=\begin{bmatrix}\gamma_i\\B_i\end{bmatrix}
+=\begin{bmatrix}\gamma_i\\\Delta_{1i}\\\vdots\\\Delta_{Ki}\end{bmatrix},
+\]
+\[
+\Delta_{ki}=\begin{bmatrix}\Delta_{1k}^{(i)}\\\vdots\\\Delta_{Lk}^{(i)}\end{bmatrix},\qquad
+\Delta_{lk}^{(i)}=b_{lk}^{(i)},
+\]
+\[
+Z_i=\begin{bmatrix}Z_{\gamma i}\\Z_{1i}\\\vdots\\Z_{Ki}\end{bmatrix}=\Delta_i,\qquad
+Z_{\gamma i}=\gamma_i,\quad Z_{ki}=\Delta_{ki},\quad k=1,\ldots,K,
+\]
+\[
+Z_{ki}=\begin{bmatrix}Z_{1k}^{(i)}\\\vdots\\Z_{LK}^{(i)}\end{bmatrix}.
+\]
+为求解优化问题 (5.69)，构造增广拉格朗日函数
+\begin{equation}
+\begin{aligned}
+L_\rho(\Delta_i,Z_i,\mu)
+={}&f(\Delta_i)+\lambda\lVert Z_{\gamma i}\rVert_1
++\lambda\sum_{k=1}^K\sqrt L\lVert Z_{ki}\rVert_2\\
+&+\mu^T(\Delta_i-Z_i)+\frac\rho2\lVert\Delta_i-Z_i\rVert_2^2\\
+={}&f(\Delta_i)+\lambda\lVert Z_{\gamma i}\rVert_1
++\lambda\sum_{k=1}^K\sqrt L\lVert Z_{ki}\rVert_2\\
+&+\frac\rho2\lVert\Delta_i-Z_i+\mu\rVert_2^2-\frac\rho2\lVert\mu\rVert_2^2.
+\end{aligned}
+\tag{5.70}
+\end{equation}
+交替方向乘子法（ADMM）（Boyd et al. 2011）包含以下迭代：
+\begin{equation}
+\Delta_i^{(l+1)}:=\argmin_{\Delta_i}L_\rho(\Delta_i,Z_i^{(l)},\mu^{(l)}),
+\tag{5.71}
+\end{equation}
+\begin{equation}
+Z_i^{(l+1)}:=\argmin_{Z_i}L_\rho(\Delta_i^{(l+1)},Z_i,\mu^{(l)}),
+\tag{5.72}
+\end{equation}
+\begin{equation}
+\mu^{(l+1)}:=\mu^{(l)}+\Delta_i^{(l+1)}-Z_i^{(l+1)},
+\tag{5.73}
+\end{equation}
+或写为
+\begin{equation}
+\Delta_i^{(l+1)}:=\argmin_{\Delta_i}
+(f(\Delta_i)+\frac\rho2\lVert\Delta_i-Z_i^{(l)}+u^{(l)}\rVert_2^2,
+\tag{5.74}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+Z_i^{(l+1)}:=\argmin_{Z_i}\Bigl(&\lambda\lVert Z_{\gamma i}\rVert_1
++\lambda\sum_{k=1}^K\sqrt L\lVert Z_{ki}\rVert_2\\
+&+\frac\rho2\lVert\Delta_i^{(l+1)}-Z_i+\mu^{(l)}\rVert_2^2\Bigr),
+\end{aligned}
+\tag{5.75}
+\end{equation}
+\begin{equation}
+\mu^{(l+1)}:=\mu^{(l)}+\Delta_i^{(l+1)}-Z_i^{(l+1)}.
+\tag{5.76}
+\end{equation}
+
+现在求解最小化问题 (5.71)。令
+\[
+\mu=\begin{bmatrix}\mu_\gamma\\\mu_{1i}\\\vdots\\\mu_{Ki}\end{bmatrix},\qquad
+\mu_{ki}\begin{bmatrix}\mu_{1ki}\\\vdots\\\mu_{Lki}\end{bmatrix}.
+\]
+令 $L_\rho$ 的偏导数为零：
+\begin{equation}
+\begin{aligned}
+\frac{\partial L_\rho}{\partial r_i}
+={}&-W_i^TX[\sigma_{ii}X^TX]^{-1}(X^Ty_i-X^TW\Delta_i)\\
+&+\rho(\Delta_i-Z_i^{(l)}+\mu^{(l)})=0,\\
+\Delta_i^{(l+1)}
+={}&[W_i^TX(X^TX)^{-1}X^TW_i+\rho I]^{-1}\\
+&\qquad\times[W_i^TX(X^TX)^{-1}X^Ty_i+\rho(Z_i^{(l)}-\mu^{(l)})].
+\end{aligned}
+\tag{5.77}
+\end{equation}
+
+优化问题 (5.75) 不可微。虽然其中前两项不可微，仍可用次微分运算求出简单的闭式解。先考虑 $\lVert Z_{\gamma i}\rVert_1$ 的广义梯度。令 $\Phi_i^{(m)}$ 为向量 $Z_{\gamma i}$ 第 $m$ 个分量的广义导数：
+\[
+\Phi_i^{(m)}=\begin{cases}
+1,&Z_{\gamma i}^{(m)}=\gamma_i^{(m)}>0,\\
+[1,1],&Z_{\gamma i}^{(m)}=\gamma_i^{(m)}=0,\\
+-1,&Z_{\gamma i}^{(m)}=\gamma_i^{(m)}<0.
+\end{cases}
+\]
+令 $\Phi_i=[\Phi_i^{(1)},\ldots,\Phi_i^{(M)}]^T$，则有
+\[
+\frac\lambda\rho\Phi_i+Z_{\gamma i}=\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)},
+\]
+从而得到
+\begin{equation}
+Z_{\gamma i}^{(l+1)}
+=\sgn(\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)})
+\left(|\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}|-\frac\lambda\rho\right)_+,
+\tag{5.78}
+\end{equation}
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+接下来考虑组套索。广义梯度 $\partial L_\rho/\partial Z_{ki}$ 为
+\begin{equation}
+\frac{\partial L_\rho}{\partial Z_{ki}}
+=\lambda\sqrt Ls+\rho\bigl(Z_{ki}-(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)})\bigr)=0,
+\tag{5.79}
+\end{equation}
+其中
+\[
+s=\begin{cases}
+0,&\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2<\dfrac{\lambda\sqrt l}{\rho},\\[7pt]
+\dfrac{Z_{ki}}{\lVert Z_{ki}\rVert_2},
+&\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2\geq\dfrac{\lambda\sqrt l}{\rho}.
+\end{cases}
+\]
+式 (5.79) 意味着
+\begin{equation}
+\left(1+\frac{\lambda\sqrt L}{\rho\lVert Z_{ki}\rVert_2}\right)Z_{ki}
+=\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)},
+\tag{5.80}
+\end{equation}
+或
+\begin{equation}
+\left(1+\frac{\lambda\sqrt L}{\rho\lVert Z_{ki}\rVert_2}\right)\lVert Z_{ki}\rVert_2
+=\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2.
+\tag{5.81}
+\end{equation}
+求解式 (5.81)，得到
+\[
+\lVert Z_{ki}\rVert_2=\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2-\frac{\lambda\sqrt L}{\rho}.
+\]
+因此，有
+\begin{equation}
+\left(1+\frac{\lambda\sqrt L}{\rho\lVert Z_{ki}\rVert_2}\right)
+=\frac1{1-\dfrac{\lambda\sqrt L}{\rho\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2}}.
+\tag{5.82}
+\end{equation}
+结合式 (5.80)—(5.82)，得到
+\begin{equation}
+Z_{ki}^{(l+1)}
+=\left(1-\frac{\lambda\sqrt L}{\rho\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2}\right)_+
+(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}),\quad k=1,\ldots,K.
+\tag{5.83}
+\end{equation}
+现在将稀疏函数型结构方程模型的参数估计算法汇总为结论 5.8。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.8：用 FSEM 构建基因型—甲基化网络的算法}\par
+对每个 $i=1,\ldots,M$，执行以下步骤。
+\begin{enumerate}[label=步骤 \arabic*：,leftmargin=4.8em]
+\item 初始化：
+\[
+\begin{aligned}
+\mu^0&:=0,\\
+\Delta_i^0&:=[W_i^TX(X^TX)^{-1}X^TW_i+\rho I]^{-1}W_i^TX(X^TX)^{-1}X^Ty_i,\\
+Z_i^0&:=\Delta_i^0,
+\end{aligned}
+\]
+其中，$\rho$ 为预先指定的参数。执行步骤 2、3、4，直至收敛。
+\item
+\[
+\begin{aligned}
+\Delta_i^{(l+1)}
+={}&[W_i^TX(X^TX)^{-1}X^TW_i+\rho I]^{-1}\\
+&\quad\times[W_i^TX(X^TX)^{-1}X^Ty_i+\rho(Z_i^{(l)}-\mu^{(l)})].
+\end{aligned}
+\]
+\item
+\[
+Z_{\gamma i}^{(l+1)}
+=\sgn(\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)})
+\left(|\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}|-\frac\lambda\rho\right)_+,
+\]
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+\[
+Z_{ki}^{(l+1)}
+=\left(-\frac{\lambda\sqrt L}{\rho\lVert\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\rVert_2}\right)_+
+(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}),\quad k=1,\ldots,K.
+\]
+\item
+\[
+\mu^{(l+1)}=\mu_i^{(l)}+(\Delta_i^{(l+1)}-Z_i^{(l+1)}).
+\]
+\end{enumerate}

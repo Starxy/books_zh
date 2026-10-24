@@ -1,0 +1,39 @@
+% 原书第195—196页：9.6。
+\clearpage
+\section{习题}
+\setcounter{problem}{9}
+
+\begin{problem}[充分性]
+证明注9.4。
+\end{problem}
+
+\begin{problem}[Simpson悖论]
+构造一个结构因果模型 $\mathfrak C$，包含二值随机变量 $X,Y$ 和变量序列 $Z_1,Z_2,\ldots$，使得对任意偶数 $d\geq0$ 以及任意 $z_1,\ldots,z_{d+1}$，均有
+\[
+\begin{aligned}
+ &P^{\mathfrak C}(Y=1\mid X=1,Z_1=z_1,\ldots,Z_d=z_d)\\
+ &\quad>P^{\mathfrak C}(Y=1\mid X=0,Z_1=z_1,\ldots,Z_d=z_d),
+\end{aligned}
+\]
+但
+\[
+\begin{aligned}
+ &P^{\mathfrak C}(Y=1\mid X=1,Z_1=z_1,\ldots,Z_d=z_d,Z_{d+1}=z_{d+1})\\
+ &\quad<P^{\mathfrak C}(Y=1\mid X=0,Z_1=z_1,\ldots,Z_d=z_d,Z_{d+1}=z_{d+1}).
+\end{aligned}
+\]
+这个例子将Simpson悖论推向极端。如果 $X$ 表示治疗，$Y$ 表示康复，而 $Z_1,Z_2,\ldots$ 表示一些混杂因子，那么根据调整公式 (6.13)，每加入一个变量进行调整，关于治疗有益还是有害的因果结论都会逆转。
+\end{problem}
+
+\begin{problem}[工具变量]
+考虑结构因果模型
+\[
+\begin{aligned}
+ H&:=N_H,\\
+ Z&:=N_Z,\\
+ X&:=f(Z)+g(H)+N_X,\\
+ Y&:=\alpha X+j(H)+N_Y,
+\end{aligned}
+\]
+并假设可以观测到 $Z,X,Y$ 的联合分布。已知的是分布而非有限样本时，将 $X$ 对 $Z$ 作非参数回归，得到的回归函数就是条件均值 $\EE[X\mid Z=z]$。写出两阶段最小二乘法，并证明它能够\mbox{识别 $\alpha$}。
+\end{problem}

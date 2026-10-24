@@ -1,0 +1,49 @@
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.3cm,y=1.15cm]
+\node[ch10node] (ch10f8a-X-0) at (0,1) {$X_{t-3}$};
+\node[ch10node] (ch10f8a-X-1) at (1,1) {$X_{t-2}$};
+\node[ch10node] (ch10f8a-X-2) at (2,1) {$X_{t-1}$};
+\node[ch10node] (ch10f8a-X-3) at (3,1) {$X_{t}$};
+\node[ch10node] (ch10f8a-Y-0) at (0,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f8a-Y-1) at (1,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f8a-Y-2) at (2,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f8a-Y-3) at (3,0) {$Y_{t}$};
+\draw[ed] (ch10f8a-Y-0)--(ch10f8a-Y-1);
+\draw[ed] (ch10f8a-Y-1)--(ch10f8a-Y-2);
+\draw[ed] (ch10f8a-Y-2)--(ch10f8a-Y-3);
+\draw[ed] (ch10f8a-X-0)--(ch10f8a-Y-0);
+\draw[ed] (ch10f8a-X-1)--(ch10f8a-Y-1);
+\draw[ed] (ch10f8a-X-2)--(ch10f8a-Y-2);
+\draw[ed] (ch10f8a-X-3)--(ch10f8a-Y-3);
+\end{tikzpicture}
+\par\small (a) Granger因果性无法检测$X$对$Y$的影响，因为$X$的过去仅通过$Y$的过去影响$Y_t$。
+\end{minipage}\hfill
+\begin{minipage}[t]{.47\linewidth}
+\centering
+\begin{tikzpicture}[causal,x=1.3cm,y=1.15cm]
+\node[ch10node] (ch10f8b-X-0) at (0,1) {$X_{t-3}$};
+\node[ch10node] (ch10f8b-X-1) at (1,1) {$X_{t-2}$};
+\node[ch10node] (ch10f8b-X-2) at (2,1) {$X_{t-1}$};
+\node[ch10node] (ch10f8b-X-3) at (3,1) {$X_{t}$};
+\node[ch10node] (ch10f8b-Y-0) at (0,0) {$Y_{t-3}$};
+\node[ch10node] (ch10f8b-Y-1) at (1,0) {$Y_{t-2}$};
+\node[ch10node] (ch10f8b-Y-2) at (2,0) {$Y_{t-1}$};
+\node[ch10node] (ch10f8b-Y-3) at (3,0) {$Y_{t}$};
+\draw[ed] (ch10f8b-X-0)--(ch10f8b-X-1);
+\draw[ed] (ch10f8b-X-1)--(ch10f8b-X-2);
+\draw[ed] (ch10f8b-X-2)--(ch10f8b-X-3);
+\draw[ed] (ch10f8b-Y-0)--(ch10f8b-Y-1);
+\draw[ed] (ch10f8b-Y-1)--(ch10f8b-Y-2);
+\draw[ed] (ch10f8b-Y-2)--(ch10f8b-Y-3);
+\draw[ed] (ch10f8b-X-0)--(ch10f8b-Y-0);
+\draw[ed] (ch10f8b-X-1)--(ch10f8b-Y-1);
+\draw[ed] (ch10f8b-X-2)--(ch10f8b-Y-2);
+\draw[ed] (ch10f8b-X-3)--(ch10f8b-Y-3);
+\end{tikzpicture}
+\par\small (b) 这里，$X$的过去仍有助于预测$Y_t$，因为$X_{t-1}$通过$X_t$间接影响$Y_t$。因此，Granger因果性仍能检测$X$对$Y$的影响。
+\end{minipage}
+\caption{两种存在即时效应的情形：Granger因果性在(a)中无法检测，在(b)中能够检测。}
+\end{figure}

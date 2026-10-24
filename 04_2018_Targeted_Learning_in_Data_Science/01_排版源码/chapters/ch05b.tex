@@ -1,0 +1,128 @@
+% 原书分章 PDF 第 4—8 页：第 5.2 节。
+\section{用于靶向极大似然估计的通用最不利子模型}
+
+设 $P_n^0$ 是 $P_0$ 的初始估计量。假定给定 $P\in\mathcal M$，我们能够构造一个通用最不利参数模型 $\operatorname{Ulfm}(P)=\{P_\epsilon:\epsilon\in(-a,a)\}\subset\mathcal M$。若将它用作 TMLE 的参数子模型，那么 TMLE 就会在一步内收敛。具体而言，令
+\[
+ \epsilon_n^0=\argmax_\epsilon P_n\log\frac{dP_{n,\epsilon}^0}{dP_n^0}.
+\]
+可以将极大值点 $\epsilon_n^0$ 换成离 $\epsilon=0$ 最近的局部极大值点；当所选的通用最不利子模型允许存在多个局部极大值时，我们建议这样做。令 $P_n^1=P_{n,\epsilon_n^0}^0$。由于 $\epsilon_n^0$ 是局部极大值点，所以它解出了得分方程 $P_nD^*(P_n^1)=0$。也就是说，它一步就实现了解出所需有效影响曲线方程的目标。继续迭代不会再产生更新，因为下一个 MLE 为
+\[
+ \epsilon_n^1=\argmax_\epsilon P_n\log\frac{dP_{n,\epsilon}^1}{dP_n^1}=0.
+\]
+因此，$\psi_0=\Psi(P_0)$ 的 TMLE 就是一步 TMLE $\psi_n^*=\Psi(P_n^1)$。
+
+此外，我们有充分理由猜测：使用这种通用最不利模型的 TMLE，其有限样本表现往往优于使用局部（非通用）最不利子模型的迭代 TMLE。在思想上，它也更为理想，因为它始终沿 $\epsilon$ 的一条路径前进，而在每个 $\epsilon$ 值处，每单位信息量所对应的参数平方变化率都达到最大。
+
+\subsection{解析公式}
+
+这促使我们考虑：这样的通用最不利模型是否存在，又能否构造出来？答案是肯定的，下文的构造将说明这一点。下面用 $p_\epsilon$ 表示 $P_\epsilon$ 相对于 $P$ 的密度，因此 $p=1$；不过，我们仍保留 $p$ 的写法，以便在希望采用相对于其他控制测度的密度时使用这些公式。对于 $\epsilon\geq0$，递归定义
+\begin{equation}
+ p_\epsilon=p\exp\left(\int_0^\epsilon D^*(P_x)\,dx\right),
+ \tag{5.2}
+\end{equation}
+而对于 $\epsilon<0$，递归定义
+\[
+ p_\epsilon=p\exp\left(-\int_\epsilon^0 D^*(P_x)\,dx\right).
+\]
+
+\begin{bookresult}{定理}{5.1}
+考虑以上定义的 $\{P_\epsilon:\epsilon\in(-a,a)\}$。它是一组受 $P$ 控制的概率分布，满足 $P_{\epsilon=0}=P$，且对每个 $\epsilon\in(-a,a)$，都有
+\[
+ \frac{d}{d\epsilon}\log\frac{dP_\epsilon}{dP}=D^*(P_\epsilon).
+\]
+\end{bookresult}
+
+\begin{proof}
+显然，对每个 $\epsilon$，$\frac{d}{d\epsilon}\log p_\epsilon=D^*(P_\epsilon)$。还需验证 $p_\epsilon$ 满足 $\int p_\epsilon(o)\,dP(o)=1$（显然 $p_\epsilon\geq0$）。定义 $C(\epsilon,P)\equiv\int p_\epsilon\,dP$。考虑概率密度 $p_{\epsilon,1}=C(\epsilon,P)^{-1}p_\epsilon$，它在 $\epsilon$ 处的得分为
+% 原书在此将归一化常数导数项印为正号，照录。
+\[
+ S(\epsilon,P)=\frac{1}{C(\epsilon,P)}
+ \frac{d}{d\epsilon}C(\epsilon,P)+D^*(P_\epsilon).
+\]
+我们知道 $P_\epsilon S(\epsilon,P)=0$。又由于 $P_\epsilon D^*(P_\epsilon)=0$，所以 $\frac{d}{d\epsilon}C(\epsilon,P)=0$。因此，$C(\epsilon,P)=C(0,P)=1$，证明完毕。
+\end{proof}
+
+注意，递归关系式 (5.2) 允许在给定 $\{p_x:x\in[0,\epsilon]\}$ 后递归求解 $p_{\epsilon+d\epsilon}$；例如，对于 $\epsilon>0$，
+\[
+ \frac{p_{\epsilon+d\epsilon}}{p_\epsilon}
+ =\exp\{D^*(P_\epsilon)d\epsilon\}
+ =\{1+d\epsilon D^*(P_\epsilon)\}.
+\]
+这一微分方程等价于 $\frac{d}{d\epsilon}\log p_\epsilon=D^*(P_\epsilon)$。由此可得到一个实用构造：从 $p_{x_0=0}=p$ 出发，在任意精细的网格 $0=x_0<x_1<\cdots<x_N=a$ 上递归求解
+\[
+ p_{x_j}=p_{x_{j-1}}
+ \{1+(x_j-x_{j-1})D^*(P_{x_{j-1}})\},
+ \qquad j=1,\ldots,N.
+\]
+类似地，递归确定
+\[
+ p_{-x_j}=p_{-x_{j-1}}
+ \{1-(x_j-x_{j-1})D^*(P_{-x_{j-1}})\},
+ \qquad j=1,\ldots,N.
+\]
+
+如果模型 $\mathcal M$ 是非参数的，那么，这一实用构造就是 $\mathcal M$ 的子模型。但若模型受到限制，上述实用构造选出的概率分布 $P_{x_j}$ 就可能不属于 $\mathcal M$，尽管它在 $x_j$ 处的得分等于 $D^*(P_{x_j})$，属于模型 $\mathcal M$ 在 $P_{x_j}$ 处的切空间。尽管如此，只要能够扩展目标参数 $\Psi$，使其在理论最不利模型的这一离散近似所包含的概率分布上有良好定义，那么，这个最不利模型的实用构造就可用于任何模型 $\mathcal M$。在正则条件下，TMLE 仍然只需一步，而且对于实际模型 $\mathcal M$ 渐近有效。此外，下一小节的定理 5.2 将证明一个颇为出人意料的结论：在温和的正则条件下，将上述实用构造在分割越来越精细时的极限定义为该通用最不利模型的理论公式 (5.2)，它实际上是 $\mathcal M$ 的子模型。换一种理解，在上述实用构造 $\{p_{x_j},p_{-x_j}:j=0,\ldots,N\}$ 中，只要分割取得足够精细，就能得到一列任意接近模型 $\mathcal M$ 的密度。下面还会给出另一种实用构造，它既近似理论公式 (5.2)，又保留子模型性质。
+
+\subsection{用局部最不利子模型表示通用最不利子模型}
+
+上述解析公式 (5.2) 的另一种表示是乘积积分（product integral）。令 $d\epsilon>0$。对于 $\epsilon\geq0$，定义
+\[
+ p_{\epsilon+d\epsilon}
+ =p\prod_{x\in(0,\epsilon]}\{1+D^*(P_x)\,dx\},
+\]
+而对于 $\epsilon<0$，定义
+\[
+ p_{\epsilon-d\epsilon}
+ =p\prod_{x\in[\epsilon,0)}\{1-D^*(P_x)\,dx\}.
+\]
+换句话说，$p_{x+dx}=p_x\{1+D^*(P_x)dx\}$。也可以这样理解：构造一个经过 $P_x$、且在 $P_x$ 处的得分为 $D^*(P_x)$ 的最不利模型，然后在稍稍偏离零的参数值 $dx$ 处求值，即得到 $p_{x+dx}$。这提示我们将通用最不利模型推广如下；此时，其实用对应构造仍会是 $\mathcal M$ 的实际子模型。
+
+设 $0=x_0<x_1<\cdots\leq x_N=a$ 是区间 $[0,a]$ 上的等距精细网格，$h=x_j-x_{j-1}$ 是分割单元的宽度。我们将构造 $P_{x_j}$，$j=0,\ldots,N$。这一构造用映射
+$P\mapsto\{P_\delta^{\mathrm{lfm}}:\delta\in(-a,a)\}\subset\mathcal M$
+来表示。对任意 $P\in\mathcal M$，该映射给出一个经过 $P$ 的 $\mathcal M$ 的局部最不利子模型，经过点对应 $\delta=0$，且在 $\delta=0$ 处的得分为 $D^*(P)$；这里 $a$ 是某个正数。对于由 $\mathcal M$ 与 $\Psi$ 定义的任意估计问题，通常都能构造这样的局部最不利子模型，因此这几乎算不上额外假设。令 $P_{x=0}=P$，并令 $p_{x_1}=p_{x_0,h}^{\mathrm{lfm}}$；一般地，令 $p_{x_{j+1}}=p_{x_j,h}^{\mathrm{lfm}}$，$j=1,2,\ldots,N-1$。类似地，设 $-a=-x_N<-x_{N-1}<\cdots<-x_1<x_0=0$ 是 $[-a,0]$ 上对应的网格，并定义 $p_{-x_{j+1}}=p_{-x_j,-h}^{\mathrm{lfm}}$，$j=1,\ldots,N-1$。这样就定义了 $P_{x_j},P_{-x_j}$，$j=0,\ldots,N$；根据构造，它们都是模型 $\mathcal M$ 中的概率分布。选择 $N$ 就确定了终点 $a$，但不必预先选定 $N$，只需选一个小的 $dx=x_j-x_{j-1}$，然后继续更新，直到到达第一个局部 MLE。在实践中使用通用最不利子模型（例如在 TMLE 中）时，这一构造已经足够。
+
+让 $N$ 趋向无穷（即令分割宽度趋向零），就能从这一实用构造得到一个理论表述。也就是说，给定局部最不利模型参数化 $(\epsilon,P)\mapsto p_\epsilon^{\mathrm{lfm}}$，该通用最不利子模型的一种解析表示为：对于 $\epsilon>0$ 与 $d\epsilon>0$，
+\[
+ p_{\epsilon+d\epsilon}=p_{\epsilon,d\epsilon}^{\mathrm{lfm}}.
+\]
+这使我们能从 $p_{\epsilon=0}=p$ 出发递归求解 $p_\epsilon$；而由于 $p_{\epsilon,h}^{\mathrm{lfm}}\in\mathcal M$，其实用近似绝不会离开模型 $\mathcal M$。
+
+利用最不利模型 $h\mapsto p_{\epsilon,h}^{\mathrm{lfm}}$ 连续二次可微、且在 $h=0$ 处具有得分 $D^*(P_\epsilon)$，得到二阶 Taylor 展开
+\[
+ \begin{aligned}
+ p_{\epsilon,d\epsilon}^{\mathrm{lfm}}
+ &=p_\epsilon+
+ \left.\frac{d}{dh}p_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}
+ d\epsilon+O((d\epsilon)^2)\\
+ &=p_\epsilon\{1+d\epsilon D^*(P_\epsilon)\}
+ +O((d\epsilon)^2),
+ \end{aligned}
+\]
+因而
+\[
+ p_{\epsilon+d\epsilon}
+ =p_\epsilon\{1+d\epsilon D^*(P_\epsilon)\}+O((d\epsilon)^2).
+\]
+这意味着
+\[
+ p_\epsilon=p\exp\left(\int_0^\epsilon D^*(P_x)\,dx\right).
+\]
+因此，我们得到了与上文完全相同的表示式 (5.2)。这证明，在温和的正则条件下，这一解析表示 (5.2) 终究是 $\mathcal M$ 的子模型。不过，在实际实现和近似时，应使用真正的局部最不利子模型，以保证始终留在模型内。下面的定理将这一结果形式化。
+
+\begin{bookresult}{定理}{5.2}
+设 $\mathcal O$ 为一个最大支撑集，使任意 $P\in\mathcal M$ 的支撑集均包含于 $\mathcal O$。假定存在映射
+$P\mapsto\{P_\delta^{\mathrm{lfm}}:\delta\in(-a,a)\}\subset\mathcal M$，
+它将任意 $P\in\mathcal M$ 映为一个经过 $P$ 的 $\mathcal M$ 的局部最不利子模型，经过点对应 $\delta=0$，且在 $\delta=0$ 处的得分为 $D^*(P)$；其中 $a$ 是与 $P$ 无关的某个正数。此外，假定存在如下类型的二阶 Taylor 展开：
+\[
+ p_{\epsilon,d\epsilon}^{\mathrm{lfm}}
+ =p_\epsilon+
+ \left.\frac{d}{dh}p_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}
+ d\epsilon+R_2(p_\epsilon,d\epsilon),
+\]
+其中
+\[
+ \sup_\epsilon\sup_{o\in\mathcal O}
+ |R_2(p_\epsilon,d\epsilon)(o)|=O((d\epsilon)^2).
+\]
+还假定 $\sup_\epsilon\sup_{o\in\mathcal O}|D^*(P_\epsilon)p_\epsilon|(o)<\infty$。那么，式 (5.2) 所定义的通用最不利模型 $\{p_\epsilon:\epsilon\}$ 是 $\mathcal M$ 的实际子模型。其定义对应于 $p_{\epsilon+d\epsilon}=p_{\epsilon,d\epsilon}^{\mathrm{lfm}}$，而对应的实用近似仍然是一个子模型。
+\end{bookresult}

@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.0cm}*{5}{>{\centering\arraybackslash}X}}
+ \toprule
+ 模型 & 独立同分布\newline 条件下预测 & 分布变化或\newline 干预下预测
+      & 回答反事实\newline 问题 & 获得物理\newline 层面的认识 & 从数据\newline 中学习 \\
+ \midrule
+ 机理／物理模型\newline （如第 2.3 节） & 是 & 是 & 是 & 是 & ? \\
+ \addlinespace[3pt]
+ 结构因果模型\newline （如第 6.2 节） & 是 & 是 & 是 & ? & ? \\
+ \addlinespace[3pt]
+ 因果图模型\newline （如第 6.5.2 节） & 是 & 是 & 否 & ? & ? \\
+ \addlinespace[3pt]
+ 统计模型\newline （如第 1.2 节） & 是 & 否 & 否 & 否 & 是 \\
+ \bottomrule
+\end{tabularx}
+\caption{模型的一个简单分类。最详细的模型（最上行）是机理模型或物理模型，通常涉及一组微分方程。另一个极端（最下行）是纯粹的统计模型：这种模型可以从数据中学习，但除了刻画伴随现象之间的关联之外，往往难以提供更多认识。因果模型可以看作介于两者之间的描述：它不再追求完整再现物理细节，却保留了回答某些干预或反事实问题的能力。物理模型与结构因果模型之间的联系，参见 Mooij et al. [2013]；关于干预的讨论，参见第 6.3 节。}
+\label{tab:1.1}
+\end{table}

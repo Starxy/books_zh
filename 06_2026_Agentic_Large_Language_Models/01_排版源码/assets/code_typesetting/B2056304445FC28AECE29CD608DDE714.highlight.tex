@@ -1,0 +1,24 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{sentence\PYGZus{}transformers}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{SentenceTransformer}\PYG{p}{,} \PYG{n}{util}
+
+\PYG{c+c1}{\PYGZsh{} Prepare a small corpus}
+\PYG{n}{texts} \PYG{o}{=} \PYG{p}{[}
+    \PYG{l+s+s2}{\PYGZdq{}The Eiffel Tower is in Paris.\PYGZdq{}}\PYG{p}{,}
+    \PYG{l+s+s2}{\PYGZdq{}The capital of France is Paris.\PYGZdq{}}\PYG{p}{,}
+    \PYG{l+s+s2}{\PYGZdq{}Berlin is the capital of Germany.\PYGZdq{}}\PYG{p}{,}
+    \PYG{l+s+s2}{\PYGZdq{}The Great Wall is in China.\PYGZdq{}}
+\PYG{p}{]}
+
+\PYG{n}{model} \PYG{o}{=} \PYG{n}{SentenceTransformer}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}all\PYGZhy{}MiniLM\PYGZhy{}L6\PYGZhy{}v2\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{corpus\PYGZus{}embeddings} \PYG{o}{=} \PYG{n}{model}\PYG{o}{.}\PYG{n}{encode}\PYG{p}{(}\PYG{n}{texts}\PYG{p}{,} \PYG{n}{convert\PYGZus{}to\PYGZus{}tensor}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{semantic\PYGZus{}search}\PYG{p}{(}\PYG{n}{question}\PYG{p}{,} \PYG{n}{k}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{):}
+    \PYG{n}{query\PYGZus{}emb} \PYG{o}{=} \PYG{n}{model}\PYG{o}{.}\PYG{n}{encode}\PYG{p}{(}\PYG{n}{question}\PYG{p}{,} \PYG{n}{convert\PYGZus{}to\PYGZus{}tensor}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+    \PYG{n}{scores} \PYG{o}{=} \PYG{n}{util}\PYG{o}{.}\PYG{n}{cos\PYGZus{}sim}\PYG{p}{(}\PYG{n}{query\PYGZus{}emb}\PYG{p}{,} \PYG{n}{corpus\PYGZus{}embeddings}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{top\PYGZus{}results} \PYG{o}{=} \PYG{n}{scores}\PYG{o}{.}\PYG{n}{topk}\PYG{p}{(}\PYG{n}{k}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{score}\PYG{p}{,} \PYG{n}{idx} \PYG{o+ow}{in} \PYG{n+nb}{zip}\PYG{p}{(}\PYG{n}{top\PYGZus{}results}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,} \PYG{n}{top\PYGZus{}results}\PYG{o}{.}\PYG{n}{indices}\PYG{p}{):}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{texts}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}(score:\PYGZdq{}}\PYG{p}{,} \PYG{n}{score}\PYG{o}{.}\PYG{n}{item}\PYG{p}{(),} \PYG{l+s+s2}{\PYGZdq{})\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Example usage}
+\PYG{n}{semantic\PYGZus{}search}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}What is the capital of France?\PYGZdq{}}\PYG{p}{)}
+\end{MintedVerbatim}

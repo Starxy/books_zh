@@ -1,0 +1,46 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{0.1cm}
+\def\bsep{2.5cm}
+
+\tikzstyle{snode} = [minimum width=0.8cm,minimum height=0.5cm,inner sep=1pt,draw,thin]
+\tikzstyle{rnode} = [minimum width=6cm,minimum height=1.1cm,inner sep=2pt,draw]
+
+\begin{scope}
+
+\node [rnode,anchor=west,align=left] (x) at (0,0) {\footnotesize{将 $(5-4i)-2(3+6i)$ 写成}\\[-0.1cm] \footnotesize{一个复数。请逐步思考。}};
+
+\node [rnode,anchor=north west,align=left] (step1) at ([yshift=-0.8cm]x.south west) {\footnotesize{先将 $2$ 分配到括号内各项：}\\[-0.1cm] \footnotesize{$2(3+6i) = 6+12i$。}};
+
+\node [rnode,anchor=north west,align=left] (step2) at ([yshift=-0.8cm]step1.south west) {\footnotesize{因此，$(5-4i)-2(3+6i)$ 等价于}\\[-0.1cm] \footnotesize{$(5-4i)-(6+12i)$。}};
+
+\node [rnode,anchor=north west,align=left] (step3) at ([yshift=-0.8cm]step2.south west) {\footnotesize{现在将各项相减：}\\[-0.1cm] \footnotesize{$5-4i-6-12i = -1-16i$。}};
+
+\node [rnode,anchor=north west,align=left] (step4) at ([yshift=-0.8cm]step3.south west) {\footnotesize{这就是答案。}\\[-0.1cm] \footnotesize{}};
+
+\node [rnode,anchor=north west,align=left] (step5) at ([yshift=-0.8cm]step4.south west) {\footnotesize{也可以写成 $-1-16i$。}\\[-0.1cm] \footnotesize{答案\ \ $-1-16i$。}};
+
+\draw [->] ([yshift=-2pt]x.south) -- ([yshift=2pt]step1.north);
+\draw [->] ([yshift=-2pt]step1.south) -- ([yshift=2pt]step2.north);
+\draw [->] ([yshift=-2pt]step2.south) -- ([yshift=2pt]step3.north);
+\draw [->] ([yshift=-2pt]step3.south) -- ([yshift=2pt]step4.north);
+\draw [->] ([yshift=-2pt]step4.south) -- ([yshift=2pt]step5.north);
+
+\node [anchor=east] (xlabel) at ([xshift=-0.2cm]x.west) {\footnotesize{问题（$\mathbf{x}$）}};
+\node [anchor=east] (step1label) at ([xshift=-0.2cm]step1.west) {\footnotesize{步骤 1（$a_1$）}};
+\node [anchor=east] (step2label) at ([xshift=-0.2cm]step2.west) {\footnotesize{步骤 2（$a_2$）}};
+\node [anchor=east] (step3label) at ([xshift=-0.2cm]step3.west) {\footnotesize{步骤 3（$a_3$）}};
+\node [anchor=east] (step4label) at ([xshift=-0.2cm]step4.west) {\footnotesize{步骤 4（$a_4$）}};
+\node [anchor=east] (step5label) at ([xshift=-0.2cm]step5.west) {\footnotesize{步骤 5（$a_5$）}};
+
+\draw [decoration={brace,amplitude=6pt},decorate] ([yshift=0.0cm,xshift=0.3cm]step1.north east) -- ([yshift=0.0cm,xshift=0.3cm]step5.south east) node [right,pos=0.5,xshift=0.3cm,align=left] {\footnotesize{包含推理路径}\\[-0.1cm] \footnotesize{的解答}};
+
+
+\end{scope}
+
+\end{tikzpicture}
+\end{center}

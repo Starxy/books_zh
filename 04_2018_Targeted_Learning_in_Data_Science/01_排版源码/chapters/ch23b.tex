@@ -1,0 +1,71 @@
+% 原书分章 PDF 第 4—5 页：第 23.2 节。
+\section{估计最优资源约束价值}
+
+现在，我们给出最优 R-C 规则的一种估计策略。后续各节将为该策略提供论证，并表明它对于广泛的数据生成分布均有良好表现。估计策略按以下步骤进行：
+\begin{enumerate}
+\item 使用任何所需的估计策略，获得 $\bar Q_0$、$\bar Q_{b,0}$ 和 $g_0$ 的估计 $\bar Q_n^0$、$\bar Q_{b,n}$ 和 $g_n$；该策略须尊重 $Y$ 有界于单位区间这一事实。
+\item 用相应的经验分布估计 $W$ 的边际分布。
+\item 用代入估计量 $S_n$ 估计 $S_0$，其中
+\[
+ \tau\mapsto\frac1n\sum_{i=1}^n I(\bar Q_{b,n}(w_i)>\tau).
+\]
+\item 用代入估计量 $\eta_n\triangleq\inf\{\tau:S_n(\tau)\leq\kappa\}$ 估计 $\eta_0$。
+\item 用代入估计量 $\tau_n\triangleq\max\{\eta_n,0\}$ 估计 $\tau_0$。
+\item 用代入估计量 $d_n$ 估计 $d_0$，其分布为
+\[
+ P_U(d_n(U,w)=1)=
+ \begin{cases}
+ \dfrac{\kappa-S_n(\tau_n)}{\Pr_{P_n}(\bar Q_{b,n}(W)=\tau_n)},
+ &\text{若 }\bar Q_{b,n}(w)=\tau_n\text{ 且 }\tau_n>0,\\[6pt]
+ I(\bar Q_{b,n}(w)>\tau_n),&\text{其他情形。}
+ \end{cases}
+\]
+\item 对参数 $\Psi_{d_n}(P_0)$ 运行靶向最小损失估计（targeted minimum loss-based estimation，TMLE）：
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item 对 $\tilde a\in\{0,1\}$，定义
+$H_n^*(a,w)\triangleq P_U(d_n(U,w)=a)/g_n(a\mid w)$。
+使用下列变量运行一元 logistic 回归：
+\[
+\begin{array}{ll}
+ \text{结局：}&(y_i:i=1,\ldots,n),\\
+ \text{偏移项：}&(\logit\bar Q_n^0(a_i,w_i):i=1,\ldots,n),\\
+ \text{协变量：}&\{H_n^*(a_i,w_i):i=1,\ldots,n\}.
+\end{array}
+\]
+令 $\epsilon_n$ 表示协变量系数的估计，即
+\[
+\begin{aligned}
+ \epsilon_n\triangleq\argmax\nolimits\ \epsilon\in\mathbb R\ \frac1n\sum_{i=1}^n
+ \Bigl(&\bar Q_n^\epsilon(a_i,w_i)\log y_i\\
+ &+\bigl(1-\bar Q_n^\epsilon(a_i,w_i)\bigr)\log(1-y_i)\Bigr),
+\end{aligned}
+\]
+其中
+\[
+ \bar Q_n^\epsilon(a,w)\triangleq\logit^{-1}\bigl(\logit\bar Q_n^0(a,w)+\epsilon H_n^*(a,w)\bigr).
+\]
+\item 定义 $\bar Q_n^*\triangleq\bar Q_n^{\epsilon_n}$。
+\item 使用下列代入估计量估计 $\Psi_{d_n}(P_0)$：
+\[
+ \Psi_{d_n}(P_n^*)\triangleq\frac1n\sum_{i=1}^n\sum_{a=0}^1
+ \bar Q_n^*(a,w_i)P_U(d_n(U,w_i)=a).
+\]
+\end{enumerate}
+\end{enumerate}
+我们用 $\Psi_{d_n}(P_n^*)$ 估计 $\Psi(P_0)$。把这一估计量记为 $\hat\Psi$，其中 $\hat\Psi$ 的定义满足 $\hat\Psi(P_n)=\Psi_{d_n}(P_n^*)$。注意，我们对依赖数据的参数 $\Psi_{d_n}(P_0)$ 使用了 TMLE；该参数表示随机干预 $d_n$ 下的价值。尽管如此，在有关估计量 $\hat\Psi$ 的许多结果中，我们假定 $P_0(\bar Q_{b,0}(W)=\tau_0)=0$，即假定最优 R-C 规则是确定性的。我们认为，估计随机干预而非确定性干预下的价值是有益的，因为可以给出使上述估计量在所有分布 $P_0$ 下均为 $\Psi(P_0)$ 的（$\sqrt n$）一致估计的条件，即使在满足 $P_0(\bar Q_{b,0}(W)=\tau_0)>0$ 的分布 $P_0$ 下，不可忽略的偏差会使感兴趣参数的标准 Wald 型置信区间失效。
+
+我们用 $P_n^*$ 表示满足以下性质的任意分布：$\bar Q_{P_n^*}=\bar Q_n^*$、$g_{P_n^*}=g_n$，并且 $P_n^*$ 中 $W$ 的边际分布为 $W$ 的边际经验分布。只要 $\bar Q_n^*$ 与 $g_n$ 分别属于 $P\mapsto\bar Q_P(W)$ 和 $P\mapsto g_P$ 的参数空间，这样的分布 $P_n^*$ 就存在。在实践中，我们建议用超级学习等集成方法估计 $\bar Q_0$ 与 $\bar Q_{b,0}$，以便在参数模型与数据自适应回归算法的混合之间达到最优的偏差—方差权衡（更一般地说，使交叉验证风险最小）（van der Laan 等，2007；Luedtke 与 van der Laan，2016b）。如果处理机制 $g_0$ 未知，我们建议用类似的数据自适应方法获得估计 $g_n$。如果 $g_0$ 已知（例如没有缺失的随机对照试验），那么可以直接取 $g_n=g_0$，也可以使用正确设定的参数模型估计 $g_0$；我们预期，在似然中的 $\bar Q_0$ 部分设定错误时，这会提高估计量的统计效率（van der Laan 与 Robins，2003；van der Laan 与 Luedtke，2015）。
+
+使用数据自适应方法估计所需的似然部分，通常并没有多少不利之处，不过我们会在第 23.4 节给出一个正式的经验过程条件，准确刻画这些估计量可以具有多强的数据自适应性。如果担心所需似然部分的估计量具有过强的数据自适应性，可以考虑 van der Laan 与 Luedtke（2015）提出的交叉验证 TMLE 方法。这种方法不限制 $\bar Q_0$、$\bar Q_{b,0}$ 或 $g_0$ 估计量的数据自适应性。
+
+现在概述本章在适当的一致性与正则性条件下成立的主要结果。
+\begin{itemize}
+\item $\hat\Psi$ 的渐近线性：
+\[
+ \hat\Psi(P_n)-\Psi(P_0)=\frac1n\sum_{i=1}^nD_0(O_i)+o_{P_0}(n^{-1/2}),
+\]
+其中 $D_0$ 是 $P_0$ 的一个已知函数。
+\item $\hat\Psi$ 是 $\Psi(P_0)$ 的渐近有效估计。
+\item 可以获得 $D_0(O)$ 方差的一致估计 $\sigma_n^2$。$\Psi(P_0)$ 的一个渐近有效的 95\% 置信区间为 $\hat\Psi(P_n)\pm1.96\sigma_n/\sqrt n$。
+\end{itemize}
+后续各节给出能够推出上述结果的一致性与正则性条件。

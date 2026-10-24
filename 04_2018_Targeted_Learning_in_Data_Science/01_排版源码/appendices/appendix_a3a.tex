@@ -1,0 +1,116 @@
+
+% 附录源 PDF 第 9—11 页；A.3.1、A.3.2。
+\section{在线超级学习}
+
+本节首先证明，在线交叉验证风险与其所需目标之差是一个离散鞅，并介绍文献中的一个定理，为此类离散鞅的尾概率给出指数不等式。随后证明定理 18.1。定理 18.2 的证明简单得多，故略去。最后，简要回顾用于在线估计的随机梯度下降算法文献。
+
+\subsection{在线交叉验证风险减去在线交叉验证真实风险是离散鞅}
+
+在线交叉验证风险与在线交叉验证真实风险（其最小化者是预言选择器）之差，可以写为如下鞅：
+\[
+\begin{aligned}
+&(n-n_l+1)\{R_{\mathrm{CV},n}(\widehat\Psi_k)
+ -\widetilde R_{\mathrm{CV},n}(\widehat\Psi_k)\}\\
+&=\sum_{t_0=n_l+1}^n\bigl\{
+ L(\widehat\Psi_k(P_{t_0-1}))(Z(t_0),O(t_0))
+ -L(\psi_0)(Z(t_0),O(t_0))\bigr\}\\
+&\qquad-\sum_{t_0=n_l+1}^nP_{\theta_{0,t_0},Z(t_0)}
+ \{L(\widehat\Psi_k(P_{t_0-1}))-L(\psi_0)\}\\
+&=\sum_{t_0=n_l+1}^n\Bigl\{
+ f(t_0,\bar O(t_0-1),O(t_0))\\
+&\hspace{8em}-E_0\bigl(f(t_0,\bar O(t_0-1),O(t_0))\mid\bar O(t_0-1)\bigr)\Bigr\}\\
+&\equiv M_n(f),
+\end{aligned}
+\]
+其中
+\[
+f(t_0,\bar O(t_0-1),O(t_0))
+ =L(\widehat\Psi_k(P_{t_0-1}))(Z(t_0),O(t_0))-L(\psi_0).
+\]
+对于 $k<n$，有 $E_0(M_n(f)\mid\bar O(k))=M_k(f)$。这就证明了 $(M_n(f):n=n_l+1,\ldots)$ 是关于 $n$ 的离散鞅。
+
+\subsection{尾概率的鞅指数不等式}
+
+为了对基于数据 $O(1),\ldots,O(n)$ 的在线交叉验证选择器建立预言不等式，我们需要鞅和 $M_n(f)$ 的尾概率指数不等式。为此，采用 Chambaz and van der Laan (2011a) 第 40 页定理 8 所引用、由 van Handel (2009) 建立的下列鞅指数不等式。
+
+\begin{bookresult}{定理}{A.2（van Handel 2009 的命题 A2）}
+在本定理中，令
+$M_n(f)=\sum_{i=1}^n f(i,O(i),\bar O(i-1))-P_{\theta_{0,i},Z(i)}f$，其中 $P_{\theta_{0,i},Z(i)}$ 表示给定 $Z(i)$ 时 $O(i)$ 的条件概率分布；令 $\mathcal F$ 为这样一类函数 $f$ 的集合。固定 $K>0$，对所有 $f\in\mathcal F$、$n\ge1$，定义
+\[
+\widetilde R_{n,K}(f)
+ =\frac{2K^2}{n}\sum_{i=1}^nP_{\theta_{0,i},Z(i)}
+ \phi\left(\frac{|f|}{K}\right),
+\]
+其中 $\phi(x)\equiv\exp(x)-x-1$。存在通用常数 $C>0$，例如 $C=100$ 即可，使得对任意 $n\ge1$、$R>0$，
+\[
+P\left(\sup_{f\in\mathcal F}
+ I(\widetilde R_{n,K}(f)\le R)\frac{M_n(f)}n\ge x\right)
+ \le2\exp\left\{-\frac{nx^2}{C^2(c_1+1)R}\right\},
+\]
+对所有满足 $c_0^2\ge C^2(c_1+1)$ 且
+\[
+\frac{c_0}{\sqrt n}\int_0^{\sqrt R}
+ \sqrt{H(\mathcal F,\|\cdot\|_\infty,\epsilon)}\,\mathrm d\epsilon
+ \le x\le\frac{c_1R}{K}
+\]
+的 $x,c_0,c_1>0$ 成立。这里，$H(\mathcal F,\|\cdot\|_\infty,\epsilon)=\log\{1+N(\mathcal F,\|\cdot\|_\infty,\epsilon)\}$ 称为相对于上确界范数的熵函数；$N(\mathcal F,\|\cdot\|_\infty,\epsilon)$ 为覆盖数，定义为覆盖 $\mathcal F$ 所需半径为 $\epsilon$ 的球的个数。
+\end{bookresult}
+
+给定满足 $c_0^2\ge C^2(c_1+1)$ 的 $c_0,c_1$，以及 $R$，当 $x$ 大于 $c_0E/\sqrt n$、小于 $c_1R/K$ 时，上述指数不等式成立，其中
+$E=\int_0^{\sqrt R}\sqrt{H(\mathcal F,\|\cdot\|_\infty,\epsilon)}\,\mathrm d\epsilon$。
+在这一 $x$ 值区间上，有 $x\le c_1R/K$，所以 $c_1\ge xK/R$。因此，上述结果也可以表述为：给定满足 $c_0^2\ge C^2(c_1+1)$ 的 $R,c_0,c_1$，对于 $x\in(c_0E/\sqrt n,c_1R/K)$，有
+\[
+P\left(\sup_{f\in\mathcal F}
+ I(\widetilde R_{n,K}(f)\le R)\frac{M_n(f)}n\ge x\right)
+ \le2\exp\left\{-\frac{nx^2}{C^2(Kx+R)}\right\}.
+\]
+用文字来说，上式表明，当 $x$ 为 $1/\sqrt n$ 量级时，尾概率呈 $\exp(-nx^2)$ 的行为；当 $x$ 较大时，则呈 $\exp(-nx)$ 的行为。
+
+特别地，对单个 $f$，可以得到下面的推论。
+
+\begin{bookresult}{推论}{A.1}
+对任意满足 $c_0^2\ge C^2(c_1+1)$ 的 $c_0,c_1\ge0$，以及 $x\in(c_0\sqrt R/\sqrt n,c_1R/K)$，有
+\begin{equation}
+P\left(I(\widetilde R_{n,K}(f)\le R)\frac{M_n(f)}n\ge x\right)
+ \le2\exp\left\{-\frac{nx^2}{C^2(Kx+R)}\right\}.
+\tag{A.6}
+\end{equation}
+\end{bookresult}
+
+在我们的证明中，$f$ 对应于 $L(\psi)-L(\psi_0)$。关于如何对 $\widetilde R_{n,K}(f)$ 求界，还需指出：如果 $\|f\|_\infty<C$ 一致有界，那么 $\widetilde R_{n,K}(f)$ 也被一个依赖于 $C$ 的常数所界定。对于二次损失函数，在证明中需要用 $n^{-1}\sum_{i=1}^nP_{\theta_{0,i},Z(i)}f$ 对 $\widetilde R_{n,K}(f)$ 求界。为此，将使用下面的引理。
+
+\begin{bookresult}{引理}{A.2}
+令
+\[
+L^0(\widehat\Psi)(\bar O(i))
+ =L(\widehat\Psi(P_{i-1}))(Z(i),O(i))-L(\psi_0)(Z(i),O(i)).
+\]
+假设以概率 1，$\sup_{\psi\in\Psi}|L^0(\psi)(Z(i),O(i))|<M_1<\infty$，且
+\[
+\sup_{\psi\in\Psi}
+ \frac{P_{\theta_{0,i},Z(i)}\{L^0(\psi)\}^2}
+ {P_{\theta_{0,i},Z(i)}L^0(\psi)}\le M_2<\infty.
+\]
+则
+\[
+\begin{aligned}
+\widetilde R_{n,K}(L^0(\widehat\Psi))
+={}&\frac{2K^2}{n}\sum_{i=1}^nP_{\theta_{0,i},Z(i)}
+ \phi\left(\frac{|L^0(\widehat\Psi(P_{i-1}))|}{K}\right)\\
+\le{}&2M_2\bigl(1/2K^2+1/6M_1K\exp(M_1/K)\bigr)\\
+&\qquad\times\frac1n\sum_{i=1}^nP_{\theta_{0,i},Z(i)}L^0(\widehat\Psi(P_{i-1})).
+\end{aligned}
+\]
+\end{bookresult}
+
+\begin{proof}
+对 $\exp(x)$ 作三阶 Taylor 展开，得到
+$\phi(x)=x^2/2!+\exp(\xi(x))x^3/3!$，其中 $\xi(x)$ 为某个中间值。利用 $|x|<M_1/K$，可得上界
+$x^2\{1/2+1/6\exp(M_1/K)M_1/K\}$。因此，
+$P_{\theta_{0,i},Z(i)}\phi(|L^0(\psi)|/K)$
+可以由
+$\{1/2+1/6M_1/K\exp(M_1/K)\}P_{\theta_{0,i},Z(i)}\{L^0(\psi)\}^2$
+来界定。根据假设，这又可以由
+$M_2\{1/2+1/6M_1/K\exp(M_1/K)\}P_{\theta_{0,i},Z(i)}L^0(\psi)$
+来界定。引理得证。
+\end{proof}

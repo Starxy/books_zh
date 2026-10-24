@@ -1,0 +1,98 @@
+% 原书第 105—109 页；6.5.2—6.5.3。
+\subsection{因果图模型}
+
+第 6.6 节将说明，要定义干预分布，通常知道观测分布与图结构就已足够。因此，我们可以将因果图模型定义为一个由图与观测分布组成的二元组，要求分布相对于该图满足马尔可夫性，即因果马尔可夫条件。不过，这里有一个微妙的技术问题：形式上，我们必须知道完整的条件分布。例如，若因为 $p(x_1=3)=0$，$p(x_2\mid x_1=3)$ 没有定义，那么可能也无法定义 $p^{\dox{X_1:=3}}(x_2)$。因此给出以下定义。
+
+\begin{definition}[因果图模型]
+随机变量 $\mathbf X=(X_1,\ldots,X_d)$ 上的\textbf{因果图模型（causal graphical model）}，包含图 $\mathcal G$ 以及一组积分为 $1$ 的函数 $f_j(x_j,x_{\PA_j^{\mathcal G}})$：
+\[
+ \int f_j(x_j,x_{\PA_j^{\mathcal G}})\,\mathrm d x_j=1.
+\]
+这些函数通过
+\[
+ p(x_1,\ldots,x_d)=\prod_{j=1}^d f_j(x_j,x_{\PA_j^{\mathcal G}})
+\]
+在 $\mathbf X$ 上诱导出分布 $P_{\mathbf X}$，因此起到条件分布的作用：$f_j(x_j,x_{\PA_j^{\mathcal G}})=p(x_j\mid x_{\PA_j^{\mathcal G}})$。因果图模型按照第 6.6 节的式 (6.8) 和式 (6.9) 诱导干预分布。在最一般的形式下，可以定义
+\[
+ p^{\dox{X_k:=q(\,\cdot\mid x_{\widetilde{\PA}_k})}}(x_1,\ldots,x_d)
+ =\prod_{j\ne k}f_j(x_j,x_{\PA_j^{\mathcal G}})
+ \ q(\,\cdot\mid x_{\widetilde{\PA}_k}),
+\]
+其中 $q(\,\cdot\mid x_{\widetilde{\PA}_k})$ 的积分为 $1$，并且新父节点不会导致环。
+\end{definition}
+
+如果 $\mathbf X$ 上的分布 $P_{\mathbf X}$ 相对于图 $\mathcal G$ 满足马尔可夫性，且存在严格为正的连续密度 $p$，则二元组 $(P_{\mathbf X},\mathcal G)$ 通过 $f_j(x_j,x_{\PA_j^{\mathcal G}}):=p(x_j\mid x_{\PA_j^{\mathcal G}})$ 定义了一个因果图模型。
+
+为什么我们主要使用结构因果模型，而不只使用图与马尔可夫条件，也就是因果图模型？形式上，结构因果模型包含的信息，严格多于其对应的图与分布，例如它还包含反事实陈述。因此，它包含的信息也多于观测分布与所有干预分布的集合之和。不过，这些额外信息是否有用，仍可以讨论。或许更重要的是，限制结构因果模型中的函数类，能够使因果结构具有可识别性（见第 4.1.3—4.1.6 节及第 7.1.2 节）。用结构因果模型的语言，比用图模型的语言更容易表达这些假设。
+
+\subsection{忠实性与因果极小性}
+
+上一小节讨论的马尔可夫假设，使我们能够从图结构中读出独立关系；忠实性则使我们能够从图结构中推断相依关系。
+
+\begin{definition}[忠实性与因果极小性]
+考虑分布 $P_{\mathbf X}$ 与 DAG $\mathcal G$。
+\begin{enumerate}[label=(\roman*)]
+ \item 若对于所有两两不相交的节点集 $\mathbf A,\mathbf B,\mathbf C$，都有
+ \[
+ \mathbf A\indep\mathbf B\mid\mathbf C
+ \quad\Longrightarrow\quad
+ \mathbf A\indep_{\mathcal G}\mathbf B\mid\mathbf C,
+ \]
+ 则称 $P_{\mathbf X}$ 对 DAG $\mathcal G$ 是\textbf{忠实的（faithful）}。
+ \item 如果一个分布相对于 $\mathcal G$ 满足马尔可夫性，但相对于 $\mathcal G$ 的任何真子图都不满足马尔可夫性，则称其相对于 $\mathcal G$ 满足\textbf{因果极小性（causal minimality）}。
+\end{enumerate}
+\end{definition}
+
+第 (i) 项提出的蕴含方向，与全局马尔可夫条件
+\[
+ \mathbf A\indep_{\mathcal G}\mathbf B\mid\mathbf C
+ \quad\Longrightarrow\quad
+ \mathbf A\indep\mathbf B\mid\mathbf C
+\]
+恰好相反，见定义 6.21。初看时，忠实性并不很直观。下面给出一个分布，它相对于给定 DAG $\mathcal G_1$ 满足马尔可夫性，但不满足忠实性：通过让两条路径的作用相互抵消，产生图结构并不蕴含的独立关系。
+
+\begin{example}[违反忠实性]
+考虑下图。
+\input{figures/ch06_faithfulness}
+先考察与左侧图 $\mathcal G_1$ 对应的线性高斯结构因果模型：
+\[
+ \begin{aligned}
+ X&:=N_X,\\
+ Y&:=aX+N_Y,\\
+ Z&:=bY+cX+N_Z,
+ \end{aligned}
+\]
+其中噪声变量 $N_X\sim\mathcal N(0,\sigma_X^2)$、$N_Y\sim\mathcal N(0,\sigma_Y^2)$、$N_Z\sim\mathcal N(0,\sigma_Z^2)$ 均服从正态分布且相互独立。这是一个图为 $\mathcal G_1$ 的线性高斯结构因果模型（见定义 6.2）。若
+\begin{equation}
+ a\cdot b+c=0,
+ \tag{6.6}
+\end{equation}
+则分布相对于 $\mathcal G_1$ 不忠实，因为会有 $X\indep Z$，而图结构并不蕴含这一独立关系。\footnote{更准确地说，该分布不满足三角忠实性（triangle-faithfulness）［Zhang and Spirtes, 2008］。}
+读者容易验证，存在一个 DAG 为 $\mathcal G_2$ 的结构因果模型，能够诱导出同一个分布。
+\end{example}
+
+为得到上例中的额外独立关系，我们必须“调节”系数，使两条路径在式 (6.6) 中相互抵消。Spirtes et al.［2000，定理 3.2］针对线性模型证明：如果假定系数从严格为正的密度中随机抽取，那么这种情况发生的概率为零。
+
+例 6.34 的分布对 $\mathcal G_2$ 忠实，对 $\mathcal G_1$ 却不忠实。不过，只要所有参数均非零，两个模型都满足因果极小性。换言之，该分布相对于 $\mathcal G_1$ 或 $\mathcal G_2$ 的任何真子图都不满足马尔可夫性，因为删除任意一条边，都会对应一个在该分布中并不成立的新（条件）独立关系。注意，$\mathcal G_2$ 不是 $\mathcal G_1$ 的真子图，但它是 $\mathcal H$ 的真子图；因此，该分布相对于 $\mathcal H$ 不满足因果极小性。一般而言，因果极小性弱于忠实性。
+
+\begin{proposition}[忠实性蕴含因果极小性]
+如果 $P_{\mathbf X}$ 相对于 $\mathcal G$ 同时满足忠实性与马尔可夫性，则满足因果极小性。
+\end{proposition}
+\begin{proof}
+论证如下。如果 $P_{\mathbf X}$ 相对于 $\mathcal G$ 的某个真子图 $\widetilde{\mathcal G}$ 满足马尔可夫性，就存在两个节点，在 $\mathcal G$ 中直接相连，在 $\widetilde{\mathcal G}$ 中却不直接相连。因此，在 $\widetilde{\mathcal G}$ 中可以将它们 d-分离，在 $\mathcal G$ 中却不能（见习题 6.62）。马尔可夫条件使得 $P_{\mathbf X}$ 中出现相应的条件独立陈述，因此 $P_{\mathbf X}$ 不可能对 $\mathcal G$ 忠实。
+\end{proof}
+
+下面的表述与因果极小性等价，希望能帮助读者进一步理解这一条件：分布相对于 $\mathcal G$ 满足极小性，当且仅当不存在这样的节点——给定其余父节点后，它与某个父节点条件独立。在某种意义上，所有父节点都在“起作用”。
+
+\begin{proposition}[因果极小性的等价表述]
+考虑随机向量 $\mathbf X=(X_1,\ldots,X_d)$，假设其联合分布相对于某个乘积测度存在密度。设 $P_{\mathbf X}$ 相对于 $\mathcal G$ 满足马尔可夫性。那么，$P_{\mathbf X}$ 相对于 $\mathcal G$ 满足因果极小性，当且仅当对所有 $X_j$ 和所有 $Y\in\PA_j^{\mathcal G}$，均有
+\[
+ X_j\nindep Y\mid\PA_j^{\mathcal G}\setminus\{Y\}.
+\]
+\end{proposition}
+\begin{proof}
+见附录 C.6。
+\end{proof}
+
+我们已经看到，忠实性是一项将条件独立陈述与因果语义联系起来的强假设，因果极小性则弱得多。假设给定一个违反因果极小性的因果图模型，那么按照命题 6.36 的含义，其中有一条边“不起作用”。删除这条边后，两个模型不一定在定义 6.47 的意义下反事实等价或干预等价。不过，若所有密度都严格为正，或者仅允许对 $X_k$ 实施支撑在 $X_k$ 支撑集某个子集上的干预，则二者干预等价；见习题 6.58。此时，可以将因果极小性理解为避免干预模型描述中出现冗余的约定。在大多数模型类中，如果没有因果极小性，就不可能从观测数据中获得可识别性。例如，若允许 $f$ 仅在 $X$ 的支撑集之外不同于常数 $c$，便无法区分 $Y:=f(X)+N_Y$ 与 $Y:=c+N_Y$；另见注 6.6 和命题 6.49。
+\FloatBarrier

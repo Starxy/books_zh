@@ -1,0 +1,187 @@
+
+% 附录源 PDF 第 26—28 页；A.4.4、A.4.5 全文。
+\subsection{基于有效影响曲线边际期望的在线估计一阶展开}
+
+现在为在线估计建立相应的展开。
+
+\begin{bookresult}{定理}{A.5}
+回顾 $D^N_{g^*}(P)=N^{-1}\sum_{i=1}^N\bar D_{g^*,i}(P)$，其中
+\[
+\bar D_{g^*,i}(P)(O^N)
+ =\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}\bar D_{x(s)}(P)(X(i),C_x(i)),
+\]
+$\bar D_{x(s)}$ 是有效影响曲线中对应于给定 $C_x(s)$ 时 $X(s)$ 条件分布得分的分量。
+有
+\[
+-P_0^N\bar D_{g^*,i}(P)
+ =\Psi_{g^*}(P)-\Psi_{g^*}(P_0)+R_{21,g^*,i}(P,P_0),
+\]
+其中 $R_{21,g^*,i}(P,P_0)=R_{21a,g^*}(\theta,\theta_0)+R_{21b,g^*,i}(P,P_0)$，且
+\[
+\begin{aligned}
+R_{21a,g^*}(\theta,\theta_0)
+={}&\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \left\{\prod_{t=1}^{s-1}P^*_{o(t)}\right\}
+ \Delta_x(P^*_{o(s)},P^*_{0,o(s)})\\
+&\quad\times\Biggl\{\sum_{j=s+1}^{\tau}
+ \prod_{l=s+1}^{j-1}P^*_{o(l)}(P^*_{o(j)}-P^*_{0,o(j)})\\
+&\hspace{12em}\times\prod_{l=j+1}^{\tau}P^*_{0,o(l)}\Biggr\}Y(\tau),
+\end{aligned}
+\]
+\[
+R_{21b,g^*,i}(P,P_0)
+ =\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}R_{21b,x(s),g^*,i}(P,P_0),
+\]
+\[
+\begin{aligned}
+&R_{21b,x(s),g^*,i}(P,P_0)\\
+&=\int_c\int_x\left(\frac{h_{c_x(i),0}}{\bar h_{c_x}}(c)-1\right)
+ \Phi_{x(s)}(x,c)\\
+&\qquad\times\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c).
+\end{aligned}
+\]
+具体而言，这给出如下恒等式：
+\[
+\begin{aligned}
+-\frac1N\sum_{i=1}^NP_0^N\bar D_{g^*,i}(\theta_{i-1})
+={}&\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})-\Psi_{g^*}(\theta_0)\\
+&+\bar R_{21,g^*,N},
+\end{aligned}
+\]
+其中
+\begin{equation}
+\bar R_{21,g^*,N}\equiv\bar R_{21a,g^*,N}+\bar R_{21b,g^*,N},
+\tag{A.14}
+\end{equation}
+且
+\[
+\begin{aligned}
+\bar R_{21a,g^*,N}&\equiv\frac1N\sum_{i=1}^NR_{21a,g^*}(\theta_{i-1},\theta_0),\\
+\bar R_{21b,g^*,N}&\equiv\frac1N\sum_{i=1}^NR_{21b,g^*,i}(\theta_{i-1},\theta_0).
+\end{aligned}
+\]
+\end{bookresult}
+
+\begin{proof}
+在定理 A.3 的证明中，已得到
+\[
+\begin{aligned}
+&\Psi_{g^*}(\theta)-\Psi_{g^*}(\theta_0)\\
+&=\sum_{x\in\{w,a,y\}}\sum_{s=1}^{\tau}
+ \bigl(\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})\bigr)
+ +R_{21a,g^*}(\theta,\theta_0).
+\end{aligned}
+\]
+我们将证明
+\begin{equation}
+\begin{aligned}
+-P_0^N\bar D_{x(s),i}(P)
+={}&\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})\\
+&+R_{21b,x(s),g^*,i}(P,P_0).
+\end{aligned}
+\tag{A.15}
+\end{equation}
+由此得到以下推导：
+\[
+\begin{aligned}
+&-P_0^N\bar D_{g^*,i}(P)\\
+&=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}-P_0^N\bar D_{x(s),i}(P)\\
+&=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}
+ \Bigl\{\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})
+ +R_{21b,x(s),g^*,i}(P,P_0)\Bigr\}\\
+&=\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}
+ \bigl\{\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)})\bigr\}\\
+&\quad+\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}R_{21b,x(s),g^*,i}(P,P_0)\\
+&=\Psi_{g^*}(P)-\Psi_{g^*}(P_0)-R_{21a,g^*}(\theta,\theta_0)\\
+&\quad+\sum_{x\in\{y,a,w\}}\sum_{s=1}^{\tau}R_{21b,x(s),g^*,i}(P,P_0)\\
+&\equiv\Psi_{g^*}(P)-\Psi_{g^*}(P_0)-R_{21a,g^*}(\theta,\theta_0)
+ +R_{21b,g^*,i}(P,P_0),
+\end{aligned}
+\]
+从而证明了定理。因此，只需再建立式 (A.15)。有
+\[
+\begin{aligned}
+&-P_0^N\bar D_{x(s),i}(P)\\
+&=-P_0^N\frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}\\
+&\quad\times\Bigl\{E(Y_{g^*}(\tau)\mid X(s)=X(i),C_x(s)=C_x(i))\\
+&\hspace{7em}-E(Y_{g^*}(\tau)\mid C_x(s)=C_x(i))\Bigr\}\\
+&=P_0^N\frac{h^*_{c_x(s)}(C_x(i))}{\bar h_{c_x}(C_x(i))}
+ \int_x\Phi_{x(s)}(x,C_x(i))\\
+&\hspace{8em}\times\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid C_x(i))\\
+&=\int_c\frac{h^*_{c_x(s)}(c)}{\bar h_{c_x}(c)}
+ \int_x\Phi_{x(s)}(x,c)\\
+&\hspace{6em}\times\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h_{c_x(i),0}(c)\,\mathrm d\mu(c)\\
+&=\int_c\int_x\frac{h_{c_x(i),0}(c)}{\bar h_{c_x}(c)}
+ \Phi_{x(s)}(x,c)\,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c)\\
+&=\int_c\int_x\left(\frac{h_{c_x(i),0}}{\bar h_{c_x}}(c)-1\right)
+ \Phi_{x(s)}(x,c)\,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c)\\
+&\quad+\int_{x,c}\Phi_{x(s)}(x,c)
+ \,\mathrm d(P^*_{x(s)}-P^*_{0,x(s)})(x\mid c)
+ h^*_{c_x(s)}(c)\,\mathrm d\mu(c)\\
+&\equiv R_{21b,x(s),g^*,i}(P,P_0)
+ +\Psi_{g^*,P,x(s)}(P^*_{x(s)})
+ -\Psi_{g^*,P,x(s)}(P^*_{0,x(s)}).
+\end{aligned}
+\]
+证明完毕。
+\end{proof}
+
+\paragraph{余项 $\bar R_{21b,g^*,N}$ 的讨论：另一个平稳性假设。}
+尽管外观相似，来自在线一步估计量和在线 TMLE 分析的余项
+$\bar R_{21b,g^*,N}$，与来自常规 TMLE 和一步估计量分析的余项
+$R_{21b,g^*}$，实际上差别很大。仔细考察可以发现，
+$\bar R_{21b,g^*,N}$ 本质上是对 $1\le i\le N$ 的各个 $i$ 特异乘积求平均，乘积形如
+\[
+\left(1-\frac{h_i(\theta_0)}{N^{-1}\sum_{j=1}^Nh_j(\theta_i)}\right)
+ \times(f(\theta_i)-f(\theta_0)),
+\]
+而 $R_{21b,g^*}$ 对 $i$ 所平均的是
+\[
+\left(1-\frac{N^{-1}\sum_{j=1}^Nh_j(\theta_0)}
+ {N^{-1}\sum_{j=1}^Nh_j(\theta_N)}\right)
+ \times(f(\theta_N)-f(\theta_0)).
+\]
+这一描述虽然粗略，却能说明问题：$f$ 和 $h_i$ 都把 $\theta$ 连续地映射为函数，且 $\theta_N$ 收敛到 $\theta_0$。
+看起来，$\bar R_{21b,g^*,N}$ 只从 $f(\theta_N)-f(\theta_0)$ 趋于零中获益；
+而 $R_{21b,g^*}$ 则通过乘积，同时利用了 $f(\theta_N)-f(\theta_0)$ 和
+\[
+1-\frac{N^{-1}\sum_{j=1}^Nh_j(\theta_0)}{N^{-1}\sum_{j=1}^Nh_j(\theta_N)}
+\]
+这两个因子趋于零的性质。这说明，$\bar R_{21b,g^*,N}$ 的行为可能明显差于 $R_{21b,g^*}$。
+
+还需要对 $\bar R_{21b,g^*,N}$ 作更深入的研究。这里指出，在时间序列满足较强平稳性时，可以把 $\bar R_{21b,g^*,N}$ 表达式中与 $i$ 对应的项换为
+\[
+\left(1-\frac{N^{-1}\sum_{j=1}^Nh_j(\theta_0)}
+ {N^{-1}\sum_{j=1}^Nh_j(\theta_i)}\right)
+ \times(f(\theta_i)-f(\theta_0)),
+\]
+于是，当 $i,N$ 趋于无穷时，$\bar R_{21b,g^*,N}$ 也可以同时利用两个因子趋于零的性质。
+具体而言，仅假设给定 $\bar O(t-1)$ 时产生 $O(t)$ 的机制不随时间 $t$ 改变，可能还不够；可以再增加一个假设：对于 $x=w,a,y$，$C_x(i)$ 的边际密度不随 $i$ 改变。
+
+\subsection{基于有效影响曲线条件期望的在线估计一阶展开}
+
+下面的定理可由定理 A.5 直接推出。
+
+\begin{bookresult}{定理}{A.6}
+有
+\[
+\begin{aligned}
+-\frac1N\sum_{i=1}^NP_{0,o(i)}\bar D_{g^*}(\theta_{i-1})
+={}&\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})-\Psi_{g^*}(\theta_0)\\
+&+\bar R_{21,g^*,N}+\bar R_{22,g^*,N},
+\end{aligned}
+\]
+其中 $\bar R_{21,g^*,N}$ 由式 (A.14) 定义，且
+\[
+\bar R_{22,g^*,N}\equiv\frac1N\sum_{i=1}^N(P_{0,o(i)}-P_0^N)
+ \{\bar D_{g^*}(\theta_{i-1})-\bar D_{g^*}(\theta_0)\}.
+\]
+\end{bookresult}

@@ -1,0 +1,60 @@
+% 原书第189—191页；9.5.3、9.5.4。
+\subsection{基于协方差的约束}
+另一类约束出现在含潜变量的线性模型中。例如，对图9.8，可以得到以下\textbf{四元约束（tetrad constraint）}［Spirtes et al., 2000；Spearman, 1904］：
+\begin{equation}
+ \rho_{AC}\rho_{BD}-\rho_{AD}\rho_{BC}=0,\tag{9.12}
+\end{equation}
+\begin{equation}
+ \rho_{AB}\rho_{CD}-\rho_{AD}\rho_{BC}=0,\tag{9.13}
+\end{equation}
+\begin{equation}
+ \rho_{AC}\rho_{BD}-\rho_{AB}\rho_{CD}=0,\tag{9.14}
+\end{equation}
+其中$\rho_{AC}$是变量$A$与$C$的相关系数。\chninenote{图9.8实际含有两个潜在因子及箭头$H\to J$。一般线性结构因果模型中，式(9.12)成立，但式(9.13)、(9.14)还需要额外条件。若$J:=\eta H+N_J$，则$\Cov(A,B)\Cov(C,D)-\Cov(A,D)\Cov(B,C)=\alpha\beta\gamma\delta\Var(H)\Var(N_J)$，通常不为零；例如再要求$\Var(N_J)=0$才可消去这一项。原图、图注及三条编号公式均予保留。}例如，第一条约束(9.12)可以很容易地从图9.8验证：
+\[
+\begin{aligned}
+ \Cov(A,C)\cdot\Cov(B,D)
+ &=\alpha\gamma\eta\Var(H)\cdot\beta\delta\eta\Var(H)\\
+ &=\alpha\delta\eta\Var(H)\cdot\beta\gamma\eta\Var(H)
+ =\Cov(A,D)\cdot\Cov(B,C).
+\end{aligned}
+\]
+\input{figures/ch09_08}
+
+可以利用\textbf{无对撞路径（trek）}与\textbf{瓶颈点（choke point）}的语言，以图形方式刻画四元约束何时为零［Spirtes et al., 2000，定理6.10］。这些约束同样使我们仅凭观测数据，就能区分不同因果结构。Bollen［1989］与Wishart［1928］构造了检验四元差是否为零的统计检验。还可以将这些检验转化为因果学习所用的得分；例如Spirtes et al.［2000，第11.2节］与Silva et al.［2006］对此进行了研究。
+
+Kela et al.［2017］考察这样一类潜变量结构：观测变量之间的一切相依关系，都源于一组相互独立的共同原因。他们描述了观测变量可能具有的协方差矩阵所受的约束，并强调，与使用完整分布相比，转而使用协方差矩阵，在统计可行性与计算可处理性方面都具有优势。通过采用观测变量的函数，即像基于再生核Hilbert空间的方法那样将变量映射到特征空间，该方法也能考虑高阶相依关系。
+
+\subsection{加性噪声模型}
+第7.2.3节已经提到，可以利用独立成分分析（ICA）来学习线性非高斯无环模型（LiNGAM）的结构。Hoyer et al.［2008b］说明，借助所谓的\textbf{过完备独立成分分析（overcomplete ICA）}，可以将可识别性结论与相应方法推广到含潜变量的线性非高斯结构。
+
+对于非线性加性噪声模型（ANM，见第4.1.4节），我们已经看到，在一般情形下，不可能同时有$Y=f(X)+N_Y$、$N_Y\indep X$，以及$X=g(Y)+M_X$、$M_X\indep Y$。我们预期，对潜变量也存在类似的可识别性。下面的加性噪声模型描述潜变量$H$对可观测变量$X,Y$的影响：
+\begin{equation}
+ H:=N_H,\tag{9.15}
+\end{equation}
+\begin{equation}
+ X:=f(H)+N_X,\tag{9.16}
+\end{equation}
+\begin{equation}
+ Y:=g(H)+N_Y.\tag{9.17}
+\end{equation}
+
+在噪声足够低的情形下，Janzing et al.［2009a］证明，可以从$P_{X,Y}$重建联合分布$P_{H,X,Y}$，至多相差对$H$的重参数化。低噪声的限制可能并非必要，而只是证明本身的不足。令$f(H)=H$、$N_X=0$，就得到从$X$到$Y$的加性噪声模型；同样，也可以得到从$Y$到$X$的模型。这提示，加性噪声假设可能使我们仅凭$P_{X,Y}$，就能区分$X\to Y$、$X\leftarrow Y$与$X\leftarrow *\to Y$这三种情况。
+
+这一模型与降维之间的联系，有助于理解如何根据数据拟合模型(9.15)—(9.17)：可以按照以下步骤，从分布$P_{X,Y}$抽取数据点$(x,y)$，见图9.9。
+\begin{enumerate}[label=\arabic*.]
+ \item 按$P_H$抽取$h$。
+ \item 考虑流形
+ \begin{equation}
+ M:=\bigl\{\bigl(f(h),g(h)\bigr)\in\mathbb R^2:h\in\mathbb R\bigr\}
+ \tag{9.18}
+ \end{equation}
+ 上对应的点$\bigl(f(h),g(h)\bigr)$。
+ \item 在各个维度上加入相互独立的噪声$(n_X,n_Y)$。
+\end{enumerate}
+\input{figures/ch09_09}
+
+因此，为对来自$P_{X,Y}$的数据样本拟合模型(9.15)—(9.17)，可以先对样本应用降维技术，得到估计流形$\widehat M$。但是，要从给定点$(x,y)$恢复对应的$h$，不应将$(x,y)$直接投影到流形$M$上，因为这通常会使残差依赖于$H$。我们所要求的并非残差$(n_X,n_Y)$尽可能小，而是残差与$H$尽可能独立［Janzing et al., 2009a］。
+
+关于含潜变量的加性噪声模型的可识别性，仍有许多未解决问题。不过，这类结果可能带来一个重要推论：只要找到了从$X$到$Y$的加性噪声模型，却找不到反向模型，这些可识别性结果就会表明，在加性噪声模型类内部，该效应不受混杂。
+\FloatBarrier

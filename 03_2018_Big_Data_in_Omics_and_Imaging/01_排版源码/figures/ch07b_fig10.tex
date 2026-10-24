@@ -1,0 +1,34 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=.9cm,font=\small,
+obs/.style={draw=inkblue,fill=white,minimum width=1.8cm,minimum height=.75cm,align=center},
+hid/.style={ellipse,draw=inkblue,fill=white,minimum width=2.6cm,minimum height=1cm,align=center},
+lab/.style={fill=white,inner sep=1pt}]
+\node[obs] (chSevenBf10aI) at (0,0) {\textcolor{red}{$I$}};
+\node[obs] (chSevenBf10aX) at (3.5,0) {$X$};
+\node[obs] (chSevenBf10aZ) at (7,0) {\textcolor{red}{$Z$}};
+\node[hid] (chSevenBf10aHG) at (3.5,1.8) {$H_G$};
+\draw[->] (chSevenBf10aI)--node[above,lab] {$\zeta$}(chSevenBf10aX);
+\draw[->] (chSevenBf10aX)--node[above,lab] {$\alpha$}(chSevenBf10aZ);
+\draw[->] (chSevenBf10aHG)--node[left,lab] {$\gamma$}(chSevenBf10aX);
+\draw[->] (chSevenBf10aHG.south east)--node[above,lab] {$\delta$}(chSevenBf10aZ.north);
+\node at (-.7,-.8) {(a)};
+\node[obs,draw=black] (chSevenBf10bI) at (-2.6,-4.7) {工具变量\\\textcolor{red}{$I$}};
+\node[obs,rounded corners=3pt] (chSevenBf10bx) at (0,-4.7) {甲基化\\$x$};
+\node[obs,rounded corners=3pt] (chSevenBf10bY) at (3.5,-4.7) {表达\\$Y$};
+\node[obs,rounded corners=3pt] (chSevenBf10bZ) at (7,-4.7) {表型\\$Z$};
+\node[hid] (chSevenBf10bHR) at (3.5,-2) {微 RNA\\$H_R$};
+\node[hid] (chSevenBf10bHG) at (3.5,-7.4) {基因型\\$H_G$};
+\draw[->] (chSevenBf10bI)--node[below,lab] {$\xi$}(chSevenBf10bx);
+\draw[->] (chSevenBf10bx.east)--node[above,sloped,lab] {$\eta$}(chSevenBf10bHR.south);
+\draw[->] (chSevenBf10bHR.south)--node[right,lab] {$\beta_{H_R}$}(chSevenBf10bY.north);
+\draw[->] (chSevenBf10bHR.south)--node[above,sloped,lab] {$\Lambda_{H_R}$}(chSevenBf10bZ.north west);
+\draw[->] (chSevenBf10bHG.north)--node[below,sloped,lab] {$\delta$}(chSevenBf10bx.east);
+\draw[->] (chSevenBf10bHG.north)--node[right,lab] {$\beta_{H_G}$}(chSevenBf10bY.south);
+\draw[->] (chSevenBf10bHG.north)--node[below,sloped,lab] {$\Lambda_{H_G}$}(chSevenBf10bZ.south west);
+\draw[->] (chSevenBf10bx.east)--node[below,lab] {$\alpha$}(chSevenBf10bY.west);
+\draw[->] (chSevenBf10bY.east)--node[above,lab] {$\gamma$}(chSevenBf10bZ.west);
+\node at (-3.3,-7.9) {(b)};
+\end{tikzpicture}
+\origfig{10}{工具变量与中介模型。（a）标准工具变量（IV）模型；（b）含有未观测混杂因子和未观测中介的中介因果模型中的工具变量。}
+\end{figure}

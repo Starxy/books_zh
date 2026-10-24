@@ -1,0 +1,45 @@
+% 原PDF118页—119页附录4.A标题之前。
+\section*{软件包}
+\addcontentsline{toc}{section}{软件包}
+\markright{软件包}
+\begingroup
+\sloppy
+\Urlmuskip=0mu plus 2mu\relax
+\def\UrlBreaks{\do\/\do\-\do\.\do\_\do\?\do\&\do\=\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z}
+
+RNA测序数据的公共来源包括基因表达综合数据库（Gene Expression Omnibus，GEO）：\url{http://www.ncbi.nlm.nih.gov/geo/}（同时包含微阵列和测序数据）；序列读段档案库（Sequence Read Archive，SRA）：\url{http://www.ncbi.nlm.nih.gov/sra}（全部为测序数据）；以及ArrayExpress：\url{https://www.ebi.ac.uk/arrayexpress/}（欧洲版GEO）。
+
+读段比对工具Bowtie是一种速度极快、内存占用较低的短读段比对程序，下载地址为\url{http://bowtie-bio.sourceforge.net/index.shtml}。
+用于转录本与异构体定量的软件RSEM（RNA-seq by Expectation-Maximization）、PennSeq和WemIQ，分别可从以下地址获得：
+\url{https://deweylab.github.io/RSEM/}、
+\url{https://omictools.com/pennseq-tool}、
+\url{https://omictools.com/weighted-log-likelihood-expectation-maximization-method-on-isoform-quantification-tool}。
+
+用于RNA测序差异表达分析的edgeR包，下载地址为\url{http://bioconductor.org/packages/release/bioc/html/edgeR.html}。
+基于负二项分布进行基因差异表达分析的R包DESeq2，下载地址为\url{http://bioconductor.org/packages/release/bioc/html/DESeq2.html}。
+EBSeq是利用贝叶斯方法分析RNA测序基因与异构体差异表达的R包，下载地址为\url{http://bioconductor.org/packages/release/bioc/html/EBSeq.html}。
+NOISeq利用非参数方法进行RNA测序数据的探索分析与差异表达分析，地址为\url{https://bioconductor.org/packages/release/bioc/html/NOISeq.html}。
+
+CMGRN使用贝叶斯网络建模推断因果相互关系，构建多层次基因调控网络，下载地址为\url{https://omictools.com/constructing-multilevel-gene-regulatory-networks-tool}。
+用于重建准确细胞网络的ARACNE，地址为\url{https://omictools.com/algorithm-for-the-reconstruction-of-accurate-cellular-networks-tool}。
+GENIE3从表达数据推断基因调控网络，地址为\url{https://omictools.com/genie3-tool}。
+NARROMI是根据基因表达数据推断基因调控网络的Matlab代码，下载地址为\url{http://comp-sysbio.org/narromi.htm}。
+\url{https://omictools.com/gene-regulatory-networks-category}收集了基因调控网络推断工具。
+
+软件fastaqc是高通量测序数据质量控制工具，地址为\url{http://www.bioinformatics.babraham.ac.uk/projects/fastqc/}。
+R包scde实现了一组单细胞RNA测序数据分析的统计方法，地址为\url{http://pklab.med.harvard.edu/scde}。
+现有比对工具GSNAP可同时用于群体RNA测序和单细胞RNA测序，下载地址为\url{https://omictools.com/gsnap-tool}。
+用于生成读段计数的HTseq，下载地址为\url{http://www-huber.embl.de/HTSeq/doc/overview.html}。
+
+SIMLR是一种通过多核学习进行大规模单细胞分析的工具，地址为
+\url{https://github.com/BatzoglouLabSU/SIMLR}及
+\url{https://bioconductor.org/packages/release/bioc/html/SIMLR.html}。
+
+PERT使用非负最小二乘法进行基因表达解卷积，下载地址为\url{http://qlab.faculty.ucdavis.edu/pert/}。
+R包DeconRNASeq利用二次规划框架，以及 $L_1$ 损失函数和Huber损失函数进行基因表达解卷积，下载地址为\url{https://www.bioconductor.org/packages/devel/bioc/manuals/DeconRNASeq/man/DeconRNASeq.pdf}。
+R包dcq（DCQ - Digital Cell Quantifier）在基因表达解卷积中结合 $L_1$ 与 $L_2$ 正则化实现稀疏性，地址为\url{https://rdrr.io/cran/ComICS/man/dcq.html}。
+用于计算非负矩阵与张量分解的快速优化算法的MATLAB实现，下载地址为\url{https://github.com/kimjingu/nonnegfac-matlab/blob/master/README.md}。
+基因表达解卷积包CellMix的在线地址为\url{http://web.cbio.uct.ac.za/~renaud/CRAN/web/CellMix}。
+CIBERSORT使用线性支持向量回归（support vector regression，SVR）进行表达解卷积，这是一种对噪声高度稳健的机器学习方法，地址为\url{https://github.com/zomithex/CIBERSORT}。
+用于非负矩阵分解的R包NMF，其大多数内置算法已用C++优化，地址为\url{https://cran.r-project.org/web/packages/NMF/index.html}。
+\endgroup

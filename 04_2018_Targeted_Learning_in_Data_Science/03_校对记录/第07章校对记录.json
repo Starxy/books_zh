@@ -1,0 +1,606 @@
+{
+  "chapter": 7,
+  "status": "complete",
+  "title_en": "A Generally Efficient HAL-TMLE",
+  "title_zh": "普遍有效的 HAL-TMLE",
+  "authors": [
+    "Mark J. van der Laan"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/08_CH07_A_Generally_Efficient_HAL_TMLE.pdf",
+    "split_pdf_pages": 8,
+    "chapter_split_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "chapter_printed_pages": "95–102",
+    "english_words_approx": 3069,
+    "source_rendered_and_visually_checked_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "annotations_removed_in_memory_before_rendering": true
+  },
+  "pages": 6,
+  "han_characters_pdf_including_running_heads": 3067,
+  "han_characters_tex_without_comment_lines": 3023,
+  "page_count_note": "统一 A4 版面重排为 6 页；原文最后一页只含讨论末段。完整性依据逐段内容、数学、两个定理及引用核查，不按页数比补写。",
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch07.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch07a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch07b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch07c.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第07章_中文译稿.pdf",
+  "sha256": "e1609353cbbcecd50116db0611e1ae588522d504fe7e1a5afc46ca171c9d3ac9",
+  "chapter_parts": [
+    {
+      "file": "chapters/ch07a.tex",
+      "coverage": "完整章首导言、作者机构邮箱 DOI、第一段强调框、第 7.1 节及两个小节和定理 7.1。"
+    },
+    {
+      "file": "chapters/ch07b.tex",
+      "coverage": "第 7.2 节全文，含全部一般模型假设、推导和定理 7.2 的完整重复陈述。"
+    },
+    {
+      "file": "chapters/ch07c.tex",
+      "coverage": "第 7.3 节全文，含第二段强调框及跨源第 7—8 页的完整末段。"
+    }
+  ],
+  "sections": [
+    {
+      "number": "7.1",
+      "title": "特定处理下的均值",
+      "source_split_pages": [
+        2,
+        3,
+        4
+      ],
+      "chinese_pages": [
+        1,
+        2,
+        3
+      ],
+      "complete": true,
+      "content": "原始数据与模型全部条件、目标参数与典范梯度、7.1.1 HAL-TMLE 构造、7.1.2 渐近有效性全部论证及定理 7.1、置信区间与方差一致性。"
+    },
+    {
+      "number": "7.2",
+      "title": "一般 HAL-TMLE 及其渐近有效性",
+      "source_split_pages": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "chinese_pages": [
+        4,
+        5,
+        6
+      ],
+      "complete": true,
+      "content": "一般参数与干扰参数映射、多分量损失、参数空间与变差范数假设、两项 HAL 构造与速率、扰动模型、有效得分、余项/连续性/Donsker 推导、定理 7.2 全部重复条件。"
+    },
+    {
+      "number": "7.3",
+      "title": "讨论",
+      "source_split_pages": [
+        7,
+        8
+      ],
+      "chinese_pages": [
+        6
+      ],
+      "complete": true,
+      "content": "一步 TMLE 与平均处理效应、原强调框、无界变差范数模型与筛、上确界范数与 CV-TMLE、双重稳健性、失配干扰参数的额外靶向与有限样本表现。"
+    }
+  ],
+  "subsections": [
+    {
+      "number": "7.1.1",
+      "title": "HAL-TMLE",
+      "source_split_pages": [
+        2,
+        3
+      ],
+      "chinese_pages": [
+        2,
+        3
+      ],
+      "complete": true,
+      "content": "两个损失、含 logistic HAL 的超级学习器、L1 范数界、两类收敛速率、截断、Logit 扰动与经验 W 分布、最终代入估计量。"
+    },
+    {
+      "number": "7.1.2",
+      "title": "渐近有效性",
+      "source_split_pages": [
+        3,
+        4
+      ],
+      "chinese_pages": [
+        3
+      ],
+      "complete": true,
+      "content": "有效方程、二阶余项、Donsker 与一致性、Cauchy–Schwarz 界、渐近线性、定理 7.1 与方差/置信区间的全部论证。"
+    }
+  ],
+  "source_page_to_chinese_content": [
+    {
+      "source_split_page": 1,
+      "chinese_pages": [
+        1
+      ],
+      "coverage": "章题、作者机构邮箱 DOI、三段导言及第一强调框。"
+    },
+    {
+      "source_split_page": 2,
+      "chinese_pages": [
+        1,
+        2
+      ],
+      "coverage": "7.1 模型与参数全部内容，7.1.1 损失、HAL 基础、收敛速率与截断前半。"
+    },
+    {
+      "source_split_page": 3,
+      "chinese_pages": [
+        2,
+        3
+      ],
+      "coverage": "7.1.1 截断后半、L2 速率、扰动与 TMLE；7.1.2 初始展开、Donsker 论证及余项上界。"
+    },
+    {
+      "source_split_page": 4,
+      "chinese_pages": [
+        3,
+        4
+      ],
+      "coverage": "7.1.2 余项收敛、定理 7.1、方差与置信区间；7.2 一般模型/参数引导和损失定义。"
+    },
+    {
+      "source_split_page": 5,
+      "chinese_pages": [
+        4,
+        5
+      ],
+      "coverage": "7.2 损失差定义续行、全部范数假设、HAL 构造与收敛、子模型和 epsilon 选择。"
+    },
+    {
+      "source_split_page": 6,
+      "chinese_pages": [
+        5
+      ],
+      "coverage": "7.2 余项分解、速率、连续性和 Donsker 推导、定理 7.2 前半。"
+    },
+    {
+      "source_split_page": 7,
+      "chinese_pages": [
+        6
+      ],
+      "coverage": "定理 7.2 后半；7.3 引导、强调框、无界模型/筛/CV-TMLE 和双重稳健讨论前半。"
+    },
+    {
+      "source_split_page": 8,
+      "chinese_pages": [
+        6
+      ],
+      "coverage": "7.3 末段续文：额外靶向 G、联合扰动与有限样本表现。"
+    }
+  ],
+  "formulas": {
+    "display_environment_count": 26,
+    "numbered_count": 0,
+    "number_range": null,
+    "source_display_groups": 23,
+    "source_numbered_equation_tags": [],
+    "source_pages_with_displays": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "all_source_formula_pages_visually_verified": true,
+    "layout_note": "典范梯度、两项损失和差异度定义原为行内公式，译稿分别展示；23 个原展示组与这 3 个新展示组均不改变数学内容。",
+    "inventory": [
+      {
+        "id": "ch07-display-1",
+        "source_split_page": 2,
+        "chinese_page": 2,
+        "identity": "典范梯度 D*(P)(O)；原为行内公式"
+      },
+      {
+        "id": "ch07-display-2",
+        "source_split_page": 2,
+        "chinese_page": 2,
+        "identity": "Qbar 和 Gbar 的两项对数似然损失；原为行内公式"
+      },
+      {
+        "id": "ch07-display-3",
+        "source_split_page": 2,
+        "chinese_page": 2,
+        "identity": "两个基于损失的差异度收敛速率"
+      },
+      {
+        "id": "ch07-display-4",
+        "source_split_page": 3,
+        "chinese_page": 2,
+        "identity": "Qbar_n 和 Gbar_n 的平方 L2(P0) 范数收敛速率"
+      },
+      {
+        "id": "ch07-display-5",
+        "source_split_page": 3,
+        "chinese_page": 2,
+        "identity": "Logit 扰动子模型"
+      },
+      {
+        "id": "ch07-display-6",
+        "source_split_page": 3,
+        "chinese_page": 2,
+        "identity": "损失导数等于 D_Y 的源式"
+      },
+      {
+        "id": "ch07-display-7",
+        "source_split_page": 3,
+        "chinese_page": 3,
+        "identity": "二阶余项 R20(Pn*,P0)"
+      },
+      {
+        "id": "ch07-display-8",
+        "source_split_page": 3,
+        "chinese_page": 3,
+        "identity": "初始经验过程与余项分解"
+      },
+      {
+        "id": "ch07-display-9",
+        "source_split_page": 3,
+        "chinese_page": 3,
+        "identity": "Cauchy–Schwarz 余项上界"
+      },
+      {
+        "id": "ch07-display-10",
+        "source_split_page": 4,
+        "chinese_page": 3,
+        "identity": "特定处理下均值的二阶余项速率"
+      },
+      {
+        "id": "ch07-display-11",
+        "source_split_page": 4,
+        "chinese_page": 3,
+        "identity": "特定处理下均值 TMLE 的渐近线性展开"
+      },
+      {
+        "id": "ch07-display-12",
+        "source_split_page": 4,
+        "chinese_page": 3,
+        "identity": "0.95 置信区间"
+      },
+      {
+        "id": "ch07-display-13",
+        "source_split_page": 4,
+        "chinese_page": 3,
+        "identity": "经验影响曲线方差 sigma_n^2"
+      },
+      {
+        "id": "ch07-display-14",
+        "source_split_page": 4,
+        "chinese_page": 3,
+        "identity": "方差估计依概率收敛"
+      },
+      {
+        "id": "ch07-display-15",
+        "source_split_page": 4,
+        "chinese_page": 4,
+        "identity": "d01 和 d02 的损失差定义，原跨源第 4—5 页行内排版"
+      },
+      {
+        "id": "ch07-display-16",
+        "source_split_page": 5,
+        "chinese_page": 4,
+        "identity": "Q 的带变差范数约束 HAL 损失最小化"
+      },
+      {
+        "id": "ch07-display-17",
+        "source_split_page": 5,
+        "chinese_page": 4,
+        "identity": "G 的带变差范数约束 HAL 损失最小化"
+      },
+      {
+        "id": "ch07-display-18",
+        "source_split_page": 5,
+        "chinese_page": 4,
+        "identity": "一般 HAL 的两项差异度速率"
+      },
+      {
+        "id": "ch07-display-19",
+        "source_split_page": 5,
+        "chinese_page": 4,
+        "identity": "参数子模型的零点损失导数"
+      },
+      {
+        "id": "ch07-display-20",
+        "source_split_page": 5,
+        "chinese_page": 4,
+        "identity": "近似求解有效影响曲线方程的条件"
+      },
+      {
+        "id": "ch07-display-21",
+        "source_split_page": 6,
+        "chinese_page": 5,
+        "identity": "一般 TMLE 的经验过程加二阶余项展开"
+      },
+      {
+        "id": "ch07-display-22",
+        "source_split_page": 6,
+        "chinese_page": 5,
+        "identity": "一般二阶余项的源印刷速率（保留正号）"
+      },
+      {
+        "id": "ch07-display-23",
+        "source_split_page": 6,
+        "chinese_page": 5,
+        "identity": "一般 TMLE 的渐近线性展开"
+      },
+      {
+        "id": "ch07-display-24",
+        "source_split_page": 6,
+        "chinese_page": 5,
+        "identity": "定理 7.2 中重复列出的两项 HAL 速率"
+      },
+      {
+        "id": "ch07-display-25",
+        "source_split_page": 6,
+        "chinese_page": 5,
+        "identity": "定理 7.2 中重复列出的损失导数"
+      },
+      {
+        "id": "ch07-display-26",
+        "source_split_page": 7,
+        "chinese_page": 6,
+        "identity": "定理 7.2 中重复列出的有效影响曲线方程条件"
+      }
+    ]
+  },
+  "figures": [],
+  "tables": [],
+  "figure_count": 0,
+  "table_count": 0,
+  "theorem_like_results": [
+    {
+      "type": "定理",
+      "number": "7.1",
+      "source_split_page": 4,
+      "chinese_page": 3,
+      "environment": "bookresult",
+      "complete": true
+    },
+    {
+      "type": "定理",
+      "number": "7.2",
+      "source_split_pages": [
+        6,
+        7
+      ],
+      "chinese_pages": [
+        5,
+        6
+      ],
+      "environment": "bookresult",
+      "complete": true
+    }
+  ],
+  "proof_coverage": {
+    "explicit_proof_headings_in_source": 0,
+    "all_pretheorem_derivations_translated": true,
+    "theorem_conditions_repeated_in_full_as_source": true
+  },
+  "emphasis_boxes": {
+    "original_count": 2,
+    "environment": "sourcebox",
+    "additional_boxes_added": 0
+  },
+  "new_terms_for_glossary_review": [
+    {
+      "en": "one-step TMLE",
+      "zh": "一步 TMLE",
+      "note": "总审明确指定，与一步估计量统一。"
+    },
+    {
+      "en": "loss-based dissimilarity",
+      "zh": "基于损失的差异度",
+      "note": "总审明确指定；dissimilarity＝差异度。"
+    },
+    {
+      "en": "variation norm",
+      "zh": "变差范数"
+    },
+    {
+      "en": "strong positivity",
+      "zh": "强正值性"
+    },
+    {
+      "en": "strong identifiability",
+      "zh": "强可识别性"
+    },
+    {
+      "en": "variation independent",
+      "zh": "变动独立"
+    },
+    {
+      "en": "supremum norm",
+      "zh": "上确界范数"
+    },
+    {
+      "en": "sieve",
+      "zh": "筛"
+    },
+    {
+      "en": "Kullback-Leibler dissimilarity",
+      "zh": "Kullback–Leibler 差异度"
+    }
+  ],
+  "terminology_checks": {
+    "targeted_minimum_loss_based_estimator": "靶向最小损失估计量",
+    "highly_adaptive_lasso": "高度自适应 Lasso",
+    "one_step_TMLE": "一步 TMLE",
+    "loss_based_dissimilarity": "基于损失的差异度",
+    "bias": "偏差",
+    "remaining_相异度": 0,
+    "remaining_单步": 0,
+    "remaining_偏倚": 0
+  },
+  "completeness_evidence": {
+    "chapter_count": 1,
+    "section_count_matches_outline": [
+      3,
+      3
+    ],
+    "subsection_count_matches_outline": [
+      2,
+      2
+    ],
+    "theorem_numbers": [
+      "7.1",
+      "7.2"
+    ],
+    "display_formula_count": 26,
+    "numbered_equation_count": 0,
+    "figure_count": 0,
+    "table_count": 0,
+    "source_year_and_suffix_occurrences_excluding_copyright": 5,
+    "translation_year_and_suffix_occurrences": 5,
+    "year_and_suffix_multisets_identical": true,
+    "year_counts": {
+      "2017": 3,
+      "2014b": 2
+    },
+    "all_citation_authors_and_dates_checked": true,
+    "author_affiliation_email_and_doi_preserved": true,
+    "all_paragraphs_reviewed_against_entire_english_text": true,
+    "source_code_blocks": 0,
+    "source_footnotes_other_than_affiliation": 0
+  },
+  "source_anomalies": [
+    {
+      "id": "source-remainder-rate-sign",
+      "source_split_page": 6,
+      "source_printed_page": 100,
+      "type": "原书公式疑点",
+      "reason": "原印刷明确为 O_P(n^(-0.5+alpha(d)/4))=o_P(n^(-1/2))，指数中的正号与后一小 o 结论不相容。",
+      "action": "400 dpi 裁片核对后照录正号，未按前文猜改为负号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-loss-score-sign",
+      "source_split_page": 3,
+      "source_printed_page": 97,
+      "type": "原书公式疑点",
+      "reason": "L1 定义为负对数似然损失，但正方向 Logit 子模型的损失导数写为正的 D_Y；源第 5 页的一般模型论证也沿用这一导数约定。",
+      "action": "全部公式及相应文字依原书保留正号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-remainder-bound-q-star",
+      "source_split_page": 3,
+      "source_printed_page": 97,
+      "type": "原书记号疑点",
+      "reason": "R20 的定义包含更新后的 Qbar_n*，随后 Cauchy–Schwarz 界却采用未加星号的 Qbar_n。",
+      "action": "两式均逐符号照录；400 dpi 裁片确认上界中没有星号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-theorem-extra-parenthesis",
+      "source_split_page": 7,
+      "source_printed_page": 101,
+      "type": "原书公式排印疑点",
+      "reason": "定理 7.2 的 d01(Q_(n,epsilon_n),Q0) 收敛速率项末尾多印一个右圆括号。",
+      "action": "400 dpi 裁片确认后保留可见的额外右圆括号，不在译文中静默勘改。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-g-star-in-variance-prose",
+      "source_split_page": 4,
+      "source_printed_page": 98,
+      "type": "原书记号疑点",
+      "reason": "方差一致性论证文字写 D*(Q_n*,G_n*)，此前该构造未定义 G_n*；同段的其余项仍写 G_n。",
+      "action": "按原文保留该处 G_n*，未统一替换为 G_n。",
+      "blocks_delivery": false
+    }
+  ],
+  "unresolved_items": [],
+  "numbering_oddities": [
+    "本章原书所有公式均无编号，译稿未补造编号。",
+    "原书仅有定理 7.1、7.2，均以 bookresult 显式编号。"
+  ],
+  "source_wording_notes": [
+    "第 96 页正文的 login of Gbar_n 显然指上下文的 logit；译为 logit，并保留两处原 L1 范数记号。",
+    "Q=(QW,Qbar) 与后文 Qn*=(Qbar_n*,QW,n) 的分量顺序不同，按原文保留；Gbar/G、L/L1 的交替也未擅自统一。",
+    "第 98 页原文将 ||f||^2=P0 f^2 称为 L2 范数；译文表述为“这里使用 L2 范数，满足此关系”，公式内容未变。",
+    "各处尚未截断/更新的估计量与已更新估计量的星号均依源页保留，不以通常证明补改。"
+  ],
+  "deliberate_content_deviations": [],
+  "build_checks": {
+    "engine": "xelatex",
+    "helper": "work/targeted_learning/compile_chapter.py",
+    "passes": [
+      0,
+      0
+    ],
+    "build_directory": "work/targeted_learning/ch07_work/build_150342",
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "control_characters": [],
+    "chapter_part_or_counter_commands": [],
+    "all_six_pages_rendered_and_viewed": true,
+    "visual_qa_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "final_visual_qa_after_last_build": [
+      2,
+      5,
+      6
+    ],
+    "shipped_file_reopened": true,
+    "shipped_page_count": 6,
+    "last_bookmark": [
+      2,
+      "7.3 讨论",
+      6
+    ],
+    "shipped_sha256_matches_build_record": true,
+    "self_test_driver_removed": true,
+    "removed_self_test_files": [
+      "work/targeted_learning/ch07_work/test_ch07.tex"
+    ]
+  },
+  "qa_artifacts": {
+    "source_images": "work/targeted_learning/render/ch07",
+    "output_images": "work/targeted_learning/ch07_work/qa_ch07_all_NNN.png",
+    "extracted_chinese_pdf_text": "work/targeted_learning/ch07_work/ch07_built_text.txt",
+    "structure_audit": "work/targeted_learning/ch07_work/qa_ch07_structure.json",
+    "source_anomaly_zooms": [
+      "work/targeted_learning/ch07_work/source_rate_sign_zoom.png",
+      "work/targeted_learning/ch07_work/source_theorem_rate_delimiter_zoom.png",
+      "work/targeted_learning/ch07_work/source_remainder_bound_zoom.png"
+    ]
+  },
+  "shared_files_edited": []
+}

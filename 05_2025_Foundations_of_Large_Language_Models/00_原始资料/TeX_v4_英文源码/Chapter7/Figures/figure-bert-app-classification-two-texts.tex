@@ -1,0 +1,93 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\vstep{1.3cm}
+\def\ssep{1.0cm}
+
+\tikzstyle{enode} = [minimum width=9*\nodestep,minimum height=1.4*\nodestep,inner sep=2pt,draw,thick];
+
+\begin{scope}
+
+%%%%%% train the encoder
+
+\node [anchor=west] (w0) at (0,0) {\footnotesize{$[\mathrm{CLS}]$}};
+\node [anchor=center] (w1) at ([xshift=\ssep]w0.center) {\footnotesize{$x_1$}};
+\node [anchor=center] (w2) at ([xshift=\ssep]w1.center) {\footnotesize{$x_2$}};
+\node [anchor=center] (w3) at ([xshift=\ssep]w2.center) {\footnotesize{$...$}};
+\node [anchor=center] (w4) at ([xshift=\ssep]w3.center) {\footnotesize{$x_m$}};
+\node [anchor=center] (w5) at ([xshift=\ssep]w4.center) {\footnotesize{$[\mathrm{SEP}]$}};
+\node [anchor=center] (w6) at ([xshift=\ssep]w5.center) {\footnotesize{$y_1$}};
+\node [anchor=center] (w7) at ([xshift=\ssep]w6.center) {\footnotesize{$y_2$}};
+\node [anchor=center] (w8) at ([xshift=\ssep]w7.center) {\footnotesize{$...$}};
+\node [anchor=center] (w9) at ([xshift=\ssep]w8.center) {\footnotesize{$y_n$}};
+\node [anchor=center] (w10) at ([xshift=\ssep]w9.center) {\footnotesize{$[\mathrm{SEP}]$}};
+
+\draw [decoration={brace,amplitude=5pt},decorate] ([xshift=0.5em,yshift=-0.8em]w4.center) -- ([xshift=-0.5em,yshift=-0.8em]w1.center) node [pos=0.5,below,yshift=-0.5em] (text1) {\footnotesize{Text 1}};
+
+\draw [decoration={brace,amplitude=5pt},decorate] ([xshift=0.5em,yshift=-0.8em]w9.center) -- ([xshift=-0.5em,yshift=-0.8em]w6.center) node [pos=0.5,below,yshift=-0.5em] (text2) {\footnotesize{Text 2}};
+
+\node [anchor=center] (e0) at ([yshift=0.7*\ssep]w0.center) {\footnotesize{$\mathbf{e}_{\mathrm{cls}}$}};
+\node [anchor=center] (e1) at ([yshift=0.7*\ssep]w1.center) {\footnotesize{$\mathbf{e}_1$}};
+\node [anchor=center] (e2) at ([yshift=0.7*\ssep]w2.center) {\footnotesize{$\mathbf{e}_2$}};
+\node [anchor=center] (e3) at ([yshift=0.7*\ssep]w3.center) {\footnotesize{$...$}};
+\node [anchor=center] (e4) at ([yshift=0.7*\ssep]w4.center) {\footnotesize{$\mathbf{e}_{m}$}};
+\node [anchor=center] (e5) at ([yshift=0.7*\ssep]w5.center) {\footnotesize{$\mathbf{e}_{m+1}$}};
+\node [anchor=center] (e6) at ([yshift=0.7*\ssep]w6.center) {\footnotesize{$\mathbf{e}_{m+2}$}};
+\node [anchor=center] (e7) at ([yshift=0.7*\ssep]w7.center) {\footnotesize{$\mathbf{e}_{m+3}$}};
+\node [anchor=center] (e8) at ([yshift=0.7*\ssep]w8.center) {\footnotesize{$...$}};
+\node [anchor=center] (e9) at ([yshift=0.7*\ssep]w9.center) {\footnotesize{$\mathbf{e}_{\mathrm{len}-1}$}};
+\node [anchor=center] (e10) at ([yshift=0.7*\ssep]w10.center) {\footnotesize{$\mathbf{e}_{\mathrm{len}}$}};
+
+\draw [->] (w0.north) -- (e0.south);
+\draw [->] (w1.north) -- (e1.south);
+\draw [->] (w2.north) -- (e2.south);
+%\draw [->] (w3.north) -- (e3.south);
+\draw [->] (w4.north) -- (e4.south);
+\draw [->] (w5.north) -- (e5.south);
+\draw [->] (w6.north) -- (e6.south);
+\draw [->] (w7.north) -- (e7.south);
+%\draw [->] (w8.north) -- (e8.south);
+\draw [->] (w9.north) -- (e9.south);
+\draw [->] (w10.north) -- (e10.south);
+
+\draw [->] (e0.north) -- ([yshift=0.2*\ssep]e0.north);
+\draw [->] (e1.north) -- ([yshift=0.2*\ssep]e1.north);
+\draw [->] (e2.north) -- ([yshift=0.2*\ssep]e2.north);
+%\draw [->] (e3.north) -- ([yshift=0.2*\ssep]e3.north);
+\draw [->] (e4.north) -- ([yshift=0.2*\ssep]e4.north);
+\draw [->] (e5.north) -- ([yshift=0.2*\ssep]e5.north);
+\draw [->] (e6.north) -- ([yshift=0.2*\ssep]e6.north);
+\draw [->] (e7.north) -- ([yshift=0.2*\ssep]e7.north);
+%\draw [->] (e8.north) -- ([yshift=0.2*\ssep]e8.north);
+\draw [->] (e9.north) -- ([yshift=0.2*\ssep]e9.north);
+\draw [->] (e10.north) -- ([yshift=0.2*\ssep]e10.north);
+
+\node [anchor=south,minimum width=12*\ssep,minimum height=1.2*\ssep,draw,thick] (encoder) at ([yshift=1.0*\ssep,xshift=0.0*\ssep]w5.north) {};
+
+\node [anchor=center] (h0) at ([yshift=2.1*\ssep]w0.center) {\footnotesize{$\mathbf{h}_{\mathrm{cls}}$}};
+\node [anchor=center] (h1) at ([yshift=2.1*\ssep]w1.center) {\footnotesize{$\mathbf{h}_1$}};
+\node [anchor=center] (h2) at ([yshift=2.1*\ssep]w2.center) {\footnotesize{$\mathbf{h}_2$}};
+\node [anchor=center] (h3) at ([yshift=2.1*\ssep]w3.center) {\footnotesize{$...$}};
+\node [anchor=center] (h4) at ([yshift=2.1*\ssep]w4.center) {\footnotesize{$\mathbf{h}_m$}};
+\node [anchor=center] (h5) at ([yshift=2.1*\ssep]w5.center) {\footnotesize{$\mathbf{h}_{m+1}$}};
+\node [anchor=center] (h6) at ([yshift=2.1*\ssep]w6.center) {\footnotesize{$\mathbf{h}_{m+2}$}};
+\node [anchor=center] (h7) at ([yshift=2.1*\ssep]w7.center) {\footnotesize{$\mathbf{h}_{m+3}$}};
+\node [anchor=center] (h8) at ([yshift=2.1*\ssep]w8.center) {\footnotesize{$...$}};
+\node [anchor=center] (h9) at ([yshift=2.1*\ssep]w9.center) {\footnotesize{$\mathbf{h}_{\mathrm{len}-1}$}};
+\node [anchor=center] (h10) at ([yshift=2.1*\ssep]w10.center) {\footnotesize{$\mathbf{h}_{\mathrm{len}}$}};
+
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em,draw,fill=gray!70] (s0) at ([yshift=0.4*\ssep]h0.north) {};
+
+\draw [->] ([yshift=-3pt]h0.north) -- ([yshift=-2pt]s0.south);
+
+\node [anchor=south] (o0) at ([yshift=0.4*\ssep]s0.north) {\footnotesize{Class}};
+
+\draw [->] ([yshift=2pt]s0.north) -- ([yshift=0.4*\ssep-2pt]s0.north);
+
+\node [anchor=south] (encodercaption) at ([yshift=0.1cm]encoder.south) {\large{BERT}};
+
+\end{scope}
+	
+\end{tikzpicture}

@@ -1,0 +1,95 @@
+% 原书第 35—39 页；章首导言及第 4.1—4.3 节。
+\chapter{LTMLE}
+\label{ch:ltmle}
+\chapterauthors{Sherri Rose 与 Mark J. van der Laan}
+\chapteraffiliations{%
+S. Rose（通讯作者）：美国哈佛医学院卫生保健政策系，180 Longwood Ave, Boston, MA 02115, USA；电子邮箱：\href{mailto:rose@hcp.med.harvard.edu}{rose@hcp.med.harvard.edu}。\\
+M. J. van der Laan：美国加利福尼亚大学伯克利分校生物统计学部及统计学系，101 Haviland Hall, \#7358, Berkeley, CA 94720, USA；电子邮箱：\href{mailto:laan@berkeley.edu}{laan@berkeley.edu}。\\
+本章 DOI：\url{https://doi.org/10.1007/978-3-319-65304-4_4}。}
+
+\noindent\begin{minipage}[c]{.81\textwidth}
+序贯决策是生活中自然而然的一部分。人类每天都要作出许多决定；在难以预测、充满不确定性的环境中，追求某一个特定目标时，通常也需要作出一连串决定。任何行动都可能影响未来的状态，尤其会影响此后有哪些可供选择的行动。如果我们能够以自动化的方式理解决策的影响，会怎样？如果我们能够评价不同的决策序列，又会怎样？
+\end{minipage}\hfill
+\begin{minipage}[c]{.15\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/ch04_decisions.jpg}
+\end{minipage}\par
+
+正如前三章所讨论的，我们常常希望评价随时间延续的处理规则，也就是动态处理规则（dynamic rule），而这些规则可能包含复杂的分类器。这类问题在临床和公共卫生研究中十分常见；在统计学中，相关工作以序贯决策理论（sequential decision theory）为基础。纵向和复杂数据结构中还有许多其他重要类型的问题，本书各处将逐一介绍，其中一些已在第 1 章有所涉及。本章着重在动态规则的背景下介绍 LTMLE，不过，这一方法具有一般性，后续章节将对此加以展示。
+
+这是第二个以估计为主题的章节，现在我们转向效应问题。此前，我们首先仔细定义了研究问题，包括数据、模型，以及数据概率分布的目标参数（target parameter）。接着，上一章介绍了利用超级学习（super learning）估计序贯预测函数的方法。我们讨论过，对于多个时点的干预，可以简单地对 $E(Y^d\mid L_0)$ 的估计值取平均，以估计 $E(Y^d)$。然而，这样做并不能得到最优的估计量。现在，我们将介绍如何在每一步进行靶向更新，以改进 $E(Y^d)$ 的估计量。由此，我们已经做好准备，可以利用 LTMLE 估计因果效应。请注意，本章使用的缩写 LTMLE 既指纵向靶向极大似然估计量（longitudinal targeted maximum likelihood estimator），也指纵向靶向最小损失估计（longitudinal targeted minimum loss-based estimation）。
+
+\section{LTMLE 的实际应用：何时开始 HIV 治疗}
+\label{sec:ch04-hiv-treatment}
+
+回顾第 1 章，我们曾以特定规则下的均值（rule-specific mean）讨论过一个问题：既往未接受治疗的 HIV 感染者，应在何时开始抗逆转录病毒治疗？多年来，这一直是一个尚无定论的问题，尽管目前对于尽早开始治疗的益处已经大体形成共识。随机研究和观察性研究考察过不同的 CD4 计数阈值，例如从 $200$ 到 $500\ \text{细胞}/\mathrm{mm}^3$，每隔 $50$ 设置一个阈值；当 CD4 计数低于阈值时，就应开始抗逆转录病毒治疗。（从首次观察到 CD4 计数低于阈值，到实际开始治疗之间应间隔多久，也一直存在争论；常用的时间窗包括 3 个月和 6 个月。）这里，假设我们只考虑 $350$ 和 $500$ 这两个阈值，并采用 6 个月的开始治疗时间窗。在美国，卫生与公众服务部制定的无症状感染者治疗指南，在 1998—2011 年间曾在 $500$ 与 $350$ 这两个临界值之间调整，随后于 2012 年改为对“所有”感染者进行治疗。本章将贯穿使用这个例子进行说明。
+
+\section{定义估计问题}
+\label{sec:ch04-estimation-problem}
+
+回顾前文，我们将一名随机抽取的研究对象的数据结构写为
+\[
+ O=(L_0,A_0,L_1,A_1,L_2=Y),
+\]
+其中，协变量（covariate）组成 $\bar L=(L_0,L_1,L_2)$，$T=1$，每个时点 $t$（$t=0,\ldots,T+1$）都有一个协变量向量 $L_t$；干预集合则为 $\bar A=(A_0,A_1)$。$L_0$ 向量包含 CD4 计数、病毒载量、年龄、性别、静脉注射吸毒状况，以及慢性丙型肝炎状况。$L_1$ 向量只包含 CD4 计数，以及研究对象是否死亡。最终的二值测量 $L_2=Y$ 表示我们感兴趣的结局，即死亡。如果研究对象到 $L_1$ 时已经死亡，那么到 $L_2$ 时也将其记录为死亡。
+
+干预节点 $\bar A=(A_0,A_1)$ 根据在相应时点或此前是否已经开始治疗来定义。样本包含随机变量 $O$ 的 $n$ 次独立同分布（independent and identically distributed，i.i.d.）抽样 $O_1,\ldots,O_n$，这些随机变量的实现值记为 $o_1,\ldots,o_n$。还应记得，$O$ 的概率分布可以按数据的时间顺序分解为
+\[
+ \begin{aligned}
+ p(O)={}&p(L_0)\times p(L_1\mid A_0,L_0)\times p(Y\mid A_1,L_1,A_0,L_0)\\
+ &{}\times p(A_0\mid L_0)\times p(A_1\mid L_1,A_0,L_0).
+ \end{aligned}
+\]
+
+一般而言，我们有一个规则集合 $\mathcal D=\{d_1,\ldots,d_K\}$，其中每个 $d_k$ 编码一个按时间排列的规则序列 $d_{k,t}$（$t=1,\ldots,T$）；$Y^d$ 则是将研究对象设定为在所有时点都遵循规则 $d$ 时，本会观测到的反事实结局（counterfactual outcome）。在这个简化的例子中，我们只考虑 CD4 计数这一分类器，以及以往关于何时开始治疗的指南中的两个水平：$350$ 和 $500\ \text{细胞}/\mathrm{mm}^3$。因此，在每个干预节点上，
+\[
+ d_{k,t}(\mathrm{CD4}_t)=
+ \begin{cases}
+  1,&\mathrm{CD4}_t<\theta_k,\\
+  0,&\text{其他情形},
+ \end{cases}
+\]
+其中，$\theta=(500,350)$，$1$ 表示已经开始治疗，且 $\mathcal D=\{d_1,d_2\}$。对于这两条规则中的每一条 $d\in\mathcal D$，我们希望估计所有人都遵循规则 $d$ 时，$Y$ 的总体均值，即 $E(Y^d)$。正如第 1 章所介绍的，利用 g 计算公式（g-computation formula），可以将 $E(Y^d)$ 表示为观测数据生成分布 $P$ 的函数：
+\[
+ \begin{aligned}
+ \Psi^d(P)={}&\sum_{l_0}\sum_{l_1}
+ P\bigl(Y=1\mid A_1=d(\bar l_1),\bar L_1=\bar l_1,A_0=d(l_0)\bigr)\\
+ &{}\times P\bigl(L_1=l_1\mid A_0=d(l_0),L_0=l_0\bigr)P(L_0=l_0).
+ \end{aligned}
+\]
+我们还知道，$Q_0^d$ 是 $\Psi^d(P)$ 的一种等价表示，其中，$Q_0^d$ 由下列条件均值的迭代序列 $Q^d=(Q_2^d,Q_1^d,Q_0^d)$ 给出：
+\[
+ \begin{aligned}
+ Q_2^d(L_1,L_0)
+  &=E\bigl(Y\mid A_1=d(L_1,L_0),L_1,A_0=d(L_0),L_0\bigr),\\
+ Q_1^d(L_0)
+  &=E\bigl(Q_2^d(L_1,L_0)\mid A_0=d(L_0),L_0\bigr),\\
+ Q_0^d&=E\bigl(Q_1^d(L_0)\bigr).
+ \end{aligned}
+\]
+
+\section{遵循一条规则意味着什么？}
+\label{sec:ch04-following-rule}
+
+在介绍用于估计 $\Psi^d(P)=E(Y^d)$ 的 LTMLE 算法之前，我们必须明确“遵循一条规则”究竟意味着什么。我们希望能够实施、却未能实施的那个实验，是设计研究、确定数据结构与分析方法，以及恰当解释估计结果的关键。
+\begin{itemize}
+ \item 如果所有研究对象都遵循如下处理规则：CD4 计数降至 $350\ \text{细胞}/\mathrm{mm}^3$ 以下后，在 6 个月内开始抗逆转录病毒治疗，那么总体平均结局是多少？
+ \item 如果所有研究对象都遵循如下处理规则：CD4 计数降至 $500\ \text{细胞}/\mathrm{mm}^3$ 以下后，在 6 个月内开始抗逆转录病毒治疗，那么总体平均结局是多少？
+\end{itemize}
+
+然而，我们拥有的是存在时变混杂（time-dependent confounding）的观察性数据，实际上并没有强制患者遵循其中任何一条规则。因此，下一步必须准确说明：在这个假想的观察性研究中，我们如何编码一名研究对象是否正在遵循这两条规则中的某一条。
+
+假设在一项假想研究中，我们对所有既往未接受治疗的 HIV 感染者随访 6 年。（为了说明本小节的内容，暂时引入更多的时点会有所帮助。）图 4.1 的三个面板分别表示研究中的三名假想患者。在第一个面板中，“患者 1”的 CD4 计数在第 6 个月首次降至 $500\ \text{细胞}/\mathrm{mm}^3$ 以下，在第 30 个月首次降至 $350\ \text{细胞}/\mathrm{mm}^3$ 以下，并在第 66 个月开始治疗。该患者一直遵循 $\theta=500$ 的处理策略 $d_1$，直至第 12 个月；此时可以看到，在首次降至 $500\ \text{细胞}/\mathrm{mm}^3$ 以下后的 6 个月内，该患者并未开始治疗。患者 1 一直遵循 $\theta=350$ 的 $d_2$，直至第 36 个月；此时，在首次降至 $350\ \text{细胞}/\mathrm{mm}^3$ 以下后的 6 个月内，该患者仍未开始治疗。从第 36 个月起，患者 1 既不遵循 $d_1$，也不遵循 $d_2$。
+
+图 4.1 的第二个面板是假想的患者 2。该患者的 CD4 计数在第 12 个月首次降至 $500\ \text{细胞}/\mathrm{mm}^3$ 以下，在第 36 个月首次降至 $350\ \text{细胞}/\mathrm{mm}^3$ 以下，并在第 16 个月开始治疗。因此，患者 2 在整个研究期间，也就是全部 72 个月中，都遵循 $d_1$，因为该患者在 CD4 计数降至 $500\ \text{细胞}/\mathrm{mm}^3$ 以下后的 6 个月内开始了治疗。按照我们定义规则的方式，一旦开始治疗，此后发生什么都不影响判定；该研究对象始终遵循 $d_1$。患者 2 一直遵循 $d_2$，直至其开始治疗的第 16 个月。由于 $d_2$ 规定，只有当研究对象的 CD4 计数降至 $350\ \text{细胞}/\mathrm{mm}^3$ 以下后才开始治疗，因此，该患者在 CD4 计数尚未降至 $350\ \text{细胞}/\mathrm{mm}^3$ 以下时就开始治疗，从这一刻起便不再遵循该规则。
+
+患者 3 在整个 72 个月的研究期间都同时遵循 $d_1$ 和 $d_2$。该患者的 CD4 计数从未降至 $500$ 或 $350\ \text{细胞}/\mathrm{mm}^3$ 以下，也从未开始治疗。只有在以下情况下才算没有遵循规则：（a）降至指定阈值 $\theta$ 以下后没有开始治疗；或（b）在降至指定阈值 $\theta$ 以下之前，或在降至该阈值以下太久之后，才开始治疗。因此，患者 3 始终同时遵循这两条规则。
+
+\begin{figure}[p]
+ \centering
+ \input{figures/ch04_cd4_trajectories}
+ \caption{三名假想个体的 CD4 计数轨迹，以及各自开始治疗的时间。（图中的数值和数据点均不反映任何真实患者的数据。）}
+ \label{fig:ch04-cd4-trajectories}
+\end{figure}
+\FloatBarrier
+

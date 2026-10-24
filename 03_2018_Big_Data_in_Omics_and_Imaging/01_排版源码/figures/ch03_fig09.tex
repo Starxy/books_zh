@@ -1,0 +1,20 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ b/.style={draw=inkblue,align=center,minimum width=3.2cm,minimum height=.8cm,font=\small},
+ r/.style={b,rounded corners=3mm}]
+\node[b] (c309data) at (0,4.8) {时程数据};
+\node[b,draw=green!55!black] (c309pre) at (0,3.4) {数据预处理};
+\node[r] (c309cnn) at (0,2.1) {CNN};
+\node[b] (c309class) at (-2,0) {分类};
+\node[b] (c309ab) at (3,0) {异常检测};
+\node[r] (c309rnn) at (4,1.3) {用于时间序列预测\\的 RNN};
+\draw[->,green!55!black] (c309data)--(c309pre)--(c309cnn);
+\draw[->,green!55!black] (c309cnn.south)--(c309class.north);
+\draw[->,green!55!black] (c309cnn.south)--(c309ab.north);
+\draw[->,green!55!black] (c309cnn.east)-|(c309rnn.north);
+\draw[->,green!55!black] (c309rnn.south)--(c309ab.north);
+\end{tikzpicture}
+\origfig{9}{CNN 用于时间序列数据分析的一般流程。}
+\label{fig:ch03-09}
+\end{figure}

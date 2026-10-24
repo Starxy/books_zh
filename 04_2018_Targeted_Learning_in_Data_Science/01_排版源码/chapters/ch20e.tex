@@ -1,0 +1,62 @@
+% 原书分章 PDF 第 14—16 页；第 20.5 节。
+\section{有效影响曲线}
+
+根据序贯条件独立性假设，$\mathbf O$ 的对数似然，即 $\mathbf O$ 的数据密度 (20.7) 的对数，可表示为关于时间点 $t$ 和个体 $i$ 的双重求和。对每个 $t$，给定过去时，关于 $i$ 的和由相互独立的随机变量构成。因此，在适当的正则条件下，可以证明对数似然服从渐近正态分布。由此，我们猜想可以确立这一统计模型的所谓局部渐近正态性（local asymptotic normality）：对于固定数据分布 $P$ 的所有可能扰动，证明从其扰动（子模型）$P_{\epsilon=1/\sqrt N}\subset\mathcal M$ 抽样时，对数似然具有渐近正态性。van der Vaart (1998) 表明，对于满足局部渐近正态性条件的模型，根据卷积定理（convolution theorem），MLE 的正态极限分布是最优极限分布（Bickel et al. 1997b）。
+
+众所周知，基于 $n$ 个独立同分布观测样本的正则估计量有效，当且仅当它渐近线性且影响曲线等于有效影响曲线。这里，我们关注的却不是观察由参数 $N$ 索引的数据结构的 $n$ 个样本时的渐近性质；例如，观察独立同分布样本 $\mathbf O_1,\ldots,\mathbf O_n$，其中每个 $\mathbf O_i$ 描述 $N$ 个因果相连个体的数据。我们关注的是基于一次抽取 $\mathbf O$、随着 $N$ 增长的渐近性质。尽管如此，van der Laan (2014a) 的第 5 节分析了当 $N\to\infty$ 时，基于这样一次抽取 $\mathbf O^N$ 的 MLE 的渐近行为，表明这种 MLE 的渐近方差仍由有效影响曲线刻画。具体而言，该文表明，在保证 MLE 有效性所需的适当正则条件下，即所有可观测变量均为离散变量，从而 MLE 渐近地具有良好定义，目标参数的标准化 MLE $\sqrt N(\psi_N-\psi_0)$ 的渐近方差，等于 $NP_0\{D^*(\bar q_0,\bar g_0)\}^2$ 在 $N$ 增长时的极限；其中，$P_0\{D^*(\bar q_0,\bar g_0)\}^2$ 是下文定义的有效影响曲线 $D^*(\bar q_0,\bar g_0)$ 的方差。因此，我们的目标仍应是构造一个渐近正态估计量，使其方差等于经过适当标准化的有效影响曲线的方差。所提出的 TMLE 使用得分张成有效影响曲线的最不利子模型，实现这一目标。
+
+技术报告 van der Laan (2012) 的定理 3，在假设基线协变量 $(W_1,\ldots,W_N)$ 相互独立的情况下，给出了纵向数据结构中 $E\bar Y_{\mathbf g^*}(\tau)$ 的有效影响曲线的一般表示。令
+\[
+\begin{aligned}
+ D^*_{W_i}(P)(W_i)
+ &=E(\bar Y_{\mathbf g^*}(\tau)\mid W_i)-E(\bar Y_{\mathbf g^*}(\tau))\\
+ &=\frac1N\sum_{j=1}^N\bigl[E(Y_{j,\mathbf g^*}(\tau)\mid W_i)
+        -E(Y_{j,\mathbf g^*}(\tau))\bigr].
+\end{aligned}
+\]
+则有效影响曲线（efficient influence curve，EIC）为
+\begin{equation}
+ D^*(P)=\sum_{i=1}^ND^*_{W_i}(P)(W_i)
+       +\sum_{t=1}^\tau\sum_{i=1}^ND_t^*(P)(Y_i(t),C_{Y(t),i}),
+ \tag{20.10}
+\end{equation}
+其中，将 $D_t^*$ 定义为
+\[
+ D_t^*(P)(Y_i(t),C_{Y(t),i})
+ =\frac1N\sum_{m=1}^N\left[
+    \frac{h^*_{t,m}}{\bar h_t}(C_{Y(t),i})
+    \frac1N\sum_{l=1}^ND_{l,t,m}(Y_i(t),C_{Y(t),i})\right].
+\]
+上式还定义了 $h^*_{t,m}(c)=P_{\bar q_0,\mathbf g^*}(C_{Y(t),m}=c)$、$h_{t,m}(c)=P_{\bar q_0,\bar g_0}(C_{Y(t),m}=c)$，以及 $\bar h_t=\frac1N\sum_mh_{t,m}$；并将 $D_{l,t,m}$ 定义为
+\[
+\begin{aligned}
+ D_{l,t,m}(Y_i(t),C_{Y(t),i})
+ &=E(Y_{l,\mathbf g^*}(\tau)\mid Y_m(t)=Y_i(t),C_{Y(t),m}=C_{Y(t),i})\\
+ &\quad{}-E(Y_{l,\mathbf g^*}(\tau)\mid C_{Y(t),m}=C_{Y(t),i}).
+\end{aligned}
+\]
+用 $\bar h$ 表示所有 $\bar h_t$ 的集合，即 $\bar h(\bar q,\bar g):=(\bar h_t(\bar q,\bar g):t=1,\ldots,\tau)$。
+
+注意，如果对基线协变量 $\mathbf W$ 的分布采用不同模型，则只会改变有效影响曲线的第一项，即上面定义的 $D^*_{W_i}$ 项。例如，下一章给出了对 $\mathbf W$ 的分布采用完全非参数模型时的有效影响曲线。还应注意，给定 $C_{Y(t),i}$ 时，$D_t^*(\bar q_0,\bar g_0)$ 的条件均值为零。为了使 $D_t^*(\bar q_0,\bar g_0)$ 具有有限方差，关于 $l$ 的求和必须缩减为有限项之和，因为对于大多数 $m$，给定 $C_{Y(t),m}$ 时，$Y_m(t)$ 与 $Y_l(\tau)$ 条件独立。上述有效影响曲线的推导及其稳健性研究，见技术报告 van der Laan (2012) 的第 6 节。
+
+现在介绍上述 EIC 的另一种表示，适用于所有 $(Y_i(t),A_i)$ 均为二元变量、$W_i$ 均为分类变量的情况，其中 $i=1,\ldots,N$，$t=1,\ldots,\tau$。具体而言，对每个 $t=1,\ldots,\tau$，上述 EIC 中对应于 $t$ 的分量，也可表示为残差 $(Y_i(t)-\bar q_t(1\mid C_{Y(t),i}))$ 的加权和，每个残差均乘以“巧妙协变量”$\bar H_t(C_{Y(t),i})$：
+\begin{equation}
+ \sum_{i=1}^ND_t^*(Y_i(t),C_{Y(t),i})
+ =\sum_{i=1}^N\bar H_t(C_{Y(t),i})
+       (Y_i(t)-\bar q_t(1\mid C_{Y(t),i})),
+ \tag{20.11}
+\end{equation}
+巧妙协变量定义为
+\[
+ \bar H_t(c_{y(t)})=\frac1N\sum_{m=1}^N
+       \frac{h^*_{t,m}}{\bar h_t}(c_{y(t)})\bar D_{t,m}(c_{y(t)}),
+\]
+其中
+\[
+\begin{aligned}
+ \bar D_{t,m}(c_{y(t)})
+ =\bigl[&E(\bar Y_{\mathbf g^*}(\tau)\mid Y_m(t)=1,C_{Y(t),m}=c_{y(t)})\\
+       &-E(\bar Y_{\mathbf g^*}(\tau)\mid Y_m(t)=0,C_{Y(t),m}=c_{y(t)})\bigr].
+\end{aligned}
+\]
+注意，式 (20.11) 中二元情形的 EIC 表示，使我们能够定义 TMLE 的最不利子模型，详见第 20.7 节。

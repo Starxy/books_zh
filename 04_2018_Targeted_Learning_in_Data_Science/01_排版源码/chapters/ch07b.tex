@@ -1,0 +1,132 @@
+% 原书第 98—101 页；第 7.2 节，包含定理 7.2 全文。
+\section{一般 HAL-TMLE 及其渐近有效性}
+\label{sec:ch07-general-hal-tmle}
+
+现在，将上述分析推广到任意统计模型和目标参数的一般 TMLE 分析。设 $O_1,\ldots,O_n$ 是随机变量 $O$ 的 $n$ 个独立同分布观测，其概率分布为 $P_0$，且已知 $P_0$ 属于统计模型 $\mathcal M$。令 $\Psi:\mathcal M\to\mathbb R$ 是一个路径可微的目标参数，其典范梯度为 $D^*(P)$。假设对于某个参数 $Q:\mathcal M\to\mathcal Q(\mathcal M)$，有 $\Psi(P)=\Psi_1(Q(P))$；并假设对于某个干扰参数（nuisance parameter）$G:\mathcal M\to\mathcal G(\mathcal M)$，有 $D^*(P)=D_1^*(Q(P),G(P))$。令 $L_1(Q)$ 和 $L_2(G)$ 分别为 $Q$ 和 $G$ 的损失函数。例如，$Q$ 可以由若干个变动独立（variation independent）的分量构成，各分量都有自己的损失函数，此时 $L_1(Q)$ 就定义为这些损失函数之和。类似地，对于具有多个分量的参数 $G$，也可以采用损失函数之和。我们将基于损失的差异度定义为
+\[
+ \begin{aligned}
+ d_{01}(Q,Q_0)&=P_0L_1(Q)-P_0L_1(Q_0),\\
+ d_{02}(G,G_0)&=P_0L_2(G)-P_0L_2(G_0).
+ \end{aligned}
+\]
+假设对于所有 $P\in\mathcal M$，$Q(P)$ 和 $G(P)$ 分别为 $d_1$ 维和 $d_2$ 维的右连续且有左极限的函数。如果 $Q$ 具有多个变动独立的分量，各分量都有自己的损失函数，那么，这相当于假设每个分量都是一个具有 $d_1$ 个自变量的实值右连续且有左极限的函数。我们还假设
+$\sup_{P\in\mathcal M}\|Q(P)\|_v<\infty$
+和
+$\sup_{P\in\mathcal M}\|G(P)\|_v<\infty$。
+令 $d=\max(d_1,d_2)$。另外，假设
+$\sup_{P\in\mathcal M}\|D^*(Q(P),G(P))\|_v<\infty$；
+不过，通常只要假设 $Q(P)$ 和 $G(P)$ 的变差范数对所有 $P\in\mathcal M$ 一致有界，就能够推出后一个条件。
+
+令 $G_n,Q_n$ 为 $G_0,Q_0$ 的 HAL 估计量。也就是说，定义
+\[
+ Q_{n,\lambda}
+ =\argmin_{\substack{Q\in\mathcal Q(\mathcal M)\\\|Q\|_v\leq\lambda}}
+ P_nL_1(Q),
+\]
+取 $\lambda_n$ 为交叉验证选择器（cross-validation selector），并令 $Q_n=Q_{n,\lambda_n}$。类似地，定义
+\[
+ G_{n,\lambda}
+ =\argmin_{\substack{G\in\mathcal G(\mathcal M)\\\|G\|_v\leq\lambda}}
+ P_nL_2(G),
+\]
+取 $\lambda_n$ 为交叉验证选择器，并令 $G_n=G_{n,\lambda_n}$。根据 HAL 估计量的一般结果，我们有
+\[
+ \begin{aligned}
+ d_{01}(Q_n,Q_0)&=O_P\bigl(n^{-(0.5+\alpha(d_1)/4)}\bigr),\\
+ d_{02}(G_n,G_0)&=O_P\bigl(n^{-(0.5+\alpha(d_2)/4)}\bigr).
+ \end{aligned}
+\]
+这些是最坏情形下的收敛速率，对应于如下模型：$Q$ 和 $G$ 的参数空间包含变差范数小于某个常数的所有右连续且有左极限的函数。如果参数空间实际上是这一非参数参数空间的子空间，那么，收敛速率会更好，van der Laan（2017）对此作了说明。也可以用算法库中包含这些 HAL 估计量的超级学习器替代 $G_n,Q_n$。
+
+令 $\{Q_{n,\epsilon}:\epsilon\}$ 为一个在 $\epsilon=0$ 时通过 $Q_n$ 的参数子模型，使得
+\[
+ \left.\frac{d}{d\epsilon}L_1(Q_{n,\epsilon})\right|_{\epsilon=0}
+\]
+的线性张成空间包含 $D^*(Q_n,G_n)$。选择 $\epsilon_n$，使得
+$d_{01}(Q_{n,\epsilon_n},Q_0)
+ =O_P\bigl(n^{-(0.5+\alpha(d)/4)}\bigr)$，
+并且
+\[
+ P_nD^*(Q_{n,\epsilon_n},G_n)=o_P(n^{-1/2}).
+\]
+令 $Q_n^*=Q_{n,\epsilon_n}$。
+
+$\epsilon_n$ 的一个自然候选值是极大似然估计值
+$\epsilon_n=\argmin_\epsilon P_nL_1(Q_{n,\epsilon})$。
+例如，如果 $\{Q_{n,\epsilon}:\epsilon\}$ 是通用最不利子模型（universal least favorable submodel），使得对于所有 $\epsilon$，都有
+$\frac{d}{d\epsilon}L_1(Q_{n,\epsilon})
+ =D^*(Q_{n,\epsilon},G_n)$，
+那么 $P_nD^*(Q_{n,\epsilon_n},G_n)=0$。在适当的正则条件下，即使不强制要求通用最不利子模型的性质，也可以证明：$Q_n,G_n$ 以快于 $n^{-1/4}$ 的速率达到一致性，就能推出
+$P_nD^*(Q_{n,\epsilon_n},G_n)=o_P(n^{-1/2})$。
+还可以将 $\epsilon_n$ 定义为方程
+$0=P_nD^*(Q_{n,\epsilon_n},G_n)=0$ 的解。
+
+令
+$R_{20}((Q,G),(Q_0,G_0))
+ \equiv\Psi(Q)-\Psi(Q_0)+P_0D^*(Q,G)$。
+于是，
+\[
+ \begin{aligned}
+ \Psi(Q_n^*)-\Psi(Q_0)
+  ={}&(P_n-P_0)D^*(Q_n^*,G_n)\\
+    &{}+R_{20}((Q_n^*,G_n),(Q_0,G_0))+o_P(n^{-1/2}).
+ \end{aligned}
+\]
+由于 $R_{20}()$ 是二阶余项，它涉及的积分，其被积函数是 $Q_n^*$ 与 $Q_0$ 之差和 $G_n$ 与 $G_0$ 之差的乘积。由于模型 $\mathcal M$ 通过要求有效影响函数一致有界而避开了奇异情形，利用 Cauchy--Schwarz 不等式，应当能够用
+$O(\max(d_{01}(Q,Q_0),d_{02}(G,G_0)))$
+来界定 $R_{20}((Q,G),(Q_0,G_0))$。因此，
+% 原书指数为 -0.5+alpha(d)/4；正号经 400 dpi 源页确认，照录。
+\[
+ R_{20}((Q_n^*,G_n),(Q_0,G_0))
+ =O_P\bigl(n^{-0.5+\alpha(d)/4}\bigr)=o_P(n^{-1/2}).
+\]
+
+假设 $(Q,G)\mapsto D^*(Q,G)$ 在 $P_0$ 处连续，具体含义是：如果当 $n\to\infty$ 时，$d_{01}(Q_n,Q_0)$ 和 $d_{02}(G_n,G_0)$ 收敛到零，那么，当 $n\to\infty$ 时，
+$P_0\{D^*(Q_n,G_n)-D^*(Q_0,G_0)\}^2\to0$。
+在这一连续性条件下，当 $n\to\infty$ 时，我们有
+$P_0\{D^*(Q_n^*,G_n)-D^*(Q_0,G_0)\}^2\to_p0$。
+由于 $D^*(Q_n^*,G_n)$ 以概率 $1$ 属于由变差范数以某个通用常数为界的多元实值右连续且有左极限函数构成的 Donsker 类，因此，
+$(P_n-P_0)D^*(Q_n^*,G_n)
+ =(P_n-P_0)D^*(Q_0,G_0)+o_P(n^{-1/2})$。
+这证明了
+\[
+ \Psi(Q_n^*)-\psi_0
+ =(P_n-P_0)D^*(Q_0,G_0)+o_P(n^{-1/2}),
+\]
+因而，$\Psi(Q_n^*)$ 具有渐近有效性。这就证明了以下定理。
+
+\begin{bookresult}{定理}{7.2}
+设 $O_1,\ldots,O_n$ 是随机变量 $O$ 的 $n$ 个独立同分布观测，其概率分布为 $P_0$，且已知 $P_0$ 属于统计模型 $\mathcal M$。令 $\Psi:\mathcal M\to\mathbb R$ 是一个路径可微的目标参数，其典范梯度为 $D^*(P)$。假设对于某个参数 $Q:\mathcal M\to\mathcal Q(\mathcal M)$，有 $\Psi(P)=\Psi_1(Q(P))$；并假设对于某个干扰参数 $G:\mathcal M\to\mathcal G(\mathcal M)$，有 $D^*(P)=D_1^*(Q(P),G(P))$。令 $L_1(Q)$ 和 $L_2(G)$ 分别为 $Q$ 和 $G$ 的损失函数。假设对于所有 $P\in\mathcal M$，$Q(P)$ 和 $G(P)$ 分别为 $d_1$ 维和 $d_2$ 维的右连续且有左极限的函数，且
+$\sup_{P\in\mathcal M}\|Q(P)\|_v<\infty$
+和
+$\sup_{P\in\mathcal M}\|G(P)\|_v<\infty$。
+令 $d=\max(d_1,d_2)$。我们还假设
+$\sup_{P\in\mathcal M}\|D^*(Q(P),G(P))\|_v<\infty$。
+假设
+$R_{20}((Q,G),(Q_0,G_0))
+ =O(\max(d_{01}(Q,Q_0),d_{02}(G,G_0)))$，
+并假设 $(Q,G)\mapsto D^*(Q,G)$ 在 $P_0$ 处连续，具体含义是：如果当 $n\to\infty$ 时，$d_{01}(Q_n,Q_0)$ 和 $d_{02}(G_n,G_0)$ 收敛到零，那么，当 $n\to\infty$ 时，
+$P_0\{D^*(Q_n,G_n)-D^*(Q_0,G_0)\}^2\to0$。
+
+令 $Q_n,G_n$ 为 HAL 估计量。我们有
+\[
+ \begin{aligned}
+ d_{01}(Q_n,Q_0)&=O_P\bigl(n^{-(0.5+\alpha(d_1)/4)}\bigr),\\
+ d_{02}(G_n,G_0)&=O_P\bigl(n^{-(0.5+\alpha(d_2)/4)}\bigr).
+ \end{aligned}
+\]
+令 $\{Q_{n,\epsilon}:\epsilon\}$ 为一个在 $\epsilon=0$ 时通过 $Q_n$ 的参数子模型，使得
+\[
+ \left.\frac{d}{d\epsilon}L_1(Q_{n,\epsilon})\right|_{\epsilon=0}
+\]
+的线性张成空间包含 $D^*(Q_n,G_n)$。选择 $\epsilon_n$，使得
+% 原书此处 O_P 项末尾多一个右圆括号，按可见原式保留。
+$d_{01}(Q_{n,\epsilon_n},Q_0)
+ =O_P(n^{-(0.5+\alpha(d)/4)}))$，
+并且
+\[
+ P_nD^*(Q_{n,\epsilon_n},G_n)=o_P(n^{-1/2}).
+\]
+令 $Q_n^*=Q_{n,\epsilon_n}$。TMLE $\Psi(Q_n^*)$ 具有渐近有效性。
+\end{bookresult}
+

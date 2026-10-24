@@ -1,0 +1,276 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.0cm}
+\def\nsep{0.1cm}
+
+\tikzstyle{snode} = [minimum width=0.65cm,minimum height=0.65cm,inner sep=0pt,draw,thin]
+\tikzstyle{bnode} = [minimum width=0.65cm,minimum height=0.65cm,inner sep=0pt,fill=gray!20]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% sub-figure 1: the T5 bias
+
+\begin{scope}
+
+\node [snode,anchor=west] (c00) at (0,0) {\tiny{$\mathbf{q}_{0} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c01) at ([xshift=0.1cm]c00.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c02) at ([xshift=0.1cm]c01.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c03) at ([xshift=0.1cm]c02.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c04) at ([xshift=0.1cm]c03.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c05) at ([xshift=0.1cm]c04.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c06) at ([xshift=0.1cm]c05.east) {};
+
+\node [snode,anchor=north] (c10) at ([yshift=-0.1cm]c00.south) {\tiny{$\mathbf{q}_{1} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c11) at ([xshift=0.1cm]c10.east) {\tiny{$\mathbf{q}_{1} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c12) at ([xshift=0.1cm]c11.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c13) at ([xshift=0.1cm]c12.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c14) at ([xshift=0.1cm]c13.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c15) at ([xshift=0.1cm]c14.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c16) at ([xshift=0.1cm]c15.east) {};
+
+\node [snode,anchor=north] (c20) at ([yshift=-0.1cm]c10.south) {\tiny{$\mathbf{q}_{2} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c21) at ([xshift=0.1cm]c20.east) {\tiny{$\mathbf{q}_{2} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c22) at ([xshift=0.1cm]c21.east) {\tiny{$\mathbf{q}_{2} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c23) at ([xshift=0.1cm]c22.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c24) at ([xshift=0.1cm]c23.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c25) at ([xshift=0.1cm]c24.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c26) at ([xshift=0.1cm]c25.east) {};
+
+\node [snode,anchor=north] (c30) at ([yshift=-0.1cm]c20.south) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c31) at ([xshift=0.1cm]c30.east) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c32) at ([xshift=0.1cm]c31.east) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c33) at ([xshift=0.1cm]c32.east) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c34) at ([xshift=0.1cm]c33.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c35) at ([xshift=0.1cm]c34.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c36) at ([xshift=0.1cm]c35.east) {};
+
+\node [snode,anchor=north] (c40) at ([yshift=-0.1cm]c30.south) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c41) at ([xshift=0.1cm]c40.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c42) at ([xshift=0.1cm]c41.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c43) at ([xshift=0.1cm]c42.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c44) at ([xshift=0.1cm]c43.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{4}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c45) at ([xshift=0.1cm]c44.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c46) at ([xshift=0.1cm]c45.east) {};
+
+\node [snode,anchor=north] (c50) at ([yshift=-0.1cm]c40.south) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c51) at ([xshift=0.1cm]c50.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c52) at ([xshift=0.1cm]c51.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c53) at ([xshift=0.1cm]c52.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c54) at ([xshift=0.1cm]c53.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{4}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c55) at ([xshift=0.1cm]c54.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{5}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c56) at ([xshift=0.1cm]c55.east) {};
+
+\node [snode,anchor=north] (c60) at ([yshift=-0.1cm]c50.south) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c61) at ([xshift=0.1cm]c60.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c62) at ([xshift=0.1cm]c61.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c63) at ([xshift=0.1cm]c62.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c64) at ([xshift=0.1cm]c63.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{4}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c65) at ([xshift=0.1cm]c64.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{5}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c66) at ([xshift=0.1cm]c65.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{6}^{\mathrm{T}}$}};
+
+\node [anchor=south] (label) at ([yshift=0.1cm]c03.north) {\large{$\mathbf{q}_i \mathbf{k}_j^{\mathrm{T}}$}};
+
+\end{scope}
+
+\begin{scope}[xshift=7.5cm]
+
+\node [bnode,anchor=west,fill=blue!5] (c00) at (0,0) {\footnotesize{$u_{0}$}};
+\node [bnode,anchor=west] (c01) at ([xshift=0.1cm]c00.east) {};
+\node [bnode,anchor=west] (c02) at ([xshift=0.1cm]c01.east) {};
+\node [bnode,anchor=west] (c03) at ([xshift=0.1cm]c02.east) {};
+\node [bnode,anchor=west] (c04) at ([xshift=0.1cm]c03.east) {};
+\node [bnode,anchor=west] (c05) at ([xshift=0.1cm]c04.east) {};
+\node [bnode,anchor=west] (c06) at ([xshift=0.1cm]c05.east) {};
+
+\node [bnode,anchor=north,fill=blue!15] (c10) at ([yshift=-0.1cm]c00.south) {\footnotesize{$u_{1}$}};
+\node [bnode,anchor=west,fill=blue!5] (c11) at ([xshift=0.1cm]c10.east) {\footnotesize{$u_{0}$}};
+\node [bnode,anchor=west] (c12) at ([xshift=0.1cm]c11.east) {};
+\node [bnode,anchor=west] (c13) at ([xshift=0.1cm]c12.east) {};
+\node [bnode,anchor=west] (c14) at ([xshift=0.1cm]c13.east) {};
+\node [bnode,anchor=west] (c15) at ([xshift=0.1cm]c14.east) {};
+\node [bnode,anchor=west] (c16) at ([xshift=0.1cm]c15.east) {};
+
+\node [bnode,anchor=north,fill=blue!30] (c20) at ([yshift=-0.1cm]c10.south) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!15] (c21) at ([xshift=0.1cm]c20.east) {\footnotesize{$u_{1}$}};
+\node [bnode,anchor=west,fill=blue!5] (c22) at ([xshift=0.1cm]c21.east) {\footnotesize{$u_{0}$}};
+\node [bnode,anchor=west] (c23) at ([xshift=0.1cm]c22.east) {};
+\node [bnode,anchor=west] (c24) at ([xshift=0.1cm]c23.east) {};
+\node [bnode,anchor=west] (c25) at ([xshift=0.1cm]c24.east) {};
+\node [bnode,anchor=west] (c26) at ([xshift=0.1cm]c25.east) {};
+
+\node [bnode,anchor=north,fill=blue!30] (c30) at ([yshift=-0.1cm]c20.south) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!30] (c31) at ([xshift=0.1cm]c30.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!15] (c32) at ([xshift=0.1cm]c31.east) {\footnotesize{$u_{1}$}};
+\node [bnode,anchor=west,fill=blue!5] (c33) at ([xshift=0.1cm]c32.east) {\footnotesize{$u_{0}$}};
+\node [bnode,anchor=west] (c34) at ([xshift=0.1cm]c33.east) {};
+\node [bnode,anchor=west] (c35) at ([xshift=0.1cm]c34.east) {};
+\node [bnode,anchor=west] (c36) at ([xshift=0.1cm]c35.east) {};
+
+\node [bnode,anchor=north,fill=blue!50] (c40) at ([yshift=-0.1cm]c30.south) {\footnotesize{$u_{3}$}};
+\node [bnode,anchor=west,fill=blue!30] (c41) at ([xshift=0.1cm]c40.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!30] (c42) at ([xshift=0.1cm]c41.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!15] (c43) at ([xshift=0.1cm]c42.east) {\footnotesize{$u_{1}$}};
+\node [bnode,anchor=west,fill=blue!5] (c44) at ([xshift=0.1cm]c43.east) {\footnotesize{$u_{0}$}};
+\node [bnode,anchor=west] (c45) at ([xshift=0.1cm]c44.east) {};
+\node [bnode,anchor=west] (c46) at ([xshift=0.1cm]c45.east) {};
+
+\node [bnode,anchor=north,fill=blue!50] (c50) at ([yshift=-0.1cm]c40.south) {\footnotesize{$u_{3}$}};
+\node [bnode,anchor=west,fill=blue!50] (c51) at ([xshift=0.1cm]c50.east) {\footnotesize{$u_{3}$}};
+\node [bnode,anchor=west,fill=blue!30] (c52) at ([xshift=0.1cm]c51.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!30] (c53) at ([xshift=0.1cm]c52.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!15] (c54) at ([xshift=0.1cm]c53.east) {\footnotesize{$u_{1}$}};
+\node [bnode,anchor=west,fill=blue!5] (c55) at ([xshift=0.1cm]c54.east) {\footnotesize{$u_{0}$}};
+\node [bnode,anchor=west] (c56) at ([xshift=0.1cm]c55.east) {};
+
+\node [bnode,anchor=north,fill=blue!50] (c60) at ([yshift=-0.1cm]c50.south) {\footnotesize{$u_{3}$}};
+\node [bnode,anchor=west,fill=blue!50] (c61) at ([xshift=0.1cm]c60.east) {\footnotesize{$u_{3}$}};
+\node [bnode,anchor=west,fill=blue!50] (c62) at ([xshift=0.1cm]c61.east) {\footnotesize{$u_{3}$}};
+\node [bnode,anchor=west,fill=blue!30] (c63) at ([xshift=0.1cm]c62.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!30] (c64) at ([xshift=0.1cm]c63.east) {\footnotesize{$u_{2}$}};
+\node [bnode,anchor=west,fill=blue!15] (c65) at ([xshift=0.1cm]c64.east) {\footnotesize{$u_{1}$}};
+\node [bnode,anchor=west,fill=blue!5] (c66) at ([xshift=0.1cm]c65.east) {\footnotesize{$u_{0}$}};
+
+\node [anchor=south] (label) at ([yshift=0.1cm]c03.north) {\large{偏置（$u_{b(i-j)}$）}};
+
+\node [anchor=east] (addition) at ([xshift=-0.7cm]c30.west) {\Huge{$+$}};
+
+\node [anchor=north] (caption) at ([xshift=-1.3cm,yshift=-0.5cm]c60.south west) {\small{（a）T5 偏置（$n_b = 3$，$\mathrm{dist}_{\mathrm{max}}=5$）}};
+
+\end{scope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% sub-figure 2: the Alibi bias
+
+\begin{scope}[yshift=-8cm]
+
+\node [snode,anchor=west] (c00) at (0,0) {\tiny{$\mathbf{q}_{0} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c01) at ([xshift=0.1cm]c00.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c02) at ([xshift=0.1cm]c01.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c03) at ([xshift=0.1cm]c02.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c04) at ([xshift=0.1cm]c03.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c05) at ([xshift=0.1cm]c04.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c06) at ([xshift=0.1cm]c05.east) {};
+
+\node [snode,anchor=north] (c10) at ([yshift=-0.1cm]c00.south) {\tiny{$\mathbf{q}_{1} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c11) at ([xshift=0.1cm]c10.east) {\tiny{$\mathbf{q}_{1} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c12) at ([xshift=0.1cm]c11.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c13) at ([xshift=0.1cm]c12.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c14) at ([xshift=0.1cm]c13.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c15) at ([xshift=0.1cm]c14.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c16) at ([xshift=0.1cm]c15.east) {};
+
+\node [snode,anchor=north] (c20) at ([yshift=-0.1cm]c10.south) {\tiny{$\mathbf{q}_{2} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c21) at ([xshift=0.1cm]c20.east) {\tiny{$\mathbf{q}_{2} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c22) at ([xshift=0.1cm]c21.east) {\tiny{$\mathbf{q}_{2} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c23) at ([xshift=0.1cm]c22.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c24) at ([xshift=0.1cm]c23.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c25) at ([xshift=0.1cm]c24.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c26) at ([xshift=0.1cm]c25.east) {};
+
+\node [snode,anchor=north] (c30) at ([yshift=-0.1cm]c20.south) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c31) at ([xshift=0.1cm]c30.east) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c32) at ([xshift=0.1cm]c31.east) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c33) at ([xshift=0.1cm]c32.east) {\tiny{$\mathbf{q}_{3} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c34) at ([xshift=0.1cm]c33.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c35) at ([xshift=0.1cm]c34.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c36) at ([xshift=0.1cm]c35.east) {};
+
+\node [snode,anchor=north] (c40) at ([yshift=-0.1cm]c30.south) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c41) at ([xshift=0.1cm]c40.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c42) at ([xshift=0.1cm]c41.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c43) at ([xshift=0.1cm]c42.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c44) at ([xshift=0.1cm]c43.east) {\tiny{$\mathbf{q}_{4} \mathbf{k}_{4}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c45) at ([xshift=0.1cm]c44.east) {};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c46) at ([xshift=0.1cm]c45.east) {};
+
+\node [snode,anchor=north] (c50) at ([yshift=-0.1cm]c40.south) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c51) at ([xshift=0.1cm]c50.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c52) at ([xshift=0.1cm]c51.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c53) at ([xshift=0.1cm]c52.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c54) at ([xshift=0.1cm]c53.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{4}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c55) at ([xshift=0.1cm]c54.east) {\tiny{$\mathbf{q}_{5} \mathbf{k}_{5}^{\mathrm{T}}$}};
+\node [snode,anchor=west,very thin,draw=gray!100,dotted] (c56) at ([xshift=0.1cm]c55.east) {};
+
+\node [snode,anchor=north] (c60) at ([yshift=-0.1cm]c50.south) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{0}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c61) at ([xshift=0.1cm]c60.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{1}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c62) at ([xshift=0.1cm]c61.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{2}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c63) at ([xshift=0.1cm]c62.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{3}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c64) at ([xshift=0.1cm]c63.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{4}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c65) at ([xshift=0.1cm]c64.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{5}^{\mathrm{T}}$}};
+\node [snode,anchor=west] (c66) at ([xshift=0.1cm]c65.east) {\tiny{$\mathbf{q}_{6} \mathbf{k}_{6}^{\mathrm{T}}$}};
+
+\node [anchor=south] (label) at ([yshift=0.1cm]c03.north) {\large{$\mathbf{q}_i \mathbf{k}_j^{\mathrm{T}}$}};
+
+\end{scope}
+
+\begin{scope}[xshift=7.5cm,yshift=-8cm]
+
+\node [bnode,anchor=west,fill=blue!5] (c00) at (0,0) {\scriptsize{$0$}};
+\node [bnode,anchor=west] (c01) at ([xshift=0.1cm]c00.east) {};
+\node [bnode,anchor=west] (c02) at ([xshift=0.1cm]c01.east) {};
+\node [bnode,anchor=west] (c03) at ([xshift=0.1cm]c02.east) {};
+\node [bnode,anchor=west] (c04) at ([xshift=0.1cm]c03.east) {};
+\node [bnode,anchor=west] (c05) at ([xshift=0.1cm]c04.east) {};
+\node [bnode,anchor=west] (c06) at ([xshift=0.1cm]c05.east) {};
+
+\node [bnode,anchor=north,fill=blue!10] (c10) at ([yshift=-0.1cm]c00.south) {\scriptsize{$-1\beta$}};
+\node [bnode,anchor=west,fill=blue!5] (c11) at ([xshift=0.1cm]c10.east) {\scriptsize{$0$}};
+\node [bnode,anchor=west] (c12) at ([xshift=0.1cm]c11.east) {};
+\node [bnode,anchor=west] (c13) at ([xshift=0.1cm]c12.east) {};
+\node [bnode,anchor=west] (c14) at ([xshift=0.1cm]c13.east) {};
+\node [bnode,anchor=west] (c15) at ([xshift=0.1cm]c14.east) {};
+\node [bnode,anchor=west] (c16) at ([xshift=0.1cm]c15.east) {};
+
+\node [bnode,anchor=north,fill=blue!15] (c20) at ([yshift=-0.1cm]c10.south) {\scriptsize{$-2\beta$}};
+\node [bnode,anchor=west,fill=blue!10] (c21) at ([xshift=0.1cm]c20.east) {\scriptsize{$-1\beta$}};
+\node [bnode,anchor=west,fill=blue!5] (c22) at ([xshift=0.1cm]c21.east) {\scriptsize{$0$}};
+\node [bnode,anchor=west] (c23) at ([xshift=0.1cm]c22.east) {};
+\node [bnode,anchor=west] (c24) at ([xshift=0.1cm]c23.east) {};
+\node [bnode,anchor=west] (c25) at ([xshift=0.1cm]c24.east) {};
+\node [bnode,anchor=west] (c26) at ([xshift=0.1cm]c25.east) {};
+
+\node [bnode,anchor=north,fill=blue!20] (c30) at ([yshift=-0.1cm]c20.south) {\scriptsize{$-3\beta$}};
+\node [bnode,anchor=west,fill=blue!15] (c31) at ([xshift=0.1cm]c30.east) {\scriptsize{$-2\beta$}};
+\node [bnode,anchor=west,fill=blue!10] (c32) at ([xshift=0.1cm]c31.east) {\scriptsize{$-1\beta$}};
+\node [bnode,anchor=west,fill=blue!5] (c33) at ([xshift=0.1cm]c32.east) {\scriptsize{$0$}};
+\node [bnode,anchor=west] (c34) at ([xshift=0.1cm]c33.east) {};
+\node [bnode,anchor=west] (c35) at ([xshift=0.1cm]c34.east) {};
+\node [bnode,anchor=west] (c36) at ([xshift=0.1cm]c35.east) {};
+
+\node [bnode,anchor=north,fill=blue!25] (c40) at ([yshift=-0.1cm]c30.south) {\scriptsize{$-4\beta$}};
+\node [bnode,anchor=west,fill=blue!20] (c41) at ([xshift=0.1cm]c40.east) {\scriptsize{$-3\beta$}};
+\node [bnode,anchor=west,fill=blue!15] (c42) at ([xshift=0.1cm]c41.east) {\scriptsize{$-2\beta$}};
+\node [bnode,anchor=west,fill=blue!10] (c43) at ([xshift=0.1cm]c42.east) {\scriptsize{$-1\beta$}};
+\node [bnode,anchor=west,fill=blue!5] (c44) at ([xshift=0.1cm]c43.east) {\scriptsize{$0$}};
+\node [bnode,anchor=west] (c45) at ([xshift=0.1cm]c44.east) {};
+\node [bnode,anchor=west] (c46) at ([xshift=0.1cm]c45.east) {};
+
+\node [bnode,anchor=north,fill=blue!30] (c50) at ([yshift=-0.1cm]c40.south) {\scriptsize{$-5\beta$}};
+\node [bnode,anchor=west,fill=blue!25] (c51) at ([xshift=0.1cm]c50.east) {\scriptsize{$-4\beta$}};
+\node [bnode,anchor=west,fill=blue!20] (c52) at ([xshift=0.1cm]c51.east) {\scriptsize{$-3\beta$}};
+\node [bnode,anchor=west,fill=blue!15] (c53) at ([xshift=0.1cm]c52.east) {\scriptsize{$-2\beta$}};
+\node [bnode,anchor=west,fill=blue!10] (c54) at ([xshift=0.1cm]c53.east) {\scriptsize{$-\beta$}};
+\node [bnode,anchor=west,fill=blue!5] (c55) at ([xshift=0.1cm]c54.east) {\scriptsize{$0$}};
+\node [bnode,anchor=west] (c56) at ([xshift=0.1cm]c55.east) {};
+
+\node [bnode,anchor=north,fill=blue!35] (c60) at ([yshift=-0.1cm]c50.south) {\scriptsize{$-6\beta$}};
+\node [bnode,anchor=west,fill=blue!30] (c61) at ([xshift=0.1cm]c60.east) {\scriptsize{$-5\beta$}};
+\node [bnode,anchor=west,fill=blue!25] (c62) at ([xshift=0.1cm]c61.east) {\scriptsize{$-4\beta$}};
+\node [bnode,anchor=west,fill=blue!20] (c63) at ([xshift=0.1cm]c62.east) {\scriptsize{$-3\beta$}};
+\node [bnode,anchor=west,fill=blue!15] (c64) at ([xshift=0.1cm]c63.east) {\scriptsize{$-2\beta$}};
+\node [bnode,anchor=west,fill=blue!10] (c65) at ([xshift=0.1cm]c64.east) {\scriptsize{$-\beta$}};
+\node [bnode,anchor=west,fill=blue!5] (c66) at ([xshift=0.1cm]c65.east) {\scriptsize{$0$}};
+
+\node [anchor=south] (label) at ([yshift=0.1cm]c03.north) {\large{偏置（$-\beta (i - j)$）}};
+
+\node [anchor=east] (addition) at ([xshift=-0.7cm]c30.west) {\Huge{$+$}};
+
+\node [anchor=north] (caption) at ([xshift=-1.3cm,yshift=-0.5cm]c60.south west) {\small{（b）ALiBi 偏置}};
+
+\end{scope}
+	
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,262 @@
+% 原章第20—26页（至5.4末）：HSIC估计、因果检验、mQTL。
+\bookdeepheading{paragraph}{5.3.2.3.2}{HSIC 的估计}
+
+假定从联合分布 $P(x,y)$ 中抽取 $n$ 对数据 $(x_i,y_i)$，$i=1,\ldots,n$。HSIC 的一个有偏估计量为（Zhang et al. 2017；附录 5.A）
+\begin{equation}
+\begin{aligned}
+\mathrm{HSIC}_u(X,Y)=\frac1{n(n-3)}\Bigl[{}&\tr(\widehat K_x\widehat K_y)
++\frac{\mathbf1^T\widehat K_x\mathbf1\mathbf1^T\widehat K_y\mathbf1}{(n-1)(n-2)}\\
+&-\frac2{n-2}\mathbf1^T\widehat K_x\widehat K_y\mathbf1\Bigr],
+\end{aligned}
+\tag{5.47}
+\end{equation}
+其中，$K_x=(k_x(x_i,x_j))_{n\times n}$，$K_y=(k_y(y_i,y_j))_{n\times n}$，$\widehat K_x=K_x-\diag(K_x)$，$\widehat K_y=K_y-\diag(K_y)$，$\mathbf1$ 为元素全为 1 的向量。HSIC 的一个有偏估计量具有如下简化形式（Zhang et al. 2017；附录 5.A）：
+\begin{equation}
+\mathrm{HSIC}_b(X,Y)=\frac1{n^2}\tr(K_xHK_yH),
+\tag{5.48}
+\end{equation}
+其中，$H=I_n-\frac1n\mathbf1\mathbf1^T$ 为对行或列进行中心化的中心化矩阵。
+
+\bookdeepheading{paragraph}{5.3.2.3.3}{HSIC 估计量的渐近分布}
+
+HSIC 可以用于检验两个随机变量之间的独立性。待检验的零假设为
+\[
+H_0:\text{两个随机变量相互独立。}
+\]
+备择假设为
+\[
+H_a:\text{两个随机变量相互独立。}
+\]
+有偏 HSIC 的渐近零分布由结论 5.5 给出（Zhang et al. 2017）。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.5：有偏 HSIC 的渐近分布（Zhang et al. 2017 中的定理 1）}\par
+在两个随机变量相互独立的零假设下，有偏 HSIC 的渐近分布为
+\begin{equation}
+n\mathrm{HSIC}_b(X,Y)\xrightarrow{D}
+\sum_{i=1}^\infty\sum_{j=1}^\infty\lambda_i\eta_jN_{i,j}^2,
+\tag{5.49}
+\end{equation}
+其中，$N_{i,j}\sim N(0,1)$ 相互独立且同分布；$\lambda_i$、$\eta_j$（$i=1,2,\ldots$，$j=1,2,\ldots$）分别为下列积分核方程的特征值：
+\[
+\int\bar k_x(x,w)g(w)\,dP_x(w)=\lambda g(x),
+\]
+\[
+\begin{aligned}
+\bar k_x(x,x')
+=\bigl\langle{}&k_x(x,\cdot)-E_W[k_x(W,\cdot)],\\
+&k_x(x',\cdot),-E_W[k_x(W,\cdot)]\bigr\rangle,\qquad W\sim P_x,
+\end{aligned}
+\]
+以及
+\[
+\int\bar k_y(y,w)g(w)\,dP_y(w)=\eta g(y),
+\]
+\[
+\begin{aligned}
+\bar k_y(y,y')
+=\bigl\langle{}&k_y(y,\cdot)-E_W[k_y(W,\cdot)],\\
+&k_y(y',),-E_W[k_y(W,\cdot)]\bigr\rangle,\qquad W\sim P_y.
+\end{aligned}
+\]
+
+类似地，无偏 HSIC 的渐近零分布由结论 5.6 给出（Zhang et al. 2017）。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.6：无偏 HSIC 的渐近分布}\par
+沿用结论 5.5 的记号，在独立性零假设下，无偏 HSIC 的渐近分布为
+\begin{equation}
+n\mathrm{HSIC}_u(X,Y)\xrightarrow{D}
+\sum_{i=1}^\infty\sum_{j=1}^\infty\lambda_i\eta_j(N_{i,j}^2-1),
+\tag{5.50}
+\end{equation}
+其中，$N_{i,j}$ 相互独立，且同服从 $N(0,1)$ 分布。
+
+\bookdeepheading{paragraph}{5.3.2.3.4}{分块 HSIC 统计量及其渐近零分布}
+
+有偏和无偏 HSIC 的渐近零分布没有解析闭式，因此难以计算独立性检验的 $P$ 值。为克服这一局限，Zhang et al.（2017）提出了基于分块的 HSIC 估计量，并推导出具有解析形式的渐近分布。
+
+假定将样本分成 $n/S$ 个块（$S\ll n$），每块大小为 $S$。每个块的数据记为 $(x_i^{(b)},y_i^{(b)})$，$i=1,\ldots,S$，$b=1,\ldots,n/S$。对每一块，利用式 (5.47) 计算 HSIC 的无偏估计量：
+\begin{equation}
+\begin{aligned}
+\widehat c_b=\frac1{S(S-3)}\Bigl[{}&\tr(\widehat K_x^{(b)}\widehat K_y^{(b)})
++\frac{\mathbf1^T\widehat K_x^{(b)}\mathbf1\mathbf1^T\widehat K_y^{(b)}\mathbf1}{(S-1)(S-2)}\\
+&-\frac2{S-2}\mathbf1^T\widehat K_x^{(b)}\widehat K_y^{(b)}\mathbf1\Bigr].
+\end{aligned}
+\tag{5.51}
+\end{equation}
+基于分块的 HSIC 无偏估计量，是 $\widehat c_b$ 的平均值：
+\begin{equation}
+\mathrm{BHSIC}=\frac Sn\sum_{b=1}^{n/S}\widehat c_b.
+\tag{5.52}
+\end{equation}
+由于 $\widehat c_b$ 是 HSIC 的无偏估计量，在独立性零假设下，$E[\widehat c_b]=0$。利用中心极限定理，可以证明分块 HSIC 无偏估计量的渐近结论 5.7（Zhang et al. 2017；附录 5.B）。
+
+\par\medskip\Needspace{4\baselineskip}
+\noindent\textbf{结论 5.7：分块 HSIC 的渐近零分布}\par
+当
+\begin{equation}
+n\to\infty,\quad S\to\infty,\quad\frac nS\to\infty,\qquad
+\sqrt{nS}\,\mathrm{BHSIC}\xrightarrow{D}N(0,\Var(W)),
+\tag{5.53}
+\end{equation}
+且
+\begin{equation}
+T_{\mathrm{BI}}=\sqrt{ns}\,\frac{\mathrm{BHSIC}}{\sqrt{\Var(W)}}
+\tag{5.54}
+\end{equation}
+渐近服从 $N(0,1($ 分布，其中 $\Var(W)=S^2\mathrm{var}(\widehat c_b)$。
+
+$W$ 的方差估计为
+\begin{equation}
+\widehat{\mathrm{var}}(W)=S^2\frac sn\sum_{b=1}^{n/s}(\widehat c_b-\mathrm{BHSIC})^2.
+\tag{5.55}
+\end{equation}
+
+\subsubsection{全表观基因组因果研究的检验统计量}
+
+现在可以给出全表观基因组因果研究（EWCS）的一般流程。该流程借鉴了两个连续变量的加性噪声模型（Hoyer et al. 2009；Mooij et al. 2016）。假定将数据分为训练集与测试集。在训练集中，首先使用模型 (5.9)，将 $Y$ 对 $X$（一个 CpG Y 位点的甲基化水平）回归，计算预测残差。然后，在训练集中，利用基于 HSIC 或分块 HSIC 的统计量，检验甲基化水平 $X$ 是否独立于预测残差。具体流程见算法 5.1。
+
+\begin{bookalgorithm}{5.1}
+\textbf{EWCS 的一般流程}
+\begin{enumerate}
+\item 将数据分为训练集 $D_{\mathrm{TR}}=(x_i,y_i)$，$i=1,\ldots,n_1$，以及测试集 $D_{\mathrm{TE}}=(x_i',y_i')$，$i=1,\ldots,n_2$。
+\item 利用模型 (5.9) 或模型 (5.10)、第 5.3.2.2 节的参数估计方法，以及训练集 $D_{\mathrm{TR}}$，得到非线性回归函数 $x\mapsto E[Y\mid X=x]$ 的估计 $\widehat f_Y$。
+\item 计算残差。
+
+残差计算是评估连续原因变量与离散变量之间因果关系的关键问题。令 $\bar f_Y$ 为 $\widehat f_Y(x_i')$ 的平均值，残差误差计算为
+\[
+\widehat\varepsilon_i=\bar f_Y-\widehat f_Y(x_i'),\qquad i=1,\ldots,n_2.
+\]
+\item 在数据集 $D_{\mathrm{TE}}$ 中检验因果关系 $X\to Y$。
+\begin{enumerate}[label=(\alph*)]
+\item 零假设为
+\[
+H_0:\text{不存在因果关系 }X\to Y\quad(X\text{ 与 }\varepsilon_Y\text{ 相依})\text{。}
+\]
+\item 检验统计量。
+\begin{enumerate}[label=(\roman*)]
+\item 选择核 $k_x(x_i,x_j)$ 与 $k_e(e_i,e_j)$，定义核矩阵 $K_x$ 和 $K_e$：
+\[
+K_x=\begin{bmatrix}
+k_x(x_1,x_1)&\cdots&k_x(x_1,x_{n_2})\\
+\vdots&\vdots&\vdots\\
+k_x(x_{n_2},x_1)&\cdots&k_x(x_{n_2},x_{n_2})
+\end{bmatrix},
+\]
+\[
+K_e=\begin{bmatrix}
+k_e(e_1,e_1)&\cdots&k_e(e_1,e_{n_2})\\
+\vdots&\vdots&\vdots\\
+k_e(e_{n_2},e_1)&\cdots&k_e(e_{n_2},e_{n_2})
+\end{bmatrix}.
+\]
+\item 利用式 (5.47)、(5.48) 与 (5.52)，计算 HSIC 的有偏、无偏估计量及分块 HSIC：
+\[
+\begin{aligned}
+\mathrm{HSIC}_u(X,e)=\frac1{n(n-3)}\Bigl[{}&\tr(\widehat K_x\widehat K_e)
++\frac{\mathbf1^T\widehat K_x\mathbf1\mathbf1^T\widehat K_e\mathbf1}{(n-1)(n-2)}\\
+&-\frac2{n-2}\mathbf1^T\widehat K_x\widehat K_e\mathbf1\Bigr],
+\end{aligned}
+\]
+其中，$\widehat K_x=K_x-\diag(K_x)$，$\widehat K_e=K_e-\diag(K_e)$，$\mathbf1$ 为元素全为 1 的向量；
+\[
+\mathrm{HSIC}_b(X,Y)=\frac1{n^2}\tr(K_xHK_yH),
+\]
+其中，$H=I_n-\frac1n\mathbf1\mathbf1^T$ 为对行或列进行中心化的中心化矩阵；
+\[
+\begin{aligned}
+\widehat c_b=\frac1{S(S-3)}\Bigl[{}&\tr(\widehat K_x^{(b)}\widehat K_e^{(b)})
++\frac{\mathbf1^T\widehat K_x^{(b)}\mathbf1\mathbf1^T\widehat K_e^{(b)}\mathbf1}{(S-1)(S-2)}\\
+&-\frac2{S-2}\mathbf1^T\widehat K_x^{(b)}\widehat K_e^{(b)}\mathbf1\Bigr],
+\end{aligned}
+\]
+其中，$b=1,2,\ldots,n/s$；
+\[
+\mathrm{BHSIC}=\frac Sn\sum_{b=1}^{n/S}\widehat c_b.
+\]
+\item 定义三个统计量：
+\[
+\begin{aligned}
+T_{u\mathrm{HSIC}}&=-\log\mathrm{HSIC}_u(X,\varepsilon),\\
+T_{b\mathrm{HSIC}}&=-\log\mathrm{HSIC}_b(X,\varepsilon),\\
+T_{\mathrm{BHSIC}}&=-\log\mathrm{BHSIC}.
+\end{aligned}
+\]
+\end{enumerate}
+\item 计算三种检验的 $P$ 值。
+\end{enumerate}
+\end{enumerate}
+\end{bookalgorithm}
+
+可以采用置换／自助法计算三个因果检验统计量的 $P$ 值。假定从真实测试集 $D_{\mathrm{TE}}$ 计算出三个统计量 $\widehat T_{u\mathrm{HSIC}}$、$\widehat T_{b\mathrm{HSIC}}$ 和 $\widehat T_{\mathrm{BHSIC}}$，总置换次数为 $n_p$。每次置换，固定 $x_i$（$i=1,\ldots,n_2$），随机置换 $y_i$（$i=1,\ldots,n_2$），随后拟合加性噪声模型 (5.9) 或 (5.10)，最后计算残差 $e_i$（$i=1,2,\ldots,n_2$）以及三个统计量 $\widetilde T_{u\mathrm{HSIC}}$、$\widetilde T_{b\mathrm{HSIC}}$ 和 $\widetilde T_{\mathrm{BHSIC}}$。重复 $n_p$ 次。三个 $P$ 值分别定义为：在置换数据上计算的对应统计量，大于或等于原始数据 $D_{\mathrm{TE}}$ 上统计量 $\widehat T_{u\mathrm{HSIC}}$、$\widehat T_{b\mathrm{HSIC}}$ 和 $\widehat T_{\mathrm{BHSIC}}$ 的比例。
+
+\FloatBarrier
+\section{全基因组 DNA 甲基化数量性状基因座（mQTL）分析}
+
+DNA 甲基化受到遗传控制的影响。与 DNA 甲基化有关联的遗传基因座，称为甲基化数量性状基因座（methylation quantitative trait locus，mQTL）。识别影响甲基化水平的遗传变异，与 QTL 和 eQTL 分析相似（Hoffmann et al. 2016）。与 eQTL 分析类似，mQTL 也分为顺式（cis）mQTL 和反式（trans）mQTL（McRae et al. 2017）。位于目标 CpG 位点两侧各 2 Mbp 范围内、与该目标位点有关联的遗传变异，称为顺式 mQTL；其他 mQTL 称为反式 mQTL。回归分析和典型相关分析都可用于识别 mQTL。下面简要介绍几种模型。
+
+\subsection{简单回归模型}
+
+简单回归模型用于估计单个 SNP 对单个 CpG 位点甲基化变异的贡献。令 $y_i$ 为第 $i$ 名个体在待检验 CpG 位点的甲基化水平，$x_i$ 为该个体某个 SNP 基因型的指示变量。用于 mQTL 建模的简单回归为
+\[
+y_i=\mu+\beta x_i+\varepsilon_i,\qquad i=1,2,\ldots,n,
+\]
+其中，$\beta$ 为该 SNP 对甲基化变异的遗传效应。
+
+\subsection{多重回归模型}
+
+考虑一个基因组区域或基因中的 $p$ 个 SNP。为研究多个 SNP 对一个 CpG 位点甲基化水平变异的遗传贡献，可以采用如下多重回归：
+\[
+y_i=\mu+x_i^T\beta+\varepsilon_i,
+\]
+其中，$x_i=[x_{i1},\ldots,x_{ip}]^T$ 为第 $i$ 名个体 $p$ 个 SNP 基因型的指示变量向量，$\beta$ 为这些 SNP 对该 CpG 位点甲基化变异的遗传效应向量。
+
+\subsection{多元回归模型}
+
+现在考虑 $q$ 个 CpG 位点。令 $Y_i=[y_{i1},\ldots,y_{iq}]^T$ 为一个基因组区域或基因中 $q$ 个 CpG 位点的甲基化水平向量，$x_i$ 为第 $i$ 名个体某个 SNP 基因型的指示变量。用于描述单个标记对该区域或基因中多个 CpG 位点甲基化水平贡献的多元回归为
+\[
+Y_i=\mu+x_i\beta+\varepsilon_i,
+\]
+其中，$\mu=[\mu_1,\ldots,\mu_q]^T$ 为均值向量，$\beta=[\beta_1,\ldots,\beta_q]^T$ 为单个 SNP 对 $q$ 个 CpG 位点的遗传效应向量，$\varepsilon_i=[\varepsilon_{i1},\ldots,\varepsilon_{iq}]^T$ 为残差向量。
+
+\subsection{多元多重回归模型}
+
+现在将多元回归模型扩展到多个 SNP。描述 $p$ 个 SNP 对 $q$ 个 CpG 位点贡献的多元多重回归为
+\[
+Y_i^T=\mu^T+x_i^TB+\varepsilon_i^T,
+\]
+其中，
+\[
+B=\begin{bmatrix}\beta_{11}&\cdots&\beta_{1q}\\\vdots&\vdots&\vdots\\\beta_{p1}&\cdots&\beta_{pq}\end{bmatrix}
+\]
+为 $p$ 个 SNP 对 $q$ 个 CpG 位点的遗传效应矩阵，其余参数定义同前。
+
+\subsection{用于全基因组测序数据 mQTL 分析的函数型线性模型}
+
+第 3 章介绍过具有标量响应和函数型预测变量的函数型线性模型（functional linear models，FLMs）。利用下一代测序数据，这类模型可用于研究一个基因组区域或基因对单个 CpG 位点甲基化水平的贡献。
+
+令 $s$ 为区域 $S=[a,b]$ 内的基因组位置。将第 $i$ 名个体的基因型谱 $x_i(s)$ 定义为
+\[
+x_i(s)=\begin{cases}
+2P_m(s),&\mathrm{MM},\\
+P_m(s)-P_M(s),&\mathrm{Mm},\\
+-2P_M(s),&\mathrm{mm}.
+\end{cases}
+\]
+其中，M 和 m 为基因组位置 $s$ 处标记的两个等位基因，$P_M(s)$ 和 $P_m(s)$ 分别为两者的频率。具有标量响应和函数型预测变量的函数型线性模型定义为
+\[
+y_i=W_i^T\alpha+\int_Sx_i(s)\beta(s)\,ds+\varepsilon_i,\qquad i=1,\ldots,n,
+\]
+其中，$W_i=[w_{i1},\ldots,w_{id}]^T$ 为协变量向量，$\alpha=[\alpha_1,\ldots,\alpha_d]^T$ 为相应的效应向量，$\beta(s)$ 为基因组位置 $s$ 处的遗传加性效应函数，$\varepsilon_i$ 为误差变量。
+
+\subsection{用于 WGBS 与 WGS 数据 mQTL 分析的函数型响应与预测变量线性模型}
+
+在同时具有 WGBS 与全基因组测序（whole genome sequencing，WGS）数据时，CpG 位点和 SNP 在整个基因组中密集分布。甲基化谱与基因型谱都可以建模为基因组位置的函数。考虑第 $i$ 名个体在基因组区域（或基因）$[a,b]$ 中位置 $t$ 处甲基化水平的函数 $y_i(t)$，$t\in T=[0,T]$；$x_i(s)$ 为基因组位置 $s$ 的基因型函数，定义同前。响应和预测变量均为函数型的线性模型定义为
+\[
+y_i(t)=W_i^T\alpha(t)+\int_Sx_i(s)\beta(s,t)\,ds+\varepsilon_i(t),
+\]
+\[
+t=t_1,\ldots,t_T,\qquad i=1,\ldots,n,
+\]
+其中，$W_i=[w_{i1},\ldots,w_{id}]^T$ 为协变量向量，$\alpha(t)=[\alpha_1(t),\ldots,\alpha_d(t)]^T$ 为相应的效应向量，$\beta(s,t)$ 为基因组位置 $s$ 与 $t$ 处的遗传加性效应函数，$\varepsilon_i(t)$ 为第 $i$ 名个体噪声及未解释效应的残差函数。参数估计方法与检验统计量已在第 3 章讨论。

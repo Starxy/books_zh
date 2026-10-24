@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ ch02box/.style={draw,rounded corners=3pt,align=center,inner sep=7pt,font=\small}]
+\node[ch02box,text width=7cm] (ch02root) at (0,0)
+ {\textbf{机制在物理上的独立性}\\原理 2.1};
+\node[ch02box,text width=3cm] (ch02left) at (-4.6,-2.7)
+ {可干预性、\\自主性、\\模块性、\\不变性、\\迁移};
+\node[ch02box,text width=3cm] (ch02middle) at (0,-2.7)
+ {各机制所含\\信息的独立性};
+\node[ch02box,text width=3cm] (ch02right) at (4.6,-2.7)
+ {噪声的独立性、\\结构的\\条件独立性};
+\draw[ed] (ch02root.south west)--(ch02left.north east);
+\draw[ed] (ch02root.south)--(ch02middle.north);
+\draw[ed] (ch02root.south east)--(ch02right.north west);
+\end{tikzpicture}
+\caption{机制独立原理及其对因果推断的启示（原理 2.1）。}
+\label{fig:ch02-icm}
+\end{figure}

@@ -1,0 +1,203 @@
+% 原书第 88—96 页；6.3。
+\section{干预}
+\label{sec:ch06-interventions}
+
+现在，我们已经可以对系统中的干预进行建模。直观地说，例如对变量 $X_2$ 进行干预，将它设为抛硬币得到的二值结果，我们预期，与未干预时相比，系统的分布会发生改变。此外，即使 $X_2$ 原先受到其他变量的因果影响，现在它也只受抛硬币结果的影响：它的因果父节点发生了变化。
+
+形式上，我们从结构因果模型 $\mathfrak C$ 出发构造干预分布：修改 $\mathfrak C$，再考察新模型导出的分布。一般而言，干预分布不同于观测分布。
+
+\begin{definition}[干预分布]
+考虑结构因果模型 $\mathfrak C:=(\mathbf S,P_{\mathbf N})$ 及其导出的分布 $P_{\mathbf X}^{\mathfrak C}$。替换其中一个或多个结构赋值，得到新的结构因果模型 $\widetilde{\mathfrak C}$。设我们将 $X_k$ 的赋值替换为
+\[
+ X_k:=\widetilde f(\widetilde{\PA}_k,\widetilde N_k).
+\]
+我们将新模型导出的分布称为\textbf{干预分布（intervention distribution）}，并称结构赋值被替换的变量受到了干预。新分布记为\footnote{只要不引入环，父节点集可以任意改变；但本书主要考察新父节点集 $\widetilde{\PA}_k$ 为空或等于 $\PA_k$ 的干预。}
+\[
+ P_{\mathbf X}^{\widetilde{\mathfrak C}}
+ :=P_{\mathbf X}^{\mathfrak C;\dox{X_k:=\widetilde f(\widetilde{\PA}_k,\widetilde N_k)}}.
+\]
+$\widetilde{\mathfrak C}$ 中的噪声变量既包括一些“新的” $\widetilde N$，也包括一些“原有的” $N$；要求所有这些噪声变量相互独立。
+
+当 $\widetilde f(\widetilde{\PA}_k,\widetilde N_k)$ 将全部概率质量集中在某个实数 $a$ 上时，简记为 $P_{\mathbf X}^{\mathfrak C;\dox{X_k:=a}}$，并称之为\textbf{原子干预（atomic intervention）}。\footnote{这也称为理想干预、结构干预［Eberhardt and Scheines, 2007］、外科手术式干预［Pearl, 2009］、独立干预，或确定性干预［Korb et al., 2004］。}
+若干预满足 $\widetilde{\PA}_k=\PA_k$，即原先的直接原因仍是直接原因，则称为\textbf{不完美干预（imperfect intervention）}。\footnote{这也称为参数干预［Eberhardt and Scheines, 2007］、相依干预［Korb et al., 2004］，或简称机制改变［Tian and Pearl, 2001］。关于“软干预”这一术语，见 Eberhardt and Scheines［2007］、Eaton and Murphy［2007］与 Markowetz et al.［2005］。}
+它是\textbf{随机干预（stochastic intervention）}［Korb et al., 2004］的一种特例；随机干预中，受干预变量的边缘分布具有正方差。
+
+我们要求新模型 $\widetilde{\mathfrak C}$ 的图无环。因此，允许实施哪些干预，取决于 $\mathfrak C$ 所诱导的图。
+\end{definition}
+
+\par\noindent\begin{minipage}{\linewidth}
+\begin{codesnippet}
+下面的代码从干预分布中抽样。考虑代码片段 6.4 中的结构因果模型 $\mathfrak C$，并实施干预 $\dox{X_2:=3}$，也就是从分布 $P_{\mathbf X}^{\mathfrak C;\dox{X_2:=3}}$ 中生成独立同分布样本。
+\begin{lstlisting}[language=R]
+# 从干预分布中生成样本
+set.seed(1)
+X3 <- runif(100)-0.5
+X1 <- 2*X3 + rnorm(100)
+# 原赋值：
+# X2 <- (0.5*X1)^2 + rnorm(100)^2
+X2 <- rep(3,100)
+X4 <- X2 + 2*sin(X3 + rnorm(100))
+\end{lstlisting}
+\end{codesnippet}
+\end{minipage}\par
+
+事实证明，干预概念是对分布差异建模和理解因果关系的有力工具。下面通过几个例子说明。
+
+\begin{example}[预测变量与干预目标]
+本例考察预测问题，说明即使某些变量能够很好地预测目标变量 $Y$，对它们进行干预，也可能不影响目标变量。考虑结构因果模型 $\mathfrak C$：
+\[
+ \begin{aligned}
+ X_1&:=N_{X_1}\\
+ Y&:=X_1+N_Y\\
+ X_2&:=Y+N_{X_2},
+ \end{aligned}
+ \qquad
+ \begin{tikzpicture}[causal,baseline=-3pt,x=1.2cm,y=1cm]
+ \node[vtx] (ch06c-x1) at (0,0) {$X_1$};
+ \node[vtx] (ch06c-y) at (1,0) {$Y$};
+ \node[vtx] (ch06c-x2) at (2,0) {$X_2$};
+ \draw[ed] (ch06c-x1)--(ch06c-y);
+ \draw[ed] (ch06c-y)--(ch06c-x2);
+ \end{tikzpicture}
+\]
+其中 $N_{X_1},N_Y\overset{\mathrm{iid}}{\sim}\mathcal N(0,1)$，$N_{X_2}\sim\mathcal N(0,0.1)$，三个噪声相互独立。假设我们关心的是根据 $X_1$ 和 $X_2$ 预测 $Y$。显然，$X_2$ 比 $X_1$ 更善于预测 $Y$。例如，不包含 $X_2$ 的线性模型，其均方误差显著大于不包含 $X_1$ 的线性模型。然而，如果希望改变 $Y$，对 $X_2$ 进行干预就毫无用处：
+\[
+ P_Y^{\mathfrak C;\dox{X_2:=\widetilde N}}=P_Y^{\mathfrak C},
+ \qquad\text{对所有变量 }\widetilde N\text{ 均成立}.
+\]
+换言之，无论对 $X_2$ 施加多强的干预，$Y$ 的分布都不受影响。但对 $X_1$ 的干预会改变 $Y$ 的分布：
+\[
+ \begin{aligned}
+ P_Y^{\mathfrak C;\dox{X_1:=\widetilde N}}
+ &=\mathcal N\bigl(\EE[N_Y]+\EE[\widetilde N],
+ \Var[N_Y]+\Var[\widetilde N]\bigr)\\
+ &\ne P_Y^{\mathfrak C},
+ \end{aligned}
+\]
+只要 $P_{\widetilde N}\ne P_{N_{X_1}}$。
+\end{example}
+\begin{quote}\small
+\textbf{译注：}原书将上式直接写为正态分布；这一写法还需要假定新的噪声 $\widetilde N$ 为高斯变量。若允许任意分布的独立新噪声，干预后 $Y$ 的分布应为 $N_Y+\widetilde N$ 的分布，不一定为正态分布。此处保留原式，其关于干预方向的论点不受影响。
+\end{quote}
+
+这个例子还可以说明，干预通常不同于条件化：
+\[
+ p_Y^{\mathfrak C;\dox{X_2:=x}}(y)
+ =p_Y^{\mathfrak C}(y)\ne p_Y^{\mathfrak C}(y\mid X_2=x).
+\]
+
+\begin{example}[近视]
+下面的案例，是将统计相依关系误解为直接因果关系的众多例子之一。缺乏背景知识时，人们似乎尤其容易得出这类错误的因果结论。一项研究发现，儿童房间使用夜灯与发生近视之间存在相依关系［Quinn et al., 1999，第 113 页］。作者虽然谨慎地指出，这项研究“并未确立因果联系”，但又补充说：“这种关联的统计强度……确实提示，在幼儿早期，若每天没有一段黑暗时间，可能会成为近视形成的一个诱发因素。”基于这些发现，有人申请了一项专利［Peterson, 2005］。其中暗含的主张是，对夜灯这一变量进行干预，就会改变发生近视的概率。
+
+随后，Gwiazda et al.［2000］和 Zadnik et al.［2000］发现，这种相关源于儿童的父母是否近视。他们认为，近视父母更可能在儿童房间放置夜灯；同时，儿童遗传到近视的风险也更高。因此，假设背后的“正确”结构因果模型具有如下形式：
+\[
+ \mathbf S:\quad
+ \begin{aligned}
+ \mathit{PM}&:=N_{\mathit{PM}}\\
+ \mathit{NL}&:=f(\mathit{PM},N_{\mathit{NL}})\\
+ \mathit{CM}&:=g(\mathit{PM},N_{\mathit{CM}}),
+ \end{aligned}
+\]
+其中 $\mathit{PM}$ 表示父母近视，$\mathit{NL}$ 表示夜灯，$\mathit{CM}$ 表示儿童近视。相应的图为
+\begin{center}
+\begin{tikzpicture}[causal,x=1.1cm,y=1.1cm]
+ \node[vtx] (ch06d-pm) at (0,1) {$\mathit{PM}$};
+ \node[vtx] (ch06d-nl) at (-1,0) {$\mathit{NL}$};
+ \node[vtx] (ch06d-cm) at (1,0) {$\mathit{CM}$};
+ \draw[ed] (ch06d-pm)--(ch06d-nl);
+ \draw[ed] (ch06d-pm)--(ch06d-cm);
+\end{tikzpicture}
+\end{center}
+Quinn et al.［1999］在论文中发现 $\mathit{NL}\nindep\mathit{CM}$，这与上述模型一致（这里假定忠实性成立，见定义 6.33）。现在，将 $\mathit{NL}$ 的结构赋值替换为 $\mathit{NL}:=\widetilde N_{\mathit{NL}}$，例如让 $\widetilde N_{\mathit{NL}}$ 以相同概率随机选择“黑暗”“夜灯”“室内灯光”这三种夜间照明条件之一。在相应的干预分布
+\[
+ P_{\mathit{NL},\mathit{CM}}^{\mathfrak C;\dox{\mathit{NL}:=\widetilde N_{\mathit{NL}}}}
+\]
+下，我们会发现 $\mathit{NL}\indep\mathit{CM}$，因为 $\mathit{CM}:=g(N_{\mathit{PM}},N_{\mathit{CM}})$。无论 $\widetilde N_{\mathit{NL}}$ 的分布如何，这一点都成立。我们说，从 $\mathit{NL}$ 到 $\mathit{CM}$ 不存在因果效应。
+\end{example}
+
+受例 6.11 最后一句话的启发，我们定义什么叫存在\textbf{总因果效应（total causal effect）}［参见 Pearl, 2009，“total causal effect”］。
+
+\begin{definition}[总因果效应]
+给定结构因果模型 $\mathfrak C$，从 $X$ 到 $Y$ 存在总因果效应，当且仅当存在某个随机变量 $\widetilde N_X$，使得
+\[
+ X\nindep Y\qquad\text{在 }P_{\mathbf X}^{\mathfrak C;\dox{X:=\widetilde N_X}}\text{ 下成立}.
+\]
+\end{definition}
+
+除了定义 6.12，还可以用其他概念直观地描述总因果效应是否存在。事实上，人们可能想到的大多数陈述是等价的。下面的命题在附录 C.4 中证明。
+
+\begin{proposition}[总因果效应]
+给定结构因果模型 $\mathfrak C$，以下陈述等价：
+\begin{enumerate}[label=(\roman*)]
+ \item 从 $X$ 到 $Y$ 存在总因果效应。
+ \item 存在 $x^\triangle$ 和 $x^\square$，使 $P_Y^{\mathfrak C;\dox{X:=x^\triangle}}\ne P_Y^{\mathfrak C;\dox{X:=x^\square}}$。
+ \item 存在 $x^\triangle$，使 $P_Y^{\mathfrak C;\dox{X:=x^\triangle}}\ne P_Y^{\mathfrak C}$。
+ \item 对任意分布具有完整支撑集的 $\widetilde N_X$，在 $P_{X,Y}^{\mathfrak C;\dox{X:=\widetilde N_X}}$ 下均有 $X\nindep Y$。
+\end{enumerate}
+\end{proposition}
+
+总因果效应是否存在，与对应图中是否存在有向路径有关，这并不令人意外。不过，二者并非一一对应。有向路径是总因果效应存在的必要条件，却不是充分条件。
+
+\begin{proposition}[总因果效应的图判据]
+设给定结构因果模型 $\mathfrak C$ 及其对应图 $\mathcal G$。
+\begin{enumerate}[label=(\roman*)]
+ \item 如果从 $X$ 到 $Y$ 不存在有向路径，则不存在总因果效应。
+ \item 有时，即使存在有向路径，也不存在总因果效应。
+\end{enumerate}
+\end{proposition}
+证明见附录 C.5。
+
+\begin{example}[随机化试验]
+因果效应的定义，在\textbf{随机化试验（randomized trial）}中得到了实际体现。在这类研究中，按照 $\widetilde N_T$ 随机为患者分配治疗 $T$，再观测例如二值的康复变量 $R$。设 $T$ 有三种可能取值：$T=0$ 表示不用药，$T=1$ 表示安慰剂，$T=2$ 表示待研究药物；$\widetilde N_T$ 随机选择其中一种，满足 $P(\widetilde N_T=0)=P(\widetilde N_T=1)=P(\widetilde N_T=2)=1/3$。在结构因果模型中，这种随机化被建模为从分布
+\[
+ P_{\mathbf X}^{\mathfrak C;\dox{T:=\widetilde N_T}}
+\]
+中观测数据。（这里 $\mathfrak C$ 表示未实施随机化的原始模型。）若此时仍发现治疗与康复之间存在相依关系，我们就断定 $T$ 对康复具有总因果效应。
+
+不过，也可能不论药物类型如何，都存在总因果效应。图 6.3 给出了一个简化描述：无论药片包含什么，服药都会改变患者的心理状态 $P$，进而影响康复。假设安慰剂和待研究药物产生的\textbf{安慰剂效应（placebo effect）}相同，也就是说，$P$ 的结构赋值满足
+\[
+ f_P(T=0,N_P)\ne f_P(T=1,N_P)=f_P(T=2,N_P).
+\]
+在药物研究中，我们更关心生物化学效应，而非安慰剂效应。因此，将随机分配的支撑集限制为安慰剂与待研究药物，即令 $P(\widetilde N_T=0)=0$。如果此时仍看到治疗 $T$ 与康复 $R$ 之间存在相依关系，那么它就一定来自生物化学效应。
+
+\input{figures/ch06_03}
+
+利用随机化试验开展因果学习的思想，最早由 Peirce［1883］及 Peirce and Jastrow［1885］用另一套数学语言加以描述，之后有 Neyman 的工作［其原始论文的翻译与编辑版本见 Splawa-Neyman et al., 1990］和 Fisher［1925］的工作。这些研究大多处理农业应用。
+
+James Lind 曾实施过一项早期随机化试验。18 世纪，英国因坏血病损失的士兵，比因敌方军事行动损失的还多；当时维生素 C 及其与坏血病的关系尚不为人知。苏格兰医生 James Lind（1716—1794）当时在船上担任外科医生，他如下记述这项试验［转引自 Bhatt, 2010］：
+\begin{quote}
+1747 年 5 月 20 日，我在航行于海上的 Salisbury 号上，选出十二名坏血病患者。他们的病情尽可能相似，普遍存在牙龈腐烂、斑点、倦怠和膝部无力等症状……其中两人每天各饮一夸脱苹果酒；另外两人每天服用三次硫酸酏剂，每次二十五滴……另外两人每天服用三次醋，每次两匙……病情最重的两人接受海水疗程……另外两人每天各吃两个橙子和一个柠檬……余下两人服用……一位医院外科医生推荐的膏剂……结果是，服用橙子和柠檬的患者出现了最迅速、最明显的改善；其中一人在六天后就已能够恢复值勤。
+\end{quote}
+读者会注意到，这项试验并非完全随机化；不过，它在历史上的独特意义足以弥补这一不足。
+\end{example}
+
+\begin{example}[肾结石]
+表 6.1 给出了一个著名的肾结石治疗康复数据集［Charig et al., 1986］。700 名患者中，一半接受开放手术（治疗 $T=a$，康复率 $78\%$），另一半接受经皮肾镜取石术（$T=b$，康复率 $83\%$），即通过小的穿刺创口清除肾结石的手术。如果只知道总体康复率，且暂不考虑副作用等问题，许多人在选择时会偏向治疗 $b$。但进一步查看数据，将结石分为小结石与大结石后，会发现开放手术在两类患者中都表现更好。应当如何处理这种结论的反转？
+
+先给出直观解释。大结石比小结石更严重（见表 6.1），而治疗 $a$ 处理了更多这类困难病例，尽管分到 $a$、$b$ 两组的患者总数相同。因此，在全体人群中，治疗 $a$ 看起来可能不如 $b$，但在两个亚组中却都更好。这种分配不平衡可能是因为，医生预期治疗 $a$ 优于 $b$，所以更倾向于将困难病例分给治疗 $a$。
+
+换一个角度，我们建议用干预语言精确表述真正关心的问题。我们关心的不是这项具体研究中 $T=a$ 与 $T=b$ 哪个更成功，而是：如果让所有患者都接受治疗 $a$，或都接受治疗 $b$，二者如何比较；或者，如果每名患者都被随机分到某种治疗，康复率如何比较。这三种情况都涉及不同于观测分布 $P_{\mathbf X}$ 的干预分布，分别对应 $P^{\mathfrak C;\dox{T:=a}}$、$P^{\mathfrak C;\dox{T:=b}}$ 和 $P^{\mathfrak C;\dox{T:=\widetilde N_T}}$。例 6.37 将计算这些干预分布，并说明为何应当偏向治疗 $a$ 而非 $b$。这个数据集是\textbf{Simpson 悖论（Simpson's paradox）}［Simpson, 1951］的著名例子（见第 9.2 节）。事实上，与其称为悖论，不如说它是混杂——即某个潜在共同原因——作用的结果。
+
+\input{figures/ch06_table01}
+
+如果对这些数据进行显著性检验，例如比例检验或 $\chi^2$ 独立性检验，会发现两种方法的差异在 $5\%$ 水平上不显著。不过，这不是本例的重点。只需将表 6.1 中每个计数乘以 $10$，结果就会达到统计显著性。此外，我们只关注康复 $R$，忽略了同样可能影响治疗选择的副作用。
+\end{example}
+
+\medskip\noindent\textbf{干预变量（intervention variable）}\quad
+下面介绍另一种将干预形式化的方法，可参见 Dawid［2015］或 Pearl［2009，第 3.2.2 节］。扩充结构因果模型 $\mathfrak C$ 及其 DAG，加入没有父节点的“干预变量” $I_1,I_2,\ldots,I_d$，分别指向 $X_1,\ldots,X_d$。为简单起见，这里只讨论对单个节点的干预。每个 $I_j$ 或取值 $\mathrm{idle}$，或取 $X_j$ 可以取到的某个值 $x_j$。于是 $I_j=x_j$ 表示将 $X_j$ 设为 $x_j$，$I_j=\mathrm{idle}$ 则表示未对 $X_j$ 进行干预。相应地，将结构赋值
+\[
+ X_j:=f_j(\PA_j,N_j)
+\]
+替换为
+\[
+ X_j:=\begin{cases}
+ f_j(\PA_j,N_j),&\text{若 }I_j=\mathrm{idle},\\
+ I_j,&\text{否则},
+ \end{cases}
+\]
+并为 $I_1,\ldots,I_d$ 添加赋值；这些变量都仅由噪声变量决定。为 $I_j$ 的所有可能取值赋予非零概率或概率密度后，原模型 $\mathfrak C$ 导出的干预概率，就变成扩充模型 $\mathfrak C^*$ 中的通常条件概率：
+\[
+ P_Y^{\mathfrak C;\dox{X_j:=x_j}}=P_{Y\mid I_j=x_j}^{\mathfrak C^*},
+\]
+见注 6.40。此外，“干预某个变量是否改变特定目标变量的分布”这一陈述，也转化为通常的统计独立性陈述。
+\FloatBarrier

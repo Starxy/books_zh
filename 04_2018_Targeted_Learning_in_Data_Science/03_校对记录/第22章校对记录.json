@@ -1,0 +1,678 @@
+{
+  "chapter": 22,
+  "status": "complete",
+  "title_en": "Optimal Dynamic Treatment Rules",
+  "title_zh": "最优动态处理规则",
+  "authors": [
+    "Alexander R. Luedtke",
+    "Mark J. van der Laan"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/23_CH22_Optimal_Dynamic_Treatment_Rules.pdf",
+    "split_pdf_pages": 20,
+    "chapter_body_source_pages": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "printed_pages": "399–417",
+    "english_words_approx": 7555,
+    "source_pages_rendered_and_visually_checked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "annotations_removed_in_memory": true,
+    "original_pdf_modified": false,
+    "whole_original_sha_matches_initial": true,
+    "part_VII_page_1_owner": "root"
+  },
+  "pages": 15,
+  "han_characters_pdf_including_running_heads": 7831,
+  "han_characters_tex_without_comment_lines": 7615,
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22e.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch22f.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第22章_中文译稿.pdf",
+  "sha256": "0d2965257efeca93cfff822297f2124cb1175b5411d8832e14983bdfd9866283",
+  "coverage": {
+    "full_chapter": true,
+    "sections": 7,
+    "subsections": 3,
+    "all_prose_math_algorithms_conditions_rates_remainders_proofs_citations": true,
+    "source_and_chinese_page_mapping": "work/targeted_learning/ch22_work/coverage_detail.json"
+  },
+  "formulas": {
+    "numbered_tags": [
+      "22.1",
+      "22.2",
+      "22.3",
+      "22.4",
+      "22.5",
+      "22.6",
+      "22.7",
+      "22.8",
+      "22.9",
+      "22.10",
+      "22.11",
+      "22.12",
+      "22.13",
+      "22.14",
+      "22.15"
+    ],
+    "separate_assumption_labels": [
+      "MA1",
+      "MA2"
+    ],
+    "translation_display_groups": 69,
+    "unnumbered_groups": 52,
+    "all_math_visually_checked": true,
+    "original_numbering_preserved": true,
+    "inventory": "work/targeted_learning/ch22_work/math_audit.json"
+  },
+  "results": {
+    "theorems": [
+      "22.1",
+      "22.2",
+      "22.3",
+      "22.4",
+      "22.5"
+    ],
+    "lemmas": [
+      "22.1"
+    ],
+    "all_statements_assumptions_and_printed_proofs_complete": true,
+    "actual_proofs_complete": [
+      "定理22.1",
+      "定理22.3",
+      "定理22.4",
+      "引理22.1",
+      "定理22.5"
+    ],
+    "detailed_inventory": "work/targeted_learning/ch22_work/coverage_detail.json"
+  },
+  "figures": [],
+  "tables": [],
+  "source_boxes": 1,
+  "footnotes": 0,
+  "citation_audit": {
+    "all_author_names_years_suffixes_match": true,
+    "citation_groups": 35,
+    "individual_year_suffix_references": 36,
+    "evidence": "work/targeted_learning/ch22_work/structural_citation_audit.json"
+  },
+  "new_terms": [
+    {
+      "en": "sequential randomized controlled trial",
+      "zh": "序贯随机对照试验",
+      "note": "本章的sequential RCT；两个时间点依次随机化处理。"
+    },
+    {
+      "en": "exceptional law",
+      "zh": "例外分布",
+      "note": "与术语表已有nonexceptional law=非例外分布对应；law指概率分布。"
+    },
+    {
+      "en": "data-adaptive parameter",
+      "zh": "数据自适应参数",
+      "note": "与已有data-adaptive target parameter统一；本章目标随训练样本估计规则而变。"
+    },
+    {
+      "en": "individualized treatment rule",
+      "zh": "个体化处理规则",
+      "note": "根据可获得历史或给定协变量子集分配处理。"
+    },
+    {
+      "en": "causally optimal rule",
+      "zh": "因果最优规则",
+      "note": "SCM反事实分布下最大化均值的规则，与未假定识别时的统计最优规则区分。"
+    },
+    {
+      "en": "Q-learning",
+      "zh": "Q学习",
+      "note": "本章逐时点回归并求最优规则的方法；正文首现保留英文。"
+    },
+    {
+      "en": "nonregularity",
+      "zh": "非正则性",
+      "note": "本章亦将irregularity译为非正则性；指估计量的统计正则性。"
+    },
+    {
+      "en": "structural nested mean model",
+      "zh": "结构嵌套均值模型",
+      "note": "本章为最优动态处理的处理增益函数设定模型。"
+    },
+    {
+      "en": "m out of n bootstrap",
+      "zh": "从n个观测中抽取m个观测的自助法",
+      "note": "本章保留m与n的区别，未把它替换为普通n取自n自助法。"
+    }
+  ],
+  "source_anomalies": [
+    {
+      "id": "ch22-A01",
+      "source_split_pages": [
+        4
+      ],
+      "printed_pages": [
+        401
+      ],
+      "item": "观测时间为j=0,1，但干预机制分解的乘积印为j=1至2；函数集合f省略fY，随后结构方程和外生量集合仍含Y。",
+      "treatment": "原乘积上下限和函数清单均照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_model_and_rule.png",
+        "work/targeted_learning/render/ch22/ch22_source_004.png"
+      ]
+    },
+    {
+      "id": "ch22-A02",
+      "source_split_pages": [
+        5
+      ],
+      "printed_pages": [
+        402
+      ],
+      "item": "一般P处的正值性假设22.2仍使用g0A(0)、g0A(1)。",
+      "treatment": "保留g0而未改为g。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_positivity.png",
+        "work/targeted_learning/render/ch22/ch22_source_005.png"
+      ]
+    },
+    {
+      "id": "ch22-A03",
+      "source_split_pages": [
+        6
+      ],
+      "printed_pages": [
+        403
+      ],
+      "item": "定理22.1中Qbar_b,10左侧输入v(0)，右侧条件仍为随机V(0)。",
+      "treatment": "不把右侧补为V(0)=v(0)。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_optimal_rule.png",
+        "work/targeted_learning/render/ch22/ch22_source_006.png"
+      ]
+    },
+    {
+      "id": "ch22-A04",
+      "source_split_pages": [
+        6,
+        12,
+        16
+      ],
+      "printed_pages": [
+        403,
+        409,
+        413
+      ],
+      "item": "规则d0,A(t)在定理22.1定义为(I(...),1)二元对，随后引理、R2分解与证明把规则直接作为乘法因子使用。",
+      "treatment": "不擅自取处理分量或改写为标量指示。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_optimal_rule.png",
+        "work/targeted_learning/ch22_work/source_lemma_margin.png",
+        "work/targeted_learning/ch22_work/source_lemma_proof.png",
+        "work/targeted_learning/render/ch22/ch22_source_006.png",
+        "work/targeted_learning/render/ch22/ch22_source_012.png",
+        "work/targeted_learning/render/ch22/ch22_source_016.png"
+      ]
+    },
+    {
+      "id": "ch22-A05",
+      "source_split_pages": [
+        6
+      ],
+      "printed_pages": [
+        403
+      ],
+      "item": "22.2节开头在给定规则参数语境先写Psi:M到R，随后才写Psi_d定义。",
+      "treatment": "按源保留Psi与Psi_d。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch22/ch22_source_006.png"
+      ]
+    },
+    {
+      "id": "ch22-A06",
+      "source_split_pages": [
+        7
+      ],
+      "printed_pages": [
+        404
+      ],
+      "item": "迭代期望表示的内层E_P在Lbar(1)后额外印一个右圆括号。",
+      "treatment": "保留多出的可见括号。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_eif_components.png",
+        "work/targeted_learning/render/ch22/ch22_source_007.png"
+      ]
+    },
+    {
+      "id": "ch22-A07",
+      "source_split_pages": [
+        7
+      ],
+      "printed_pages": [
+        404
+      ],
+      "item": "22.5第一行V_{a(0)=(a0(0),1)}没有其他位置使用的时间自变量(1)。",
+      "treatment": "保留无(1)记法。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_nonexceptional.png",
+        "work/targeted_learning/render/ch22/ch22_source_007.png"
+      ]
+    },
+    {
+      "id": "ch22-A08",
+      "source_split_pages": [
+        8
+      ],
+      "printed_pages": [
+        405
+      ],
+      "item": "定理22.3把已知规则EIF指向定理22.2，虽然22.2是未知最优规则的路径可微结果。",
+      "treatment": "交叉引用照录，不改为22.4。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch22/ch22_source_008.png"
+      ]
+    },
+    {
+      "id": "ch22-A09",
+      "source_split_pages": [
+        9
+      ],
+      "printed_pages": [
+        406
+      ],
+      "item": "J折说明称Bn在验证集j索引上为1、在“不对应于训练集j”的索引上为0。",
+      "treatment": "按原限定翻译，不改为“不对应于验证集j”。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch22/ch22_source_009.png"
+      ]
+    },
+    {
+      "id": "ch22-A10",
+      "source_split_pages": [
+        9
+      ],
+      "printed_pages": [
+        406
+      ],
+      "item": "第三扰动子模型集合有两个可见右花括号；QL(0),nj是经验分布，却与另两项一起称“三个回归函数”。",
+      "treatment": "双右花括号和源称谓均保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_cv_submodels.png",
+        "work/targeted_learning/render/ch22/ch22_source_009.png"
+      ]
+    },
+    {
+      "id": "ch22-A11",
+      "source_split_pages": [
+        10
+      ],
+      "printed_pages": [
+        407
+      ],
+      "item": "选择共同epsilon_n的损失最小化写P_n^1 phi(Q_nj(...))，没有显式折平均；后文称CV-TMLE实现在“附录”中，实际具体算法见22.6。",
+      "treatment": "保留目标函数及“附录”指向，不补入折平均或改引。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_targeted_map.png",
+        "work/targeted_learning/render/ch22/ch22_source_010.png"
+      ]
+    },
+    {
+      "id": "ch22-A12",
+      "source_split_pages": [
+        11
+      ],
+      "printed_pages": [
+        408
+      ],
+      "item": "定理22.4假定极限机制为g，结论及方差表达式使用g^{d1}。",
+      "treatment": "g和g^{d1}逐处按源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_inference.png",
+        "work/targeted_learning/render/ch22/ch22_source_011.png"
+      ]
+    },
+    {
+      "id": "ch22-A13",
+      "source_split_pages": [
+        11
+      ],
+      "printed_pages": [
+        408
+      ],
+      "item": "式22.7被称为95%置信区间，端点却只有±sigma_n/sqrt n，未印1.96。",
+      "treatment": "不补1.96，区间及原称谓均照录。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_inference.png",
+        "work/targeted_learning/render/ch22/ch22_source_011.png"
+      ]
+    },
+    {
+      "id": "ch22-A14",
+      "source_split_pages": [
+        12
+      ],
+      "printed_pages": [
+        409
+      ],
+      "item": "22.3.3首段If J^{-1}sum[Psi_dnj(P0)-psi0]后缺少谓词或速率条件。",
+      "treatment": "保留不完整条件句，不补=o_P(n^{-1/2})；随后实际22.8完整照排。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/render/ch22/ch22_source_012.png"
+      ]
+    },
+    {
+      "id": "ch22-A15",
+      "source_split_pages": [
+        12
+      ],
+      "printed_pages": [
+        409
+      ],
+      "item": "MA1解释段将不允许零点质量的条件称为exceptional law condition。",
+      "treatment": "照译“例外分布条件”，不代改为nonexceptional。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_lemma_margin.png",
+        "work/targeted_learning/render/ch22/ch22_source_012.png"
+      ]
+    },
+    {
+      "id": "ch22-A16",
+      "source_split_pages": [
+        13
+      ],
+      "printed_pages": [
+        410
+      ],
+      "item": "22.10两个指数均印beta1而非beta2；第二范数内是Qbar_b,1-Qbar_b,10，范数下标只印P0,(0,1)，没有∞。",
+      "treatment": "beta、函数下标与缺少∞均逐处照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_margin_bounds.png",
+        "work/targeted_learning/render/ch22/ch22_source_013.png"
+      ]
+    },
+    {
+      "id": "ch22-A17",
+      "source_split_pages": [
+        13
+      ],
+      "printed_pages": [
+        410
+      ],
+      "item": "速率o_P(n^{-3/8缺少可见闭圆括号。",
+      "treatment": "保留缺失括号，用普通定界符使TeX合法。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_margin_bounds.png",
+        "work/targeted_learning/render/ch22/ch22_source_013.png"
+      ]
+    },
+    {
+      "id": "ch22-A18",
+      "source_split_pages": [
+        14,
+        15
+      ],
+      "printed_pages": [
+        411,
+        412
+      ],
+      "item": "定理22.1证明首式未对a(0)、a(1)求和；首式及最后最大化式中的I(a(0)=...)缺可见闭括号，最后等号右侧也缺I的闭括号。",
+      "treatment": "不补求和或可见括号；保留外层期望的原闭括号。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_proof22_1_start.png",
+        "work/targeted_learning/ch22_work/source_proof22_1.png",
+        "work/targeted_learning/render/ch22/ch22_source_014.png",
+        "work/targeted_learning/render/ch22/ch22_source_015.png"
+      ]
+    },
+    {
+      "id": "ch22-A19",
+      "source_split_pages": [
+        15,
+        16
+      ],
+      "printed_pages": [
+        412,
+        413
+      ],
+      "item": "定理22.4证明把真实Q0^{dnj}逐处印为Q0^{dnj*}；文字称Qhat*(P^0_nBn,epsilon_n)仅通过epsilon_n依赖P^0_nBn。",
+      "treatment": "上标星与训练样本P^0依赖说法照录。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_proof22_3_4.png",
+        "work/targeted_learning/render/ch22/ch22_source_015.png",
+        "work/targeted_learning/render/ch22/ch22_source_016.png"
+      ]
+    },
+    {
+      "id": "ch22-A20",
+      "source_split_pages": [
+        16
+      ],
+      "printed_pages": [
+        413
+      ],
+      "item": "引理22.1证明的单时点恒等式末多一个右圆括号；后续Qbar_b,20多处首自变量印0而非(0,1)。",
+      "treatment": "额外括号及0自变量照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_lemma_proof.png",
+        "work/targeted_learning/render/ch22/ch22_source_016.png"
+      ]
+    },
+    {
+      "id": "ch22-A21",
+      "source_split_pages": [
+        16,
+        17
+      ],
+      "printed_pages": [
+        413,
+        414
+      ],
+      "item": "定理22.5证明L2界使用C0而MA1为C1；优化t的范数指数印2(1+beta1)/(2+beta1)，并称常数依赖C0。",
+      "treatment": "不按推导重算或改常数，全部照录。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_margin_proof_a.png",
+        "work/targeted_learning/ch22_work/source_margin_proof_b.png",
+        "work/targeted_learning/render/ch22/ch22_source_016.png",
+        "work/targeted_learning/render/ch22/ch22_source_017.png"
+      ]
+    },
+    {
+      "id": "ch22-A22",
+      "source_split_pages": [
+        17
+      ],
+      "printed_pages": [
+        414
+      ],
+      "item": "定理22.5证明最后由MA1得到的界写为两个Psi_{d_,A(0)}之差，而非前述R2记号。",
+      "treatment": "保留原Psi参数及下标。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_margin_proof_b.png",
+        "work/targeted_learning/render/ch22/ch22_source_017.png"
+      ]
+    },
+    {
+      "id": "ch22-A23",
+      "source_split_pages": [
+        17
+      ],
+      "printed_pages": [
+        414
+      ],
+      "item": "H2的规则自变量为(A(0),V(1))，而相邻结局回归用(A(0),V)。",
+      "treatment": "逐处保留V(1)/V。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_algorithm_a.png",
+        "work/targeted_learning/render/ch22/ch22_source_017.png"
+      ]
+    },
+    {
+      "id": "ch22-A24",
+      "source_split_pages": [
+        18
+      ],
+      "printed_pages": [
+        415
+      ],
+      "item": "式22.14及其训练回归使用未加星Enj，虽然此前已完成Enj*靶向更新；epsilon1子模型加项印epsilon而非epsilon1。",
+      "treatment": "初始Enj及未带1的epsilon照源保留。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_algorithm_b.png",
+        "work/targeted_learning/render/ch22/ch22_source_018.png"
+      ]
+    },
+    {
+      "id": "ch22-A25",
+      "source_split_pages": [
+        18
+      ],
+      "printed_pages": [
+        415
+      ],
+      "item": "第二logistic回归伪结局的条件末尾直接写小写lbar(1)i，没有Lbar(1)=。",
+      "treatment": "不补等号或大写L。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_algorithm_b.png",
+        "work/targeted_learning/render/ch22/ch22_source_018.png"
+      ]
+    },
+    {
+      "id": "ch22-A26",
+      "source_split_pages": [
+        19
+      ],
+      "printed_pages": [
+        416
+      ],
+      "item": "最终psi_nj*写为P^1_nj Qbar_b,1nj*，使用处理增益记号；最后平均估计量写psi_n*而非前文tilde psi_n*。",
+      "treatment": "Qbar_b下标及无波浪号估计量照印。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_algorithm_c.png",
+        "work/targeted_learning/render/ch22/ch22_source_019.png"
+      ]
+    },
+    {
+      "id": "ch22-A27",
+      "source_split_pages": [
+        19
+      ],
+      "printed_pages": [
+        416
+      ],
+      "item": "Q_nj^{dnj*}含验证样本L(0)经验分布，但文字仍称它只通过epsilon1n、epsilon2n依赖P^1_nj。",
+      "treatment": "完整照译原依赖声称，不擅自加入例外。",
+      "confirmed_from_source_pixels": true,
+      "evidence": [
+        "work/targeted_learning/ch22_work/source_algorithm_c.png",
+        "work/targeted_learning/render/ch22/ch22_source_019.png"
+      ]
+    }
+  ],
+  "unresolved_items": [],
+  "coverage_detail": "work/targeted_learning/ch22_work/coverage_detail.json",
+  "build_validation": {
+    "build": "work/targeted_learning/ch22_work/build_191819",
+    "two_pass_return_codes": [
+      0,
+      0
+    ],
+    "errors": [],
+    "missing_glyphs": [],
+    "overfull": [],
+    "undefined_references": false,
+    "all_15_output_pages_visually_checked": true,
+    "final_shipped_pdf_reopened": true,
+    "final_page_count": 15,
+    "final_bookmark": [
+      2,
+      "22.7 注记与延伸阅读",
+      15
+    ],
+    "test_driver_cleanup": "removed own ch22_work/test_ch22.* only",
+    "evidence": "work/targeted_learning/ch22_work/delivery_validation.json",
+    "benign_warnings_note": "有良性underfull及字体回退类警告；未声称全部TeX警告为零。选定错误、缺字、越界和未定义引用检查均为零。"
+  },
+  "layout_adjustments": [
+    "A4中文重排；完整长节题自然换行，无截短。",
+    "仅原书一处强调框，全文同页，无新增框。",
+    "少数源行内长恒等式独立为无编号展示式；连续展示式重新分行，保留所有原符号、可见多/缺定界符与原编号。"
+  ],
+  "evidence": {
+    "source_detail_crops": "work/targeted_learning/ch22_work/source_crops.json",
+    "output_page_visual_audit": "work/targeted_learning/ch22_work/page_visual_audit.json",
+    "structure_and_year_counters": "work/targeted_learning/ch22_work/qa_ch22_structure.json",
+    "built_text": "work/targeted_learning/ch22_work/ch22_built_text.txt",
+    "delivery_validation": "work/targeted_learning/ch22_work/delivery_validation.json"
+  },
+  "completed_at": "2026-10-23T19:28:21",
+  "frozen_after_final_qa": true,
+  "final_visual_check_completed_at": "2026-10-23T19:29:55"
+}

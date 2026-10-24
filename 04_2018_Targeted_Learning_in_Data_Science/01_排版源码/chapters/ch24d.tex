@@ -1,0 +1,36 @@
+% 原书分章 PDF 第14—15页：第24.5节及致谢。
+\section{结论（一个转折）}
+
+我们已经承认，A1 中的相等条件 $\bar q_{1,Y}=\bar q_{0,Y}$ 很严格。事实上，只有在推论24.1的语境中才必须有这一相等条件；该推论为 TMLE 估计 $r_0$ 下平均奖励 $\psi_0$ 提供了充分条件。然而，我们也曾论述，与 $\psi_0$ 相比，我们更关心数据自适应参数 $\psi_{r_n,0}$，即 $r_n$ 下的平均奖励。那么，不再假定 $\bar q_{1,Y}=\bar q_{0,Y}$ 时，可以得到什么结论？
+
+令 \textbf{A1*} 为从假设 A1 中删除条件 $\bar q_{1,Y}=\bar q_{0,Y}$ 所得的假设。依据式 (24.1) 和 (24.6)，令规则 $r_1$ 及其近似 $g_1$ 由 $r_1(W)\equiv I\{\bar q_{1,Y}(W)\geq0\}$ 和 $g_1(1\mid W)=1-g_1(0\mid W)\equiv G(\bar q_{1,Y}(W))$ 给出。引入
+\[
+ \psi_1\equiv E_{Q_0}\bigl(Y(r_1(W))\bigr),
+\]
+即规则 $r_1$ 下的平均奖励。现在，令 \textbf{A2*} 为将 A2 中的映射 $\epsilon\mapsto E_{P_{Q_0,g_0}}\bigl(\ell(\bar Q_{1,Y,\rho}(\epsilon))(O)\bigr)$ 替换为 $\epsilon\mapsto E_{P_{Q_0,g_1}}\bigl(\ell(\bar Q_{1,Y,\rho}'(\epsilon))(O)\bigr)$ 所得的假设，其中 $\bar Q_{1,Y,\rho}'(\epsilon)$ 的定义与式 (24.7) 相同，只是用 $g_1$ 代替 $g_0$。引入 $\bar Q_{1,Y,r_1}^{\prime *}\equiv\bar Q_{1,Y,r_1}'(\epsilon_0(r_1))$，并依据式 (24.9) 定义 $D_1^{\prime *}$：
+\[
+ \begin{aligned}
+ D_1^{\prime *}(O)\equiv{}&\bigl(Y-\bar Q_{1,Y}^{\prime *}(A,W)\bigr)\frac{I\{A=r_1(W)\}}{g_1(A\mid W)}\\
+ &+\bar Q_{1,Y}^{\prime *}(r_1(W),W)-\psi_1,
+ \end{aligned}
+\]
+然后令 $\Sigma_1^2\equiv E_{P_{Q_0,g_1}}(D_1^{\prime *}(O)^2)$。最后，考虑以下与 A3 对应的假设：
+\Needspace{9\baselineskip}
+\begin{description}[leftmargin=3em,labelwidth=2.5em]
+\item[A3*.] 在 $Q_0$ 下，给定 $W$ 后 $Y(0)$ 和 $Y(1)$ 的条件分布不退化。而且，存在 $\gamma_1,\gamma_2>0$，使对所有 $t\geq0$，都有
+\begin{equation}
+ P_{Q_0}\bigl(0\leq|\bar q_{1,Y}(W)|\leq t\bigr)\leq\gamma_1t^{\gamma_2}.
+ \tag{24.12}
+\end{equation}
+此外，比值 $|\bar q_{0,Y}/\bar q_{1,Y}|$ 可以定义，且其（本质）上确界有限。
+\end{description}
+现在，A3* 中的间隔条件（margin condition）涉及极限处理增益函数 $\bar q_{1,Y}$。真实处理增益函数 $\bar q_{0,Y}$ 不再需要在 $Q_0$ 几乎处处取正值。至于对比值 $|\bar q_{0,Y}/\bar q_{1,Y}|$ 的约束（显然，当 $\bar q_{1,Y}=\bar q_{0,Y}$ 时满足），我们可以简单地通过选择工作模型 $\bar{\mathcal Q}_Y$ 来保证它：要求所有 $\bar Q_Y\in\bar{\mathcal Q}_Y$ 均满足 $|\bar q_Y|\geq\delta>0$。现在可以陈述本章的最终结果。
+
+\begin{bookresult}{命题}{24.4}
+在 A1*、A2* 和 A3* 下，当 $n$ 趋于无穷时，$\|\bar Q_{n,Y}-\bar Q_{1,Y}\|_{Q_0}$、$\|\bar q_{n,Y}-\bar q_{1,Y}\|_{Q_0}$、$\|r_n-r_1\|_{Q_0}$、$\|g_n-g_1\|_{Q_0}$ 以及数据自适应参数 $\psi_1-\psi_{r_n,0}$，均依概率收敛于零。此外，$\psi_n^*$ 一致估计 $\psi_{r_n,0}$，从而也一致估计 $\psi_1$。这一估计具有如下性质：当 $n$ 趋于无穷时，$\sqrt{n/\sigma_n^2}(\psi_n^*-\psi_{r_n,0})$ 依分布收敛于标准正态分布，其中 $\sigma_n^2$ 一致估计正数 $\Sigma_1^2$。
+\end{bookresult}
+
+因此，在命题24.4的假设下，式 (24.10) 所定义的置信区间仍以随 $n$ 趋于无穷而趋于 $1-\alpha$ 的概率包含 $\psi_{r_n,0}$。本章最重要的结果由此得以保留，而无需假定极限处理增益函数与真实处理增益函数一致。
+
+\paragraph*{致谢。}
+Antoine Chambaz 和 Wenjing Zheng 感谢法国国家研究署（Agence Nationale de la Recherche，ANR）通过资助号 ANR-13-BS01-0005（SPADRO 项目）给予的支持。Antoine Chambaz 还说明，本研究也是 Labex MME-DII 项目（ANR11-LBX-0023-01）的一部分。

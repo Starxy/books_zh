@@ -1,0 +1,129 @@
+% 原书分章 PDF 第 24—26 页：第 5.7 节。
+\section{多维目标参数靶向最小损失估计的通用典范一维子模型}
+
+为便于表述，本节重点讨论目标参数取 Euclidean 空间值的情形，即 $H=\mathbb R^d$；但这一表述可立即推广到无限维目标参数，正如上一节所示。现在，把通用典范子模型的构造推广到更一般的靶向最小损失估计方法。假定
+$\Psi(P)=\Psi_1(Q(P))\in\mathbb R^d$，
+其中 $Q:\mathcal M\to Q(\mathcal M)$ 是模型上定义的某个目标参数，
+$\Psi_1:Q(\mathcal M)\to\mathbb R^d$ 为实值函数。设 $L(Q)(O)$ 是 $Q(P)$ 的损失函数，即 $Q(P)=\argmin_{Q\in Q(\mathcal M)}PL(Q)$。设
+$D^*(P)=D^*(Q(P),G(P))$
+是 $\Psi$ 在 $P$ 处的典范梯度，其中 $G:\mathcal M\to G(\mathcal M)$ 为某个干扰参数。考虑有效影响曲线 $D^*(P)$ 各分量的线性张成空间包含于 $Q$ 的切空间的情形，这样最不利子模型无需扰动 $G$；否则，只需把 $G$ 纳入 $Q$ 的定义。给定 $(Q,G)$，设
+$\{Q_\delta^{\mathrm{lfm}}:\delta\}\subset Q(\mathcal M)$
+为相对于损失函数 $L(Q)$、在 $\delta=0$ 处局部最不利的 $d$ 维模型，满足
+\[
+ \left.\frac{d}{d\delta}L(Q_\delta^{\mathrm{lfm}})\right|_{\delta=0}
+ =D^*(Q,G).
+\]
+记号中省略了该子模型对 $G$ 的依赖。
+
+考虑经验风险 $P_nL(Q_\delta^{\mathrm{lfm}})$，其在 $\delta=0$ 处的梯度等于 $P_nD^*(Q,G)$。对于一个很小的数 $dx$，我们希望在满足 $\|\delta\|\leq dx$ 的所有 $\delta$ 中最小化经验风险；在局部，这相当于使其线性梯度近似
+\[
+ \delta\mapsto\{P_nD^*(Q,G)\}^{\top}\delta
+\]
+最大。由 Cauchy--Schwarz 不等式，在 $\|\delta\|\leq dx$ 下，使其最大的选择为
+\[
+ \delta_n^*(Q,dx)=\frac{P_nD^*(Q,G)}{\|P_nD^*(Q,G)\|}dx
+ \equiv\delta_n^*(Q)dx,
+\]
+其中定义 $\delta_n^*(Q)=P_nD^*(Q,G)/\|P_nD^*(Q,G)\|$。于是定义更新
+$Q_{dx}=Q_{\delta_n^*(Q,dx)}^{\mathrm{lfm}}$。
+将上式中的 $Q$ 换为 $Q_{dx}$ 后重复应用，可得到更新 $Q_{2dx}$，一般地得到 $Q_{Kdx}$。因此，这一更新过程由下列微分方程定义：
+\[
+ Q_{x+dx}=Q_{x,\delta_n^*(Q_x)dx)}^{\mathrm{lfm}},
+\]
+其中 $Q_{x,\delta}^{\mathrm{lfm}}$ 为上述局部最不利多维子模型，但现在经过 $Q_x$，而不是 $Q$。
+
+假定对某个 $\dot L(Q)(O)$，有
+\begin{equation}
+ \left.\frac{d}{dh}L(Q_{x,h}^{\mathrm{lfm}})\right|_{h=0}
+ =\dot L(Q_x)
+ \left.\frac{d}{dh}Q_{x,h}^{\mathrm{lfm}}\right|_{h=0}.
+ \tag{5.9}
+\end{equation}
+那么
+\[
+ \left.\frac{d}{dh}Q_{x,h}^{\mathrm{lfm}}\right|_{h=0}
+ =\frac{D^*(Q_x,G)}{\dot L(Q_x)}.
+\]
+利用局部最不利模型 $h\mapsto Q_{x,h}^{\mathrm{lfm}}$ 连续二次可微、且在 $h=0$ 处具有得分 $D^*(Q_x,G)$，得到二阶 Taylor 展开
+\[
+ \begin{aligned}
+ Q_{x,\delta_n^*(Q_x)dx}^{\mathrm{lfm}}
+ &=Q_x+
+ \left.\frac{d}{dh}Q_{x,h}^{\mathrm{lfm}}\right|_{h=0}
+ \delta_n^*(Q_x)dx+O((dx)^2)\\
+ &=Q_x+\frac{D^*(Q_x,G)^\top}{\dot L(Q_x)}
+ \delta_n^*(Q_x)dx+O((dx)^2).
+ \end{aligned}
+\]
+由此，经过 $Q$ 的通用典范子模型具有以下递归解析定义：
+\begin{equation}
+ Q_\epsilon=Q+\int_0^\epsilon
+ \frac{D^*(Q_x,G)^\top}{\dot L(Q_x)}\delta_n^*(Q_x)\,dx.
+ \tag{5.10}
+\end{equation}
+
+下面明确验证，它确实满足所需条件，使一步 TMLE 解出
+$P_nD^*(Q_{\epsilon_n},G)=0$。
+仅假定式 (5.9)，即可得到
+\[
+ \begin{aligned}
+ \frac{d}{d\epsilon}P_nL(Q_\epsilon)
+ &=P_n\frac{d}{d\epsilon}L(Q_\epsilon)\\
+ &=P_n\dot L(Q_\epsilon)\frac{d}{d\epsilon}Q_\epsilon\\
+ &=P_n\dot L(Q_\epsilon)
+ \frac{D^*(Q_\epsilon,G)^\top}{\dot L(Q_\epsilon)}
+ \delta_n^*(Q_\epsilon)\\
+ &=P_nD^*(Q_\epsilon,G)^\top\delta_n^*(Q_\epsilon)\\
+ &=\{P_nD^*(Q_\epsilon,G)\}^\top
+ \frac{P_nD^*(Q_\epsilon,G)}{\|P_nD^*(Q_\epsilon,G)\|}\\
+ &=\frac{\sum_{j=1}^d\{P_nD_j^*(Q_\epsilon,G)\}^2}
+ {\|P_nD^*(Q_\epsilon,G)\|}\\
+ &=\|P_nD^*(Q_\epsilon,G)\|.
+ \end{aligned}
+\]
+此外，在某些正则条件下，下文以局部最不利子模型进行的推导适用，从而还有 $Q_\epsilon\in Q(\mathcal M)$。这就证明了下面的定理。
+
+\begin{bookresult}{定理}{5.5}
+给定与模型 $\mathcal M$ 相容的任意 $(Q,G)$，设
+$\{Q_\delta^{\mathrm{lfm}}:\delta\in B_a(0)\}\subset Q(\mathcal M)$
+为相对于损失函数 $L(Q)$、在 $\delta=0$ 处局部最不利的模型，满足
+\[
+ \left.\frac{d}{d\delta}L(Q_\delta^{\mathrm{lfm}})\right|_{\delta=0}
+ =D^*(Q,G).
+\]
+这里，对某个正数 $a$，$B_a(0)=\{x:\|x\|<a\}$。假定对某个 $\dot L(Q)(O)$，有
+\[
+ \left.\frac{d}{d\epsilon}L(Q_\epsilon^{\mathrm{lfm}})\right|_{\epsilon=0}
+ =\dot L(Q)
+ \left.\frac{d}{d\epsilon}Q_\epsilon^{\mathrm{lfm}}\right|_{\epsilon=0}.
+\]
+考虑式 (5.10) 定义的相应单变量模型 $\{Q_\epsilon:\epsilon\}$。它在 $\epsilon=0$ 处经过 $Q$，且对所有 $\epsilon$ 满足
+\begin{equation}
+ P_n\frac{d}{d\epsilon}L(Q_\epsilon)=\|P_nD^*(Q_\epsilon,G)\|,
+ \tag{5.11}
+\end{equation}
+其中 $\|x\|=\sqrt{\sum_{j=1}^d x_j^2}$ 为 Euclidean 范数。
+
+此外，假定 $B_a(0)$ 中的 $a$ 可以选为与
+$\{(Q_\epsilon,G):\epsilon>0\}$ 中 $(Q,G)$ 的选择无关，并假定如下二阶 Taylor 展开成立：对于 $h=(h_1,\ldots,h_d)$，
+\[
+ \begin{aligned}
+ Q_{\epsilon,h}^{\mathrm{lfm}}
+ &=Q_\epsilon+
+ \left.\frac{d}{dh}Q_{\epsilon,h}^{\mathrm{lfm}}\right|_{h=0}
+ h+R_2(Q_\epsilon,G,\|h\|)\\
+ &=Q_\epsilon+\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}
+ h+R_2(Q_\epsilon,G,\|h\|),
+ \end{aligned}
+\]
+其中
+% 原书 O 项多印一个左括号，保留原样。
+\[
+ \sup_\epsilon\sup_{o\in\mathcal O}
+ |R_2(Q_\epsilon,G,\|h\|)(o)|=O((\|h\|^2).
+\]
+还假定
+$\sup_\epsilon\sup_{o\in\mathcal O}
+ \left|\frac{D^*(Q_\epsilon,G)}{\dot L(Q_\epsilon)}(o)\right|<\infty$。
+那么，还有 $\{Q_\epsilon:\epsilon\geq0\}\subset\mathcal M$。
+\end{bookresult}

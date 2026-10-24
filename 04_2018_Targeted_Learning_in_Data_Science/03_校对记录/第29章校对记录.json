@@ -1,0 +1,860 @@
+{
+  "chapter": 29,
+  "status": "complete",
+  "title_en": "Targeted Learning Using Adaptive Survey Sampling",
+  "title_zh": "利用自适应调查抽样进行靶向学习",
+  "authors": [
+    "Antoine Chambaz",
+    "Emilien Joly",
+    "Xavier Mary"
+  ],
+  "pages": 15,
+  "han_characters_pdf_including_running_heads": 7592,
+  "han_characters_tex_without_comment_lines": 7270,
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/30_CH29_Targeted_Learning_Using_Adaptive_Survey_Sampling.pdf",
+    "split_pages": 19,
+    "body_split_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "printed_body_pages": "541–559",
+    "english_words_approx": 7445,
+    "all_19_source_pages_visually_checked": true,
+    "all_37_source_crops_visually_checked_at_400dpi": true,
+    "reader_annotations_excluded_in_memory_only": true,
+    "original_full_source_sha256_unchanged": "749e21c90b072a3b2d44e674573a47a475e57df02441d48800d3e714d05ceae0",
+    "source_split_sha256": "b0c2094836c9e209204031a0fb3e8a9a2cc8e5abece205ceaae72d4ee531d1f1"
+  },
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29e.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29f.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29g.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch29_table1.tex"
+  ],
+  "source_file_sha256": {
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29.tex": "f519575a92100494ff64cdc0f317630a6f0a51c5ff7710d3becb81afba9f0f00",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29a.tex": "c749094b0b052e62897ee3dccfc8698516ee8d28ab814f568d7cee302fb374fb",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29b.tex": "c03277e9032c565b810a7bb8390eb2e1972dc5541f7a5a2c014c1b936aecaf46",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29c.tex": "a8c4e07a0a070cb2a8131113ccb02fa6d392db0242de90b8fbc1809eaf855bf9",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29d.tex": "d4d852e55b38fa6e91186ede068b68306e188596e5828c3a9f22426328bc4d07",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29e.tex": "8fffd5c807d3e53c78f13f1b1759d901f51d44c0f9d9feac8f50e38175d7a644",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29f.tex": "dca18bfe3fcfd68ecc3ca4894c9bf6feb256370b09bef6c5372e9348eb7c4506",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch29g.tex": "11b8300c32bf9fb1a92e3dec86aed42378c6a0384c9df1f37134fcbaf6079fcc",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch29_table1.tex": "9e4f52c77e3d8031ef6838ae7b5869523cfc617d6e32dd0efce7f885c32db775"
+  },
+  "pdf": "outputs/分章中文/Targeted_Learning_第29章_中文译稿.pdf",
+  "sha256": "fcdb3598d9fc4f01c4d28becb2ae4975ffc3d758abab3a6b0653325e293bff5f",
+  "coverage": [
+    {
+      "section": "章首",
+      "source_split_pages": [
+        1,
+        2
+      ],
+      "files": [
+        "ch29a.tex"
+      ],
+      "complete": true,
+      "items": [
+        "章题、三作者、全部机构地址及三邮箱、DOI",
+        "唯一无标题灰框",
+        "大总体/小样本渐近情形",
+        "IPCW与在线靶向学习比较的三个推广",
+        "两类设计的全部背景及引文、连续暴露示例和模拟导言"
+      ]
+    },
+    {
+      "section": "29.1",
+      "source_split_pages": [
+        2,
+        3,
+        4
+      ],
+      "files": [
+        "ch29a.tex"
+      ],
+      "complete": true,
+      "subsections": [
+        "29.1.1",
+        "29.1.2"
+      ],
+      "items": [
+        "积分与L2范数约定",
+        "获取观测及条件联合分布、一阶/二阶包含概率",
+        "HT经验测度、无偏性和完整方差式",
+        "损失与广义得分/路径可微子模型全部定义",
+        "TMLE靶向方程和A1—A3全部条件",
+        "命题29.1、保守方差估计、CI及SRS非最优讨论"
+      ]
+    },
+    {
+      "section": "29.2",
+      "source_split_pages": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "files": [
+        "ch29b.tex"
+      ],
+      "complete": true,
+      "subsections": [
+        "29.2.1",
+        "29.2.2"
+      ],
+      "items": [
+        "Sampford/拒绝设计构造与命题29.2完整熵及矩条件",
+        "实际pi与p的区别及替代HT测度",
+        "厄米核/特征值/主子式/一阶二阶概率/投影与迹",
+        "命题29.3全部假设及Soshnikov讨论",
+        "分层等权设计的归一化与投影矩阵完整构造",
+        "命题29.4所有速率和括号熵条件",
+        "29.8—29.10及退化V可测函数、精确方差与极限方差、开放问题和两类效率比较"
+      ]
+    },
+    {
+      "section": "29.3",
+      "source_split_pages": [
+        9
+      ],
+      "files": [
+        "ch29b.tex"
+      ],
+      "complete": true,
+      "subsections": [],
+      "items": [
+        "两个f_2平方根定义",
+        "Cauchy–Schwarz完整不等式及等号条件",
+        "Poisson与行列式设计的最优h及各自最优方差、两种归一化条件"
+      ]
+    },
+    {
+      "section": "29.4",
+      "source_split_pages": [
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "files": [
+        "ch29c.tex"
+      ],
+      "complete": true,
+      "subsections": [
+        "29.4.1",
+        "29.4.2"
+      ],
+      "items": [
+        "数据结构、背景/暴露/结局域和正值条件",
+        "目标参数与模型泛函的两个argmin及闭式",
+        "有效影响曲线的两分量、路径可微解释和二阶余项29.14",
+        "三个加权经验风险最小化及交叉验证相依性提醒",
+        "边际经验分布的完整归一化与zeta²估计",
+        "初始分布及完整Monte Carlo双步抽样",
+        "一维波动、epsilon极大似然、所有分布分量更新和迭代收敛",
+        "通用最不利一步方案、最终Monte Carlo估计",
+        "完整A3乘积替代条件及协同收敛解释"
+      ]
+    },
+    {
+      "section": "29.5",
+      "source_split_pages": [
+        13,
+        14,
+        15
+      ],
+      "files": [
+        "ch29d.tex",
+        "ch29_table1.tex"
+      ],
+      "complete": true,
+      "subsections": [],
+      "items": [
+        "全部三个数据生成分布、概率、阈值、协方差矩阵、卡方分布、均值、标准差及真实参数",
+        "B次完整三步模拟及步骤2的(a)—(c)",
+        "三个n与三种设计的27B估计和CI",
+        "三个场景全部h平均向量及显著性讨论",
+        "完整R包/参数字面内容与模型策略",
+        "Sampford接受拒绝、Pareto近似和非整数层抽样实现",
+        "完整结果解释、表29.1的81数值、全部表头/空白/三公式表注"
+      ]
+    },
+    {
+      "section": "29.6",
+      "source_split_pages": [
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "files": [
+        "ch29e.tex",
+        "ch29f.tex",
+        "ch29g.tex"
+      ],
+      "complete": true,
+      "subsections": [
+        "29.6.1",
+        "29.6.2",
+        "29.6.3",
+        "29.6.4"
+      ],
+      "items": [
+        "bar f、overline(f²)、层指标函数和I_v定义",
+        "29.6.1完整两步渐近展开和经验过程论证",
+        "29.6.2层内零方差、29.15、N²方差重写、29.16和全部期望方差推导",
+        "29.6.3 Soshnikov三条件、Omega可数交、Z_N、特征函数、Slutsky/Cramér–Wold及29.20链式论证",
+        "29.6.4 V可测/非V可测两类情形、次高斯二次型、Hanson–Wright及完整N/n速率验证",
+        "末尾完整ANR/SPADRO及Labex资助致谢"
+      ]
+    }
+  ],
+  "structure": {
+    "sections": 6,
+    "subsections": 10,
+    "propositions": [
+      "29.1",
+      "29.2",
+      "29.3",
+      "29.4"
+    ],
+    "actual_proofs": 4,
+    "actual_proof_subsections": [
+      "命题29.1的证明",
+      "式 (29.8) 与 (29.9) 的证明",
+      "命题29.3的证明",
+      "命题29.4的证明"
+    ],
+    "proof_environments": 0,
+    "actual_proof_note": "原书将四部分证明作为29.6.1—29.6.4小节，四小节均完整翻译；未重复添加同号命题。",
+    "sourceboxes": 1,
+    "body_footnotes": 0,
+    "final_acknowledgment": true
+  },
+  "equations": {
+    "tags": [
+      "29.1",
+      "29.2",
+      "29.3",
+      "29.4",
+      "29.5",
+      "29.6",
+      "29.7",
+      "29.8",
+      "29.9",
+      "29.10",
+      "29.11",
+      "29.12",
+      "29.13",
+      "29.14",
+      "29.15",
+      "29.16",
+      "29.17",
+      "29.18",
+      "29.19",
+      "29.20"
+    ],
+    "all_tags_retained": true,
+    "source_display_groups": 41,
+    "source_numbered_display_groups": 20,
+    "source_unnumbered_display_groups": 21,
+    "display_math_groups": 45,
+    "numbered_display_groups": 20,
+    "unnumbered_display_groups": 25,
+    "original_inline_expressions_reflowed_unnumbered": 4,
+    "reflow_display_ids": [
+      12,
+      28,
+      42,
+      45
+    ],
+    "all_45_display_groups_and_all_inline_math_checked": true,
+    "table_math_notes": 3,
+    "audit": "work/targeted_learning/ch29_work/math_audit.json"
+  },
+  "figures": [],
+  "tables": [
+    {
+      "number": "29.1",
+      "source_page": 15,
+      "chinese_page": 12,
+      "scenario_groups": 3,
+      "metrics_per_scenario": 3,
+      "rows": 9,
+      "numeric_columns": 9,
+      "numeric_cells": 81,
+      "coverage_cells": 27,
+      "variance_cells": 54,
+      "all_values_match_source_tex_and_final_pdf": true,
+      "scenario_blank_cells_retained": 6,
+      "leading_zeros_retained": [
+        "09",
+        "08",
+        "07",
+        "07",
+        "06",
+        "06",
+        "07",
+        "06",
+        "06"
+      ],
+      "full_math_notes_retained": 3,
+      "evidence": "work/targeted_learning/ch29_work/table_fidelity.json"
+    }
+  ],
+  "citations": {
+    "distinct_author_year_references": 21,
+    "occurrences": 37,
+    "year_and_suffix_groups": 17,
+    "all_author_names_years_suffixes_and_occurrences_checked": true,
+    "source_and_tex_year_counts_equal": true,
+    "evidence": "work/targeted_learning/ch29_work/citation_evidence.json"
+  },
+  "new_terms_for_glossary_review": [
+    {
+      "en": "Hermitian matrix",
+      "zh": "厄米矩阵",
+      "note": "行列式设计的厄米核与主子矩阵；保留复数情形。"
+    },
+    {
+      "en": "bracketing entropy",
+      "zh": "括号熵",
+      "note": "本章要求关于上确界范数的括号熵有限；与一致熵积分区分。"
+    },
+    {
+      "en": "simple random sampling",
+      "zh": "简单随机抽样",
+      "note": "缩写SRS；本章指从总体不放回且等权地抽取固定样本量。"
+    },
+    {
+      "en": "concentration inequality",
+      "zh": "集中不等式",
+      "note": "Pemantle–Peres与Hanson–Wright型概率界。"
+    },
+    {
+      "en": "sub-Gaussian random variable",
+      "zh": "次高斯随机变量",
+      "note": "用于独立随机变量二次型的指数集中。"
+    },
+    {
+      "en": "asymptotic tightness",
+      "zh": "渐近紧性",
+      "note": "经验过程收敛论证中的概率测度紧性。"
+    },
+    {
+      "en": "Pareto sampling",
+      "zh": "Pareto抽样",
+      "note": "本章以此近似Sampford设计，沿用原人名拼写。"
+    }
+  ],
+  "source_anomalies": [
+    {
+      "id": "summary-index-n",
+      "source_split_pages": [
+        2
+      ],
+      "printed_pages": [
+        542
+      ],
+      "issue": "获取观测段的汇总量末项原印V_n，尽管导言及其他处写V_N；本段照录V_1,…,V_n。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p02_1.png"
+      ]
+    },
+    {
+      "id": "conditioning-index-n",
+      "source_split_pages": [
+        3
+      ],
+      "printed_pages": [
+        543
+      ],
+      "issue": "定义一般条件分布P^s的首句原印给定O_1,…,O_n；本段照录小写n。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p03_1.png",
+        "work/targeted_learning/ch29_work/source_p03_2.png"
+      ]
+    },
+    {
+      "id": "generalized-score-density-sign",
+      "source_split_pages": [
+        4
+      ],
+      "printed_pages": [
+        544
+      ],
+      "issue": "负对数似然示例的密度为1−epsilon s，但随后仍称s为经典得分；正负号和原称谓均保留。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p04_1.png",
+        "work/targeted_learning/ch29_work/source_p04_2.png"
+      ]
+    },
+    {
+      "id": "variance-consistency-claim",
+      "source_split_pages": [
+        4,
+        14
+      ],
+      "printed_pages": [
+        544,
+        554
+      ],
+      "issue": "A1/A2后称29.4一致估计sigma_1²，随后允许保守估计；模拟步骤3又称事先不确定29.4是否保守。完整保留原各处陈述。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p04_1.png",
+        "work/targeted_learning/ch29_work/source_p04_2.png",
+        "work/targeted_learning/ch29_work/source_p14_1.png",
+        "work/targeted_learning/ch29_work/source_p14_2.png"
+      ]
+    },
+    {
+      "id": "inclusion-away-from-zero",
+      "source_split_pages": [
+        6,
+        18
+      ],
+      "printed_pages": [
+        546,
+        558
+      ],
+      "issue": "命题29.3及其证明原要求一阶包含概率关于N一致远离0，而紧接讨论n/N趋零。原条件原样译出，不按预期速率重写。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p06_1.png",
+        "work/targeted_learning/ch29_work/source_p06_2.png",
+        "work/targeted_learning/ch29_work/source_p18_1.png",
+        "work/targeted_learning/ch29_work/source_p18_2.png"
+      ]
+    },
+    {
+      "id": "projection-block-construction",
+      "source_split_pages": [
+        7
+      ],
+      "printed_pages": [
+        547
+      ],
+      "issue": "原投影矩阵构造写n_v²个方阵，每块大小N_v/n_v×N_v/n_v，对角块各元素n_v^{-1}。400dpi与总审独立复核后全部照录。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p07_1.png",
+        "work/targeted_learning/ch29_work/source_p07_2.png"
+      ]
+    },
+    {
+      "id": "covariance-no-comma",
+      "source_split_pages": [
+        8
+      ],
+      "printed_pages": [
+        548
+      ],
+      "issue": "命题29.4的协方差核中Cov_{P0}[f(O)g(O)|V]在f与g之间没有逗号；保留相邻乘积形态。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p08_1.png",
+        "work/targeted_learning/ch29_work/source_p08_2.png"
+      ]
+    },
+    {
+      "id": "proposition29-4-proof-pointer",
+      "source_split_pages": [
+        8
+      ],
+      "printed_pages": [
+        548
+      ],
+      "issue": "命题29.4前正文把其证明概要指向29.6.3，实际独立小节是29.6.4；保留原交叉指向。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p08_1.png",
+        "work/targeted_learning/ch29_work/source_p08_2.png"
+      ]
+    },
+    {
+      "id": "bounded-model-versus-simulation",
+      "source_split_pages": [
+        9,
+        13
+      ],
+      "printed_pages": [
+        549,
+        553
+      ],
+      "issue": "示例初设Y∈[0,1]且A有界，模拟却令Y为高斯、非零A由卡方分布构造；完整保留两处原模型和分布。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p09_1.png",
+        "work/targeted_learning/ch29_work/source_p09_2.png",
+        "work/targeted_learning/ch29_work/source_p13_1.png",
+        "work/targeted_learning/ch29_work/source_p13_2.png"
+      ]
+    },
+    {
+      "id": "submodel-density-missing-denominator",
+      "source_split_pages": [
+        10
+      ],
+      "printed_pages": [
+        550
+      ],
+      "issue": "路径可微示例原写dP_{s,epsilon}≡1+epsilon s，没有/dP；与此前1−epsilon s的写法不同，均照录。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p10_1.png",
+        "work/targeted_learning/ch29_work/source_p10_2.png"
+      ]
+    },
+    {
+      "id": "initial-parameter-b-c",
+      "source_split_pages": [
+        12
+      ],
+      "printed_pages": [
+        552
+      ],
+      "issue": "初始估计量段原印Psi^b(P_n^0)与psi_0^b，后面的展示近似用Psi^c；保留b/c差异。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p12_1.png",
+        "work/targeted_learning/ch29_work/source_p12_2.png"
+      ]
+    },
+    {
+      "id": "fluctuation-bound-slash",
+      "source_split_pages": [
+        12
+      ],
+      "printed_pages": [
+        552
+      ],
+      "issue": "波动参数界原印c(P_n^k)/2||D^c(P_n^k)||_infty，斜线之后未加将2与范数一并括入分母的括号；保留原可见表达。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p12_1.png",
+        "work/targeted_learning/ch29_work/source_p12_2.png"
+      ]
+    },
+    {
+      "id": "simulation-f2-square-root-wording",
+      "source_split_pages": [
+        13
+      ],
+      "printed_pages": [
+        553
+      ],
+      "issue": "步骤2(b)称对f_2^P与f_2^Pi的估计取平方根，而29.11已将f_2定义为平方根；按原措辞保留。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p13_1.png",
+        "work/targeted_learning/ch29_work/source_p13_2.png"
+      ]
+    },
+    {
+      "id": "simulation-P-versus-h",
+      "source_split_pages": [
+        14
+      ],
+      "printed_pages": [
+        554
+      ],
+      "issue": "步骤3列P^{sPi}时原印with P_{n0}^Pi而非h_{n0}^Pi；译文照录P_{n0}^Pi，表头仍保留原h。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p14_1.png",
+        "work/targeted_learning/ch29_work/source_p14_2.png"
+      ]
+    },
+    {
+      "id": "simulation-h1-tuples",
+      "source_split_pages": [
+        14
+      ],
+      "printed_pages": [
+        554
+      ],
+      "issue": "三个场景的所有h平均向量均写(h_1(1),h_1(2),h_1(3))，包括P0,2与P0,3；原下标1全部保留。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p14_1.png",
+        "work/targeted_learning/ch29_work/source_p14_2.png"
+      ]
+    },
+    {
+      "id": "table-leading-zeros",
+      "source_split_pages": [
+        15
+      ],
+      "printed_pages": [
+        555
+      ],
+      "issue": "表29.1第一组经验方差行实际印09、08、07、07、06、06、07、06、06，没有小数点；保留前导零。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p15_1.png",
+        "work/targeted_learning/ch29_work/source_p15_2.png",
+        "work/targeted_learning/ch29_work/source_p15_3.png"
+      ]
+    },
+    {
+      "id": "variance-proof-extra-n",
+      "source_split_pages": [
+        17
+      ],
+      "printed_pages": [
+        557
+      ],
+      "issue": "29.9证明末行原印n Sigma_h^Pi(f,f)，而29.9陈述首项为Sigma_h^Pi(f,f)；两处均按原印。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p17_1.png",
+        "work/targeted_learning/ch29_work/source_p17_2.png"
+      ]
+    },
+    {
+      "id": "Soshnikov-max-and-exponents",
+      "source_split_pages": [
+        17
+      ],
+      "printed_pages": [
+        557
+      ],
+      "issue": "29.18最大值内未印绝对值；29.18与29.19的epsilon/delta次幂位于o/O圆括号外。保留原各式形式。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p17_1.png",
+        "work/targeted_learning/ch29_work/source_p17_2.png"
+      ]
+    },
+    {
+      "id": "ZN-centering-and-generic-design",
+      "source_split_pages": [
+        17
+      ],
+      "printed_pages": [
+        557
+      ],
+      "issue": "Z_N(f)定义原用Var_{P^s}及(P_n^HT−P_0)f，而此前条件CLT以P_N为中心；定义与后续特征函数推理照录。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p17_1.png",
+        "work/targeted_learning/ch29_work/source_p17_2.png"
+      ]
+    },
+    {
+      "id": "concentration-centering-and-slash",
+      "source_split_pages": [
+        18
+      ],
+      "printed_pages": [
+        558
+      ],
+      "issue": "29.20原以P_0为中心，且指数写−nt²/8C(f)²，没有将8C(f)²整体写成分式分母；原式照录。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p18_1.png",
+        "work/targeted_learning/ch29_work/source_p18_2.png"
+      ]
+    },
+    {
+      "id": "last-proof-generic-Ps",
+      "source_split_pages": [
+        19
+      ],
+      "printed_pages": [
+        559
+      ],
+      "issue": "命题29.4证明末段两处方差的设计下标原写一般P^s，前面则用P^{sPi}；保留原符号切换。",
+      "action": "经原页及400dpi相应裁片确认，译文按原印保留；不据理论推测修正。",
+      "confirmed_visually": true,
+      "evidence": [
+        "work/targeted_learning/ch29_work/source_p19_1.png"
+      ]
+    }
+  ],
+  "unresolved_items": [],
+  "deliberate_content_deviations": [],
+  "numbering_oddities": [
+    "20个原公式编号29.1—29.20逐一保留，无编号式未新增编号。",
+    "4个原行内表达式为可读性改作无编号展示，逐式来源见math_audit.json。",
+    "命题29.4之前的原证明交叉引用29.6.3保留，真实四部分证明分列29.6.1—29.6.4。"
+  ],
+  "build_checks": {
+    "engine": "xelatex",
+    "build_directory": "work/targeted_learning/ch29_work/build_042821",
+    "passes": [
+      0,
+      0
+    ],
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "undefined_references": 0,
+    "duplicate_destinations": 0,
+    "benign_underfull_boxes": 2,
+    "all_15_final_output_pages_visually_checked": true,
+    "all_source_math_and_all_45_display_groups_checked": true,
+    "control_characters": [],
+    "forbidden_counter_part_commands": [],
+    "self_test_driver_removed": true,
+    "removed_self_test_files": [
+      "work/targeted_learning/ch29_work/test_ch29.tex"
+    ],
+    "shipped_pdf_reopened": true,
+    "shipped_pages": 15,
+    "last_bookmark": [
+      3,
+      "29.6.4 命题29.4的证明",
+      15
+    ],
+    "shipped_sha256_matches_build": true,
+    "post_repair_changed_pages_actually_viewed": [
+      1
+    ],
+    "post_repair_pixel_identical_pages_with_inherited_review": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "qa_artifacts": {
+    "coverage_detail": "work/targeted_learning/ch29_work/coverage_detail.json",
+    "math_audit": "work/targeted_learning/ch29_work/math_audit.json",
+    "raw_math_inventory": "work/targeted_learning/ch29_work/display_inventory.json",
+    "structure_audit": "work/targeted_learning/ch29_work/structural_audit.json",
+    "citation_evidence": "work/targeted_learning/ch29_work/citation_evidence.json",
+    "source_anomaly_detail": "work/targeted_learning/ch29_work/source_anomalies.json",
+    "source_visual_audit": "work/targeted_learning/ch29_work/source_visual_manifest.json",
+    "source_crop_manifest": "work/targeted_learning/ch29_work/source_crop_manifest.json",
+    "output_page_visual_audit": "work/targeted_learning/ch29_work/product_visual_manifest.json",
+    "final_pdf_text": "work/targeted_learning/ch29_work/ch29_built_text.txt",
+    "table_numeric_fidelity": "work/targeted_learning/ch29_work/table_fidelity.json",
+    "R_literal_code_audit": "work/targeted_learning/ch29_work/code_audit.json",
+    "delivery_reopen_validation": "work/targeted_learning/ch29_work/delivery_validation.json",
+    "ModalX_apostrophe_repair": "work/targeted_learning/ch29_work/modalx_repair/repair_validation.json"
+  },
+  "shared_files_edited": [],
+  "frozen_until_wave_29_30_integration": true,
+  "narrow_layout_repairs": [
+    {
+      "status": "complete",
+      "completed_at": "2026-10-24T04:30:11",
+      "request": "根合排目视发现Latin机构词内的U+2019被XeCJK放大全宽间隙，仅改为ASCII撇号。",
+      "scope": "ch29a.tex: Modal’X → Modal'X；唯一一处字符替换，其他8个源码/表文件字节SHA均不变。",
+      "old_pdf_sha256": "bb2d35cca01d3507b70497f9a8c34b2fbb948357f7b8bef273f436fd3b0f15ec",
+      "new_pdf_sha256": "fcdb3598d9fc4f01c4d28becb2ae4975ffc3d758abab3a6b0653325e293bff5f",
+      "old_source_sha256": "4c0042f2a13cb0a9fc8e925bcb6ce00c7e58728ba3d7ef3125fa722d770918fc",
+      "new_source_sha256": "c749094b0b052e62897ee3dccfc8698516ee8d28ab814f568d7cee302fb374fb",
+      "changed_pages": [
+        1
+      ],
+      "changed_pages_actually_viewed": [
+        1
+      ],
+      "pixel_identical_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "prior_visual_proof_inherited_only_for_pixel_identical_pages": true,
+      "full_prior_content_audits_preserved": true,
+      "source_anomalies_preserved": true,
+      "math_table_citation_audits_not_repeated": true,
+      "passes": [
+        0,
+        0
+      ],
+      "latex_errors": 0,
+      "missing_glyphs": 0,
+      "overfull_boxes": 0,
+      "undefined_references": 0,
+      "duplicate_destinations": 0,
+      "actual_BOOK05_pdf_reopened": true,
+      "shipped_pages": 15,
+      "last_bookmark": [
+        3,
+        "29.6.4 命题29.4的证明",
+        15
+      ],
+      "shipped_sha256_matches_build": true,
+      "removed_self_test_files": [
+        "work/targeted_learning/ch29_work/test_ch29.tex"
+      ],
+      "pixel_comparison": "work/targeted_learning/ch29_work/modalx_repair/pixel_comparison.json",
+      "changed_page_image": "work/targeted_learning/ch29_work/modalx_repair/after_product_001.png",
+      "prior_report_snapshot": "work/targeted_learning/ch29_work/modalx_repair/before_ch29_report.json"
+    }
+  ]
+}

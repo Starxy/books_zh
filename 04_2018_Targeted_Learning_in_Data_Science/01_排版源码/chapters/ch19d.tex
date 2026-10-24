@@ -1,0 +1,284 @@
+% 原书分章 PDF 第 19—24 页：第 19.5—19.6 节及其全部证明。
+\section{在线一步估计量}
+
+考虑 $\theta_0=(\bar q_0,\bar g_0)$ 的在线估计量 $(\theta_i:i)$。回顾定理 19.3，
+\[
+ -\frac1N\sum_{i=1}^N P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})
+ =\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})
+ -\Psi_{g^*}(\theta_0)+\bar R_{2,g^*,N}.
+\]
+定义如下在线一步估计量：
+\[
+ \psi_{g^*,N}=\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})
+ +\frac1N\sum_{i=1}^N\bar D_{g^*}(\theta_{i-1})(\bar O(i)).
+\]
+有
+\[
+\begin{aligned}
+ \psi_{g^*,N}-\psi_{g^*}(\theta_0)
+ &=\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})-\Psi_{g^*}(\theta_0)
+ +\frac1N\sum_{i=1}^N\bar D_{g^*}(\theta_{i-1})(\bar O(i))\\
+ &=\frac1N\sum_{i=1}^N
+ \{\bar D_{g^*}(\theta_{i-1})-P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})\}
+ -\bar R_{2,g^*,N}\\
+ &\equiv\frac{M_N}{\sqrt N}-\bar R_{2,g^*,N}.
+\end{aligned}
+\]
+由鞅中心极限定理即可证明下面的定理。
+
+\begin{bookresult}{定理}{19.4}
+假设 $\bar R_{2,g^*,N}=o_P(N^{-1/2})$；存在某个 $M<\infty$，使 $\max_i|\bar D_{g^*,i}(\theta_{i-1})|<M$ 以概率 1 成立；并且当 $N\to\infty$ 时，
+\[
+ \frac1N\sum_{i=1}^N(P_0^N-P_{0,o(i)})
+ \bar D_{g^*,i}(\theta_{i-1})\bar D_{g^*,i}(\theta_{i-1})^\top\to0.
+\]
+令
+\[
+ \Sigma(N)=\frac1N\sum_{i=1}^N P_0^N
+ \bar D_{g^*,i}(\theta_{i-1})\bar D_{g^*,i}(\theta_{i-1})^\top.
+\]
+则
+\[
+\begin{aligned}
+ \sqrt N(\psi_{g^*,N}-\psi_{g^*}(\theta_0))&=M_N+o_P(1),\\
+ \Sigma(N)^{-1/2}M_N&\xrightarrow{d}N(0,I),\\
+ \sqrt N\Sigma(N)^{-1/2}(\psi_{g^*,N}-\psi_{g^*}(\theta_0))
+ &\xrightarrow{d}N(0,I),\qquad N\to\infty.
+\end{aligned}
+\]
+若 $\Sigma(N)\to\Sigma_0$，其中 $\Sigma_0$ 固定，则
+\[
+ \sqrt N(\psi_N-\psi_0)\xrightarrow{d}N(0,\Sigma_0).
+\]
+\end{bookresult}
+
+同样，可以定义 $\Psi_J(P_0)$ 的在线一步估计量，并给出关于它的完全类似的定理。
+
+\paragraph{在线一步估计量相对于普通一步估计量的二阶余项。}
+对各个 $i$ 特定的二阶项 $R_{2,g^*,i}(\theta_{i-1},\theta_0)$，有 $\bar R_{2,g^*,N}=N^{-1}\sum_{i=1}^N R_{2,g^*,i}(\theta_{i-1},\theta_0)$。假设对某个 $0<\delta<1$，有 $R_{2,g^*,i}(\theta_{i-1},\theta_0)=O(i^{-\delta})$。此时，$\bar R_{2,g^*,N}=N^{-1}\sum_{i=1}^N R_{2,g^*,i}(\theta_{i-1},\theta_0)=O(N^{-\delta})$。换言之，二阶余项 $\bar R_{2,g^*,N}$ 趋于零的收敛速率，与普通一步估计量的余项 $R_{2,g^*,N}(\theta_N,\theta_0)$ 相同。不过，预期 $\bar R_{2,g^*,N}$ 会比 $R_{2,g^*,N}(\theta_N,\theta_0)$ 大一个常数因子 $1/(-\delta+1)$。在 $R_{2,g^*,i}(\theta_{i-1},\theta_0)=O(i^{-1})$ 的特殊情形下，即正确设定的参数模型中 MLE 的速率，有 $\bar R_{2,g^*,N}=O(\log N/N)$；因此，$\bar R_{2,g^*,N}$ 比 $R_{2,g^*,N}(\theta_N,\theta_0)$ 大一个 $\log N$ 因子。
+
+\section{在线 TMLE}
+
+尽管 $(\theta_i:i)$ 可能是在线估计量，前一节给出的 $\theta_0$ 的实际 TMLE $\theta_{N,\epsilon_N}$ 却不是在线估计量，因为 $\epsilon_N$ 不是在线估计量。本节构造在线一步估计量 $\epsilon_N^*$，使 $\Psi_{g^*}(\theta_{N,\epsilon_N^*})$ 仍是 $\Psi_{g^*}(\theta_0)$ 的渐近有效估计量。我们将其称为在线 TMLE。在线一步估计量 $(\epsilon_N^*:N)$ 的输入，是 $\theta_0$ 的在线估计量 $(\theta_N:N)$，以及初始在线估计量 $(\epsilon_N^0:N)$。与普通 TMLE 一样，$\{\theta_{N,\epsilon}:\epsilon\}$ 是在 $\epsilon=0$ 处经过 $\theta_N$ 的最不利子模型，因此其得分
+\[
+ \left.\frac d{d\epsilon}\log p^N_{\theta_{N,\epsilon}}(O^N)\right|_{\epsilon=0}
+\]
+的线性张成空间包含 $D^N(\theta_N)(O^N)$。此外，假设 $\epsilon$ 与 $\psi_{g^*,0}$ 具有相同维数。
+
+令 $\epsilon_N^0$ 为 $\epsilon_{0N}$ 的初始估计量，其中 $\epsilon_{0N}=f_N^{-1}(\psi_{g^*,0})$ 定义为下式的解：
+\[
+ f_N(\epsilon_{0N})\equiv\Psi_{g^*}(\theta_{N,\epsilon_{0N}})=\Psi_{g^*}(\theta_0).
+\]
+如果 $\theta_N$ 是 $\theta_0$ 的一致估计量——这是我们有效性定理的一项要求——则可以令 $\epsilon_N^0=0$。利用 $\epsilon_{0N}$ 的这一初始估计量 $\epsilon_N^0$，在 $\epsilon_{0N}$ 的一个邻域内构造 $\epsilon\to f_N(\epsilon)$ 的一阶 Taylor 展开 $\tilde f_N$：
+\[
+ \tilde f_N(\epsilon)=f_N(\epsilon_N^0)
+ +\frac d{d\epsilon_N^0}f_N(\epsilon_N^0)(\epsilon-\epsilon_N^0).
+\]
+令 $f_N^{-1}$ 为 $f_N$ 的逆函数，同样令 $\tilde f_N^{-1}$ 为 $\tilde f_N$ 的逆函数：
+\[
+ \tilde f_N^{-1}(\psi)=\epsilon_N^0+c_N^{-1}(\psi-f_N(\epsilon_N^0)),
+\]
+其中使用简记
+\[
+ c_N\equiv\frac d{d\epsilon_N^0}f_N(\epsilon_N^0).
+\]
+下面的引理表明，一阶 Taylor 展开 $\tilde f_N^{-1}(\psi_0)$ 对 $\epsilon_{0N}=f_N^{-1}(\psi_0)$ 的逼近，仅有可忽略的 $o_P(N^{-1/2})$ 余项。在该引理中，$\psi_0$ 表示 $\psi_{g^*,0}$。
+
+\begin{bookresult}{引理}{19.2}
+假设存在某个 $M<\infty$，使对 $k\in\{1,2\}$，$\|({d}/{d\epsilon_N^0})^k f_N(\epsilon_N^0)\|<M$ 以趋于 1 的概率成立；$\|c_N^{-1}\|<M$ 以趋于 1 的概率成立；并且 $\|\epsilon_{0N}-\epsilon_N^0\|^2=o_P(N^{-1/2})$。则
+\begin{equation}
+ R_{0N}(\epsilon_N^0,\epsilon_{0N})
+ \equiv\tilde f_N^{-1}(\psi_0)-f_N^{-1}(\psi_0)=o_P(N^{-1/2}).
+ \tag{19.6}
+\end{equation}
+\end{bookresult}
+
+\begin{proof}
+若 $f_N$ 二次可微，且其二阶导数有界、连续，则
+\[
+ f_N(\epsilon)=\tilde f_N(\epsilon)+O_P(\|\epsilon-\epsilon_N^0\|^2).
+\]
+有
+\[
+\begin{aligned}
+ &\tilde f_N^{-1}(\psi_0)-f_N^{-1}(\psi_0)\\
+ &\quad=-\{\tilde f_N^{-1}\tilde f_N f_N^{-1}(\psi_0)
+ -\tilde f_N^{-1}f_N f_N^{-1}(\psi_0)\}\\
+ &\quad=-\{\epsilon_N^0+c_N^{-1}\{\tilde f_N(\epsilon_{0N})-f_N(\epsilon_N^0)\}
+ -\epsilon_N^0-c_N^{-1}\{\psi_0-f_N(\epsilon_N^0)\}\}\\
+ &\quad=-c_N^{-1}\{\tilde f_N(\epsilon_{0N})-f_N(\epsilon_{0N})\}\\
+ &\quad=-c_N^{-1}O_P(\|\epsilon_{0N}-\epsilon_N^0\|^2)\\
+ &\quad=O_P(\|\epsilon_{0N}-\epsilon_N^0\|^2),
+\end{aligned}
+\]
+其中使用了 $c_N^{-1}$ 的范数对 $N$ 一致有界。根据假设，$\|\epsilon_{0N}-\epsilon_N^0\|^2=o_P(N^{-1/2})$。
+\end{proof}
+
+假设 $\|\epsilon_{0N}-\epsilon_N^0\|^2=o_P(N^{-1/2})$，通常对应于假设：相对于基于损失的差异度，$\theta_N$ 以快于 $N^{-1/4}$ 的速率收敛到 $\theta_0$。条件（19.6）是下面提出的在线估计量 $\epsilon_N^*$ 所依赖的关键条件；由引理可知，它在较弱的附加正则条件下成立。现用 $\tilde f_N$ 定义如下 $\epsilon_{0N}$ 的在线一步估计量 $\epsilon_N^*$：
+\[
+ \epsilon_N^*=\frac1N\sum_{i=1}^N c_N^{-1}\Psi_{g^*}(\theta_{i-1})
+ +\frac1N\sum_{i=1}^N\tilde f_N^{-1}\bar D_{g^*}(\theta_{i-1})(\bar O(i)).
+\]
+如果选择 $\epsilon_N^0=0$，则简化为
+\[
+ \epsilon_N^*=\frac1N\sum_{i=1}^N c_N^{-1}\bar D_{g^*}(\theta_{i-1})(\bar O(i)).
+\]
+这定义了 $\psi_{g^*,0}$ 的在线 TMLE $\psi_N^*=\Psi_{g^*}(\theta_{N,\epsilon_N^*})$。为分析该在线 TMLE，先给出关于上述在线一步估计量 $\epsilon_N^*$ 的定理。
+
+\begin{bookresult}{定理}{19.5}
+令
+\[
+ M_N=\frac1{\sqrt N}\sum_{i=1}^N
+ \{\bar D_{g^*}(\theta_{i-1})(\bar O(i))-P_{0,o(i)}\bar D_{g^*,i}\},
+\]
+以及二阶余项
+\[
+ \bar R(N)=-\frac1N\sum_{i=1}^N P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})
+ -\Bigl\{\frac1N\sum_{i=1}^N\Psi_{g^*}(\theta_{i-1})-\Psi_{g^*}(\theta_0)\Bigr\},
+\]
+其明确定义见定理 19.3。回顾上面对 $f_N$、$\tilde f_N$、$c_N$、$R_{0N}(\epsilon_N^0,\epsilon_{0N})\equiv\tilde f_N^{-1}(\psi_{g^*,0})-f_N^{-1}(\psi_{g^*,0})$ 的定义，以及由 $\Psi_{g^*}(\theta_{N,\epsilon})=\psi_{g^*,0}$ 定义的 $\epsilon_{0N}$。令 $c_{0N}\equiv({d}/{d\epsilon_{0N}})\Psi_{g^*}(\theta_{N,\epsilon_{0N}})$。有如下展开：
+\begin{equation}
+ \epsilon_N^*-\epsilon_{0N}=c_N^{-1}M_N/\sqrt N
+ +c_N^{-1}\bar R(N)+R_{0N}(\epsilon_N^0,\epsilon_{0N}).
+ \tag{19.7}
+\end{equation}
+
+\textbf{假设。}假设 $\bar R(N)=o_P(1/\sqrt N)$，且 $\theta_N$ 满足鞅一致性条件，使 $M_N$ 依分布收敛到 $Z\sim N(0,\Sigma_0)$。此外，假设 $\epsilon_N^0$、$\epsilon_{0N}$ 依概率收敛到零，且 $\|\epsilon_N^0-\epsilon_{0N}\|^2=o_P(N^{-1/2})$；$f_N(\epsilon)$ 在 0 处的一阶和二阶导数连续，并以趋于 1 的概率对 $N$ 一致有界；一阶导数 $c_N(\epsilon)=({d}/{d\epsilon})f_N(\epsilon)$ 的逆，在 $\epsilon=0$ 处关于 $\epsilon$ 连续。
+
+\textbf{结论。}则
+\[
+ \epsilon_N^*-\epsilon_{0N}=c_{0N}^{-1}\frac{M_N}{\sqrt N}+o_P(1/\sqrt N),
+\]
+并且
+\[
+ \sqrt N(\epsilon_N^*-\epsilon_{0N})-c_{0N}^{-1}Z\to0
+ \quad\text{依概率成立。}
+\]
+\end{bookresult}
+
+利用下面定理 19.6 证明中给出的简单 Delta 方法论证，定理 19.5 确立了 $\psi_{g^*,0}$ 的在线 TMLE $\Psi_{g^*}(\theta_{N,\epsilon_N^*})$ 的渐近有效性。
+
+\begin{bookresult}{定理}{19.6}
+在与定理 19.5 相同的条件下，有
+\[
+ \Psi_{g^*}(\theta_{N,\epsilon_N^*})-\Psi_{g^*}(\theta_0)
+ =\frac{M_N}{\sqrt N}+o_P(1/\sqrt N),
+\]
+从而 $\sqrt N(\Psi_{g^*}(\theta_N(\epsilon_N^*))-\Psi_{g^*}(\theta_0))\xrightarrow{d}Z$，其中 $Z\sim N(0,\Sigma_0)$。因此，$\Psi_{g^*}(\theta_N(\epsilon_N^*))$ 是 $\psi_{g^*,0}$ 的渐近有效估计量。
+\end{bookresult}
+
+\subsubsection*{定理 19.6 的证明}
+
+在本证明和定理 19.5 的证明中，记号将省略各量对 $g^*$ 的依赖。考虑以在线 TMLE $\psi_N^*=\Psi(\theta_{N,\epsilon_N^*})$ 估计 $\psi_0$，以及定理 19.5 的结论 $\epsilon_N^*-\epsilon_{0N}=c_{0N}^{-1}M_N/\sqrt N+o_P(N^{-1/2})$。对介于 $\epsilon_N^*$ 与 $\epsilon_{0N}$ 之间的某个 $\tilde\epsilon_{0N}$，有
+\[
+\begin{aligned}
+ \Psi(\theta_{N,\epsilon_N^*})-\Psi(\theta_0)
+ &=\Psi(\theta_{N,\epsilon_N^*})-\Psi(\theta_{N,\epsilon_{0N}})\\
+ &=\frac d{d\tilde\epsilon_{0N}}\Psi(\theta_{N,\tilde\epsilon_{0N}})
+ (\epsilon_N^*-\epsilon_{0N}))\\
+ &=\frac d{d\tilde\epsilon_{0N}}\Psi(\theta_{N,\tilde\epsilon_{0N}})
+ c_{0N}^{-1}\frac{M_N}{\sqrt N}+o_P(1/\sqrt N)\\
+ &=\frac{M_N}{\sqrt N}+o_P(1/\sqrt N),
+\end{aligned}
+\]
+其中用到 $\tilde\epsilon_{0N}-\epsilon_{0N}$ 在 $N\to\infty$ 时收敛到零，因此由假设，当 $N\to\infty$ 时，
+\[
+ \frac d{d\tilde\epsilon_{0N}}\Psi(\theta_{N,\tilde\epsilon_{0N}})c_{0N}^{-1}
+ \to1\quad\text{依概率成立。}
+\]
+
+\subsubsection*{定理 19.5 的证明}
+
+先证明式（19.7）。有
+\[
+\begin{aligned}
+ \epsilon_N^*&=\frac1N\sum_{i=1}^N c_N^{-1}\Psi(\theta_{i-1})\\
+ &\quad+\frac1N\sum_{i=1}^N
+ \{\tilde f_N^{-1}\bar D_{g^*}(\theta_{i-1})(\bar O(i))
+ -\tilde f_N^{-1}P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})\}\\
+ &\quad+\frac1N\sum_{i=1}^N\tilde f_N^{-1}P_{0,o(i)}\bar D_{g^*}(\theta_{i-1}).
+\end{aligned}
+\]
+由恒等式
+\[
+ -P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})
+ =\Psi(\theta_{i-1})-\Psi(\theta_0)+R_{2,i}(\theta_{i-1},\theta_0),
+\]
+最后一项等于
+\[
+\begin{aligned}
+ &\frac1N\sum_{i=1}^N\tilde f_N^{-1}
+ \{\Psi(\theta_0)-\Psi(\theta_{i-1})+R_{2,i}(\theta_{i-1},\theta_0)\}\\
+ &\quad=\frac1N\sum_{i=1}^N\tilde f_N^{-1}
+ \lbrace\Psi(\theta_0)-\Psi(\theta_{i-1})
+ +\frac1N\sum_{i=1}^N R_{2,i}(\theta_{i-1},\theta_0).
+\end{aligned}
+\]
+对于第二项，回顾 $\tilde f_N^{-1}(\psi)=\epsilon_N^0-c_N^{-1}\Psi(\theta_N(\epsilon_N^0))+c_N^{-1}\psi$，它等于一个常数加上线性变换 $c_N^{-1}$。因此，对任意两个数 $a,b$，有 $\tilde f_N^{-1}a-\tilde f_N^{-1}b=c_N^{-1}(a-b)$。于是
+\[
+\begin{aligned}
+ &\frac1N\sum_{i=1}^N
+ \{\tilde f_N^{-1}\bar D_{g^*}(\theta_{i-1})(\bar O(i))
+ -\tilde f_N^{-1}P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})\}\\
+ &\quad=\frac1N\sum_{i=1}^N c_N^{-1}
+ \{\bar D_{g^*,i}(\theta_{i-1})(\bar O(i))
+ -P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})\}.
+\end{aligned}
+\]
+因此得到
+\[
+\begin{aligned}
+ \epsilon_N^*&=\frac1N\sum_{i=1}^N c_N^{-1}\Psi(\theta_{i-1})
+ +c_N^{-1}\frac{M_N}{\sqrt N}\\
+ &\quad+\frac1N\sum_{i=1}^N\tilde f_N^{-1}
+ \{\Psi(\theta_0)-\Psi(\theta_{i-1})\}+c_N^{-1}\bar R_{2,N},
+\end{aligned}
+\]
+其中
+\[
+ \bar R_{2,N}=\frac1N\sum_{i=1}^N R_{2,i}(\theta_{i-1},\theta_0),
+\]
+以及
+\[
+ M_N=\frac1{\sqrt N}\sum_{i=1}^N
+ \{\bar D_{g^*}(\theta_{i-1})(\bar O(i))-P_{0,o(i)}\bar D_{g^*}(\theta_{i-1})\}.
+\]
+现在考察最后一项 $N^{-1}\sum_{i=1}^N\tilde f_N^{-1}\{\Psi(\theta_0)-\Psi(\theta_{i-1})\}$，它等于
+\[
+\begin{aligned}
+ &\frac1N\sum_{i=1}^N
+ \{\epsilon_N^0-c_N^{-1}f_N(\epsilon_N^0)+c_N^{-1}\psi_0-c_N^{-1}\Psi(\theta_{i-1})\}\\
+ &\quad=\{\epsilon_N^0-c_N^{-1}f_N(\epsilon_N^0)+c_N^{-1}\psi_0\}
+ -\frac1N\sum_{i=1}^N c_N^{-1}(\Psi(\theta_{i-1})\\
+ &\quad=\tilde f_N^{-1}(\psi_0)-\frac1N\sum_{i=1}^N c_N^{-1}\Psi(\theta_{i-1}).
+\end{aligned}
+\]
+将此表达式代回上面 $\epsilon_N^*$ 的表达式，注意到
+\[
+ \frac1N\sum_i c_N^{-1}\Psi(\theta_{i-1})
+\]
+相互抵消，从而得到
+\[
+ \epsilon_N^*-\tilde f_N^{-1}(\psi_0)
+ =c_N^{-1}\frac{M_N}{\sqrt N}+c_N^{-1}\bar R_{2,N}.
+\]
+最后利用 $\tilde f_N^{-1}(\psi_0)=f_N^{-1}(\psi_0)+R_{0N}(\epsilon_N^0,\epsilon_{0N})$ 和 $f_N^{-1}(\psi_0)=\epsilon_{0N}$，得到
+\[
+ \epsilon_N^*-\epsilon_{0N}=c_N^{-1}\frac{M_N}{\sqrt N}
+ +c_N^{-1}\bar R_{2,N}+R_{0N}(\epsilon_N^0,\epsilon_{0N}).
+\]
+由假设及引理 19.2，$R_{0N}(\epsilon_0^N,\epsilon_{0N})=o_P(N^{-1/2})$。我们已假设 $\bar R_{2,N}=o_P(1/\sqrt N)$。在这些假设下，
+\[
+ \epsilon_N^*-\epsilon_{0N}=c_N^{-1}\frac{M_N}{\sqrt N}+o_P(1/\sqrt N).
+\]
+根据关于一阶导数 $c_N(\epsilon)$ 的逆在 $\epsilon=0$ 处的连续性和有界性假设，以及 $Z_N=M_N/\sqrt N$ 收敛到 $Z$，有
+\[
+\begin{aligned}
+ (c_N^{-1}-c_{0N}^{-1})(Z_N)
+ &=-\{c_{0N}^{-1}c_N(c_N^{-1}(Z_N))
+ -c_{0N}^{-1}c_{0N}(c_N^{-1}(Z_N))\}\\
+ &=-c_{0N}^{-1}(c_N-c_{0N})(c_N^{-1}(Z_N)\\
+ &\xrightarrow{p}0.
+\end{aligned}
+\]
+定理 19.5 证毕。

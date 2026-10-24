@@ -1,0 +1,45 @@
+% 依照 alpha.png 重绘；保留上下两种架构、指令往返、工具交互及四条内部有向边。
+\resizebox{.94\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+ every node/.style={font=\normalsize,align=center,inner sep=4pt},
+ model/.style={draw=black!20,fill=yellow!10,rounded corners=3mm,line width=.6pt,minimum width=4.5cm,minimum height=1.65cm},
+ module/.style={draw=green!35!black,fill=white,rounded corners=2mm,line width=.6pt,minimum width=2.3cm,minimum height=.9cm},
+ tools/.style={draw=black!15,fill=black!10,rounded corners=3mm,minimum width=3.1cm,minimum height=1.65cm},
+ flow/.style={-{Stealth[length=2.8mm,width=2.0mm]},line width=1.4pt},
+ control/.style={flow,draw=blue!65!cyan},
+ feedback/.style={flow,draw=orange!55}]
+\path[use as bounding box] (0,-.4) rectangle (15,8.5);
+\node[draw,rounded corners=1mm,fill=cyan!10,minimum width=1.8cm,minimum height=.5cm] at (1.0,7.65) {\textbf{Q}};
+\node[draw,rounded corners=1mm,fill=magenta!10,minimum width=1.8cm,minimum height=.5cm] at (1.0,7.0) {\textbf{A}};
+\node[font=\bfseries] at (1.0,6.25) {指令};
+\node[model,font=\bfseries\large] (single) at (6.3,7.4) {单一大语言模型};
+\node[tools] (toptool) at (12.9,7.4) {Rapid \quad Python\\OpenAPI \quad Java};
+\node[font=\bfseries] at (12.9,6.2) {工具};
+\draw[flow] (2.3,7.65) -- (3.8,7.65);
+\draw[flow] (3.8,7.05) -- (2.3,7.05);
+\draw[flow] (9.25,7.55) .. controls (9.5,8.1) and (10.2,8.1) .. (10.45,7.55);
+\draw[flow] (10.45,7.05) .. controls (10.2,6.5) and (9.5,6.5) .. (9.25,7.05);
+\draw[black!50,dashed,line width=.8pt] (0,5.65) -- (15,5.65);
+\fill[green!7,rounded corners=3mm] (3.2,.75) rectangle (9.8,5.2);
+\node[draw,rounded corners=1mm,fill=cyan!10,minimum width=1.8cm,minimum height=.5cm] at (1.0,3.75) {\textbf{Q}};
+\node[draw,rounded corners=1mm,fill=magenta!10,minimum width=1.8cm,minimum height=.5cm] at (1.0,3.1) {\textbf{A}};
+\node[font=\bfseries] at (1.0,2.35) {指令};
+\node[module,font=\bfseries] (planner) at (4.55,3.1) {规划器\\[-1pt]\normalfont\small LLM};
+\node[module,font=\bfseries] (caller) at (7.95,4.25) {调用器\\[-1pt]\normalfont\small LLM};
+\node[module,font=\bfseries] (summarizer) at (7.95,1.75) {总结器\\[-1pt]\normalfont\small LLM};
+\node[tools] at (12.9,3.1) {Rapid \quad Python\\OpenAPI \quad Java};
+\node[font=\bfseries] at (12.9,1.9) {工具};
+\draw[flow] (2.3,3.75) -- (3.05,3.75);
+\draw[flow] (3.05,3.1) -- (2.3,3.1);
+\draw[control] (planner.north) .. controls (4.65,4.25) and (5.8,4.6) .. (caller.west);
+\draw[feedback] (caller.south west) .. controls (6.45,3.3) and (6.0,3.45) .. (planner.north east);
+\draw[control] (planner.south) .. controls (4.8,1.7) and (5.8,1.4) .. (summarizer.west);
+\draw[feedback] (summarizer.north west) .. controls (6.5,2.75) and (6.0,2.75) .. (planner.south east);
+\draw[flow] (10.05,3.35) .. controls (10.2,3.9) and (10.65,3.9) .. (10.8,3.35);
+\draw[flow] (10.8,2.85) .. controls (10.65,2.3) and (10.2,2.3) .. (10.05,2.85);
+\draw[control] (1.2,.05) -- (3.0,.05);
+\node[anchor=west] at (3.1,.05) {引导与控制};
+\draw[feedback] (8.5,.05) -- (10.3,.05);
+\node[anchor=west] at (10.4,.05) {反馈};
+\end{tikzpicture}%
+}

@@ -1,0 +1,95 @@
+% 严格对应原包 transformer_full_architecture.png 的预归一化版本。
+% 保留编码器两子层、解码器三子层、全部残差，以及交叉注意力的 V/K/Q 来源。
+\begin{tikzpicture}[
+    font=\small,
+    box/.style={draw,line width=.8pt,rounded corners=3pt,minimum width=2.55cm,minimum height=.55cm,align=center,fill=white},
+    norm/.style={box,fill=green!15,draw=green!45!black},
+    attn/.style={box,fill=blue!15,draw=blue!55!black,minimum height=.8cm},
+    ff/.style={box,fill=yellow!20,draw=yellow!55!black,minimum height=.8cm},
+    add/.style={circle,draw,line width=.8pt,fill=white,minimum size=.4cm,inner sep=0pt},
+    flow/.style={-{Stealth[length=1.8mm]},line width=.7pt},
+    residual/.style={flow,rounded corners=3pt},
+    grouping/.style={draw,dashed,line width=.7pt,rounded corners=7pt},
+    qkv/.style={font=\scriptsize,fill=white,inner sep=.5pt}
+]
+% 编码器。
+\node[align=center] (source) at (2.8,0) {源序列};
+\node[box] (ee) at (2.8,.85) {嵌入／投影};
+\node[add] (ep) at (2.8,1.9) {$+$};
+\node[align=center] (epos) at (.55,1.9) {位置编码};
+\node[norm] (en1) at (2.8,2.95) {归一化};
+\node[attn] (ea) at (2.8,4.2) {多头自注意力};
+\node[add] (es1) at (2.8,5.2) {$+$};
+\node[norm] (en2) at (2.8,6.15) {归一化};
+\node[ff] (ef) at (2.8,7.2) {前馈网络};
+\node[add] (es2) at (2.8,8.2) {$+$};
+\node[norm] (enout) at (2.8,9.2) {归一化};
+\draw[flow] (source) -- (ee);
+\draw[flow] (ee) -- (ep);
+\draw[flow] (epos) -- (ep);
+\draw[flow] (ep) -- (en1);
+\draw[line width=.7pt] (en1.north) -- (2.8,3.4);
+\foreach \xx/\offset/\lab in {2.15/-.65/V,2.8/0/K,3.45/.65/Q}{
+  \draw[flow,rounded corners=2pt] (2.8,3.4) -| ([xshift=\offset cm]ea.south);
+  \node[qkv] at (\xx,3.6) {\lab};
+}
+\draw[flow] (ea) -- (es1);
+\draw[flow] (es1) -- (en2);
+\draw[flow] (en2) -- (ef);
+\draw[flow] (ef) -- (es2);
+\draw[flow] (es2) -- (enout);
+\draw[residual] (2.8,2.4) -- (4.35,2.4) -- (4.35,5.2) -- (es1.east);
+\draw[residual] (2.8,5.65) -- (4.35,5.65) -- (4.35,8.2) -- (es2.east);
+\draw[grouping] (1.25,2.35) rectangle (4.5,5.65);
+\draw[grouping] (1.25,5.65) rectangle (4.5,8.65);
+\draw[draw=yellow!60!black,line width=.9pt,rounded corners=10pt] (1.12,2.22) rectangle (4.63,8.78);
+\node[align=center] at (.45,5.55) {$N$ 层};
+
+% 解码器。
+\node[align=center] (target) at (7.8,0) {移位后的\\目标序列};
+\node[box] (de) at (7.8,.85) {嵌入／投影};
+\node[add] (dp) at (7.8,1.9) {$+$};
+\node[align=center] (dpos) at (10.2,1.9) {位置编码};
+\node[norm] (dn1) at (7.8,2.95) {归一化};
+\node[attn,fill=red!15,draw=red!55!black] (da) at (7.8,4.2) {掩码多头\\自注意力};
+\node[add] (ds1) at (7.8,5.2) {$+$};
+\node[norm] (dn2) at (7.8,6.15) {归一化};
+\node[attn] (dc) at (7.8,7.5) {多头交叉注意力};
+\node[add] (ds2) at (7.8,8.55) {$+$};
+\node[norm] (dn3) at (7.8,9.5) {归一化};
+\node[ff] (df) at (7.8,10.55) {前馈网络};
+\node[add] (ds3) at (7.8,11.6) {$+$};
+\node[norm] (dnout) at (7.8,12.65) {归一化};
+\node[box] (linear) at (7.8,13.65) {线性层};
+\node (pred) at (7.8,14.55) {预测};
+\draw[flow] (target) -- (de);
+\draw[flow] (de) -- (dp);
+\draw[flow] (dpos) -- (dp);
+\draw[flow] (dp) -- (dn1);
+\draw[line width=.7pt] (dn1.north) -- (7.8,3.35);
+\foreach \xx/\offset/\lab in {7.15/-.65/V,7.8/0/K,8.45/.65/Q}{
+  \draw[flow,rounded corners=2pt] (7.8,3.35) -| ([xshift=\offset cm]da.south);
+  \node[qkv] at (\xx,3.45) {\lab};
+}
+\draw[flow] (da) -- (ds1);
+\draw[flow] (ds1) -- (dn2);
+\draw[flow,rounded corners=3pt] (dn2.north) -- (7.8,6.6) -- (8.45,6.6) -- node[qkv,pos=.7] {$Q$} (8.45,7.1);
+\draw[line width=.7pt,rounded corners=4pt] (enout.north) -- (2.8,9.85) -- (5.2,9.85) -- (5.2,6.8) -- (7.8,6.8);
+\draw[flow] (7.15,6.8) -- node[qkv,pos=.55] {$V$} (7.15,7.1);
+\draw[flow] (7.8,6.8) -- node[qkv,pos=.55] {$K$} (7.8,7.1);
+\draw[flow] (dc) -- (ds2);
+\draw[flow] (ds2) -- (dn3);
+\draw[flow] (dn3) -- (df);
+\draw[flow] (df) -- (ds3);
+\draw[flow] (ds3) -- (dnout);
+\draw[flow] (dnout) -- (linear);
+\draw[flow] (linear) -- (pred);
+\draw[residual] (7.8,2.4) -- (9.35,2.4) -- (9.35,5.2) -- (ds1.east);
+\draw[residual] (7.8,5.65) -- (9.35,5.65) -- (9.35,8.55) -- (ds2.east);
+\draw[residual] (7.8,9.0) -- (9.35,9.0) -- (9.35,11.6) -- (ds3.east);
+\draw[grouping] (6.25,2.35) rectangle (9.5,5.65);
+\draw[grouping] (6.25,5.65) rectangle (9.5,9.0);
+\draw[grouping] (6.25,9.0) rectangle (9.5,12.05);
+\draw[draw=green!45!black,line width=.9pt,rounded corners=10pt] (6.12,2.22) rectangle (9.63,12.18);
+\node[align=center] at (10.3,6.9) {$N$ 层};
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,every node/.style={font=\small},
+ b/.style={draw=inkblue,minimum width=3cm,minimum height=1.15cm,text=red!70!black}]
+\node[b] (c311a) at (0,4) {线性系统};
+\node[b] (c311b) at (0,2) {线性系统};
+\node[b] (c311c) at (0,0) {线性系统};
+\foreach \yy/\bb/\intext/\outtext/\panel in {4/c311a/{\delta(n)}/{h(n)}/a,2/c311b/{\delta(n-k)}/{h(n-k)}/b,0/c311c/{c\delta(n)}/{ch(n)}/c}{
+ \draw[->,green!55!black] (-4.3,\yy)--node[above,text=black]{冲激输入}(\bb.west);
+ \draw[->,green!55!black] (\bb.east)--node[above,text=black]{冲激响应}(4.3,\yy);
+ \node[anchor=east] at (-4.4,\yy) {$\intext$};
+ \node[anchor=west] at (4.4,\yy) {$\outtext$};
+ \node[anchor=west] at (-5.2,\yy-.65) {(\panel)};
+}
+\end{tikzpicture}
+\origfig{11}{冲激响应。}
+\label{fig:ch03-11}
+\end{figure}

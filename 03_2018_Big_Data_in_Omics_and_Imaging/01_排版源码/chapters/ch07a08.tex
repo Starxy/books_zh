@@ -1,0 +1,152 @@
+% 原书PDF第38页7.1.4.5.5至第42页7.1.5标题前。
+\bookdeepheading{paragraph}{7.1.4.5.5}{稀疏迹方法}
+迹方法用于发现两组变量之间的因果关系。效应变量的集合通常称为响应，原因变量的集合通常称为预测变量。高维响应与预测变量都具有自然的分组结构。例如，研究两条通路之间的因果调控关系时，一个基因的表达构成一组。有些基因可能参与因果关系，有些则不参与。因果分析应当识别在高维响应与预测变量之间产生因果关系的重要响应及重要预测变量，剔除不重要的响应与预测变量。本节将迹方法与多元稀疏组套索（Li et al. 2015）相结合，建立用于稀疏因果推断的稀疏迹方法。
+
+考虑线性模型
+\begin{equation}
+Y=AX+W,
+\tag{7.159}
+\end{equation}
+其中
+\[
+\begin{gathered}
+Y=\begin{bmatrix}y_{11}&\cdots&y_{1L}\\\vdots&\vdots&\vdots\\y_{m1}&\cdots&y_{mL}\end{bmatrix},\quad
+A=\begin{bmatrix}a_{11}&\cdots&a_{1n}\\\vdots&\vdots&\vdots\\a_{m1}&\cdots&a_{mn}\end{bmatrix},\\
+X=\begin{bmatrix}x_{11}&\cdots&x_{1L}\\\vdots&\vdots&\vdots\\x_{n1}&\cdots&x_{nL}\end{bmatrix},\quad
+W=\begin{bmatrix}w_{11}&\cdots&w_{1L}\\\vdots&\vdots&\vdots\\w_{m1}&\cdots&w_{mL}\end{bmatrix}.
+\end{gathered}
+\]
+考虑用于惩罚的矩阵 $A$ 的两种分组结构（图7.2）。组 $a_{i.}=[a_{i1},\ldots,a_{in}]$ 用于剔除响应 $y_i$，组 $a_{.j}=[a_{1j},\ldots,a_{mj}]$ 用于剔除预测变量 $x_j$。定义
+\[
+\lVert a_{i.}\rVert_2=\sqrt{a_{i.}^Ta_{i.}},\qquad
+\lVert a_{.j}\rVert_2=\sqrt{a_{.j}^Ta_{.j}}.
+\]
+\input{figures/ch07a_fig02}
+多元线性模型 (7.159) 的多元稀疏组套索，定义为求解以下非光滑优化问题：
+\begin{equation}
+\begin{aligned}
+\min_{a_{i.},a_{.j}}F={}&\Tr\bigl((Y-AX)^T(Y-AX)\bigr)\\
+&+\lambda\sum_{j=1}^nm\lVert a_{.j}\rVert_2
++\lambda\sum_{i=1}^mn\lVert a_{i.}\rVert_2.
+\end{aligned}
+\tag{7.160}
+\end{equation}
+可以用 $a_g$ 表示 $a_{i.}$ 与 $a_{.j}$，并令 $G=n+m$。优化问题 (7.159) 可改写为
+\begin{equation}
+\min_{a_g}F=\Tr\bigl((Y-AX)^T(Y-AX)\bigr)+\lambda\sum_{g=1}^G\lVert a_g\rVert_2.
+\tag{7.161}
+\end{equation}
+传统组套索问题只考虑对预测变量或响应之一施加惩罚。然而，这里的组套索问题需要同时考虑对预测变量和响应施加惩罚。采用坐标下降法求解该问题，算法汇总于结论7.22（附录7.I）。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.22：稀疏迹方法的算法}\par
+\noindent\textbf{步骤1：初始化。}选择惩罚参数 $\lambda$。令 $A^{(0)}$ 为矩阵 $A$ 的初始估计，$A^{(-j)}$ 为将 $A$ 的第 $j$ 列向量各元素替换为零所得到的矩阵。令
+\[
+\begin{gathered}
+X=\begin{bmatrix}X_1\\\vdots\\X_i\\\vdots\\X_n\end{bmatrix}
+=\begin{bmatrix}x_{11}&\cdots&x_{1j}&\cdots&x_{1L}\\\vdots&\vdots&\vdots&\vdots&\vdots\\x_{i1}&\cdots&x_{ij}&\cdots&x_{iL}\\\vdots&\vdots&\vdots&\vdots&\vdots\\x_{n1}&\cdots&x_{nj}&\cdots&x_{nL}\end{bmatrix},\\
+X_j=\begin{bmatrix}x_{1j}\\\vdots\\x_{ij}\\\vdots\\x_{nj}\end{bmatrix},\qquad
+X_i=\lfloor x_{i1}\quad\cdots\quad x_{ij}\quad\cdots\quad x_{iL}\rfloor.
+\end{gathered}
+\]
+定义 $S_j=(Y-A^{(-j)}X)X_{j.}^T$，则
+\begin{equation}
+a_j^{(0)}=\left(1-\frac{m\lambda}{\lVert S_j\rVert_2}\right)_+
+\frac{S_j}{\lVert x_j\rVert_2^2},\qquad j=1,\ldots,n,
+\tag{7.162}
+\end{equation}
+\[
+A^{(0)}=\begin{bmatrix}a_{.1}^{(0)}&\cdots&a_{.j}^{(0)}&\cdots&a_{.n}^{(0)}\end{bmatrix}.
+\]
+\noindent\textbf{步骤2：重复。}
+\[
+t\leftarrow t+1.
+\]
+对 $i=1,\ldots,m$，$j=1,\ldots,n$，计算
+\begin{equation}
+S_{kj}^{(t)}=\left(Y_k-\bigl(a_k^{-(kj)}\bigr)^{(t)}X\right)X_j^T.
+\tag{7.163}
+\end{equation}
+若 $|S_{kj}^{(t)}|\le\lambda(m+n)$，则置 $a_{kj}^{(t+1)}=0$；否则更新
+\begin{equation}
+a_{kj}^{(t+1)}=\frac{S_{kj}^{(t)}}{\lVert X_{.j}\rVert_2^2+
+\lambda\left(\dfrac n{\lVert a_{.k}^{(t)}\rVert_2}+\dfrac m{\lVert a_{.j}^{(t)}\rVert_2}\right)},
+\tag{7.164}
+\end{equation}
+其中 $S_{kj}^{(t)}$、$a_{k.}^{(t)}$ 与 $a_{.j}^{(t)}$ 利用矩阵 $A^{(t)}$ 计算。
+
+\noindent\textbf{步骤3：检查收敛性。}若
+\[
+\lVert A^{(t+1)}-A^{(t)}\rVert_F\le\varepsilon,
+\]
+其中 $\lVert A\rVert_F=\sqrt{\Tr(A^TA)}$ 是矩阵的Frobenius范数，$\varepsilon$ 是预先设定的误差，则转至步骤4；否则令
+\[
+A^{(t)}\leftarrow A^{(t+1)},
+\]
+转至步骤2。
+
+\noindent\textbf{步骤4：初始化。}选择惩罚参数 $\lambda$。令 $\widetilde A^{(0)}$ 为矩阵 $\widetilde A$ 的初始估计，$\widetilde A^{(-j)}$ 为将 $\widetilde A$ 的第 $j$ 列向量各元素替换为零所得到的矩阵。令
+\[
+\begin{gathered}
+Y=\begin{bmatrix}Y_{1.}\\\vdots\\Y_{i.}\\\vdots\\Y_{m.}\end{bmatrix}
+=\begin{bmatrix}y_{11}&\cdots&y_{1j}&\cdots&y_{1L}\\\vdots&\vdots&\vdots&\vdots&\vdots\\y_{i1}&\cdots&y_{ij}&\cdots&y_{iL}\\\vdots&\vdots&\vdots&\vdots&\vdots\\y_{m1}&\cdots&y_{mj}&\cdots&y_{mL}\end{bmatrix},\\
+Y_{.j}=\begin{bmatrix}y_{1j}\\\vdots\\y_{ij}\\\vdots\\y_{mj}\end{bmatrix},\qquad
+Y_i=\lfloor y_{i1}\quad\cdots\quad y_{ij}\quad\cdots\quad y_{iL}\rfloor.
+\end{gathered}
+\]
+定义 $\widetilde S_j=(X-\widetilde A^{(-j)}Y)Y_{j.}^T$，则
+\begin{equation}
+\widetilde a_j^{(0)}=\left(1-\frac{n\lambda}{\lVert\widetilde S_j\rVert_2}\right)_+
+\frac{\widetilde S_j}{\lVert Y_j\rVert_2^2},\qquad j=1,\ldots,m,
+\tag{7.165}
+\end{equation}
+\[
+\widetilde A^{(0)}=\begin{bmatrix}\widetilde a_{.1}^{(0)}&\cdots&\widetilde a_j^{(0)}&\cdots&\widetilde a_m^{(0)}\end{bmatrix}.
+\]
+\noindent\textbf{步骤5：重复。}
+\[
+t\leftarrow t+1.
+\]
+对 $i=1,\ldots,n$，$j=1,\ldots,m$，计算
+\begin{equation}
+\widetilde S_{kj}^{(t)}=\left(X_{k.}-\bigl(\widetilde a_{k.}^{-(kj)}\bigr)^{(t)}Y\right)Y_{j.}^T.
+\tag{7.166}
+\end{equation}
+若 $|S_{kj}^{(t)}|\le\lambda(m+n)$，则置 $\widetilde a_{kj}^{(t+1)}=0$；否则更新
+\begin{equation}
+\widetilde a_{kj}^{(t+1)}=\frac{\widetilde S_{kj}^{(t)}}{\lVert X_{j.}\rVert_2^2+
+\lambda\left(\dfrac m{\lVert\widetilde a_{k.}^{(t)}\rVert_2}+\dfrac n{\lVert\widetilde a_{.j}^{(t)}\rVert_2}\right)},
+\tag{7.167}
+\end{equation}
+其中 $\widetilde S_{kj}^{(t)}$、$\widetilde a_{k.}^{(t)}$ 与 $\widetilde a_{.j}^{(t)}$ 利用矩阵 $\widetilde A^{(t)}$ 计算。
+
+\noindent\textbf{步骤6：检查收敛性。}若 $\lVert\widetilde A^{(t+1)}-A^{(t)}\rVert_F\le\varepsilon$，则转至步骤7；否则令
+\[
+A^{(t)}\leftarrow A^{(t+1)},
+\]
+转至步骤5。
+
+\noindent\textbf{步骤7：}估计 $\Sigma_X$、$\Sigma_Y$、$\Sigma_{XY}$ 和 $\Sigma_{YX}$。
+
+\noindent\textbf{步骤8：}计算
+\[
+\Delta_{X\to Y}=\log\frac{\tau_m(A\Sigma_XA^T)}{\tau_n(\Sigma_X)\tau_m(AA^T)}
+\]
+和
+\[
+\Delta_{Y\to X}=\log\frac{\tau_n(\widetilde A\Sigma_Y\widetilde A^T)}{\tau_m(\Sigma_Y)\tau_n(\widetilde A\widetilde A^T)}.
+\]
+\noindent\textbf{步骤9：}若 $|\Delta_{Y\to X}|>(1+\varepsilon)|\Delta_{X\to Y}|$，则
+\[
+X\to Y.
+\]
+否则：
+\begin{quote}
+若 $|\Delta_{X\to Y}|>(1+\varepsilon)|\Delta_{Y\to X}|$，则
+\[
+Y\to X.
+\]
+否则：没有因果关系，然后检验关联。
+
+结束条件判断。
+\end{quote}
+结束条件判断。

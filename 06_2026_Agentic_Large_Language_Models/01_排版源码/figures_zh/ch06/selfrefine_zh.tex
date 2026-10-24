@@ -1,0 +1,21 @@
+% 依照 figures/selfref.png 重绘，保留输入、模型、反馈、改进与 0/1/2 循环编号。
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+ every node/.style={font=\normalsize,align=center,inner sep=4pt},
+ box/.style={draw=black,line width=1pt,minimum height=.85cm},
+ flow/.style={-{Stealth[length=3mm,width=2.4mm]},line width=1.6pt},
+ stage/.style={draw=black,circle,fill=white,font=\small,inner sep=2pt}]
+\draw[line width=.9pt] (0,0) rectangle (14.4,6.0);
+\node[box,fill=blue!8,minimum width=2.4cm] (input) at (7.2,5.15) {输入};
+\node[box,fill=violet!20,minimum width=3.0cm,minimum height=2.2cm] (model) at (7.2,2.9) {模型 $\mathcal{M}$};
+\node[box,fill=red!25,minimum width=3.8cm] (feedback) at (2.3,2.9) {反馈};
+\node[box,fill=orange!20,minimum width=3.8cm] (refine) at (12.1,2.9) {改进};
+\draw[flow] (input.south) -- node[stage,left=2pt] {$0$} (model.north);
+\draw[flow] (model.north west) to[out=155,in=90] (feedback.north);
+\draw[flow] (feedback.south) to[out=-90,in=210] node[stage,pos=.45] {$1$} (model.south west);
+\draw[flow] (model.north east) to[out=25,in=90] (refine.north);
+\draw[flow] (refine.south) to[out=-90,in=-30] node[stage,pos=.45] {$2$} (model.south east);
+\node[fill=black!7,rounded corners=1mm,text width=6.4cm,font=\small,minimum height=.55cm] at (3.6,.45) {用 $\mathcal{M}$ 对自身输出给出反馈};
+\node[fill=black!7,rounded corners=1mm,text width=6.4cm,font=\small,minimum height=.55cm] at (10.8,.45) {根据反馈，用 $\mathcal{M}$ 改进先前输出};
+\end{tikzpicture}%
+}

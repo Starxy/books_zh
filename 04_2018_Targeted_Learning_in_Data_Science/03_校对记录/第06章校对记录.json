@@ -1,0 +1,1004 @@
+{
+  "chapter": 6,
+  "status": "complete",
+  "title_en": "Highly Adaptive Lasso (HAL)",
+  "title_zh": "高度自适应 Lasso（HAL）",
+  "authors": [
+    "Mark J. van der Laan",
+    "David Benkeser"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_原始资料/分章_EN/07_CH06_Highly_Adaptive_Lasso_HAL.pdf",
+    "split_pdf_pages": 18,
+    "chapter_split_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "chapter_printed_pages": "77–94",
+    "english_words_approx": 6329,
+    "source_rendered_and_visually_checked_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "annotations_removed_in_memory_before_rendering": true,
+    "formula_zoom_pages": [
+      2,
+      7,
+      8,
+      16,
+      17
+    ]
+  },
+  "pages": 17,
+  "han_characters_pdf_including_running_heads": 7524,
+  "han_characters_tex_without_comment_lines": 7070,
+  "han_characters_figure_tex_without_comment_lines": 322,
+  "han_characters_full_body_and_figure_labels": 7392,
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch06.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch06a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch06b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch06c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch06d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/chapters/ch06e.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig1.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig1_source.pdf",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig2.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig2_source.pdf",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig3.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig3_source.pdf",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig4.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig4_source.pdf",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig5.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig5_source.pdf",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig6.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_排版源码/figures/ch06_fig6_source.pdf"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第06章_中文译稿.pdf",
+  "sha256": "81cac94e5dcc6ba95c28ddc1909e6f8684f2b3e3de77431676d115d6cb209eaa",
+  "chapter_parts": [
+    {
+      "file": "chapters/ch06a.tex",
+      "coverage": "章首全部导言、作者机构邮箱与 DOI、第 6.1—6.2 节。"
+    },
+    {
+      "file": "chapters/ch06b.tex",
+      "coverage": "第 6.3—6.4 节，含完整定理证明和引理。"
+    },
+    {
+      "file": "chapters/ch06c.tex",
+      "coverage": "第 6.5 节、第 6.6 节导言、第 6.6.1 节及图 6.1—6.2。"
+    },
+    {
+      "file": "chapters/ch06d.tex",
+      "coverage": "第 6.6.2—6.6.3 节、图 6.3—6.4、表 6.1。"
+    },
+    {
+      "file": "chapters/ch06e.tex",
+      "coverage": "第 6.6.4—6.6.5 节，九个缺失机制、图 6.5—6.6 及结论。"
+    }
+  ],
+  "sections": [
+    {
+      "number": "6.1",
+      "title": "估计问题的统计表述",
+      "source_split_pages": [
+        3
+      ],
+      "chinese_pages": [
+        2,
+        3
+      ],
+      "coverage": "数据与函数值目标参数、参数空间、càdlàg 与有限变差条件、测度及积分、一致有界损失与二次差异度假设、交叉验证预言不等式、完整无标题强调框。",
+      "complete": true
+    },
+    {
+      "number": "6.2",
+      "title": "càdlàg 函数的基函数线性组合表示",
+      "source_split_pages": [
+        4,
+        5
+      ],
+      "chinese_pages": [
+        3,
+        4
+      ],
+      "coverage": "子向量和补集、S 截面及其测度、矩形增量、变差范数及二元例、一般与二元积分表示、指示函数表示、离散测度近似、支撑点、系数、经验风险最小化与选择支撑集的动机。",
+      "complete": true
+    },
+    {
+      "number": "6.3",
+      "title": "在变差范数小于 λ 的全部函数上最小化的最小损失估计量（MLE）",
+      "source_split_pages": [
+        6,
+        7
+      ],
+      "chinese_pages": [
+        4,
+        5,
+        6
+      ],
+      "coverage": "约束经验风险与真实风险最小化解、定理 6.1 两项假设与结论、完整证明、Donsker 类与经验过程论证、最大不等式及熵积分、引理 6.1 全部条件与两个界。",
+      "complete": true
+    },
+    {
+      "number": "6.4",
+      "title": "HAL 估计量",
+      "source_split_pages": [
+        7,
+        8
+      ],
+      "chinese_pages": [
+        6,
+        7
+      ],
+      "coverage": "K_n 候选 λ、V 折交叉验证、预言不等式与收敛率、纳入超级学习器、W=f(O) 的实现设定、有限支撑表示、ψβ、子空间与 β_n 最优化、m=(2^d−1)n 及 L1 约束。",
+      "complete": true
+    },
+    {
+      "number": "6.5",
+      "title": "关于进一步降维的考虑",
+      "source_split_pages": [
+        8,
+        9
+      ],
+      "chinese_pages": [
+        7,
+        8
+      ],
+      "coverage": "内存与有限样本近似误差、嵌套候选估计量、一元至多元基函数排序、K_j 逐步扩充、交叉验证风险停止策略、其假设与 O(n) 基函数期望。",
+      "complete": true
+    },
+    {
+      "number": "6.6",
+      "title": "应用",
+      "source_split_pages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "chinese_pages": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "coverage": "完整导言和 6.6.1—6.6.5，含全部数据生成机制、9 个回归函数、9 个缺失机制、6 幅图、表 6.1 及全部模拟结果与结论。",
+      "complete": true
+    }
+  ],
+  "subsections": [
+    {
+      "number": "6.6.1",
+      "title": "高度自适应 Lasso 的构造",
+      "source_split_pages": [
+        10,
+        11,
+        12
+      ],
+      "chinese_pages": [
+        8,
+        9,
+        10
+      ],
+      "coverage": "一元 n=500 例、100 个上界与十折验证、图 6.1 的全部说明、二元离散协变量例、全部基函数与冗余说明、图 6.2 与短刻线解释。",
+      "complete": true
+    },
+    {
+      "number": "6.6.2",
+      "title": "预测模拟",
+      "source_split_pages": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "chinese_pages": [
+        10,
+        11,
+        12,
+        13
+      ],
+      "coverage": "六类比较算法与引文、维数与样本量、R² 和最优 R²、W 的五个分布、光滑/跳跃/正弦型各三个回归函数、图 6.3 的 16 面板及全部逐行结果讨论。",
+      "complete": true
+    },
+    {
+      "number": "6.6.3",
+      "title": "预测数据分析",
+      "source_split_pages": [
+        15,
+        16
+      ],
+      "chinese_pages": [
+        13,
+        14
+      ],
+      "coverage": "五个公开数据集及表格、GLM/逐步 GLM/GAM、超级学习器、相对交叉验证 MSE、几何均值和 cpu 数据结果、图 6.4。",
+      "complete": true
+    },
+    {
+      "number": "6.6.4",
+      "title": "缺失数据模拟",
+      "source_split_pages": [
+        15,
+        16,
+        17,
+        18
+      ],
+      "chinese_pages": [
+        14,
+        15,
+        16,
+        17
+      ],
+      "coverage": "临界速率动机、A 与 g0、全部九个缺失机制、9×3 情形各 500 次重复、TMLE 目标参数与干扰参数算法、真实渐近方差及 Wald 覆盖率、全部覆盖率和偏差结果、图 6.5—6.6。",
+      "complete": true
+    },
+    {
+      "number": "6.6.5",
+      "title": "结论",
+      "source_split_pages": [
+        18
+      ],
+      "chinese_pages": [
+        17
+      ],
+      "coverage": "预测和 TMLE 中间参数估计表现、稳健超级学习器算法库、实际应用收益、Benkeser and van der Laan（2016）引文。",
+      "complete": true
+    }
+  ],
+  "en_to_zh_page_map": [
+    {
+      "source_split_page": 1,
+      "source_printed_page": 77,
+      "chinese_pages": [
+        1
+      ]
+    },
+    {
+      "source_split_page": 2,
+      "source_printed_page": 78,
+      "chinese_pages": [
+        1,
+        2
+      ]
+    },
+    {
+      "source_split_page": 3,
+      "source_printed_page": 79,
+      "chinese_pages": [
+        2,
+        3
+      ]
+    },
+    {
+      "source_split_page": 4,
+      "source_printed_page": 80,
+      "chinese_pages": [
+        3
+      ]
+    },
+    {
+      "source_split_page": 5,
+      "source_printed_page": 81,
+      "chinese_pages": [
+        4
+      ]
+    },
+    {
+      "source_split_page": 6,
+      "source_printed_page": 82,
+      "chinese_pages": [
+        4,
+        5
+      ]
+    },
+    {
+      "source_split_page": 7,
+      "source_printed_page": 83,
+      "chinese_pages": [
+        5,
+        6
+      ]
+    },
+    {
+      "source_split_page": 8,
+      "source_printed_page": 84,
+      "chinese_pages": [
+        6,
+        7
+      ]
+    },
+    {
+      "source_split_page": 9,
+      "source_printed_page": 85,
+      "chinese_pages": [
+        7,
+        8
+      ]
+    },
+    {
+      "source_split_page": 10,
+      "source_printed_page": 86,
+      "chinese_pages": [
+        8,
+        9
+      ]
+    },
+    {
+      "source_split_page": 11,
+      "source_printed_page": 87,
+      "chinese_pages": [
+        9,
+        10
+      ]
+    },
+    {
+      "source_split_page": 12,
+      "source_printed_page": 88,
+      "chinese_pages": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "source_split_page": 13,
+      "source_printed_page": 89,
+      "chinese_pages": [
+        11
+      ]
+    },
+    {
+      "source_split_page": 14,
+      "source_printed_page": 90,
+      "chinese_pages": [
+        12
+      ]
+    },
+    {
+      "source_split_page": 15,
+      "source_printed_page": 91,
+      "chinese_pages": [
+        13,
+        14
+      ]
+    },
+    {
+      "source_split_page": 16,
+      "source_printed_page": 92,
+      "chinese_pages": [
+        14,
+        15
+      ]
+    },
+    {
+      "source_split_page": 17,
+      "source_printed_page": 93,
+      "chinese_pages": [
+        15,
+        16
+      ]
+    },
+    {
+      "source_split_page": 18,
+      "source_printed_page": 94,
+      "chinese_pages": [
+        15,
+        16,
+        17
+      ]
+    }
+  ],
+  "figures": [
+    {
+      "number": "6.1",
+      "source_split_page": 10,
+      "source_printed_page": 86,
+      "chinese_page": 9,
+      "caption": "一元情形下的高度自适应 Lasso",
+      "files": [
+        "figures/ch06_fig1_source.pdf",
+        "figures/ch06_fig1.tex"
+      ],
+      "method": "原始 PDF 图形数据层原样裁出；原符号标签完整保留",
+      "source_data_preserved": true,
+      "output_visually_checked": true
+    },
+    {
+      "number": "6.2",
+      "source_split_page": 11,
+      "source_printed_page": 87,
+      "chinese_page": 10,
+      "caption": "二元情形下的高度自适应 Lasso",
+      "files": [
+        "figures/ch06_fig2_source.pdf",
+        "figures/ch06_fig2.tex"
+      ],
+      "method": "原始 PDF 图形数据层原样裁出；原符号标签完整保留",
+      "source_data_preserved": true,
+      "output_visually_checked": true
+    },
+    {
+      "number": "6.3",
+      "source_split_page": 14,
+      "source_printed_page": 90,
+      "chinese_page": 12,
+      "caption": "模拟研究结果",
+      "files": [
+        "figures/ch06_fig3_source.pdf",
+        "figures/ch06_fig3.tex"
+      ],
+      "method": "保留原始 PDF 矢量数据层，仅用 TikZ 覆排中文文字标签",
+      "source_data_preserved": true,
+      "output_visually_checked": true,
+      "panels": 16,
+      "layout": "4×4 面板；维数 d=1、3、5 与全部，情景光滑、跳跃、正弦与全部；原三种样本量符号与排序均保留。",
+      "vector_data_paths_checked_against_label_masks": 755,
+      "label_masks_intersecting_filled_data_paths": 0
+    },
+    {
+      "number": "6.4",
+      "source_split_page": 16,
+      "source_printed_page": 92,
+      "chinese_page": 14,
+      "caption": "五个真实数据集的相对交叉验证均方误差",
+      "files": [
+        "figures/ch06_fig4_source.pdf",
+        "figures/ch06_fig4.tex"
+      ],
+      "method": "保留原始 PDF 矢量数据层，仅用 TikZ 覆排中文文字标签",
+      "source_data_preserved": true,
+      "output_visually_checked": true
+    },
+    {
+      "number": "6.5",
+      "source_split_page": 17,
+      "source_printed_page": 93,
+      "chinese_page": 16,
+      "caption": "不同干扰参数估计量下 TMLE 的 Wald 型区间覆盖率",
+      "files": [
+        "figures/ch06_fig5_source.pdf",
+        "figures/ch06_fig5.tex"
+      ],
+      "method": "保留原始 PDF 矢量数据层，仅用 TikZ 覆排中文文字标签",
+      "source_data_preserved": true,
+      "output_visually_checked": true
+    },
+    {
+      "number": "6.6",
+      "source_split_page": 18,
+      "source_printed_page": 94,
+      "chinese_page": 17,
+      "caption": "HAL 与核回归 TMLE 的标准化抽样分布",
+      "files": [
+        "figures/ch06_fig6_source.pdf",
+        "figures/ch06_fig6.tex"
+      ],
+      "method": "原书嵌入的 575×381 栅格直方图原样保留，只覆排“核回归”行标签；不估计或重建数据。",
+      "source_data_preserved": true,
+      "output_visually_checked": true,
+      "panels": 4,
+      "source_resolution_limitation": "源图本身是低分辨率位图，成品保留其真实细节，没有生成不存在的柱高或曲线。"
+    }
+  ],
+  "tables": [
+    {
+      "number": "6.1",
+      "source_split_page": 15,
+      "source_printed_page": 91,
+      "chinese_page": 13,
+      "rows": [
+        [
+          "cpu",
+          "Kibler et al., 1989",
+          209,
+          6
+        ],
+        [
+          "laheart",
+          "Afifi and Azen, 1979",
+          201,
+          11
+        ],
+        [
+          "oecdpanel",
+          "Liu and Stengos, 1999",
+          616,
+          6
+        ],
+        [
+          "pima",
+          "Smith et al., 1988",
+          392,
+          7
+        ],
+        [
+          "fev",
+          "Rosner, 1999",
+          654,
+          4
+        ]
+      ],
+      "all_ten_numeric_cells_checked_against_render": true,
+      "rows_added": 0
+    }
+  ],
+  "formulas": {
+    "numbered_formula_count": 0,
+    "equation_tags": [],
+    "translation_display_blocks": 34,
+    "groups": [
+      {
+        "section": "导言",
+        "source_split_pages": [
+          1,
+          2
+        ],
+        "chinese_pages": [
+          1
+        ],
+        "display_blocks": 2,
+        "inventory": "sqrt(d0) 的一般速率；回归函数 L² 误差速率（原行内式改为独立展示）。"
+      },
+      {
+        "section": "6.1",
+        "source_split_pages": [
+          3
+        ],
+        "chinese_pages": [
+          2
+        ],
+        "display_blocks": 1,
+        "inventory": "二次差异度与损失差 L² 范数比值的有界性假设。"
+      },
+      {
+        "section": "6.2",
+        "source_split_pages": [
+          4,
+          5
+        ],
+        "chinese_pages": [
+          3,
+          4
+        ],
+        "display_blocks": 8,
+        "inventory": "二元矩形增量；一般、二元及离散测度的变差范数；一般、二元、指示函数及离散基函数表示。"
+      },
+      {
+        "section": "6.3",
+        "source_split_pages": [
+          6,
+          7
+        ],
+        "chinese_pages": [
+          5,
+          6
+        ],
+        "display_blocks": 9,
+        "inventory": "定理两项假设、经验风险差链式不等式、M2 条件、经验过程速率、最大不等式、熵积分、引理熵条件及两个上界。"
+      },
+      {
+        "section": "6.4",
+        "source_split_pages": [
+          7,
+          8
+        ],
+        "chinese_pages": [
+          6,
+          7
+        ],
+        "display_blocks": 6,
+        "inventory": "交叉验证 λ_n、HAL 风险速率、有限支撑 ψ_m、ψβ、有限子空间及 β_n 约束最小化。"
+      },
+      {
+        "section": "6.6.2",
+        "source_split_pages": [
+          12,
+          13
+        ],
+        "chinese_pages": [
+          10,
+          11
+        ],
+        "display_blocks": 5,
+        "inventory": "R²、最优 R²、光滑/跳跃/正弦型三组共 9 个回归函数。"
+      },
+      {
+        "section": "6.6.4",
+        "source_split_pages": [
+          16,
+          17
+        ],
+        "chinese_pages": [
+          14,
+          15
+        ],
+        "display_blocks": 3,
+        "inventory": "光滑/跳跃/正弦型三组共 9 个缺失机制函数。"
+      }
+    ],
+    "all_9_regression_functions_and_9_missingness_functions_checked": true,
+    "note": "无问题公式按组列出；每个源页均已渲染核对。原行内式有独立展示，相邻假设或函数组有同块排版，未改数学内容。"
+  },
+  "results": [
+    {
+      "type": "定理",
+      "number": "6.1",
+      "source_split_page": 6,
+      "chinese_page": 5,
+      "proof_complete": true
+    },
+    {
+      "type": "引理",
+      "number": "6.1",
+      "source_split_page": 7,
+      "chinese_page": 6,
+      "source_has_no_separate_proof": true
+    }
+  ],
+  "emphasis_boxes": {
+    "original_untitled_boxes": 2,
+    "environment": "sourcebox",
+    "extra_boxes_added": 0
+  },
+  "new_terms_for_glossary_review": [
+    {
+      "en": "function-valued parameter",
+      "zh": "函数值参数"
+    },
+    {
+      "en": "variation norm",
+      "zh": "变差范数"
+    },
+    {
+      "en": "minimax rate of convergence",
+      "zh": "极小极大收敛速率"
+    },
+    {
+      "en": "local smoother",
+      "zh": "局部平滑器"
+    },
+    {
+      "en": "histogram regression estimator",
+      "zh": "直方图回归估计量"
+    },
+    {
+      "en": "curse of dimensionality",
+      "zh": "维数灾难"
+    },
+    {
+      "en": "section",
+      "zh": "截面"
+    },
+    {
+      "en": "indicator basis function",
+      "zh": "指示基函数"
+    },
+    {
+      "en": "pointmass",
+      "zh": "点质量"
+    },
+    {
+      "en": "minimum loss-based estimator",
+      "zh": "最小损失估计量"
+    },
+    {
+      "en": "envelope",
+      "zh": "包络函数"
+    },
+    {
+      "en": "envelope bound",
+      "zh": "包络界"
+    },
+    {
+      "en": "entropy integral",
+      "zh": "熵积分"
+    },
+    {
+      "en": "regression tree",
+      "zh": "回归树"
+    },
+    {
+      "en": "random forest",
+      "zh": "随机森林"
+    },
+    {
+      "en": "gradient boosted machine",
+      "zh": "梯度提升机"
+    },
+    {
+      "en": "kernel regression",
+      "zh": "核回归"
+    },
+    {
+      "en": "support vector machine",
+      "zh": "支持向量机"
+    },
+    {
+      "en": "polynomial multivariate adaptive regression splines",
+      "zh": "多项式多元自适应回归样条"
+    },
+    {
+      "en": "generalized linear model",
+      "zh": "广义线性模型"
+    },
+    {
+      "en": "generalized additive model",
+      "zh": "广义可加模型"
+    },
+    {
+      "en": "geometric mean",
+      "zh": "几何均值"
+    },
+    {
+      "en": "Wald-style confidence interval",
+      "zh": "Wald 型置信区间"
+    }
+  ],
+  "terminology_checks": {
+    "highly_adaptive_lasso": "高度自适应 Lasso",
+    "loss_based_dissimilarity": "基于损失的差异度",
+    "minimum_loss_based_estimator_MLE": "最小损失估计量；本章 MLE 不译为极大似然估计量",
+    "targeted_minimum_loss_based_estimator": "靶向最小损失估计量",
+    "bias": "偏差",
+    "remaining_偏倚_occurrences": 0,
+    "variation_norm": "源文使用 variation norm，译作变差范数；不与术语表 sectional variation norm＝截面变差范数混淆。"
+  },
+  "completeness_evidence": {
+    "chapter_count": 1,
+    "section_count_matches_outline": [
+      6,
+      6
+    ],
+    "subsection_count_matches_outline": [
+      5,
+      5
+    ],
+    "result_numbers": [
+      [
+        "定理",
+        "6.1"
+      ],
+      [
+        "引理",
+        "6.1"
+      ]
+    ],
+    "figure_sequence": "6.1–6.6",
+    "table_sequence": "6.1",
+    "full_theorem_proof_and_lemma_preserved": true,
+    "all_source_paragraphs_reviewed": true,
+    "author_affiliations_emails_and_doi_preserved": true,
+    "citation_year_and_author_checks": {
+      "source_citation_occurrences": 16,
+      "translation_citation_occurrences": 16,
+      "year_multisets_identical": true,
+      "year_counts": {
+        "1964": 2,
+        "1979": 1,
+        "1984": 1,
+        "1988": 1,
+        "1989": 1,
+        "1991": 1,
+        "1996": 2,
+        "1998": 1,
+        "1999": 2,
+        "2001": 2,
+        "2011": 1,
+        "2016": 1
+      },
+      "noncitation_values_excluded": [
+        "版权年份 2018",
+        "样本量 2000"
+      ],
+      "all_names_manually_checked": true
+    }
+  },
+  "unresolved_items": [],
+  "source_wording_notes": [
+    "6.1 末尾原文写下一章，6.6.1 中原文写上一章，均保留原指代，不替作者改写章号。",
+    "作者机构原英文 Boinformatics 为拼写错误，中文按其机构含义译为生物信息学。"
+  ],
+  "numbering_oddities": [
+    "metadata 中 equation_tags 的 0.5 是图 6.4 轴刻度，并非公式号；本章无编号公式。",
+    "定理 6.1 与引理 6.1 各自编号，使用 bookresult 显式标明，未共享自动计数。"
+  ],
+  "deliberate_content_deviations": [],
+  "layout_adjustments": [
+    "原行内的长公式另行展示，长式使用 aligned 断行。",
+    "图 6.3 保留原书横向整页布局；其余图保持源数据与中文图题。",
+    "本章在局部 TeX 分组中使用 raggedbottom，避免图和长公式之间垂直胶过度拉伸；章末清出当前页后结束分组，恢复外层设置。",
+    "根级合排复核：图6.3使用真正的PDF横向页（Rotate=90），页数仍17，16面板及全部数据标签保持不变。"
+  ],
+  "build_checks": {
+    "engine": "xelatex",
+    "helper": "work/targeted_learning/compile_chapter.py",
+    "passes": [
+      0,
+      0
+    ],
+    "build_directory": "work/targeted_learning/ch06_work/build_154503",
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "chapter_part_or_counter_commands": [],
+    "control_characters": [],
+    "all_17_pages_rendered": true,
+    "visual_qa_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "final_visual_qa_after_last_build": [
+      12
+    ],
+    "figure3_landscape_view_checked": true,
+    "figure3_data_path_mask_intersections": 0,
+    "shipped_file_reopened": true,
+    "shipped_page_count": 17,
+    "last_bookmark": [
+      3,
+      "6.6.5 结论",
+      17
+    ],
+    "shipped_sha256_matches_build_record": true,
+    "self_test_driver_removed": true,
+    "removed_self_test_files": [
+      "work/targeted_learning/ch06_work/test_ch06.tex"
+    ],
+    "figure3_pdf_page_rotation": 90,
+    "root_final_adjustment": "根级将 sidewaysfigure 改为 pdflscape 横向页，图形宽度改用当前 linewidth；PDF 阅读器会自动横向显示。第12页已重新渲染并检查。"
+  },
+  "qa_artifacts": {
+    "source_images": "work/targeted_learning/render/ch06",
+    "output_images": "work/targeted_learning/ch06_work/qa_ch06_all_NNN.png",
+    "landscape_figure3": "work/targeted_learning/ch06_work/qa_ch06_fig3_auto_landscape.png",
+    "structure_audit": "work/targeted_learning/ch06_work/qa_ch06_structure.json",
+    "figure3_mask_audit": "work/targeted_learning/ch06_work/figure3_mask_audit.json",
+    "extracted_chinese_pdf_text": "work/targeted_learning/ch06_work/ch06_built_text.txt"
+  },
+  "shared_files_edited": [],
+  "source_anomalies": [
+    {
+      "id": "norm-origin-and-rectangle",
+      "source_split_pages": [
+        4,
+        5
+      ],
+      "reason": "变差范数定义的原点项印为 ψ(0) 或 ψ(0,0)，没有绝对值；二元矩形增量中后两项印为 −ψ(a2,b1)+ψ(a1,a2)。",
+      "action": "逐符号照录原印刷式；不擅自补绝对值或交换变量。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "intro-rate-notation",
+      "source_split_pages": [
+        2
+      ],
+      "reason": "章首 L² 误差式写作 (ψ_n(w)−ψ0)^2(w)；直方图段把 MSE 速率写作 O(n^(−1/(d+2)))，与同段 h 的速率相同。",
+      "action": "保留原式与 MSE 原称谓，未将其改为均方根误差或替换指数。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "entropy-L2-notation",
+      "source_split_pages": [
+        7
+      ],
+      "reason": "最大不等式同一行中，J 的第三个参数分别出现 L^2 与 L_2。",
+      "action": "350 dpi 裁图核对后保留原上、下标。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "finite-space-constraint",
+      "source_split_pages": [
+        8
+      ],
+      "reason": "子空间写作 {ψβ:β,β(0)+ΣΣ|β_j|<λ}，β_j 未标 S；下一式 β_n 的约束写 ΣΣ|β_j(S)|≤λ，未含 β(0)。",
+      "action": "按原书保留两种约束及各自下标，不推断或补写截距约束。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "figure61-lambda",
+      "source_split_pages": [
+        10
+      ],
+      "reason": "图 6.1 图例 λ_n=13.4，而正文写交叉验证选出的 λ_n=13.9。",
+      "action": "图内保留 13.4，正文保留 13.9，源码注释记载，未强行统一。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "bivariate-basis-notation",
+      "source_split_pages": [
+        11,
+        12
+      ],
+      "reason": "二元基函数首式写 φ_12,i，却在条件和文字中用 j；后文出现 bar φ_1,j；递增关系末项印为 bar Q_1(w1,1)，而前项为 bar Q_0(w1,0)。",
+      "action": "全部按印刷记号保留。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "W-extra-delimiter",
+      "source_split_pages": [
+        12
+      ],
+      "reason": "W 的定义右端印为 (W_j:j=1,…,d})，多一个右花括号。",
+      "action": "保留源书右花括号，并在源码注释指出。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "missingness-delimiters",
+      "source_split_pages": [
+        16,
+        17
+      ],
+      "reason": "光滑型 g0^5 以 expit{( 开始、)) 结束；跳跃型 g0^1 以 expit{ 开始、)) 结束；正弦型 g0^3、g0^5 在左花括号后各多印一个未闭合左圆括号。",
+      "action": "350 dpi 裁图核对全部定界符、系数和阈值后，严格照录；未因重新断行而补删括号。",
+      "blocks_delivery": false
+    }
+  ],
+  "integration_note": "源书数学、图文疑点保留在 source_anomalies；不存在阻断译稿交付的未决项。",
+  "root_visual_check_before_merge": [
+    "qa_ch06_fig3_landscape.png",
+    "qa_ch06_all_009.png",
+    "qa_ch06_all_017.png"
+  ]
+}

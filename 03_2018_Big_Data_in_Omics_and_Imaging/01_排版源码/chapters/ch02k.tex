@@ -1,0 +1,296 @@
+% 分章页86—90附录2.A末；印刷页158—162。
+平滑样条回归函数为
+\begin{equation}
+\widehat f(\boldsymbol x)=\sum_{j=1}^r\widehat a_j\phi_j(\boldsymbol x)
+ +\sum_{i=1}^n\widehat b_i\xi_i(\boldsymbol x),\tag{2.A.105}
+\end{equation}
+其中 $\xi_i(\boldsymbol x)=L_{i(z)}R_1(x,z)$。最后，得到拟合值
+\begin{equation}
+\widehat f=H(\lambda)Y,\tag{2.A.106}
+\end{equation}
+其中 $H(\lambda)=I-n\lambda Q_2(Q_2^TMQ_2)^{-1}Q_2^T$。
+
+\begin{bookexample}{2.A.5：$W_2^m[a,b]\otimes W_2^m[a,b]$ 上的平滑样条}
+考虑区间 $[0,1]$ 上的两个连续变量 $x_1$ 与 $x_2$。假设这两个变量的模型空间为张量积 $W_2^m[a,b]\otimes W_2^m[a,b]$。设 $m_1=m_2=2$，即考虑三次样条。
+
+定义四个平均算子：
+\[
+A_1^{(k)}f=\int_0^1f\,dx_k,
+\qquad
+A_2^{(k)}f=\int_0^1\frac{\partial f(\boldsymbol x)}{\partial x_k}
+ \,dx_k(x_k-0.5),\qquad k=1,2.
+\]
+因此，有
+\begingroup
+\allowdisplaybreaks[2]
+\begin{align}
+A_1^{(1)}A_1^{(2)}f
+ &=A_1^{(1)}\left(\int_0^1f(x_1,x_2)\,dx_2\right)\notag\\
+ &=\int_0^1\int_0^1f(x_1,x_2)\,dx_1dx_2=\mu,\notag\\
+A_2^{(1)}A_1^{(2)}f
+ &=A_2^{(1)}\left(\int_0^1f(x_1,x_2)\,dx_2\right)\notag\\
+ &=\int_0^1\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_1}
+    \,dx_1dx_2(x_1-0.5)\notag\\
+ &=\beta_1(x_1-0.5),\notag\\
+A_1^{(1)}A_2^{(2)}f
+ &=A_1^{(1)}\left(\int_0^1
+   \frac{\partial f(\boldsymbol x)}{\partial x_2}
+   \,dx_2(x_2-0.5)\right)\notag\\
+ &=\int_0^1\int_0^1\frac{\partial f(\boldsymbol x)}{\partial x_2}
+   \,dx_1dx_2(x_2-0.5)\notag\\
+ &=\beta_2(x_2-0.5),\notag\\
+A_2^{(1)}A_2^{(2)}f
+ &=A_2^{(1)}\left(\int_0^1
+   \frac{\partial f(\boldsymbol x)}{\partial x_2}
+   \,dx_2(x_2-0.5)\right)\notag\\
+ &=\int_0^1\int_0^1
+   \frac{\partial^2 f(\boldsymbol x)}{\partial x_1\,\partial x_2}
+   \,dx_1dx_2(x_1-0.5)(x_2-0.5)\notag\\
+ &=\gamma_{12}(x_1-0.5)(x_2-0.5),\tag{2.A.107}
+\end{align}
+\endgroup
+其中
+\[
+\begin{aligned}
+\mu&=\int_0^1\int_0^1f(x_1,x_2)\,dx_1dx_2,\\
+\beta_1&=\int_0^1\int_0^1
+       \frac{\partial f(x_1,x_2)}{\partial x_1}\,dx_1dx_2,\\
+\beta_2&=\int_0^1\int_0^1
+       \frac{\partial f(\boldsymbol x)}{\partial x_2}\,dx_1dx_2,\\
+\gamma_{12}&=\int_0^1\int_0^1
+       \frac{\partial^2f(\boldsymbol x)}{\partial x_1\,\partial x_2}
+       \,dx_1dx_2.
+\end{aligned}
+\]
+定义 $A_3^{(k)}=I-A_1^{(k)}-A_2^{(k)}$，$k=1,2$，则有
+\[
+A_3^{(k)}f=f(\boldsymbol x)-\int_0^1f\,dx_k
+ -\int_0^1\frac{\partial f(\boldsymbol x)}{\partial x_k}
+     \,dx_k(x_k-0.5),
+\]
+\[
+\begin{aligned}
+A_1^{(1)}A_3^{(2)}f
+ &=\int_0^1f(x_1,x_2)\,dx_1
+   -\int_0^1\int_0^1f(x_1,x_2)\,dx_1dx_2\\
+ &\quad-\int_0^1\int_0^1
+    \frac{\partial f(x_1,x_2)}{\partial x_2}\,dx_1dx_2(x_2-0.5)\\
+ &=g_2(x_2)-\mu-\beta_2(x_2-0.5),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+A_2^{(1)}A_3^{(2)}f
+ &=\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_1}\,dx_1(x_1-0.5)\\
+ &\quad-\int_0^1\int_0^1
+    \frac{\partial f(x_1,x_2)}{\partial x_1}\,dx_1dx_2(x_1-0.5)\\
+ &\quad-\int_0^1\int_0^1
+    \frac{\partial^2f(x_1,x_2)}{\partial x_1\,\partial x_2}
+    \,dx_1dx_2(x_1-0.5)(x_2-0.5)\\
+ &=\alpha_1(x_1-0.5)-\beta_1(x_1-0.5)
+   -\gamma_{12}(x_1-0.5)(x_2-0.5),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+A_3^{(1)}A_1^{(2)}f
+ &=\int_0^1f(x_1,x_2)\,dx_2
+  -\int_0^1\int_0^1f(x_1,x_2)\,dx_1dx_2\\
+ &\quad-\int_0^1\int_0^1
+    \frac{\partial f(x_1,x_2)}{\partial x_1}\,dx_1dx_2(x_1-0.5)\\
+ &=g_1(x_1)-\mu-\beta_1(x_1-0.5),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+A_3^{(1)}A_2^{(2)}f
+ &=\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_2}\,dx_2(x_2-0.5)\\
+ &\quad-\int_0^1\int_0^1
+    \frac{\partial f(x_1,x_2)}{\partial x_2}\,dx_1dx_2(x_2-0.5)\\
+ &\quad-\int_0^1\int_0^1
+    \frac{\partial^2f(x_1,x_2)}{\partial x_1\,\partial x_2}
+    \,dx_1dx_2(x_1-0.5)(x_2-0.5)\\
+ &=\alpha_2(x_2-0.5)-\beta_2(x_2-0.5)
+   -\gamma_{12}(x_1-0.5)(x_2-0.5),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+A_3^{(1)}A_3^{(2)}f
+ &=f(x_1,x_2)+\int_0^1\int_0^1f(x_1,x_2)\,dx_1dx_2\\
+ &\quad-\int_0^1f(x_1,x_2)\,dx_1-\int_0^1f(x_1,x_2)\,dx_2\\
+ &\quad+\left[\int_0^1\int_0^1
+    \frac{\partial f(x_1,x_2)}{\partial x_1}\,dx_1dx_2
+    -\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_1}\right](x_1-0.5)\\
+ &\quad+\left[\int_0^1\int_0^1
+    \frac{\partial f(x_1,x_2)}{\partial x_2}\,dx_1dx_2\right.\\
+ &\quad-\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_2}
+    \,dx_2(x_2-0.5)\\
+ &\quad+\int_0^1\int_0^1
+    \frac{\partial^2f(x_1,x_2)}{\partial x_1\,\partial x_2}
+    \,dx_1dx_2(x_1-0.5)(x_2-0.5)\\
+ &=f(x_1,x_2)+\mu-g_1(x_1)-g_2(x_2)
+   +(\beta_1-\alpha_1)(x_1-0.5)\\
+ &\quad+(\beta_2-\alpha_2)(x_2-0.5)
+   +\gamma_{12}(x_1-0.5)(x_2-0.5),
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+g_1(x_1)&=\int_0^1f(x_1,x_2)\,dx_2,&
+g_2(x_2)&=\int_0^1f(x_1,x_2)\,dx_1,\\
+\alpha_1&=\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_1}\,dx_1,&
+\alpha_2&=\int_0^1\frac{\partial f(x_1,x_2)}{\partial x_2}\,dx_2.
+\end{aligned}
+\]
+利用式（2.A.80），函数 $f(x_1,x_2)$ 在张量积空间 $W_2^m[a,b]\otimes W_2^m[a,b]$ 上的分解为
+\[
+\begin{aligned}
+f&=\left\{A_1^{(1)}+A_2^{(1)}+A_3^{(1)}\right\}
+   \left\{A_1^{(2)}+A_2^{(2)}+A_3^{(2)}\right\}f\\
+ &=A_1^{(1)}A_1^{(2)}f+A_1^{(1)}A_2^{(2)}f+A_1^{(1)}A_3^{(2)}f\\
+ &\quad+A_2^{(1)}A_1^{(2)}f+A_2^{(1)}A_2^{(2)}f+A_2^{(1)}A_3^{(2)}f\\
+ &\quad+A_3^{(1)}A_1^{(2)}f+A_3^{(1)}A_2^{(2)}f+A_3^{(1)}A_3^{(2)}f\\
+ &=\mu+\beta_2(x_2-0.5)+f_2^s(x_2)+\beta_1(x_1-0.5)\\
+ &\quad+\gamma_{12}(x_1-0.5)(x_2-0.5)
+   +f_{12}^{ls}(x_1,x_2)+f_1^s(x_1)\\
+ &\quad+f_{12}^{sl}(x_1,x_2)+f_{12}^{ss}(x_1,x_2),
+\end{aligned}
+\]
+其中
+\[
+f_1^s(x_1)=A_3^{(1)}A_1^{(2)}f
+ =g_1(x_1)-\mu-\beta_1(x_1-0.5),
+\]
+\[
+f_2^s(x_2)=A_1^{(1)}A_3^{(2)}f
+ =g_2(x_2)-\mu-\beta_2(x_2-0.5),
+\]
+\[
+\begin{aligned}
+f_{12}^{ls}(x_1,x_2)&=A_2^{(1)}A_3^{(2)}f\\
+ &=\alpha_1(x_1-0.5)-\beta_1(x_1-0.5)
+   -\gamma_{12}(x_1-0.5)(x_2-0.5),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+f_{12}^{sl}(x_1,x_2)&=A_3^{(1)}A_2^{(2)}f\\
+ &=\alpha_2(x_2-0.5)-\beta_2(x_2-0.5)
+   -\gamma_{12}(x_1-0.5)(x_2-0.5),
+\end{aligned}
+\]
+\[
+\begin{aligned}
+f_{12}^{ss}(x_1,x_2)&=A_3^{(1)}A_3^{(2)}f\\
+ &=f(x_1,x_2)+\mu-g_1(x_1)-g_2(x_2)
+   +(\beta_1-\alpha_1)(x_1-0.5)\\
+ &\quad+(\beta_2-\alpha_2)(x_2-0.5)
+   +\gamma_{12}(x_1-0.5)(x_2-0.5).
+\end{aligned}
+\]
+$f_1^s(x_1)$ 与 $f_2^s(x_2)$ 分别度量 $x_1$ 与 $x_2$ 的主效应；$f_{12}^{ls}(x_1,x_2)$、$f_{12}^{sl}(x_1,x_2)$ 和 $f_{12}^{ss}(x_1,x_2)$ 分别为 $x_1$ 与 $x_2$ 的线性—平滑、平滑—线性和平滑—平滑交互作用函数。式（2.A.27）说明，函数可以分解为线性函数和平滑的非线性交互作用。
+
+接着研究模型空间 $W_2^m[0,1]\otimes W_2^m[0,1]$ 的张量积分解。假设 Sobolev 空间 $W_2^m[0,1]$ 分解为由两个基函数构成的有限维基函数子空间 $H_0^{(k)}=\{1\}$、$H_1^{(k)}=\{x_k-0.5\}$，以及无限维函数空间
+\[
+H_2^{(k)}=\left\{f\in W_2^m[0,1]:
+ \int_0^1f(x_1,x_2)\,dx_k=0,\
+ \int_0^1\frac{\partial f(\boldsymbol x)}{\partial x_k}\,dx_k=0\right\},
+\quad k=1,2.
+\]
+张量积空间 $W_2^m[0,1]\otimes W_2^m[0,1]$ 可分解为
+\begin{equation}
+\begin{aligned}
+&W_2^m[0,1]\otimes W_2^m[0,1]\\
+&=\left\{H_0^{(1)}\oplus H_1^{(1)}\oplus H_2^{(1)}\right\}
+ \left\{H_0^{(2)}\oplus H_1^{(2)}\oplus H_2^{(2)}\right\}\\
+&=\left\{H_0^{(1)}\otimes H_0^{(2)}\right\}
+ \oplus\left\{H_0^{(1)}\otimes H_1^{(2)}\right\}
+ \oplus\left\{H_0^{(1)}\otimes H_2^{(2)}\right\}\\
+&\quad\oplus\left\{H_1^{(1)}\otimes H_0^{(2)}\right\}
+ \oplus\left\{H_1^{(1)}\otimes H_1^{(2)}\right\}
+ \oplus\left\{H_1^{(1)}\otimes H_2^{(2)}\right\}\\
+&\quad\oplus\left\{H_2^{(1)}\otimes H_0^{(2)}\right\}
+ \oplus\left\{H_2^{(1)}\otimes H_1^{(2)}\right\}
+ \oplus\left\{H_2^{(1)}\otimes H_2^{(2)}\right\}.
+\end{aligned}\tag{2.A.108}
+\end{equation}
+式（2.A.28）可以重新分组为
+\begin{equation}
+\begin{aligned}
+W_2^m[0,1]\otimes W_2^m[0,1]
+ &=H^{(0)}\oplus H^{(1)}\oplus H^{(2)}\\
+ &\quad\oplus H^{(3)}\oplus H^{(4)}\oplus H^{(5)},
+\end{aligned}\tag{2.A.109}
+\end{equation}
+其中
+\[
+\begin{aligned}
+H^{(0)}
+ &=\left\{H_0^{(1)}\otimes H_0^{(2)}\right\}
+ \oplus\left\{H_1^{(1)}\otimes H_0^{(2)}\right\}\\
+ &\quad\oplus\left\{H_0^{(1)}\otimes H_1^{(2)}\right\}
+ \oplus\left\{H_1^{(1)}\otimes H_1^{(2)}\right\}\\
+ &=\{\phi_1(\boldsymbol x)=1\}
+ \oplus\{\phi_2(\boldsymbol x)=x_1-0.5\}\\
+ &\quad\oplus\{\phi_3(\boldsymbol x)=x_2-0.5\}
+ \oplus\{\phi_4(\boldsymbol x)=(x_1-0.5)(x_2-0.5)\},
+\end{aligned}
+\]
+\[
+\begin{aligned}
+H^1&=H_2^{(1)}\otimes H_0^{(2)},&
+H^2&=H_2^{(1)}\otimes H_1^{(2)},\\
+H^3&=H_0^{(1)}\otimes H_2^2,&
+H^4&=H_1^{(1)}\otimes H_2^{(2)},\\
+H^5&=H_2^{(1)}\otimes H_2^{(2)}.
+\end{aligned}
+\]
+$H^1,H^2,H^3,H^4,H^5$ 的再生核 $R^1,R^2,R^3,R^4,R^5$ 分别计算如下：
+\begin{equation}
+\begin{aligned}
+R^1&=k_2(x_1)k_2(z_1)-k_4(|x_1-z_1|),\\
+R^2&=\bigl(k_2(x_1)k_2(z_1)-k_4(|x_1-z_1|)\bigr)k_1(x_2)k_1(z_2),\\
+R^3&=k_2(x_2)k_2(z_2)-k_4(|x_2-z_2|),\\
+R^4&=k_1(x_1)k_1(z_1)\bigl(k_2(x_2)k_2(z_2)-k_4(|x_2-z_2|)\bigr),\\
+R^5&=\bigl(k_2(x_1)k_2(z_1)-k_4(|x_1-z_1|)\bigr)\\
+ &\quad{}\times\bigl(k_2(x_2)k_2(z_2)-k_4(|x_2-z_2|)\bigr).
+\end{aligned}\tag{2.A.110}
+\end{equation}
+假设连续泛函为求值泛函，则矩阵 $T$ 为
+\begin{equation}
+T=\begin{bmatrix}
+1&x_1^{(1)}-0.5&x_2^{(1)}-0.5&(x_1^{(1)}-0.5)(x_2^{(1)}-0.5)\\
+1&x_1^{(2)}-0.5&x_2^{(2)}-0.5&(x_1^{(2)}-0.5)(x_2^{(2)}-0.5)\\
+\vdots&\vdots&\vdots&\vdots\\
+1&x_1^{(n)}-0.5&x_2^{(n)}-0.5&(x_1^{(n)}-0.5)(x_2^{(n)}-0.5)
+\end{bmatrix},\tag{2.A.111}
+\end{equation}
+其中 $\boldsymbol x_1=[x_1^{(1)},\ldots,x_1^{(n)}]^T$ 和 $\boldsymbol x_2=[x_2^{(1)},\ldots,x_2^{(n)}]^T$ 是两个观测自变量向量。
+
+接着计算矩阵 $\Sigma_j$：
+\[
+\Sigma_1=\begin{bmatrix}
+R^1(\boldsymbol x^{(1)},\boldsymbol x^{(1)})&\cdots&
+ R^1(\boldsymbol x^{(1)},\boldsymbol x^{(n)})\\
+\vdots&\vdots&\vdots\\
+R^1(\boldsymbol x^{(n)},\boldsymbol x^{(1)})&\cdots&
+ R^1(\boldsymbol x^{(n)},\boldsymbol x^{(n)})
+\end{bmatrix}
+\]
+\[
+=\begin{bmatrix}
+[k_2(x_1^{(1)})]^2-k_4(0)&\cdots&
+ k_2(x_1^{(1)})k_2(x_1^{(n)})-k_4(|x_1^{(1)}-x_1^{(n)}|)\\
+\vdots&\vdots&\vdots\\
+k_2(x_1^{(n)})k_2(x_1^{(1)})-k_4(|x_1^{(n)}-x_1^{(1)}|)&\cdots&
+ [k_2(x_1^{(n)})]^2k_4(0)
+\end{bmatrix}.
+\]
+类似地，利用式（2.A.12）可以计算矩阵 $\Sigma_2,\Sigma_3,\Sigma_4,\Sigma_5$。最后，计算
+\[
+\Sigma_\theta=\theta_1\Sigma_1+\theta_2\Sigma_2+\theta_3\Sigma_3
+ +\theta_4\Sigma_4+\theta_5\Sigma_5.
+\]
+\end{bookexample}

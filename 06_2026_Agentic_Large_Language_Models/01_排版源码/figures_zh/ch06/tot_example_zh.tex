@@ -1,0 +1,65 @@
+% 依照 figures/tot-ex.png 重绘。原例的所有数字、运算符、剩余数字和评价均逐项保留。
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+ every node/.style={font=\footnotesize,align=left,inner sep=2pt},
+ tree/.style={font=\fontsize{8.5pt}{10pt}\selectfont,align=center,inner sep=1pt},
+ leftnums/.style={font=\scriptsize,align=center,inner sep=1pt},
+ edge/.style={-{Stealth[length=1.6mm,width=1.2mm]},draw=black!60,line width=.6pt},
+ card/.style={draw=black!60,rounded corners=1mm,line width=.7pt},
+ header/.style={draw=black!60,rounded corners=.8mm,line width=.7pt,font=\bfseries\small,minimum height=.55cm},
+ body/.style={anchor=north west,text width=3.6cm},
+ call/.style={draw=black!60,rounded corners=1.5mm,font=\bfseries\Large,minimum width=1.0cm,minimum height=1.1cm},
+ link/.style={-{Stealth[length=2.5mm,width=2mm]},draw=black!60,line width=1.0pt}]
+\node[tree,font=\bfseries\small] at (2.3,7.65) {输入：4 9 10 13};
+\draw[dashed,draw=black!60,line width=.9pt] (.2,6.6) rectangle (4.4,7.25);
+\foreach \xx in {.65,2.3,3.95}{\draw[edge] (2.3,7.2) -- (\xx,6.6);}
+\node[tree] at (.55,6.2) {$\cdots$};
+\node[tree,text=green!55!black] (a) at (2.3,6.2) {$10-4=6$};
+\node[leftnums,text=green!55!black] at (2.3,5.85) {余：6 9 13};
+\node[tree,text=red!85!black] at (3.95,6.2) {$4+9=13$};
+\node[leftnums,text=red!85!black] at (3.95,5.85) {余：10 13 13};
+\draw[dashed,draw=orange!85!black,line width=1pt] (3.13,5.45) rectangle (4.77,6.57);
+\foreach \xx in {.65,2.3,3.95}{\draw[edge] (2.3,5.35) -- (\xx,4.98);}
+\node[tree,text=red!85!black] at (.65,4.65) {$13-6=7$};
+\node[leftnums,text=red!85!black] at (.65,4.3) {余：7 9};
+\node[tree,text=green!55!black] at (2.3,4.65) {$13-9=4$};
+\node[leftnums,text=green!55!black] at (2.3,4.3) {余：4 6};
+\node[tree] at (3.95,4.65) {$\cdots$};
+\foreach \xx in {.65,2.3,3.95}{\draw[edge] (2.3,3.85) -- (\xx,3.43);}
+\node[tree,text=red!85!black] at (.65,3.1) {$4+6=10$};
+\node[leftnums,text=red!85!black] at (.65,2.75) {余：10};
+\node[tree,text=green!55!black] at (2.3,3.1) {$4*6=24$};
+\node[leftnums,text=green!55!black] at (2.3,2.75) {余：24};
+\node[tree] at (3.95,3.1) {$\cdots$};
+
+\draw[card] (5.1,4.9) rectangle (9.0,7.5);
+\node[header,fill=black!7,minimum width=3.9cm] at (7.05,7.2) {(a) 提议提示};
+\node[body] at (5.23,6.68) {{\color{black!45}\emph{（一个示例）}}\par
+输入：\colorbox{black!8}{4 9 10 13}\par
+可能的下一步：};
+\node[call] (lm1) at (10.2,6.0) {LM};
+\draw[link] (9.0,6.0) -- (lm1.west);
+\draw[link] (lm1.east) -- (11.5,6.0);
+\draw[card] (11.5,4.9) rectangle (17.0,7.5);
+\node[header,fill=black!7,minimum width=5.5cm] at (14.25,7.2) {思维生成};
+\node[body,text width=5.2cm] at (11.63,6.68) {$4+9=13$（剩余：10 13 13）\par
+$10-4=6$（剩余：6 9 13）\par
+{\color{black!45}\emph{（\ldots 更多行\ldots）}}};
+
+\draw[card] (5.1,.6) rectangle (9.0,4.25);
+\node[header,fill=orange!15,text=orange!65!black,minimum width=3.9cm] at (7.05,3.95) {(b) 价值提示};
+\node[body] at (5.23,3.43) {评估给定数字能否得到 24（确定／可能／不可能）\par
+10 14：$10+14=24$。确定\par
+{\color{black!45}\emph{（更多示例）}}\par
+\colorbox{red!12}{10 13 13}};
+\node[call] (lm2) at (10.2,2.35) {LM};
+\draw[link] (9.0,2.35) -- (lm2.west);
+\draw[link] (lm2.east) -- (11.5,2.35);
+\draw[card] (11.5,.6) rectangle (17.0,4.25);
+\node[header,fill=orange!15,text=orange!65!black,minimum width=5.5cm] at (14.25,3.95) {思维评估};
+\node[body,text width=5.2cm] at (11.63,3.43) {$(13-10)*13=3*13=39$\par
+$10+13+13=36$。用这些大数无法得到 24。\colorbox{red!12}{不可能}};
+\draw[-{Stealth[length=3mm,width=3mm]},draw=black!60,line width=2.2pt] (4.5,6.93) -- (5.0,6.93);
+\draw[-{Stealth[length=3mm,width=3mm]},draw=orange!80!black,line width=2.0pt] (4.6,5.35) -- (5.0,4.3);
+\end{tikzpicture}%
+}

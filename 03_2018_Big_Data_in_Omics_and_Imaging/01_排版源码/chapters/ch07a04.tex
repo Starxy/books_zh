@@ -1,0 +1,278 @@
+% 原书PDF第19页7.1.4.3至第25页7.1.4.4标题前。
+\subsubsection{推广}
+现在将均匀分布推广到任意参考分布（Janzing et al. 2012）。先用任意参考分布定义 $U_f(Y)$ 与 $V_g(X)$。
+
+\begin{bookdefinition}{7.6}
+\textbf{输出分布。}令 $U(X)$ 与 $V(Y)$ 分别表示 $X$、$Y$ 的参考密度。定义
+\begin{equation}
+U_{\mathrm{out}}(y)=\int P(y\mid x)U(x)\,dx
+\tag{7.55}
+\end{equation}
+为参考输入 $U(X)$ 下系统的输出分布，并定义
+\begin{equation}
+V_{\mathrm{out}}(x)=\int P(x\mid y)V(y)\,dy
+\tag{7.56}
+\end{equation}
+为参考输入 $V(Y)$ 下系统的输出分布。
+\end{bookdefinition}
+当 $Y=f(x)$ 时，$U_{\mathrm{out}}(y)$ 与 $V_{\mathrm{out}}(x)$ 简化为
+\begin{equation}
+U_{\mathrm{out}}(y)=u_f(y),\qquad V_{\mathrm{out}}(x)=V_g(x).
+\tag{7.57}
+\end{equation}
+下面定义这些分布之间的K–L距离或结构函数。
+
+\begin{bookdefinition}{7.7}
+\textbf{结构函数。}
+\begin{equation}
+D_{CY}(x)=D(P_{Y\mid x}\Vert V(y))
+=\int P(y\mid x)\log\frac{P(y\mid x)}{V(y)}\,dy,
+\tag{7.58}
+\end{equation}
+\begin{equation}
+D_{CU_o}(x)=D(P_{Y\mid x}\Vert U_{\mathrm{out}}(y))
+=\int P(y\mid x)\log\frac{P(y\mid x)}{U_{\mathrm{out}}(y)}\,dy,
+\tag{7.59}
+\end{equation}
+\begin{equation}
+D_{\mathrm{diff}}(x)=D_{CY}(x)-D_{CU_o}(x)
+=\int P(y\mid x)\log\frac{U_{\mathrm{out}}(y)}{V(y)}\,dy.
+\tag{7.60}
+\end{equation}
+\end{bookdefinition}
+
+为便于表述，将式 (7.45) 的勾股定理写成一般形式（Janzing et al. 2012）：
+\begin{equation}
+D(P\Vert Q)=D(P\Vert R)+D(R\Vert Q).
+\tag{7.61}
+\end{equation}
+勾股定理蕴含下列正交条件。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.7：正交条件}\par
+式 (7.61) 的勾股定理等价于
+\begin{equation}
+\int\log\frac{R(x)}{Q(x)}P(x)\,dx
+=\int\log\frac{R(x)}{Q(x)}R(x)\,dx.
+\tag{7.62}
+\end{equation}
+\begin{bookproof}
+\begin{equation}
+\begin{aligned}
+\int\log\frac{R(x)}{Q(x)}P(x)\,dx
+&=\int\log\frac{P(x)}{Q(x)}\frac{R(x)}{P(x)}P(x)\,dx\\
+&=\int\log\frac{P(x)}{Q(x)}P(x)\,dx
++\int\log\frac{R(x)}{P(x)}P(x)\,dx\\
+&=D(P\Vert Q)-D(P\Vert R).
+\end{aligned}
+\tag{7.63}
+\end{equation}
+结合式 (7.62) 与式 (7.63)，得到
+\[
+D(P\Vert Q)-D(P\Vert R)=D(R\Vert Q),
+\]
+从而
+\postdisplaypenalty=10000
+\[
+D(P\Vert Q)=D(P\Vert R)+D(R\Vert Q).
+\]
+\nopagebreak[4]
+\end{bookproof}
+
+正交性与统计学中的协方差有关。这里以 $U(X)$ 为参考分布，分别计算 $D_{CY}(X)$、$D_{CU_o}$ 和 $D_{\mathrm{diff}}$ 与比值 $P(X)/U(X)$ 的协方差，定义如下：
+\begin{equation}
+\begin{aligned}
+&\Cov_{U_X}\left(D_{CY},\frac{P(X)}{U(X)}\right)\\
+&\quad=\int D_{CY}(x)\frac{P(x)}{U(x)}U(x)\,dx
+-\int D_{CY}(x)U(x)\,dx\int\frac{P(x)}{U(x)}U(x)\,dx\\
+&\quad=\int D_{CY}(x)P(x)\,dx
+-\int D_{CY}(x)U(x)\,dx\int P(x)\,dx\\
+&\quad=\int D_{CY}(x)P(x)\,dx-\int D_{CY}(x)U(x)\,dx,
+\end{aligned}
+\tag{7.64}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+&\Cov\left(D_{CU_o},\frac{P(X)}{U(X)}\right)\\
+&\quad=\int D_{CU_o}(x)\frac{P(x)}{U(x)}U(x)\,dx
+-\int D_{CU_o}(x)U(x)\,dx\int\frac{P(x)}{U(x)}U(x)\,dx\\
+&\quad=\int D_{CU_o}(x)P(x)\,dx-\int D_{CU_o}(x)U(x)\,dx,
+\end{aligned}
+\tag{7.65}
+\end{equation}
+以及
+\begin{equation}
+\begin{aligned}
+&\Cov\left(D_{\mathrm{diff}},\frac{P(X)}{U(X)}\right)\\
+&\quad=\int D_{\mathrm{diff}}(x)\frac{P(x)}{U(x)}U(x)\,dx
+-\int D_{\mathrm{diff}}(x)U(x)\,dx\int\frac{P(x)}{U(x)}U(x)\,dx\\
+&\quad=\int D_{\mathrm{diff}}(x)P(x)\,dx-\int D_{\mathrm{diff}}(x)U(x)\,dx.
+\end{aligned}
+\tag{7.66}
+\end{equation}
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.8：正交条件}\par
+附录7.B证明，条件 (7.64)、(7.65) 与 (7.66) 分别等价于
+\begin{equation}
+\begin{aligned}
+D(P_{Y,X}\Vert U_XV_Y)
+&=D(P_{Y,X}\Vert U_XP_{Y\mid X})\\
+&\hspace{1em}+D(U_XP_{Y\mid X}\Vert U_XV_Y),
+\end{aligned}
+\tag{7.67}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+D(P_{Y,X}\Vert U_XU_{\mathrm{out}}(Y))
+&=D(P_{Y,X}\Vert U_XP_{Y\mid X})\\
+&\hspace{1em}+D(U_XP_{Y\mid X}\Vert U_XU_{\mathrm{out}}(y)),
+\end{aligned}
+\tag{7.68}
+\end{equation}
+\begin{equation}
+D(P_Y\Vert V_Y)=D(P_Y\Vert U_{\mathrm{out}}(Y))+D(U_{\mathrm{out}}(Y)\Vert V_Y).
+\tag{7.69}
+\end{equation}
+
+下面直观考察因果关系 $X\to Y$ 与正交性之间的联系。前面指出，若 $X\to Y$，则条件分布 $P_{Y\mid X}$ 独立于原因 $X$ 的分布 $P_X$。若 $\Cov_{U_X}(D_{CY},P(X)/U(X))=0$，由式 (7.64) 可得
+\begin{equation}
+\int D_{CY}(x)P(x)\,dx=\int D_{CY}(x)U(x)\,dx.
+\tag{7.70}
+\end{equation}
+注意，
+\begin{equation}
+\begin{aligned}
+\int D_{CY}(x)P(x)\,dx
+&=\iint\log\frac{P_{Y\mid X}}{V(y)}P_{Y\mid X}\frac{P_X}{U_X}U_X\,dydx\\
+&=\iint\log\frac{P_{Y\mid X}}{V(y)}P_{Y\mid X}P_X\,dydx,
+\end{aligned}
+\tag{7.71}
+\end{equation}
+且
+\begin{equation}
+\int D_{CY}(x)U(x)\,dx
+=\iint\log\frac{P_{Y\mid X}}{V(y)}P_{Y\mid X}U_X\,dydx.
+\tag{7.72}
+\end{equation}
+式 (7.70)—(7.72) 表明
+\begin{equation}
+\iint\log\frac{P_{Y\mid X}}{V(y)}P_{Y\mid X}P_X\,dydx
+=\iint\log\frac{P_{Y\mid X}}{V(y)}P_{Y\mid X}U_X\,dydx.
+\tag{7.73}
+\end{equation}
+由于式 (7.73) 两侧积分相等，两个积分之间不同的 $P_X$ 与 $U_X$，应不影响共同部分 $P_{Y\mid X}$。换言之，条件分布 $P_{Y\mid X}$ 与分布 $P_X$ 独立。因此，可以把 $\Cov_{U_X}(D_{CY},P(X)/U(X))=0$ 作为 $X\to Y$ 的特征。
+
+为说明式 (7.67)，先计算 $D(P_{Y,X}\Vert U_XV_Y)$。由K–L距离的定义，
+\begin{equation}
+\begin{aligned}
+D(P_{Y,X}\Vert U_XV_Y)
+&=\int\log\frac{P(x,y)}{U(x)V(y)}U(x)V(y)\,dxdy\\
+&=\int\log\frac{P(y\mid x)P(x)}{U(x)V(y)}U(x)V(y)\,dxdy\\
+&=\int\log\frac{P(x)}{U(x)}U(x)\,dx
++\int\log\frac{P(y\mid x)}{V(y)}U(x)V(y)\\
+&=f_1(P_X)+f_2(P(y\mid x)).
+\end{aligned}
+\tag{7.74}
+\end{equation}
+再计算 $D(P_{Y,X}\Vert U_XP_{Y\mid X})$ 与 $D(U_XP_{Y\mid X}\Vert U_XV_Y)$。再次应用K–L距离定义，得到
+\begin{equation}
+\begin{aligned}
+D(P_{Y,X}\Vert U_XP_{Y\mid X})
+&=\int\log\frac{P(x,y)}{U(x)P(y\mid x)}P(x,y)\,dxdy\\
+&=\int\log\frac{P(x)}{U(x)}P(x,y)\,dxdy\\
+&=\int\log\frac{P(x)}{U(x)}P(x)\,dx=g_1(P_X).
+\end{aligned}
+\tag{7.75}
+\end{equation}
+类似地，
+\begin{equation}
+\begin{aligned}
+D(U_XP_{Y\mid X}\Vert U_XV_Y)
+&=\int\log\frac{U(x)P(y\mid x)}{U(x)V(y)}U(x)P(y\mid x)\,dxdy\\
+&=\int\log\frac{P(y\mid x)}{V(y)}P(y\mid x)U(x)\,dxdy\\
+&=g_2(P(y\mid x)).
+\end{aligned}
+\tag{7.76}
+\end{equation}
+结合式 (7.67) 与式 (7.74)—(7.76)，得到
+\begin{equation}
+f_1(P_X)+f_2(P(y\mid x))=g_1(P_X)+g_2(P(Y\mid x)).
+\tag{7.77}
+\end{equation}
+由于 $P_X$ 与 $P_{Y\mid X}$ 独立，二者正交，所以勾股定理 (7.67) 成立。式 (7.68) 也可类似说明。
+
+\begin{bookexample}{7.12}
+假设 $X$ 与 $Y$ 定义于区间 $[0,1]$，$U(X)$ 与 $V(Y)$ 均在 $[0,1]$ 上均匀分布，则 $D_{CY}(x)$ 是条件分布 $P_{Y\mid X}$ 的负熵：
+\begin{equation}
+D_{CY}(x)=D(P_{Y\mid x}\Vert V(y))
+=\int P(y\mid x)\log P(y\mid x)\,dy=-S(P_{Y\mid X}).
+\tag{7.78}
+\end{equation}
+参考分布为均匀分布时，式 (7.58) 简化为
+\begin{equation}
+\int S(P_{Y\mid X})P_X\,dx=\int S(P_{Y\mid X})\,dx.
+\tag{7.79}
+\end{equation}
+\end{bookexample}
+
+为完整起见，将结论7.8扩展为结论7.9，纳入Janzing et al.（2012）总结的更多正交性等价刻画。
+
+\par\medskip\Needspace{5\baselineskip}\noindent\textbf{结论7.9：勾股定理的等价表述}\par
+下列正交性表述彼此等价。
+\begin{enumerate}
+\item 输入分布与反向映射不相关：
+\begin{equation}
+\Cov_{U_X}\left(\log\frac{V_{\mathrm{out}}}{U_X},\frac{P_X}{U_X}\right)=0.
+\tag{7.80}
+\end{equation}
+\item $P_Y$、$V_Y$ 与 $U_{\mathrm{out}}$ 之间的勾股定理：
+\begin{equation}
+D(P_Y\Vert V_Y)=D(P_Y\Vert U_{\mathrm{out}}(Y))+D(U_{\mathrm{out}}(Y)\Vert V_Y).
+\tag{7.81}
+\end{equation}
+\item $P_X$、$U_X$ 与 $V_{\mathrm{out}}$ 之间的勾股定理：
+\begin{equation}
+D(P_X\Vert V_{\mathrm{out}})=D(P_X\Vert U_X)+D(U_X\Vert V_{\mathrm{out}}).
+\tag{7.82}
+\end{equation}
+\item 输入分布与正向映射的正交性：
+\begin{equation}
+D(P_Y\Vert V_Y)=D(P_X\Vert U_X)+D(U_{\mathrm{out}}(Y)\Vert V_Y).
+\tag{7.83}
+\end{equation}
+\item 近似误差的勾股定理：
+\begin{equation}
+D(P_X\Vert V_{\mathrm{out}})=D(P_Y\Vert U_{\mathrm{out}}(Y))+D(U_{\mathrm{out}}(Y)\Vert V_Y).
+\tag{7.84}
+\end{equation}
+\end{enumerate}
+下面考察反向情形中的这五个条件，汇总为结论7.10。
+
+\par\medskip\Needspace{6\baselineskip}\noindent\textbf{结论7.10：反向关系}\par
+假设 $X\to Y$，且参考分布 $U_X$ 在映射 $f$ 下的像的像不与 $V_Y$ 重合。与正向的正交性结论7.9对应，下列结果表明，反向不满足勾股定理（附录7.D）。
+\begin{enumerate}
+\item
+\begin{equation}
+D(P_X\Vert V_{\mathrm{out}}(X))+D(V_{\mathrm{out}}(X)\Vert U_X)>D(P_X\Vert U_X).
+\tag{7.85}
+\end{equation}
+\item
+\begin{equation}
+\Cov_{V_Y}\left(\log\frac{U_{\mathrm{out}}(Y)}{V_Y},\frac{P_Y}{V_Y}\right)>0.
+\tag{7.86}
+\end{equation}
+\item
+\begin{equation}
+D(P_Y\Vert V_Y)+D(V_Y\Vert U_{\mathrm{out}}(Y))>D(P_Y\Vert U_{\mathrm{out}}(Y)).
+\tag{7.87}
+\end{equation}
+\item
+\begin{equation}
+D(P_Y\Vert V_Y)+D(V_{\mathrm{out}}(X)\Vert U_X)>D(P_X\Vert U_X).
+\tag{7.88}
+\end{equation}
+\item
+\begin{equation}
+D(P_X\Vert V_{\mathrm{out}}(X))+D(V_{\mathrm{out}}(X)\Vert U_X)>D(P_Y\Vert U_{\mathrm{out}}(Y)).
+\tag{7.89}
+\end{equation}
+\end{enumerate}

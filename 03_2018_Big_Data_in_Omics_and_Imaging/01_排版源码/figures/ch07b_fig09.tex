@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\definecolor{chSevenBblue}{RGB}{79,129,189}
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+observed/.style={rounded corners=4pt,draw=inkblue,fill=chSevenBblue,text=white,minimum width=1.8cm,minimum height=.95cm,align=center},
+hidden/.style={ellipse,draw=inkblue,fill=chSevenBblue,text=white,minimum width=2.7cm,minimum height=1.2cm,align=center}]
+\node[observed] (chSevenBf9x) at (0,0) {甲基化\\$x$};
+\node[observed] (chSevenBf9Y) at (3.5,0) {表达\\$Y$};
+\node[observed] (chSevenBf9Z) at (7,0) {表型\\$Z$};
+\node[hidden] (chSevenBf9HR) at (3.5,2.4) {微 RNA\\$H_R$};
+\node[hidden] (chSevenBf9HG) at (3.5,-2.4) {基因型\\$H_G$};
+\draw[->] (chSevenBf9x.north east)--(chSevenBf9HR.south);
+\draw[->] (chSevenBf9HR.south)--(chSevenBf9Y.north);
+\draw[->] (chSevenBf9HR.south)--(chSevenBf9Z.north west);
+\draw[->] (chSevenBf9HG.north)--(chSevenBf9x.east);
+\draw[->] (chSevenBf9HG.north)--(chSevenBf9Y.south);
+\draw[->] (chSevenBf9HG.north)--(chSevenBf9Z.south west);
+\draw[->] (chSevenBf9x.east)--(chSevenBf9Y.west);
+\draw[->] (chSevenBf9Y.east)--(chSevenBf9Z.west);
+\end{tikzpicture}
+\origfig{9}{存在混杂的中介模型。}
+\end{figure}

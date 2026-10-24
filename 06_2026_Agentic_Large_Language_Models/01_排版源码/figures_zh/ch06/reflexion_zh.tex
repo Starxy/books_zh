@@ -1,0 +1,32 @@
+% 依照 figures/reflexion3.png 重绘，全部外部/内部反馈、轨迹、经验和动作连线对应原图。
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+ every node/.style={font=\normalsize,align=center,inner sep=4pt},
+ lm/.style={draw=black!60,fill=cyan!8!gray!15,rounded corners=1.5mm,line width=.8pt,minimum width=4.5cm,minimum height=.85cm},
+ memory/.style={draw=black!60,fill=yellow!15,line width=.8pt,minimum width=4.4cm,minimum height=1.2cm},
+ flow/.style={-{Stealth[length=2.5mm,width=1.8mm]},draw=black!60,line width=.9pt},
+ label/.style={font=\small,fill=black!2,inner sep=2pt}]
+\filldraw[draw=black!60,fill=black!2,line width=.8pt] (.6,2.5) rectangle (12.8,10.2);
+\node[font=\bfseries\Large] at (6.7,9.55) {智能体};
+\node[lm] (reflect) at (7.0,8.2) {自我反思（LM）};
+\node[lm] (eval) at (3.7,6.25) {评估者（LM）};
+\node[memory] (traj) at (3.7,4.0) {轨迹\\（短期记忆）};
+\node[memory] (experience) at (9.7,6.0) {经验\\（长期记忆）};
+\node[lm] (actor) at (9.7,4.0) {行动者（LM）};
+\node[draw=black!60,fill=black!7,line width=.8pt,minimum width=4.5cm,minimum height=.9cm,font=\bfseries\large] (env) at (6.4,.7) {环境};
+
+\draw[flow] (traj.north) -- (eval.south);
+\draw[flow] (traj.east) -- (actor.west);
+\draw[flow] (experience.south) -- (actor.north);
+\draw[flow] (reflect.east) -- (10.3,8.2) -- (10.3,6.6);
+\node[label] at (11.25,7.35) {反思文本};
+\draw[draw=black!60,line width=.9pt] (eval.north) -- (3.7,8.2);
+\node[label] at (2.65,7.35) {内部\\反馈};
+\draw[flow] (env.west) -- (0,.7) -- (0,8.2) -- (reflect.west);
+\node[label] at (2.65,8.65) {外部反馈};
+\draw[flow] (0,4.0) -- (traj.west);
+\node[font=\normalsize,fill=white,inner sep=4pt] at (2.1,.7) {观测／奖励};
+\draw[flow] (actor.east) -- (13.3,4.0) -- (13.3,.7) -- (env.east);
+\node[font=\normalsize,fill=white,inner sep=4pt] at (10.8,.7) {动作};
+\end{tikzpicture}%
+}

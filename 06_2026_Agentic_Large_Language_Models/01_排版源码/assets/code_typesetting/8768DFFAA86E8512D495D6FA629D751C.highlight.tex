@@ -1,0 +1,21 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{rewrite\PYGZus{}question}\PYG{p}{(}\PYG{n}{q}\PYG{p}{,} \PYG{n}{n\PYGZus{}variants}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Use an LLM to generate alternative phrasings and hypothetical answers.}
+
+\PYG{l+s+sd}{    :param q: The user question.}
+\PYG{l+s+sd}{    :param n\PYGZus{}variants: Number of rewrites to generate.}
+\PYG{l+s+sd}{    :return: A list of expanded queries.}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{variants} \PYG{o}{=} \PYG{p}{[}\PYG{n}{q}\PYG{p}{]}
+    \PYG{c+c1}{\PYGZsh{} Ask the model for paraphrases and clarifications}
+    \PYG{n}{paraphrases} \PYG{o}{=} \PYG{n}{llm}\PYG{o}{.}\PYG{n}{generate}\PYG{p}{([}\PYG{l+s+s2}{\PYGZdq{}Rewrite: \PYGZdq{}} \PYG{o}{+} \PYG{n}{q}\PYG{p}{]} \PYG{o}{*} \PYG{n}{n\PYGZus{}variants}\PYG{p}{)}
+    \PYG{n}{variants}\PYG{o}{.}\PYG{n}{extend}\PYG{p}{(}\PYG{n}{paraphrases}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Ask the model to guess an answer (HyDE) and use it as a pseudo\PYGZhy{}query}
+    \PYG{n}{guess} \PYG{o}{=} \PYG{n}{llm}\PYG{o}{.}\PYG{n}{generate}\PYG{p}{([}\PYG{l+s+s2}{\PYGZdq{}Answer briefly: \PYGZdq{}} \PYG{o}{+} \PYG{n}{q}\PYG{p}{])[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{variants}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{guess}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Optionally add entity aliases from a knowledge base}
+    \PYG{n}{aliases} \PYG{o}{=} \PYG{n}{lookup\PYGZus{}aliases}\PYG{p}{(}\PYG{n}{q}\PYG{p}{)}
+    \PYG{n}{variants}\PYG{o}{.}\PYG{n}{extend}\PYG{p}{(}\PYG{n}{aliases}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{variants}
+\end{MintedVerbatim}

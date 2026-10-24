@@ -1,0 +1,153 @@
+% !TeX program = xelatex
+% ============================================================
+%  Causal Inference: What If —— 中文译稿 共享导言区
+%  版式特征：外侧宽边距 + 边注（marginalia）、精要框、技术注记框
+% ============================================================
+\usepackage{amsmath,amssymb,amsthm,mathrsfs,bm}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,shapes.geometric}
+\usepackage{graphicx}
+\usepackage{booktabs,array,multirow,longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{caption}
+\usepackage{ragged2e}
+\usepackage{fancyhdr}
+\usepackage{emptypage}
+\usepackage{marginnote}
+\usepackage{etoolbox}
+
+% ---------- 颜色 ----------
+\definecolor{inkblue}{RGB}{30,70,120}
+\definecolor{fpbg}{RGB}{235,238,243}   % 精要框底色（原书浅灰蓝）
+\definecolor{tpbg}{RGB}{250,250,248}
+\definecolor{rule}{RGB}{120,120,120}
+
+% ---------- 页面：外侧留宽边距放边注 ----------
+\usepackage[a4paper,inner=2.3cm,outer=5.3cm,top=2.5cm,bottom=2.5cm,
+            marginparwidth=3.1cm,marginparsep=0.45cm,
+            headsep=0.65cm,footskip=0.95cm]{geometry}
+\linespread{1.28}
+\let\cleardoublepage\clearpage
+\setlength{\parindent}{2em}
+
+% ---------- 标题格式 ----------
+\ctexset{
+  chapter = {
+    format     = \raggedright\heiti\zihao{2},
+    name       = {第,章},
+    number     = \chinese{chapter},
+    aftername  = \hspace{0.55em},
+    beforeskip = 0.6cm,
+    afterskip  = 0.9cm,
+  },
+  section = {
+    format = \heiti\zihao{3},
+    beforeskip = 1.2ex plus .3ex minus .2ex,
+    afterskip  = .9ex plus .2ex,
+  },
+  subsection = {
+    format = \heiti\zihao{4},
+    beforeskip = 1.0ex plus .3ex minus .2ex,
+    afterskip  = .6ex plus .2ex,
+  },
+  figurename = 图,
+  tablename  = 表,
+}
+
+\captionsetup{font=small,labelsep=quad}
+\captionsetup[figure]{justification=centering}
+
+% ---------- 页眉页脚 ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\kaishu\leftmark}
+\fancyhead[RO]{\small\kaishu\rightmark}
+\fancyfoot[LE,RO]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[LE,RO]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\makeatletter
+\renewcommand{\chaptermark}[1]{\markboth{\CTEXthechapter\quad #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\quad #1}}
+\makeatother
+
+% ---------- 边注 ----------
+\renewcommand*{\marginfont}{\sffamily\footnotesize\raggedright\linespread{1.06}\selectfont}
+\newcommand{\mnote}[1]{\marginnote{\textcolor{black!85}{#1}}}
+\setlength{\marginparpush}{6pt}
+
+% ---------- 精要框 / 技术注记框 ----------
+\newcommand{\FPname}{精要}
+\newcommand{\TPname}{技术注记}
+\newcounter{fp}[chapter]
+\newcounter{tp}[chapter]
+\renewcommand{\thefp}{\thechapter.\arabic{fp}}
+\renewcommand{\thetp}{\thechapter.\arabic{tp}}
+
+\newtcolorbox{finepoint}[1][]{
+  enhanced, breakable, colback=fpbg, colframe=fpbg,
+  colbacktitle=fpbg, coltitle=black,
+  boxrule=0pt, arc=0pt, left=9pt, right=9pt, top=5pt, bottom=8pt,
+  toptitle=3pt, bottomtitle=3pt,
+  before skip=10pt, after skip=10pt,
+  fontupper=\small, fonttitle=\heiti\small,
+  title={\refstepcounter{fp}\FPname~\thefp\ifx\relax#1\relax\else\hspace{0.8em}#1\fi},
+}
+
+\newtcolorbox{techpoint}[1][]{
+  enhanced, breakable, colback=tpbg, colframe=rule!70,
+  colbacktitle=tpbg, coltitle=black,
+  boxrule=0.5pt, arc=0pt, left=9pt, right=9pt, top=5pt, bottom=7pt,
+  toptitle=3pt, bottomtitle=3pt,
+  before skip=10pt, after skip=10pt,
+  fontupper=\small, fonttitle=\heiti\small,
+  title={\refstepcounter{tp}\TPname~\thetp\ifx\relax#1\relax\else\hspace{0.8em}#1\fi},
+}
+
+% 定义小方框（原书置于边栏的定义式）
+\newtcolorbox{defbox}[1][]{
+  enhanced, colback=white, colframe=black!55,
+  boxrule=0.5pt, arc=0pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  halign=center, fontupper=\small,
+  before skip=8pt, after skip=8pt,
+  title={#1}, coltitle=black, fonttitle=\small\heiti,
+  attach title to upper={\par\vspace{2pt}}
+}
+
+% ---------- 数学算子 ----------
+\newcommand{\dox}[1]{\mathrm{do}(#1)}
+\newcommand{\pr}{\Pr}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\newcommand{\nindep}{\not\perp\!\!\!\perp}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\given}{\,|\,}
+
+% ---------- TikZ 统一风格 ----------
+\tikzset{
+  causal/.style={>={Stealth[length=2.1mm,width=1.5mm]},semithick},
+  vtx/.style={circle,draw,inner sep=1pt,minimum size=6.2mm,font=\small},
+  vtxs/.style={circle,draw,inner sep=1pt,minimum size=5.2mm,font=\footnotesize},
+  lat/.style={circle,draw,dashed,inner sep=1pt,minimum size=6.2mm,font=\small},
+  ed/.style={->,semithick},
+  edb/.style={->,very thick},
+  edd/.style={->,semithick,dashed},
+  bi/.style={<->,semithick},
+  bid/.style={<->,semithick,dashed},
+}
+
+% ---------- 杂项 ----------
+\renewcommand{\arraystretch}{1.12}
+\setlist[itemize]{leftmargin=1.6em,itemsep=0.15em,topsep=0.3em}
+\setlist[enumerate]{leftmargin=1.9em,itemsep=0.15em,topsep=0.3em}
+
+% ---------- 超链接（最后）----------
+\usepackage{url}
+\usepackage[bookmarks=true,bookmarksnumbered=true,colorlinks=true,
+            linkcolor=inkblue,citecolor=inkblue,urlcolor=inkblue]{hyperref}
+
+% 定义框内禁止数学间距被拉伸
+\AtBeginEnvironment{defbox}{\medmuskip=4mu \thickmuskip=5mu}

@@ -1,0 +1,169 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{center}
+\begin{tikzpicture}
+	
+\def\ssep{1.0cm}
+\def\nsep{0.1cm}
+
+\tikzstyle{snode} = [minimum width=1*\ssep,minimum height=1*\ssep,inner sep=0pt,draw,thick];
+\tikzstyle{knode} = [minimum width=0.3*\ssep,minimum height=0.3*\ssep,inner sep=0pt];
+
+%%% sub-figure 1: knn-based attention
+\begin{scope}
+
+\node [knode,anchor=west,fill=blue!30,draw=blue] (k1) at (0,0) {};
+\node [knode,anchor=west,fill=blue!30,draw=blue] (k2) at ([xshift=0.2*\ssep]k1.east) {};
+\node [knode,anchor=west,fill=blue!30,draw=blue] (k3) at ([xshift=0.2*\ssep]k2.east) {};
+\node [knode,anchor=east] (kdots) at ([xshift=-0.2*\ssep]k1.west) {\scriptsize{$\cdots$}};
+\node [knode,anchor=north,fill=blue!30,draw=blue] (v1) at ([yshift=-0.1cm]k1.south) {};
+\node [knode,anchor=north,fill=blue!30,draw=blue] (v2) at ([yshift=-0.1cm]k2.south) {};
+\node [knode,anchor=north,fill=blue!30,draw=blue] (v3) at ([yshift=-0.1cm]k3.south) {};
+\node [knode,anchor=east] (vdots) at ([xshift=-0.2*\ssep]v1.west) {\scriptsize{$\cdots$}};
+
+\begin{pgfonlayer}{background}
+\node [draw] [fit = (k3) (vdots)] (kvcache) {};
+\end{pgfonlayer}
+
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk4) at ([xshift=-1.5cm]kdots.west) {};
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk3) at ([xshift=-0.2*\ssep]knnk4.west) {};
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk2) at ([xshift=-0.2*\ssep]knnk3.west) {};
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk1) at ([xshift=-0.2*\ssep]knnk2.west) {};
+\node [knode,anchor=north,fill=red!30,draw=red] (knnv4) at ([yshift=-0.1cm]knnk4.south) {};
+\node [knode,anchor=north,fill=red!30,draw=red] (knnv3) at ([yshift=-0.1cm]knnk3.south) {};
+\node [knode,anchor=north,fill=red!30,draw=red] (knnv2) at ([yshift=-0.1cm]knnk2.south) {};
+\node [knode,anchor=north,fill=red!30,draw=red] (knnv1) at ([yshift=-0.1cm]knnk1.south) {};
+
+\begin{pgfonlayer}{background}
+\node [draw] [fit = (knnk4) (knnv1)] (knncache) {};
+\end{pgfonlayer}
+
+\node [anchor=north west,minimum height=2*0.3*\ssep+0.3cm,minimum width=4*0.3*\ssep+0.91cm,draw,double] (datastore) at ([yshift=-1.0cm]knncache.south west) {\small{Datastore}};
+
+\node [anchor=west,minimum height=2*0.3*\ssep+0.3cm,minimum width=2*0.3*\ssep+0.3cm,draw,thick] (qi) at ([xshift=1.3cm]kvcache.east) {$\mathbf{q}_i$};
+
+\draw [->] ([yshift=2pt]datastore.north) -- ([yshift=1.0cm-2pt]datastore.north);
+\draw [->,dashed] ([yshift=-2pt]qi.south) .. controls +(-90:1.5cm) and +(0:1cm) .. ([xshift=2pt]datastore.east) node [pos=0.7,below] (rlabel) {\footnotesize{Search}};
+
+\node [anchor=north] (kvcachelabel) at (kvcache.south) {\footnotesize{KV Cache}};
+\node [anchor=north east] (knnresultlabel) at ([yshift=-0.1cm]knncache.south) {\scriptsize{$k$ Nearest}};
+\node [anchor=north east] (knnresultlabel2) at ([yshift=0.15cm]knnresultlabel.south east) {\scriptsize{Neighbors}};
+
+\draw [->,thick] ([xshift=-0.3cm,yshift=2pt]qi.north) .. controls +(90:0.5cm) and +(90:0.5cm) ..  ([yshift=2pt]kvcache.north) node [pos=0.8,left,xshift=-0.1cm,yshift=0.1cm] {\scriptsize{$\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem})$}};
+\draw [->,thick] ([xshift=-0.0cm,yshift=2pt]qi.north) .. controls +(90:1.0cm) and +(90:1.0cm) ..  ([yshift=2pt]knncache.north) node [pos=0.90,left,xshift=-0.2cm,yshift=0.1cm] {\scriptsize{$\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}_{k\mathrm{nn}})$}};
+
+\draw [-{Stealth[length=3mm]},thick,double,double distance=1pt] ([yshift=0.4cm]qi.north) -- ([yshift=1.2cm]qi.north) node [pos=1,above] {\footnotesize{$\mathbf{g} \odot \mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}) + (1 - \mathbf{g}) \odot \mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}_{k\mathrm{nn}}) $}};
+
+\node [knode,anchor=west,fill=blue!30,draw=blue] (legend) at ([xshift=6cm,yshift=-0.2cm]datastore.north east) {};
+\node [anchor=west] (legendtext) at (legend.east) {\scriptsize{Keys/values in LLM}};
+\node [knode,anchor=north west,fill=red!30,draw=red] (legend2) at ([yshift=-0.2cm]legend.south west) {};
+\node [anchor=west] (legendtext2) at (legend2.east) {\scriptsize{Keys/values in Datastore}};
+
+\node [anchor=north] (caption) at ([yshift=-3cm]k1.west) {\small{(a) $k$-NN Search Augmented Attention}};]
+
+\end{scope}
+
+%%% sub-figure 2: knn-lm
+\begin{scope}[yshift=-7.5cm]
+
+\node [knode,anchor=west,fill=blue!30,draw=blue] (k1) at (0,0) {};
+\node [knode,anchor=west,fill=blue!30,draw=blue] (k2) at ([xshift=0.2*\ssep]k1.east) {};
+\node [knode,anchor=west,fill=blue!30,draw=blue] (k3) at ([xshift=0.2*\ssep]k2.east) {};
+\node [knode,anchor=east] (kdots) at ([xshift=-0.2*\ssep]k1.west) {\scriptsize{$\cdots$}};
+\node [knode,anchor=north,fill=blue!30,draw=blue] (v1) at ([yshift=-0.1cm]k1.south) {};
+\node [knode,anchor=north,fill=blue!30,draw=blue] (v2) at ([yshift=-0.1cm]k2.south) {};
+\node [knode,anchor=north,fill=blue!30,draw=blue] (v3) at ([yshift=-0.1cm]k3.south) {};
+\node [knode,anchor=east] (vdots) at ([xshift=-0.2*\ssep]v1.west) {\scriptsize{$\cdots$}};
+
+\begin{pgfonlayer}{background}
+\node [draw] [fit = (k3) (vdots)] (kvcache) {};
+\end{pgfonlayer}
+
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk4) at ([xshift=-1.5cm]kdots.west) {};
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk3) at ([xshift=-0.2*\ssep]knnk4.west) {};
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk2) at ([xshift=-0.2*\ssep]knnk3.west) {};
+\node [knode,anchor=east,fill=red!30,draw=red] (knnk1) at ([xshift=-0.2*\ssep]knnk2.west) {};
+\node [knode,anchor=north,fill=ugreen!30,draw=ugreen] (knnv4) at ([yshift=-0.1cm]knnk4.south) {};
+\node [knode,anchor=north,fill=ugreen!30,draw=ugreen] (knnv3) at ([yshift=-0.1cm]knnk3.south) {};
+\node [knode,anchor=north,fill=ugreen!30,draw=ugreen] (knnv2) at ([yshift=-0.1cm]knnk2.south) {};
+\node [knode,anchor=north,fill=ugreen!30,draw=ugreen] (knnv1) at ([yshift=-0.1cm]knnk1.south) {};
+
+\begin{pgfonlayer}{background}
+\node [draw] [fit = (knnk4) (knnv1)] (knncache) {};
+\end{pgfonlayer}
+
+\node [anchor=north west,minimum height=2*0.3*\ssep+0.3cm,minimum width=4*0.3*\ssep+0.91cm,draw,double] (datastore) at ([yshift=-1.0cm]knncache.south west) {\small{Datastore}};
+
+\node [anchor=west,minimum height=2*0.3*\ssep+0.3cm,minimum width=2*0.3*\ssep+0.3cm,draw,thick] (qi) at ([xshift=1.3cm]kvcache.east) {$\mathbf{q}_i$};
+
+\draw [->] ([yshift=2pt]datastore.north) -- ([yshift=1.0cm-2pt]datastore.north);
+\draw [->,dashed] ([yshift=-2pt]qi.south) .. controls +(-90:1.5cm) and +(0:1cm) .. ([xshift=2pt]datastore.east) node [pos=0.7,below] (rlabel) {\footnotesize{Search}};
+
+\node [anchor=north] (kvcachelabel) at (kvcache.south) {\footnotesize{KV Cache}};
+\node [anchor=north east] (knnresultlabel) at ([yshift=-0.1cm]knncache.south) {\scriptsize{$k$ Nearest}};
+\node [anchor=north east] (knnresultlabel2) at ([yshift=0.15cm]knnresultlabel.south east) {\scriptsize{Neighbors}};
+
+\draw [->,thick] ([xshift=-0.1cm,yshift=2pt]qi.north) .. controls +(90:0.5cm) and +(90:0.5cm) ..  ([yshift=2pt]kvcache.north) node [pos=0.8,left,xshift=-0.1cm,yshift=0.1cm] {\scriptsize{$\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem})$}};
+
+\draw [-{Stealth[length=3mm]},thick,double,double distance=1pt] ([yshift=0.2cm]qi.north) -- ([yshift=0.8cm]qi.north) node [pos=0.5,right] {\footnotesize{$\mathrm{Att}(\mathbf{q}_i,\mathrm{Mem}) $}};
+
+\node [anchor=south] (layers) at ([yshift=0.8cm]qi.north) {\footnotesize{$\cdots$}};
+
+\draw [->,thick] (layers.north) -- ([yshift=0.8cm]layers.north) node [pos=0.5,right] {\footnotesize{Distribution $\mathrm{Pr}(\cdot)$}};
+\node [circle,minimum size=0.5cm,anchor=south,draw,thick] (additionatt) at ([yshift=0.8cm+2pt]layers.north) {};
+\draw [-,thick] (additionatt.180) -- (additionatt.0);
+\draw [-,thick] (additionatt.90) -- (additionatt.-90);
+
+\node [anchor=south] (knndistribution) at ([yshift=0.8cm]knncache.north) {\footnotesize{Distribution $\mathrm{Pr}_{k\mathrm{nn}}(\cdot)$}};
+
+\draw [->] ([yshift=2pt]knncache.north) -- ([yshift=2pt]knndistribution.south);
+\draw [->] ([yshift=2pt]knndistribution.north) -- ([yshift=0.9cm]knndistribution.north) -- ([yshift=0.9cm,xshift=6cm-2pt]knndistribution.north);
+
+\draw [->] ([yshift=2pt]additionatt.north) -- ([yshift=0.5cm]additionatt.north) node [pos=1,above] {\footnotesize{Output Distribution}};
+
+\node [knode,anchor=west,fill=blue!30,draw=blue] (legend) at ([xshift=6cm,yshift=0.3cm]datastore.north east) {};
+\node [anchor=west] (legendtext) at (legend.east) {\scriptsize{Keys/values in LLM}};
+\node [knode,anchor=north west,fill=red!30,draw=red] (legend2) at ([yshift=-0.2cm]legend.south west) {};
+\node [anchor=west] (legendtext2) at (legend2.east) {\scriptsize{Keys in Datastore}};
+\node [knode,anchor=north west,fill=ugreen!30,draw=ugreen] (legend3) at ([yshift=-0.2cm]legend2.south west) {};
+\node [anchor=west] (legendtext3) at (legend3.east) {\scriptsize{Predicted Tokens}};
+
+\node [anchor=north] (caption) at ([yshift=-3cm]k1.west) {\small{(b) $k$-NN Language Modeling}};
+
+\end{scope}
+
+%%% sub-figure 3: RAG
+
+\begin{scope}[yshift=-16.0cm]
+
+\node [anchor=west] (input) at (2cm,0) {\footnotesize{Input Context:}};
+\node [anchor=north west] (input2) at ([yshift=0.1cm]input.south west) {\footnotesize{$\mathbf{x}$ = \colorbox{blue!20}{What is deep learning?}}};
+
+\node [anchor=west,minimum height=2*0.3*\ssep+0.3cm,minimum width=4*0.3*\ssep+0.91cm,draw,double] (datastore) at ([xshift=-6.1cm,yshift=0.1cm]input.south west) {\small{Datastore}};
+\draw [->,dashed] ([xshift=0cm,yshift=0.1cm]input.south west) -- ([xshift=-3.9cm,yshift=0.1cm]input.south west) node [pos=0.5,above] {\footnotesize{Search}};
+
+\node [anchor=south west] (knn1) at ([yshift=0.8cm]datastore.north west) {\footnotesize{$\cdots$}};
+\node [anchor=south west] (knn2) at ([yshift=-0.1cm]knn1.north west) {\footnotesize{$\mathbf{c}_2 = $ \colorbox{red!20}{Machine learning is ...}}};
+\node [anchor=south west] (knn3) at ([yshift=-0.1cm]knn2.north west) {\footnotesize{$\mathbf{c}_1 = $ \colorbox{red!20}{Deep network is ...}}};
+
+\draw [->] ([yshift=2pt]datastore.north) -- ([yshift=1.0cm]datastore.north);
+\node [anchor=north east] (knnresultlabel) at ([yshift=0.9cm]datastore.north) {\scriptsize{$k$ Nearest}};
+\node [anchor=north east] (knnresultlabel2) at ([yshift=0.15cm]knnresultlabel.south east) {\scriptsize{Neighbors}};
+
+\node [anchor=south west] (combined) at ([yshift=1.1cm]input.north west) {\footnotesize{\colorbox{blue!20}{What is deep learning?}}};
+\node [anchor=south west] (combined2) at ([yshift=-0.1cm]combined.north west) {\footnotesize{Message: \colorbox{red!20}{deep network ... machine learning ...}}};
+
+\draw [->] ([yshift=0pt]input.north) -- ([yshift=1cm]input.north);
+
+\node [anchor=south west,minimum height=2*0.3*\ssep+0.3cm,minimum width=4*0.3*\ssep+0.91cm,draw,thick] (llm) at ([yshift=0.8cm]combined2.north west) {\small{LLM}};
+
+\draw [<-] ([yshift=-2pt]llm.south) -- ([yshift=-0.8cm]llm.south);
+\draw [->] (knn2.north east) -- ([xshift=2cm]knn2.north east);
+
+\node [anchor=north] (caption) at ([yshift=-0.2cm,xshift=-2cm]input2.south west) {\small{(c) Retrieval-augmented Generation}};
+
+\end{scope}
+	
+\end{tikzpicture}
+\end{center}

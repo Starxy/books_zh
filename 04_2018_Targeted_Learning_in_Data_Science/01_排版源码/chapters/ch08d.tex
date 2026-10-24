@@ -1,0 +1,100 @@
+% 原书分章 PDF 第 9—11 页：第 8.4 节。
+\section{基于区间删失数据的截断均值}
+
+设 $O=(C_m,\Delta_m=I(T\leq C_m):m=1,\ldots,M)$ 为一般的区间删失数据（interval-censored data）结构，其中 $T$ 为事件发生时间，$C=(C_1,\ldots,C_M)$ 为连续取值的监测时间向量。假定各监测时间与 $T$ 均大于 0。为简单起见，我们考虑监测次数 $M$ 固定的情形；不过，我们认为下述结果可推广到 $M$ 随机的情形。假定 $T$ 和 $C$ 独立。令 $F(t)=P(T\leq t)$ 为 $T$ 的累积分布函数，$G$ 和 $g$ 分别表示 $C$ 的概率分布与密度。注意，$O$ 的概率分布 $P=P_{F,G}$ 由 $T$ 与 $C$ 的真实分布 $F$ 和 $G$ 索引。统计模型为
+$\mathcal M=\{P_{F,G}:F,G\in\mathcal G\}$；
+模型对 $F$ 不作限定，而对 $C$ 分布的限制或知识可由集合 $\mathcal G$ 表示。设
+$\Psi^f(F)=\int r(t)\bar F(t)\,dt$
+为感兴趣的完整数据参数，其中 $\bar F=1-F$。在对 $g$ 作出某些支撑集条件的假设下，该参数可由 $P$ 识别，因此 $\Psi:\mathcal M\to\mathbb R$ 满足 $\Psi(P_{F,G})=\Psi^f(F)$。令 $D^*(F,G)$ 为 $\Psi$ 在 $P_{F,G}$ 处的典范梯度。
+
+注意，$P_{F,G}$ 的密度为
+$p_{F,G}(o)=g(c_1,\ldots,c_M)F(\mathcal C(o))$，
+其中 $\mathcal C(o)$ 为 $O=o$ 所隐含的 $T$ 的粗化集（coarsening）；对集合 $A$，$F(A)=P(T\in A)$。因此，
+$\mathcal C(o)=(L(o),R(o)]$
+是一个区间：$L(O)$ 为满足 $\Delta_j=0$ 的最大监测时间 $C_j$，$R(O)$ 为满足 $\Delta_j=1$ 的最小监测时间 $C_j$。若 $\Delta_1=1$，则定义 $L(O)=0$；若 $\Delta_M=0$，则 $R(O)=\infty$。所以，$O$ 的密度分解为一个 $F$ 因子与一个 $G$ 因子；模型 $\mathcal M$ 中的有效影响曲线，与 $G$ 已知的模型 $\mathcal M(G)=\{P_{F,G}:F\}\subset\mathcal M$ 中的有效影响曲线相同。
+
+首先要确定模型 $\mathcal M(G)$ 中的初始梯度 $D(F,G)$。为此，定义随机变量 $\bar C$ 为以下试验的结果：先生成 $C$，再从 $M$ 个监测时间中随机抽取一个，每个时间被抽中的概率均为 $1/M$。令 $\bar\Delta=I(T\leq\bar C)$，并令
+$\bar g=\frac1M\sum_{m=1}^M g_m$
+为 $\bar C$ 的一元密度，其中 $g_m$ 为 $C_m$ 的边际密度。基于简化的现状数据（current status data）结构 $(\bar C,\bar\Delta=I(T\leq\bar C)$，$\Psi^f(F)$ 的一个初始估计量，是逆删失概率加权（inverse probability of censoring weighting，IPCW）估计量
+$\frac1n\sum_{i=1}^n(1-\bar\Delta_i)r(\bar C_i)/\bar g(\bar C_i)$。
+其影响曲线为
+$(1-\bar\Delta)r(\bar C)/\bar g(\bar C)-\Psi(F)$。
+严格来说，这并不是影响曲线，因为它不只依赖 $O$，还依赖选取 $\bar C$ 时的随机抽取。因而，我们取给定 $O$ 时这条影响曲线的条件期望，得到
+$\frac1M\sum_{m=1}^M(1-\Delta_m)r(C_m)/\bar g(C_m)-\Psi(F)$。
+下面验证它的期望确实等于零，从而说明它是模型 $\mathcal M(G)$ 中一个线性无偏估计量的影响曲线。有
+\[
+ \begin{aligned}
+ E_{P_{F,G}}\frac1M\sum_{m=1}^M
+ (1-\Delta_m)r(C_m)/\bar g(C_m)
+ &=\frac1M\sum_{m=1}^M E_G\bar F(C_m)r(C_m)/\bar g(C_m)\\
+ &=\frac1M\sum_{m=1}^M\int_c
+ \bar F(c)r(c)\frac{g_m(c)}{\bar g(c)}\,dc\\
+ &=\int r(c)\bar F(c)\,dc=\Psi(F).
+ \end{aligned}
+\]
+这证明，可以选择初始梯度
+\[
+ D(F,G)(O)=\frac1M\sum_{m=1}^M
+ (1-\Delta_m)r(C_m)/\bar g(C_m)-\Psi(F).
+\]
+
+设 $A_F:L_0^2(F)\to L_0^2(P_{F,G})$ 为得分算子，将子模型
+$\{dF_{\epsilon,h}=(1+\epsilon h)dF:\epsilon\}$
+在 $\epsilon=0$ 处的得分 $h\in L_0^2(F)$，映射为
+$\{P_{F_{\epsilon,h},G}:\epsilon\}$
+在 $\epsilon=0$ 处的得分 $A_F(h)$。有
+\[
+ \begin{aligned}
+ A_F(h)(O)&=E_F(h(T)\mid O)\\
+ &=E_F\bigl(h(T)\mid T\in(L(O),R(O)]\bigr)\\
+ &=\frac{\int_{L(O)}^{R(O)}h(t)\,dF(t)}
+ {F(R(O))-F(L(O))}.
+ \end{aligned}
+\]
+有效影响曲线 $D^*(F,G)$ 可定义为 $A_F(h^*-Fh^*)$，其中
+\[
+ h^*=h^*(F,G)=\argmin_{h\in L^2(F)}
+ P_{F,G}\{D(F,G)-A_F(h-Fh)\}^2.
+\]
+可以表示
+$h(t)=h(0)+\int I(t\geq x)\,dh(x)=h(0)+\int\phi_x(t)\,dh(x)$，
+其中 $\phi_x(t)=I(t\geq x)$。利用这一表示，有
+$Fh=h(0)+\int\bar F(x)\,dh(x)$。
+代入上述 $h^*$ 的定义，得到
+\[
+ \begin{aligned}
+ h^*&=\argmin_h P\left\{D(F,G)-\int A_F(\phi_x)\,dh(x)
+ +\int\bar F(x)\,dh(x)\right\}^2\\
+ &=\argmin_h P\left\{D(F,G)-\int
+ \{\bar F(x\mid\cdot)-\bar F(x)\}\,dh(x)\right\}^2,
+ \end{aligned}
+\]
+其中 $\bar F(x\mid O)=P(T>x\mid T\in(L(O),R(O)])$。
+
+设 $O_1,\ldots,O_n\sim_{\mathrm{iid}}P_{F,G}$ 为来自 $P_{F,G}$ 的样本。可以用下式估计 $h^*$：
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \left\{D(F,G)(O_i)-\int
+ \{\bar F(x\mid O_i)-\bar F(x)\}\,dh(x)\right\}^2.
+\]
+令 $\{x_1,\ldots,x_J\}$ 为在 $n$ 个粗化区间
+$(L(O_i),R(O_i)]$（$i=1,\ldots,n$）中，作为 $L(O_i)$ 或 $R(O_i)$ 出现的监测时间的集合。注意，$J=J(n)$ 至多为 $2n$；如果某些粗化区间的左端点为 0，或右端点为 $\infty$，则它会略小于 $2n$。我们认为，对每个 $M$，最小值 $h_{n,M}^*$ 都可由一个只在 $\{x_1,\ldots,x_J\}$ 上放置质量的离散测度 $dh$ 达到：
+\[
+ h_{n,M}^*=\argmin_{h,\|h\|_v<M}\frac1n\sum_{i=1}^n
+ \left\{D(F,G)(O_i)-\sum_{j=1}^J
+ \{\bar F(x_j\mid O_i)-\bar F(x_j)\}\,dh(x_j)\right\}^2.
+\]
+令 $\beta_j=dh(x_j)$，$\|\beta\|_1=\sum_{j=1}^n|\beta_j|$，并定义
+\[
+ \beta_{n,M}=\argmin_{\beta,\|\beta\|_1<M}\frac1n\sum_{i=1}^n
+ \left\{D(F,G)(O_i)-\sum_{j=1}^J
+ \beta_j\{\bar F(x_j\mid O_i)-\bar F(x_j)\}\right\}^2.
+\]
+这是一个标准的 Lasso 最小二乘线性回归估计量，$L_1$ 约束设为 $M$，结局为 $D(F,G)(O_i)$，$J$ 个主项为
+$\bar F(x_j\mid O_i)-\bar F(x_j)$，$j=1,\ldots,J$。
+设 $M_n$ 为交叉验证选择器，并定义 $\beta_n=\beta_{n,M_n}$。那么，有效影响曲线 $D^*(F,G)$ 的估计量为
+\[
+ D_n^*(F,G)(O)=\sum_{j=1}^J
+ \beta_{n,j}\{\bar F(x_j\mid O)-\bar F(x_j)\}.
+\]
+根据定理 8.1，该估计量在 $L^2(P_{F,G})$ 范数下，以快于 $n^{-1/4}$ 的速率收敛到 $D^*(F,G)$。

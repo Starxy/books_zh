@@ -1,0 +1,116 @@
+% 原分章PDF104页附录7.F—106页附录7.G标题前，印刷页680—682。
+\section*{附录7.F\quad 各向异性与K–L距离}
+\addcontentsline{toc}{section}{附录7.F 各向异性与K–L距离}
+\markright{附录7.F 各向异性与K–L距离}
+
+考虑均值相同、协方差矩阵分别为 $\Sigma_1,\Sigma_0$ 的两个高斯分布 $Z_1,Z_0$。两个高斯分布之间的K–L距离定义为
+\begin{equation}
+\begin{aligned}
+D(P_{\Sigma_1}\parallel P_{\Sigma_0})
+={}&E_{Z_1}\left[\log
+ \frac{\dfrac1{(2\pi)^{n/2}|\Sigma_1|^{1/2}}}
+ {\dfrac1{(2\pi)^{n/2}|\Sigma_0|^{1/2}}}
+ \frac{\exp\{-\tfrac12\operatorname{Tr}(\Sigma_1^{-1}Z_1Z_1^T)\}}
+ {\exp\{-\tfrac12\operatorname{Tr}(\Sigma_0^{-1}Z_0Z_0^T)\}}\right.\\
+={}&\frac12\log\frac{|\Sigma_0|}{|\Sigma_1|}
+ -\frac12E_{Z_1}[\operatorname{Tr}(\Sigma_1^{-1}Z_1Z_1^T)]\\
+&{}+\frac12E_{Z_1}[\operatorname{Tr}(\Sigma_0^{-1}Z_0Z_0^T)]\\
+={}&\frac12\log\frac{|\Sigma_0|}{|\Sigma_1|}
+ -\frac12n+\frac12\operatorname{Tr}(\Sigma_0^{-1}\Sigma_1)\\
+={}&\frac12\left(\log\frac{|\Sigma_0|}{|\Sigma_1|}
+ +n[\tau_n(\Sigma_0^{-1}\Sigma_1)-1]\right).
+\end{aligned}\tag{7.F.1}
+\end{equation}
+令 $\Sigma_0=\lambda I$。将 $\Sigma$ 的各向异性（anisotropy）定义为高斯分布 $Z_1$ 与协方差矩阵为 $\Sigma_0=\lambda I$ 的各向同性高斯分布之间的最小K–L距离：
+\begin{equation}
+D(\Sigma_1)=\min_\lambda\quad D(P_{\Sigma_1}\parallel P_{\Sigma_0}).\tag{7.F.2}
+\end{equation}
+注意
+\begin{equation}
+D(P_{\Sigma_1}\parallel P_{\Sigma_0})
+ =\frac12\left(n\log\lambda-\log|\Sigma_1|
+ +\frac1\lambda\operatorname{Tr}(\Sigma_1)-n\right).\tag{7.F.3}
+\end{equation}
+令式（7.F.3）右侧的导数为零，可得 $D(P_{\Sigma_1}\parallel P_{\Sigma_0})$ 的最小值：
+\begin{equation}
+\frac n\lambda-\frac{\operatorname{Tr}(\Sigma_1)}{\lambda^2}=0.\tag{7.F.4}
+\end{equation}
+由式（7.F.4）解出 $\lambda$，得到
+\begin{equation}
+\lambda=\tau_n(\Sigma_1).\tag{7.F.5}
+\end{equation}
+将式（7.F.5）代入式（7.F.3），得到
+\begin{equation}
+\begin{aligned}
+D(P_{\Sigma_1}\parallel P_{\Sigma_0})
+ &=\frac12\left(n\log\tau_n(\Sigma_1)-\log|\Sigma_1|
+  +n\frac{\operatorname{Tr}(\Sigma_1)}{\operatorname{Tr}(\Sigma_1)}-n\right)\\
+ &=\frac12\bigl(n\log\tau_n(\Sigma_1)-\log|\Sigma_1|\bigr).
+\end{aligned}\tag{7.F.6}
+\end{equation}
+将式（7.F.6）代入式（7.F.2），得到
+\begin{equation}
+D(\Sigma_1)=\frac12\bigl(n\log\tau_n(\Sigma_1)-\log|\Sigma_1|\bigr).\tag{7.F.7}
+\end{equation}
+假设 $\varepsilon_X,\varepsilon_Y$ 都是各向同性高斯分布流形，$\varepsilon_X^*,\varepsilon_Y^*$ 分别是 $P_X,P_Y$ 的投影。回顾 $P_X,P_Y$ 的协方差矩阵分别为 $\Sigma_X,A\Sigma_XA^T$，于是有
+\begin{equation}
+D(\Sigma_X)=D(P_X\parallel\varepsilon_X^*)
+ =\frac12\bigl(n\log\tau_n(\Sigma_X)-\log|\Sigma_X|\bigr)\tag{7.F.8}
+\end{equation}
+以及
+\begin{equation}
+D(\Sigma_Y)=D(P_Y\parallel\varepsilon_Y^*)
+ =\frac12\bigl(n\log\tau_n(\Sigma_Y)-\log|\Sigma_Y|\bigr).\tag{7.F.9}
+\end{equation}
+注意
+\begin{equation}
+\tau_n(\Sigma_Y)=\tau_n(A\Sigma_XA^T)\tag{7.F.10}
+\end{equation}
+以及
+\begin{equation}
+\log|\Sigma_Y|=\log|\Sigma_X|+\log|AA^T|.\tag{7.F.11}
+\end{equation}
+回顾
+\begin{equation}
+\begin{aligned}
+\Delta_{X\to Y}&=\log\tau_n(A\Sigma A^T)-\log\tau_n(\Sigma)
+ -\log\tau_m(AA^T),\qquad\text{或}\\
+\log\tau_n(A\Sigma A^T)&=\Delta_{X\to Y}+\log\tau_n(\Sigma)+\log\tau_m(AA^T).
+\end{aligned}\tag{7.F.12}
+\end{equation}
+代入式（7.F.10）—（7.F.12），得到
+\begin{equation}
+\begin{aligned}
+D(A\Sigma_XA^T)
+={}&\frac n2\Delta_{X\to Y}+\frac n2\log\tau_n(\Sigma_X)
+ +\frac n2\log\tau_m(AA^T)\\
+&{}-\frac12\log|\Sigma_X|-\frac12\log|AA^T|\\
+={}&\frac n2\Delta_{X\to Y}+\frac n2\log\tau_n(\Sigma_X)
+ -\frac12\log|\Sigma_X|\frac n2\log\tau_m(AA^T)\\
+&{}-\frac12\log|AA^T|\\
+={}&\frac n2\Delta_{X\to Y}+D(\Sigma_X)+D(AA^T).
+\end{aligned}\tag{7.F.13}
+\end{equation}
+回顾 $U_{out}(Y)$ 表示 $Y=AX$ 的分布，$\varepsilon_Y^*$ 是变量 $Y$ 在各向同性高斯分布流形 $\varepsilon_Y$ 上的投影分布。$U_{out}(Y)$ 的协方差矩阵为 $\Sigma_1=A\tau_n(\Sigma_X)IA^T=\tau_n(\Sigma_X)AA^T$，$\varepsilon_Y^*$ 的协方差矩阵为 $\Sigma_0=\tau_n(\Sigma_Y)I$。于是，由式（7.F.1），可得 $U_{out}(Y)$ 与 $\varepsilon_Y^*$ 之间的K–L距离（Janzing et al. 2012）：
+\begin{equation}
+D(U_{out}(Y)\parallel\varepsilon_Y^*)
+ =\frac12\left(\log\frac{(\tau_n(\Sigma_Y))^n}
+ {(\tau_n(\Sigma_X))^n|AA^T|}
+ +n\left[\frac{\tau_n(\Sigma_X)\tau_n(AA^T)}{\tau_n(\Sigma_Y)}-1\right]\right).\tag{7.F.14}
+\end{equation}
+注意
+\begin{equation}
+|\Sigma_Y|=|\Sigma_X||AA^T).\tag{7.F.15}
+\end{equation}
+将式（7.F.8）、（7.F.9）、（7.F.15）代入式（7.F.14），得到
+\begin{equation}
+\begin{aligned}
+D(P_Y\parallel\varepsilon_Y^*)
+={}&D(P_X\parallel\varepsilon_X^*)+D(U_{out}(Y)\parallel\varepsilon_Y^*)\\
+&{}+\frac n2\left[1-\frac{\tau_n(\Sigma_X)\tau_n(AA^T)}{\tau_n(\Sigma_Y)}\right].
+\end{aligned}\tag{7.F.16}
+\end{equation}
+将式（7.F.16）与式（7.68）比较，可以断定：为了使这两个等式相等，$X\to Y$ 必须蕴含
+\begin{equation}
+\tau_n(\Sigma_Y)=\tau_n(\Sigma_X)\tau_n(AA^T).\tag{7.F.17}
+\end{equation}

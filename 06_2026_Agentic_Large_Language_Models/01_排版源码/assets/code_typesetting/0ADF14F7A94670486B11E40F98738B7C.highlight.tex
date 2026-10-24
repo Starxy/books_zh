@@ -1,0 +1,33 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{async} \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{main}\PYG{p}{():}
+    \PYG{c+c1}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{} Demo Run \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+    \PYG{n}{current\PYGZus{}context} \PYG{o}{=} \PYG{p}{(}
+        \PYG{l+s+s2}{\PYGZdq{}Task: Determine if 97 is a prime number.}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+        \PYG{l+s+s2}{\PYGZdq{}Thought: I need to use the is\PYGZus{}prime tool to solve this.}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+        \PYG{l+s+s2}{\PYGZdq{}Action: Call tool `is\PYGZus{}prime` with number 97.}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+    \PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Simulate a tool\PYGZsq{}s output observation.}
+    \PYG{n}{tool\PYGZus{}output\PYGZus{}observation} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Observation: The tool returned the value \PYGZsq{}True\PYGZsq{}.\PYGZdq{}}
+
+    \PYG{c+c1}{\PYGZsh{} Update the context using the MCP function.}
+    \PYG{n}{updated\PYGZus{}context} \PYG{o}{=} \PYG{k}{await} \PYG{n}{update\PYGZus{}context\PYGZus{}with\PYGZus{}summary}\PYG{p}{(}\PYG{n}{current\PYGZus{}context}\PYG{p}{,} \PYG{n}{tool\PYGZus{}output\PYGZus{}observation}\PYG{p}{)}
+
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZhy{}\PYGZhy{}\PYGZhy{} Updated Context \PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{updated\PYGZus{}context}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Now, let\PYGZsq{}s add more \PYGZdq{}chatter\PYGZdq{} to force a summary.}
+    \PYG{n}{long\PYGZus{}chatter} \PYG{o}{=} \PYG{p}{(}
+        \PYG{l+s+s2}{\PYGZdq{}Thought: The tool has confirmed that 97 is a prime number. \PYGZdq{}}
+        \PYG{l+s+s2}{\PYGZdq{}The task is complete. \PYGZdq{}}
+        \PYG{l+s+s2}{\PYGZdq{}Final Answer: Yes, 97 is a prime number.\PYGZdq{}}
+    \PYG{p}{)}
+
+    \PYG{n}{updated\PYGZus{}context} \PYG{o}{=} \PYG{k}{await} \PYG{n}{update\PYGZus{}context\PYGZus{}with\PYGZus{}summary}\PYG{p}{(}\PYG{n}{updated\PYGZus{}context}\PYG{p}{,} \PYG{n}{long\PYGZus{}chatter}\PYG{p}{)}
+
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZhy{}\PYGZhy{}\PYGZhy{} Context after second update (summarized) \PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{updated\PYGZus{}context}\PYG{p}{)}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+    \PYG{n}{asyncio}\PYG{o}{.}\PYG{n}{run}\PYG{p}{(}\PYG{n}{main}\PYG{p}{())}
+\end{MintedVerbatim}

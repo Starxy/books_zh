@@ -1,0 +1,50 @@
+% 原分章PDF119页，全部7道习题；120页仅出版社标识。
+\Needspace{6\baselineskip}
+\section*{习题}
+\addcontentsline{toc}{section}{习题}
+\markright{习题}
+
+\begin{enumerate}[label=\textbf{习题\arabic*.},leftmargin=5em]
+\item 考虑结构方程模型
+\[
+\begin{aligned}
+X&=\varepsilon_x,\\
+Y&=X^2+\varepsilon_y,
+\end{aligned}
+\]
+其中 $\varepsilon_x,\varepsilon_y$ 均服从正态分布 $N(0,1)$。若将 $X$ 设为3，求效应 $Y$ 的分布。
+
+\item 令 $f(x)=\frac1{2b}\exp\{-|x-\mu|/b\}$ 为Laplace分布的密度函数。证明其微分熵为
+\[
+S(l)=1+\log(2b).
+\]
+
+\item 令 $f(x)=x^{\alpha-1}(1-x)^{\beta-1}/B(\alpha,\beta)$ 为Beta分布的密度函数。证明其微分熵为
+\[
+\begin{aligned}
+S(b)={}&\log B(\alpha,\beta)-(\alpha-1)[\psi(\alpha)-\psi(\alpha+\beta)]\\
+&{}-(\beta-1)[\psi(\beta)-\psi(\alpha+\beta)],
+\end{aligned}
+\]
+其中 $\psi$ 为双伽马函数。
+
+\item 令 $f(x)$ 为Beta分布，$g(x)$ 为 $[0,1]$ 上的均匀分布。计算K–L距离 $D(f\parallel g)$。
+
+\item 令
+\[
+g_2(x)=D(P_{Y\mid x}\parallel\vec P(y)
+ =\int\log\frac{P(y\mid x)}{\vec P(y)}P(y\mid x)\,dy.
+\]
+讨论 $\operatorname{cov}_{U_x}\bigl(g_2,P_X/U_X\bigr)=0$ 的含义。
+
+\item 证明：若 $X,Y$ 均为一维，则
+\[
+\Delta_{X\to Y}=0,\qquad\text{且}\quad\Delta_{Y\to X}=0.
+\]
+
+\item 证明
+\[
+\Delta_{X\to Y}+\Delta_{Y\to X}
+ =-\log(1-\operatorname{cov}(Z,1/Z))+\log\frac nm.
+\]
+\end{enumerate}

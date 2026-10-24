@@ -1,0 +1,97 @@
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode
+
+\begin{tikzpicture}
+	
+\def\vstep{1.3cm}
+\def\ssep{1.0cm}
+
+\tikzstyle{enode} = [minimum width=9*\nodestep,minimum height=1.4*\nodestep,inner sep=2pt,draw,thick]
+
+%%%%%% encoder
+\begin{scope}
+
+\node [anchor=west] (w0) at (0,0) {\footnotesize{$[\mathrm{CLS}]$}};
+\node [anchor=center] (w1) at ([xshift=\ssep]w0.center) {\footnotesize{$x_1$}};
+\node [anchor=center] (w2) at ([xshift=\ssep]w1.center) {\footnotesize{$...$}};
+\node [anchor=center] (w3) at ([xshift=\ssep]w2.center) {\footnotesize{$x_m$}};
+\node [anchor=center] (w4) at ([xshift=\ssep]w3.center) {\footnotesize{$[\mathrm{SEP}]$}};
+
+
+\draw [decoration={brace,amplitude=5pt},decorate] ([xshift=0.5em,yshift=-0.8em]w3.center) -- ([xshift=-0.5em,yshift=-0.8em]w1.center) node [pos=0.5,below,yshift=-0.5em] (text1) {\footnotesize{源文本}};
+
+\node [anchor=center] (e0) at ([yshift=0.8*\ssep]w0.center) {\footnotesize{$\mathbf{e}^{x}_{\mathrm{cls}}$}};
+\node [anchor=center] (e1) at ([yshift=0.8*\ssep]w1.center) {\footnotesize{$\mathbf{e}^{x}_1$}};
+\node [anchor=center] (e2) at ([yshift=0.8*\ssep]w2.center) {\footnotesize{$...$}};
+\node [anchor=center] (e3) at ([yshift=0.8*\ssep]w3.center) {\footnotesize{$\mathbf{e}^{x}_{m}$}};
+\node [anchor=center] (e4) at ([yshift=0.8*\ssep]w4.center) {\footnotesize{$\mathbf{e}^{x}_{m+1}$}};
+
+\draw [->] (w0.north) -- (e0.south);
+\draw [->] (w1.north) -- (e1.south);
+%\draw [->] (w2.north) -- (e2.south);
+\draw [->] (w3.north) -- (e3.south);
+\draw [->] (w4.north) -- (e4.south);
+
+
+\draw [->] (e0.north) -- ([yshift=0.3*\ssep]e0.north);
+\draw [->] (e1.north) -- ([yshift=0.3*\ssep]e1.north);
+%\draw [->] (e2.north) -- ([yshift=0.3*\ssep]e2.north);
+\draw [->] (e3.north) -- ([yshift=0.3*\ssep]e3.north);
+\draw [->] ([yshift=0]e4.north) -- ([yshift=0.3*\ssep-1pt]e4.north);
+
+\node [anchor=south,minimum width=5.5*\ssep,minimum height=1.0*\ssep,draw,thick] (encoder) at ([yshift=1.2*\ssep + 0.3cm,xshift=0.0*\ssep]w2.center) {\large{BERT（编码器）}};
+
+\node [anchor=south,minimum width=5.5*\ssep,minimum height=0.6*\ssep,draw,thick] (adapter) at ([yshift=0.5*\ssep]encoder.north) {适配器};
+
+\end{scope}
+
+%%%%%% decoder
+\begin{scope}[xshift=7.3cm]
+
+\node [anchor=west] (y0) at (0,0) {\footnotesize{$\langle s \rangle$}};
+\node [anchor=center] (y1) at ([xshift=\ssep]y0.center) {\footnotesize{$y_1$}};
+\node [anchor=center] (y2) at ([xshift=\ssep]y1.center) {\footnotesize{$y_2$}};
+\node [anchor=center] (y3) at ([xshift=\ssep]y2.center) {\footnotesize{$...$}};
+\node [anchor=center] (y4) at ([xshift=\ssep]y3.center) {\footnotesize{$y_{n-1}$}};
+
+\node [anchor=center] (ey0) at ([yshift=0.8*\ssep]y0.center) {\footnotesize{$\mathbf{e}^{y}_{0}$}};
+\node [anchor=center] (ey1) at ([yshift=0.8*\ssep]y1.center) {\footnotesize{$\mathbf{e}^{y}_{1}$}};
+\node [anchor=center] (ey2) at ([yshift=0.8*\ssep]y2.center) {\footnotesize{$\mathbf{e}^{y}_{2}$}};
+\node [anchor=center] (ey3) at ([yshift=0.8*\ssep]y3.center) {\footnotesize{$...$}};
+\node [anchor=center] (ey4) at ([yshift=0.8*\ssep]y4.center) {\footnotesize{$\mathbf{e}^{y}_{n-1}$}};
+
+\draw [->] (y0.north) -- (ey0.south);
+\draw [->] (y1.north) -- (ey1.south);
+\draw [->] (y2.north) -- (ey2.south);
+%\draw [->] (y3.north) -- (ey3.south);
+\draw [->] (y4.north) -- (ey4.south);
+
+\draw [->] (ey0.north) -- ([yshift=0.3*\ssep]ey0.north);
+\draw [->] (ey1.north) -- ([yshift=0.3*\ssep]ey1.north);
+\draw [->] (ey2.north) -- ([yshift=0.3*\ssep]ey2.north);
+%\draw [->] (ey3.north) -- ([yshift=0.3*\ssep]ey3.north);
+\draw [->] (ey4.north) -- ([yshift=0.3*\ssep]ey4.north);
+
+\node [anchor=south,minimum width=5.5*\ssep,minimum height=1.0*\ssep,draw,thick] (decoder) at ([yshift=1.2*\ssep + 0.3cm,xshift=0.0*\ssep]y2.center) {\large{解码器}};
+
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em] (t0) at ([yshift=2.2*\ssep]ey0.center) {\footnotesize{$y_1$}};
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em] (t1) at ([yshift=2.2*\ssep]ey1.center) {\footnotesize{$y_2$}};
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em] (t2) at ([yshift=2.2*\ssep]ey2.center) {\footnotesize{$y_3$}};
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em] (t3) at ([yshift=2.2*\ssep]ey3.center) {\footnotesize{$...$}};
+\node [anchor=south,minimum height=0.8em,minimum width=0.8em] (t4) at ([yshift=2.2*\ssep]ey4.center) {\footnotesize{$y_{n}$}};
+
+\draw [->] ([yshift=-0.4*\ssep]t0.south) -- ([yshift=-0pt]t0.south);
+\draw [->] ([yshift=-0.4*\ssep]t1.south) -- ([yshift=-0pt]t1.south);
+\draw [->] ([yshift=-0.4*\ssep]t2.south) -- ([yshift=-0pt]t2.south);
+%\draw [->] ([yshift=-0.4*\ssep]t3.south) -- ([yshift=-0pt]t3.south);
+\draw [->] ([yshift=-0.4*\ssep]t4.south) -- ([yshift=-0pt]t4.south);
+
+\draw [decoration={brace,amplitude=5pt},decorate] ([xshift=-0.5em,yshift=0.8em]t0.center) -- ([xshift=0.5em,yshift=0.8em]t4.center) node [pos=0.5,above,yshift=0.5em] (text2) {\footnotesize{目标文本}};
+
+\draw [->,thick,densely dashed] ([yshift=2pt]encoder.north) -- ([yshift=-2pt]adapter.south);
+\draw [->,thick,densely dashed] ([yshift=2pt]adapter.north) -- ([yshift=0.25*\ssep]adapter.north) -- ([yshift=0.25*\ssep,xshift=0.8*\ssep]adapter.north east) -- ([xshift=0.8*\ssep,yshift=0.5em]encoder.east) -- ([xshift=-2pt,yshift=0.5em]decoder.west);
+\draw [->,thick] ([xshift=2pt,yshift=-0.5em]encoder.east) -- ([xshift=-2pt,yshift=-0.5em]decoder.west);
+
+\end{scope}
+	
+\end{tikzpicture}

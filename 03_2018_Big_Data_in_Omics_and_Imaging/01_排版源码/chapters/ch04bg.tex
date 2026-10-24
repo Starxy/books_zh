@@ -1,0 +1,194 @@
+% 原PDF132页附录4.B标题—137页4.B.3标题之前。
+\section*{附录4.B\quad 基于负二项分布的RNA测序差异表达分析的对数线性模型}
+\addcontentsline{toc}{section}{附录4.B 基于负二项分布的RNA测序差异表达分析的对数线性模型}
+\markright{附录4.B RNA测序差异表达的对数线性模型}
+
+\subsection*{4.B.1\quad RNA测序计数数据的负二项分布模型}
+\addcontentsline{toc}{subsection}{4.B.1 RNA测序计数数据的负二项分布模型}
+
+用泊松分布建立计数数据模型，假设均值与方差相等。但实际中，由于异质性，常观察到RNA测序计数数据的方差大于均值。因此，需要修改读段计数的泊松分布模型。考虑计数数据的两种变异，即技术变异与生物变异，并建立同时包含二者的统计模型（McCarthy 2012）。
+
+首先考虑技术变异。假设对同一生物样本重复测序多次。令 $\pi_{gi}$ 为样本 $i$ 全部cDNA片段中，来自基因 $g$ 的比例。该比例在不同重复间变化。令 $\sqrt{\phi_g}$ 为 $\pi_{gi}$ 在重复间的变异系数（coefficient of variation，CV），即其标准差除以均值。样本 $i$ 中比对上的读段总数，以及比对至基因 $g$ 的读段数，分别记为 $N_i,y_{gi}$。显然
+\begin{equation}
+\E[y_{gi}]=\mu_{gi}=N_i\pi_{gi}.\tag{4.B.1}
+\end{equation}
+假设 $\pi_{gi}$ 为随机变量。$y_{gi}$ 的方差来自两部分。固定 $\pi_{gi}$ 时，假设 $y_{gi}$ 服从泊松过程，可观察到测序技术变异带来的条件方差 $\operatorname{var}(y\mid\pi)$。另一方面，还存在 $\pi_{gi}$ 变化带来的方差。因此，$y_{gi}$ 的总方差为
+\begin{equation}
+\begin{aligned}
+\operatorname{var}(y_{gi})
+&=\E_\pi[\operatorname{var}(y\mid\pi)]+\operatorname{var}_\pi(\E[y\mid\pi])\\
+&=\E_\pi[\mu_{gi}]+\operatorname{var}_\pi(N_i\pi_{gi})\\
+&=\mu_{gi}+N_i^2\operatorname{var}(\pi_{gi}).
+\end{aligned}\tag{4.B.2}
+\end{equation}
+由CV定义，
+\begin{equation}
+\operatorname{var}(\pi_{gi})=\pi_{gi}^2\phi_g.\tag{4.B.3}
+\end{equation}
+将式（4.B.3）代入式（4.B.2），利用式（4.B.1），得到
+\begin{equation}
+\operatorname{var}(y_{gi})=\mu_{gi}+\phi_g\mu_{gi}^2.\tag{4.B.4}
+\end{equation}
+现在考虑均值为 $Z$ 的复合泊松过程。均值 $Z$ 自身也是随机变量，服从形状参数 $\alpha=1/\phi_g$、率参数 $\beta=1/(\phi_g\mu_{gi})$ 的伽马分布，其密度为
+$f(z)=\beta^\alpha z^{\alpha-1}e^{-\beta z}/\Gamma(\alpha)$。
+于是，边际概率为
+\begin{equation}
+\begin{aligned}
+P(Y=y_{gi})
+&=\int_0^\infty\frac1{y_{gi}!}e^{-z}z^{y_{gi}}
+ \frac1{\Gamma(\alpha)}\beta^\alpha z^{\alpha-1}e^{-\beta z}\,dz\\
+&=\frac{\beta^\alpha}{y_{gi}!\Gamma(\alpha)}
+ \int_0^\infty e^{-(\beta+1)z}z^{y_{gi}+\alpha-1}\,dz.
+\end{aligned}\tag{4.B.5}
+\end{equation}
+令 $x=(\beta+1)z$，在式（4.B.5）中作变量替换：
+\begin{equation}
+\begin{aligned}
+P(Y=y_{gi})
+&=\frac{\beta^\alpha}{y_{gi}!\Gamma(\alpha)(\beta+1)^{y_{gi}+\alpha-1}}
+ \int_0^\infty e^{-x}x^{y_{gi}+\alpha-1}\,dx\\
+&=\frac{\beta^\alpha\Gamma(y_{gi}+\alpha)}{
+ y_{gi}!\Gamma(\alpha)(\beta+1)^{y_{gi}+\alpha}}\\
+&=\frac{\Gamma(y_{gi}+\alpha)}{y_{gi}!\Gamma(\alpha)}
+ \left(\frac1{1+\beta}\right)^{y_{gi}}
+ \left(\frac\beta{1+\beta}\right)^\alpha.
+\end{aligned}\tag{4.B.6}
+\end{equation}
+定义 $p=1/(1+\beta)$，则式（4.B.6）化为
+\begin{equation}
+P(Y=y_{gi})=\frac{\Gamma(y_{gi}+\alpha)}{y_{gi}!\Gamma(\alpha)}p^{y_{gi}}(1-p)^\alpha,\tag{4.B.7}
+\end{equation}
+表明读段计数服从负二项分布，其概率参数为 $p=1/(1+\beta)$，离散参数为 $\alpha$，常记为 $y_{gi}\sim\mathrm{NB}(\alpha,p)$。均值与方差分别为
+\begin{equation}
+\E[y_{gi}]=\alpha\frac p{1-p}=\frac\alpha\beta
+=\frac{1/\phi_g}{1/(\phi_{gi}\mu_{gi})}=\mu_{gi}\tag{4.B.8}
+\end{equation}
+与
+\begin{equation}
+\operatorname{var}(y_{gi})=\alpha\frac p{(1-p)^2}
+=\alpha\left(1+\frac1\beta\right)=\mu_{gi}(1+\phi_g\mu_{gi}).\tag{4.B.9}
+\end{equation}
+
+\subsection*{4.B.2\quad 对数线性模型}
+\addcontentsline{toc}{subsection}{4.B.2 对数线性模型}
+
+假设用以下对数线性模型检验差异表达（McCarthy et al. 2012）：
+\begin{equation}
+\log\mu_{gi}=x_i^T\gamma_g+\log N_i,\tag{4.B.10}
+\end{equation}
+其中，$x_i$ 为描述RNA样本 $i$ 的状态或所受处理条件的协变量向量，$\gamma_g$ 为与基因 $g$ 相关的 $q$ 维回归系数向量。对数似然正比于
+\begin{equation}
+\begin{aligned}
+l(\gamma_g,\phi_g)
+&\approx y_{gi}\log\phi_g+y_{gi}\log\mu_{gi}
+ -\left(y_{gi}+\frac1{\phi_g}\right)\log(1+\phi_g\mu_{gi})\\
+&=y_{gi}\log\phi_g+y_{gi}(x_i^T\gamma_g+\log N_i)\\
+&\quad{}-\left(y_{gi}+\frac1{\phi_g}\right)
+ \log(1+\phi_gN_ie^{x_i^T\gamma_g}),
+\end{aligned}\tag{4.B.11}
+\end{equation}
+或
+\begin{equation}
+\begin{aligned}
+l(\gamma_g,\phi_g)\approx{}&\left(\sum_{i=1}^{n}y_{gi}\right)\log\phi_g\\
+&{}+\sum_{i=1}^{n}\biggl[y_{gi}(x_i^T\gamma_g+\log N_i)\\
+&\hspace{4em}{}-\left(y_{gi}+\frac1{\phi_g}\right)
+ \log(1+\phi_gN_ie^{x_i^T\gamma_g})\biggr].
+\end{aligned}\tag{4.B.12}
+\end{equation}
+假设 $\phi_g$ 已知，下面研究参数 $\gamma_g$ 的估计。最大似然估计的必要最优条件为
+\begin{equation}
+\frac{\partial l}{\partial\gamma_g}=
+\sum_{i=1}^{n}\left[y_{gi}x_i-
+\left(y_{gi}+\frac1{\phi_g}\right)
+\frac{\phi_gx_iN_ie^{x_i^T\gamma_g}}{1+\phi_gN_ie^{x_i^T\gamma_g}}\right]=0.\tag{4.B.13}
+\end{equation}
+由式（4.B.10），
+\begin{equation}
+\mu_{gi}=N_ie^{x_i^T\gamma_g}.\tag{4.B.14}
+\end{equation}
+将式（4.B.14）代入式（4.B.13），可将对数似然关于 $\gamma_g$ 的导数写成均值 $\mu_{gi}$ 的函数：
+\begin{equation}
+\begin{aligned}
+\frac{\partial l}{\partial\gamma_g}
+&=\sum_{i=1}^{n}\left[y_{gi}x_i-
+ \left(y_{gi}+\frac1{\phi_g}\right)\frac{\phi_gx_i\mu_{gi}}{1+\phi_g\mu_{gi}}\right]\\
+&=\sum_{i=1}^{n}\frac{y_{gi}-\mu_{gi}}{1+\phi_g\mu_{gi}}x_i
+=\sum_{i=1}^{n}z_{gi}x_i,
+\end{aligned}\tag{4.B.15}
+\end{equation}
+其中
+\begin{equation}
+Z_{gi}=\frac{y_{gi}-\mu_{gi}}{1+\phi_g\mu_{gi}}.\tag{4.B.16}
+\end{equation}
+令设计矩阵 $X=[x_1,\ldots,x_n]$，向量 $z_g=[z_{g1},\ldots,z_{gn}]^T$。于是式（4.B.15）可写为
+\begin{equation}
+\frac{\partial l}{\partial\gamma_g}=Xz_g.\tag{4.B.17}
+\end{equation}
+因此，必要最优条件为
+\begin{equation}
+Xz_g=0,\tag{4.B.18}
+\end{equation}
+这是 $\gamma_g$ 的非线性方程，可用牛顿迭代法求解。首先计算Fisher信息矩阵。由式（4.B.14），
+\begin{equation}
+\frac{\partial\mu_{gi}}{\partial\gamma_g^T}
+=N_ix_i^Te^{x_i^T\gamma_g}=\mu_{gi}x_i^T.\tag{4.B.19}
+\end{equation}
+由式（4.B.16），
+\begin{equation}
+\begin{aligned}
+\frac{\partial z_{gi}}{\partial\gamma_g^T}
+&=\frac{-\dfrac{\partial\mu_{gi}}{\partial\gamma_g^T}
+ [1+\phi_g\mu_{gi}+(y_{gi}-\mu_{gi})\phi_g]}{(1+\phi_g\mu_{gi})^2}\\
+&=-\frac{\mu_{gi}[1+\phi_g\mu_{gi}+(y_{gi}-\mu_{gi})\phi_g]x_i^T}{(1+\phi_g\mu_{gi})^2}\\
+&=-\frac{\mu_{gi}y_{gi}\phi_gx_i^T}{(1+\phi_g\mu_{gi})^2}.
+\end{aligned}\tag{4.B.20}
+\end{equation}
+利用式（4.B.17）与式（4.B.20），得到对数似然函数的Hessian矩阵：
+\begin{equation}
+\frac{\partial^2l}{\partial\gamma_g\,\partial\gamma_g^T}
+=X\frac{\partial z_g}{\partial\gamma_g^T}=-XWX^T,\tag{4.B.21}
+\end{equation}
+其中
+\[
+W=\begin{bmatrix}
+\dfrac{\mu_{g1}y_{g1}\phi_g}{(1+\phi_g\mu_{g1})^2}&\cdots&0\\
+\vdots&\vdots&\vdots\\
+0&\cdots&\dfrac{\mu_{gn}y_{gn}\phi_g}{(1+\phi_g\mu_{gn})^2}
+\end{bmatrix}.
+\]
+Hessian矩阵为
+\begin{equation}
+I_g=-\left[\frac{\partial^2l}{\partial\gamma_g\,\partial\gamma_g^T}\right]=XWX^T.\tag{4.B.22}
+\end{equation}
+由Taylor展开，
+\begin{equation}
+\frac{\partial l}{\partial\gamma_g}
+=\left.\frac{\partial l}{\partial\gamma_g}\right|_{\gamma_g^{\mathrm{old}}}
++\frac{\partial^2l}{\partial\gamma\,\partial\gamma^T}
+(\gamma_g-\gamma_g^{\mathrm{old}}).\tag{4.B.23}
+\end{equation}
+最优条件（4.B.11）意味着
+\[
+\gamma_g-\gamma_g^{\mathrm{old}}=
+-\left(\frac{\partial^2l}{\partial\gamma\,\partial\gamma^T}\right)^{-1}
+\left.\frac{\partial l}{\partial\gamma_g}\right|_{\gamma_g^{\mathrm{old}}}.
+\]
+利用式（4.B.17）与式（4.B.23），得到参数 $\gamma_g$ 的迭代估计过程：
+\begin{equation}
+\gamma_g^{\mathrm{new}}=\gamma_g^{\mathrm{old}}+(XWX^T)^{-1}Xz_g.\tag{4.B.24}
+\end{equation}
+尽管迭代通常增加似然函数，也可能产生使似然下降的解。为保证每次迭代均使似然增加，可通过线搜索修改式（4.B.24）。令 $\delta=(XWX^T)^{-1}Xz_g$，定义新的迭代过程
+\begin{equation}
+\gamma_g^{\mathrm{new}}=\gamma_g^{\mathrm{old}}+\alpha\delta,\tag{4.B.25}
+\end{equation}
+其中 $\alpha$ 为步长常数。以 $\delta$ 为搜索方向，通过线搜索确定 $\alpha$，以保证似然增加。
+为简化搜索方向 $\delta$ 的计算，假设
+$y_{gi}\approx\mu_{gi}+1/\phi_g$、$\mu_{g1}=\cdots=\mu_{gn}=\mu_g$、$XX^T=I$。
+于是 $XWX^T\approx[\mu_g/(1+\phi_g\mu_g)]I$，
+$\delta=[\mu_g/(1+\phi_g\mu_g)]Xz_g$。
+令 $\alpha_0=\alpha\mu_g/(1+\phi_g\mu_g)$，则迭代过程（4.A90）化为
+\begin{equation}
+\gamma_g^{\mathrm{new}}=\gamma_g^{\mathrm{old}}+\alpha_0Xz_g.\tag{4.B.26}
+\end{equation}
+再次通过线搜索，可保证似然随迭代增加。

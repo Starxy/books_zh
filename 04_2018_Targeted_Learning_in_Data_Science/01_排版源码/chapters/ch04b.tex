@@ -1,0 +1,188 @@
+% 原书第 40—44 页；第 4.4 节及其三个小节。
+\section{用于确定何时开始治疗的 LTMLE}
+\label{sec:ch04-ltmle-start-treatment}
+
+\begin{sourcebox}
+现在，我们已将目标参数定义为一个映射：它把观测单位数据结构的概率分布的一个无限维参数，映射到参数空间。为此，我们仔细地将科学研究问题转化为了统计估计问题。构造 LTMLE 需要推导目标参数路径导数的有效影响曲线（efficient influence curve），指定一个损失函数（loss function），并设定一个通过初始或当前估计量的扰动工作子模型，使得在扰动为零时，得分的线性张成空间包含有效影响曲线；此外，还需要一个迭代极大化算法。这一迭代极大化过程一直进行到扰动参数的极大似然估计值接近零。LTMLE 将求解有效得分方程（efficient score equation），从而使目标参数的代入估计量（substitution estimator）具有双重稳健性（double robustness）和渐近有效性（asymptotic efficiency）。
+\end{sourcebox}
+
+\subsection{确定有效影响曲线}
+\label{subsec:ch04-eic}
+
+给定 $P\in\mathcal M$。假设我们已知处理机制 $g=g(P)$。此时，统计模型是一个较小的模型
+$\mathcal M(g)=\{P_1\in\mathcal M:g(P_1)=g\}$，由 $O$ 的所有可能密度构成，其中处理机制的各因子均由 $g$ 确定。在这样的模型中，我们可以利用已知的 $g$，用逆处理概率加权估计量（inverse probability of treatment weighted estimator）$\psi^d_{n,\mathrm{IPTW}}$ 来估计 $\psi^d$：
+\[
+ \psi^d_{n,\mathrm{IPTW}}
+ =\frac1n\sum_{i=1}^n
+ \frac{I\bigl(\bar A_i(T)=\bar d_T(\bar L_i(T))\bigr)}
+      {g_{0:T}\bigl(\bar A_i(T),\bar L_i(T)\bigr)}Y_i.
+\]
+由于 $\psi^d_{n,\mathrm{IPTW}}$ 是一个样本均值，所以它在任何 $P\in\mathcal M(g)$ 处都是一个（渐近）线性估计量，其影响曲线（influence curve）为
+\[
+ D^d(P)(O)
+ =\frac{I\bigl(\bar A(T)=\bar d_T(\bar L(T))\bigr)}
+       {g_{0:T}\bigl(\bar A(T),\bar L(T)\bigr)}Y-\Psi^d(P).
+\]
+
+有效性理论中的一个重要结果是：目标参数的一个正则渐近线性估计量在 $P$ 处的影响曲线，是目标参数路径导数在 $P$ 处的一个梯度。因此，我们知道，$D^d(P)$ 是模型 $\mathcal M(g)$ 中在 $P$ 处的一个梯度。$\Psi^d:\mathcal M(g)\to\mathbb R$ 在 $P$ 处的典范梯度（canonical gradient），定义为该梯度在 $\mathcal M(g)$ 的切空间（tangent space）$T_g(P)$ 上的投影：
+\[
+ D^{d*}(P)=\Pi\bigl(D^d(P)\mid T_g(P)\bigr).
+\]
+由于模型 $\mathcal M$ 中 $g$ 的切空间与 $\mathcal M(g)$ 的切空间正交，所以 $D^{d*}(P)$ 也是实际模型 $\mathcal M$ 中 $\Psi^d:\mathcal M\to\mathbb R$ 的典范梯度。因此，求目标参数 $\Psi^d:\mathcal M\to\mathbb R$ 在 $P$ 处的典范梯度或有效影响曲线，就归结为：计算初始梯度 $D^d(P)$ 在模型 $\mathcal M(g)$ 于 $P$ 处的切空间上的投影。切空间 $T_g(P)$ 等于各个条件密度的切空间 $T_{g,t}(P)$ 的正交和，这些条件密度分别是给定 $\bar L(t-1),\bar A(t-1)$ 时 $L(t)$ 的条件密度，$t=0,\ldots,T+1$。切空间 $T_{g,t}(P)$ 由 $L_0^2(P)$ 中所有关于 $(\bar A(t-1),\bar L(t))$ 的函数构成，并且这些函数给定 $\bar L(t-1),\bar A(t-1)$ 时的条件均值为零。由此可知，$D^d(P)$ 在 $T_g(P)$ 上的投影 $D^{d*}(P)$，等于 $D^d(P)$ 在各个 $T_{g,t}(P)$ 上投影之和，而后一个投影为
+\[
+ \begin{aligned}
+ D_t^{d*}(P)
+ &\equiv\Pi\bigl(D^d(P)\mid T_{g,t}(P)\bigr)\\
+ &=E\bigl(D^d(P)(O)\mid\bar L(t),\bar A(t-1)\bigr)\\
+ &\quad{}-E\bigl(D^d(P)(O)\mid\bar L(t-1),\bar A(t-1)\bigr).
+ \end{aligned}
+\]
+将 $A(t:T)$ 积分消去，可以把后一个投影改写为
+% 原书分母为 g_{t-1}，照录，未擅改成累积处理概率。
+\[
+ D_t^{d*}(P)
+ =\frac{I\bigl(\bar A(t-1)=\bar d_{t-1}\bigr)}
+        {g_{t-1}\bigl(\bar A(t-1),\bar L(t-1)\bigr)}
+  \bigl\{\bar Q_{t+1}^d(\bar L(t))-\bar Q_t^d(\bar L(t-1))\bigr\}.
+\]
+因此，$\Psi^d:\mathcal M\to\mathbb R$ 的有效影响曲线为
+\[
+ \begin{aligned}
+ D^{d*}(P)(O)
+ &=\sum_{t=0}^{T+1}D_t^{d*}(P)\\
+ &=\bar Q_1^d(L(0))-\Psi^d(P)\\
+ &\quad{}+\sum_{t=1}^{T+1}
+ \frac{I\bigl(\bar A(t-1)=\bar d_{t-1}\bigr)}
+      {g_{t-1}\bigl(\bar A(t-1),\bar L(t-1)\bigr)}
+ \bigl\{\bar Q_{t+1}^d(\bar L(t))-\bar Q_t^d(\bar L(t-1))\bigr\}.
+ \end{aligned}
+\]
+第一项 $D_0^{d,*}(P)$ 表示 $L(0)$ 分布的得分分量，而对 $t$ 求和中的各项，表示给定 $\bar L(t-1),\bar A(t-1)$ 时 $L(t)$ 分布的得分分量。
+
+\subsection{确定损失函数与扰动子模型}
+\label{subsec:ch04-loss-submodel}
+
+我们需要为 $\bar Q_t^d$ 确定一个损失函数，以及一个在 $\epsilon=0$ 时通过 $\bar Q_t^d$ 的子模型 $\{\bar Q_t^d(\epsilon_t,g):\epsilon\}$，其得分为 $D_t^{d*}(P)$，$t=T+1,\ldots,0$。由于参数 $\bar Q_t^d$ 是迭代定义的，我们也将以迭代的方式定义损失函数与子模型的这一组合，从 $t=T+1$ 开始，直到 $t=0$。$\bar Q_{T+1}^d$ 的一个有效损失函数是 Bernoulli 对数似然损失函数：
+% 原书对数内的左花括号没有单独的右括号，保留其可见定界符。
+\[
+ L(\bar Q_{T+1}^d)(O)
+ =-\Bigl\{Y\log\bar Q_{T+1}^d(\bar L(T))
+ +(1-Y)\log\{1-\bar Q_{T+1}^d(\bar L(T))\Bigr\}.
+\]
+考虑以下在 $\epsilon_{T+1}=0$ 时通过 $\bar Q_{T+1}^d$ 的子模型
+$\{\bar Q_{T+1}^d(\epsilon_{T+1},g):\epsilon_{T+1}\}$：
+\[
+ \logit Q_{T+1}^d(\epsilon_{T+1},g)
+ =\logit Q_{T+1}^d
+ +\epsilon_{T+1}\frac{I(\bar A_T=\bar d_T)}{g_{0:T}},
+\]
+其中，$I(\bar A_{t-1}=\bar d_{t-1})$ 表示从 $t=0$ 到 $t-1$ 始终遵循规则 $d$ 的示性函数，且
+$g_{0:t-1}=g_0\times\cdots\times g_{t-1}
+=P(A_0\mid L_0)\cdots P(A_{t-1}\mid\bar L_{t-1},\bar A_{t-1})$。
+注意，在 $\epsilon=0$ 时，得分确实等于 $D_{T+1}^{d*}(P)$：
+% 原书将负对数似然损失的导数写为正的 D；此处保留原式。
+\[
+ \left.\frac{d}{d\epsilon}L\bigl(\bar Q_{T+1}^d(\epsilon,g)\bigr)
+ \right|_{\epsilon=0}=D_{T+1}^{d*}(P).
+\]
+
+令 $t=T$。现在，我们希望为 $\bar Q_t^d$ 确定损失函数和子模型，此时可以把 $\bar Q_{t+1}^d$ 作为给定的结局。将 $\bar Q_{t+1}^d$ 视为给定的结局后，$\bar Q_t^d$ 的一个有效损失函数，仍可由对数似然损失函数给出：
+\[
+ \begin{aligned}
+ L_{\bar Q_{t+1}^d}(\bar Q_t^d)(O)
+ =-\Bigl\{&
+ \bar Q_{t+1}^d(\bar L(t))\log\bar Q_t^d(\bar L(t-1))\\
+ &{}+(1-\bar Q_{t+1}^d)\log\{1-\bar Q_t^d(\bar L(t-1))\Bigr\}.
+ \end{aligned}
+\]
+考虑以下在 $\epsilon_t=0$ 时通过 $\bar Q_t^d$ 的子模型
+$\{\bar Q_t^d(\epsilon_t,g):\epsilon\}$：
+\[
+ \logit Q_t^d(\epsilon_t,g)
+ =\logit Q_t^d+\epsilon_t\frac{I(\bar A_{t-1}=\bar d_{t-1})}{g_{0:t-1}}.
+\]
+事实上，得分
+$\frac{d}{d\epsilon_t}L_{\bar Q_{t+1}^d}\bigl(\bar Q_t^d(\epsilon_t,g)\bigr)$
+在 $\epsilon_t=0$ 时等于 $D_t^{d,*}(P)$。这样，我们便序贯地定义了损失函数 $L_{\bar Q_{t+1}^d}(\bar Q_t^d)$ 和在 $\epsilon_t=0$ 时通过 $\bar Q_t^d$ 的子模型
+$\{\bar Q_t^d(\epsilon_t,g):\epsilon_t\}$，其得分为 $D_t^{d*}(P)$，$t=T+1,\ldots,1$。
+
+最后，给定 $\bar Q_1^d(L(0))$，我们定义边际（Bernoulli）对数似然损失函数：
+% 原书末项印为 log{1-Q_0^d)}；保留其多出的圆括号及定界符。
+\[
+ L_{\bar Q_1^d}(\bar Q_0^d)
+ =-\bigl\{\bar Q_1^d(L(0))\log\bar Q_0^d
+ +(1-\bar Q_1^d(L(0)))\log\{1-\bar Q_0^d)\bigr\}.
+\]
+对于通过 $\bar Q_0^d$ 的子模型，我们选择
+\[
+ \logit Q_0^d(\epsilon_0)=\logit Q_0^d+\epsilon_0.
+\]
+同样，得分
+$\frac{d}{d\epsilon_0}L_{\bar Q_1^d}\bigl(\bar Q_0^d(\epsilon_0)\bigr)$
+在 $\epsilon_0=0$ 时等于所需的分量 $D_0^{d*}(P)$。
+
+\subsection{LTMLE 算法}
+\label{subsec:ch04-algorithm}
+
+从 $t=T+1$ 开始，直至 $t=0$，依次用 $\bar Q_t^d(\epsilon_{t,n},g_n)$ 的极大似然估计量更新 $\bar Q_t^d$ 的初始估计量 $\bar Q_{t,n}^d$，便得到以下 TMLE 算法。
+
+\begin{sourcebox}
+\textbf{算法。}\quad 特定规则下均值的 LTMLE\par
+\smallskip\hrule\smallskip
+对每一条规则 $d$：
+\begin{itemize}[label=$\star$,leftmargin=1.7em,itemsep=.3em]
+ \item 利用超级学习得到估计量 $Q_{T+1,n}^d$ 和 $g_{T,n}$。
+\end{itemize}
+\hspace*{1.7em}从 $t=T+1$ 到 $t=1$：
+\begin{itemize}[label=$\star$,leftmargin=3.4em,itemsep=.3em]
+ \item 保持 $Q_{t,n}^d$ 不变，在下列子模型中，计算 $\epsilon_t$ 的极大似然估计值
+ \[
+  \epsilon_{t,n}
+  =\argmin_\epsilon P_nL_{\bar Q_{t+1}^d}\bigl(\bar Q_t^d(\epsilon,g)\bigr):
+ \]
+ \[
+  \logit Q_t^d(\epsilon_t,g)
+  =\logit Q_{t,n}^d
+  +\epsilon_t\bigl(I(\bar A_{t-1}=\bar d_{t-1})/g_{0:t-1}\bigr).
+ \]
+ \item 令更新后的估计量为 $Q_{t,n}^{d*}=Q_{t,n}^d(\epsilon_{t,n},g_n)$。
+ \item 将 $Q_{t,n}^{d*}$ 定义为下一次回归的结局，并利用超级学习估计
+ \[
+  E\bigl(Q_t^d(L_{0:t-1})\mid
+   A_{t-2:0}=d(L_{t-2:0}),L_{t-2:0}\bigr).
+ \]
+\end{itemize}
+保存 $\Psi^d(P)$ 的最终估计量
+\[
+ Q_{0,n}^{d*}=\frac1n\sum_{i=1}^nQ_{t=1,n}^{d*}(L_{0,i}).
+\]
+\end{sourcebox}
+
+具体而言，在具有两个干预时点 $\bar A=(A_0,A_1)$、$T=1$ 的 HIV 治疗例子中，$E(Y^d)$ 的 LTMLE 按照以下步骤构造。还需回顾第 4.3 节中关于“遵循”这两条规则 $\mathcal D=\{d_1,d_2\}$ 的定义。
+\begin{enumerate}
+ \item 令 $Q_{3,n}^d=Y$，并设 $t=T+1=2$。
+ \item 考虑包含 $n$ 个观测的原始数据集 $S_n$。对于两条规则 $\mathcal D=\{d_1,d_2\}$ 中的每一条，分别建立数据 $S_n$ 的反事实“特定规则”版本。在这些反事实数据集 $S_{d_1}$ 和 $S_{d_2}$ 中，根据每个观测在规则 $d_1$ 和 $d_2$ 下本会取到的值，设定其 $\bar A=(A_0,A_1)$。
+ \item 使用 $S_n$，通过超级学习得到估计量 $Q_{2,n}^d$、$g_{1,n}$ 和 $g_{0,n}$。
+ \item 利用 $S_{d_1}$、$S_{d_2}$，以及上一步通过超级学习得到的 $Q_{2,n}^d$ 拟合结果，估计 $\bar A$ 取观测值时的预测结局，并估计每条规则下的反事实预测结局 $Q_{2,n}^{d_1}$ 和 $Q_{2,n}^{d_2}$。
+ \item 对每一条规则 $d_k$：保持 $Q_{2,n}^d$ 不变，计算 $\epsilon_2$ 在下列子模型中的极大似然估计值
+ $\epsilon_{2,n}=\argmin_\epsilon P_nL_{\bar Q_3^d}\bigl(\bar Q_2^d(\epsilon,g)\bigr)$：
+ \[
+  \logit Q_2^d(\epsilon_2,g)
+  =\logit Q_{2,n}^d+
+  \epsilon_2\bigl(I(\bar A_{t=1}=\bar d_{t=1})/g_{0:1}\bigr),
+ \]
+ 其中，$g_{0:1}=g_0\times g_1$；对于某个个体，
+ $I(\bar A_{t=1}=\bar d_{t=1})$ 表示其观测一直到 $t-1=1$ 都遵循规则 $d_k$ 的示性函数。令更新后的估计量为
+ $Q_{2,n}^{d*}=Q_{2,n}^d(\epsilon_{2,n},g_n)$。
+ \item 将 $Q_{2,n}^{d*}$ 定义为下一次基于超级学习的回归 $Q_{1,n}^d$ 的结局，并设 $t=1$。
+ \item 对 $t=1$ 重复第 4 步和第 5 步。然后，设 $t=0$。
+ \item 保存最终估计量
+ \[
+  Q_{0,n}^{d_1*}=\frac1n\sum_{i=1}^n Q_{t=1,n}^{d_1*}(L_{0,i})
+  \quad\text{和}\quad
+  Q_{0,n}^{d_2*}=\frac1n\sum_{i=1}^n Q_{t=1,n}^{d_2*}(L_{0,i}).
+ \]
+\end{enumerate}
+
+为了便于教学，这个例子忽略了患者退出研究等问题。关于明确包含删失机制的 LTMLE 例子，请参阅第 15 章。这个用于说明的 LTMLE 还对每个 $d_k$ 和每个 $t$ 分别估计了子模型。实现时也可以作出其他选择，包括使用联合子模型。目前已有 R 和 SAS 软件可用：\url{https://berkeleybiostats.github.io}，其中包括 CRAN 上的 R 包 \texttt{ltmle}（Lendle et al.，2017）。
+

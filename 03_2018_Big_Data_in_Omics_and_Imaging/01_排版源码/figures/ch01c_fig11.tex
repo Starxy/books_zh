@@ -1,0 +1,43 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,
+ n/.style={draw=blue!55!black,fill=white,minimum width=9mm,minimum height=6mm,inner sep=2pt,font=\small},
+ lab/.style={font=\small,inner sep=2pt}]
+\node[n] (c11a1) at (0,4.6) {$X_1$};
+\node[n] (c11a2) at (2.5,4.6) {$X_2$};
+\node[n] (c11a3) at (1.25,2.8) {$X_3$};
+\draw[green!55!black] (c11a1.north) to[bend left=18] node[lab,above] {$r_{12}$} (c11a2.north);
+\draw[->,green!55!black] (c11a1) -- node[lab,left] {$b_{31}$} (c11a3);
+\draw[->,green!55!black] (c11a2) -- node[lab,right] {$b_{32}$} (c11a3);
+\node[lab,anchor=west] at (-.6,2.3) {(a)};
+\node[n] (c11bz) at (7.2,4.9) {$Z$};
+\node[n] (c11by) at (7.2,3.7) {$Y$};
+\node[n] (c11bx) at (7.2,2.5) {$X$};
+\draw[->,green!55!black] (c11bz) -- (c11by);
+\draw[->,green!55!black] (c11by) -- (c11bx);
+\node[lab,anchor=west] at (5.1,2.3) {(b)};
+\node[n] (c11cx) at (0,.6) {$X$};
+\node[n] (c11cy) at (2.5,.6) {$Y$};
+\node[n] (c11cz) at (1.25,-1.2) {$Z$};
+\draw[->,green!55!black] (c11cx) -- (c11cz);
+\draw[->,green!55!black] (c11cy) -- (c11cz);
+\node[lab,anchor=west] at (-.6,-1.8) {(c)};
+\node[n] (c11da) at (6.5,1) {$A$};
+\node[n] (c11df) at (4.8,-.2) {$F$};
+\node[n] (c11dc) at (6.1,-1.8) {$C$};
+\node[n] (c11db) at (7.8,-.5) {$B$};
+\node[n] (c11de) at (9.8,-.5) {$E$};
+\node[n] (c11dd) at (8.7,-1.8) {$D$};
+\draw[->,green!55!black] (c11df) -- (c11dc);
+\draw[->,green!55!black] (c11da) -- (c11dc);
+\draw[->,green!55!black] (c11db) -- (c11dc);
+\draw[->,green!55!black] (c11da) -- (c11de);
+\draw[->,green!55!black] (c11db) -- (c11de);
+\draw[->,green!55!black] (c11db) -- (c11dd);
+\draw[->,green!55!black] (c11dc) -- (c11dd);
+\draw[->,green!55!black] (c11dd) -- (c11de);
+\node[lab,anchor=west] at (4.5,-2.4) {(d)};
+\end{tikzpicture}
+\origfig{11}{若干示例。(a) 例 9.5.3 的有向图；(b) 贝叶斯网络中的条件独立；(c) 判断变量间的独立关系；(d) 例 9.5.4 的路径图。}
+\label{fig:ch01c-11}
+\end{figure}

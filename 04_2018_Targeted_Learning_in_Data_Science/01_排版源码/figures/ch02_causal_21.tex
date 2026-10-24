@@ -1,0 +1,29 @@
+% 图 2.1；依据原书第 19 页的实线箭头逐条重绘。
+\begin{tikzpicture}[causal,x=1.7cm,y=1.3cm,
+ ch02n/.style={inner sep=2pt,fill=white,font=\normalsize}]
+\node[ch02n] (ch02aL0) at (0,0) {$L_0$};
+\node[ch02n] (ch02aA0) at (1,1) {$A_0$};
+\node[ch02n] (ch02aL1) at (2,0) {$L_1$};
+\node[ch02n] (ch02aA1) at (3,1) {$A_1$};
+\node[ch02n] (ch02aY) at (4,0) {$Y$};
+\node[ch02n] (ch02aUL0) at (0,-1) {$U_{L_0}$};
+\node[ch02n] (ch02aUA0) at (1,2) {$U_{A_0}$};
+\node[ch02n] (ch02aUL1) at (2,-1) {$U_{L_1}$};
+\node[ch02n] (ch02aUA1) at (3,2) {$U_{A_1}$};
+\node[ch02n] (ch02aUY) at (4,-1) {$U_Y$};
+\begin{scope}[on background layer]
+\draw[ed] (ch02aUL0) -- (ch02aL0);
+\draw[ed] (ch02aUA0) -- (ch02aA0);
+\draw[ed] (ch02aUL1) -- (ch02aL1);
+\draw[ed] (ch02aUA1) -- (ch02aA1);
+\draw[ed] (ch02aUY) -- (ch02aY);
+\draw[ed] (ch02aL0) -- (ch02aA0);
+\draw[ed] (ch02aL0) -- (ch02aL1);
+\draw[ed] (ch02aA0) -- (ch02aL1);
+\draw[ed] (ch02aA0) -- (ch02aA1);
+\draw[ed] (ch02aA0) -- (ch02aY);
+\draw[ed] (ch02aL1) -- (ch02aA1);
+\draw[ed] (ch02aL1) -- (ch02aY);
+\draw[ed] (ch02aA1) -- (ch02aY);
+\end{scope}
+\end{tikzpicture}

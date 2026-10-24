@@ -1,0 +1,50 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,x=1cm,y=1cm,every node/.style={font=\small,inner sep=2pt}]
+\draw[dash dot,purple](-.4,-.2)rectangle(4.9,5.1);
+\node at (2.2,5.45) {256个时间序列点 $\times$ 3个通道};
+\foreach \xx/\yy/\name in {0/0/c315l1,1.8/0/c315l2,3.6/0/c315l3}{
+ \draw[green!60!black,dotted](\xx,\yy)--(\xx,\yy+4.4)--(\xx+.45,\yy+4.85)--(\xx+.45,\yy+.45)--cycle;
+ \draw[line width=3pt,green!55](\xx+.12,\yy+.12)--(\xx+.12,\yy+4.52);
+}
+\coordinate(c315ls1)at(.12,4.05);
+\coordinate(c315ls2)at(1.92,3.35);
+\coordinate(c315ls3)at(3.72,3.25);
+\draw[line width=2pt,red!75] (.12,3.7)--(.12,4.4);
+\draw[line width=2pt,orange] (1.92,3)--(1.92,3.7);
+\draw[line width=2pt,red!75] (3.72,2.9)--(3.72,3.6);
+\node[left,text=orange]at(1.92,3.35){$5$};
+\node[left,text=red!75]at(3.72,3.25){$5$};
+\draw[dash dot,magenta!60](6.3,-1.7)rectangle(11.2,5.2);
+\foreach \xx/\yy/\name in {7.1/-1.4/c315r1,8.7/-.45/c315r2,10.3/.5/c315r3}{
+ \draw[green!55!black,dotted](\xx,\yy)--(\xx,\yy+4.2)--(\xx+.4,\yy+4.65)--(\xx+.4,\yy+.45)--cycle;
+ \draw[line width=3pt,green!60!black](\xx+.12,\yy+.12)--(\xx+.12,\yy+4.32);
+}
+\coordinate(c315rs1)at(7.22,1.3);
+\coordinate(c315rs2)at(8.82,2.6);
+\coordinate(c315rs3)at(10.42,3.9);
+\draw[line width=2pt,red!75](7.22,.95)--(7.22,1.65);
+\draw[line width=2pt,orange](8.82,2.25)--(8.82,2.95);
+\draw[line width=2pt,red!75](10.42,3.55)--(10.42,4.25);
+\draw[blue!60](c315ls1)--(c315rs3);
+\draw[green!55!black](c315ls2)--(c315rs2);
+\draw[magenta!75](c315ls3)--(c315rs1);
+\node[left,text=red!75]at(7.22,1.3){$5$};
+\node[right,text=orange]at(8.82,2.6){$5$};
+\node[anchor=west]at(10.6,3.9){$m_1\times m_2$};
+\node[anchor=west]at(11.3,3.2){$5\times3$滤波器};
+\node[anchor=west]at(11.3,2.2){$m_1=5,\ m_2=3$};
+\node (c315filter)at(8.5,1.1){滤波器};
+\draw[->,green!55!black](c315filter)--(c315rs1);
+\draw[->,green!55!black](c315filter)--(c315rs2);
+\draw[->,green!55!black](c315filter)--(c315rs3);
+\node(c315input)at(2.4,-.65){输入时间序列};
+\draw[->,magenta!65](c315input)--(3.72,.2);
+\node(c315map)at(9,-1.75){特征图};
+\draw[->,magenta!65](c315map)--(7.22,-1.28);
+\draw[->,magenta!65](c315map)--(8.82,-.33);
+\draw[->,magenta!65](c315map)--(10.42,.62);
+\end{tikzpicture}
+\origfig{15}{卷积层。}
+\label{fig:ch03-15}
+\end{figure}

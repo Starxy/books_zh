@@ -1,0 +1,34 @@
+\begin{tikzpicture}[
+    x=1cm,y=1cm,>=Latex,font=\small,
+    card/.style={draw=black!35,minimum width=.78cm,minimum height=.8cm,inner sep=3pt,font=\large},
+    model/.style={draw=black!45,rounded corners=5pt,minimum height=1cm,align=center,inner sep=6pt},
+    flow/.style={->,thick}
+]
+    \draw[densely dashed,black!55] (5.4,0) -- (5.4,5.8);
+    \node[font=\bfseries] at (2.5,5.45) {偏好数据};
+    \node[card,fill=cyan!45] (px) at (.6,4.3) {$x$};
+    \node[card,fill=yellow!75!orange] (pa) at (1.9,4.3) {$a^1$};
+    \node[card,fill=yellow!75!orange] (pb) at (3.2,4.3) {$a^2$};
+    \node[card,fill=violet!35] (py) at (4.5,4.3) {$y$};
+    \node[text=cyan!55!black] at (.6,3.6) {提示};
+    \node[text=orange!80!black] at (2.55,3.6) {回答};
+    \node[text=violet!70!black] at (4.5,3.6) {偏好};
+    \node[model,fill=green!45,minimum width=2.8cm,font=\bfseries] (rewardleft) at (2.55,1.35) {奖励模型};
+    \draw[flow] (2.55,3.15) -- node[right] {训练} (rewardleft.north);
+    \node[font=\bfseries] at (2.55,.2) {奖励建模};
+
+    \node[card,fill=cyan!45] (x) at (8.2,5.05) {$x$};
+    \node[anchor=west] at (8.85,5.05) {提示集合};
+    \node[model,fill=yellow!55,minimum width=3.25cm] (policy) at (8.2,3.65)
+        {\textbf{策略模型}\\[-1pt]\footnotesize 待对齐的大语言模型};
+    \draw[flow] (x.south) -- (policy.north);
+    \node[card,fill=yellow!75!orange] (a) at (7.55,1.35) {$a^1$};
+    \node[card,fill=yellow!75!orange] (b) at (8.85,1.35) {$a^2$};
+    \draw[flow] (policy.south) -- node[right] {生成回答} (8.2,1.95);
+    \node[model,fill=green!45,minimum width=2.4cm,font=\bfseries] (reward) at (13.05,1.35) {奖励模型};
+    \draw[flow] (9.55,1.35) -- (reward.west);
+    \node[card,fill=violet!35] (y) at (13.05,3.65) {$y$};
+    \draw[flow] (reward.north) -- node[right] {输出偏好} (y.south);
+    \draw[flow] (y.west) -- node[above] {更新参数} (policy.east);
+    \node[font=\bfseries] at (10.5,.2) {在线迭代 RLHF};
+\end{tikzpicture}

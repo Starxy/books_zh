@@ -1,0 +1,242 @@
+\section{可识别性的图形检验}
+
+图 3.7 展示了若干简单图形，其中 $P(y\mid\hat{x})$ 因存在“弓形模式”而不可识别——所谓弓形模式，是一条（虚线）混杂弧环抱着 $X$ 与 $Y$ 之间的因果连线。混杂弧表示图中存在一条只含未观测变量、且没有收敛箭头的后门路径。例如，图 3.1 中的路径 $X,Z_0,B,Z_3$ 可以表示为 $X$ 与 $Z_3$ 之间的一条混杂弧。弓形模式代表方程 $y=f_Y(x,u,e_Y)$，其中 $U$ 未被观测且与 $X$ 相依。这样的方程不允许识别因果效应，因为 $X$ 与 $Y$ 之间观测依赖的任何部分，总可以被归因于经由 $U$ 中介的虚假依赖。
+
+即便弓形模式出现在更大的图形语境中，它也妨碍 $P(y\mid\hat{x})$ 的识别，如图 3.7(b) 所示。这与线性模型形成对照：在线性模型中，给弓形模式添加一条弧反而可使 $P(y\mid\hat{x})$ 可识别（见第五章图 5.9）。例如，若 $Y$ 与 $X$ 通过线性关系 $y=bx+u$ 相联系，其中 $U$ 是可能与 $X$ 相关的未观测扰动，则 $b=E(Y\mid\hat{x})$ 不可识别。然而，若在结构中添加一条弧 $Z\to X$（即找到与 $X$ 相关而不与 $U$ 相关的变量 $Z$），便可借助工具变量公式计算 $E(Y\mid\hat{x})$（Bowden and Turkington 1984；另见第五章）：
+\begin{equation}
+b\triangleq\frac{\partial}{\partial x}E(Y\mid\hat{x})=\frac{E(Y\mid z)}{E(X\mid z)}=\frac{r_{YZ}}{r_{XZ}}. \tag{3.46}
+\end{equation}
+在非参数模型中，给弓形模式（图 3.7(b)）添加工具变量 $Z$ 并不能使 $P(y\mid\hat{x})$ 可识别。这是临床试验分析中一个熟悉的问题：处理分配（$Z$）是随机化的（因而没有连线进入 $Z$），但依从性不完美（见第八章）。图 3.7(b) 中 $X$ 与 $Y$ 之间的混杂弧，代表影响受试者选择处理（$X$）以及受试者对处理之反应（$Y$）的不可测因素。在此类试验中，若不对依从性与反应之间交互作用的性质作额外假设，就不可能获得处理效应 $P(y\mid\hat{x})$ 的无偏估计（例如 Imbens and Angrist 1994 与 Angrist et al. 1996 的分析即作了此类假设）。虽然添加的弧 $Z\to X$ 使我们能计算 $P(y\mid\hat{x})$ 的界（Robins 1989, sec.~lg; Manski 1990; Balke and Pearl 1997），且在某些类型的分布 $P(x,y,z)$ 上上下界甚至可能重合（\S 8.2.4），但对每个正分布 $P(x,y,z)$ 都计算 $P(y\mid\hat{x})$（如定义 3.2.4 所要求）却是不可能的。
+
+一般而言，在非参数模型中，给因果图添加弧只会妨碍、而绝不会助益因果效应的识别。这是因为添加弧减少了图所承载的 d-分离条件集；因此，若因果效应的推导在原图中失败，它在增广图中也必定失败。反之，任何在增广图中成功（通过一系列符号变换，如推论 3.4.2）的因果效应推导，都会在原图中成功。
+
+我们能够计算单变量对 $(Y_1,Y_2)$ 的 $P(y_1\mid\hat{x})$ 与 $P(y_2\mid\hat{x})$，并不保证能够计算联合分布，如 $P(y_1,y_2\mid\hat{x})$。例如，图 3.7(c) 展示了一个因果图，其中 $P(z_1\mid\hat{x})$ 与 $P(z_2\mid\hat{x})$ 都可计算，而 $P(z_1,z_2\mid\hat{x})$ 不可计算；因此我们无法计算 $P(y\mid\hat{x})$。有趣的是，这个图是不含弓形模式、却仍呈现不可计算因果效应的最小图。
+
+图 3.7(c) 展示的另一个有趣特征是：计算联合干预的效应往往比计算其各单变量干预的效应更容易。\footnote{这一点由 James Robins 提请我注意，他在序贯治疗管理的语境中算出了许多此类结果（Robins 1986, p.~1423）。}这里，$P(y\mid\hat{x},\hat{z}_1)$ 与 $P(y\mid\hat{x},\hat{z}_2)$ 都可计算，却无法计算 $P(y\mid\hat{x})$。例如，前者可在 $G_{\bar{X}}$ 中援引规则 2 求得：
+\begin{equation}
+P(y\mid\hat{x},\hat{z}_2)=\sum_{z_1}P(y\mid z_1,\hat{x},\hat{z}_2)P(z_1\mid\hat{x},\hat{z}_2)=\sum_{z_1}P(y\mid z_1,x,z_2)P(z_1\mid x). \tag{3.47}
+\end{equation}
+然而，规则 2 不能用来把 $P(z_1\mid\hat{x},z_2)$ 转换为 $P(z_1\mid x,z_2)$，因为在对 $Z_2$ 取条件时，$X$ 与 $Z_1$ 在 $G_{\bar{X}\bar{Z}_2}$ 中是 d-连通的（经由虚线）。计算联合干预与序贯干预之效应的一般方法由 Pearl and Robins (1995) 发展，将在第四章（\S 4.4）描述。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.92,every node/.style={transform shape}]
+  % (a) bow
+  \begin{scope}
+    \node[circle,fill,inner sep=1.4pt] (X) at (0,0.9) {}; \node[font=\small,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.4pt] (Y) at (1.6,-0.5) {}; \node[font=\small,right=0.4mm] at (1.6,-0.5) {$Y$};
+    \draw[ed] (X)--(Y);
+    \draw[bid,dashed] (X) to[bend right=35] (Y);
+    \node[font=\small] at (0.8,-1.25) {(a)};
+  \end{scope}
+  % (b) bow + instrument
+  \begin{scope}[xshift=4.0cm]
+    \node[circle,fill,inner sep=1.4pt] (Z) at (-1.4,0.9) {}; \node[font=\small,left=0.4mm] at (-1.4,0.9) {$Z$};
+    \node[circle,fill,inner sep=1.4pt] (X) at (0,0.9) {}; \node[font=\small,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.4pt] (Y) at (1.6,-0.5) {}; \node[font=\small,right=0.4mm] at (1.6,-0.5) {$Y$};
+    \draw[ed] (Z)--(X); \draw[ed] (X)--(Y);
+    \draw[bid,dashed] (X) to[bend right=35] (Y);
+    \node[font=\small] at (0.1,-1.25) {(b)};
+  \end{scope}
+  % (c) joint intervention case
+  \begin{scope}[xshift=8.6cm]
+    \node[circle,fill,inner sep=1.4pt] (X) at (-1.3,0.9) {}; \node[font=\small,left=0.4mm] at (-1.3,0.9) {$X$};
+    \node[circle,fill,inner sep=1.4pt] (Z1) at (0.2,1.2) {}; \node[font=\small,above=0.4mm] at (0.2,1.2) {$Z_1$};
+    \node[circle,fill,inner sep=1.4pt] (Z2) at (1.7,0.9) {}; \node[font=\small,right=0.4mm] at (1.7,0.9) {$Z_2$};
+    \node[circle,fill,inner sep=1.4pt] (Y) at (0.2,-0.4) {}; \node[font=\small,below=0.4mm] at (0.2,-0.4) {$Y$};
+    \draw[ed] (X)--(Z1); \draw[ed] (X)--(Z2);
+    \draw[ed] (Z1)--(Y); \draw[ed] (Z2)--(Y);
+    \draw[bid,dashed] (Z1) to[bend left=40] (Z2);
+    \node[font=\small] at (0.2,-1.25) {(c)};
+  \end{scope}
+\end{tikzpicture}
+\caption{(a) 弓形模式：一条混杂弧环抱因果连线 $X\to Y$，从而妨碍 $P(y\mid\hat{x})$ 的识别，即便存在工具变量 $Z$ 亦然，如 (b) 所示。(c) 一个不含弓形模式、却仍禁止识别 $P(y\mid\hat{x})$ 的图。}
+\label{fig:3.7}
+\end{figure}
+
+\subsection{可识别的模型}
+
+图 3.8 展示了若干简单图形，其中 $X$ 对 $Y$ 的因果效应可识别（$X$、$Y$ 为单变量）。这类模型称为“可识别的”，因为其结构传达了足够多的假设（缺失的连线），使目标量 $P(y\mid\hat{x})$ 得以识别。这些图中并未显式画出潜变量；这类变量隐含于（虚线）混杂弧之中。每个含潜变量的因果图，都可转换为一个由被测量变量经箭头与混杂弧互联的等价图。这一转换相当于从 \textup{(3.2)} 的结构方程中消去一切潜变量，然后构造新图：凡 $X_j$ 出现在 $X_i$ 的方程中，就从 $X_j$ 向 $X_i$ 画箭头；凡同一个 $e$ 项同时出现在 $f_i$ 与 $f_j$ 中，就画一条混杂弧。所得图中，一切未测量变量都是外生的且相互独立。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.9,every node/.style={transform shape}]
+  \def\panel#1#2{%
+    \begin{scope}[xshift=#1,yshift=#2]
+      \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+      \node[circle,fill,inner sep=1.3pt] (Y) at (0.9,-0.5) {}; \node[font=\footnotesize,below=0.4mm] at (0.9,-0.5) {$Y$};
+    \end{scope}}
+  % (a)
+  \panel{0cm}{0cm}
+  \draw[ed] (X)--(Y); \node[font=\small] at (0.45,-1.3) {(a)};
+  % (b)
+  \begin{scope}[xshift=2.9cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0.9,-0.5) {}; \node[font=\footnotesize,below=0.4mm] at (0.9,-0.5) {$Y$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (2.1,0.2) {}; \node[font=\footnotesize,right=0.4mm] at (2.1,0.2) {$Z$};
+    \draw[ed] (X)--(Y); \draw[ed] (Z)--(Y);
+    \node[font=\small] at (0.9,-1.3) {(b)};
+  \end{scope}
+  % (c)
+  \begin{scope}[xshift=6.1cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0.9,-0.5) {}; \node[font=\footnotesize,below=0.4mm] at (0.9,-0.5) {$Y$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (1.9,0.9) {}; \node[font=\footnotesize,right=0.4mm] at (1.9,0.9) {$Z$};
+    \draw[ed] (X)--(Y); \draw[ed] (Z)--(Y);
+    \draw[bid,dashed] (X) to[bend left=35] (Z);
+    \node[font=\small] at (0.9,-1.3) {(c)};
+  \end{scope}
+  % (d)
+  \begin{scope}[xshift=9.3cm]
+    \node[circle,fill,inner sep=1.3pt] (Z) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$Z$};
+    \node[circle,fill,inner sep=1.3pt] (X) at (1.1,0.35) {}; \node[font=\footnotesize,right=0.4mm] at (1.1,0.35) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (1.1,-0.8) {}; \node[font=\footnotesize,below=0.4mm] at (1.1,-0.8) {$Y$};
+    \draw[ed] (Z)--(X); \draw[ed] (Z)--(Y); \draw[ed] (X)--(Y);
+    \node[font=\small] at (1.1,-1.5) {(d)};
+  \end{scope}
+  % (e)
+  \begin{scope}[yshift=-3.6cm,xshift=0.6cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (0.9,0) {}; \node[font=\footnotesize,right=0.4mm] at (0.9,0) {$Z$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0,-0.9) {$Y$};
+    \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+    \draw[bid,dashed] (X) to[bend left=45] (Y);
+    \node[font=\small] at (0,-1.6) {(e)};
+  \end{scope}
+  % (f)
+  \begin{scope}[yshift=-3.6cm,xshift=4.2cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z1) at (-0.9,0) {}; \node[font=\footnotesize,left=0.4mm] at (-0.9,0) {$Z_1$};
+    \node[circle,fill,inner sep=1.3pt] (Z2) at (1.3,0) {}; \node[font=\footnotesize,right=0.4mm] at (1.3,0) {$Z_2$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0,-1.0) {}; \node[font=\footnotesize,below=0.4mm] at (0,-1.0) {$Y$};
+    \draw[ed] (X)--(Z1); \draw[ed] (X)--(Z2);
+    \draw[ed] (Z1)--(Y); \draw[ed] (Z2)--(Y);
+    \draw[bid,dashed] (Z1) to[bend left=30] (Z2);
+    \node[font=\small] at (0,-1.7) {(f)};
+  \end{scope}
+  % (g)
+  \begin{scope}[yshift=-3.6cm,xshift=8.6cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (-1.2,0.9) {}; \node[font=\footnotesize,left=0.4mm] at (-1.2,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z1) at (0.1,0.3) {}; \node[font=\footnotesize,below=0.4mm] at (0.1,0.3) {$Z_1$};
+    \node[circle,fill,inner sep=1.3pt] (Z2) at (1.6,1.1) {}; \node[font=\footnotesize,above=0.4mm] at (1.6,1.1) {$Z_2$};
+    \node[circle,fill,inner sep=1.3pt] (Z3) at (1.0,-0.5) {}; \node[font=\footnotesize,below=0.4mm] at (1.0,-0.5) {$Z_3$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (2.5,0.1) {}; \node[font=\footnotesize,right=0.4mm] at (2.5,0.1) {$Y$};
+    \draw[ed] (X)--(Z1); \draw[ed] (X)--(Z2);
+    \draw[ed] (Z1)--(Z3); \draw[ed] (Z2)--(Z3); \draw[ed] (Z3)--(Y);
+    \draw[bid,dashed] (Z1) to[bend left=30] (Z2);
+    \draw[bid,dashed] (X) to[bend right=40] (Z3);
+    \node[font=\small] at (0.7,-1.3) {(g)};
+  \end{scope}
+\end{tikzpicture}
+\caption{$X$ 对 $Y$ 之效应可识别的典型模型。虚线弧表示混杂路径，$Z$ 表示被观测的协变量。}
+\label{fig:3.8}
+\end{figure}
+
+审视图 3.8 的各图，应注意以下几个特征。
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 由于从因果图中移除任何弧或箭头只会助益因果效应的可识别性，$P(y\mid\hat{x})$ 在图 3.8 各图的任何边子图中仍可识别。同样，在因果图任一边上引入观测中介变量，只会助益而绝不会妨碍因果效应的可识别性。因此，在图 3.8 各图上添加中介节点所得的任何图，$P(y\mid\hat{x})$ 仍可识别。
+\item 图 3.8 的各图是\emph{极大的}：在已有节点对上再引入任何附加弧或箭头，都会使 $P(y\mid\hat{x})$ 不再可识别。注意这与第 105 页定理 3.6.1 相符。
+\item 尽管图 3.8 中的大多数图都含弓形模式，但没有一个弓形模式发自 $X$（如下文图 3.9(a)、(b) 那样）。一般而言，$P(y\mid\hat{x})$ 可识别的一个必要条件是：$X$ 与“作为 $Y$ 之祖先的 $X$ 的任何子节点”之间不存在混杂弧。
+\item 图 3.8 的 (a)、(b) 两图不含 $X$ 与 $Y$ 之间的后门路径，因而代表处理（$X$）与响应（$Y$）之间没有混杂偏倚的实验设计；于是 $P(y\mid\hat{x})=P(y\mid x)$。同样，图 3.8 的 (c)、(d) 两图代表这样的设计：被观测协变量 $Z$ 阻断了 $X$ 与 $Y$ 之间的一切后门路径（用 Rosenbaum and Rubin 1983 的说法，$X$ 是“给定 $Z$ 时条件可忽略的”）；于是 $P(y\mid\hat{x})$ 由对 $Z$ 的标准调整得到（如 \textup{(3.19)}）：
+\[
+P(y\mid\hat{x})=\sum_{z}P(y\mid x,z)P(z).
+\]
+\item 对图 3.8 的每个图，我们都不难仿照 \S 3.4.3 的样式作符号推导，得到 $P(y\mid\hat{x})$ 的公式；推导往往由图的结构引导。例如，图 3.8 的图 (f) 指示如下推导。写出
+\[
+P(y\mid\hat{x})=\sum_{z_1,z_2}P(y\mid z_1,z_2,\hat{x})P(z_1,z_2\mid\hat{x}),
+\]
+我们看到含 $\{X,Z_1,Z_2\}$ 的子图在结构上与图 (e) 相同，只是以 $(Z_1,Z_2)$ 替换了 $(Z,Y)$。因此 $P(z_1,z_2\mid\hat{x})$ 可由 \textup{(3.43)} 得到。同样，项 $P(y\mid z_1,z_2,\hat{x})$ 可由规则 2 化简为 $P(y\mid z_1,z_2,x)$，因为 $(Y\indep X\mid Z_1,Z_2)_{G_{\bar{X}}}$。于是有
+\begin{equation}
+P(y\mid\hat{x})=\sum_{z_1,z_2}P(y\mid z_1,z_2,x)P(z_1\mid x)\sum_{x'}P(z_2\mid z_1,x')P(x'). \tag{3.48}
+\end{equation}
+对图 3.8 的图 (g) 作类似推导，得到
+\begin{equation}
+P(y\mid\hat{x})=\sum_{z_1}\sum_{z_2}\sum_{x'}P(y\mid z_1,z_2,x')P(z_1\mid z_2,x)P(z_2). \tag{3.49}
+\end{equation}
+注意变量 $Z_3$ 未出现在 \textup{(3.49)} 中，这意味着若只想了解 $X$ 对 $Y$ 的因果效应，$Z_3$ 无须被测量。
+\item 在图 3.8 的 (e)、(f)、(g) 三图中，$P(y\mid\hat{x})$ 的可识别性是由受处理 $X$ 影响的被观测协变量 $Z$ 促成的（因为 $Z$ 的成员是 $X$ 的后代）。这与统计学实验文献中反复出现的告诫相反——不要对那些受处理影响的伴随观测作调整（Cox 1958; Rosenbaum 1984; Pratt and Schlaifer 1988; Wainer 1989）。人们通常相信，受处理影响的伴随变量 $Z$ 必须被排除在总效应分析之外（Pratt and Schlaifer 1988），理由是对总效应的计算相当于把 $Z$ 积分掉，而这在功能上等同于一开始就省略 $Z$。图 (e)、(f)、(g) 表明，有些情形确实以 $X$ 的总效应为研究对象，即便如此，测量受 $X$ 影响的伴随变量（如 $Z$ 或 $Z_1$）仍然是必要的。然而，对此类伴随变量所需的调整是非标准的，涉及 \textup{(3.19)} 标准调整的两阶段或更多阶段（见 \textup{(3.28)}、\textup{(3.48)} 与 \textup{(3.49)}）。
+\item 在图 3.8 的 (b)、(c)、(f) 三图中，$Y$ 有一个父节点，其对 $Y$ 的效应不可识别；即便如此，$X$ 对 $Y$ 的效应仍可识别。这表明局部可识别性并非全局可识别性的必要条件。换言之，为识别 $X$ 对 $Y$ 的效应，我们不必坚持识别从 $X$ 到 $Y$ 各路径上的每一条连线。
+\end{enumerate}
+
+\subsection{不可识别的模型}
+
+图 3.9 展示了若干典型图形，其中 $X$ 对 $Y$ 的总效应 $P(y\mid\hat{x})$ 不可识别。这些图值得注意的特征如下。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[causal,scale=0.88,every node/.style={transform shape}]
+  % (a) bow
+  \begin{scope}
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0,-0.9) {$Y$};
+    \draw[ed] (X)--(Y); \draw[bid,dashed] (X) to[bend left=45] (Y);
+    \node[font=\small] at (0,-1.6) {(a)};
+  \end{scope}
+  % (b) confounded child
+  \begin{scope}[xshift=3.0cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (0.1,0) {}; \node[font=\footnotesize,right=0.4mm] at (0.1,0) {$Z$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0,-0.9) {$Y$};
+    \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+    \draw[bid,dashed] (X) to[bend right=35] (Z);
+    \node[font=\small] at (0,-1.6) {(b)};
+  \end{scope}
+  % (c)
+  \begin{scope}[xshift=6.2cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (1.4,0.2) {}; \node[font=\footnotesize,right=0.4mm] at (1.4,0.2) {$Z$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0.1,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0.1,-0.9) {$Y$};
+    \draw[ed] (X)--(Z); \draw[ed] (X)--(Y);
+    \draw[bid,dashed] (X) to[bend right=40] (Y);
+    \node[font=\small] at (0.5,-1.6) {(c)};
+  \end{scope}
+  % (d)
+  \begin{scope}[xshift=9.4cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (1.4,0.3) {}; \node[font=\footnotesize,right=0.4mm] at (1.4,0.3) {$Z$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0.3,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0.3,-0.9) {$Y$};
+    \draw[ed] (X)--(Y); \draw[ed] (Z)--(Y);
+    \draw[bid,dashed] (X) to[bend left=40] (Z);
+    \draw[bid,dashed] (X) to[bend right=40] (Y);
+    \node[font=\small] at (0.7,-1.6) {(d)};
+  \end{scope}
+  % (e) surrogate case
+  \begin{scope}[yshift=-3.5cm,xshift=0.8cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z) at (0.9,0.05) {}; \node[font=\footnotesize,right=0.4mm] at (0.9,0.05) {$Z$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0,-0.9) {$Y$};
+    \draw[ed] (X)--(Z); \draw[ed] (Z)--(Y);
+    \draw[bid,dashed] (X) to[bend left=45] (Y);
+    \draw[bid,dashed] (Z) to[bend right=35] (Y);
+    \node[font=\small] at (0.3,-1.6) {(e)};
+  \end{scope}
+  % (f)
+  \begin{scope}[yshift=-3.5cm,xshift=4.2cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (0,0.9) {}; \node[font=\footnotesize,above=0.4mm] at (0,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z1) at (0.1,0) {}; \node[font=\footnotesize,right=0.4mm] at (0.1,0) {$Z_1$};
+    \node[circle,fill,inner sep=1.3pt] (Z2) at (0.7,-0.9) {}; \node[font=\footnotesize,right=0.4mm] at (0.7,-0.9) {$Z_2$};
+    \draw[ed] (X)--(Z1); \draw[ed] (Z1)--(Z2);
+    \draw[bid,dashed] (X) to[bend left=40] (Z2);
+    \node[font=\small] at (0.3,-1.6) {(f)};
+  \end{scope}
+  % (g)
+  \begin{scope}[yshift=-3.5cm,xshift=7.6cm]
+    \node[circle,fill,inner sep=1.3pt] (X) at (-0.9,0.9) {}; \node[font=\footnotesize,left=0.4mm] at (-0.9,0.9) {$X$};
+    \node[circle,fill,inner sep=1.3pt] (Z1) at (0.2,0.2) {}; \node[font=\footnotesize,left=0.4mm] at (0.2,0.2) {$Z_1$};
+    \node[circle,fill,inner sep=1.3pt] (Z2) at (1.4,0.2) {}; \node[font=\footnotesize,right=0.4mm] at (1.4,0.2) {$Z_2$};
+    \node[circle,fill,inner sep=1.3pt] (Y) at (0.5,-0.9) {}; \node[font=\footnotesize,below=0.4mm] at (0.5,-0.9) {$Y$};
+    \draw[ed] (X)--(Z1); \draw[ed] (X)--(Z2);
+    \draw[ed] (Z1)--(Y); \draw[ed] (Z2)--(Y);
+    \draw[bid,dashed] (Z1) to[bend left=30] (Z2);
+    \node[font=\small] at (0.4,-1.6) {(g)};
+  \end{scope}
+\end{tikzpicture}
+\caption{$P(y\mid\hat{x})$ 不可识别的典型模型。}
+\label{fig:3.9}
+\end{figure}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em]
+\item 图 3.9 中所有图都含有 $X$ 与 $Y$ 之间的不可阻断后门路径，即那些以指向 $X$ 的箭头结尾、且不能被 $X$ 的被观测非后代阻断的路径。此类路径的存在确实是不可识别性的一个\emph{必要}检验（见定理 3.3.2）。但它并非充分检验，这一点由图 3.8(e) 表明：那里后门路径（虚线）不可阻断，而 $P(y\mid\hat{x})$ 仍可识别。
+\item $P(y\mid\hat{x})$ 不可识别的一个\emph{充分}条件，是 $X$ 与它在从 $X$ 到 $Y$ 某条路径上的任一子节点之间存在混杂弧，如图 3.9(b)、(c) 所示。更强的充分条件是：图中以图 3.9 所示任一模式为其边子图。
+\item 图 3.9 的图 (g)（与图 3.7(c) 相同）表明，局部可识别性并不足以保证全局可识别性。例如，我们可以识别 $P(z_1\mid\hat{x})$、$P(z_2\mid\hat{x})$、$P(y\mid\hat{z}_1)$ 与 $P(y\mid\hat{z}_2)$，却无法识别 $P(y\mid\hat{x})$。这是非参数模型与线性模型的主要差别之一；在线性模型中，一切因果效应都可由结构系数确定，而每个系数都表示一个变量对其直接后继的因果效应。
+\end{enumerate}
