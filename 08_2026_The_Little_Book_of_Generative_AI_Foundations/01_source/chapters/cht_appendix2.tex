@@ -1,0 +1,339 @@
+\chapter{扩散模型逆后验推导}
+\label{app:diffusion-posterior}
+
+在第 4.4 节中，我们指出真实逆后验
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\]
+是高斯分布，并给出了其均值与方差的闭式表达式。这里给出的推导建立在与此前 PPCA 中相同的基本代数思想之上：一旦所有相关项都是高斯的，就可以把关于目标变量的二次项收集起来，再通过配方法得到结果。
+
+\subsection*{步骤 1：从 Bayes 公式开始}
+
+根据前向过程，有
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)\,
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}.
+\]
+由于分母不依赖于 \(\mathbf{x}_{t-1}\)，当把该式视为关于 \(\mathbf{x}_{t-1}\) 的函数时，分母只起归一化常数的作用。因此，在比例意义下，
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\propto
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)\,
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0).
+\]
+
+由于前向过程满足 Markov 性，
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)
+=
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1}),
+\]
+因此两个高斯因子分别为
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_t\mid
+\sqrt{\alpha_t}\,\mathbf{x}_{t-1},
+(1-\alpha_t)\mathbf{I}
+\bigr),
+\]
+以及
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_{t-1}\mid
+\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0,
+(1-\bar{\alpha}_{t-1})\mathbf{I}
+\bigr).
+\]
+
+\subsection*{步骤 2：把乘积写成指数形式}
+
+忽略与 \(\mathbf{x}_{t-1}\) 无关的归一化常数，有
+\[
+\begin{aligned}
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+&\propto
+\exp\!\left(
+-\frac{1}{2(1-\alpha_t)}
+\left\|
+\mathbf{x}_t-\sqrt{\alpha_t}\,\mathbf{x}_{t-1}
+\right\|^2
+\right)
+\\[4pt]
+&\qquad\times
+\exp\!\left(
+-\frac{1}{2(1-\bar{\alpha}_{t-1})}
+\left\|
+\mathbf{x}_{t-1}-\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0
+\right\|^2
+\right).
+\end{aligned}
+\]
+合并两个指数项得到
+\[
+\begin{aligned}
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\propto
+\exp\!\Bigg(
+&-\frac{1}{2(1-\alpha_t)}
+\left\|
+\mathbf{x}_t-\sqrt{\alpha_t}\,\mathbf{x}_{t-1}
+\right\|^2
+\\
+&-\frac{1}{2(1-\bar{\alpha}_{t-1})}
+\left\|
+\mathbf{x}_{t-1}-\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0
+\right\|^2
+\Bigg).
+\end{aligned}
+\]
+
+\subsection*{步骤 3：展开关于 \texorpdfstring{$\mathbf{x}_{t-1}$}{x\_\{t-1\}} 的二次项}
+
+现在展开两个平方范数，只保留包含 \(\mathbf{x}_{t-1}\) 的项。
+
+对于第一项，
+\[
+\begin{aligned}
+\left\|
+\mathbf{x}_t-\sqrt{\alpha_t}\,\mathbf{x}_{t-1}
+\right\|^2
+&=
+\mathbf{x}_t^\top\mathbf{x}_t
+-2\sqrt{\alpha_t}\,\mathbf{x}_t^\top \mathbf{x}_{t-1}
++\alpha_t\,\mathbf{x}_{t-1}^\top \mathbf{x}_{t-1}.
+\end{aligned}
+\]
+对于第二项，
+\[
+\begin{aligned}
+\left\|
+\mathbf{x}_{t-1}-\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0
+\right\|^2
+&=
+\mathbf{x}_{t-1}^\top \mathbf{x}_{t-1}
+-2\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_{t-1}^\top \mathbf{x}_0
++\bar{\alpha}_{t-1}\,\mathbf{x}_0^\top\mathbf{x}_0.
+\end{aligned}
+\]
+
+将这些结果代入指数部分，并去掉与 \(\mathbf{x}_{t-1}\) 无关的项，得到
+\[
+\begin{aligned}
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\propto
+\exp\!\Bigg(
+&-\frac{1}{2}
+\left[
+\frac{\alpha_t}{1-\alpha_t}
++
+\frac{1}{1-\bar{\alpha}_{t-1}}
+\right]
+\mathbf{x}_{t-1}^\top \mathbf{x}_{t-1}
+\\
+&+
+\left[
+\frac{\sqrt{\alpha_t}}{1-\alpha_t}\,\mathbf{x}_t^\top
++
+\frac{\sqrt{\bar{\alpha}_{t-1}}}{1-\bar{\alpha}_{t-1}}\,\mathbf{x}_0^\top
+\right]
+\mathbf{x}_{t-1}
+\Bigg).
+\end{aligned}
+\]
+
+此时它已经具有标准的高斯二次型形式
+\[
+-\frac12 A\,\mathbf{x}_{t-1}^\top \mathbf{x}_{t-1}
++
+\mathbf{b}^\top \mathbf{x}_{t-1},
+\]
+其中
+\[
+A
+=
+\frac{\alpha_t}{1-\alpha_t}
++
+\frac{1}{1-\bar{\alpha}_{t-1}},
+\qquad
+\mathbf{b}
+=
+\frac{\sqrt{\alpha_t}}{1-\alpha_t}\,\mathbf{x}_t
++
+\frac{\sqrt{\bar{\alpha}_{t-1}}}{1-\bar{\alpha}_{t-1}}\,\mathbf{x}_0.
+\]
+
+\subsection*{步骤 4：配方}
+
+利用标准恒等式
+\[
+-\frac12 A\,\mathbf{x}^\top\mathbf{x}
++
+\mathbf{b}^\top\mathbf{x}
+=
+-\frac12 A
+\left\|
+\mathbf{x}-A^{-1}\mathbf{b}
+\right\|^2
++\text{常数},
+\]
+可以看出，该后验是高斯分布，其协方差系数为
+\[
+\tilde{\beta}_t = A^{-1},
+\]
+均值为
+\[
+\tilde{\boldsymbol{\mu}}_t = A^{-1}\mathbf{b}.
+\]
+
+因此先化简 \(A\)：
+\[
+\begin{aligned}
+A
+&=
+\frac{\alpha_t}{1-\alpha_t}
++
+\frac{1}{1-\bar{\alpha}_{t-1}}
+\\[4pt]
+&=
+\frac{
+\alpha_t(1-\bar{\alpha}_{t-1}) + (1-\alpha_t)
+}{
+(1-\alpha_t)(1-\bar{\alpha}_{t-1})
+}.
+\end{aligned}
+\]
+由于 \(1-\alpha_t=\beta_t\)，且 \(\bar{\alpha}_t=\alpha_t\bar{\alpha}_{t-1}\)，分子变为
+\[
+\alpha_t - \alpha_t\bar{\alpha}_{t-1} + 1 - \alpha_t
+=
+1-\bar{\alpha}_t.
+\]
+因此
+\[
+A
+=
+\frac{
+1-\bar{\alpha}_t
+}{
+\beta_t(1-\bar{\alpha}_{t-1})
+},
+\]
+从而
+\[
+\boxed{
+\tilde{\beta}_t
+=
+A^{-1}
+=
+\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\,\beta_t.
+}
+\]
+
+接下来计算均值：
+\[
+\tilde{\boldsymbol{\mu}}_t
+=
+A^{-1}\mathbf{b}
+=
+\tilde{\beta}_t
+\left(
+\frac{\sqrt{\alpha_t}}{1-\alpha_t}\,\mathbf{x}_t
++
+\frac{\sqrt{\bar{\alpha}_{t-1}}}{1-\bar{\alpha}_{t-1}}\,\mathbf{x}_0
+\right).
+\]
+代入
+\(
+\tilde{\beta}_t
+=
+\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t
+\)
+以及 \(1-\alpha_t=\beta_t\)，可得
+\[
+\begin{aligned}
+\tilde{\boldsymbol{\mu}}_t
+&=
+\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t
+\left(
+\frac{\sqrt{\alpha_t}}{\beta_t}\,\mathbf{x}_t
++
+\frac{\sqrt{\bar{\alpha}_{t-1}}}{1-\bar{\alpha}_{t-1}}\,\mathbf{x}_0
+\right)
+\\[6pt]
+&=
+\frac{\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\,\mathbf{x}_t
++
+\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}\,\mathbf{x}_0.
+\end{aligned}
+\]
+因此
+\[
+\boxed{
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+\sqrt{\bar{\alpha}_{t-1}}\,\beta_t
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_0
++
+\frac{
+\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_t.
+}
+\]
+
+\subsection*{步骤 5：最终结果}
+
+综合以上各式，
+\[
+\boxed{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+=
+\mathcal{N}\!\Bigl(
+\mathbf{x}_{t-1}\mid
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0),
+\tilde{\beta}_t\mathbf{I}
+\Bigr),
+}
+\]
+其中
+\[
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+\sqrt{\bar{\alpha}_{t-1}}\,\beta_t
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_0
++
+\frac{
+\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_t,
+\]
+并且
+\[
+\tilde{\beta}_t
+=
+\frac{
+1-\bar{\alpha}_{t-1}
+}{
+1-\bar{\alpha}_t
+}\,\beta_t.
+\]
+
+这就是 ELBO 中学习得到的去噪转移 \(p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)\) 所需要拟合的精确局部逆向目标。

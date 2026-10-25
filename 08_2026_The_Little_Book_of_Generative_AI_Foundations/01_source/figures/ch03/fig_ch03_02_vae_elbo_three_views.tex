@@ -1,0 +1,82 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  elbo/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=7pt,
+    text width=12.2cm
+  },
+  view/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=7pt,
+    text width=5.75cm,
+    minimum height=2.35cm
+  },
+  flow/.style={->,thick}
+]
+
+\node[elbo] (joint) at (0,2.25) {
+  \textbf{联合密度形式}\\[4pt]
+  $\displaystyle
+  \mathcal{L}(\mathbf{x};\theta,\phi)
+  =
+  \mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+  \!\left[
+  \log
+  \frac{p_{\theta}(\mathbf{x},\mathbf{z})}
+       {q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+  \right]$
+};
+
+\node[view] (inf) at (-3.45,-1.2) {
+  \textbf{推断视角}\\[4pt]
+  $\displaystyle
+  \begin{aligned}
+  \mathcal{L}
+  &=
+  \log p_{\theta}(\mathbf{x})\\[-1pt]
+  &\quad-
+  \mathrm{KL}\!\left(
+  q_{\phi}(\mathbf{z}\mid\mathbf{x})
+  \,\|\,p_{\theta}(\mathbf{z}\mid\mathbf{x})
+  \right)
+  \end{aligned}$\\[5pt]
+  精确对数似然与 ELBO 之间的差距来自
+  近似后验与真实后验的不匹配。
+};
+
+\node[view] (train) at (3.45,-1.2) {
+  \textbf{训练视角}\\[4pt]
+  $\displaystyle
+  \begin{aligned}
+  \mathcal{L}
+  &=
+  \mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+  [\log p_{\theta}(\mathbf{x}\mid\mathbf{z})]\\[-1pt]
+  &\quad-
+  \mathrm{KL}\!\left(
+  q_{\phi}(\mathbf{z}\mid\mathbf{x})
+  \,\|\,p(\mathbf{z})
+  \right)
+  \end{aligned}$\\[5pt]
+  期望重构对数似然与
+  朝先验的正则化相互权衡。
+};
+
+\draw[flow] (joint) -- node[left] {\scriptsize Bayes 规则} (inf);
+\draw[flow] (joint) -- node[right] {\scriptsize 分解联合分布} (train);
+
+\node[font=\normalsize\bfseries] at (0,3.45)
+  {同一个 ELBO 的三种视角};
+
+\end{tikzpicture}
+\caption{\textbf{VAE ELBO 的三种等价视角。}
+联合密度形式是一般变分目标。利用 Bayes 规则可得到推断视角，即“精确对数似然减去后验不匹配”；对联合分布进行分解则得到训练视角，即“期望重构对数似然减去朝潜变量先验的正则化”。三种形式在代数上完全等价。}
+\label{fig:vae-elbo-three-views}
+\end{figure}

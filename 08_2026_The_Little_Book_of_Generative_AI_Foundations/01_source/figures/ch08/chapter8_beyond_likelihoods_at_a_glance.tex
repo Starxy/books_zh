@@ -1,0 +1,54 @@
+\begin{center}
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  box/.style={draw,rounded corners=2pt,align=center,inner sep=6pt,
+             text width=3.15cm,minimum height=1.02cm},
+  flow/.style={->,thick}
+]
+\node[font=\normalsize\bfseries] at (6.0,2.65)
+  {超越似然：概览};
+
+\node[box] (gan) at (1.7,0.85) {
+  \textbf{GAN 比较}\\[2pt]
+  生成器样本\\
+  $\leftrightarrow$ 判别器\\
+  反馈
+};
+\node[box] (wgan) at (6.0,0.85) {
+  \textbf{WGAN 几何}\\[2pt]
+  传输距离\\
+  取代\\
+  分类
+};
+\node[box] (ebm) at (10.3,0.85) {
+  \textbf{EBM 景观}\\[2pt]
+  能量赋予\\
+  相对\\
+  合理性
+};
+\draw[flow] (gan) -- (wgan);
+\draw[flow] (wgan) -- (ebm);
+
+\node[box] (ratio) at (1.7,-2.15) {
+  \textbf{最优}\\[-1pt]
+  \textbf{判别器}\\[2pt]
+  局部密度比\\
+  信息
+};
+\node[box] (energy) at (6.0,-2.15) {
+  \textbf{未归一化密度}\\[2pt]
+  $p_\theta(x)\propto e^{-E_\theta(x)}$\\
+  全局\\
+  配分函数
+};
+\node[box] (score) at (10.3,-2.15) {
+  \textbf{回到得分}\\[2pt]
+  $\nabla_x\log p_\theta(x)$\\
+  $=-\nabla_xE_\theta(x)$
+};
+\draw[flow] (gan) -- (ratio);
+\draw[flow] (ebm) -- (energy);
+\draw[flow] (energy) -- (score);
+\end{tikzpicture}
+\end{center}

@@ -48,6 +48,9 @@ scripts/                          仓库维护检查工具
 | [Foundations of Large Language Models](05_2025_Foundations_of_Large_Language_Models/) | 大语言模型基础 | [PDF](00_books/Foundations_of_Large_Language_Models_cn_translated.pdf) | 285 |
 | [Agentic Large Language Models](06_2026_Agentic_Large_Language_Models/) | 智能体大语言模型 | [PDF](00_books/Agentic_Large_Language_Models_cn_translated.pdf) | 382 |
 | [Causal Inference: What If](07_2026_Causal_Inference_What_If/) | 因果推断：如果 | [PDF](00_books/Causal_Inference_What_If_cn_translated.pdf) | 346 |
+| [The Little Book of Generative AI Foundations: An Intuitive Mathematical Primer](08_2026_The_Little_Book_of_Generative_AI_Foundations/) | 生成式人工智能基础小册：直观数学导论 | [PDF](00_books/The_Little_Book_of_Generative_AI_Foundations_cn_translated.pdf) | 196 |
+
+《生成式人工智能基础小册》于2026-10-25导入用户提供的既有中文PDF与源码。本次只整理目录、源码结构和构建入口，未重新编译或检查翻译质量。
 
 当前底本与内容范围：
 
@@ -58,6 +61,7 @@ scripts/                          仓库维护检查工具
 - **Foundations of Large Language Models：** 依据 arXiv:2501.09223v4 源码，6 章、参考文献及中文索引。目录中的 2025 是归档年份，具体底本以 v4 为准。
 - **Agentic Large Language Models：** 依据 arXiv:2610.13455v1 源码，23 章、7 个分部引言及按章参考文献。
 - **Causal Inference: What If：** 3 个分部、23 章、引言、参考文献及索引；当前中文成品为包含书后材料的 346 页版本。
+- **The Little Book of Generative AI Foundations：** arXiv:2605.29713v2，2026-09-08；主文件组织为8章、前言、结语、附录A—B和参考文献，保留所提供译文。
 
 ## 新增与维护书籍
 
@@ -78,7 +82,7 @@ scripts/                          仓库维护检查工具
 python build.py
 ```
 
-也可使用工程提供的 `build.ps1`。现有构建脚本在系统临时目录编译，成功后将完整 PDF 输出到根目录 `00_books/`，编译失败保留已有成品。Foundations of Large Language Models 还使用 BibTeX 和 upmendex，具体依赖和执行顺序以各书说明为准。
+也可使用工程提供的 `build.ps1`。现有构建脚本在系统临时目录编译，成功后将完整 PDF 输出到根目录 `00_books/`，编译失败保留已有成品。Foundations of Large Language Models 还使用 BibTeX 和 upmendex；The Little Book of Generative AI Foundations 使用 Biber，由 latexmk 调用。具体依赖和执行顺序以各书说明为准。
 
 修改正文、文献或图表后，重新核对目录、引用、页码、索引及受影响版面。源码中的图形 PDF、数据、样式和固定文献排版源可能是必要构建输入，清理时依据工程依赖判断。
 

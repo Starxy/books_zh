@@ -1,0 +1,217 @@
+\chapter{高斯代数与配方法}
+\label{app:completing-square}
+
+第 2 章通过直接的线性高斯论证推导了 PPCA 的边缘分布 \(p(\mathbf{x})\)。对于该章的主线而言，这种方法最为快捷、透明。不过，还有另一种推导方式值得考察，因为同样的代数结构会在后续其他高斯潜变量模型中反复出现，即\emph{配方法}（completing the square）。
+
+本附录集中整理若干依赖显式高斯代数的推导，尤其着重把正文中隐式使用的配方恒等式说明清楚。在 PPCA 情形下，这一方法的价值在于：它能够在同一套推导中同时得到两个关键的高斯量：
+\begin{itemize}
+    \item 后验分布 \(p(\mathbf{z}\mid \mathbf{x})\)；
+    \item 以及对 \(\mathbf{z}\) 积分消去之后得到的边缘分布 \(p(\mathbf{x})\)。
+\end{itemize}
+
+\paragraph{配方法。}
+高斯密度是二次型的指数函数。因此，只要某个变量的对数密度可以写成该变量的二次函数，我们就可以尝试把它改写成标准高斯形式。配方法正是完成这种改写的代数工具：它把二次表达式重新组织为
+\[
+-\frac12 (\text{变量} - \text{均值})^\top
+(\text{精度矩阵})
+(\text{变量} - \text{均值})
++\text{常数},
+\]
+于是便可以直接读出高斯分布的均值和协方差。
+
+为了便于后续复用，有必要显式给出这一技巧的矩阵形式。若 \(A\) 为对称正定矩阵，则
+\[
+-\frac12 \mathbf{x}^\top A \mathbf{x} + \mathbf{b}^\top \mathbf{x}
+=
+-\frac12 (\mathbf{x}-A^{-1}\mathbf{b})^\top A (\mathbf{x}-A^{-1}\mathbf{b})
++\frac12 \mathbf{b}^\top A^{-1}\mathbf{b}.
+\]
+这是因为将右侧展开可得
+\[
+\begin{aligned}
+&-\frac12 (\mathbf{x}-A^{-1}\mathbf{b})^\top A (\mathbf{x}-A^{-1}\mathbf{b})
++\frac12 \mathbf{b}^\top A^{-1}\mathbf{b} \\[4pt]
+&\qquad=
+-\frac12 \mathbf{x}^\top A \mathbf{x}
++\mathbf{b}^\top \mathbf{x}
+-\frac12 \mathbf{b}^\top A^{-1}\mathbf{b}
++\frac12 \mathbf{b}^\top A^{-1}\mathbf{b} \\[4pt]
+&\qquad=
+-\frac12 \mathbf{x}^\top A \mathbf{x}+\mathbf{b}^\top \mathbf{x}.
+\end{aligned}
+\]
+因此，这两个表达式完全等价；第二个只是把第一个改写成以高斯分布中心为中心的形式。向量 \(A^{-1}\mathbf{b}\) 是该二次型的中心，而 \(A\) 是精度矩阵，其逆矩阵给出协方差。
+
+\paragraph{步骤 1：从联合密度开始。}
+回顾 PPCA 模型：
+\[
+p(\mathbf{z})=\mathcal{N}(\mathbf{z}\mid \mathbf{0},\mathbf{I}),
+\qquad
+p(\mathbf{x}\mid \mathbf{z})
+=
+\mathcal{N}(\mathbf{x}\mid \mathbf{Wz}+\boldsymbol{\mu},\alpha^2\mathbf{I}).
+\]
+因此
+\[
+p(\mathbf{x},\mathbf{z})
+=
+p(\mathbf{x}\mid \mathbf{z})\,p(\mathbf{z}).
+\]
+
+由于高斯密度是二次型的指数函数，因此处理联合对数密度更加方便：
+\[
+\log p(\mathbf{x},\mathbf{z})
+=
+-\frac{1}{2\alpha^2}\|\mathbf{x}-\boldsymbol{\mu}-\mathbf{Wz}\|^2
+-\frac12 \|\mathbf{z}\|^2
++\text{常数}.
+\]
+
+\paragraph{步骤 2：展开关于 \(\mathbf{z}\) 的二次项。}
+展开第一个范数得
+\[
+\|\mathbf{x}-\boldsymbol{\mu}-\mathbf{Wz}\|^2
+=
+(\mathbf{x}-\boldsymbol{\mu})^\top(\mathbf{x}-\boldsymbol{\mu})
+-2\,\mathbf{z}^\top \mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu})
++\mathbf{z}^\top \mathbf{W}^\top\mathbf{W}\mathbf{z}.
+\]
+代回可得
+\[
+\log p(\mathbf{x},\mathbf{z})
+=
+-\frac{1}{2\alpha^2}(\mathbf{x}-\boldsymbol{\mu})^\top(\mathbf{x}-\boldsymbol{\mu})
++\frac{1}{\alpha^2}\mathbf{z}^\top\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu})
+-\frac12 \mathbf{z}^\top
+\Bigl(\frac{1}{\alpha^2}\mathbf{W}^\top\mathbf{W}+\mathbf{I}\Bigr)\mathbf{z}
++\text{常数}.
+\]
+
+现在把 \(\mathbf{x}\) 视为固定。此时联合对数密度是 \(\mathbf{z}\) 的二次函数，因此可以通过配方法把它改写为关于 \(\mathbf{z}\) 的高斯形式。
+
+\paragraph{步骤 3：配方。}
+定义
+\[
+\mathbf{M}
+=
+\mathbf{W}^\top\mathbf{W}+\alpha^2\mathbf{I},
+\qquad
+\mathbf{m}
+=
+\mathbf{M}^{-1}\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}).
+\]
+由于
+\[
+\frac{1}{\alpha^2}\mathbf{W}^\top\mathbf{W}+\mathbf{I}
+=
+\frac{1}{\alpha^2}\mathbf{M},
+\]
+联合对数密度中依赖于 \(\mathbf{z}\) 的部分变为
+\[
+-\frac{1}{2\alpha^2}\mathbf{z}^\top\mathbf{M}\mathbf{z}
++
+\frac{1}{\alpha^2}\mathbf{z}^\top\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}).
+\]
+此时它与上面的通用恒等式完全同形，其中
+\[
+A=\frac{1}{\alpha^2}\mathbf{M},
+\qquad
+\mathbf{b}=\frac{1}{\alpha^2}\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}).
+\]
+应用该恒等式得到
+\[
+-\frac{1}{2\alpha^2}\mathbf{z}^\top\mathbf{M}\mathbf{z}
++
+\frac{1}{\alpha^2}\mathbf{z}^\top\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu})
+=
+-\frac{1}{2\alpha^2}(\mathbf{z}-\mathbf{m})^\top\mathbf{M}(\mathbf{z}-\mathbf{m})
++\frac{1}{2\alpha^2}\mathbf{m}^\top\mathbf{M}\mathbf{m}.
+\]
+将其代回可得
+\[
+\log p(\mathbf{x},\mathbf{z})
+=
+-\frac{1}{2\alpha^2}(\mathbf{z}-\mathbf{m})^\top\mathbf{M}(\mathbf{z}-\mathbf{m})
+-\frac{1}{2\alpha^2}(\mathbf{x}-\boldsymbol{\mu})^\top(\mathbf{x}-\boldsymbol{\mu})
++\frac{1}{2\alpha^2}\mathbf{m}^\top\mathbf{M}\mathbf{m}
++\text{常数}.
+\]
+
+到这里，关于 \(\mathbf{z}\) 的高斯结构已经显式呈现出来。
+
+\paragraph{为什么这能够确定一个高斯后验。}
+一旦 \(\mathbf{x}\) 固定，所有与 \(\mathbf{z}\) 无关的项都可以并入归一化常数。因此，真正需要关注的唯一 \(\mathbf{z}\) 相关项是
+\[
+-\frac{1}{2\alpha^2}(\mathbf{z}-\mathbf{m})^\top\mathbf{M}(\mathbf{z}-\mathbf{m}),
+\]
+它恰好就是关于 \(\mathbf{z}\) 的高斯密度的对数核。由于 \(\mathbf{M}\) 为正定矩阵，该二次函数关于 \(\mathbf{z}\) 是凹的，因此它确实定义了一个适当的高斯分布。
+
+\paragraph{步骤 4：读出后验 \(p(\mathbf{z}\mid \mathbf{x})\)。}
+因此
+\[
+p(\mathbf{z}\mid \mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\mathbf{m},
+\alpha^2\mathbf{M}^{-1}
+\bigr),
+\]
+即
+\[
+p(\mathbf{z}\mid \mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\mathbf{M}^{-1}\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}),
+\alpha^2\mathbf{M}^{-1}
+\bigr),
+\qquad
+\mathbf{M}=\mathbf{W}^\top\mathbf{W}+\alpha^2\mathbf{I}.
+\]
+
+所以，配方法直接给出了后验分布：其均值是潜变量估计 \(\mathbf{m}\)，协方差则为 \(\alpha^2\mathbf{M}^{-1}\)。
+
+\paragraph{步骤 5：对 \(\mathbf{z}\) 积分消去以得到 \(p(\mathbf{x})\)。}
+边缘分布为
+\[
+p(\mathbf{x})
+=
+\int p(\mathbf{x},\mathbf{z})\,d\mathbf{z}.
+\]
+从配方后的形式可见，依赖于 \(\mathbf{z}\) 的部分是一个以 \(\mathbf{m}\) 为中心的关于 \(\mathbf{z}\) 的高斯密度。因此，对 \(\mathbf{z}\) 积分会消去这一部分，只留下一个归一化常数。剩余部分是 \((\mathbf{x}-\boldsymbol{\mu})\) 的二次函数，所以边缘分布也必然是高斯分布。
+
+继续完成余下的代数运算可得
+\[
+p(\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}\mid
+\boldsymbol{\mu},
+\mathbf{W}\mathbf{W}^\top+\alpha^2\mathbf{I}
+\bigr).
+\]
+
+\bigskip
+因此，只需完成一次配方，我们便同时得到
+\[
+p(\mathbf{z}\mid \mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\mathbf{M}^{-1}\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}),
+\alpha^2\mathbf{M}^{-1}
+\bigr)
+\]
+以及
+\[
+p(\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}\mid
+\boldsymbol{\mu},
+\mathbf{W}\mathbf{W}^\top+\alpha^2\mathbf{I}
+\bigr).
+\]
+
+对于 PPCA 的主要概念主线而言，这一推导并非必需；但它仍然很有用，因为此后每当需要显式处理高斯潜变量模型时，同样的二次项配方技巧都会再次出现。

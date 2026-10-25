@@ -1,0 +1,854 @@
+\chapter{概率主成分分析：通向潜变量生成建模的桥梁}
+
+\section*{概述}
+\addcontentsline{toc}{section}{概述}
+
+从确定性表示学习走向概率生成建模之后，概率主成分分析（Probabilistic Principal Component Analysis, PPCA）自然成为继 PCA 和自编码器之后的下一步，主要有两个原因：
+
+\begin{itemize}
+    \item \textbf{引入概率潜变量建模。}  
+    上一章中的 PCA 和自编码器展示了如何利用低维结构表示数据，但二者从根本上仍是确定性的。PPCA 则引入了本书后续将反复出现的关键概率要素：潜变量的先验、给定潜在原因时观测量的条件分布、用于学习的边缘似然，以及用于推断的后验分布。从这个意义上说，PPCA 是本书中的第一个概率潜变量模型。
+
+    \item \textbf{为现代生成模型提供一个解析可解的桥梁。}  
+    由于 PPCA 同时具有线性结构和高斯分布，其所有核心量仍然可以闭式推导。这种少见的可解性使它成为理想的过渡模型：我们可以在每一步都保持数学透明的环境中，研究基于似然的学习、后验推断、Jensen 不等式、证据下界（Evidence Lower Bound, ELBO）以及期望最大化（Expectation Maximisation, EM）算法。后续在表达能力更强、但不再解析可解的模型（例如变分自编码器）中，这些思想都会再次出现。
+\end{itemize}
+
+\section*{概念地图}
+\addcontentsline{toc}{section}{概念地图}
+
+本章按照一条从确定性降维走向概率潜变量建模的路径展开。
+\begin{itemize}
+
+    \item[\(\rightarrow\)] \textbf{首先把 PPCA 表述为 PCA 的概率扩展。}  
+    我们引入一个潜变量，把它视为观测数据背后隐藏的低维原因；随后加入高斯噪声，把确定性的 PCA 重构变成对可能观测值的完整生成分布。
+
+    \item[\(\rightarrow\)] \textbf{随后推导观测数据的边缘似然。}  
+    由于 PPCA 是线性高斯模型，可以精确地对潜变量进行积分消去，从而得到观测数据本身也服从高斯分布；其协方差可以明确区分潜在结构与各向同性噪声。
+
+    \item[\(\rightarrow\)] \textbf{有了显式边缘似然后，再比较三种优化视角。}  
+    PPCA 可以通过解析最大似然、通用的基于梯度的优化，或者 EM 算法进行学习。这种比较一方面说明 PPCA 为什么具有异常良好的可解性，另一方面也说明为什么从概念上说，EM 才是连接后续内容最重要的路径。
+
+    \item[\(\rightarrow\)] \textbf{随后从精确可解的 PPCA 走向一般潜变量情形。}  
+    我们引入 Jensen 不等式，把它作为将难以计算的对数似然替换为可计算下界的关键数学工具，并由此得到 ELBO。
+
+    \item[\(\rightarrow\)] \textbf{接下来把 EM 推导为迭代最大化这一证据下界的方法。}  
+    E 步更新潜变量分布，M 步更新模型参数。在 PPCA 中，这一过程会恢复与精确解析推导相同的解，但此时我们可以把它理解为一个更一般的推断原则的特殊情形。
+
+    \item[\(\rightarrow\)] \textbf{最后识别 PPCA 中仍然存在的一个局限，并由此引出下一章。}  
+    尽管 PPCA 为潜变量引入了先验，但它并没有显式正则化推断得到的潜在空间，使其与先验保持一致。这个局限会直接引向变分自编码器：在 VAE 中，概率推断与潜在空间正则化被统一到同一个学习目标中。
+
+\end{itemize}
+
+\medskip
+\noindent PPCA 的主要概率关系概括如下图所示。
+\input{figures/ch02/chapter2_ppca_at_a_glance}
+\medskip
+
+\section{概率主成分分析的形式化}
+
+上一章中，PCA 和自编码器引入了这样一种思想：高维数据可以通过低维潜在结构进行表示。然而，二者从根本上仍然是\emph{确定性的}：一旦选择某个潜在表示，对应的重构也随之固定。迈向生成建模的关键一步，是超越这种确定性图景，使一个潜在点不再只对应单一观测，而是对应一个可能观测值的\emph{分布}。
+
+概率主成分分析（PPCA）~\cite{tipping1999ppca} 是本书中最简单、也最明确地完成这一转变的模型。它保留了 PCA 的线性潜在结构，但把它嵌入概率生成过程中，因此成为我们遇到的第一个具体潜变量生成模型。
+
+\paragraph{把 PPCA 理解为潜变量生成模型。}
+在正式给出模型之前，先说明\emph{潜变量}（latent variable）这个术语。“latent”最直接的意思就是“隐藏的”：它指一个无法被直接观测、但被假设存在于数据背后并解释其部分结构的变量。在 PPCA 中，观测向量 \(\mathbf{x}\) 是我们实际看到的数据点，而 \(\mathbf{z}\) 是一个较低维、无法直接观测的隐藏表示。模型假定 \(\mathbf{x}\) 是由 \(\mathbf{z}\) 生成的，而不是把 \(\mathbf{x}\) 看成孤立对象。从“只处理观测数据”转向“观测数据由隐藏原因生成”，正是潜变量生成建模的定义性思想之一。
+
+PPCA 的生成过程包含两步：
+\begin{enumerate}
+    \item 从标准高斯先验中采样潜向量
+    \[
+        \mathbf{z}\sim\mathcal{N}(\mathbf{0},\mathbf{I}).
+    \]
+
+    \item 对其施加线性变换、加入均值偏置，再叠加高斯噪声 \(\boldsymbol{\epsilon}\) 生成观测：
+    \[
+        \mathbf{x}=\mathbf{W}\mathbf{z}+\boldsymbol{\mu}+\boldsymbol{\epsilon},
+        \qquad
+        \boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\alpha^2\mathbf{I}).
+    \]
+\end{enumerate}
+
+其中：
+\begin{itemize}
+    \item \(\mathbf{z}\in\mathbb{R}^k\) 是潜变量；
+    \item \(\mathbf{x}\in\mathbb{R}^d\) 是观测数据点；
+    \item \(\mathbf{W}\in\mathbb{R}^{d\times k}\) 把潜在坐标映射到观测空间；
+    \item \(\boldsymbol{\mu}\in\mathbb{R}^d\) 是数据均值；
+    \item \(\alpha^2\) 控制各向同性观测噪声。
+\end{itemize}
+
+这个模型已经包含了后续许多生成模型的基本组成要素：潜变量上的先验、从潜变量映射到观测的生成规则，以及对可能输出的概率分布。与 PCA 相比，关键的新意在于：潜在表示不再精确决定一个单点，而是决定一个合理观测分布的\emph{中心}。
+
+\paragraph{观测的条件分布。}
+
+虽然生成方程
+\[
+\mathbf{x}=\mathbf{W}\mathbf{z}+\boldsymbol{\mu}+\boldsymbol{\epsilon}
+\]
+看起来与确定性映射相似，但由于包含随机噪声项，其含义从根本上是概率性的。给定潜向量 \(\mathbf{z}\) 后，观测服从高斯分布：
+\[
+\mathbf{x}\mid\mathbf{z}
+\sim
+\mathcal{N}\!\bigl(\mathbf{W}\mathbf{z}+\boldsymbol{\mu},\;\alpha^2\mathbf{I}\bigr).
+\]
+
+这正是核心的概率化转变：一旦固定 \(\mathbf{z}\)，\(\mathbf{W}\mathbf{z}+\boldsymbol{\mu}\) 决定的是观测分布的\emph{均值}，而不是单一重构结果。图~\ref{fig:ppca-generative-story} 用 \(k=1,d=2\) 的简单情形展示了这一几何结构。随着 \(z\) 变化，条件均值在观测空间中描出一条直线；各向同性高斯噪声则在每个均值周围产生可能观测。因而，潜变量控制沿低维子空间的位置，而噪声允许观测偏离该子空间。
+
+\input{figures/ch02/fig_ch02_01_ppca_generative_story}
+
+\paragraph{与 PCA 的联系：零噪声极限。}
+
+此时自然会问：PPCA 与经典 PCA 到底是什么关系？最清晰的理解方式是考察零噪声极限。回顾 PPCA 模型：
+\[
+\mathbf{x}=\mathbf{W}\mathbf{z}+\boldsymbol{\mu}+\boldsymbol{\epsilon},
+\qquad
+\mathbf{z}\sim\mathcal{N}(\mathbf{0},\mathbf{I}),
+\qquad
+\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\alpha^2\mathbf{I}).
+\]
+当观测噪声趋近于零，即 \(\alpha^2\to0\) 时，条件分布
+\[
+p(\mathbf{x}\mid\mathbf{z})
+=
+\mathcal{N}\!\bigl(\mathbf{x}\mid\mathbf{W}\mathbf{z}+\boldsymbol{\mu},\;\alpha^2\mathbf{I}\bigr)
+\]
+会越来越集中在其均值附近。在极限情况下，随机性消失，每个潜在坐标 \(\mathbf{z}\) 都映射为唯一的确定性点：
+\[
+\mathbf{x}=\mathbf{W}\mathbf{z}+\boldsymbol{\mu}.
+\]
+
+从这个意义上说，可以把 PCA 理解为 PPCA 的零噪声极限。潜在子空间仍然存在，但围绕它的概率扩散消失。因而 PPCA 把 PCA 作为一个特殊极限情形包含在内，同时引入了一个本质上新的要素：重构周围的不确定性。
+
+下一节将看到 PPCA 仍然具有异常良好的可解性：由于模型是线性高斯的，其边缘似然 \(p(\mathbf{x})\) 仍可解析推导。
+
+\section{为什么 PPCA 可以解析求解}
+
+把 PPCA 表述成潜变量生成模型后，下一个问题就是如何根据数据拟合它。在 PCA 中，我们寻找最大方差方向；在自编码器中，我们最小化重构误差。相比之下，PPCA 是一个概率模型，因此最自然的拟合原则是最大化模型对观测数据赋予的似然。
+
+\subsection{从似然到边缘化}
+假设观测到数据集
+\[
+\{\mathbf{x}_1,\dots,\mathbf{x}_N\}.
+\]
+PPCA 下数据集的对数似然为
+\[
+\sum_{i=1}^N\log p(\mathbf{x}_i).
+\]
+通常也可以除以 \(N\)，写成平均对数似然
+\[
+\frac{1}{N}\sum_{i=1}^N\log p(\mathbf{x}_i),
+\]
+还可以进一步写成关于经验数据分布的期望：
+\[
+\mathbb{E}_{q(\mathbf{x})}\big[\log p(\mathbf{x})\big].
+\]
+这里的 \(q(\mathbf{x})\) 仅表示经验分布，它为每一个观测数据点分配相同概率质量。因此，对 \(q(\mathbf{x})\) 取期望，本质上就是对训练样本求平均。后续更一般的概率建模情形中，这种记号会频繁出现。
+
+因此，PPCA 的目标为
+\[
+\max_{\mathbf{W},\boldsymbol{\mu},\alpha}
+\;
+\mathbb{E}_{q(\mathbf{x})}\big[\log p(\mathbf{x};\mathbf{W},\boldsymbol{\mu},\alpha)\big].
+\]
+这里，边缘似然依赖模型参数 \((\mathbf{W},\boldsymbol{\mu},\alpha)\)。不过，为避免记号过于繁重，在含义明确时我们通常会省略这种依赖，仅写成 \(p(\mathbf{x})\)。
+
+这里的关键量是边缘似然 \(p(\mathbf{x})\)。根据全概率公式，它通过对潜变量积分消去得到：
+\[
+p(\mathbf{x})
+=
+\int p(\mathbf{x}\mid\mathbf{z})\,p(\mathbf{z})\,d\mathbf{z}.
+\]
+
+\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={为什么最大化对数似然而不是似然？},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+最大化\emph{对数}似然而非似然本身，既能提高数值稳定性，也能简化代数处理。对于独立数据点，
+\[
+L=\prod_{i=1}^N p(\mathbf{x}_i),
+\qquad
+\log L=\sum_{i=1}^N\log p(\mathbf{x}_i).
+\]
+对数把许多很小概率值的乘积变成求和，从而避免数值下溢，同时得到更易分析和优化的加法形式：
+\[
+\frac{1}{N}\sum_{i=1}^N\log p(\mathbf{x}_i)
+=
+\mathbb{E}_{q(\mathbf{x})}\big[\log p(\mathbf{x})\big].
+\]
+\end{tcolorbox}
+
+乍看之下，这个边缘似然似乎很难计算。代入 PPCA 模型得
+\[
+p(\mathbf{x})
+=
+\int
+\mathcal{N}\!\bigl(\mathbf{x}\mid\mathbf{W}\mathbf{z}+\boldsymbol{\mu},\alpha^2\mathbf{I}\bigr)
+\;
+\mathcal{N}\!\bigl(\mathbf{z}\mid\mathbf{0},\mathbf{I}\bigr)
+\,d\mathbf{z}.
+\]
+由于 \(\mathbf{z}\) 遍历连续潜在空间，看起来精确计算该积分应该十分困难。对于大多数潜变量模型而言，这种直觉确实是正确的。PPCA 的特殊之处恰恰在于，它的线性高斯结构使这一边缘化仍然可以解析完成。
+
+\begin{tcolorbox}[
+  colback=blue!5!white,
+  colframe=blue!75!black,
+  title={为什么线性高斯模型易于解析处理？},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+\begin{itemize}
+    \item \textbf{线性变换保持高斯性。}  
+    如果一个随机向量服从高斯分布，那么它的任何仿射变换仍然服从高斯分布。
+
+    \item \textbf{独立高斯变量之和仍为高斯。}  
+    如果两个高斯随机变量彼此独立，那么它们的和仍然服从高斯分布。
+
+    \item \textbf{对高斯潜变量积分消去后仍保持高斯。}  
+    如果 \((\mathbf{x},\mathbf{z})\) 的联合分布是高斯分布，那么对 \(\mathbf{z}\) 做边缘化后，\(\mathbf{x}\) 的分布仍然是高斯的。
+\end{itemize}
+\end{tcolorbox}
+
+借助这些事实，我们无需对积分进行暴力计算，就能够直接识别 \(\mathbf{x}\) 的分布。
+
+\subsection{推导并解释边缘分布}
+
+回顾 PPCA 的生成方程：
+\[
+\mathbf{x}=\mathbf{W}\mathbf{z}+\boldsymbol{\mu}+\boldsymbol{\epsilon},
+\qquad
+\mathbf{z}\sim\mathcal{N}(\mathbf{0},\mathbf{I}),
+\qquad
+\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\alpha^2\mathbf{I}),
+\]
+其中假设潜变量 \(\mathbf{z}\) 与噪声项 \(\boldsymbol{\epsilon}\) 相互独立。这说明 \(\mathbf{x}\) 是通过对一个高斯潜变量做仿射变换，再加上独立高斯噪声得到的。由于高斯变量的仿射变换仍为高斯，而独立高斯变量的和仍为高斯，因此 \(\mathbf{x}\) 本身也必然服从高斯分布。
+
+同一个边缘分布也可以通过展开联合密度
+\[
+p(\mathbf{x},\mathbf{z})=p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})
+\]
+再利用所谓的\emph{配方法}（completing the square）对 \(\mathbf{z}\) 积分得到。附录~\ref{app:completing-square} 回顾了这一代数路径，并展示高斯联合分布如何导出高斯边缘分布和后验分布。这里先使用更简单的、基于高斯变量仿射变换的分布论证。
+
+现在可以直接求出其均值与协方差。
+
+\paragraph{均值。}
+取期望得到
+\[
+\mathbb{E}[\mathbf{x}]
+=
+\mathbb{E}[\mathbf{W}\mathbf{z}+\boldsymbol{\mu}+\boldsymbol{\epsilon}]
+=
+\mathbf{W}\,\mathbb{E}[\mathbf{z}]+\boldsymbol{\mu}+\mathbb{E}[\boldsymbol{\epsilon}]
+=
+\boldsymbol{\mu},
+\]
+因为 \(\mathbb{E}[\mathbf{z}]=\mathbf{0}\)，且 \(\mathbb{E}[\boldsymbol{\epsilon}]=\mathbf{0}\)。
+
+\paragraph{协方差。}
+由
+\[
+\mathbf{x}=\mathbf{W}\mathbf{z}+\boldsymbol{\mu}+\boldsymbol{\epsilon},
+\]
+并注意常数偏置 \(\boldsymbol{\mu}\) 不影响协方差，有
+\[
+\operatorname{Cov}[\mathbf{x}]
+=
+\operatorname{Cov}[\mathbf{W}\mathbf{z}+\boldsymbol{\epsilon}].
+\]
+
+更显式地展开时，回顾一般恒等式
+\[
+\operatorname{Cov}[a+b]
+=
+\operatorname{Cov}[a]
++
+\operatorname{Cov}[b]
++
+\operatorname{Cov}[a,b]
++
+\operatorname{Cov}[b,a].
+\]
+令 \(a=\mathbf{W}\mathbf{z}\)、\(b=\boldsymbol{\epsilon}\)，得到
+\[
+\operatorname{Cov}[\mathbf{x}]
+=
+\operatorname{Cov}[\mathbf{W}\mathbf{z}]
++
+\operatorname{Cov}[\boldsymbol{\epsilon}]
++
+\operatorname{Cov}[\mathbf{W}\mathbf{z},\boldsymbol{\epsilon}]
++
+\operatorname{Cov}[\boldsymbol{\epsilon},\mathbf{W}\mathbf{z}].
+\]
+
+由于 \(\mathbf{z}\) 与 \(\boldsymbol{\epsilon}\) 相互独立，交叉协方差项为零：
+\[
+\operatorname{Cov}[\mathbf{W}\mathbf{z},\boldsymbol{\epsilon}]=\mathbf{0},
+\qquad
+\operatorname{Cov}[\boldsymbol{\epsilon},\mathbf{W}\mathbf{z}]=\mathbf{0}.
+\]
+因此
+\[
+\operatorname{Cov}[\mathbf{x}]
+=
+\operatorname{Cov}[\mathbf{W}\mathbf{z}]
++
+\operatorname{Cov}[\boldsymbol{\epsilon}].
+\]
+
+再使用线性变换下协方差的标准公式：
+\[
+\operatorname{Cov}[\mathbf{W}\mathbf{z}]
+=
+\mathbf{W}\operatorname{Cov}[\mathbf{z}]\,\mathbf{W}^\top.
+\]
+所以
+\[
+\operatorname{Cov}[\mathbf{x}]
+=
+\mathbf{W}\operatorname{Cov}[\mathbf{z}]\,\mathbf{W}^\top
++
+\operatorname{Cov}[\boldsymbol{\epsilon}].
+\]
+
+最后代入
+\[
+\operatorname{Cov}[\mathbf{z}]=\mathbf{I},
+\qquad
+\operatorname{Cov}[\boldsymbol{\epsilon}]=\alpha^2\mathbf{I},
+\]
+得到
+\[
+\operatorname{Cov}[\mathbf{x}]
+=
+\mathbf{W}\mathbf{W}^\top+\alpha^2\mathbf{I}.
+\]
+
+综合均值与协方差，观测的边缘分布为
+\[
+p(\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}\mid
+\boldsymbol{\mu},
+\mathbf{W}\mathbf{W}^\top+\alpha^2\mathbf{I}
+\bigr).
+\]
+
+这是 PPCA 的关键解析结果：潜变量已经被精确积分消去，而得到的观测边缘分布仍然是高斯分布。
+
+\paragraph{协方差结构的解释。}
+项 \(\mathbf{W}\mathbf{W}^\top\) 表示潜在变化经映射后在观测空间中贡献的协方差，因为
+\[
+\operatorname{Cov}(\mathbf{W}\mathbf{z})
+=
+\mathbf{W}\operatorname{Cov}(\mathbf{z})\mathbf{W}^\top
+=
+\mathbf{W}\mathbf{W}^\top.
+\]
+它是低秩矩阵：
+\[
+\operatorname{rank}(\mathbf{W}\mathbf{W}^\top)\le k,
+\]
+因此由潜变量诱导的变化最多只分布在 \(d\) 维观测空间中的一个 \(k\) 维子空间内。若
+\[
+\mathbf{W}=[\,w_1\;\;w_2\;\;\cdots\;\;w_k\,],
+\qquad
+\mathbf{W}\mathbf{W}^\top=\sum_{j=1}^k w_jw_j^\top,
+\]
+那么这一结构化协方差可以看成与各个潜在方向对应的一组秩一贡献之和。
+
+相对而言，\(\alpha^2\mathbf{I}\) 在观测空间每个方向上贡献相同方差。因此，PPCA 同时建模两类变化：通过 \(\mathbf{W}\mathbf{W}^\top\) 描述潜在子空间\emph{沿线}的变化，通过各向同性噪声描述子空间\emph{周围}的偏离。图~\ref{fig:ppca-covariance-decomposition} 直观总结了这一分解，将潜变量诱导的结构与各向同性观测噪声明确区分开。
+
+\input{figures/ch02/fig_ch02_02_ppca_covariance_decomposition}
+
+\bigskip
+
+下一节从 \(p(\mathbf{x})\) 的形式转向学习问题。既然边缘似然已经可以显式写出，我们就可以讨论如何根据数据估计参数 \((\mathbf{W},\boldsymbol{\mu},\alpha)\)。
+
+\section{学习 PPCA：三种优化视角}
+
+我们已经推导出边缘分布
+\[
+p(\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}\mid
+\boldsymbol{\mu},
+\mathbf{W}\mathbf{W}^\top+\alpha^2\mathbf{I}
+\bigr),
+\]
+现在可以从“表示”转向“学习”。PPCA 的参数 \((\mathbf{W},\boldsymbol{\mu},\alpha)\) 通过最大化观测数据集的对数似然进行拟合：
+\[
+\max_{\mathbf{W},\boldsymbol{\mu},\alpha}
+\;
+\mathbb{E}_{q(\mathbf{x})}\big[\log p(\mathbf{x})\big].
+\]
+
+这时自然会产生一个问题：
+\begin{quote}
+\emph{既然似然已经能够显式计算，应当怎样优化它？}
+\end{quote}
+有三种有用的理解方式。第一种利用 PPCA 特有的解析结构；第二种使用通用的基于梯度的优化；第三种是期望最大化（EM），它尤其重要，因为它揭示了潜变量模型更深层的原理，而这些原理随后会通向变分推断与 VAE。
+
+\subsection{直接解析最大似然}
+
+由于 \(\mathbf{x}\) 的边缘分布是高斯分布，PPCA 具有一条异常简洁的学习路径。原则上，可以把对数似然显式写出，对各参数求导，把导数设为零，再求解驻点：
+\[
+\nabla_{\mathbf{W}}\log p(\mathbf{x})=0,
+\qquad
+\nabla_{\boldsymbol{\mu}}\log p(\mathbf{x})=0,
+\qquad
+\frac{\partial}{\partial\alpha}\log p(\mathbf{x})=0.
+\]
+
+这就是经典的最大似然策略。它的吸引力很直观：如果这些方程可以精确求解，那么模型参数就能够直接写成数据经验协方差结构的函数。
+
+对 PPCA 而言，这一路径之所以可行，是因为从始至终模型都保持线性高斯结构。最终解可以闭式写出，并与样本协方差矩阵的特征结构紧密相关。这也是 PPCA 具有重要教学价值的原因之一：它是一个真正的潜变量生成模型，却仍然拥有精确的最大似然解。
+
+与此同时，这条路径也暴露出一个局限。直接解析优化虽然优雅，却高度依赖于模型足够简单，导数方程能够精确求解。一旦潜变量模型变为非线性或非高斯，这种闭式求解方式通常就会失效。而且，即使解析解存在，获得它也可能需要矩阵求逆、特征分解等计算开销较大的操作，尤其是在高维情形下。
+
+\subsection{基于梯度的优化}
+
+第二种方式，是把对数似然直接看成目标函数，再利用梯度上升进行数值优化。此时参数按如下方式迭代更新：
+\[
+\theta
+\leftarrow
+\theta+\eta\,\nabla_\theta\mathbb{E}_{q(\mathbf{x})}\big[\log p(\mathbf{x};\theta)\big],
+\]
+其中 \(\theta=\{\mathbf{W},\boldsymbol{\mu},\alpha\}\)，\(\eta\) 为步长。
+
+这是最通用的优化视角。与直接解析最大似然不同，它不要求最优参数本身可以闭式求得，而是把 PPCA 当作任意可微概率模型，通过梯度逐步爬升似然曲面。
+
+在 PPCA 中，边缘似然 \(p(\mathbf{x})\) 可以显式计算，因此其梯度也可以显式计算。与解析路线的区别，并不在于梯度法绕开了似然本身，而在于它不必把整个优化问题精确地闭式求解。更一般地，即使参数没有精确闭式解，只要目标函数或其梯度能够计算——或者至少能够近似——仍然可以使用基于梯度的方法。
+
+这一点值得强调，因为它预示了现代大多数生成模型的训练方式。后续章节中，一旦闭式解不再存在，基于梯度的优化就会成为默认的计算工具。
+
+不过，对 PPCA 这个特例而言，梯度上升并不是最具启发性的路径。它当然可用，但没有利用模型特殊的潜变量结构，也没有揭示为什么处理潜变量模型时，人们往往会显式进行后验推断，而不只是直接优化目标。要理解这一点，需要第三种视角。
+
+\subsection{期望最大化（EM）}
+
+第三条路径是期望最大化（Expectation--Maximisation, EM）算法~\cite{dempster1977em}。与直接解析优化不同，EM 并不试图一步求解似然；与通用梯度上升不同，它也不会把潜变量仅仅当成黑箱目标函数中的隐藏干扰项。相反，它显式利用模型的\emph{潜变量结构}。
+
+基本思想很简单。边缘对数似然
+\[
+\log p(\mathbf{x})
+=
+\log\int p(\mathbf{x},\mathbf{z})\,d\mathbf{z}
+\]
+可能很难直接优化，但联合分布
+\[
+p(\mathbf{x},\mathbf{z})
+\]
+往往具有简单得多的形式。EM 通过在以下两个任务之间交替来利用这一点：
+\begin{itemize}
+    \item 在当前参数下估计潜变量；
+    \item 利用这些估计更新模型参数。
+\end{itemize}
+
+对 PPCA 而言，EM 并非严格必需，因为模型本身已经能够解析求解。但它仍然极其重要：它揭示了适用于潜变量模型的一般优化原则，而即使精确解不再存在，这一原则仍然成立。
+
+从更广的角度看，PPCA 之所以特别有价值，是因为它属于少数几个所有核心概率量都能显式写出的潜变量模型：先验 \(p(\mathbf{z})\)、条件分布 \(p(\mathbf{x}\mid\mathbf{z})\)、边缘似然 \(p(\mathbf{x})\) 和后验 \(p(\mathbf{z}\mid\mathbf{x})\)。在更复杂模型中，这些量仍然处于核心位置，但不再都具有解析可解性。尤其是，学习由边缘似然 \(p(\mathbf{x})\) 驱动，而推断依赖后验 \(p(\mathbf{z}\mid\mathbf{x})\)。这正是 EM 如此重要的原因：它提供了一种结构化方法，在潜变量问题的这两个方面之间交替。
+
+对后续内容更重要的是，EM 会自然引出两个更深层思想：在潜变量上引入辅助分布，以及用一个可以迭代优化的下界替代难处理的对数似然。这些思想并不属于 PPCA 专有，而是潜变量建模一般理论的一部分；后续讨论变分推断时，它们会以更一般的形式再次出现。
+
+因此，下面转向 EM 背后的数学基础：Jensen 不等式与证据下界（ELBO）。
+
+\section{Jensen 不等式与证据下界}
+
+为了理解 EM 为什么如此重要，现在需要暂时从 PPCA 退一步，提出一个更一般的问题。当边缘似然
+\[
+p(\mathbf{x};\theta)=\int p(\mathbf{x},\mathbf{z};\theta)\,d\mathbf{z}
+\]
+不再具有解析可解性时，该怎么办？PPCA 的特殊之处在于，这个积分仍然能够精确计算。但大多数潜变量模型并没有这种便利。在更一般的情形下，潜变量可能通过非线性变换、非高斯条件分布，或者二者共同进入模型，此时边缘似然就无法再写出闭式结果。
+
+这正是 Jensen 不等式发挥作用的地方。它提供了一种系统方法，把困难的对数似然替换成一个可计算的下界。这个下界就是\emph{证据下界}（Evidence Lower Bound, ELBO），也是 EM 以及后续章节中更多生成模型背后的核心思想之一。
+
+\subsection{从边缘似然到 Jensen 不等式}
+
+PPCA 的潜变量结构并非 PPCA 独有。更一般地，许多生成模型都假设数据通过两个阶段产生：
+\begin{enumerate}
+    \item 从先验 \(p(\mathbf{z})\) 中采样潜变量 \(\mathbf{z}\)；
+    \item 再从条件分布 \(p(\mathbf{x}\mid\mathbf{z};\theta)\) 中生成观测 \(\mathbf{x}\)。
+\end{enumerate}
+相应的边缘似然为
+\[
+p(\mathbf{x};\theta)
+=
+\int p(\mathbf{x}\mid\mathbf{z};\theta)\,p(\mathbf{z})\,d\mathbf{z}
+=
+\int p(\mathbf{x},\mathbf{z};\theta)\,d\mathbf{z}.
+\]
+
+对于数据集 \(\{\mathbf{x}^{(i)}\}\)，最大似然学习变为
+\[
+\max_\theta\sum_i\log p(\mathbf{x}^{(i)};\theta)
+=
+\max_\theta\sum_i\log\int p(\mathbf{x}^{(i)},\mathbf{z};\theta)\,d\mathbf{z}.
+\]
+困难正来自这一表达式的结构：必须对潜变量进行积分，而对数却位于积分外部。在 PPCA 中，线性高斯结构使我们可以绕开这一障碍；一般情况下，则需要一个更系统的工具。
+
+这个工具从 Jensen 不等式开始。回顾一下，\emph{凸函数}向上弯曲，因此连接其图像上任意两点的直线位于函数图像上方；\emph{凹函数}向下弯曲，因此相应直线位于函数图像下方。对于随机变量 \(X\) 和凸函数 \(f\)，Jensen 不等式给出
+\[
+f(\mathbb{E}[X])\le\mathbb{E}[f(X)].
+\]
+如果 \(f\) 是凹函数，不等号方向反转：
+\[
+f(\mathbb{E}[X])\ge\mathbb{E}[f(X)].
+\]
+
+在这里，我们真正关心的函数是对数。由于 \(\log\) 是凹函数，
+\[
+\log\mathbb{E}[X]\ge\mathbb{E}[\log X].
+\]
+
+这恰好就是我们需要的形式。潜变量模型中，难处理的量通常形如
+\[
+\log\int(\cdots)\,d\mathbf{z},
+\]
+等价地也可以看成 \(\log\mathbb{E}[\cdot]\)，即对数位于积分或期望之外。Jensen 不等式允许我们把对数移入期望内部，代价是从精确等式变成一个下界，但这个下界要容易处理得多。
+
+\subsection{推导证据下界}
+
+为了应用 Jensen 不等式，先把边缘似然改写成期望。令 \(Q(\mathbf{z})\) 是潜变量上的任意概率分布，满足
+\[
+\int Q(\mathbf{z})\,d\mathbf{z}=1.
+\]
+于是
+\[
+p(\mathbf{x};\theta)
+=
+\int p(\mathbf{x},\mathbf{z};\theta)\,d\mathbf{z}
+=
+\int Q(\mathbf{z})
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}\,d\mathbf{z}
+=
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right].
+\]
+取对数得到
+\[
+\log p(\mathbf{x};\theta)
+=
+\log
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right].
+\]
+
+乍看之下，这可能只是一个纯粹的代数技巧，但它其实是关键步骤。分布 \(Q(\mathbf{z})\) 是我们自由选择的辅助分布，引入它的目的，就是把边缘似然写成期望。一旦做到这一点，就可以使用 Jensen 不等式。
+
+现在对改写后的边缘似然应用 Jensen 不等式：
+\[
+\log p(\mathbf{x};\theta)
+=
+\log
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right].
+\]
+由于对数函数是凹函数，Jensen 不等式给出
+\[
+\log
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right]
+\ge
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\log
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right].
+\]
+因此
+\[
+\log p(\mathbf{x};\theta)
+\ge
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\log
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right].
+\]
+
+这个下界称为\emph{证据下界}（Evidence Lower Bound），简称\emph{ELBO}：
+\[
+\mathcal{L}(Q,\theta;\mathbf{x})
+=
+\mathbb{E}_{\mathbf{z}\sim Q}
+\!\left[
+\log
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+\right].
+\]
+把分式中的对数展开，可得到等价形式
+\[
+\mathcal{L}(Q,\theta;\mathbf{x})
+=
+\mathbb{E}_{Q}\big[\log p(\mathbf{x},\mathbf{z};\theta)\big]
+-
+\mathbb{E}_{Q}\big[\log Q(\mathbf{z})\big].
+\]
+
+这一表达式更易处理，因为此时对数直接作用在期望内部的联合密度上，而不是位于一个难以计算的积分之外。因而，它更适合做迭代优化。
+
+这就是本节的核心结果。与其直接最大化通常不可计算的 \(\log p(\mathbf{x};\theta)\)，不如最大化一个可处理的下界；该下界依赖两个对象：模型参数 \(\theta\) 和辅助分布 \(Q(\mathbf{z})\)。
+
+\subsection{什么时候下界会变成精确等式？}
+
+只有理解它何时取紧，下界才真正有用。对于 Jensen 不等式，当凹函数的输入——这里就是对数的输入——相对于求平均的变量保持常数时，等号成立。这里被平均的变量是 \(\mathbf{z}\)，所以等号成立当且仅当
+\[
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{Q(\mathbf{z})}
+=
+c
+\qquad
+\text{for all }\mathbf{z},
+\]
+其中 \(c\) 与 \(\mathbf{z}\) 无关。
+
+整理得
+\[
+Q(\mathbf{z})\propto p(\mathbf{x},\mathbf{z};\theta).
+\]
+为了确定归一化常数，对 \(\mathbf{z}\) 积分。由于 \(Q(\mathbf{z})\) 是合法概率分布，
+\[
+\int Q(\mathbf{z})\,d\mathbf{z}=1.
+\]
+因此
+\[
+p(\mathbf{x};\theta)
+=
+\int p(\mathbf{x},\mathbf{z};\theta)\,d\mathbf{z}
+=
+c\int Q(\mathbf{z})\,d\mathbf{z}
+=
+c.
+\]
+所以常数必须为
+\[
+c=p(\mathbf{x};\theta).
+\]
+将其代回等号条件得
+\[
+Q(\mathbf{z})
+=
+\frac{p(\mathbf{x},\mathbf{z};\theta)}{p(\mathbf{x};\theta)}
+=
+p(\mathbf{z}\mid\mathbf{x};\theta),
+\]
+这正是真实的潜变量后验分布。
+
+因此，ELBO 恰好等于真实对数似然，当且仅当
+\[
+Q(\mathbf{z})=p(\mathbf{z}\mid\mathbf{x};\theta),
+\]
+也就是辅助分布与真实潜变量后验完全一致。这一点非常关键：ELBO 并不是任意构造的替代目标，它的紧致程度完全由 \(Q(\mathbf{z})\) 对真实后验的逼近程度所控制。
+
+这个视角也进一步说明了 PPCA 在本章中的作用。PPCA 的特殊之处并不在于它绕开了潜变量问题，而在于它恰好能够把这个问题精确解决。其后验 \(p(\mathbf{z}\mid\mathbf{x})\) 可解析计算，边缘似然 \(p(\mathbf{x})\) 也可精确求得，因此 PPCA 并不严格需要 ELBO。
+
+然而，ELBO 框架揭示的是 PPCA 所体现的一般原则。相同的潜变量结构在更复杂模型中仍然存在，只是精确后验和精确边缘似然不再可得。ELBO 正是当精确高斯计算失效之后，让我们能够继续进行学习的工具。
+
+\bigskip
+
+现在已经可以引入期望最大化算法。ELBO 依赖两个耦合的要素：辅助分布 \(Q(\mathbf{z})\) 与模型参数 \(\theta\)。这自然暗示出一种交替策略：先改进 \(Q(\mathbf{z})\)，使下界尽可能紧；然后改进 \(\theta\)，使下界本身变得更大。
+
+这种交替逻辑正是 EM 所形式化的内容。下一节将说明 EM 如何作为一个迭代最大化 ELBO 的过程自然产生，并展示在 PPCA 这个特殊情形下，它如何恢复此前利用精确高斯计算得到的同一个解。
+
+\section{期望最大化：最大化下界}
+
+潜变量模型中的根本困难是边缘对数似然
+\[
+\log p(\mathbf{x};\theta)
+=
+\log\int p(\mathbf{x},\mathbf{z};\theta)\,d\mathbf{z},
+\]
+因为对数位于隐藏变量 \(\mathbf{z}\) 的边缘化积分之外。这使直接优化变得困难，即使联合分布 \(p(\mathbf{x},\mathbf{z};\theta)\) 本身可能具有相对简单的形式。
+
+ELBO 通过引入下界
+\[
+\mathcal{L}(Q,\theta;\mathbf{x})
+=
+\mathbb{E}_{Q}\big[\log p(\mathbf{x},\mathbf{z};\theta)\big]
+-
+\mathbb{E}_{Q}\big[\log Q(\mathbf{z})\big]
+\]
+来解决这一问题。它依赖两个相互耦合的对象：辅助分布 \(Q(\mathbf{z})\) 与模型参数 \(\theta\)。于是自然得到一个交替优化策略：
+\begin{quote}
+\emph{如果固定其中一个，能否改进另一个？}
+\end{quote}
+这正是 EM 所形式化的思想。直观上，当二者中的一个固定时，ELBO 就变成只关于另一个对象的优化问题。EM 利用这种可分结构，在“改进潜变量分布”和“改进模型参数”之间交替进行。
+
+\subsection{EM 的两个步骤}
+
+每一轮 EM 迭代都由两个阶段组成。
+
+\paragraph{E 步（Expectation step）。}
+固定当前参数 \(\theta^{(t)}\)，选择使 ELBO 尽可能紧的分布 \(Q(\mathbf{z})\)。上一节已经知道，当
+\[
+Q(\mathbf{z})=p(\mathbf{z}\mid\mathbf{x};\theta^{(t)})
+\]
+时，下界最紧。因此，E 步设定
+\[
+Q^{(t)}(\mathbf{z})
+=
+p(\mathbf{z}\mid\mathbf{x};\theta^{(t)}).
+\]
+换句话说，E 步在当前参数值下计算潜变量的后验分布。
+
+这也澄清了一个重要问题。在标准 EM 中，E 步假设后验 \(p(\mathbf{z}\mid\mathbf{x};\theta^{(t)})\) 足够容易处理，可以精确计算。PPCA 正是如此，因此 EM 可以直接应用。但更一般地，后验往往没有闭式形式。在这种情况下，我们就不能把 \(Q\) 设为精确后验，而必须用某种近似来代替它。这正是从 EM 走向\emph{变分推断}的关键一步。
+
+还需要注意的是，“后验可计算”并不自动意味着整个优化问题都有闭式解。对 EM 来说，关键要求是：在当前参数值下，后验 \(p(\mathbf{z}\mid\mathbf{x};\theta)\)，或者至少关于该后验所需的期望，能够被计算出来。这就足以完成 E 步。然而，随后的参数更新仍然可能需要通过 M 步迭代求解，而不是一次性直接解析得到。
+
+PPCA 的特殊性在于，它的若干核心量——包括边缘似然和后验——都可以解析处理，而且模型还具有闭式最大似然解。在许多其他模型中，即使后验足够容易处理、可以执行 EM，完整的参数优化问题仍然可能必须依赖迭代过程。
+
+\paragraph{M 步（Maximisation step）。}
+固定 \(Q^{(t)}\) 后，通过关于 \(\theta\) 最大化 ELBO 来更新模型参数：
+\[
+\theta^{(t+1)}
+=
+\arg\max_{\theta}
+\mathcal{L}(Q^{(t)},\theta;\mathbf{x}).
+\]
+由于熵项
+\[
+-\mathbb{E}_{Q^{(t)}}[\log Q^{(t)}(\mathbf{z})]
+\]
+不依赖 \(\theta\)，这等价于最大化
+\[
+\theta^{(t+1)}
+=
+\arg\max_{\theta}
+\mathbb{E}_{Q^{(t)}}\big[\log p(\mathbf{x},\mathbf{z};\theta)\big].
+\]
+这个量通常称为\emph{完整数据对数似然的期望}（expected complete-data log-likelihood）。
+
+因此，EM 的两步更新模式可以写成
+\[
+\boxed{
+\begin{aligned}
+\text{E-step:}\quad
+&Q^{(t)}(\mathbf{z})=p(\mathbf{z}\mid\mathbf{x};\theta^{(t)}),\\[4pt]
+\text{M-step:}\quad
+&\theta^{(t+1)}
+=
+\arg\max_{\theta}
+\mathbb{E}_{Q^{(t)}}\big[\log p(\mathbf{x},\mathbf{z};\theta)\big].
+\end{aligned}}
+\]
+
+\paragraph{为什么 EM 不会降低似然。}
+EM 的单调性可以直接由这两个优化步骤以及 ELBO 的下界性质推出。首先，E 步之后，下界在当前参数处是紧的：
+\[
+\mathcal{L}(Q^{(t)},\theta^{(t)};\mathbf{x})
+=
+\log p(\mathbf{x};\theta^{(t)}).
+\]
+第二，在固定 \(Q^{(t)}\) 时，M 步选择不会使该下界下降的新参数：
+\[
+\mathcal{L}(Q^{(t)},\theta^{(t+1)};\mathbf{x})
+\ge
+\mathcal{L}(Q^{(t)},\theta^{(t)};\mathbf{x}).
+\]
+最后，由于 ELBO 是对数似然的下界，
+\[
+\log p(\mathbf{x};\theta^{(t+1)})
+\ge
+\mathcal{L}(Q^{(t)},\theta^{(t+1)};\mathbf{x}).
+\]
+将这些关系合并，就得到一次完整 EM 迭代不会降低观测数据的对数似然。图~\ref{fig:em-elbo-geometry} 从几何角度展示了同一个过程：算法交替地“收紧”下界并把下界“抬高”。
+
+\input{figures/ch02/fig_ch02_04_em_elbo_geometry}
+
+\subsection{把 EM 应用于 PPCA}
+
+在 PPCA 中，潜变量后验是可解析处理的，因此可以显式执行 EM。这使 PPCA 成为特别有价值的示例：它展示了一个一般的、基于 ELBO 的算法如何在线性高斯模型中退化为闭式更新。
+
+对于 PPCA，潜变量的后验分布是高斯分布。这仍然来自此前推导边缘分布时所利用的线性高斯结构，而配方法推导见附录~\ref{app:completing-square}。后验为
+\[
+p(\mathbf{z}\mid\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\mathbf{M}^{-1}\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}),
+\alpha^2\mathbf{M}^{-1}
+\bigr),
+\qquad
+\mathbf{M}=\mathbf{W}^\top\mathbf{W}+\alpha^2\mathbf{I}.
+\]
+图~\ref{fig:ppca-four-probabilistic-views} 把 PPCA 中至此已经出现的四个概率对象放在一起展示：先验 \(p(\mathbf{z})\)、条件分布 \(p(\mathbf{x}\mid\mathbf{z})\)、边缘分布 \(p(\mathbf{x})\) 和后验 \(p(\mathbf{z}\mid\mathbf{x})\)。
+
+\input{figures/ch02/fig_ch02_03_ppca_probability_views}
+
+根据这一后验，E 步可以计算
+\[
+\mathbb{E}[\mathbf{z}]
+=
+\mathbf{M}^{-1}\mathbf{W}^\top(\mathbf{x}-\boldsymbol{\mu}),
+\]
+以及
+\[
+\mathbb{E}[\mathbf{z}\mathbf{z}^\top]
+=
+\alpha^2\mathbf{M}^{-1}
++
+\mathbb{E}[\mathbf{z}]\,\mathbb{E}[\mathbf{z}]^\top.
+\]
+
+随后，M 步把这些期望代入完整数据对数似然的期望，并关于参数 \((\mathbf{W},\boldsymbol{\mu},\alpha)\) 最大化，从而得到 PPCA 参数的闭式更新方程。
+
+这里真正重要的并不只是“PPCA 可以用 EM 来拟合”，而是“PPCA 的精确解可以被重新解释为 EM 过程的固定点”。换句话说，EM 并没有得到不同的模型，它提供的是对\emph{同一个模型如何学习}的另一种理解。
+
+更广泛地看，EM 告诉我们，潜变量模型中的学习可以理解为以下两个过程的交替：
+\begin{itemize}
+    \item \textbf{推断}：给定数据，估计隐藏变量；
+    \item \textbf{学习}：利用这些推断得到的潜变量更新模型参数。
+\end{itemize}
+
+\subsection{从 PPCA 到正则化潜在表示}
+尽管 PPCA 引入了潜变量先验 \(p(\mathbf{z})=\mathcal{N}(\mathbf{0},\mathbf{I})\)，并定义了合法的生成模型，但它还没有提供现代潜变量模型（例如 VAE）中将成为核心的那种灵活、正则化的推断框架。
+
+对于任意单个观测 \(\mathbf{x}\)，后验 \(p(\mathbf{z}\mid\mathbf{x})\) 描述了在模型下哪些潜在坐标可以合理解释该数据点。如果对经验数据分布上的这些后验取平均，就得到\emph{聚合后验}（aggregate posterior）：
+\[
+\mathbb{E}_{q(\mathbf{x})}\!\left[p(\mathbf{z}\mid\mathbf{x})\right].
+\]
+该分布描述整个数据集如何被表示在潜在空间中。
+
+在 PPCA 中，由于模型是线性高斯的，这个后验可以精确计算。这当然是 PPCA 的优点，但也恰好揭示了其局限的来源：干净的数学结果依赖很强的假设。潜变量到观测的映射必须是线性的，观测噪声必须是高斯的，而且后验推断必须能够解析完成。
+
+当我们离开线性高斯世界时，这一点就变得非常重要。现代生成模型希望保留同样的潜变量思想，同时让潜变量到观测的映射变得更加灵活。一旦引入这种灵活性，使 PPCA 如此透明的简单闭式计算通常就不复存在。因此，我们需要一种新的框架：它能够学习表达能力更强的生成映射、从数据中推断潜在表示，并使潜在空间保持一种有利于生成的组织结构。
+
+变分自编码器正是为此而生。可以把 VAE 看成 PPCA 叙事的非线性、变分扩展：它保留“潜变量生成观测”的基本思想，却用一个可学习的推断--生成框架替代精确高斯计算。关于这一框架的细节，包括变分后验的准确作用以及潜在空间正则化项，将在下一章展开。
+
+因此，从 PPCA 过渡到 VAE，并不是从“非生成模型”转向“生成模型”；PPCA 本身已经是生成模型。真正发生的，是从解析可解的线性高斯潜变量模型，过渡到一个更灵活的非线性潜变量模型，在后者中，推断与生成必须被共同学习。
+
+下一章中，变分自编码器将把重构、概率推断和潜在空间正则化统一进一个变分目标，从而完整展开这一思想。
+
+\section*{总结与参考文献}
+\addcontentsline{toc}{section}{总结与参考文献}
+
+本章把概率主成分分析（PPCA）作为本书中的第一个概率潜变量模型进行了介绍。它在 PCA 的确定性图景之上，引入潜变量先验、概率解码器、用于学习的边缘似然以及用于推断的后验分布。
+
+由于 PPCA 是线性高斯模型，其所有核心量都保持解析可解。这使我们能够显式推导边缘似然，把其协方差解释为结构化低秩成分与各向同性噪声之和，并把 PPCA 看作一个少见的模型：其先验、似然、边缘分布和后验都能够写成闭式。
+
+随后，我们比较了三种模型学习视角：直接解析最大似然、基于梯度的优化以及 EM。其中 EM 尤其重要，因为它揭示了潜变量学习更深层的结构：在隐藏变量推断和模型参数优化之间交替。由此进一步引出 Jensen 不等式和 ELBO，它们把 PPCA 的思想推广到无法进行精确边缘化的模型。
+
+最后，我们识别出 PPCA 的一个重要局限：虽然它为潜变量引入了先验，却并没有显式正则化聚合后的推断潜在空间，使其与该先验对齐。这直接引向下一章的变分自编码器（VAE）；VAE 会把重构、概率推断以及潜在空间正则化统一到一个变分目标中。
+
+\bigskip
+
+本章内容建立在概率主成分分析、潜变量模型和最大似然推断的经典工作之上。PPCA 的原始形式由 Tipping 和 Bishop~\cite{tipping1999ppca} 提出，而 EM 算法的经典工作来自 Dempster、Laird 和 Rubin~\cite{dempster1977em}。希望进一步学习这些思想，尤其是高斯潜变量模型、EM 及其概率解释的读者，可以参考 Bishop~\cite{bishop2006prml} 与 Murphy~\cite{murphy2012ml} 的教材。

@@ -1,0 +1,1725 @@
+\chapter{基于得分的生成建模与连续时间扩散}
+\section*{概述}
+\addcontentsline{toc}{section}{概述}
+
+前面的 DDPM 章节把扩散模型介绍为一种离散潜变量构造：数据逐渐被扰动成噪声，而学习得到的反向过程再逐步重建结构。
+这一视角十分强大，因为它把扩散模型与本书前面发展出的概率建模思想联系起来，包括潜变量、高斯转移、后验推断以及变分学习。
+
+但扩散模型还有另一种解释方式，并且这种视角已经成为现代生成建模的核心之一。
+我们不再只问“如何写出一条反向马尔可夫链”，而是提出一个更加局部且几何化的问题：如果一个样本当前位于 $x$，应该朝哪个方向移动，才能使它在我们希望生成的目标分布下变得更可能？
+答案由\emph{得分函数}给出，即
+$\nabla_x \log p(x)$，它指向对数密度局部增长最快的方向。
+
+这种视角变化非常深刻。
+概率密度描述概率质量集中在哪里，而得分则描述在这个密度定义的空间中应该如何移动。
+它把一个分布转化为向量场。
+一旦知道这个场，就可以用它把噪声样本引导回高概率区域。
+从这个意义上说，基于得分的建模把生成建模从“显式计算密度”的问题，转化为“学习密度局部几何结构”的问题。
+
+这也是基于得分的生成建模成为理解扩散模型重要方式的原因之一。
+与通过一次直接变换生成数据的模型不同，现代扩散系统学习在多个扰动水平上逐步或连续地修正噪声。
+在每一个噪声水平，模型都需要局部信息，告诉它应该怎样轻微推动当前噪声样本，使其更像数据。
+得分恰好提供了这种信息。
+
+上一章已经给出了理解这一视角所需的微积分工具。
+我们研究了粒子在确定性和随机动力学下如何运动，以及整个概率密度如何通过 Liouville 方程与 Fokker--Planck 方程演化。
+本章现在将利用这些工具，解释得分场、随机采样和密度演化如何共同构成基于得分的扩散模型。
+
+本章的目的并不是取代 DDPM 视角，而是对它进行补充。
+DDPM 说明扩散模型如何组织成一个离散潜变量模型；基于得分的视角则说明，去噪为什么也可以从几何和动力学角度理解：生成由沿一系列噪声分布学习得到的局部方向引导，把样本从随机性逐渐带回有结构的数据区域。
+
+\section*{概念导图}
+\addcontentsline{toc}{section}{概念导图}
+
+本章逐步建立扩散模型的得分解释：从局部密度几何，到得分学习，再到多尺度去噪，最后进入连续时间反向扩散。
+
+\begin{itemize}
+
+    \item[\(\rightarrow\)] \textbf{首先从得分函数开始。}
+    得分 $\nabla_x \log p(x)$ 被解释为一个局部概率方向场，它指向对数密度增长最快的区域。
+
+    \item[\(\rightarrow\)] \textbf{随后通过 Langevin 动力学把得分与采样联系起来。}
+    确定性的得分流把样本推向高密度区域，而布朗噪声防止塌缩并维持探索。
+    Fokker--Planck 方程说明，为什么目标密度在这种“得分+噪声”动力学下是平稳分布。
+
+    \item[\(\rightarrow\)] \textbf{接着讨论如何学习得分。}
+    Fisher 散度为把学习到的得分 $s_\theta(x)$ 与真实数据得分匹配提供了自然目标。
+    得分匹配通过分部积分改写这一目标，从而不再需要计算未知的数据密度。
+
+    \item[\(\rightarrow\)] \textbf{随后通过去噪来稳定得分学习。}
+    与其直接学习原始数据得分，不如加入高斯噪声，学习平滑后分布 $p_\sigma$ 的得分。
+    这样，得分估计就转化为对去噪方向的回归问题。
+
+    \item[\(\rightarrow\)] \textbf{再从单一噪声尺度扩展到多个噪声尺度。}
+    大噪声水平揭示粗粒度全局结构，小噪声水平揭示精细局部细节。
+    因此，多尺度得分学习是在不同平滑尺度上学习一族得分场。
+
+    \item[\(\rightarrow\)] \textbf{把多尺度得分与扩散联系起来。}
+    当一族噪声分布被组织为同一个前向加噪过程的边缘分布时，一族噪声得分场就形成扩散模型。
+    在连续时间中，这对应一条密度路径 $p_t(x)$，$0\leq t\leq T$。
+
+    \item[\(\rightarrow\)] \textbf{利用得分反转扩散。}
+    前向过程把数据推向噪声。
+    反向时间动力学使用随时间变化的得分
+    $\nabla_x \log p_t(x)$
+    作为局部修正，把样本从噪声引导回数据。
+
+    \item[\(\rightarrow\)] \textbf{最后重新连接 DDPM。}
+    前面曾把 DDPM 作为离散潜变量模型引入；这里重新解释其噪声预测目标，说明它携带了中间噪声分布的类得分信息，从而揭示 DDPM 视角与得分视角其实是互补的。
+
+\end{itemize}
+
+\medskip
+\noindent 本章基于得分建模的主要路径总结如下图所示。
+\input{figures/ch06/chapter6_score_at_a_glance}
+\medskip
+
+\section{从得分函数到 Langevin 采样}
+
+上一章解释了概率密度如何在确定性输运与随机扩散下演化。
+我们看到，常微分方程会诱导 Liouville 型密度演化，而含布朗噪声的随机微分方程会导出 Fokker--Planck 方程。
+这些结果很重要，因为它们把讨论从单个粒子的运动推进到整个分布的演化。
+
+由此自然出现下一个问题：在所有可能的密度演化中，哪些真正适合生成建模？
+在生成建模中，我们并不需要任意运动，而是希望得到一种与某个感兴趣的概率密度相关联的动力学，通常这个密度就是数据分布，或者它的某个平滑版本。
+这正是得分函数发挥作用的地方。
+
+得分提供一个局部概率方向场；当它与噪声结合时，就得到 Langevin 动力学——连接密度建模与采样最重要的桥梁之一。
+本节会仔细建立这座桥梁：先把得分解释为概率漂移场，再说明如何通过 Langevin 动力学加入噪声，最后解释为什么得到的动力学通过平稳性与目标密度绑定在一起。
+
+因此，本节还不会完整引入现代扩散模型。
+它首先建立一个更简单、更基础的原则：如果目标密度的得分可得，那么可以把它用作随机动力学中的漂移场，而这一动力学的平稳分布正是目标分布本身。
+这构成从“描述目标密度”到“构造能够从该密度生成样本的动力学”的主要概念桥梁之一。
+
+\subsection{作为概率漂移场的得分函数}
+
+设 $p(x)$ 是 $\mathbb{R}^d$ 上的概率密度。
+其\emph{得分函数}定义为
+\[
+s(x)=\nabla_x \log p(x).
+\]
+如果密度还依赖时间，那么随时间变化的得分写为
+\[
+s(x,t)=\nabla_x \log p(x,t).
+\]
+
+乍看之下，对\emph{对数}密度求梯度为何如此重要似乎有些意外。
+原因在于，得分以一种特别有用的形式编码了局部方向信息。
+密度 $p(x)$ 告诉我们在 $x$ 附近集中了多少概率质量，而得分则告诉我们沿哪个方向移动会使对数密度增长得最快。
+因此，它提供了一个指向更高概率区域的局部向量场。
+
+在一维中，得分变成
+\[
+s(x)
+=
+\frac{d}{dx}\log p(x)
+=
+\frac{p'(x)}{p(x)}.
+\]
+这个表达已经很有启发性。
+分子 $p'(x)$ 衡量密度的局部变化，而除以 $p(x)$ 会根据密度自身的局部尺度对这种变化进行归一化。
+因此，得分衡量的是相对斜率，而不仅仅是绝对斜率。
+这使它更适合作为一种概率运动场。
+
+一个简单的高斯例子可以把这种解释具体化。
+考虑一维高斯密度
+\[
+p(x)
+=
+\frac{1}{\sqrt{2\pi\sigma^2}}
+\exp\left(
+-\frac{(x-\mu)^2}{2\sigma^2}
+\right).
+\]
+取对数得到
+\[
+\log p(x)
+=
+-\frac{(x-\mu)^2}{2\sigma^2}
+-\frac{1}{2}\log(2\pi\sigma^2).
+\]
+关于 $x$ 求导，得到
+\[
+\frac{d}{dx}\log p(x)
+=
+-\frac{x-\mu}{\sigma^2}.
+\]
+因此得分为
+\[
+\boxed{
+s(x)
+=
+-\frac{x-\mu}{\sigma^2}.
+}
+\]
+
+这个高斯例子立刻揭示了得分的几何含义。
+如果 $x>\mu$，得分为负，方向指回均值；如果 $x<\mu$，得分为正，同样指回均值。
+$x$ 离均值越远，得分的绝对值越大。
+因此，对于高斯密度，得分就像一个恢复力场，把粒子引向高密度区域。
+
+在多元高斯情形
+\[
+p(x)=\mathcal{N}(\mu,\Sigma)
+\]
+中，得分变为
+\[
+\boxed{
+\nabla_x \log p(x)
+=
+-\Sigma^{-1}(x-\mu).
+}
+\]
+因此，得分仍然是指向高密度中心的向量场，但其形状由协方差结构决定。
+方差较小的方向产生更强的恢复作用，方差较大的方向则更弱。
+图~\ref{fig:score-field-geometry} 展示了同一思想如何从单个高斯推广到多峰分布：对于多峰密度，得分会形成随空间变化的向量场，其局部方向取决于周围的密度几何结构。
+
+\input{figures/ch06/fig_ch06_01_score_field_geometry}
+
+这启发了一个自然想法。
+如果定义确定性流
+\[
+\frac{dx}{dt}
+=
+\nabla_x \log p(x),
+\]
+那么粒子会沿着对数密度增长最快的方向移动。
+由于对数函数单调，这也会使粒子朝密度更高的区域移动。
+从这个意义上说，得分可以解释为一个\emph{概率漂移场}：它告诉我们，如果想把粒子引导到目标分布下更可能的区域，应该怎样移动。
+
+这种视角非常有用，但也暴露出一个重要局限。
+纯确定性的得分流会把粒子沿上坡方向推向众数，因此可能使轨迹塌缩到高度集中的高密度区域，而无法探索完整目标分布。
+这种性质对于优化很有用，但对采样还不够。
+为了得到真正的采样动力学，必须加入噪声。
+这就直接引出了 Langevin 动力学。
+
+\subsection{Langevin 动力学：得分加噪声}
+
+Langevin 动力学结合两个成分：
+\begin{enumerate}
+    \item 由得分给出的漂移项，把粒子拉向高密度区域；
+    \item 布朗噪声项，注入随机性并维持探索。
+\end{enumerate}
+
+在连续时间中，Langevin 随机微分方程写作
+\[
+\boxed{
+dX_t
+=
+\nabla_x \log p^\ast(X_t)\,dt
++
+\sqrt{2}\,dW_t,
+}
+\]
+其中 $p^\ast(x)$ 表示目标密度。
+这里使用 $p^\ast$ 是为了强调：这是我们希望从中采样的目标分布。
+
+在离散时间中，可以启发式地写成更新式
+\[
+\boxed{
+x_{k+1}
+=
+x_k
++
+\epsilon\,\nabla_x \log p^\ast(x_k)
++
+\sqrt{2\epsilon}\,\xi_k,
+\qquad
+\xi_k\sim\mathcal{N}(0,I),
+}
+\]
+其中 $\epsilon>0$ 是较小步长。
+
+这个更新有非常直接的解释。
+当前状态 $x_k$ 首先经过得分项
+\[
+\epsilon\,\nabla_x \log p^\ast(x_k)
+\]
+移动，使粒子朝目标密度下更高概率的区域偏移。
+随后加入高斯扰动
+\[
+\sqrt{2\epsilon}\,\xi_k.
+\]
+这个随机项阻止粒子简单地塌缩到某个众数，并让它继续探索状态空间。
+在连续时间极限下，确定性得分漂移与布朗扰动结合成上面的 Langevin SDE。
+
+这一结构应该与上一章非常熟悉。
+Langevin 动力学是一个“漂移+噪声”系统，因此其密度按照 Fokker--Planck 方程演化。
+对于
+\[
+dX_t
+=
+\nabla_x \log p^\ast(X_t)\,dt
++
+\sqrt{2}\,dW_t,
+\]
+漂移场是
+\[
+v(x)=\nabla_x \log p^\ast(x),
+\]
+扩散系数为 $\sigma=\sqrt{2}$。
+由于常数各向同性扩散下的 Fokker--Planck 方程为
+\[
+\partial_t p(x,t)
+=
+-\nabla\cdot\bigl(p(x,t)v(x,t)\bigr)
++
+\frac{\sigma^2}{2}\Delta p(x,t),
+\]
+代入 $v(x)=\nabla_x\log p^\ast(x)$ 与 $\sigma^2=2$，得到
+\[
+\boxed{
+\partial_t p(x,t)
+=
+-\nabla\cdot\bigl(p(x,t)\nabla_x \log p^\ast(x)\bigr)
++
+\Delta p(x,t).
+}
+\]
+
+该方程结合两种效应。
+第一项
+$-\nabla\cdot\bigl(p\nabla_x \log p^\ast\bigr)$
+描述由得分场诱导的确定性输运；第二项 $\Delta p$ 描述布朗噪声导致的扩散。
+漂移项倾向于把概率集中到目标的高密度区域，而扩散项倾向于把概率向外铺开。
+重要的是，正是在这种精确组合下，目标密度会成为平稳分布。
+这正是 Langevin 动力学能够作为采样机制使用的关键原因。
+
+把它与前面介绍的 Ornstein--Uhlenbeck 过程比较也很有帮助。
+OU 过程具有指向原点的线性漂移和高斯平稳分布。
+Langevin 动力学推广了同一原则：不再使用固定的线性恢复力，而是把所选目标密度的得分作为恢复场。
+从这个意义上说，OU 过程可以视为更一般得分采样机制的高斯特例。
+
+为了显式看出这一点，假设目标密度为标准高斯
+$p^\ast(x)=\mathcal{N}(0,I)$。
+那么
+\[
+\nabla_x\log p^\ast(x)=-x,
+\]
+Langevin 动力学变为
+\[
+dX_t=-X_t\,dt+\sqrt{2}\,dW_t,
+\]
+这正是一个特定噪声缩放下的 Ornstein--Uhlenbeck 过程。
+因此，当目标密度为高斯时，Langevin 方程恢复 OU 过程；而对于非高斯目标，它通过得分
+$\nabla_x\log p^\ast(x)$ 对该原则进行推广。
+
+\subsection{目标分布与平稳分布}
+
+下面解释为什么 Langevin 动力学不只是一个形式化方程，而是真正有意义的采样机制。
+
+假设某个密度 $p(x,t)$ 按照密度演化方程
+\[
+\partial_t p(x,t)
+=
+\mathcal{L}[p(x,t)]
+\]
+演化。
+如果系统一旦具有密度 $p^\ast(x)$ 就会一直保持该密度，那么 $p^\ast(x)$ 就称为\emph{平稳分布}。
+在 PDE 语言中，这意味着
+\[
+\mathcal{L}[p^\ast(x)]=0.
+\]
+等价地，
+\[
+\partial_t p(x,t)=0
+\qquad
+\text{当}
+\qquad
+p(x,t)=p^\ast(x).
+\]
+
+这个概念在生成建模中非常重要。
+如果目标密度是某个动力学的平稳分布，那么该动力学就与目标分布相一致。
+如果进一步地，从其他初始状态出发的轨迹或密度会随时间趋近这一平稳分布，那么该过程就成为从目标分布中采样的机制。
+完整的收敛理论还需要额外假设，超出了本教程范围，但仅仅平稳性计算就已经揭示了核心思想。
+
+现在验证 Langevin 动力学的平稳性。
+回顾其 Fokker--Planck 方程
+\[
+\partial_t p(x,t)
+=
+-\nabla\cdot\bigl(p(x,t)\nabla_x \log p^\ast(x)\bigr)
++
+\Delta p(x,t).
+\]
+令
+\[
+p(x,t)=p^\ast(x).
+\]
+右侧变为
+\[
+-\nabla\cdot\bigl(p^\ast(x)\nabla_x \log p^\ast(x)\bigr)
++
+\Delta p^\ast(x).
+\]
+利用恒等式
+\[
+p^\ast(x)\nabla_x \log p^\ast(x)
+=
+\nabla_x p^\ast(x),
+\]
+因为
+\[
+\nabla_x \log p^\ast(x)
+=
+\frac{\nabla_x p^\ast(x)}{p^\ast(x)}.
+\]
+于是上式化简为
+\[
+-\nabla\cdot(\nabla_x p^\ast(x))
++
+\Delta p^\ast(x).
+\]
+而根据定义，
+\[
+\nabla\cdot(\nabla_x p^\ast)
+=
+\Delta p^\ast.
+\]
+因此
+\[
+-\Delta p^\ast(x)+\Delta p^\ast(x)=0.
+\]
+所以确实有
+\[
+\boxed{
+\partial_t p(x,t)=0
+\qquad
+\text{当}
+\qquad
+p(x,t)=p^\ast(x).
+}
+\]
+
+因此，$p^\ast$ 是 Langevin 动力学
+\[
+\boxed{
+dX_t
+=
+\nabla_x \log p^\ast(X_t)\,dt
++
+\sqrt{2}\,dW_t
+}
+\]
+的一个平稳分布。
+
+这是基于得分的生成建模背后最核心的概念结果之一。
+它说明，如果把目标密度的得分作为漂移场，并配合适当的布朗噪声，那么得到的密度演化会保持该目标密度不变。
+因此，得分不只是密度的一个有趣导数；它恰好就是使目标密度在自然随机动力学下保持平稳的漂移场。
+
+同时，也必须准确理解这里真正证明了什么。
+上面的论证建立的是\emph{平稳性}，而不是“任意初始密度都必然收敛到 $p^\ast$”的完整证明。
+后一个问题更深入，涉及随机过程的长期行为。
+尽管如此，平稳性结果已经填补了一个重要的概念缺口：它解释了为什么得分漂移配合布朗噪声能够为从感兴趣的分布中采样提供有原则的路径。
+
+在适当条件下，如果让 Langevin 过程演化足够长时间，其分布可能逐渐接近平稳分布 $p^\ast$。
+从密度层面看，这意味着概率质量逐渐形成目标分布的形状；从粒子层面看，则意味着不断用 Langevin 动力学更新样本，最终可得到统计行为类似于目标分布抽样的粒子。
+
+因此，密度层面与粒子层面的视角彼此一致。
+Fokker--Planck 方程解释分布如何演化，Langevin 更新解释单个样本如何移动，而得分把二者连接起来：局部上，它作为概率漂移场；全局上，它是使目标密度成为平稳分布的关键成分。
+
+\section{学习得分：Fisher 散度与得分匹配}
+
+上一节说明了得分函数为什么对采样重要。
+如果目标密度 $p^\ast(x)$ 的得分可得，那么可以把它作为 Langevin 动力学
+\[
+dX_t
+=
+\nabla_x \log p^\ast(X_t)\,dt
++
+\sqrt{2}\,dW_t
+\]
+中的漂移场，而该动力学的平稳分布就是 $p^\ast$。
+这在概率密度与随机采样动力学之间建立了有原则的联系。
+
+然而在生成建模中，目标密度通常并不存在可直接使用的闭式形式。
+我们只有来自某个未知数据生成分布的样本，却不知道该密度本身。
+记这个未知分布为 $p_{\text{data}}(x)$。
+因此，核心学习问题变成近似其得分
+\[
+s_{\text{data}}(x)
+=
+\nabla_x \log p_{\text{data}}(x).
+\]
+如果能从数据中学到这个向量场，就可以把它用于 Langevin 型采样动力学。
+
+我们用参数化函数 $s_\theta(x)$ 建模得分，通常由参数为 $\theta$ 的神经网络实现。
+一个自然目标是在数据分布下最小化学习得分与真实数据得分之间的差异。
+这就得到\emph{Fisher 散度}：
+\[
+\mathcal{J}(\theta)
+=
+\mathbb{E}_{x\sim p_{\text{data}}}
+\left[
+\left\|
+s_\theta(x)-s_{\text{data}}(x)
+\right\|_2^2
+\right].
+\]
+等价地，学习问题是 $\min_\theta \mathcal{J}(\theta)$。
+这里，散度定义在两个向量场之间，而优化则针对参数 $\theta$ 进行。
+如果 $\mathcal{J}(\theta)=0$，则
+\[
+s_\theta(x)=s_{\text{data}}(x)
+\]
+在 $p_{\text{data}}$ 下几乎处处成立。
+此时，学习到的向量场就匹配了数据分布的局部几何结构。
+
+然而立刻会遇到一个困难。
+该目标似乎需要真实得分 $s_{\text{data}}(x)$，而它依赖未知密度 $p_{\text{data}}(x)$。
+得分匹配（score matching）~\cite{hyvarinen2005estimation} 通过改写目标解决了这一问题，使未知真实得分不再显式出现。
+
+\subsection{展开 Fisher 散度}
+
+先展开平方范数：
+\[
+\begin{aligned}
+\mathcal{J}(\theta)
+&=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\bigl(s_\theta(x)-s_{\text{data}}(x)\bigr)^\top
+\bigl(s_\theta(x)-s_{\text{data}}(x)\bigr)
+\right] \\[4pt]
+&=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\|s_\theta(x)\|_2^2
+-
+2s_\theta(x)^\top s_{\text{data}}(x)
++
+\|s_{\text{data}}(x)\|_2^2
+\right].
+\end{aligned}
+\]
+最后一项
+\[
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\|s_{\text{data}}(x)\|_2^2
+\right]
+\]
+与 $\theta$ 无关，因此不会影响优化。
+所以，最小化 $\mathcal{J}(\theta)$ 等价于最小化
+\[
+\tilde{\mathcal{J}}(\theta)
+=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\|s_\theta(x)\|_2^2
+\right]
+-
+2
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)^\top s_{\text{data}}(x)
+\right].
+\]
+
+第一项可以直接从样本计算，因为只需要在数据点上计算模型 $s_\theta(x)$。
+困难在交叉项
+\[
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)^\top s_{\text{data}}(x)
+\right],
+\]
+因为它仍然包含未知真实得分。
+
+得分匹配的关键思想是利用分部积分改写这一交叉项。
+我们先在一维中仔细推导，因为此时计算最透明，再把结果推广到多维。
+
+\subsection{一维情形}
+
+为清楚展示核心思想，先考虑一维场景，此时真实数据得分为
+\[
+s_{\text{data}}(x)
+=
+\frac{d}{dx}\log p_{\text{data}}(x)
+=
+\frac{1}{p_{\text{data}}(x)}
+\frac{d}{dx}p_{\text{data}}(x).
+\]
+代入交叉项，得到
+\[
+\begin{aligned}
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)s_{\text{data}}(x)
+\right]
+&=
+\int
+s_\theta(x)
+\frac{d}{dx}\log p_{\text{data}}(x)
+p_{\text{data}}(x)
+\,dx \\[4pt]
+&=
+\int
+s_\theta(x)
+\frac{1}{p_{\text{data}}(x)}
+\frac{d}{dx}p_{\text{data}}(x)
+p_{\text{data}}(x)
+\,dx \\[4pt]
+&=
+\int
+s_\theta(x)
+\frac{d}{dx}p_{\text{data}}(x)
+\,dx.
+\end{aligned}
+\]
+
+此时，导数作用在未知密度 $p_{\text{data}}(x)$ 上。
+我们的目标是通过分部积分把导数转移到模型 $s_\theta(x)$ 上。
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={一维分部积分},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+乘积法则给出
+\[
+\frac{d}{dx}\bigl(u(x)v(x)\bigr)
+=
+u'(x)v(x)+u(x)v'(x).
+\]
+两边积分，得到
+\[
+\int u(x)v'(x)\,dx
+=
+\bigl[u(x)v(x)\bigr]_{-\infty}^{\infty}
+-
+\int u'(x)v(x)\,dx.
+\]
+这个恒等式以产生一个边界项为代价，把导数从 $v$ 转移到了 $u$。
+\end{tcolorbox}
+
+现在取
+\[
+u(x)=s_\theta(x),
+\qquad
+v'(x)=\frac{d}{dx}p_{\text{data}}(x),
+\qquad
+v(x)=p_{\text{data}}(x).
+\]
+于是
+\[
+\int
+s_\theta(x)
+\frac{d}{dx}p_{\text{data}}(x)
+\,dx
+=
+\bigl[
+s_\theta(x)p_{\text{data}}(x)
+\bigr]_{-\infty}^{\infty}
+-
+\int
+\frac{d}{dx}s_\theta(x)
+p_{\text{data}}(x)
+\,dx.
+\]
+
+在标准假设下，$p_{\text{data}}(x)$ 在 $|x|\to\infty$ 时衰减得足够快，同时 $s_\theta(x)$ 不会增长得过快，因此乘积 $s_\theta(x)p_{\text{data}}(x)$ 在边界处消失。
+所以边界项为零，从而得到
+\[
+\int
+s_\theta(x)
+\frac{d}{dx}p_{\text{data}}(x)
+\,dx
+=
+-
+\int
+\frac{d}{dx}s_\theta(x)
+p_{\text{data}}(x)
+\,dx.
+\]
+把右侧识别为 $p_{\text{data}}$ 下的期望，可得
+\[
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)s_{\text{data}}(x)
+\right]
+=
+-
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\frac{d}{dx}s_\theta(x)
+\right].
+\]
+
+这样，导数就从未知密度 $p_{\text{data}}(x)$ 转移到了模型 $s_\theta(x)$ 上，不再需要显式知道真实数据得分。
+把这一结果代入约化后的 Fisher 散度，得到
+\[
+\begin{aligned}
+\tilde{\mathcal{J}}(\theta)
+&=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)^2
+\right]
+-
+2
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)s_{\text{data}}(x)
+\right] \\[4pt]
+&=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)^2
+\right]
++
+2
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\frac{d}{dx}s_\theta(x)
+\right].
+\end{aligned}
+\]
+
+由于把目标函数乘以正的常数不会改变最优解，一维得分匹配目标通常写为
+\[
+\boxed{
+\mathcal{L}_{\text{SM}}(\theta)
+=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\frac{1}{2}s_\theta(x)^2
++
+\frac{d}{dx}s_\theta(x)
+\right].
+}
+\]
+
+\subsection{推广到多维}
+
+现在把同样的论证推广到一般情形 $x\in\mathbb{R}^d$。
+真实数据得分为
+\[
+s_{\text{data}}(x)
+=
+\nabla_x\log p_{\text{data}}(x),
+\]
+Fisher 散度中的交叉项变为
+\[
+\begin{aligned}
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)^\top s_{\text{data}}(x)
+\right]
+&=
+\int
+s_\theta(x)^\top
+\nabla_x\log p_{\text{data}}(x)
+p_{\text{data}}(x)
+\,dx \\[4pt]
+&=
+\int
+s_\theta(x)^\top
+\nabla_x p_{\text{data}}(x)
+\,dx.
+\end{aligned}
+\]
+
+在一维中由普通导数承担的角色，现在由散度承担。
+对于向量场
+\[
+v(x)=
+\begin{bmatrix}
+v_1(x)\\
+\vdots\\
+v_d(x)
+\end{bmatrix},
+\]
+散度定义为
+\[
+\nabla_x\cdot v(x)
+=
+\sum_{i=1}^d
+\frac{\partial v_i(x)}{\partial x_i}.
+\]
+正如上一章介绍的，散度衡量向量场的局部净流出。
+这里之所以出现散度，是因为模型得分 $s_\theta(x)$ 本身就是一个向量场。
+
+多维分部积分的对应形式来自散度定理。
+相关乘积法则为
+\[
+\nabla_x\cdot
+\bigl(p_{\text{data}}(x)s_\theta(x)\bigr)
+=
+s_\theta(x)^\top\nabla_x p_{\text{data}}(x)
++
+p_{\text{data}}(x)\nabla_x\cdot s_\theta(x).
+\]
+重新整理得
+\[
+s_\theta(x)^\top\nabla_x p_{\text{data}}(x)
+=
+\nabla_x\cdot
+\bigl(p_{\text{data}}(x)s_\theta(x)\bigr)
+-
+p_{\text{data}}(x)\nabla_x\cdot s_\theta(x).
+\]
+在 $\mathbb{R}^d$ 上积分，并假设满足合适的边界条件，使散度项没有边界通量贡献，可得
+\[
+\int
+s_\theta(x)^\top\nabla_x p_{\text{data}}(x)
+\,dx
+=
+-
+\int
+p_{\text{data}}(x)
+\nabla_x\cdot s_\theta(x)
+\,dx.
+\]
+因此
+\[
+\boxed{
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)^\top s_{\text{data}}(x)
+\right]
+=
+-
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\nabla_x\cdot s_\theta(x)
+\right].
+}
+\]
+
+这就是一维结果
+\[
+\mathbb{E}_{p_{\text{data}}}
+\left[
+s_\theta(x)s_{\text{data}}(x)
+\right]
+=
+-
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\frac{d}{dx}s_\theta(x)
+\right]
+\]
+在多维中的直接对应。
+唯一的结构变化是：标量得分的普通导数被向量得分场的散度所替代。
+
+把交叉项恒等式代入约化后的 Fisher 散度，得到
+\[
+\tilde{\mathcal{J}}(\theta)
+=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\|s_\theta(x)\|_2^2
++
+2\nabla_x\cdot s_\theta(x)
+\right].
+\]
+等价地，乘以 $1/2$ 后，一般的得分匹配目标为
+\[
+\boxed{
+\mathcal{L}_{\text{SM}}(\theta)
+=
+\mathbb{E}_{p_{\text{data}}}
+\left[
+\frac{1}{2}
+\|s_\theta(x)\|_2^2
++
+\nabla_x\cdot s_\theta(x)
+\right].
+}
+\]
+
+这就是经典得分匹配目标。
+它最初来自学习得分与真实数据得分之间的 Fisher 散度，但最终表达式不再显式包含 $s_{\text{data}}(x)$。
+一旦 $s_\theta(x)$ 能够逼近 $s_{\text{data}}(x)$，就可以把它代入前面介绍的 Langevin 动力学。
+在适当条件下，这种学习得到的动力学可以用于生成分布近似数据分布的样本。
+
+\section{稳定学习：通过扰动实现去噪得分匹配}
+
+上一节推导了得分匹配目标，它允许我们在不知道数据密度显式形式的情况下，从数据中学习得分函数 $s_\theta(x)$。
+虽然理论上非常优雅，但直接得分匹配在高维生成建模中可能难以应用。
+
+核心困难来自真实数据分布的几何结构。
+经验数据往往集中在嵌入高维空间的低维流形上或其附近。
+因此，数据密度可能高度集中、不规则，或者在数据支撑集之外表现很差。
+直接学习这样的分布得分可能非常不稳定，因为在数据覆盖很少或完全没有覆盖的区域，诱导出的向量场可能行为异常。
+
+一个自然解决办法是引入噪声。
+高斯扰动会把经验分布或高度集中的数据分布变成一个平滑后的分布，其得分场通常表现更良好。
+我们不再直接学习原始数据分布的得分，而是学习其带噪版本的得分。
+这就是\emph{去噪得分匹配}（denoising score matching）~\cite{vincent2011connection} 的基础思想。
+
+\subsection{高斯扰动与平滑得分}
+
+首先用加性高斯噪声扰动数据。
+给定干净样本
+\[
+x\sim p_{\text{data}}(x),
+\]
+构造噪声观测
+\[
+\tilde{x}
+=
+x+\varepsilon,
+\qquad
+\varepsilon\sim\mathcal{N}(0,\sigma^2 I).
+\]
+等价地，给定干净样本时，扰动后样本的条件分布为
+\[
+p(\tilde{x}\mid x)
+=
+\mathcal{N}(\tilde{x};x,\sigma^2 I).
+\]
+
+$\tilde{x}$ 的边缘分布通过对干净变量 $x$ 积分得到：
+\[
+p_\sigma(\tilde{x})
+=
+\int
+p_{\text{data}}(x)
+p(\tilde{x}\mid x)
+\,dx.
+\]
+这就是原始数据分布与高斯核的卷积。
+其作用是平滑：概率质量被扩散到邻近区域，尖锐结构得到软化，而原本密度几乎为零的区域在扰动后分布下也可能获得非零概率。
+
+现在不再学习原始数据分布的得分，而是学习这个平滑密度的得分：
+\[
+s_\sigma(\tilde{x})
+=
+\nabla_{\tilde{x}}\log p_\sigma(\tilde{x}).
+\]
+
+下面考察这一噪声得分的结构。
+根据对数梯度恒等式，
+\[
+\nabla_{\tilde{x}}\log p_\sigma(\tilde{x})
+=
+\frac{1}{p_\sigma(\tilde{x})}
+\nabla_{\tilde{x}}p_\sigma(\tilde{x}).
+\]
+平滑密度的梯度为
+\[
+\begin{aligned}
+\nabla_{\tilde{x}}p_\sigma(\tilde{x})
+&=
+\nabla_{\tilde{x}}
+\int
+p_{\text{data}}(x)
+p(\tilde{x}\mid x)
+\,dx \\[4pt]
+&=
+\int
+p_{\text{data}}(x)
+\nabla_{\tilde{x}}p(\tilde{x}\mid x)
+\,dx,
+\end{aligned}
+\]
+其中在标准正则条件下可以交换求导和积分。
+因此
+\[
+s_\sigma(\tilde{x})
+=
+\frac{
+\int
+p_{\text{data}}(x)
+\nabla_{\tilde{x}}p(\tilde{x}\mid x)
+\,dx
+}{
+\int
+p_{\text{data}}(x)
+p(\tilde{x}\mid x)
+\,dx
+}.
+\]
+
+这个表达具有一个很有用的概率解释。
+由贝叶斯公式，给定扰动观测时干净变量的后验为
+\[
+p(x\mid\tilde{x})
+=
+\frac{
+p_{\text{data}}(x)p(\tilde{x}\mid x)
+}{
+p_\sigma(\tilde{x})
+}.
+\]
+利用这个后验，噪声得分可以写成
+\[
+s_\sigma(\tilde{x})
+=
+\int
+p(x\mid\tilde{x})
+\nabla_{\tilde{x}}\log p(\tilde{x}\mid x)
+\,dx,
+\]
+等价地，
+\[
+s_\sigma(\tilde{x})
+=
+\mathbb{E}_{x\sim p(x\mid\tilde{x})}
+\left[
+\nabla_{\tilde{x}}\log p(\tilde{x}\mid x)
+\right].
+\]
+
+对于高斯扰动，
+\[
+p(\tilde{x}\mid x)
+=
+\mathcal{N}(\tilde{x};x,\sigma^2 I).
+\]
+忽略与 $\tilde{x}$ 无关的常数，其对数为
+\[
+\log p(\tilde{x}\mid x)
+=
+-\frac{1}{2\sigma^2}
+\|\tilde{x}-x\|_2^2
++\text{常数}.
+\]
+因此
+\[
+\nabla_{\tilde{x}}\log p(\tilde{x}\mid x)
+=
+-\frac{1}{\sigma^2}(\tilde{x}-x)
+=
+\frac{1}{\sigma^2}(x-\tilde{x}).
+\]
+代入条件期望可得
+\[
+\boxed{
+s_\sigma(\tilde{x})
+=
+\frac{1}{\sigma^2}
+\mathbb{E}_{x\sim p(x\mid\tilde{x})}
+\left[
+x-\tilde{x}
+\right].
+}
+\]
+
+这个恒等式给出了平滑得分的直观解释。
+在扰动点 $\tilde{x}$ 处，得分指向可能生成该点的干净样本的条件平均位置。
+换句话说，噪声得分提供一个局部去噪方向：它告诉我们平均而言应如何移动 $\tilde{x}$，才能重新靠近数据分布。
+
+\subsection{噪声得分的不可直接计算性}
+
+上面的恒等式在概念上非常有用，但还没有给出可以直接计算的训练目标。
+前向扰动过程很简单：我们可以采样
+\[
+x\sim p_{\text{data}}(x),
+\qquad
+\tilde{x}=x+\varepsilon,
+\qquad
+\varepsilon\sim\mathcal{N}(0,\sigma^2 I).
+\]
+因此可以很容易生成 $(x,\tilde{x})$ 样本对。
+
+问题在于，噪声得分包含关于后验分布 $p(x\mid\tilde{x})$ 的期望：
+\[
+s_\sigma(\tilde{x})
+=
+\frac{1}{\sigma^2}
+\mathbb{E}_{x\sim p(x\mid\tilde{x})}
+\left[
+x-\tilde{x}
+\right].
+\]
+根据贝叶斯公式，
+\[
+p(x\mid\tilde{x})
+=
+\frac{
+p(\tilde{x}\mid x)p_{\text{data}}(x)
+}{
+p_\sigma(\tilde{x})
+},
+\]
+其中
+\[
+p_\sigma(\tilde{x})
+=
+\int
+p_{\text{data}}(x)p(\tilde{x}\mid x)\,dx.
+\]
+虽然似然 $p(\tilde{x}\mid x)$ 已知，但数据分布 $p_{\text{data}}(x)$ 没有闭式形式，我们只有它的样本。
+因此，边缘密度 $p_\sigma(\tilde{x})$ 和后验 $p(x\mid\tilde{x})$ 都无法直接获得。
+
+这阻止我们直接最小化噪声 Fisher 散度
+\[
+\mathbb{E}_{\tilde{x}\sim p_\sigma}
+\left[
+\left\|
+s_\theta(\tilde{x})
+-
+s_\sigma(\tilde{x})
+\right\|_2^2
+\right],
+\]
+因为计算该目标需要显式访问真实噪声得分 $s_\sigma(\tilde{x})$。
+因此，尽管前向扰动过程可处理，对应得分仍不能以闭式直接得到。
+
+所以我们再次面对一个熟悉局面：得分估计问题定义清楚，但目标无法直接计算。
+关键问题在于，能否利用已知扰动过程来避开对后验的显式计算？
+
+\subsection{去噪得分匹配作为回归}
+
+关键观察是，扰动过程定义了 $(x,\tilde{x})$ 上一个可处理的联合分布：
+\[
+p_{\text{data}}(x)p(\tilde{x}\mid x).
+\]
+我们也许不知道边缘密度 $p_\sigma(\tilde{x})$ 或后验 $p(x\mid\tilde{x})$ 的显式形式，但可以精确地从这个联合分布采样：先抽取一个干净数据点 $x$，再加入高斯噪声得到 $\tilde{x}$。
+
+去噪得分匹配利用一个基本的最小二乘回归性质来使用这一联合采样过程。
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={最小二乘回归恒等式},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+对于随机变量 $(U,Y)$，使
+\[
+\mathbb{E}
+\left[
+\|f(U)-Y\|_2^2
+\right]
+\]
+最小的函数为
+\[
+f^\star(U)=\mathbb{E}[Y\mid U].
+\]
+因此，在平方误差损失下，最佳预测就是给定输入后目标变量的条件均值。
+\end{tcolorbox}
+
+现在把这一恒等式应用于去噪场景。
+令输入变量为扰动观测
+\[
+U=\tilde{x},
+\]
+回归目标为缩放后的残差
+\[
+Y=
+\frac{1}{\sigma^2}(x-\tilde{x}).
+\]
+考虑目标
+\[
+\boxed{
+\mathcal{L}_{\text{DSM}}(\theta)
+=
+\mathbb{E}_{x\sim p_{\text{data}},\,
+\tilde{x}\sim p(\tilde{x}\mid x)}
+\left[
+\left\|
+s_\theta(\tilde{x})
+-
+\frac{1}{\sigma^2}(x-\tilde{x})
+\right\|_2^2
+\right].
+}
+\]
+
+根据最小二乘回归恒等式，最优函数满足
+\[
+s_\theta^\star(\tilde{x})
+=
+\mathbb{E}
+\left[
+\frac{1}{\sigma^2}(x-\tilde{x})
+\;\middle|\;
+\tilde{x}
+\right].
+\]
+而这个条件期望恰好就是前面推导出的噪声得分：
+\[
+s_\sigma(\tilde{x})
+=
+\frac{1}{\sigma^2}
+\mathbb{E}
+\left[
+x-\tilde{x}
+\;\middle|\;
+\tilde{x}
+\right].
+\]
+因此
+\[
+\boxed{
+s_\theta^\star(\tilde{x})=s_\sigma(\tilde{x}).
+}
+\]
+
+这就是去噪得分匹配的核心洞见。
+单个训练样本对提供可处理的条件目标，而平方误差回归会在给定 $\tilde{x}$ 的条件下对这些目标求平均，从而恢复平滑密度的得分。
+图~\ref{fig:score-dsm-regression} 将这种平均几何关系直观展示出来。
+
+\input{figures/ch06/fig_ch06_03_dsm_regression}
+
+等价地，由于
+\[
+\tilde{x}=x+\varepsilon,
+\]
+有
+\[
+x-\tilde{x}=-\varepsilon.
+\]
+所以去噪得分匹配目标也可以写成
+\[
+\mathcal{L}_{\text{DSM}}(\theta)
+=
+\mathbb{E}_{x\sim p_{\text{data}},\,
+\varepsilon\sim\mathcal{N}(0,\sigma^2 I)}
+\left[
+\left\|
+s_\theta(x+\varepsilon)
++
+\frac{\varepsilon}{\sigma^2}
+\right\|_2^2
+\right].
+\]
+这个形式使学习目标尤其具体：模型被训练去预测负的噪声方向，并乘以 $1/\sigma^2$ 进行缩放。
+
+因此，去噪得分匹配把一个难以直接处理的得分估计问题转化为完全由已知扰动过程定义的监督回归问题。
+目标函数只依赖干净数据样本和高斯噪声，不需要计算 $p_{\text{data}}(x)$、$p_\sigma(\tilde{x})$ 或后验 $p(x\mid\tilde{x})$。
+
+需要注意，对于固定的 $\sigma$，模型学习的是扰动后密度 $p_\sigma$ 的得分，而不是直接学习 $p_{\text{data}}$ 的得分。
+因此，噪声水平控制了模型正在学习其几何结构的那个分布。
+然而，只学习单一噪声水平的得分又引出进一步问题：应该如何选择噪声尺度 $\sigma$？
+
+\section{从多尺度得分学习到连续时间扩散}
+
+到目前为止，本章自底向上建立了基于得分的生成建模。
+我们先把得分解释为概率漂移场，再说明 Langevin 动力学如何利用得分进行采样，并进一步推导得分匹配和去噪得分匹配，使得分场能够从数据中学习。
+
+现在进行最后一个概念性过渡：从单一噪声水平的得分学习，过渡到沿一整条噪声分布路径学习得分。这种多尺度视角已经成为现代基于得分生成建模的核心~\cite{song2019generative,song2021scorebased}。
+也正是在这里，得分学习开始与扩散模型直接连接起来。
+
+这种联系需要谨慎理解。
+在前面的 DDPM 章节中，我们从离散潜变量视角引入扩散模型：前向加噪马尔可夫链、学习得到的反向链，以及变分训练目标。
+这里则从另一个方向接近同一大框架。
+从得分学习出发，我们询问一族带噪得分场如何把样本从噪声移动回数据。
+这会先导出多尺度去噪得分匹配，再导出退火 Langevin 动力学，最后进入连续时间扩散过程。
+
+因此，本节不会重复 DDPM 的推导，而是展示得分视角如何提供一条通往扩散的连续时间路径：
+\[
+\begin{aligned}
+\text{单一噪声得分}
+&\;\longrightarrow\;
+\text{多个噪声得分}
+\\
+&\;\longrightarrow\;
+\text{退火反向采样}
+\;\longrightarrow\;
+\text{连续时间得分引导扩散}.
+\end{aligned}
+\]
+
+\subsection{多尺度去噪得分匹配}
+
+上一节已经说明，对于固定噪声水平 $\sigma$，去噪得分匹配学习的是平滑数据分布 $p_\sigma$ 的得分。
+我们通过
+\[
+\tilde{x}=x+\varepsilon,
+\qquad
+\varepsilon\sim\mathcal{N}(0,\sigma^2I)
+\]
+扰动数据，并训练
+\[
+s_\theta(\tilde{x},\sigma)
+\approx
+\nabla_{\tilde{x}}\log p_\sigma(\tilde{x}).
+\]
+对应的去噪目标为
+\[
+\frac{1}{\sigma^2}(x-\tilde{x})
+=
+-\frac{\varepsilon}{\sigma^2}.
+\]
+
+然而，单一噪声水平只提供数据分布的一个平滑视图。
+如果 $\sigma$ 很大，密度非常平滑，得分场能稳定地提供指向整体数据区域的全局引导，但精细细节会被模糊掉。
+如果 $\sigma$ 很小，密度更接近原始数据分布，得分场能够捕捉更尖锐的局部细节，但在远离数据支撑集的区域又可能难以可靠估计。
+因此，单一噪声水平无法同时提供稳健的全局引导和精确的局部细化。
+
+图~\ref{fig:score-multiscale-fields} 展示了同一个多峰密度在三个高斯平滑尺度下的这一效应：大噪声揭示粗粒度全局几何，小噪声则恢复更尖锐的局部结构。
+
+\input{figures/ch06/fig_ch06_04_multiscale_scores}
+
+这说明噪声尺度不应只选择一次。
+相反，应在一系列噪声水平上学习一族得分场。
+
+令
+\[
+\sigma_1>\sigma_2>\cdots>\sigma_K>0
+\]
+为递减的噪声尺度序列。
+对每个 $\sigma_k$，定义扰动后密度
+\[
+p_{\sigma_k}(\tilde{x})
+=
+\int
+p_{\text{data}}(x)
+\mathcal{N}(\tilde{x};x,\sigma_k^2I)
+\,dx.
+\]
+我们不再学习一个得分场，而是训练一个噪声条件模型
+\[
+s_\theta(\tilde{x},\sigma_k)
+\approx
+\nabla_{\tilde{x}}\log p_{\sigma_k}(\tilde{x}).
+\]
+
+去噪得分匹配目标可以直接从单尺度情形扩展：
+\[
+\boxed{
+\mathcal{L}_{\text{MS-DSM}}(\theta)
+=
+\mathbb{E}_{k}
+\mathbb{E}_{x\sim p_{\text{data}},\,
+\tilde{x}\sim\mathcal{N}(x,\sigma_k^2I)}
+\left[
+\left\|
+s_\theta(\tilde{x},\sigma_k)
+-
+\frac{1}{\sigma_k^2}(x-\tilde{x})
+\right\|_2^2
+\right].
+}
+\]
+等价地，写 $\tilde{x}=x+\varepsilon$，其中
+$\varepsilon\sim\mathcal{N}(0,\sigma_k^2I)$，得到
+\[
+\mathcal{L}_{\text{MS-DSM}}(\theta)
+=
+\mathbb{E}_{k}
+\mathbb{E}_{x\sim p_{\text{data}},\,
+\varepsilon\sim\mathcal{N}(0,\sigma_k^2I)}
+\left[
+\left\|
+s_\theta(x+\varepsilon,\sigma_k)
++
+\frac{\varepsilon}{\sigma_k^2}
+\right\|_2^2
+\right].
+\]
+
+对于每一个固定噪声水平，前面同样的回归论证都成立。
+最优预测器会恢复相应平滑密度的得分：
+\[
+s_\theta^\star(\tilde{x},\sigma_k)
+=
+\nabla_{\tilde{x}}\log p_{\sigma_k}(\tilde{x}).
+\]
+区别在于，现在模型学习的是一族得分场，而不是单个得分场。
+因此，我们不再只对一个密度建模，而是在从高度加噪、简单的分布到轻度加噪、细节丰富的分布之间，对一整套层次化平滑密度建模。
+
+\subsection{退火 Langevin 动力学}
+
+一旦在多个噪声水平上学到得分，就可以用于采样。
+这就得到\emph{退火 Langevin 动力学}，它按照从大噪声到小噪声的顺序执行 Langevin 更新。
+
+假设
+\[
+s_\theta(x,\sigma_k)
+\approx
+\nabla_x\log p_{\sigma_k}(x),
+\qquad
+k=1,\dots,K,
+\]
+并且
+\[
+\sigma_1>\sigma_2>\cdots>\sigma_K.
+\]
+我们从一个宽的噪声分布初始化，例如
+\[
+x^{(0)}\sim\mathcal{N}(0,\sigma_1^2I),
+\]
+然后对每个尺度 $\sigma_k$ 执行若干次更新：
+\[
+\boxed{
+x
+\leftarrow
+x
++
+\epsilon_k s_\theta(x,\sigma_k)
++
+\sqrt{2\epsilon_k}\,\xi,
+\qquad
+\xi\sim\mathcal{N}(0,I).
+}
+\]
+在尺度 $\sigma_k$ 上迭代若干步后，再移动到更小的下一尺度 $\sigma_{k+1}$。
+
+其逻辑很简单。
+在大噪声水平下，得分提供指向整体数据区域的粗略引导；在更小噪声水平下，得分提供更尖锐的局部修正。
+因此，采样过程表现为逐步细化：
+\[
+\text{随机噪声}
+\;\longrightarrow\;
+\text{粗略数据区域}
+\;\longrightarrow\;
+\text{局部结构}
+\;\longrightarrow\;
+\text{精细细节}.
+\]
+
+退火 Langevin 动力学把多尺度得分学习转化成明确的生成过程。
+它也自然启发了下一步：如果噪声水平的数量越来越多，相邻水平之间的间隔越来越小，那么这种离散细化过程就开始类似连续时间扩散过程。
+
+退火 Langevin 动力学已经是一种生成过程，但还不是 DDPM 意义上的扩散模型。
+它使用一组噪声分布 $p_{\sigma_k}$，并在每个尺度上执行 Langevin 细化。
+而扩散模型会把这些中间噪声分布组织成同一个前向加噪过程的边缘分布。
+在 DDPM 中，这个过程是一条离散马尔可夫链；在连续时间的得分视角中，它由随机微分方程描述。
+
+\subsection{从离散噪声水平到连续扩散过程}
+
+多尺度构造使用有限多个噪声水平来近似从数据到噪声的平滑演进。
+当噪声水平数量变大、相邻水平越来越接近时，自然可以用连续时间变量 $t$ 取代离散索引 $\sigma_k$。
+我们不再考虑彼此分开的平滑密度
+\[
+p_{\sigma_1},p_{\sigma_2},\dots,p_{\sigma_K},
+\]
+而是考虑一族连续密度
+\[
+p_t(x),
+\qquad
+0\leq t\leq T.
+\]
+这一连续时间描述应理解为 DDPM 章节中离散加噪路径的对应形式：有限个中间噪声变量序列被连续索引的一族噪声分布替代。
+
+在一端，$p_0$ 是数据分布，或其理想化版本；在另一端，$p_T$ 被设计成简单的类噪声分布，通常近似高斯。
+
+得分模型也从噪声条件场
+\[
+s_\theta(x,\sigma_k)
+\approx
+\nabla_x\log p_{\sigma_k}(x)
+\]
+变为时间依赖场
+\[
+s_\theta(x,t)
+\approx
+\nabla_x\log p_t(x).
+\]
+因此，多尺度得分学习图景变成
+\[
+\text{有限噪声尺度}
+\quad\longrightarrow\quad
+\text{连续的一族噪声密度}
+\quad\longrightarrow\quad
+\text{前向扩散过程}.
+\]
+
+正是在这里，多尺度得分学习与扩散模型真正绑定起来。
+在多个噪声水平上学习得分，会得到一族向量场，但仅凭这一点还不能定义完整扩散模型。
+只有当这些噪声密度被组织成同一个前向加噪过程在不同时间的边缘分布时，才得到扩散模型。
+换言之，必须存在一个随机动力学，使其随时间演化的分布正是 $p_t$。
+此时，学习得到的得分 $s_\theta(x,t)$ 不再只是孤立的去噪场，而成为把这一加噪过程反向运行所需的修正项。
+
+连续加噪过程可以由如下随机微分方程描述：
+\[
+\boxed{
+dX_t
+=
+f(X_t,t)\,dt
++
+g(t)\,dW_t.
+}
+\]
+其中 $f(X_t,t)\,dt$ 是确定性漂移，$g(t)\,dW_t$ 注入布朗噪声，函数 $g(t)$ 控制时刻 $t$ 的噪声强度。
+
+这正是上一章建立的“漂移+噪声”结构。
+如果 $p_t(x)$ 表示 $X_t$ 的密度，那么在这里的标量、各向同性扩散系数 $g(t)$ 情形下，其演化由 Fokker--Planck 方程控制：
+\[
+\partial_t p_t(x)
+=
+-\nabla_x\cdot\bigl(p_t(x)f(x,t)\bigr)
++
+\frac{1}{2}g(t)^2\Delta p_t(x).
+\]
+漂移项在空间中输运概率质量，而扩散项使密度扩散并平滑。
+
+在生成建模中，前向过程并不是直接用于生成新数据。
+它的作用是定义一条从数据到噪声的受控路径：
+\[
+p_0(x)
+\approx
+p_{\text{data}}(x),
+\qquad
+p_T(x)
+\approx
+\text{简单噪声分布}.
+\]
+生成问题则是把这一过程反向运行：从噪声开始，恢复出有结构的样本。
+
+\subsection{反向时间动力学与得分的作用}
+
+前向扩散过程很容易模拟。
+从一个数据样本出发，按照所选随机微分方程不断加入噪声，就能得到噪声越来越强的状态。
+但生成需要相反方向：我们希望从一个简单噪声样本开始，反向移动到数据分布。
+
+乍看之下，反转带噪过程似乎不可能，因为扩散看起来会破坏信息。
+然而，在适当的正则条件下，扩散过程的反向时间演化同样可以由随机微分方程描述。
+关键事实是：反向漂移依赖中间密度 $p_t$ 的得分。
+
+对于前向过程
+\[
+dX_t
+=
+f(X_t,t)\,dt
++
+g(t)\,dW_t,
+\]
+在这里考虑的标量扩散情形下，反向时间动力学具有形式
+\[
+\boxed{
+dX_t
+=
+\left[
+f(X_t,t)
+-
+g(t)^2\nabla_x\log p_t(X_t)
+\right]dt
++
+g(t)\,d\bar{W}_t.
+}
+\]
+这里采用常见的反向时间记号：过程从 $t=T$ 向 $t=0$ 模拟，所以时间增量应理解为沿反方向。
+布朗运动 $\bar{W}_t$ 表示与该反向过程相联系的噪声。
+
+这个方程正是学习得分真正进入生成过程的地方。
+前向 SDE 定义一族噪声密度 $p_t$，而反向漂移则需要依赖得分的修正
+\[
+-g(t)^2\nabla_x\log p_t(X_t).
+\]
+由于真实得分未知，我们学习一个时间条件模型：
+\[
+s_\theta(x,t)
+\approx
+\nabla_x\log p_t(x),
+\qquad
+0\leq t\leq T.
+\]
+图~\ref{fig:score-forward-reverse-sde} 总结了这些组成部分如何相互配合。
+
+\input{figures/ch06/fig_ch06_05_forward_reverse_sde}
+
+因此，模型学习的是中间噪声分布的得分，而不只是数据分布本身的得分。
+这些局部场提供从简单终端噪声分布回到结构化数据所需的修正信息。
+
+一旦这些得分已知或能够被良好近似，就可以通过模拟反向时间动力学生成样本。
+首先从
+\[
+X_T\sim p_T
+\]
+开始，其中 $p_T$ 是简单噪声分布；然后利用学习到的得分 $s_\theta(x,t)$，从 $T$ 向 $0$ 反向演化。
+最终状态就被视为来自数据分布的近似样本。
+
+至此，我们完成了从得分学习到基于得分扩散的概念过渡。
+去噪得分匹配解释如何学习噪声分布的得分；多尺度得分学习把它扩展到多个噪声水平；前向扩散过程把这些噪声分布组织成一条统一的时间路径；反向时间 SDE 则说明如何利用学习到的得分沿这条路径返回。
+
+因此，扩散模型并不只是得分估计器，而仅有得分匹配也还不是完整的生成模型。
+前向扩散过程定义从数据到噪声的结构化路径，而得分学习提供反转这条路径所需的局部信息。
+生成过程由二者结合得到：从一个简单噪声分布开始，沿学习得到的、由得分引导的反向动力学回到数据分布。
+
+\section{从得分视角理解离散扩散模型}
+
+上面的讨论建立了连续时间的得分扩散视角。
+现在把它重新连接到本书前面介绍的离散 DDPM 形式。
+目的不是重复潜变量推导，而是从得分视角重新解释 DDPM 中一个熟悉的部分：噪声预测目标。
+
+在 DDPM 章节中，扩散模型通过前向加噪马尔可夫链、学习得到的反向马尔可夫链以及最终化简为噪声预测损失的变分训练目标来介绍。
+这里说明为什么噪声预测损失也可以理解为携带中间噪声分布的类得分信息。
+
+\subsection{噪声预测与条件得分}
+
+回顾 DDPM 前向过程，它通过加入高斯噪声逐步扰动干净数据样本 $x_0$。
+该过程一个关键性质是，可以直接从 $x_0$ 采样 $x_t$：
+\[
+x_t
+=
+\sqrt{\bar{\alpha}_t}\,x_0
++
+\sqrt{1-\bar{\alpha}_t}\,\varepsilon,
+\qquad
+\varepsilon\sim\mathcal{N}(0,I),
+\]
+其中 $\bar{\alpha}_t$ 控制时刻 $t$ 剩余的信号强度。
+等价地，
+\[
+q(x_t\mid x_0)
+=
+\mathcal{N}
+\left(
+x_t;
+\sqrt{\bar{\alpha}_t}\,x_0,
+(1-\bar{\alpha}_t)I
+\right).
+\]
+
+从得分视角看，相关对象是关于噪声变量 $x_t$ 的对数密度梯度。
+对于条件高斯 $q(x_t\mid x_0)$，有
+\[
+\log q(x_t\mid x_0)
+=
+-\frac{1}{2(1-\bar{\alpha}_t)}
+\left\|
+x_t-\sqrt{\bar{\alpha}_t}x_0
+\right\|_2^2
++
+\text{常数}.
+\]
+关于 $x_t$ 求导，得到
+\[
+\nabla_{x_t}\log q(x_t\mid x_0)
+=
+-\frac{1}{1-\bar{\alpha}_t}
+\left(
+x_t-\sqrt{\bar{\alpha}_t}x_0
+\right).
+\]
+利用重参数化关系
+\[
+x_t-\sqrt{\bar{\alpha}_t}x_0
+=
+\sqrt{1-\bar{\alpha}_t}\,\varepsilon,
+\]
+可进一步写成
+\[
+\boxed{
+\nabla_{x_t}\log q(x_t\mid x_0)
+=
+-\frac{1}{\sqrt{1-\bar{\alpha}_t}}\,
+\varepsilon.
+}
+\]
+
+这个恒等式解释了噪声预测为什么与得分估计密切相关。
+如果模型能够预测加入的噪声 $\varepsilon$，那么乘上已知缩放因子
+\[
+-\frac{1}{\sqrt{1-\bar{\alpha}_t}}
+\]
+之后，它也就预测了噪声高斯分布 $q(x_t\mid x_0)$ 的条件得分。
+
+必须准确理解这一含义。
+上述表达是\emph{条件得分}，其中干净样本 $x_0$ 被视为已知。
+而反向过程真正需要的是边缘得分
+\[
+\nabla_{x_t}\log q_t(x_t),
+\]
+其中 $q_t(x_t)$ 是时刻 $t$ 所有噪声样本的完整分布。
+与去噪得分匹配一样，边缘得分可以理解为对所有可能产生同一噪声观测 $x_t$ 的干净样本 $x_0$ 进行平均后得到。
+
+因此，DDPM 的噪声预测为获得得分模型所需的同类信息提供了一个实际回归路径：它给出局部方向，告诉一个噪声样本应该如何被修正，才能变得更像数据。
+
+\subsection{基于得分扩散的统一视角}
+
+现在可以把不同视角并列起来。
+
+从 DDPM 的潜变量视角看，扩散模型由离散前向加噪过程
+\[
+x_0 \rightarrow x_1 \rightarrow \cdots \rightarrow x_T
+\]
+与学习得到的反向过程
+\[
+x_T \rightarrow x_{T-1} \rightarrow \cdots \rightarrow x_0
+\]
+共同构成。
+训练可以通过变分目标表达，而在标准参数化下，最终得到一个预测每个时间步所加入噪声的神经网络。
+
+从得分视角看，同一组噪声变量定义了一族中间噪声分布
+\[
+q_t(x_t),
+\qquad
+t=0,\dots,T.
+\]
+在每个时间步，反向过程都需要局部信息，告诉它应如何把噪声样本移动到对应中间分布下更高概率的区域。
+这种局部信息由得分
+\[
+\nabla_{x_t}\log q_t(x_t)
+\]
+编码。
+
+因此，两种视角是互补的。
+DDPM 视角强调概率潜变量结构与离散反向马尔可夫链；得分视角强调中间噪声分布的几何结构，以及反转扰动所需的局部去噪方向。
+
+在连续时间中，这种几何图景尤其清晰。
+离散的一族
+\[
+q_0,q_1,\dots,q_T
+\]
+被连续密度路径
+\[
+p_t(x),
+\qquad
+0\leq t\leq T
+\]
+取代，而反向动力学显式包含得分
+\[
+\nabla_x\log p_t(x).
+\]
+因此，基于得分的连续时间形式可以看作 DDPM 中同一去噪原则的平滑对应。
+
+这里最重要的概念信息并不是所有形式在细节上完全相同。
+DDPM、退火 Langevin 动力学和连续时间得分扩散以不同方式组织生成过程，但都共享同一核心思想：
+\[
+\text{学习噪声样本在局部应当如何被修正，}
+\]
+并利用这些学习到的修正把噪声转化为数据。
+
+从这个意义上说，扩散模型是结构化的时间依赖去噪模型。
+前向过程创建一系列层次化噪声分布；学习问题估计沿这一层次反向移动所需的信息；采样则从简单噪声开始，反复应用学习到的修正，直到获得类似数据的样本。
+
+至此，本章完成了离散 DDPM 视角与得分视角之间的连接。
+DDPM 章节说明扩散模型如何作为潜变量生成模型推导出来；本章则说明它的去噪行为为什么也可以从几何角度理解：模型在不同噪声水平上学习类得分信息，并利用这些信息引导从噪声到数据的反向变换。
+
+\section*{本章小结与参考文献}
+\addcontentsline{toc}{section}{本章小结与参考文献}
+
+本章建立了生成建模的得分视角，并利用它构建扩散模型的连续时间解释。
+此前 DDPM 章节通过离散潜变量和变分学习引入扩散，而本章从局部概率几何出发理解同一去噪思想。
+
+核心对象是得分函数 $\nabla_x \log p(x)$，它把密度转化为向量场。
+我们先把得分解释为概率漂移方向，并说明它与布朗噪声结合后如何形成 Langevin 动力学。
+利用 Fokker--Planck 方程进行的平稳性计算解释了：为什么目标密度的得分可以支撑一个以该目标分布为平稳分布的采样动力学。
+
+随后转向学习问题。
+由于真实数据密度未知，其得分无法直接计算。
+得分匹配通过最小化 Fisher 散度目标并利用分部积分，把未知数据得分从训练损失中消去。
+去噪得分匹配进一步通过高斯噪声扰动数据，使这一思想更适用于实际高维建模，并把平滑密度得分的学习转化为回归问题。
+在这一视角下，模型学习的是一个噪声样本应如何朝干净数据分布方向移动。
+
+接着，本章从单一噪声水平扩展到一族噪声分布。
+多尺度得分学习在大噪声水平提供粗粒度全局引导，在小噪声水平提供精细局部修正。
+退火 Langevin 动力学把这些得分场转化为采样过程，而连续时间形式则把这些噪声分布组织成前向随机微分方程的边缘分布。
+相应的反向时间动力学说明，时间依赖得分
+$\nabla_x \log p_t(x)$
+为何是把噪声重新转化为数据所需的关键修正项。
+
+最后，我们把这一得分视角重新连接到 DDPM。
+DDPM 的噪声预测目标可以理解为学习中间噪声分布的类得分信息。
+因此，DDPM 与得分视角并不是相互竞争的解释，而是互补的：DDPM 强调离散潜变量构造，而得分扩散强调反转噪声过程的几何结构与动力学。
+
+\bigskip
+
+基于得分扩散的发展融合了若干重要研究脉络。
+Hyv\"arinen~\cite{hyvarinen2005estimation} 提出了得分匹配原则，说明模型可以通过匹配对数密度梯度进行估计，而不需要密度的归一化常数。
+Vincent~\cite{vincent2011connection} 随后把得分匹配与去噪联系起来，说明去噪目标可以恢复扰动后数据分布的得分信息。
+这些思想构成本章得分学习与去噪得分匹配推导的基础。
+
+Song 和 Ermon~\cite{song2019generative} 把基于得分的生成建模带入现代深度生成模型场景：他们在多个高斯噪声水平上学习得分，并利用退火 Langevin 动力学采样。
+这项工作明确展示了多尺度得分场的重要性，尤其是在数据集中于低维结构附近时。
+随后，Song 等人~\cite{song2021scorebased} 通过随机微分方程、反向时间 SDE 及相关采样过程，统一并扩展了连续时间形式。
+这些工作与 Ho 等人~\cite{ho2020denoising} 的 DDPM 形式共同构成了现代扩散模型的主要概念基础：扩散既可以理解为概率去噪模型，也可以理解为由得分引导的生成动力学。

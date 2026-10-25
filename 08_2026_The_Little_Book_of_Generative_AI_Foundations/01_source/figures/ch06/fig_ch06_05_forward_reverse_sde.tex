@@ -1,0 +1,66 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  state/.style={
+    draw, rounded corners=2pt, align=center, inner sep=5pt,
+    text width=2.20cm, minimum height=0.82cm
+  },
+  eqbox/.style={
+    draw, rounded corners=2pt, align=center, inner sep=6pt,
+    text width=10.8cm, minimum height=1.12cm
+  },
+  flow/.style={->,thick},
+  reverse/.style={->,thick,dashed}
+]
+\node[font=\normalsize\bfseries] at (6.1,3.25)
+  {得分提供反转扩散所需的修正};
+
+% Forward row
+\node[state] (f0) at (0,1.75) {$p_0$\\数据};
+\node[state] (ft) at (6.1,1.75) {$p_t$\\中间状态};
+\node[state] (fT) at (12.2,1.75) {$p_T$\\简单噪声};
+
+\draw[flow] (f0) -- node[above] {\scriptsize 前向加噪} (ft);
+\draw[flow] (ft) -- (fT);
+
+\node[eqbox] (forward) at (6.1,0.15) {
+\textbf{前向 SDE}\\[3pt]
+$\displaystyle
+dX_t=f(X_t,t)\,dt+g(t)\,dW_t
+$
+\qquad
+\textbf{沿其边缘分布学习：}
+$\displaystyle
+s_\theta(x,t)\approx\nabla_x\log p_t(x)
+$
+};
+
+% Reverse row
+\node[state] (r0) at (0,-1.65) {$p_0$\\数据};
+\node[state] (rt) at (6.1,-1.65) {$p_t$\\中间状态};
+\node[state] (rT) at (12.2,-1.65) {$p_T$\\简单噪声};
+
+\draw[reverse] (rT) -- node[above] {\scriptsize 反向时间生成} (rt);
+\draw[reverse] (rt) -- (r0);
+
+\node[eqbox] (reversebox) at (6.1,-3.45) {
+\textbf{反向时间 SDE：从 $T$ 向 $0$ 模拟}\\[3pt]
+$\displaystyle
+dX_t=
+\left[
+f(X_t,t)-g(t)^2s_\theta(X_t,t)
+\right]dt
++
+g(t)\,d\bar W_t
+$
+};
+
+\draw[flow] (forward) -- (reversebox);
+
+\end{tikzpicture}
+\caption{\textbf{得分提供反转扩散所需的修正。}
+前向 SDE 定义带时间索引的边缘分布 $p_t$，而以时间为条件的模型学习 $s_\theta(x,t)\approx\nabla_x\log p_t(x)$。对于这里采用的标量、与状态无关的扩散系数，反向漂移与前向漂移相差 $-g(t)^2\nabla_x\log p_t(x)$。用 $s_\theta(x,t)$ 替代未知得分，就得到实际使用的反向时间 SDE，并从 $T$ 向 $0$ 进行模拟。}
+\label{fig:score-forward-reverse-sde}
+\end{figure}

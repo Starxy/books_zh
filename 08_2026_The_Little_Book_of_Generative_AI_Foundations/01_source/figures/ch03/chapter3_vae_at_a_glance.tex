@@ -1,0 +1,83 @@
+\begin{center}
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  box/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=6pt,
+    minimum height=1.02cm,
+    text width=3.0cm
+  },
+  objective/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=6pt,
+    minimum height=1.08cm,
+    text width=4.2cm
+  },
+  smallbox/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=5pt,
+    minimum height=0.88cm,
+    text width=2.4cm
+  },
+  flow/.style={->,thick},
+  secondary/.style={->,densely dashed}
+]
+
+\node[smallbox] (x) at (0,0) {
+  \textbf{观测数据}\\[1pt]
+  $\mathbf{x}$
+};
+
+\node[box] (enc) at (4.1,0) {
+  \textbf{变分编码器}\\[1pt]
+  $q_{\phi}(\mathbf{z}\mid\mathbf{x})$
+};
+
+\node[smallbox] (z) at (8.1,0) {
+  \textbf{潜变量样本}\\[1pt]
+  $\mathbf{z}$
+};
+
+\node[box] (dec) at (12.2,0) {
+  \textbf{概率解码器}\\[1pt]
+  $p_{\theta}(\mathbf{x}\mid\mathbf{z})$
+};
+
+\node[smallbox] (prior) at (8.1,-2.45) {
+  \textbf{潜变量先验}\\[1pt]
+  $p(\mathbf{z})=\mathcal{N}(\mathbf{0},\mathbf{I})$
+};
+
+\node[objective] (elbo) at (3.0,-2.45) {
+  \textbf{ELBO 目标}\\[2pt]
+  $\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+   [\log p_{\theta}(\mathbf{x}\mid\mathbf{z})]$
+  $-\;
+  \mathrm{KL}\!\left(
+  q_{\phi}(\mathbf{z}\mid\mathbf{x})
+  \,\|\,p(\mathbf{z})\right)$
+};
+
+\draw[flow] (x) -- (enc);
+\draw[flow] (enc) -- (z);
+\draw[flow] (z) -- (dec);
+
+% Prior supplies latent samples when generating new observations.
+\draw[flow] (prior) -- node[right] {\scriptsize 生成} (z);
+
+% Dashed links indicate distributions entering the ELBO terms.
+\draw[secondary] (prior) -- (elbo);
+\draw[secondary] (enc) -- (elbo);
+\draw[secondary] (dec.south west) to[out=-120,in=0] (elbo.east);
+
+\node[font=\normalsize\bfseries] at (6.1,1.45) {VAE 概览};
+
+\end{tikzpicture}
+\end{center}

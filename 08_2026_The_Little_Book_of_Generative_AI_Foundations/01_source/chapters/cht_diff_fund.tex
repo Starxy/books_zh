@@ -1,0 +1,1220 @@
+\chapter{连续时间生成建模的微积分基础}
+
+\section*{概述}
+\addcontentsline{toc}{section}{概述}
+
+上一章研究了离散时间下的去噪扩散概率模型（DDPM），其中生成过程被描述为一系列有限的加噪与去噪步骤。这一视角十分强大，但也自然引出了下一个问题：当步长越来越小时，会发生什么？此时，演化过程更适合被视为时间上的连续运动。
+
+这个问题并非扩散模型所独有。更一般地，机器学习与生成建模中的许多方法都可以理解为反复执行如下局部更新：
+\[
+x_{t+\Delta t}\approx x_t+\text{小幅更新}.
+\]
+一个更具体的例子是
+\[
+x_{t+\Delta t}=x_t+\alpha f(x_t)\Delta t+\beta\,\text{噪声},
+\]
+其中下一状态由当前状态加上一个有结构的变化得到，而在某些情形下还会再加入随机扰动。
+在离散时间中，这类规则被逐步写出；而在连续时间中，同样的思想要通过无穷小运动来表达：状态在任意短的时间区间内如何变化，以及随机性如何进入这种运动。
+这就是为什么微积分语言在这里变得不可或缺。
+
+因此，本章从\emph{运动与轨迹}开始。
+在研究完整概率分布之前，先理解单个状态如何在局部更新规则下移动、这种运动如何在连续时间中变成微分方程，以及确定性运动和随机运动如何在统一框架下表示，会更有帮助。
+
+但对生成建模而言，仅有运动还不够。
+我们最终关心的不只是某一个粒子移动到哪里，而是一整团粒子如何演化，使其概率密度变成我们希望的形状。
+因此，下一步将转向\emph{密度演化}：粒子运动如何重塑概率质量，先研究确定性输运，再研究漂移加噪声的动力学，最终得到 Fokker--Planck 方程。
+
+所以，本章按照下面的路线展开：
+\[
+\text{离散更新}
+\;\longrightarrow\;
+\text{连续运动}
+\;\longrightarrow\;
+\text{密度演化}.
+\]
+这些内容构成下一章的微积分基础；下一章会把它们与基于得分的生成建模相联系，并进一步进入完全连续时间的扩散模型。
+
+\section*{概念导图}
+\addcontentsline{toc}{section}{概念导图}
+
+本章建立从离散更新规则过渡到连续时间生成动力学，以及从粒子运动过渡到完整概率密度演化所需的微积分基础。
+
+\begin{itemize}
+    \item[\(\rightarrow\)] \textbf{首先通过收缩研究确定性连续时间运动。}
+    在一维情形下，收缩展示微分方程如何显式决定一条轨迹；在多维情形下，同一思想通过矩阵与矩阵指数自然推广，并揭示不同方向可以以不同速率收缩。
+
+    \item[\(\rightarrow\)] \textbf{随后通过布朗运动引入随机运动。}
+    布朗运动是连续时间随机波动的典型模型，其高斯增量的方差随时间线性增长。它提供了后续扩散过程所依赖的基本随机成分。
+
+    \item[\(\rightarrow\)] \textbf{接着，在 Ornstein--Uhlenbeck 过程中把漂移与噪声结合起来。}
+    OU 过程展示了确定性收缩与随机扰动如何共存于同一个系统中，形成均值回归的“漂移+噪声”动力学，并预示后续连续时间生成模型的结构。
+
+    \item[\(\rightarrow\)] \textbf{然后，从粒子运动转向确定性密度演化。}
+    从流映射下的概率守恒出发，我们先推导有限时间的变量变换公式，再令时间步趋于无穷小，得到一维 Liouville 方程及沿轨迹的对数密度变化规律。
+
+    \item[\(\rightarrow\)] \textbf{进一步把确定性密度演化推广到多维。}
+    这里会引入 Jacobian 作为流映射的局部线性化，行列式用于衡量局部体积变化，散度则刻画净局部流出。这些量共同导出多维 Liouville 方程及其沿轨迹形式。
+
+    \item[\(\rightarrow\)] \textbf{最后加入布朗扩散并得到 Fokker--Planck 方程。}
+    纯布朗运动通过高斯平均使密度平滑，由此得到扩散方程；再加入确定性漂移，就得到完整的 Fokker--Planck 方程，说明输运与扩散如何共同控制连续时间随机密度演化。
+\end{itemize}
+
+\medskip
+\noindent 本章建立的主要关系总结如下图所示。
+\input{figures/ch05/chapter5_continuous_time_at_a_glance}
+\medskip
+
+\section{从离散更新到连续运动}
+
+本节引入本章后续将反复使用的连续时间运动语言。
+我们先建立状态、速度、微分方程和局部近似等核心概念，使离散更新规则能够被重新解释为连续运动规律。
+随后研究三个基本例子：确定性收缩，它以有结构的方式把状态拉向原点；布朗运动，它引入连续时间随机波动；以及 Ornstein--Uhlenbeck 过程，它把漂移和噪声统一在一个随机系统中。
+这些例子共同构成后续密度演化与连续时间生成动力学的基本运动模式。
+
+\subsection{连续时间运动的基本语言}
+
+首先引入描述连续时间运动所需的基本语言。
+目标是精确定义状态“平滑演化”意味着什么、局部变化如何度量，以及离散更新规则如何转写成无穷小形式。
+
+设 $x(t)$ 表示时刻 $t$ 的某个量的位置。
+在一维中，$x(t)$ 只是时间的标量函数；在多维中，它变成一个所有坐标都随时间演化的向量。
+一阶导数 $\frac{dx}{dt}$ 描述 $x$ 相对于时间的瞬时变化率，通常解释为速度，也常写作点记号 $\dot{x}(t)$。
+类似地，二阶导数 $\frac{d^2x}{dt^2}=\ddot{x}(t)$ 描述速度的变化率，通常解释为加速度。
+
+符号 $dx$ 与 $dt$ 常被非正式地理解为位置的无穷小变化和时间的无穷小变化。
+基本直觉是：如果 $\frac{dx}{dt}$ 是变化率，那么在极短的时间区间内，对应的位置变化可表示为
+\[
+dx=\frac{dx}{dt}\,dt.
+\]
+因此在无穷小形式下，局部变化仍可理解为
+\[
+\text{变化}=\text{变化率}\times\text{持续时间}.
+\]
+
+一旦我们写出描述位置如何随时间变化的方程，就得到了\emph{微分方程}。
+在最简单的情形下，这种方程规定状态在每个可能位置上的速度，速度是其当前位置的函数，有时还显式依赖时间。
+在高维中，这种局部运动规则可从几何上理解为：为空间中的每一点指定一个运动方向。
+因此，可以把微分方程理解为“运动规则”，把向量场理解为由所有局部箭头构成的图景；这些箭头表示如果一个粒子被放在不同位置，它将向哪个方向移动。
+
+这些思想在这里尤其有用，因为它们允许我们把迭代更新规则重新解释为连续运动规律。
+在一个很小的时间间隔 $\Delta t$ 内，一阶近似给出
+\[
+x(t+\Delta t)\approx x(t)+\frac{dx}{dt}\,\Delta t.
+\]
+这意味着稍后时刻的值约等于当前值加上“速度乘以一个很小的时间增量”。
+因此，它正是离散更新规则在连续时间中的对应形式。
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={一阶 Taylor 展开},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+Taylor 展开利用某一点处的导数来近似该点附近的光滑函数。
+在局部形式下，对于很小的位移 $\Delta x$，可以写成
+\[
+f(x+\Delta x)
+=
+\sum_{k=0}^{\infty}
+\frac{f^{(k)}(x)}{k!}(\Delta x)^k.
+\]
+写出前几项得到
+\[
+f(x+\Delta x)
+=
+f(x)
++
+f'(x)\Delta x
++
+\frac{f''(x)}{2!}(\Delta x)^2
++
+\frac{f^{(3)}(x)}{3!}(\Delta x)^3
++\cdots.
+\]
+
+\emph{一阶} Taylor 近似只保留常数项和线性项：
+\[
+f(x+\Delta x)
+\approx
+f(x)+f'(x)\Delta x.
+\]
+被舍弃的项包含 $(\Delta x)^2$、$(\Delta x)^3$ 等更高次幂。
+当 $\Delta x$ 很小时，这些高阶项会比线性项小得多。
+
+在当前语境中，函数是轨迹 $x(t)$，展开变量是时间，小位移则是 $\Delta t$。
+因此
+\[
+x(t+\Delta t)
+=
+x(t)
++
+\left.\frac{dx}{dt}\right|_{t}\Delta t
++
+O(\Delta t^2).
+\]
+只保留一阶项就得到
+$x(t+\Delta t)
+\approx
+x(t)
++
+\left.\frac{dx}{dt}\right|_{t}\Delta t$。
+\end{tcolorbox}
+
+\subsection{确定性收缩}
+
+首先考虑确定性运动：一旦给定当前状态，未来演化就被完全确定。
+最简单的例子是\emph{收缩}，即状态被持续拉回原点的运动。
+我们先从一维开始，再自然推广到多维，此时不同坐标可以具有不同的收缩速率。
+
+\paragraph{一维收缩。}
+在一维中，向原点收缩可表示为
+\[
+\frac{dx}{dt}=-\alpha x,
+\qquad \alpha>0.
+\]
+这意味着速度始终与当前位置成正比，但符号相反。
+若 $x>0$，则 $\dot{x}<0$，状态向左移动、靠近原点；若 $x<0$，则 $\dot{x}>0$，状态向右移动、同样靠近原点。
+无论哪种情况，运动都指向内部，而且状态离原点越远，受到的拉回作用越强。
+
+这个方程可以直接求解：
+\[
+\begin{aligned}
+\frac{dx}{dt}=-\alpha x
+&\;\Longrightarrow\;
+\frac{1}{x}\frac{dx}{dt}=-\alpha
+\;\Longrightarrow\;
+\frac{d}{dt}\log|x|=-\alpha \\[4pt]
+&\;\Longrightarrow\;
+\log|x(t)|=-\alpha t + C
+\;\Longrightarrow\;
+x(t)=Ce^{-\alpha t}.
+\end{aligned}
+\]
+利用初始条件 $x(0)=x_0$，得到 $C=x_0$，因此
+\[
+\boxed{
+x(t)=x_0e^{-\alpha t}.
+}
+\]
+
+这使系统行为一目了然。
+在 $t=0$ 时，状态为 $x_0$；随着时间增加，指数因子 $e^{-\alpha t}$ 逐渐衰减到零，因此 $x(t)$ 的绝对值逐渐趋近原点。
+参数 $\alpha$ 控制收缩速度：$\alpha$ 越大，衰减越快；$\alpha$ 越小，衰减越慢。
+
+因此，即便如此简单的例子也已经体现连续时间运动的基本原则：微分方程规定局部运动的方向和速度，而其解则给出随时间形成的完整轨迹。
+
+\paragraph{推广到多维。}
+同样的思想可以自然推广到更高维。
+现在设 $x(t)\in\mathbb{R}^2$ 为二维状态向量
+\[
+x(t)=
+\begin{bmatrix}
+x_1(t)\\
+x_2(t)
+\end{bmatrix}.
+\]
+一个简单的多维收缩模型为
+\[
+\frac{d}{dt}x(t)=Ax(t),
+\]
+其中 $A$ 是常数矩阵。
+若希望两个坐标轴方向彼此独立地收缩，可以取
+\[
+A=
+\begin{bmatrix}
+-\alpha_1 & 0\\
+0 & -\alpha_2
+\end{bmatrix},
+\qquad \alpha_1,\alpha_2>0.
+\]
+于是系统变成
+\[
+\frac{d}{dt}
+\begin{bmatrix}
+x_1(t)\\
+x_2(t)
+\end{bmatrix}
+=
+\begin{bmatrix}
+-\alpha_1 & 0\\
+0 & -\alpha_2
+\end{bmatrix}
+\begin{bmatrix}
+x_1(t)\\
+x_2(t)
+\end{bmatrix},
+\]
+等价于两个标量方程
+\[
+\dot{x}_1(t)=-\alpha_1x_1(t),
+\qquad
+\dot{x}_2(t)=-\alpha_2x_2(t).
+\]
+每个坐标都按照自身的速率独立收缩：
+\[
+x_1(t)=x_1(0)e^{-\alpha_1 t},
+\qquad
+x_2(t)=x_2(0)e^{-\alpha_2 t}.
+\]
+紧凑地写为
+\[
+x(t)=e^{At}x(0),
+\]
+其中 $e^{At}$ 是\emph{矩阵指数}。
+在当前例子中，$A$ 为对角矩阵，因此矩阵指数只需对每个对角元素应用普通标量指数：
+\[
+e^{At}
+=
+\begin{bmatrix}
+e^{-\alpha_1 t} & 0\\
+0 & e^{-\alpha_2 t}
+\end{bmatrix}.
+\]
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={通过 Maclaurin 级数理解矩阵指数},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+光滑函数在零点附近的 Taylor 展开称为\emph{Maclaurin 级数}。对于标量函数 $f$，其形式为
+\[
+f(u)
+=
+\sum_{k=0}^{\infty}\frac{f^{(k)}(0)}{k!}u^k
+=
+f(0)
++
+f'(0)u
++
+\frac{f''(0)}{2!}u^2
++
+\frac{f^{(3)}(0)}{3!}u^3
++\cdots.
+\]
+对于指数函数，其任意阶导数仍然是 $e^u$，所以在 $u=0$ 处都等于 $1$。因此
+\[
+e^u
+=
+1+u+\frac{u^2}{2!}+\frac{u^3}{3!}+\cdots
+=
+\sum_{k=0}^{\infty}\frac{u^k}{k!}.
+\]
+
+矩阵指数使用同一个级数来定义，只需把标量 $u$ 替换成矩阵 $At$：
+\[
+\boxed{
+e^{At}
+=
+I
++
+At
++
+\frac{(At)^2}{2!}
++
+\frac{(At)^3}{3!}
++\cdots.
+}
+\]
+这里，标量 $1$ 被单位矩阵 $I$ 取代，因为 $I$ 是矩阵乘法中的乘法单位元。
+对于当前使用的对角矩阵
+$A=
+\begin{bmatrix}
+-\alpha_1 & 0\\
+0 & -\alpha_2
+\end{bmatrix}$，
+有
+\[
+At=
+\begin{bmatrix}
+-\alpha_1 t & 0\\
+0 & -\alpha_2 t
+\end{bmatrix}.
+\]
+对角矩阵的幂仍然是对角矩阵：
+\[
+(At)^k
+=
+\begin{bmatrix}
+(-\alpha_1 t)^k & 0\\
+0 & (-\alpha_2 t)^k
+\end{bmatrix}.
+\]
+将这些幂代入级数，得到
+\[
+e^{At}
+=
+\begin{bmatrix}
+\sum_{k=0}^{\infty}\frac{(-\alpha_1 t)^k}{k!} & 0\\
+0 & \sum_{k=0}^{\infty}\frac{(-\alpha_2 t)^k}{k!}
+\end{bmatrix}
+=
+\begin{bmatrix}
+e^{-\alpha_1 t} & 0\\
+0 & e^{-\alpha_2 t}
+\end{bmatrix}.
+\]
+\end{tcolorbox}
+
+这个多维例子引入了一个重要的新特征：运动在不同方向上可以以不同速度收缩。
+如果 $\alpha_1>\alpha_2$，那么第一个坐标比第二个坐标衰减得更快，因此状态在 $x_1$ 方向上的收缩速度高于 $x_2$ 方向。
+所以运动仍然趋向原点，但各方向上的收缩并不需要均匀一致。
+
+对角形式也说明坐标之间仍不存在相互作用：每个分量都独立演化。
+虽然为了清晰起见这里写成二维情形，但同一思想可以直接推广到 $\mathbb{R}^d$。
+对角矩阵
+\[
+A=\mathrm{diag}(-\alpha_1,-\alpha_2,\dots,-\alpha_d)
+\]
+会使每个坐标方向独立地进行指数收缩。
+
+因此，对角收缩是一个很有用的第一个多维例子。
+它以最简单的方式引入基于矩阵的连续运动，也自然架起了从标量微分方程到向量值连续动力学的桥梁。
+
+\subsection{布朗运动}
+
+到目前为止，我们的讨论完全是确定性的：一旦固定初始状态，未来轨迹就由控制它的微分方程完全决定。
+然而，许多连续时间生成模型还包含随机性。
+在每一个很短的时间区间内，状态都可能受到随机扰动，因此仅凭初始条件无法完全预测后续运动。
+
+描述这类连续时间随机波动的基本模型就是\emph{布朗运动}（Brownian motion），也称为\emph{Wiener 过程}~\cite{oksendal2003sde}。
+通常记为 $\{W_t\}_{t\ge 0}$，可以通过三个基本性质刻画：
+\begin{enumerate}
+    \item $W_0=0$；
+    \item 不相交时间区间上的增量彼此独立；
+    \item 对任意 $\Delta t>0$，
+    \[
+    W_{t+\Delta t}-W_t \sim \mathcal{N}(0,\Delta t).
+    \]
+\end{enumerate}
+
+第三个性质尤其重要。
+它表示在长度为 $\Delta t$ 的短时间区间内，随机增量均值为零、方差为 $\Delta t$。
+因此，布朗运动引入的波动平均而言没有偏置，但其不确定性会随经历的时间增加而增长。
+
+高斯假设也很自然。
+如果把一个短区间内的运动想象为大量微小且近似独立的随机扰动的累积结果，那么它们的总和可以很好地用高斯随机变量建模。
+这与中心极限定理背后的直觉密切相关：许多微小独立效应相加时，其总和趋向于高斯形式。
+
+一个有用的理解方法是把区间 $[0,t]$ 划分为许多小段，并把 $W_t$ 写成独立高斯增量之和。
+若把 $[0,t]$ 等分为 $n$ 段，每段长度
+$\Delta t=\frac{t}{n}$，则
+\[
+W_t-W_0
+=
+\sum_{k=0}^{n-1}\bigl(W_{(k+1)\Delta t}-W_{k\Delta t}\bigr)
+=
+\sum_{k=0}^{n-1}\Delta W_k,
+\qquad
+\Delta W_k:=W_{(k+1)\Delta t}-W_{k\Delta t}.
+\]
+
+由于 $W_0=0$，得到
+\[
+W_t=\sum_{k=0}^{n-1}\Delta W_k.
+\]
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={时刻 $t$ 的布朗运动均值与方差},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+每个增量满足
+\[
+\Delta W_k\sim \mathcal{N}(0,\Delta t),
+\qquad
+\mathbb{E}[\Delta W_k]=0,
+\qquad
+\mathrm{Var}(\Delta W_k)=\Delta t=\frac{t}{n}.
+\]
+因此
+\[
+\mathbb{E}[W_t]
+=
+\sum_{k=0}^{n-1}\mathbb{E}[\Delta W_k]
+=
+0,
+\]
+并且利用独立性，
+\[
+\mathrm{Var}(W_t)
+=
+\sum_{k=0}^{n-1}\mathrm{Var}(\Delta W_k)
+=
+\sum_{k=0}^{n-1}\frac{t}{n}
+=
+t.
+\]
+所以
+\[
+\mathbb{E}[W_t]=0,
+\qquad
+\mathrm{Var}(W_t)=t.
+\]
+\end{tcolorbox}
+
+因此，在任意固定时刻 $t$，布朗运动都以零为中心，但其离散程度随时间线性增长。
+这意味着布朗运动不会把状态拉向任何偏好的位置；它描述的是一种随机游走，其不确定性随着时间推移不断增大。
+
+一个有用的启发式写法是
+\[
+W_{t+\Delta t}-W_t \approx \sqrt{\Delta t}\,\varepsilon_t,
+\qquad
+\varepsilon_t\sim\mathcal{N}(0,1).
+\]
+这个形式特别清楚地展示了缩放规律。
+由于增量方差为 $\Delta t$，其典型大小是 $\sqrt{\Delta t}$ 阶，而不是 $\Delta t$ 阶。
+这种平方根缩放是随机连续时间运动最典型的特征之一，后续也会在扩散模型中再次出现。
+
+布朗运动常被非正式地写成微分形式 $dW_t$，表示一个无穷小随机增量。
+虽然 $dW_t$ 不是确定性微积分意义下的普通微分，但这种记号非常有用，因为它使随机运动能够用与常微分方程平行的形式书写。
+
+\subsection{Ornstein--Uhlenbeck 过程}
+
+Ornstein--Uhlenbeck（OU）过程是一个特别重要的随机连续时间运动例子。
+它把确定性收缩与布朗噪声结合起来：
+\[
+dX_t=-\alpha X_t\,dt+\sigma\,dW_t,
+\qquad
+\alpha>0,\ \sigma>0.
+\]
+
+这个方程包含两部分。
+漂移项 $-\alpha X_t\,dt$ 像前面介绍的一维收缩模型一样，把状态拉回原点；噪声项 $\sigma\,dW_t$ 则注入由布朗运动驱动的随机扰动。
+因此，OU 过程平衡了两种相互竞争的趋势：确定性地拉向原点，以及随机地偏离原点。
+
+在一个很小的时间区间 $\Delta t$ 内，可以启发式地写成更新式
+\[
+X_{t+\Delta t}
+\approx
+X_t-\alpha X_t\,\Delta t+\sigma\sqrt{\Delta t}\,\varepsilon_t,
+\qquad
+\varepsilon_t\sim\mathcal{N}(0,1).
+\]
+这个离散时间视角很有用。
+它说明下一状态由当前状态加上两部分得到：
+\begin{itemize}
+    \item 大小为 $\Delta t$ 阶的确定性修正；
+    \item 大小为 $\sqrt{\Delta t}$ 阶的随机扰动。
+\end{itemize}
+因此，OU 过程已经具有后续 Langevin 动力学和扩散模型中会出现的基本“漂移+噪声”结构。
+
+OU 过程还存在显式解：
+\[
+X_t
+=
+X_0e^{-\alpha t}
++
+\sigma \int_0^t e^{-\alpha(t-s)}\,dW_s.
+\]
+这个公式清楚揭示了其结构。
+第一项 $X_0e^{-\alpha t}$ 正是初始状态的确定性指数收缩；第二项累积所有过去的随机扰动，但每个扰动都乘以衰减因子 $e^{-\alpha(t-s)}$。
+因此，更早发生的噪声影响会逐渐减弱，而更近期的扰动影响更大。
+
+这就是为什么 OU 过程常被描述为一种\emph{均值回归}随机过程：它始终具有随机性，同时保持稳定的恢复趋势。
+图~\ref{fig:continuous-three-motion-laws} 将这一行为与确定性收缩和布朗运动并列展示，清楚说明 OU 过程如何把两种基本效应结合起来。
+
+不过，到目前为止，我们仍然只是在单个粒子的层面描述运动。
+下一步要理解的是，这类运动如何随时间重塑整个概率密度。
+
+\input{figures/ch05/fig_ch05_01_three_motion_laws}
+
+\section{确定性密度演化}
+
+上一节关注的是单个粒子的运动。
+这一视角已经很有用，因为许多连续时间模型确实由作用于状态或轨迹的微分方程来描述。
+然而，对生成建模而言，一个粒子的运动只是故事的一部分。
+最终我们关心的是一整组粒子的\emph{概率密度}如何随时间变化。
+
+因此，本节完成一个重要过渡：从\emph{轨迹动力学}转向\emph{密度动力学}。
+我们从最简单的确定性情形开始，在这种情形下，粒子由一个映射输运，并且概率质量守恒。
+这会先导出有限时间的变量变换公式，再导出无穷小密度演化规律，最后通过散度得到其多维形式。
+整个过程中，底层思想始终相同：
+\[
+\text{粒子运动}
+\;\longrightarrow\;
+\text{概率质量输运}
+\;\longrightarrow\;
+\text{确定性密度演化}.
+\]
+
+\subsection{有限时间密度变换}
+
+先从最基本的密度原则开始：\emph{概率在确定性输运下守恒}。
+这里的含义是：动力系统以完全确定的方式把粒子从一个位置移动到另一个位置，而与粒子关联的概率质量只是随之被携带，不会被创造或消失。
+
+设时刻 $0$ 的粒子位置为 $x_0$，其密度为 $p_0(x_0)$。
+再假设确定性动力系统把这个初始点输运到稍后的
+\[
+x_t=\phi_t(x_0),
+\]
+其中 $\phi_t$ 表示把粒子从时刻 $0$ 移动到时刻 $t$ 的轨迹映射或流映射。
+
+为了理解密度如何变化，考虑 $x_0$ 附近一个长度为 $dx_0$ 的极小区间。
+该微小区间中包含的概率质量近似为
+\[
+p_0(x_0)\,dx_0.
+\]
+演化到时刻 $t$ 后，同一小块概率质量被输运到 $x_t=\phi_t(x_0)$ 附近的新区间。
+设输运后区间长度为 $dx_t$。
+由于确定性运动只是在搬运粒子而不创造或销毁概率质量，总概率必须保持不变：
+\[
+p_0(x_0)\,dx_0=p_t(x_t)\,dx_t.
+\]
+
+因此，关键问题变成：小区间 $dx_0$ 在流映射下如何变换？
+在一维中，这种局部拉伸或压缩由映射的导数度量。
+推导如下。
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={一维变量变换公式的推导},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+不仅跟踪点 $x_0$，同时跟踪其附近的点 $x_0+dx_0$。
+在同一个流映射下，
+\[
+x_t=\phi_t(x_0), \qquad x_t+dx_t=\phi_t(x_0+dx_0),
+\]
+所以
+$dx_t=\phi_t(x_0+dx_0)-\phi_t(x_0)$。
+由于 $dx_0$ 很小，对 $\phi_t$ 在 $x_0$ 附近作一阶 Taylor 展开，得到
+\[
+\phi_t(x_0+dx_0)\approx \phi_t(x_0)+\frac{d\phi_t(x_0)}{dx_0}\,dx_0.
+\]
+因此
+$dx_t\approx \frac{d\phi_t(x_0)}{dx_0}\,dx_0
+= \frac{dx_t}{dx_0}\,dx_0$。
+代入概率守恒关系，
+\[
+p_0(x_0)\,dx_0
+=
+p_t(x_t)\left|\frac{dx_t}{dx_0}\right|dx_0,
+\]
+约去 $dx_0$ 后得到
+\[
+\boxed{
+p_t(x_t)=p_0(x_0)\left|\frac{dx_t}{dx_0}\right|^{-1}.
+}
+\]
+\end{tcolorbox}
+
+这就是由确定性流诱导的一维变量变换公式。
+它的直观含义非常清楚：如果变换把一个区间拉长，那么同样数量的概率会分摊到更大的区域中，因此密度降低；如果变换把区间压缩，那么同样的概率质量被挤压到更小区域中，因此密度增大。
+所以，导数 $\frac{dx_t}{dx_0}$ 衡量局部长度改变了多少，而其倒数则告诉我们密度应如何重新缩放。
+
+同样的思想可以自然推广到多维。
+在一维中，我们跟踪一个微小\emph{长度}如何在映射下变化；二维中要跟踪微小\emph{面积}，三维中要跟踪微小\emph{体积}，一般情况下则是一个 $d$ 维微小体积元。
+衡量这种局部缩放的量不再是普通导数，而是变换 Jacobian 矩阵的行列式。
+因此，多维变量变换公式变成
+\[
+p_t(x_t)
+=
+p_0(x_0)
+\left|
+\det\!\left(\frac{\partial x_t}{\partial x_0}\right)
+\right|^{-1}.
+\]
+所以在高维中，行列式扮演一维导数 $\frac{dx_t}{dx_0}$ 的角色，用来度量一个微小局部区域被流拉伸或压缩了多少。
+
+需要注意的是，这个公式描述的是\emph{有限时间}确定性变换。
+它告诉我们密度如何在时刻 $0$ 与时刻 $t$ 之间变化，但尚未描述密度变化的无穷小速率。
+为此，下面推导局部时间意义下的连续性方程。
+
+\subsection{一维无穷小密度演化：Liouville 方程}
+
+有限时间变量变换公式告诉我们密度在时刻 $0$ 与时刻 $t$ 之间如何变换。
+然而在连续时间建模中，更重要的往往是理解密度在一个\emph{无穷小}时间区间内如何变化，因为连续动力学正是由这种局部更新构成的。
+这就导出了\emph{Liouville 方程}；在确定性情形下，它也称为连续性方程。
+
+设粒子服从一维常微分方程
+\[
+\frac{dx}{dt}=f(x,t),
+\]
+其中 $f(x,t)$ 是局部速度场。
+为了理解密度如何变化，现在采用固定空间视角：不再跟随某一个粒子，而是站在空间中的一个小区间处，观察概率质量如何穿过该区间。
+
+考虑短区间 $[x,x+\Delta x]$。
+时刻 $t$ 区间内的总概率质量近似为
+\[
+p(x,t)\,\Delta x.
+\]
+在一个无穷小时间区间内，这部分局部概率质量只能通过左边界流入，或通过右边界流出而发生改变。
+
+相关的流量称为\emph{概率通量}，即密度乘以速度：
+\[
+p(x,t)f(x,t).
+\]
+它表示单位时间内穿过某一位置的概率质量。
+因此，左边界流入量为
+\[
+p(x,t)f(x,t),
+\]
+而右边界流出量为
+\[
+p(x+\Delta x,t)f(x+\Delta x,t).
+\]
+
+概率守恒意味着，区间内概率质量的变化率必须等于流入减去流出：
+\[
+\frac{\partial}{\partial t}p(x,t)\,\Delta x
+=
+p(x,t)f(x,t)-p(x+\Delta x,t)f(x+\Delta x,t).
+\]
+两边除以 $\Delta x$，得到
+\[
+\frac{\partial}{\partial t}p(x,t)
+=
+\frac{p(x,t)f(x,t)-p(x+\Delta x,t)f(x+\Delta x,t)}{\Delta x}.
+\]
+整理为
+\[
+\frac{\partial}{\partial t}p(x,t)
+=
+-
+\frac{p(x+\Delta x,t)f(x+\Delta x,t)-p(x,t)f(x,t)}{\Delta x}.
+\]
+令 $\Delta x\to 0$，右侧变为空间导数，因此得到
+\[
+\boxed{
+\partial_t p(x,t)
+=
+-\partial_x\bigl(p(x,t)f(x,t)\bigr).
+}
+\]
+这就是一维 Liouville 方程。
+
+该方程表示密度的变化由概率通量的净流出决定。
+若某个区域流出的概率多于流入，密度就会下降；若流入多于流出，密度就会上升。
+利用乘积法则展开右侧往往很有帮助：
+\[
+\partial_t p
+=
+-\bigl(f\,\partial_x p + p\,\partial_x f\bigr).
+\]
+由此可以看出两个不同的贡献。
+
+项 $-f\,\partial_x p$ 依赖密度自身的空间斜率，因此描述\emph{输运}：已有密度轮廓被速度场携带着穿过空间。
+如果流只是把粒子从一个位置移动到另一个位置，而不改变它们之间的相对间距，那么主要效果就是整个密度轮廓发生平移。
+
+相比之下，项 $-p\,\partial_x f$ 依赖速度场的空间斜率，因此描述\emph{形变}：相邻粒子的速度不再完全相同，于是它们会彼此远离或相互压缩。
+如果 $\partial_x f>0$，速度随位置增大而增大，相邻粒子彼此分开，密度下降；如果 $\partial_x f<0$，速度随位置增大而减小，相邻粒子相互压缩，密度上升。
+
+\subsection{沿轨迹的密度变化}
+
+Liouville 方程描述固定空间位置上的密度如何变化。
+但还有另一个同样有用的视角：沿着一个运动粒子的轨迹，密度如何变化？
+这一视角把注意力从固定位置上发生的变化，转向粒子随流移动时自身经历的变化。
+
+设粒子服从确定性动力学
+\[
+\frac{dx(t)}{dt}=f(x(t),t).
+\]
+现在考虑沿该粒子路径取值的密度
+\[
+p(x(t),t).
+\]
+由于位置和时间都在变化，我们利用链式法则对其求导。
+等价地，这就是\emph{全导数}：它同时包含对时间的显式变化，以及由于粒子本身在空间中移动而引起的隐式变化。
+因此
+\[
+\frac{d}{dt}p(x(t),t)
+=
+\partial_t p(x(t),t)
++
+\frac{dx(t)}{dt}\,\partial_x p(x(t),t).
+\]
+由于 $\dot{x}(t)=f(x(t),t)$，得到
+\[
+\frac{d}{dt}p(x(t),t)
+=
+\partial_t p + f\,\partial_x p.
+\]
+
+代入 Liouville 方程
+\[
+\partial_t p
+=
+-\partial_x(pf)
+=
+-(f\,\partial_x p + p\,\partial_x f),
+\]
+于是
+\[
+\frac{d}{dt}p(x(t),t)
+=
+-(f\,\partial_x p + p\,\partial_x f)+f\,\partial_x p.
+\]
+输运项相互抵消，只剩
+\[
+\frac{d}{dt}p(x(t),t)
+=
+-p(x(t),t)\,\partial_x f(x(t),t).
+\]
+两边除以 $p(x(t),t)$，得到
+\[
+\frac{d}{dt}\log p(x(t),t)
+=
+-\partial_x f(x(t),t).
+\]
+因此
+\[
+\boxed{
+\frac{d}{dt}\log p(x(t),t)
+=
+-\partial_x f(x(t),t).
+}
+\]
+
+这是一个重要结果。
+上一小节把密度演化分解成输运项和形变项。
+而这里可以看到，一旦我们随粒子一起移动，输运项就消失了：从粒子自身的视角看，它不再观察密度轮廓被流携带穿过空间，因为它自己就在随流移动。
+此时剩下的只有局部膨胀或压缩效应。
+
+因此，当 $\partial_x f>0$ 时，相邻粒子趋于分离，沿轨迹的密度下降；当 $\partial_x f<0$ 时，相邻粒子趋于压缩，密度上升。
+所以，固定空间视角和随粒子移动视角强调了同一动力学的不同方面。
+Liouville 方程描述整个密度场如何在空间中改变，而上面的公式告诉我们密度沿单条轨迹如何变化。
+
+\subsection{散度与多维 Liouville 方程}
+
+现在把密度演化从一维推广到完整的多维状态空间。
+主要的新特征是运动与概率通量都变成向量值。
+在一维中，标量导数 $\partial_x$ 足以描述概率如何流入或流出一个小区间；而在多维中，对应的量是\emph{散度}，它衡量一个向量场从空间微小区域中向外流出的净量。
+本节将说明散度如何从局部体积变化中自然出现，以及它如何导出多维 Liouville 方程。
+
+设 $x(t)\in\mathbb{R}^d$，粒子按照
+\[
+\frac{dx}{dt}=v(x,t)
+\]
+演化，其中速度场为
+\[
+v(x,t)=
+\begin{bmatrix}
+v_1(x,t)\\
+v_2(x,t)\\
+\vdots\\
+v_d(x,t)
+\end{bmatrix}.
+\]
+
+与一维情形一样，基本思想仍然是局部概率守恒。
+不过在写出密度方程之前，需要先理解空间中的一个微小区域如何在流作用下变化。
+在一维中，这由映射的导数度量，它告诉我们一个小区间如何被拉伸或压缩；在多维中，对应对象是\emph{Jacobian 矩阵}及其行列式。
+
+在很小的时间步 $t\to t+dt$ 上，运动可以近似为
+\[
+x(t+dt)=x(t)+v(x(t),t)\,dt.
+\]
+所以无穷小变换是
+\[
+x\mapsto x+v(x,t)\,dt.
+\]
+
+为了理解一个微小体积如何变化，我们考察更新后的点如何依赖起始位置。
+这种依赖通过对映射关于 $x$ 求导来刻画，从而得到该变换的\emph{Jacobian 矩阵}：
+\[
+\frac{\partial x(t+dt)}{\partial x}
+=
+I+\frac{\partial v}{\partial x}dt.
+\]
+若把速度场的 Jacobian 记为
+\[
+J_v(x,t)=\frac{\partial v}{\partial x},
+\]
+则
+\[
+\frac{\partial x(t+dt)}{\partial x}=I+J_v(x,t)\,dt.
+\]
+
+Jacobian 告诉我们微小位移在流作用下如何变化。
+要从位移过渡到体积，就取其行列式。
+
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={局部体积缩放与散度},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+局部体积缩放因子为
+\[
+\det\!\bigl(I+J_v(x,t)\,dt\bigr).
+\]
+当 $dt$ 很小时，一阶展开给出
+\[
+\det(I+A\,dt)=1+\operatorname{tr}(A)\,dt+O(dt^2).
+\]
+令 $A=J_v(x,t)$，得到
+\[
+\det\!\bigl(I+J_v(x,t)\,dt\bigr)
+=
+1+\operatorname{tr}(J_v(x,t))\,dt+O(dt^2).
+\]
+Jacobian 的迹有一个专门名称：
+\[
+\operatorname{tr}(J_v(x,t))
+=
+\nabla\cdot v(x,t)
+=
+\sum_{i=1}^d \frac{\partial v_i}{\partial x_i}(x,t).
+\]
+因此
+\[
+\det\!\bigl(I+J_v(x,t)\,dt\bigr)
+=
+1+(\nabla\cdot v(x,t))\,dt+O(dt^2),
+\]
+所以一个微小体积元的一阶演化为
+\[
+dV(t+dt)=\bigl(1+(\nabla\cdot v(x,t))\,dt\bigr)dV(t).
+\]
+\end{tcolorbox}
+
+这就给出了散度的关键几何解释：它是一个微小体积在流作用下瞬时膨胀或收缩的速率。
+若 $\nabla\cdot v>0$，流在局部使体积膨胀；若 $\nabla\cdot v<0$，则在局部压缩体积。
+
+有了这个几何图景，就可以推导密度演化方程。
+一个随流移动的小体积中所包含的概率质量必须保持不变：
+\[
+p(x,t)\,dV(t)
+=
+p(x+v(x,t)dt,t+dt)\,dV(t+dt).
+\]
+代入体积缩放关系
+\[
+dV(t+dt)=\bigl(1+(\nabla\cdot v)\,dt\bigr)dV(t),
+\]
+得到
+\[
+p(x,t)
+=
+p(x+vdt,t+dt)\bigl(1+(\nabla\cdot v)\,dt\bigr).
+\]
+
+接下来，对密度应用多变量一阶 Taylor 展开。
+\begin{tcolorbox}[
+  colback=blue!4,
+  colframe=blue!50!black,
+  title={多维 Liouville 方程的推导},
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+对于依赖位置与时间的函数 $p(x,t)$，多变量一阶 Taylor 展开为
+\[
+p(x+\Delta x,t+\Delta t)
+\approx
+p(x,t)+\nabla p(x,t)\cdot \Delta x+\partial_t p(x,t)\Delta t.
+\]
+在这里的流中，$\Delta x=v(x,t)dt$ 且 $\Delta t=dt$，因此
+\[
+\begin{aligned}
+p(x+vdt,t+dt)
+&=
+p(x,t)+\nabla p(x,t)\cdot(vdt)+\partial_t p(x,t)dt+O(dt^2)\\
+&=
+p(x,t)+(v\cdot\nabla p)dt+(\partial_t p)dt+O(dt^2).
+\end{aligned}
+\]
+
+把它代入概率守恒关系
+\[
+p(x,t)
+=
+p(x+vdt,t+dt)\bigl(1+(\nabla\cdot v)dt\bigr),
+\]
+得到
+\[
+\begin{aligned}
+p
+&=
+\left[p+(\partial_t p)dt+(v\cdot\nabla p)dt\right]
+\left[1+(\nabla\cdot v)dt\right]
++O(dt^2)\\
+&=
+p+(\partial_t p)dt+(v\cdot\nabla p)dt+p(\nabla\cdot v)dt+O(dt^2).
+\end{aligned}
+\]
+两边减去 $p$、除以 $dt$ 并令 $dt\to0$，得到
+\[
+0=\partial_t p+v\cdot\nabla p+p(\nabla\cdot v).
+\]
+利用恒等式 $\nabla\cdot(pv)=v\cdot\nabla p+p(\nabla\cdot v)$，可写为
+\[
+0=\partial_t p+\nabla\cdot(pv),
+\]
+等价地，
+\[
+\boxed{
+\partial_t p(x,t)=-\nabla\cdot\bigl(p(x,t)v(x,t)\bigr).
+}
+\]
+\end{tcolorbox}
+
+这就是多维 Liouville 方程，它是一维连续性方程的自然推广。
+原来的一维标量导数 $\partial_x(pf)$ 现在变成了向量值概率通量 $pv$ 的散度。
+因此，密度的变化由概率从空间微小区域中净流出的程度决定。
+
+沿轨迹的视角也可以自然推广。
+沿着满足
+\[
+\dot{x}(t)=v(x(t),t)
+\]
+的路径，对数密度按照
+\[
+\boxed{
+\frac{d}{dt}\log p(x(t),t)
+=
+-\nabla\cdot v(x(t),t).
+}
+\]
+演化。
+所以在多维中，与一维完全类似，一旦我们随粒子本身一起移动，输运部分就消失，剩余的密度变化由流的局部膨胀或压缩决定。
+图~\ref{fig:continuous-flow-density-jacobian} 总结了有限时间体积变化、密度重新缩放和无穷小散度关系之间的几何联系。
+
+\input{figures/ch05/fig_ch05_02_flow_density_jacobian}
+
+\section{随机密度演化与 Fokker--Planck 方程}
+
+到目前为止，密度演化完全是确定性的：概率质量由流输运，其局部变化由散度控制。
+然而，许多连续时间生成模型还包含随机扰动。
+一旦加入这种扩散，密度就不再只通过输运和局部膨胀/压缩而变化，还会在空间中扩散开来。
+这就把我们从 Liouville 方程带到\emph{Fokker--Planck 方程}~\cite{risken1996fokker}。
+
+\subsection{纯布朗扩散作为高斯平滑}
+
+为了建立直觉，先考虑一维纯布朗扩散：
+\[
+dX_t=\sigma\,dW_t.
+\]
+在很短的时间区间 $\Delta t$ 内，增量服从高斯分布：
+\[
+X_{t+\Delta t}-X_t \sim \mathcal{N}(0,\sigma^2\Delta t).
+\]
+因此，一个原本位于 $y$ 的粒子，在这一短时间步之后有一定概率到达 $x$ 附近，而这一概率由以 $y$ 为中心的高斯核描述。
+所以更新后的密度可由所有邻近旧位置的贡献累加得到：
+\[
+p(x,t+\Delta t)
+=
+\int p(y,t)\,
+\frac{1}{\sqrt{2\pi \sigma^2\Delta t}}
+\exp\!\left(
+-\frac{(x-y)^2}{2\sigma^2\Delta t}
+\right)dy.
+\]
+
+换句话说，短时间后的 $x$ 处密度是先前 $x$ 附近密度的加权平均，权重由短时间高斯转移核给出。
+这就是与窄高斯核的卷积。
+直观上，概率质量从邻近位置扩散进入 $x$，同时原本位于 $x$ 附近的一些概率也扩散出去；净结果是密度被平滑并逐渐展宽。
+
+为了更方便分析，记高斯增量为 $\eta$，其中
+\[
+\eta\sim \mathcal{N}(0,\sigma^2\Delta t).
+\]
+作变量替换
+\[
+\eta=x-y,
+\qquad\text{因此}\qquad
+y=x-\eta.
+\]
+于是密度更新可以写成
+\[
+p(x,t+\Delta t)
+=
+\int p(x-\eta,t)\,G_{\Delta t}(\eta)\,d\eta,
+\]
+其中
+\[
+G_{\Delta t}(\eta)
+=
+\frac{1}{\sqrt{2\pi \sigma^2\Delta t}}
+\exp\!\left(
+-\frac{\eta^2}{2\sigma^2\Delta t}
+\right)
+\]
+是增量的高斯密度。
+由于
+\[
+\int G_{\Delta t}(\eta)\,d\eta=1,
+\]
+也可以把它理解成期望：
+\[
+p(x,t+\Delta t)=\mathbb{E}_{\eta}\bigl[p(x-\eta,t)\bigr].
+\]
+
+\subsection{从布朗扩散到 Fokker--Planck 方程}
+
+现在利用 Taylor 级数在 $x$ 附近展开 $p(x-\eta,t)$。
+一般而言，对于足够光滑的一元函数，
+$f(x+h)=\sum_{k=0}^{\infty}\frac{f^{(k)}(x)}{k!}h^k$。
+令 $f(\cdot)=p(\cdot,t)$、$h=-\eta$，得到
+\[
+\begin{aligned}
+p(x-\eta,t)
+&=
+\sum_{k=0}^{\infty}
+\frac{\partial_x^{\,k}p(x,t)}{k!}(-\eta)^k \\[4pt]
+&=
+p(x,t)
+-\eta\,\partial_x p(x,t)
++\frac{(-\eta)^2}{2!}\partial_{xx}p(x,t)
++\frac{(-\eta)^3}{3!}\partial_{xxx}p(x,t)
++\cdots \\[4pt]
+&=
+p(x,t)-\eta\,\partial_x p(x,t)
++\frac{\eta^2}{2}\partial_{xx}p(x,t)
++O(\eta^3).
+\end{aligned}
+\]
+对 $\eta$ 取期望，得到
+\[
+p(x,t+\Delta t)
+=
+\mathbb{E}_{\eta}\bigl[p(x-\eta,t)\bigr]
+=
+p(x,t)
+-
+\mathbb{E}[\eta]\partial_x p(x,t)
++
+\frac{1}{2}\mathbb{E}[\eta^2]\partial_{xx}p(x,t)
++\cdots.
+\]
+由于高斯增量均值为零，
+\[
+\mathbb{E}[\eta]=0,
+\]
+一阶项消失。
+其方差为
+\[
+\mathbb{E}[\eta^2]=\sigma^2\Delta t,
+\]
+所以二阶项保留下来：
+\[
+p(x,t+\Delta t)
+=
+p(x,t)+\frac{\sigma^2\Delta t}{2}\partial_{xx}p(x,t)+o(\Delta t).
+\]
+两边减去 $p(x,t)$，除以 $\Delta t$，再令 $\Delta t\to 0$，得到
+\[
+\boxed{
+\partial_t p(x,t)=\frac{\sigma^2}{2}\partial_{xx}p(x,t).
+}
+\]
+因此，纯布朗运动导出了纯扩散方程。
+
+这就是随机扩散在密度层面的特征。
+Liouville 方程通过确定性输运移动密度，而扩散方程则使密度在空间中变得更加平滑并展宽。
+
+现在再加入确定性漂移：
+\[
+dX_t=f(X_t,t)\,dt+\sigma\,dW_t.
+\]
+在短时间区间内，粒子会同时经历两种效应：
+\begin{itemize}
+    \item 由漂移 $f$ 引起的 $\Delta t$ 阶确定性位移；
+    \item 由布朗项引起的 $\sqrt{\Delta t}$ 阶随机高斯位移。
+\end{itemize}
+最终的密度演化把确定性的 Liouville 输运项与上面推导出的扩散项结合起来：
+\[
+\boxed{
+\partial_t p(x,t)
+=
+-\partial_x\bigl(f(x,t)p(x,t)\bigr)
++
+\frac{\sigma^2}{2}\partial_{xx}p(x,t).
+}
+\]
+这就是扩散系数 $\sigma$ 为常数时的一维\textbf{Fokker--Planck 方程}。
+图~\ref{fig:continuous-liouville-fokker-planck} 对比了仅有漂移、仅有扩散以及二者结合时对应的密度演化。
+
+\input{figures/ch05/fig_ch05_03_liouville_fokker_planck}
+
+\subsection{多维形式与解释}
+
+在多维中，确定性部分变为
+\[
+-\nabla\cdot\bigl(p(x,t)v(x,t)\bigr),
+\]
+扩散项变为
+\[
+\frac{\sigma^2}{2}\Delta p(x,t),
+\]
+其中 Laplacian 算子为
+\[
+\Delta p
+=
+\nabla\cdot(\nabla p)
+=
+\sum_{i=1}^d \frac{\partial^2 p}{\partial x_i^2}.
+\]
+因此，对于常数各向同性扩散系数 $\sigma$，多维 Fokker--Planck 方程为
+\[
+\boxed{
+\partial_t p(x,t)
+=
+-\nabla\cdot\bigl(p(x,t)v(x,t)\bigr)
++
+\frac{\sigma^2}{2}\Delta p(x,t).
+}
+\]
+
+这是连续时间概率建模中最重要的密度演化定律之一。
+Liouville 方程告诉我们密度如何在确定性流下移动；Fokker--Planck 方程在此基础上加入随机扩散。
+二者共同构成从基本连续时间运动过渡到完全连续扩散模型底层密度动力学的主要桥梁。
+
+下一章将直接建立在这些基础之上。
+关键的下一步是理解密度演化如何与对数密度的梯度相联系，以及这一视角如何自然导向基于得分的学习和完全连续时间扩散模型。
+
+\section*{本章小结与参考文献}
+\addcontentsline{toc}{section}{本章小结与参考文献}
+
+本章建立了从离散更新过渡到连续时间生成动力学所需的微积分基础。
+首先通过导数、微分方程、无穷小变化与一阶 Taylor 近似，引入连续运动的基本语言。
+
+随后研究了三种核心运动模式。
+确定性收缩展示了微分方程如何确定轨迹，先在一维中说明，再借助矩阵和矩阵指数推广到多维。
+布朗运动通过高斯增量引入连续时间随机波动；Ornstein--Uhlenbeck 过程则把漂移和噪声统一在一个均值回归系统中。
+
+接着，本章从粒子运动转向密度演化。
+对于确定性流，我们推导了有限时间变量变换公式以及 Liouville 方程，并给出了沿轨迹的对数密度形式。
+将其推广到多维后，引入了 Jacobian、行列式和散度，它们是描述局部体积变化与密度流动的关键工具。
+
+最后加入布朗扩散，得到 Fokker--Planck 方程，它把确定性输运与随机扩散结合起来。
+这构成了通往下一章的主要桥梁；下一章会把密度演化与对数密度梯度、得分学习和完全连续时间扩散模型联系起来。
+
+\bigskip
+
+本章内容建立在微积分、微分方程、随机过程以及连续时间概率论的标准思想之上。
+关于机器学习背景和概率建模视角，可参考 Bishop~\cite{bishop2006prml} 与 Murphy~\cite{murphy2012ml}。
+关于随机微分方程与布朗运动，Øksendal~\cite{oksendal2003sde} 是经典入门教材。
+关于连续性方程、输运及相关偏微分方程视角，可参考 Evans~\cite{evans2010pde}。
+更具体地讨论 Fokker--Planck 方程与随机扩散的经典参考文献则是 Risken~\cite{risken1996fokker}。

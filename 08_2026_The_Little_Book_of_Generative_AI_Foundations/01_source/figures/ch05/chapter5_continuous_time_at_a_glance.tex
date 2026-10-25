@@ -1,0 +1,48 @@
+\begin{center}
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  stage/.style={
+    draw, rounded corners=2pt, align=center, inner sep=6pt,
+    text width=3.0cm, minimum height=1.35cm
+  },
+  next/.style={
+    draw, rounded corners=2pt, align=center, inner sep=6pt,
+    text width=2.65cm, minimum height=1.35cm
+  },
+  flow/.style={->,thick}
+]
+\node[font=\normalsize\bfseries] at (6.15,1.95)
+  {连续时间基础概览};
+
+\node[stage] (disc) at (0,0) {
+  \textbf{小步离散}\\[-1pt]\textbf{更新}\\[3pt]
+  $x_{t+\Delta t}\approx x_t+$ 局部变化
+};
+
+\node[stage] (运动) at (4.1,0) {
+  \textbf{粒子层面}\\[-1pt]\textbf{运动}\\[3pt]
+  {\scriptsize ODE: $dX_t=f(X_t,t)\,dt$}\\
+  {\scriptsize SDE:}\\[-1pt]{\scriptsize $dX_t=f\,dt+\sigma\,dW_t$}
+};
+
+\node[stage] (density) at (8.2,0) {
+  \textbf{密度层面}\\[-1pt]\textbf{演化}\\[3pt]
+  Liouville：输运\\
+  Fokker--Planck：输运 $+$ 扩散
+};
+
+\node[next] (得分) at (12.3,0) {
+  \textbf{下一章}\\[3pt]
+  density 演化\\
+  $\longrightarrow$ 得分\\
+  $\nabla_x\log p_t(x)$
+};
+
+\draw[flow] (disc) -- node[above] {\scriptsize 取极限} (运动);
+\draw[flow] (运动) -- node[above] {\scriptsize 系综} (density);
+\draw[flow] (density) -- (得分);
+\end{tikzpicture}%
+}
+\end{center}

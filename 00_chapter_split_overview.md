@@ -2,7 +2,7 @@
 
 当前保留五本 PDF 底本的分章文件，共 **101 个 PDF、2,563 页**。文件位于各书 `00_originals/chapters_en/`，同目录的 `_chapter_manifest.md` 与 `_chapter_manifest.json` 记录原书页码映射。
 
-Foundations of Large Language Models 和 Agentic Large Language Models 使用提供的 TeX 源码包，按源码章节开展翻译与核对；英文整书 PDF 保留在各自 `00_originals/` 中。
+Foundations of Large Language Models、Agentic Large Language Models 和 The Little Book of Generative AI Foundations 均保留所提供的 TeX 源码包，按源码章节组织；英文整书 PDF 保留在各自 `00_originals/` 中。
 
 分章文件保留原书书签、印刷页码标签、元数据与内文链接。分部扉页并入其后的第一章，前置页、附录、结语、参考文献和索引按原结构分配。下列页码来自原拆分记录，与中文成品页数无关。
 

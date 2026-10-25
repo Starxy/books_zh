@@ -1,0 +1,29 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  state/.style={draw,rounded corners=2pt,align=center,inner sep=5pt,text width=2.35cm,minimum height=.82cm},
+  note/.style={draw,rounded corners=2pt,align=center,inner sep=5pt,text width=4.45cm,minimum height=.82cm},
+  flow/.style={->,thick}
+]
+\node[font=\normalsize\bfseries] at (6.0,2.75) {仿射耦合：单向依赖带来可处理性};
+
+\node[state] (x1) at (.8,1.20) {$x_1$\\上下文};
+\node[state] (x2) at (.8,-.55) {$x_2$\\被变换};
+\node[state] (st) at (4.0,.30) {缩放与平移\\由 $x_1$ 决定};
+\node[state] (y1) at (7.35,1.20) {$y_1$\\保持不变};
+\node[state] (y2) at (7.35,-.55) {$y_2$\\被变换};
+
+\draw[flow] (x1) -- (st);
+\draw[flow] (x1) -- (y1);
+\draw[flow] (st) -- (y2);
+\draw[flow] (x2) -- (y2);
+
+\node[note] (tri) at (3.0,-2.45) {单向依赖\\$\Rightarrow$ 分块三角 Jacobian};
+\node[note] (inv) at (8.7,-2.45) {保持不变 branch\\$\Rightarrow$ 可在逆变换中直接恢复};
+\end{tikzpicture}
+\caption{\textbf{仿射耦合中的非对称信息流。}
+一部分变量原样通过，同时决定另一部分变量如何变换。这种单向依赖同时带来了三角 Jacobian 和闭式逆映射。}
+\label{fig:affine-coupling-structure}
+\end{figure}

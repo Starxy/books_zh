@@ -1,0 +1,27 @@
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch05/panels/fig5_3a_drift_only.pdf}\\[-0.2em]
+  {\small $\displaystyle \partial_t p=-\partial_x(fp)$}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch05/panels/fig5_3b_diffusion_only.pdf}\\[-0.2em]
+  {\small $\displaystyle \partial_t p=\frac{\sigma^2}{2}\partial_{xx}p$}
+\end{minipage}
+
+\vspace{0.8em}
+
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch05/panels/fig5_3c_ou_density.pdf}\\[-0.2em]
+  {\small $\displaystyle \partial_t p=-\partial_x(fp)+\frac{\sigma^2}{2}\partial_{xx}p$}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}
+  \caption{\textbf{漂移输运概率，扩散使概率铺展。}
+  从同一个高斯密度出发，确定性收缩使均值朝原点移动，同时减小方差；纯 Brownian 扩散则保持均值不变而增大方差。Ornstein--Uhlenbeck 过程结合了两种效应：其均值回归零点，而方差趋近于平稳值 $\sigma^2/(2\alpha)$。图中曲线为精确的高斯密度解。}
+  \label{fig:continuous-liouville-fokker-planck}
+\end{minipage}
+\end{figure}

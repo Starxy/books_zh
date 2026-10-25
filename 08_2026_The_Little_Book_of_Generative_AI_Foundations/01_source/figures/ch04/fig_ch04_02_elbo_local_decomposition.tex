@@ -1,0 +1,75 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  state/.style={draw,circle,minimum size=0.76cm,inner sep=1pt},
+  term/.style={draw,rounded corners=2pt,align=center,inner sep=5pt},
+  flow/.style={->,thick},
+  reverse/.style={->,thick,dashed}
+]
+\node[font=\normalsize\bfseries] at (6.1,3.0)
+  {扩散 ELBO 沿链分解};
+
+\node[state] (x0) at (0,1.35) {$x_0$};
+\node[state] (x1) at (2.15,1.35) {$x_1$};
+\node at (3.75,1.35) {$\cdots$};
+\node[state] (xtm1) at (5.7,1.35) {$x_{t-1}$};
+\node[state] (xt) at (8.15,1.35) {$x_t$};
+\node at (9.8,1.35) {$\cdots$};
+\node[state] (xT) at (12.0,1.35) {$x_T$};
+
+% Forward chain
+\draw[flow] (x0) -- node[above] {\scriptsize 固定的 $q$} (x1);
+\draw[flow] (x1) -- (3.2,1.35);
+\draw[flow] (4.3,1.35) -- (xtm1);
+\draw[flow] (xtm1) -- node[above] {\scriptsize $q(x_t\mid x_{t-1})$} (xt);
+\draw[flow] (xt) -- (9.25,1.35);
+\draw[flow] (10.35,1.35) -- (xT);
+
+% Learned reverse chain
+\draw[reverse] (x1) -- node[below] {\scriptsize $p_\theta$} (x0);
+\draw[reverse] (xt) -- node[below] {\scriptsize $p_\theta(x_{t-1}\mid x_t)$} (xtm1);
+\draw[reverse] (xT) -- node[below] {\scriptsize 学习到的反向过程} (10.35,1.35);
+
+\node[term,text width=3.45cm] (recon) at (1.1,-1.15) {
+\textbf{重构}\\[2pt]
+$\displaystyle
+-\mathbb E_{q(x_1\mid x_0)}
+[\log p_\theta(x_0\mid x_1)]$
+};
+
+\node[term,text width=5.15cm] (local) at (7.0,-1.35) {
+\textbf{中间步骤，$t=2,\ldots,T$}\\[2pt]
+$\displaystyle
+\begin{aligned}
+&\mathbb E_{q(x_t\mid x_0)}\Big[
+\mathrm{KL}\!\big(\\[-1pt]
+&q(x_{t-1}\mid x_t,x_0)
+\,\|\,p_\theta(x_{t-1}\mid x_t)
+\big)\Big]
+\end{aligned}$
+};
+
+\node[term,text width=3.85cm] (prior) at (10.55,-3.65) {
+\textbf{端点／先验匹配}\\[2pt]
+$\displaystyle
+\mathrm{KL}\!\big(
+q(x_T\mid x_0)\,\|\,p(x_T)
+\big)$
+};
+
+\draw[flow] (x0.south) to[out=-90,in=90] (recon.north west);
+\draw[flow] (xtm1.south) to[out=-90,in=90] (local.north west);
+\draw[flow] (xt.south) to[out=-90,in=90] (local.north east);
+\draw[flow] (xT.south) to[out=-90,in=90] (prior.north);
+
+\node[font=\scriptsize,align=center,text width=11.5cm] at (5.8,-5.0) {
+全局潜轨迹目标可化为一个边界项、一个重构项，以及若干局部反向转移匹配项之和。
+};
+
+\end{tikzpicture}
+\caption{\textbf{从扩散 ELBO 到局部去噪项。}
+固定的前向链 $q$ 产生潜在轨迹，而 $p_\theta$ 建模反向转移。重新整理负 ELBO 后，可得到端点先验匹配、数据重构，以及一系列中间 KL 项；这些项把每个学习到的反向转移与精确后验 $q(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)$ 进行比较。}
+\label{fig:ddpm-elbo-local-decomposition}
+\end{figure}

@@ -1,0 +1,665 @@
+\chapter{变分自编码器：从概率潜变量到变分推断}
+
+\section*{概述}
+\addcontentsline{toc}{section}{概述}
+
+变分自编码器（Variational Autoencoder, VAE）是现代深度生成学习的基础模型之一。它在本书中占据重要位置，因为它把前几章分别发展的两条脉络汇合起来：一条是作为基于重构的表示学习器的自编码器，另一条是作为潜变量生成模型的概率主成分分析。
+
+在确定性自编码器中，每个输入被映射到一个单一潜在编码，然后再进行重构。在 PPCA 中，潜变量被概率化处理，但模型仍然保持线性高斯结构。VAE 把这两种思想结合到更灵活的非线性框架中：编码器输出潜变量上的分布，解码器定义观测上的条件分布，而模型学习则通过优化变分下界完成，而不是直接优化精确边缘似然。
+
+这使 VAE 成为从经典潜变量模型通向现代深度生成建模的自然桥梁。它保留了 PPCA 的概率结构——先验、似然、后验和边缘似然——但用一个学习得到的近似后验替代精确高斯推断。上一章引入的证据下界（ELBO）在这里成为实际训练目标，在重构准确性与潜在空间正则化之间取得平衡。
+
+尽管 VAE 已不再是最新一代生成模型中最占主导地位的范式，但从概念上看，它依然处于核心位置。VAE 展示了如何把概率推断、神经网络、潜在表示与基于梯度的优化统一到一个端到端生成模型中。因此，本章是从解析可解的潜变量模型迈向本书后续更广泛深度生成框架的第一个重要步骤。
+
+\section*{概念地图}
+\addcontentsline{toc}{section}{概念地图}
+
+本章追踪从确定性自编码器走向变分潜变量生成模型的过程。
+
+\begin{itemize}
+
+    \item[\(\rightarrow\)] \textbf{首先把确定性自编码器改造成概率模型。}  
+    编码器不再把每个观测映射为单一潜在编码，而是输出分布 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\)；与此同时，解码器定义条件分布 \(p_{\theta}(\mathbf{x}\mid\mathbf{z})\)。这样，模型既能表达不确定性，也真正具备生成能力。
+
+    \item[\(\rightarrow\)] \textbf{随后从潜变量模型本身推导学习目标。}  
+    从难以计算的边缘似然 \(p_{\theta}(\mathbf{x})\) 出发，我们使用上一章建立的 ELBO 框架，并将其具体化到 VAE。由此得到熟悉的“重构项 + 正则项”分解，揭示模型如何在拟合数据与组织潜在空间之间取得平衡。
+
+    \item[\(\rightarrow\)] \textbf{最后解释 VAE 如何训练，以及这种训练实现了什么。}  
+    变分后验 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\) 充当对真实后验的学习近似，而重参数化技巧使这一随机推断过程变得可微，从而能够用基于梯度的方法进行训练。
+
+\end{itemize}
+
+\medskip
+\noindent VAE 的主要概率关系概括如下图所示。
+\input{figures/ch03/chapter3_vae_at_a_glance}
+\medskip
+
+\section{从自编码器到变分自编码器}
+
+前几章并行发展了两种思想。一方面，自编码器说明数据可以被压缩为较低维的潜在表示，也就是一种紧凑的内部描述或特征编码，再由此重构输入。另一方面，概率主成分分析（PPCA）说明如何把这样的表示变成真正的概率生成过程。变分自编码器（VAE）~\cite{kingma2014autoencoding,rezende2014stochastic} 把这两条路径结合起来。
+
+标准自编码器具有熟悉的确定性形式
+\[
+\mathbf{x}
+\;\xrightarrow{\text{encoder}}\;
+\mathbf{z}
+\;\xrightarrow{\text{decoder}}\;
+\hat{\mathbf{x}}.
+\]
+给定输入 \(\mathbf{x}\)，编码器产生一个唯一潜在编码 \(\mathbf{z}\)，解码器再把该编码映射为一个唯一重构 \(\hat{\mathbf{x}}\)。这种结构对于压缩和表示学习很有用，但有一个重要局限：潜在编码只是一个固定点，而不是概率对象。因此，模型无法自然表达不确定性，也没有提供一个有原则的潜变量生成框架。
+
+VAE 通过把确定性的潜在编码替换为潜变量上的\emph{概率分布}来解决这一问题。这与此前从 PCA 过渡到 PPCA 的过程相呼应：在那里，我们也是通过引入不确定性，把确定性的低维描述转化为概率潜变量模型。VAE 不再把 \(\mathbf{x}\) 编码为潜在空间中的一个精确点，而是编码为一个概率分布，用于表达“哪些潜在表示最可能解释该观测”这一不确定性。这就是核心概念转变：
+\begin{quote}
+\emph{潜在表示不再是单一编码，而是一个可以从中采样编码的分布。}
+\end{quote}
+
+\subsection{让编码器概率化}
+
+在确定性自编码器中，编码器是函数
+\[
+f_{\text{enc}}:\mathbf{x}\mapsto\mathbf{z}.
+\]
+对于每个观测 \(\mathbf{x}\)，它精确返回一个潜向量 \(\mathbf{z}\)。
+
+在 VAE 中，编码器则定义一个易于处理的潜变量条件分布
+\[
+q_{\phi}(\mathbf{z}\mid\mathbf{x}),
+\]
+它作为对真实后验的学习近似。这个分布通常称为\emph{变分后验}（variational posterior）或\emph{近似后验}（approximate posterior）。其作用是描述：给定观测数据点 \(\mathbf{x}\) 后，哪些潜变量是合理的。
+
+这里使用“后验”一词是有意的。上一章的 PPCA 中，我们看到潜变量模型的真实后验为
+\[
+p_{\theta}(\mathbf{z}\mid\mathbf{x}),
+\]
+即观察到 \(\mathbf{x}\) 之后，潜变量的条件分布。在 VAE 中，这个真实后验通常难以解析计算。主要原因是编码器和解码器通常由多层非线性神经网络建模，因此后验不再保留使 PPCA 可解析求解的简单线性高斯形式。所以，我们改为引入可处理的近似 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\)。此时最关键的结构变化很简单：编码器不再输出单一向量，而是输出一个分布的参数。
+
+实际中，编码器通常由神经网络实现，把 \(\mathbf{x}\) 映射为某个高斯分布的参数。最常见的假设为
+\[
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\boldsymbol{\mu}_{\phi}(\mathbf{x}),
+\operatorname{diag}(\boldsymbol{\sigma}_{\phi}^2(\mathbf{x}))
+\bigr),
+\]
+或者在简化的各向同性表述中，
+\[
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\boldsymbol{\mu}_{\phi}(\mathbf{x}),
+\boldsymbol{\sigma}_{\phi}^2(\mathbf{x})\mathbf{I}
+\bigr).
+\]
+因此，编码器网络并不直接输出 \(\mathbf{z}\)，而是输出潜在空间中高斯分布的均值和方差参数。
+
+从概念上看，编码器现在具有如下形式：
+\[
+\mathbf{x}
+\;\longrightarrow\;
+\bigl(\boldsymbol{\mu}_{\phi}(\mathbf{x}),
+\boldsymbol{\sigma}_{\phi}(\mathbf{x})\bigr)
+\;\longrightarrow\;
+q_{\phi}(\mathbf{z}\mid\mathbf{x}).
+\]
+随后通过采样得到潜在编码：
+\[
+\mathbf{z}\sim q_{\phi}(\mathbf{z}\mid\mathbf{x}).
+\]
+
+因此，对于固定输入 \(\mathbf{x}\)，确定性自编码器与 VAE 的差别十分直接：前者返回一个潜在点，而后者的编码器定义一组可能的潜在值所构成的分布，可以从中采样不同编码。图~\ref{fig:vae-ae-versus-posterior} 从几何上展示了这种“点到分布”的转变。
+
+\input{figures/ch03/fig_ch03_01_ae_vs_vae_latent_representation}
+
+\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={为什么选择易处理的高斯近似后验？},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+
+VAE 中的真实后验 \(p_{\theta}(\mathbf{z}\mid\mathbf{x})\) 通常复杂到无法精确计算，因此我们用一个更简单的分布族 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\) 替代它，使其能够在实际中表示和学习。选择高斯分布尤其方便，主要有两个原因。
+
+\begin{itemize}
+    \item 它容易表示。神经网络只需输出均值和方差，就可以紧凑、可微地描述潜在分布。
+    \item 它便于计算。我们可以轻松从中采样，而且后续学习目标中将出现的许多数学量，在采用高斯分布时都更容易求值。
+\end{itemize}
+这里所谓“易处理”，只是指近似后验被选得足够简单，可以在学习过程中进行操作，并不意味着整个 VAE 又重新变成解析可解模型。与 PPCA 不同，VAE 的解码器仍然是非线性的，精确数据似然仍不可计算，我们仍需要替代目标与基于梯度的优化来训练模型。
+
+\end{tcolorbox}
+
+\subsection{让解码器概率化}
+
+解码端也会发生类似转变。在确定性自编码器中，解码器是函数
+\[
+f_{\text{dec}}:\mathbf{z}\mapsto\hat{\mathbf{x}},
+\]
+它对每个潜在输入给出一个唯一重构 \(\hat{\mathbf{x}}\)。
+
+在 VAE 中，解码器则定义条件分布
+\[
+p_{\theta}(\mathbf{x}\mid\mathbf{z}),
+\]
+用于描述如何由潜变量生成观测。这就是模型的生成部分。
+
+同样，解码器通常由神经网络参数化。给定 \(\mathbf{z}\) 后，解码器输出数据空间中某个分布的参数。对于连续数据，一种常见选择是高斯分布，例如
+\[
+p_{\theta}(\mathbf{x}\mid\mathbf{z})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}\mid
+\boldsymbol{\mu}_{\theta}(\mathbf{z}),
+\sigma^2\mathbf{I}
+\bigr),
+\]
+而对于二值数据则经常使用 Bernoulli 似然。具体选择取决于所建模的数据类型，但底层原则始终相同：
+\begin{quote}
+\emph{解码器输出的不是一个确定性重构点，而是给定潜变量时可能观测值的概率分布。}
+\end{quote}
+
+实践中，人们通常会用该分布的均值或众数作为模型的代表性重构，但从概念上说，解码器定义的是完整条件概率律，而不是单点预测。因此，编码器把数据映射为潜在空间中的分布，而解码器则把潜变量映射为数据空间中的分布。
+
+\subsection{先验与学习困难}
+
+\paragraph{潜变量先验。}
+为了完成概率潜变量模型，还需要引入潜变量的先验分布：
+\[
+p(\mathbf{z}).
+\]
+与 PPCA 类似，标准 VAE 通常从简单的标准高斯先验开始：
+\[
+p(\mathbf{z})=\mathcal{N}(\mathbf{0},\mathbf{I}).
+\]
+
+这个先验有两个作用。
+
+第一，它提供生成的起点。训练完成后，可以采样
+\[
+\mathbf{z}\sim p(\mathbf{z}),
+\]
+再从解码器分布中采样生成观测：
+\[
+\mathbf{x}\sim p_{\theta}(\mathbf{x}\mid\mathbf{z}).
+\]
+
+第二，它提供一个参考分布，后续会用它来正则化推断得到的潜变量分布。这是相对于 PPCA 的一个重要推进：在 PPCA 中，先验虽然存在，但模型并不会显式鼓励推断得到的潜在表示与先验对齐；在 VAE 中，这种对齐将直接成为学习目标的一部分。
+
+因此，先验赋予潜在空间全局结构，而解码器把该空间中的点转换为数据。
+
+\paragraph{为什么这会带来新的困难。}
+
+把上述部分合在一起，VAE 包含三个概率组件：
+\[
+p(\mathbf{z}),
+\qquad
+q_{\phi}(\mathbf{z}\mid\mathbf{x}),
+\qquad
+p_{\theta}(\mathbf{x}\mid\mathbf{z}),
+\]
+分别对应潜变量先验、用于推断的近似后验，以及用于生成的解码器似然。
+
+这使 VAE 的结构既类似自编码器，也类似 PPCA，但比二者都更加丰富。像自编码器一样，它具有编码器--解码器架构；像 PPCA 一样，它是概率潜变量模型。但与 PPCA 不同，编码器和解码器现在通常都是非线性神经网络，这大幅增强了建模能力，同时也破坏了我们此前依赖的解析可解性。
+
+在 PPCA 中，线性高斯结构使得边缘似然 \(p(\mathbf{x})\) 和后验 \(p(\mathbf{z}\mid\mathbf{x})\) 等量都能显式推导。在 VAE 中，这些量通常都不再具有闭式形式。因此，虽然 VAE 具有清晰的概率结构，但其学习问题已经不能像 PPCA 那样解析求解。这就直接带来了本章的核心问题：
+\begin{quote}
+\emph{如果真实边缘似然和后验都难以计算，我们应当转而优化什么目标？}
+\end{quote}
+
+答案就是上一章介绍的同一条一般原则：证据下界（ELBO）。下一节将把这一原则具体化到 VAE，并推导使模型能够训练的目标函数。
+
+\section{从不可计算似然到 ELBO}
+
+建立了 VAE 的概率结构之后，现在可以讨论如何学习模型。与 PPCA 一样，最自然的原则仍然是最大似然：希望选择模型参数，使模型对实际观测数据赋予较高概率。
+
+对于单个观测 \(\mathbf{x}\)，相关量是边缘似然
+\[
+p_{\theta}(\mathbf{x})
+=
+\int p_{\theta}(\mathbf{x},\mathbf{z})\,d\mathbf{z}
+=
+\int p_{\theta}(\mathbf{x}\mid\mathbf{z})\,p(\mathbf{z})\,d\mathbf{z},
+\]
+对数据集 \(\{\mathbf{x}^{(i)}\}\)，学习目标为
+\[
+\max_{\theta}\sum_i\log p_{\theta}(\mathbf{x}^{(i)}).
+\]
+
+它在形式上与上一章 PPCA 的目标完全相同，但现在存在一个关键差异。PPCA 的线性高斯结构允许我们精确计算关于 \(\mathbf{z}\) 的积分；VAE 中的解码器 \(p_{\theta}(\mathbf{x}\mid\mathbf{z})\) 通常由非线性神经网络参数化，因此此前支持精确边缘化的简单线性高斯结构不再存在。结果就是边缘似然
+\[
+\log p_{\theta}(\mathbf{x})
+=
+\log\int p_{\theta}(\mathbf{x}\mid\mathbf{z})\,p(\mathbf{z})\,d\mathbf{z}
+\]
+通常不可计算。
+
+同样的困难也立刻出现在后验中：
+\[
+p_{\theta}(\mathbf{z}\mid\mathbf{x})
+=
+\frac{p_{\theta}(\mathbf{x}\mid\mathbf{z})\,p(\mathbf{z})}
+{p_{\theta}(\mathbf{x})}.
+\]
+分子可以写出，但要将其归一化就需要同一个不可计算的边缘似然 \(p_{\theta}(\mathbf{x})\)。因此，在 VAE 中，边缘似然和真实后验通常都没有闭式形式。
+
+这正是上一章的变分机制成为必需工具的地方。我们不直接优化不可计算的对数似然，而是优化一个可处理的下界：证据下界（ELBO）。
+
+\subsection{引入变分后验}
+
+第 2 章推导 ELBO 时，引入了潜变量上的辅助分布 \(Q(\mathbf{z})\)。在 VAE 中，这个辅助分布现在变成一个学习得到的、参数化的真实后验近似：
+\[
+Q(\mathbf{z})
+\;\longrightarrow\;
+q_{\phi}(\mathbf{z}\mid\mathbf{x}),
+\]
+其中 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\) 就是上一节引入的编码器网络。
+
+这一替换，是把一般 ELBO 框架转化为 VAE 目标的关键一步。我们不再尝试计算不可处理的真实后验 \(p_{\theta}(\mathbf{z}\mid\mathbf{x})\)，而是使用易处理的近似 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\)，并优化 \(\log p_{\theta}(\mathbf{x})\) 的下界。
+
+应用 ELBO 构造得到
+\[
+\log p_{\theta}(\mathbf{x})
+\geq
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log\frac{p_{\theta}(\mathbf{x},\mathbf{z})}
+{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\right].
+\]
+因此，单个数据点的 VAE 目标为
+\[
+\mathcal{L}(\mathbf{x};\theta,\phi)
+=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log\frac{p_{\theta}(\mathbf{x},\mathbf{z})}
+{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\right].
+\]
+
+这就是针对 VAE 具体化之后的 ELBO。它依赖两组参数：
+\begin{itemize}
+    \item \(\theta\)：解码器网络 \(p_{\theta}(\mathbf{x}\mid\mathbf{z})\) 的参数；
+    \item \(\phi\)：编码器网络 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\) 的参数。
+\end{itemize}
+训练 VAE，就是同时关于模型的这两个部分最大化该下界。
+
+下面把同一个目标改写成三种等价形式。每种形式突出学习问题的一个不同侧面：潜变量结构、与精确似然之间的差距，以及实践中重构与正则化之间的平衡。
+
+\subsection{ELBO 的三种等价形式}
+
+\paragraph{ELBO 的第一种形式：联合密度形式。}
+ELBO 最紧凑的形式为
+\[
+\mathcal{L}(\mathbf{x};\theta,\phi)
+=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log\frac{p_{\theta}(\mathbf{x},\mathbf{z})}
+{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\right].
+\]
+展开分式的对数，可以更清楚地看到其结构：
+\[
+\mathcal{L}(\mathbf{x};\theta,\phi)
+=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+[\log p_{\theta}(\mathbf{x},\mathbf{z})]
+-
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+[\log q_{\phi}(\mathbf{z}\mid\mathbf{x})].
+\]
+
+这一形式在概念上很有用，因为它与上一章的一般 ELBO 推导展示的是完全相同的潜变量结构。第一项要求采样得到的潜变量与联合模型 \(p_{\theta}(\mathbf{x},\mathbf{z})\) 相容；第二项则来自变分分布本身。
+
+它也清楚说明了 VAE 在做什么。模型希望通过潜变量 \(\mathbf{z}\) 解释观测 \(\mathbf{x}\)，但由于精确后验不可得，只能转而优化依赖近似后验 \(q_{\phi}(\mathbf{z}\mid\mathbf{x})\) 的下界。
+
+\paragraph{ELBO 的第二种形式：精确似然减去后验失配。}
+
+利用 Bayes 公式
+\[
+p_{\theta}(\mathbf{x},\mathbf{z})
+=
+p_{\theta}(\mathbf{z}\mid\mathbf{x})\,p_{\theta}(\mathbf{x}),
+\]
+可将 ELBO 重写为
+\[
+\begin{aligned}
+\mathcal{L}(\mathbf{x};\theta,\phi)
+&=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log\frac{p_{\theta}(\mathbf{z}\mid\mathbf{x})\,p_{\theta}(\mathbf{x})}
+{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\right] \\[4pt]
+&=
+\log p_{\theta}(\mathbf{x})
+-
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log\frac{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+{p_{\theta}(\mathbf{z}\mid\mathbf{x})}
+\right].
+\end{aligned}
+\]
+
+\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={KL 散度},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+对于两个概率分布 \(q\) 和 \(p\)，从 \(q\) 到 \(p\) 的\emph{Kullback--Leibler（KL）散度}定义为
+\[
+\mathrm{KL}(q\,\|\,p)
+=
+\mathbb{E}_{q}\!\left[\log\frac{q}{p}\right].
+\]
+它衡量在关于 \(q\) 取期望时，\(q\) 与 \(p\) 之间有多大差异。
+
+这里尤其重要的两个基本事实是：
+\begin{itemize}
+    \item \(\mathrm{KL}(q\,\|\,p)\ge0\)；
+    \item 当且仅当 \(q=p\) 几乎处处成立时，\(\mathrm{KL}(q\,\|\,p)=0\)。
+\end{itemize}
+
+因此，KL 散度可以看成两个分布之间非负的失配度量。严格来说它并不是真正的几何距离，因为它不对称，但在概率建模中极其有用。
+\end{tcolorbox}
+
+识别出第二项正是 KL 散度后，可得
+\[
+\boxed{
+\mathcal{L}(\mathbf{x};\theta,\phi)
+=
+\log p_{\theta}(\mathbf{x})
+-
+\mathrm{KL}\!\bigl(
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+\,\|\,\,
+p_{\theta}(\mathbf{z}\mid\mathbf{x})
+\bigr).
+}
+\]
+
+这一形式表明，ELBO 与真实对数似然之间只相差近似后验与真实后验之间的散度。由于 KL 散度始终非负，
+\[
+\mathrm{KL}\!\bigl(
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+\,\|\,\,
+p_{\theta}(\mathbf{z}\mid\mathbf{x})
+\bigr)\ge0,
+\]
+立即得到
+\[
+\mathcal{L}(\mathbf{x};\theta,\phi)\le\log p_{\theta}(\mathbf{x}),
+\]
+这也解释了为什么 ELBO 的确是一个下界。
+
+这一形式还清楚说明 ELBO 最大化试图实现什么：一方面提高模型证据的下界，另一方面同时减小近似后验与真实后验之间的失配。
+
+\paragraph{ELBO 的第三种形式：重构加正则化。}
+
+为了得到实践中最常用的形式，把联合分布分解为
+\[
+p_{\theta}(\mathbf{x},\mathbf{z})
+=
+p_{\theta}(\mathbf{x}\mid\mathbf{z})\,p(\mathbf{z}).
+\]
+将其代入 ELBO，得到
+\[
+\begin{aligned}
+\mathcal{L}(\mathbf{x};\theta,\phi)
+&=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log\frac{p_{\theta}(\mathbf{x}\mid\mathbf{z})\,p(\mathbf{z})}
+{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\right] \\[4pt]
+&=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[\log p_{\theta}(\mathbf{x}\mid\mathbf{z})\right]
++
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log p(\mathbf{z})-\log q_{\phi}(\mathbf{z}\mid\mathbf{x})
+\right].
+\end{aligned}
+\]
+第二个期望同样是一个负 KL 散度，因此得到
+\[
+\boxed{
+\mathcal{L}(\mathbf{x};\theta,\phi)
+=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[\log p_{\theta}(\mathbf{x}\mid\mathbf{z})\right]
+-
+\mathrm{KL}\!\bigl(
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+\,\|\,\,
+p(\mathbf{z})
+\bigr).
+}
+\]
+
+这就是最熟悉的 VAE 目标。它包含作用不同的两个部分：
+\begin{itemize}
+    \item \textbf{重构项}
+    \[
+    \mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+    [\log p_{\theta}(\mathbf{x}\mid \mathbf{z})],
+    \]
+    它鼓励解码器在给定采样潜编码时为观测数据赋予较高概率，因此起到重构目标的作用；
+
+    \item \textbf{正则化项}
+    \[
+    \mathrm{KL}\!\bigl(
+    q_{\phi}(\mathbf{z}\mid \mathbf{x})
+    \,\|\,\,
+    p(\mathbf{z})
+    \bigr),
+    \]
+    它鼓励近似后验保持接近先验。
+\end{itemize}
+
+第一项通过解码器促进准确重构。
+第二项则防止编码器将每个数据点任意放置在潜空间中。
+相反，它鼓励推断得到的潜变量分布与所假定的先验保持相容，从而使潜空间具有更加连贯的全局结构。
+
+正是这种正则化使生成式采样具有实际意义。
+训练完成后，我们可以采样
+\[
+\mathbf{z}\sim p(\mathbf{z}),
+\qquad
+\mathbf{x}\sim p_{\theta}(\mathbf{x}\mid \mathbf{z}),
+\]
+并期望生成的样本与数据分布相似。
+
+这也回应了 PPCA 一章末尾指出的局限。
+在 PPCA 中，模型虽然引入了先验，但并没有显式地对推断得到的潜空间施加正则约束，使其与先验对齐。
+而在 VAE 中，这种对齐被直接纳入学习目标之中。
+
+上面推导出的三种形式在代数上完全等价，只是分别强调了同一目标的不同方面。图~\ref{fig:vae-elbo-three-views}
+在我们总结 ELBO 最大化的作用之前，将这三种视角汇集在一起。
+
+\input{figures/ch03/fig_ch03_02_vae_elbo_three_views}
+
+\paragraph{ELBO 实现了什么。}
+
+现在，我们可以从两个互补的视角理解 VAE 的目标。
+
+从推断视角看，ELBO 表达的是：
+\begin{quote}
+\emph{学习一个既接近真实后验、又能够很好解释数据的近似后验。}
+\end{quote}
+
+从表征学习视角看，它表达的是：
+\begin{quote}
+\emph{学习能够准确重构数据的潜编码，同时使潜空间保持有组织的结构，并与一个简单先验相容。}
+\end{quote}
+
+这就是为什么 VAE 并不是“加入噪声的自编码器”那么简单。
+它的目标并非仅仅完成重构，而是在潜变量生成模型内部执行近似概率推断。
+
+与此同时，这一目标也带来了新的计算挑战。
+重构项是关于随机潜变量的期望，而该潜变量是从
+$q_{\phi}(\mathbf{z}\mid\mathbf{x})$ 中采样得到的。
+为了关于编码器参数 $\phi$ 优化 ELBO，并由此将近似后验与解码器联合训练，我们需要一种能够让梯度穿过这一采样过程的方法。
+
+这正是重参数化技巧的用途，也是下一节的出发点。
+
+\section{学习变分自编码器：重参数化与优化}
+
+上一节已经说明，VAE 通过最大化 ELBO 来训练：
+\[
+\mathcal{L}(\mathbf{x};\theta,\phi)
+=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log p_{\theta}(\mathbf{x}\mid\mathbf{z})
+\right]
+-
+\mathrm{KL}\!\bigl(
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+\,\|\,\,
+p(\mathbf{z})
+\bigr).
+\]
+剩下的问题是：这个目标中包含对编码器分布所生成随机潜样本的期望，那么在实践中应如何对它进行优化？
+
+ELBO 的重构项包含对潜变量样本的期望：
+\[
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid\mathbf{x})}
+\!\left[
+\log p_{\theta}(\mathbf{x}\mid\mathbf{z})
+\right].
+\]
+这意味着在训练过程中，我们必须先从编码器分布中采样 $\mathbf{z}$，再将该样本送入解码器。
+
+乍看之下，这似乎很直接：先采样
+\[
+\mathbf{z}\sim q_{\phi}(\mathbf{z}\mid\mathbf{x}),
+\]
+计算重构项，然后进行优化。
+困难在于，采样所依据的分布本身依赖编码器参数 $\phi$。
+如果把 $\mathbf{z}\sim q_{\phi}(\mathbf{z}\mid\mathbf{x})$
+视为一个黑盒随机操作，那么样本 $\mathbf{z}$ 对 $\phi$ 的依赖就被隐藏在采样步骤内部，普通反向传播因此无法穿过编码器中的这一过程。
+
+换句话说，一旦给定 $\mathbf{z}$，对解码器参数 $\theta$ 求导并不困难；真正棘手的是编码器参数 $\phi$，因为它决定了 $\mathbf{z}$ 是\emph{如何}被采样出来的。
+因此，如果希望利用基于梯度的优化高效训练 VAE，就需要把这个随机采样步骤改写成可微计算。
+
+\paragraph{重参数化技巧。}
+关键思想是把随机性的来源与对编码器参数的依赖分离开来。
+对于最常见的对角协方差高斯近似后验，
+\[
+q_{\phi}(\mathbf{z}\mid\mathbf{x})
+=
+\mathcal{N}\!\bigl(
+\mathbf{z}\mid
+\boldsymbol{\mu}_{\phi}(\mathbf{x}),
+\operatorname{diag}(\boldsymbol{\sigma}_{\phi}^2(\mathbf{x}))
+\bigr),
+\]
+我们可以先从标准正态分布采样噪声
+\[
+\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\mathbf{I}),
+\]
+再定义
+\[
+\mathbf{z}
+=
+\boldsymbol{\mu}_{\phi}(\mathbf{x})
++
+\boldsymbol{\sigma}_{\phi}(\mathbf{x})\odot \boldsymbol{\epsilon}.
+\]
+这就是重参数化技巧~\cite{kingma2014autoencoding,rezende2014stochastic}。
+图~\ref{fig:vae-reparameterisation} 对比了直接随机采样视角与重参数化后的计算方式。
+
+\input{figures/ch03/fig_ch03_03_vae_reparameterisation}
+
+这一技巧并没有消除随机性，而是把随机性转移到了与编码器参数无关的辅助噪声 $\boldsymbol{\epsilon}$ 上。
+对于固定的一次噪声采样，潜变量就是一个确定性的可微函数
+\[
+\mathbf{z}=\mathbf{z}(\mathbf{x},\phi,\boldsymbol{\epsilon}),
+\]
+因此普通的路径导数可以通过标准反向传播穿过编码器进行传播。
+
+\paragraph{编码器与解码器的联合优化。}
+有了重参数化技巧之后，就可以通过同时关于两组参数最大化 ELBO，对 VAE 进行端到端训练：
+\[
+(\theta,\phi)
+\quad\longmapsto\quad
+\max \; \mathcal{L}(\mathbf{x};\theta,\phi).
+\]
+实践中，对每个输入，编码器首先输出
+$\boldsymbol{\mu}_{\phi}(\mathbf{x})$ 和
+$\boldsymbol{\sigma}_{\phi}(\mathbf{x})$；随后通过重参数化构造一个潜变量样本，计算 ELBO，再将梯度同时反向传播经过编码器和解码器。
+这种优化通常使用小批量随机梯度方法或其现代变体完成。
+
+这是 VAE 最重要的概念性成果之一。
+它把近似后验推断与生成模型学习转化为同一个可微计算图。
+从这一点开始，编码器和解码器不再被作为两个彼此分离的对象训练：它们通过 ELBO 相互耦合，并被联合学习。
+
+从这个意义上说，训练 VAE 本身就是一种变分推断。
+我们不再精确计算真实后验 $p_{\theta}(\mathbf{z}\mid\mathbf{x})$，而是学习一个易处理的近似
+$q_{\phi}(\mathbf{z}\mid\mathbf{x})$，并同时关于解码器参数 $\theta$ 与编码器参数 $\phi$ 优化 ELBO。
+
+\paragraph{一种变体：$\beta$-VAE。}
+
+重构与正则化之间的平衡可以采用不同方式调节。其中一个重要扩展是
+$\beta$-VAE~\cite{higgins2017beta}，它在 KL 项前引入一个权重系数：
+\[
+\mathcal{L}_{\beta}
+=
+\mathbb{E}_{q_{\phi}(\mathbf{z}\mid \mathbf{x})}
+\!\left[
+\log p_{\theta}(\mathbf{x}\mid \mathbf{z})
+\right]
+-
+\beta\,
+\mathrm{KL}\!\bigl(
+q_{\phi}(\mathbf{z}\mid \mathbf{x})
+\,\|\,\,
+p(\mathbf{z})
+\bigr).
+\]
+当 $\beta>1$ 时，潜空间受到更强的正则化，往往会得到更有结构、或更具解耦性的表征，但通常要以重构质量下降为代价。
+
+这一扩展尤其清楚地揭示了变分潜变量模型中的一个核心张力：
+\begin{quote}
+\emph{潜空间既必须足够规整以支持生成，又必须具有足够的信息量以支持有用的表征与重构。}
+\end{quote}
+
+从这一视角来看，VAE 标志着现代生成建模发展中的重要一步。
+PPCA 引入了一个可解析处理的概率潜变量模型；VAE 则通过以学习得到的近似取代精确推断，并把 ELBO 转化为可实际优化的训练目标，将同样的潜变量思想推进到非线性神经网络场景。
+
+这些思想在后续章节中仍将发挥作用。
+尤其是，尽管扩散模型经常从其他角度引入，但基于 ELBO 的推理方式和潜变量视角同样为理解它们提供了有用框架。
+下一章中，我们将看到这些概率思想如何进一步扩展到现代生成式人工智能最重要的框架之一。
+
+\section*{本章小结与参考文献}
+\addcontentsline{toc}{section}{本章小结与参考文献}
+
+本章将变分自编码器（VAE）介绍为自编码器的概率扩展，同时也是通过 PPCA 建立起来的潜变量框架在非线性情形下的延续。
+
+由于模型是非线性的，边缘似然
+$p_{\theta}(\mathbf{x})$ 与真实后验
+$p_{\theta}(\mathbf{z}\mid\mathbf{x})$ 一般都不存在闭式表达。
+随后我们看到，ELBO 有若干种等价形式，其中最常见的一种可分解为重构项与正则化项。
+由此可以清楚地看到，VAE 并非只是重构输入，而是在学习一种与简单先验保持相容的潜在表征，从而支持有意义的生成。
+
+最后，本章说明了重参数化技巧如何把随机潜变量采样改写为无参数噪声的可微变换，使编码器和解码器能够利用基于梯度的优化进行联合训练。
+
+最初的 VAE 形式由 Kingma 和 Welling 提出~\cite{kingma2014autoencoding}，Rezende、Mohamed 与 Wierstra 也发展了密切相关的随机梯度变分方法~\cite{rezende2014stochastic}。
+有关更广泛的概率建模背景，可参见 Bishop~\cite{bishop2006prml} 与 Murphy~\cite{murphy2012ml}。
+关于 VAE 的系统性介绍以及较新进展的综述，可参见 Kingma 和 Welling~\cite{kingma2019introduction}。

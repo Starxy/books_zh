@@ -1,0 +1,98 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  box/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=5pt,
+    minimum height=0.92cm,
+    text width=2.55cm
+  },
+  tinybox/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=4pt,
+    minimum height=0.82cm,
+    text width=2.0cm
+  },
+  flow/.style={->,thick},
+  stochastic/.style={->,thick,dashed}
+]
+
+% ---------------- Direct sampling ----------------
+\begin{scope}[shift={(-6.15,0)}]
+\node[font=\normalsize\bfseries] at (4.75,2.05)
+  {(a) 直接的参数依赖采样};
+
+\node[tinybox] (x1) at (0,0.55) {$\mathbf{x}$};
+\node[box] (enc1) at (3.0,0.55) {
+  编码器\\[-1pt]
+  $\boldsymbol{\mu}_{\phi}(\mathbf{x}),
+   \boldsymbol{\sigma}_{\phi}(\mathbf{x})$
+};
+\node[box] (draw1) at (6.25,0.55) {
+  随机采样\\[-1pt]
+  $\mathbf{z}\sim q_{\phi}(\mathbf{z}\mid\mathbf{x})$
+};
+\node[box] (dec1) at (9.5,0.55) {
+  解码器\\[-1pt]
+  $p_{\theta}(\mathbf{x}\mid\mathbf{z})$
+};
+
+\draw[flow] (x1) -- (enc1);
+\draw[stochastic] (enc1) -- (draw1);
+\draw[flow] (draw1) -- (dec1);
+
+\node[align=center,text width=8.8cm] at (4.75,-0.95) {
+把采样视为黑盒随机操作，会遮蔽通往编码器参数 $\phi$ 的常规路径式反向传播通路。
+};
+\end{scope}
+
+% ---------------- Reparameterised sampling ----------------
+\begin{scope}[shift={(-6.15,-4.55)}]
+\node[font=\normalsize\bfseries] at (4.75,2.05)
+  {(b) 重参数化采样};
+
+\node[tinybox] (x2) at (0,0.55) {$\mathbf{x}$};
+\node[box] (enc2) at (3.0,0.55) {
+  编码器\\[-1pt]
+  $\boldsymbol{\mu}_{\phi}(\mathbf{x}),
+   \boldsymbol{\sigma}_{\phi}(\mathbf{x})$
+};
+\node[tinybox] (eps) at (3.0,-1.05) {
+  $\boldsymbol{\epsilon}\sim
+  \mathcal{N}(\mathbf{0},\mathbf{I})$
+};
+\node[box] (combine) at (6.25,0.55) {
+  确定性变换\\[-1pt]
+  $\mathbf{z}
+  =
+  \boldsymbol{\mu}_{\phi}
+  +
+  \boldsymbol{\sigma}_{\phi}
+  \odot\boldsymbol{\epsilon}$
+};
+\node[box] (dec2) at (9.5,0.55) {
+  解码器\\[-1pt]
+  $p_{\theta}(\mathbf{x}\mid\mathbf{z})$
+};
+
+\draw[flow] (x2) -- (enc2);
+\draw[flow] (enc2) -- (combine);
+\draw[flow] (eps) -- (combine);
+\draw[flow] (combine) -- (dec2);
+
+\node[align=center,text width=8.8cm] at (4.75,-2.15) {
+在固定 $\boldsymbol{\epsilon}$ 时，$\mathbf{z}$ 是编码器输出的确定性可微函数，因此显式提供了通往 $\phi$ 的路径式梯度。
+};
+\end{scope}
+
+\end{tikzpicture}
+\caption{\textbf{重参数化技巧把随机性与编码器参数分离。}
+直接从 $\mathbf{z}\sim q_{\phi}(\mathbf{z}\mid\mathbf{x})$ 采样，会使穿过采样步骤的常规路径式梯度变得不明显。改为采样与参数无关的 $\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\mathbf{I})$，并令 $\mathbf{z}=\boldsymbol{\mu}_{\phi}(\mathbf{x})+\boldsymbol{\sigma}_{\phi}(\mathbf{x})\odot\boldsymbol{\epsilon}$，既保持同一个高斯分布，又使固定噪声样本下的 $\mathbf{z}$ 对编码器输出可微。}
+\label{fig:vae-reparameterisation}
+\end{figure}

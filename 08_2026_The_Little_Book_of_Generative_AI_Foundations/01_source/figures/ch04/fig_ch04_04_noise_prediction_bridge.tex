@@ -1,0 +1,102 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  box/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=6pt,
+    text width=5.45cm,
+    minimum height=1.38cm
+  },
+  narrow/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=6pt,
+    text width=4.15cm,
+    minimum height=1.15cm
+  },
+  flow/.style={->,thick}
+]
+
+\node[box] (true) at (2.9,1.45) {
+\textbf{精确反向后验均值}\\[3pt]
+$\displaystyle
+\tilde{\boldsymbol{\mu}}_t
+=
+\frac{1}{\sqrt{\alpha_t}}
+\left(
+\mathbf{x}_t-
+\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}
+\,\boldsymbol{\epsilon}
+\right)$
+};
+
+\node[box] (learned) at (9.1,1.45) {
+\textbf{学习到的反向均值}\\[3pt]
+$\displaystyle
+\boldsymbol{\mu}_{\theta}
+=
+\frac{1}{\sqrt{\alpha_t}}
+\left(
+\mathbf{x}_t-
+\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}
+\,\boldsymbol{\epsilon}_{\theta}(\mathbf{x}_t,t)
+\right)$
+};
+
+\draw[flow] (true) -- (learned);
+
+\node[narrow] (samevar) at (2.9,-0.95) {
+\textbf{共享的固定方差}\\[2pt]
+$q:\ \tilde{\beta}_t\mathbf I
+\qquad
+p_\theta:\ \tilde{\beta}_t\mathbf I$
+};
+
+\node[narrow] (meanmse) at (9.1,-0.95) {
+\textbf{高斯 KL 化为\\均值匹配}\\[2pt]
+$\displaystyle
+\mathrm{KL}(q\,\|\,p_\theta)
+\propto
+\|\tilde{\boldsymbol{\mu}}_t-\boldsymbol{\mu}_\theta\|^2$
+};
+
+\draw[flow] (true.south) -- (samevar.north);
+\draw[flow] (learned.south) -- (meanmse.north);
+\draw[flow] (samevar) -- (meanmse);
+
+\node[box] (noise) at (6.0,-3.45) {
+\textbf{共享系数只留下时间依赖的缩放}\\[3pt]
+$\displaystyle
+\|\tilde{\boldsymbol{\mu}}_t-\boldsymbol{\mu}_\theta\|^2
+\propto
+\|\boldsymbol{\epsilon}
+-\boldsymbol{\epsilon}_{\theta}(\mathbf{x}_t,t)\|^2$
+};
+
+\draw[flow] (meanmse) -- (noise);
+
+\node[narrow] (simple) at (6.0,-5.95) {
+\textbf{实用 DDPM 目标}\\[3pt]
+$\displaystyle
+\mathcal L_{\mathrm{simple}}
+=
+\mathbb E
+\left[
+\|\boldsymbol{\epsilon}
+-\boldsymbol{\epsilon}_{\theta}(\mathbf{x}_t,t)\|^2
+\right]$
+};
+
+\draw[flow] (noise) -- (simple);
+
+\end{tikzpicture}
+
+\caption{\textbf{从精确后验匹配到噪声预测。}
+把精确反向均值与学习到的反向均值写成同一形式，并使用相同的固定方差，局部高斯 KL 就转化为均值平方误差匹配。由于两者共享系数，该目标进一步化为真实噪声 $\boldsymbol{\epsilon}$ 与其预测 $\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)$ 之间带时间权重的平方误差。常用的 $\mathcal{L}_{\mathrm{simple}}$ 目标会去掉这一时间依赖权重。}
+\label{fig:ddpm-noise-prediction-bridge}
+\end{figure}

@@ -1,0 +1,82 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,>=Latex,font=\small]
+\def\thetacur{2.0}
+\def\thetanext{2.714}
+
+% Common schematic functions:
+% log likelihood: 3 - 0.25(theta-3)^2
+% post-E ELBO: likelihood - 0.10(theta-2)^2
+% loose pre-E ELBO: likelihood - 0.60 - 0.15(theta-1.5)^2
+
+% Panel (a): E-step
+\begin{scope}[shift={(0,0)}]
+  \draw[->] (0,0) -- (5.0,0) node[right] {$\theta$};
+  \draw[->] (0,0) -- (0,3.35);
+
+  \draw[thick] plot[domain=0.3:4.7,samples=100]
+    (\x,{3 - 0.25*(\x-3)^2});
+  \node[anchor=west] at (3.25,3.02) {$\log p(\mathbf{x};\theta)$};
+
+  \draw[dashed] plot[domain=0.3:4.7,samples=100]
+    (\x,{3 - 0.25*(\x-3)^2 - 0.60 - 0.15*(\x-1.5)^2});
+  \node[anchor=west] at (0.55,0.92) {$\mathcal{L}(Q,\theta;\mathbf{x})$};
+
+  \draw[thick,dash dot] plot[domain=0.3:4.7,samples=100]
+    (\x,{3 - 0.25*(\x-3)^2 - 0.10*(\x-2)^2});
+  \node[anchor=west] at (3.15,2.12)
+    {$\mathcal{L}(Q^{(t)},\theta;\mathbf{x})$};
+
+  \draw[densely dotted] (\thetacur,0) -- (\thetacur,2.75);
+  \fill (\thetacur,2.75) circle (1.4pt);
+  \node[below] at (\thetacur,0) {$\theta^{(t)}$};
+
+  \draw[->] (1.45,1.28) .. controls (1.35,1.80) and (1.55,2.25) .. (1.90,2.62);
+  \node[align=center] at (0.95,1.80) {\scriptsize 更新\\[-1pt]\scriptsize $Q$};
+
+  \node[font=\small\bfseries] at (2.5,3.72) {(a) E 步：收紧下界};
+\end{scope}
+
+% Panel (b): M-step
+\begin{scope}[shift={(7.0,0)}]
+  \draw[->] (0,0) -- (5.0,0) node[right] {$\theta$};
+  \draw[->] (0,0) -- (0,3.35);
+
+  \draw[thick] plot[domain=0.3:4.7,samples=100]
+    (\x,{3 - 0.25*(\x-3)^2});
+  \node[anchor=west] at (3.25,3.02) {$\log p(\mathbf{x};\theta)$};
+
+  % Exactly the same post-E-step bound as in panel (a)
+  \draw[thick,dash dot] plot[domain=0.3:4.7,samples=100]
+    (\x,{3 - 0.25*(\x-3)^2 - 0.10*(\x-2)^2});
+  \node[anchor=west] at (3.15,2.12)
+    {$\mathcal{L}(Q^{(t)},\theta;\mathbf{x})$};
+
+  \draw[densely dotted] (\thetacur,0) -- (\thetacur,2.75);
+  \draw[densely dotted] (\thetanext,0) -- (\thetanext,2.929);
+  \fill (\thetacur,2.75) circle (1.4pt);
+  \fill (\thetanext,2.929) circle (1.4pt);
+
+  \node[below,xshift=-4pt] at (\thetacur,0) {$\theta^{(t)}$};
+  \node[below,xshift=7pt] at (\thetanext,0) {$\theta^{(t+1)}$};
+
+  \draw[->,thick] (2.08,2.78) -- (2.62,2.92);
+
+  \node[font=\small\bfseries] at (2.5,3.72) {(b) M 步：抬高下界};
+\end{scope}
+
+\node[align=center] at (6.0,-0.92) {
+$\displaystyle
+\log p(\mathbf{x};\theta^{(t+1)})
+\ge
+\mathcal{L}(Q^{(t)},\theta^{(t+1)};\mathbf{x})
+\ge
+\mathcal{L}(Q^{(t)},\theta^{(t)};\mathbf{x})
+=
+\log p(\mathbf{x};\theta^{(t)})$};
+
+\end{tikzpicture}
+\caption{\textbf{把 EM 理解为对 ELBO 的交替优化。}
+在 E 步中，把 $Q$ 设为精确后验，使 ELBO 在当前参数处与对数似然相切。固定这一界后，M 步更新参数以提高该下界。下方不等式说明完整的一次迭代不会降低观测数据的对数似然。曲线仅为示意。}
+\label{fig:em-elbo-geometry}
+\end{figure}

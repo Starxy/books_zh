@@ -1,0 +1,7 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/ch04/figure4_3_true_reverse_posterior_gaussian_fusion.pdf}
+\caption{\textbf{把精确反向后验理解为高斯融合。}
+在固定 $\mathbf{x}_0$ 与 $\mathbf{x}_t$ 时，前向边缘分布 $q(\mathbf{x}_{t-1}\mid\mathbf{x}_0)$ 与转移似然 $q(\mathbf{x}_t\mid\mathbf{x}_{t-1})$（把后者视为 $\mathbf{x}_{t-1}$ 的函数）给出两个高斯因子。二者乘积得到 $q(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)$。一维图展示了各向同性多变量情形中同样的逐分量计算。}
+\label{fig:ddpm-true-reverse-posterior}
+\end{figure}

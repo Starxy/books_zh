@@ -1,0 +1,43 @@
+\begin{center}
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  box/.style={draw,rounded corners=2pt,align=center,inner sep=5pt,
+             text width=3.05cm,minimum height=1.15cm},
+  flow/.style={->,thick}
+]
+\node[font=\normalsize\bfseries] at (6.0,2.75)
+  {线性代数基础概览};
+
+\node[box] (mat) at (1.7,0.95) {
+  \textbf{把矩阵理解为变换}\\[3pt]
+  {\scriptsize 基向量的像决定\\整个线性映射}
+};
+\node[box] (proj) at (6.0,0.95) {
+  \textbf{内积与投影}\\[3pt]
+  {\scriptsize 对齐程度 $\rightarrow$ 所选方向\\上的坐标}
+};
+\node[box] (eig) at (10.3,0.95) {
+  \textbf{特征向量与特征值}\\[3pt]
+  {\scriptsize 自然方向\\与缩放强度}
+};
+\draw[flow] (mat) -- (proj);
+\draw[flow] (proj) -- (eig);
+
+\node[box] (pca) at (10.3,-2.30) {
+  \textbf{PCA}\\[3pt]
+  {\scriptsize 最大方差\\主子空间}
+};
+\node[box] (basis) at (6.0,-2.30) {
+  \textbf{基变换与 SVD}\\[3pt]
+  {\scriptsize 对角化协方差\\并揭示结构}
+};
+\node[box] (ae) at (1.7,-2.30) {
+  \textbf{重构桥梁}\\[3pt]
+  {\scriptsize 自编码器\\流形\\概率}
+};
+\draw[flow] (eig) -- (pca);
+\draw[flow] (pca) -- (basis);
+\draw[flow] (basis) -- (ae);
+\end{tikzpicture}
+\end{center}

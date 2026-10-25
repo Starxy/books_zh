@@ -1,0 +1,1553 @@
+\chapter{去噪扩散概率模型}
+\section*{概述}
+\addcontentsline{toc}{section}{概述}
+
+扩散模型是现代生成模型中最重要的模型族之一，在广泛的应用中取得了出色性能，尤其是在图像生成领域。
+其核心思想简单而强大：不是一步生成一个样本，而是学习通过一系列去噪操作，将噪声逐渐转化为具有结构的数据。
+
+本章聚焦于离散时间的\emph{去噪扩散概率模型}（Denoising Diffusion Probabilistic Model，DDPM）框架~\cite{ho2020denoising}，它为这一思想提供了最清晰的概率建模形式之一。
+从历史上看，基于扩散的生成建模由 Sohl-Dickstein 等人~\cite{sohl2015deep} 开创，其灵感来自物理学中的一些过程，尤其是随机性随时间逐渐累积的过程。
+例如在物理世界中，一滴墨水进入水中后会缓慢扩散，直到原有结构与周围环境难以区分。
+扩散模型借用了这种直觉，并将过程反转：我们不再观察有序结构如何消解为噪声，而是学习如何从噪声出发，逐步重建结构。
+
+不过在本书中，我们首先从 PPCA 与 VAE 已经建立的概率建模和潜变量视角来理解扩散模型。
+这为后续引入连续时间动力学视角提供了一个自然入口。
+随后在第~5 章中，我们将重新讨论相关的微积分、动力系统以及密度演化视角，并在第~6 章逐步构建更连续的解释。
+
+从方法论角度看，扩散模型与此前的潜变量模型仍具有重要的结构联系。
+关键区别在于：扩散模型并不只使用一个潜变量或一次随机编码，而是引入一整条随时间相连的潜状态序列。
+实践中，这使扩散模型包含两个彼此衔接的阶段：一个固定的前向过程，将数据逐步扰动为噪声；以及一个学习得到的反向去噪过程，从噪声逐步恢复结构。
+这种时间化设计赋予模型更强的灵活性，同时也改变了推断与学习的形式。
+
+\section*{概念导图}
+\addcontentsline{toc}{section}{概念导图}
+
+本章延续前面章节的建模逻辑，利用潜变量、后验推断和变分学习来解释序贯加噪与去噪过程。
+
+\begin{itemize}
+
+    \item[\(\rightarrow\)] \textbf{首先从前向扩散过程开始。}
+    干净样本 $\mathbf{x}_0$ 在 $T$ 个步骤中逐渐受到高斯噪声污染，形成潜在轨迹
+    $\mathbf{x}_1,\dots,\mathbf{x}_T$。
+    这定义了一条固定的马尔可夫链，并给出了任意噪声状态 $\mathbf{x}_t$ 与原始样本 $\mathbf{x}_0$ 之间的闭式关系。
+
+    \item[\(\rightarrow\)] \textbf{随后把反向过程引入为需要学习的生成模型。}
+    模型从时刻 $T$ 的简单高斯先验出发，学习一条反向去噪链，以恢复数据分布。
+    这条反向链是扩散模型中的未知部分，也是学习的主要对象。
+
+    \item[\(\rightarrow\)] \textbf{接着，把扩散模型改写为 ELBO 形式。}
+    观测变量是干净样本 $\mathbf{x}_0$，潜变量则是整条轨迹 $\mathbf{x}_{1:T}$。
+    已知的前向过程在 ELBO 中扮演辅助分布的角色，从而把难以直接处理的似然转化为可处理的下界。
+
+    \item[\(\rightarrow\)] \textbf{然后，将 ELBO 分解为局部去噪项。}
+    由此可以看出，每个时间步上真正需要训练的量，是学习得到的反向转移
+    $p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$ 与真实逆后验
+    $q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)$ 之间的差异。
+
+    \item[\(\rightarrow\)] \textbf{随后推导真实逆后验，并在噪声域中重新表达。}
+    由于前向过程是高斯过程，真实逆后验同样是高斯分布。
+    通过噪声变量对其均值进行重参数化，可以消除对 $\mathbf{x}_0$ 的显式依赖，并得到标准 DDPM 参数化。
+
+    \item[\(\rightarrow\)] \textbf{最后得到实际使用的 DDPM 目标与生成过程。}
+    学习问题可简化为噪声预测，因此训练变成对高斯噪声的回归任务；而采样则成为一个迭代去噪过程，将纯噪声逐步转化为数据样本。
+
+\end{itemize}
+
+\medskip
+\noindent 下图对 DDPM 的核心概率结构进行了可视化概括。
+\input{figures/ch04/chapter4_ddpm_at_a_glance}
+\medskip
+
+\section{前向扩散过程：从数据到噪声}
+
+扩散模型与此前学习的生成框架相比，有一个重要不同。
+在 PPCA 和 VAE 中，每个观测通常通过一个相对直接的潜在表示来描述。
+相比之下，在扩散模型中，一个数据点对应于一个\emph{潜状态序列}，它记录了随时间逐渐发生的变换。
+因此，生成不再是一次性的解码步骤，而是一条轨迹。
+
+从整体上看，DDPM 包含两个互补过程。
+\textbf{前向过程}逐渐破坏干净数据样本 $\mathbf{x}_0$，直到它几乎成为纯高斯噪声。
+\textbf{反向过程}，也就是\textbf{去噪过程}，试图逐步撤销这种破坏：从噪声出发，一步步恢复具有结构的样本。
+
+我们先从模型中较简单的一半——前向过程——开始。
+在扩散模型文献中，这一过程通常记为 $q$。
+它是固定且已知的，而不是从数据中学习得到的。
+它的作用是规定如何在 $T$ 个离散时间步中逐渐扰动干净样本 $\mathbf{x}_0$，得到一系列噪声越来越强的潜状态
+\[
+\mathbf{x}_1,\mathbf{x}_2,\dots,\mathbf{x}_T.
+\]
+
+\subsection{高斯加噪与前向过程的闭式形式}
+
+\paragraph{逐步高斯加噪过程。}
+设 $\mathbf{x}_0$ 表示一个观测数据样本。
+前向扩散过程在每一步加入少量高斯噪声，从而产生上述序列。
+形式上，从 $\mathbf{x}_{t-1}$ 到 $\mathbf{x}_t$ 的转移定义为
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_t \mid
+\sqrt{1-\beta_t}\,\mathbf{x}_{t-1},
+\beta_t\mathbf{I}
+\bigr),
+\]
+其中 $\beta_t\in(0,1)$ 控制第 $t$ 步注入多少噪声。
+
+等价地，同一步骤可以写成
+\[
+\mathbf{x}_t
+=
+\sqrt{1-\beta_t}\,\mathbf{x}_{t-1}
++
+\sqrt{\beta_t}\,\mathbf{z}_t,
+\qquad
+\mathbf{z}_t\sim\mathcal{N}(\mathbf{0},\mathbf{I}).
+\]
+这个更新有一个直观解释：
+$\sqrt{1-\beta_t}$ 保留上一状态中的一部分信号，而
+$\sqrt{\beta_t}$ 对当前步骤新加入的高斯扰动进行缩放。
+因此，每个新状态 $\mathbf{x}_t$ 都比前一个状态稍微更嘈杂。
+
+这里，$\beta_t$ 控制第 $t$ 步加入多少新的高斯噪声，因而也决定了随着过程推进，原始数据结构被破坏的速度。
+
+\paragraph{$\mathbf{x}_t$ 与 $\mathbf{x}_0$ 之间的闭式联系。}
+上述单步规则描述了 $\mathbf{x}_t$ 如何依赖 $\mathbf{x}_{t-1}$，但在很多情况下，更有用的是直接建立 $\mathbf{x}_t$ 与原始干净样本 $\mathbf{x}_0$ 的关系。
+事实证明，这是前向扩散过程最有用的性质之一，因为它允许我们直接跳到任意时间步 $t$，而无需模拟整条链。
+
+从
+\[
+\mathbf{x}_t
+=
+\sqrt{1-\beta_t}\,\mathbf{x}_{t-1}
++
+\sqrt{\beta_t}\,\mathbf{z}_t,
+\qquad
+\mathbf{z}_t\sim\mathcal{N}(\mathbf{0},\mathbf{I}),
+\]
+出发，我们可以递归地把较早时间步代入后面的时间步。
+
+例如，
+\[
+\begin{aligned}
+\mathbf{x}_1
+&=
+\sqrt{1-\beta_1}\,\mathbf{x}_0
++
+\sqrt{\beta_1}\,\mathbf{z}_1,\\[4pt]
+\mathbf{x}_2
+&=
+\sqrt{1-\beta_2}\,\mathbf{x}_1
++
+\sqrt{\beta_2}\,\mathbf{z}_2.
+\end{aligned}
+\]
+将第一式代入第二式可得
+\[
+\mathbf{x}_2
+=
+\sqrt{(1-\beta_2)(1-\beta_1)}\,\mathbf{x}_0
++
+\sqrt{1-\beta_2}\sqrt{\beta_1}\,\mathbf{z}_1
++
+\sqrt{\beta_2}\,\mathbf{z}_2.
+\]
+
+此时定义
+\[
+\alpha_t = 1-\beta_t,
+\qquad
+\bar{\alpha}_t = \prod_{s=1}^{t}\alpha_s.
+\]
+其中，$\alpha_t$ 是第 $t$ 步的信号保留因子，而 $\bar{\alpha}_t$ 是截至时刻 $t$ 的累积信号保留因子。
+
+现在规律已经很清楚。
+每增加一个时间步，剩余信号都会再乘上一个因子
+$\sqrt{1-\beta_t}=\sqrt{\alpha_t}$，同时加入新的高斯扰动。
+经过 $t$ 步之后，从 $\mathbf{x}_0$ 继承下来的信号因此被缩放为
+\[
+\prod_{s=1}^{t}\sqrt{1-\beta_s}
+=
+\prod_{s=1}^{t}\sqrt{\alpha_s}
+=
+\sqrt{\bar{\alpha}_t}.
+\]
+
+与此同时，许多彼此独立的高斯噪声项可以合并成一个整体高斯变量。
+由于独立高斯变量的加权和仍然是高斯变量，累积噪声可以写成一个标准高斯变量，再由总方差因子 $1-\bar{\alpha}_t$ 进行缩放。
+于是得到闭式关系
+\[
+\mathbf{x}_t
+=
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0
++
+\sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon},
+\qquad
+\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\mathbf{I}).
+\]
+
+以概率分布形式写为
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+=
+\mathcal{N}\!\left(
+\mathbf{x}_t \mid
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,\,
+(1-\bar{\alpha}_t)\mathbf{I}
+\right).
+\]
+
+这里的记号很重要：
+\begin{itemize}
+    \item $\mathbf{z}_t$ 表示第 $t$ 步新加入的\emph{局部}高斯噪声；
+    \item $\boldsymbol{\epsilon}$ 表示\emph{整体累积}噪声，它概括了截至时刻 $t$ 的所有加噪步骤的综合作用。
+\end{itemize}
+
+上述闭式表达非常有用。
+它告诉我们，经过 $t$ 步之后，样本 $\mathbf{x}_t$ 中仍保留原始信号的
+$\sqrt{\bar{\alpha}_t}$ 比例，而剩余部分已经被高斯噪声取代。
+当 $t=0$ 时，$\bar{\alpha}_0=1$，因此 $\mathbf{x}_t=\mathbf{x}_0$。
+当 $t=T$ 足够大，使得 $\bar{\alpha}_T\approx 0$ 时，反复的高斯扰动已经冲淡原始结构，使样本接近各向同性高斯噪声。
+
+这种 $\mathbf{x}_t$ 与 $\mathbf{x}_0$ 之间的直接关系会使后续训练高效得多，因为我们可以在任意时间步直接采样噪声状态，而无需模拟整条轨迹。
+
+图~\ref{fig:ddpm-forward-closed-form} 对这两种效应进行了可视化总结：随着噪声系数增大，信号系数逐渐减小，而边缘分布也逐渐失去其原始结构。
+
+\input{figures/ch04/fig_ch04_01_forward_diffusion}
+
+\subsection{前向链与马尔可夫假设}
+
+由于扩散过程引入了一整条潜状态序列，完整的前向轨迹可以由联合分布
+\[
+q(\mathbf{x}_{0:T}) = q(\mathbf{x}_0)\,q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)
+\]
+描述。
+根据概率的链式法则，
+\[
+q(\mathbf{x}_{0:T})
+=
+q(\mathbf{x}_0)
+\prod_{t=1}^{T}
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_{t-2},\dots,\mathbf{x}_0).
+\]
+
+关键的简化假设是前向过程具有\textbf{马尔可夫性}。
+这意味着每个新状态只依赖于紧邻的前一状态：
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_{t-2},\dots,\mathbf{x}_0)
+=
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1}).
+\]
+因此，完整的前向分布可分解为
+\[
+q(\mathbf{x}_{0:T})
+=
+q(\mathbf{x}_0)\prod_{t=1}^{T}q(\mathbf{x}_t\mid \mathbf{x}_{t-1}).
+\]
+
+这使前向过程在数学上易于处理和分析。
+但它并不是主要的学习对象。
+一旦数据样本 $\mathbf{x}_0$ 和噪声调度
+$\{\beta_t\}_{t=1}^{T}$ 给定，前向过程 $q$ 就完全已知。
+
+\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={前向过程小结},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_t\mid
+\sqrt{1-\beta_t}\,\mathbf{x}_{t-1},
+\beta_t\mathbf{I}
+\bigr),
+\qquad
+\alpha_t=1-\beta_t,
+\qquad
+\bar{\alpha}_t=\prod_{s=1}^{t}\alpha_s.
+\]
+
+\[
+\mathbf{x}_t
+=
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0
++
+\sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon},
+\qquad
+\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\mathbf{I}),
+\]
+因此等价地有
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+=
+\mathcal{N}\!\left(
+\mathbf{x}_t\mid
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,\,
+(1-\bar{\alpha}_t)\mathbf{I}
+\right).
+\]
+
+\[
+q(\mathbf{x}_{0:T})
+=
+q(\mathbf{x}_0)\prod_{t=1}^{T}q(\mathbf{x}_t\mid \mathbf{x}_{t-1}).
+\]
+\end{tcolorbox}
+
+然而，对生成而言真正重要的是\textbf{反向}过程，也就是\textbf{去噪}过程：
+从一个随机高斯点出发，逐渐重建出类似真实数据的样本。
+这一反向过程没有已知的解析形式，必须学习，通常由神经网络来参数化。
+为了理解它，我们现在重新引入前面发展出的 ELBO 与变分推断工具，并将其适配到这一随时间变化的潜变量序列，从而使反向过程能够被表达、分析并最终训练。
+
+\section{反向过程与 ELBO 形式化}
+
+前向过程为我们提供了一种固定且易处理的方法：把干净数据样本 $\mathbf{x}_0$ 变换成噪声逐渐增大的潜状态序列
+$\mathbf{x}_1,\dots,\mathbf{x}_T$，最终接近高斯噪声。
+但这一过程并不是我们真正想学习的部分。
+对于生成而言，重要的是相反的方向：从噪声出发逐步恢复结构。
+这就是\textbf{反向过程}的作用，通常记为 $p$。
+
+从整体上看，反向过程试图撤销前向链引入的扰动。
+它从一个简单的高斯样本 $\mathbf{x}_T$ 开始，逐步生成
+$\mathbf{x}_{T-1},\mathbf{x}_{T-2},\dots,\mathbf{x}_0$，目标是使最终状态 $\mathbf{x}_0$ 看起来像真实的数据样本。
+换句话说，如果前向过程沿着
+\[
+\mathbf{x}_0 \longrightarrow \mathbf{x}_1 \longrightarrow \cdots \longrightarrow \mathbf{x}_T
+\]
+演化，那么反向过程要建模的就是相反方向
+\[
+\mathbf{x}_T \longrightarrow \mathbf{x}_{T-1} \longrightarrow \cdots \longrightarrow \mathbf{x}_0.
+\]
+
+\subsection{需要学习的反向链}
+
+为了从概率角度描述生成，我们引入一个参数化的反向过程。
+根据一般的概率链式法则，整条反向轨迹的联合分布原则上可以写成
+\[
+\begin{aligned}
+p_\theta(\mathbf{x}_{0:T})
+&= p_\theta(\mathbf{x}_0,\mathbf{x}_{1:T}) \\[4pt]
+&= p_\theta(\mathbf{x}_0\mid \mathbf{x}_{1:T})\,p_\theta(\mathbf{x}_{1:T}) \\[4pt]
+&= p_\theta(\mathbf{x}_0\mid \mathbf{x}_{1:T})\,
+   p_\theta(\mathbf{x}_1\mid \mathbf{x}_{2:T})\,
+   p_\theta(\mathbf{x}_{2:T}) \\[4pt]
+&= p_\theta(\mathbf{x}_0\mid \mathbf{x}_{1:T})\,
+   p_\theta(\mathbf{x}_1\mid \mathbf{x}_{2:T})\,
+   p_\theta(\mathbf{x}_2\mid \mathbf{x}_{3:T})\,
+   \cdots\,
+   p_\theta(\mathbf{x}_{T-1}\mid \mathbf{x}_T)\,
+   p(\mathbf{x}_T).
+\end{aligned}
+\]
+这是最一般的展开形式：每个更早的状态都可能依赖所有更晚的状态。
+
+不过在扩散模型中，我们与前向过程一样采用简化假设，认为反向链同样具有\textbf{马尔可夫性}。
+即
+\[
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_{t:T})
+=
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t).
+\]
+在这一一阶马尔可夫假设下，反向联合分布简化为
+\[
+p_\theta(\mathbf{x}_{0:T})
+=
+p(\mathbf{x}_T)\prod_{t=1}^{T} p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t).
+\]
+这个表达式应当从右向左阅读。
+我们先从最终时间步的一个简单先验开始，通常取
+\[
+p(\mathbf{x}_T)=\mathcal{N}(\mathbf{0},\mathbf{I}),
+\]
+然后连续应用学习得到的反向转移
+$p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$，直到最终得到时刻 $0$ 的样本。
+
+这就是模型中关键的未知对象。
+前向过程 $q$ 在选定噪声调度 $\{\beta_t\}$ 后就完全确定，而反向转移并没有已知的闭式形式，因此必须从数据中学习。
+实践中，参数 $\theta$ 属于一个神经网络，该网络将被训练来建模这些反向去噪步骤。
+
+\subsection{为什么反向过程很困难}
+
+乍看之下，我们似乎只需要把前向规则直接反转即可。
+但事情并没有这么简单。
+尽管前向转移
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1})
+\]
+是高斯分布且有明确解析定义，相应的反向转移
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\]
+却不能直接以可用的形式得到。
+
+原因可以通过贝叶斯公式看出：
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+=
+\frac{
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1})\,q(\mathbf{x}_{t-1})
+}{
+q(\mathbf{x}_t)
+}.
+\]
+前向条件分布 $q(\mathbf{x}_t\mid \mathbf{x}_{t-1})$ 是按构造已知的。
+困难在于边缘分布 $q(\mathbf{x}_{t-1})$ 与 $q(\mathbf{x}_t)$。
+它们并不是人为指定的简单固定高斯分布，而是由未知数据分布 $q(\mathbf{x}_0)$ 经过前向加噪链推送后诱导得到的。
+因此，尽管单个前向步骤很简单，真实反向条件分布却隐式依赖底层数据分布，无法作为一个可直接计算或采样的简单规则使用。
+
+当考虑基于似然的学习时，还会出现第二个困难。
+模型定义了整条反向轨迹 $\mathbf{x}_{0:T}$ 上的联合分布，但我们最终关心的是观测到的干净数据的边缘似然：
+\[
+p_\theta(\mathbf{x}_0)
+=
+\int p_\theta(\mathbf{x}_{0:T})\,d\mathbf{x}_{1:T}.
+\]
+这正是此前潜变量模型中边缘似然在扩散模型中的对应形式。
+观测变量是干净样本 $\mathbf{x}_0$，而整条轨迹 $\mathbf{x}_{1:T}$ 扮演潜变量的角色，必须被积分消去。
+
+$p_\theta(\mathbf{x}_0)$ 是我们希望学习和优化的关键量，因为它衡量模型给真实数据样本赋予了多大概率。
+如果一个生成模型能够为观测数据赋予较高概率，就意味着它对数据域上的分布学得较好。
+然而在扩散模型中，这个边缘似然只通过反向链
+\[
+p_\theta(\mathbf{x}_{0:T})
+=
+p(\mathbf{x}_T)\prod_{t=1}^{T} p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\]
+间接定义。
+所以，把反向转移 $p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$ 学好，正是我们构建一个能够给 $\mathbf{x}_0$ 赋予高似然模型的方式。
+
+困难在于，计算 $p_\theta(\mathbf{x}_0)$ 需要对整条潜在轨迹 $\mathbf{x}_{1:T}$ 积分。
+由于这条轨迹既是高维的，又带有时间索引，这个积分通常不可处理。
+
+因此，正如 VAE 中一样，核心学习问题变成：
+\begin{quote}
+\emph{当精确边缘似然不存在闭式形式时，我们应如何优化模型？}
+\end{quote}
+答案仍然是使用\textbf{证据下界（ELBO）}。
+
+\subsection{扩散模型的 ELBO}
+\paragraph{在扩散模型中重新表达 ELBO。}
+此时，把扩散模型重新与前面章节建立的一般 ELBO 框架联系起来会很有帮助。
+
+在 PPCA 和 VAE 中，我们把边缘似然写成一般的潜变量形式
+\[
+p(\mathbf{x}) = \int p(\mathbf{x},\mathbf{z})\,d\mathbf{z},
+\]
+其中 $\mathbf{x}$ 是观测变量，$\mathbf{z}$ 是潜变量。
+在扩散模型中，同样的结构仍然存在，只是记号具体化为
+\[
+\mathbf{x}\;\longrightarrow\;\mathbf{x}_0,
+\qquad
+\mathbf{z}\;\longrightarrow\;\mathbf{x}_{1:T}.
+\]
+也就是说，观测变量是干净数据样本 $\mathbf{x}_0$，而潜变量不再是单一编码，而是整条噪声轨迹 $\mathbf{x}_{1:T}$。
+
+因此，边缘似然写成
+\[
+p_\theta(\mathbf{x}_0)
+=
+\int p_\theta(\mathbf{x}_{0:T})\,d\mathbf{x}_{1:T}.
+\]
+
+在一般的 ELBO 推导中，我们还会在潜变量上引入一个辅助分布 $Q(\mathbf{z})$。
+在扩散模型中，这一角色自然由
+\[
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)
+\]
+承担，即\emph{以观测数据为条件的已知前向过程}。
+
+这一点值得强调。
+在 VAE 中，由于真实后验难以处理且没有闭式编码器，辅助分布必须以学习得到的近似
+$q_\phi(\mathbf{z}\mid \mathbf{x})$ 的形式引入。
+而扩散模型的情况不同：
+一旦给定 $\mathbf{x}_0$，前向加噪过程已经为整条潜在轨迹提供了完整的条件分布。
+也就是说，对给定的干净数据点 $\mathbf{x}_0$，模型已经精确规定了如何采样其噪声版本
+$\mathbf{x}_1,\mathbf{x}_2,\dots,\mathbf{x}_T$。
+所以，ELBO 所需要的辅助分布并不是额外叠加在模型之上的学习结构；它已经作为前向扩散过程本身内置在模型中。
+
+这是扩散模型非常简洁优雅的性质之一。
+“变分分布”已经直接可得：
+\[
+Q(\mathbf{Z})
+\;\longrightarrow\;
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0).
+\]
+换言之，扩散模型不需要像 VAE 那样额外学习一个用于潜变量的独立编码器网络。
+已知前向过程本身已经提供了 ELBO 所需的潜状态条件分布。
+
+\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={ELBO 形式下的扩散模型各量},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+\[
+\text{观测变量： }\mathbf{x}\rightarrow \mathbf{x}_0,
+\qquad
+\text{潜变量： }\mathbf{z}\rightarrow \mathbf{x}_{1:T}.
+\]
+
+\[
+\text{学习得到的生成联合分布：}\;
+p(\mathbf{x},\mathbf{z})
+\rightarrow
+p_\theta(\mathbf{x}_{0:T})
+=
+p(\mathbf{x}_T)\prod_{t=1}^{T} p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t).
+\]
+
+\[
+\text{辅助/变分分布：}\;
+Q(\mathbf{z})
+\rightarrow
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0),
+\]
+它由前向扩散过程直接给出。
+
+\[
+\text{边缘似然：}\;
+p_\theta(\mathbf{x}_0)
+=
+\int p_\theta(\mathbf{x}_{0:T})\,d\mathbf{x}_{1:T},
+\]
+由于需要边缘化整条潜在轨迹，这一量通常难以直接计算。
+\end{tcolorbox}
+
+\paragraph{扩散模型的 ELBO。}
+完成上述对应之后，标准 ELBO 构造给出
+\[
+\log p_\theta(\mathbf{x}_0)
+\ge
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_{0:T})
+}{
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)
+}
+\right].
+\]
+这就是专门适用于扩散模型的 ELBO。
+
+为了在整个数据集上训练模型，我们还需要对经验数据分布 $q(\mathbf{x}_0)$ 取外层期望，也就是对干净训练样本本身取期望。
+由此得到总体目标
+\[
+\mathbb{E}_{q(\mathbf{x}_0)}
+\left[
+\log p_\theta(\mathbf{x}_0)
+\right]
+\ge
+\mathbb{E}_{q(\mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_{0:T})
+}{
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)
+}
+\right].
+\]
+
+因此，从本书前面建立的潜变量视角看，扩散模型很自然地落入同一个一般概率框架：
+它仍然是生成式潜变量模型，只不过潜变量由单个潜编码变成了带时间索引的潜变量序列。
+我们并不直接优化难以处理的边缘似然，而是利用两个组成部分构造并优化一个可处理的下界：学习得到的反向生成模型
+$p_\theta(\mathbf{x}_{0:T})$ 与已知前向过程
+$q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)$。
+
+因此，下一步的关键是展开并化简这个 ELBO，从而看清学习问题如何分解到各个扩散时间步。
+这正是下一节的目标：我们将更明确地展开反向过程，并推导逐步目标，最终得到实际使用的 DDPM 训练损失。
+
+\section{从扩散 ELBO 到逐步目标}
+
+现在，我们把上一节推导的扩散 ELBO 改写为能够直接揭示模型究竟在学习什么的形式。
+关键思想是：尽管似然涉及整条潜在轨迹 $\mathbf{x}_{1:T}$，最终目标却可以分解为一系列局部去噪步骤。
+
+\subsection{展开扩散 ELBO}
+
+\paragraph{代入前向链与反向链。}
+
+回顾已经建立的两个分解：
+\[
+p_\theta(\mathbf{x}_{0:T})
+=
+p(\mathbf{x}_T)\prod_{t=1}^{T} p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t),
+\]
+以及
+\[
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)
+=
+\prod_{t=1}^{T} q(\mathbf{x}_t\mid \mathbf{x}_{t-1}).
+\]
+如前所述，由于前向过程是以干净数据样本 $\mathbf{x}_0$ 为条件定义的，也可以等价地显式保留这一条件，写成
+\[
+q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)
+=
+\prod_{t=1}^{T} q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0).
+\]
+根据马尔可夫性质，在单步前向转移中对 $\mathbf{x}_0$ 的条件实际上是冗余的；但暂时把它保留下来，在稍后利用贝叶斯公式改写 ELBO 时会很有用。
+
+把前向链与反向链代入 ELBO，得到
+\[
+\begin{aligned}
+\mathcal{L}_{\mathrm{ELBO}}
+&=
+\mathbb{E}_{q(\mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p(\mathbf{x}_T)\prod_{t=1}^{T} p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+\prod_{t=1}^{T} q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)
+}
+\right].
+\end{aligned}
+\]
+利用对数把乘积变为求和，可写为
+\[
+\begin{aligned}
+\mathcal{L}_{\mathrm{ELBO}}
+&=
+\mathbb{E}_{q(\mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log p(\mathbf{x}_T)
++
+\sum_{t=1}^{T}
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)
+}
+\right].
+\end{aligned}
+\]
+
+乍看之下，这似乎已经是一个逐步目标。
+但它还不是最有用的形式。
+这里的分母仍然是\emph{前向}加噪分布，而模型真正试图学习的是一个\emph{反向}去噪过程。
+
+\paragraph{学习到的去噪过程应当逼近什么？}
+
+学习得到的反向转移
+\[
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\]
+就是模型的去噪规则：给定一个噪声状态 $\mathbf{x}_t$，它应当输出稍微更干净的状态 $\mathbf{x}_{t-1}$ 的分布。
+因此，自然的学习目标并不是前向扰动规则
+$q(\mathbf{x}_t\mid \mathbf{x}_{t-1})$，而是由前向过程诱导出的相应\emph{真实逆后验}。
+
+这里必须区分两个密切相关的对象：
+
+\begin{itemize}
+    \item \textbf{学习得到的反向过程}，或者说\textbf{学习得到的去噪过程}
+    \[
+    p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t),
+    \]
+    它是我们参数化并训练的模型；
+
+    \item \textbf{由前向过程诱导的真实逆后验}
+    \[
+    q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0),
+    \]
+    它是在给定干净样本 $\mathbf{x}_0$ 后，由已知加噪机制所蕴含的精确单步去噪分布。
+\end{itemize}
+
+为什么希望学习得到的去噪过程与这一后验匹配？
+因为前向过程精确规定了真实数据是如何被扰动的。
+所以在训练过程中，它也同时告诉我们，这种扰动在单步意义下“正确的逆过程”应该是什么。
+如果学习得到的反向转移在每个时间步都能够模拟真实逆后验，那么整条学习得到的反向链就有能力撤销前向加噪过程并恢复数据分布。
+
+一个细微但重要的点是：我们并不直接使用
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t).
+\]
+这个对象是由完整数据分布诱导出的无条件反向分布，并不能直接解析处理。
+然而在训练期间，干净数据样本 $\mathbf{x}_0$ 是已知的。
+因此，我们可以改用
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0),
+\]
+它是针对某个具体观测样本、由已知前向过程诱导出的条件后验。
+这正是我们显式保留 $\mathbf{x}_0$ 的原因：对观测数据进行条件化之后，相关的反向分布变得解析可处理。
+
+因此，学习反向过程的任务可以更精确地表述为：
+\begin{quote}
+\emph{在每个扩散时间步上，训练建模的去噪转移
+$p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$
+去匹配真实逆后验
+$q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)$。}
+\end{quote}
+
+\subsection{利用贝叶斯公式改写 ELBO}\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={显式得到真实逆后验的一个实用技巧},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+技巧是让所有项都显式以观测到的干净样本 $\mathbf{x}_0$ 为条件，然后应用贝叶斯公式。从前向转移
+$q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)$ 出发，在给定 $\mathbf{x}_0$ 的条件下，贝叶斯公式给出：
+\[
+\begin{aligned}
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)
+&=
+\frac{
+q(\mathbf{x}_{t-1},\mathbf{x}_t\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}=
+\frac{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)\,
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}.
+\end{aligned}
+\]
+重新整理后得到真实逆后验：
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)\,
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}.
+\]
+\end{tcolorbox}
+
+为了把这个真实逆后验引入 ELBO，我们对前向转移应用贝叶斯公式：
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)
+=
+\frac{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)\,
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}.
+\]
+把它代入 ELBO 的分母，得到
+\[
+\begin{aligned}
+\mathcal{L}_{\mathrm{ELBO}}
+&=
+\mathbb{E}_{q(\mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log p(\mathbf{x}_T)
++
+\sum_{t=1}^{T}
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)\,
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)\,
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}
+\right].
+\end{aligned}
+\]
+现在把乘积的对数拆成和：
+\[
+\begin{aligned}
+\mathcal{L}_{\mathrm{ELBO}}
+&=
+\mathbb{E}_{q(\mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log p(\mathbf{x}_T)
++
+\sum_{t=1}^{T}
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
++
+\sum_{t=1}^{T}
+\log
+\frac{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}
+\right].
+\end{aligned}
+\]
+
+第二个求和是一个望远镜求和。
+显式展开即可看出：
+\[
+\begin{aligned}
+\sum_{t=1}^{T}
+\log
+\frac{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}
+&=
+\log
+\frac{q(\mathbf{x}_0\mid \mathbf{x}_0)}{q(\mathbf{x}_1\mid \mathbf{x}_0)}
++
+\log
+\frac{q(\mathbf{x}_1\mid \mathbf{x}_0)}{q(\mathbf{x}_2\mid \mathbf{x}_0)}
++\cdots+
+\log
+\frac{q(\mathbf{x}_{T-1}\mid \mathbf{x}_0)}{q(\mathbf{x}_T\mid \mathbf{x}_0)}
+\\[6pt]
+&=
+\log\!\left[
+\frac{q(\mathbf{x}_0\mid \mathbf{x}_0)}{q(\mathbf{x}_1\mid \mathbf{x}_0)}
+\cdot
+\frac{q(\mathbf{x}_1\mid \mathbf{x}_0)}{q(\mathbf{x}_2\mid \mathbf{x}_0)}
+\cdots
+\frac{q(\mathbf{x}_{T-1}\mid \mathbf{x}_0)}{q(\mathbf{x}_T\mid \mathbf{x}_0)}
+\right]
+\\[6pt]
+&=
+\log\!\left[
+\frac{q(\mathbf{x}_0\mid \mathbf{x}_0)}{q(\mathbf{x}_T\mid \mathbf{x}_0)}
+\right] =
+\log q(\mathbf{x}_0\mid \mathbf{x}_0)
+-\log q(\mathbf{x}_T\mid \mathbf{x}_0).
+\end{aligned}
+\]
+因为所有中间项都会两两抵消。
+严格来说，$q(\mathbf{x}_0\mid \mathbf{x}_0)$ 是集中在观测值 $\mathbf{x}_0$ 处的退化分布，对应于狄拉克 delta 而不是普通概率密度。
+由于它不包含任何可学习参数，因此对目标函数只贡献一个加性常数，在优化时可以忽略。
+于是 ELBO 变为
+\[
+\begin{aligned}
+\mathcal{L}_{\mathrm{ELBO}}
+&=
+\mathbb{E}_{q(\mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log p(\mathbf{x}_T)
+-
+\log q(\mathbf{x}_T\mid \mathbf{x}_0)
++
+\sum_{t=1}^{T}
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
+\right]
++\text{常数}.
+\end{aligned}
+\]
+
+\subsection{从全局 ELBO 到局部学习项}
+
+现在，我们把 ELBO 重新组织为标准的逐步分解。
+主要需要处理两部分：
+\begin{itemize}
+    \item 与终点 $\mathbf{x}_T$ 有关的\textbf{边界项}；
+    \item 与学习得到的去噪转移
+    $p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$ 有关的\textbf{时间步项}。
+\end{itemize}
+
+从上面的表达式出发，先分离出只涉及终点 $\mathbf{x}_T$ 的部分：
+\[
+\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\big[
+\log p(\mathbf{x}_T)-\log q(\mathbf{x}_T\mid \mathbf{x}_0)
+\big].
+\]
+由于被积函数只依赖 $\mathbf{x}_T$，在前向链下可以把其他潜变量
+$\mathbf{x}_1,\dots,\mathbf{x}_{T-1}$ 全部边缘化，只留下边缘分布
+$q(\mathbf{x}_T\mid \mathbf{x}_0)$：
+\[
+\begin{aligned}
+&\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\big[
+\log p(\mathbf{x}_T)-\log q(\mathbf{x}_T\mid \mathbf{x}_0)
+\big] \\[4pt]
+&\qquad=
+\mathbb{E}_{q(\mathbf{x}_T\mid \mathbf{x}_0)}
+\!\big[
+\log p(\mathbf{x}_T)-\log q(\mathbf{x}_T\mid \mathbf{x}_0)
+\big] \\[4pt]
+&\qquad=
+-\mathbb{E}_{q(\mathbf{x}_T\mid \mathbf{x}_0)}
+\!\left[
+\log \frac{q(\mathbf{x}_T\mid \mathbf{x}_0)}{p(\mathbf{x}_T)}
+\right] \\[4pt]
+&\qquad=
+-\mathrm{KL}\!\bigl(
+q(\mathbf{x}_T\mid \mathbf{x}_0)\,\|\,p(\mathbf{x}_T)
+\bigr).
+\end{aligned}
+\]
+这就是\textbf{先验匹配项}：它比较前向过程到达最终时间步时的分布，与学习到的反向过程作为起点的简单高斯先验。
+
+接下来处理关于 $t$ 的求和。
+这里必须谨慎处理内部期望
+$\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}$。
+整个求和都位于期望内部，但每个求和项
+\[
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
+\]
+只依赖局部变量 $\mathbf{x}_{t-1}$ 和 $\mathbf{x}_t$，以及观测样本 $\mathbf{x}_0$。
+因此，对固定的 $t$，其余潜变量同样可以被边缘化掉。
+
+对于特殊情形 $t=1$，有
+\[
+\begin{aligned}
+&\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_0\mid \mathbf{x}_1)
+}{
+q(\mathbf{x}_0\mid \mathbf{x}_1,\mathbf{x}_0)
+}
+\right] =
+\mathbb{E}_{q(\mathbf{x}_1\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_0\mid \mathbf{x}_1)
+}{
+q(\mathbf{x}_0\mid \mathbf{x}_1,\mathbf{x}_0)
+}
+\right].
+\end{aligned}
+\]
+一旦以 $\mathbf{x}_0$ 为条件，$q(\mathbf{x}_0\mid \mathbf{x}_1,\mathbf{x}_0)$ 就是退化分布，对应于观测值处的点质量，并且不包含可学习参数。
+因此它只贡献一个加性常数，留下\textbf{重构项}
+\[
+\mathbb{E}_{q(\mathbf{x}_1\mid \mathbf{x}_0)}
+\big[
+\log p_\theta(\mathbf{x}_0\mid \mathbf{x}_1)
+\big].
+\]
+
+对于剩余时间步 $t=2,\dots,T$，我们以相同方式将内部期望局部化：
+\[
+\begin{aligned}
+&\mathbb{E}_{q(\mathbf{x}_{1:T}\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
+\right] \\[6pt]
+&\qquad=
+\mathbb{E}_{q(\mathbf{x}_{t-1},\mathbf{x}_t\mid \mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
+\right] \\[6pt]
+&\qquad=
+\mathbb{E}_{q(\mathbf{x}_t\mid \mathbf{x}_0)}
+\mathbb{E}_{q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
+\right].
+\end{aligned}
+\]
+现在可以识别出，内层期望就是某个 KL 散度的负值：
+\[
+\begin{aligned}
+&\mathbb{E}_{q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}
+\right] \\[4pt]
+&\qquad=
+-\mathbb{E}_{q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)}
+\!\left[
+\log
+\frac{
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+}{
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+}
+\right] \\[4pt]
+&\qquad=
+-\mathrm{KL}\!\big(
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\,\|\,\,
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\big).
+\end{aligned}
+\]
+因此，每个中间时间步的贡献都变为
+\[
+-
+\mathbb{E}_{q(\mathbf{x}_t\mid \mathbf{x}_0)}
+\Big[
+\mathrm{KL}\!\big(
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\,\|\,\,
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\big)
+\Big].
+\]
+
+把边界项和各时间步项合并起来，负 ELBO 可以写成
+\[
+\begin{aligned}
+-\mathcal{L}_{\mathrm{ELBO}}
+=
+\mathbb{E}_{q(\mathbf{x}_0)}
+\Big[
+&\underbrace{
+\mathrm{KL}\!\bigl(
+q(\mathbf{x}_T\mid \mathbf{x}_0)\,\|\,p(\mathbf{x}_T)
+\bigr)
+}_{\text{先验匹配项}}
+\\[4pt]
+&+
+\sum_{t=2}^{T}
+\underbrace{
+\mathbb{E}_{q(\mathbf{x}_t\mid \mathbf{x}_0)}
+\Big[
+\mathrm{KL}\!\big(
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\,\|\,\,
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\big)
+\Big]
+}_{\text{逐步去噪项}}
+\\[4pt]
+&-
+\underbrace{
+\mathbb{E}_{q(\mathbf{x}_1\mid \mathbf{x}_0)}
+\big[
+\log p_\theta(\mathbf{x}_0\mid \mathbf{x}_1)
+\big]
+}_{\text{重构项}}
+\Big].
+\end{aligned}
+\]
+
+这一分解把三种作用清晰区分开来：噪声终点处的先验匹配、中间时间步的局部反向转移匹配，以及数据端的重构。
+图~\ref{fig:ddpm-elbo-local-decomposition} 展示了这些项如何分布在前向链和反向链上。
+
+\input{figures/ch04/fig_ch04_02_elbo_local_decomposition}
+
+\noindent
+关键结论是：学习可以归结为在每个时间步上，让学习得到的去噪转移
+$p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$
+匹配真实逆后验
+$q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)$。
+因此，下一步就是求出这个后验的解析形式。
+
+\section{从真实逆后验到 DDPM 学习}
+
+前面几节已经说明，扩散 ELBO 中核心的可训练项比较的是学习得到的去噪转移
+\[
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\]
+与真实逆后验
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0).
+\]
+本节的目标是把这两个视角连接起来：首先确定前向过程所蕴含的精确高斯逆后验，然后说明该后验如何导出实际使用的 DDPM 学习目标与采样过程。
+
+\subsection{由已知前向量得到真实逆后验}
+
+上一节给出了恒等式
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)\,
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+}{
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+}.
+\]
+这个形式很有用，因为右侧每一项都由已经完全已知的前向过程决定。特别地，
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1},\mathbf{x}_0)
+=
+q(\mathbf{x}_t\mid \mathbf{x}_{t-1})
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_t \mid
+\sqrt{\alpha_t}\,\mathbf{x}_{t-1},
+(1-\alpha_t)\mathbf{I}
+\bigr),
+\]
+其中 $\alpha_t=1-\beta_t$。由前面推导的前向闭式关系，我们还知道
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_0)
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_{t-1}\mid
+\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0,
+(1-\bar{\alpha}_{t-1})\mathbf{I}
+\bigr),
+\]
+以及
+\[
+q(\mathbf{x}_t\mid \mathbf{x}_0)
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_t\mid
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,
+(1-\bar{\alpha}_t)\mathbf{I}
+\bigr).
+\]
+
+因此，真实逆后验完全由前向扩散过程中的高斯量表示。
+由于上面的各项都是高斯分布，关于 $\mathbf{x}_{t-1}$ 的后验也必然是高斯分布。
+所以可以写成
+\[
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_{t-1}\mid
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0),
+\tilde{\beta}_t\mathbf{I}
+\bigr),
+\]
+其中均值为 $\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)$，方差系数为 $\tilde{\beta}_t$。
+
+利用前面介绍的配方法，并结合附录~\ref{app:diffusion-posterior} 中的完整推导，真实逆后验具有如下高斯形式，其均值为
+\[
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+\sqrt{\bar{\alpha}_{t-1}}\,\beta_t
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_0
++
+\frac{
+\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_t,
+\]
+方差系数为
+\[
+\tilde{\beta}_t
+=
+\frac{
+1-\bar{\alpha}_{t-1}
+}{
+1-\bar{\alpha}_t
+}\,\beta_t.
+\]
+
+这个结果值得解释。
+后验均值
+$\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)$
+是两部分信息的加权组合：
+干净样本 $\mathbf{x}_0$ 告诉我们轨迹从何处出发，而当前噪声状态 $\mathbf{x}_t$ 告诉我们在时刻 $t$ 位于何处。
+因此，真实逆后验通过结合干净起点与当前噪声观测的信息，确定最可能的、稍微更干净的上一状态。
+
+后验方差 $\tilde{\beta}_t\mathbf{I}$ 同样由前向扩散调度固定。
+也就是说，一旦选择了前向加噪过程，对应反向步骤的不确定性也随之确定。
+所以从 ELBO 视角看，反向模型并不是要匹配任意去噪分布，而是要匹配由已知前向过程诱导出的特定高斯目标。
+
+图~\ref{fig:ddpm-true-reverse-posterior} 将这一目标可视化为两个已知前向过程因子的高斯融合。
+
+\input{figures/ch04/fig_ch04_03_true_reverse_posterior}
+
+尽管这个后验是精确的，但它仍然显式依赖干净数据样本 $\mathbf{x}_0$。
+训练时 $\mathbf{x}_0$ 是已知的，因此没有问题；但在生成时，$\mathbf{x}_0$ 恰恰是我们希望创建的未知对象，所以不能直接使用这一后验。
+
+\subsection{通过噪声变量重参数化后验}
+
+关键观察是，前向过程已经给出了干净样本 $\mathbf{x}_0$、噪声样本 $\mathbf{x}_t$ 与标准高斯噪声变量之间的直接关系：
+\[
+\mathbf{x}_t
+=
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0
++
+\sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon},
+\qquad
+\boldsymbol{\epsilon}\sim \mathcal{N}(\mathbf{0},\mathbf{I}).
+\]
+
+解出 $\mathbf{x}_0$，得到
+\[
+\mathbf{x}_0
+=
+\frac{1}{\sqrt{\bar{\alpha}_t}}
+\Bigl(
+\mathbf{x}_t-\sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}
+\Bigr).
+\]
+现在把这个表达式代入后验均值
+$\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)$，以消除其中对 $\mathbf{x}_0$ 的显式依赖。
+
+从
+\[
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\mathbf{x}_0)
+=
+\frac{
+\sqrt{\bar{\alpha}_{t-1}}\,\beta_t
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_0
++
+\frac{
+\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_t
+\]
+出发，将 $\mathbf{x}_0$ 的表达式代入可得
+\[
+\begin{aligned}
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\boldsymbol{\epsilon})
+&=
+\frac{
+\sqrt{\bar{\alpha}_{t-1}}\,\beta_t
+}{
+1-\bar{\alpha}_t
+}
+\cdot
+\frac{1}{\sqrt{\bar{\alpha}_t}}
+\Bigl(
+\mathbf{x}_t-\sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}
+\Bigr)
++
+\frac{
+\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})
+}{
+1-\bar{\alpha}_t
+}\,\mathbf{x}_t.
+\end{aligned}
+\]
+
+化简系数后，得到
+\[
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\boldsymbol{\epsilon})
+=
+\frac{1}{\sqrt{\alpha_t}}
+\left(
+\mathbf{x}_t
+-
+\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\,
+\boldsymbol{\epsilon}
+\right).
+\]
+
+\begin{tcolorbox}[
+  colback=blue!6,
+  colframe=blue!55!black,
+  title={系数化简背后的代数过程},
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+]
+利用
+\[
+\bar{\alpha}_t=\alpha_t\bar{\alpha}_{t-1},
+\qquad
+\frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_t}}
+=
+\frac{1}{\sqrt{\alpha_t}},
+\]
+$\mathbf{x}_t$ 的系数变为
+\[
+\frac{\beta_t}{\sqrt{\alpha_t}(1-\bar{\alpha}_t)}
++
+\frac{\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}
+=
+\frac{
+\beta_t+\alpha_t(1-\bar{\alpha}_{t-1})
+}{
+\sqrt{\alpha_t}(1-\bar{\alpha}_t)
+}.
+\]
+由于
+\[
+\beta_t=1-\alpha_t,
+\qquad
+\bar{\alpha}_t=\alpha_t\bar{\alpha}_{t-1},
+\]
+可得
+\[
+\beta_t+\alpha_t(1-\bar{\alpha}_{t-1})
+=
+(1-\alpha_t)+\alpha_t-\alpha_t\bar{\alpha}_{t-1}
+=
+1-\bar{\alpha}_t,
+\]
+因此化简为
+\[
+\frac{1-\bar{\alpha}_t}{\sqrt{\alpha_t}(1-\bar{\alpha}_t)}
+=
+\frac{1}{\sqrt{\alpha_t}}.
+\]
+类似地，$\boldsymbol{\epsilon}$ 的系数变为
+\[
+\frac{
+\sqrt{\bar{\alpha}_{t-1}}\,\beta_t
+}{
+\sqrt{\bar{\alpha}_t}\sqrt{1-\bar{\alpha}_t}
+}
+=
+\frac{\beta_t}{\sqrt{\alpha_t}\sqrt{1-\bar{\alpha}_t}}.
+\]
+\end{tcolorbox}
+
+因此，真实逆后验可以改写为
+\[
+\boxed{
+\begin{aligned}
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\boldsymbol{\epsilon})
+&=
+\mathcal{N}\!\left(
+\mathbf{x}_{t-1}\mid
+\frac{1}{\sqrt{\alpha_t}}
+\left(
+\mathbf{x}_t
+-
+\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\,
+\boldsymbol{\epsilon}
+\right),
+\tilde{\beta}_t\mathbf{I}
+\right).
+\end{aligned}
+}
+\]
+
+这一形式极其重要。
+它说明，反向步骤可以仅通过当前噪声样本 $\mathbf{x}_t$ 与生成该样本的累积噪声 $\boldsymbol{\epsilon}$ 来刻画。
+因此，模型不必直接恢复 $\mathbf{x}_0$，而可以转而预测底层噪声。
+
+\subsection{参数化学习得到的反向过程，并推导实际 DDPM 目标}
+
+这就导出了标准 DDPM 参数化。
+真实噪声 $\boldsymbol{\epsilon}$ 对模型而言是未知的，因此我们引入神经网络
+\[
+\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)
+\]
+根据噪声样本 $\mathbf{x}_t$ 和时间步 $t$ 来预测它。
+
+学习得到的反向转移定义为
+\[
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+=
+\mathcal{N}\!\bigl(
+\mathbf{x}_{t-1}\mid
+\boldsymbol{\mu}_\theta(\mathbf{x}_t,t),
+\tilde{\beta}_t\mathbf{I}
+\bigr),
+\]
+其中均值为
+\[
+\boldsymbol{\mu}_\theta(\mathbf{x}_t,t)
+=
+\frac{1}{\sqrt{\alpha_t}}
+\left(
+\mathbf{x}_t
+-
+\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\,
+\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)
+\right).
+\]
+
+其解释非常直接：
+如果网络能够准确预测真实噪声，那么学习得到的反向均值就会与精确逆后验均值一致，因此学习到的去噪过程也就匹配了正确的局部反向步骤。
+
+\bigskip
+
+回顾 ELBO 中核心的可训练项
+\[
+\mathbb{E}_{q(\mathbf{x}_t\mid \mathbf{x}_0)}
+\Big[
+\mathrm{KL}\!\big(
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\,\|\,\,
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\big)
+\Big].
+\]
+现在两个分布都是具有相同方差
+$\tilde{\beta}_t\mathbf{I}$ 的高斯分布。
+因此，它们之间的 KL 散度会化简为均值之差的平方：
+\[
+\mathrm{KL}\!\big(
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\,\|\,\,
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\big)
+\propto
+\bigl\|
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\boldsymbol{\epsilon})
+-
+\boldsymbol{\mu}_\theta(\mathbf{x}_t,t)
+\bigr\|^2.
+\]
+代入两个均值表达式，得到
+\[
+\tilde{\boldsymbol{\mu}}_t(\mathbf{x}_t,\boldsymbol{\epsilon})
+-
+\boldsymbol{\mu}_\theta(\mathbf{x}_t,t)
+=
+\frac{\beta_t}{\sqrt{\alpha_t}\sqrt{1-\bar{\alpha}_t}}
+\Bigl(
+\boldsymbol{\epsilon}
+-
+\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)
+\Bigr).
+\]
+因此，忽略一个依赖时间步的缩放因子后，KL 项就变成噪声预测的均方误差：
+\[
+\mathrm{KL}\!\big(
+q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)
+\,\|\,\,
+p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)
+\big)
+\propto
+\bigl\|
+\boldsymbol{\epsilon}
+-
+\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)
+\bigr\|^2.
+\]
+
+这就是 DDPM 中最核心的化简：局部变分项在相差一个时间相关系数的意义下，归结为对所加入高斯噪声的回归问题。
+因此，精确 ELBO 会导出带时间权重的噪声预测均方误差。
+实践中，Ho 等人~\cite{ho2020denoising} 常用的简化目标去掉了这个依赖时间步的权重，采用
+\[
+\boxed{
+\mathcal{L}_{\mathrm{simple}}
+=
+\mathbb{E}_{t,\mathbf{x}_0,\boldsymbol{\epsilon}}
+\Bigl[
+\bigl\|
+\boldsymbol{\epsilon}
+-
+\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)
+\bigr\|^2
+\Bigr]
+}
+\]
+其中
+$\mathbf{x}_t
+=
+\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0
++
+\sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}$。
+图~\ref{fig:ddpm-noise-prediction-bridge} 总结了从局部后验匹配到这一实际噪声预测损失的代数桥梁。
+
+\input{figures/ch04/fig_ch04_04_noise_prediction_bridge}
+
+\subsection{训练与采样如何工作}
+
+现在，训练循环在概念上已经非常简单。
+对于每个干净数据样本 $\mathbf{x}_0$，我们：
+\begin{enumerate}
+    \item 采样一个时间步 $t$；
+    \item 采样高斯噪声 $\boldsymbol{\epsilon}\sim\mathcal{N}(\mathbf{0},\mathbf{I})$；
+    \item 构造噪声状态
+    \[
+    \mathbf{x}_t
+    =
+    \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0
+    +
+    \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon};
+    \]
+    \item 训练网络根据 $(\mathbf{x}_t,t)$ 预测 $\boldsymbol{\epsilon}$。
+\end{enumerate}
+由于可以直接从 $\mathbf{x}_0$ 采样得到 $\mathbf{x}_t$，训练时不需要逐步模拟完整前向链。
+
+训练完成后，模型通过迭代运行学习到的反向过程来生成数据。
+我们从
+\[
+\mathbf{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})
+\]
+开始，然后对 $t=T,T-1,\dots,1$ 依次采样
+\[
+\mathbf{x}_{t-1}\sim p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t).
+\]
+在每一步，模型利用预测噪声
+$\boldsymbol{\epsilon}_\theta(\mathbf{x}_t,t)$ 计算反向均值，并去除少量扰动。
+经过所有时间步反复执行后，最终状态 $\mathbf{x}_0$ 就是生成样本。
+
+\bigskip
+\noindent
+至此，我们完成了离散时间 DDPM 的主要概率建模逻辑。
+前向过程固定，反向过程通过学习获得，ELBO 化简为局部去噪目标，而最终实际使用的目标进一步化为噪声预测。
+
+\section*{本章小结与参考文献}
+\addcontentsline{toc}{section}{本章小结与参考文献}
+
+本章从概率潜变量视角介绍了去噪扩散概率模型（DDPM）。
+与 PPCA 和 VAE 中由单一潜变量发挥核心作用不同，扩散模型处理的是完整的带时间索引潜在轨迹
+$\mathbf{x}_{1:T}$；该轨迹由固定的高斯马尔可夫过程逐步扰动数据而产生。
+
+我们首先说明了前向过程如何把干净样本 $\mathbf{x}_0$ 变换为噪声逐渐增强的状态，并推导了 $\mathbf{x}_t$ 与 $\mathbf{x}_0$ 之间的闭式关系。
+随后转向必须学习的反向过程，并利用 ELBO 框架把扩散模型表达为一个具有难以直接计算边缘似然的潜变量生成模型。
+
+接着，我们把 ELBO 分解为局部去噪项，从而揭示每个时间步上真正需要训练的量，是学习得到的反向转移
+$p_\theta(\mathbf{x}_{t-1}\mid \mathbf{x}_t)$ 与真实逆后验
+$q(\mathbf{x}_{t-1}\mid \mathbf{x}_t,\mathbf{x}_0)$ 之间的差异。
+由于前向过程是高斯过程，这个后验同样是高斯分布，并可以闭式推导。
+然而，由于它显式依赖干净样本 $\mathbf{x}_0$，在生成时不能直接使用。
+
+最后，通过利用噪声变量对后验进行重参数化，我们说明了扩散学习如何归结为噪声预测。
+这就得到实际 DDPM 目标：训练神经网络预测在给定时间步生成噪声样本时所加入的高斯噪声，然后利用这个学习到的预测器，把纯高斯噪声迭代去噪为数据样本。
+以这种方式，DDPM 将前面章节逐步建立的概率潜变量思想扩展成一种基于渐进扰动与渐进重构的序贯生成框架。
+
+\medskip
+\noindent
+
+基于扩散的生成建模框架由 Sohl-Dickstein 等人~\cite{sohl2015deep} 提出，他们把生成建模表述为对渐进加噪过程的学习式逆转，并从非平衡热力学中获得启发。
+这项工作确立了后来 DDPM 仍然沿用的多个核心组成：固定的前向扰动过程、学习得到的反向过程，以及连接数据与噪声的一系列中间潜状态。
+
+现代 DDPM 形式由 Ho、Jain 和 Abbeel~\cite{ho2020denoising} 建立，他们说明了这一序贯潜变量模型可以通过变分目标进行有效训练，而该目标进一步简化为噪声预测。
+Nichol 与 Dhariwal~\cite{nichol2021improved} 等后续工作又改进了 DDPM 的实际训练与采样表现。
+本书后续介绍的得分模型与连续时间视角会为同一去噪原理提供互补解释，但本章重点是 DDPM 的离散潜变量构造。

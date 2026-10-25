@@ -1,0 +1,21 @@
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.45\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/ch02/panels/fig2_3a_prior.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/ch02/panels/fig2_3b_conditional.pdf}
+\end{minipage}
+
+\vspace{0.4em}
+
+\begin{minipage}[t]{0.45\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/ch02/panels/fig2_3c_marginal.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/ch02/panels/fig2_3d_posterior.pdf}
+\end{minipage}
+\caption{\textbf{同一个 PPCA 模型的四种概率视角。}
+先验 $p(z)$ 描述潜在坐标；固定 $z^\ast$ 得到 $p(\mathbf{x}\mid z^\ast)$；对 $z$ 积分得到边缘分布 $p(\mathbf{x})$；观察到 $\mathbf{x}^\ast$ 后得到后验 $p(z\mid\mathbf{x}^\ast)$。后验子图中标出了真实生成用的 $z^\ast$；由于存在观测噪声，它不必等于后验均值。在 PPCA 中，这四种分布均为高斯分布且都可解析求得。}
+\label{fig:ppca-four-probabilistic-views}
+\end{figure}

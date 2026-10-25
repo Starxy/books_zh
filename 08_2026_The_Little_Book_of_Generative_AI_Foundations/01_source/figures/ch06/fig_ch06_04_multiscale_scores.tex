@@ -1,0 +1,27 @@
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.43\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch06/panels/fig6_4_scale_1.pdf}\\[-0.2em]
+  {\small 大噪声：粗尺度几何}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.43\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch06/panels/fig6_4_scale_2.pdf}\\[-0.2em]
+  {\small 中间尺度}
+\end{minipage}
+
+\vspace{0.8em}
+
+\begin{minipage}[t]{0.43\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch06/panels/fig6_4_scale_3.pdf}\\[-0.2em]
+  {\small 小噪声：局部细节}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.43\textwidth}
+  \vspace{0pt}
+  \caption{\textbf{不同噪声水平对应不同的得分场。}
+  同一个双分量分布在三个尺度上用高斯噪声进行平滑。大噪声揭示粗尺度的全局几何；随着噪声减小，独立模态和更尖锐的局部结构逐渐显现。因此，多尺度得分模型以噪声水平为条件，而不是让所有尺度共享同一个得分场。为便于阅读，箭头长度经过归一化。}
+  \label{fig:score-multiscale-fields}
+\end{minipage}
+\end{figure}

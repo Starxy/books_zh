@@ -1,0 +1,67 @@
+\begin{center}
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  box/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=7pt,
+    minimum height=1.20cm,
+    text width=3.75cm
+  },
+  lowerbox/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    inner sep=7pt,
+    minimum height=1.12cm,
+    text width=3.75cm
+  },
+  flow/.style={->,thick}
+]
+
+\node[box] (prior) at (0,0) {
+  \textbf{潜变量先验}\\[2pt]
+  $\mathbf{z}\sim\mathcal{N}(\mathbf{0},\mathbf{I})$
+};
+
+\node[box] (gen) at (5.15,0) {
+  \textbf{条件生成}\\[2pt]
+  $p(\mathbf{x}\mid\mathbf{z})
+  =\mathcal{N}(\mathbf{W}\mathbf{z}+\boldsymbol{\mu},
+  \alpha^2\mathbf{I})$
+};
+
+\node[box] (marginal) at (10.30,0) {
+  \textbf{边缘数据模型}\\[2pt]
+  $p(\mathbf{x})
+  =\mathcal{N}\!\bigl(
+  \boldsymbol{\mu},
+  \mathbf{W}\mathbf{W}^{\top}+\alpha^2\mathbf{I}
+  \bigr)$
+};
+
+\node[lowerbox] (posterior) at (5.15,-2.75) {
+  \textbf{后验推断}\\[2pt]
+  $p(\mathbf{z}\mid\mathbf{x})
+  \propto p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})$\\[-1pt]
+  在 PPCA 中为\\精确高斯分布
+};
+
+\node[lowerbox] (learning) at (10.30,-2.75) {
+  \textbf{参数学习}\\[2pt]
+  最大化 $\log p(\mathbf{x})$\\[-1pt]
+  直接优化或使用 ELBO / EM
+};
+
+\draw[flow] (prior) -- (gen);
+\draw[flow] (gen) -- (marginal);
+\draw[flow] (gen) -- node[right] {\scriptsize Bayes} (posterior);
+\draw[flow] (marginal) -- node[right] {\scriptsize 似然} (learning);
+\draw[flow] (posterior) -- node[above] {\scriptsize EM} (learning);
+
+\node[font=\normalsize\bfseries] at (5.15,1.45) {PPCA 概览};
+
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,24 @@
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.45\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch02/panels/fig2_1a_prior.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch02/panels/fig2_1b_means.pdf}
+\end{minipage}
+
+\vspace{0.8em}
+
+\begin{minipage}[t]{0.45\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch02/panels/fig2_1c_conditionals.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\textwidth}
+  \vspace{0pt}
+  \caption{\textbf{从潜在坐标到概率观测。}
+  图中从先验 $p(z)=\mathcal{N}(0,1)$ 中选取若干潜在坐标，将其映射为观测空间中的条件均值 $\mathbf{W}z+\boldsymbol{\mu}$，再以这些均值为中心构造各向同性条件分布 $p(\mathbf{x}\mid z)=\mathcal{N}(\mathbf{W}z+\boldsymbol{\mu},\alpha^2\mathbf{I})$。子图 (c) 展示的是在三个选定潜变量值条件下的样本，而不是边缘分布 $p(\mathbf{x})$。}
+  \label{fig:ppca-generative-story}
+\end{minipage}
+\end{figure}

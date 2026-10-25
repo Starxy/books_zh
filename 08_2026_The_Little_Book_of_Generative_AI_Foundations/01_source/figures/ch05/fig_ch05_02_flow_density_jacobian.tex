@@ -1,0 +1,55 @@
+\begin{figure}[H]
+\centering
+\resizebox{0.76\textwidth}{!}{%
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  panel/.style={draw,rounded corners=2pt,minimum width=4.0cm,minimum height=3.25cm,align=center},
+  eq/.style={draw,rounded corners=2pt,align=center,inner sep=5pt,text width=5.4cm},
+  flow/.style={->,thick}
+]
+\node[font=\normalsize\bfseries] at (6.0,3.05)
+  {确定性流：局部体积变化控制密度};
+
+\node[panel] (left) at (2.0,0.65) {};
+\node[panel] (right) at (10.0,0.65) {};
+
+\node[font=\bfseries] at (2.0,1.85) {初始局部区域};
+\node[font=\bfseries] at (10.0,1.85) {经过流映射 $F_t$ 后};
+
+\draw[thick] (1.05,0.05) rectangle (2.95,1.10);
+\node at (2.0,0.58) {$\Delta V_0$};
+\node at (2.0,-0.45) {$p_0(x_0)$};
+
+\draw[thick] (9.25,0.25) rectangle (10.75,0.92);
+\node at (10.0,0.58) {$\Delta V_t$};
+\node at (10.0,-0.45) {$p_t(x_t)$};
+
+\draw[flow] (4.0,0.75) -- node[above,align=center]
+  {$x_t=F_t(x_0)$\\[-1pt]
+   $J_t=\partial F_t/\partial x_0$} (8.0,0.75);
+
+\node[eq] (volume) at (3.0,-2.05) {
+  \textbf{局部体积缩放}\\[3pt]
+  $\displaystyle \Delta V_t\approx |\det J_t|\,\Delta V_0$
+};
+
+\node[eq] (density) at (9.0,-2.05) {
+  \textbf{概率守恒}\\[3pt]
+  $\displaystyle p_t(F_t(x_0))=\frac{p_0(x_0)}{|\det J_t|}$
+};
+
+\draw[flow] (volume) -- (density);
+
+\node[eq,text width=7.0cm] (instant) at (6.0,-4.05) {
+  \textbf{沿轨迹的无穷小极限}\\[3pt]
+  $\displaystyle \frac{d}{dt}\log p(x(t),t)=-\nabla\!\cdot v(x(t),t)$
+};
+
+
+\end{tikzpicture}%
+}
+\caption{\textbf{概率守恒把局部体积变化与密度变化联系起来。}
+确定性流映射 $F_t$ 会移动粒子及其周围的体积元。Jacobian 行列式度量局部体积缩放，因此概率守恒要求密度按照体积因子的倒数重新缩放。在无穷小极限下，这给出沿轨迹的 Liouville 关系：局部膨胀降低密度，而局部压缩提高密度。}
+\label{fig:continuous-flow-density-jacobian}
+\end{figure}

@@ -1,0 +1,145 @@
+\documentclass[UTF8,12pt,oneside]{ctexbook}
+\setcounter{tocdepth}{1}
+%------------------------------------------------
+% Packages
+%------------------------------------------------
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setCJKmainfont{Noto Serif CJK SC}
+\setCJKsansfont{Noto Sans CJK SC}
+\setCJKmonofont{Noto Sans Mono CJK SC}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[normalem]{ulem}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{textgreek}
+\usepackage{xparse}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[
+    backend=biber,
+    style=numeric,
+    sorting=nyt
+]{biblatex}
+\addbibresource{references.bib}
+
+%------------------------------------------------
+% Page geometry
+%------------------------------------------------
+\geometry{margin=1in}
+\setlength{\headheight}{15pt}
+\emergencystretch=2em
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RO]{\thepage}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+
+%------------------------------------------------
+% Theorem-like environments
+%------------------------------------------------
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{example}{例}[chapter]
+\newtheorem{theorem}{定理}[chapter]
+
+% ---------- Global tcolorbox styles ----------
+\tcbset{
+  mybox/.style={
+    enhanced,
+    boxrule=0.8pt,
+    arc=2mm,
+    left=2mm, right=2mm, top=1mm, bottom=1mm,
+    coltitle=black,
+    fonttitle=\bfseries,
+    title={#1},
+    attach title to upper,
+  },
+  conceptbox/.style={
+    mybox={#1},
+    colback=blue!6,
+    colframe=blue!55!black,
+  },
+  derivbox/.style={
+    mybox={#1},
+    colback=black!3,
+    colframe=black!45,
+  },
+  insightbox/.style={
+    mybox={#1},
+    colback=green!6,
+    colframe=green!50!black,
+  },
+}
+\newtcolorbox{ConceptBox}[1]{conceptbox={#1}}
+\newtcolorbox{DerivBox}[1]{derivbox={#1}}
+\newtcolorbox{InsightBox}[1]{insightbox={#1}}
+
+\NewDocumentEnvironment{faq}{+b}{
+  \section*{常见问题}
+  \begin{description}[leftmargin=2em,labelsep=1em]
+  #1
+  \end{description}
+}{}
+\newcommand{\question}[1]{\item[\textbf{问：}] #1}
+\newcommand{\answer}[1]{\\ \textbf{答：} #1}
+
+\newenvironment{exercises}{
+  \section*{练习}
+  \begin{enumerate}
+}{
+  \end{enumerate}
+}
+\newenvironment{summary}{
+  \section*{要点总结}
+  \begin{itemize}
+}{
+  \end{itemize}
+}
+
+\newcommand{\bookdate}{2026年9月8日}
+\title{生成式人工智能基础小册：直观数学导论}
+\author{
+Tianhua Chen\\[0.3em]
+计算与工程学院\\
+哈德斯菲尔德大学\\[0.3em]
+\texttt{t.chen@hud.ac.uk}\\[1.5em]
+预印本中文翻译版\\
+基于 arXiv:2605.29713v2（CC BY 4.0）\\
+\bookdate
+}
+\date{}
+\hypersetup{
+  hidelinks,
+  unicode=true,
+  pdftitle={生成式人工智能基础小册：直观数学导论},
+  pdfauthor={Tianhua Chen}
+}
+
+\begin{document}
+\frontmatter
+\maketitle
+\include{chapters/prefer_new_short}
+\tableofcontents
+\mainmatter
+\include{chapters/cht_1_2_merged}
+\include{chapters/cht3}
+\include{chapters/cht4_new}
+\include{chapters/cht5_new}
+\include{chapters/cht_diff_fund}
+\include{chapters/cht_score_diffusion}
+\include{chapters/cht_8_9_merged_new}
+\include{chapters/cht10_new}
+\include{chapters/cht_closing_remarks}
+\appendix
+\include{chapters/cht_appendix1}
+\include{chapters/cht_appendix2}
+\backmatter
+\printbibliography[heading=bibintoc,title={参考文献}]
+\end{document}

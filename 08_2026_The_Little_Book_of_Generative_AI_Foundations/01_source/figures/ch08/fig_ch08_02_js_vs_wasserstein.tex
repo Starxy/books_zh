@@ -1,0 +1,24 @@
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch08/panels/figure8_2_a.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch08/panels/figure8_2_b.pdf}
+\end{minipage}
+
+\vspace{0.8em}
+
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch08/panels/figure8_2_c.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \vspace{0pt}
+  \caption{\textbf{JS 散度会饱和，而 Wasserstein 距离仍保留几何信息。}
+  各子图比较方差相同、均值逐渐分离的高斯分布。随着重叠消失，JS 散度逼近上界 $\log 2$，对进一步分离逐渐不敏感。对于这些平移分布，$1$-Wasserstein 距离为 $W_1=\Delta$，因此仍持续度量概率质量需要搬运多远。}
+  \label{fig:gan-js-wasserstein-geometry}
+\end{minipage}
+\end{figure}

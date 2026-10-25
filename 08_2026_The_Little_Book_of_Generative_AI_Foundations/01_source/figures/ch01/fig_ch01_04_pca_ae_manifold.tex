@@ -1,0 +1,24 @@
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.42\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch01/panels/fig1_4a_pca_basis.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.42\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch01/panels/fig1_4b_linear_ae_basis.pdf}
+\end{minipage}
+
+\vspace{0.8em}
+
+\begin{minipage}[t]{0.42\textwidth}
+  \vspace{0pt}\centering
+  \includegraphics[width=\linewidth]{figures/ch01/panels/fig1_4c_nonlinear_manifold.pdf}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.42\textwidth}
+  \vspace{0pt}
+  \caption{\textbf{从 PCA 子空间到学习得到的流形。}
+  PCA 使用一组特定的标准正交基表示线性子空间。线性自编码器可以用另一组通常并不正交的解码器基恢复同一个最优子空间；即使所表示的平面一致，其基向量也不必与 PCA 相同。当解码器变为非线性后，重构集合不再局限于单一平坦子空间，而可以形成弯曲的低维流形。}
+  \label{fig:ch1-pca-ae-manifold}
+\end{minipage}
+\end{figure}

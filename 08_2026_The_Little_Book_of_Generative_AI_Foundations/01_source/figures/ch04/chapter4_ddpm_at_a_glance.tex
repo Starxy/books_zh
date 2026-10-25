@@ -1,0 +1,46 @@
+\begin{center}
+\begin{tikzpicture}[
+  >=Latex,
+  every node/.style={font=\small},
+  state/.style={draw,rounded corners=2pt,minimum width=1.65cm,minimum height=0.82cm,align=center},
+  wide/.style={draw,rounded corners=2pt,text width=4.2cm,minimum height=1.02cm,align=center,inner sep=6pt},
+  flow/.style={->,thick},
+  rev/.style={->,thick,dashed}
+]
+\node[font=\normalsize\bfseries] at (6.3,2.0) {DDPM 概览};
+
+\node[state] (x0) at (0,0.65) {$\mathbf{x}_0$\\干净数据};
+\node[state] (x1) at (3.0,0.65) {$\mathbf{x}_1$};
+\node at (5.0,0.65) {$\cdots$};
+\node[state] (xt) at (7.0,0.65) {$\mathbf{x}_t$};
+\node at (9.0,0.65) {$\cdots$};
+\node[state] (xT) at (12.0,0.65) {$\mathbf{x}_T$\\高斯噪声};
+
+\draw[flow] (x0) -- node[above] {\scriptsize 固定的 $q$} (x1);
+\draw[flow] (x1) -- (4.45,0.65);
+\draw[flow] (5.55,0.65) -- (xt);
+\draw[flow] (xt) -- (8.45,0.65);
+\draw[flow] (9.55,0.65) -- node[above] {\scriptsize 加噪} (xT);
+
+\draw[rev] (xT.south) to[out=-135,in=-45] node[midway,above] {\scriptsize 学习到的反向过程 $p_\theta$} (xt.south);
+\draw[rev] (xt.south) to[out=-135,in=-45] (x1.south);
+\draw[rev] (x1.south) to[out=-135,in=-45] node[below] {\scriptsize 去噪} (x0.south);
+
+\node[wide] (shortcut) at (3.25,-2.15) {
+\textbf{训练捷径}\\[2pt]
+采样 $t,\boldsymbol{\epsilon}$，直接跳到
+$\displaystyle
+\mathbf{x}_t=
+\sqrt{\bar{\alpha}_t}\mathbf{x}_0+
+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}$
+};
+
+\node[wide] (learn) at (9.2,-2.15) {
+\textbf{学习}\\[2pt]
+由 $(\mathbf{x}_t,t)$ 预测 $\boldsymbol{\epsilon}$，使
+$p_\theta(\mathbf{x}_{t-1}\mid\mathbf{x}_t)$ 匹配局部反向目标
+};
+
+\draw[flow] (shortcut) -- (learn);
+\end{tikzpicture}
+\end{center}

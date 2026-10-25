@@ -1,8 +1,8 @@
 {
-  "organized_on": "2026-10-24",
+  "organized_on": "2026-10-25",
   "root": ".",
   "operation": "保留TeX底本与必要PDF资料，完整中文译本统一保存在00_books。",
-  "status": "七本完整中文PDF已归档；中文TeX源码已清理。",
+  "status": "八本中文PDF已归档；第八本为用户提供的既有译本，本次仅整理目录与源码结构，未检查翻译质量。",
   "subfolders": [
     "00_originals",
     "01_source",
@@ -232,6 +232,35 @@
       "build_command": "python \"07_2026_Causal_Inference_What_If/01_source/build.py\"",
       "description": "3个分部、23章、引言、参考文献及索引；采用含书后材料的346页版本。",
       "source_route": "pdf"
+    },
+    {
+      "title": "The Little Book of Generative AI Foundations: An Intuitive Mathematical Primer",
+      "chinese_title": "生成式人工智能基础小册：直观数学导论",
+      "author": "Tianhua Chen",
+      "folder": "08_2026_The_Little_Book_of_Generative_AI_Foundations",
+      "original_name": "2605.29713v2.pdf",
+      "renamed_file": "2026_The_Little_Book_of_Generative_AI_Foundations_arXiv-2605.29713v2_EN.pdf",
+      "relative_path": "08_2026_The_Little_Book_of_Generative_AI_Foundations/00_originals/2026_The_Little_Book_of_Generative_AI_Foundations_arXiv-2605.29713v2_EN.pdf",
+      "version": "arXiv:2605.29713v2; 2026-09-08",
+      "pages": 195,
+      "bytes": 2194142,
+      "sha256": "7a88b2ba5c54d7c787f4b569f7b9421524de44974f8e290ff30faef0bf113f32",
+      "translation_status": "用户提供的既有中文译本；本次仅导入并整理目录，未检查翻译质量。",
+      "translated_pdf": "00_books/The_Little_Book_of_Generative_AI_Foundations_cn_translated.pdf",
+      "translated_pages": 196,
+      "translated_sha256": "0b8e8750b4702e7c3f3e0bd25507261dfd7eb9a6a5661854684cdb17e1f1c7fb",
+      "chinese_source": "08_2026_The_Little_Book_of_Generative_AI_Foundations/01_source",
+      "build_command": "python \"08_2026_The_Little_Book_of_Generative_AI_Foundations/01_source/build.py\"",
+      "description": "依照所附主文件组织为8章、前言、结语、附录A—B与参考文献；保留原有TeX和图表内容。",
+      "source_route": "tex",
+      "tex_source": "08_2026_The_Little_Book_of_Generative_AI_Foundations/00_originals/arXiv-2605.29713v2.tar.gz",
+      "tex_source_sha256": "b2e65c72a62c789248cfa17b91a91a424ce3f197ffbd120c0f72a16cd0a3bc15",
+      "imported_chinese_source_archive": "08_2026_The_Little_Book_of_Generative_AI_Foundations/00_originals/arXiv-2605.29713v2_zh-CN_source.tar.gz",
+      "imported_chinese_source_archive_sha256": "b875e09a0e945c5c8a84cc63675ee43a1ef49ba9f2cb384196c5fc4180220acf",
+      "imported_on": "2026-10-25",
+      "import_scope": "Directory layout, file naming, source extraction, build entry points and catalogue updates only.",
+      "translation_quality_review": "not_performed",
+      "build_status": "not_run_during_import"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
@@ -249,7 +278,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 2773,
+  "translated_pages_total": 2969,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -257,14 +286,15 @@
     "all_bookmarks_equal": true,
     "all_pixels_equal_at_dpi": 96,
     "final_files_sha256_verified": true,
-    "date": "2026-10-24"
+    "date": "2026-10-24",
+    "scope": "2026-10-24已归档的前七本书；不包含2026-10-25新导入的The Little Book of Generative AI Foundations。"
   },
   "directory_layout_updated_on": "2026-10-25",
   "directory_layout_note": "正式中文TeX位于各书01_source，完整中文PDF仅保存在仓库根目录00_books。",
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 7,
+  "collection_count": 8,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",
