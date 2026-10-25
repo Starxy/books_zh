@@ -50,7 +50,7 @@ scripts/                          仓库维护检查工具
 | [Causal Inference: What If](07_2026_Causal_Inference_What_If/) | 因果推断：如果 | [PDF](00_books/Causal_Inference_What_If_cn_translated.pdf) | 346 |
 | [The Little Book of Generative AI Foundations: An Intuitive Mathematical Primer](08_2026_The_Little_Book_of_Generative_AI_Foundations/) | 生成式人工智能基础小册：直观数学导论 | [PDF](00_books/The_Little_Book_of_Generative_AI_Foundations_cn_translated.pdf) | 196 |
 
-《生成式人工智能基础小册》于2026-10-25导入用户提供的既有中文PDF与源码。本次只整理目录、源码结构和构建入口，未重新编译或检查翻译质量。
+《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 
 当前底本与内容范围：
 
@@ -61,7 +61,7 @@ scripts/                          仓库维护检查工具
 - **Foundations of Large Language Models：** 依据 arXiv:2501.09223v4 源码，6 章、参考文献及中文索引。目录中的 2025 是归档年份，具体底本以 v4 为准。
 - **Agentic Large Language Models：** 依据 arXiv:2610.13455v1 源码，23 章、7 个分部引言及按章参考文献。
 - **Causal Inference: What If：** 3 个分部、23 章、引言、参考文献及索引；当前中文成品为包含书后材料的 346 页版本。
-- **The Little Book of Generative AI Foundations：** arXiv:2605.29713v2，2026-09-08；主文件组织为8章、前言、结语、附录A—B和参考文献，保留所提供译文。
+- **The Little Book of Generative AI Foundations：** arXiv:2605.29713v2，2026-09-08；8章、前言、结语、附录A—B和参考文献，已对照英文源码校订并重新编译。
 
 ## 新增与维护书籍
 

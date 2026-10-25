@@ -1,4 +1,4 @@
-\chapter{概率主成分分析：通向潜变量生成建模的桥梁}
+\chapter[概率主成分分析：通向潜变量生成建模的桥梁]{概率主成分分析：\\通向潜变量生成建模的桥梁}
 
 \section*{概述}
 \addcontentsline{toc}{section}{概述}
@@ -10,11 +10,11 @@
     上一章中的 PCA 和自编码器展示了如何利用低维结构表示数据，但二者从根本上仍是确定性的。PPCA 则引入了本书后续将反复出现的关键概率要素：潜变量的先验、给定潜在原因时观测量的条件分布、用于学习的边缘似然，以及用于推断的后验分布。从这个意义上说，PPCA 是本书中的第一个概率潜变量模型。
 
     \item \textbf{为现代生成模型提供一个解析可解的桥梁。}  
-    由于 PPCA 同时具有线性结构和高斯分布，其所有核心量仍然可以闭式推导。这种少见的可解性使它成为理想的过渡模型：我们可以在每一步都保持数学透明的环境中，研究基于似然的学习、后验推断、Jensen 不等式、证据下界（Evidence Lower Bound, ELBO）以及期望最大化（Expectation Maximisation, EM）算法。后续在表达能力更强、但不再解析可解的模型（例如变分自编码器）中，这些思想都会再次出现。
+    由于 PPCA 同时具有线性结构和高斯分布，其所有核心量仍然可以闭式推导。这种少见的可解性使它成为理想的过渡模型：我们可以在每一步都保持数学透明的环境中，研究基于似然的学习、后验推断、Jensen 不等式、证据下界（Evidence Lower Bound, ELBO）以及期望最大化（Expectation Maximisation, EM）算法。后续在表达能力更强、但更难处理的模型（例如变分自编码器）中，这些思想都会再次出现。
 \end{itemize}
 
-\section*{概念地图}
-\addcontentsline{toc}{section}{概念地图}
+\section*{概念导图}
+\addcontentsline{toc}{section}{概念导图}
 
 本章按照一条从确定性降维走向概率潜变量建模的路径展开。
 \begin{itemize}
@@ -368,7 +368,7 @@ p(\mathbf{x})
 \]
 那么这一结构化协方差可以看成与各个潜在方向对应的一组秩一贡献之和。
 
-相对而言，\(\alpha^2\mathbf{I}\) 在观测空间每个方向上贡献相同方差。因此，PPCA 同时建模两类变化：通过 \(\mathbf{W}\mathbf{W}^\top\) 描述潜在子空间\emph{沿线}的变化，通过各向同性噪声描述子空间\emph{周围}的偏离。图~\ref{fig:ppca-covariance-decomposition} 直观总结了这一分解，将潜变量诱导的结构与各向同性观测噪声明确区分开。
+相对而言，\(\alpha^2\mathbf{I}\) 在观测空间每个方向上贡献相同方差。因此，PPCA 同时建模两类变化：通过 \(\mathbf{W}\mathbf{W}^\top\) 描述\emph{沿潜在子空间各方向}的变化，通过各向同性噪声描述子空间\emph{周围}的偏离。图~\ref{fig:ppca-covariance-decomposition} 直观总结了这一分解，将潜变量诱导的结构与各向同性观测噪声明确区分开。
 
 \input{figures/ch02/fig_ch02_02_ppca_covariance_decomposition}
 
@@ -607,7 +607,7 @@ p(\mathbf{x};\theta)
 
 这一表达式更易处理，因为此时对数直接作用在期望内部的联合密度上，而不是位于一个难以计算的积分之外。因而，它更适合做迭代优化。
 
-这就是本节的核心结果。与其直接最大化通常不可计算的 \(\log p(\mathbf{x};\theta)\)，不如最大化一个可处理的下界；该下界依赖两个对象：模型参数 \(\theta\) 和辅助分布 \(Q(\mathbf{z})\)。
+这就是本节的核心结果。与其直接最大化通常难以计算的 \(\log p(\mathbf{x};\theta)\)，不如最大化一个可处理的下界；该下界依赖两个对象：模型参数 \(\theta\) 和辅助分布 \(Q(\mathbf{z})\)。
 
 \subsection{什么时候下界会变成精确等式？}
 
@@ -617,7 +617,7 @@ p(\mathbf{x};\theta)
 =
 c
 \qquad
-\text{for all }\mathbf{z},
+\text{对所有 }\mathbf{z}\text{ 成立},
 \]
 其中 \(c\) 与 \(\mathbf{z}\) 无关。
 
@@ -657,7 +657,7 @@ p(\mathbf{z}\mid\mathbf{x};\theta),
 \[
 Q(\mathbf{z})=p(\mathbf{z}\mid\mathbf{x};\theta),
 \]
-也就是辅助分布与真实潜变量后验完全一致。这一点非常关键：ELBO 并不是任意构造的替代目标，它的紧致程度完全由 \(Q(\mathbf{z})\) 对真实后验的逼近程度所控制。
+也就是辅助分布与真实潜变量后验完全一致。这一点非常关键：ELBO 并不是任意构造的替代目标，它与真实对数似然的接近程度由 \(Q(\mathbf{z})\) 对真实后验的逼近程度所控制。
 
 这个视角也进一步说明了 PPCA 在本章中的作用。PPCA 的特殊之处并不在于它绕开了潜变量问题，而在于它恰好能够把这个问题精确解决。其后验 \(p(\mathbf{z}\mid\mathbf{x})\) 可解析计算，边缘似然 \(p(\mathbf{x})\) 也可精确求得，因此 PPCA 并不严格需要 ELBO。
 
@@ -741,9 +741,9 @@ PPCA 的特殊性在于，它的若干核心量——包括边缘似然和后验
 \[
 \boxed{
 \begin{aligned}
-\text{E-step:}\quad
+\text{E 步：}\quad
 &Q^{(t)}(\mathbf{z})=p(\mathbf{z}\mid\mathbf{x};\theta^{(t)}),\\[4pt]
-\text{M-step:}\quad
+\text{M 步：}\quad
 &\theta^{(t+1)}
 =
 \arg\max_{\theta}
@@ -838,8 +838,8 @@ p(\mathbf{z}\mid\mathbf{x})
 
 下一章中，变分自编码器将把重构、概率推断和潜在空间正则化统一进一个变分目标，从而完整展开这一思想。
 
-\section*{总结与参考文献}
-\addcontentsline{toc}{section}{总结与参考文献}
+\section*{本章小结与参考文献}
+\addcontentsline{toc}{section}{本章小结与参考文献}
 
 本章把概率主成分分析（PPCA）作为本书中的第一个概率潜变量模型进行了介绍。它在 PCA 的确定性图景之上，引入潜变量先验、概率解码器、用于学习的边缘似然以及用于推断的后验分布。
 

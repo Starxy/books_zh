@@ -69,7 +69,7 @@
   朝先验的正则化相互权衡。
 };
 
-\draw[flow] (joint) -- node[left] {\scriptsize Bayes 规则} (inf);
+\draw[flow] (joint) -- node[left] {\scriptsize 贝叶斯公式} (inf);
 \draw[flow] (joint) -- node[right] {\scriptsize 分解联合分布} (train);
 
 \node[font=\normalsize\bfseries] at (0,3.45)
@@ -77,6 +77,6 @@
 
 \end{tikzpicture}
 \caption{\textbf{VAE ELBO 的三种等价视角。}
-联合密度形式是一般变分目标。利用 Bayes 规则可得到推断视角，即“精确对数似然减去后验不匹配”；对联合分布进行分解则得到训练视角，即“期望重构对数似然减去朝潜变量先验的正则化”。三种形式在代数上完全等价。}
+联合密度形式是一般变分目标。利用 贝叶斯公式可得到推断视角，即“精确对数似然减去后验不匹配”；对联合分布进行分解则得到训练视角，即“期望重构对数似然减去朝潜变量先验的正则化”。三种形式在代数上完全等价。}
 \label{fig:vae-elbo-three-views}
 \end{figure}

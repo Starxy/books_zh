@@ -1,0 +1,92 @@
+{
+  "fig1_1a_rotation.pdf": {"rotation": "旋转"},
+  "fig1_1b_shear.pdf": {"(b) Shear": "(b) 剪切"},
+  "fig1_2a_bad_direction.pdf": {
+    "(a) A non-principal direction": "(a) 非主方向",
+    "lower projected variance, higher reconstruction error": "投影方差较小，重构误差较大"
+  },
+  "fig1_2b_pc_direction.pdf": {
+    "(b) Leading principal direction": "(b) 第一主方向",
+    "higher projected variance, lower reconstruction error": "投影方差较大，重构误差较小"
+  },
+  "fig1_3a_original_coordinates.pdf": {"(a) Original coordinates": "(a) 原始坐标"},
+  "fig1_3b_pca_coordinates.pdf": {"(b) Principal-component coordinates": "(b) 主成分坐标"},
+  "fig1_4a_pca_basis.pdf": {"(a) PCA: orthonormal basis": "(a) PCA：标准正交基"},
+  "fig1_4b_linear_ae_basis.pdf": {"(b) Linear AE: another basis, same plane": "(b) 线性自编码器：不同基，同一平面"},
+  "fig1_4c_nonlinear_manifold.pdf": {"(c) Nonlinear AE: curved manifold": "(c) 非线性自编码器：弯曲流形"},
+  "fig2_1a_prior.pdf": {"(a) Selected coordinates under": "(a) 在下列先验中选取坐标："},
+  "fig2_1b_means.pdf": {"(b) Conditional means": "(b) 条件均值"},
+  "fig2_1c_conditionals.pdf": {"(c) Samples from": "(c) 采样自"},
+  "fig2_2a_latent_cov.pdf": {"(a) Latent-induced covariance": "(a) 潜变量诱导的协方差"},
+  "fig2_2b_noise_cov.pdf": {"(b) Noise covariance": "(b) 噪声协方差"},
+  "fig2_2c_total_cov.pdf": {"(c) Total covariance": "(c) 总协方差"},
+  "fig2_3a_prior.pdf": {"(a) Prior": "(a) 先验", "with selected": "与选定的"},
+  "fig2_3b_conditional.pdf": {"(b) Conditional": "(b) 条件分布"},
+  "fig2_3c_marginal.pdf": {"(c) Marginal": "(c) 边缘分布"},
+  "fig2_3d_posterior.pdf": {"(d) Exact posterior": "(d) 精确后验"},
+  "figure3_1_ae_vs_vae_latent_representation.pdf": {"(a) Autoencoder: one latent point": "(a) 自编码器：一个潜在点"},
+  "figure4_1_forward_diffusion_closed_form.pdf": {
+    "Forward diffusion: marginal noising and the closed-form coefficients": "前向扩散：边缘分布的加噪与闭式系数",
+    "time step": "时间步", "signal coefficient": "信号系数", "noise coefficient": "噪声系数", "coefficient": "系数"
+  },
+  "figure4_3_true_reverse_posterior_gaussian_fusion.pdf": {
+    "normalised likelihood factor": "归一化的似然因子",
+    "density / normalised factor": "密度／归一化因子",
+    "candidate previous state": "候选的前一步状态"
+  },
+  "fig5_1a_contraction.pdf": {"(a) Deterministic contraction": "(a) 确定性收缩", "time": "时间"},
+  "fig5_1b_brownian.pdf": {"(b) Brownian motion": "(b) 布朗运动", "time": "时间"},
+  "fig5_1c_ou.pdf": {"time": "时间"},
+  "fig5_3a_drift_only.pdf": {"(a) Drift only: transport and compression": "(a) 仅有漂移：输运与压缩", "density": "密度"},
+  "fig5_3b_diffusion_only.pdf": {"(b) Diffusion only: smoothing and spreading": "(b) 仅有扩散：平滑与展宽", "density": "密度"},
+  "fig5_3c_ou_density.pdf": {"(c) Drift + diffusion:": "(c) 漂移＋扩散：", "density": "密度"},
+  "chapter6_score_at_a_glance_figure.pdf": {
+    "Score-based generative modelling at a glance": "基于得分的生成建模概览",
+    "Local score geometry": "得分的局部几何",
+    "density": "密度", "vector field": "向量场",
+    "Sampling with a score": "利用得分采样",
+    "score drift": "得分漂移", "Brownian noise": "布朗噪声", "Langevin dynamics": "Langevin动力学",
+    "Learn the score": "学习得分", "score matching": "得分匹配", "denoising": "去噪",
+    "Many noise levels": "多个噪声水平", "coarse-to-fine fields": "由粗到细的场",
+    "Time-dependent": "随时间变化的", "diffusion": "扩散", "guides the reverse SDE": "引导逆时间SDE",
+    "Back to DDPM": "回到DDPM", "noise prediction carries": "噪声预测包含", "score information": "得分信息"
+  },
+  "figure6_1_score_field_geometry.pdf": {
+    "A probability density becomes a local direction field": "概率密度转化为局部方向场",
+    "(a) Density contours": "(a) 密度等高线", "(b) Score directions": "(b) 得分方向"
+  },
+  "figure6_3_dsm_regression_geometry.pdf": {
+    "DSM: individual denoising targets average to the noisy score": "去噪得分匹配：逐样本去噪目标的均值给出带噪分布的得分",
+    "marginal score": "边缘得分", "possible clean points": "可能的干净点", "corrupted point": "受扰点"
+  },
+  "chapter7_exact_density_at_a_glance.pdf": {
+    "Exact density models at a glance": "精确密度模型概览",
+    "Route 1: normalising flows": "路线1：归一化流",
+    "Route 2: autoregressive": "路线2：自回归", "factorisation": "分解",
+    "invertible transformation": "可逆变换", "tractable Jacobian": "易于计算的Jacobian",
+    "likelihood:": "似然：", "log-determinants": "对数行列式", "sampling:": "采样：", "through forward maps": "通过正向映射",
+    "ordered conditional dependencies": "有序条件依赖", "sum con-": "各条件", "ditional log-densities": "对数密度之和",
+    "Common design principle: tractability by structure": "共同设计原则：以结构保证易于计算",
+    "triangular Jacobians in coupling flows": "耦合流中的三角Jacobian矩阵",
+    "triangular dependency masks in autoregressive models": "自回归模型中的三角依赖掩码"
+  },
+  "figure7_1_change_of_variables_geometry.pdf": {
+    "(a) Base-space neighbourhood": "(a) 基础空间中的邻域",
+    "(b) After the invertible map": "(b) 经可逆映射后：", "area": "面积"
+  },
+  "figure7_2_planar_flow_rank_one.pdf": {
+    "(a) Input grid": "(a) 输入网格", "(b) After one planar flow": "(b) 经过一次平面流",
+    "all residual displacements are parallel to": "所有残差位移都平行于"
+  },
+  "figure8_1_optimal_discriminator.pdf": {
+    "The optimal discriminator is a local density-ratio object": "最优判别器由局部密度比决定",
+    "(a) Real and generator densities": "(a) 真实分布与生成分布的密度",
+    "(b) Optimal discriminator": "(b) 最优判别器", "dominates": "占优", "density": "密度"
+  },
+  "figure8_2_a.pdf": {"(a) Same shape, increasing separation": "(a) 形状相同，间距增大", "density": "密度", "separation": "间距"},
+  "figure8_2_b.pdf": {"(b) JS becomes nearly saturated": "(b) JS散度接近饱和", "JS divergence": "JS散度", "separation": "间距"},
+  "figure8_2_c.pdf": {"(c) Wasserstein remains geometric:": "(c) Wasserstein距离保留几何差异：", "separation": "间距"},
+  "figure8_3_a.pdf": {"(a) Scalar energy landscape": "(a) 标量能量景观"},
+  "figure8_3_b.pdf": {"(b) Exponentiating reverses the landscape": "(b) 负指数变换翻转景观", "unnormalised weight": "未归一化权重"},
+  "figure8_3_c.pdf": {"(c) Divide by": "(c) 除以", "to normalise globally": "进行全局归一化", "density": "密度"}
+}

@@ -2,6 +2,6 @@
 \centering
 \includegraphics[width=0.80\textwidth]{figures/ch06/figure6_3_dsm_regression_geometry.pdf}
 \caption{\textbf{把去噪得分匹配理解为最小二乘回归。}
-在这个有限示例中，细箭头表示各个可能干净点对应的可处理条件目标 $(x-\tilde{x})/\sigma^2$，其视觉强度反映相应的后验责任度。按后验加权后的平均值由粗箭头表示，终点位于 $\mathbb{E}[x\mid\tilde{x}]$，并等于边缘得分 $\nabla_{\tilde{x}}\log p_\sigma(\tilde{x})$。因此，平方误差回归能够从单个去噪目标恢复含噪分布的得分。}
+在这个有限示例中，细箭头表示各个可能干净点对应的可处理条件目标 $(x-\tilde{x})/\sigma^2$，其视觉强度反映相应的后验责任度。按后验加权后的平均值由粗箭头表示，终点位于 $\mathbb{E}[x\mid\tilde{x}]$，并等于边缘得分 $\nabla_{\tilde{x}}\log p_\sigma(\tilde{x})$。因此，平方误差回归能够从单个去噪目标恢复带噪分布的得分。}
 \label{fig:score-dsm-regression}
 \end{figure}

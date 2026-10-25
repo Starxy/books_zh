@@ -1,11 +1,11 @@
-\documentclass[UTF8,12pt,oneside]{ctexbook}
+\documentclass[UTF8,12pt,oneside,fontset=none]{ctexbook}
 \setcounter{tocdepth}{1}
 %------------------------------------------------
 % Packages
 %------------------------------------------------
 \usepackage{fontspec}
 \setmainfont{Noto Serif}
-\setCJKmainfont{Noto Serif CJK SC}
+\setCJKmainfont[AutoFakeSlant=0.15]{Noto Serif CJK SC}
 \setCJKsansfont{Noto Sans CJK SC}
 \setCJKmonofont{Noto Sans Mono CJK SC}
 \usepackage{tikz}
@@ -37,6 +37,11 @@
 \geometry{margin=1in}
 \setlength{\headheight}{15pt}
 \emergencystretch=2em
+% Allow three-digit page numbers in the table of contents.
+\makeatletter
+\renewcommand{\@pnumwidth}{2.5em}
+\renewcommand{\@tocrmarg}{3.5em}
+\makeatother
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[RO]{\thepage}
@@ -111,7 +116,7 @@ Tianhua Chen\\[0.3em]
 哈德斯菲尔德大学\\[0.3em]
 \texttt{t.chen@hud.ac.uk}\\[1.5em]
 预印本中文翻译版\\
-基于 arXiv:2605.29713v2（CC BY 4.0）\\
+基于 arXiv:2605.29713v2\\
 \bookdate
 }
 \date{}
@@ -124,7 +129,10 @@ Tianhua Chen\\[0.3em]
 
 \begin{document}
 \frontmatter
+% The title page and preface both use i; only the preface needs a page anchor.
+\hypersetup{pageanchor=false}
 \maketitle
+\hypersetup{pageanchor=true}
 \include{chapters/prefer_new_short}
 \tableofcontents
 \mainmatter
