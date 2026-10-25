@@ -1,0 +1,269 @@
+{
+  "chapter": 18,
+  "status": "complete",
+  "title_en": "Online Super Learning",
+  "title_zh": "在线超级学习",
+  "authors": [
+    "Mark J. van der Laan",
+    "David Benkeser"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_originals/chapters_en/19_CH18_Online_Super_Learning.pdf",
+    "pages": 14,
+    "body_pages": 13,
+    "printed_body_pages": "303–315",
+    "part_v_first_page_by_root": true,
+    "english_words_approx": 4560,
+    "all_source_pages_viewed": true,
+    "reader_annotations_excluded_in_memory": true,
+    "source_pdf_unchanged": true,
+    "sha256": "35fe5905da8b52e103f515a0c957329ceaf73d2ecbd476490f37e9e72961c46e"
+  },
+  "pages": 10,
+  "han_characters_tex_without_comment_lines": 4993,
+  "han_characters_pdf_including_running_heads": 5109,
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch18.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch18a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch18b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch18c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch18d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch18e.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第18章_中文译稿.pdf",
+  "sha256": "480d75dd048c120d366f3422ead26e9dc1d4f79343de5d5b3ea32f8dd76ff5f9",
+  "coverage": {
+    "full_chapter": true,
+    "sections": 5,
+    "subsections": 11,
+    "all_prose_math_algorithms_and_citations": true,
+    "detail": "work/targeted_learning/ch18_work/coverage_detail.json"
+  },
+  "formulas": {
+    "source_display_groups": 47,
+    "translation_display_groups": 49,
+    "original_inline_to_display": 2,
+    "numbered_tags": [
+      "18.1",
+      "18.2",
+      "18.3"
+    ],
+    "unnumbered_groups": 46,
+    "original_numbering_preserved": true,
+    "all_math_visually_checked": true,
+    "inventory": "work/targeted_learning/ch18_work/coverage_detail.json"
+  },
+  "results": {
+    "theorems": [
+      "18.1",
+      "18.2",
+      "18.3"
+    ],
+    "all_assumptions_constants_bounds_discussions": true,
+    "source_proof_omission_fully_translated": true,
+    "no_proof_added": true
+  },
+  "figures": [],
+  "tables": [],
+  "source_boxes": 2,
+  "body_footnotes": 0,
+  "citation_audit": {
+    "source_body_year_groups": 16,
+    "all_years_and_suffixes_match": true,
+    "all_author_names_checked": true,
+    "evidence": "work/targeted_learning/ch18_work/structural_citation_audit.json"
+  },
+  "new_terms": [
+    {
+      "en": "online cross-validation selector",
+      "zh": "在线交叉验证选择器",
+      "note": ""
+    },
+    {
+      "en": "online oracle selector",
+      "zh": "在线预言选择器",
+      "note": ""
+    },
+    {
+      "en": "online cross-validated risk",
+      "zh": "在线交叉验证风险",
+      "note": ""
+    },
+    {
+      "en": "online cross-validated true risk",
+      "zh": "在线交叉验证真实风险",
+      "note": "依赖历史的条件真实风险，区别于对数据取外层期望。"
+    },
+    {
+      "en": "quadratic loss function",
+      "zh": "二次损失函数",
+      "note": "原书在目标真值附近呈二次行为的一般损失类，不限于平方误差损失。"
+    },
+    {
+      "en": "nonquadratic loss function",
+      "zh": "非二次损失函数",
+      "note": ""
+    },
+    {
+      "en": "second-order stochastic gradient descent",
+      "zh": "二阶随机梯度下降",
+      "note": ""
+    },
+    {
+      "en": "Kullback-Leibler divergence",
+      "zh": "Kullback–Leibler 散度",
+      "note": "与既有Kullback–Leibler差异度按原词分别使用。"
+    }
+  ],
+  "source_anomalies": [
+    {
+      "id": "loss-definition-lhs",
+      "source_split_page": 4,
+      "reason": "损失定义的左端原印P_theta0,t,z L(psi0)，右端为argmin_psi P_theta0,t,z L(psi)，并非左端psi0。",
+      "action": "400dpi确认后照录左端期望损失及右端argmin，未改数学含义。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "regression-o-and-argument-orders",
+      "source_split_page": 5,
+      "reason": "回归例原印P_{o(t)}（小写字母o）；前段psi0(w,z)，损失psi(Z,W)，随后极小点psi0(z,w)。",
+      "action": "400dpi确认，分别保留o(t)与所有原参数顺序。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "split-normalization",
+      "source_split_page": 5,
+      "reason": "时点范围为t0=nl+1,…,n，原文仍将划分数及全部风险分母写成n−nl+1。",
+      "action": "原范围、计数陈述及各处n−nl+1全部保留，未静默减1。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "postupdate-risk-and-missing-parenthesis",
+      "source_split_page": 6,
+      "reason": "更新文字先将Psihat(Pn)更新成Psihat(Pn+1)，再在新观测上计算其损失；该损失表达式L缺外层可见右圆括号，与前序风险定义的训练索引写法不同。",
+      "action": "400dpi确认，保留Pn+1和缺失的可见闭括号；普通括号保证TeX编译，不补原书没有的符号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "open-ended-superlearner-range",
+      "source_split_pages": [
+        6,
+        12
+      ],
+      "reason": "两处在线超级学习器定义的原印取值范围分别为t=1,…,.与t=nl,…,.，省略号后有逗号。",
+      "action": "两处开放上界及原尾逗号照录，没有增添n。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "sgd-indices-and-comparison",
+      "source_split_page": 8,
+      "reason": "cn求和中二阶导数写S^1_{n,alpha_{t0−1}}，更新式仍用S*_{n,alpha*n}而非n+1；后段先检查新风险≥旧风险，再写“若不满足”才替换为减风险的凸组合。",
+      "action": "400dpi确认，保留S^1、n、alpha层级、≥和原文“若不满足”的逻辑。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "a4-failure-small-o",
+      "source_split_pages": [
+        10,
+        14
+      ],
+      "reason": "定理18.1和18.3在A4不成立时，均原印两个小o_P项：o_P(n^-1 M3n^3)+o_P(n^-1 M3n^2(1+logK(n)))。",
+      "action": "400dpi确认后保留小o_P与全部幂次/括号，未改成大O_P。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "assumption-discussion-wording",
+      "source_split_page": 10,
+      "reason": "A1正式条件界定损失差，讨论文字称损失函数有界；A3讨论原印中心化log差与区间[-logn,logn]的等价说法。",
+      "action": "正式条件和完整讨论分别按源保留，不以数学推断重写。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "theorem18.3-a2-missing-brace",
+      "source_split_page": 13,
+      "reason": "定理18.3 A2风险比分母原印barP0{L(psi)−L(psi0)，没有可见右花括号。",
+      "action": "400dpi确认，TeX分式分组保持合法，分母用字面左花括号且不补可见右花括号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "proof-reference-without-printed-proof",
+      "source_split_page": 14,
+      "reason": "定理18.3证明说明引用定理18.1的证明并称类似故略，但本章没有印出定理18.1/18.2的证明。",
+      "action": "完整照译原书实际的证明省略说明与平均V项观察，不补造任何证明。",
+      "blocks_delivery": false
+    }
+  ],
+  "unresolved_items": [],
+  "compile": {
+    "engine": "XeLaTeX",
+    "build_directory": "work/targeted_learning/ch18_work/build_182440",
+    "return_codes": [
+      0,
+      0
+    ],
+    "errors": [],
+    "missing_glyphs": [],
+    "overfull": [],
+    "undefined_references": []
+  },
+  "visual_checks": {
+    "all_source_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "all_output_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "source_400dpi_crop_count": 11,
+    "all_displays_and_nested_indices_checked": true,
+    "output_png_pattern": "work/targeted_learning/ch18_work/qa_final_*.png",
+    "last_term_change_recheck": "work/targeted_learning/ch18_work/last_term_normalization_page_changes.json"
+  },
+  "delivered_pdf_reopened": {
+    "path": "outputs/分章中文/Targeted_Learning_第18章_中文译稿.pdf",
+    "pages": 10,
+    "last_bookmark": [
+      2,
+      "18.5 讨论",
+      10
+    ],
+    "sha256": "480d75dd048c120d366f3422ead26e9dc1d4f79343de5d5b3ea32f8dd76ff5f9",
+    "matches_final_build": true
+  },
+  "isolated_test_drivers_removed": [
+    "work/targeted_learning/ch18_work/test_ch18.tex"
+  ],
+  "integration_focus_chinese_pages": [
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "shared_files_edited": []
+}

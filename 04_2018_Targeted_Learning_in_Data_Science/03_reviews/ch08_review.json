@@ -1,0 +1,467 @@
+{
+  "chapter": 8,
+  "status": "complete",
+  "title_en": "HAL Estimator of the Efficient Influence Curve",
+  "title_zh": "有效影响曲线的 HAL 估计量",
+  "authors": [
+    "Mark J. van der Laan"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_originals/chapters_en/09_CH08_HAL_Estimator_of_the_Efficient_Influence_Curve.pdf",
+    "split_pdf_pages": 21,
+    "chapter_printed_pages": "103–123",
+    "english_words_approx": 9841,
+    "source_rendered_and_visually_checked_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "all_displayed_equations_checked_against_source_images": true,
+    "additional_400dpi_crops_checked": [
+      "source page 6 rate exponent",
+      "source page 16 score superscripts and indicators",
+      "source page 18 final estimator"
+    ],
+    "annotations_removed_in_memory_before_rendering": true,
+    "original_source_untouched": true
+  },
+  "pages": 18,
+  "han_characters_pdf_including_running_heads": 7760,
+  "han_characters_tex_without_comment_lines": 7485,
+  "page_count_note": "完整正文按统一A4体例重排，未按页数比增删内容。",
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08d.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08e.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08f.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08g.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch08h.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第08章_中文译稿.pdf",
+  "sha256": "5cf3d497123850447935880725493f976eea8a392eaba4f8f772736af8a983a0",
+  "chapter_intro": {
+    "source_split_pages": [
+      1,
+      2
+    ],
+    "chinese_page": 1,
+    "complete": true
+  },
+  "sections": [
+    {
+      "number": "8.1",
+      "title": "有效影响曲线的 HAL 最小二乘线性回归估计量的构造",
+      "source_split_pages": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "chinese_pages": [
+        2,
+        3,
+        4
+      ],
+      "file": "chapters/ch08a.tex",
+      "complete": true
+    },
+    {
+      "number": "8.2",
+      "title": "有效影响曲线的 HAL 估计量的收敛速率",
+      "source_split_pages": [
+        5,
+        6,
+        7
+      ],
+      "chinese_pages": [
+        4,
+        5,
+        6
+      ],
+      "file": "chapters/ch08b.tex",
+      "complete": true
+    },
+    {
+      "number": "8.3",
+      "title": "基于现状数据的截断均值",
+      "source_split_pages": [
+        7,
+        8,
+        9
+      ],
+      "chinese_pages": [
+        6,
+        7
+      ],
+      "file": "chapters/ch08c.tex",
+      "complete": true
+    },
+    {
+      "number": "8.4",
+      "title": "基于区间删失数据的截断均值",
+      "source_split_pages": [
+        9,
+        10,
+        11
+      ],
+      "chinese_pages": [
+        7,
+        8,
+        9
+      ],
+      "file": "chapters/ch08d.tex",
+      "complete": true
+    },
+    {
+      "number": "8.5",
+      "title": "二值处理对区间删失事件发生时间的因果效应",
+      "source_split_pages": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "chinese_pages": [
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "file": "chapters/ch08e.tex",
+      "complete": true
+    },
+    {
+      "number": "8.6",
+      "title": "基于双变量右删失数据的双变量生存函数",
+      "source_split_pages": [
+        16,
+        17,
+        18
+      ],
+      "chinese_pages": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "file": "chapters/ch08f.tex",
+      "complete": true
+    },
+    {
+      "number": "8.7",
+      "title": "基于双变量右删失数据的二值处理对双变量生存概率的因果效应",
+      "source_split_pages": [
+        19,
+        20
+      ],
+      "chinese_pages": [
+        16,
+        17,
+        18
+      ],
+      "file": "chapters/ch08g.tex",
+      "complete": true
+    },
+    {
+      "number": "8.8",
+      "title": "讨论",
+      "source_split_pages": [
+        21
+      ],
+      "chinese_pages": [
+        18
+      ],
+      "file": "chapters/ch08h.tex",
+      "complete": true
+    }
+  ],
+  "subsections_complete": [
+    "8.2.1",
+    "8.2.2"
+  ],
+  "equations": {
+    "numbered_tags": [],
+    "display_groups_in_translation": 86,
+    "display_groups_by_file": {
+      "ch08a.tex": 13,
+      "ch08b.tex": 8,
+      "ch08c.tex": 9,
+      "ch08d.tex": 9,
+      "ch08e.tex": 22,
+      "ch08f.tex": 16,
+      "ch08g.tex": 9,
+      "ch08h.tex": 0
+    },
+    "all_source_displays_transcribed_and_checked": true,
+    "some_inline_formulas_displayed_for_readability": true
+  },
+  "results": {
+    "theorems": [
+      "8.1"
+    ],
+    "proofs": 1,
+    "all_original_proofs_and_derivations_translated": true
+  },
+  "source_boxes": {
+    "count": 3,
+    "source_split_pages": [
+      1,
+      7,
+      21
+    ],
+    "preserved": true
+  },
+  "tables": [],
+  "figures": [],
+  "completeness_evidence": {
+    "section_count_matches_outline": [
+      8,
+      8
+    ],
+    "subsection_count_matches_outline": [
+      2,
+      2
+    ],
+    "author_affiliations_email_and_doi_preserved": true,
+    "chapter_intro_all_paragraphs_examples_proof_and_discussion_checked": true,
+    "citation_year_multisets_identical": true,
+    "citation_year_counts": {
+      "2017": 1,
+      "2011": 1,
+      "2003": 1,
+      "2015": 4,
+      "2015a": 1
+    },
+    "citation_check": "van der Laan(2017)×1；van der Vaart/Wellner(2011)×1；van der Laan/Dudoit(2003)×1；van der Laan等(2015)×2；Frangakis等(2015)×2；Luedtke等(2015a)×1。"
+  },
+  "new_terms": [
+    {
+      "en": "monitoring time",
+      "zh": "监测时间"
+    },
+    {
+      "en": "coarsening",
+      "zh": "粗化",
+      "note": "本章C(o)指相应粗化集，coarsening interval译“粗化区间”。"
+    },
+    {
+      "en": "subtangent space",
+      "zh": "子切空间"
+    }
+  ],
+  "unresolved_items": [],
+  "source_anomalies": [
+    {
+      "source_split_pages": [
+        4,
+        5
+      ],
+      "reason": "A_P(h)展开首行的dh_S(u_S缺右括号；phi_{S,j}(O_i)的右端遗漏(O_i)；定理前的有限基函数子集有一个无配对右花括号。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        6
+      ],
+      "reason": "较快速率的指数印为-(1/2+alpha(d)/4，指数内部缺右括号；已用400dpi裁片确认。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        8
+      ],
+      "reason": "截断均值定义为积分bar F(t)r(t)dt，正文却称r(t)=t时等于T的均值。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        8,
+        9,
+        12,
+        19
+      ],
+      "reason": "模型集合将F,G或Q,G同时写成属于G，正文却仅限制G；各处原集合照录。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        9
+      ],
+      "reason": "现状数据的离散化回归及最终估计式中，多处边际项仍印为bar F(x)，未改成bar F(C_j)。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        10,
+        12
+      ],
+      "reason": "简化现状数据向量的最外层右括号缺失。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        11,
+        14
+      ],
+      "reason": "系数L1范数求和上限印为n，尽管文中支持点数J可达2n。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        12
+      ],
+      "reason": "目标参数记号在Psi_a^f、Psi^f与Psi_a之间变动；密度式中的大写A,W与小写a,w混用。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        13
+      ],
+      "reason": "单变量区间删失事件时间一节将T写成(T1,T2)，并称算子映入(tilde T,Delta)的函数空间；h*(P)(T|A,W)=h*(P|A,W)也混合函数及函数值记法。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        14
+      ],
+      "reason": "条件抽样固定A,W，后续公式仍使用A_i,W_i；J个主项的正文描述又将bar F(x_j|A,W)印成bar F(x_j)。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        15
+      ],
+      "reason": "“Nonconditional Maximization Approach”标题为极大化，正文及公式为极小化；基函数的变量顺序从(W,A,T)变成(T,A,W)，Fh式使用dh(u)，A_F(h_n)展开系数另加星号，sum_{j=1}没有上限。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        16,
+        20
+      ],
+      "reason": "二元右删失得分展开的两个分式都乘I(Delta=(0,1))；第二项未改成推测的(1,0)。F^{01}及F^{10}为上标，已用400dpi确认。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        16,
+        19
+      ],
+      "reason": "kappa_t(O)的定义仍使用阈值t_0；第8.7节IPCW估计量分母印bar G而梯度分母为bar G_c。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        17
+      ],
+      "reason": "第三组支持点集合印为{(tilde T_i:i}，左圆括号没有配对。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    },
+    {
+      "source_split_pages": [
+        18
+      ],
+      "reason": "A_F展开首项使用h(dm_{j1},0)，前后定义却为m_{1j}；L1范数求和未把三项括起；最终D_n左侧为O而右侧为X_i及O_i，首分量还缺左括号。400dpi裁片已确认。",
+      "action": "已对照原页印刷式确认并保留，未推测改正。",
+      "blocks_delivery": false
+    }
+  ],
+  "numbering_oddities": [
+    "本章原文没有编号公式；仅定理8.1，不给无编号展示式补造tag。"
+  ],
+  "build_checks": {
+    "engine": "xelatex",
+    "passes": [
+      0,
+      0
+    ],
+    "build_directory": "work/targeted_learning/ch08_work/build_160351",
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "undefined_references": 0,
+    "underfull_warnings": [
+      "Underfull \\vbox (badness 10000) has occurred while \\output is active []"
+    ],
+    "underfull_visual_result": "18页全部逐页检查，无异常拉伸、遮挡或页脚冲突。",
+    "other_warnings": [
+      "Package caption Warning: Unused \\captionsetup[figure] on input line 22.",
+      "Package caption Warning: Unused \\captionsetup[table] on input line 23."
+    ],
+    "output_pages_rendered_and_visually_checked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "chapter_counter_or_part_residue": false,
+    "control_characters": [],
+    "shipped_file_reopened": true,
+    "shipped_page_count": 18,
+    "last_bookmark": [
+      2,
+      "8.8 讨论",
+      18
+    ],
+    "shipped_sha256_matches_build_record": true,
+    "self_test_driver_removed": true
+  },
+  "qa_artifacts": {
+    "structure_audit": "work/targeted_learning/ch08_work/structure_audit.json",
+    "output_images": "work/targeted_learning/ch08_work/qa_all_NNN.png",
+    "source_images": "work/targeted_learning/ch08_work/source_NNN.png"
+  },
+  "shared_files_edited": []
+}

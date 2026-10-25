@@ -1,0 +1,330 @@
+{
+  "chapter": 8,
+  "title_zh": "元学习",
+  "status": "complete",
+  "page_count": 6,
+  "page_count_scope": "单章独立编译；正文至第5页，随附参考文献位于第5页后半至第6页。",
+  "source": {
+    "effective_tex": "work/agentic/active/part2/08_meta.tex",
+    "source_chapter_pdf_used": false,
+    "online_source_used": false,
+    "bibliography": "保留原文 bibliographystyle 与 bibliography 调用；工程 part2/08_meta.bbl 与原包同路径文件的 SHA-256 一致，未改写参考文献。"
+  },
+  "file_list": [
+    "01_source/part2/08_meta.tex",
+    "03_reviews/ch08_translation_review.json"
+  ],
+  "coverage": "完整逐段译出全部有效正文、4项学习目标、5节、4小节、6小小节、迁移学习段落、Mozart问题示例及结语；保留全部20段数学表达式（含1个内外循环行间公式）、标签、跨章引用、8次文献引用命令中的11个文献键，以及原文参考文献调用。有效源码与译文均为54个非空段落块。本章无外部图、表格、脚注、代码或独立练习环境。",
+  "structure_checks": {
+    "chapter": {
+      "source_count": 1,
+      "translation_count": 1,
+      "count_match": true
+    },
+    "section": {
+      "source_count": 5,
+      "translation_count": 5,
+      "count_match": true
+    },
+    "subsection": {
+      "source_count": 4,
+      "translation_count": 4,
+      "count_match": true
+    },
+    "subsubsection": {
+      "source_count": 6,
+      "translation_count": 6,
+      "count_match": true
+    },
+    "paragraph": {
+      "source_count": 1,
+      "translation_count": 1,
+      "count_match": true
+    },
+    "item": {
+      "source_count": 4,
+      "translation_count": 4,
+      "count_match": true
+    },
+    "footnote": {
+      "source_count": 0,
+      "translation_count": 0,
+      "count_match": true
+    },
+    "caption": {
+      "source_count": 0,
+      "translation_count": 0,
+      "count_match": true
+    },
+    "audit_file": "work/agentic/structure_audit_08.json",
+    "audit_results": {
+      "headings": {
+        "match": true,
+        "source_count": 17,
+        "translation_count": 17
+      },
+      "labels": {
+        "match": true,
+        "source_count": 1,
+        "translation_count": 1
+      },
+      "references": {
+        "match": true,
+        "source_count": 2,
+        "translation_count": 2
+      },
+      "citation_keys": {
+        "match": true,
+        "source_count": 8,
+        "translation_count": 8
+      },
+      "environments": {
+        "match": true,
+        "source_count": 2,
+        "translation_count": 2
+      },
+      "bibliography": {
+        "match": true,
+        "source_count": 1,
+        "translation_count": 1
+      },
+      "structural_commands": {
+        "match": true,
+        "source_count": 4,
+        "translation_count": 4
+      },
+      "code_blocks": {
+        "match": true
+      },
+      "math_segments": {
+        "match": false,
+        "symbol_multiset_match": true,
+        "source_count": 20,
+        "translation_count": 20,
+        "missing": [],
+        "added": []
+      },
+      "text": {
+        "source_english_words": 2654,
+        "translated_CJK": 4198,
+        "translation_characters": 6287,
+        "source_characters": 17427,
+        "source_paragraph_blocks": 54,
+        "translation_paragraph_blocks": 54
+      },
+      "stray_chapter_counter": false,
+      "stray_part": false
+    },
+    "ordered_labels_match": true,
+    "ordered_reference_calls_match": true,
+    "ordered_citation_calls_match": true,
+    "environment_sequence_match": true,
+    "bibliography_commands_unchanged": true,
+    "bbl_sha256_match": true,
+    "math": {
+      "source_count": 20,
+      "translation_count": 20,
+      "symbol_multiset_match": true,
+      "missing": [],
+      "added": [],
+      "ordering_note": "中文语序将同一句中的损失函数与参数化模型、以及任务/数据集/参数的出现顺序作了调整；表达式及其重数不变。行间公式仅将 textrm{outer loop}/textrm{inner loop} 改为 text{外循环}/text{内循环}，符号、算子、上下标与数值原样保留。"
+    },
+    "forbidden_inference_terms_found": false,
+    "stray_chapter_counter_found": false,
+    "stray_part_found": false
+  },
+  "new_terms": {
+    "metalearning": "元学习",
+    "meta-train phase": "元训练阶段",
+    "meta-test phase": "元测试阶段",
+    "base learner": "基础学习器",
+    "metalearner": "元学习器",
+    "meta optimization": "元优化",
+    "momentum": "动量",
+    "initialization scheme": "初始化方案",
+    "algorithm selection": "算法选择",
+    "pretrainer": "预训练器",
+    "damping": "阻尼",
+    "under-damped": "欠阻尼",
+    "student/teacher setup": "学生／教师设置",
+    "greedy behavior": "贪心行为",
+    "online machine learning": "在线机器学习",
+    "Hierarchical Reasoning Models (HRM)": "层次推理模型（HRM）"
+  },
+  "source_anomalies": [
+    {
+      "location": "8.1.1 Deep Learning is Slow",
+      "description": "原文 special parallel parallel hardware 中 parallel 连续重复。译文按单次“专用并行硬件”自然译出，不涉及方法或事实变更。"
+    },
+    {
+      "location": "8.2 Inner/Outer Loop，原文内外循环行间公式",
+      "description": "源码使用嵌套 argmin 示意内外循环，但外层损失未显式给出跨任务聚合、测试集或对内层最优参数的评价方式。译文完整保留原公式，仅翻译循环文字标注，不补写符号或更改目标。"
+    },
+    {
+      "location": "8.3 LLM and Metalearning，首段",
+      "description": "源文直接概括“Metalearning is repeated finetuning”，其范围比前文基于超参数学习的定义更窄；同段还将上下文少样本学习列入这一框架。正文保留作者的概括，没有替换为译者自拟的严格定义。"
+    },
+    {
+      "location": "8.3.1.2 In-Context Learning 与 8.3.2.1 Self-Reflection",
+      "description": "作者把静态预训练模型称为内循环或内训练循环，同时明确模型权重不受当前提示影响。这是本章对“学习循环”的广义用法；译文保留原表述，未擅自改写为参数更新过程。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "command": "python -X utf8 build.py --chapter 8 --name ch08",
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch08_2f0d0ee7/agenticbook.pdf",
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_source/build/ch08_2f0d0ee7/build_report.json",
+    "passes": 3,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overfull_count": 0,
+    "underfull_vbox_count": 1,
+    "undefined_references": false,
+    "undefined_citations": false,
+    "observed_nonblocking_warnings": [
+      "按要求关闭 shell escape；shellesc 包给出提示。",
+      "chapterbib 的 sectionbib 提示来自共享配置。",
+      "第1页出现一次 Underfull vbox（badness 1655）；目检页底、学习框与段间距正常，无溢出或遮挡。",
+      "日志记录 OT1/TeXGyreTermes 字形回退到 cmr；内外循环公式和全部符号已目检，无缺字。",
+      "两处单章跨章引用的 hyperref 目标为空而抑制链接；引用编号正常显示，未定义引用计数为0。全书链接由合排处理。"
+    ],
+    "training_or_example_commands_executed": false
+  },
+  "visual_qa": {
+    "renderer": "PyMuPDF",
+    "resolution_dpi": 108,
+    "initial_pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch08_23587307/agenticbook.pdf",
+    "initial_full_size_pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "language_polish_pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch08_c09626d1/agenticbook.pdf",
+    "language_polish_affected_pages_reinspected": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "final_pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch08_2f0d0ee7/agenticbook.pdf",
+    "final_affected_pages_reinspected": [
+      3
+    ],
+    "final_pixel_identical_pages_carried_forward": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "formula_page": 3,
+    "image_directory": "work/agentic/ch08_work",
+    "image_files": [
+      "work/agentic/ch08_work/qa_ch08_001.png",
+      "work/agentic/ch08_work/qa_ch08_002.png",
+      "work/agentic/ch08_work/qa_ch08_003.png",
+      "work/agentic/ch08_work/qa_ch08_004.png",
+      "work/agentic/ch08_work/qa_ch08_005.png",
+      "work/agentic/ch08_work/qa_ch08_006.png"
+    ],
+    "comparison_file": "work/agentic/ch08_work/final_page_comparison.json",
+    "checks": "全尺寸目检学习目标框、中文正文、各级标题、迁移学习段落、第3页内外循环公式及其中文下标注释、跨章引用编号，以及第5—6页参考文献。公式符号与括号完整，正文未见缺字、裁切或重叠；最终仅复核修改影响的第3页，其余页与前次通过的页图像素一致。"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_source/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

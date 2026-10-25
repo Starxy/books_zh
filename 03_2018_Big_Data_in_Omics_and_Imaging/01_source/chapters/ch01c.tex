@@ -1,0 +1,984 @@
+% 原书第34—60页（至1.5.6末）；第1.4—1.5节。
+% 原书疑似错误均保留，详见03_reviews/ch01c_review.md。
+\FloatBarrier
+\section{基因型—表型网络的函数型结构方程模型}
+\label{sec:ch01c-functional}
+
+上一节的结构方程模型逐个分析遗传变异。然而，使用传统的逐变异分析工具研究罕见变异与表型的关联，统计功效往往有限。大量模拟表明，整合所分析基因组区域内多个变异的信息，可以大幅提高检出罕见变异关联的功效。为利用多位点遗传信息，我们提出在多性状关联分析中以基因组区域或基因为单位，并发展稀疏函数型结构方程模型（sparse structural functional equation models，SFEMs），用于构建和分析表型与基因型网络。
+
+\subsection{函数型结构方程模型}
+
+首先定义基因型函数（genotype function）。令 $t$ 表示基因组位置，第 $i$ 个个体的基因型函数 $x_i(t)$ 定义为
+\[
+x_i(t)=
+\begin{cases}
+2P_q(t),& QQ,\\
+P_q(t)-P_Q(t),& Qq,\\
+-2P_Q(t),& qq.
+\end{cases}
+\]
+其中，$Q$ 和 $q$ 是基因组位置 $t$ 处标记的两个等位基因，$P_Q(t)$ 和 $P_q(t)$ 分别是等位基因 $Q$ 和 $q$ 的频率。假设我们关注 $k$ 个基因组区域或基因 $[a_j,b_j]$，将其记为 $T_j$，$j=1,2,\ldots,k$。考虑以下函数型结构方程模型（functional structural equation models，FSEMs）：
+\begin{equation}
+\begin{aligned}
+&y_1\gamma_{11}+y_2\gamma_{21}+\cdots+y_M\gamma_{M1}\\
+&\qquad+\int_{T_1}x_1(t)\beta_{11}(t)\,dt+\cdots
+ +\int_{T_k}x_k(t)\beta_{k1}(t)\,dt+e_1=0,\\
+&y_1\gamma_{12}+y_2\gamma_{22}+\cdots+y_M\gamma_{M2}\\
+&\qquad+\int_{T_1}x_1(t)\beta_{12}(t)\,dt+\cdots
+ +\int_{T_k}x_k(t)\beta_{k2}(t)\,dt+e_2=0,\\
+&\hspace{12em}\vdots\\
+&y_1\gamma_{1M}+y_2\gamma_{2M}+\cdots+y_M\gamma_{MM}\\
+&\qquad+\int_{T_1}x_1(t)\beta_{1M}(t)\,dt+\cdots
+ +\int_{T_k}x_k(t)\beta_{kM}(t)\,dt+e_M=0.
+\end{aligned}
+\tag{1.104}
+\end{equation}
+其中，$\beta_{ji}(t)$，$j=1,\ldots,k$，$i=1,\ldots,M$，是遗传效应函数。
+
+函数主成分（functional principal components，FPCs）是高效的汇总统计量。它同时利用各个变异的遗传信息，以及所有变异之间的相关信息，即连锁不平衡信息。函数主成分把一个基因组区域内的遗传变异视为基因组位置的函数，利用数据内在的函数相依结构，以及该区域内变异的全部可用遗传信息。相邻的遗传变异之间存在连锁；一个 SNP 的基因型依赖于附近 SNP 的基因型。函数主成分将遗传变异数据在空间上的排列顺序纳入考虑。用少数几个正交函数主成分展开基因型函数，可以大幅降低遗传变异数据的维数，同时保留数据内在的相关结构和空间顺序。具体而言，对每个基因组区域或基因，我们使用函数主成分分析计算主成分函数。令 $N$ 表示抽样个体数。对于每个基因组区域，将 $x_{nj}(t)$，$n=1,\ldots,N$，$j=1,2,\ldots,k$，按正交主成分函数展开：
+\[
+x_{nj}(t)=\sum_{l=1}^{L_j}\eta_{njl}\phi_{jl}(t),
+\qquad j=1,\ldots,k.
+\]
+其中，$\phi_{jl}(t)$，$j=1,\ldots,k$，$l=1,\ldots,L_j$，表示第 $j$ 个基因组区域或基因的第 $l$ 个主成分函数，$\eta_{njl}$ 是第 $n$ 个个体的函数主成分得分。由 $x_{nj}(t)$ 的函数主成分展开，得到
+\begin{equation}
+\begin{aligned}
+\int_{T_j}x_{nj}(t)\beta_{ji}(t)\,dt
+&=\int_{T_j}\sum_{l=1}^{L_j}\eta_{njl}\phi_{jl}(t)\beta_{ji}(t)\,dt\\
+&=\sum_{l=1}^{L_j}\eta_{njl}b_{jl}^{(i)},\\[-2pt]
+&\qquad n=1,\ldots,N,\quad j=1,\ldots,k,\quad i=1,\ldots,M,
+\end{aligned}
+\tag{1.105}
+\end{equation}
+其中
+\[
+b_{jl}^{(i)}=\int_{T_j}\phi_{jl}(t)\beta_{ji}(t)\,dt.
+\]
+令 $x_j(t)=[x_{1j}(t),\ldots,x_{nj}(t)]^T$，$\eta_{jl}=[\eta_{1jl},\ldots,\eta_{Njl}]^T$。将式 (1.105) 代入式 (1.104)，得到
+\begin{equation}
+\begin{aligned}
+&y_1r_{11}+y_2r_{21}+\cdots+y_Mr_{M1}
+ +\sum_{l=1}^{L_1}\eta_{1l}b_{1l}^{(1)}
+ +\cdots+\sum_{l=1}^{L_k}\eta_{kl}b_{kl}^{(1)}+e_1=0,\\
+&\hspace{15em}\vdots\\
+&y_1r_{1M}+y_2r_{2M}+\cdots+y_Mr_{MM}
+ +\sum_{l=1}^{L_1}\eta_{1l}b_{1l}^{(M)}
+ +\cdots+\sum_{l=1}^{L_k}\eta_{kl}b_{kl}^{(M)}+e_M=0.
+\end{aligned}
+\tag{1.106}
+\end{equation}
+令
+\[
+\eta=[\eta_{11},\ldots,\eta_{1L_1},\ldots,\eta_{k1},\ldots,\eta_{kL_k}],
+\]
+\[
+B=
+\begin{bmatrix}
+b_{11}^{(1)}&\cdots&b_{11}^{(M)}\\
+\vdots&\vdots&\vdots\\
+b_{1L_1}^{(1)}&\cdots&b_{1L_1}^{(M)}\\
+\vdots&\vdots&\vdots\\
+b_{k1}^{(1)}&\cdots&b_{k1}^{(M)}\\
+\vdots&\vdots&\vdots\\
+b_{kL_k}^{(1)}&\cdots&b_{kL_k}^{(M)}
+\end{bmatrix}
+=[B_1\ \cdots\ B_M],
+\]
+$Y$、$\Gamma$ 和 $E$ 的定义与前文相同。式 (1.106) 可写成矩阵形式
+\begin{equation}
+Y\Gamma+\eta B+E=0.
+\tag{1.107}
+\end{equation}
+如果只考虑一个基因组区域或基因，矩阵 $\eta$ 和 $B$ 就简化为
+\[
+\eta=[\eta_1,\ldots,\eta_L],
+\qquad
+B=\begin{bmatrix}
+b_{11}&\cdots&b_{1M}\\
+\vdots&\vdots&\vdots\\
+b_{L1}&\cdots&b_{LM}
+\end{bmatrix}.
+\]
+如果将函数主成分得分作为预测变量，用于估计网络结构和参数的模型与算法，就与上一节讨论的内容类似。具体地，第 $i$ 个方程为
+\[
+Y\Gamma_i+\eta B_i+e_i=0,
+\]
+可改写为
+\begin{equation}
+y_i=W_i\Delta_i+e_i,
+\tag{1.108}
+\end{equation}
+其中 $W_i=[Y_{-i}\ \eta]$，$\Delta_i=[\gamma_{-i}\ B_i]$。于是，稀疏函数型结构方程模型转化为
+\begin{equation}
+\begin{aligned}
+&\min_{\Delta_i}\quad f(\Delta_i)+\lambda\|\Delta_i\|_1,\\
+&f(\Delta_i)=
+(\eta^Ty_i-\eta^TW_i\Delta_i)^T
+(\eta^T\eta)^{-1}
+(\eta^Ty_i-\eta^TW_i\Delta_i).
+\end{aligned}
+\tag{1.109}
+\end{equation}
+最后，交替方向乘子法（ADMM）的算法如下。
+
+\begin{bookalgorithm}{1.4}
+对于 $i=1,\ldots,M$：
+
+\textbf{步骤 1：初始化。}
+\[
+\begin{aligned}
+u^0&:=0,\\
+\Delta_i^0&:=
+\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^TW_i\right]^{-1}
+W_i^T\eta(\eta^T\eta)^{-1}\eta^Ty_i,\\
+Z_i^0&:=\Delta_i^0.
+\end{aligned}
+\]
+重复步骤 2、3、4，直至收敛。
+
+\textbf{步骤 2。}
+\[
+\begin{aligned}
+\Delta_i^{(k+1)}:={}&
+\left[\frac1\rho I-\frac1\rho W_i^T\eta
+\left(\rho\eta^T\eta+\eta^TW_iW_i^T\eta\right)^{-1}
+\eta^TW_i\right]\\
+&\quad\cdot
+\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^Ty_i
+ +\rho\left(Z_i^k-u^k\right)\right].
+\end{aligned}
+\]
+\textbf{步骤 3。}
+\[
+Z_i^{(k+1)}:=
+\operatorname{sgn}\left(\Delta_i^{k+1}+u^k\right)
+\left(\left|\Delta_i^{k+1}+u^k\right|-\frac{\lambda}{\rho}\right)_+.
+\]
+\textbf{步骤 4。}
+\[
+u^{(k+)}:==u^{(k)}
+ +\left(\Delta_i^{(k+1)}-Z_i^{(k+1)}\right).
+\]
+\end{bookalgorithm}
+
+\subsection{函数型结构方程模型参数估计的组套索与 ADMM}
+
+在一个基因组区域或基因内，基因型函数的展开通常含有多个函数主成分。然而，在基因型—表型网络中，一个基因可以有一条指向表型的有向边。因此，需要将一个基因中基因型函数展开的所有函数主成分视为一组，使用组套索（group lasso）对该基因或基因组区域中的全部函数主成分施加惩罚。
+
+假设
+\[
+\Delta_i=
+\begin{bmatrix}\gamma_i\\B_i\end{bmatrix}
+=\begin{bmatrix}\gamma_i\\\Delta_{1i}\\\vdots\\\Delta_{Ki}\end{bmatrix},
+\qquad
+\Delta_{ki}=\begin{bmatrix}\Delta_{k1}^{(i)}\\\vdots\\\Delta_{kL_k}^{(i)}\end{bmatrix},
+\qquad
+\Delta_{kl}^{(i)}=b_{kl}^{(i)},\quad l=1,\ldots,L_k.
+\]
+令 $Z_{\gamma i}=\gamma_i$，$Z_{ki}=\Delta_{ki}$，$k=1,\ldots,K$，
+\[
+Z_{ki}
+=\begin{bmatrix}Z_{k1}^{(i)}\\\vdots\\Z_{kL_k}^{(i)}\end{bmatrix}
+=\begin{bmatrix}\Delta_{k1}^{(i)}\\\vdots\\\Delta_{kL_k}^{(i)}\end{bmatrix},
+\qquad
+Z_i=\begin{bmatrix}Z_{\gamma i}\\Z_{1i}\\\vdots\\Z_{Ki}\end{bmatrix}
+=\Delta_i.
+\]
+稀疏函数型结构方程模型旨在求解以下优化问题：
+\begin{equation}
+\min\quad f(\Delta_i)+
+\lambda\left[\|Z_{\gamma i}\|_1+
+\sum_{k=1}^K\sqrt{L_k}\|Z_{ki}\|_2\right],
+\tag{1.110}
+\end{equation}
+约束为 $\Delta_i-Z_i=0$。
+
+为求解优化问题 (1.110)，构造增广拉格朗日函数
+\begin{equation}
+\begin{aligned}
+L_\rho(\Delta_i,Z_i,\mu)
+={}&f(\Delta_i)+\lambda\|Z_{\gamma i}\|_1
+ +\lambda\sum_{k=1}^K\sqrt{L_k}\|Z_{ki}\|_2\\
+&+\mu^T(\Delta_i-Z_i)+\frac{\rho}{2}\|\Delta_i-Z_i\|_2^2\\
+={}&f(\Delta_i)+\lambda\|Z_{\gamma i}\|_1
+ +\lambda\sum_{k=1}^K\sqrt{L_k}\|Z_{ki}\|_2\\
+&+\frac{\rho}{2}\|\Delta_i-Z_i+\mu\|_2^2
+ -\frac{\rho}{2}\|\mu\|_2^2.
+\end{aligned}
+\tag{1.111}
+\end{equation}
+ADMM 算法由以下迭代构成：
+\begin{equation}
+\Delta_i^{(l+1)}:=
+\argmin_{\Delta_i}L_\rho\left(\Delta_i,Z_i^{(l)},\mu^{(l)}\right),
+\tag{1.112}
+\end{equation}
+\begin{equation}
+Z_i^{(l+1)}:=
+\argmin_{Z_i}L_\rho\left(\Delta_i^{(l+1)},Z_i,\mu^{(l)}\right),
+\tag{1.113}
+\end{equation}
+\begin{equation}
+\mu^{(l+1)}:=\mu^{(l)}+\Delta_i^{(l+1)}-Z_i^{(l+1)}.
+\tag{1.114}
+\end{equation}
+或者写成
+\begin{equation}
+\Delta_i^{(l+1)}:=
+\argmin_{\Delta_i}
+\left(f(\Delta_i)+\frac{\rho}{2}
+\left\|\Delta_i-Z_i^{(l)}+u^{(l)}\right\|_2^2\right),
+\tag{1.115}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+Z_i^{(l+1)}:=\argmin_{Z_i}\bigg(&\lambda\|Z_{\gamma i}\|_1
+ +\lambda\sum_{k=1}^K\sqrt{L_k}\|Z_{ki}\|_2\\
+&+\frac{\rho}{2}
+\left\|\Delta_i^{(l+1)}-Z_i+\mu^{(l)}\right\|_2^2\bigg),
+\end{aligned}
+\tag{1.116}
+\end{equation}
+\begin{equation}
+\mu^{(l+1)}:=\mu^{(l)}+\Delta_i^{(l+1)}-Z_i^{(l+1)}.
+\tag{1.117}
+\end{equation}
+首先求解极小化问题 (1.112)。令
+\[
+\mu=\begin{bmatrix}\mu_\gamma\\\mu_{1i}\\\vdots\\\mu_{Ki}\end{bmatrix},
+\qquad
+\mu_{ki}=\begin{bmatrix}\mu_{k1}^{(i)}\\\vdots\\\mu_{kL_k}^{(i)}\end{bmatrix}.
+\]
+将 $L_\rho$ 的偏导数置为零，得到
+\begin{equation}
+\begin{aligned}
+\frac{\partial L_\rho}{\partial\Delta_i}
+={}&-W_i^T\eta[\eta^T\eta]^{-1}
+\left(\eta^Ty_i-\eta^TW\Delta_i\right)\\
+&+\rho\left(\Delta_i-Z_i^{(l)}+\mu^{(l)}\right)=0,
+\end{aligned}
+\tag{1.118}
+\end{equation}
+从而有
+\begin{equation}
+\begin{aligned}
+\Delta_i^{(l+1)}
+={}&\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^TW_i+\rho I\right]^{-1}\\
+&\quad\cdot
+\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^Ty_i
+ +\rho\left(Z_i^{(l)}-\mu^{(l)}\right)\right].
+\end{aligned}
+\tag{1.119}
+\end{equation}
+
+优化问题 (1.116) 不可微。虽然式 (1.116) 的前两项不可微，仍然可以利用次微分运算得到该问题的简单闭式解。首先考虑 $\|Z_{\gamma i}\|_1$ 的广义梯度（generalized gradient）。令 $\Phi_i^{(m)}$ 表示向量 $\|Z_{\gamma i}\|_1$ 的第 $m$ 个分量的广义导数：
+\[
+\Phi_i^{(m)}=
+\begin{cases}
+1,&Z_{\gamma i}^{(m)}=\gamma_{im}>0,\\
+[-1,1],&Z_{\gamma i}^{(m)}=\gamma_{im}=0,\\
+-1,&Z_{\gamma i}^{(m)}=\gamma_{im}<0.
+\end{cases}
+\]
+令
+\[
+\Phi_i=\begin{bmatrix}\Phi_i^{(1)}\\\vdots\\\Phi_i^{(M)}\end{bmatrix}.
+\]
+于是有
+\[
+\frac{\lambda}{\rho}\Phi_i+Z_{\gamma i}
+=\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)},
+\]
+由此得到
+\begin{equation}
+Z_{\gamma i}^{(l+1)}
+=\operatorname{sgn}\left(\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}\right)
+\left(\left|\Delta_{\gamma i}^{(l+1)}+\mu_\gamma^{(l)}\right|
+ -\frac{\lambda}{\rho}\right)_+,
+\tag{1.120}
+\end{equation}
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0.\end{cases}
+\]
+接着考虑组套索。广义梯度 $\partial L_\rho/\partial Z_{ki}$ 为
+\begin{equation}
+\frac{\partial L_\rho}{\partial Z_{ki}}
+=\lambda\sqrt{L_k}\,s+
+\rho\left(Z_{ki}-\left(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right)\right)=0,
+\tag{1.121}
+\end{equation}
+其中
+\[
+s=
+\begin{cases}
+0,&\displaystyle
+\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2
+ <\frac{\lambda\sqrt{L_k}}{\rho},\\[6pt]
+\displaystyle\frac{Z_{ki}}{\|Z_{ki}\|_2},&
+\displaystyle
+\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2
+ \geq\frac{\lambda\sqrt{L_k}}{\rho}.
+\end{cases}
+\]
+式 (1.121) 给出
+\begin{equation}
+\left(1+\frac{\lambda\sqrt{L_k}}{\rho\|Z_{ki}\|_2}\right)Z_{ki}
+=\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)},
+\tag{1.122}
+\end{equation}
+或者
+\begin{equation}
+\left(1+\frac{\lambda\sqrt{L_k}}{\rho\|Z_{ki}\|_2}\right)\|Z_{ki}\|_2
+=\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2.
+\tag{1.123}
+\end{equation}
+解式 (1.123)，得到
+\[
+\|Z_{ki}\|_2=
+\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2
+ -\frac{\lambda\sqrt{L_k}}{\rho}.
+\]
+因此有
+\begin{equation}
+\left(1+\frac{\lambda\sqrt{L_k}}{\rho\|Z_{ki}\|_2}\right)
+=\frac{1}{\displaystyle
+1-\frac{\lambda\sqrt{L_k}}
+{\rho\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2}}.
+\tag{1.124}
+\end{equation}
+联立式 (1.122) 和式 (1.124)，得到
+\begin{equation}
+Z_{ki}^{(l+1)}
+=\left(1-\frac{\lambda\sqrt{L_k}}
+{\rho\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2}\right)_+
+\left(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right),
+\quad k=1,\ldots,K.
+\tag{1.125}
+\end{equation}
+
+求解函数型结构方程模型的 ADMM 算法可概括如下。
+
+对于 $i=1,\ldots,M$：
+
+\textbf{步骤 1：初始化。}
+\[
+\begin{aligned}
+\mu^0&:=0,\\
+\Delta_i^0&:=
+\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^TW_i+\rho I\right]^{-1}
+W_i^T\eta(\eta^T\eta)^{-1}\eta^Ty_i,\\
+Z_i^0&:=\Delta_i^0.
+\end{aligned}
+\]
+重复步骤 2、3、4，直至收敛。
+
+\textbf{步骤 2。}
+\[
+\begin{aligned}
+\Delta_i^{(l+1)}
+={}&\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^TW_i+\rho I\right]^{-1}\\
+&\quad\cdot\left[W_i^T\eta(\eta^T\eta)^{-1}\eta^Ty_i
+ +\rho\left(Z_i^{(l)}-\mu^{(l)}\right)\right].
+\end{aligned}
+\]
+\textbf{步骤 3。}
+\[
+Z_{yi}^{(l+1)}
+=\operatorname{sgn}\left(\Delta_{yi}^{(l+1)}+\mu_\gamma^{(l)}\right)
+\left(\left|\Delta_{yi}^{(l+1)}+\mu_\gamma^{(l)}\right|
+ -\frac{\lambda}{\rho}\right)_+,
+\]
+其中
+\[
+|x|_+=\begin{cases}x,&x\geq0,\\0,&x<0,\end{cases}
+\]
+\[
+Z_{ki}^{(l+1)}
+=\left(-\frac{\lambda\sqrt{L_k}}
+{\rho\left\|\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right\|_2}\right)_+
+\left(\Delta_{ki}^{(l+1)}-\mu_{ki}^{(l)}\right),
+\quad k=1,\ldots,K.
+\]
+令
+
+\textbf{步骤 4。}
+\[
+\mu_i^{(l+1)}=\mu_i^{(l)}
+ +\left(\Delta_i^{(l+1)}-Z_i^{(l+1)}\right).
+\]
+
+\FloatBarrier
+\section{因果演算}
+\label{sec:ch01c-causal-calculus}
+
+\subsection{效应分解与估计}
+
+在基因型—表型网络中，我们关注遗传变异对表型效应的估计，这种效应称为遗传效应；我们也关注处理对表型的效应。所有遗传效应和处理效应都可以分解为总（因果）效应、直接效应和间接效应。在遗传分析中，区分总效应、直接效应和间接效应具有重要的实际意义（Pearl 2001）。总效应刻画通过外部干预将变量 $X$ 赋值为 $x$ 时，响应变量 $Y$ 取值 $y$ 的变化。将变量 $X$ 设为 $x$ 的操作，表示为删除 $X$ 的结构方程，并用等式 $X=x$ 代替。直接效应定义为：将模型中所有其他变量保持不变时，$Y$ 对 $X$ 变化的敏感程度。间接效应则在抑制 $Y$ 对 $X$ 直接响应能力的情况下，度量仅由中介作用解释的那部分效应。总效应等于直接效应与间接效应之和。
+
+给定一个有向无环图模型 $G$，可以使用干预演算（intervention calculus）计算总效应（Maathuis et al. 2001）。将通过干预把 $X$ 赋值为 $x$ 之后响应变量 $Y$ 的期望记为 $\E[Y\mid\dox{X=x}]$。总效应定义为
+\begin{equation}
+\frac{\partial}{\partial x}\E[Y\mid\dox{X=x}].
+\tag{1.126}
+\end{equation}
+注意，如果 $G$ 中存在有向边 $X_j\to X$，就称 $X_j$ 为 $X$ 的一个父节点。用 $\mathrm{pa}_x$ 表示 $G$ 中 $X$ 的所有父节点组成的集合。在线性结构方程模型中，$\E[Y\mid X,\mathrm{pa}_x]$ 是 $X$ 和 $\mathrm{pa}_x$ 的线性函数：
+\begin{equation}
+\E[Y\mid X,\mathrm{pa}_x]
+=\alpha+\beta X+\gamma^T\mathrm{pa}_x.
+\tag{1.127}
+\end{equation}
+于是
+\[
+\frac{\partial}{\partial x}\E[Y\mid\dox{X=x}]=\beta.
+\]
+也可以将 $\beta$ 写成 $\beta_{YX.\mathrm{pa}_x}$。
+
+给定有向无环图后，很容易计算总效应。假设从 $X$ 到 $Y$ 有 $k$ 条有向路径，$p_i$ 是第 $i$ 条路径上各路径系数的乘积。那么，$X$ 对 $Y$ 的总效应定义为 $\sum_{i=1}^kp_i$。如图 1.5 所示，$X$ 对 $Y$ 的总效应为 $ag+bdh+cdh$。根据定义，直接效应度量的是其他所有模型变量保持不变时，$Y$ 对 $X$ 变化的敏感程度。换言之，从 $X$ 到 $Y$ 的所有连接中，除直接连接外，其余连接全部被阻断。因此，直接效应等于从 $X$ 到 $Y$ 的路径系数。在线性结构方程模型中，$X$ 经由 $M$ 对 $Y$ 产生的间接效应，等于从 $X$ 到 $Y$ 且经过 $M$ 的各条有向路径上系数乘积之和。图 1.6 中，$X$ 对 $Y$ 没有直接效应；$X$ 经由 $B$ 和 $D$ 对 $Y$ 产生的间接效应等于 $bdh$。
+
+\input{figures/ch01c_fig05}
+\input{figures/ch01c_fig06}
+
+在基因型—表型网络的结构方程模型中，所有 SNP 只构成无向图；虽然 SNP 之间可以存在连锁不平衡（或相关），但没有有向连接。因此，基因型—表型网络中的 SNP 没有父节点。SNP $X$ 对 $Y$ 的总效应，就是以下线性回归中的回归系数 $\beta$：
+\[
+\E[Y\mid\dox{X=x}]=\alpha+\beta x.
+\]
+这是 $Y$ 对 $X$ 的简单回归。这说明，关联研究中传统的简单回归刻画了遗传变异对表型的总效应。
+
+如果在模型中纳入环境以及吸烟、肥胖等风险因素，并希望评估环境和风险因素对表型的效应，那么这些变量起中介作用，也将被视为表型。将这些中介表型记为 $Y_{\mathrm{ME}}$。由于遗传变异、其他风险因素和表型都会影响中介表型，图中的中介表型可能具有父节点。将这些父节点记为 $S$。中介表型对目标表型的总效应通过下式计算：
+\begin{equation}
+\E\left[Y\mid\dox{Y_{\mathrm{ME}}=y_{\mathrm{ME}},X_{\mathrm{pa}}=x_{\mathrm{pa}}}\right]
+=\alpha+\beta y_{\mathrm{ME}}+\gamma^Tx_{\mathrm{pa}},
+\tag{1.128}
+\end{equation}
+其中，$\beta$ 是中介表型 $Y_{\mathrm{ME}}$ 对目标表型 $Y$ 的总效应。此时，不能再用 $Y$ 对 $Y_{\mathrm{ME}}$ 的简单回归来度量 $Y_{\mathrm{ME}}$ 对 $Y$ 的总效应。为说明这一点，我们按照图 1.7 中的结构方程模型模拟了 1000 个个体。每个变量都带有一个服从 $N(0,1)$ 分布的噪声项。中介表型 $Y_{\mathrm{ME}}$ 对目标表型 $Y$ 的总效应为 3.5。得到的简单回归为
+\[
+Y=1.39+5.85Y_{\mathrm{ME}}.
+\]
+简单回归系数显然为 5.85，与总效应 3.5 相差很远。然而，使用式 (1.13)，得到
+\[
+Y=3.54Y_{\mathrm{ME}}+5.85X,
+\]
+其中回归系数 3.54 度量了中介表型 $Y_{\mathrm{ME}}$ 对目标表型 $Y$ 的总效应。
+
+\input{figures/ch01c_fig07}
+\FloatBarrier
+
+\subsection{线性结构方程模型中用于因果推断的图工具}
+\subsubsection{基础知识}
+
+从数据中学习线性结构方程模型后，我们的主要关注点是进行因果推断。本节介绍图工具，将其作为线性结构方程模型因果推断的主要工具；其中许多内容来自 Chen and Pearl（2015）的工作。这些结果与代数方法相互补充，并为遗传流行病学和治疗评价提供基础（Shrout et al. 2010）。
+
+上一节讨论了观测变量和有向图。现在研究如何在图模型中表示隐藏变量（hidden variable）。考虑三个观测变量 $X$（低密度脂蛋白，LDL）、$Y$（高密度脂蛋白，HDL）和 $Z$（收缩压），以及两个无法直接测量的隐藏变量 $H_1$（环境 1）和 $H_2$（环境 2），见图 1.8。观测变量用节点表示，隐藏变量用虚线框表示。除非误差项之间存在相关，否则图中通常不显示误差项。图中的箭头表示因果方向，相应结构系数标在箭头旁。模型 1 明确概括了包括观测变量与隐藏变量在内的各变量之间的关系。
+
+\input{figures/ch01c_fig08}
+
+\noindent\textbf{模型 1}
+\[
+\begin{aligned}
+H_1&=U_1,\\
+X&=aH_1+U_2,\\
+H_2&=cX+aH_1+U_3,\\
+Y&=bX+eH_2+U_4,\\
+Z&=fY+hH_2+U_5,
+\end{aligned}
+\]
+其中，$U_1,U_2,U_3,U_4,U_5$ 为噪声。
+
+图 1.8 展示了因果图。图 1.8a 显式画出隐藏变量 $H_1$ 和 $H_2$，表示各变量间的因果关系。然而，隐藏变量无法测量。为将其纳入分析，可以考虑隐藏变量在误差项之间诱导的相关。图 1.8b 给出了将隐藏变量概括后的模型。此时，变量 $X$ 对 $Y$ 的效应由系数 $\alpha=b+ce$ 概括。$X$ 与 $Y$ 之间的相关项 $C_{XY}=ade$、$Y$ 与 $Z$ 之间的相关项 $C_{YZ}=eh$，以及 $X$ 与 $Z$ 之间的相关项 $C_{XZ}=adh$，分别由相应的双向箭头表示。图 1.8b 对应的模型概括为模型 2。
+
+\noindent\textbf{模型 2}
+\[
+\begin{aligned}
+X&=U_X,\\
+Y&=\alpha X+U_Y,\\
+Z&=fY+U_Z.
+\end{aligned}
+\]
+在研究如何从有向无环图计算因果效应之前，先介绍图中的一些基本定义。
+
+\begin{bookdefinition}{1.2}
+\textbf{边：}边是两个节点之间的连接，可以是箭头，也可以是双向弧。
+
+\textbf{路径：}节点 $X$ 与 $Y$ 之间的路径定义为连接这两个节点的一系列边。路径既可以沿有向边方向，也可以逆有向边方向。从 $X$ 到 $Y$ 的有向路径，是仅由指向 $Y$ 的有向边构成的路径。从 $X$ 到 $Y$ 的后门路径，是以指向 $X$ 的箭头开始、以指向 $Y$ 的箭头结束的路径。\textbf{碰撞点（collider）}是两个箭头头部相遇的节点。误差项之间不相关的无环模型称为马尔可夫模型（Markovian model）；误差项之间相关的模型称为非马尔可夫模型；无环的非马尔可夫模型称为半马尔可夫模型（semi-Markovian model）。
+\end{bookdefinition}
+
+现在研究如何从图计算因果效应。
+
+\medskip\noindent\textbf{结论 1.1}\quad
+假设 $\Pi=\{\pi_1,\ldots,\pi_m\}$ 是从 $X$ 到 $Y$ 的有向路径集合，$p_i$ 是沿路径 $\pi_i$ 的结构系数（结构方程模型中的系数）的乘积。那么，$X$ 对 $Y$ 的总因果效应为所有路径效应之和：
+$\alpha_T=\sum_{i=1}^mp_i$。
+\par\medskip
+
+\begin{bookexample}{1.2}
+考虑图 1.9。节点 $G$ 是碰撞点。从 $Y$ 到 $G$ 有四条有向路径：
+$Y\to H\to G$、$Y\to Z\to G$、$Y\to G$ 和 $Y\to H\to Z\to G$，
+相应路径效应为 $p_1=ab$、$p_2=hd$、$p_3=g$ 和 $p_4=acd$。
+$Y$ 对 $G$ 的总效应为 $ab+hd+g+acd$。
+\end{bookexample}
+
+\input{figures/ch01c_fig09}
+\FloatBarrier
+
+\subsubsection{Wright 路径追踪规则与路径分析}
+
+路径分析（path analysis）是因果分析的主要图工具之一，Wright 路径追踪规则（Wright's rules of tracing）则是路径分析的基本组成部分（Wright 1921）。因果分析模型可分为递归模型与非递归模型。在递归模型中，因果作用只沿一个方向传递；在非递归模型中，因果作用可以沿多个方向传递。Wright 路径追踪规则是为非递归图模型设计的。为便于表述，假设所有变量均已标准化，均值为零、方差为一。考虑 $X$ 与 $Y$ 之间的一组路径 $\Pi=\{\pi_1,\pi_2,\ldots,\pi_m\}$。这些路径不经过碰撞点，并遵循以下三条规则。
+
+\begin{enumerate}
+\item 不允许出现环路。同一个变量不能在路径中出现多次。
+
+在图 1.10a 中，考虑 $X_4$ 与 $X_5$ 之间的路径。路径 $X_4\leftarrow X_3\to X_5$ 有效，但路径 $X_4\leftarrow X_3\leftarrow X_1\leftrightarrow X_2\to X_3\to X_5$ 无效。
+\item 不允许先沿箭头方向前进、再逆箭头方向后退。可以先逆着一条有向边后退，再沿下一条边前进，也可以一直沿箭头方向从一个变量走向另一个变量；但绝不能先前进再后退。
+
+如图 1.10b 所示，考虑 $X_2$ 与 $X_3$ 之间的路径，$X_2\leftarrow X_1\to X_3$ 有效，$X_2\to X_4\leftarrow X_3$ 无效。
+\item 一条路径最多只能包含一条双向边。
+
+考虑 $X_4$ 与 $X_6$ 之间的路径。路径 $X_4\leftarrow X_1\leftrightarrow X_3\to X_6$ 有效，$X_4\leftarrow X_1\leftrightarrow X_2\leftrightarrow X_3\to X_6$ 无效。
+\end{enumerate}
+
+\input{figures/ch01c_fig10}
+
+\medskip\noindent\textbf{结论 1.2}\quad
+令 $p_i$ 表示沿路径 $\pi_i$ 的路径系数乘积。那么，任意一对变量 $X$ 和 $Y$ 之间的协方差，等于两者之间某些路径上的路径系数和误差协方差乘积之和：
+$\sigma_{XY}=\operatorname{cov}(X,Y)=\sum_{i=1}^mp_i$。
+\par\medskip
+
+\begin{bookexample}{1.3}
+考虑图 1.10d 的因果图。我们希望计算 $X_2$ 与 $X_5$ 的协方差。计算这一协方差的有效路径集合为
+\[
+\begin{gathered}
+X_2\to X_5,\\
+X_2\leftrightarrow X_4\to X_5,\\
+X_2\to X_3\to X_5,\\
+X_2\leftarrow X_1\to X_3\to X_5.
+\end{gathered}
+\]
+$X_2$ 与 $X_5$ 的协方差为
+\[
+\sigma_{25}=b_{25}+r_{24}b_{54}+b_{32}b_{53}+b_{21}b_{31}b_{51}.
+\]
+\end{bookexample}
+
+\subsubsection{偏相关、回归与路径分析}
+
+偏相关和回归系数都可以用路径系数表示。考虑协方差矩阵
+\[
+\Sigma_{xyz}=
+\begin{bmatrix}
+\sigma_{xx}&\sigma_{xy}&\sigma_{xz}\\
+\sigma_{yx}&\sigma_{yy}&\sigma_{yz}\\
+\sigma_{zx}&\sigma_{zy}&\sigma_{zz}
+\end{bmatrix}.
+\]
+条件方差 $\sigma_{xx.z}$ 和 $\sigma_{yy.z}$ 分别为
+\begin{equation}
+\sigma_{xx.z}=\sigma_{xx}-\frac{\sigma_{xz}^2}{\sigma_{zz}},
+\tag{1.129}
+\end{equation}
+以及
+\begin{equation}
+\sigma_{yy.z}=\sigma_{yy}-\frac{\sigma_{yz}^2}{\sigma_{zz}}.
+\tag{1.130}
+\end{equation}
+给定一个标量变量时，$X$ 与 $Y$ 的条件协方差矩阵为
+\begin{equation}
+\Sigma_{xy\ z}=
+\begin{bmatrix}\sigma_{xx}&\sigma_{xy}\\\sigma_{yx}&\sigma_{yy}\end{bmatrix}
+-\begin{bmatrix}\sigma_{xz}\\\sigma_{yz}\end{bmatrix}
+\sigma_{zz}^{-1}
+\begin{bmatrix}\sigma_{zx}&\sigma_{zy}\end{bmatrix},
+\tag{1.131}
+\end{equation}
+由此得到以下结果。
+
+\medskip\noindent\textbf{结论 1.3}
+\begin{equation}
+\sigma_{yx.z}=\sigma_{yx}-\frac{\sigma_{yz}\sigma_{zx}}{\sigma_{zz}},
+\tag{1.132}
+\end{equation}
+\begin{equation}
+\rho_{yx.z}=
+\frac{\rho_{yx}-\rho_{yz}\rho_{xz}}
+{\left[(1-\rho_{yz}^2)(1-\rho_{xz}^2)\right]^{1/2}},
+\tag{1.133}
+\end{equation}
+\begin{equation}
+\beta_{yx.z}=
+\frac{\sqrt{\sigma_{yy}}}{\sqrt{\sigma_{xx}}}
+\frac{\rho_{yx}-\rho_{yz}\rho_{zx}}{1-\rho_{xz}^2},
+\tag{1.134}
+\end{equation}
+其中，$\beta_{yx.z}$ 为给定 $Z$ 时 $Y$ 对 $X$ 的回归系数。一般地，$Y$ 对 $X$ 和 $Z$ 的回归可以写为
+\begin{equation}
+Y=\beta_{yx.z}X+\beta_{yz.x}Z+\varepsilon.
+\tag{1.135}
+\end{equation}
+假设 $Z$ 是标量变量，$S$ 是一组变量，利用式 (1.132)，可以定义给定 $S$ 时 $Y$ 与 $X$ 的条件协方差：
+\begin{equation}
+\sigma_{yx.s}=\sigma_{yx}-\sigma_{ys}\sigma_{ss}^{-1}\sigma_{xs}.
+\tag{1.136}
+\end{equation}
+给定 $ZS$ 时 $Y$ 与 $X$ 的条件协方差 $\sigma_{yx.zs}$，可以视为给定 $Z$ 时随机变量 $\sigma_{yx.s}$ 的条件方差：
+\begin{equation}
+\sigma_{yx.zs}=\sigma_{yx.s}-
+\frac{\sigma_{yz.s}\sigma_{xz.s}}{\sigma_{z.s}^2}.
+\tag{1.137}
+\end{equation}
+类似地，有
+\begin{equation}
+\rho_{yx.zs}=
+\frac{\rho_{yx.s}-\rho_{yz.s}\rho_{xz.s}}
+{\sqrt{(1-\rho_{yz.s}^2)}(1-\rho_{xz.s}^2)},
+\tag{1.138}
+\end{equation}
+以及
+\begin{equation}
+\beta_{yx.zs}=
+\frac{\sqrt{\sigma_{yy.s}}}{\sqrt{\sigma_{xx.s}}}
+\frac{\rho_{yx.s}-\rho_{yz.s}\rho_{zx.s}}{1-\rho_{xz.s}^2}.
+\tag{1.139}
+\end{equation}
+回归中，遗传力或表型变异可以用预测变量的变异来解释，并可通过 Wright 路径追踪规则计算。
+
+\begin{bookexample}{1.4}
+考虑图 1.11 中的有向图。根据 Wright 路径追踪规则计算得到的相关系数为
+\[
+\rho_{31}=b_{31}+r_{12}b_{32},
+\qquad
+\rho_{32}=b_{32}+r_{12}b_{31}.
+\]
+由式 (1.134) 得到的回归系数为
+\[
+\beta_{31.2}=\frac{\rho_{31}-\rho_{32}\rho_{12}}{1-r_{12}^2},
+\qquad
+\beta_{32.1}=\frac{\rho_{32}-\rho_{31}\rho_{21}}{1-r_{12}^2}.
+\]
+\end{bookexample}
+
+\input{figures/ch01c_fig11}
+\FloatBarrier
+
+\subsubsection{条件独立与 d-分离}
+
+贝叶斯网络假设：给定一个变量的父节点后，该变量与其非后代节点条件独立。例如，图 1.11b 中，由于已知 $X$ 的所有父节点（即 $Y$）的取值，而 $Y$ 不是 $X$ 的后代，因此 $X$ 与 $Z$ 条件独立。然而，这一规则不足以判断变量间所有的独立关系。考虑图 1.11c。$X$ 没有父节点，因此其父节点的取值自然已知；$Z$ 不是 $X$ 的后代，于是变量 $X$ 和 $Y$ 边际独立。然而，如果知道 $Z$ 的取值，又会怎样？
+
+为在更一般的情形下判断条件独立，引入一个有用的概念：d-分离（d-separation）。它将“相关”与“连通”联系起来，将独立与“分离”联系起来。为体现有向图的方向性，使用“d-分离”这一术语。
+
+\begin{bookdefinition}{1.3：d-分离}
+两个变量集合 $X$ 和 $Y$ 被第三个变量集合 $Z$ d-分离，当且仅当从 $X$ 到 $Y$ 的每一条无向路径均被阻断。满足以下一个或多个条件时，称一条路径被“阻断”：
+\begin{enumerate}
+\item 存在变量 $V\in Z$，使路径中与 $V$ 相接的两条弧为“尾对尾”结构（$\leftarrow V\to$）。
+\item 存在变量 $V\in Z$，使路径中与 $V$ 相接的两条弧为“尾对头”结构（$\to V\to$）。
+\item 路径中存在变量 $V$，它不在集合 $Z$ 或其后代中。此外，$V$ 不是碰撞点。
+\end{enumerate}
+若 $X$ 和 $Y$ 被 $Z$ d-分离，则给定变量 $Z$ 后，$X$ 和 $Y$ 条件独立。通常使用以下过程计算 d-分离：
+\begin{enumerate}
+\item 绘制祖先图。
+
+构造所有关注变量的“祖先图”。这是原有向图的简化版本，只包含所研究的变量及其所有祖先（父节点、父节点的父节点等）。
+\item 将具有共同子节点的父节点“联姻”，使祖先图“道德化”。
+
+对每一对具有共同子节点的变量，在两者之间增加一条无向边。如果一个变量有两个以上父节点，就在每一对父节点之间连边。
+\item 将有向边替换为无向边。
+\item 删除作为条件的节点以及与这些节点相连的边。
+\end{enumerate}
+完成这四个步骤后，就能直接根据图判断独立性。如果变量在该图中不连通，可以保证它们独立；如果变量在该图中连通，则不能保证它们独立。
+\end{bookdefinition}
+
+\begin{bookexample}{1.5}
+考虑图 1.11d 的路径图。我们关心给定 $A$ 和 $C$ 时 $F$ 与 $E$ 的条件独立性。首先构造祖先图，包含节点 $F,E,A,C$ 及其父节点，如图 1.12a 所示。随后，将具有共同子节点 $C$ 的节点 $F$ 与 $A$ 相连，使祖先图道德化（图 1.12b）。再将所有有向边替换为无向边（图 1.12c）。最后，删除条件节点集合 $A$ 和 $C$，以及与它们相连的边 $F-A$、$F-C$、$A-C$、$C-B$ 和 $A-E$，得到图 1.12d。显然，$F$ 被 $A$ 和 $C$ 与 $E$ d-分离。换言之，给定 $A$ 和 $C$ 后，$F$ 与 $E$ 条件独立。
+\end{bookexample}
+
+\input{figures/ch01c_fig12}
+\FloatBarrier
+
+\subsection{识别与单门准则}
+
+\begin{bookdefinition}{1.4}
+识别包括参数识别和模型识别。如果模型参数能够由模型变量的概率分布唯一确定，则称该参数可识别。如果模型中的每一个参数都可识别，则称模型可识别（Chen and Pearl 2015）。
+
+在结构方程模型中，如果一个参数可以用协方差矩阵唯一表示，它就是可识别的。一些软件可以检查模型的可识别性。这里重点讨论利用图准则来判断参数与模型的可识别性。
+
+考虑图 1.13a 的路径图及结构方程模型：
+\begin{equation}
+Y=\beta_1X+\beta_2Z+\varepsilon_Y.
+\tag{1.140}
+\end{equation}
+如果误差 $\varepsilon_Y$ 与 $X$ 和 $Z$ 独立，参数就是可识别的。然而，如果使用回归模型
+\begin{equation}
+Y=\beta X+U_Y,
+\tag{1.141}
+\end{equation}
+由于 $U_Y$ 与 $X$ 相关，估计量 $\widehat\beta$ 有偏。
+
+为克服简单回归的局限，在回归 (1.141) 中加入变量 $Z$。因果效应 $\alpha$ 可以用给定 $Z$ 时 $Y$ 对 $X$ 的回归系数 $\beta_{YX.Z}$ 估计。事实上，利用式 (1.134)，有
+\[
+\begin{aligned}
+\beta_{yx.z}
+&=\frac{\sqrt{\sigma_{yy}}}{\sqrt{\sigma_{xx}}}
+\frac{\rho_{yx}-\rho_{yz}\rho_{zx}}{1-\rho_{xz}^2}\\
+&=\frac11\frac{\alpha+C_{zy}b-(\alpha b+C_{zy})b}{1-b^2}\\
+&=\frac{\alpha-\alpha b^2}{1-b^2}\\
+&=\alpha.
+\end{aligned}
+\]
+为估计一个路径系数而在回归中加入一组变量 $Z$，称为对 $Z$ 进行调整。问题在于如何选择变量集合，以及如何判断该集合足以用于调整，从而保证参数和模型可识别。下面介绍图可识别性条件，使我们能够通过观察路径图来判断参数的可识别性（Pearl 2001；Chen and Pearl 2015）。
+\end{bookdefinition}
+
+\input{figures/ch01c_fig13}
+
+\begin{booktheorem}{1.1：单门准则}
+令 $G$ 为无环有向图，$\alpha$ 为有向边 $X\to Y$ 对应的路径系数，$G_\alpha$ 为从原图 $G$ 中删除 $X\to Y$ 后得到的有向图。如果存在变量集合 $Z$，满足（1）$Z$ 中不含 $Y$ 的后代；（2）在 $G_\alpha$ 中，$X$ 与 $Y$ 被 $Z$ d-分离，则路径系数 $\alpha$ 可识别。此时，$\alpha$ 可由回归系数 $\beta_{YX.Z}$ 估计。
+\end{booktheorem}
+
+\begin{bookexample}{1.6}
+考虑图 1.13b 的路径图。我们希望估计 $\alpha$。在 $G_\alpha$ 中，$X$ 与 $Y$ 被 $W$ d-分离，因此 $\alpha$ 可识别，并等于 $\beta_{YX.W}$。利用 Wright 路径追踪规则，得到
+\[
+\begin{aligned}
+\rho_{YX}&=\alpha+ec+dbc,\\
+\rho_{YW}&=c+e\alpha+bd\alpha,\\
+\rho_{WX}&=e+db.
+\end{aligned}
+\]
+利用式 (1.134)，得到
+\[
+\begin{aligned}
+\beta_{YX.W}
+&=\frac{\sqrt{\sigma_{YY}}}{\sqrt{\sigma_{XX}}}
+\frac{\rho_{YX}-\rho_{YW}\rho_{XW}}{1-\rho_{XW}^2}\\
+&=\frac{\sqrt1}{\sqrt1}
+\frac{\alpha+ec+dbc-(c+e\alpha+bd\alpha)(e+db)}
+{1-(e+db)^2}\\
+&=\alpha\frac{1-(e+db)^2}{1-(e+db)^2}\\
+&=\alpha.
+\end{aligned}
+\]
+\end{bookexample}
+
+利用定理 1.1，可以说明任何马尔可夫模型（误差项之间不相关的有向无环图模型）均可识别。考虑有向边 $X\to Y$ 对应的路径系数 $\alpha$，其结构方程为
+\[
+Y=\beta_1X+\beta_2\mathrm{Pa}(Y),
+\]
+其中 $\mathrm{Pa}(Y)$ 是 $Y$ 的父节点集合。显然，$Y$ 与 $X$ 被 $Y$ 的父节点集合 d-分离。因此，路径系数 $\alpha$ 可以无偏估计：
+\[
+\widehat\alpha=\beta_{YX.\mathrm{Pa}(Y)}.
+\]
+一般地，有以下结果。
+
+\medskip\noindent\textbf{结论 1.4}\quad
+任何马尔可夫模型（误差项之间不相关的无环有向图模型），都可以使用回归逐个方程进行识别。
+\par\medskip
+
+\begin{bookexample}{1.7}
+考虑图 1.13c 及有向边 $G\to H$ 对应的路径系数 $b$。$H$ 的父节点为 $Y$。图 1.13c 是马尔可夫图，因此路径系数 $b$ 可识别，并可估计为
+\[
+\begin{aligned}
+b&=\beta_{HG.Y}\\
+&=\frac{\sqrt{\sigma_{HH}}}{\sqrt{\sigma_{GG}}}
+\frac{\rho_{HG}-\rho_{HY}\rho_{GY}}{1-\rho_{GY}^2}\\
+&=\frac{\sqrt1}{\sqrt1}
+\frac{b+eqa+ga-(a+qeb+gb)(g+qe)}{1-(g+qe)^2}\\
+&=\frac{b[1-(g+qe)^2]}{1-(g+qe)^2}\\
+&=b.
+\end{aligned}
+\]
+\end{bookexample}
+\FloatBarrier
+
+\subsection{工具变量}
+
+满足单门准则的可调整集合，可能代表混杂因子。其中某些混杂因子可能没有被测量，此时便无法使用单门准则。考虑图 1.14a，它给出了工具变量 $Z$、引起结局 $Y$ 变化的因素 $D$，以及未测量混杂因子 $U$ 之间关系的有向无环图。由于存在未测量混杂，很难无偏估计 $D$ 对 $Y$ 的因果效应。为克服这一局限，可以在使用观测数据进行因果推断时，借助工具变量（instrumental variables，IVs）控制未测量混杂和测量误差。工具变量方法的基本思想是：寻找与原因变量相关、但独立于未测量混杂因子的变量；这些变量除了通过原因变量产生作用之外，对结局没有直接效应（Baiocchi et al. 2014）。形式化定义如下（Bollen 2012；Chen and Pearl 2015）。
+
+\begin{bookdefinition}{1.5}
+考虑结构方程 $Y=\beta_1X_1+\cdots+\beta_mX_m+U_Y$。如果满足以下条件，则 $Z$ 为工具变量：
+\begin{enumerate}
+\item $Z$ 与 $X=\{X_1,\ldots,X_m\}$ 相关；
+\item $Z$ 与 $U_Y$ 不相关。
+\end{enumerate}
+用 $Y$ 与 $X$ 之间的相关来表示未测量混杂因子 $U$（图 1.14b）。由 Wright 路径追踪规则，得到
+$\sigma_{YZ}=\gamma\alpha$ 和 $\sigma_{XZ}=\gamma$。
+因此，参数 $\alpha$ 可以估计为
+$\widehat\alpha=\sigma_{YZ}/\sigma_{XZ}$。
+如果没有工具变量 $Z$，使用 Wright 路径追踪规则，只能得到 $\sigma_{YX}=\alpha+U_{YX}$，这意味着 $\alpha$ 不可识别。
+
+定义 1.5 针对一个方程定义工具变量。然而，使用工具变量后，方程作为整体可识别，其中某些参数仍可能不可识别。下面给出 Pearl（2001）提出的定义，针对所关注的参数规定工具变量（Chen and Pearl 2015）。
+\end{bookdefinition}
+
+\input{figures/ch01c_fig14}
+
+\begin{bookdefinition}{1.6}
+令 $G_\alpha$ 是从原图 $G$ 中删除路径系数为 $\alpha$ 的有向边 $X\to Y$ 后得到的子图。变量 $Z$ 满足以下两个条件：
+\begin{enumerate}
+\item 在简化后的图 $G_\alpha$ 中，$Z$ 与 $Y$ d-分离；
+\item 在 $G_\alpha$ 中，$Z$ 与 $X$ 不被 d-分离。
+\end{enumerate}
+例如，图 1.14b 中，删除 $X\to Y$ 后得到 $G_\alpha$，其中 $Z$ 与 $Y$ d-分离，而 $Z$ 与 $X$ 不被 d-分离。因此，$Z$ 是参数 $\alpha$ 的工具变量。
+\end{bookdefinition}
+
+在实践中，许多潜在工具变量与结局 $Y$ 并不 d-分离。然而，给定某些变量集合后，这些潜在工具变量就与结局或响应 $Y$ d-分离。例如，图 1.14c 中，$Z$ 不是估计有向边 $X\to y$ 对应参数 $\alpha$ 的工具变量，因为在子图 $G_\alpha$ 中，$Z$ 与 $Y$ 不被 d-分离。但是，给定 $F$ 或 $W$ 后，$Z$ 与 $Y$ 之间的连接被阻断，因而可以选 $Z$ 为工具变量。结合条件化与工具变量，即可识别参数。因此，引入条件工具变量的如下定义，以扩展工具变量进行因果推断的能力。
+
+\begin{bookdefinition}{1.7}
+对于有向边 $X\to Y$ 对应的路径系数 $\alpha$，如果满足以下三个条件，则称 $Z$ 为给定条件集合 $W$ 时的条件工具变量（conditional instrumental variable）：
+\begin{enumerate}
+\item $W$ 不含 $Y$ 的后代。
+\item 在子图 $G_\alpha$ 中，$Z$ 与 $Y$ 被集合 $W$ d-分离。
+\item 在子图 $G_\alpha$ 中，$W$ 不使 $Z$ 与 $X$ d-分离。
+\end{enumerate}
+此时，参数可识别，可估计为
+$\widehat\alpha=\beta_{YZ.W}/\beta_{XZ.W}$。
+为说明条件工具变量的定义，考察图 1.14d。在子图 $G_\alpha$ 中，给定 $W$ 后，$W$ 使 $Z$ 与 $Y$ d-分离，因此，$Z$ 是给定 $W$ 时 $\alpha$ 的条件工具变量。
+\end{bookdefinition}
+
+单个工具变量的概念可以推广为工具变量集合。
+
+\begin{bookdefinition}{1.8}
+考虑有向边 $X_1\to Y,\ldots,X_m\to Y$ 对应的 $m$ 个路径系数 $\alpha_1,\ldots,\alpha_m$。用 $\pi_h[V_i\cdots V_j]$ 表示从 $V_i$ 开始、在 $V_j$ 结束的子路径。如果满足以下条件，则 $\{Z_1,\ldots,Z_m\}$ 是系数 $\alpha_1,\ldots,\alpha_m$ 的工具变量集合（instrumental set）。
+\begin{enumerate}
+\item 令 $G_m$ 为从 $G$ 中删除有向边 $X_1\to Y,\ldots,X_m\to Y$ 后得到的子图。对所有 $i=1,\ldots,m$，$Z_i$ 与 $Y$ 在 $G_m$ 中 d-分离。
+\item 存在路径 $\pi_1,\ldots,\pi_m$，其中 $\pi_i$ 是从 $Z_i$ 到 $Y$、包含有向边 $X_i\to Y$ 的路径。如果路径 $\pi_i$ 和 $\pi_j$ 有共同节点，则对所有 $i,j=1,2,\ldots,m$，$i\ne j$，有以下两种情形之一：
+\[
+\begin{aligned}
+\text{a.}\quad&
+\pi_i[Z_i\cdots V]_i:Z_i\cdots\to V,\qquad
+\pi_j[V\cdots Y]:V\leftarrow\cdots Y;\\
+\text{b.}\quad&
+\pi_j[Z_j\cdots V]_i:Z_j\cdots\to V,\qquad
+\pi_i[V\cdots Y]:V\leftarrow\cdots Y.
+\end{aligned}
+\]
+\end{enumerate}
+这一条件表示共同节点必须是碰撞点。借助工具变量集合，可以通过求解协方差分析得到的线性方程组来估计路径系数（Brito and Pearl 2002）。
+\end{bookdefinition}
+
+\begin{booktheorem}{1.2}
+令 $\{Z_1,\ldots,Z_m\}$ 为有向边 $X_1\to Y_1,\ldots,X_m\to Y$ 对应路径系数 $\alpha_1,\ldots,\alpha_m$ 的工具变量集合。以下线性方程组
+\begin{equation}
+A_{ZX}\alpha=b_{ZY},
+\tag{1.142}
+\end{equation}
+其中
+\[
+A_{ZX}=
+\begin{bmatrix}
+\sigma_{Z_1X_1}&\cdots&\sigma_{Z_1X_m}\\
+\vdots&\vdots&\vdots\\
+\sigma_{Z_mX_1}&\cdots&\sigma_{Z_mX_m}
+\end{bmatrix},
+\quad
+\alpha=\begin{bmatrix}\alpha_1\\\vdots\\\alpha_m\end{bmatrix},
+\quad
+b_{ZY}=\begin{bmatrix}\sigma_{Z_1Y}\\\vdots\\\sigma_{Z_mY}\end{bmatrix},
+\]
+对于模型几乎所有的参数化方式都是线性独立的。换言之，矩阵 $A_{ZX}$ 非奇异，线性方程组有唯一解。可以利用式 (1.142) 估计路径系数 $\alpha_1,\ldots,\alpha_m$。
+\end{booktheorem}
+
+\begin{bookexample}{1.8}
+考虑图 1.15a 的有向无环图。显然，$Z_1,Z_2,Z_3$ 与 $Y$ 在 $G_m$ 中 d-分离。路径 $\pi_1:Z_1\to Z_2\to X_1\to Y$ 和 $\pi_2:Z_2\leftrightarrow X_2\to Y$ 有共同节点 $Z_2$，显然 $Z_2$ 是碰撞点。因此，根据定义 1.8，$\{Z_1,Z_2,Z_3\}$ 是一个工具变量集合。现在计算矩阵 $A_{ZX}$。由 Wright 规则，得到
+\[
+\begin{aligned}
+\sigma_{Z_1X_1}&=ab,&
+\sigma_{Z_1X_2}&=0,&
+\sigma_{Z_1X_3}&=0,\\
+\sigma_{Z_2X_1}&=b,&
+\sigma_{Z_2X_2}&=c,&
+\sigma_{Z_2X_3}&=0,\\
+\sigma_{Z_3X_1}&=0,&
+\sigma_{Z_3X_2}&=0,&
+\sigma_{Z_3X_3}&=d.
+\end{aligned}
+\]
+因此
+\[
+A_{ZX}=
+\begin{bmatrix}
+\sigma_{Z_1X_1}&0&0\\
+\sigma_{Z_2X_1}&\sigma_{Z_2X_2}&0\\
+0&0&\sigma_{Z_3X_3}
+\end{bmatrix}
+=\begin{bmatrix}
+ab&0&0\\
+b&c&0\\
+0&0&d
+\end{bmatrix},
+\]
+以及
+\[
+A_{ZX}^{-1}=
+\begin{bmatrix}
+\dfrac1{ab}&0&0\\[4pt]
+-\dfrac1{ac}&\dfrac1c&0\\[4pt]
+0&0&\dfrac1d
+\end{bmatrix}.
+\]
+利用式 (1.142)，得到总效应与后门准则。
+\end{bookexample}
+
+\input{figures/ch01c_fig15}
+\FloatBarrier
+
+\subsection{总效应与后门准则}
+
+前面的讨论表明，即使模型作为整体不可识别，其中某些系数仍可能可识别。我们还看到，当总效应可识别时，不必识别参与总效应计算的每一条因果路径上的所有系数。在实践中，经常遇到处理变量和响应变量未被观测到，但能够测量一些受观测变量影响的替代变量的情形。通过这些替代变量，仍然可以估计处理对结局或响应变量的因果效应。这里介绍 Pearl 提出的后门准则，它是总效应可识别的一个充分条件（Pearl 2001；Chen and Pearl 2015）。
+
+\begin{booktheorem}{1.3：后门准则}
+对于因果图中任意两个变量 $X$ 和 $Y$，如果存在变量集合 $Z$，满足
+\begin{enumerate}
+\item $Z$ 中没有节点是 $X$ 的后代；
+\item $Z$ d-分离（阻断）$X$ 与 $Y$ 之间每一条包含指向 $X$ 的箭头的后门路径，
+\end{enumerate}
+则 $X$ 对 $Y$ 的总效应可识别。此时，$X$ 对 $Y$ 的总效应 $T_{YX}$ 由 $\beta_{YX.Z}$ 估计。
+\end{booktheorem}
+
+\begin{bookexample}{1.9}
+考虑图 1.15b。$Z$ 不是 $X$ 的后代，并且阻断后门路径 $X\leftarrow Z\to U\to Y$。因此，$Z$ 满足后门条件，$X$ 对 $Y$ 的总效应 $T_{YX}$ 可识别，并可由 $\beta_{YX.Z}$ 估计。
+
+后门路径以有向边 $\to X$ 开始。所有后门路径都应被集合 $Z$ 阻断。集合 $Z$ 可以为空，此时 $\beta_{YX.Z}=\beta_{XY}$。
+\end{bookexample}
+
+\subsection{反事实与线性结构方程模型}
+
+图模型编码科学假设，而反事实则为形式化表述所关注的研究问题提供一般框架（Pear 2013；Chen and Pearl 2015）。如果模型可识别，就可以提出反事实查询，利用可用信息预测模型中变量的取值。例如，对于某个个体，已观测到证据 $E=e$；如果变量 $A$ 曾取值为 $a$，那么我们预期该个体的变量 $B$ 会取何值？考虑图 1.15c，其中 $X$ 表示个体每天吸烟的支数，$P$ 表示身体锻炼的度量，$Y$ 表示某个基因的总体表达水平。各变量取值均表示其高于均值的标准差个数，因此数据已经标准化为均值 0、方差 1。图 1.15c 的模型如下。
+
+\noindent\textbf{模型}
+\begin{equation}
+\begin{aligned}
+X&=U_X,\\
+P&=aX+U_P,\\
+Y&=bX+cP+U_Y,
+\end{aligned}
+\tag{1.143}
+\end{equation}
+其中 $a=0.1$、$b=0.2$、$c=0.5$。
+
+假设另一个个体的测量值为 $X=1$、$P=0.8$ 和 $Y=1.2$。问题是：如果其身体锻炼活动增加一倍，基因表达水平 $Y$ 会是多少？使用结构方程模型解决这一问题，首先需要利用该个体的观测证据，求出随机变量 $U_X,U_P,U_Y$ 对该个体特定的取值。根据模型 (1.143) 和观测证据，得到
+\[
+\begin{aligned}
+U_X&=1,\\
+U_P&=P-aX=0.8-0.1*1=0.7,\\
+U_Y&=Y-bX-cP=1.2-0.2*1-0.5*0.8=0.6.
+\end{aligned}
+\]
+随后，将方程 $P=0.1X+U_P$ 替换为 $P=1.6$，模拟将个体身体锻炼增加一倍的操作。修改后的模型见图 1.15d。如果该个体的身体活动增加一倍，就可以用模型 (1.143) 的第三个方程预测基因表达水平：
+\[
+Y=0.2*1+0.5*1.6+0.6=1.6.
+\]
+一般地，将结构方程模型拟合于总体数据，得到
+\begin{equation}
+Y=\Gamma Y+BX+U.
+\tag{1.144}
+\end{equation}
+\Needspace{6\baselineskip}
+\textbf{反事实分析包含三个步骤：}
+\begin{enumerate}
+\item \textbf{溯因（abduction）。}根据对该个体新观测到的内生变量与外生变量的证据 $(Y_*,X_*)$，估计随机向量 $U_*$：
+\begin{equation}
+U_*=Y_*-\Gamma Y_*-BX_*.
+\tag{1.145}
+\end{equation}
+\item \textbf{行动（action）。}假设 $A$ 由 $Y$ 和 $X$ 中的多个变量组成。设 $A=a$，将模型 (1.144) 中涉及 $A$ 的方程替换为 $A=a$，得到修改后的模型：
+\begin{equation}
+Y_A=\Gamma Y_A+BX_A+U_*.
+\tag{1.146}
+\end{equation}
+\item \textbf{预测（prediction）。}使用修改后的模型 (1.146) 计算 $B$ 的期望。
+\end{enumerate}
+\FloatBarrier

@@ -1,0 +1,350 @@
+{
+  "chapter": 9,
+  "title_zh": "智能体大语言模型的交互方式",
+  "status": "complete",
+  "page_count": 14,
+  "page_count_note": "单章自测 PDF 共14页；正文延续到第11页，参考文献位于第11—14页。",
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_source/part3/09_agents.tex",
+    "06_2026_Agentic_Large_Language_Models/03_reviews/ch09_translation_review.json"
+  ],
+  "coverage": {
+    "source": "work/agentic/active/part3/09_agents.tex",
+    "source_policy": "仅以本地有效TeX为权威原文；未读取旧英文整书PDF，未联网改写原文事实。",
+    "all_valid_prose_translated": true,
+    "source_paragraph_blocks": 84,
+    "translation_paragraph_blocks": 84,
+    "headings": 27,
+    "learning_boxes": 1,
+    "learning_items": 3,
+    "figures": 8,
+    "captions_translated": 9,
+    "tables": 1,
+    "table_styles": 5,
+    "table_physical_rows_including_header": 12,
+    "table_columns": 4,
+    "footnotes": 1,
+    "citation_commands": 44,
+    "math_segments": 39,
+    "shared_figure_calls_read_only": [
+      "figures/rl",
+      "figures/rl-llm",
+      "figures/rl-llm2",
+      "figures/rlA",
+      "figures/rlB",
+      "figures/rlC",
+      "figures/rlD",
+      "figures/rlE"
+    ],
+    "new_figure_files": [],
+    "examples": "纯文字情绪补全、逐步思考与提示压缩示例已译为中文；英法词语映射示例保留用于演示语言任务的原词语、法语拼写与答案。",
+    "bibliography": "保留plainnat及agenticbook,refs,case,synthetic调用与全部引文键。",
+    "example_commands_executed": false,
+    "english_prose_residue": []
+  },
+  "structure_checks": {
+    "headings": {
+      "match": true,
+      "source_count": 27,
+      "translation_count": 27
+    },
+    "labels": {
+      "match": true,
+      "source_count": 12,
+      "translation_count": 12
+    },
+    "references": {
+      "match": true,
+      "source_count": 22,
+      "translation_count": 22
+    },
+    "citation_keys": {
+      "match": true,
+      "source_count": 44,
+      "translation_count": 44
+    },
+    "environments": {
+      "match": true,
+      "source_count": 20,
+      "translation_count": 20
+    },
+    "bibliography": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "structural_commands": {
+      "match": true,
+      "source_count": 13,
+      "translation_count": 13
+    },
+    "code_blocks": {
+      "match": true
+    },
+    "math_segments": {
+      "match": true,
+      "symbol_multiset_match": true,
+      "source_count": 39,
+      "translation_count": 39
+    },
+    "text": {
+      "source_english_words": 5359,
+      "translated_CJK": 8075,
+      "translation_characters": 13791,
+      "source_characters": 34742,
+      "source_paragraph_blocks": 84,
+      "translation_paragraph_blocks": 84
+    },
+    "stray_chapter_counter": false,
+    "stray_part": false,
+    "reference_and_citation_commands_order_match": true,
+    "input_calls_match": true,
+    "table_shape_match": true,
+    "source_table_shape": [
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ],
+    "translation_table_shape": [
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ],
+    "numeric_values_match_after_chinese_unit_conversion": true,
+    "numeric_unit_conversion": "100 billion = 1000 亿",
+    "source_sha256": "f1d9c8eaf6be6a76f4aaeccb504bd9239f00b9d4ed1395a1709da2906c6bd4ed",
+    "translation_sha256": "98c4efd287c049eb0b8de3293a2ff86518eb8e2c098da52e33b2db7849d3162a",
+    "audit_artifact": "work/agentic/ch09_work/checks.json"
+  },
+  "new_terms": {
+    "robotic assistant agent": "机器人助手智能体",
+    "super-organism": "超级有机体",
+    "ant colony optimization": "蚁群优化",
+    "query prompt": "查询提示",
+    "self-reflection harness": "自我反思控制框架",
+    "reinforcement finetuning harness": "强化微调控制框架",
+    "coherent conversation": "连贯对话",
+    "identity": "身份认同",
+    "long-context architecture": "长上下文架构",
+    "explicit memory management": "显式记忆管理",
+    "hierarchical summaries": "分层摘要",
+    "memory as a tool": "将记忆作为工具",
+    "mailbox principle": "邮箱原则",
+    "state consolidation": "状态整合",
+    "Model Context Protocol (MCP)": "模型上下文协议（MCP）"
+  },
+  "source_anomalies": [
+    {
+      "location": "表9.1 A行及9.2.1.1末段；有效源第138、178行",
+      "description": "GPT-2对应的引用键两处均为vaswani2017attention，模型名与该引用的对应关系存疑。已原样保留模型名和引用键，未替作者更换参考文献。"
+    },
+    {
+      "location": "表9.1 A行与9.2.1.1末段；有效源第138、175—178行",
+      "description": "表中A方式的大语言模型列为pretrained，正文又说明模型经过instruction answering微调。已分别保留两个位置的表述，未改动分类。"
+    },
+    {
+      "location": "9.2.1.5 强化微调控制框架；有效源第290—310行",
+      "description": "前文将强化微调称为finetuning at inference-time，后文又说明方式E不在测试/推理阶段(3)进行强化学习，而在微调阶段(2)进行。阶段划分存在解释张力，已逐段完整保留，未统一改写作者定义。"
+    },
+    {
+      "location": "9.3.2.3 显式记忆管理；有效源第386行",
+      "description": "原文将MCP表述为为context management设计的一组strategies。按原文译为“一组为上下文管理设计的策略”，未以外部资料重写该定义。"
+    },
+    {
+      "location": "9.3.2.3 显式记忆管理；有效源第383行",
+      "description": "A-mem所依循原则在原文写作mailbox principle，已保留为“邮箱原则”，未替作者更换概念。"
+    },
+    {
+      "location": "9.3.2.3 显式记忆管理；有效源第380行",
+      "description": "MemoryBank段落的running personality of the interaction events of a user语义不够清晰；译为“根据用户的交互事件持续构建其人格画像”，未补写实现细节。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "command": "python -X utf8 build.py --chapter 9 --name ch09",
+    "engine": "XeLaTeX",
+    "shell_escape": false,
+    "build_path": "06_2026_Agentic_Large_Language_Models/01_source/build/ch09_c21f0dbd",
+    "driver_path": "06_2026_Agentic_Large_Language_Models/01_source/build/ch09_c21f0dbd/driver.tex",
+    "pdf_path": "06_2026_Agentic_Large_Language_Models/01_source/build/ch09_c21f0dbd/agenticbook.pdf",
+    "log_path": "06_2026_Agentic_Large_Language_Models/01_source/build/ch09_c21f0dbd/agenticbook.log",
+    "build_report_path": "06_2026_Agentic_Large_Language_Models/01_source/build/ch09_c21f0dbd/build_report.json",
+    "passes": 4,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overfull_boxes": 0,
+    "undefined_references": 0,
+    "undefined_citations": 0,
+    "single_chapter_limitations": [
+      {
+        "location": "单章PDF第5页，9.2.1.3末句，跨章页码引用\\pageref{fig:cot}",
+        "description": "单章驱动为跨章标签提供编号、未提供页字段，因此该处暂渲染为“见第页”；日志中未定义引用数为0。原调用完整保留，主编已确认在第1—10章合排后核对图6.1实际页码。此为单章构建限制，无待改译文。",
+        "resolution": "由主编全书/阶段合排解析跨章页码，并在合排QA复核。"
+      }
+    ]
+  },
+  "visual_qa": {
+    "renderer": "Poppler pdftoppm，140 dpi；页眉另以PyMuPDF裁片与像素核对",
+    "inspected_pages": [
+      1,
+      4,
+      5,
+      7,
+      9,
+      10
+    ],
+    "page_checks": [
+      {
+        "page": 1,
+        "content": "章标题、学习目标框、三级历史类型导入",
+        "result": "字号、层次、框内换行与正文边界正常。"
+      },
+      {
+        "page": 4,
+        "content": "表9.1五种智能体交互方式",
+        "result": "12个物理行、4列完整；中文和引文均在表内，无裁切或重叠。"
+      },
+      {
+        "page": 5,
+        "content": "图9.4、9.5与英法少样本提示、思维链正文",
+        "result": "图文清晰、语言示例完整；跨章页码空值已单列为构建限制。"
+      },
+      {
+        "page": 7,
+        "content": "图9.7自我反思、图9.8强化微调及方式E正文",
+        "result": "图中节点与箭头、题注和正文间距正常，公式未裁切。"
+      },
+      {
+        "page": 9,
+        "content": "身份认同、持续学习、微调、长上下文与软提示",
+        "result": "中文段落、长引文及英文学术术语换行正常。"
+      },
+      {
+        "page": 10,
+        "content": "显式记忆管理、MCP、学习使用记忆、向量数据库与结语开头",
+        "result": "段落标题、引文、中文内容与页码无重叠或裁切。"
+      }
+    ],
+    "table_clipping": false,
+    "overlap": false,
+    "missing_glyphs_seen": false,
+    "shared_figures_note": "只读复用主编已中文化并通过QA的共享图，本章未另改图或重复检查全部22图。",
+    "render_directory": "work/agentic/ch09_work/render"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_source/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

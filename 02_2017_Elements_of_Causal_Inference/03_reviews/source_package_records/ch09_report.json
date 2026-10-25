@@ -1,0 +1,392 @@
+{
+  "chapter": "ch09",
+  "title": "潜变量",
+  "status": "complete",
+  "source_pages": 26,
+  "source_nonblank_pages": 26,
+  "source_book_pages": "171—196",
+  "translated_pages": 19,
+  "project_root": "02_2017_Elements_of_Causal_Inference/01_source",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e3.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09f.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_02.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_03.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_04.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_05.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_06.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_07.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_08.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_09.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_10.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_11.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_12.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_table_01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch09_09_printed_paths.json"
+  ],
+  "test_pdf": "work/elements_book/build/ch09/driver.pdf",
+  "structure": {
+    "chapters": 1,
+    "sections": 6,
+    "subsections": 8,
+    "outline": [
+      [
+        1,
+        "第九章  潜变量",
+        1
+      ],
+      [
+        2,
+        "9.1 干预充分性",
+        1
+      ],
+      [
+        2,
+        "9.2 Simpson悖论",
+        3
+      ],
+      [
+        2,
+        "9.3 工具变量",
+        4
+      ],
+      [
+        2,
+        "9.4 条件独立性与图表示",
+        5
+      ],
+      [
+        3,
+        "9.4.1 图",
+        7
+      ],
+      [
+        3,
+        "9.4.2 快速因果推断",
+        10
+      ],
+      [
+        2,
+        "9.5 超出条件独立性的约束",
+        10
+      ],
+      [
+        3,
+        "9.5.1 Verma约束",
+        10
+      ],
+      [
+        3,
+        "9.5.2 不等式约束",
+        11
+      ],
+      [
+        3,
+        "9.5.3 基于协方差的约束",
+        13
+      ],
+      [
+        3,
+        "9.5.4 加性噪声模型",
+        14
+      ],
+      [
+        3,
+        "9.5.5 检测低复杂度混杂因子",
+        15
+      ],
+      [
+        3,
+        "9.5.6 不同环境",
+        18
+      ],
+      [
+        2,
+        "9.6 习题",
+        19
+      ]
+    ]
+  },
+  "counts": {
+    "numbered_equations": 20,
+    "equation_tags": [
+      "9.1",
+      "9.2",
+      "9.3",
+      "9.4",
+      "9.5",
+      "9.6",
+      "9.7",
+      "9.8",
+      "9.9",
+      "9.10",
+      "9.11",
+      "9.12",
+      "9.13",
+      "9.14",
+      "9.15",
+      "9.16",
+      "9.17",
+      "9.18",
+      "9.19",
+      "9.20"
+    ],
+    "figures": 12,
+    "figure_numbers": [
+      "9.1",
+      "9.2",
+      "9.3",
+      "9.4",
+      "9.5",
+      "9.6",
+      "9.7",
+      "9.8",
+      "9.9",
+      "9.10",
+      "9.11",
+      "9.12"
+    ],
+    "tables": 1,
+    "table_numbers": [
+      "9.1"
+    ],
+    "table_data_rows": 10,
+    "shared_result_environments": 9,
+    "shared_result_sequence": [
+      {
+        "number": "9.1",
+        "environment": "definition"
+      },
+      {
+        "number": "9.2",
+        "environment": "example"
+      },
+      {
+        "number": "9.3",
+        "environment": "proposition"
+      },
+      {
+        "number": "9.4",
+        "environment": "remark"
+      },
+      {
+        "number": "9.5",
+        "environment": "example"
+      },
+      {
+        "number": "9.6",
+        "environment": "definition"
+      },
+      {
+        "number": "9.7",
+        "environment": "theorem"
+      },
+      {
+        "number": "9.8",
+        "environment": "definition"
+      },
+      {
+        "number": "9.9",
+        "environment": "theorem"
+      }
+    ],
+    "proof_environments": 1,
+    "source_footnotes": 3,
+    "translator_notes": 8,
+    "problems": 3,
+    "problem_numbers": [
+      "9.10",
+      "9.11",
+      "9.12"
+    ],
+    "code_snippets": 0,
+    "code_lines": 0,
+    "formal_numbered_algorithms": 0
+  },
+  "new_terms_en_zh": {
+    "causal sufficiency": "因果充分性",
+    "interventional sufficiency": "干预充分性",
+    "marginalized SCM": "边缘化结构因果模型",
+    "instrumental variable": "工具变量",
+    "relevance": "相关性条件",
+    "exclusion restriction": "排除限制",
+    "two-stage least squares": "两阶段最小二乘法",
+    "weak instrument": "弱工具变量",
+    "generalized instrumental variables": "广义工具变量",
+    "curved exponential family": "弯曲指数族",
+    "maximal ancestral graph": "极大祖先图",
+    "m-separation": "m-分离",
+    "partially ancestral graph": "部分祖先图",
+    "induced path graph": "诱导路径图",
+    "completed partially oriented induced path graph": "完备部分定向诱导路径图",
+    "latent projection": "潜在投影",
+    "acyclic directed mixed graph": "无环有向混合图",
+    "nested Markov property": "嵌套马尔可夫性",
+    "bow-free": "无弓图",
+    "chain graph": "链图",
+    "fast causal inference": "快速因果推断",
+    "really fast causal inference": "真正快速因果推断",
+    "Y-structure": "Y结构",
+    "Verma constraint": "Verma约束",
+    "dormant independence": "休眠独立性",
+    "nested Markov model": "嵌套马尔可夫模型",
+    "CHSH inequality": "CHSH不等式",
+    "Bell inequality": "Bell不等式",
+    "elementary inequality": "基本不等式",
+    "polymatroid axiom": "多拟阵公理",
+    "Fourier-Motzkin elimination": "Fourier-Motzkin消元法",
+    "tetrad constraint": "四元约束",
+    "tetrad difference": "四元差",
+    "trek": "无对撞路径",
+    "choke point": "瓶颈点",
+    "overcomplete ICA": "过完备独立成分分析",
+    "manifold": "流形",
+    "pairwise purity": "两两纯性",
+    "rank of a conditional distribution": "条件分布的秩",
+    "shift variable": "移位变量",
+    "joint diagonalization": "联合对角化"
+  },
+  "source_anomalies": [
+    {
+      "source_book_pages": [
+        176
+      ],
+      "source_pdf_pages": [
+        6
+      ],
+      "location": "9.3中Y的未编号展开式",
+      "original": "将X:=beta Z+gamma H+N_X代入Y时，最后一项只保留N_Y，漏写alpha N_X。",
+      "suggested_reading": "完整噪声项应为alpha N_X+N_Y；仍与Z独立。",
+      "treatment": "主文保留原印展开，以译注1给出完整公式并说明不影响两阶段回归一致性。"
+    },
+    {
+      "source_book_pages": [
+        181,
+        183
+      ],
+      "source_pdf_pages": [
+        11,
+        13
+      ],
+      "location": "表9.1图注及9.4.1模型类包含关系首行",
+      "original": "在观测/潜变量始终记O/H的上下文中，原文将联合分布写成P_{O,V}。",
+      "suggested_reading": "V应理解为潜变量集合H。",
+      "treatment": "保留原符号，译注2统一说明表9.1与集合首行。"
+    },
+    {
+      "location": "式(9.4)",
+      "issue": "原式不能由工具变量DAG一般推出；例如X=Z、Y=X使左侧为2。标准形式需固定同一个x。",
+      "handling": "编号式照原印，解释句末译注3说明。",
+      "source_book_pages": [
+        186
+      ]
+    },
+    {
+      "location": "式(9.5)",
+      "issue": "CHSH原印四项全部为加号；X=Y=1即给出4，标准CHSH需要一个负号。",
+      "handling": "保留原公式与编号，译注4给出可用的标准符号。",
+      "source_book_pages": [
+        187
+      ]
+    },
+    {
+      "location": "式(9.7)",
+      "issue": "右侧相较标准次模性少了-H(S)；所印不等式仍成立但较弱。",
+      "handling": "保留原式，译注5区分。",
+      "source_book_pages": [
+        188
+      ]
+    },
+    {
+      "location": "图9.8与式(9.13)、(9.14)",
+      "issue": "图含H与J两个潜在因子，后两条四元约束一般还需要额外条件；对应协方差差含Var(N_J)项。",
+      "handling": "原图和三式均保留，译注6显式说明额外条件。",
+      "source_book_pages": [
+        189
+      ]
+    },
+    {
+      "location": "定义9.6、图9.12前解释及密度判据",
+      "issue": "两点应限制x1不等于x2；另原书“纯性强于各点在单纯形内部”的措辞与图9.12实际边界例子不吻合。",
+      "handling": "正文按原意转写；译注7合并澄清不同取值与边界例子。",
+      "source_book_pages": [
+        192,
+        193
+      ]
+    },
+    {
+      "location": "定理9.9后多元推广",
+      "issue": "原印d个乘积分布；应为k个混合项，每项含d个因子。",
+      "handling": "主文保留原计数，句末译注8说明。",
+      "source_book_pages": [
+        195
+      ]
+    }
+  ],
+  "intentional_layout_differences": [
+    "A4中文教材版式，26个原书正文页逐段译出，不追求逐页等长。",
+    "12图全部以TikZ重建，保留图中变量、潜节点虚线、箭头方向、PAG圆端点、面板及完整图注。",
+    "图9.9依据原PDF的201个印刷点及200段红色曲线重建；使用印刷矢量坐标，不以模拟数据替代。",
+    "表9.1完整保留5列及10个比较行，中文换行以适应A4版面。",
+    "3条原脚注保持原序号；译注使用单独的连续计数，不改变原脚注编号。",
+    "原文错误公式和符号保留，另用明确的译注说明必要读法。",
+    "习题9.10—9.12完整保留，未增写答案。"
+  ],
+  "unresolved_items": [],
+  "validation": {
+    "engine": "xelatex",
+    "final_xelatex_passes": 2,
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "undefined_references": 0,
+    "all_source_pages_rendered_and_reviewed": true,
+    "all_translated_pages_rendered_and_reviewed": true,
+    "numbered_and_unnumbered_displays_checked_against_rendered_source": true,
+    "all_figure_nodes_arrows_circle_endpoints_and_table_cells_checked": true,
+    "all_original_footnotes_and_problems_preserved": true,
+    "source_sha256": "a315207ba896065b77cb52e6193d12ffb7cad75d14e4b5ceb34cabbb57940d50",
+    "pdf_sha256": "ae29fcfef9cde07b267f13164133dacb35ccdcd0cf70ea2a7781ef81dd691f78",
+    "source_tex_sha256": {
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09.tex": "167c60db866fcc6a72f42dc45c240988604517e87d4e75a1379c73ec91fddc4b",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09a.tex": "e8ef07e7258168fce99cd4d2e386b0267dc35c18a1bad81850f3de0b3935d4af",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09b.tex": "99664a3a72df4eac02ea9a398218c3ed8c3b64ececbedf81000824293669df6c",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09c.tex": "5572d348669bc56520b1834fb7d98c585f9e67ee05e2f806aa35f9c1ec1e9752",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e.tex": "8458748caf4708a08f6c22e6bb37558302e1aea9745dcea9106c58deee208f74",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e1.tex": "db1de7353df055fd9592777faa46edaeccb4dfb8249ab60c50d485181b392a41",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e2.tex": "af813dcf0c20ee9a60147a4059c31a244286ae158eea7d73ff17316d6358fee2",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09e3.tex": "88f8ef8863617ff231375be8b83ee0221c1006a32fd9c56662494053b1389897",
+      "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch09f.tex": "48c16de0f52d05e0bde8a1cb8580b5462e44d926f1be1f802ae9d00a14e35dbb",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_01.tex": "958db6d178a0ee4c6ac4e2a12855348f3c4e03ac30b104b26fcf4939f8bf64b3",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_02.tex": "c01281771921db6a6d19630d0bc55a33a765f412fcaa115689b17b13502fa418",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_03.tex": "7762ff26ee3e00b45abf5ea7970a64da729850b3761bc0f5688d0b7d29a89381",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_04.tex": "b83691b8f80a6d9a71e32229f0b8ad064b50fdbda3f9cb54f26e573579dd4b8f",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_05.tex": "514c16b5a9d907217c1a01728b5f466fbecdd01d2f485dfc38002f986f6072c4",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_06.tex": "9056ac5cf4f72bae8e2eeddeb38570dba7067677e3e581de065dbee6f92db69c",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_07.tex": "f5178a81a083ecef84fecf1eaf6959092235684419b4ce2f8c87efb53aaf03c7",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_08.tex": "915db8bfc7a84adf4cd8b7a8cbd34d9751a34b6d91b4f97770fee3c6f8258138",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_09.tex": "e195144798ab070bf2da1f8d4ba0f7a688a4eef48ae2ea7e712e1cf3c66b43ff",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_10.tex": "1205c5d5b9dfc620542ec719af71125a17b8b0cf23448416db225cf2d1e203de",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_11.tex": "a217f8d62739a2a3f8202f92a4630c55ae72c35f15a6ff56d4a36647b32d9f0e",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_12.tex": "a8bab6a691f33e35fada5ceb8d83e909685bd50aba83ad05158fb4fbc6221d74",
+      "02_2017_Elements_of_Causal_Inference/01_source/figures/ch09_table_01.tex": "b5c1d885af355815dfbc235be0e1b507209b845898db70eb5946da2e1083472b",
+      "02_2017_Elements_of_Causal_Inference/01_source/data/ch09_09_printed_paths.json": "3201cfdc62243cc8e760a6f4a49f5022c3d1344d4b6f463fb329dbaa77839253"
+    },
+    "control_characters": []
+  },
+  "local_macros": [
+    "chninetransnote",
+    "chninenote"
+  ],
+  "section_9_5_independent_report": "work/elements_book/reports/ch09_section95_report.json",
+  "figure_9_9_provenance": {},
+  "shared_files_edited": []
+}

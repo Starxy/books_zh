@@ -1,0 +1,459 @@
+> 当前状态（2026-10-24）：全书中文译稿已编译完成，成品为 `00_books/Elements_of_Causal_Inference_cn_translated.pdf`（197页）。当前源码为 `../../01_source/`，构建方法见该目录的 `README_build.txt`。以下为历史制作/校对依据，其中阶段进度、旧文件名及临时路径仅作追溯，不代表当前交付状态。
+
+# 《因果推断基础》术语表（中英对照）
+
+原书：Jonas Peters, Dominik Janzing, Bernhard Schölkopf，
+*Elements of Causal Inference: Foundations and Learning Algorithms*（2017）。
+范围：全书第 1—10 章及附录 A—C；建立日期：2026-10-23。
+
+沿用《Causality》和《Causal Inference: What If》已定核心译名。
+同一术语固定使用同一译名；正文首次出现时标注英文，随后使用中文。
+下列“全书预设”词条用于后续章节，并不表示这些概念都出现在第 1 章。
+
+## 一、用户指定的因果推断核心术语（全书预设）
+
+| 英文 | 统一中文 | 说明 |
+|---|---|---|
+| counterfactual outcome | 反事实结局 | 不作“反事实结果” |
+| potential outcome | 潜在结局 | 与 counterfactual outcome 按原词区分 |
+| average causal effect | 平均因果效应 | 原文未出现时不添加 |
+| exchangeability | 可交换性 | |
+| conditional exchangeability | 条件可交换性 | |
+| positivity | 正值性 | 不作“正性” |
+| consistency | 一致性 | 第 1 章主要指统计估计的一致性；与因果推断中的一致性假设区分 |
+| standardization | 标准化 | |
+| inverse probability weighting | 逆概率加权 | |
+| target trial | 目标试验 | |
+
+## 二、第 1 章：概率、统计与学习理论
+
+| 英文 | 统一中文 | 说明 |
+|---|---|---|
+| statistical model | 统计模型 | |
+| probabilistic model / probability model | 概率模型 | |
+| statistical learning | 统计学习 | |
+| observational data | 观测数据 | |
+| random variable | 随机变量 | |
+| statistical dependence | 统计相依 | 与仅指线性相关的 correlation 区分 |
+| dependence | 相依关系 | |
+| correlation | 相关 | |
+| random experiment | 随机试验 | 与 randomized experiment“随机化实验”区分 |
+| probability space | 概率空间 | |
+| event | 事件 | |
+| measure | 测度 | |
+| inverse problem | 逆问题 | |
+| input / output | 输入 / 输出 | |
+| covariate | 协变量 | |
+| case | 样例 | 机器学习输入语境 |
+| target | 目标值 | |
+| label / class label | 标签 / 类别标签 | |
+| independent and identically distributed (i.i.d.) | 独立同分布 | 保留缩写 i.i.d. |
+| joint distribution | 联合分布 | |
+| metric space | 度量空间 | |
+| Borel sigma-algebra | Borel σ-代数 | |
+| distribution shift | 分布偏移 | |
+| conditional expectation | 条件期望 | |
+| regression | 回归 | |
+| binary classifier | 二分类器 | |
+| density | 密度 | |
+| empirical distribution | 经验分布 | |
+| point mass | 点质量 | |
+| ill-posed problem / ill-posedness | 不适定问题 / 不适定性 | 不作“病态问题” |
+| function class | 函数类 | |
+| capacity / capacity measure | 容量 / 容量度量 | 函数类复杂程度 |
+| a priori knowledge | 先验知识 | |
+| smoothness | 光滑性 | |
+| Bayesian approach | 贝叶斯方法 | |
+| prior distribution | 先验分布 | |
+| noise model / noise term | 噪声模型 / 噪声项 | |
+| regularization theory | 正则化理论 | |
+| regularizer | 正则化项 | |
+| binary pattern recognition | 二类模式识别 | |
+| expected error | 期望误差 | |
+| risk | 风险 | 统计学习中的期望损失；不是疾病发生概率 |
+| loss function | 损失函数 | |
+| induction principle | 归纳原则 | |
+| empirical risk minimization | 经验风险最小化 | |
+| training error / empirical risk | 训练误差 / 经验风险 | |
+| convergence in probability | 依概率收敛 | |
+| Vapnik–Chervonenkis (VC) dimension | Vapnik–Chervonenkis（VC）维 | |
+| finite-sample guarantee | 有限样本保证 | |
+| universal consistency | 普适一致性 | |
+| nearest neighbor classifier | 最近邻分类器 | |
+| Support Vector Machine | 支持向量机 | |
+| learning rate | 学习收敛速率 | 本章指误差随样本量变化的速率，不是优化算法的步长 |
+| slow rates | 慢收敛现象 | |
+
+## 三、第 1 章：因果模型与示例
+
+| 英文 | 统一中文 | 说明 |
+|---|---|---|
+| inference | 推断 | 本书上位概念，同时包括 learning 和 reasoning |
+| reasoning | 推理 | 从给定模型推出结论 |
+| learning | 学习 | 根据数据推断模型或模型性质 |
+| causal inference | 因果推断 | |
+| causal modeling | 因果建模 | |
+| causal structure | 因果结构 | |
+| causal reasoning | 因果推理 | |
+| probabilistic reasoning | 概率推理 | |
+| structure learning | 结构学习 | |
+| causal discovery | 因果发现 | |
+| structure identifiability | 结构可识别性 | 不作“结构可识别性” |
+| causal learning | 因果学习 | |
+| additive noise model | 加性噪声模型 | 参见原书第 4.1.4 节 |
+| causal link | 因果联系 | |
+| common cause principle | 共同原因原理 | 人名 Reichenbach 保留英文 |
+| common cause | 共同原因 | |
+| confounder | 混杂因子 | 不作“混杂因素” |
+| screening off | 屏蔽 | 指给定 Z 后 X 与 Y 条件独立 |
+| conditional independence | 条件独立 | |
+| selection bias | 选择偏倚 | |
+| multiple testing correction | 多重检验校正 | |
+| type I error | 第一类错误 | |
+| independence test | 独立性检验 | |
+| spurious correlation | 伪相关 | |
+| optical character recognition | 光学字符识别 | |
+| mechanism | 机制 | |
+| observational distribution | 观测分布 | |
+| intervention | 干预 | |
+| intervention distribution | 干预分布 | |
+| direct causation | 直接因果关系 | |
+| intention | 书写意图 | 手写数字示例语境 |
+| structural causal model (SCM) | 结构因果模型 | |
+| structural equation model | 结构方程模型 | |
+| assignment | 赋值 | “:=”不是普通等式约束 |
+| counterfactual | 反事实 | |
+| mechanistic model | 机理模型 | |
+| physical model | 物理模型 | |
+| causal graphical model | 因果图模型 | |
+| epiphenomena | 伴随现象 | |
+| gene perturbation | 基因扰动 | 小节标题 |
+| gene activity | 基因活性 | |
+| phenotype | 表型 | |
+| gene deletion | 基因敲除 | 本例的理想化设定为将基因活性设为 0 |
+
+## 四、排版与编号
+
+- 第 1 章含 1.1—1.4 四节；1.4 下含 1.4.1、1.4.2 两小节。
+- 公式保留 (1.1)—(1.3)，图保留 1.1—1.4，表保留 1.1，原理保留 1.1，脚注保留 1—6。
+- 本章只有“原理”结构，没有 Fine Point 或 Technical Point；保持原书实际体例。
+- 图中的随机变量符号保持原样，其余说明、坐标轴和图注译成中文。
+- 作者姓名、文献年份及本书后续章节号保持原样；独立章节成品不制造空的交叉引用链接。
+
+## 五、整书后续章节统一术语（2026-10-23）
+
+| English | 中文 | 约定 |
+|---|---|---|
+| cause / effect | 原因 / 结果 | cause-effect model 统一“原因—结果模型” |
+| independent mechanisms | 独立机制 | principle of independent mechanisms 机制独立原理 |
+| independent causal mechanisms (ICM) | 因果机制独立性 | 缩写 ICM 保留 |
+| causal direction / anticausal direction | 因果方向 / 反因果方向 | |
+| modularity / autonomy | 模块性 / 自主性 | |
+| non-Gaussian | 非高斯 | |
+| post-nonlinear model | 后非线性模型 | |
+| information-geometric causal inference (IGCI) | 信息几何因果推断 | |
+| trace method | 迹方法 | |
+| algorithmic information theory | 算法信息论 | |
+| Kolmogorov complexity | Kolmogorov 复杂度 | 人名保留英文 |
+| causal Markov condition | 因果马尔可夫条件 | |
+| Markov property | 马尔可夫性 | |
+| faithfulness | 忠实性 | 不与因果极小性混用 |
+| causal minimality | 因果极小性 | |
+| Markov equivalence class | 马尔可夫等价类 | |
+| d-separation / d-connection | d-分离 / d-连通 | |
+| directed acyclic graph (DAG) | 有向无环图 | |
+| parent / child / ancestor / descendant | 父节点 / 子节点 / 祖先节点 / 后代节点 | |
+| collider | 对撞节点 | |
+| skeleton | 骨架 | |
+| v-structure | v 结构 | |
+| structural causal model / structural equation model | 结构因果模型 / 结构方程模型 | 按原词区分 |
+| hard intervention / soft intervention | 硬干预 / 软干预 | |
+| perfect intervention | 完美干预 | |
+| covariate adjustment | 协变量调整 | |
+| adjustment set | 调整集 | |
+| back-door criterion / front-door criterion | 后门准则 / 前门准则 | |
+| do-calculus | do 演算 | |
+| interventionally equivalent | 干预等价 | |
+| counterfactually equivalent | 反事实等价 | |
+| falsifiability | 可否证性 | |
+| semi-supervised learning | 半监督学习 | |
+| covariate shift | 协变量偏移 | |
+| half-sibling regression | 半同胞回归 | |
+| episodic reinforcement learning | 回合式强化学习 | |
+| domain adaptation | 领域适应 | |
+| hidden variable / latent variable | 潜变量 | 章 9 标题用“潜变量” |
+| interventional sufficiency | 干预充分性 | |
+| instrumental variable | 工具变量 | |
+| ancestral graph | 祖先图 | |
+| maximal ancestral graph (MAG) | 极大祖先图 | |
+| acyclic directed mixed graph (ADMG) | 有向无环混合图 | |
+| time series | 时间序列 | |
+| Granger causality | Granger 因果性 | |
+| autoregressive | 自回归 | |
+| weak / strict stationarity | 弱平稳性 / 严平稳性 | |
+| dynamic causal modeling | 动态因果建模 | |
+| sparse / sparsity | 稀疏 / 稀疏性 | |
+| regular conditional probability | 正则条件概率 | |
+| conditional distribution / marginal distribution | 条件分布 / 边缘分布 | |
+| Gaussian process | 高斯过程 | |
+| structural identifiability | 结构可识别性 | |
+| maximum mean discrepancy (MMD) | 最大均值差异 | |
+| reproducing kernel Hilbert space (RKHS) | 再生核 Hilbert 空间 | |
+| Hilbert-Schmidt independence criterion (HSIC) | Hilbert-Schmidt 独立性准则 | |
+| causal ordering | 因果排序 | |
+| adjacency matrix | 邻接矩阵 | |
+| observational / interventional / counterfactual | 观测 / 干预 / 反事实 | |
+
+
+## 六、第 2—4 章与附录新增术语
+
+| English | 中文 | 来源 |
+|---|---|---|
+| generic viewpoint assumption | 一般视点假设 | ch02 |
+| structure from motion | 运动恢复结构 | ch02 |
+| independence of cause and mechanism | 原因与机制的独立性 | ch02 |
+| intervenability | 可干预性 | ch02 |
+| invariance | 不变性 | ch02 |
+| path model | 路径模型 | ch02 |
+| path coefficient | 路径系数 | ch02 |
+| observational equivalence | 观测等价性 | ch02 |
+| identification | 识别 | ch02 |
+| endogenous variable | 内生变量 | ch02 |
+| exogenous variable | 外生变量 | ch02 |
+| super-exogeneity | 超外生性 | ch02 |
+| concept drift | 概念漂移 | ch02 |
+| equilibrium state | 平衡状态 | ch02 |
+| dynamical law | 动力学定律 | ch02 |
+| thermodynamic arrow of time | 热力学时间箭头 | ch02 |
+| dam / sire | 母本 / 父本 | ch02 |
+| direct cause | 直接原因 | ch03 |
+| causal graph | 因果图 | ch03 |
+| canonical representation | 典范表示 | ch03 |
+| Cartesian product | 笛卡尔积 | ch03 |
+| reparameterization | 重参数化 | ch03 |
+| cyclic SCM | 有环结构因果模型 | ch03 |
+| uniform mixture | 等权混合 | ch03 |
+| interventional probability | 干预概率 | ch03 |
+| observational conditional probability | 观测条件概率 | ch03 |
+| linear non-Gaussian acyclic model | 线性非高斯无环模型 | ch04 |
+| independent component analysis | 独立成分分析 | ch04 |
+| non-degenerate random variable | 非退化随机变量 | ch04 |
+| smooth additive noise model | 光滑加性噪声模型 | ch04 |
+| support | 支撑集 | ch04 |
+| information-geometric causal inference | 信息几何因果推断 | ch04 |
+| diffeomorphism | 微分同胚 | ch04 |
+| trace condition | 迹条件 | ch04 |
+| renormalized trace | 归一化迹 | ch04 |
+| rotation-invariant prior | 旋转不变先验 | ch04 |
+| algorithmic mutual information | 算法互信息 | ch04 |
+| conditional algorithmic information | 条件算法信息 | ch04 |
+| algorithmically independent conditionals | 算法独立的条件分布 | ch04 |
+| minimum description length principle | 最小描述长度原理 | ch04 |
+| regression with subsequent independence test | 回归后进行独立性检验 | ch04 |
+| tracial dependency ratio | 迹相依比 | ch04 |
+| free probability theory | 自由概率论 | ch04 |
+| unsupervised inverse regression | 无监督逆回归 | ch04 |
+| time-reversibility | 时间可逆性 | ch04 |
+| partial correlation | 偏相关 | 附录 |
+| non-degenerate | 非退化 | 附录 |
+| characteristic kernel | 特征核 | 附录 |
+| median heuristic | 中位数启发法 | 附录 |
+| cross-covariance operator | 互协方差算子 | 附录 |
+| youngest parent | 最年轻父节点 | 附录 |
+| source node | 源节点 | 附录 |
+| sink node | 汇节点 | 附录 |
+
+ICM 的具体展开依原文区分：第 2 章的 independence of cause and mechanism 译“原因与机制的独立性”；independent causal mechanisms 译“因果机制独立性”。
+
+
+## 第 5—7 章新增术语
+
+| English | 中文 | 来源 |
+|---|---|---|
+| inductive semi-supervised learning | 归纳式半监督学习 | ch05 |
+| cluster assumption | 聚类假设 | ch05 |
+| low-density separation assumption | 低密度分离假设 | ch05 |
+| semi-supervised smoothness assumption | 半监督光滑性假设 | ch05 |
+| self-training | 自训练 | ch05 |
+| base classifier | 基础分类器 | ch05 |
+| probability mass function | 概率质量函数 | ch05 |
+| worst case analysis | 最坏情形分析 | ch05 |
+| model misspecification | 模型误设 | ch05 |
+| projection | 投影 | ch05 |
+| convolution | 卷积 | ch05 |
+| deconvolution | 反卷积 | ch05 |
+| multivariate causal model | 多元因果模型 | ch06 |
+| graph terminology | 图论术语 | ch06 |
+| subgraph | 子图 | ch06 |
+| proper subgraph | 真子图 | ch06 |
+| fully connected | 全连接的 | ch06 |
+| immorality | 非道德结构 | ch06 |
+| ancestor | 祖先节点 | ch06 |
+| descendant | 后代节点 | ch06 |
+| topological ordering | 拓扑排序 | ch06 |
+| partially directed acyclic graph | 部分有向无环图 | ch06 |
+| d-separation | d-分离 | ch06 |
+| entailed distribution | 模型导出的分布 | ch06 |
+| ancestral sampling | 祖先抽样 | ch06 |
+| structural minimality | 结构极小性 | ch06 |
+| atomic intervention | 原子干预 | ch06 |
+| imperfect intervention | 不完美干预 | ch06 |
+| stochastic intervention | 随机干预 | ch06 |
+| total causal effect | 总因果效应 | ch06 |
+| placebo effect | 安慰剂效应 | ch06 |
+| intervention variable | 干预变量 | ch06 |
+| global Markov property | 全局马尔可夫性 | ch06 |
+| local Markov property | 局部马尔可夫性 | ch06 |
+| Markov factorization property | 马尔可夫分解性质 | ch06 |
+| causal Markov kernel | 因果马尔可夫核 | ch06 |
+| completed PDAG | 完整部分有向无环图 | ch06 |
+| Markov blanket | 马尔可夫毯 | ch06 |
+| Berkson's paradox | Berkson 悖论 | ch06 |
+| triangle-faithfulness | 三角忠实性 | ch06 |
+| autonomy | 自主性 | ch06 |
+| truncated factorization | 截断分解 | ch06 |
+| G-computation formula | G 计算公式 | ch06 |
+| manipulation theorem | 操纵定理 | ch06 |
+| valid adjustment set | 有效调整集 | ch06 |
+| parent adjustment | 父节点调整 | ch06 |
+| backdoor criterion | 后门准则 | ch06 |
+| propensity score matching | 倾向评分匹配 | ch06 |
+| propensity score | 倾向评分 | ch06 |
+| hedge | 篱结构 | ch06 |
+| frontdoor adjustment | 前门调整 | ch06 |
+| transportability | 可迁移性 | ch06 |
+| probabilistic model | 概率模型 | ch06 |
+| interventional model | 干预模型 | ch06 |
+| counterfactual model | 反事实模型 | ch06 |
+| probabilistically equivalent | 概率等价 | ch06 |
+| Rubin causal model | Rubin 因果模型 | ch06 |
+| fundamental problem of causal inference | 因果推断的基本问题 | ch06 |
+| stable unit treatment value assumption | 稳定单位治疗值假设 | ch06 |
+| unit-level causal effect | 单位层面的因果效应 | ch06 |
+| single world intervention graph | 单世界干预图 | ch06 |
+| generalized conditional mutual information | 广义条件互信息 | ch06 |
+| submodularity | 次模性 | ch06 |
+| algorithmic Markov condition | 算法马尔可夫条件 | ch06 |
+| multi-information | 多元信息 | ch06 |
+| algorithmic independence of conditionals | 条件分布的算法独立性 | ch06 |
+| constraint-based methods | 基于约束的方法 | ch07 |
+| causal additive model | 因果加性模型 | ch07 |
+| structural Hamming distance | 结构 Hamming 距离 | ch07 |
+| oracle | 预言机 | ch07 |
+| inductive causation | 归纳因果 | ch07 |
+| strong faithfulness | 强忠实性 | ch07 |
+| uniform consistency | 均匀一致性 | ch07 |
+| Meek's orientation rules | Meek 定向规则 | ch07 |
+| satisfiability | 可满足性 | ch07 |
+| Max-Min Hill-Climbing | 最大最小爬山 | ch07 |
+| marginal likelihood | 边缘似然 | ch07 |
+| maximum a posteriori estimator | 最大后验估计量 | ch07 |
+| Bayesian Dirichlet score | 贝叶斯 Dirichlet 得分 | ch07 |
+| Bayesian Dirichlet equivalence score | 贝叶斯 Dirichlet 等价得分 | ch07 |
+| distribution equivalent | 分布等价 | ch07 |
+| greedy equivalence search | 贪心等价搜索 | ch07 |
+| integer linear programming | 整数线性规划 | ch07 |
+| characteristic imset | 特征 imset | ch07 |
+| pedigree learning | 系谱学习 | ch07 |
+| greedy interventional equivalence search | 贪心干预等价搜索 | ch07 |
+| invariant prediction | 不变预测 | ch07 |
+| invariant causal prediction | 不变因果预测 | ch07 |
+| intervention target | 干预目标 | ch07 |
+| multivariate | 多元 | 全书 |
+| bivariate | 二元 | 全书 |
+
+
+## 第 8—10 章新增术语
+
+| English | 中文 | 来源 |
+|---|---|---|
+| systematic noise | 系统噪声 | ch08 |
+| denoising | 去噪 | ch08 |
+| exoplanet | 系外行星 | ch08 |
+| light curve | 光变曲线 | ch08 |
+| reinforcement learning | 强化学习 | ch08 |
+| agent | 智能体 | ch08 |
+| action | 动作 | ch08 |
+| state | 状态 | ch08 |
+| reward | 奖励 | ch08 |
+| return | 回报 | ch08 |
+| strategy | 策略 | ch08 |
+| Markov decision process | 马尔可夫决策过程 | ch08 |
+| Horvitz–Thompson estimator | Horvitz–Thompson 估计量 | ch08 |
+| weighted likelihood estimator | 加权似然估计量 | ch08 |
+| importance sampling | 重要性抽样 | ch08 |
+| off-policy evaluation | 异策略评估 | ch08 |
+| state simplification | 状态简化 | ch08 |
+| blackjack | 二十一点纸牌游戏 | ch08 |
+| publisher | 发布商 | ch08 |
+| mainline | 主栏 | ch08 |
+| mainline reserve | 主栏保留阈值 | ch08 |
+| domain generalization | 领域泛化 | ch08 |
+| multi-task learning | 多任务学习 | ch08 |
+| asymmetric multi-task learning | 非对称多任务学习 | ch08 |
+| invariant predictors | 不变预测变量 | ch08 |
+| adversarial setting | 对抗性设定 | ch08 |
+| causal sufficiency | 因果充分性 | ch09 |
+| marginalized SCM | 边缘化结构因果模型 | ch09 |
+| relevance | 相关性条件 | ch09 |
+| exclusion restriction | 排除限制 | ch09 |
+| two-stage least squares | 两阶段最小二乘法 | ch09 |
+| weak instrument | 弱工具变量 | ch09 |
+| generalized instrumental variables | 广义工具变量 | ch09 |
+| curved exponential family | 弯曲指数族 | ch09 |
+| maximal ancestral graph | 极大祖先图 | ch09 |
+| m-separation | m-分离 | ch09 |
+| partially ancestral graph | 部分祖先图 | ch09 |
+| induced path graph | 诱导路径图 | ch09 |
+| completed partially oriented induced path graph | 完备部分定向诱导路径图 | ch09 |
+| latent projection | 潜在投影 | ch09 |
+| acyclic directed mixed graph | 无环有向混合图 | ch09 |
+| nested Markov property | 嵌套马尔可夫性 | ch09 |
+| bow-free | 无弓图 | ch09 |
+| chain graph | 链图 | ch09 |
+| fast causal inference | 快速因果推断 | ch09 |
+| really fast causal inference | 真正快速因果推断 | ch09 |
+| Y-structure | Y结构 | ch09 |
+| Verma constraint | Verma约束 | ch09 |
+| dormant independence | 休眠独立性 | ch09 |
+| nested Markov model | 嵌套马尔可夫模型 | ch09 |
+| CHSH inequality | CHSH不等式 | ch09 |
+| Bell inequality | Bell不等式 | ch09 |
+| elementary inequality | 基本不等式 | ch09 |
+| polymatroid axiom | 多拟阵公理 | ch09 |
+| Fourier-Motzkin elimination | Fourier-Motzkin消元法 | ch09 |
+| tetrad constraint | 四元约束 | ch09 |
+| tetrad difference | 四元差 | ch09 |
+| trek | 无对撞路径 | ch09 |
+| choke point | 瓶颈点 | ch09 |
+| overcomplete ICA | 过完备独立成分分析 | ch09 |
+| manifold | 流形 | ch09 |
+| pairwise purity | 两两纯性 | ch09 |
+| rank of a conditional distribution | 条件分布的秩 | ch09 |
+| shift variable | 移位变量 | ch09 |
+| joint diagonalization | 联合对角化 | ch09 |
+| instantaneous effect | 即时效应 | ch10 |
+| purely instantaneous | 纯即时的 | ch10 |
+| full time graph | 完整时间图 | ch10 |
+| summary graph | 汇总图 | ch10 |
+| vector autoregressive model | 向量自回归模型 | ch10 |
+| subsampling | 降采样 | ch10 |
+| lag | 时滞 | ch10 |
+| transfer entropy | 转移熵 | ch10 |
+| spectral independence criterion | 谱独立性准则 | ch10 |
+| linear time invariant filter | 线性时不变滤波器 | ch10 |
+| power spectral density | 功率谱密度 | ch10 |
+| auto-covariance function | 自协方差函数 | ch10 |
+| transfer function | 传递函数 | ch10 |
+| squared gain | 平方增益 | ch10 |
+| frequency domain | 频域 | ch10 |
+| bilinear approximation | 双线性近似 | ch10 |
+| hemodynamic response | 血流动力学响应 | ch10 |
+| functional magnetic resonance imaging | 功能磁共振成像 | ch10 |
+| blood-oxygen-level-dependent | 血氧水平依赖 | ch10 |
+| expectation maximization | 期望最大化 | ch10 |
+
+
+## 术语核查依据
+
+polymatroid 统一译为“多拟阵”，其信息论语境用法参见[西安电子科技大学陈琦的研究介绍](https://web.xidian.edu.cn/qichen/research.html)。本书中对应术语为“多拟阵公理”。

@@ -1,0 +1,143 @@
+> 当前状态（2026-10-24）：全书中文译稿已编译完成，成品为 `00_books/Causal_Inference_What_If_cn_translated.pdf`（346页）。当前源码为 `../01_source/`，构建方法见该目录的 `README_build.txt`。以下为历史制作/校对依据，其中阶段进度、旧文件名及临时路径仅作追溯，不代表当前交付状态。
+
+# 《Causal Inference: What If》中译本体例说明（译者必读）
+
+本文件是各章译者的唯一规范。动手前请完整读一遍，并读一遍样板章 `chapters/ch01.tex`。
+
+## 一、工程位置
+
+根目录：
+`07_2026_Causal_Inference_What_If`
+
+| 路径 | 作用 |
+|---|---|
+| `01_source/preamble.tex` | 共享导言区。**只读，不得修改** |
+| `01_source/chapters/chNN.tex` | 你的产出文件（每章一个） |
+| `01_source/chapters/ch01.tex` | 样板章，体例与语言风格照此办理 |
+| `02_glossary/glossary_zh.md` | 术语表，**只读**；新术语在报告中列出，不要改表 |
+| `00_originals/chapters_en/*.pdf` | 英文底本（每章一个 PDF） |
+| `work/hermes/whatif/en3/chNN.txt` | 已清洗的抽取文本（见下） |
+
+Python（含 pymupdf）：
+`python`
+
+## 二、底本与抽取文本
+
+- 抽取文本 `en3/chNN.txt` 按页分段，页标记为 `<<<PDFPAGE n>>>`（n 从 1 起，对应本章 PDF 的第 n 页）。
+- 页边批注在文本里标为 `<<<NOTE>>> … <<<ENDNOTE>>>`，位置就是它在页面上大致对应的正文位置。
+- 文本中的公式符号残缺（希腊字母、上下标、分式常丢），**凡含公式、图、表的段落，必须渲染原页核对**：
+
+```python
+import pymupdf
+d = pymupdf.open(r"…\00_originals\chapters_en\NN_CHxx_….pdf")
+d[页码-1].get_pixmap(dpi=200).save(r"…\pages\chNN_p{n}.png")
+```
+
+然后用 `vision_analyze` 看这张图，逐字核对公式、表格数值、箭头方向。
+
+- 已知底本印刷问题：表 1.2 只印出前两行；个别公式括号不配。遇到时按数学含义处理，并在报告中写明。
+
+## 三、文件骨架
+
+```latex
+\chapter{中文章名}
+（开篇段落，不写“本章介绍……”之类的话，直接进入原文内容）
+
+\section{节名}
+...
+\subsection{小节名}
+```
+
+- 章、节、小节标题照原书层级，不多不少。
+- 原书的 **Fine Point** 与 **Technical Point** 一律用环境，不手写编号：
+
+```latex
+\begin{finepoint}[干扰]        % 自动排成“精要 2.1 干扰”
+...
+\end{finepoint}
+
+\begin{techpoint}[总体中的因果效应]   % 自动排成“技术注记 2.1 …”
+...
+\end{techpoint}
+```
+
+编号按章自动生成，与是否出现顺序一致即可，**不要自己写“精要 2.1”**。
+
+- 原书放在页边的**定义小方框**（只有一行定义式，如“个体 i 的因果效应：Y^{a=1}_i − Y^{a=0}_i”）用：
+
+```latex
+\begin{defbox}[标题]
+$公式$
+\end{defbox}
+```
+
+- 页边批注用 `\mnote{…}`，插在它所注释的句子之后（或该句所在段落内）。批注都很短，照译，不要改写成正文。
+
+## 四、图、表、公式
+
+- **图**：用 TikZ 重绘，保留原图号（`\caption` 自动编号，确保本章图按 1,2,3… 顺序出现）。可用样式：`vtx`（节点）、`lat`（虚线节点）、`ed`（箭头）、`edb`（粗箭头）、`edd`（虚箭头）、`bi`（双向）、`bid`（虚双向）、`causal`（整体箭头样式）。
+  - 重绘以“拓扑正确、标注齐全”为准，不追求笔触还原。
+  - 看不清的箭头不要臆造：只画能确认的，并在图注或报告中注明。
+  - 若某图确属无法用 TikZ 表达的位图，用 `\fbox{\parbox{0.8\textwidth}{…占位说明…}}` 并在报告中列为待补。
+- **表**：`booktabs`（`\toprule/\midrule/\bottomrule`），编号同原书；表题在表上方。
+- **公式**：行间公式用 `\[ … \]`；需要编号的少数公式用 `\tag{x.y}` 硬编码，正文引用写“式 (x.y)”。原书多数公式不编号，不要擅自加号。
+- 数学记号沿用样板章：`\E[Y^{a}]`、`\Pr[Y^{a}=1]`、`\indep`（⊥⊥）、`\given`（|）、`\dox{a}`（do(a)）。上下标用 `Y^{a=1}`、`Y_i^{a}`。
+
+## 五、术语（强制）
+
+以下译名一律照用，不得另创：
+
+反事实结局、潜在结局、因果效应、个体因果效应、平均因果效应、一致性、可交换性、条件可交换性、正值性、标准化、逆概率加权、目标试验、可识别（不用“可辨识”）、混杂（confounder = 混杂因子，不用“混杂因素”）、选择偏倚、测量偏倚、效应修饰、交互作用、干扰、超总体、抽样变异、随机变异、置信区间、点估计、风险差、风险比、优势比、需治疗人数（NNT）、稳定单元治疗取值假设（SUTVA）、结构嵌套模型、边缘结构模型、g 公式、g 估计、倾向性评分、工具变量、中介、直接效应、间接效应。
+
+其余术语查 `02_glossary/glossary_zh.md`；表中没有的，取该领域通用译法，并在报告里列出（英文 → 中文），供合并进总表。
+
+## 六、语言要求
+
+- 学术教材语体，句子长短交错，避免“翻译腔”：不逐词对译，按中文逻辑重组语序，但不增删原意。
+- 原书对读者称“你”（第二人称），译文保留这一口吻；技术推导处可用“我们”。
+- 人名、文献、软件名、数据集名保留英文原名（如 Hernán、Robins、`nhefs`、`R`）。
+- 例子中的叙事（Zeus、Hera、心脏移植等）照译，不必本土化。
+- 术语首次出现可在括号内附英文，之后不再附。
+- 不要出现“本节将介绍”“综上所述”之类原文没有的话；原书的小结、Key Point 等结构照译。
+
+## 七、自检与编译
+
+在 `01_source/` 下建临时文件 `test_chNN.tex`：
+
+```latex
+\documentclass[UTF8,11pt,openany,fontset=windows]{ctexbook}
+\input{preamble}
+\begin{document}
+\input{chapters/chNN}
+\end{document}
+```
+
+编译两遍：
+
+```bash
+xelatex -interaction=nonstopmode test_chNN.tex
+xelatex -interaction=nonstopmode test_chNN.tex
+```
+
+要求：`grep -E "^!" test_chNN.log` 无输出；`Overfull \hbox` 超过 5pt 的逐条修掉（改措辞、加 `\allowbreak`、调整公式断行）。完成后删掉 `test_chNN.tex/.log/.aux/.out`，只留 `chapters/chNN.tex`。
+
+## 八、禁止事项
+
+1. 不得修改 `preamble.tex`、`main.tex`、`chapters/ch01.tex`、术语表、其他章的文件。
+2. 不得用 `sed`/`awk`/heredoc 编辑 `.tex`（shell 会吞反斜杠）；用 `write_file` 整体写入，或 `patch` 局部替换。
+3. 不得压缩、节译、合并段落；原书有几段就译几段，有几个边注就译几个边注。
+4. 不得留英文原文段落（术语、人名、书名、软件名除外）。
+5. 不得在章首加“本章导读”“小结”等原书没有的结构。
+
+## 九、交付报告
+
+完成后报告：页数、字数（约）、`\section` 数、精要/技术注记各几个、图几个（编号）、表几个（编号）、仍未解决的问题（看不清的图、可疑原文、需补的术语）。
+
+## 十、前十一章的经验（第二批必读）
+
+1. **边注互压**：同一页相邻的两三条边注会叠在一起。用 `\marginnote[<上移量>]` 手动错开，或把语义相近的批注合并成一条（合并须在报告中写明）。
+2. **tcolorbox 内不能放浮动体**：精要/技术注记框里的图用 `\begin{center}…\captionof{figure}{…}\end{center}`，表用 `\captionof{table}{…}`，编号仍连续。
+3. **原书表/图常只有编号没有题注**：用空 `\caption{}` 占位保持编号，正文照原书写“表 x.y”“图 x.y”。
+4. **自检时的 `\setcounter{chapter}` 必须删掉**，正式编号由 main.tex 的章序给出。
+5. **图号不能断档**：某图实在无法重绘时，用占位框 + `\caption` 保住编号，并在报告中列出。
+6. **术语统一（重要）**：collider = 对撞节点（不用“对撞因子”）；carryover effect = 延续效应（不用“携带效应”）；pseudo-population = 伪总体；positivity = 正值性；consistency = 一致性。

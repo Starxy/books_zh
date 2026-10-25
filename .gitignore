@@ -8,7 +8,7 @@
 
 # PDF originals, deliverables and figure assets are tracked with Git LFS.
 # Keep build directories and archive bundles out of version control.
-**/01_排版源码/build/
+**/01_source/build/
 *.zip
 *.tar
 *.tar.gz
@@ -17,12 +17,12 @@
 *.rar
 
 # Keep original source archives as provenance; only duplicate deliverable archives are excluded.
-!**/00_原始资料/**/*.zip
-!**/00_原始资料/**/*.tar
-!**/00_原始资料/**/*.tar.gz
-!**/00_原始资料/**/*.tgz
-!**/00_原始资料/**/*.7z
-!**/00_原始资料/**/*.rar
+!**/00_originals/**/*.zip
+!**/00_originals/**/*.tar
+!**/00_originals/**/*.tar.gz
+!**/00_originals/**/*.tgz
+!**/00_originals/**/*.7z
+!**/00_originals/**/*.rar
 
 # LaTeX intermediates. Do not blanket-ignore PDF figures, .bbl or .minted dependencies.
 *.aux

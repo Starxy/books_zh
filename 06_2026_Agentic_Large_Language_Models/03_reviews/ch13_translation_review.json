@@ -1,0 +1,373 @@
+{
+  "chapter": 13,
+  "title_zh": "从工具到助手：现实世界中的应用",
+  "status": "complete",
+  "page_count": 12,
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_source/part4/13_assist.tex",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch13/assist_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch13/medco_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch13/swe_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/03_reviews/ch13_translation_review.json",
+    "06_2026_Agentic_Large_Language_Models/01_source/build/ch13_137398cd/agenticbook.pdf",
+    "work/agentic/ch13_work/build_stdout.txt",
+    "work/agentic/ch13_work/CHECKPOINT.md",
+    "work/agentic/ch13_work/finalise_report.py",
+    "work/agentic/ch13_work/inspect_pdf.py",
+    "work/agentic/ch13_work/inspect_stdout.txt",
+    "work/agentic/ch13_work/pdf_inventory.json",
+    "work/agentic/ch13_work/pdf_text.txt",
+    "work/agentic/ch13_work/qa/medco_detail.png",
+    "work/agentic/ch13_work/qa/page_01.png",
+    "work/agentic/ch13_work/qa/page_02.png",
+    "work/agentic/ch13_work/qa/page_04.png",
+    "work/agentic/ch13_work/qa/page_06.png",
+    "work/agentic/ch13_work/qa/page_07.png",
+    "work/agentic/ch13_work/qa/page_08.png",
+    "work/agentic/ch13_work/qa/page_09.png",
+    "work/agentic/ch13_work/qa/page_12.png",
+    "work/agentic/ch13_work/render_qa.py",
+    "work/agentic/ch13_work/run_checks.py",
+    "work/agentic/ch13_work/structure_audit_13.json"
+  ],
+  "coverage": {
+    "source": "work/agentic/active/part4/13_assist.tex",
+    "entire_active_source_read": true,
+    "full_translation": true,
+    "source_paragraph_blocks": 61,
+    "translated_paragraph_blocks": 61,
+    "chapter_short_title_preserved": true,
+    "sections": [
+      "13.1 作为助手的智能体大语言模型",
+      "13.2 对话助手",
+      "13.3 购物助手",
+      "13.4 飞行运行助手",
+      "13.5 医疗助手",
+      "13.6 交易助手",
+      "13.7 自动化科学发现",
+      "13.8 编程助手与总体进展",
+      "13.9 结语"
+    ],
+    "section_count": 9,
+    "paragraph_heading_count": 14,
+    "learning_boxes": 1,
+    "list_items": 18,
+    "figures": 3,
+    "captions": 3,
+    "footnotes": 0,
+    "tables": 0,
+    "formula_segments": 0,
+    "code_blocks": 0,
+    "bibliography": "原文 plainnat 样式及 agenticbook,refs,case,synthetic 调用全部保留，使用随附 bbl。",
+    "figure_treatment": {
+      "13.1": "依据 assist.png 中文 TikZ 重绘；七条有向关系及用户图标保留。",
+      "13.2": "以 medco.png 为底图，全部自然语言对话和字段覆盖为中文；角色图标、面板、边框、CT/MRI、P/R、xxx、(1) 与省略信息保留。",
+      "13.3": "以 swe.png 为底图，只中文化实际存在的接口标签；ACI/UI、应用图标、颜色与箭头保留。为可读性由原 12 cm 调整至正文宽。"
+    },
+    "external_fact_updates": false,
+    "source_commands_executed": false
+  },
+  "structure_checks": {
+    "audit_script": "work/agentic/audit_structure.py",
+    "audit_function": "audit_structure.audit",
+    "audit_output": "work/agentic/ch13_work/structure_audit_13.json",
+    "results": {
+      "headings": {
+        "match": true,
+        "source_count": 24,
+        "translation_count": 24
+      },
+      "labels": {
+        "match": true,
+        "source_count": 4,
+        "translation_count": 4
+      },
+      "references": {
+        "match": true,
+        "source_count": 7,
+        "translation_count": 7
+      },
+      "citation_keys": {
+        "match": true,
+        "source_count": 44,
+        "translation_count": 44
+      },
+      "environments": {
+        "match": true,
+        "source_count": 11,
+        "translation_count": 11
+      },
+      "bibliography": {
+        "match": true,
+        "source_count": 1,
+        "translation_count": 1
+      },
+      "structural_commands": {
+        "match": true,
+        "source_count": 21,
+        "translation_count": 21
+      },
+      "code_blocks": {
+        "match": true
+      },
+      "math_segments": {
+        "match": true,
+        "symbol_multiset_match": true,
+        "source_count": 0,
+        "translation_count": 0
+      },
+      "text": {
+        "source_english_words": 3857,
+        "translated_CJK": 6729,
+        "translation_characters": 11421,
+        "source_characters": 28471,
+        "source_paragraph_blocks": 61,
+        "translation_paragraph_blocks": 61
+      },
+      "stray_chapter_counter": false,
+      "stray_part": false
+    },
+    "manual_checks": {
+      "automatic_numbering_preserved": true,
+      "all_reference_and_citation_keys_preserved": true,
+      "no_new_boxes_or_figures": true,
+      "no_manual_tags_or_chapter_counter": true,
+      "no_shared_source_files_modified": true,
+      "all_source_prose_and_list_arguments_reviewed": true
+    }
+  },
+  "new_terms": {
+    "thinking assistant": "思考助手",
+    "reflective thinking": "反思性思考",
+    "shopping assistant": "购物助手",
+    "arrival-slot allocation": "到达时隙分配",
+    "medical scribe": "医疗记录员",
+    "scoping review": "范围综述",
+    "lost-in-the-middle": "迷失在中间",
+    "copilot / co-pilot": "协同助手",
+    "case-based learning": "基于病例的学习",
+    "market intelligence module": "市场情报模块",
+    "fundamental analyst": "基本面分析师",
+    "sentiment analyst": "情绪分析师",
+    "software engineering agent": "软件工程智能体",
+    "long-horizon planning": "长程规划",
+    "socio-technical system": "社会技术系统",
+    "graceful degradation": "平稳降级",
+    "image interpreting": "图像解读",
+    "radiologist": "放射医师"
+  },
+  "source_anomalies": [
+    {
+      "location": "13.2 对话助手正文与图13.1题注",
+      "description": "正文使用 AssistantGPT，题注使用 AssistGPT；译稿分别保留原名称，未统一改名。"
+    },
+    {
+      "location": "13.4 主要建议，第3项",
+      "description": "原句含 expected outputs are evaluation metrics tailored to the domain are necessary，语法连接异常；按上下文译作需要领域任务数据集、提示、预期输出与评估指标，未增改技术论断。"
+    },
+    {
+      "location": "13.7 AI Scientist 段",
+      "description": "原文 incorrect implementation if ideas 中 if 疑为 of 的笔误；译为研究构想的实现不正确。"
+    },
+    {
+      "location": "13.8 首段",
+      "description": "原文写 software discovery，与随后软件工程任务的表述不一致；正文仍译为软件发现，未替作者改成软件开发。"
+    },
+    {
+      "location": "图13.2 练习场景顶部",
+      "description": "源图写 After Initial Diagnosis through Conversion；结合图内问诊对话，Conversion 按疑似 Conversation 的误写译作通过对话完成初步诊断后。"
+    },
+    {
+      "location": "图13.3 源图底部",
+      "description": "swe.png 实际为接口概览图，底边有原始裁切留下的极细文字残片；底图原像素保留。源图没有完整任务、代码或终端命令区，未补画或编造这些内容。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch13_137398cd/agenticbook.pdf",
+    "passes": 3,
+    "pagination_stable": true,
+    "page_count": 12,
+    "errors": 0,
+    "missing_characters": 0,
+    "overflow_count": 0,
+    "overflow": [],
+    "undefined_references": false,
+    "undefined_citations": false,
+    "engine_mode": "XeLaTeX -no-shell-escape；minted frozencache",
+    "console_capture": "subprocess bytes，按 UTF-8 解码；原始 stdout 保存于 ch13_work/build_stdout.txt"
+  },
+  "visual_qa": {
+    "status": "passed",
+    "source_images_full_size": [
+      {
+        "path": "06_2026_Agentic_Large_Language_Models/01_source/figures/assist.png",
+        "dimensions": [
+          916,
+          642
+        ],
+        "inspected": true
+      },
+      {
+        "path": "06_2026_Agentic_Large_Language_Models/01_source/figures/medco.png",
+        "dimensions": [
+          1748,
+          840
+        ],
+        "inspected": true
+      },
+      {
+        "path": "06_2026_Agentic_Large_Language_Models/01_source/figures/swe.png",
+        "dimensions": [
+          2168,
+          486
+        ],
+        "inspected": true
+      }
+    ],
+    "source_atlas": "work/agentic/source_atlas/chapter13_01.png",
+    "output_pages_inspected": [
+      {
+        "page": 1,
+        "purpose": "章标题、学习目标与首段",
+        "image": "work/agentic/ch13_work/qa/page_01.png"
+      },
+      {
+        "page": 2,
+        "purpose": "图13.1全部节点、箭头、标签与题注；修改后复核",
+        "image": "work/agentic/ch13_work/qa/page_02.png"
+      },
+      {
+        "page": 4,
+        "purpose": "飞行运行正文、长列表与页脚",
+        "image": "work/agentic/ch13_work/qa/page_04.png"
+      },
+      {
+        "page": 6,
+        "purpose": "图13.2全部角色、字段与对话；修改后复核",
+        "image": "work/agentic/ch13_work/qa/page_06.png"
+      },
+      {
+        "page": 7,
+        "purpose": "图13.3接口标签与图标、科学发现正文",
+        "image": "work/agentic/ch13_work/qa/page_07.png"
+      },
+      {
+        "page": 8,
+        "purpose": "结语与实践建议",
+        "image": "work/agentic/ch13_work/qa/page_08.png"
+      },
+      {
+        "page": 9,
+        "purpose": "正文末段、跨章引用与参考文献起始",
+        "image": "work/agentic/ch13_work/qa/page_09.png"
+      },
+      {
+        "page": 12,
+        "purpose": "参考文献末页",
+        "image": "work/agentic/ch13_work/qa/page_12.png"
+      }
+    ],
+    "figure_detail": "work/agentic/ch13_work/qa/medco_detail.png",
+    "checks": [
+      "AssistGPT 七条有向关系与原图逐条对应，标签不遮挡连线。",
+      "Medco 文字限制在原框内；字段与对话无碰撞，图标与边框完整，底图医疗内容保持原值。",
+      "SWE-agent 中文接口标签清楚；ACI/UI 与原图应用图标完整，未添加原图不存在的任务或代码。",
+      "正文首尾、代表性段落、图题与参考文献页脚无裁切、重叠或缺字。"
+    ],
+    "revision_policy": "先检查8页；图13.1/13.2调整后只重新渲染并目检其所在页2/6，最后只复核Medco页6，其余已检查且未改动的页面复用原检查结果。"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_source/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

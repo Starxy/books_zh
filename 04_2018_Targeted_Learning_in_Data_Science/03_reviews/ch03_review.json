@@ -1,0 +1,614 @@
+{
+  "chapter": 3,
+  "status": "complete",
+  "title_en": "Sequential Super Learning",
+  "title_zh": "序贯超级学习",
+  "authors": [
+    "Sherri Rose",
+    "Mark J. van der Laan"
+  ],
+  "source": {
+    "split_pdf": "04_2018_Targeted_Learning_in_Data_Science/00_originals/chapters_en/04_CH03_Sequential_Super_Learning.pdf",
+    "split_pdf_pages": 8,
+    "chapter_split_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "chapter_printed_pages": "27–34",
+    "source_rendered_and_visually_checked_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "annotations_removed_in_memory_before_rendering": true,
+    "english_words_approx": 3080,
+    "authoritative_outline_section_count": 5,
+    "metadata_inventory_omissions_found": [
+      "第 7 页无编号 V 折交叉验证示意图",
+      "第 8 页无编号候选算法预测值表"
+    ]
+  },
+  "pages": 7,
+  "han_characters_pdf_including_running_heads": 4083,
+  "han_characters_tex_without_comment_lines": 4012,
+  "page_count_note": "按统一 A4 体例重排，正文开本比原书大；完整性依据逐段覆盖、书签、公式图表和引文核查，不以页数比补写或删减。",
+  "files": [
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch03.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch03a.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch03b.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/chapters/ch03c.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/figures/ch03_crossvalidation.tex",
+    "04_2018_Targeted_Learning_in_Data_Science/01_source/figures/ch03_predictions.tex"
+  ],
+  "pdf": "outputs/分章中文/Targeted_Learning_第03章_中文译稿.pdf",
+  "sha256": "fbccd238c8d59829690e7bfea1a4e2325c6f8e65f62051294cfdaf143118489c",
+  "chapter_parts": [
+    {
+      "file": "chapters/ch03a.tex",
+      "coverage": "章题、作者机构邮箱及 DOI、完整章首导言、纵向效应与预测框、第 3.1 节及完整有限样本预言不等式框。"
+    },
+    {
+      "file": "chapters/ch03b.tex",
+      "coverage": "第 3.2—3.3 节、全部公式、算法框、七个算法步骤、未编号图和未编号预测值表。"
+    },
+    {
+      "file": "chapters/ch03c.tex",
+      "coverage": "第 3.4—3.5 节，含计算说明、软件网址、全部注记与延伸阅读。"
+    }
+  ],
+  "sections": [
+    {
+      "number": "3.1",
+      "title": "背景：集成学习",
+      "source_split_pages": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "chinese_pages": [
+        2,
+        3,
+        4
+      ],
+      "complete": true,
+      "content": "全部集成学习背景、算法选择讨论、非参数平滑与参数模型比较、五项应用及其所有数字和引文、完整有限样本预言不等式框。"
+    },
+    {
+      "number": "3.2",
+      "title": "定义估计问题",
+      "source_split_pages": [
+        5,
+        6
+      ],
+      "chinese_pages": [
+        4,
+        5
+      ],
+      "complete": true,
+      "content": "IVF/HIV 数据结构、时序密度分解、动态规则与反事实均值、g 计算公式、一致性与密度估计困难、三步条件均值递推、反事实预测参数及依赖未知干扰参数的损失。"
+    },
+    {
+      "number": "3.3",
+      "title": "序贯超级（机器）学习",
+      "source_split_pages": [
+        6,
+        7,
+        8
+      ],
+      "chinese_pages": [
+        5,
+        6
+      ],
+      "complete": true,
+      "content": "序贯预测概念与 L_t:0 记号、完整算法框、全部七个构造步骤、V 折交叉验证无编号图和无编号预测值表。"
+    },
+    {
+      "number": "3.4",
+      "title": "计算",
+      "source_split_pages": [
+        8
+      ],
+      "chinese_pages": [
+        6
+      ],
+      "complete": true,
+      "content": "并行化与云计算、R/H20/SAS、软件网址、SAS 宏及 CRAN 链接、算法数与时点数的计算权衡。"
+    },
+    {
+      "number": "3.5",
+      "title": "注记与延伸阅读",
+      "source_split_pages": [
+        8
+      ],
+      "chinese_pages": [
+        7
+      ],
+      "complete": true,
+      "content": "超级学习渐近与有限样本性质全部引文、房颤计数过程及总体损失公式、缺失纵向数据文献和前书第 3 章。"
+    }
+  ],
+  "subsections": [],
+  "chapter_introduction": {
+    "source_split_pages": [
+      1,
+      2
+    ],
+    "chinese_pages": [
+      1,
+      2
+    ],
+    "complete": true,
+    "content": "医生的两个未来时点、两种用药方案、疗效与安全性结局；横断面回归的反事实对应；多时点干预、条件均值、序贯回归与 LTMLE 的关系；预测与效应估计区分框。"
+  },
+  "en_to_zh_page_map": [
+    {
+      "source_split_page": 1,
+      "source_printed_page": 27,
+      "chinese_pages": [
+        1
+      ]
+    },
+    {
+      "source_split_page": 2,
+      "source_printed_page": 28,
+      "chinese_pages": [
+        1,
+        2
+      ]
+    },
+    {
+      "source_split_page": 3,
+      "source_printed_page": 29,
+      "chinese_pages": [
+        2,
+        3
+      ]
+    },
+    {
+      "source_split_page": 4,
+      "source_printed_page": 30,
+      "chinese_pages": [
+        3
+      ]
+    },
+    {
+      "source_split_page": 5,
+      "source_printed_page": 31,
+      "chinese_pages": [
+        4
+      ]
+    },
+    {
+      "source_split_page": 6,
+      "source_printed_page": 32,
+      "chinese_pages": [
+        4,
+        5
+      ]
+    },
+    {
+      "source_split_page": 7,
+      "source_printed_page": 33,
+      "chinese_pages": [
+        5,
+        6
+      ]
+    },
+    {
+      "source_split_page": 8,
+      "source_printed_page": 34,
+      "chinese_pages": [
+        6,
+        7
+      ]
+    }
+  ],
+  "figures": [
+    {
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 33,
+      "chinese_page": 6,
+      "method": "中文 TikZ 重绘，置于第 3 步之后；不补造图号或图题。",
+      "file": "figures/ch03_crossvalidation.tex",
+      "source_labels": [
+        "Algorithms",
+        "Training Set",
+        "Validation Set",
+        "Fold 1",
+        "Fold 2",
+        "Fold 3",
+        "...",
+        "Fold V"
+      ],
+      "chinese_labels": [
+        "算法",
+        "训练集",
+        "验证集",
+        "第 1 折",
+        "第 2 折",
+        "第 3 折",
+        "…",
+        "第 V 折"
+      ],
+      "algorithm_labels_preserved": [
+        "glm",
+        "glmnet",
+        "nnet"
+      ],
+      "topology": "算法库方框；左侧独立的第 1 折放大示意及训练/验证的两条双向竖箭头；右侧第 1、2、3、…、V 折五个竖列，灰色验证部分逐步上移，保留 1、V 和省略号。",
+      "all_labels_translated": true,
+      "data_invented": false,
+      "output_visually_checked": true
+    }
+  ],
+  "tables": [
+    {
+      "number": null,
+      "source_split_page": 8,
+      "source_printed_page": 34,
+      "chinese_page": 6,
+      "file": "figures/ch03_predictions.tex",
+      "method": "LaTeX tabular 重排，置于第 5 步之后；保留原书省略行和省略列。",
+      "headers": [
+        "编号",
+        "Y_glm^d",
+        "…",
+        "Y_nnet^d"
+      ],
+      "rows": [
+        [
+          "1",
+          "0.54",
+          "…",
+          "0.42"
+        ],
+        [
+          "…",
+          "…",
+          "…",
+          "…"
+        ],
+        [
+          "n",
+          "0.09",
+          "…",
+          "0.12"
+        ]
+      ],
+      "four_numeric_prediction_cells_checked_against_render": true,
+      "data_rows_added": 0,
+      "output_visually_checked": true
+    }
+  ],
+  "formulas": [
+    {
+      "id": "ch03-selector",
+      "number": null,
+      "source_split_page": 4,
+      "source_printed_page": 30,
+      "chinese_page": 3,
+      "identity": "k_n=Khat(P_n)：基于损失函数的交叉验证选择器",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-variance-bound",
+      "number": null,
+      "source_split_page": 4,
+      "source_printed_page": 30,
+      "chinese_page": 3,
+      "identity": "sup_Q var_P0{L(Q)-L(Q0)}/P0{L(Q)-L(Q0)} <= M2",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-uniform-bound",
+      "number": null,
+      "source_split_page": 4,
+      "source_printed_page": 30,
+      "chinese_page": 3,
+      "identity": "sup_O,Q |L(Q)-L(Q0)|(O) < M1 < infinity",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-oracle-inequality",
+      "number": null,
+      "source_split_page": 5,
+      "source_printed_page": 31,
+      "chinese_page": 4,
+      "identity": "有限样本预言不等式，含 2C(M1,M2,delta)(1+log K(n))/(np)",
+      "visually_verified": true,
+      "source_issue_preserved": "左端 L( 缺少一个闭括号；严格按印刷原式照录，未补括号。"
+    },
+    {
+      "id": "ch03-observed-data",
+      "number": null,
+      "source_split_page": 5,
+      "source_printed_page": 31,
+      "chinese_page": 4,
+      "identity": "O=(L0,A0,L1,A1,L2=Y)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-density-factorization",
+      "number": null,
+      "source_split_page": 5,
+      "source_printed_page": 31,
+      "chinese_page": 4,
+      "identity": "p(O) 的五因子时间分解",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-g-computation",
+      "number": null,
+      "source_split_page": 5,
+      "source_printed_page": 31,
+      "chinese_page": 4,
+      "identity": "Psi^d(P) 的 l0、l1 双重求和 g 计算公式",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-sequential-means",
+      "number": null,
+      "source_split_page": 6,
+      "source_printed_page": 32,
+      "chinese_page": 5,
+      "identity": "Q2^d(L1,L0)、Q1^d(L0)、Q0^d 的三个迭代条件均值",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-counterfactual-prediction",
+      "number": null,
+      "source_split_page": 6,
+      "source_printed_page": 32,
+      "chinese_page": 5,
+      "identity": "Qbar_Yd=Q1^d(L0)=E(Q2^d|A0=d(L0),L0)=E(Y^d|L0)",
+      "visually_verified": true
+    },
+    {
+      "id": "ch03-algorithm-conditional-mean",
+      "number": null,
+      "source_split_page": 7,
+      "source_printed_page": 33,
+      "chinese_page": 5,
+      "identity": "算法框内 E(Q_t^d(L_0:t-1)|A_t-2:0=d(L_t-2:0),L_t-2:0)",
+      "visually_verified": true,
+      "layout_note": "源文在算法条目内排作行内公式，译稿为便于阅读另起一行；符号、下标均保留。"
+    }
+  ],
+  "inline_math_audit": {
+    "chapter_intro_EYd_given_W_equivalence": true,
+    "discrete_super_learner_definition": true,
+    "oracle_constant_C_and_np_denominator": true,
+    "Q2_and_Q1_log_likelihood_loss_paragraph": true,
+    "all_seven_algorithm_steps_and_Z_predictions": true,
+    "overall_counting_process_loss_sum": true
+  },
+  "emphasis_boxes": {
+    "original_boxes": 3,
+    "environment": "sourcebox",
+    "titles": [
+      "纵向数据中的效应估计与预测",
+      "有限样本预言不等式（源文框内首行标题）",
+      "算法：纵向数据序贯预测的超级学习"
+    ],
+    "fine_point_or_technical_point_boxes_added": 0,
+    "finite_sample_box_may_break_across_pages_as_in_source": true
+  },
+  "new_terms_for_glossary_review": [
+    {
+      "en": "sequential prediction",
+      "zh": "序贯预测"
+    },
+    {
+      "en": "sequential regression",
+      "zh": "序贯回归"
+    },
+    {
+      "en": "counterfactual prediction problem",
+      "zh": "反事实预测问题"
+    },
+    {
+      "en": "finite sample oracle inequality",
+      "zh": "有限样本预言不等式"
+    },
+    {
+      "en": "cross-validation selector",
+      "zh": "交叉验证选择器"
+    },
+    {
+      "en": "oracle selector",
+      "zh": "预言选择器"
+    },
+    {
+      "en": "discrete super learner",
+      "zh": "离散超级学习器"
+    },
+    {
+      "en": "log-likelihood loss",
+      "zh": "对数似然损失"
+    },
+    {
+      "en": "convex combination",
+      "zh": "凸组合"
+    },
+    {
+      "en": "receiver operating characteristic curve",
+      "zh": "受试者工作特征曲线"
+    },
+    {
+      "en": "conditional intensity of a counting process",
+      "zh": "计数过程的条件强度"
+    },
+    {
+      "en": "diagnostic upcoding",
+      "zh": "提高诊断编码等级"
+    }
+  ],
+  "terminology_checks": {
+    "targeted_learning": "靶向学习",
+    "targeted_minimum_loss_based_estimation": "靶向最小损失估计",
+    "longitudinal_targeted_minimum_loss_based_estimation": "纵向靶向最小损失估计",
+    "maximum_likelihood_and_minimum_loss_based_not_conflated": true,
+    "bias": "偏差",
+    "remaining_偏倚_occurrences": 0
+  },
+  "completeness_evidence": {
+    "chapter_count": 1,
+    "section_count_matches_outline": [
+      5,
+      5
+    ],
+    "subsection_count_matches_outline": [
+      0,
+      0
+    ],
+    "source_display_formula_blocks": 9,
+    "translation_display_formula_blocks": 10,
+    "display_count_difference": "算法框内一条原为行内的条件均值公式，在译稿中另行排版，故 9+1=10；无公式增删。",
+    "numbered_figure_count": 0,
+    "unnumbered_figure_count": 1,
+    "numbered_table_count": 0,
+    "unnumbered_table_count": 1,
+    "source_year_and_suffix_occurrences": 22,
+    "translation_year_and_suffix_occurrences": 22,
+    "year_and_suffix_multisets_identical": true,
+    "year_counts": {
+      "1997": 1,
+      "2000": 1,
+      "2002": 1,
+      "2003": 2,
+      "2004": 1,
+      "2005": 1,
+      "2006": 2,
+      "2007": 1,
+      "2010": 1,
+      "2011": 5,
+      "2012": 1,
+      "2013": 1,
+      "2015": 3,
+      "2016": 1
+    },
+    "citation_audit_exclusion": "仅排除章首页重复出版信息中的版权年份 2018；正文引文及前书年份均保留。",
+    "author_affiliations_emails_and_doi_preserved": true,
+    "chapter_intro_and_all_notes_further_reading_translated": true,
+    "all_five_application_bullets_translated": true,
+    "all_seven_algorithm_steps_translated": true,
+    "paragraphs_reviewed_against_entire_english_text": true,
+    "source_has_no_numbered_theorem_definition_or_footnote_body": true
+  },
+  "unresolved_items": [],
+  "numbering_oddities": [
+    "本章原书展示公式全部无编号，译稿不添加 tag 或公式号。",
+    "第 33 页交叉验证示意图和第 34 页预测值表均无编号；metadata 的空图表清单未能识别，逐页渲染后补入译稿。",
+    "有限样本预言不等式和算法均有标题框但无定理/算法号，不另造计数。"
+  ],
+  "source_wording_notes": [
+    "原书第 28 页 using targeted at each step 语法残缺，按上下文译为在 LTMLE 的每一步中实施靶向更新，未增加算法步骤。",
+    "原书第 32 页前一步回归写作 bar Q_2^d，而相邻定义多为 Q_2^d；保留横线记号的原书交替。",
+    "原书第 34 页软件字符串为 H20，按文本层照录，未擅自改为常见拼写 H2O。",
+    "原书目前等表述保持出版时语境，未更新为现时状态。"
+  ],
+  "deliberate_content_deviations": [],
+  "layout_adjustments": [
+    "原书一条算法行内条件均值另起一行以便阅读，数学内容保持。",
+    "原书未编号图以中文 TikZ 重绘，未编号预测值表用 LaTeX tabular 重排。"
+  ],
+  "build_checks": {
+    "engine": "xelatex",
+    "helper": "work/targeted_learning/compile_chapter.py",
+    "passes": [
+      0,
+      0
+    ],
+    "build_directory": "work/targeted_learning/ch03_work/build_144226",
+    "latex_errors": 0,
+    "missing_glyphs": 0,
+    "overfull_boxes": 0,
+    "chapter_part_or_counter_commands": [],
+    "control_characters": [],
+    "all_seven_pages_rendered": true,
+    "visual_qa_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "final_visual_qa_after_last_build": [
+      3,
+      4,
+      6
+    ],
+    "table_figure_formula_and_body_pages_checked": true,
+    "shipped_file_reopened": true,
+    "shipped_page_count": 7,
+    "last_bookmark": [
+      2,
+      "3.5 注记与延伸阅读",
+      7
+    ],
+    "shipped_sha256_matches_build_record": true,
+    "self_test_driver_removed": true,
+    "removed_self_test_files": [
+      "work/targeted_learning/ch03_work/test_ch03.tex"
+    ]
+  },
+  "qa_artifacts": {
+    "source_images": "work/targeted_learning/render/ch03",
+    "output_images": "work/targeted_learning/ch03_work/qa_ch03_all_NNN.png",
+    "extracted_chinese_pdf_text": "work/targeted_learning/ch03_work/ch03_built_text.txt",
+    "source_oracle_zoom": "work/targeted_learning/ch03_work/source_oracle_zoom.png",
+    "structure_audit": "work/targeted_learning/ch03_work/qa_ch03_structure.json"
+  },
+  "shared_files_edited": [],
+  "source_anomalies": [
+    {
+      "id": "source-oracle-parenthesis",
+      "type": "原书公式疑点",
+      "source_split_page": 5,
+      "source_printed_page": 31,
+      "reason": "预言不等式左端印为 E_Bn{P0 L(Qhat_kn(P^0_n,Bn) - L(Q0)}，L( 的闭括号缺失；右端对应项括号完整。350 dpi 裁图确认不是文本层丢失。",
+      "action": "按印刷原式保留缺括号，源码注释和报告均明确记载；总审如需勘误，可另加校对说明。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-y-membership",
+      "type": "原书行内公式疑点",
+      "source_split_page": 6,
+      "source_printed_page": 32,
+      "reason": "对数似然损失段印为 Y{0,1} or Y∈(0,1)，第一个 Y 后没有属于号。",
+      "action": "保留 Y{0,1} 的原符号，不在译稿中擅自补入属于号。",
+      "blocks_delivery": false
+    },
+    {
+      "id": "source-sequential-indexing",
+      "type": "原书算法下标疑点",
+      "source_split_pages": [
+        7,
+        8
+      ],
+      "source_printed_pages": [
+        33,
+        34
+      ],
+      "reason": "算法框从 t=T+1 到 t=1，但条件中使用 A_t-2:0、L_t-2:0；七步算法在 t=T+1 时用 A_0:t、L_0:t 及 Q_t+1,n(L_t+1:0)，与之前两时点递推和第 5 步 L_0:t,i 的写法不完全一致。",
+      "action": "逐项照录所有源下标，不推断、补造或重写算法。",
+      "blocks_delivery": false
+    }
+  ],
+  "report_schema_note": "早期报告将已确认并照录的原书疑点放在unresolved_items。现移至source_anomalies，所有疑点、源页和处理说明完整保留；未修改正文、公式、图表或PDF。"
+}

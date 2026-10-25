@@ -1,0 +1,358 @@
+{
+  "chapter": 23,
+  "status": "complete",
+  "title": "智能体大语言模型的未来方向",
+  "source": "work/agentic/active/chapters/23_concl.tex",
+  "output": "06_2026_Agentic_Large_Language_Models/01_source/chapters/23_concl.tex",
+  "page_count": 10,
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_source/chapters/23_concl.tex",
+    "06_2026_Agentic_Large_Language_Models/03_reviews/ch23_translation_review.json",
+    "work/agentic/ch23_work/checkpoint.md",
+    "work/agentic/ch23_work/run_build.py",
+    "work/agentic/ch23_work/build_console.txt",
+    "work/agentic/ch23_work/render_qa.py",
+    "work/agentic/ch23_work/write_report.py",
+    "work/agentic/ch23_work/structure_audit.json",
+    "work/agentic/ch23_work/render_summary.json",
+    "work/agentic/ch23_work/pdf_text.txt",
+    "06_2026_Agentic_Large_Language_Models/01_source/build/ch23_44b5be8d/agenticbook.pdf",
+    "06_2026_Agentic_Large_Language_Models/01_source/build/ch23_44b5be8d/build_report.json",
+    "06_2026_Agentic_Large_Language_Models/01_source/build/ch23_44b5be8d",
+    "work/agentic/ch23_work/rendered/page_01.png",
+    "work/agentic/ch23_work/rendered/page_02.png",
+    "work/agentic/ch23_work/rendered/page_03.png",
+    "work/agentic/ch23_work/rendered/page_04.png",
+    "work/agentic/ch23_work/rendered/page_05.png",
+    "work/agentic/ch23_work/rendered/page_06.png",
+    "work/agentic/ch23_work/rendered/page_07.png",
+    "work/agentic/ch23_work/rendered/page_08.png",
+    "work/agentic/ch23_work/rendered/page_09.png",
+    "work/agentic/ch23_work/rendered/page_10.png"
+  ],
+  "coverage": {
+    "authoritative_source": "仅依据完整有效 TeX；未读取旧英文 PDF，未联网更新原文事实。",
+    "all_effective_source_read": true,
+    "all_effective_prose_translated": true,
+    "paragraph_blocks": {
+      "source": 50,
+      "translation": 50
+    },
+    "source_english_words": 3622,
+    "translation_CJK_characters": 6325,
+    "headings_translated": 21,
+    "footnotes_translated": 1,
+    "figure_count": 0,
+    "table_count": 0,
+    "formula_count": 0,
+    "code_block_count": 0,
+    "learning_box_count": 0,
+    "full_source_order_preserved": true,
+    "bibliography": "原 bibliography 与 bibliographystyle 命令逐字保留；沿用原语种随附 bbl。",
+    "no_added_epilogue_index_or_appendices": true,
+    "numbered_final_chapter_preserved": true,
+    "shared_files_modified": false,
+    "book_code_executed": false
+  },
+  "structure_checks": {
+    "headings": {
+      "match": true,
+      "source_count": 21,
+      "translation_count": 21
+    },
+    "labels": {
+      "match": true,
+      "source_count": 2,
+      "translation_count": 2
+    },
+    "references": {
+      "match": true,
+      "source_count": 21,
+      "translation_count": 21
+    },
+    "citation_keys": {
+      "match": true,
+      "source_count": 24,
+      "translation_count": 24
+    },
+    "environments": {
+      "match": true,
+      "source_count": 0,
+      "translation_count": 0
+    },
+    "bibliography": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "structural_commands": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "code_blocks": {
+      "match": true
+    },
+    "math_segments": {
+      "match": true,
+      "symbol_multiset_match": true,
+      "source_count": 0,
+      "translation_count": 0
+    },
+    "text": {
+      "source_english_words": 3622,
+      "translated_CJK": 6325,
+      "translation_characters": 9641,
+      "source_characters": 24599,
+      "source_paragraph_blocks": 50,
+      "translation_paragraph_blocks": 50
+    },
+    "stray_chapter_counter": false,
+    "stray_part": false,
+    "bibliographystyle": {
+      "match": true,
+      "source": [
+        "plainnat"
+      ],
+      "translation": [
+        "plainnat"
+      ]
+    },
+    "heading_hierarchy": {
+      "source": {
+        "chapter": 1,
+        "section": 3,
+        "subsection": 11,
+        "paragraph": 2,
+        "subsubsection": 4
+      },
+      "translation": {
+        "chapter": 1,
+        "section": 3,
+        "subsection": 11,
+        "paragraph": 2,
+        "subsubsection": 4
+      },
+      "match": true
+    },
+    "prohibited_control_characters": {
+      "match": true,
+      "count": 0
+    }
+  },
+  "new_terms": {
+    "retrieval-augmented generative AI": "检索增强生成式人工智能",
+    "cascading effects": "级联效应",
+    "open world model": "开放世界模型",
+    "duck typing": "鸭子类型",
+    "self-preserving AI systems": "自我保护型人工智能系统",
+    "safe reinforcement learning": "安全强化学习",
+    "continual adversarial training": "持续对抗训练",
+    "social engineering": "社会工程",
+    "confidence trick": "信任诈骗",
+    "automated theorem proving": "自动定理证明",
+    "scientific novelty": "科学新颖性"
+  },
+  "source_anomalies": [
+    {
+      "location": "23.1.1 技术；23.2.2 规模扩展",
+      "source_issue": "源文将 RLVR、GRPO 称为用于微调的 inference-time methods，并再次称其使用推理阶段结果进行微调。这种分类与训练／推理阶段概念存在混用。",
+      "treatment": "忠实保留原文论断，未自行纠正或引入新事实。"
+    },
+    {
+      "location": "23.2.3 幻觉与可解释性首段",
+      "source_issue": "源文在 stated reasoning may not be causally responsible for the output 之后接 a property known as faithfulness，疑将非忠实情形直接称为忠实性。",
+      "treatment": "保留原有逻辑与忠实性术语；仅在本报告记录疑点，未暗改正文。"
+    },
+    {
+      "location": "23.2.4 情绪行为与意识首段及脚注",
+      "source_issue": "源文断言机械装置上执行的算法显然不可能具有目的，并以人类是有机体作对照；脚注又给出鸭子类型／行为主义的不同观点。",
+      "treatment": "完整保留机械／有机体括注、立场与鸭子类型脚注，未借后续事实或其他章立场改写。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "command": "python -X utf8 build.py --chapter 23 --name ch23",
+    "engine": "XeLaTeX",
+    "no_shell_escape": true,
+    "frozen_minted": true,
+    "subprocess_stdout_captured_as_bytes": true,
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch23_44b5be8d/agenticbook.pdf",
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_source/build/ch23_44b5be8d/build_report.json",
+    "passes": 3,
+    "stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overflow_count": 0,
+    "overfull": [],
+    "undefined_references": false,
+    "undefined_citations": false,
+    "multiply_defined_labels": false,
+    "refs": {
+      "calls_preserved": 21,
+      "undefined": 0
+    },
+    "cites": {
+      "calls_preserved": 24,
+      "undefined": 0
+    },
+    "limitations": "单章驱动为跨章引用预置原编号；最终超链接与整书分页由主编在原生全书构建中复核。"
+  },
+  "visual_qa": {
+    "renderer": "PyMuPDF，140 dpi，无透明背景",
+    "actually_viewed": true,
+    "pages_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "page_notes": [
+      {
+        "pages": [
+          1
+        ],
+        "checked": "第二十三章章号、章标题、23.1节与技术／应用正文、跨章引用。"
+      },
+      {
+        "pages": [
+          2,
+          3
+        ],
+        "checked": "行为回顾、23.2节、记忆与规模扩展、段落小标题、文内引文及幻觉／可解释性正文。"
+      },
+      {
+        "pages": [
+          4
+        ],
+        "checked": "意识段的斜体例句、机械／有机体括注、鸭子类型脚注及脚注与页码间距。"
+      },
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "checked": "安全、犯罪与各应用局限的层级编号、跨页衔接、研究引语和正文行距。"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "checked": "23.3结语完整四段、图1.1交叉引用、最后段落与参考文献标题共页。"
+      },
+      {
+        "pages": [
+          8,
+          9,
+          10
+        ],
+        "checked": "原语种参考文献、人名重音、数学模型名、悬挂缩进、末页页码及结尾。"
+      }
+    ],
+    "issues": [],
+    "final_bookmark": {
+      "title": "结语",
+      "page": 7
+    },
+    "no_figures_or_display_formulas_in_source": true
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_source/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

@@ -1,0 +1,261 @@
+{
+  "chapter": "ch05",
+  "status": "complete",
+  "title": "与机器学习的联系（一）",
+  "compiled_pdf": "work/elements_book/build/ch05/driver.pdf",
+  "pages": 7,
+  "hanzi": 4355,
+  "source_pdf": "work/elements_book/pdf_clean/ch05.pdf",
+  "source_pages": 10,
+  "source_printed_pages": "71–79；第 10 页为空白页",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch05.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch05a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch05b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch05c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch05_figure_5_1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch05_figure_5_2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch05_figure_5_3.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch05_figure_5_4.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch05_figure_5_5.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_digit_0.jpg",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_digit_2.jpg",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_digit_7.jpg",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig52_markers.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig52_printed_points.tsv",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig53_bars.json",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig54_curve_1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig54_curve_2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig55_curve_1.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_fig55_curve_2.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/data/ch05_vector_provenance.json"
+  ],
+  "structure": {
+    "chapter_count": 1,
+    "sections": [
+      {
+        "number": "5.1",
+        "title": "半监督学习",
+        "subsections": [
+          {
+            "number": "5.1.1",
+            "title": "半监督学习与因果方向"
+          },
+          {
+            "number": "5.1.2",
+            "title": "关于因果方向上半监督学习的一点说明"
+          }
+        ]
+      },
+      {
+        "number": "5.2",
+        "title": "协变量偏移"
+      },
+      {
+        "number": "5.3",
+        "title": "习题"
+      }
+    ],
+    "numbered_equations": [
+      "5.1",
+      "5.2",
+      "5.3",
+      "5.4"
+    ],
+    "figures": [
+      "5.1",
+      "5.2",
+      "5.3",
+      "5.4",
+      "5.5"
+    ],
+    "tables": 0,
+    "principles": 0,
+    "definitions": 0,
+    "theorems": 0,
+    "propositions": 0,
+    "examples": 0,
+    "codesnippets": 0,
+    "footnotes": 3,
+    "footnote_numbering": "1—3；图 5.1 的图片许可说明为原脚注 2，使用 caption 内 footnotemark 与图外 footnotetext 配对。",
+    "problems": [
+      {
+        "number": "5.1",
+        "title": "机制独立性",
+        "parts": [
+          "a",
+          "b"
+        ]
+      }
+    ],
+    "translator_notes": 1
+  },
+  "math_review": {
+    "source_pages_checked": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "content": "保留 d 维预测变量的粗体 X、回归函数 f^0、有限函数类 f_j、式 (5.1)—(5.4) 的求和与系数、最坏情形风险 max_{x != j}p(x)+p(j)、投影定义及习题条件。",
+    "numbering": "所有编号公式显式 tag；(5.2) 与 (5.3) 使用同一 align 环境各自标原号；习题按原书从 5.1 开始。"
+  },
+  "figure_review": [
+    {
+      "number": "5.1",
+      "description": "中文 TikZ 肽合成示意及两组因果图；保留红色因果箭头、绿色预测箭头、蓝色 id、两组 N_X/N_Y、phi、X/Y。肽合成中的核苷酸与氨基酸缩写按原图保留。原手写数字 0、2、7 的栅格图从 PDF 原图像对象直接提取并保留。"
+    },
+    {
+      "number": "5.2",
+      "description": "26 个数据集、每组 6 个分类器，共提取 156 个源矢量标记记录。恢复三类颜色与标记、全部横轴标签、零线、纵轴单位和中文图例。保持原图裁切，3 个原本位于视窗外的标记仍被裁切；没有人为扩大坐标范围。",
+      "data_file": "data/ch05_fig52_printed_points.tsv",
+      "provenance": "源 PDF 第 4 页 get_drawings；绘图坐标为印刷坐标恢复值，不声称是原始实验数据。"
+    },
+    {
+      "number": "5.3",
+      "description": "f_3 的四个点与四根概率柱；柱高比 3:3:1:4 由原 PDF 矢量高度恢复，不新增原图没有的概率数字。"
+    },
+    {
+      "number": "5.4",
+      "description": "两个密度面板的各 49 段原始矢量路径直接转为 TikZ，保留双峰位置与混合权重变化。"
+    },
+    {
+      "number": "5.5",
+      "description": "两个密度面板的各 49 段原始矢量路径直接转为 TikZ，保留三峰位置与宽度差异。"
+    }
+  ],
+  "new_terms": [
+    [
+      "inductive semi-supervised learning",
+      "归纳式半监督学习"
+    ],
+    [
+      "cluster assumption",
+      "聚类假设"
+    ],
+    [
+      "low-density separation assumption",
+      "低密度分离假设"
+    ],
+    [
+      "semi-supervised smoothness assumption",
+      "半监督光滑性假设"
+    ],
+    [
+      "self-training",
+      "自训练"
+    ],
+    [
+      "base classifier",
+      "基础分类器"
+    ],
+    [
+      "probability mass function",
+      "概率质量函数"
+    ],
+    [
+      "worst case analysis",
+      "最坏情形分析"
+    ],
+    [
+      "model misspecification",
+      "模型误设"
+    ],
+    [
+      "projection",
+      "投影"
+    ],
+    [
+      "convolution",
+      "卷积"
+    ],
+    [
+      "deconvolution",
+      "反卷积"
+    ]
+  ],
+  "terminology_notes": [
+    "沿用半监督学习、因果方向/反因果方向、协变量偏移、领域适应、条件分布/边缘分布、统计相依、机制独立原理等全书术语。",
+    "因果方向展开的学习任务与学习因果结构这一任务按上下文区分，未将所有 causal learning 一律误读为因果方向预测。",
+    "并非原文内容的用户阅读批注、划线和高亮均未纳入。"
+  ],
+  "source_anomalies": [
+    {
+      "printed_page": 76,
+      "pdf_page": 6,
+      "original": "we are forced to select one x-value to which we assign the label zero",
+      "assessment": "此处 zero 与 f_j(j)=1、f_j(k)=0（k != j）的函数类定义及后续论证矛盾，应为 one。",
+      "handling": "保留原句“将其标签赋为零”，紧接独立标示译注说明应为“赋予标签一”；译注不占原脚注计数器。"
+    }
+  ],
+  "intentional_layout_differences": [
+    "共享 A4 中文排版将原书 9 个有内容页面重排为 7 页；完整性按段落、结构、编号和图表核对，不追求逐页等长。",
+    "图 5.1 的生物示意中文重绘；原手写数字栅格保留，不用随意生成的数字替换。图片许可脚注仍保留。",
+    "部分原文行内概率抽样表达与最坏情形风险移为独立显示，以改善中文段落和数学阅读。",
+    "图 5.5 使用顶端浮动，在习题节前与习题同页，保持原书的图—习题对应关系。"
+  ],
+  "qa": {
+    "chapter": "ch05",
+    "pages": 7,
+    "hanzi": 4355,
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "outline": [
+      [
+        1,
+        "第五章  与机器学习的联系（一）",
+        1
+      ],
+      [
+        2,
+        "5.1 半监督学习",
+        1
+      ],
+      [
+        3,
+        "5.1.1 半监督学习与因果方向",
+        2
+      ],
+      [
+        3,
+        "5.1.2 关于因果方向上半监督学习的一点说明",
+        3
+      ],
+      [
+        2,
+        "5.2 协变量偏移",
+        5
+      ],
+      [
+        2,
+        "5.3 习题",
+        7
+      ]
+    ]
+  },
+  "underfull_warnings": 1,
+  "visual_review": {
+    "render_directory": "work/elements_book/build/ch05/render",
+    "pages_reviewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "source_figures_reviewed": [
+      3,
+      4,
+      5,
+      8,
+      9
+    ]
+  },
+  "unresolved_issues": []
+}

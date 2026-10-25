@@ -1,0 +1,372 @@
+{
+  "chapter": 4,
+  "title_zh": "扩展定律与高效大语言模型",
+  "status": "complete",
+  "page_count": 23,
+  "page_count_scope": "单章独立编译，含随附原文参考文献；正文至第 16 页上部，参考文献从第 16 页至第 23 页。",
+  "source": {
+    "effective_tex": "work/agentic/active/part1/04_scaling.tex",
+    "assets_directory": "work/agentic/en/part1/visuals/",
+    "source_pdf_used": false,
+    "bibliography": "保留原文 bibliographystyle 与 bibliography 调用，使用共享工程中由原始源码包复制的 part1/04_scaling.bbl；未改写文献内容。"
+  },
+  "file_list": [
+    "01_source/part1/04_scaling.tex",
+    "01_source/figures_zh/ch04/scaling_zh.tex",
+    "01_source/figures_zh/ch04/sample_efficiency_zh.tex",
+    "01_source/figures_zh/ch04/isoflop_zh.tex",
+    "01_source/figures_zh/ch04/emergent_zh.tex",
+    "01_source/figures_zh/ch04/token_edit_zh.tex",
+    "01_source/figures_zh/ch04/negative_scaling_zh.tex",
+    "01_source/figures_zh/ch04/grokking_zh.tex",
+    "01_source/figures_zh/ch04/lora_zh.tex",
+    "01_source/figures_zh/ch04/moe_zh.tex",
+    "03_reviews/ch04_translation_review.json"
+  ],
+  "coverage": "全章有效正文逐段完整译出，包含学习目标中的 4 项、5 节、9 小节、5 小小节、10 个段标题、全部 32 个列表条目、13 个模型家族介绍、1 条脚注、9 幅图与图题、1 张表及其 6 行数据、6 个独立公式、结语和参考文献调用。有效原文不含独立例题或练习；未增删例题、练习或学习框。",
+  "structure_checks": {
+    "chapter": {
+      "source_count": 1,
+      "translation_count": 1,
+      "count_match": true
+    },
+    "section": {
+      "source_count": 5,
+      "translation_count": 5,
+      "count_match": true
+    },
+    "subsection": {
+      "source_count": 9,
+      "translation_count": 9,
+      "count_match": true
+    },
+    "subsubsection": {
+      "source_count": 5,
+      "translation_count": 5,
+      "count_match": true
+    },
+    "paragraph": {
+      "source_count": 10,
+      "translation_count": 10,
+      "count_match": true
+    },
+    "item": {
+      "source_count": 32,
+      "translation_count": 32,
+      "count_match": true
+    },
+    "label": {
+      "source_count": 16,
+      "translation_count": 16,
+      "ordered_calls_match": true
+    },
+    "references": {
+      "source_count": 16,
+      "translation_count": 16,
+      "ordered_calls_match": true
+    },
+    "citations": {
+      "source_count": 77,
+      "translation_count": 77,
+      "ordered_calls_match": true
+    },
+    "caption": {
+      "source_count": 10,
+      "translation_count": 10,
+      "count_match": true
+    },
+    "footnote": {
+      "source_count": 1,
+      "translation_count": 1,
+      "count_match": true
+    },
+    "bibliography_calls": {
+      "source_count": 2,
+      "translation_count": 2,
+      "ordered_calls_match": true
+    },
+    "environment_sequence_match": true,
+    "display_equations": {
+      "source_count": 6,
+      "translation_count": 6,
+      "exact_source_match": true
+    },
+    "inline_math": {
+      "source_count": 141,
+      "translation_count": 141,
+      "all_source_expressions_preserved_verbatim_with_multiplicity": true,
+      "ordering_note": "仅因中文语序在同一句中调整 C、a+b=1、N/D、C≈6ND 等行内式的位置；每个数学表达式与出现次数均完整保留。"
+    },
+    "table_numeric_data_preserved": true,
+    "forbidden_inference_terms_found": false,
+    "audit_file": "01_source/build/ch04_c67fdb7e/qa/structure_audit.json"
+  },
+  "figures": {
+    "source_assets_inspected": [
+      "scaling.png",
+      "sample_efficiency_tokens.png",
+      "isoflop.png",
+      "emergent.png",
+      "token_edit.png",
+      "negative_scaling.png",
+      "Grokking_modular_addition.jpg",
+      "lora.png",
+      "moe.png"
+    ],
+    "conceptual_redraws": [
+      {
+        "label": "fig:lora",
+        "file": "figures_zh/ch04/lora_zh.tex",
+        "description": "中文 TikZ 重绘预训练权重分支、A/B 低秩更新分支、x/h 向量、加号、d/r 维度标注与四条流向箭头；保留原图 W∈R^{d×d} 特例、B=0 和 A=N(0,σ²) 的原始符号。"
+      },
+      {
+        "label": "fig:moe",
+        "file": "figures_zh/ch04/moe_zh.tex",
+        "description": "中文 TikZ 重绘左侧 Transformer 模块及右侧放大图，保留四个词元列、各列四个 FFN 专家、top-2 选择、路由器、稀疏汇总、位置与词元嵌入、自注意力、两条残差支路、两层相加与归一化及输出词元。路由箭头上的原始权重 0.7/0.2、0.22/0.6、0.55/0.2、0.2/0.5 未改写或重新归一化。"
+      }
+    ],
+    "statistical_plots": "7 幅统计图直接引用随附原始位图，不重新绘制任何数据点、曲线、拟合线、刻度、基线或数值。专属 TikZ 包装仅为标题、轴题和必要的图例文字叠加中文遮罩。所有共享原始素材保持不变。token_edit 图由 0.30 正文宽增至 0.36，以便阅读两面板的刻度和图例。",
+    "plot_overlays": [
+      "figures_zh/ch04/scaling_zh.tex",
+      "figures_zh/ch04/sample_efficiency_zh.tex",
+      "figures_zh/ch04/isoflop_zh.tex",
+      "figures_zh/ch04/emergent_zh.tex",
+      "figures_zh/ch04/token_edit_zh.tex",
+      "figures_zh/ch04/negative_scaling_zh.tex",
+      "figures_zh/ch04/grokking_zh.tex"
+    ]
+  },
+  "new_terms": {
+    "power law": "幂律",
+    "floating point operations (FLOPs)": "浮点运算次数（FLOPs）",
+    "sample efficiency": "样本效率",
+    "compute-optimal frontier": "计算最优前沿",
+    "IsoFLOP": "等浮点运算量",
+    "undertrained": "训练不足",
+    "overtrained": "超额训练",
+    "emergent abilities": "涌现能力",
+    "inverse scaling": "逆向扩展",
+    "hindsight neglect": "忽略事后结果",
+    "grokking": "顿悟",
+    "small language model (SLM)": "小语言模型（SLM）",
+    "parameter-efficient finetuning (PEFT)": "参数高效微调（PEFT）",
+    "Low-Rank Adaptation (LoRA)": "低秩适配（LoRA）",
+    "intrinsic rank": "内在秩",
+    "Grouped-Query Attention (GQA)": "分组查询注意力（GQA）",
+    "multi-head attention (MHA)": "多头注意力（MHA）",
+    "multi-query attention (MQA)": "多查询注意力（MQA）",
+    "Mixture of Experts (MoE)": "混合专家（MoE）",
+    "gating network": "门控网络",
+    "router": "路由器",
+    "sparse activation": "稀疏激活",
+    "KV cache": "KV 缓存／键值缓存",
+    "pruning": "剪枝",
+    "quantization": "量化",
+    "mixed precision": "混合精度",
+    "speculative decoding": "推测解码",
+    "data curation": "数据整理",
+    "LLM-as-a-judge": "大语言模型裁判",
+    "decontamination": "去污染",
+    "Multi-head Latent Attention (MLA)": "多头潜在注意力（MLA）",
+    "neural processing unit (NPU)": "神经处理单元（NPU）",
+    "embodied carbon": "隐含碳排放",
+    "thermal throttling": "过热降频"
+  },
+  "unresolved_issues": [],
+  "resolved_issues": [
+    {
+      "kind": "page_header_preview",
+      "description": "早期 Poppler 预览曾疑似缺少部分章页眉。主编使用 PyMuPDF 独立检查最终 ch04_c67fdb7e PDF，确认第 2–23 页文本层均含正确的“第 4 章／扩展定律与效率”页眉，并在重新渲染的第 3、6 页上直接目检可见。该事项已核对并关闭，无需修改共享页样式。"
+    }
+  ],
+  "unresolved_figures_or_formulas": [],
+  "source_anomalies": [
+    {
+      "location": "Kaplan Scaling Laws",
+      "description": "原文出现 rekated 和 N is with becoming 等拼写、语法错误，译文按上下文自然表达其原意，未删去论述。"
+    },
+    {
+      "location": "Kaplan Scaling Laws, description of S and B",
+      "description": "原文将 S 称为 optimal step size，但脚注 D=B·S 和 S∝C^{0.03} 所用 S 实际是训练步数。译文按数学上下文使用“最优步数”，脚注与所有公式原样保留。"
+    },
+    {
+      "location": "Chinchilla Scaling Laws",
+      "description": "原文用 a≈0.45、b≈0.55 推述 Dopt/Nopt 跨多个计算量级仍接近常数 20，并明确称这是经验校准；译文完整保留这些限定，不自行修改系数或经验比值。"
+    },
+    {
+      "location": "Grokking, paragraph after the figure",
+      "description": "原文将固定模加法数据集上增加训练轮次的图描述为 data wall / data running out。译文保留其数据墙说法；它与本图直接展示的训练轮次及泛化迟滞之间存在概念跳转。"
+    },
+    {
+      "location": "Reducing Pretraining Cost",
+      "description": "原文小小节标题为“降低预训练成本”，其中首个段落却讲述微调阶段的 PEFT/LoRA。标题与段落归属均依原文保留。"
+    },
+    {
+      "location": "LoRA figure versus surrounding prose",
+      "description": "原图标注 W∈R^{d×d}，正文使用一般的 W0∈R^{d×k}。中文重绘保留图中的方阵特例，不擅自更改原图公式。原图 A=N(0,σ²) 的等号也按源图保留。"
+    },
+    {
+      "location": "Mixture-of-Experts figure",
+      "description": "原图部分 top-2 路由权重之和并非 1。中文重绘保留原始数值与选择关系，不对图中数值重新归一化。"
+    },
+    {
+      "location": "Sustainable Language Models",
+      "description": "原文 parameter and quantization count 的后半表述不常见；结合推理内存与量化上下文，译作“参数量与量化位数”，未改变其论述。"
+    }
+  ],
+  "compile": {
+    "command": "bundled-python -X utf8 build.py --chapter 4 --name ch04",
+    "passes": 3,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overfull_count": 0,
+    "undefined_references": false,
+    "undefined_citations": false,
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch04_c67fdb7e/agenticbook.pdf",
+    "build_report": "06_2026_Agentic_Large_Language_Models/01_source/build/ch04_c67fdb7e/build_report.json"
+  },
+  "visual_qa": {
+    "renderer": "Poppler pdftoppm",
+    "resolution_dpi": 108,
+    "render_directory": "06_2026_Agentic_Large_Language_Models/01_source/build/ch04_c67fdb7e/qa",
+    "all_pages_rendered": true,
+    "inspected_contact_sheet_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "inspected_full_size_pages": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      16,
+      23
+    ],
+    "checks": "逐页总览，并全尺寸检查全部统计图、LoRA 与 MoE、参数比例表、Chinchilla 及 LoRA 公式、脚注和正文/参考文献衔接页。中文轴题遮罩只覆盖文字区；曲线、数据点、坐标刻度和图例数值清晰保留。修整了原 scaling 图左边杂线遮罩、样本效率图轴题残余以及 MoE 专家框/路由器文本间距。无正文或图表裁切、缺字、溢出，未发现节点文字重叠。章页眉已经主编使用 PyMuPDF 独立复核，确认正常。"
+  },
+  "editorial_choices": {
+    "register": "自然学术教材口吻，以“你”称呼读者。",
+    "terminology": "遵照共享术语表与最新用户要求，inference 和 reasoning 均译作“推理”；使用“扩展定律”“训练流程”“先进架构”。",
+    "counters": "未添加任何 setcounter 或手工公式/图表编号；保留自动计数、全部标签和跨章引用键。",
+    "ownership": "只改本章、figures_zh/ch04/ 与本报告；编译与检查产物留在 build/，共享导言区、构建脚本、原图和其他章节均未改动。"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_source/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

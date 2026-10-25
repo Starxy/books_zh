@@ -1,0 +1,419 @@
+{
+  "chapter": 20,
+  "status": "complete",
+  "title": "*先进 Transformer 架构与智能体架构",
+  "short_title": "*先进智能体架构",
+  "page_count": 11,
+  "pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch20_fa6f97c4/agenticbook.pdf",
+  "file_list": [
+    "06_2026_Agentic_Large_Language_Models/01_source/part6/20_advanced_arch.tex",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch20/asset_manifest.json",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch20/metaharness_zh.tex",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch20/shepherd_charts.png",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch20/shepherd_code.png",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch20/shepherd_flow.png",
+    "06_2026_Agentic_Large_Language_Models/01_source/figures_zh/ch20/shepherd_zh.tex",
+    "work/agentic/ch20_work/structure_checks.json",
+    "work/agentic/ch20_work/qa_page_manifest.json",
+    "06_2026_Agentic_Large_Language_Models/01_source/build/ch20_fa6f97c4/agenticbook.pdf",
+    "06_2026_Agentic_Large_Language_Models/03_reviews/ch20_translation_review.json"
+  ],
+  "coverage": {
+    "all_effective_source_read": true,
+    "all_effective_prose_translated": true,
+    "source": "WORK/active/part6/20_advanced_arch.tex",
+    "archive_only": true,
+    "old_english_pdf_read": false,
+    "chapter_count": 1,
+    "section_count": 3,
+    "subsection_count": 6,
+    "learning_boxes": 1,
+    "learning_items": 6,
+    "paragraph_blocks": {
+      "source": 46,
+      "translation": 46,
+      "manually_corresponded": true
+    },
+    "figures": 5,
+    "tables": 0,
+    "footnotes": 2,
+    "displayed_equations": 0,
+    "inline_math_segments": 10,
+    "body_code_blocks": 0,
+    "bibliography_commands_retained": true,
+    "bibliography_entries": 42,
+    "figure_text": {
+      "fig:cartpole": "原始物理示意图完整保留；仅有变量，无须翻译图内自然语言。",
+      "fig:rl6": "只读复用已中文化的共享 figures/rl.tex，保留两节点、两个弯曲有向边和全部公式。",
+      "fig:rl-icrl": "只读复用已中文化的共享 figures/rl-icrl.tex，保留历史累积公式与箭头方向。",
+      "fig:metaharness": "中文 LaTeX 覆盖全部说明标签；保留所有目录、图标、1/2/3 编号、最大化提示、代码框和箭头。",
+      "fig:shepherd": "流程、代码、三幅数据图分三行排放；所有说明标签中文化；代码截图（含注释、字符串和空白）、所有图标、失败/通过路径、虚线与数据像素保留。"
+    },
+    "book_code_or_examples_executed": false,
+    "shared_files_modified": false,
+    "literal_stars_in_long_and_short_titles": true
+  },
+  "structure_checks": {
+    "headings": {
+      "match": true,
+      "source_count": 10,
+      "translation_count": 10
+    },
+    "labels": {
+      "match": true,
+      "source_count": 9,
+      "translation_count": 9
+    },
+    "references": {
+      "match": true,
+      "source_count": 11,
+      "translation_count": 11
+    },
+    "citation_keys": {
+      "match": true,
+      "source_count": 36,
+      "translation_count": 36
+    },
+    "environments": {
+      "match": true,
+      "source_count": 9,
+      "translation_count": 9
+    },
+    "bibliography": {
+      "match": true,
+      "source_count": 1,
+      "translation_count": 1
+    },
+    "structural_commands": {
+      "match": true,
+      "source_count": 13,
+      "translation_count": 13
+    },
+    "code_blocks": {
+      "match": true
+    },
+    "math_segments": {
+      "match": true,
+      "symbol_multiset_match": true,
+      "source_count": 10,
+      "translation_count": 10
+    },
+    "text": {
+      "source_english_words": 3194,
+      "translated_CJK": 5038,
+      "translation_characters": 9472,
+      "source_characters": 22119,
+      "source_paragraph_blocks": 46,
+      "translation_paragraph_blocks": 46
+    },
+    "stray_chapter_counter": false,
+    "stray_part": false,
+    "table_count": {
+      "source": 0,
+      "translation": 0
+    },
+    "literal_title_star": true,
+    "inference_reasoning_convention": true,
+    "all_code_blocks": {
+      "count": 0,
+      "exact_match": true
+    },
+    "math_symbol_multiset_independent": true
+  },
+  "figure_asset_checks": {
+    "shepherd_flow.png": {
+      "source_bbox": [
+        0,
+        4,
+        1070,
+        595
+      ],
+      "pixel_exact": true
+    },
+    "shepherd_code.png": {
+      "source_bbox": [
+        1090,
+        19,
+        2078,
+        598
+      ],
+      "pixel_exact": true
+    },
+    "shepherd_charts.png": {
+      "source_bbox": [
+        0,
+        638,
+        2080,
+        1178
+      ],
+      "pixel_exact": true
+    }
+  },
+  "new_terms": {
+    "Turing machine": "图灵机",
+    "backreference": "反向引用",
+    "minimax": "极小极大",
+    "looped transformer": "循环式 Transformer",
+    "latent thought generation": "潜在思维生成",
+    "cross-agent latent state transfer": "跨智能体潜在状态传递",
+    "recursive-link": "递归连接",
+    "in-weights learning": "权重内学习",
+    "self-modifying code": "自修改代码",
+    "just-in-time compilation": "即时编译",
+    "open-endedness": "开放性",
+    "parent selection": "父代选择",
+    "execution trace": "执行轨迹",
+    "pair coding": "结对编程",
+    "runtime intervention": "运行时干预",
+    "counterfactual optimization": "反事实优化",
+    "meta-agent-guided tree RL": "元智能体引导的树式强化学习",
+    "pass rate": "通过率",
+    "optimization wall-clock": "优化实际耗时"
+  },
+  "source_anomalies": [
+    {
+      "location": "20.1.3 最后一段",
+      "source": "The training occurs in two stages.",
+      "note": "原文称训练分为两个阶段，但有效正文未进一步说明这两个阶段。译文保留原句，不补造阶段。"
+    },
+    {
+      "location": "20.2.1 第一段",
+      "source": "The self-reflection approaches from the previous section",
+      "note": "原文将自我反思方法称为前一节内容，但直接在前的内容为循环/递归架构。保留该指代，未自行改写引用位置。"
+    }
+  ],
+  "unresolved_issues": [],
+  "unresolved_figures_or_formulas": [],
+  "compile": {
+    "pdf": "06_2026_Agentic_Large_Language_Models/01_source/build/ch20_fa6f97c4/agenticbook.pdf",
+    "chapters": [
+      20
+    ],
+    "passes": 3,
+    "pagination_stable": true,
+    "errors": 0,
+    "missing_characters": 0,
+    "overfull": [],
+    "undefined_references": false,
+    "undefined_citations": false,
+    "multiply_defined_labels": false,
+    "pages": [
+      "11"
+    ],
+    "engine": "XeLaTeX",
+    "command": "python PROJECT/build.py --chapter 20 --name ch20",
+    "no_shell_escape": true,
+    "minted_frozen_cache": true,
+    "subprocess_output_captured_as_bytes": true,
+    "published_by_child": false
+  },
+  "visual_qa": {
+    "method": "PyMuPDF 实际渲染并通过 view_image 逐页目检；复杂图另以300–400dpi局部复核。",
+    "pages_actually_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "final_build_rechecked_pages": [
+      4,
+      6,
+      7
+    ],
+    "unchanged_pages_reviewed_in_prior_stable_build": [
+      1,
+      2,
+      3,
+      5,
+      8,
+      9,
+      10,
+      11
+    ],
+    "page_checks": [
+      {
+        "page": 1,
+        "checked": "章号、长标题星号、学习框六项、首节、脚注与页脚",
+        "issues": []
+      },
+      {
+        "page": 2,
+        "checked": "图20.1全部物理结构、变量、虚线、角度箭头、中文题注与正文",
+        "issues": []
+      },
+      {
+        "page": 3,
+        "checked": "回溯词元、两级标题、跨章引用、递归架构正文",
+        "issues": []
+      },
+      {
+        "page": 4,
+        "checked": "图20.2及20.3全部公式和双向循环边、中文题注、ICRL正文",
+        "issues": []
+      },
+      {
+        "page": 5,
+        "checked": "权重内学习对比、自修改超智能体正文、引文与底部间距",
+        "issues": []
+      },
+      {
+        "page": 6,
+        "checked": "图20.4全部标签/节点/箭头、底部三标签与图标间距、元智能体正文、URL脚注",
+        "issues": []
+      },
+      {
+        "page": 7,
+        "checked": "图20.5创建/观测/拦截/回滚/分支全部路径，失败虚线，修补路径，完整代码，三图标题/轴/刻度/数据/模型名/图例",
+        "issues": []
+      },
+      {
+        "page": 8,
+        "checked": "结语、参考文献起始、章页眉与页脚",
+        "issues": []
+      },
+      {
+        "page": 9,
+        "checked": "参考文献、长作者列表、URL和断行",
+        "issues": []
+      },
+      {
+        "page": 10,
+        "checked": "参考文献、长条目、URL和页脚",
+        "issues": []
+      },
+      {
+        "page": 11,
+        "checked": "参考文献最后条目、书签末项及页数",
+        "issues": []
+      }
+    ],
+    "details_actually_viewed": [
+      {
+        "page": 6,
+        "file": "work/agentic/ch20_work/rendered/meta_detail.png",
+        "dpi": 300
+      },
+      {
+        "page": 7,
+        "file": "work/agentic/ch20_work/rendered/shepherd_flow_detail.png",
+        "dpi": 240
+      },
+      {
+        "page": 7,
+        "file": "work/agentic/ch20_work/rendered/shepherd_charts_detail.png",
+        "dpi": 400
+      }
+    ],
+    "resolved_during_qa": [
+      "将 Meta Harness 底部三个中文标签下移，消除与图标相接。",
+      "清理 Shepherd 的拦截标签英文残留和截图非内容边缘。",
+      "收窄并左移第三幅数据图的纵轴覆盖区域，保留完整20/40刻度，清除原英文残留。",
+      "恢复未优化标签覆盖区域内的一小段浅灰水平网格线。"
+    ],
+    "remaining_issues": []
+  },
+  "integration_note": "本报告为第20章单章自测；整书合排与发布由 root 执行。本章未发现待合排才能解决的引用、图或公式。",
+  "sha256": {
+    "chapter_tex": "cd3e3bd6ec6121c3b95f620fad5f2fda4587c0707b56129796479c4fef65498d",
+    "pdf": "93f79d4a512483d384ef164e6683c93586001094ce834976dfac2ff777f82129"
+  },
+  "integration_validation": {
+    "stage": "book",
+    "new_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_included_chapters": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "build": "06_2026_Agentic_Large_Language_Models/01_source/build/book_7520ca78/agenticbook.pdf",
+    "pages": 382,
+    "reviewed_images": [
+      "work/agentic/render_book/contact_01.png",
+      "work/agentic/render_book/contact_07.png",
+      "work/agentic/render_book/contact_13.png",
+      "work/agentic/render_book/contact_19.png",
+      "work/agentic/render_book/contact_25.png",
+      "work/agentic/render_book/contact_31.png",
+      "work/agentic/render_book/contact_37.png",
+      "work/agentic/render_book/contact_43.png",
+      "work/agentic/render_book/contact_49.png",
+      "work/agentic/render_book/contact_55.png",
+      "work/agentic/render_book/page_012.png",
+      "work/agentic/render_book/page_013.png",
+      "work/agentic/render_book/page_015.png",
+      "work/agentic/render_book/page_039.png",
+      "work/agentic/render_book/page_040.png",
+      "work/agentic/render_book/page_104.png",
+      "work/agentic/render_book/page_112.png",
+      "work/agentic/render_book/page_373.png",
+      "work/agentic/render_book/extra_017.png",
+      "work/agentic/render_book/extra_019.png",
+      "work/agentic/render_book/extra_110.png",
+      "work/agentic/render_book/extra_161.png",
+      "work/agentic/render_book/extra_291.png",
+      "work/agentic/render_book/extra_374.png",
+      "work/agentic/render_book/extra_375.png",
+      "work/agentic/render_book/extra_376.png",
+      "work/agentic/render_book/extra_377.png",
+      "work/agentic/render_book/extra_378.png",
+      "work/agentic/render_book/extra_379.png",
+      "work/agentic/render_book/extra_380.png",
+      "work/agentic/render_book/extra_381.png",
+      "work/agentic/render_book/extra_382.png"
+    ],
+    "source_structure_math_code_tables_and_bibliography_match": true,
+    "numbering_mismatches": [],
+    "visual_defects": []
+  }
+}

@@ -1,0 +1,309 @@
+{
+  "chapter": "ch03",
+  "title_zh": "原因—结果模型",
+  "status": "complete",
+  "source_pdf": "work/elements_book/pdf_clean/ch03.pdf",
+  "source_pdf_pages": 10,
+  "source_printed_pages": "33–41；分章 PDF 第 10 页为空白",
+  "pages": 7,
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch03.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch03a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch03b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch03c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch03d.tex"
+  ],
+  "compiled_pdf": "work/elements_book/build/ch03/driver.pdf",
+  "qa_json": "work/elements_book/build/ch03/qa.json",
+  "structure": [
+    {
+      "number": "3",
+      "title": "原因—结果模型",
+      "type": "chapter",
+      "includes": "完整章首导言"
+    },
+    {
+      "number": "3.1",
+      "title": "结构因果模型",
+      "type": "section"
+    },
+    {
+      "number": "3.2",
+      "title": "干预",
+      "type": "section"
+    },
+    {
+      "number": "3.3",
+      "title": "反事实",
+      "type": "section"
+    },
+    {
+      "number": "3.4",
+      "title": "结构因果模型的典范表示",
+      "type": "section"
+    },
+    {
+      "number": "3.5",
+      "title": "习题",
+      "type": "section"
+    }
+  ],
+  "counts": {
+    "chapters": 1,
+    "sections": 5,
+    "numbered_equations": 13,
+    "definitions": 1,
+    "examples": 2,
+    "code_snippets": 1,
+    "code_lines": 20,
+    "footnotes": 2,
+    "problems": 4,
+    "problem_subparts": 2,
+    "figures": 0,
+    "tables": 0,
+    "fine_points": 0,
+    "technical_points": 0
+  },
+  "equations": [
+    {
+      "number": "3.1",
+      "content": "C := N_C",
+      "source_pdf_page": 1,
+      "visual_checked": true
+    },
+    {
+      "number": "3.2",
+      "content": "E := f_E(C,N_E)",
+      "source_pdf_page": 1,
+      "visual_checked": true
+    },
+    {
+      "number": "3.3",
+      "content": "C := N_C; E := 4 C + N_E",
+      "source_pdf_page": 2,
+      "visual_checked": true
+    },
+    {
+      "number": "3.4",
+      "content": "E 上的两种干预不改变 C 的分布，且不同于条件分布",
+      "source_pdf_page": 3,
+      "visual_checked": true
+    },
+    {
+      "number": "3.5",
+      "content": "眼病例的 T、B 结构赋值",
+      "source_pdf_page": 4,
+      "visual_checked": true
+    },
+    {
+      "number": "3.6",
+      "content": "给定 B=T=1 后更新噪声分布的 SCM",
+      "source_pdf_page": 4,
+      "visual_checked": true
+    },
+    {
+      "number": "3.7",
+      "content": "更新后的 SCM 上实施 do(T:=0)",
+      "source_pdf_page": 5,
+      "visual_checked": true
+    },
+    {
+      "number": "3.8",
+      "content": "E = f_E(C,n_E)",
+      "source_pdf_page": 6,
+      "visual_checked": true
+    },
+    {
+      "number": "3.9",
+      "content": "E = n_E(C)",
+      "source_pdf_page": 6,
+      "visual_checked": true
+    },
+    {
+      "number": "3.10",
+      "content": "X := Y^2 + N_X",
+      "source_pdf_page": 7,
+      "visual_checked": true
+    },
+    {
+      "number": "3.11",
+      "content": "Y := N_Y",
+      "source_pdf_page": 7,
+      "visual_checked": true
+    },
+    {
+      "number": "3.12",
+      "content": "X := 2 Y + N_X",
+      "source_pdf_page": 8,
+      "visual_checked": true
+    },
+    {
+      "number": "3.13",
+      "content": "Y := 2 X + N_Y",
+      "source_pdf_page": 8,
+      "visual_checked": true
+    }
+  ],
+  "numbered_structures": [
+    {
+      "kind": "定义",
+      "number": "3.1",
+      "title": "结构因果模型"
+    },
+    {
+      "kind": "例",
+      "number": "3.2",
+      "title": "对原因和结果的干预"
+    },
+    {
+      "kind": "代码片段",
+      "number": "3.3",
+      "title": "从例 3.2 的 SCM 中抽样"
+    },
+    {
+      "kind": "例",
+      "number": "3.4",
+      "title": "眼病"
+    }
+  ],
+  "footnotes": [
+    {
+      "number": 1,
+      "source_pdf_page": 2,
+      "content": "为何使用 p 的 do 上标记法，区分干预与条件化"
+    },
+    {
+      "number": 2,
+      "source_pdf_page": 5,
+      "content": "典范表示已见于 Pearl 等文献，但此名称并非原有用语"
+    }
+  ],
+  "problems": [
+    {
+      "number": "3.5",
+      "title": "从结构因果模型中抽样",
+      "content": "生成容量为 200 的 iid 样本"
+    },
+    {
+      "number": "3.6",
+      "title": "条件分布",
+      "content": "证明给定 E=2 时 C 服从指定高斯分布"
+    },
+    {
+      "number": "3.7",
+      "title": "干预",
+      "content": "能否通过某个单一干预分布区分两个 SCM"
+    },
+    {
+      "number": "3.8",
+      "title": "有环结构因果模型",
+      "subparts": [
+        "a：计算唯一解的系数",
+        "b：证明某条件下无解，并另构造一个可解分布"
+      ]
+    }
+  ],
+  "new_terms": [
+    {
+      "en": "direct cause",
+      "zh": "直接原因"
+    },
+    {
+      "en": "causal graph",
+      "zh": "因果图"
+    },
+    {
+      "en": "canonical representation",
+      "zh": "典范表示"
+    },
+    {
+      "en": "Cartesian product",
+      "zh": "笛卡尔积"
+    },
+    {
+      "en": "reparameterization",
+      "zh": "重新参数化"
+    },
+    {
+      "en": "cyclic SCM",
+      "zh": "有环结构因果模型"
+    },
+    {
+      "en": "uniform mixture",
+      "zh": "等权混合"
+    },
+    {
+      "en": "interventional probability",
+      "zh": "干预概率"
+    },
+    {
+      "en": "observational conditional probability",
+      "zh": "观测条件概率"
+    }
+  ],
+  "source_anomalies": [
+    {
+      "location": "习题 3.7，原书第 40 页，分章 PDF 第 8 页",
+      "issue": "N_Y 的高斯分布均值印作 μ_X，而同句接着将 μ_X、μ_Y 都列为未知参数，疑为 μ_Y 的排印错误。",
+      "action": "按原书保留 N_Y ~ N(μ_X,σ_Y²)，未擅自修正；建议在整书校对记录中注明。"
+    },
+    {
+      "location": "例 3.4，式 (3.7) 前一句",
+      "issue": "原书此句干预写作 do(T=0)，而相邻公式写作 do(T:=0)。",
+      "action": "分别保留原书等号与赋值号用法，不改变公式含义。"
+    }
+  ],
+  "deliberate_layout_differences": [
+    "沿用共享 A4 中文教材版式，未复制原书较小开本的逐页分页；完整中文为 7 页，原分章 PDF 为 9 页内容加 1 页空白。",
+    "式 (3.4) 为保证中文页面可读性拆为两行，但同一公式号下所有分布及不等式均保留。",
+    "代码片段 3.3 放入不可跨页区块，保持全部 20 行代码、注释及原输出完整显示在同页。",
+    "原书本章没有图、表、Fine Point、Technical Point，因此未添加任何此类结构。",
+    "独立 problem 计数器在本章习题开始前设置为 4，以保留原书接续编号 3.5—3.8；不改变 resultshared。"
+  ],
+  "validation": {
+    "compiler": "XeLaTeX / TeX Live 2026；compile_chapter.py ch03",
+    "passes": 2,
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "visual_source_pages_checked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "visual_output_pages_checked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "numbered_equations_sequence": [
+      "3.1",
+      "3.2",
+      "3.3",
+      "3.4",
+      "3.5",
+      "3.6",
+      "3.7",
+      "3.8",
+      "3.9",
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13"
+    ],
+    "code_logic_and_outputs": "逐行程序化核对通过：10 行可执行代码、20 行整体、原三组输出均保留。",
+    "annotations": "只使用已移除 annotations 的清洁原文，未译后期划线、批注、高亮。",
+    "shared_files_modified": false
+  },
+  "unresolved_items": []
+}

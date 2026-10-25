@@ -1,0 +1,373 @@
+{
+  "chapter": "ch07",
+  "title": "学习多元因果模型",
+  "status": "complete",
+  "source_pages": 22,
+  "source_nonblank_pages": 21,
+  "source_book_pages": "135–155",
+  "source_last_page_blank": true,
+  "translated_pages": 15,
+  "project_root": "02_2017_Elements_of_Causal_Inference/01_source",
+  "files": [
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07a.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07b.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07c.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07d.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07e.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/chapters/ch07f.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch07_01.tex",
+    "02_2017_Elements_of_Causal_Inference/01_source/figures/ch07_table_01.tex"
+  ],
+  "test_pdf": "work/elements_book/build/ch07/driver.pdf",
+  "structure": {
+    "chapters": 1,
+    "sections": 3,
+    "subsections": 11,
+    "section_7_1_subsections": 6,
+    "section_7_2_subsections": 5,
+    "outline": [
+      [
+        1,
+        "第七章  学习多元因果模型",
+        1
+      ],
+      [
+        2,
+        "7.1 结构可识别性",
+        1
+      ],
+      [
+        3,
+        "7.1.1 忠实性",
+        1
+      ],
+      [
+        3,
+        "7.1.2 加性噪声模型",
+        2
+      ],
+      [
+        3,
+        "7.1.3 误差方差相等的线性高斯模型",
+        3
+      ],
+      [
+        3,
+        "7.1.4 线性非高斯无环模型",
+        4
+      ],
+      [
+        3,
+        "7.1.5 非线性高斯加性噪声模型",
+        4
+      ],
+      [
+        3,
+        "7.1.6 观测数据与实验数据",
+        5
+      ],
+      [
+        2,
+        "7.2 结构识别方法",
+        6
+      ],
+      [
+        3,
+        "7.2.1 基于独立性的方法",
+        7
+      ],
+      [
+        3,
+        "7.2.2 基于得分的方法",
+        10
+      ],
+      [
+        3,
+        "7.2.3 加性噪声模型",
+        12
+      ],
+      [
+        3,
+        "7.2.4 已知因果排序",
+        13
+      ],
+      [
+        3,
+        "7.2.5 观测数据与实验数据",
+        13
+      ],
+      [
+        2,
+        "7.3 习题",
+        15
+      ]
+    ],
+    "source_bookmark_note": "源PDF仅记录章与三节，11个小节根据实际印刷标题核对补入中文书签。"
+  },
+  "counts": {
+    "numbered_equations": 8,
+    "equation_tags": [
+      "7.1",
+      "7.2",
+      "7.3",
+      "7.4",
+      "7.5",
+      "7.6",
+      "7.7",
+      "7.8"
+    ],
+    "figures": 1,
+    "figure_numbers": [
+      "7.1"
+    ],
+    "tables": 1,
+    "table_numbers": [
+      "7.1"
+    ],
+    "table_data_rows": 5,
+    "shared_result_environments": 11,
+    "shared_result_sequence": [
+      {
+        "number": "7.1",
+        "environment": "proposition"
+      },
+      {
+        "number": "7.2",
+        "environment": "lemma"
+      },
+      {
+        "number": "7.3",
+        "environment": "definition"
+      },
+      {
+        "number": "7.4",
+        "environment": "proposition"
+      },
+      {
+        "number": "7.5",
+        "environment": "proposition"
+      },
+      {
+        "number": "7.6",
+        "environment": "theorem"
+      },
+      {
+        "number": "7.7",
+        "environment": "theorem"
+      },
+      {
+        "number": "7.8",
+        "environment": "lemma"
+      },
+      {
+        "number": "7.9",
+        "environment": "example"
+      },
+      {
+        "number": "7.10",
+        "environment": "proposition"
+      },
+      {
+        "number": "7.11",
+        "environment": "codesnippet"
+      }
+    ],
+    "proof_environments": 3,
+    "proof_details": "7.1为指向附录的证明环境；7.2及7.10含本章证明正文。",
+    "source_footnotes": 3,
+    "translator_notes": 5,
+    "problems": 4,
+    "problem_numbers": [
+      "7.12",
+      "7.13",
+      "7.14",
+      "7.15"
+    ],
+    "code_snippets": 1,
+    "code_lines": 23,
+    "formal_numbered_algorithms": 0,
+    "conditional_independence_procedure_steps": 3
+  },
+  "figures": [
+    {
+      "number": "7.1",
+      "source_book_page": 144,
+      "source_pdf_page": 10,
+      "method": "根据渲染原图逐节点逐箭头手工中文TikZ重排",
+      "dag_nodes": [
+        "X1",
+        "X2",
+        "X3",
+        "X4"
+      ],
+      "dag_edges": [
+        "X1->X3",
+        "X2->X4",
+        "X3->X4"
+      ],
+      "workflow_arrows": 5,
+      "independence_statements": 4,
+      "structural_assignments": 4,
+      "added_or_dropped_nodes_or_edges": false,
+      "unresolved": []
+    }
+  ],
+  "new_terms_en_zh": {
+    "constraint-based methods": "基于约束的方法",
+    "causal additive model": "因果加性模型",
+    "structural Hamming distance": "结构 Hamming 距离",
+    "oracle": "预言机",
+    "inductive causation": "归纳因果",
+    "strong faithfulness": "强忠实性",
+    "uniform consistency": "均匀一致性",
+    "Meek's orientation rules": "Meek 定向规则",
+    "satisfiability": "可满足性",
+    "Max-Min Hill-Climbing": "最大最小爬山",
+    "marginal likelihood": "边缘似然",
+    "maximum a posteriori estimator": "最大后验估计量",
+    "Bayesian Dirichlet score": "贝叶斯 Dirichlet 得分",
+    "Bayesian Dirichlet equivalence score": "贝叶斯 Dirichlet 等价得分",
+    "distribution equivalent": "分布等价",
+    "greedy equivalence search": "贪心等价搜索",
+    "integer linear programming": "整数线性规划",
+    "characteristic imset": "特征 imset",
+    "pedigree learning": "系谱学习",
+    "greedy interventional equivalence search": "贪心干预等价搜索",
+    "invariant prediction": "不变预测",
+    "invariant causal prediction": "不变因果预测",
+    "structural minimality": "结构极小性",
+    "intervention target": "干预目标"
+  },
+  "source_anomalies": [
+    {
+      "source_book_pages": [
+        139,
+        140,
+        153
+      ],
+      "source_pdf_pages": [
+        5,
+        6,
+        19
+      ],
+      "location": "命题7.5、定理7.6、第7.2.5节",
+      "original": "变量总数定义为d，却把指标或干预集合上限写成p。",
+      "suggested_reading": "这些位置的p应按d理解。",
+      "treatment": "主文保留p，译注1集中说明。"
+    },
+    {
+      "source_book_pages": [
+        148
+      ],
+      "source_pdf_pages": [
+        14
+      ],
+      "location": "命题7.10证明",
+      "original": "X-E[X|Z]=N_X，未假设N_X零均值；定义7.3也未保证条件期望存在。",
+      "suggested_reading": "期望存在时应为N_X-E[N_X]，加常数不影响独立性。",
+      "treatment": "保留原等式，译注2说明零均值及期望存在的隐含要求。"
+    },
+    {
+      "source_book_pages": [
+        148
+      ],
+      "source_pdf_pages": [
+        14
+      ],
+      "location": "命题7.10之后四变量讨论",
+      "original": "先列X,Y,Z,V，下方图结构使用W。",
+      "suggested_reading": "V、W均指第四变量。",
+      "treatment": "保留印刷符号，译注3说明。"
+    },
+    {
+      "source_book_pages": [
+        149
+      ],
+      "source_pdf_pages": [
+        15
+      ],
+      "location": "贝叶斯得分函数",
+      "original": "对数后验与对数先验加对数似然之间使用比例符号propto。",
+      "suggested_reading": "对数形式应相差与图无关的加法常数-log p(D)，而非乘法比例。",
+      "treatment": "保留原公式，译注4说明排序及MAP不受影响。"
+    },
+    {
+      "source_book_pages": [
+        151
+      ],
+      "source_pdf_pages": [
+        17
+      ],
+      "location": "7.2.3高斯得分",
+      "original": "将sum_j -log varhat[R_j]直接记为log p(D|G)。",
+      "suggested_reading": "用于比较的得分省略了正比例系数n/2及与图无关的加法常数。",
+      "treatment": "保留原式，译注5说明。"
+    },
+    {
+      "source_book_pages": [
+        138
+      ],
+      "source_pdf_pages": [
+        4
+      ],
+      "location": "7.1.2末段",
+      "original": "先列三个例子，随后写those two examples。",
+      "suggested_reading": "这里指前面列出的例子。",
+      "treatment": "中文使用“这些例子”，未删减三个具体模型。"
+    },
+    {
+      "source_book_pages": [
+        144
+      ],
+      "source_pdf_pages": [
+        10
+      ],
+      "location": "引理7.8(i)",
+      "original": "图写为(X,E)，子集却写S subset V。",
+      "suggested_reading": "V与X均为该图的节点集合。",
+      "treatment": "保留原式记号；不影响图论陈述。"
+    },
+    {
+      "source_book_pages": [
+        154
+      ],
+      "source_pdf_pages": [
+        20
+      ],
+      "location": "代码片段7.11说明",
+      "original": "称合并数据线性模型在第13行；实际拟合调用在第12行，第13行为输出标题。",
+      "suggested_reading": "第12行拟合，输出从第13行开始。",
+      "treatment": "中文明确两个行号所指，完整保留23行代码及数值。"
+    }
+  ],
+  "intentional_layout_differences": [
+    "A4中文排版，不复刻英文页码；全部21个非空白原页内容均逐段译出，源PDF第22页为空白，未另加中文空白页。",
+    "图7.1采用中文流程标签与统一圆形节点，以TikZ完整重排；保持原有4个DAG节点、3条因果箭头、5条流程箭头、条件独立列表及4条结构赋值。",
+    "表7.1完整保留5行模型与全部5列字段，把原勾叉改为“是/否”，改善中文可读性。",
+    "原书3条脚注保持1—3编号；5条译注另用“译注1—5”编号。",
+    "代码片段7.11完整23行置于同一页，保持代码、注释、模型输出及数值；正文对第12/13行作明确说明。",
+    "源PDF章节书签未列小节；按实际印刷小节补足中文目录层级。"
+  ],
+  "unresolved_items": [],
+  "validation": {
+    "partial_compile_runs": 4,
+    "complete_compile_runs": 4,
+    "xelatex_passes_total": 16,
+    "errors": [],
+    "overfull": [],
+    "missing_glyphs": 0,
+    "all_source_pages_rendered_and_reviewed": true,
+    "all_translated_pages_rendered_and_reviewed": true,
+    "numbered_and_unnumbered_displays_checked_against_rendered_source": true,
+    "dag_checked_node_by_node_and_arrow_by_arrow": true,
+    "source_sha256": "61af46269f0ca46547903ecb76b771e6b305b9713dc0fd5393d0d3a88f0f0507",
+    "pdf_sha256": "38ea47c4b87d583ac4fccbc2b22c173186284cd74278e2d74ce6d02ebc7384e2"
+  },
+  "local_macros": [
+    "chseventnote",
+    "chseventransnote counter"
+  ],
+  "local_tikz_library": "shapes.symbols",
+  "remarks": "只编辑本章独占文件和报告；未改main、preamble、其他章、附录、术语表；仅译原书，不纳入阅读划线、批注或高亮。"
+}
