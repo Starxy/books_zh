@@ -1,0 +1,290 @@
+\section{训练与学习范式}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figs/training-paradigm.pdf}
+    \caption{世界模型主要训练与学习范式概览。}
+    \label{fig:training-paradigm}
+\end{figure}
+
+\subsection{自监督与生成式预训练}
+自监督与生成式预训练已成为世界模型的自然起点，因为在尚无任务奖励或密集专家标注时，它们便能把无标签经验转化为密集监督。令$\mathbf{x}_{1:T}$表示像素级观测或视频帧，$\mathbf{a}_{1:T}$表示行动，$\mathbf{c}$表示可选条件，$u_{1:T}$表示离散词元。共同目标不是为重建而重建，而是通过预测经验中被遮蔽、未来或下一个元素，获得紧凑信念状态（belief state）与转移先验。
+
+视频预测是最直接的形式：
+\begin{equation}
+    p_{\theta}\!\left(
+    \mathbf{x}_{t+1:t+K}
+    \mid
+    \mathbf{x}_{\le t},
+    \mathbf{a}_{t:t+K-1},
+    \mathbf{c}
+    \right).
+\end{equation}
+它将表征学习建立在时间之上：持续存在、遮挡、接触、运动和场景变化，在每一帧都构成监督信号。然而，无行动条件的预测学习的是观测动力学，以行动为条件的预测才开始近似干预动力学——这一区别对规划至关重要。像素预测也是一个脆弱的替代目标：逼真画面既非可控物理理解的必要条件，也非充分条件。因此，现代系统越来越多地预测随机潜变量、词元化潜变量或扩散潜变量，将目标从渲染可信未来转向保留行动相关动力学\citep{finn2016unsupervised,ha2018worldmodels}。
+
+掩码自编码（masked autoencoding）提供互补路线。MAE类目标根据可见上下文重建被掩蔽图块，视频变体则利用管状掩码（tube masking）与很高的掩码比例，发掘时间冗余\citep{he2022mae,tong2022videomae}。其有益作用在于压缩：编码器不能简单复制像素，必须从上下文推断结构。但重建只是替代目标。对世界模型而言，最好的掩码目标，应使潜在空间在干预下仍具有预测能力；这推动了JEPA类表征预测，在舍弃无关外观的同时，保留有利于规划的语义与动力学不变量\citep{bardes2024vjepa,assran2025vjepa2}。
+
+下一词元预测（next-token prediction）提供了最易扩展的生成接口。视频、行动、语言、地图、本体感觉（proprioception）和奖励一经词元化或嵌入，预训练便可以最小化
+\begin{equation}
+\mathcal{L}_{\mathrm{NTP}}
+=
+-\sum_{t=1}^{T}
+\log p_\theta\!\left(
+u_t \mid u_{<t}, \mathbf{a}_{\le t}, \mathbf{c}
+\right).
+\end{equation}
+这使世界建模能够借助Transformer的规模扩展，并支持多模态提示。GAIA-1将自动驾驶世界建模表述为离散词元序列预测；Genie则结合时空视频分词器（tokenizer）、自回归动力学模型，以及从无标签视频训练得到的潜在行动模型\citep{hu2023gaia1,bruce2024genie}。隐藏的瓶颈在于词元化：词元定义了模型的本体，而分词器舍弃的几何、接触或可控性信息，无法仅靠扩大规模恢复。
+
+尺度定律将这些目标转化为系统问题。一种有用的抽象是
+\begin{equation}
+\mathcal{L}(N,D)
+\approx
+\mathcal{L}_{\infty}
++
+A N^{-\alpha}
++
+B D^{-\beta},
+\qquad
+C \approx \kappa N D,
+\end{equation}
+其中$N$是模型规模，$D$是训练数据，$C$是计算量。语言模型研究表明，扩大规模能带来可预测的幂律改进，而计算最优训练要求平衡参数量与词元量\citep{kaplan2020scaling,hoffmann2022training}。但对世界模型而言，$D$不应只理解为词元数量，还应理解为对状态、行动、机器人本体（embodiment）、视角、接触、罕见事件和时间跨度的覆盖。具身预训练的早期研究发现了类似的尺度行为，但其系数受到分词器、任务与架构的影响\citep{pearce2024scaling}。因此，仅有似然还不够：可扩展世界模型还必须按闭环一致性、可控性、长时域持续可靠性，以及对罕见运行情形的鲁棒性来评判。
+
+因此，合成数据是扩展规模的实用途径。Omniverse Replicator和Isaac Sim等平台支持基于物理的合成数据生成；Cosmos-Drive-Dreams和GR00T-Dreams等近期流程，使用世界基础模型生成可控驾驶场景或合成机器人轨迹\citep{nvidia2022replicator,nvidia2025cosmos,nvidia2025grootdreams}。它们最有力的作用不是替代现实，而是扩展现实经验：真实数据确定分布的依据，模拟与生成式合成数据生成（synthetic data generation，SDG）则提供长尾、危险和反事实情形。核心问题在于校准：如何混合真实、模拟和生成数据，使更广覆盖改善物理泛化，而非让模型学到模拟器伪影。在这一观点下，预训练教给模型的不是如何渲染世界，而是智能体能够借以改变世界的那些变量。
+
+\subsection{基于模型的强化学习}
+\label{sec:mbrl}
+基于模型的强化学习（MBRL）\citep{moerland2022modelbasedreinforcementlearningsurvey}，是最早赋予世界模型以决策为中心定义的学习范式：世界模型是一种内部模型，通过足够好地预测行动后果来改进策略。典型MBRL流程交替进行两个阶段：1）智能体与环境交互，拟合动力学模型，即学习转移模型$\widehat P_\theta$，通常也学习价值函数；2）将该模型用作现实的低成本、可微、可重置替代物，直接在模型中规划行动序列，或用想象推演训练策略，从而摊薄真实交互的成本。
+
+形式上，MBRL定义为元组$\mathcal{M}_{\mathrm{MDP}} = (\mathcal{S}, \mathcal{A}, P^\star, R, \gamma, \rho_0)$，其中$\mathcal{S}$为状态空间，$\mathcal{A}$为行动空间，$P^\star(\mathbf{s}_{t+1} \mid \mathbf{s}_t, \mathbf{a}_t)$表示真实转移动力学，$R: \mathcal{S} \times \mathcal{A} \to \mathbb{R}$为奖励函数，$\gamma \in [0,1)$为折扣因子，$\rho_0$为初始状态分布。学习目标是寻找策略$\pi_\phi: \mathcal{S} \to \Delta(\mathcal{A})$，最大化期望累积回报：
+\begin{equation}
+    J(\pi_\phi)
+    =
+    \mathbb{E}_{\pi_\phi,P^\star}
+    \left[
+    \sum_{t=0}^{H-1}\gamma^t r_t
+    \right],
+    \qquad
+    r_t = R(\mathbf{s}_t,\mathbf{a}_t).
+\end{equation}
+其关键区别在于学习由$\theta$参数化的\textbf{近似转移函数}$\widehat P_\theta$，以近似真实转移$P^\star$：
+\begin{equation}
+    \widehat P_\theta:
+    \mathcal{S}\times\mathcal{A}\to\Delta(\mathcal{S}),
+    \qquad
+    \widehat{\mathbf{s}}_{t+1}
+    \sim
+    \widehat P_\theta(\cdot\mid\mathbf{s}_t,\mathbf{a}_t),
+\end{equation}
+其中，$\widehat P_\theta$通过最小化经验回放缓冲区（replay buffer）$\mathcal{D} = \{(\mathbf{s}_t, \mathbf{a}_t, \mathbf{s}_{t+1})\}$上的负对数似然来训练：
+\begin{equation}
+\label{eq:learn_dynamic_mbrl}
+    \mathcal{L}_{\mathrm{dyn}}(\theta)
+    =
+    -\mathbb{E}_{(\mathbf{s},\mathbf{a},\mathbf{s}')\sim\mathcal{D}}
+    \left[
+    \log \widehat P_\theta(\mathbf{s}'\mid\mathbf{s},\mathbf{a})
+    \right].
+\end{equation}
+学习$\widehat P_\theta$后，智能体可以完全在模型中进行策略优化，相较于无模型（model-free）方法，大幅提高\textbf{样本效率（sample efficiency）}。
+
+现有MBRL研究主要关注\textit{模型学习（model learning）}与\textit{模型利用（model exploitation）}两个方向。在模型学习方面，PILCO等早期工作\citep{deisenroth2011pilco}用高斯过程刻画动力学的认识不确定性（epistemic uncertainty）；后续方法采用表达能力更强的深度神经网络，包括确定性网络\citep{nagabandi2018mbmf}、概率集成\citep{chua2018pets,janner2019mbpo}，以及联合学习紧凑状态表征与动力学的潜在空间世界模型\citep{hafner2019dreamer,hafner2020dreamerv2,hafner2023dreamerv3}。在模型利用方面，各方法使用所学模型的方式不同：Dyna类方法\citep{sutton1990dyna,janner2019mbpo}将模型作为生成器，扩充经验回放缓冲区，用于离策略（off-policy）策略优化；PETS\citep{chua2018pets}和MPPI\citep{williams2017mppi}等规划方法，通过模型预测控制（model predictive control，MPC）进行\textit{在线轨迹优化}；基于模型的策略梯度方法\citep{heess2015svg,clavera2020mbmpo}则\textit{通过模型推演}反向传播梯度，直接优化策略。这两条研究路线共同揭示了MBRL的核心挑战：学习足够准确的模型，同时高效利用模型进行下游策略优化。因此，下述推理与决策过程应理解为模型利用的具体形式，主要区别在于模型用于后台训练、决策时规划（decision-time planning），还是因果诊断。
+
+\paragraph{作为模型利用的推理与决策。}
+拥有世界模型不等于善用世界模型。\citet{sutton2018rl}将文献中的模型使用方式区分为\emph{后台规划（background planning）}与\emph{决策时规划}。在后台规划中，模型充当数据生成器，将想象轨迹作为改进策略的额外经验，例如Dyna类更新\citep{sutton1991dyna}、为限制模型误差而刻意截短的MBPO模型推演\citep{janner2019mbpo}，以及Dreamer在潜在想象中的演员—评论家学习\citep{hafner2019dreamer}。计算成本在训练时承担，部署时智能体通过将规划计算摊入参数的策略（amortized policy）做出反应。相对地，在前向搜索中，模型在决策时被查询：给定当前状态，智能体模拟候选未来，选择想象后果得分最高的行动。决策时规划能立即适应目标变化，并在推理阶段利用额外计算，但每一步都会重新承受模型误差。这两种方式互补而非竞争；MuZero等现代系统用学习策略提出行动，再通过搜索加以改进。摊销式反应与审议式搜索的取舍，越来越多地被类比于认知中的系统1／系统2区别\citep{kahneman2011thinking}。
+
+前向搜索本身跨越两种方法传统。在连续控制中，规划被表述为行动序列上的轨迹优化，通常嵌入模型预测控制（MPC）：智能体依据模型优化$H$步行动序列，只执行第一个行动，下一步重新规划，以频繁反馈修正模型漂移。内部优化常使用交叉熵方法（cross-entropy method，CEM）；它是一种无导数采样器，反复利用想象轨迹中表现最好的部分重新拟合采样分布，PETS即采用此法\citep{chua2018pets}。后续改进包括模型预测路径积分控制\citep{williams2017mppi}，以及如TD-MPC那样，用已学策略和价值函数为采样提供初始解的混合方案\citep{hansen2022tdmpc}。在离散领域，主要工具是蒙特卡洛树搜索（Monte Carlo tree search，MCTS），在所学策略先验和价值估计的引导下逐步构建搜索树\citep{silver2016alphago,silver2017alphagozero}；MuZero表明搜索可以完全在学习得到的隐式模型中进行，Stochastic MuZero和Sampled MuZero进一步将这一方法扩展到随机动力学及大型或连续行动空间\citep{antonoglou2022stochasticmuzero,hubert2021sampledmuzero}。
+
+当不完美的模型用于决策时，三种失效模式反复出现，推动了近期研究议程。第一是\emph{误差累积（compounding error）}：自回归推演将模型自身预测作为后续输入，单步误差因而不断累积，想象状态分布逐渐偏离训练中见过的状态，误差随时域超线性增长\citep{talvitie2017selfcorrecting,lambert2022compounding}。实际系统通过缩短推演\citep{janner2019mbpo}、在MPC中频繁重规划、采用$\lambda$类多时域估计对想象回报加权，或按集成模型的分歧惩罚轨迹等方式应对；但如何从原理上保证长时域推演可靠，仍未解决，我们也将其视为基于视频生成的世界模型的首要瓶颈。
+
+第二是\emph{目标不匹配（objective mismatch）}：模型训练时最大化预测似然，评估时却看它所支持策略或计划的回报，这两个目标并不一致。将容量用于视觉显著、但与决策无关的细节的模型，可能不如一个预测较不准确、却保留决策相关信息的模型适合规划\citep{lambert2020objectivemismatch}。价值等价（value equivalence）与决策感知模型学习\citep{grimm2020valueequivalence,farahmand2017vaml}，直接用规划器所需的量训练模型，这正是MuZero体现的设计思想。
+
+第三是\emph{乐观—悲观偏差（optimism--pessimism bias）}：规划器会以对抗性的方式使用自身模型，主动寻找预测回报高的行动序列，因此会系统地发现并利用模型的乐观误差。这有时被称为模型误差利用（model exploitation），在离线场景中，也被形容为规划器在没有数据支持的区域“幻觉出”价值。在线学习中，面对不确定性而保持经过校准的乐观是一种优点，可以推动探索\citep{curi2020hucrl}；但在离线或安全关键场景中，它会成为负担。MOPO和MOReL等保守方法从想象奖励中扣除不确定性惩罚，或终止离开数据流形的推演\citep{yu2020mopo,kidambi2020morel}。决定系统应处在乐观—悲观连续谱的何处，不是一个超参数细节，而是决定智能体在多大程度上信任自身世界模型；正如下文所论述，这个问题同样适用于部署在物理环境中的基础模型规模世界模型。
+
+两种代表范式实现了上述模型利用方式。MuZero\citep{schrittwieser2020muzero}不同于在物理状态上显式近似转移函数$\widehat P_\theta$的传统MBRL方法：它学习价值等价的潜在动力学模型，完全在潜在空间内进行蒙特卡洛树搜索，无需显式环境先验，便在游戏中取得超人表现。Dreamer家族\citep{hafner2019dreamer,hafner2020dreamerv2,hafner2023dreamerv3}则采用循环状态空间模型（RSSM）想象潜在推演，通过演员—评论家学习优化策略，在视觉连续控制中表现出很高的样本效率。尽管这两种范式显著推进了MBRL，其世界模型仍限于特定任务和可控情境，每个新任务都需要从头训练。因此，近期研究转向在大规模异构数据上预训练的通用世界模型。例如，DreamZero\citep{ye2026dreamzero}以预训练视频扩散骨干构建世界—行动者模型（原文为World-Actor-Model，WAM），联合预测未来视频帧与机器人行动。它将视频视为物理动力学的密集表征，无需重复性演示即可学习多样技能，实现物理情境中的零样本任务泛化与少样本本体适应，同时保持7\,Hz实时闭环控制。这一路线将MBRL从特定环境的模型学习，扩展到预训练通用世界模型，使世界模型不只作为改进策略的替代模型，而成为蕴含广泛物理先验的基础。
+
+\paragraph{MBRL中的仿真到现实差距。}
+将MBRL部署到真实具身系统的一个根本障碍，是仿真到现实差距（sim2real gap），即$\widehat P_\theta$所学动力学与目标环境真实物理动力学$P^\star$之间的差异。在MBRL中，这一差距体现在两个层面：（i）$\widehat P_\theta$学习不完善造成的\textit{模型偏差（model bias）}，即使在训练分布内也会引入系统性预测误差；（ii）\textit{分布变化}，即策略$\pi_\phi$部署时访问的状态偏离模型训练时遇到的状态，使模型无法可靠外推\citep{janner2019mbpo,ross2011dagger}。可以从模型差异与策略部署的角度来表述这一问题。
+
+缩小差距的办法可概括为：提高模型利用过程中的保真度，或提高策略执行时的鲁棒性。DreamZero\citep{ye2026dreamzero}采取了最直接的方式：以在大规模真实视频上预训练的视频扩散骨干构建世界模型，使动力学先验立足于真实物理观测，而非模拟观测。不过，DreamZero并未从理论上解决协变量变化和误差累积，只是通过技术手段加以缓解。这一范式也有若干限制：1）预训练计算开销较大，而且控制频率仍远低于动态或灵巧操作任务所需的高频控制要求\footnote{译注：原文第1点将“预训练计算开销”与“高频控制速率”直接比较，量纲不一致；此处依据前文7\,Hz控制频率及本句上下文，将两项限制分别表达。}；2）依赖完整真实数据学习，因此在机器人本体层面需要大量数据；3）行动预测质量根本上受视频生成质量制约；4）当前框架不支持多本体联合训练，限制了跨本体泛化的可扩展性。
+
+由于MBRL智能体拥有显式预测模型，它们也能从原理上回答探索问题：寻找模型会出错的经验。好奇心驱动探索通过将模型误差或不确定性转化为\emph{内在奖励（intrinsic reward）}来实现这一点。内在好奇心模块等预测误差方法，按照前向模型在所学特征空间中的意外程度给予奖励\citep{pathak2017curiosity}；随机网络蒸馏则提供了衡量状态新颖性的鲁棒替代指标\citep{burda2019rnd}。信息论表述将探索重新理解为动力学的主动学习，奖励关于模型参数的期望信息增益\citep{houthooft2016vime}。Plan2Explore表明，智能体可以利用世界模型\emph{规划如何遭遇意外}：寻找潜在动力学模型集成中分歧较大的状态，从而学习不依赖具体任务、可以零样本迁移到下游奖励的世界模型\citep{sekar2020plan2explore}。因此，内在奖励在世界模型研究中具有双重作用：既是获取互联网视频无法提供的稀缺具身交互数据的机制，也是模型主动指导数据采集、进而改进自身的早期范例。本文后续还将多次讨论这一自我改进循环。
+
+\subsection{在世界模型内部学习策略}
+在讨论如何把想象未来转化为行为之前，有必要明确区分经典MBRL与前述WAM范式的结构差异。如上所述，传统MBRL将模型学习与策略优化解耦：先最小化状态预测负对数似然（式\eqref{eq:learn_dynamic_mbrl}），拟合显式转移模型$\hat{P}_\theta$以近似$P^\star$；然后才通过后台规划、决策时搜索或想象推演上的演员—评论家学习，利用模型改进另一套参数化策略$\pi_\phi$。WAM偏离这一两阶段方法，在单一生成过程中耦合动力学预测与行动生成，从视频—行动数据联合学习，而非采用专门的$(s,a,s')$转移目标\citep{ye2026dreamzero,wang2026wam_survey}。WAM共同建模预测未来状态及实现该状态的行动：可以采用先想象未来、再导出行动的级联分解，也可以采用状态与行动的完全联合分布\citep{ye2026dreamzero}。因此，在系统层面，“模型”与“策略”之间不再有清楚的分界。
+
+这一架构变化以一组优势换取另一组优势。解耦MBRL保留可检查、可替换的动力学模型，可以使其训练目标感知决策需求\citep{grimm2020valueequivalence,farahmand2017vaml}，并显式量化认识不确定性，用于保守规划\citep{chua2018pets,janner2019mbpo}。但相应地，它更易受到预测似然与下游控制性能之间目标不匹配的影响\citep{lambert2020objectivemismatch}；动力学模型通常针对特定任务和机器人本体，也难以充分利用占现有物理数据主体、互联网规模且大多无行动标签的视频。相反，WAM从视频—行动预训练直接继承广泛物理先验，已被证明能够在维持实时闭环控制的同时，支持零样本任务泛化和少样本本体适应\citep{Ye2026b}。代价是失去解耦模型学习所提供的模块性与经过校准的不确定性：联合形式更难分离动力学误差与策略误差，预测行动保真度受底层视频生成骨干保真度制约；如前所述，当前实现也相对依赖大量机器人本体数据，并不适合进行基于集成或不确定性的MBRL所提供的、具有原理依据的分布外（out-of-distribution，OOD）检测。
+
+世界模型对具身智能有用，不仅在于预测未来观测，还在于其内部未来能够转化为行动。这使关注点从经典MBRL中的模型利用，转向在模型表征空间\emph{内部}学习策略。Dreamer家族是典型例子。Dreamer学习循环状态空间模型（RSSM），将观测历史压缩为随机潜变量，预测奖励和过程继续的可能性，并在候选行动下展开潜在轨迹\citep{hafner2019dreamer,hafner2020dreamerv2,hafner2023dreamerv3}。演员和评论家网络在这些想象轨迹上训练：价值估计提供长时域学习信号，演员则将规划摊入反应式策略。因此，模型不只是合成数据生成器，还定义了改进行为所依赖的状态抽象、想象时域和承载梯度的接口。DreamerV2与DreamerV3进一步表明，通过离散潜变量、鲁棒的奖励／价值变换，以及跨不同领域基本固定的超参数，这一方法可以扩展到连续控制之外。
+
+在具身基础模型中，同一问题以不同接口再次出现：策略应直接解码行动，还是以显式未来预测为行动依据？RT-2等视觉—语言—行动（vision-language-action，VLA）模型\citep{zitkovich2023rt}扩展预训练视觉语言模型，将机器人行动表示为以图像和语言为条件的输出词元。其优势在于语义迁移：互联网规模预训练帮助机器人理解机器人数据集中少见的物体、指令和关系。然而，连接行动与未来后果的物理动力学，在行动词元映射中大多仍是隐式的。世界行动模型（WAM）使这一通道显式化。依照具身世界模型观点，世界模型可以充当数据引擎（data engine）、策略评估器、规划模块或机器人端侧大脑\citep{shang2026survey}；WAM联合预测未来感知状态与行动，把视频视为物理变化的密集载体。DreamZero是这一范式的代表：它建立在预训练视频扩散骨干上，共同生成未来视频与机器人行动，使策略成为对想象世界演化的读出，而不仅是直接模仿的输出头\citep{ye2026dreamzero}。简言之，VLA问的是“给定这一指令和观测，接下来应输出哪个行动词元”，WAM问的则是“应当发生怎样的未来，以及什么行动序列能实现它”。
+
+因此，在世界模型内部学习策略与MBRL相邻，却比MBRL更广泛。MBRL提供决策论基础：预测模型应改善控制。本小节强调这一思想的架构演化：从Dreamer中针对特定任务的潜在想象，到VLA中的基础模型策略，再到预测与行动生成耦合的WAM。模型偏差、误差累积、延迟和分布变化等风险依旧存在，但世界模型从辅助转移近似器，变成了表示、优化和泛化策略所依赖的计算基础。
+
+\subsection{想象链：通过世界模型进行推理}
+经典世界模型将想象作为规划基础：智能体把经验压缩为潜在状态，推演可能未来，并在所学模拟器中优化行动或价值\citep{ha2018worldmodels,hafner2019dreamer,Schrittwieser2020}。想象链（Chain-of-Imagination，CoI）标志着更鲜明的转变。世界模型不再只是被外部规划器查询的模拟器，而成为推理本身展开的计算媒介。在这一观点下，思考不一定是一句话，也可以是所学动力学空间中以行动为条件的转移。
+
+这一重新表述受到潜在推理的启发。思维链（chain-of-thought，CoT）提示表明，中间计算能够使困难推理变得可处理\citep{wei2022chain}；但对具身决策而言，自然语言不是高效的载体：它把几何、动力学、不确定性和可供性串行化为词元，而这些词元可能与控制联系薄弱。Coconut允许大语言模型将连续隐藏状态作为“连续思考”回馈模型，避免过早确定离散文本，并在潜在空间保留尚未解决的备选项，从而明确揭示了表征问题\citep{hao2024coconut}。对具身智能体而言，类似的工作空间是时空信念状态：
+\begin{equation}
+    \mathbf{z}_t
+    =
+    E_\eta(\mathbf{o}_{\le t},\mathbf{a}_{<t}),
+\end{equation}
+它在策略确定行动之前，概括当前场景、交互上下文与不确定性。
+
+因此，通用CoI推理轨迹应当区分审议深度与假说多样性。令$B_t$表示想象分支数，$K_b$表示分支$b$的推演深度，则
+\begin{equation}
+  \begin{aligned}
+    \mathcal{C}_t &=
+    \left\{
+    \left[
+    (\mathbf{a}_{b,1}, \widehat{\mathbf{z}}_{b,1\mid t}),
+    \ldots,
+    (\mathbf{a}_{b,K_b}, \widehat{\mathbf{z}}_{b,K_b\mid t})
+    \right]
+    \right\}_{b=1}^{B_t},
+    \\[3pt]
+    \widehat{\mathbf{z}}_{b,k\mid t}
+    &=
+    W_\theta(\widehat{\mathbf{z}}_{b,k-1\mid t}, \mathbf{a}_{b,k}),
+    \quad
+    \widehat{\mathbf{z}}_{b,0\mid t}=\mathbf{z}_t ,
+  \end{aligned}
+\end{equation}
+最终决策同时以当前信念和想象的反事实为条件：
+\begin{equation}
+    \widehat{\mathbf{a}}_t
+    =
+    \pi_\phi\!\left(
+    \mathbf{z}_t,
+    \operatorname{Agg}_\psi(\mathcal{C}_t)
+    \right).
+\end{equation}
+这一抽象刻画了CoI的本质：推理是一组具有结构的、想象的行动—后果配对，而非事后的语言理由。
+
+近期系统实现了这一设计空间中的不同位置。MineDreamer提供视觉形式的CoI：逐步想象目标图像，并将其作为低层控制的视觉提示，使中间想象可以直接指导行动\citep{zhou2024minedreamer}。LCDrive把这一思想转移到用于端到端驾驶的紧凑潜在空间。它的潜在思维链交替放置行动提议词元与潜在世界模型预测词元，使每个候选机动在解码最终轨迹前，都根据其预测后果接受评估\citep{tan2025lcdrive}。关键在于，提议词元与策略共享行动词表，而世界模型词元使推理轨迹依托反事实动力学；因此，推理与控制在表征层面相互对应，而非靠事后解释连接。FutureX进一步提出一个系统层原则：审议计算应当按需分配，而非盲目消耗。其Auto-think Switch将常规场景交给即时策略，只在困难场景启用潜在世界模型推演；此时，汇总器利用想象的未来潜变量改进初始轨迹\citep{lin2025futurex}。更一般地，可将自适应CoI视为学习
+\begin{equation}
+    (B_t,K_t)=\rho_\omega(\mathbf{z}_t),
+\end{equation}
+使推理预算受风险、不确定性、交互复杂度及延迟约束支配。
+
+因此，CoI是思维链推理与世界模型想象的汇合。思维链提供审慎的中间计算，世界模型提供有物理依据的反事实动力学，CoI将二者融合为想象行动及其后果的时空链。训练目标不应奖励仅仅听起来合理的解释，而应奖励能够改善决策的内部未来。高质量CoI需要潜在未来监督、行动与推理一致性、轨迹级或奖励级反馈、不确定性校准，以及选择性计算。其主要风险同样明确：未经校准的世界模型会把推理变成结构化幻觉。CoI的前景不是使智能体更善于解释行动，而是使它们使用行动所依赖的同一组变量进行思考。
+
+\subsection{物理信息驱动与约束学习}
+与纯数据驱动世界模型学习互补的方向，是将物理结构直接注入学习过程。动机很直接：世界模型不仅应生成看似合理的未来，还应生成符合物理世界规律的容许轨迹。这些规律可能表现为微分方程、守恒律、边界条件、物体恒存性、接触约束、稳定性要求或已知因果机制。从这个意义上说，物理信息驱动学习（physics-informed learning）提供一种归纳偏置，将假说空间从所有统计上可能的未来，收窄至同时具有物理连贯性的未来。
+
+不过，物理知识的嵌入方式，在所能提供的保证强度及其在模型中的作用位置上，差异很大。可以按结构约束逐渐增强的三个层次组织现有方法：\emph{基于惩罚的软约束（soft constraint）}，将物理规律编码为辅助损失项；\emph{基于架构的硬约束（hard constraint）}，将物理规律内置于模型，使其由构造保证成立；\emph{物理—学习混合方案（hybrid physics--learning scheme）}，采用双通路设计，将可微物理引擎与学习组件耦合。这些层次在灵活性、所得模型的可靠性及分布外行为之间进行取舍。
+
+\paragraph{基于惩罚的软约束。}
+最常见、侵入性最小的办法，是将物理残差作为软惩罚加入训练目标。一般目标可写为
+\begin{equation}
+    \mathcal{L}
+    =
+    \mathcal{L}_{\mathrm{pred}}
+    +
+    \lambda_{\mathrm{dyn}}\mathcal{L}_{\mathrm{dyn}}
+    +
+    \lambda_{\mathrm{cons}}\mathcal{L}_{\mathrm{cons}}
+    +
+    \lambda_{\mathrm{bc}}\mathcal{L}_{\mathrm{bc}},
+\end{equation}
+其中，$\mathcal{L}_{\mathrm{pred}}$度量观测空间或潜在空间的预测误差，$\mathcal{L}_{\mathrm{dyn}}$惩罚对已知运动方程的违反，$\mathcal{L}_{\mathrm{cons}}$施加守恒性或不变性要求，$\mathcal{L}_{\mathrm{bc}}$编码边界、接触或可行性约束。这与物理信息神经网络（physics-informed neural network，PINN）密切相关：后者使用神经函数近似器，同时用控制方程和边界条件加以正则化\citep{raissi2019physics}。对于世界模型，这一思想不仅适用于连续物理场，也适用于潜在状态转移、物体轨迹、接触事件和行动条件推演。由于物理规律仅以加权惩罚进入，约束是\emph{受到鼓励，而非得到保证}：它易于附加到几乎任何可微模型上，但当数据项压过惩罚项时，预测轨迹仍可能违反预期规律；而不同项的尺度和优化刚性不同，平衡各个乘子$\lambda$通常也很困难。
+
+\paragraph{基于架构的硬约束。}
+更强的物理信息驱动学习将约束内置于架构，而非作为额外损失，使相关物理规律由构造保证满足。哈密顿、拉格朗日、辛及端口哈密顿神经网络，不直接预测任意状态更新，而是参数化能量函数或结构化动力系统，再由此导出演化规律，从而在积分误差之外精确守恒能量或动量\citep{greydanus2019hamiltonian,cranmer2020lagrangian,zhong2020symplectic}。类似地，基于图的神经模拟器将粒子、网格或物体作为节点，将物理相互作用作为边，以编码局部性和关系性交互，将平移不变性与成对交互结构内置于模型\citep{sanchez2020learning,pfaff2021learning}。这类结构保持设计尤其适合长时域预测：不受约束的推演误差常累积为物理上不可能的状态，而在架构中编码不变量可以减少能量漂移、改善稳定性，并提高训练分布外的泛化能力。代价是灵活性下降，并且依赖所假定结构的正确性：若硬约束编码了错误不变量，就会以软惩罚不会造成的方式使模型产生偏差。
+
+\paragraph{物理—学习混合方案。}
+第三条路线采用双通路设计，将显式、可微物理引擎与所学神经组件耦合，结合前两层的优势。当部分底层物理规律已知时，可以将可微模拟器嵌入世界模型，使梯度穿过物理状态更新、碰撞处理或控制目标\citep{de2018end,hu2020difftaichi,freeman2021brax}。学习则聚焦于未知或难以建模的组成部分，如摩擦、阻力、执行器延迟、可变形接触、材料参数，或残余的仿真到现实差距。这一混合策略通常比从头学习完整转移函数更节省数据：解析物理提供粗略的因果骨架，神经组件补偿模型不匹配。在具身场景中，这尤其有价值，因为真实交互数据昂贵，微小预测误差也可能导致不安全或无效的计划。实际中，这一层与上一层的边界并不清晰：当支配形式仅部分已知时，拉格朗日和哈密顿网络等基于架构的组件，也可以充当混合方案的解析通路。
+
+不过，对视觉世界模型而言，物理知识虽有帮助，却并不完备。原始观测包含光照、纹理、遮挡、相机运动、背景杂乱及其他并不直接属于物理状态的因素。因此，在像素空间直接强制施加物理规律，可能过于严格。更适合的策略，是约束对应行动相关物理量的潜在变量，而将外观因素交给更灵活的生成组件。这提示一种分层设计：感知模块从观测推断紧凑物理状态，结构化动力学模块在行动作用下演化这些状态，渲染或解码模块再将潜在状态映射回观测。在这种设计中，物理约束不必解释每个像素，却应约束对预测、干预与控制重要的变量。
+
+物理信息驱动学习也澄清了视觉可信与物理正确之间的重要区别。视频预测模型可能生成逼真的帧，却仍违反物体恒存性、动量守恒、接触一致性或对行动的因果响应。反过来，具有物理结构的模型可能准确预测粗粒度轨迹，却生成视觉上不完美的图像。这种张力是世界模型的核心问题：模型最终必须同时支持高保真感知与可靠物理推理。因此，物理信息驱动与约束学习不应被视为大规模自监督的替代品，而应被视为使所学表征符合规划和决策所需不变量的机制。
+
+尽管前景可期，约束学习也带来自身困难。软物理惩罚难以与重建或预测损失平衡，尤其在各项尺度或优化刚性不同的情况下。假定结构正确时，硬约束可以改善外推；但当先验不完整或错误时，也可能使模型产生偏差。现实系统还涉及部分可观测性、不连续接触、隐藏材料属性、耗散、多物理场耦合及随机外部扰动，都使精确物理建模变得困难。因此，中心问题不是世界模型应当纯数据驱动还是基于物理，而是应在何处、以多大强度施加物理结构。
+
+因此，最可能的前进道路是混合式的。未来世界模型很可能从广泛观测与交互数据中学习，同时在最需要可靠性的层次选择性施加物理约束，包括潜在状态表征、转移动力学、数值积分、接触处理及规划时可行性。从这个角度看，物理信息驱动学习不仅是提高预测准确性的技术，也是使世界模型部署到物理世界时具有更强因果性、可解释性与可信度的办法。
+
+\subsection{反事实推理}
+传统世界模型回答预测问题：给定当前状况，在不同行动下，哪些未来是合理的？反事实推理（counterfactual reasoning）提出更尖锐、更具诊断性的问题：给定实际发生的这一段经历，如果其中一个决策不同，同一段经历会怎样？从这个意义上说，反事实推理将世界模型从可能未来的模拟器，转化为因果归因工具。关键不只是生成另一条可信推演，而是在重演同一世界时，仅精确改变所分析的决策。
+
+这一思想可以用结构因果模型（structural causal model，SCM）形式化：
+\begin{equation}
+    \mathcal{M}_{\mathrm{SCM}}
+    =
+    (\mathcal{U},\mathcal{V},\mathcal{F},P_{\mathcal{U}}),
+\end{equation}
+其中，$\mathcal{U}$表示外生背景变量（exogenous background variable）空间，$\mathcal{V}$表示模型内部的内生变量（endogenous variable），$\mathcal{F}$表示决定变量如何相互影响的机制，$P_{\mathcal{U}}$表示潜在情境的分布。反事实\(Y_x(u)\)的含义是：保持背景情境\(u\)相同，用干预\(X=x\)替换\(X\)的机制，再问\(Y\)在修改后的模型$(\mathcal{M}_{\mathrm{SCM}})_x$中取何值。观测到事实信息\(E=e\)后，相应查询为
+\begin{equation}
+    \mathbb{P}_{\mathcal{M}_{\mathrm{SCM}}}(Y_x \mid E=e)
+    =
+    \int
+    \mathbb{P}_{(\mathcal{M}_{\mathrm{SCM}})_x}(Y\mid U=u)\,
+    p_{\mathcal{M}_{\mathrm{SCM}}}(u\mid E=e)\,du .
+\end{equation}
+该式只是以下三步过程的形式化：推断哪些隐藏情境造成了事实经历；通过干预改变一个机制；在保持所推断背景不变的条件下，预测后果\citep{pearl2009causality,rubin1974estimating}。
+
+这通常称为“溯因—行动—预测（abduction--action--prediction）”流程。\textbf{溯因}重建观测轨迹背后的潜在情境：隐藏状态、未观测上下文、物理参数、随机噪声或其他智能体的意图。\textbf{行动}进行精确的局部修改，例如用\(do(A_t=\mathbf{a}')\)替换事实行动\(A_t=\mathbf{a}\)。\textbf{预测}在同一组溯因得到的情境下，向前运行修改后的模型。因此，反事实不是问采取行动\(\mathbf{a}'\)后通常会发生什么，而是问在这里、就在这一段经历中，如果选择了\(\mathbf{a}'\)，会发生什么。这就是为什么一般而言，
+\begin{equation}
+    \mathbb{P}(Y_{\mathbf{a}'}\mid E=e)
+    \neq
+    \mathbb{P}(Y\mid A_t=\mathbf{a}',E=e).
+\end{equation}
+右侧比较的是恰好采取了\(\mathbf{a}'\)的其他经历，它们可能涉及不同状态、目标、噪声、对手或环境。左侧则保持事实世界不变，只改变决策\citep{pearl2009causality,pawlowski2020deep}。
+
+这一区别的实际重要性在于“同一世界”约束。一个模型即使能在两种行动下生成两条视觉可信的推演，如果两条推演的隐藏背景因素不同，它仍可能不具备反事实能力。例如，评估机器人抓取时，改变抓取方向应当改变物体后续运动，而不是改变其质量、身份、光照或摩擦。如果这些背景因素悄然变化，模型就没有分离出决策效应，而是改变了世界本身。因此，真正的反事实对比形式为
+\begin{equation}
+    \Delta_Y(\mathbf{a}',\mathbf{a}\mid E=e)
+    =
+    \mathbb{E}_{\mathcal{M}_{\mathrm{SCM}}}
+    \left[
+    Y_{\mathbf{a}'}-Y_{\mathbf{a}}
+    \mid E=e
+    \right],
+\end{equation}
+由于潜在情境保持不变，其中差异可以归因于决策。这类对比是因果信用分配（causal credit assignment）、遗憾分析、策略调试、离策略解释和安全评估的核心。
+
+这也解释了为什么反事实世界模型需要超越准确的下一步预测。观测预测可以学习某些事件往往接在其他事件之后，却不能单凭这一点确定：在相同潜在情境中采取另一行动，会发生什么。要支持反事实推断（counterfactual inference），模型不仅要学习时间规律，还要学习区分可操纵变量、不变机制与无关上下文的因果结构。干预数据或带行动标签的数据有助于区分\(P(Y\mid A)\)与\(P(Y\mid do(A))\)；配对模拟和反事实数据增强提供相同上下文下的直接对比；不变表征目标则促使模型将不变因果机制与变化背景条件分离\citep{scholkopf2021toward,pitis2022mocoda,richens2024robust,gupta2024essential}。溯因步骤尤其重要：如果没有经过校准的外生因素后验，所谓反事实推演就只是披上因果语言的条件生成。
+
+局限同样根本。仅凭观测预测准确，通常无法识别反事实。多个结构模型可能在观测分布上相同，甚至在干预分布上也相同，却对\(Y_x\)等反事实量给出不同结论，因为它们对事实世界与假想世界之间的耦合做出了不同编码。深度生成参数化并不能消除这一歧义。单调性、可逆性、模块性、已知机制或足够丰富的干预等假设，属于结构性承诺，而不是扩大规模的自动结果\citep{bareinboim2022pearl,nasr2023counterfactual}。因此，具备反事实能力的世界模型，应当将反事实有效性视为语义约束，而不只是视觉或预测约束。它必须保留事实观测信息，保持外生因素的同一性，只修改被干预的机制，遵守因果支持范围，并避免不可能或分布外行动。当这些条件无法验证时，适当输出不应是一条充满自信的想象轨迹，而应是不确定性、界限，或对所假设因果结构的敏感性。
+
+\subsection{长时域与层级规划}
+世界模型使长时域规划变得可处理，靠的不是推演得更远，而是改变规划单位。对原始行动进行平坦规划，会面临指数级分支、薄弱的信用分配，以及被优化器放大的模型误差。因此，有用的世界模型会学习可控性的决策几何：哪些潜在区域可达，哪些转移可靠，哪些事件应当成为子目标。在部分可观测条件下，这种几何由循环信念承载，并通过紧凑潜在动力学进行想象：
+\begin{equation}
+    b_t
+    =
+    \mathcal{B}_\theta(b_{t-1},\mathbf{a}_{t-1},\mathbf{o}_t),
+    \qquad
+    \widehat{\mathbf{z}}_{t+1\mid t}
+    \sim
+    \widehat p_\theta(\cdot\mid \mathbf{z}_t,\mathbf{a}_t),
+    \label{eq:belief-world-model}
+\end{equation}
+由此，规划转化为信念上的反事实搜索。这将Dyna类模拟与World Models、PlaNet、Dreamer以及MuZero类价值等价规划联系起来：模型是否有用，取决于它能否保留奖励、价值、可达性和行动相关因果结构\citep{sutton1991dyna,ha2018worldmodels,hafner2019planet,hafner2019dreamer,Schrittwieser2020}。
+
+层级规划（hierarchical planning）将这种几何转化为时间分解。经典选项框架（options）和MAXQ形式化了时间延展行动与价值分解，现代世界模型智能体则学习目标空间本身\citep{sutton1999between,dietterich2000maxq}。高层策略选择潜在子目标、技能或瓶颈状态，低层策略通过反馈控制将其实现：
+\begin{equation}
+    \mathbf{g}_k
+    \sim
+    \pi_{\mathrm{hi}}(\cdot\mid b_{t_k},\mathbf{m}_{t_k}),
+    \qquad
+    \mathbf{a}_t
+    \sim
+    \pi_{\mathrm{lo}}(\cdot\mid b_t,\mathbf{g}_k),
+    \quad
+    t_k\le t<t_{k+1}.
+    \label{eq:hierarchical-policy}
+\end{equation}
+收益不仅是推演变短，更在于搜索问题的熵降低：当每次抽象决策对应一个可执行闭环技能时，$H$个原始行动便可替换为$K\ll H$次抽象决策。Director从像素出发，在潜在目标上规划，实现了这一思想；THICK则展示层级世界模型如何揭示多时间尺度、可解释的时间抽象\citep{hafner2022director,gumbsch2024learning}。无法执行的子目标并非抽象，而是模型制造的虚构。
+
+记忆提供时间连续性。工作记忆（working memory）在信念状态中维持隐藏变量、指令、既定安排和近期失败。情景记忆（episodic memory）检索具体轨迹——罕见成功、死路和标志性转移——为子目标提供初始候选、约束推演，或提供非参数价值依据。MERLIN、Neural Episodic Control、GEM和R2I展示了决策中互补的预测式、情景式与序列级记忆\citep{wayne2018merlin,pritzel2017neural,hu2021gem,samsami2024mastering}。因此，记忆不是辅助缓存，而是约束规划器可以把什么视为可能。
+
+主要失效模式是模型设定错误下的幻觉式规划。由于规划在所学模型内优化，它会主动寻找模型误差：一个在想象中最优的策略，在环境中可能不可行或不安全。一项诊断指标是有限时域价值差：
+\begin{equation}
+    \Delta_H(\pi_\phi;b_t)
+    =
+    \left|
+    V_{\widehat p_\theta,H}^{\pi_\phi}(b_t)
+    -
+    V_{P^\star,H}^{\pi_\phi}(b_t)
+    \right|,
+    \label{eq:model-misspecification-error}
+\end{equation}
+当推演离开数据支持区域时，这一差距可能增长。层级结构缩短推演，并允许在子目标边界重规划；但若抽象转移没有根据真实执行校准，也会放大幻觉。因此，鲁棒智能体将想象视为提案机制，而非预言机：推演长度、价值展开、不确定性、情景检索、可行性检查与在线修正，都必须让想象未来立足于经验\citep{talvitie2017self,jafferjee2020hallucinating}。世界模型并未消除规划风险，而是将其转移到表征、记忆与校准之中。

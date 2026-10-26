@@ -50,10 +50,13 @@ scripts/                          仓库维护检查工具
 | [Causal Inference: What If](07_2026_Causal_Inference_What_If/) | 因果推断：如果 | [PDF](00_books/Causal_Inference_What_If_cn_translated.pdf) | 346 |
 | [The Little Book of Generative AI Foundations: An Intuitive Mathematical Primer](08_2026_The_Little_Book_of_Generative_AI_Foundations/) | 生成式人工智能基础小册：直观数学导论 | [PDF](00_books/The_Little_Book_of_Generative_AI_Foundations_cn_translated.pdf) | 196 |
 | [The Principles of Diffusion Models](09_2026_The_Principles_of_Diffusion_Models/) | 扩散模型原理 | [PDF](00_books/The_Principles_of_Diffusion_Models_cn_translated.pdf) | 450 |
+| [A Definition and Roadmap for World Models](10_2026_A_Definition_and_Roadmap_for_World_Models/) | 世界模型的定义与发展路线图 | [PDF](00_books/A_Definition_and_Roadmap_for_World_Models_cn_translated.pdf) | 63 |
 
 《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 
 《扩散模型原理》于2026-10-25初始化：归档英文v3源码与PDF、用户提供的450页中文PDF，并整理[术语表](09_2026_The_Principles_of_Diffusion_Models/02_glossary/glossary_en_zh.md)。对应中文TeX已缺失，整本复核与源码重建尚未启动；汇总目录中的PDF沿用用户提供的文件。
+
+《世界模型的定义与发展路线图》于2026-10-26依据用户提供的arXiv:2607.06401v1源码完成全文翻译，在原article/COLM模板上调整中文排字：正文11pt、行距17.6pt，宋体正文配黑体标题。包含八节正文、十幅原图、中文图注与表格、贡献者及253条参考文献。十幅图没有图内源码，保持原图及图内英文；专业术语首次出现保留英文括注，PDF链接边框隐藏且保留点击跳转。中文TeX、术语表和构建入口见[论文工程](10_2026_A_Definition_and_Roadmap_for_World_Models/)。原文明确笔误按译排体例说明。
 
 当前底本与内容范围：
 
@@ -66,6 +69,7 @@ scripts/                          仓库维护检查工具
 - **Causal Inference: What If：** 3 个分部、23 章、引言、参考文献及索引；当前中文成品为包含书后材料的 346 页版本。
 - **The Little Book of Generative AI Foundations：** arXiv:2605.29713v2，2026-09-08；8章、前言、结语、附录A—B和参考文献，已对照英文源码校订并重新编译。
 - **The Principles of Diffusion Models：** 英文底本为arXiv:2510.21890v3，封面日期2026-08-27；四个分部、第1—12章（第12章属尾声与展望）、附录A—D和参考文献，另有摘要、致谢、前言及符号说明。中文PDF已归档，中文TeX待恢复。
+- **A Definition and Roadmap for World Models：** arXiv:2607.06401v1；8节、28个小节、1个定义、19个编号公式、10幅图、1张表，以及摘要、贡献者和253条被引文献。
 
 ## 新增与维护书籍
 
@@ -78,7 +82,7 @@ scripts/                          仓库维护检查工具
 
 ## 编译
 
-先阅读目标书 `01_source/README_build.txt`，确认引擎、字体、文献和索引工具。前八本工程在 Windows、Python 3、TeX Live 2026 及相应中文字体环境下验证；《扩散模型原理》因中文TeX缺失，当前入口只说明缺失状态并退出。新增或待恢复工程按自身说明记录依赖。
+先阅读目标书 `01_source/README_build.txt`，确认引擎、字体、文献和索引工具。前八本工程在 Windows、Python 3、TeX Live 2026 及相应中文字体环境下验证；《扩散模型原理》因中文TeX缺失，当前入口只说明缺失状态并退出。《世界模型的定义与发展路线图》使用XeLaTeX、BibTeX和TeX Live自带的Fandol字体，已从新的临时源码目录编译。新增或待恢复工程按自身说明记录依赖。
 
 进入对应书籍的 `01_source/`，运行：
 

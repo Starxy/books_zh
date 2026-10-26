@@ -1,8 +1,8 @@
 {
-  "organized_on": "2026-10-25",
+  "organized_on": "2026-10-26",
   "root": ".",
   "operation": "保留TeX底本与必要PDF资料，完整中文译本统一保存在00_books。",
-  "status": "九本中文PDF已归档；第九本《扩散模型原理》已初始化并整理术语，中文TeX缺失，整本复核尚未启动。",
+  "status": "十份中文PDF（九本书籍与一篇论文）已归档；《扩散模型原理》的中文TeX仍缺失，整本复核尚未启动。",
   "subfolders": [
     "00_originals",
     "01_source",
@@ -308,6 +308,39 @@
       "build_status": "unavailable_chinese_tex_missing",
       "glossary": "09_2026_The_Principles_of_Diffusion_Models/02_glossary/glossary_en_zh.md",
       "current_pdf_origin": "用户提供的既有中文PDF，归档时内容未改动；尚未确认其逐节内容与英文v3一致。"
+    },
+    {
+      "title": "A Definition and Roadmap for World Models",
+      "chinese_title": "世界模型的定义与发展路线图",
+      "author": "Physical Intelligence Team, Shanghai AI Laboratory",
+      "document_type": "perspective_article",
+      "folder": "10_2026_A_Definition_and_Roadmap_for_World_Models",
+      "original_name": "arXiv-2607.06401v1 (1).tar.gz",
+      "renamed_file": "2026_A_Definition_and_Roadmap_for_World_Models_arXiv-2607.06401v1_EN.pdf",
+      "relative_path": "10_2026_A_Definition_and_Roadmap_for_World_Models/00_originals/2026_A_Definition_and_Roadmap_for_World_Models_arXiv-2607.06401v1_EN.pdf",
+      "version": "arXiv:2607.06401v1; identifier from user-supplied archive filename",
+      "pages": 58,
+      "bytes": 8963327,
+      "sha256": "812096cd4c84d8fd99cc31b1953cda7577c7fb5c0a2b622e29e26b2284f9c052",
+      "original_pdf_origin": "使用用户提供的v1 TeX源码在TeX Live 2026中重建，非另行下载的版本。",
+      "translation_status": "已完成v1全文翻译，在原TeX模板上优化中文字体、字号与间距；专业术语首次出现附英文，链接可点击且无边框；十幅无图内源码的成图原样保留。",
+      "translated_pdf": "00_books/A_Definition_and_Roadmap_for_World_Models_cn_translated.pdf",
+      "translated_pages": 63,
+      "translated_bytes": 7972255,
+      "translated_sha256": "d3a86778bfa4448b9f674834ca7ae2fe74e1c263c644b02c66a2b5fa7c787d0c",
+      "chinese_source": "10_2026_A_Definition_and_Roadmap_for_World_Models/01_source",
+      "build_command": "python \"10_2026_A_Definition_and_Roadmap_for_World_Models/01_source/build.py\"",
+      "description": "8节及28小节、1个定义、19个编号公式、10幅原图、1张中文表格、摘要、贡献者和253条被引文献；以原article/COLM模板为基础，正文11pt、行距17.6pt。",
+      "source_route": "tex",
+      "tex_source": "10_2026_A_Definition_and_Roadmap_for_World_Models/00_originals/arXiv-2607.06401v1.tar.gz",
+      "tex_source_sha256": "9a56d921b72c99cb88bf6b366b2fe8386890b3bd584a22baaee2dc94445fef91",
+      "english_main": "main.tex",
+      "english_compiler": "pdflatex",
+      "english_bibliography": "bibtex",
+      "imported_on": "2026-10-26",
+      "translation_completed_on": "2026-10-26",
+      "glossary": "10_2026_A_Definition_and_Roadmap_for_World_Models/02_glossary/glossary_en_zh.md",
+      "build_status": "passed_from_fresh_source_copy"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
@@ -325,7 +358,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 3419,
+  "translated_pages_total": 3482,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -341,7 +374,7 @@
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 9,
+  "collection_count": 10,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",

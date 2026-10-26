@@ -1,0 +1,80 @@
+% Chinese typesetting on top of the original COLM article template.
+% Keep the original paper, text area, numbering, figures and page furniture.
+\usepackage{indentfirst}
+\usepackage{xurl}
+\usepackage{caption}
+\usepackage{needspace}
+\captionsetup{font=small,labelfont=bf,skip=7pt}
+
+\makeatletter
+\renewcommand{\normalsize}{%
+  \@setfontsize\normalsize{11pt}{17.6pt}%
+  \abovedisplayskip 9pt plus 2pt minus 2pt
+  \belowdisplayskip 9pt plus 2pt minus 2pt
+  \abovedisplayshortskip 3pt plus 2pt
+  \belowdisplayshortskip 6pt plus 2pt minus 2pt}
+\renewcommand{\small}{\@setfontsize\small{10pt}{15pt}}
+\renewcommand{\footnotesize}{\@setfontsize\footnotesize{9pt}{13.5pt}}
+\renewcommand{\scriptsize}{\@setfontsize\scriptsize{7.5pt}{10pt}}
+\renewcommand{\tiny}{\@setfontsize\tiny{6.5pt}{8pt}}
+\renewcommand{\large}{\@setfontsize\large{13pt}{20pt}}
+\renewcommand{\Large}{\@setfontsize\Large{16pt}{24pt}}
+\renewcommand{\LARGE}{\@setfontsize\LARGE{18pt}{27pt}}
+\renewcommand{\huge}{\@setfontsize\huge{20pt}{30pt}}
+\renewcommand{\Huge}{\@setfontsize\Huge{24pt}{34pt}}
+
+\renewcommand{\section}{\@startsection{section}{1}{\z@}%
+  {18pt plus 2pt minus 2pt}{8pt plus 1pt}%
+  {\large\sffamily\bfseries\raggedright}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
+  {13pt plus 2pt minus 1pt}{5pt plus 1pt}%
+  {\fontsize{12pt}{19pt}\selectfont\sffamily\bfseries\raggedright}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{\z@}%
+  {10pt plus 1pt minus 1pt}{4pt plus 1pt}%
+  {\normalsize\sffamily\bfseries\raggedright}}
+\patchcmd{\@maketitle}{\Large\bf}%
+  {\fontsize{18pt}{26pt}\selectfont\sffamily\bfseries}{}%
+  {\PackageError{translation}{Title font patch failed}{}}
+\patchcmd{\@maketitle}{\hsize\textwidth}%
+  {\hsize\textwidth\parindent=0pt}{}%
+  {\PackageError{translation}{Title indentation patch failed}{}}
+\patchcmd{\abstract}{\large\bf}{\large\sffamily\bfseries}{}%
+  {\PackageError{translation}{Abstract font patch failed}{}}
+\pretocmd{\l@section}{\Needspace{3\baselineskip}}{}%
+  {\PackageError{translation}{Contents spacing patch failed}{}}
+
+% Keep numbered-heading link targets inside the heading line. Otherwise a
+% preceding float page can capture the vertical-mode target in XeLaTeX.
+\newcommand{\zh@headingstep}[1]{%
+  \let\zh@savedraisedlink\Hy@raisedlink
+  \def\Hy@raisedlink##1{\def\zh@headinganchor{\Hy@raisedlink{##1}}}%
+  \refstepcounter{#1}%
+  \let\Hy@raisedlink\zh@savedraisedlink}
+\pretocmd{\NR@sect}{\let\zh@headinganchor\@empty}{}%
+  {\PackageError{translation}{Heading target initialization failed}{}}
+\patchcmd{\NR@sect}{\refstepcounter}{\zh@headingstep}{}%
+  {\PackageError{translation}{Heading counter patch failed}{}}
+\patchcmd{\NR@sect}{\@hangfrom{\hskip #3\relax\@svsec}}%
+  {\@hangfrom{\hskip #3\relax\zh@headinganchor\@svsec}}{}%
+  {\PackageError{translation}{Heading target placement failed}{}}
+
+\renewcommand{\@listi}{%
+  \leftmargin\leftmargini
+  \topsep 5pt plus 1pt minus 1pt
+  \partopsep 0pt
+  \itemsep 3pt plus 1pt minus 1pt
+  \parsep 2pt plus 1pt minus 1pt}
+\makeatother
+
+\normalsize
+\setlength{\parindent}{2em}
+\setlength{\parskip}{3pt plus 1pt minus 1pt}
+\setlength{\footnotesep}{9pt}
+\setlength{\skip\footins}{12pt plus 2pt minus 2pt}
+\setlength{\headheight}{16pt}
+\addtolength{\topmargin}{-4pt}
+\renewcommand{\bibfont}{\fontsize{9.5pt}{12.5pt}\selectfont}
+\setlength{\bibsep}{4pt plus 1pt minus 1pt}
+% Larger Chinese headings and leading need room below top-of-page figures.
+\renewcommand{\textfraction}{0.12}
+\raggedbottom
