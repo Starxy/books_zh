@@ -1,4 +1,4 @@
 interface:
   display_name: "技术书籍中文翻译"
-  short_description: "按底本与学科选择流程，完成中文译写、LaTeX排版与整书核验"
-  default_prompt: "使用 $technical-book-translation，先确认底本版本与书籍体例，再完整译排为中文 PDF。"
+  short_description: "按底本完成中文译排；参考原模板优化中文排字，保留无源码原图"
+  default_prompt: "使用 $technical-book-translation，确认底本版本与范围后完整译排为中文PDF；有TeX时参考原模板优化中文字体与间距，图表有源码只译文字，无源码保留原图。"
