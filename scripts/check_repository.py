@@ -91,7 +91,13 @@ def main():
         config_path = existing(source + '/build_config.json')
         if config_path:
             config = json.loads(config_path.read_text(encoding='utf-8'))
-            existing(source + '/' + config['main'])
+            if config.get('source_status') == 'missing_chinese_tex':
+                require(config.get('main') is None,
+                        'Missing-source project must not declare a buildable main: ' + folder)
+                require(book.get('chinese_source_status') == 'missing_chinese_tex',
+                        'Missing Chinese source status differs from manifest: ' + folder)
+            else:
+                existing(source + '/' + config['main'])
             if config.get('index'):
                 existing(source + '/' + config['index'])
             for alias in config.get('frozen_aliases', []):
