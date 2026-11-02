@@ -1,0 +1,264 @@
+\chapter{利用既有数据或标本开展研究}
+\chapterauthors{Mark J. Pletcher、Deborah G. Grady 和 Steven R. Cummings}
+\sourcepage{501}
+许多问题可利用已收集的研究数据或标本，迅速而高效地回答。研究者可以开展\term{二次数据分析}（secondary data analysis），也可在\term{附属研究}（ancillary study）中把既有数据与新测量结合。仍在随访参与者的数据来源，可为新的前瞻性队列研究或随机试验收集结局。
+
+数据也会因研究以外的原因被收集。例如，医疗服务产生大量健康相关数据；我们与互联网或智能手机等联网设备的一切互动，也都被追踪和记录。
+
+利用既有数据的研究虽然快捷、经济，却也有缺点。可接触人群、样本和测量均已预定；样本可能比希望的窄（如仅包括50--64岁女性），测量未必理想（只有高血压病史而非实际血压），质量也可能不佳（大量缺失或错误值）。重要混杂因素和结局可能未充分测量。这些都构成主要缺点：无法控制可用内容。尽管如此，创造性地利用既有数据和标本，是资源有限的新研究者回答重要问题的快捷有效途径，也是医疗服务及医疗产品“真实世界”使用等领域的主要研究方式（1）。
+
+本章先讨论既有数据分析的优点与问题（表16.1），再介绍创造性地使用和扩充数据的方法，包括荟萃分析、附属研究、整合不同来源，以及利用既有收集机制开展前瞻性研究和随机试验。
+\sourcepage{502}
+\begingroup\fontsize{9.5}{13}\selectfont
+\begin{longtable}{L{.16\textwidth}L{.35\textwidth}L{.41\textwidth}}
+\caption*{\textbf{表16.1\quad 不同既有数据类型的用途、优点和问题}}\\\toprule
+数据类型 & 用途／优点 & 问题\\\midrule\endfirsthead
+\toprule 数据类型 & 用途／优点 & 问题\\\midrule\endhead
+\multicolumn{3}{c}{\textbf{研究数据}}\\
+全国调查 & 全国范围；抽样方法常允许推广至美国人群；记录完善、易于获取。 & 多级整群抽样需特殊分析方法；测量和参与者种类有限；其他人可能作类似分析并抢先发表。\\
+登记系统 & 从明确的目标人群（如特定疾病患者）获得整理过的数据要素。 & 纳入人员与资料收集通常依赖参与者、卫生系统或其他机构的非随机参与。\\
+其他研究 & 测量达到研究要求，记录完善，可直接统计分析。 & 自愿参加研究者不同于一般人群；研究情境中的测量未必反映日常经历或生理状态；研究者无法控制样本和测量。\\
+\multicolumn{3}{c}{\sourcepage{503}\textbf{医疗服务数据}}\\
+电子健康记录（EHR）数据 & 就诊、操作、诊断、药物、实验室测量和结局信息丰富；适合研究医疗利用、卫生服务及服务差异。 & 从复杂 EHR 中提取有用要素很困难。患者出于特定原因（患病、需要某种服务、接受照护）进入数据库，且必须能接触该系统。干预非随机，测量并非系统开展，而是由个人或健康特征决定。因此：评价干预效果易受适应证混杂影响；缺失测量常见且难以插补；患者在多个医疗系统就诊，暴露及尤其结局的判定常不完整；数据敏感、受 HIPAA 保护，难以获取；不同 EHR 结构不同，难以合并。\\
+\sourcepage{504}医疗索赔、账单及其他行政数据 & 诊断与操作（包括开具的实验室检查）资料丰富，就诊资料较有限；适合医疗利用、卫生服务和服务差异研究；结局判定相对完整。 & 没有临床测量结果（如化验值或血压）；样本常有限制（如 Medicare 数据主要为65岁以上人群，私人保险数据中贫困患者少）；数据敏感、受 HIPAA 保护，获取常很昂贵。\\
+\multicolumn{3}{c}{\textbf{互联网与设备数据}}\\
+智能手机数据 & 传感器经全球定位系统收集位置、三轴加速度计收集运动、相机收集影像、通话和短信反映社交互动，并通过蓝牙接收其他设备数据；应用与用户互动，收集饮食记录等主观资料、实施干预并整合数据。 & 手机技术不同（iPhone、Android、无互联网的纯短信手机），且与用户特征相关；有无测量、准确程度和频率依赖技术；用户使用应用的时间常很短。\\
+\sourcepage{505}消费电子产品数据 & 联网设备可主动测量（血压、体重）或被动记录（步数、睡眠）；技术进步迅速。 & 技术和测量差异很大，与用户特征密切相关；测量来自专有算法，常未验证；用户常短期使用、不充电或以其他方式停止使用。\\
+社交媒体 & 结构化（朋友、群组关系）与非结构化（文字内容）资料结合，包含丰富的兴趣、习惯、情绪、心境和社会联系信息。 & 测量的用途依赖用户参与程度；资料可能敏感且难以获取。\\\bottomrule
+\end{longtable}
+EHR：电子健康记录（electronic health record）；HIPAA：《健康保险流通与责任法案》（Health Insurance Portability and Accountability Act）。
+\endgroup
+
+\section{既有数据来源}
+利用既有数据，必须重视资料在何地、何时、如何、从谁身上汇集。各类来源各有优缺点。
+\sourcepage{506}
+\subsection{为研究收集的数据}
+收集研究数据需要大量资源和时间。利用既有研究数据，能使研究者和资助者的投入发挥更大价值，也尊重参与者捐献的时间与精力。
+
+\subsubsection{全国调查}
+所有研究者都应了解政府收集并开放研究使用的全国调查及其他资料。这些调查或覆盖所有可及人员（如人口普查、登记），或通过抽样产生全国代表性结果，研究价值很高。重要例子包括：
+\begin{itemize}
+\item 美国全国健康与营养检查调查（National Health and Nutrition Examination Survey，NHANES）通过人群整群随机抽样选择全国代表性样本，收集自报资料（人口、社会经济、饮食和健康行为等）、体格检查、实验室检验及其他测量，可估计疾病患病率、危险因素等人群指标。数据与说明由国家卫生统计中心（National Center for Health Statistics，NCHS；\url{cdc.gov/nchs}）维护，该中心也开展全国健康访谈调查（National Health Interview Survey，NHIS）等人群调查。
+\item 全国门诊医疗调查（National Ambulatory Medical Care Survey，NAMCS）是一项美国诊所门诊就诊的全国代表性研究，从病历提取、编码就诊原因、生命体征、疼痛及严重程度、处方和诊断。它与全国医院门诊医疗调查（National Hospital Ambulatory Medical Care Survey，NHAMCS，采用近乎相同的方法调查医院急诊与门诊就诊）均由 NCHS 协调维护。
+\item 医疗支出面板调查（Medical Expenditure Panel Survey，MEPS）衡量美国医疗服务利用、费用、支付方式，以及医疗保险的可及性和成本。
+\sourcepage{507}
+该调查由医疗保健研究与质量局维护；该局还支持医疗成本与利用项目（\url{hcup-us.ahrq.gov}），提供全国住院样本（National Inpatient Sample，NIS）、全国门诊手术样本（National Ambulatory Surgery Sample，NASS）及部分州级数据库。
+\item 美国人口普查局（\url{census.gov}）每10年尝试调查全体美国居民，开放大量资料，并通过美国社区调查（American Community Survey）对滚动人口样本收集更详细的信息（2）。
+\item NCHS 还保存全部出生、死亡等生命统计。全国死亡索引（National Death Index，NDI）集中死亡证明资料，包括死亡日期及原因。研究参与者失访时，可提交社会安全号码、姓名和／或出生日期，判定随访期内的死亡。
+\item 美国疾病控制与预防中心的广域在线流行病学研究数据系统（Wide-ranging ONline Data for Epidemiologic Research，CDC WONDER；\url{wonder.cdc.gov}），可查询生命统计、癌症和法定报告传染病等公共卫生资料。
+\end{itemize}
+
+全国调查资料用途广泛。例如，研究者用 NHANES 描述美国髋部骨密度正常值，帮助把“骨质疏松”界定为低于青年成人均值2.5个标准差（3）；用 NHAMCS 显示急诊疼痛患者阿片处方的差异（4）；用 NDI 完成一项预防心源性猝死的可穿戴除颤器随机试验的生存状态随访（5）。
+
+新研究者可考虑分析相关领域的全国调查资料。困难之一，是采用正确统计方法处理整群抽样；统计支持通常可解决。
+\sourcepage{508}
+由于数据易于获得，也可能被其他研究者“抢先”。
+
+\subsubsection{登记系统}
+\term{登记系统}（registries）识别属于特定人群者（如新诊断乳腺癌女性），并收集便于日后研究分析的信息（6）。数据可用于回答具体问题、连接其他来源，或招募参与者。与全国调查不同，登记不采用随机抽样，而是依靠愿意参加的卫生系统、其他机构或目标人群直接参与建立。
+
+癌症登记自1973年起，通过监测、流行病学与最终结果项目（Surveillance, Epidemiology, and End Results，SEER）收集基于人群的癌症发病、治疗和结局资料。SEER 覆盖多个州、地区及三个美国原住民人群（\url{seer.cancer.gov/registries}）；全国癌症登记计划协助美国其他地区收集资料（\url{cdc.gov/cancer/npcr}）。研究者据 SEER 发现，2001--2003年绝经后女性雌激素受体阳性乳腺癌发病率下降，与激素替代治疗使用减少的趋势一致，提示因果联系（7）。另有研究通过大湾区和洛杉矶 SEER 登记，招募完成主要治疗未满5年的乳腺癌女性并访谈，发现文化适应程度低的华裔女性身体功能较差，但情绪功能较好、焦虑少于白人女性（8）。
+
+美国心血管登记也很成熟。美国心脏病学会支持全国心血管数据登记项目（\url{cvquality.acc.org/NCDR-Home}），涵盖胸痛、心肌梗死、心房颤动等疾病，及经皮冠状动脉介入、植入式心律转复除颤器、门诊预防等治疗人群。
+\sourcepage{509}
+利用这些资料，研究者发现，房颤患者适当使用口服抗凝药的比例虽在增加，但高危患者中只有一半获得处方（9）。
+
+NIH 提供登记系统列表及网站、联系信息（10），但这只是研究者可在本领域发现的一部分。PCORI 资助了许多“患者驱动”登记，借助在线门户收集患者自报信息和结局（11）。例如，Health eHeart Study（\url{health-eheartstudy.org}）是关注心脏健康与技术的大型在线登记，很多人捐献手机和可穿戴设备数据；Pride Study（\url{pridestudy.org}）纳入自我认同为 LGBTQ+、愿为研究贡献数据和参加附属研究者。Health eHeart 的一项应用让使用者把手指放在相机镜头上测量脉搏；这些数据被用于开发与自报糖尿病状态相关的“数字生物标志物”，随后在多个外部人群中验证（12）。
+
+英国生物样本库（United Kingdom Biobank；\url{ukbiobank.ac.uk}）纳入50万名志愿者，将问卷与 EHR 连接，并发展了全基因组测序、代谢组学以及脑、心和身体磁共振成像等丰富测量。一项利用设备测量身体活动的全基因组关联研究据此估计，总体活动水平约20\%具有遗传性（13）。NIH 的 All of Us Research Program（\url{allofus.nih.gov}）支持一个大型队列登记，将收集自报、EHR、设备及包括遗传材料的生物样本资料。
+
+依赖参与者主动投入的登记，其样本通常比原人群更偏向白人和高教育程度者（14），解释分析时必须考虑这一点。
+\sourcepage{510}
+\subsubsection{其他研究}
+多数研究保存资料供未来使用。NIH 等主要资助方要求数据管理与分享计划；期刊也常要求开放资料以作二次分析。有些 NIH 项目本身的重要目标就是支持二次分析。例如，多中心队列 CARDIA（原文称 Coronary Artery Disease In Young Adults；\url{cardia.dopm.uab.edu}）由 NIH 资助，研究冠状动脉病的发展和决定因素，具备完善的数据申请、附属研究提案程序、审批申请和论文的发表委员会，以及发表前核查结果的分析人员。几十年积累的丰富、独特、重复测量已支持700余篇论文，其中许多与冠状动脉病无关，例如结合肺功能与调查资料，表明通常水平的大麻吸食与烟草不同，并未影响肺功能（15）。NIH 的骨关节炎倡议提供包括膝关节影像的在线研究资源（\url{nda.nih.gov/oai}）。阿尔茨海默病神经影像倡议包括患者及轻度或无认知障碍者的影像、遗传、认知测试、脑脊液和血液标志物（\url{adni.loni.usc.edu}）。NIH 还维护基因组与表型数据库 dbGaP（\url{ncbi.nlm.nih.gov/gap}），以及国家心肺血液研究所项目资料库 BioLINCC（\url{biolincc.nhlbi.nih.gov/home}）。
+
+小型研究通常也收集了超过团队分析能力的资料。虽然获取程序不如大项目正式，许多研究者也欢迎合理的合作请求。
+\sourcepage{511}
+\subsubsection{如何开始利用研究数据}
+选定主题并熟悉文献后，新研究者应考察既有资料能否通过二次分析回答问题，包括原为其他目的收集者。经验丰富的导师在识别和取得本机构或其他机构的合适数据集方面极有价值。
+
+例如，男性骨质疏松性骨折研究纳入社区老年男性，研究骨折危险因素。一位新研究者在导师帮助下取得数据，发现下尿路症状患者中衰弱更常见（16）。心脏与雌激素／孕激素替代研究（Heart and Estrogen/Progestin Replacement Study，HERS）是对已有冠心病女性预防再次冠脉事件的激素替代试验（17），要求入组及以后每年的宫颈涂片正常。一位新研究者利用资料发现，2763名女性中虽有110次异常涂片，但只有1人后续组织学异常，即除1例外均为假阳性（18）。研究影响了此后美国预防服务工作组的建议：既往检查正常的低危65岁以上女性不应再作宫颈涂片。
+
+有时仅搜索互联网就能找到资料。NHANES、BioLINCC 提供开放数据；CARDIA、开创心血管流行病学的弗雷明汉心脏研究（\url{framinghamheartstudy.org}）等也有欢迎新研究者的申请程序。资料未上线时，可致电或电邮原作者、政府官员。通信应使用正式职称和机构域名，并抄送领域内熟悉的导师。
+\sourcepage{512}
+应先了解导师是否认识数据库开发者，介绍往往比陌生联系有效。不过，很多研究者对提出有趣问题的年轻同事出乎意料地合作，愿提供资料或推荐其他渠道。
+
+最好找到原团队中愿意合作的人，既帮助取得资料，也确保理解方法和变量测量。合作关系应尽早明确，包括计划论文的第一和末位作者。与外机构合作对双方都很有价值，也帮助新研究者发展机会，逐步独立于本机构导师。
+
+\subsection{医疗服务数据}
+EHR、医疗账单和向支付方提交的索赔，以及医院、诊所、药房、实验室等复杂网络交换的数据十分丰富。医疗服务及其他在研究情境之外收集的“真实世界数据”（real-world data）（1）有三大优点：不限于愿为科学奉献时间的自选志愿者；测量较少因知晓自己被研究观察而失真；观察数通常很大。但它们难以获取、分析复杂、不完整，并反映美国医疗的复杂和碎片化。用途例如：
+\begin{itemize}
+\item \textbf{研究临床人员如何工作、使用 EHR，以及对医疗和人员福祉的影响。}例如，分析审计日志发现，在临床工作日下班后使用 EHR 的时间，与问卷测得的职业倦怠相关（19）。
+\sourcepage{513}
+\item \textbf{研究向人群提供服务的时间趋势、差异和其他模式。}大型社区卫生中心网络的 EHR 分析显示，非西班牙裔白人阿片处方率高于其他种族、族裔，且2009--2018年人均处方明显下降（20）。
+\item \textbf{评价照护质量。}利用 Medicare 索赔，研究者发现，从主动脉瓣置换到胰腺癌切除等多种高风险手术中，手术量大的外科医生，其患者手术死亡率明显低于手术量小者（21）。
+\item \textbf{推断医疗产品或其他干预的效果和安全性，}但很容易产生偏倚和误解（22）。例如，退伍军人医疗系统资料研究用倾向评分加权比较新开始用他汀的老年退伍军人与未使用者，发现开始治疗与死亡率下降相关（23）。然而，这种关联不大可能是因果效应，部分因为对非心血管死亡的效应量竟是心血管死亡的5倍多（24）。另一研究结合索赔和 EHR 比较不同降压单药，发现新用噻嗪类或噻嗪样利尿剂者的心肌梗死、心衰和卒中率，低于新用血管紧张素转换酶抑制剂者（25）。
+\end{itemize}
+
+\textbf{用观察数据推断医疗干预效果，容易受到混杂影响。}真实世界中，接受与未接受干预的患者并不相同：前者有医疗可及性、被认为存在适应证，还必须开始并持续依从治疗。
+\sourcepage{514}
+这些因素本身而非干预，可能与结局密切相关，形成\term{适应证混杂}（confounding by indication）和\term{健康使用者效应}（healthy user effects）（26）。多变量调整、倾向评分加权或匹配、“试验模拟”等方法可提高两组可比性（第10章），但残余混杂始终存在挑战，甚至无法克服（22）。
+
+也可分析组内、组间随时间的趋势。医疗组织常为质量改进或其他需要改变程序，研究者可比较前后结局来推断效果。如第12章所述，当改变在时间上突然发生、不同单位或机构实施情况不同时，这些设计可能有用，但同期时间趋势可造成混杂。
+
+医疗服务资料还面临选择偏倚、缺失和失访。寻求并获得医疗者不同于其他人，故推广至人群需谨慎。实验室检验等测量有临床原因，\textbf{是否测量以及测量时间，常比结果本身更有信息}（27）。患者可能在多机构就诊，单机构 EHR 常无法完整判定随访结局。Medicare 或私人保险索赔在这方面可能更完整，但美国体系的碎片化仍是困难。\textbf{住院患者的短期队列研究，随访可在出院时完成，适合用 EHR。}Kaiser Permanente 等与保险计划整合的系统，也可提供可靠的门诊随访资料。
+\sourcepage{515}
+从服务数据提取可用变量也很困难。EHR 结构首先服务收费，其次帮助临床人员在各种情境中便捷录入、检索。因此，诊断或药物代码可能散落于不同表中。例如，药物代码可存在病史用药、当前用药清单、处方、给药和配药事件表。编码系统可能追求具体性（品牌、剂量、剂型）或层级一致性（ICD10 的 S93.4 表示踝扭伤就诊，S93.421A 表示右踝三角韧带扭伤初次就诊），但临床使用并不一致，难以归并为有意义的概念。即使简单定义“有无2型糖尿病”，也可能需结合诊断代码、主要或专门用于糖尿病的药物、提示未治疗或未确诊糖尿病的化验，建立复杂逻辑。
+
+每个机构都会根据当地流程和偏好定制 EHR，即使供应商相同（如 Epic）也如此，因此某机构的数据提取和分析代码未必适用于其他机构。研究网络开发\term{共同数据模型}（common data models），统一表名、变量名与定义，以支持跨机构研究。例如，加州大学六个医疗中心将 EHR 转成观察性医疗结局合作组织（Observational Medical Outcomes Partnership，OMOP）共同数据模型，并汇入统一仓库（\url{data.ucop.edu}）；该模型由观察性健康数据科学与信息学项目推广（\url{ohdsi.org}），退伍军人系统及其他机构也采用。PCORI 支持全国以患者为中心的临床研究网络 PCORnet（\url{pcornet.org}），提供共同数据模型和合同关系网络，便利多中心研究。
+\sourcepage{516}
+共同模型使多中心 EHR 研究成为可能，但开发和维护昂贵，也失去了原始表中的许多细节与具体信息。
+
+\subsubsection{如何开始利用医疗服务数据}
+为保护隐私与保密性，以及基于数据被认为具有的机构价值，访问受到控制。按照 HIPAA，患者签署同意和 HIPAA 授权，或在有限情形下由伦理审查委员会给予同意及授权豁免后，研究才可访问其医疗数据。HIPAA 要求通过可信中介（honest brokers）获取 EHR 数据，只提供项目最低必需内容。许多机构还删除18类受保护健康信息，建立去标识化数据集；仅保留日期和邮政编码的有限数据集，可通过数据使用协议取得。了解 HIPAA 基本要求，有助于完成获取程序。
+
+Medicare 和私人保险等支付方已汇集大型索赔数据集。Medicare、Medicaid 资料可经政府机构购买（\url{data.medicare.gov}）；Optum、Truven Health Analytics 等营利公司打包销售私人保险的大型索赔资料。
+
+分析大型数据集在技术上也有难度。数据库通常需用结构化查询语言提取便于统计分析的数据（第19章）。信息学训练有助于理解医疗编码系统，建议寻求有经验的专业分析者协助。
+
+\subsection{互联网与设备数据}
+\sourcepage{517}
+公司收集用户与互联网、联网设备互动的数据，用于定向广告、增加参与等商业目标。有些公司向消费者或研究者等其他机构开放资料。用途例如：
+\begin{itemize}
+\item \textbf{搜索信息、读新闻、购物和社交媒体互动均产生可供研究的数据。}一位研究者用 Twitter 自由文本开发、验证识别负面种族情绪的算法，发现 COVID-19 流行后，提及亚裔美国人的负面推文明显增加（28）。
+\item \textbf{手机通过声音、视频、全球定位、三轴加速度计和蓝牙收集数据。}一些应用用专有算法把原始信号转为健康信息，如用加速度计追踪步数、运动时间，用相机检测指尖脉搏。研究者与一家拥有热门免费应用的科技公司合作，发现 COVID-19 流行期间全球身体活动普遍下降（29）。
+\item \textbf{其他电子设备主动或被动收集资料。}前者如浴室蓝牙体重秤，后者如腕部活动追踪器，通常经联网手机把数据传至中央服务器。联网腕表可识别不规则脉搏；研究者与生产商合作，对提示不规则者提供最长7天的心电贴片，其中34\%确诊房颤（30）。
+\end{itemize}
+
+单一来源的测量种类通常少，但常重复、甚至高频记录。
+\sourcepage{518}
+联网消费设备使用者不同于一般人群，便利样本结果未必可推广。虽然多数美国成年人已有手机，但机型、联网条件和流量计划随社会经济地位不同。需要主动投入（充电、佩戴）的互联网服务、应用和可穿戴设备，使用程度也常迅速减退。希望系统收集此类资料时，可能需要向参与者提供设备，并激励持续使用。
+
+\subsubsection{如何开始利用互联网与设备数据}
+取得数据可能不易。有些公司愿合作并直接开放，少数如 Twitter 则公开资料。另一种机制是由用户主动授权。科技公司常允许客户使用的其他应用访问资料，例如让云服务器通过\term{应用程序编程接口}（application programming interface，API）与其他服务器通信。研究者获得参与者许可后可访问，但需要专门编程与基础设施。NIH 资助的 Eureka Research Platform（\url{info.eurekaplatform.org}）向获资助研究者开放，专门通过 API 与商业平台互动收集\term{移动健康}（mobile health，mHealth）数据，并支持电子知情同意、在线调查，以及直接从参与者手机应用收集资料。
+
+\section{创造性地使用既有数据}
+既有数据有时足以回答问题；有时则需更有创造性的使用、增补其他来源或特殊方法。
+
+\subsection{荟萃分析}
+\sourcepage{519}
+多个研究涉及相近问题（如他汀对老年人是否有效）时，可通过\term{荟萃分析}（meta-analysis）合并，得到单一汇总估计。通常先\term{系统综述}发表文献，以全面、预定的方法识别全部相关研究，明确纳入标准，并用标准方法提取资料。
+
+若能获得纳入综述各项研究的参与者级数据，就可以合成一个大型数据集，重新开展“合并式”荟萃分析。例如，胆固醇治疗试验者协作组（Cholesterol Treatment Trialists’ Collaboration）合并他汀治疗随机试验的数据，表明他汀即使对75岁以上参与者也有效；而这些参与者在各项试验的样本中仅占很小比例（31）。
+
+更常见的是只有论文结果，无法取得个人数据。合并研究可获得比任一研究更精确的汇总估计，但需特殊方法考虑各估计的精度。大研究结果更精确、置信区间更窄，因此权重更大。例如，研究者整合40项随机试验的亚组发现（每项老年人均有限），显示持续至少1年的运动项目降低60岁以上者跌倒及伤害性跌倒的风险（32）。
+
+必须考虑研究间不可避免的差异。荟萃方法可估计\term{异质性}（heterogeneity），即结果的差异程度。若差异很大，意味着各研究可能并非估计同一现象，此时报告平均的单一汇总估计未必合理。可分析特点较相似的研究子集，或采用同时考虑研究特征的\term{荟萃回归}（meta-regression）。
+\sourcepage{520}
+上述运动研究的一系列荟萃回归提示每周2--3次可能最佳（32）。但回归需要个人数据，或足够多的研究。
+
+更隐蔽的问题是\term{发表偏倚}（publication bias）：已发表或可被纳入的研究不能代表全部已完成研究，通常因为阳性结果比阴性结果更易发表。研究者应：（1）系统综述，识别所有相关已发表研究；（2）寻找未发表研究，如询问同行、审阅摘要、会议报告和博士论文，尽可能取得结果；（3）用专门方法检验是否存在发表偏倚，例如结果较不利的小型研究异常稀少（33）。
+
+新研究者可由系统综述与荟萃分析获益：深入了解领域文献，并通过发表建立专业地位。但即使经费不多，也需大量时间与努力。应参考 Cochrane 网络资源，包括《系统综述手册》（\url{http://handbook.cochrane.org}），并寻求方法帮助或培训。
+
+\subsection{附属研究}
+\textbf{附属研究在既有项目中设计并增加测量，回答新问题。}它保留二次分析的许多优势，限制较少；可加入任何设计，尤其适合前瞻性队列与随机试验。例如，在绝经后激素 HERS 试验（17）中，增加尿失禁频率、严重程度测量，便以很少额外时间和费用，形成了激素对尿失禁影响的大型试验（34）。
+\sourcepage{521}
+通常在开始入组前增加测量最有价值，但外部研究者可能难以找到仍在规划的“宿主”研究。即使未在开始时测量某变量，中途或末期增加一次也可有用。例如，在 HERS 结束时测认知功能，可比较接受4年激素与安慰剂的老年女性（35）。
+
+负责人必须平衡参与负担和科学收益。附属测量可能破坏平衡，导致不满和退出。新研究者应对此敏感，设计让参与者感兴趣、且不损害主研究的附属项目。
+
+也可利用多数大型试验和队列保存的生物样本、影像等。对存样开展新测量，既经济，又不增加参与负担；常可采用巢式病例对照或病例队列设计，只测部分标本（第9章）。HERS 的巢式病例对照遗传分析发现，激素组过多的血栓栓塞事件并非因与凝血因子 V Leiden 相互作用所致（36）。
+
+多数大型多中心项目要求书面申请，由委员会批准、拒绝或修改；部分要求与原团队成员合作。新增测量往往需要额外经费，由附属研究者筹措。
+\sourcepage{522}
+当然，其边际费用远低于独立开展同类研究。某些 NIH 经费仅少量支持测量分析，却大量支持职业发展，适合附属研究（第20章）。部分大项目有自己的资助机制，尤其当问题重要且与资助机构目标相关时。
+
+\subsection{整合多个来源的数据}
+可以连接两个以上既有数据集形成新数据。例如，研究军旅对健康的影响，使用1970--1972年越战征兵抽签数据：根据生日，随机决定20岁美国男性被征召的顺序；再从加州、宾夕法尼亚死亡证明登记取得死亡资料。预测变量生日是军旅经历的随机替代指标。研究发现，随机分到可被征召者，此后10年自杀和车祸死亡显著增加（37）。研究费用很少，却比预算大得多的其他研究更能无偏倚地考察服役对特定死因的影响。
+
+位置数据也可与其他来源的资料有效结合。例如，研究者取得费城各地点的哮喘死亡信息（第一个资料来源），并从1990年美国人口普查取得费城各人口普查区的拥挤、贫困程度及其他人口学资料（第二个资料来源），发现居住在贫困程度高的人口普查区与哮喘死亡有强关联（38）。另一些研究者取得 Health eHeart Study 中 Fitbit 设备收集的步数（第一个资料来源），与同期空气质量传感器资料（第二个资料来源）连接，发现2017--2018年加州野火季中，空气质量差时的日步数比空气质量尚可时低18\%（39）。
+\sourcepage{523}
+有时可按机构连接。研究者把加州全州卫生规划与发展办公室（Office of Statewide Health Planning and Development，OSHPD）的急诊出院数据，与当地急救机构的救护车分流数据按机构和时间连接，发现急诊拥挤日再入院并未增加（40）。
+
+\textbf{若只在汇总层面整合分析、不使用个人资料，对个人因果关系的推断较弱，并易产生\term{生态学谬误}（ecologic fallacy）。}例如，21国乳腺癌发病率相差5倍以上，且随人均脂肪摄入增加（41）；但护士健康研究的高质量个人饮食与结局数据不支持这种增加：脂肪摄入每增加5\%，相对风险为0.96，95\%置信区间0.93--0.99（42）。生态分析的表面错误，被归因于各国乳腺癌危险因素（如初潮较晚、使用激素替代）也与人均脂肪摄入相关，造成严重混杂（42）。
+
+\subsection{利用既有资料收集机制开展随机试验}
+有时可用现成机制为队列或随机试验前瞻性收集资料。例如，\term{随机登记试验}（randomized registry trial）在登记系统持续收集资料的过程中加入随机干预（43）。瑞典冠状动脉造影与成形术登记前瞻性记录经皮冠状动脉介入（percutaneous coronary intervention，PCI）患者。研究者随机让部分患者在 PCI 时接受血栓抽吸，用登记比较再次心梗、卒中等结局，发现与单独 PCI 相比无差异（44）。
+\sourcepage{524}
+\term{嵌入 EHR 的随机试验}（EHR-embedded randomized trials）使用现有收集系统，把患者、就诊、医生或临床单位随机分配到不同干预，再比较结局。例如，在五个重症监护病区开展整群随机试验，比较生理盐水与平衡晶体液，后者主要不良肾事件风险略低（45）。
+
+\term{随机质量改进试验}（randomized quality improvement trial）只部分实施质量改进：随机让某些患者或医务人员接受干预，其余不接受，常采用阶梯楔形设计（第12章），以判断有效性和意外后果，再决定是否全面实施。例如，研究者随机设定较低的阿片处方默认数量，但仍允许医生决定处方剂量，发现平均发药数量下降（46）。
+
+这类试验尤其适合研究 EHR 提示遵循指南、临床决策支持或其他改善照护措施。\textbf{试验可完全嵌入系统，自动选择患者、随机化、实施干预和随访，}但仍须考虑伦理含义和方法困难（47）。嵌入 EHR 的随机试验和随机质量改进试验，都是美国国家医学科学院“学习型卫生系统”（learning health system）愿景的一部分（48）。
+
+\section{小结}
+\begin{enumerate}
+\item 既往研究是丰富多样的数据来源。新研究者应与导师一起考察，能否用已有研究回答问题；利用导师的资料是职业起步的好方法。
+\sourcepage{525}
+\item EHR、索赔及其他行政数据可研究医疗利用、卫生服务和质量改进，但选择偏倚与混杂使分析解释困难。
+\item 公司为商业目的收集的互联网和设备资料，有时可开放研究使用。
+\item 系统综述和荟萃分析可整合同类问题的多项研究，帮助新研究者成为领域专家；应评价异质性和发表偏倚。
+\item 附属研究增加一项或多项测量，利用现有项目，通常经济、高效。
+\item 整合多来源资料常能回答新问题；汇总层面关联易受生态学谬误影响，需谨慎解释。
+\item 条件允许时，利用既有收集机制开展随机试验，可高效产生有力的临床研究依据。
+\end{enumerate}
+
+\begin{references}
+\item US Food and Drug Administration. Real-World Evidence. Accessed April 4, 2021. \url{https://www.fda.gov/science-research/science-and-research-special-topics/real-world-evidence}
+\item US Census Bureau. American Community Survey (ACS). Accessed April 30, 2021. \url{https://www.census.gov/programs-surveys/acs}.
+\item Looker AC, Johnston CC, Jr., Wahner HW, et al. Prevalence of low femoral bone density in older U.S. women from NHANES III. J Bone Miner Res. 1995;10(5):796-802.
+\item Pletcher MJ, Kertesz SG, Kohn MA, Gonzales R. Trends in opioid prescribing by race/ethnicity for patients seeking care in US emergency departments. JAMA. 2008;299(1):70-78.
+\sourcepage{526}
+\item Olgin JE, Pletcher MJ, Vittinghoff E, et al. Wearable cardioverter-defibrillator after myocardial infarction. N Engl J Med. 2018;379(13):1205-1215.
+\item Workman TA. Engaging Patients in Information Sharing and Data Collection: The Role of Patient-Powered Registries and Research Networks. Agency for Healthcare Research and Quality; 2013.
+\item Kerlikowske K, Miglioretti DL, Buist DS, et al. Declines in invasive breast cancer and use of postmenopausal hormone therapy in a screening mammography population. J Natl Cancer Inst. 2007;99(17):1335-1339.
+\item Wang JH, Gomez SL, Brown RL, et al. Factors associated with Chinese American and White cancer survivors’ physical and psychological functioning. Health Psychol. 2019;38(5):455-465.
+\item Hsu JC, Maddox TM, Kennedy KF, et al. Oral anticoagulant therapy prescription in patients with atrial fibrillation across the spectrum of stroke risk: insights from the NCDR PINNACLE registry. JAMA Cardiol. 2016;1(1):55-62.
+\item National Institutes of Health. List of Registries. Accessed April 30, 2021. \url{https://www.nih.gov/health-information/nih-clinical-research-trials-you/list-registries}.
+\item PCORnet PPRN Consortium, Daugherty SE, Wahba S, Fleurence R. Patient-powered research networks: building capacity for conducting patient-centered clinical outcomes research. J Am Med Inform Assoc. 2014;21(4):583-586.
+\item Avram R, Olgin JE, Kuhar P, et al. A digital biomarker of diabetes from smartphone-based vascular signals. Nat Med. 2020;26(10):1576-1582.
+\item Doherty A, Smith-Byrne K, Ferreira T, et al. GWAS identifies 14 loci for device-measured physical activity and sleep duration. Nat Commun. 2018;9(1):5257.
+\item Guo X, Vittinghoff E, Olgin JE, Marcus GM, Pletcher MJ. Volunteer participation in the health eheart study: a comparison with the US population. Sci Rep. 2017;7(1):1956.
+\item Pletcher MJ, Vittinghoff E, Kalhan R, et al. Association between marijuana exposure and pulmonary function over 20 years. JAMA. 2012;307(2):173-181.
+\item Bauer SR, Scherzer R, Suskind AM, et al. Co-occurrence of lower urinary tract symptoms and frailty among community-dwelling older men. J Am Geriatr Soc. 2020;68(12):2805-2813.
+\item Hulley S, Grady D, Bush T, et al. Randomized trial of estrogen plus progestin for secondary prevention of coronary heart disease in postmenopausal women. Heart and Estrogen/progestin Replacement Study (HERS) Research Group. JAMA. 1998;280(7):605-613.
+\sourcepage{527}
+\item Sawaya GF, Grady D, Kerlikowske K, et al. The positive predictive value of cervical smears in previously screened postmenopausal women: the Heart and Estrogen/progestin Replacement Study (HERS). Ann Intern Med. 2000;133(12):942-950.
+\item Adler-Milstein J, Zhao W, Willard-Grace R, Knox M, Grumbach K. Electronic health records and burnout: time spent on the electronic health record after hours and message volume associated with exhaustion but not with cynicism among primary care clinicians. J Am Med Inform Assoc. 2020;27(4):531-538.
+\item Muench J, Fankhauser K, Voss RW, et al. Assessment of opioid prescribing patterns in a large network of US community health centers, 2009 to 2018. JAMA Netw Open. 2020;3(9):e2013431.
+\item Birkmeyer JD, Stukel TA, Siewers AE, Goodney PP, Wennberg DE, Lucas FL. Surgeon volume and operative mortality in the United States. N Engl J Med. 2003;349(22):2117-2127.
+\item Collins R, Bowman L, Landray M, Peto R. The magic of randomization versus the myth of real-world evidence. N Engl J Med. 2020;382(7):674-678.
+\item Orkaby AR, Driver JA, Ho YL, et al. Association of statin use with all-cause and cardiovascular mortality in US veterans 75 years and older. JAMA. 2020;324(1):68-78.
+\item Digitale JC, Newman TB. New statin use and mortality in older veterans. JAMA. 2020;324(18):1907-1908.
+\item Suchard MA, Schuemie MJ, Krumholz HM, et al. Comprehensive comparative effectiveness and safety of first-line antihypertensive drug classes: a systematic, multinational, large-scale analysis. Lancet. 2019;394(10211):1816-1826.
+\item Shrank WH, Patrick AR, Brookhart MA. Healthy user and related biases in observational studies of preventive interventions: a primer for physicians. J Gen Intern Med. 2011;26(5):546-550.
+\item Agniel D, Kohane IS, Weber GM. Biases in electronic health record data due to processes within the healthcare system: retrospective observational study. BMJ. 2018;361:k1479.
+\item Nguyen TT, Criss S, Dwivedi P, et al. Exploring U.S. shifts in anti-Asian sentiment with the emergence of COVID-19. Int J Environ Res Public Health. 2020;17(19).
+\item Tison GH, Avram R, Kuhar P, et al. Worldwide effect of COVID-19 on physical activity: a descriptive study. Ann Intern Med. 2020;173(9):767-770.
+\item Perez MV, Mahaffey KW, Hedlin H, et al. Large-scale assessment of a smartwatch to identify atrial fibrillation. N Engl J Med. 2019;381(20):1909-1917.
+\sourcepage{528}
+\item Cholesterol Treatment Trialists Collaboration. Efficacy and safety of statin therapy in older people: a meta-analysis of individual participant data from 28 randomised controlled trials. Lancet. 2019;393(10170):407-415.
+\item de Souto Barreto P, Rolland Y, Vellas B, Maltais M. Association of long-term exercise training with risk of falls, fractures, hospitalizations, and mortality in older adults: a systematic review and meta-analysis. JAMA Intern Med. 2019;179(3):394-405.
+\item Lin L, Chu H. Quantifying publication bias in meta-analysis. Biometrics. 2018;74(3):785-794.
+\item Grady D, Brown JS, Vittinghoff E, et al. Postmenopausal hormones and incontinence: the Heart and Estrogen/Progestin Replacement Study. Obstet Gynecol. 2001;97(1):116-120.
+\item Grady D, Yaffe K, Kristof M, Lin F, Richards C, Barrett-Connor E. Effect of postmenopausal hormone therapy on cognitive function: the Heart and Estrogen/progestin Replacement Study. Am J Med. 2002;113(7):543-548.
+\item Herrington DM, Vittinghoff E, Howard TD, et al. Factor V Leiden, hormone replacement therapy, and risk of venous thromboembolic events in women with coronary disease. Arterioscler Thromb Vasc Biol. 2002;22(6):1012-1017.
+\item Hearst N, Newman TB, Hulley SB. Delayed effects of the military draft on mortality. A randomized natural experiment. N Engl J Med. 1986;314(10):620-624.
+\item Lang DM, Polansky M. Patterns of asthma mortality in Philadelphia from 1969 to 1991. N Engl J Med. 1994;331(23):1542-1546.
+\item Rosenthal DG, Vittinghoff E, Tison GH, et al. Assessment of accelerometer-based physical activity during the 2017–2018 California wildfire seasons. JAMA Netw Open. 2020;3(9):e2018116.
+\item Hsia RY, Asch SM, Weiss RE, et al. Is emergency department crowding associated with increased “bounceback” admissions? Med Care. 2013;51(11):1008-1014.
+\item Prentice RL, Kakar F, Hursting S, Sheppard L, Klein R, Kushi LH. Aspects of the rationale for the Women’s Health Trial. J Natl Cancer Inst. 1988;80(11):802-814.
+\item Holmes MD, Hunter DJ, Colditz GA, et al. Association of dietary intake of fat and fatty acids with risk of breast cancer. JAMA. 1999;281(10):914-920.
+\item Lauer MS, D’Agostino RB, Sr. The randomized registry trial—the next disruptive technology in clinical research? N Engl J Med. 2013;369(17):1579-1581.
+\item Frobert O, Lagerqvist B, Olivecrona GK, et al. Thrombus aspiration during ST-segment elevation myocardial infarction. N Engl J Med. 2013;369(17):1587-1597.
+\sourcepage{529}
+\item Semler MW, Self WH, Wanderer JP, et al. Balanced crystalloids versus saline in critically ill adults. N Engl J Med. 2018;378(9):829-839.
+\item Montoy JCC, Coralic Z, Herring AA, Clattenburg EJ, Raven MC. Association of default electronic medical record settings with health care professional patterns of opioid prescribing in emergency departments: a randomized quality improvement study. JAMA Intern Med. 2020;180(4):487-493.
+\item Pletcher MJ, Flaherman V, Najafi N, et al. Randomized controlled trials of electronic health record interventions: design, conduct, and reporting considerations. Ann Intern Med. 2020;172(11 Suppl):S85-S91.
+\item Friedman CP, Wong AK, Blumenthal D. Achieving a nationwide learning health system. Sci Transl Med. 2010;2(57):57cm29.
+\end{references}
+
+\chapterappendix{16A}{第16章习题：利用既有数据或标本开展研究}
+\sourcepage{530}
+\begin{enumerate}
+\item 研究问题是：“美国拉丁裔的胆囊疾病发生率是否高于其他族裔和种族？”哪些既有数据库可使你以较低时间与经费成本，估计按种族／族裔、年龄和性别分类的发生率？
+\item 一位研究员想知道轻度或中度肾功能障碍是否增加冠心病事件和死亡。因收集原始数据昂贵、困难，他找到 NIH 资助的老年男女心血管疾病预测因素多中心队列——心血管健康研究（Cardiovascular Health Study，CHS），其中有全部所需变量。导师介绍他联系主要研究者，帮助提交分析提案，并获指导委员会批准。
+\begin{enumerate}\item 此方法研究该问题有哪些优势？\item 有哪些缺点？\end{enumerate}
+\item 一位研究者想知道，绝经后雌激素或选择性雌激素受体调节剂（selective estrogen receptor modulators，SERM）的治疗效果是否随内源性雌激素水平而异。如何用附属研究回答？
+\item 一组研究者关注 COVID-19 流行期间钠-葡萄糖协同转运蛋白2（sodium glucose cotransporter 2，SGLT2）抑制剂的使用，可取得某大型学术卫生系统数千名糖尿病患者的 EHR。
+\begin{enumerate}
+\item 流行期间有机制假设认为，该药可能使感染 COVID-19 的糖尿病患者更易发生重症。如何用 EHR 研究？适应证混杂如何威胁因果推断？可用什么分析方法减轻威胁？
+\item 因大众媒体报道了该假设，研究者认为用药模式可能改变。如何用 EHR 研究这一医疗利用假设？
+\end{enumerate}
+\end{enumerate}

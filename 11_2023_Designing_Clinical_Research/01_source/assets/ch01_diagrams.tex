@@ -1,0 +1,96 @@
+\tikzset{dcrhead/.style={draw=blue!50!cyan,fill=blue!48!cyan!65,text=white,
+ font=\small\bfseries\heiti,minimum height=9mm,align=center},
+ dcrbody/.style={draw=blue!45!cyan,text=dcrblue,align=left,font=\footnotesize,
+ inner sep=2mm},dcrresult/.style={draw=red!60!black,thick,align=center,
+ font=\small\bfseries\heiti,minimum height=13mm},
+ dcrarr/.style={-{Latex[length=3mm,width=2.5mm]},line width=1.6pt},
+ dcrvalid/.style={text=black!55,font=\small\bfseries\heiti,align=center}}
+\newcommand{\chonebasicflow}{%
+\begin{tikzpicture}[x=1mm,y=1mm]
+\foreach \x/\name/\txt in {0/q/研究问题,48/p/研究计划,96/a/实际研究}
+ \node[dcrhead,text width=32mm] (\name) at (\x,0) {\txt};
+\foreach \x/\name/\txt in {0/u/当前认识,48/c/研究结论,96/r/研究结果}
+ \node[dcrresult,text width=32mm] (\name) at (\x,-39) {\txt};
+\draw[dcrarr,blue!60] (q)--node[above,font=\small]{设计}(p);
+\draw[dcrarr,blue!60] (p)--node[above,font=\small]{实施}(a);
+\draw[dcrarr,red!65!black] (r)--node[above,font=\small]{解释}(c);
+\draw[dcrarr,red!65!black] (c)--node[above,font=\small]{推断}(u);
+\draw[dcrarr,blue!65!red] (a.east)--++(7,0)|-node[pos=.25,right,rotate=90,font=\small]{分析}(r.east);
+\draw[dcrarr,red!65!blue] (u.west)--++(-7,0)|-node[pos=.25,left,rotate=90,font=\small]{思考}(q.west);
+\end{tikzpicture}}
+\newcommand{\chonedesignflow}{%
+\begin{tikzpicture}[x=1mm,y=1mm]
+\node[dcrhead,text width=49mm] (q) at (0,0) {研究问题};
+\node[dcrhead,text width=49mm] (p) at (84,0) {研究计划};
+\node[dcrbody,text width=49mm,minimum height=58mm,anchor=north] (qb) at (q.south)
+ {\textbf{目标人群}\\全体 70 岁及以上、认知功能正常的美国人\\[5mm]
+ \textbf{目标现象}\\过去一个月每天摄入咖啡因的情况};
+\node[dcrbody,text width=49mm,minimum height=58mm,anchor=north] (pb) at (p.south)
+ {\textbf{预定样本}\\70 岁及以上、无痴呆或认知功能障碍诊断的医保计划成员\\[5mm]
+ \textbf{预定变量}\\自报过去一个月的咖啡、茶、含咖啡因饮料及高能量饮料摄入情况};
+\node[dcrresult,text width=49mm] (u) at (0,-102) {当前认识};
+\node[dcrresult,text width=49mm] (c) at (84,-102) {研究结论};
+\draw[dcrarr,blue!65] (qb.east)--node[above,font=\small]{设计}(pb.west);
+\draw[dcrarr,red!65!black] (c)--node[above,font=\small]{推断}(u);
+\node[dcrvalid] (v) at (42,-78) {外部效度};
+\draw[dcrarr,black!45] (v.north)--(42,-35);
+\draw[dcrarr,black!45] (v.south)--(42,-102);
+\node[text=dcrgold,align=center,font=\small\bfseries] (e) at (100,-78) {选择与误差\\影响……};
+\draw[dcrarr,black!45] (e.west)--(v.east);
+\end{tikzpicture}}
+\newcommand{\choneimplementationflow}{%
+\begin{tikzpicture}[x=1mm,y=1mm]
+\node[dcrhead,text width=48mm] (p) at (0,0) {研究计划};
+\node[dcrhead,text width=48mm] (a) at (80,0) {实际研究};
+\node[dcrbody,text width=48mm,minimum height=60mm,anchor=north] (pb) at (p.south)
+ {\textbf{预定样本}\\70 岁及以上、无痴呆或认知功能障碍诊断的医保计划成员\\[5mm]
+ \textbf{预定变量}\\自报过去一个月的咖啡、茶、含咖啡因饮料及高能量饮料摄入情况};
+\node[dcrbody,text width=48mm,minimum height=60mm,anchor=north] (ab) at (a.south)
+ {\textbf{实际样本}\\70 岁及以上、无痴呆或认知功能障碍诊断且寄回问卷的医保计划成员\\[4mm]
+ \textbf{实际测量}\\关于过去一个月咖啡、茶、含咖啡因饮料及高能量饮料摄入情况的回答};
+\node[dcrresult,text width=48mm] (c) at (0,-105) {研究结论};
+\node[dcrresult,text width=48mm] (r) at (80,-105) {研究结果};
+\draw[dcrarr,blue!65] (pb.east)--node[above,font=\small]{实施}(ab.west);
+\draw[dcrarr,red!65!black] (r)--node[above,font=\small]{解释}(c);
+\draw[dcrarr,blue!65!red] (ab.east)--++(9,0)|-node[pos=.28,right,font=\small]{分析}(r.east);
+\node[dcrvalid] (v) at (40,-81) {内部效度};
+\draw[dcrarr,black!45] (v.north)--(40,-35);
+\draw[dcrarr,black!45] (v.south)--(40,-105);
+\draw[dcrarr,black!45] (v.east)--(115,-81);
+\node[text=dcrgold,align=center,font=\small\bfseries] (e) at (-9,-81) {选择与误差\\影响……};
+\draw[dcrarr,black!45] (e.east)--(v.west);
+\end{tikzpicture}}
+\newcommand{\chonefullflow}{%
+\begin{tikzpicture}[x=1mm,y=1mm]
+\node[dcrhead,text width=32mm] (q) at (0,0) {研究问题};
+\node[dcrhead,text width=32mm] (p) at (49,0) {研究计划};
+\node[dcrhead,text width=32mm] (a) at (98,0) {实际研究};
+\node[dcrbody,text width=32mm,minimum height=80mm,anchor=north] (qb) at (q.south)
+ {\textbf{目标人群}\\全体 70 岁及以上、认知功能正常的美国人\\[5mm]
+ \textbf{目标现象}\\过去一个月每天摄入咖啡因的情况};
+\node[dcrbody,text width=32mm,minimum height=80mm,anchor=north] (pb) at (p.south)
+ {\textbf{预定样本}\\70 岁及以上、无痴呆或认知功能障碍诊断的医保计划成员\\[4mm]
+ \textbf{预定变量}\\自报过去一个月的咖啡、茶、含咖啡因饮料及高能量饮料摄入情况};
+\node[dcrbody,text width=32mm,minimum height=80mm,anchor=north] (ab) at (a.south)
+ {\textbf{实际样本}\\70 岁及以上、无痴呆或认知功能障碍诊断且寄回问卷的医保计划成员\\[3mm]
+ \textbf{实际测量}\\关于过去一个月咖啡、茶、含咖啡因饮料及高能量饮料摄入情况的回答};
+\node[dcrresult,text width=32mm] (u) at (0,-135) {当前认识};
+\node[dcrresult,text width=32mm] (c) at (49,-135) {研究结论};
+\node[dcrresult,text width=32mm] (r) at (98,-135) {研究结果};
+\draw[dcrarr,blue!65] (qb.east)--node[above,font=\footnotesize]{设计}(pb.west);
+\draw[dcrarr,blue!65] (pb.east)--node[above,font=\footnotesize]{实施}(ab.west);
+\draw[dcrarr,red!65!black] (r)--node[above,font=\footnotesize]{解释}(c);
+\draw[dcrarr,red!65!black] (c)--node[above,font=\footnotesize]{推断}(u);
+\draw[dcrarr,blue!65!red] (ab.east)--++(6,0)|-node[pos=.3,right,rotate=90,font=\footnotesize]{分析}(r.east);
+\draw[dcrarr,red!65!blue] (u.west)--++(-6,0)|-node[pos=.3,left,rotate=90,font=\footnotesize]{思考}(qb.west);
+\node[dcrvalid] (ev) at (24.5,-108) {外部效度};
+\node[dcrvalid] (iv) at (73.5,-108) {内部效度};
+\node[text=dcrgold,align=center,font=\footnotesize\bfseries] (e) at (49,-108) {选择与误差\\影响……};
+\draw[dcrarr,black!45] (e.west)--(ev.east);
+\draw[dcrarr,black!45] (e.east)--(iv.west);
+\draw[dcrarr,black!45] (ev.north)--(24.5,-35);
+\draw[dcrarr,black!45] (ev.south)--(u.north east);
+\draw[dcrarr,black!45] (iv.north)--(73.5,-35);
+\draw[dcrarr,black!45] (iv.south)--(c.north east);
+\draw[dcrarr,black!45] (iv.east)--(121,-108);
+\end{tikzpicture}}

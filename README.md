@@ -51,6 +51,7 @@ scripts/                          仓库维护检查工具
 | [The Little Book of Generative AI Foundations: An Intuitive Mathematical Primer](08_2026_The_Little_Book_of_Generative_AI_Foundations/) | 生成式人工智能基础小册：直观数学导论 | [PDF](00_books/The_Little_Book_of_Generative_AI_Foundations_cn_translated.pdf) | 196 |
 | [The Principles of Diffusion Models](09_2026_The_Principles_of_Diffusion_Models/) | 扩散模型原理 | [PDF](00_books/The_Principles_of_Diffusion_Models_cn_translated.pdf) | 450 |
 | [A Definition and Roadmap for World Models](10_2026_A_Definition_and_Roadmap_for_World_Models/) | 世界模型的定义与发展路线图 | [PDF](00_books/A_Definition_and_Roadmap_for_World_Models_cn_translated.pdf) | 63 |
+| [Designing Clinical Research](11_2023_Designing_Clinical_Research/) | 临床研究设计 | [PDF](00_books/Designing_Clinical_Research_cn_translated.pdf) | 515 |
 
 《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 
@@ -70,6 +71,8 @@ scripts/                          仓库维护检查工具
 - **The Little Book of Generative AI Foundations：** arXiv:2605.29713v2，2026-09-08；8章、前言、结语、附录A—B和参考文献，已对照英文源码校订并重新编译。
 - **The Principles of Diffusion Models：** 英文底本为arXiv:2510.21890v3，封面日期2026-08-27；四个分部、第1—12章（第12章属尾声与展望）、附录A—D和参考文献，另有摘要、致谢、前言及符号说明。中文PDF已归档，中文TeX待恢复。
 - **A Definition and Roadmap for World Models：** arXiv:2607.06401v1；8节、28个小节、1个定义、19个编号公式、10幅图、1张表，以及摘要、贡献者和253条被引文献。
+
+《临床研究设计》第五版于2026-11-02依据用户提供的786页电子PDF完成中文译排。版权页与CIP标为2023年，原文件名标为2022年；译文以所提供第五版内容为底本。包含三个分部、20章、全部章内附录与习题、习题答案、442条术语释义及分层索引。原书疑点在文内加注；索引保留英文纸本页码，并附英文PDF页序与中文章节起始页表。中文源码、术语及构建入口见[书籍工程](11_2023_Designing_Clinical_Research/)。
 
 ## 新增与维护书籍
 

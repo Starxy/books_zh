@@ -1,0 +1,38 @@
+\newcommand{\chthirteenroc}{%
+\begin{tikzpicture}[x=.23mm,y=.23mm]
+\node[anchor=south west,inner sep=0] at (0,0)
+ {\includegraphics[width=124.89mm]{assets/ch13_roc_original.png}};
+% Cover only the English axis titles and legend text; keep all data marks and ticks.
+\fill[white] (0,130) rectangle (18,280);
+\node[rotate=90,font=\small] at (8,207) {灵敏度};
+\fill[white] (215,0) rectangle (355,22);
+\node[font=\small] at (290,10) {$1-$特异度};
+\fill[white] (364,69) rectangle (516,119);
+\node[anchor=west,font=\small] at (366,105) {出生 $\geq4$ 小时};
+\node[anchor=west,font=\small] at (366,80) {出生 $<1$ 小时};
+\end{tikzpicture}}
+\newcommand{\chthirteentree}{%
+\begin{tikzpicture}[x=1mm,y=1mm,>=Latex,
+ decision/.style={draw=dcrblue!70,fill=dcrlight,rounded corners=2pt,
+ align=center,text width=39mm,font=\small,inner sep=3mm},
+ high/.style={draw=red!65!black,fill=red!65!black,text=white,rounded corners=2pt,
+ align=center,text width=34mm,font=\small,inner sep=3mm},
+ low/.style={draw=green!45!black,fill=green!15!gray!25,rounded corners=2pt,
+ align=center,text width=34mm,font=\small,inner sep=3mm}]
+\node[decision,text width=63mm] (root) at (0,0)
+ {908 名 $<60$ 日龄婴儿，\\82 名（9\%）有严重细菌感染};
+\node[decision] (ua) at (0,-25) {尿液分析阳性？};
+\node[high] (h1) at (-30,-52) {较高风险\\$63/127=50\%$};
+\node[decision] (anc) at (25,-52) {中性粒细胞绝对计数\\$>4090/\mu$L？};
+\node[high] (h2) at (0,-82) {较高风险\\$15/248=6\%$};
+\node[decision] (pct) at (55,-82) {降钙素原\\$>1.71$ ng/mL？};
+\node[high] (h3) at (25,-113) {较高风险\\$3/11=27\%$};
+\node[low] (l) at (85,-113) {低风险\\$1/522=0.2\%$};
+\draw[->,thick] (root)--(ua);
+\draw[->,thick] (ua)--(h1);
+\draw[->,thick] (ua)--(anc);
+\draw[->,thick] (anc)--(h2);
+\draw[->,thick] (anc)--(pct);
+\draw[->,thick] (pct)--(h3);
+\draw[->,thick] (pct)--(l);
+\end{tikzpicture}}

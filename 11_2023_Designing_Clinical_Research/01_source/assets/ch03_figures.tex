@@ -1,0 +1,83 @@
+% Chinese reconstructions of source PDF figures 3.1--3.4.
+\newcommand{\chthreeoverview}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,>=Stealth,
+ panel/.style={draw=dcrblue!65,line width=.7pt,fill=white,align=center,text width=3cm},
+ base/.style={draw=dcrred,fill=white,line width=.8pt,minimum width=3.15cm,minimum height=.9cm,align=center}]
+\foreach \x/\t/\a/\b in {0/研究问题/目标人群/目标现象,5/研究计划/预定样本/预定变量,10/实际研究/实际样本/实际测量}{
+\node[panel,minimum height=2.5cm] (c\x) at (\x,0) {};
+\node[fill=dcrblue!65,text=white,align=center,minimum width=3.15cm,minimum height=.7cm] at (\x,1.05) {\bfseries\t};
+\node at (\x,.25) {\a};\node at (\x,-.65) {\b};}
+\draw[->,line width=3pt,dcrblue!65] (1.6,.25)--(3.4,.25) node[midway,above,font=\small] {设计};
+\draw[->,line width=3pt,dcrblue!65] (6.6,.25)--(8.4,.25) node[midway,above,font=\small] {实施};
+\draw[red,line width=1.2pt] (-1.75,-.15) rectangle (11.75,.65);
+\node[text=dcrgold,align=center] (choice) at (5,-2.2) {选择与误差\\影响……};
+\node[text=gray,align=center] (ev) at (2,-3) {外部\\效度};
+\node[text=gray,align=center] (iv) at (8,-3) {内部\\效度};
+\node[base] (understand) at (0,-5) {现有认识};
+\node[base] (conclusion) at (5,-5) {研究结论};
+\node[base] (result) at (10,-5) {研究结果};
+\draw[->,gray,thick] (choice)--(ev);\draw[->,gray,thick] (choice)--(iv);
+\draw[->,gray,thick] (ev)--(2.5,.1);\draw[->,gray,thick] (ev)--(understand);
+\draw[->,gray,thick] (iv)--(7.5,.1);\draw[->,gray,thick] (iv)--(11.85,-3);
+\draw[->,gray,thick] (iv)--(conclusion);
+\draw[->,line width=3pt,dcrred!75] (result.west)--(conclusion.east) node[midway,above,font=\small] {解释};
+\draw[->,line width=3pt,dcrred!90] (conclusion.west)--(understand.east) node[midway,above,font=\small] {推断};
+\draw[->,line width=2pt,dcrblue!70] (c10.east)--(12.3,0)--(12.3,-5)--(result.east) node[pos=.43,right,font=\small,text=black] {分析};
+\draw[->,line width=2pt,dcrred!85] (understand.west)--(-2.3,-5)--(-2.3,0)--(c0.west) node[pos=.43,left,font=\small,text=black] {思考};
+\end{tikzpicture}}
+
+\newcommand{\chthreegeneralize}{%
+\begin{tikzpicture}[font=\footnotesize,>=Stealth,
+ p/.style={draw=dcrblue!70,fill=white,align=left,text width=2.65cm,inner sep=5pt},
+ b/.style={draw=dcrred,align=center,minimum width=2.7cm,minimum height=.8cm}]
+\node[p] (target) at (0,0) {\textbf{目标人群}\\\textbf{推广较有把握：}\\研究期间美国所有郊区白人具有同样的关联。\\[4pt]\textbf{推广把握较小：}\\同样的关联存在于：\\其他成人（如黑人）；\\儿童；其他国家的人；\\2050 年的人。};
+\node[p] (accessible) at (4,.25) {\textbf{可接触人群}\\弗雷明汉所有成人中存在同样的关联。};
+\node[p] (intended) at (8,.25) {\textbf{预定样本}\\按设计选出的弗雷明汉成人样本中存在同样的关联。};
+\node[p] (actual) at (12,.25) {\textbf{实际样本}\\在研究参与者中观察到高血压与冠心病之间存在关联。};
+\draw[->,dcrblue!70,line width=2pt] (actual)--(intended);
+\draw[->,dcrblue!70,line width=2pt] (intended)--(accessible);
+\draw[->,dcrblue!70,line width=2pt] (accessible)--(target);
+\node[text=dcrgold,align=center] (choice) at (6,-3) {选择与误差\\影响……};
+\node[text=gray,align=center] (ev) at (2.5,-3.4) {外部效度};
+\node[text=gray,align=center] (iv) at (9.5,-3.4) {内部效度};
+\node[b] (u) at (0,-5.5) {现有认识};\node[b] (c) at (6,-5.5) {研究结论};\node[b] (r) at (12,-5.5) {研究结果};
+\draw[->,gray,thick] (choice)--(ev);\draw[->,gray,thick] (choice)--(iv);
+\draw[->,gray,thick] (ev)--(2,-.1);\draw[->,gray,thick] (ev)--(u);
+\draw[->,gray,thick] (iv)--(6,-.1);\draw[->,gray,thick] (iv)--(10,-.1);\draw[->,gray,thick] (iv)--(c);\draw[->,gray,thick] (iv)--(13.5,-3.4);
+\draw[->,dcrred!70,line width=2pt] (r)--(c) node[midway,above,text=black] {解释};
+\draw[->,dcrred!90,line width=2pt] (c)--(u) node[midway,above,text=black] {推断};
+\draw[->,dcrblue!70,line width=2pt] (actual.east)--(14,0)--(14,-5.5)--(r.east) node[pos=.45,right,text=black] {分析};
+\draw[->,dcrred!85,line width=2pt] (u.west)--(-2,-5.5)--(-2,0)--(target.west) node[pos=.45,left,text=black] {思考};
+\end{tikzpicture}}
+
+\newcommand{\chthreesteps}{%
+\begin{tikzpicture}[>=Stealth,font=\small,
+ chthreeStep/.style={draw=dcrblue!70,fill=dcrlight,text width=3.5cm,minimum height=3cm,align=left,inner sep=7pt}]
+\node[chthreeStep] (a) at (0,0) {\textbf{步骤 1：目标人群}\\[7pt]明确适合研究问题的人口学及临床特征。};
+\node[chthreeStep] (b) at (5.4,0) {\textbf{步骤 2：可接触人群}\\[7pt]明确时间及“地理”特征，使其既代表目标人群，又可供研究。};
+\node[chthreeStep] (c) at (10.8,0) {\textbf{步骤 3：预定样本}\\[7pt]明确抽样方法，选出能够代表可接触人群、愿意且能够充分参与的人。};
+\draw[->,line width=3pt,dcrblue!70] (a)--(b);\draw[->,line width=3pt,dcrblue!70] (b)--(c);
+\end{tikzpicture}}
+
+\newcommand{\chthreesamples}{%
+\begin{tikzpicture}[>=Stealth,font=\scriptsize,
+ r/.style={draw=dcrred,align=center,fill=white,text width=2cm,inner sep=3pt}]
+\foreach \x in {0,5,10}{\draw[dcrred,dashed,thick] (\x,0) circle (2.2);}
+\node[align=center,text=dcrred] (a) at (0,3.2) {接受白内障手术患者的\\可接触人群（$n=2500$）};
+\node[align=center,text=dcrred] (b) at (5,3.2) {有子痫前期孕妇的\\可接触人群};
+\node[align=center,text=dcrred] (c) at (10,3.2) {收治心肌梗死（MI）患者的\\医院可及总体};
+\foreach \x/\n in {0/a,5/b,10/c}{\draw[->] (\n.south) to[bend right] (\x,2.2);}
+\node[r] at (0,0) {随机抽取\\100 名患者};
+\foreach \i/\y/\t in {1/1.6/拉丁裔,2/.8/黑人,3/0/白人,4/-.8/亚裔,5/-1.6/其他}{
+\node[r] (s\i) at (5,\y) {随机抽取\\50 名女性};
+\node[anchor=east] (l\i) at (3.2,\y) {\t};\draw[->] (l\i)--(s\i);
+}
+\foreach \y in {-1.2,-.4,.4,1.2}{\draw[dcrblue] (3.15,\y)--(6.85,\y);}
+\draw (9.1,1) circle (.9);\draw (10.95,-.1) circle (.9);\draw (9.1,-1.05) circle (.9);
+\node at (9.1,1.72) {医院 A};\node[r,text width=1.5cm] at (9.1,.9) {随机抽取\\75 名 MI 患者};
+\node[align=center] at (10.95,-.1) {医院 B\\（不在样本中）};
+\node at (9.1,-.25) {医院 C};\node[r,text width=1.5cm] at (9.1,-1.2) {随机抽取\\75 名 MI 患者};
+\node[text=dcrblue,font=\small\bfseries] at (0,-2.7) {简单随机样本};
+\node[text=dcrblue,font=\small\bfseries] at (5,-2.7) {分层随机样本};
+\node[text=dcrblue,font=\small\bfseries] at (10,-2.7) {整群样本};
+\end{tikzpicture}}

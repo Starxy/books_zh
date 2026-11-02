@@ -1,0 +1,82 @@
+\providecommand{\chTenCounterfactual}{\begin{tikzpicture}[font=\small,>=Stealth]
+\fill[dcrlight] (-5,0) rectangle (5,4.2);\fill[dcrgold!15] (-5,-4.2) rectangle (5,0);
+\draw[gray] (0,-4.2)--(0,4.2);\draw[gray] (-5,0)--(5,0);
+\node[text=dcrblue] at (0,4.6) {现实世界};\node[text=dcrgold] at (0,-4.6) {反事实世界};
+\node at (-2.5,3.8) {有暴露};\node at (2.5,3.8) {无暴露};
+\node[anchor=west] at (-4.9,.3) {A};\node[anchor=east] at (4.9,.3) {B};
+\node[anchor=west] at (-4.9,-.3) {C};\node[anchor=east] at (4.9,-.3) {D};
+\node[draw,fill=dcrblue!20] at (-3.5,2.7) {男＋};\node[draw,fill=yellow!40] at (-1.4,1.5) {女＋};
+\node[draw,fill=gray!30] at (1.2,2.8) {男};\node[draw,fill=dcrpurple!30] at (2.6,2) {女};\node[draw,fill=dcrteal!25] at (4,1.2) {女};
+\node[draw,fill=gray!30] at (-4,-1.2) {男＋};\node[draw,fill=dcrpurple!30] at (-2.6,-2) {女＋};\node[draw,fill=dcrteal!25] at (-1.2,-2.8) {女＋};
+\node[draw,fill=dcrblue!20] at (1.4,-1.5) {男};\node[draw,fill=yellow!40] at (3.5,-2.7) {女};
+\draw[->,line width=2pt] (-.9,.9)--(.9,-.9);\draw[->,line width=2pt,gray] (.9,.9)--(-.9,-.9);
+\node[circle,draw,fill=white,text width=22mm,align=center,minimum size=28mm] at (0,0) {反事实\\转换器};
+\end{tikzpicture}}
+\providecommand{\chTenPlan}{\begin{tikzpicture}[font=\small,>=Stealth]
+\node[draw=dcrblue,text width=48mm,align=left,minimum height=65mm] (q) at (0,0) {\textbf{研究问题}\\[6pt]\textbf{目标人群}\\全部成人\\[9pt]\textbf{目标现象}\\原因：红肉摄入\\$\downarrow$ 因果效应\\效应：结肠癌};
+\node[draw=dcrblue,text width=48mm,align=left,minimum height=65mm] (p) at (8,0) {\textbf{研究计划}\\[6pt]\textbf{预定样本}\\符合选择标准的住院\\结肠癌病例和对照\\[9pt]\textbf{预定变量}\\预测：食物频率问卷的红肉摄入\\$\updownarrow$ 关联\\结局：病历结肠癌诊断};
+\draw[->,thick,dcrblue] (q)--node[above]{设计}(p);
+\node[draw=dcrred,minimum width=48mm,minimum height=12mm] (u) at (0,-4.7) {当前认识};
+\node[draw=dcrred,minimum width=48mm,minimum height=12mm] (c) at (8,-4.7) {研究结论};
+\draw[->,thick,dcrred] (c)--node[above]{推断}(u);
+\end{tikzpicture}}
+\providecommand{\chTenColliders}{\begin{tikzpicture}[font=\small,>=Stealth]
+\foreach \yy/\aa/\bb/\cc/\panel in {0/节食/癌症/体重下降/A,-3/父母吸烟/早产/低出生体重/B}{\begin{scope}[yshift=\yy cm]
+\node at (-3,.3) {\panel};\node[text=dcrpurple] (x) at (-1.5,.5) {\aa};\node[text=dcrgold] (y) at (2.2,.5) {\bb};
+\node[draw=dcrred,text=dcrteal] (z) at (.4,-.8) {\cc};\draw[->,dcrpurple] (x)--(z);\draw[->,dcrgold] (y)--(z);
+\end{scope}}\end{tikzpicture}}
+\providecommand{\chTenTableModel}[1]{\begin{tikzpicture}[font=\footnotesize,>=Stealth,thick,baseline=(current bounding box.north)]
+\ifcase#1
+\or
+\node (m) at (0,1.2) {吃红肉};\node (v) at (0,.3) {CVD};\node[draw] (h) at (2.2,-.5) {住院};\node (c) at (0,-1.3) {CRC};
+\draw[->,dcrblue] (m)--(v);\draw[->,dcrblue] (v)--(h);\draw[->,dcrblue] (c)--(h);
+\or
+\node (c) at (0,1) {CRC};\node (a) at (0,0) {贫血};\node (m) at (0,-1) {吃红肉};\draw[->,dcrblue] (c)--(a);\draw[->,dcrblue] (a)--(m);
+\or
+\node (s) at (0,1.2) {男性性别};\node (m) at (-1.1,0) {吃红肉};\node (c) at (1.5,0) {CRC};\draw[->,dcrblue] (s)--(m);\draw[->,dcrblue] (s)--(c);\draw[->,dcrblue] (m)--(c);
+\fi\end{tikzpicture}}
+\providecommand{\chTenSexDAG}{\begin{tikzpicture}[font=\small,>=Stealth,thick]
+\node (s) at (0,1.4) {性别};\node (m) at (-1.2,0) {吃红肉};\node (c) at (1.5,0) {CRC};
+\draw[->,dcrblue] (s)--(m);\draw[->,dcrblue] (s)--(c);\draw[->,dcrblue] (m)--(c);\end{tikzpicture}}
+\providecommand{\chTenTablePath}[1]{\begin{tikzpicture}[font=\scriptsize,>=Stealth,thick,x=.55cm,y=.55cm,baseline=(current bounding box.north)]
+\ifcase#1
+\or
+\node (p) at (0,0) {LDL};\node (o) at (4,0) {卒中};\node[align=center] (z) at (2,-1.7) {颈动脉\\狭窄};\draw[->] (p)--(o);\draw[->,dcrblue] (p)--(z);\draw[->,dcrblue] (z)--(o);
+\or
+\node (p) at (0,0) {吸大麻};\node (o) at (4,0) {肺癌};\node (z) at (2,1.7) {吸烟};\draw[->] (p)--(o);\draw[->,dcrblue] (z)--(p);\draw[->,dcrblue] (z)--(o);
+\or
+\node[align=center] (p) at (0,0) {低热量\\饮食};\node (o) at (4,0) {胃癌};\node[align=center] (z) at (2,-1.7) {体重下降};\draw[->] (p)--(o);\draw[->,dcrblue] (p)--(z);\draw[->,dcrblue] (o)--(z);
+\fi\end{tikzpicture}}
+\providecommand{\chTenDAG}[1]{\begin{tikzpicture}[font=\small,>=Stealth,thick]
+\ifcase#1
+\or\node[text=dcrpurple](p)at(0,0){头部创伤};\node[text=dcrgold](o)at(7,0){帕金森病};\node[text=dcrteal](z)at(3.5,1.7){骑车戴头盔};\draw[->,dcrblue](z)--(p);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){A型血};\node[text=dcrgold](o)at(7,0){因COVID-19住院};\node[text=dcrteal](z)at(3.5,1.7){男性};\draw[->,dcrblue](z)--(o);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){雄激素水平};\node[text=dcrgold](o)at(7,0){肾癌};\node[text=dcrteal](z)at(3.5,-1.7){男性型脱发};\draw[->,dcrblue](p)--(z);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){终生铅暴露};\node[text=dcrgold](o)at(7,0){退行性关节病};\node[text=dcrteal](z)at(3.5,-1.7){使用镇痛药};\draw[->,dcrblue](o)--(z);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){LDL胆固醇};\node[text=dcrgold](o)at(7,0){卒中};\node[text=dcrteal](z)at(3.5,-1.7){颈动脉狭窄};\draw[->,dcrblue](p)--(z);\draw[->,dcrblue](z)--(o);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){低热量饮食};\node[text=dcrgold](o)at(7,0){胃癌};\node[text=dcrteal](z)at(3.5,-1.7){体重下降};\draw[->,dcrblue](p)--(z);\draw[->,dcrblue](o)--(z);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){吸大麻};\node[text=dcrgold](o)at(7,0){肺癌};\node[text=dcrteal](z)at(3.5,1.7){吸烟};\draw[->,dcrblue](z)--(p);\draw[->,dcrblue](z)--(o);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){肥胖};\node[text=dcrgold](o)at(7,0){关节炎};\node[text=dcrteal](z)at(3.5,-1.7){久坐生活方式};\draw[->,dcrblue](o)--(z);\draw[->,dcrblue](z)--(p);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){激素替代治疗};\node[text=dcrgold](o)at(7,0){子宫内膜癌};\node[text=dcrteal](z)at(3.5,-1.7){绝经后出血};\draw[->,dcrblue](p)--(z);\draw[->,dcrblue](o)--(z);\draw[->](p)--(o);
+\or\node[text=dcrpurple](p)at(0,0){吃红肉};\node[text=dcrgold](o)at(7,0){结直肠癌};\node[text=dcrteal](z)at(3,2.3){健康生活方式};\node[text=dcrteal](s)at(5.4,1.2){癌症筛查};\draw[->,dcrblue](z)--(p);\draw[->,dcrblue](z)--(s);\draw[->,dcrblue](s)--(o);\draw[->](p)--(o);
+\fi\end{tikzpicture}}
+\providecommand{\chTenManyDAG}{\begin{tikzpicture}[font=\small,>=Stealth,thick]
+\node[text=dcrpurple](p)at(0,0){\underline{红肉摄入}};\node[text=dcrgold](o)at(8,0){\underline{结直肠癌}};
+\node[text=dcrteal](pol)at(-.5,2){政治观点};\node[text=dcrteal](f)at(3.8,2){\underline{膳食纤维}};\node[text=dcrteal](g)at(8,2){遗传多态性};
+\node[text=dcrteal](m)at(4,-1.6){微生物组};\draw[dotted,dcrteal] (3.3,-1.85)--(4.7,-1.85);
+\node[text=dcrteal](b)at(4,-3.2){粪便隐血试验阳性};
+\draw[->](p)--(o);\foreach \a/\b in {pol/p,f/p,f/o,g/o,p/m,m/o,p/b,o/b}{\draw[->,dcrblue](\a)--(\b);}
+\end{tikzpicture}}
+\providecommand{\chTenIQ}{\begin{tikzpicture}[font=\small,>=Stealth,x=.85cm,y=.18cm]
+\draw[->] (6,90)--(16.5,90);\node at(11,85.5){父母受教育年限};\draw[->] (6,90)--(6,122) node[above] {儿童IQ};
+\foreach \x in {6,8,10,12,14,16}{\draw(\x,90)--(\x,89.5) node[below]{\x};}
+\foreach \y in {90,95,100,105,110,115,120}{\draw(6,\y)--(5.9,\y) node[left]{\y};}
+\draw[dashed,dcrgold,thick](6,95)--(15.8,119.5);
+\foreach \y in {95,105,110}{\draw[gray,thin](6,\y)--(16,\y);}
+\fill[dcrblue](12,110)circle(2pt) node[below right]{$A$};\fill[dcrblue](10,105)circle(2pt) node[below right]{$A'$};\fill[dcrblue](10,95)circle(2pt) node[below right]{$B$};
+\node[align=center,anchor=east] (a)at(11.5,117){平均IQ\\正常铅水平};\draw[->](a)--(11.9,110.4);
+\node[align=center,anchor=east](ap)at(9.8,112){正常铅平均IQ\\按父母教育调整};\draw[->](ap)--(10,105.4);
+\node[align=center](b)at(8.7,92.5){平均IQ\\高铅水平};\draw[->](b)--(9.85,94.8);
+\draw[<->](14.1,105)--(14.1,110);\node[align=left,anchor=west,text width=21mm]at(14.2,107.5){父母教育\\所致IQ差};
+\draw[<->](14.1,95)--(14.1,105);\node[align=left,anchor=west,text width=21mm]at(14.2,100){铅所致\\IQ差};
+\end{tikzpicture}}

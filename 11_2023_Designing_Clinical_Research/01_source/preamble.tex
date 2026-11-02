@@ -1,0 +1,71 @@
+\documentclass[UTF8,fontset=fandol,zihao=-4,oneside,openany]{ctexbook}
+\usepackage[a4paper,textwidth=160mm,top=23mm,bottom=24mm,headheight=16pt,headsep=7mm]{geometry}
+\usepackage{amsmath}
+\usepackage{fontspec,unicode-math}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+\setmathfont{TeX Gyre Termes Math}
+\usepackage{microtype}
+\usepackage[table]{xcolor}
+\definecolor{dcrteal}{HTML}{005E6B}
+\definecolor{dcrred}{HTML}{9B3509}
+\definecolor{dcrblue}{HTML}{245AAB}
+\definecolor{dcrlight}{HTML}{E8F2FA}
+\definecolor{dcrpurple}{HTML}{6E5595}
+\definecolor{dcrgold}{HTML}{AC8422}
+\usepackage{graphicx,booktabs,longtable,tabularx,array,multirow}
+\usepackage{enumitem,etoolbox}
+\setlist{nosep,leftmargin=2em,topsep=4pt}
+\setlist[enumerate,2]{label=\alph*.}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{bookbox}[1]{enhanced,breakable,colback=dcrlight,colframe=dcrblue!65,
+ boxrule=.45pt,arc=0pt,title={#1},fonttitle=\bfseries\heiti,
+ colbacktitle=dcrlight,coltitle=dcrblue,before skip=9pt,after skip=9pt,
+ left=7pt,right=7pt,top=6pt,bottom=6pt}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.arrows,fit,backgrounds}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,labelsep=quad}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small 临床研究设计}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{.3pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\usepackage{xurl}
+\usepackage{hyperref,bookmark}
+\hypersetup{unicode=true,hidelinks,pdftitle={临床研究设计（第五版）},
+ pdfauthor={Warren S. Browner et al.},bookmarksnumbered=true}
+\pdfstringdefDisableCommands{\def\quad{ }\def\qquad{ }\def\term#1{#1}}
+\ctexset{chapter={format=\huge\bfseries\heiti\color{dcrteal},name={第,章},
+ beforeskip=0pt,afterskip=16pt},
+ section={format=\Large\bfseries\heiti\color{dcrred},numbering=false,beforeskip=16pt,afterskip=6pt},
+ subsection={format=\large\bfseries\heiti\color{dcrteal},numbering=false,beforeskip=10pt,afterskip=4pt},
+ subsubsection={format=\normalsize\bfseries\heiti,numbering=false,beforeskip=7pt,afterskip=3pt},
+ part={format=\Huge\bfseries\heiti\color{dcrteal},name={第,分部}}}
+\renewcommand{\normalsize}{\fontsize{11.5}{18}\selectfont}
+\AtBeginDocument{\normalsize}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{2pt}
+\setlength{\emergencystretch}{1.5em}
+\raggedbottom
+\newcommand{\term}[1]{\textcolor{dcrred}{#1}}
+\newcommand{\sourcepage}[1]{\phantomsection\label{sourcepage-#1}}
+\newcommand{\chapterauthors}[1]{{\noindent\small\bfseries\color{dcrteal}#1\par}\vspace{10pt}}
+\newcommand{\chapterappendix}[2]{\section*{附录 #1\quad #2}\addcontentsline{toc}{section}{附录 #1\quad #2}}
+\newenvironment{references}{\section*{参考文献}\begingroup\fontsize{9.5}{13}\selectfont
+ \begin{enumerate}[label=\arabic*.,leftmargin=2em,itemsep=3pt]}{\end{enumerate}\endgroup}
+\newenvironment{studyquote}{\begin{quote}\small}{\end{quote}}
+\newenvironment{answerlist}{\begin{description}[style=unboxed,font=\bfseries,
+ leftmargin=2.6em,labelwidth=2.2em,align=left,itemsep=5pt]}{\end{description}}
+\newcommand{\glossentry}[3]{\par\noindent\textbf{#2（#1）}\quad #3\par\medskip}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\LTpre}{7pt}\setlength{\LTpost}{9pt}
+\renewcommand{\arraystretch}{1.23}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000

@@ -1,8 +1,8 @@
 {
-  "organized_on": "2026-10-26",
+  "organized_on": "2026-11-02",
   "root": ".",
   "operation": "保留TeX底本与必要PDF资料，完整中文译本统一保存在00_books。",
-  "status": "十份中文PDF（九本书籍与一篇论文）已归档；《扩散模型原理》的中文TeX仍缺失，整本复核尚未启动。",
+  "status": "十一份中文PDF（十本书籍与一篇论文）已归档；《扩散模型原理》的中文TeX仍缺失，整本复核尚未启动。",
   "subfolders": [
     "00_originals",
     "01_source",
@@ -341,6 +341,25 @@
       "translation_completed_on": "2026-10-26",
       "glossary": "10_2026_A_Definition_and_Roadmap_for_World_Models/02_glossary/glossary_en_zh.md",
       "build_status": "passed_from_fresh_source_copy"
+    },
+    {
+      "title": "Designing Clinical Research",
+      "folder": "11_2023_Designing_Clinical_Research",
+      "original_name": "Designing Clinical Research{Warren S. Browner, Thomas B. Newman, Steven R. Cummings, Deborah G. Grady}(2022, LWW){115190982} libgen.li.pdf",
+      "renamed_file": "2023_Designing_Clinical_Research_5thEd_EN.pdf",
+      "relative_path": "11_2023_Designing_Clinical_Research/00_originals/2023_Designing_Clinical_Research_5thEd_EN.pdf",
+      "version": "Fifth edition; copyright and CIP 2023 (supplied filename says 2022)",
+      "pages": 786,
+      "bytes": 10937460,
+      "sha256": "f4679f71b29d44aba93234f8892a3f138bcb3c0341818492799814ced4ead609",
+      "translation_status": "全书中文译文已完成并编译",
+      "translated_pdf": "00_books/Designing_Clinical_Research_cn_translated.pdf",
+      "translated_pages": 515,
+      "translated_sha256": "cf6e202ff44f6aea29a89e6b70efb463c8307d17fa7c7bd0652a3426155595c3",
+      "chinese_source": "11_2023_Designing_Clinical_Research/01_source",
+      "build_command": "python \"11_2023_Designing_Clinical_Research/01_source/build.py\"",
+      "description": "三个分部、20章、章内附录与习题、习题答案、442条术语释义及分层索引；索引保留原纸本定位，另附章节起始页对照。",
+      "source_route": "pdf"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
@@ -358,7 +377,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 3482,
+  "translated_pages_total": 3997,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -374,7 +393,7 @@
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 10,
+  "collection_count": 11,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",

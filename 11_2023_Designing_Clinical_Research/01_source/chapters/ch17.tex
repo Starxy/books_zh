@@ -1,0 +1,355 @@
+\chapter{自报测量的设计、选择与实施}
+\chapterauthors{Alison J. Huang、Steven R. Cummings 和 Michael A. Kohn}
+\sourcepage{531}
+临床研究的许多信息来自\term{自报测量}（self-reported measures），由参与者描述自己的行为、态度、病史、症状、功能或生活质量。许多研究发现的效度，取决于这些信息是否得到良好判定。
+
+资料可通过纸质或在线问卷、纸质或电子日记及记录、面对面或电话结构式访谈等收集。无论采用何种方式，良好的自报测量都遵循相同设计原则：指引清楚，问题措辞恰当，能够获得有信息的回答；还应适合目标人群，考虑其预期读写能力和文化假定。
+
+本章介绍常见自报测量、问题及选项的基本要素，讨论影响资料质量的因素，并概述如何为研究选择、调整及实施合适的测量。
+
+\section{常见自报测量类型}
+自报资料可采用多种方式，服务不同目的，例如：
+\begin{itemize}
+\item 研究协调员通过结构式访谈，询问筛选问题，评估潜在参与者是否符合资格；
+\sourcepage{532}
+\item 用 Qualtrics、SurveyMonkey、REDCap 等软件制作电子邮件调查，让参与者报告健康史；
+\item 在家或研究访视时填写纸质问卷，描述健康相关生活质量；
+\item 日记记录间歇性症状的类型、频率，供日后提取；
+\item 使用手机等便携设备，电子记录何时发生某种健康行为。
+\end{itemize}
+
+\section{自报问题与回答的基本要素}
+\subsection{开放式与封闭式问题}
+结构化自报测量采用两种基本格式。\term{开放式问题}（open-ended questions）允许自由回答，以自己的语言表达，比固定答案清单的限制少。例如：
+\begin{studyquote}你认为哪些习惯会增加一个人发生卒中的可能？\end{studyquote}
+但回答可能多变、难以预料，因此不能可靠估计某种具体回答的频率。例如，即使明确列出吸烟时受访者会认为它是卒中危险因素，上题也未必促使其主动提到。开放式回答还常需定性方法，或编码词典等特殊系统，才能编码和分析（第14章）。
+
+\term{封闭式问题}（closed-ended questions）提供答案清单，使参与者考虑每种可能，也可能帮助澄清含糊问题，并能快速汇总答案。
+\sourcepage{533}
+但它仅提供研究者预期、列出的答案，会把参与者引向预设方向，无法让他们表达自己可能更准确、更有信息的回答。
+
+\subsection{封闭式问题的回答选项}
+如只允许一个答案，应注明“仅选一项”；在线调查也应设为只能选择一项。选项应互斥，即类别间没有有意义的重叠，避免受访者不知道选哪项。
+
+有些问题，如“你认为下列哪些因素增加卒中风险？”，要求“选择所有适用项”。但这不能迫使受访者逐项考虑，未选可能表示“否”，也可能只是遗漏。更好的办法是为每项分别设“是”“否”（第19章）。
+
+选项还应尽可能穷尽所有回答。若预期还有其他可能，可加“其他（请注明）”，收集补充的开放式回答。
+
+\subsection{封闭式问题中的有序选项}
+许多问题测量数量、频率或强度，产生有序分类资料，或连续尺度回答。使用有序分类尺度时，从排序清单选择，例如：
+\begin{bookbox}{过去7天，你的疼痛有多严重？}
+\sourcepage{534}
+\begin{itemize}[label=$\circ$]
+\item 1＝没有疼痛\item 2＝非常轻\item 3＝轻\item 4＝中等\item 5＝严重\item 6＝非常严重
+\end{itemize}
+\end{bookbox}
+\term{李克特量表}的选项围绕中间“中立”值两侧对称安排，既容纳中立或未决定者，也容纳态度较强者：
+\begin{bookbox}{过去7天，你对疼痛控制有多满意？}
+\begin{itemize}[label=$\circ$]
+\item 1＝非常满意\item 2＝满意\item 3＝既非满意，也非不满意\item 4＝不满意\item 5＝非常不满意
+\end{itemize}
+\end{bookbox}
+另一种方式使用连续数值尺度，例如让受访者在0（最轻）到10（最重）之间评分；可用文字锚定两端及中间位置：
+\begin{bookbox}{过去7天，你的疼痛有多严重？}
+\centering
+\begin{tikzpicture}[x=1.32cm,y=1cm,font=\small]
+\draw[dcrteal,line width=1pt] (0,0)--(10,0);
+\foreach \x in {0,...,10} {\node[below] at (\x,0){\x};}
+\node[below,align=center] at (0,-.55){没有\\疼痛};
+\node[below,align=center] at (2,-.55){轻度\\疼痛};
+\node[below,align=center] at (4,-.55){中度\\疼痛};
+\node[below,align=center] at (6,-.55){强烈\\疼痛};
+\node[below,align=center] at (8,-.55){严重\\疼痛};
+\node[below,align=center] at (10,-.55){能想象的\\最严重疼痛};
+\end{tikzpicture}
+\end{bookbox}
+\term{视觉模拟量表}（visual analog scale，VAS）让参与者在线条等连续图形上，标记两端之间最能代表回答的位置。两端用文字说明极端值，中间通常没有描述语。与分类评分相比，VAS 可能更敏感地反映微小变化。
+\sourcepage{535}
+\begin{bookbox}{请在线上标记一个位置，最恰当地表示你过去一周总体疼痛的严重程度。}
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+\draw[dcrteal,line width=1pt] (0,0)--(13.5,0);
+\node[below right,align=left] at (0,-.2){没有\\疼痛};
+\node[below left,align=right] at (13.5,-.2){能想象的\\最严重疼痛};
+\end{tikzpicture}
+\end{bookbox}
+
+\subsection{分支问题}
+研究者有时想根据初始回答进一步追问。\term{分支问题}（branching questions）让初始问题（常称筛选题）的答案，决定是否需回答后续题，节省时间并避免无关或重复问题。
+
+纸质工具必须用箭头把初始回答指向相应后续题，并注明“转至第11题”等指引：
+\begin{bookbox}{你是否曾被告知血压高？}
+\begin{tikzpicture}[font=\small,>=Stealth]
+\node[anchor=west] (yes) at (0,0){$\circ$ 是};
+\node[draw,anchor=north west,text width=9cm,inner sep=6pt] (follow) at (2,.3){第一次被告知血压高时，你多大？\\\underline{\hspace{1.5cm}}岁};
+\draw[->] (yes.east)--(follow.west);
+\node[anchor=west] (no) at (0,-1.8){$\circ$ 否};
+\node[anchor=west] (next) at (0,-2.8){转至第11题};
+\draw[->] (no.south)--(next.north);
+\end{tikzpicture}
+\end{bookbox}
+在线工具的优势之一是可编程自动跳题。例如，报告从未被告知血压高者，不再回答首次告知时间。但必须在预试阶段验证跳题逻辑，因为复杂分支可能产生死路和永远到不了的“孤立”问题。
+\sourcepage{536}
+\subsection{恰当的问题措辞}
+好的问题简单、没有歧义，鼓励准确诚实回答，又不使受访者难堪或受冒犯。
+\begin{itemize}
+\item \textbf{清楚。}措辞明确具体，尽量不用抽象词。“你通常运动多少？”可能因各人对运动理解不同而不可靠。可分别问“在通常的一周里，你快走多少小时？”等，覆盖相关活动；也可给明确、包容且有例子的定义，如“运动包括为改善健康和体能进行的任何身体活动，例如步行、游泳、瑜伽、球类或举重”。
+\item \textbf{简单。}采用常见词语和语法，避免术语。面向美国成年人的经验是，不超过八年级阅读水平；老年或弱势人群不超过六年级。可利用文字处理软件的年级评估工具，例如 Word 校对设置中的“可读性统计”。
+\item \textbf{中立。}题干避免暗示理想答案的带感情色彩词语和刻板印象。“过去一个月，你多常喝酒喝过量？”可能使人不愿承认。较少评判且更明确的问法是“过去一个月，你有多常一天喝五杯或更多酒？”
+\end{itemize}
+
+有时可用一段开场白，使受访者愿意承认可能不受赞许的行为或态度。
+\sourcepage{537}
+例如，询问服药依从性时先说：“人们有时会忘记服用医生开的药。你有过这种情况吗？”问题应让参与者感到选择任何答案都可接受，但又不诱导某一个答案。
+
+\subsection{设计问题的常见错误}
+\begin{itemize}
+\item \term{双重问题}（double-barreled questions）。每题只包含一个概念、问题或行为。例如，评估近期住院照护满意度：“你对医生和护士提供的照护有多满意？”若满意护士却不满意医生，就难以单答。分成两题更准确。
+\item \textbf{隐含假定。}不适用所有人的假定会使问题难答。例如，抑郁条目询问过去一周“即使家人帮助，我仍感到低落或抑郁”的频率，假定每个人都有家庭并寻求情感支持；没有家庭或不向家人求助者可能不知如何回答。
+\item \textbf{问题与选项不相配。}“过去一周你有疼痛吗？”若提供“从不、很少、经常、非常经常”，会令人困惑。可改为“过去一周你多久有一次疼痛？”
+\item \textbf{医学或科学行话。}措辞应符合受访者健康素养及一般读写水平。熟悉医学的研究者使用的词语，对无生物医学训练者可能很难理解。例如，问“血压高”而非“高血压”，“心跳快”而非“心动过速”，可能更清楚。
+\end{itemize}
+
+\sourcepage{538}
+\subsection{问题的时间范围}
+对随时间变化的特征，应引导参与者考虑适当时间单位。有些问法假定行为每天相同，如“你每天吃几片药？”但若服药变化，指定时间范围更可靠：“过去2周，你通常每天吃几片这种药？”
+
+\textbf{最有用的问题通常规定：在目标时期内，受访者能准确回忆的、最近且尽可能短的一段时间。}最佳长度取决于变量。过去一周睡眠习惯可能代表全年模式，但无保护性行为频率常每周变化，需要更长范围；若询问整整过去一年，回忆又可能不准确。
+
+平均行为可问“通常”“典型”情况，也可计数某段时间实际行为。例如：
+\begin{studyquote}通常一周你大约喝几份啤酒？（一份等于一罐或一瓶12盎司啤酒，或一大杯。）\\\underline{\hspace{1.5cm}}份／周\end{studyquote}
+虽然简单、简短，却假定人能把行为平均成单一估计。饮酒模式短期内也可能明显变化，因此难以决定何为典型一周。
+\sourcepage{539}
+人们往往报告最常见行为，忽略极端情况；若周末大量饮酒，询问典型日便会低估。
+
+若连续询问饮酒、大麻和其他物质等一系列行为，应使用相同方式和时间范围。
+
+\subsection{用多条目量表测量抽象变量}
+生活质量等抽象概念难以用单题把握，可将系列问题得分汇总为\term{多条目量表}（multi-item scale）（1，2）。\textbf{组合条目可丰富对概念的评估。}其可能得分范围也通常更广，例如多条目生活质量量表可为1--100分，单题只有“差”到“极好”的几个回答，从而可能提高检出差异的敏感性。
+
+例如，用下列问卷衡量一个人认为多吃水果蔬菜能改善健康的信念强度：
+\begin{bookbox}{每题圈出最能代表你意见的一个数字。}
+\small
+\begin{tabularx}{\linewidth}{YL{.07\linewidth}L{.07\linewidth}L{.07\linewidth}L{.07\linewidth}L{.07\linewidth}}\toprule
+条目 & 非常同意 & 同意 & 中立 & 不同意 & 非常不同意\\\midrule
+a. 多吃水果和蔬菜可降低心脏病风险。 & 1&2&3&4&5\\
+b. 素食者通常比饮食包含肉类者更健康。 &1&2&3&4&5\\
+c. 增加水果和蔬菜摄入可减缓衰老。 &1&2&3&4&5\\\bottomrule
+\end{tabularx}
+\end{bookbox}
+假定所有条目权重相同、测量同一总体特征，可对全部非缺失项求平均，得到总体得分。例如，对前两项“非常同意”（各1分）、第三项“不同意”（4分）者，总分为6。\footnote{译注：原文上一句说明对非缺失项求平均，此例给出的6则是三个条目的合计；若求平均应为2。此处保留原书的6。}
+\sourcepage{540}
+多条目测量的随机误差也较少，即信度较高，因为单项误差由其他项抵消。但复杂评分算法可能产生难以直观理解的结果，如生活质量46.2分。
+
+可用 Cronbach $\alpha$ 等指标（3）评价\term{内部一致性}（internal consistency），即不同条目获得相似回答的程度。$\alpha$ 取值0--1.0，根据条目得分间相关计算，越高表示越一致。不能预期所有人对两题完全相同，但较低值（如$\alpha<0.70$）提示有些条目测量不同特征，可能不宜合成单一量表。
+
+\subsection{多条目工具的格式}
+格式应方便按正确顺序答完全部题目。过于复杂会使参与者或访谈者跳题、答错或未完成。开始应说明填写方法；不仅自填工具，研究人员提问记录时也需清楚指引。有时可用容易回答的题目提供填写示例：
+\sourcepage{541}
+\begin{bookbox}{膳食摄入问卷填写说明}
+以下问题询问你过去12个月通常的饮食习惯。请标出通常每份的大小，并在每种食物旁写明食用频率。例如，若每周约三次喝中杯（6盎司）苹果汁，应这样回答：
+\begin{tabularx}{\linewidth}{L{.17\linewidth}Y Y}\toprule
+苹果汁 & $\circ$ 小杯（3盎司） & 每\ $\circ$ 天\\
+ & $\bullet$ 中杯（6盎司） & $\bullet$ 周\quad [3]次\\
+ & $\circ$ 大杯（9盎司） & $\circ$ 月\\
+ & & $\circ$ 年\\\bottomrule
+\end{tabularx}
+\end{bookbox}
+同一主题或同一格式的问题应放在一起。新主题或新格式前，应有简短说明、描述或标题。还应考虑问题的难度和敏感性；先问出生日期、家庭人数等情绪中立问题，再问收入或性行为等，可能获得更完整诚实的回答。
+
+\subsection{日记与记录表}
+对间歇发生（如跌倒）或每天变化（如月经出血）的事件、行为和症状，日记可能更准确，尤其当时间、持续长度很重要或容易遗忘时。可用纸张、在线表格或移动应用记录，再提取计算每天、每周等时段的平均频率。
+
+但日记比回顾式提问更费参与者时间。长期详细记录可能造成负担和“日记疲劳”，增加缺失与错误。
+\sourcepage{542}
+因此应仅用于主要预测变量或结局等必不可少的行为、事件，并在仍有信息价值的前提下尽量缩短记录时间。
+
+参与者通常在日常活动中填写，不能实时获得人员指导，所以清楚指引和示例尤其重要。例如，尿失禁治疗试验常用排尿日记测量症状频率、时间、严重程度和类型（4）；内容复杂，除了详细说明，还可能需已填示例：
+\begin{bookbox}{排尿日记填写示例}
+\small
+\begin{tabularx}{\linewidth}{L{.10\linewidth}YL{.15\linewidth}L{.13\linewidth}Y}\toprule
+1. 时间 & 2. 有尿意吗？ & 3. 在厕所排尿了吗？ & 4. 漏尿了吗？ & 若是，4a. 漏尿原因（DK＝不知道）\\\midrule
+10:30 & 无\quad 轻\quad 中\quad 重 & 否\quad 是 & 否\quad 是 & 尿急\quad 压力性\quad DK\\
+上午：是 & 1\quad 2\quad \textbf{3}\quad 4 & $\mdlgwhtsquare$\quad $\boxtimes$ & $\mdlgwhtsquare$\quad $\boxtimes$ & $\boxtimes$\quad $\mdlgwhtsquare$\quad $\mdlgwhtsquare$\\
+下午：否 & & & &\\\bottomrule
+\end{tabularx}
+\end{bookbox}
+纸质日记需人员提取以供定量分析，因此除参与者日记外，还需单独的提取表或问卷：
+\begin{bookbox}{排尿日记资料提取表示例}
+\small
+\begin{tabularx}{\linewidth}{L{.18\linewidth}YYYYY}\toprule
+ & 厕所排尿次数 & 漏尿次数 & 尿急所致 & 压力性漏尿 & 其他原因\\\midrule
+日间总计 & $\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$\\
+夜间总计 & $\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$ &$\mdlgwhtsquare\mdlgwhtsquare$\\\bottomrule
+\end{tabularx}
+\end{bookbox}
+\sourcepage{543}
+电子或在线日记可自动求和、求平均，从而省去这一步。
+
+\section{开发新测量还是使用已有测量}
+\subsection{开发新测量}
+如果某重要特征没有标准问卷、日记或访谈方法，研究者可能只能开发新工具。任务可小至为小型研究的次要变量增加一题，也可大至为多中心研究主要结局设计、验证新的多条目量表。
+
+最简单时，依据判断和基本写作原则拟题，再预试确认清楚、能获得适当回答。另一极端则可能需多年开发、完善和验证（5）。通常先澄清所测\term{构念}（construct），再通过定性访谈或焦点小组产生候选条目；焦点小组邀请有相关经历或特征者，由主持人带领，讨论研究主题1--2小时。依形成性定性研究提出初始条目池，再在其他人群中反复预试、完善。
+
+随后把最佳条目组成多条目工具，请同行、导师、专家批评审阅，再反复预试、修订、缩短和评价下节所述性能（例17.1）。
+\sourcepage{544}
+\begin{bookbox}{例17.1\quad 新多条目工具的开发}
+阴道老化对日常生活影响（Day-to-Day Impact of Vaginal Aging，DIVA）问卷说明了反复开发、测试和评价的过程。当时，NIH 专家组担心缺乏适用于不同女性人群、可靠评估绝经后阴道症状的测量（6）。DIVA 旨在自报常见症状对社区女性重要的多维功能与福祉的影响，历时多年开发测试。研究者先在三个种族／族裔的有症状绝经后女性中开展焦点小组，讨论症状对活动、感受和关系的影响（7）。产生100个候选条目，再根据临床专家与其他有症状女性意见修订、淘汰，形成25题问卷，在北加州多族裔队列的数百名女性中实施。根据条目及量表变异、内部一致性、信度和构念效度，进一步整合为23题、四个领域：日常生活活动、情绪福祉、性功能、自我概念与身体意象（8）。随后纳入 NIH 资助的“绝经策略：为症状与健康寻找持久答案”（Menopause Strategies: Finding Lasting Answers for Symptoms and Health，MsFLASH）阴道健康多中心试验网络，在美国其他地区继续考察构念效度（9），并评估治疗后变化敏感性及领域得分的潜在最小临床重要差异（10）。美国及其他国家继续使用问卷，使心理测量性能得以持续评价，也形成了适合癌症女性等特殊人群的简短或更专门版本（11）。
+\sourcepage{545}
+\end{bookbox}
+\textbf{开发和验证新工具耗时，只应在现有测量无法满足主要预测变量或结局等必需变量时采用。}
+
+\subsection{使用既有测量}
+尽可能使用或调整已有工具，既借助前人工作，也便于研究间比较。研究者常惊讶于自报工具数量和种类之多，许多在公共领域可免费使用；有些由共识组织开发，促进本领域研究和照护（表17.1）。
+\begingroup\small
+\begin{longtable}{L{.48\textwidth}L{.44\textwidth}}
+\caption*{\textbf{表17.1\quad 公开自报测量数据库示例}}\\\toprule
+数据库和网址 & 说明\\\midrule\endfirsthead\toprule 数据库和网址 & 说明\\\midrule\endhead
+PhenX 工具包\newline\url{https://www.phenxtoolkit.org/} & 提供成熟、经广泛验证的生物医学测量，含物质滥用与成瘾、精神健康、血液科学和健康社会决定因素专题。\\
+NIH 工具箱\newline\url{http://www.healthmeasures.net/exploremeasurement-systems/nih-toolbox} & 涵盖全生命周期的认知、感觉、运动和情绪功能测量，在全国代表性样本中开发验证。\\
+\sourcepage{546}患者报告结局测量信息系统（Patient-Reported Outcomes Measurement Information System，PROMIS）\newline\url{http://www.healthmeasures.net/exploremeasurement-systems/promis} & 提供适合一般及慢性病人群的身体、精神和社会健康自报测量。\\
+行为改变科学测量库\newline\url{https://scienceofbehaviorchange.org/measures} & 包含行为改变科学网络使用的行为改变机制测量，以及在特定人群中具有适当心理测量性能的依据。\\
+NIH 共同数据要素（Common Data Element，CDE）资源门户\newline\url{https://www.nlm.nih.gov/cde} & 提供 CDE、调查、问卷、工具、条目及其他收集方法清单。\\
+神经系统生活质量测量 Neuro-QoL\newline\url{http://www.healthmeasures.net/exploremeasurement-systems/neuro-qol} & 评估神经疾病成人、儿童的身体、精神和社会健康及生活质量。\\
+REDCap HealthMeasures\newline\url{https://www.healthmeasures.net/implement-healthmeasures/administration-platforms/redcap} & 包括 PROMIS 和 Neuro-QoL 等自报、代理报告工具，可通过 REDCap 在线调查和数据库应用实施。\\
+\sourcepage{547}Rand Health\newline\url{https://www.rand.org/health-care/surveys_tools.html} & 包含评估患者健康、筛查精神健康问题、测量照护质量和生活质量的调查。\\\bottomrule
+\end{longtable}
+经 Anita Stewart 博士许可改编。
+\endgroup
+
+并非所有工具都属于公共领域。不确定时，应联系作者或出版者，申请在新目标人群使用或调整的许可；无论是否标版权，保护都适用。即使免费开放，研究报告仍应注明或引用来源。
+
+若性能已经评价，最好原样使用。但部分条目不适当时，例如把某文化群体工具用于另一场景，可能需要删除、修改或增加条目。若工具太长，可询问开发者是否有保留原优势的简版。自行删题可能改变得分含义，损害与完整量表研究的可比性，降低可重复性和变化敏感性。不过，有些工具包含可独立计分的部分或“分量表”，可删去非必需部分、完整保留其他部分。
+
+\section{选择与调整测量的建议步骤}
+\sourcepage{548}
+以下过程适用于预测变量、结局或潜在混杂因素的每个变量／构念，旨在评估既有工具在目标人群中收集关键资料、回答问题的优缺点。
+\subsection{步骤1：界定变量或构念}
+列出重要变量或构念，可各写一个简短定义，并判断复杂变量是否包含应分别测量的多个维度或“子构念”。
+\subsection{步骤2：汇集既有测量}
+收集测量每个变量的现有问题和工具，先从研究过同类现象的项目及常用资料库寻找（表17.1），汇集最初及后续开发论文。有多个选择时，为每个变量建候选问题和工具文件夹。
+\subsection{步骤3：审视基础概念}
+审查每个工具如何界定概念，包括各领域、分量表的具体概念；根据说明、题干和回答尺度，判断这些定义与本研究目的多相似。
+\subsection{步骤4：检查量表构建与得分可解释性}
+查看得分范围与方向（高低分别意味着什么），数值是否有直观含义，构建时是否使用因子分析等特殊方法，以及有无说明如何计分的手册或指南。
+\sourcepage{549}
+\subsection{步骤5：审查既往实施方法和目标人群}
+判断开发或测试人群与当前目标是否相近；若不同，差异是否重要。查看以往自填或访谈、面对面或电话等方式，考虑是否需改变。若需翻译，检查有无相关语言版本。
+\subsection{步骤6：审查心理测量特征}
+对于旨在评估复杂构念的工具，应审查其在与目标人群类似的受访者中的表现。这些信息称为测量的\term{心理测量特征}（psychometric characteristics，表17.2），可据此判断工具是否可能产生可信、有用且与问题相关的信息。问卷和其他自报测量可从以下方面评价：变异程度（能否产生适当范围的回答）、信度（在同样条件下能否重复得到一致回答）、效度（能否代表原本打算测量的现象），以及变化敏感性（第4章）。
+
+\begingroup\small
+\begin{longtable}{L{.20\textwidth}L{.72\textwidth}}
+\caption*{\textbf{表17.2\quad 自报测量常见的心理测量性能}}\\\toprule
+性能 & 说明\\\midrule\endfirsthead\toprule 性能 & 说明\\\midrule\endhead
+变异程度 & 初步考察得分变异，确认回答是否具有足够分布。高度偏斜造成“天花板”或“地板”效应时，难以检出亚组差异或干预后的变化。\\
+\sourcepage{550}重测信度（test-retest reliability） & 两次测量间隔应短到真实特征不会改变，又长到受访者不会记得初次答案；此时应产生相同或近似结果。两次相关越高，重测信度越好，提示同条件下可重复。\\
+效度 & 通常先考察表面效度，即主观但重要地判断条目确在测量关注特征。例如，视觉功能工具应包含对常见视力障碍者有表面效度的问题：“不戴框架或隐形眼镜，你能读报吗？”再考察内容效度和构念效度，判断回答与重叠构念的其他测量是否相关。例如，新工具与同类构念的成熟测量相关（会聚效度，convergent validity），而与不同构念不相关（区分效度，divergent validity）。\\
+变化敏感性 & 若需测量变化，可在接受被认为有效的干预前后施测，评价反应性。例如，在白内障术前后评价视觉相关功能（如夜间开车）；视力由20/60改善为20/30者，问卷也应改善；视力未改善者则不应出现这种改善。\\
+最小临床重要差异（minimal clinically important difference） & 用作结局的数值测量，可确定对应有意义改善或恶化的最小分差。例如，视觉功能问卷中，最小重要变化可对应另一公认治疗成功指标，如术后对视力变化总体满意度，或是否愿意再次接受手术。\\\bottomrule
+\end{longtable}\endgroup
+\sourcepage{551}
+\subsection{步骤7：修订并缩短工具组合}
+不要“以防万一”收集可能有趣的额外测量。长访谈、问卷和检查会使人疲倦，降低准确度和可重复性。非必需问题增加获取、录入、清理与分析工作。取舍的好准则是：有疑问，就不纳入。
+\subsection{步骤8：预试工具}
+尽可能在类似目标人群的小样本中预试，了解施测时间，尤其是新工具或新人群。根据预试修改造成缺失或含糊回答的条目，改进说明与格式。关键测量可能需较大预试，确认每题／量表回答范围足够，并评估其他心理测量特征。
+
+\section{评价工具对不同人群的适用性}
+许多工具在受教育良好的主流群体中开发测试，对其他人群的适当性、信度、效度和反应性了解很少。
+
+偏倚可来自概念意义、处理问题的认知方式，以及对常用收集方法的熟悉程度等文化差异（12）。例如，多族裔成人抑郁研究的回答，会受表达负面情绪的文化规范、向陌生人谈情绪的自在程度，以及其他语言中“抑郁”一词细微含义的影响。
+\sourcepage{552}
+调整工具用于新人群时，需评价\term{概念适当性}（conceptual adequacy）：基本概念是否仍相关、有意义、可接受；也可能需确认跨群体\term{概念等价性}（conceptual equivalence），即测量的根本概念是否相同（13）。依赖不适用文化假定的条目可能需重新测试。
+
+还应重新评估心理测量性能，确认在新文化群体中仍能产生有信度、有效度的数据。虽费时费力，却可确保适用于各组。如果要比较文化群体，必须确信工具具有跨组\term{心理测量等价性}（psychometric equivalence），否则分差可能仅反映工具性能不同。
+
+\section{实施测量}
+\subsection{实施平台}
+参与者可在访视时用纸张、平板或工作站填问卷，点击网站或电邮链接，也可用预贴邮票信封寄回日记或表格。
+
+电邮与在线问卷比纸质有若干优势。答案可直接入库，省去转录成本与错误（14）；自动检查缺失和越界值，实时提示并在更正后才接受。
+\sourcepage{553}
+软件可提醒规定期限内未完成者，并在回答不完整时通知人员。
+
+但没有互联网或电子设备者无法使用，可能影响老年、经济弱势等较少使用数字技术人群的入组和随访。可能需借给或赠送便携设备，或请参与者来研究点完成。
+
+更换平台时可能需重新排版。纸质工具应留足间距，采用大而易读字体，如白纸黑字。在线工具需考虑设备屏幕，避免重要选项被截断，或需过多滚动才能看到。
+
+\subsection{自填与访谈实施}
+\textbf{自填方式适合基本人口信息等简单问题，高效而统一。}所需人员时间较少，尤其电子捕获后无需再录入；额外隐私也可能使症状或受污名行为等敏感题获得诚实回答。
+
+\textbf{访谈方式更适合需要解释或详细指引的复杂题。}读题与理解能力不一，或需实时确认完整性时，也可能需要访谈者。
+\sourcepage{554}
+但成本和时间较多，回答会受双方关系影响；提问、选项呈现的微小差异，也使每次实施略有不同。
+
+两种方法都受记忆不完美及社会赞许性回答影响，后者在直接回应研究人员的访谈中可能更明显。
+
+折中方式是让参与者在有人员在场的访视中自行完成，开始前解释说明；也可提前寄问卷，离开前检查完整性。
+
+\subsection{访谈方法}
+访谈技巧显著影响回答质量。保持每次措辞和非语言信号一致，是提高可重复性的关键；不能改变词语或语调，将自己的偏倚带入回答。为便于逐字朗读，问题应接近日常口语；生硬、不自然的问法会促使访谈者即兴改写，牺牲标准化。
+
+有时需追问，使回答更恰当或明确含义。可在题旁、题下写标准语句来统一追问。
+\sourcepage{555}
+例如询问典型日咖啡杯数，有人说“不清楚，每天不一样”，可规定追问：“请尽量估计，告诉我通常一天大约喝几杯。”
+
+访谈可面对面、视频或电话开展。若需直接观察收集其他资料，或参与者不用、不能用电话，面对面可能更合适。
+
+\section{其他测量策略}
+生理仪器与生物检测有时可替代自报，测量常见疾病或暴露。例如，佩戴式小型加速度计比问卷更客观、精确地估计身体活动总量、模式和能量消耗（15）；夜间活动记录仪及其他传感器，比睡眠日记更准确测量睡眠长度、中断（16）。应留意能测量过去只能靠自报特征的新技术。
+
+但自报常提供不可替代的独特、补充信息。失眠研究即使能客观记录睡眠长度、中断，了解参与者对质量或白天嗜睡影响的感受仍很重要。更重要的是，广泛性焦虑障碍、肠易激综合征等，主要由患者症状感受界定；自报便是最佳、甚至唯一的测量。
+
+\section{小结}
+\sourcepage{556}
+\begin{enumerate}
+\item 研究结果效度常取决于问卷、日记或访谈所得自报资料的质量与适当性。
+\item 问题应清楚、简单、中立，适合目标人群；从参与者视角检查歧义、双重问题、隐含假定、题答不配和医学行话。
+\item 态度、健康状况等抽象变量可用多条目量表，但应测量同一特征，并具有内部一致性。
+\item 应寻找能在目标参与者中产生有效、可信结果的既有工具。
+\item 开发工具应澄清概念、审查已有工具、提出候选题进行预试完善；最佳条目经同行批评审阅后，继续预试、修订和评价。
+\item 工具需预试，开始研究前应评估施测时间。
+\item 为某人群设计的工具未必适用于其他文化背景。
+\item 自填比访谈经济、易标准化，隐私有助于效度；访谈则促进完整回答、澄清理解。
+\item 电子与在线方式可提高效率和数据准确度，但要求参与者有数字通信条件。
+\item 问题应易读，访谈题读出声也应自然；格式应适合预期平台。
+\sourcepage{557}
+\end{enumerate}
+
+\begin{references}
+\item McDowell I. Measuring Health: A Guide to Rating Scales and Questionnaires. 3rd ed. Oxford University Press; 2006.
+\item Streiner DL, Norman GR. Health Measurement Scales: A Practical Guide to Their Development and Use. 4th ed. Oxford University Press; 2009.
+\item Bland JM, Altman DG. Cronbach’s alpha. Br Med J. 1997;314:572.
+\item Food and Drug Administration. Guidance for Industry and Food and Drug Administration Staff: Clinical Investigations of Devices Indicated for the Treatment of Urinary Incontinence. March 2011. FDA-2008-D-0457.
+\item Food and Drug Administration. Guidance for Industry: Patient-Reported Outcome Measures: Use in Medical Product Development to Support Labeling Claims; 2009.
+\item Santoro N, Sherman S. New Interventions for Menopausal Symptoms Meeting Summary. National Institutes of Health; 2007.
+\item Huang AJ, Luft J, Grady D, et al. The day-to-day impact of urogenital aging: perspectives from racially/ethnically diverse women. J Gen Intern Med. 2010; 25(1):45-51.
+\item Huang AJ, Gregorich SE, Kuppermann M, et al. Day-to-day impact of vaginal aging questionnaire: a multidimensional measure of the impact of vaginal symptoms on functioning and well-being in postmenopausal women. Menopause. 2015; 22(2):144-154.
+\item Hunter MM, Guthrie KA, Larson JC, et al. Convergent-divergent validity and correlates of the day-to-day impact of vaginal aging domain scales in the MsFLASH vaginal health trial. J Sex Med. 2020;17(1):117-125.
+\item Gibson CJ, Huang AJ, Larson JC, et al. Patient-centered change in the day-to-day impact of postmenopausal vaginal symptoms: results from a multicenter randomized trial. Am J Obst Gynecol 2020;223(1):99.e1-99.e9.
+\item Toivonen K, Santos-Iglesias P, Walker LM. Impact of vulvovaginal symptoms in women diagnosed with cancer: a psychometric evaluation of the day-to-day impact of vaginal aging questionnaire. J Women Health (Larchmt). 2021;30(8):1192-1203.
+\item Sanchez A, Hidalgo B, Rosario AM, Artiles L, Stewart AL, and Nápoles A. Applying self-report measures in minority health and health disparities research. In: Dankwa-Mullan I, Pérez-Stable EJ, Gardner KL, Zhang X, and Rosario AM, Eds. The Science of Health Disparities Research. 1st ed. John Wiley \& Sons, Inc. 2021;153-169.
+\sourcepage{558}
+\item Stewart AL, Thrasher AD, Goldberg J, and Shea JA. A framework for understanding modifications to measures for diverse populations. J Aging Health. 2012;24(6):992-1017.
+\item Dillman DA, Smyth JD, Christian LM. Internet, Mail, and Mixed-Mode Surveys: The Tailored Design Method. 3rd ed. Wiley, 2008.
+\item Mackey DC, Manini TM, Schoeller DA, et al. Validation of an armband to measure daily energy expenditure in older adults. J Gerontol Ser A Biol Sci Med Sci. 2011;66:1108-1113.
+\item Girshik J, Fritschi L, Heyworth J, Waters F. Validation of self-reported sleep against actigraphy. J Epidemiol. 2012;22:462-468.
+\end{references}
+
+\chapterappendix{17A}{第17章习题：自报测量的设计、选择与实施}
+\sourcepage{559}
+\begin{enumerate}
+\item 在酒精与肌力研究中，拟用下题确定当前饮酒：“你每天喝多少份啤酒、葡萄酒或烈酒？”勾选一个圆圈：$\circ$ 0；$\circ$ 1--2；$\circ$ 3--4；$\circ$ 5--6。简述至少两个问题。
+\item 写出几个能更好评估当前饮酒的自报问题。
+\item 年轻成人观察研究需收集性传播感染危险行为。比较自填问卷、访谈问卷及记录性行为日期和背景的日记，在测量无保护性交频率方面的优缺点。
+\item 你计划研究低收入慢性背痛老年人的社区运动项目，评价疼痛相关功能与生活质量。文献中发现新开发的10题“慢性背痛影响”（Impact of Chronic Back Pain，ICBP）结构式自报问卷，总分0（最小）至40（最严重）。以下发表信息各提示哪些适用性问题？
+\begin{enumerate}[label=4\alph*.]
+\item 由骨科医生开发，在私人诊所患者中评价性能。
+\item 寻求背痛手术咨询者中，均值$\pm$标准差为$10\pm6$，范围4--24。
+\item 内部一致性 Cronbach $\alpha=0.59$。
+\item 在一组同时填写另一种成熟、较通用的疼痛严重程度和影响测量工具的受访者中，
+\sourcepage{560}
+该工具简明疼痛量表（Brief Pain Inventory，BPI）的得分与 ICBP 得分并不相关。
+\end{enumerate}
+\end{enumerate}

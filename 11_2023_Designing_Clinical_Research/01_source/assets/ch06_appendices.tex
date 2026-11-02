@@ -1,0 +1,98 @@
+\sourcepage{164}
+\clearpage
+\chapterappendix{6A}{用 \texorpdfstring{$t$}{t} 检验比较连续变量均值时，每个等大组的所需样本量}
+\sourcepage{165}
+\subsection*{表 6A\quad 比较两个均值的每组样本量}
+最左列为标准化效应量 $E/S$。
+\input{assets/ch06_table_a}
+\sourcepage{166}
+\noindent\small $E/S$ 为预期效应量 $E$（两组均值差）除以结局标准差 $S$。按该行与指定 alpha、beta 列查得每组人数。单样本 $t$ 检验的总人数，为表列数字的一半。\par\normalsize
+\subsection{计算变异程度}
+变异常报告为标准差，或均值标准误（standard error of the mean，SEM）。样本量计算最有用的是标准差，转换很容易：标准差等于标准误乘以 $\sqrt N$，其中 $N$ 为用于计算平均值的参与者人数。例如，25 人低纤维饮食后减重为 $10\pm2$ kg（均值 $\pm$ SEM），则标准差为 $2\text{ kg}\times\sqrt{25}=10\text{ kg}$。
+\subsection{其他取值}
+表中没有的 $E/S$，或两组大小不等时，请使用 \url{https://www.sample-size.net} 计算器。
+
+\clearpage
+\chapterappendix{6B}{用卡方统计量或 \texorpdfstring{$Z$}{Z} 检验比较二分类变量比例时，每个等大组的所需样本量}
+\sourcepage{167}
+\subsection*{表 6B.1\quad 比较两个比例的每组样本量}
+每格三数分别对应：上方，单侧 $\alpha=0.05$ 或双侧 $\alpha=0.10$，$\beta=0.20$；中间，单侧 $\alpha=0.025$ 或双侧 $\alpha=0.05$，$\beta=0.20$；下方，单侧 $\alpha=0.025$ 或双侧 $\alpha=0.05$，$\beta=0.10$。各数值列为 $|P_1-P_0|$，最左列为两比例中较小者。
+\input{assets/ch06_table_b1}
+\sourcepage{168}
+单侧估计使用 $Z$ 统计量。$P_0$ 表示一组中预期发生结局的比例，$P_1$ 是另一组的比例。在病例对照研究，$P_1$ 是病例中具有预测特征者比例，$P_0$ 是对照中相应比例。按较小的 $P_0$ 或 $P_1$ 行和预期绝对差列读取；三个数表示指定 alpha、beta 下各组所需样本量。$P_0$ 或 $P_1$ 为 0.01～0.10 的更详细数字见表 6B.2。
+\subsection{其他取值}
+\sourcepage{169}
+两表未列的比例，或两组大小不等时，请用网站计算器。
+\subsection*{表 6B.2\quad 比较两个比例的每组样本量：较小比例为 0.01～0.10}
+上、中、下三数的 alpha、beta 组合与表 6B.1 相同；各列为两比例绝对差，最左列为较小比例。
+\input{assets/ch06_table_b2}
+\sourcepage{170}
+单侧估计使用 $Z$ 统计量。
+\subsection{其他取值}
+两表未列的 $P_0$、$P_1$，或两组大小不等时，请使用 \url{https://www.sample-size.net}。
+
+\clearpage
+\chapterappendix{6C}{使用相关系数时所需的总样本量}
+\sourcepage{171}
+\subsection*{表 6C\quad 判断相关系数是否异于零的样本量}
+最左列为预期相关系数 $r$。按该行和指定 alpha、beta 列查总人数。
+\input{assets/ch06_table_c}
+\subsection{其他取值}
+表中未列的 $r$，请使用网站计算器。
+
+\sourcepage{172}
+\clearpage
+\chapterappendix{6D}{连续变量描述性研究的样本量}
+\sourcepage{173}
+\subsection*{表 6D\quad 常见 \texorpdfstring{$W/S$}{W/S} 下的样本量}
+数字列为置信水平。
+\input{assets/ch06_table_d}
+$W/S$ 是标准化置信区间宽度，即所需总宽 $W$ 除以变量标准差 $S$。按标准化宽度行与指定置信水平列查总人数。
+\subsection{其他取值}
+表中未列的 $W/S$，请使用网站计算器。
+
+\clearpage
+\chapterappendix{6E}{二分类变量描述性研究的样本量}
+\sourcepage{174}
+\subsection*{表 6E\quad 比例的样本量}
+最左列为预期比例 $P$，各数值列为置信区间总宽 $W$。每格上、中、下三数依次为 90\%、95\%、99\% 置信水平所需样本量。
+\input{assets/ch06_table_e}
+\sourcepage{175}
+按具有目标特征的预期比例行和所需区间总宽列查人数；三数对应三个置信水平。
+\subsection{其他取值}
+表中未列的 $P$，请使用网站计算器。
+
+\clearpage
+\chapterappendix{6F}{\texorpdfstring{$t$}{t} 检验的使用与误用}
+\sourcepage{176}
+本章重点之一的双样本 $t$ 检验，比较两组变量均值。组别可按二分类预测变量定义，例如随机试验的有效药与安慰剂、队列的危险因素有无；也可按二分类结局定义，例如病例对照研究。比较一次测量时为非配对；比较每人两个时间点，例如干预前后测量的变化时，本书称配对。第三种单样本配对 $t$ 检验，则比较单组个体两次测量的平均变化与零或其他指定变化值。
+
+表 6F 展示了原本应作组间比较，却误用单样本配对检验的情况：随机盲法试验研究新安眠药对 0～10 分生活质量的影响。一些研究者曾分别对治疗及安慰剂组各做一次单样本检验，甚至发表，这并不恰当。
+
+标有匕首号 $\dagger$ 的 $P$ 值来自单样本配对检验。治疗组 $P=0.05$，显示研究期间显著变化；对照组 $P=0.16$，无显著变化。但这不能推断组间差别，不能据此说治疗有显著效果。
+
+星号 $*$ 是适当的双样本检验。前两个 $P=0.87$ 和 0.64 为非配对，显示初始及末次生活质量组间均无显著差异。最后 $P=0.17$ 是本书所称双样本配对检验，比末次比较 0.64 更接近 0.05，因为变化均值的标准差更小。
+\sourcepage{177}
+但是治疗组平均改善 1.3 分，与安慰剂 0.9 分无显著差异。因此，正确结论是本研究未发现治疗有效。
+\begin{bookbox}{表 6F\quad 分析配对资料的正确与错误方式}
+\begin{tabularx}{\linewidth}{YYYY}
+\toprule 测量时间 & 治疗（$N=100$） & 对照（$N=100$） & $P$ 值\\
+\multicolumn{4}{c}{生活质量：均值 $\pm$ 标准差}\\\midrule
+研究开始 & $7.0\pm4.5$ & $7.1\pm4.4$ & $0.87^*$\\
+研究结束 & $8.3\pm4.7$ & $8.0\pm4.6$ & $0.64^*$\\
+变化（结束减开始） & $1.3\pm2.1$ & $0.9\pm2.0$ & $0.17^*$\\
+$P$ 值 & $0.05^\dagger$ & $0.16^\dagger$ & \\\bottomrule
+\end{tabularx}
+\footnotesize $*$ 比较治疗组与对照组。$\dagger$ 比较变化值与零。
+\end{bookbox}
+
+\clearpage
+\chapterappendix{6G}{第 6 章习题：估计样本量与效能}
+\sourcepage{178}
+\begin{enumerate}
+\item 回顾第 5 章习题 1。研究需多少胃癌病例？若效能要求 0.90 呢？若显著性水平 0.01 呢？附加题：如果只有 60 例，她可以怎样处理？
+\item 肌力随年龄增长下降。初步资料提示，部分可能由脱氢表雄酮（dehydroepiandrosterone，DHEA）逐渐缺乏造成。研究者计划随机给予老年人 DHEA 或相同外观安慰剂六个月，再测肌力。既往平均握力 20 kg、标准差 8 kg。双侧 alpha 0.05、beta 0.10 时，为显示治疗组与安慰剂至少 10\% 差异，需多少人？若 beta 0.20 呢？
+\item 习题 2 计算人数超过可招募数。同事指出，老年人握力差异很大，可能掩盖治疗效果；建议研究开始及治疗后各测一次，以变化作结局。小型先导研究显示六个月变化标准差仅 2 kg。双侧 alpha 0.05、beta 0.10，仍检出效应量 2 kg，每组需多少人？
+\item 研究者怀疑阅读障碍三年级学生中左利手更多。既往约 10\% 为左利手，阅读障碍不常见。计划选学区全部阅读障碍者为病例，随机选同样多无障碍者为对照。若检出左利手相对右利手的阅读障碍 OR 为 2.0，双侧 alpha 0.05、beta 0.20，需要多少人？
+\item 研究者希望估计所在机构医学生平均智商，99\% 置信区间为 $\pm3$ 分。小型先导研究显示约 110～150 分，需要的大致人数是多少？
+\end{enumerate}

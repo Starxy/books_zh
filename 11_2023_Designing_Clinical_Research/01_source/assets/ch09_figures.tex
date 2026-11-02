@@ -1,0 +1,94 @@
+\usetikzlibrary{shapes.geometric}
+\providecommand{\chNineCaseControl}{\begin{tikzpicture}[font=\small,>=Stealth]
+\foreach \yy/\type/\pop in {0/病例/已发生结局的可接触人群,-4.2/对照/未发生结局的可接触人群}{\begin{scope}[yshift=\yy cm]
+\draw[dashed,dcrred] (3,0) ellipse (2 and 1.55);
+\node[text=dcrred] at (2.5,1.9) {\pop};
+\node[draw,text width=31mm,align=center] (s) at (3,0) {\textcolor{dcrgold}{\type}\\符合选择标准的样本};
+\node[draw,text width=29mm,align=center,text=dcrpurple] (m) at (-3,0) {测量预测变量\\（常为既往值）};
+\draw[thick,->,dcrteal] (s)--node[above]{回顾}(m);
+\end{scope}}
+\node[align=center,font=\footnotesize] at (3,-5.4) {对照通常更多，\quad 可与病例匹配};
+\node[align=center,font=\footnotesize] at (-3,-5.4) {与病例采用相同测量方式};
+\end{tikzpicture}}
+\providecommand{\chNineSelection}{\begin{tikzpicture}[font=\small,>=Stealth]
+\node at (0,3.1) {疾病新发病例};
+\fill[dcrblue!70] (-.35,2.7)--(.35,2.7)--(.35,1.5)--(.18,1.5)--(.18,.4)--(.1,.4)--(.1,-.7)--(.04,-.7)--(.04,-1.8)--(-.04,-1.8)--(-.04,-.7)--(-.1,-.7)--(-.1,.4)--(-.18,.4)--(-.18,1.5)--(-.35,1.5)--cycle;
+\foreach \yy/\txt in {1.8/未就医,.7/在别处就诊,-.4/就诊但误诊,-1.5/诊断前死亡或缓解}{\draw[->,thick] (.15,\yy)--(2.1,\yy) node[right]{\txt};}
+\draw[->] (0,-1.8)--(0,-2.4);\node at (0,-2.7) {可供病例对照研究的病例};
+\end{tikzpicture}}
+\providecommand{\chNineNested}{\begin{tikzpicture}[font=\footnotesize,>=Stealth]
+\draw[dashed,dcrred] (0,0) ellipse (2.3 and 2.4);\node[text=dcrred] at (0,2.7) {人群};
+\node[draw,text width=36mm,align=center,minimum height=28mm] (c) at (0,.5) {既已界定的队列\\预测因素可从保存的\\标本、影像等测量};
+\node[draw,text width=36mm,align=center] at (0,-1.3) {基线已有结局$\to$排除};
+\node[draw=dcrgold,text width=25mm,align=center] (cases) at (8,1.2) {\textcolor{dcrgold}{病例}\\测量预测因素};
+\node[draw=dcrgold,text width=25mm,align=center] (controls) at (8,-.2) {\textcolor{dcrgold}{对照}\\测量预测因素};
+\node[draw=dcrgold,text width=25mm,align=center] at (8,-1.8) {队列其余成员\\多数无须测量\\预测因素};
+\draw[->,thick,dcrteal] (2,.7)--(6.6,.7);
+\node[text=dcrgold,align=center] at (4.4,1.4) {结局发生时或\\随访结束时测量};
+\foreach \x in {3.5,5.5}{\draw[->,dcrteal] (\x,.7) to[bend left=30] (\x+.5,-2.1);}
+\node[text=dcrteal] at (4.7,-2.5) {失访};
+\draw[->,thick,dcrteal] (2,-3)--(6.5,-3);\node[fill=white,text=dcrteal] at (4.4,-3) {随访时间};
+\node[align=center] at (0,-3) {队列在过去组建};
+\node[align=center] at (8,-3.65) {现在从保存标本、影像等\\测量预测变量};
+\node[align=left] at (10.4,1.2) {全部病例\\或其样本};
+\node[align=left] at (10.4,-.2) {对照样本};
+\end{tikzpicture}}
+% Each of the 16 timelines below follows the printed Figure 9.4 (PDF p258).
+% The three incident cases, two losses, and three changes in exposure are retained.
+\providecommand{\chNineRiskSets}{\begin{tikzpicture}[font=\footnotesize,>=Stealth,x=.019cm,y=-.019cm]
+\draw[dashed,dcrred] (171,207) ellipse[x radius=3.12cm,y radius=3.17cm];
+\node[text=dcrred,align=left,anchor=west] (pop) at (8,16) {可接触人群};
+\draw[->,dcrred] (pop.east) to[bend left=20] (126,48);
+\node[align=center,anchor=south] at (177,104) {符合选择标准的队列};
+\draw[->] (225,94) to[bend left=20] (242,111);
+\draw[dcrred] (87,111) rectangle (273,299);
+\node[align=center,text width=29mm,font=\footnotesize\bfseries] at (180,205) {有结局发生风险的\\合格参与者};
+% 1: exposure starts before the first case.
+\draw[dcrblue,thick] (273,111)--(325,111);
+\draw[red,thick] (325,111)--(355,111);
+\node[diamond,fill=red,inner sep=1.7pt] at (355,111) {};
+% 2--7: one loss and a change from exposed to unexposed person-time.
+\draw[->,dcrblue,thick] (273,124)--(377,124);
+\draw[->,dcrblue,thick] (273,136)--(389,136);
+\draw[dcrblue,thick] (273,149)--(389,149);
+\draw[dcrblue,thick] (389,144)--(389,154);
+\draw[->,dcrblue,thick] (273,161)--(407,161);
+\draw[red,thick] (273,173)--(378,173);
+\draw[->,dcrblue,thick] (378,173)--(418,173);
+\draw[->,dcrblue,thick] (273,186)--(438,186);
+% 8: the second case occurs during unexposed person-time.
+\draw[dcrblue,thick] (273,199)--(439,199);
+\node[diamond,fill=dcrblue,inner sep=1.7pt] at (439,199) {};
+% 9--12: the second loss is on the eleventh timeline.
+\draw[->,red,thick] (273,211)--(466,211);
+\draw[->,dcrblue,thick] (273,224)--(479,224);
+\draw[dcrblue,thick] (273,236)--(494,236);
+\draw[dcrblue,thick] (494,231)--(494,241);
+\draw[->,dcrblue,thick] (273,248)--(504,248);
+% 13: the third case occurs during exposed person-time.
+\draw[red,thick] (273,260)--(507,260);
+\node[diamond,fill=red,inner sep=1.7pt] at (507,260) {};
+% 14--16: the final participant becomes exposed during follow-up.
+\draw[->,dcrblue,thick] (273,273)--(528,273);
+\draw[->,dcrblue,thick] (273,285)--(541,285);
+\draw[dcrblue,thick] (273,298)--(406,298);
+\draw[->,red,thick] (406,298)--(553,298);
+\foreach \xx/\nn/\labelx in {357/1/310,439/2/420,508/3/530}{
+  \draw[dcrteal] (\xx-10,98) rectangle (\xx+10,313);
+  \node[draw=dcrteal] (r\nn) at (\labelx,374) {风险集\nn};
+  \draw[->,dcrteal] (\xx,313)--(r\nn.north);
+}
+% Legend preserves the meanings of colors and endpoint symbols.
+\draw[dcrblue,thick] (540,89)--(568,89);
+\node[anchor=west] at (575,89) {未暴露人时};
+\draw[red,thick] (540,116)--(568,116);
+\node[anchor=west] at (575,116) {暴露人时};
+\node[diamond,fill=red,inner sep=1.6pt] at (545,143) {};
+\node[diamond,fill=dcrblue,inner sep=1.6pt] at (562,143) {};
+\node[anchor=west] at (575,143) {新发病例};
+\draw[red,thick] (547,165)--(547,178);
+\draw[dcrblue,thick] (562,165)--(562,178);
+\node[anchor=west] at (575,172) {失访};
+\draw[->,dcrblue,thick] (540,205)--(568,205);
+\node[anchor=west,align=left] at (575,213) {随访结束时\\未成为病例};
+\end{tikzpicture}}

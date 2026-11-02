@@ -1,0 +1,27 @@
+% Chinese reconstructions of source PDF figures 3.1--3.4.
+\newcommand{\chfouroverview}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,>=Stealth,
+ panel/.style={draw=dcrblue!65,line width=.7pt,fill=white,align=center,text width=3cm},
+ base/.style={draw=dcrred,fill=white,line width=.8pt,minimum width=3.15cm,minimum height=.9cm,align=center}]
+\foreach \x/\t/\a/\b in {0/研究问题/目标人群/目标现象,5/研究计划/预定样本/预定变量,10/实际研究/实际样本/实际测量}{
+\node[panel,minimum height=2.5cm] (c\x) at (\x,0) {};
+\node[fill=dcrblue!65,text=white,align=center,minimum width=3.15cm,minimum height=.7cm] at (\x,1.05) {\bfseries\t};
+\node at (\x,.25) {\a};\node at (\x,-.65) {\b};}
+\draw[->,line width=3pt,dcrblue!65] (1.6,-.65)--(3.4,-.65) node[midway,above,font=\small] {设计};
+\draw[->,line width=3pt,dcrblue!65] (6.6,-.65)--(8.4,-.65) node[midway,above,font=\small] {实施};
+\draw[red,line width=1.2pt] (-1.75,-1.05) rectangle (11.75,-.25);
+\node[text=dcrgold,align=center] (choice) at (5,-2.2) {选择与误差\\影响……};
+\node[text=gray,align=center] (ev) at (2,-3) {外部\\效度};
+\node[text=gray,align=center] (iv) at (8,-3) {内部\\效度};
+\node[base] (understand) at (0,-5) {现有认识};
+\node[base] (conclusion) at (5,-5) {研究结论};
+\node[base] (result) at (10,-5) {研究结果};
+\draw[->,gray,thick] (choice)--(ev);\draw[->,gray,thick] (choice)--(iv);
+\draw[->,gray,thick] (ev)--(2.5,-.7);\draw[->,gray,thick] (ev)--(understand);
+\draw[->,gray,thick] (iv)--(7.5,-.7);\draw[->,gray,thick] (iv)--(11.85,-3);
+\draw[->,gray,thick] (iv)--(conclusion);
+\draw[->,line width=3pt,dcrred!75] (result.west)--(conclusion.east) node[midway,above,font=\small] {解释};
+\draw[->,line width=3pt,dcrred!90] (conclusion.west)--(understand.east) node[midway,above,font=\small] {推断};
+\draw[->,line width=2pt,dcrblue!70] (c10.east)--(12.3,0)--(12.3,-5)--(result.east) node[pos=.43,right,font=\small,text=black] {分析};
+\draw[->,line width=2pt,dcrred!85] (understand.west)--(-2.3,-5)--(-2.3,0)--(c0.west) node[pos=.43,left,font=\small,text=black] {思考};
+\end{tikzpicture}}
