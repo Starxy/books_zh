@@ -176,7 +176,7 @@ IP 加权的目标是构造一个伪总体，其中协变量 $L$ 与治疗 $A$ �
 \]
 其中 $a^2=a\times a$ 为 $a$ 的平方，$\E[Y^{a=0}]=\beta_0$ 是 $a=0$ 时的平均体重增加，即在基线至 1982 年间吸烟强度不变时的平均体重增加。\mnote{针对连续治疗 $A$ 的（非饱和）边缘结构均值模型。}
 
-假设我们想估计把吸烟强度增加 20 支/日相对于不变的平均因果效应，即 $\E[Y^{a=20}]-\E[Y^{a=0}]$。\marginnote{更稳定地估计 IP 权重的方法是一个活跃的研究领域。见 Imai and Ratkovic (2015)、Wang and Zubizarreta (2020)、Kallus and Santacatterina (2018) 以及 Avagyan and Vansteelandt (2021) 的工作。}[0.55cm]根据我们的结构模型，$\E[Y^{a=20}]=\beta_0+20\beta_1+400\beta_2$，因此 $\E[Y^{a=20}]-\E[Y^{a=0}]=20\beta_1+400\beta_2$。现在我们需要估计参数 $\beta_1$ 与 $\beta_2$。为此，需要估计 IP 权重 $SW^{A}$ 以构造一个不受 $L$ 混杂的伪总体，然后把关联模型 $\E[Y\given A]=\theta_0+\theta_1A+\theta_2A^2$ 拟合到伪总体数据上。
+假设我们想估计把吸烟强度增加 20 支/日相对于不变的平均因果效应，即 $\E[Y^{a=20}]-\E[Y^{a=0}]$。\mnote{更稳定地估计 IP 权重的方法是一个活跃的研究领域。见 Imai and Ratkovic (2015)、Wang and Zubizarreta (2020)、Kallus and Santacatterina (2018) 以及 Avagyan and Vansteelandt (2021) 的工作。}根据我们的结构模型，$\E[Y^{a=20}]=\beta_0+20\beta_1+400\beta_2$，因此 $\E[Y^{a=20}]-\E[Y^{a=0}]=20\beta_1+400\beta_2$。现在我们需要估计参数 $\beta_1$ 与 $\beta_2$。为此，需要估计 IP 权重 $SW^{A}$ 以构造一个不受 $L$ 混杂的伪总体，然后把关联模型 $\E[Y\given A]=\theta_0+\theta_1A+\theta_2A^2$ 拟合到伪总体数据上。
 
 为估计稳定化权重 $SW^{A}=f(A)/f(A\given L)$，我们需要估计 $f(A\given L)$。对二值治疗 $A$，$f(A\given L)$ 是一个概率，所以我们用 logistic 模型估计 $\Pr[A=1\given L]$。对连续治疗 $A$，$f(A\given L)$ 是概率密度函数（pdf）。遗憾的是，pdf 一般很难估计，尤其当 $L$ 高维且含有连续成分时；这正是用 IP 加权处理连续治疗往往很危险的原因。在我们的例子中，我们假定密度 $f(A\given L)$ 为正态（高斯）分布，均值为 $\mu_L=\E[A\given L]$、方差 $\sigma^2$ 为常数。然后我们用线性回归模型对 $L$ 取值的所有组合估计均值 $\E[A\given L]$ 与残差方差 $\sigma^2$。我们还假定分子中的密度 $f(A)$ 也是正态的。用 IP 加权处理连续治疗时应格外小心，因为效应估计可能对用于估计条件密度 $f(A\given L)$ 的模型或算法的选择极为敏感。\mnote{代码：程序 12.4。估计的 $SW^{A}$ 从 0.19 到 5.10，均值为 1.00。我们假定方差为常数（同方差），检查残差图后看是合理的。}
 

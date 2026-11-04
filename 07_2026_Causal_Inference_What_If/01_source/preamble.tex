@@ -17,7 +17,7 @@
 \usepackage{ragged2e}
 \usepackage{fancyhdr}
 \usepackage{emptypage}
-\usepackage{marginnote}
+\usepackage{marginfix}
 \usepackage{etoolbox}
 
 % ---------- 颜色 ----------
@@ -75,9 +75,13 @@
 \makeatother
 
 % ---------- 边注 ----------
-\renewcommand*{\marginfont}{\sffamily\footnotesize\raggedright\linespread{1.06}\selectfont}
-\newcommand{\mnote}[1]{\marginnote{\textcolor{black!85}{#1}}}
+% marginfix 按实际高度排列边注，并在页底空间不足时向上收拢。
+% 所有边注均进入同一队列；不再使用不参与避让的 marginnote。
+\newcommand*{\marginfont}{\sffamily\footnotesize\raggedright\linespread{1.06}\selectfont}
+\newcommand{\mnote}[1]{\marginpar{\marginfont\color{black!85}#1}}
 \setlength{\marginparpush}{6pt}
+% 为边注最后一行的字形下缘留出空间，避免伸入页脚。
+\setlength{\marginheightadjustment}{-8pt}
 
 % ---------- 精要框 / 技术注记框 ----------
 \newcommand{\FPname}{精要}

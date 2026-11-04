@@ -262,11 +262,11 @@ H(\psi^\dagger)=Y-\psi^\dagger A
 
 共三个。使 $\alpha_1=0$ 的那个候选 $H(\psi^\dagger)$ 就是反事实 $Y^{a=0}$，相应的 $\psi^\dagger$ 就是真值 $\psi_1$。例如，设 $H(\psi^\dagger=10)$ 在给定协变量 $L$ 时与治疗 $A$ 无关，那么 $\psi_1$ 的估计 $\hat\psi_1$ 就是 10。大功告成。这就是 g 估计。
 
-\marginnote{\textcolor{black!85}{Rosenbaum (1987) 针对不随时间变化的治疗提出了这一过程的一个版本。}\par\vspace{4pt}\textcolor{black!85}{要点：g 估计并不检验条件可交换性是否成立；它假定条件可交换性成立。}}
+\mnote{\textcolor{black!85}{Rosenbaum (1987) 针对不随时间变化的治疗提出了这一过程的一个版本。}\par\vspace{4pt}\textcolor{black!85}{要点：g 估计并不检验条件可交换性是否成立；它假定条件可交换性成立。}}
 
 然而在实践中，我们要在既没有知道答案、又不爱玩游戏的朋友的情况下 g 估计参数 $\psi_1$。因此需要在一切可能取值 $\psi^\dagger$ 上搜索，直到找到使 $H(\psi^\dagger)$ 的 $\alpha_1=0$ 的那个值。由于不可能检验所有取值——任何给定区间内都有无穷多个 $\psi^\dagger$——我们可以在 $-20$ 到 $20$ 的可能范围内以 $0.01$ 为步长做细搜索。搜索越细，得到的估计 $\hat\psi_1$ 越接近真值，计算量也越大。
 
-\marginnote{\textcolor{black!85}{代码：程序 14.2}}[4.2\baselineskip]
+\mnote{\textcolor{black!85}{代码：程序 14.2}}
 
 在我们的戒烟例子里，我们先对 $\psi^\dagger$ 从 2.0 到 5.0、步长 0.1 的取值，计算每个个体在 31 个候选 $H(2.0)$、$H(2.1)$、$H(2.2)$、……$H(4.9)$、$H(5.0)$ 上的取值，然后拟合 31 个戒烟概率的 logistic 模型。这些模型与第 12 章估计 IP 权重分母所用的模型完全相同，只是每个模型都额外加入了一个候选 $H(\psi^\dagger)$。$H(\psi^\dagger)$ 的系数估计 $\hat\alpha_1$ 在 $H(3.4)$ 与 $H(3.5)$ 处最接近零。更细的搜索发现，$\hat\alpha_1$ 的最小值（实质上为零）出现在 $H(3.446)$。于是，戒烟对体重增加的平均因果效应 $\psi_1=\beta_1$ 的 g 估计为 $\hat\psi_1=3.4$ kg。
 
