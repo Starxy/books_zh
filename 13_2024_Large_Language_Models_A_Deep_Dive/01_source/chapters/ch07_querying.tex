@@ -1,0 +1,101 @@
+% PDF 309--315；原书第 281--287 页。
+\section{增强 RAG}
+\label{sec:ch07-enhancing}
+2022 年末，ChatGPT 等聊天机器人显著改善了 RAG 应用生成阶段的输出质量。它们还能用接近人类的方式回答事实性问题，使市场广泛需要能够处理训练数据之外信息的聊天机器人。这些变化推动了新 RAG 应用的发展，也催生了可纳入 RAG 工作流程的新模块和新做法。\refcite{ch07-ref-007}{Gao 等人（2024）}将采用这些新方法构建的系统称为“模块化 RAG”（modular RAG）。本节按 RAG 流程的先后顺序，从索引到查询、检索和生成，讨论其中若干改进，重点是每种办法要解决的具体表现问题。图~\ref{fig:ch07-indexing} 至图~\ref{fig:ch07-generation-augment} 将这些优化与增强方法画在 RAG 流程中的大致位置。
+
+\subsection{数据来源与嵌入}
+\begin{keypoint}
+改进数据索引最直接的办法，是清理数据，例如将输入文本规范化，去掉 HTML 标签等无关标记，以及选择更合适的分块大小。也有较复杂的方法，可以改善模型表现并扩大知识范围。这里简述怎样把结构化数据表纳入 RAG 索引系统，并讨论微调索引嵌入模型的优点。
+\end{keypoint}
+
+\subsubsection{使用结构化数据}
+\label{sec:ch07-structured}
+许多适合用 RAG 查询的信息来源，并不便于转换成纯文本，包括文档中的数据表、SQL 数据库、知识库和网站。数据结构承载大量事实、数值与比较信息，RAG 应用需要能够正确解读。这里回顾纳入这些信息的现有做法。
+
+\refcite{ch07-ref-010}{Hu 等人（2023）}与 \refcite{ch07-ref-024}{Wang 等人（2023d）}等研究考察了在 RAG 检索阶段加入表格查询的办法。例如，可以给一组文档补充一张含有更多相关信息的 SQL 表。再为 RAG 系统配置路由器（见第~\ref{sec:ch07-routing}~节），判断某项用户查询能否利用表中的信息。如果可以，就将用户查询交给在 SQL 代码上训练过的大语言模型，生成符合目的的 SQL 查询。随后用输出查询表格。最后，将返回的信息连同原始查询和其他检索到的文档交给生成器，形成最终回答。
+
+\sourcefigure{fig07_03.pdf}{用于增强 RAG 索引的办法。预处理、分块和元数据（第~\ref{sec:ch07-optimizing}~节）在生成嵌入之前对语料起作用，并可补充结构化数据（第~\ref{sec:ch07-structured}~节）。微调嵌入（第~\ref{sec:ch07-embedding-ft}~节）和选好索引存储（第~\ref{sec:ch07-optimizing}~节），可以改善检索的准确程度和吞吐量。}{fig:ch07-indexing}
+
+举例来说，\refcite{ch07-ref-010}{Hu 等人（2023）}给出下列输入与输出对，演示 ChatDB 系统的能力。
+
+\begin{lstlisting}[nolol=true]
+Question: What was the total revenue for January 2023?
+LLM-generated Query:
+SELECT SUM(total_price) AS total_revenue
+FROM sales
+WHERE sale_date >= '2023-01-01' AND sale_date < '2023-02-01';
+Database response:
++---------------+
+| total_revenue |
++---------------+
+|         707.0 |
++---------------+
+\end{lstlisting}
+
+系统将“2023 年 1 月的总收入是多少？”这一英语请求转换成精确的 SQL 查询，返回所需信息，供生成答案时使用。
+
+\begin{practicaltip}
+有些表格没有便于检索的格式。尤其在读入技术 PDF 等文档时，RAG 系统经常遇到包含有用信息的表格，但怎样转换成适合 RAG 的表示并不明确。如果结构不能保留单元格与其标签之间的关系，这些表格就难以发挥作用。为此，人们提出了多种办法，把 PDF 表格转换成便于检索的格式。LlamaParse\footnote{\url{https://www.llamaindex.ai/blog/introducing-llamacloud-and-llamaparse-af8cedf9006b}} 使用专有算法，将各种形状的表格解析成 Markdown 表示，保留表中数值与行、列标签之间的关系。还可以结合为 Markdown 优化的迭代检索方法，提取原表中的数据关系，供生成使用。
+\end{practicaltip}
+
+\subsubsection{微调嵌入}
+\label{sec:ch07-embedding-ft}
+检索的准确程度取决于嵌入模型是否能充分表达 RAG 文档的关键特征，从而取出相关文档。BGE（\refcite{ch07-ref-025}{Xiao et al., 2023}）和 VoyageAI（\refcite{ch07-ref-021}{Wang et al., 2023a}）等开源嵌入模型系列，在语义文本相似性任务上表现出色，但训练语料覆盖范围较广，遇到专业术语与概念较多的主题时，表现可能下降。可以用领域专用样例微调嵌入模型，缓解这一问题。
+
+LlamaIndex（\refcite{ch07-ref-012}{Liu, 2022}）实现了一种常用方法，直接从 RAG 文档构造训练样例。将留出集的文本块交给 GPT-4，让它编写可由对应文档回答的问题。然后微调嵌入，使检索器为每个生成的问题选中正确的来源文档。这样可以使嵌入模型接触专业术语，并弥合查询与 RAG 所选分块形式之间的语义差距。调优之后，可重新生成文档嵌入，再构建 RAG 应用。与使用基础嵌入相比，这一方法使检索准确率提高了 5\% 至 10\%，也改善了在某些专门主题上的表现。%
+\footnote{\url{https://blog.llamaindex.ai/fine-tuning-embeddings-for-rag-with-synthetic-data-e534409a3971}}
+
+\subsection{查询}
+\begin{keypoint}
+RAG 系统的一项主要挑战是，根据人编写的查询找到相关文档。用户之间的措辞差异很大，查询与用来回答查询的文档，在语法和包含的信息上也存在基本差别。这些差异使检索更难。查询增强通常把用户查询变成更容易匹配向量索引中恰当文本块的形式。下面介绍一些解析、转换和扩展查询的办法，以更好地满足用户需求。
+\end{keypoint}
+
+\subsubsection{查询改写}
+\label{sec:ch07-rewrite}
+如本书前面所述，大语言模型的回答可能对输入提示的细节很敏感。措辞、语法等细微变化，交给生成式模型后也可能引起结果的明显变化。RAG 系统需要忠实地回答用户查询，即便查询的写法不够理想。提高成功可能性的一种方法是自动查询改写（query rewriting），将人编写的查询转换成更可能检索到所需结果的提示。
+
+一般无法事先知道哪种提示形式最有效，因此可以按 RAG 流程的结果，用强化学习训练一个改写器来执行这种转换。\refcite{ch07-ref-014}{Ma 等人（2023a）}用 T5（\refcite{ch07-ref-018}{Raffel et al., 2020}）构造查询改写器，再用多个问答训练集与依据生成器输出准确程度构建的奖励模型调优。所得模块位于查询与检索之间，在生成嵌入前，将人编写的查询转换成优化后的形式。实验表明，可训练的改写器优于固定的改写器（定义后未经微调），也优于直接使用原查询。
+
+\sourcefigure{fig07_04.pdf}{RAG 查询阶段的增强方法。查询改写（第~\ref{sec:ch07-rewrite}~节）和查询到文档扩展（第~\ref{sec:ch07-query-to-doc}~节）用调优后的大语言模型改变用户提示，提高检索到正确文档的可能。子查询生成（第~\ref{sec:ch07-subqueries}~节）用模型将复杂提示分解成若干问题，使它们更易在 RAG 数据库中查询。路由（第~\ref{sec:ch07-routing}~节）按查询内容决定采用哪些方法。}{fig:ch07-query-augment}
+
+Raudashcl 提出的 RAG-Fusion 是另一种查询改写方法。%
+\footnote{\url{https://towardsdatascience.com/forget-rag-the-future-is-rag-fusion-1147298d8ad1}}
+它把数据库的初始查询送给 ChatGPT，改写成若干变体。用各变体分别查询数据库，再通过倒数排名融合（reciprocal rank fusion，RRF）将各次检索所得文档合并为一份排序表。在 RRF 中，某次检索返回的每份文档获得如下分数。
+\begin{equation}
+\mathrm{Score}_{\mathrm{RRF}}=\frac{1}{r+60},
+\label{eq:ch07-rrf}
+\end{equation}
+其中，$r$ 是该文档在检索结果中的名次。若一份文档在多次检索中出现，就把它的分数加起来。所得分数用于合并成一份排序表。因此，在 RRF 合并结果中得分最高的文档，往往在多个查询变体中都排得较靠前。这样可以减轻选词造成的检索结果波动，返回能够回应多种查询表达方式的文档。
+
+\subsubsection{查询到文档扩展}
+\label{sec:ch07-query-to-doc}
+基本 RAG 使用查询嵌入搜索一组向量化文本块，取余弦相似度最高的结果，希望它们包含可回答查询的具体信息。一个干扰因素是，查询的语法结构通常与文档文本块不同。如果文本块主题与查询内容足够相似，仍有希望得到合适的匹配，但不同的文本结构可能降低检索效果。
+
+查询到文档扩展（query-to-document expansion）旨在解决这个问题。它先将用户查询交给生成式模型，要求模型构造一段假想文本，其中包含查询的答案。再用嵌入模型将这个文本块向量化，在向量索引中搜索语义相近的文本。这一过程被戏称为生成增强检索（generation-augmented retrieval，GAR）（\refcite{ch07-ref-016}{Mao et al., 2021}）。由于大语言模型可能对查询的答案产生幻觉，生成的文本块常含有错误信息。不过，它仍能形成一段关于查询主题、格式更接近待搜索文档的文本。可以微调生成模型，使输出更像 RAG 文本块，也可以采用少样本上下文学习，将查询与若干示例文本块一起交给模型，让它掌握目标文档的主要特征。\refcite{ch07-ref-006}{Gao 等人（2023）}提出了 HyDE（Hypothetical Document Encoding，假想文档编码），\refcite{ch07-ref-022}{Wang 等人（2023b）}提出了 query2doc，都是这种方法的变体。后者在多种稠密检索任务上，观察到表现最多改善 15\%。
+
+\subsubsection{生成子查询}
+\label{sec:ch07-subqueries}
+基本 RAG 的一个局限是，只在单条查询上作语义相似度匹配。对于较复杂的查询，回答往往需要综合可能分散于 RAG 语料各处的信息，这个办法常无法找到全部信息。
+
+例如，假设有一组关于美国消费者价格指数（Consumer Price Index，CPI）的报告，用户想知道 2020 至 2023 年各年 3 月的通胀主要由哪些因素推动。这些信息合起来都在文档里，却未必出现在同一个文本块及其周围。需要从各月的 CPI 报告中分别提取。基本 RAG 的语义匹配能力不足以取出所有必要信息，并在生成阶段把它们综合起来。
+
+为弥补这一不足，可以生成子查询（subquery）。使用能力较强的聊天机器人（例如 ChatGPT）把原始查询拆成若干提示，每条提示只针对一项必要信息。每项查询各自执行检索与生成，再把所有回答汇总，作为原始查询的上下文交给最后的生成阶段。对上述 CPI 请求，子查询引擎可能作如下处理。
+
+\begin{lstlisting}[nolol=true]
+Input:
+What were the key drivers of inflation in the month of March
+from 2020-2023?
+Subqueries:
+1) What were the key drivers of inflation in March 2020?
+2) What were the key drivers of inflation in March 2021?
+3) What were the key drivers of inflation in March 2022?
+4) What were the key drivers of inflation in March 2023?
+\end{lstlisting}
+
+这些子查询分别询问 2020、2021、2022 和 2023 年 3 月通胀的主要驱动因素，更能针对性地从 CPI 文档中找到所需信息，提取四个月中各自较重要的通胀成因。再将四个回答合成原始查询的上下文。
+
+\subsubsection{路由}
+\label{sec:ch07-routing}
+从用户查询到执行检索，RAG 系统可以采用多条途径，例如查询改写、生成子查询，以及查询向量索引以外的知识库。为了利用这些能力，可让 RAG 系统根据查询内容在多种选项之间选择。可以引入路由系统（routing system），接收查询，判断哪些操作最能为好的回答准备信息，再启动相应模块。
+
+通常，这类决策由能力较强的生成式模型完成。为它设计提示模板，让模型仔细考察查询，再从列出的选项中选择。需要考虑的问题包括，查询是否含糊到需要改写，是否必须用多个子提示取回全部必要信息，以及查询是否涉及相关数据库中的信息。

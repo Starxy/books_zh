@@ -1,0 +1,48 @@
+\fronttocchapter{索引}
+\label{back:index}
+\chaptercredit{}
+
+索引按英文词项排列，词项后的数字是原书印刷页码。点击页码可跳到该页附近的译文章节，再用中英文词项搜索具体位置。下表列出各章和附录在原书与译本中的起始页。
+
+\begin{center}
+\small\renewcommand{\arraystretch}{1.08}
+\begin{tabularx}{\linewidth}{@{}Xrr@{}}
+\toprule
+章节 & 原版起页 & 译本起页\\
+\midrule
+1\quad 大语言模型导论 & 1 & \pageref{ch:intro}\\
+2\quad 语言模型预训练 & 29 & \pageref{ch:pretraining}\\
+3\quad 基于提示的学习 & 83 & \pageref{ch:prompting}\\
+4\quad 大语言模型的适配与使用 & 135 & \pageref{ch:adaptation}\\
+5\quad 大语言模型的对齐调优 & 177 & \pageref{ch:alignment}\\
+6\quad 大语言模型的挑战与应对方法 & 219 & \pageref{ch:challenges}\\
+7\quad 检索增强生成 & 275 & \pageref{ch:rag}\\
+8\quad 生产环境中的大语言模型 & 315 & \pageref{ch:production}\\
+9\quad 多模态大语言模型 & 375 & \pageref{ch:multimodal}\\
+10\quad 大语言模型的演进与前沿 & 423 & \pageref{ch:frontiers}\\
+附录 A\quad 深度学习基础 & 439 & \pageref{app:deep-learning}\\
+附录 B\quad 强化学习基础 & 451 & \pageref{app:reinforcement-learning}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begingroup
+\newcommand{\bookindexgroup}[1]{\par\medskip\noindent\textsf{\textbf{#1}}\par\nobreak\smallskip}
+\newcommand{\bookindexpage}[2]{\hyperlink{#1}{\textcolor{blue!50!black}{#2}}}
+\newcommand{\bookindexentry}[3]{%
+  \par\hangindent=1.25em\hangafter=1\noindent
+  \if\relax\detokenize{#1}\relax
+    \textbf{#2}%
+  \else
+    \textbf{#1}\hskip.25em\relax(#2)%
+  \fi
+  \enspace#3\par}
+\small
+\raggedright
+\setlength{\parskip}{2pt}
+\setlength{\columnsep}{12pt}
+\interlinepenalty=10000
+\begin{multicols}{2}
+\input{index_terms}
+\end{multicols}
+\endgroup

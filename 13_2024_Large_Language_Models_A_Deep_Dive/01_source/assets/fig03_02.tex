@@ -1,0 +1,26 @@
+% 重绘自原书第 86 页的图 3.2。示例文本和分类标签保留原样。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  tag/.style={anchor=east,font=\footnotesize\sffamily\bfseries}]
+\node[tag] at (1.92,3.98) {预测};
+\node[tag] at (1.92,2.16) {模型};
+\node[tag,align=right] at (1.92,.19) {训练\\数据};
+\node[inner sep=0pt] (prediction) at (5.16,4.04) {
+  \begin{tabular}{|l|}\hline
+  Negative\\\hline Positive\\\hline
+  \end{tabular}};
+\filldraw[fill=black!4,draw=black!68] (3.55,1.02) rectangle (6.77,3.14);
+\draw[black!50] (3.74,1.13) -- (3.74,3.00);
+\draw[blue!38!gray,thick,domain=3.74:6.62,samples=60]
+  plot (\x,{1.13+1.87/(1+exp(-5.8*(\x-5.40)))});
+\node[font=\tiny,anchor=west] at (3.77,1.17) {0};
+\node[font=\tiny,anchor=west] at (3.77,3.00) {1.0};
+\node[align=left] at (4.77,2.15) {逻辑回归\\分类器};
+\draw[black!62,line width=1.4pt,-{Stealth[length=2.1mm]}] (5.16,3.14) -- (prediction.south);
+\node[inner sep=0pt,anchor=north] at (5.53,.91) {
+  \begin{tabular}{|l|l|}\hline
+  \textbf{文本} & \textbf{标签}\\\hline
+  Cannot watch this movie. & Negative\\\hline
+  Loved every bit of it. & Positive\\\hline
+  \end{tabular}};
+\end{tikzpicture}

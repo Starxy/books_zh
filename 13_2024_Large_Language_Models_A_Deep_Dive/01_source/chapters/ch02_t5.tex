@@ -1,0 +1,65 @@
+% PDF 94--97；原书第 64--67 页。
+\subsection{T5（编码器—解码器）}
+文本到文本迁移 Transformer（Text-to-Text Transfer Transformer，T5）提出了一个统一框架，整合自然语言处理迁移学习过程中的多种要素（\refcite{ch02-raffel}{Raffel et al., 2020}）。其中包括不同的无标签数据集、预训练目标、基准以及微调方法。该框架用消融实验（ablation experiment）组合和比较这些要素，从中找出能够改善表现的做法。
+
+\subsubsection{数据集}
+T5 的数据来自从 Common Crawl 网页档案抽取的文本。研究者对数据作了基本的启发式过滤与预处理。提取文本后，他们剔除了不当语言、占位文本（例如 Lorem Ipsum）、代码括号（例如“\{”）、重复内容，以及没有句末标点的句子。由于主要任务面向英文文本，他们使用 \textit{langdetect7} 排除被判定为英语的置信度低于 99\% 的网页。
+
+\subsubsection{架构}
+T5 主要采用编码器—解码器架构。除少数改动外，它与原始 Transformer 的设计非常相似。T5 的一个特点是使用相对位置嵌入。它根据自注意力中键与查询之间的偏移生成可学习的嵌入，而不用固定的位置嵌入。研究提出了五种模型变体。
+\begin{itemize}
+\item \textbf{Base} 是与 \texttt{BERT\_base} 对应的基准模型，含 2.22 亿个参数。
+\item \textbf{Small} 是 Base 的缩小版，含 6\,000 万个参数，编码器和解码器各 6 层。
+\item \textbf{Large} 是 Base 的扩展版，含 7.70 亿个参数。
+\item \textbf{3B} 在 Base 的基础上扩大到 30 亿个参数。
+\item \textbf{11B} 是最大的变体，把 Base 扩大到 110 亿个参数。
+\end{itemize}
+
+\subsubsection{训练}
+T5 采用多任务学习方法，在预训练阶段组合不同任务。按训练方式，这些任务可分为两类。
+\begin{enumerate}
+\item \textbf{无监督训练}
+  \begin{itemize}
+  \item 在 C4 数据集上用传统的语言模型训练任务和最大似然目标训练。
+  \item 在掩码语言建模等无监督任务中，T5 使用从 \texttt{<extra\_id\_0>} 到 \texttt{<extra\_id\_99>} 的 100 个不同词元来组织输入与输出文本。例如，要遮盖“My name is John Smith”中的“name is”，输入变为“My \texttt{<extra\_id\_0>} John Smith”，期望输出为“\texttt{<extra\_id\_0>} name is \texttt{<extra\_id\_1>}”。
+  \end{itemize}
+\item \textbf{监督训练}
+  \begin{itemize}
+  \item 纳入问答、摘要和分类等自然语言处理任务，用整理后的数据作监督训练。所有任务都改成适合编码器—解码器模型的文本输入、文本输出形式，见图~\ref{fig:ch02-t5}.
+  \item 研究采用提示方法，要求语言模型以文本给出回答。T5 处理的每项自然语言处理任务，都转换成文本到文本的格式。例如，输入可以是“\texttt{translate English to German: The house is wonderful.</s>}”，相应输出为“\texttt{<pad> Das Haus ist wunderbar.</s>}”。
+  \item 研究者进行了一系列消融实验，以确定各部件的合适策略，见图~\ref{fig:ch02-t5-ablation}。最初比较三种主要方法，即（1）语言建模，（2）BERT 式掩码，（3）恢复被打乱的顺序。BERT 式方法效果最好，因此被选作后续分析。
+  \item 后续实验考察了不同的输入破坏策略，如仅遮盖词元而不调换、遮盖词元并用哨兵词元（sentinel token）替代，以及删除词元。
+  \end{itemize}
+\end{enumerate}
+
+\sourcefigure{fig02_11.pdf}{T5 架构把不同的自然语言处理任务统一为序列到序列任务，并按提示生成相应的回答。图中由上到下依次是德语翻译、句子可接受性判断、语义相似度评分和摘要。}{fig:ch02-t5}
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_12}
+\caption{用于选择 T5 训练策略的消融实验设置。}
+\label{fig:ch02-t5-ablation}
+\end{figure}
+
+\subsubsection{要点}
+\begin{keypoint}
+\begin{itemize}
+\item T5，尤其是 11B 变体，在多数自然语言处理任务中达到当时的先进水平，在 24 项任务中有 18 项领先。
+\item 实验表明，为模型提供双向上下文有助于提高预测能力。
+\item 破坏词的训练目标最为有效，尤其是目标序列较短的做法。这是因为用较短序列预训练，计算成本更低。
+\item 过滤训练数据，尤其是移除非英语内容，已证明有益。此外，在新闻报道等特定领域数据上预训练，显著改善了相关下游任务的表现。
+\item 同时用多个任务训练一个模型看似有吸引力，却导致表现下降，在 GLUE、SQuAD 和 SuperGLUE 等任务上尤其明显。
+\item 加深和加宽模型、延长训练时间，可以显著改善表现。训练多个模型再使用集成方法（ensemble method），还能进一步提升表现。
+\end{itemize}
+\end{keypoint}
+
+\subsubsection{变体}
+\begin{enumerate}
+\item \textbf{T5v1.1} 是修改架构后的增强版，只在 C4 上预训练，未加入监督任务。
+\item \textbf{mT5} 是多语言变体，在涵盖 101 种语言的 mC4 语料库上训练。
+\item \textbf{byT5} 用字节序列训练，替代 SentencePiece 子词词元序列。
+\item \textbf{UL2} 与 T5 类似，采用多种去噪目标进行预训练。
+\item \textbf{Flan-T5} 是采用基于提示的 Flan 预训练方法得到的 T5 模型。所用数据集包括 \texttt{taskmaster2}、\texttt{djaym7/wiki\_dialog}、\texttt{deepmind/code\_contests} 等。
+\item \textbf{FLan-UL2} 使用 Flan 的提示调优方法和数据集集合微调 UL2。
+\item \textbf{UMT5} 是多语言 T5 模型，采用 UniMax 采样，在更新的 mC4 多语言语料库上训练。该语料库含 107 种语言、29 万亿个字符。
+\end{enumerate}

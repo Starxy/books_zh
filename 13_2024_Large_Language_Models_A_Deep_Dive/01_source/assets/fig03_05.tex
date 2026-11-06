@@ -1,0 +1,15 @@
+% 重绘自原书第 90 页的图 3.5。
+\begin{tikzpicture}[font=\small\sffamily,
+  flow/.style={draw=black!60,-{Stealth[length=1.4mm]},line width=.48pt},
+  bracket/.style={draw=black!49,line width=.45pt}]
+\node[font=\footnotesize\itshape] (input) at (0,0) {Cannot watch this movie.};
+\node[fill=black!15,align=center,minimum width=21mm] (classifier) at (4.00,0)
+  {分类器\\$P(\symbf{y}\mid\symbf{x};\theta)$};
+\node[font=\footnotesize\itshape] (output) at (6.51,0) {negative};
+\draw[flow] (input.east) -- (classifier.west);
+\draw[flow] (classifier.east) -- (output.west);
+\draw[bracket] (input.south west) -- ++(0,-.19) -| (input.south east);
+\draw[bracket] (output.south west) -- ++(0,-.19) -| (output.south east);
+\node[below=2mm of input] {$\symbf{x}$};
+\node[below=2mm of output] {$\symbf{y}$};
+\end{tikzpicture}

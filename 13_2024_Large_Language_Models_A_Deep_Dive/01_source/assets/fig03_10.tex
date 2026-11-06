@@ -1,0 +1,47 @@
+% 重绘自原书第 100 页的图 3.10。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  option/.style={align=center,minimum width=24mm,minimum height=8mm,inner sep=2pt},
+  wire/.style={draw=black!48,line width=.65pt}]
+\node[option,fill=green!17] (root) at (0,0) {基于提示\\的学习};
+\node[option,fill=yellow!65!orange] (model) at (2.92,3.80) {预训练模型};
+\node[option,fill=blue!15] (eng) at (2.92,2.70) {提示工程};
+\node[option,fill=orange!20] (ans) at (2.92,-2.00) {答案工程};
+\node[option,fill=black!10] (multi) at (2.92,-3.10) {多提示学习};
+\node[option,fill=black!55,text=white] (tuning) at (2.92,-4.20) {基于提示的微调};
+
+\node[option,fill=blue!26] (promptshape) at (5.84,3.80) {提示形式};
+\node[option,fill=blue!26] (template) at (5.84,1.60) {提示模板设计};
+\node[option,fill=orange!30] (answershape) at (5.84,-.60) {答案形式};
+\node[option,fill=orange!30] (search) at (5.84,-3.30) {答案搜索};
+
+\node[option,fill=blue!37] (cloze) at (8.76,4.35) {完形填空提示};
+\node[option,fill=blue!37] (prefix) at (8.76,3.25) {前缀提示};
+\node[option,fill=blue!59!black,text=white] (manual) at (8.76,2.30) {手工设计};
+\node[option,fill=blue!59!black,text=white] (auto) at (8.76,1.38) {自动设计};
+\node[option,fill=orange!59] (token) at (8.76,.50) {词元};
+\node[option,fill=orange!59] (span) at (8.76,-.60) {片段};
+\node[option,fill=orange!59] (sentence) at (8.76,-1.70) {句子};
+\node[option,fill=orange!68!black,text=white] (human) at (8.76,-2.75) {人工设计};
+\node[option,fill=orange!68!black,text=white] (automated) at (8.76,-3.85) {自动答案搜索};
+
+\draw[wire] (root.east) -- (1.46,0);
+\draw[wire] (1.46,-4.20) -- (1.46,3.80);
+\foreach \target/\y in {model/3.80,eng/2.70,ans/-2.00,multi/-3.10,tuning/-4.20} {
+  \draw[wire] (1.46,\y) -- (\target.west);
+}
+\draw[wire] (eng.east) -- (4.38,2.70) |- (promptshape.west);
+\draw[wire] (4.38,2.70) |- (template.west);
+\draw[wire] (ans.east) -- (4.38,-2.00) |- (answershape.west);
+\draw[wire] (4.38,-2.00) |- (search.west);
+
+\draw[wire] (promptshape.east) -- (7.30,3.80) |- (cloze.west);
+\draw[wire] (7.30,3.80) |- (prefix.west);
+\draw[wire] (template.east) -- (7.30,1.60) |- (manual.west);
+\draw[wire] (7.30,1.60) |- (auto.west);
+\draw[wire] (answershape.east) -- (span.west);
+\draw[wire] (7.30,-.60) |- (token.west);
+\draw[wire] (7.30,-.60) |- (sentence.west);
+\draw[wire] (search.east) -- (7.30,-3.30) |- (human.west);
+\draw[wire] (7.30,-3.30) |- (automated.west);
+\end{tikzpicture}

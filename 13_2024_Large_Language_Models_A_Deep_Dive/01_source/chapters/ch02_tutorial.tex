@@ -1,0 +1,54 @@
+% PDF 106--108；原书第 76--78 页。
+\section[教程：认识大语言模型与预训练]{教程——认识大语言模型与预训练}
+\subsection{概述}
+本教程考察大语言模型架构如何工作，重点比较掩码模型与因果模型。先考察现有的预训练模型，了解它们怎样产生输出。看清大语言模型发挥作用的方式后，再运行一个简化的训练循环，初步了解训练过程。
+
+\noindent\textbf{目标}
+\begin{itemize}
+\item 检查大语言模型的输入和输出，包括词元切分器。
+\item 逐步查看代码，演示掩码大语言模型和因果大语言模型如何预测词元。
+\item 以小规模例子演示怎样从头训练大语言模型。
+\item 检查训练循环是否按预期工作。
+\end{itemize}
+这里给出的是教程的简版。完整版可在 \url{https://github.com/springer-llms-deep-dive/llms-deep-dive-tutorials} 查阅。
+
+\subsection{实验设计}
+本教程最终要展示预训练过程怎样运作。我们先分析大语言模型架构的组成部分。首先考察前向传播（forward pass），借此介绍各部件以及它们如何协作，实现语言建模目标。BERT 与 GPT-2 都使用这段代码，以对比掩码模型（纯编码器）与自回归模型（纯解码器）的异同。
+
+分析完词元预测的步骤后，就容易理解大语言模型的训练循环。它采用典型的反向传播（backpropagation），使梯度经过模型的各层。这里假定读者了解深度学习基础，不再讨论具体超参数的影响或训练循环的其他细节。需要简要复习的读者可以参阅附录。
+
+练习结束后，代码会得到一个记住一小部分维基百科数据的示例模型。随书提供的笔记本只包含 GPT-2 的训练循环。读者有需要时，可以把这个实验扩展到其他大语言模型，包括掩码模型。
+
+\subsection{结果与分析}
+在大语言模型预训练实验中，训练损失很快下降，验证损失却保持在高位，如图~\ref{fig:ch02-loss} 所示。这是模型过拟合训练数据时会出现的现象。要使模型习得足够多的信息，在验证数据上表现出良好的泛化能力，需要更多文档和训练步骤。英语中可能出现的词元序列数量庞大，出现这种结果并不奇怪。
+
+\sourcefigure{fig02_15.pdf}{GPT-2 学习一小组维基百科文档内容时的损失曲线。横轴为训练步数，纵轴为损失，蓝线为训练集，橙线为验证集。}{fig:ch02-loss}
+
+虽然训练还不足以让模型在验证数据上表现良好，可以看出它已从训练数据中学到了很多内容。可以用一个训练样例来验证。
+\begin{lstlisting}[language=Python,caption={访问数据集中的文本样例}]
+print(raw_datasets["train"][0]["text"])
+# Output:
+# William Edward Whitehouse (20 May 1859 – 12 January 1935) was an English cellist.
+# Career
+# He studied for one year with Alfredo Piatti, for whom he deputised (taking his place in concerts when called upon), and was his favourite pupil. He went on to teach at the Royal Academy of Music, Royal College of Music and King's College, Cambridge...
+\end{lstlisting}
+
+给定开头若干词元，可以检查模型是否能补全这段文本。
+\begin{lstlisting}[language=Python,caption={用模型生成文本}]
+text = "William Edward Whitehouse (20 May 1859 – 12 January 1935) was an English cellist.\n\nCareer\nHe studied for one year with"
+
+model_inputs = tokenizer(text, return_tensors='pt')
+output_generate = model.generate(**model_inputs, max_new_tokens=5)
+sequence = tokenizer.decode(output_generate[0])
+print(sequence)
+# Output:
+# William Edward Whitehouse (20 May 1859 – 12 January 1935) was an English cellist.
+#
+# Career
+# He studied for one year with Alfredo Piatti,
+\end{lstlisting}
+
+在这个例子中，模型正确识别了 Alfredo Piatti，说明它反复接触特定的维基百科条目后记住了这条信息。这让我们相信，词元切分器与模型能从维基百科中学习语言模式。当然，这并不保证同样的训练方法可以直接用于完整规模的数据集。学习率等具体参数可能需要调整。
+
+\subsection{结论}
+我们展示了掩码语言模型与因果语言模型如何预测词元，并演示了这些模型如何反复尝试预测词元，随后更新权重以降低损失，由此把信息学进模型。

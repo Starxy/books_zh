@@ -1,0 +1,58 @@
+% 重绘自原书第 39 页的图 2.6。
+\begin{tikzpicture}[
+  font=\scriptsize\sffamily,
+  block/.style={draw=black!28,rounded corners=1.2pt,align=center,
+     minimum height=4.9mm,minimum width=18mm,inner sep=1.4pt},
+  items/.style={rounded corners=1.3pt,draw=black!25,text width=26mm,
+     align=left,inner sep=2.8pt,font=\scriptsize\sffamily},
+  frame/.style={dashed,draw=black!45,rounded corners=2pt,line width=.54pt},
+  wire/.style={-{Stealth[length=1.2mm]},draw=black!62,line width=.47pt}]
+\draw[frame] (0,-.23) rectangle (3.00,6.37);
+\node[anchor=west,font=\scriptsize\sffamily\bfseries] at (.13,6.12) {模块层面};
+\node[items,fill=cyan!15,anchor=north] (act) at (1.50,5.88) {激活函数\\扩大容量\\去掉 FFN 模块};
+\node[items,fill=yellow!31,below=1.5mm of act] (norm) {归一化的位置\\替代归一化\\免归一化};
+\node[items,fill=red!22,below=1.5mm of norm] (attention) {稀疏注意力\\线性化注意力\\查询原型\\记忆压缩\\低秩自注意力\\带先验的注意力\\改进的多头注意力};
+\node[items,fill=blue!19,below=1.5mm of attention] {绝对位置\\相对位置\\其他表示\\隐式表示};
+
+\filldraw[fill=black!5,draw=black!20,rounded corners=2mm] (4.20,2.01) rectangle (6.27,6.07);
+\node[block,fill=yellow!28] (n2) at (5.23,5.73) {相加与归一化};
+\node[block,fill=cyan!17,minimum height=7mm] (ff) at (5.23,4.96) {逐位置 FFN};
+\node[block,fill=yellow!28] (n1) at (5.23,3.97) {相加与归一化};
+\node[block,fill=red!20,minimum height=7mm] (ma) at (5.23,3.20) {多头注意力};
+\node[draw=black!56,circle,inner sep=1pt] (p) at (5.23,1.63) {$+$};
+\node[block,fill=blue!16,minimum width=14mm] (pos) at (4.14,1.63) {位置编码};
+\node[block,fill=cyan!17] (token) at (5.23,.79) {词元嵌入};
+\node (input) at (5.23,.11) {输入};
+\node at (6.54,4.48) {$\times L$};
+\draw[wire] (input.north) -- (token.south);
+\draw[wire] (token.north) -- (p.south);
+\draw[wire] (pos.east) -- (p.west);
+\draw[wire] (p.north) -- (ma.south);
+\foreach \offset in {-.43,.43} {
+  \draw[wire] (5.23,2.54) -- (5.23+\offset,2.54) -- (5.23+\offset,2.85);
+}
+\draw[wire] (ma.north) -- (n1.south);
+\draw[wire] (n1.north) -- (ff.south);
+\draw[wire] (ff.north) -- (n2.south);
+\draw[wire] (n2.north) -- (5.23,6.66);
+\draw[wire] (5.23,2.18) -- (4.28,2.18) |- (n1.west);
+\draw[wire] (5.23,4.37) -- (4.28,4.37) |- (n2.west);
+
+\draw[frame] (7.03,3.59) rectangle (11.56,5.99);
+\node[anchor=west,font=\scriptsize\sffamily\bfseries] at (7.17,5.72) {架构层面};
+\node[items,fill=green!16,text width=39mm,anchor=north] at (9.31,5.51)
+  {轻量级变体\\跨块连接\\自适应计算时间\\循环与层次结构\\替代架构};
+\draw[black!38,densely dotted] (6.28,5.77) -- (7.03,5.95);
+\draw[black!38,densely dotted] (6.28,2.20) -- (7.03,3.62);
+
+\draw[frame] (7.03,2.35) rectangle (11.56,3.44);
+\node[anchor=west,font=\scriptsize\sffamily\bfseries] at (7.17,3.23) {预训练模型};
+\foreach \x/\name in {7.85/编码器,9.30/解码器,10.77/{编码器\\—解码器}} {
+  \node[block,fill=cyan!15,minimum width=13mm,minimum height=5.3mm] at (\x,2.70) {\name};
+}
+\draw[frame] (7.03,1.22) rectangle (11.56,2.20);
+\node[anchor=west,font=\scriptsize\sffamily\bfseries] at (7.17,2.00) {应用};
+\foreach \x/\name in {7.70/文本,8.76/视觉,9.82/音频,10.88/多模态} {
+  \node[block,fill=orange!22,minimum width=9.5mm] at (\x,1.55) {\name};
+}
+\end{tikzpicture}

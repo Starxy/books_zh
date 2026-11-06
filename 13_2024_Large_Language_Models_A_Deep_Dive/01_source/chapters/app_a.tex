@@ -1,0 +1,334 @@
+% 原书附录 A，印刷页 439--450。
+\chapter{深度学习基础}
+\label{app:deep-learning}
+\chaptercredit{}
+
+\section{神经网络的基本结构}
+受人脑启发，神经网络由互相连接的节点或“神经元”组成，分层处理信息。
+\begin{equation}
+y=f(w\cdot x+b),
+\label{eq:appa-neuron}
+\end{equation}
+其中 $y$ 为输出，$w$ 为权重向量，$x$ 为输入向量，$b$ 为偏置，$f$ 为激活函数。
+\begin{itemize}
+\item \textbf{神经元。}神经网络的基本处理单元。
+\item \textbf{权重。}决定神经元之间连接强度的数值。
+\item \textbf{偏置。}将加权输入送入激活函数之前加上的偏移量。
+\item \textbf{激活函数。}为网络引入非线性的函数，例如 sigmoid 函数 $\sigma(x)=1/(1+e^{-x})$、tanh 函数和 ReLU 函数 $f(x)=\max(0,x)$。
+\end{itemize}
+
+\section{感知机}
+\label{sec:appa-perceptron}
+感知机（perceptron）是一种线性分类器，根据把权重与特征向量结合的线性预测函数进行分类。算法对线性输出应用符号函数，在两个类别之间作出判断。其数学形式为
+\begin{equation}
+h(x)=\operatorname{sign}\left(\sum_{i=0}^{d}w_ix_i\right),
+\label{eq:appa-perceptron}
+\end{equation}
+其中 $h(x)$ 表示假设函数或预测函数，$x$ 为输入特征向量，$w_i$ 为权重，$d$ 为输入向量的维数。
+
+\sourcefigure{figa_01.pdf}{感知机模型。输入 $x_0=1,x_1,\ldots,x_d$ 分别乘以权重 $w_0,w_1,\ldots,w_d$，加权和 $w^{\mathsf T}x$ 经符号函数作阈值判断，得到预测标签 $\hat{y}$。}{fig:appa-perceptron}
+
+在数据线性可分时，可用下列方法训练感知机。先初始化权重，每当出现误分类时再迭代调整。训练算法的主要步骤如下。
+\begin{enumerate}
+\item 将权重初始化为零或较小的随机值。
+\item 对训练集中的每个样本执行以下操作。
+  \begin{enumerate}[label=\alph*.]
+  \item 用当前权重计算输出。
+  \item 如果输出错误，则更新权重。
+  \[
+  w_i\leftarrow w_i+\eta(y-\hat{y})x_i,
+  \]
+  其中 $\eta$ 为学习率，$y$ 为真实标签，$\hat{y}$ 为预测标签。
+  \end{enumerate}
+\item 重复上述步骤，直至权重收敛，或达到预定迭代次数。数据不可分时可采用口袋算法。
+\end{enumerate}
+
+算法试图找到能把两个类别分开的超平面。如果数据集不线性可分，口袋算法等改进方法会保留迭代过程中误差最低的超平面。
+
+\section{多层感知机}
+\label{sec:appa-mlp}
+多层感知机（multilayer perceptron，MLP）在感知机模型中加入一层或多层神经元。各层由感知机组成，按前馈方式连接。多层感知机使用可微的非线性激活函数代替简单的阶跃函数，从而捕捉数据中的复杂模式和关系。
+
+\subsection{多层感知机的结构与功能}
+多层感知机由一个输入层、一个或多个隐藏层以及一个输出层组成。各层与下一层全连接，即一层中的每个神经元都与后一层的每个神经元相连。第 $l$ 层的输出向量计算为
+\begin{equation}
+h^{(l)}=g\bigl(W^{(l)}h^{(l-1)}+b^{(l)}\bigr),
+\label{eq:appa-mlp-layer}
+\end{equation}
+其中 $h^{(l-1)}$ 为上一层的输出，$W^{(l)}$ 和 $b^{(l)}$ 分别为第 $l$ 层的权重矩阵与偏置向量，$g$ 为 sigmoid 或 ReLU 等非线性激活函数。
+
+\sourcefigure{figa_02.pdf}{包含一个输入层、一个隐藏层和一个输出层的多层感知机。图中自左至右分别是这三层，相邻层的神经元全连接。}{fig:appa-mlp}
+
+\subsection{训练多层感知机}
+训练多层感知机需要优化所有层的权重与偏置，以尽量减小预测误差，通常包括以下步骤。
+
+\begin{enumerate}
+\item \textbf{前向传播。}给定一个输入，逐层处理以计算输出。
+\begin{equation}
+h^{(l)}=g\bigl(W^{(l)}h^{(l-1)}+b^{(l)}\bigr).
+\label{eq:appa-forward}
+\end{equation}
+\item \textbf{计算误差。}得到最终输出 $\hat{y}$ 后，用均方误差（MSE）等损失函数计算损失 $E$。例如，采用带系数 $1/2$ 的平方误差和，
+\begin{equation}
+E(\hat{y},y)=\frac12\sum_i(\hat{y}_i-y_i)^2.
+\label{eq:appa-square-error}
+\end{equation}
+\item \textbf{反向传播。}利用链式法则，计算损失对各个权重和偏置的梯度。
+\begin{equation}
+\frac{\partial E}{\partial W^{(l)}}=
+\frac{\partial E}{\partial h^{(l)}}\cdot
+\frac{\partial h^{(l)}}{\partial W^{(l)}}.
+\label{eq:appa-backprop}
+\end{equation}
+\item \textbf{更新权重。}采用随机梯度下降（SGD）等优化方法调整权重和偏置。
+\begin{align}
+W^{(l)}&=W^{(l)}-\eta\frac{\partial E}{\partial W^{(l)}},
+\label{eq:appa-update-weight}\\
+b^{(l)}&=b^{(l)}-\eta\frac{\partial E}{\partial b^{(l)}},
+\label{eq:appa-update-bias}
+\end{align}
+其中 $\eta$ 为学习率。
+\end{enumerate}
+
+在训练数据上反复执行这些步骤，经过多个训练轮次，直到网络表现不再明显提高。每次迭代逐步调整网络参数，以减少预测误差并提高模型的准确性。
+
+\section{深度学习}
+深度学习是机器学习的一个分支。其网络通过具有多级抽象的各层，从数据中学习。人们常将深度学习与神经网络等同起来，但这里特指采用多层网络的学习方法。较多的层使模型比浅层网络更有效地捕捉复杂的数据模式。
+
+“深”和“浅”的界限随具体情况而异。深层网络通常有更多层，可学习更复杂的函数和数据的层次化抽象。这些网络使用反向传播和基于梯度的优化方法，在图像识别、语音识别、自然语言处理等领域表现出色。
+
+\subsection{深度神经网络的主要组成}
+深度神经网络的设计及其效果受多个因素影响。
+\begin{itemize}
+\item \textbf{激活函数。}给网络引入学习复杂模式所需的非线性。常用选择包括 ReLU、sigmoid 和 tanh。
+\item \textbf{损失函数。}也称误差函数，衡量网络预测与真实数据的吻合程度。例子有均方误差和交叉熵。
+\item \textbf{优化方法。}随机梯度下降、Adam 和 RMSprop 等方法更新网络权重，以最小化损失。
+\item \textbf{正则化方法。}随机失活（dropout）、L2 正则化和批归一化等方法，有助于防止过拟合并改善网络的泛化能力。
+\end{itemize}
+下面详细介绍这些组成及其在设计和训练深度神经网络、解决复杂任务中的作用。
+
+\subsection{激活函数}
+\label{sec:appa-activations}
+激活函数提供深度神经网络学习复杂模式所需的非线性。它们应用于各神经元，显著影响网络能否收敛及收敛速度。
+
+\subsubsection{Sigmoid}
+Sigmoid 是最早广泛使用的激活函数之一，定义为
+\begin{equation}
+\sigma(x)=\frac{1}{1+e^{-x}}.
+\label{eq:appa-sigmoid}
+\end{equation}
+它将输入映射到区间 $(0,1)$，并提供反向传播所需的连续梯度。输出接近函数值域的边界时，梯度可能趋于消失。
+
+\subsubsection{Tanh}
+双曲正切函数 tanh 通过缩放和平移 sigmoid 的输出，将值域变为 $-1$ 与 $1$ 之间。
+\begin{equation}
+f(x)=\tanh(x)=2\sigma(2x)-1.
+\label{eq:appa-tanh}
+\end{equation}
+它以零为中心，在神经网络的隐藏层中通常比 sigmoid 更合适。
+
+\subsubsection{ReLU}
+整流线性单元（rectified linear unit，ReLU）计算简单高效，已成为许多神经网络的默认激活函数。
+\begin{equation}
+f(x)=\max(0,x).
+\label{eq:appa-relu}
+\end{equation}
+当输入为正时，ReLU 允许梯度原样通过，有助于更快、更有效地训练模型。不过，它可能造成“神经元死亡”，即某些神经元的输入一直落在负半轴，因而完全停止学习。
+
+\subsubsection{带泄漏的 ReLU 及其变体}
+为缓解 ReLU 的神经元死亡问题，带泄漏的 ReLU（Leaky ReLU）在单元不激活时也允许一个较小的非零梯度。
+\begin{equation}
+f(x)=
+\begin{cases}
+x,&x>0,\\
+\alpha x,&x\leq 0,
+\end{cases}
+\label{eq:appa-leaky-relu}
+\end{equation}
+其中 $\alpha$ 是一个较小的系数。参数化 ReLU（PReLU）、指数线性单元（ELU）等变体进一步扩展了这个想法，分别在训练时调整 $\alpha$，或将函数的负半轴部分改为指数形式。
+
+\subsubsection{Softmax}
+对分类任务，通常在输出层应用 softmax 函数，将最后一个线性层的输出归一化为各预测类别的概率分布。
+\begin{equation}
+f(x_i)=\frac{e^{x_i}}{\sum_j e^{x_j}},
+\label{eq:appa-softmax}
+\end{equation}
+其中各 $x_i$ 为网络最后一层传给 softmax 函数的输入。
+
+\subsection{损失函数}
+\label{sec:appa-losses}
+损失函数也称代价函数或目标函数，用于量化模型预测与真实数据的吻合程度。通过最小化损失函数来优化模型参数。
+
+\subsubsection{均方误差（L2）}
+均方误差（MSE）计算预测值与目标值之差的平方的平均值。误差取平方会放大较大的误差，使该指标对离群值敏感。均方误差常用于回归，也可用于二分类。
+\begin{equation}
+E(\hat{y},y)=\frac1n\sum_{i=1}^{n}(y_i-\hat{y}_i)^2.
+\label{eq:appa-mse}
+\end{equation}
+
+\subsubsection{平均绝对误差（L1）}
+平均绝对误差（MAE）度量预测值与真实目标之差的绝对值。差值未取平方，因此对离群值的敏感度低于均方误差。
+\begin{equation}
+E(\hat{y},y)=\frac1n\sum_{i=1}^{n}|y_i-\hat{y}_i|.
+\label{eq:appa-mae}
+\end{equation}
+
+\subsubsection{负对数似然}
+负对数似然（negative log likelihood，NLL）常用于分类。它根据真实类别的预测概率计算对数代价，当模型给真实类别的概率很低时给予较大的惩罚，与分类中的交叉熵密切相关。底本在此给出二分类形式。
+\begin{equation}
+E(\hat{y},y)=-\frac1n\sum_{i=1}^{n}
+\bigl(y_i\log(\hat{y}_i)+(1-y_i)\log(1-\hat{y}_i)\bigr).
+\label{eq:appa-nll}
+\end{equation}
+\transnote{原书称式~\eqref{eq:appa-nll}为多分类负对数似然。式中的两项分别对应正类和负类，是二分类的形式。}
+
+\subsubsection{交叉熵损失}
+分类问题中的交叉熵损失衡量真实标签分布与预测概率分布之间的差异。
+\begin{equation}
+E(\hat{y},y)=-\sum_{i=1}^{n}y_i\log(\hat{y}_i),
+\label{eq:appa-cross-entropy}
+\end{equation}
+其中 $y_i$ 为第 $i$ 类的真实标签分量，$\hat{y}_i$ 为该类的预测概率。
+
+\subsubsection{铰链损失}
+铰链损失（hinge loss）适用于二分类。它在折点处不可微，但它是凸函数，因而可用作损失函数。
+\begin{equation}
+E(\hat{y},y)=\sum_{i=1}^{n}\max(0,1-y_i\hat{y}_i).
+\label{eq:appa-hinge}
+\end{equation}
+
+\subsubsection{Kullback–Leibler（KL）散度损失}
+Kullback–Leibler 散度是一种衡量两个概率分布之间差异的统计量。它特别适用于生成网络输出涉及连续概率分布的情况。原书用下式比较目标分布 $y$ 与预测分布 $\hat{y}$。
+\begin{equation}
+E(\hat{y},y)=\frac1n\sum_{i=1}^{n}
+y_i\log\!\left(\frac{y_i}{\hat{y}_i}\right).
+\label{eq:appa-kl}
+\end{equation}
+该式用真实分布的概率对两分布的对数概率比加权，据此衡量两分布的差异。\footnote{式~\eqref{eq:appa-kl}保留了原书的平均系数 $1/n$。当 $i$ 遍历一个离散分布的各类别时，通常定义的 $D_{\mathrm{KL}}(y\|\hat{y})$ 直接求和。}
+
+\subsection{优化方法}
+\label{sec:appa-optimization}
+优化方法通过调整模型参数来最小化衡量预测与真实结果差异的损失函数。优化算法的选择会明显影响模型的训练速度和最终表现。
+
+\subsubsection{随机梯度下降（SGD）}
+随机梯度下降（stochastic gradient descent，SGD）是梯度下降算法的一种变体。每次迭代只使用一个数据点或一个小批次来更新权重，因此更适合大型数据集。
+\begin{equation}
+\theta_{t+1}=\theta_t-\eta\nabla L(\theta_t),
+\label{eq:appa-sgd}
+\end{equation}
+其中 $\theta_t$ 是第 $t$ 次迭代的参数向量，$\eta$ 为学习率，$\nabla L(\theta_t)$ 是损失函数对参数的梯度。
+
+\subsubsection{动量}
+动量（momentum）通过减少振荡来加速 SGD 收敛。把上一步更新向量的一部分加到本次更新中，有助于越过平坦区域，也可减轻狭长谷地两侧的来回振荡。
+\begin{align}
+v_t&=\gamma v_{t-1}+\eta\nabla_\theta E(\theta_t),
+\label{eq:appa-momentum-velocity}\\
+\theta_{t+1}&=\theta_t-v_t,
+\label{eq:appa-momentum-update}
+\end{align}
+其中 $\theta_t$ 表示第 $t$ 次迭代的参数，$\gamma$ 为动量系数，$\eta$ 为学习率。
+
+\subsubsection{自适应梯度（Adagrad）}
+自适应梯度（adaptive gradient，Adagrad）根据梯度历史分别调整每个参数的学习率，适用于数据稀疏的情形。
+\begin{equation}
+\theta_{t+1,i}=\theta_{t,i}-
+\frac{\eta}{\sqrt{G_{t,ii}+\epsilon}}\nabla_\theta E(\theta_{t,i}),
+\label{eq:appa-adagrad}
+\end{equation}
+其中 $G_{t,ii}$ 累加以往梯度的平方，$\epsilon$ 为避免除零的小常数。
+
+\subsubsection{RMSprop}
+RMSprop 用梯度平方的指数衰减平均值改进 Adagrad，以缓解学习率过快衰减的问题。
+\begin{align}
+\mathbb{E}[g^2]_t&=\rho\,\mathbb{E}[g^2]_{t-1}+(1-\rho)g_t^2,
+\label{eq:appa-rmsprop-average}\\
+\theta_{t+1}&=\theta_t-\frac{\eta}{\sqrt{\mathbb{E}[g^2]_t+\epsilon}}g_t,
+\label{eq:appa-rmsprop-update}
+\end{align}
+其中 $\rho$ 是衰减因子，通常设为接近 1 的数。
+
+\subsubsection{自适应矩估计（Adam）}
+自适应矩估计（adaptive moment estimation，Adam）结合 Adagrad 和 RMSprop 的优点，根据梯度的一阶矩与二阶矩来调整学习率。
+\begin{align}
+m_t&=\beta_1m_{t-1}+(1-\beta_1)g_t,
+\label{eq:appa-adam-first-moment}\\
+v_t&=\beta_2v_{t-1}+(1-\beta_2)g_t^2,
+\label{eq:appa-adam-second-moment}\\
+\hat{m}_t&=\frac{m_t}{1-\beta_1^t},
+\label{eq:appa-adam-corrected-first}\\
+\hat{v}_t&=\frac{v_t}{1-\beta_2^t},
+\label{eq:appa-adam-corrected-second}\\
+\theta_{t+1}&=\theta_t-\frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t,
+\label{eq:appa-adam-update}
+\end{align}
+其中 $\beta_1$、$\beta_2$ 分别是一阶矩与二阶矩估计的衰减率。
+
+\subsubsection{AdamW}
+AdamW 是 Adam 的一种变体，将权重衰减与优化更新分开。这种修改有助于改善训练表现和泛化能力。
+\begin{align}
+m_t&=\beta_1m_{t-1}+(1-\beta_1)\nabla L(\theta_t),
+\label{eq:appa-adamw-first-moment}\\
+v_t&=\beta_2v_{t-1}+(1-\beta_2)\nabla L(\theta_t)^2,
+\label{eq:appa-adamw-second-moment}\\
+\theta_{t+1}&=(\theta_t-\eta\lambda\theta_t)-
+\eta\frac{m_t}{\sqrt{v_t}+\epsilon},
+\label{eq:appa-adamw-update}
+\end{align}
+其中 $\lambda$ 是权重衰减系数。修改后的更新规则把权重衰减从梯度优化步骤中分离出来。\footnote{式~\eqref{eq:appa-adamw-update}保留了原书用未校正矩表示的简式。沿用 Adam 的偏差校正时，分式应相应用 $\hat{m}_t$ 和 $\hat{v}_t$。}
+
+\subsection{模型训练}
+机器学习的主要目标是尽量减少泛化误差，在过拟合和欠拟合之间取得平衡。深度学习模型含有大量参数，尤其容易过拟合，甚至能以零误差拟合完全随机的训练数据。
+
+另一方面，深度模型的训练涉及非凸优化，通常只能求得局部解。在正则化得当的网络中，局部极小值往往足够接近全局极小值。正则化不当的网络可能落入损失过高的局部极小值。\footnote{原书把非凸优化概括为 NP 完全。这里保留其关于局部解的讨论。具体的计算复杂度取决于所求解的问题。}
+
+缩小训练损失与验证损失之间的差距，是有效训练模型的重要环节，需要仔细选择模型架构和训练策略。
+
+\subsubsection{早停}
+早停（early stopping）是常用的防止过拟合的方法。当训练误差仍在下降、验证误差已停止下降时，结束训练，并选出在验证集上表现最好的模型。这个方法依赖正确划分训练集、验证集和测试集，以保持测试结果的有效性并防止数据泄漏。
+
+早停简单有效，因而广泛用作深度学习中的一种正则化方法。
+
+\subsection{正则化方法}
+\label{sec:appa-regularization}
+正则化用于防止机器学习模型过拟合。过拟合发生在模型对训练数据表现很好，而在未见数据上表现较差时。正则化可以在损失函数中加入惩罚项，约束模型并提高泛化能力。
+
+\subsubsection{L1 正则化（Lasso）}
+L1 正则化也称 Lasso 回归，加入与各系数绝对值成正比的惩罚。这可能使某些系数恰为零，相当于选出具有较少特征的简单模型。
+\begin{equation}
+L_{\mathrm{L1}}(\theta)=L(\theta)+\lambda\sum_i|\theta_i|,
+\label{eq:appa-l1}
+\end{equation}
+其中 $L(\theta)$ 为原损失函数，$\theta_i$ 为模型的各个系数，$\lambda$ 为正则化强度。
+
+\subsubsection{L2 正则化（岭回归）}
+L2 正则化也称岭回归，加入与系数大小的平方成正比的惩罚。它会使系数趋于缩小，但未必使其为零。
+\begin{equation}
+L_{\mathrm{L2}}(\theta)=L(\theta)+\lambda\sum_i\theta_i^2.
+\label{eq:appa-l2}
+\end{equation}
+
+\subsubsection{随机失活}
+随机失活是神经网络的一种正则化方法。训练期间，随机选出部分神经元并暂时移除，以抑制隐藏单元的共同适应。
+\begin{equation}
+h'_i=
+\begin{cases}
+0,&\text{概率为 }p,\\
+h_i,&\text{概率为 }1-p,
+\end{cases}
+\label{eq:appa-dropout}
+\end{equation}
+其中 $h'_i$ 为应用随机失活后神经元的输出，$h_i$ 为原输出，$p$ 为失活概率。
+
+\subsubsection{批归一化}
+批归一化（batch normalization）用于改进深度神经网络的训练。它把各层的输出归一化为均值为零、方差为一的数值，可以起到正则化作用，并有助于加快收敛。
+\begin{align}
+\mu_B&=\frac1m\sum_{i=1}^{m}x_i,
+\label{eq:appa-bn-mean}\\
+\sigma_B^2&=\frac1m\sum_{i=1}^{m}(x_i-\mu_B)^2,
+\label{eq:appa-bn-variance}\\
+\hat{x}_i&=\frac{x_i-\mu_B}{\sqrt{\sigma_B^2+\epsilon}},
+\label{eq:appa-bn-normalize}\\
+y_i&=\gamma\hat{x}_i+\beta,
+\label{eq:appa-bn-affine}
+\end{align}
+其中 $x_i$ 为输入，$\mu_B$ 为批均值，$\sigma_B^2$ 为批方差，$\hat{x}_i$ 为归一化后的输入，$\gamma$ 和 $\beta$ 为可学习参数。

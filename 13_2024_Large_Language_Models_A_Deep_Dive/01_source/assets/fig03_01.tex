@@ -1,0 +1,23 @@
+% 重绘自原书第 84 页的图 3.1。提示和示例保留原文及拼写。
+\begin{tikzpicture}[
+  prompt/.style={fill=blue!10!gray!7,anchor=north west,inner sep=4pt,align=left,
+    text width=53mm,font=\footnotesize\ttfamily},
+  annotation/.style={anchor=west,font=\footnotesize\sffamily,inner sep=1.6pt},
+  callout/.style={draw=black!61,line width=.48pt,-{Stealth[length=1.3mm]}}]
+\node[prompt] at (0,0) {Translate English to French\\[5pt]
+  cheese\hspace{8mm}=>};
+\node[prompt] at (0,-1.78) {Translate English to French\\[5pt]
+  sea otter\hspace{4mm}=> loutre de mar\\
+  cheese\hspace{8mm}=>};
+\node[prompt] at (0,-3.88) {Translate English to French\\[5pt]
+  sea otter\hspace{4mm}=> loutre de mar\\
+  peppermint\hspace{2mm}=> menthe poivrée\\
+  plush girafe\hspace{1mm}=> girafe peluche\\
+  cheese\hspace{8mm}=>};
+\foreach \y/\note in {-.19/任务描述,-.87/提示,-1.97/任务描述,-2.63/示例,-3.02/提示,
+  -4.07/任务描述,-5.15/示例,-5.99/提示} {
+  \node[annotation] (tag) at (6.63,\y) {\note};
+  \draw[callout] (tag.west) -- (5.47,\y);
+}
+\draw[black!61] (5.32,-4.69) -- (5.47,-4.69) -- (5.47,-5.70) -- (5.32,-5.70);
+\end{tikzpicture}

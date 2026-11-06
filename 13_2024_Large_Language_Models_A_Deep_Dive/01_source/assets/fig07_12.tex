@@ -1,0 +1,27 @@
+% 重绘自原书第 306 页的图 7.12。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  topbox/.style={fill=yellow!26,minimum width=24mm,minimum height=8mm,
+    inner sep=2pt,align=center},
+  band/.style={draw=black!78,minimum width=109mm,minimum height=8.7mm,
+    align=center,font=\sffamily\bfseries},
+  line/.style={draw=black!71,line width=.56pt},
+  arrow/.style={line,-{Stealth[length=1.5mm]}}]
+\node[band,fill=violet!17] (response) at (0,0) {生成回答};
+\node[band,fill=green!18] (documents) at (0,-3.67) {检索文档};
+\foreach \x/\item in {-3.99/噪声鲁棒性,-1.33/无答案时拒答,1.33/信息整合,3.99/反事实鲁棒性}{
+  \node[topbox] (metric) at (\x,2.32) {\item};
+  \draw[line] (metric.south) -- (response.north -| metric);
+}
+\node[fill=white,inner sep=2pt,font=\scriptsize\sffamily] at (0,1.15)
+  {衡量生成回答的下列能力};
+\foreach \x/\y/\item in {
+   -3.99/-1.36/忽略其中的\\无关信息,
+   -1.33/-2.44/承认其中缺少\\回答所需的信息,
+   1.33/-1.36/整合来自\\多份文档的信息,
+   3.99/-2.44/识别并拒绝\\其中的错误信息}{
+  \coordinate (lane) at (\x,0);
+  \draw[arrow] (response.south -| lane) -- (documents.north -| lane);
+  \node[fill=white,inner sep=1.8pt,align=center,font=\scriptsize\sffamily] at (\x,\y) {\item};
+}
+\end{tikzpicture}

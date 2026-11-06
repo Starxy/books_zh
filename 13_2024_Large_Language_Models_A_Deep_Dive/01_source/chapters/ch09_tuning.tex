@@ -1,0 +1,186 @@
+% 原书第 9.3.4 至 9.3.7 节。
+\subsection{多模态大语言模型的调优与增强}
+预训练完成后，可以进一步提高多模态大语言模型的适应性、推理和任务泛化能力。这里介绍三种方法。多模态指令调优（MM-IT）训练模型遵循多种任务指令。多模态上下文学习（MM-ICL）使模型能用已有知识完成输入提示中的新任务。多模态思维链（MM-CoT）使模型求解复杂问题的过程更透明，也更有条理。
+
+\subsubsection{多模态指令调优}
+\label{sec:ch09-mm-it}
+\begin{keypoint}
+传统的监督微调需要大量数据，少样本提示方法带来的提升也有限。指令调优（IT）旨在把任务能力推广到初始训练数据之外，参见第~4.2~节。多模态指令调优（MM-IT）沿用指令调优的原理，在按指令任务组织的多模态数据集上微调大语言模型（\refcite{ch09-ref-038}{Liu et al., 2024}; \refcite{ch09-ref-076}{Zhao et al., 2023}; \refcite{ch09-ref-077}{Zhu et al., 2023}）。模型能通过理解指令处理新任务，从而提高在不同模态上的零样本学习能力。
+\end{keypoint}
+
+多模态指令样本可表示为三元组 $(I,M,R)$，分别对应指令、多模态输入和真实响应。参数为 $\theta$ 的模型根据指令和多模态输入预测答案。
+\begin{equation}
+A=f(I,M;\theta).
+\label{eq:ch09-mm-it-prediction}
+\end{equation}
+这里 $A$ 表示预测答案。训练常沿用原先的自回归目标，要求多模态大语言模型预测响应中的下一个词元。
+\begin{equation}
+L(\theta)=-\sum_{i=1}^N\log p(R_i\mid I,R_{<i};\theta),
+\label{eq:ch09-mm-it-loss}
+\end{equation}
+其中 $N$ 为真实响应长度。模型根据前文与指令准确生成响应序列中的下一个词元。\footnote{式~\eqref{eq:ch09-mm-it-loss}保留原书写法。按式~\eqref{eq:ch09-mm-it-prediction}，多模态输入 $M$ 也属于生成响应的条件。}图~\ref{fig:ch09-mm-it}展示视觉问答任务的一个示例模板，表~\ref{tab:ch09-mm-it}列出若干常用的多模态指令调优数据集。
+
+\sourcefigure{fig09_04.pdf}{视觉问答任务的多模态指令调优模板。在序列开始标记 \texttt{<BOS>} 后，要求按给定的任务指令作答。模板包含指令、由图像与文本组成的输入、响应，以及序列结束标记 \texttt{<EOS>}。}{fig:ch09-mm-it}
+
+{\small\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}p{41mm}p{43mm}r@{}}
+\caption{多模态指令调优数据集。第二列表示输入到输出的模态。T 为文本，I 为图像，V 为视频，A 为音频，B 为边界框，3D 为点云。}\label{tab:ch09-mm-it}\\
+\toprule
+数据集 & 输入到输出 & 实例数\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{表 \thetable\ （续）}\\
+\toprule
+数据集 & 输入到输出 & 实例数\\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{下页续}\\
+\endfoot
+\bottomrule
+\endlastfoot
+MiniGPT-4’sIT & I+T$\to$T & 5K\\
+StableLLaVA & I+T$\to$T & 126K\\
+LLaVA’sIT & I+T$\to$T & 150K\\
+SVIT & I+T$\to$T & 3.2M\\
+LLaVAR & I+T$\to$T & 174K\\
+ShareGPT4V & I+T$\to$T & —\\
+DRESS’sIT & I+T$\to$T & —\\
+VideoChat’sIT & V+T$\to$T & 11K\\
+Video-ChatGPT’sIT & V+T$\to$T & 100K\\
+Video-LLaMA’sIT & I/V+T$\to$T & 171K\\
+InstructBLIP’sIT & I/V+T$\to$T & $\sim$1.6M\\
+X-InstructBLIP’sIT & I/V/A/3D+T$\to$T & $\sim$1.8M\\
+MIMIC-IT & I/V+T$\to$T & 2.8M\\
+PandaGPT’sIT & I+T$\to$T & 160K\\
+MGVLID & I+B+T$\to$T & —\\
+M3IT & I/V/B+T$\to$T & 2.4M\\
+LAMM & I+3D+T$\to$T & 196K\\
+BuboGPT’sIT & (I+A)/A+T$\to$T & 9K\\
+T2M & T$\to$I/V/A+T & 14.7K\\
+MosIT & I+V+A+T$\to$I+V+A+T & 5K\\
+\end{longtable}
+}
+
+\subsubsection{多模态上下文学习}
+\label{sec:ch09-mm-icl}
+\begin{keypoint}
+上下文学习（ICL）使大语言模型能从少数示例中理解任务并加以执行，提示通常还包含指令。传统监督学习需要大量数据，上下文学习则无需额外训练就能处理新任务。指令调优需要在指令数据集上微调模型，上下文学习在推理时借助模型已预训练的能力适应新任务，无需更新模型。
+
+把上下文学习扩展到多模态，就得到多模态上下文学习（MM-ICL），它用多种模态丰富学习过程（\refcite{ch09-ref-019}{Gupta and Kembhavi, 2023}）。推理时，MM-ICL 将一组演示样例与原待处理样本同时输入，用多个上下文示例丰富模型可以利用的信息。
+\end{keypoint}
+
+\sourcefigure{fig09_05.pdf}{图像描述生成任务中的多模态上下文学习。给出“生成下列图像的描述”这一指令后，示范如何描述坐在沙发上的猫和在山间小径远足的一群人。最后输入一张房前停着汽车的图像，留出响应让模型生成。}{fig:ch09-mm-icl}
+
+图~\ref{fig:ch09-mm-icl}用两个示例展示如何用 MM-ICL 生成图像描述。示例的结构和数量可以灵活调整，模型表现往往也取决于它们的排列顺序。表~\ref{tab:ch09-mm-icl}列出两个重要的 MM-ICL 数据集。
+
+\begin{table}[!htbp]
+\centering\small
+\caption{多模态上下文学习数据集。}
+\label{tab:ch09-mm-icl}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}llr>{\raggedright\arraybackslash}X@{}}
+\toprule
+数据集 & 模态 & 规模 & 说明\\
+\midrule
+MM-ICL & 图像—文本 & 5.8M & 包含交错的文本与图像输入，以及人工构造的多模态上下文学习输入。\\
+MIMIC-IT & 图像—文本 & 2.8M & 提供多模态指令与响应配对，提高视觉语言模型在多种语言中的感知、推理和规划能力。\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{多模态思维链}
+\label{sec:ch09-mm-cot}
+\begin{keypoint}
+多模态思维链（multimodal chain-of-thought，MM-CoT）是大语言模型思维链概念的扩展。思维链在复杂推理任务中有效，要求大语言模型同时生成最终答案和中间推理步骤，类似人类的认知过程。MM-CoT 将单模态思维链用于多模态情境，首先需要在不同模态之间建立联系。可以融合特征，也可以把视觉输入转为文本描述。MM-CoT 可以通过微调建立，也可采用无需训练的少样本或零样本学习，各方法所需的样本量不同。
+\end{keypoint}
+
+Lian et al. (2023) 使用 ChatGPT 将人工标注者提供的多条描述线索综合为连贯的摘要，提取其中的主要行为和表情，再用这些综合线索推断人物的实际情绪，如图~\ref{fig:ch09-emotion-cot}所示。
+
+\sourcefigure{fig09_06.pdf}{以人工标注的视频片段描述为线索，用多模态思维链检测情绪。第一步把多段描述统一用“他”作主语，去掉重复文字、合成完整句子并检查标点。第二步用示例引导情绪归纳，示例中“他看起来很开心，但实际上很焦虑”归为“焦虑”。}{fig:ch09-emotion-cot}
+
+MM-CoT 的推理链配置大致有两类。
+\begin{enumerate}
+\item \textbf{自适应配置。}大语言模型自主确定推理链的长度（\refcite{ch09-ref-057}{Wu et al., 2023a}）。模型可根据任务的复杂程度调整推理过程，使响应更切合任务，也可能更准确。不同任务需要的推理深度相差很大时，这种方式尤其有用。
+\item \textbf{预定义配置。}预先确定推理链长度（\refcite{ch09-ref-020}{Himakunthala et al., 2023}），在不同任务上用一致的推理结构。这样可以简化模型的运作，但在复杂情形中可能限制推理深度。
+\end{enumerate}
+
+除链长配置外，MM-CoT 还可选择不同的推理链生成方式。
+\begin{enumerate}
+\item \textbf{基于填补的方式。}推导能够在逻辑上衔接前后文的中间步骤，补上推理过程中的空缺（\refcite{ch09-ref-020}{Himakunthala et al., 2023}）。模型需找出并补齐思路中缺失的环节，使思路连贯且符合逻辑。例如，给定一组展示故事的图像，要求模型叙述事件，模型就要补全图像之间的情节，使故事连贯。
+\item \textbf{基于预测的方式。}根据指令或此前的推理步骤等给定条件，将推理链向后延伸（\refcite{ch09-ref-057}{Wu et al., 2023a}）。模型需要理解当前上下文并推测合乎逻辑的后续内容，从而合成新的推理步骤。例如，要求模型预测图像故事的下一幕时，它需根据给定图像和文本描述延续情节，推测接下来会发生哪些事件或动作。
+\end{enumerate}
+表~\ref{tab:ch09-mm-cot}介绍若干常用的 MM-CoT 推理数据集。
+
+\begin{table}[!htbp]
+\centering\small
+\caption{多模态思维链数据集。}
+\label{tab:ch09-mm-cot}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}p{19mm}p{18mm}p{24mm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+数据集 & 模态 & 规模 & 说明\\
+\midrule
+EMER & 视频—文本 & 100 & 侧重可解释的情绪推理，为推理任务提供线索和摘要。\\
+EgoCOT & 视频—文本 & 3,670 小时 & 用于具身场景规划的大规模具身规划数据集。\\
+VIP & 视频—文本 & 3.6M，测试集 1.5K & 用于视频思维链评估，提供大量描述数据和推理阶段的挑战任务。\\
+ScienceQA & 图像—文本 & 21K 问答对 & 用于深入分析的多模态多项选择题数据集，覆盖科学及其他多个领域。\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{多模态 RLHF}
+多模态大语言模型需要整合和解释不同类型的数据，因此比在单一模态上训练的模型面临更多挑战。与其在单模态模型中的用法类似，RLHF 可以解决多模态大语言模型面临的多种问题，包括纳入人类偏好和选择、把人类反馈融入描述，以及生成符合安全与伦理标准的响应。下面介绍关于可信度以及如何纳入人类偏好和进行对齐的若干研究。
+
+\begin{practicaltip}
+Li et al. (2023) 研究如何通过偏好蒸馏，生成对用户有帮助且以视觉上下文为依据的响应。研究提出 VLFeedback 数据集，包含 80,000 条多模态指令、12 个大型视觉语言模型（LVLM）的响应，以及 GPT-4V 提供的偏好标注。用该数据集调优的 Silkie 在多种基准上大幅超过基础模型。与人工标注的数据集相比，该数据集有效提高了大型视觉语言模型的感知与认知能力，在扩展规模以及改善多项任务表现方面也有优势。
+\end{practicaltip}
+
+RLHF-V 是一种基于 RLHF 的方法，旨在通过细粒度的人类反馈对齐模型行为，提高多模态大语言模型的可信度（\refcite{ch09-ref-067}{Yu et al., 2023}）。它针对已有模型的一项重要问题，即模型容易生成缺乏关联图像事实依据的文本幻觉，影响在现实应用中的可靠性，在结果影响较大的使用场景中尤其如此。RLHF-V 通过纠正响应各片段中的幻觉收集人类偏好，并基于这些反馈进行密集的直接偏好优化。在五项基准上的自动评估和人工评估表明，RLHF-V 显著提高了多模态大语言模型行为的可信度，所需的数据和计算资源也较少。
+
+\begin{practicaltip}
+Sun et al. (2023) 提出“事实增强 RLHF”（Factually Augmented RLHF）对齐算法，将图像描述和多项选择题的正确答案等事实内容纳入已有奖励模型。这一做法旨在减少 RLHF 中的奖励投机，显著改善模型效果。研究还将已有的人工图文对纳入视觉指令调优的训练数据，该数据原先由 GPT-4 生成。这样可以改善模型的整体表现。该研究首次将 RLHF 用于语言多模态模型（LMM），使其在 LLaVA-Bench 上的表现明显提升，接近纯文本 GPT-4 的结果。
+\end{practicaltip}
+
+\subsection{输出投影器}
+\label{sec:ch09-output-projector}
+\begin{keypoint}
+输出投影器 $\mathrm{OUT\_ALIGN}_{T\to X}$ 将大语言模型产生的信号词元表征 $S_X$ 转成后续模态生成器 $\mathrm{MG}_X$ 可以解释的特征 $H_X$。
+\end{keypoint}
+
+具体来说，给定模态与文本的配对数据集 $\{(I_X,t)\}$，大语言模型先处理输入 $t$，得到 $S_X$，随后将其转为 $H_X$。主要目标是使 $H_X$ 与模态生成器可理解的条件表征充分对齐。
+\begin{equation}
+\arg\min_{\mathrm{OUT\_ALIGN}_{T\to X}}L_{\mathrm{mse}}(H_X,\tau_X(t)),
+\label{eq:ch09-output-projector-loss}
+\end{equation}
+其中
+\begin{equation}
+H_X=\mathrm{OUT\_ALIGN}_{T\to X}(S_X).
+\label{eq:ch09-output-projector}
+\end{equation}
+$L_{\mathrm{mse}}$ 是均方误差损失，用于最小化投影特征 $H_X$ 与文本条件表征 $\tau_X(t)$ 的差异。$\tau_X$ 是 $\mathrm{MG}_X$ 中的文本条件编码器。此优化过程主要处理文本，无需直接提供音频或视觉等非文本模态 $X$ 的输入。
+
+\begin{practicaltip}
+输出投影器通常用小型 Transformer 或多层感知机（MLP）实现，以兼顾效率与适应性。原书在此处将 MLP 写作 MLLP。
+\end{practicaltip}
+
+\subsection{模态生成器}
+\label{sec:ch09-modality-generator}
+\begin{keypoint}
+模态生成器 $\mathrm{MG}_X$ 用于产生各种模态的输出，将编码特征转为多模态内容。
+\end{keypoint}
+
+\begin{practicaltip}
+该组件常用先进的潜空间扩散模型（latent diffusion model，LDM）合成图像、视频和音频等特定模态的输出（\refcite{ch09-ref-075}{Zhao et al., 2022}）。常用实现包括用于图像合成的 Stable Diffusion、用于视频合成的 Zeroscope 和用于音频生成的 AudioLDM-2（\refcite{ch09-ref-006}{Cerspense, 2023}; \refcite{ch09-ref-037}{Liu et al., 2023}; \refcite{ch09-ref-044}{Rombach et al., 2022}）。
+\end{practicaltip}
+
+用输出投影器给出的 $H_X$ 作为条件输入，引导生成高质量多模态内容所需的去噪步骤。训练阶段，先用预训练的变分自编码器（VAE）将原始内容编码为潜变量特征 $z_0$（\refcite{ch09-ref-026}{Kingma and Welling, 2013}）。然后加入噪声 $\epsilon$ 扰动潜在表征，得到带噪潜变量特征 $z_t$。
+
+通常用预训练的 U-Net（$\epsilon_X$）计算条件 LDM 损失 $L_{X\text{-gen}}$（\refcite{ch09-ref-045}{Ronneberger et al., 2015}）。
+\begin{equation}
+L_{X\text{-gen}}:=
+\mathbb{E}_{\epsilon\sim\mathcal{N}(0,1),\,t}
+\left\lVert\epsilon-\epsilon_X(z_t,t,H_X)\right\rVert_2^2.
+\label{eq:ch09-modality-generator-loss}
+\end{equation}
+通过最小化 $L_{X\text{-gen}}$ 优化 $\mathrm{IN\_ALIGN}_{X\to T}$ 和 $\mathrm{OUT\_ALIGN}_{T\to X}$。

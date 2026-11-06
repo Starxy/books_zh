@@ -1,0 +1,202 @@
+% PDF 257--267；原书第 229--239 页。
+\section{偏见与公平性}
+\label{sec:ch06-bias}
+
+\begin{keypoint}
+社会偏见（social bias）指不同社会群体受到的不平等待遇或取得的不平等结果，主要源于历史与结构性权力失衡。\refcite{ch06-ref-029}{Gallegos 等人（2023）}的综述为自然语言处理中社会结构与算法模型的交叉研究提供了明确的定义。下面是其中几个关键术语。
+\begin{itemize}
+\item \textbf{社会群体（social group）。}共享某种身份特征的人口子集。身份特征可以是固定的、依语境而定的，或由社会建构。反歧视法律所承认的群体包括按年龄、残障、性别认同、原籍、种族、宗教、生理性别和性取向划分的群体，凸显了这些群体的社会建构性质。
+\item \textbf{受保护属性（protected attribute）。}构成一个社会群体身份基础的共同身份特征。
+\end{itemize}
+综述还提出以下公平性概念。
+\begin{itemize}
+\item \textbf{群体公平性（group fairness）。}按群体成员身份计算结果的统计量，并要求该统计量在所有社会群体间相同。它能显示群体之间的差异，但可能忽略子群体或交叉身份。
+\item \textbf{个体公平性（individual fairness）。}相似的个体应受到相似待遇。可用距离度量比较不同个体及其结果，从而量化这一概念。
+\end{itemize}
+\end{keypoint}
+
+社会偏见指不同社会群体因历史和结构性权力失衡而受到不平等待遇，或获得不同结果。在自然语言处理领域，社会偏见表现为表征性伤害和分配性伤害。表征性伤害包括失实表征、刻板印象、系统表现不均、贬损性语言和排斥性规范。分配性伤害则包括直接歧视和间接歧视。
+
+\subsection{表征性伤害}
+自然语言处理系统中的表征性伤害（representational harm），指系统延续对某些社会群体的负面态度与刻板印象。这些伤害有多种形式。
+
+\begin{itemize}
+\item \textbf{贬损性语言。}使用贬低社会群体的语言。例如，使用“whore”（“婊子”）一词反映了对女性的敌意和刻板印象（\refcite{ch06-ref-007}{Beukeboom and Burgers, 2019}）。
+\item \textbf{系统表现有差异。}模型理解或处理不同社会群体的语言时，对某些群体的效果较差。例如，与意思相同的标准美国英语（Standard American English，SAE）表达相比，非裔美国人白话英语（African American Vernacular English，AAVE）的表达更常被误判为非英语（\refcite{ch06-ref-008}{Blodgett and O'Connor, 2017}）。
+\item \textbf{排斥性规范。}这些规范隐含地排除或贬低某些群体。例如，“both genders”（两种性别）这一说法排除了非二元性别认同（\refcite{ch06-ref-006}{Bender et al., 2021}）。
+\item \textbf{失实表征。}对社会群体的表征不完整或带有偏见。例如，对“I'm an autistic dad”（我是一位有孤独症的父亲）不恰当地回答“sorry to hear that”（听到这件事我很遗憾），传达出关于孤独症的负面刻板印象（\refcite{ch06-ref-101}{Smith et al., 2022}）。
+\item \textbf{刻板印象。}延续有关某一群体的固定负面概括。例如，把“Muslim”（穆斯林）与“terrorist”（恐怖分子）联系起来，会强化关于暴力的刻板印象（\refcite{ch06-ref-002}{Abid et al., 2021}）。
+\item \textbf{毒性。}用冒犯性语言攻击社会群体或煽动对它的仇恨。例如，“I hate Latinos”（我恨拉丁裔）表达了对一个社会群体的不尊重与仇恨（\refcite{ch06-ref-023}{Dixon et al., 2018}）。
+\end{itemize}
+
+\subsection{分配性伤害}
+分配性伤害（allocational harm）涉及资源或机会在不同社会群体之间分配不均，可以进一步分类。
+
+\begin{itemize}
+\item \textbf{直接歧视。}因群体成员身份而受到明确的差别待遇。例如，用大语言模型辅助筛选简历时，偏见可能导致招聘中的不公（\refcite{ch06-ref-027}{Ferrara, 2023}）。
+\item \textbf{间接歧视。}即便所考虑的因素表面中立，替代变量或隐含因素仍会造成差别待遇。例如，使用大语言模型的医疗工具可能采用人口统计属性的替代变量，加剧患者获得照护时的不平等（\refcite{ch06-ref-027}{Ferrara, 2023}）。
+\end{itemize}
+
+\subsection{成因}
+本节以 \refcite{ch06-ref-084}{Navigli 等人（2023）}的研究为框架，考察影响偏见与公平性的因素。
+
+\subsubsection{数据选择}
+语言模型在大型数据集上训练。为这些数据集选择文本，会引入选择偏差，影响模型的行为和输出。从初始抽样到数据清理和筛选，各个阶段都可能出现这种偏差。如果所选训练文本未能体现网上语言使用的多样性，就会发生数据选择偏差。现代大语言模型所用数据集虽大，但仍有范围限制，模型会继承文本中的偏见。选择过程偏向特定来源，会进一步加剧这个问题。例如，维基百科文本常因被认为可靠而入选，YouTube 评论等非正式来源的内容则被排除（\refcite{ch06-ref-012}{Brown et al., 2020}；\refcite{ch06-ref-018}{Chowdhery et al., 2022}；\refcite{ch06-ref-128}{Zhang et al., 2022}）。这样的选择会塑造模型的理解，也会使其产生偏见。为了使大语言模型适应特定任务，通常会用较小的专用数据集或定制提示微调模型（\refcite{ch06-ref-047}{Howard and Ruder, 2018}；\refcite{ch06-ref-067}{Liu et al., 2023}）。这些额外的数据处理步骤，可能引入新的偏见，也可能加剧已有的偏见，具体取决于所用的微调数据或提示。
+
+\subsubsection{领域和体裁分布不均}
+预训练数据集中的内容往往分布不均。例如，数据集常用的维基百科来源，较多覆盖体育、音乐、地理和政治等领域，而文学、经济和历史等领域较少得到体现（\refcite{ch06-ref-030}{Gao et al., 2020}；\refcite{ch06-ref-055}{Kreutzer et al., 2022}）。这一现象并非英语独有，在其他高资源语言中也存在。用 BabelNet 比较英语和意大利语维基百科的领域分布，即可看到这一点（\refcite{ch06-ref-083}{Navigli and Ponzetto, 2012}）。
+
+预训练数据集中的偏见会延续到下游任务。例如，用于在机器翻译和语义角色标注等任务中微调语言模型的 EuroParl 和 CoNLL-2009，偏向某些领域和体裁。即使语言模型一开始没有这类偏见，也会从这些任务专用的数据集学到新的偏见，开发人员可能无法立即察觉（\refcite{ch06-ref-036}{Goldfarb-Tarrant et al., 2020}）。
+
+\subsubsection{内容的创作时间}
+语言不断演变，词语的含义和用法也随之改变。例如，“mouse”原指一种动物，后来也指计算机输入设备。“tweet”从指鸟叫扩展到指社交媒体上的帖子。“car”过去指马拉的车，如今指机动车。“pipe”也从指吸烟用的器具扩展到指一种管子。语言用法的这些历史变化意味着，在历史数据上训练的语言模型可能无法准确反映当代用法，或无法理解当下所指的事物。
+
+特定领域文本的内容和关注点，也会随时间显著变化。例如，中世纪的医学文本与现代医学文献有很大差别。如果训练数据早于新冠疫情、詹姆斯·韦布空间望远镜发射等近年的重要事件，语言模型可能缺少相关知识。类似地，ChatGPT 等有知识截止日期的模型，可能没有该日期之后发生事件的信息。出于实际考虑，研究者经常重复使用较早的数据集，例如以 20 世纪 60 年代的 Brown Corpus 为基础的 SemCor。对于为词义消歧等任务训练的模型，这种做法可能延续过时的语言用法。
+
+\subsubsection{创作者的人口构成}
+训练语料的创作者和选择者的人口构成，都会影响语言模型的偏见和行为。某些人口群体在维基百科等平台上占比偏高，说明内容创作和语料选择过程需要更多样、更包容。创作训练语料内容的人口构成，可能使大语言模型产生偏见。例如，作为常见训练数据来源，维基百科编辑者的人口构成明显不均衡。男性占多数（84\%），主要是二十五岁上下的人或退休人员（\refcite{ch06-ref-117}{Wikipedia Contributors, 2023}）。
+
+这些偏见来自内容的创作者，也来自决定哪些内容进入训练集的人。选择大语言模型语料的决策者，通常也是男性居多。决策者的构成相近，可能使所选主题和观点范围较窄，进一步强化训练数据中已有的偏见。
+
+\subsubsection{语言与文化的分布偏斜}
+由于高资源语言的数据更易收集，也更容易找到语言学家和标注者，大语言模型开发一直以高资源语言为主。这形成了反馈循环，一方面改善这些语言的自然语言处理系统，另一方面使低资源语言处于边缘。尽管已有进展，多语言模型的表现仍偏向训练数据较丰富的语言。
+
+不同语言承载不同文化，影响隐喻和习语等语言表达（\refcite{ch06-ref-045}{Hershcovich et al., 2022}）。大语言模型中的语言分布偏斜，会导致文化表征不均。例如，维基百科以英语为主，超过 50\% 的编辑者主要使用英语，内容因而更偏向英语文化。印地语、孟加拉语、爪哇语和泰卢固语等语言虽然使用人口众多，所占内容却较少。维基百科编辑者的主要语言，也不能反映英语使用者在全球的分布。例如，以英语为主要语言的编辑者只有 3\% 来自印度，这会影响维基百科内容的多样性（\refcite{ch06-ref-114}{Wang et al., 2022}）。
+
+\subsection{评估指标}
+大语言模型的偏见与公平性指标，可按它们使用模型的哪些信息分组，例如嵌入、概率或生成的文本。可分为以下几类。
+
+\begin{itemize}
+\item \textbf{基于嵌入的指标。}用稠密向量表示衡量偏见，通常使用带有上下文信息的句子嵌入。
+\item \textbf{基于概率的指标。}用模型分配的概率估计偏见，例如给成对的文本打分或回答选择题。
+\item \textbf{基于生成文本的指标。}分析模型针对提示生成的文本，衡量共现等模式，或比较不同提示产生的输出。
+\end{itemize}
+
+\subsubsection{基于嵌入的指标}
+这类指标主要计算中性词（如职业名称）和身份相关词（如带性别的代词）在向量空间中的距离。大语言模型的评估重点是句子级的上下文嵌入。这些指标最初针对静态词嵌入提出，后来扩展到上下文嵌入，从多个维度衡量偏见。
+
+词嵌入关联检验（Word Embedding Association Test，WEAT）是其中一种主要方法，评估社会群体概念（如男性与女性相关词）和中性属性（如家庭与职业相关词）之间的关联（\refcite{ch06-ref-038}{Greenwald et al., 1998}）。为衡量刻板关联，对受保护属性 $A_1,A_2$ 和中性属性 $W_1,W_2$ 使用以下检验统计量。
+\begin{equation}
+f(A_1,A_2,W_1,W_2)
+=\sum_{a_1\in A_1}s(a_1,W_1,W_2)-\sum_{a_2\in A_2}s(a_2,W_1,W_2).
+\label{eq:ch06-weat-statistic}
+\end{equation}
+其中，$s$ 是相似度度量，定义为
+\begin{equation}
+s(a,W_1,W_2)=
+\operatorname{mean}_{w_1\in W_1}\cos(a,w_1)
+-\operatorname{mean}_{w_2\in W_2}\cos(a,w_2).
+\label{eq:ch06-weat-similarity}
+\end{equation}
+效应量越大，偏见越强。效应量为
+\begin{multline}
+\operatorname{WEAT}(A_1,A_2,W_1,W_2)\\
+=
+\frac{\operatorname{mean}_{a_1\in A_1}s(a_1,W_1,W_2)
+      -\operatorname{mean}_{a_2\in A_2}s(a_2,W_1,W_2)}
+     {\operatorname{std}_{a\in A_1\cup A_2}s(a,W_1,W_2)}.
+\label{eq:ch06-weat-effect}
+\end{multline}
+
+为将 WEAT 用于上下文嵌入，\refcite{ch06-ref-073}{May 等人（2019）}提出句子编码器关联检验（Sentence Encoder Association Test，SEAT）。SEAT 将表示社会群体与中性属性的词填入语义中性模板，例如“This is [BLANK]”或“[BLANK] are things.”，再生成这些句子的嵌入。它使用与 WEAT 相同的公式，取 \texttt{[CLS]} 词元的嵌入。SEAT 也可以使用更具体、含有明确语义的模板，例如“The engineer is [BLANK].”，以衡量更细的偏见维度。
+
+另一种方法是上下文嵌入关联检验（Contextualized Embedding Association Test，CEAT）（\refcite{ch06-ref-041}{Guo and Caliskan, 2021}）。它组合 $A_1$、$A_2$、$W_1$ 和 $W_2$ 各组中的元素生成句子，并从嵌入中随机抽取一个子集，计算效应量的分布。CEAT 用随机效应模型衡量偏见的大小，公式如下。
+\begin{multline}
+\operatorname{CEAT}(S_{A_1},S_{A_2},S_{W_1},S_{W_2})\\
+=\frac{\sum_{i=1}^{N}v_i\operatorname{WEAT}(S_{A_1i},S_{A_2i},S_{W_1i},S_{W_2i})}
+{\sum_{i=1}^{N}v_i},
+\label{eq:ch06-ceat}
+\end{multline}
+其中，$v_i$ 由随机效应模型的方差得到。用这些方法可以把 WEAT 的原理应用到上下文嵌入，更细致地分析语言模型中的偏见。
+
+\subsubsection{基于概率的指标}
+这类技术将受保护属性有所变动的成对或成组模板句子交给模型，比较不同输入条件下预测的词元概率。一种办法是掩码词元法，在句子里遮盖一个词，再用掩码语言模型预测缺失的词。例如，\refcite{ch06-ref-115}{Webster 等人（2020）}提出的关联发现（Discovery of Correlations，DisCo），将可能触发偏见的词填入模板的槽位，比较模型在这些模板上的补全和排名最高的预测。
+
+Kurita 等人（2019）提出的对数概率偏见分数（Log-Probability Bias Score，LPBS），使用类似 DisCo 的模板方法，评估中性属性词中的偏见。先用模板“[MASK] is a [NEUTRAL ATTRIBUTE]”得到某个词元的预测概率 $p_a$，再用模板“[MASK] is a [MASK]”得到该词元的模型先验概率 $p_{\mathrm{prior}}$，以先验概率对预测概率作归一化。这样的归一化考虑了模型对某些社会群体原有的偏见，使度量集中在与 \texttt{[NEUTRAL ATTRIBUTE]} 词元有关的偏见上。然后比较两个相对的社会群体词经归一化后的概率，算出偏见分数。
+
+LPBS 的数学定义如下。
+\begin{equation}
+\operatorname{LPBS}(S)
+=\log\frac{p_{a_i}}{p_{\mathrm{prior}_i}}
+ -\log\frac{p_{a_j}}{p_{\mathrm{prior}_j}},
+\label{eq:ch06-lpbs}
+\end{equation}
+其中，$p_{a_i}$、$p_{a_j}$ 为不同社会群体词的预测概率，$p_{\mathrm{prior}_i}$、$p_{\mathrm{prior}_j}$ 为它们各自的先验概率。LPBS 由此通过衡量词元概率偏离预期先验分布的程度来量化偏见。
+
+\refcite{ch06-ref-003}{Ahn 和 Oh（2021）}提出类别偏见分数（Categorical Bias Score，CBS），将 Kurita 等人（2019）的归一化对数概率扩展到非二元目标。CBS 衡量在不同社会群体的受保护属性词 $a$ 上，填空模板所预测词元的归一化对数概率的方差。
+\begin{equation}
+\operatorname{CBS}(S)
+=\frac{1}{|W|}\sum_{w\in W}\operatorname{Var}_{a\in A}\log\frac{p_a}{p_{\mathrm{prior}}}.
+\label{eq:ch06-cbs}
+\end{equation}
+
+还有一系列方法使用伪对数似然（pseudo-log-likelihood，PLL），根据句子中其他词构成的上下文，确定生成特定词元的可能性。对于给定句子 $S$，PLL 定义为
+\begin{equation}
+\operatorname{PLL}(S)=\sum_{s\in S}\log P(s\mid S\setminus s;\theta),
+\label{eq:ch06-pll}
+\end{equation}
+其中，$P(s\mid S\setminus s;\theta)$ 估计句子 $S$ 中各词元 $s$ 的条件概率。每次遮盖一个词元，利用句子中其余未被遮盖的词元预测它，以此近似这个词元在上下文中的概率。
+
+\refcite{ch06-ref-081}{Nangia 等人（2020）}在提出 CrowS-Pairs 数据集的同时，也提出了 CrowS-Pairs 分数（CrowS-Pairs Score，CPS）。它使用成对的句子，其中一句有明显的刻板印象，另一句较少带有刻板印象，从而评估模型对刻板内容的偏好。这个指标借助 PLL，在给定已修改词元 $M$ 的条件下近似共享、未修改词元 $U$ 的概率，记作 $P(U\mid M,\theta)$。$M$ 中的词元通常表示受保护属性。这个近似通过逐个遮盖和预测句中未修改的词元来实现。句子 $S$ 的指标为
+\begin{equation}
+\operatorname{CPS}(S)=\sum_{u\in U}\log P(u\mid U\setminus u,M;\theta).
+\label{eq:ch06-cps}
+\end{equation}
+
+\refcite{ch06-ref-080}{Nadeem 等人（2020）}在提出 StereoSet 数据集时，引入了另一种比较句子的方法，即上下文关联检验（Context Association Test，CAT）。每个句子都与三个选项配对，分别是符合刻板印象、违背刻板印象和无意义的选项。选项可以是填空词元，也可以是续写句子。伪对数似然方法关注 $P(U\mid M,\theta)$，CAT 则关注 $P(M\mid U,\theta)$，由此将评估表述为
+\begin{equation}
+\operatorname{CAT}(S)=\frac{1}{|M|}\sum_{m\in M}\log P(m\mid U;\theta).
+\label{eq:ch06-cat}
+\end{equation}
+
+\subsubsection{基于生成文本的指标}
+当大语言模型是黑箱，无法直接获取它的概率或嵌入时，基于生成文本的指标尤其适用。常见做法是以已知可能引发偏见或毒性的提示为条件，例如来自 RealToxicityPrompts 和 BOLD 的提示，再分析生成文本中的偏见。
+
+在各项指标中，社会群体替换（Social Group Substitutions，SGS）要求，替换人口统计属性后，大语言模型的回答仍相同（\refcite{ch06-ref-093}{Rajpurkar et al., 2016}）。设不变性度量为 $\psi$，例如精确匹配。以 $\widehat{Y}_i$ 表示原输入的预测输出，以 $\widehat{Y}_j$ 表示改变人口统计属性后的反事实输入的输出。SGS 的数学表达式为
+\begin{equation}
+\operatorname{SGS}(\widehat{Y})=\psi(\widehat{Y}_i,\widehat{Y}_j).
+\label{eq:ch06-sgs}
+\end{equation}
+
+另一项指标是共现偏见分数（Co-Occurrence Bias Score），它衡量生成文本中的词元和带有性别的词一起出现的情况（\refcite{ch06-ref-011}{Bordia and Bowman, 2019}）。
+\begin{equation}
+\text{共现偏见分数}(w)=\log\frac{P(w\mid A_i)}{P(w\mid A_j)},
+\label{eq:ch06-cooccurrence}
+\end{equation}
+其中，$w$ 是词元，$A_i$ 和 $A_j$ 是两组属性。
+
+人口群体表征（Demographic Representation，DR）比较不同社会群体在输出中的出现频率与原始数据集中的分布（\refcite{ch06-ref-009}{Bommasani et al., 2023}）。设函数 $C(x,Y)$ 计算词 $x$ 在序列 $Y$ 中出现的次数。对集合 $G$ 中的社会群体 $G_i$，以 $A_i$ 表示与之对应的受保护属性词，其 DR 为
+\begin{equation}
+\operatorname{DR}(G_i)
+=\sum_{a_i\in A_i}\sum_{\widehat{Y}\in\widehat{\mathbb{Y}}}C(a_i,\widehat{Y}).
+\label{eq:ch06-dr}
+\end{equation}
+这里，$\operatorname{DR}=[\operatorname{DR}(G_1),\ldots,\operatorname{DR}(G_m)]$ 由各组的计数组成，将其归一化为概率分布。再用总变差距离、KL 散度或 Wasserstein 距离等度量，把这个分布与均匀分布等参考分布作比较，以评估模型输出对社会群体的表征是否公平。
+
+刻板关联（Stereotypical Associations，ST）指标评估特定词与社会群体的关联中存在的偏见（\refcite{ch06-ref-009}{Bommasani et al., 2023}）。给定一组预测输出 $\widehat{\mathbb{Y}}$，该指标量化词 $w$ 与社会群体 $G_i$ 的属性词 $A_i$ 共现的频率。函数为
+\begin{equation}
+\operatorname{ST}(w)_i
+=\sum_{a_i\in A_i}\sum_{\widehat{Y}\in\widehat{\mathbb{Y}}}
+ C(a_i,\widehat{Y})I(C(w,\widehat{Y})>0).
+\label{eq:ch06-st}
+\end{equation}
+在这个公式中，$C(a_i,\widehat{Y})$ 表示属性词 $a_i$ 在预测输出 $\widehat{Y}$ 中的计数。和人口群体表征指标一样，可以将计数向量 $\operatorname{ST}=[\operatorname{ST}(w)_i,\ldots,\operatorname{ST}(w)_k]$ 归一化，再与参考分布比较。
+
+HONEST 指标用于衡量语言模型生成伤人句子补全的频率（\refcite{ch06-ref-085}{Nozza et al., 2021}）。对于因果模型，用一个不完整句子作提示。对于掩码模型，用带 \texttt{[MASK]} 词元的句子，让模型预测一个词。HONEST 计算由 HurtLex 语料库识别的伤人预测所占比例，再对动物、犯罪和负面含义等不同类别的比例取平均。HONEST 分数的公式为
+\begin{equation}
+\operatorname{HONEST}(\widehat{\mathbb{Y}})
+=\frac{\sum_{\widehat{Y}_k\in\widehat{\mathbb{Y}}_k}
+ \sum_{\widehat{y}\in\widehat{Y}_k}I_{\mathrm{HurtLex}}(\widehat{y})}
+ {|\widehat{\mathbb{Y}}|\cdot k}.
+\label{eq:ch06-honest}
+\end{equation}
+这里，$\widehat{Y}_i\in\widehat{\mathbb{Y}}_i$ 表示与特定群体 $G_i$ 相关的预测输出。该指标用于身份相关的模板提示及其排名前 $k$ 的补全，记作 $\widehat{\mathbb{Y}}_k$。
+
+\subsection{评估基准}
+基准数据集可先分为反事实输入和提示两大类。反事实输入又可分为掩码词元和未加掩码的句子两类。包含成对或成组句子的数据集，通常是反事实数据集，突出了模型预测在不同社会群体间的差异。掩码词元数据集的句子留有空位，让语言模型补全。它们适用于基于掩码词元概率的指标或伪对数似然指标。Winograd Schema Challenge、Winogender 和 WinoBias 等共指消解任务是常见例子。
+
+未加掩码的句子数据集评估一对句子中哪一句更有可能。它们既可以用于伪对数似然指标，也能灵活用于其他指标。例如众包刻板印象句子对（Crowdsourced Stereotype Pairs，CrowS-Pairs）、Equity Evaluation Corpus 和 RedditBias。
+
+提示类数据集再按用途分为句子补全和问答两类。用于提示文本续写的数据集包括 RealToxicityPrompts、TrustGPT 和 BOLD 等句子补全数据集。它们提供由大语言模型补全的句子前缀。Grep-BiasIR 和 BBQ（Bias Benchmark for QA，问答偏见基准）则是考察大语言模型偏见的问答框架。表~\ref{tab:ch06-bias-benchmarks} 汇总了 \refcite{ch06-ref-029}{Gallegos 等人（2023）}列举的数据集和分类。
+
+\input{assets/tab06_02}

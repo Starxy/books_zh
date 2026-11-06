@@ -1,0 +1,109 @@
+% PDF 10--17: 前言及原书两个清单。
+\frontchapter{前言}
+\frontsection{为什么写这本书}
+在技术演进的长河中，大语言模型已经成为一块基石。它们正在改变我们与信息打交道的方式，重塑各个行业，并重新划定人工智能的边界。在这场转变初现之际，大语言模型的影响已经越过计算能力的进步本身，遍及从日常事务到复杂问题求解的各类活动。这一巨大变化既引起技术人员和研究者的兴趣，也让更多人想了解并运用大语言模型的能力。
+
+大语言模型的出现标志着计算方式显著偏离了传统范式。机器能够以前所未有的方式理解、生成并借助人类语言互动，交互显得自然且富有见解。这类模型从大量人类语言数据中学习，由此为创新、创作和提高效率开辟了新的途径。它们处理和生成语言的能力带来了改变各领域的应用，包括内容自动生成、更复杂的聊天机器人、功能更强的搜索引擎，以及开创性的研究工具。
+
+强大的能力伴随着复杂性。大语言模型的工作原理令人着迷，却并非人人都能立即理解。复杂的架构、底层算法，以及伴随模型部署的伦理问题，都十分重要，值得深入探讨。人们迫切需要一份全面的资料，既能解释这些模型在技术上如何运作，也能把影响放在具体背景下加以理解，探究应用，并讨论由此产生的伦理难题。这正是本书的目标。
+
+本书深入考察大语言模型的实际工作方式。开篇综述预训练模型，按不同标准分类，并详解 Transformer 等架构。这为进一步理解基于提示的学习打下基础。书中介绍多种提示学习机制，说明从大语言模型提取知识的重要性及可用的技术，随后详细讨论微调的不同策略和取舍。
+
+接下来，本书系统考察如何把强化学习（reinforcement learning，RL）纳入大语言模型的训练，让模型符合人类价值观。这是大语言模型训练的重要组成部分。我们还讨论大语言模型与计算机视觉（computer vision）、机器人学（robotics）、语音处理（speech processing）等领域的交汇。本书重视实际应用，详细介绍检索增强生成等真实用例。选择这些例子，是为了说明大语言模型在不同的行业和情境中可以发挥哪些作用。
+
+本书也介绍如何使大语言模型投入运行和部署，引导读者借助现有工具和程序库实现这些模型，掌握实际使用方法。书中探讨模型所面临的挑战，从模型内在的偏见与不可预测性，到涌现行为（emergent behavior）所带来的更广泛伦理问题。最后，本书介绍前沿的多模态大语言模型。它们将处理范围从文本扩展到音频、图像、视频和机器人的输入，开启更全面的人工智能交互。各章还配有动手教程，展示大语言模型在自然语言处理（Natural Language Processing，NLP）任务中与本章主题相关的功能。
+
+为了让读者能够深入而顺畅地认识大语言模型，本书提供以下内容。
+
+\begin{itemize}
+\item 探讨 100 多种技术和先进方法，包括预训练、基于提示的调优（prompt-based tuning）、指令调优（instruction tuning）、参数高效微调（Parameter-Efficient Fine-Tuning，PEFT）、计算高效微调（compute-efficient fine-tuning）、面向终端用户的提示工程、检索增强生成系统的构建与优化，以及使用强化学习使大语言模型符合人类价值观的策略。
+\item 汇集 200 多个数据集，适用范围从预训练到多模态调优，可作为开发多种大语言模型应用的基础。
+\item 介绍 50 多种应对幻觉（hallucination）、毒性（toxicity）、偏见、公平性和隐私等伦理问题的策略，说明如何度量、评估和缓解这些问题，以负责任地部署大语言模型。
+\item 讲解如何选择合适的大语言模型、优化训练和推理（inference）成本、降低延迟、改善性能并利用相关工具，从而将模型的潜力付诸实践。
+\item 收录 200 多项基准，覆盖各种任务上的模型表现、伦理考量和多模态应用，并介绍大语言模型生命周期中的 50 多项评估指标。
+\item 通过 9 个详细教程，使用与 Google Colab 兼容的工具和程序库，练习大语言模型的预训练、微调、对齐调优（alignment tuning）、偏见缓解、多模态训练和部署，把理论概念用于实践。
+\item 面向数据科学家和从业者提供 100 多条实用提示，介绍实现细节、技巧和工具，帮助读者处理大语言模型生命周期各环节的工作，高效完成任务。
+\end{itemize}
+
+\frontsection{本书适合谁读}
+本书面向不同背景的读者，旨在为希望理解大语言模型基本思想和技术细节的人提供一站式参考。无论你是希望了解人工智能复杂机制的计算机科学、数据科学或人工智能专业本科生或研究生，是深入研究语言模型理论进展和实际应用的人工智能或自然语言处理研究者，还是想借助大语言模型的前沿能力解决实际问题的产业界数据科学家，本书都为你而写。
+
+本书的内容安排兼顾初涉人工智能的读者，以及希望深化理解、扩展知识的资深从业者和学者。学生可以把它当作基础教材，学习理解和使用大语言模型所需的基本概念、方法和工具。它把课堂所学与实际工作中应对人工智能带来的挑战、把握机会所需的技能连接起来。
+
+对于研究人员和学者，本书全面介绍大语言模型各方面的前沿研究，包括提示工程技术、学习策略、基于人类反馈的强化学习（Reinforcement Learning from Human Feedback，RLHF）和多模态大语言模型，也深入分析现有挑战及其缓解策略。
+
+数据科学家和行业从业者可以用本书掌握高效微调大语言模型的技术，使模型适用于特定领域。除微调外，本书还讨论检索增强生成等应用与学习策略，帮助读者掌握把大语言模型部署到生产系统的技能。本书也深入讲解如何评估和缓解幻觉、偏见、公平性和隐私问题，使读者能够在实际环境中处理这些问题。
+
+阅读本书之前，读者应具备一定的预备知识。
+\begin{itemize}
+\item 了解线性代数、微积分、统计学和概率论的基础。
+\item 具备中等水平的机器学习和人工智能知识。
+\item 了解基本的自然语言处理概念和深度学习技术。
+\item 具备中等水平的 Python 编程能力，并熟悉 Pandas、Matplotlib、PyTorch 等程序库。
+\end{itemize}
+
+\frontsection{本书讲什么}
+下面逐章概述内容与主题，让读者对将要学习的材料有更具体的认识。
+
+\noindent\textbf{第 1 章\quad 大语言模型导论}\enspace 本章从自然语言处理的历史背景和演进谈起。它追溯人类语言能力的起源，说明如何逐步过渡到计算语言建模，突出其中生物演化与技术之间复杂联系的重要性。本章沿时间脉络介绍计算领域中语言模型的演进，展示早期的简单模型怎样发展为今天的大语言模型，讨论算法进展、算力和数据可获得性等促成变化的因素，并界定何谓大语言模型，帮助读者理解它在当代人工智能范式中的地位。
+
+\noindent\textbf{第 2 章\quad 语言模型预训练}\enspace 本章深入介绍预训练模型及其基本机制和结构。首先细致考察注意力机制（attention mechanism），说明模型如何聚焦相关信息，以及这如何改变了自然语言处理。接着介绍 Transformer 架构的开创性及其在现代自然语言处理中的意义。本章随后对大语言模型分类，说明编码器—解码器（encoder-decoder）、自回归（autoregressive）语言模型和掩码语言模型（masked language model）的具体特点。讨论 BERT、T5、GPT（第 1—3 代）和 Mixtral~8x7B 等开创性架构时，侧重各自的训练技术和主要应用。随后介绍关键数据集，说明先进模型以哪些数据为基础。章末给出主要模型、工具和模型平台的实用指南，为后续进阶内容做好准备。
+
+\noindent\textbf{第 3 章\quad 基于提示的学习}\enspace 本章探讨目前对自然语言处理发展十分重要的提示学习技术。它循序介绍基本原理，说明如何把各类自然语言处理任务映射为具体提示。然后讨论提示工程、答案工程（answer engineering）和多提示（multi-prompting），解释如何设计有效且高效的提示，引导模型给出所需输出。本章还将传统的预训练再微调方法与基于提示的方法作比较。
+
+\noindent\textbf{第 4 章\quad 大语言模型的适配与使用}\enspace 本章研究大语言模型的能力及其在实践中带来的复杂问题，特别是必须微调模型的情形。书中详细考察多种参数高效学习策略，介绍串行适配器（serial adapter）、并行适配器（parallel adapter）、低秩适配（Low-Rank Adaptation，LoRA）和基于向量的随机矩阵适配（Vector-Based Random Matrix Adaptation，VeRA）等方法，并用增量调优（delta-tuning）的视角比较为达到预期效果而采用这些方法的效率。对数据有限的场景，本章阐述大语言模型的零样本、少样本和多样本学习（zero-, few-, and multi-shot learning）方法，说明提示设计和上下文长度的细节如何影响上下文学习（In-Context Learning，ICL），并强调数据稀少时思维链推理（chain-of-thought reasoning）的价值。最后，本章讨论如何降低全参数调优（full-parameter tuning）的资金和计算负担，介绍训练后量化（Post-Training Quantization，PTQ）和量化感知微调（quantization-aware fine-tuning）等做法，使资金有限的机构也有机会运用大语言模型的能力。
+
+\noindent\textbf{第 5 章\quad 大语言模型的对齐调优}\enspace 本章介绍与人类偏好对齐的概念。人类偏好在此概括为 3H，即有帮助、无害和诚实（Helpful, Harmless, and Honest）。本章讨论把复杂的人类价值观写入大语言模型所遇到的难题，考察如何通过反馈机制，运用强化学习，尤其是基于人类反馈的强化学习，使大语言模型符合人类价值观。面对 RLHF 的资源需求高、难以扩展等挑战，本章介绍宪法式人工智能（Constitutional AI）和直接偏好优化（Direct Preference Optimization，DPO）等进展，说明怎样更合乎伦理、更负责任地应用大语言模型。
+
+\noindent\textbf{第 6 章\quad 大语言模型的挑战及应对方法}\enspace 本章探讨大语言模型固有的难题和伦理困境。概述其局限和挑战之后，首先分析模型以海量且多样的数据训练而引发的认识论问题。接着考察预训练模型内部隐含的道德规范，探问模型自身有哪些偏见，以及可能在无意间传播哪些社会文化价值观。随后讨论如何辨识大语言模型的道德倾向，以及确保其符合伦理的复杂之处。本章还研究神经模型的毒性退化（neural toxic degeneration），介绍缓解和抑制这种倾向的策略。后续内容转向伦理中的隐私问题，特别是语言模型面对隐私攻击时的脆弱性，最后系统介绍针对大语言模型的隐私增强技术，着重说明保护用户数据与交互的先进方法。
+
+\noindent\textbf{第 7 章\quad 检索增强生成}\enspace 本章阐述检索增强生成的基本要素，说明设计 RAG 系统时要考虑的问题。我们考察可纳入 RAG 工作流程的各种模块化改进，以扩展功能、减轻潜在漏洞的影响。随后分析评估 RAG 表现的主要指标，重点关注稠密检索（dense retrieval）过程的准确性及聊天机器人回答查询的效果。
+
+\noindent\textbf{第 8 章\quad 生产环境中的大语言模型}\enspace 本章关注大语言模型在运行和工程上的问题，尤其关注已经逐步成为各类实际应用组成部分的提示方法。它系统介绍怎样在生产环境中有效部署大语言模型，讨论如何选择合适的模型、理解评估指标、开展基准评测，以及怎样从延迟、成本、质量、可适配性和维护等方面优化系统。章中给出所需的工具和技术，带领读者掌握大语言模型应用开发中的细节。
+
+\noindent\textbf{第 9 章\quad 多模态大语言模型}\enspace 本章深入探讨迅速发展的多模态大语言模型，这一领域代表语言建模的一项重要进展。我们给出一个通用框架，从理论和实践两方面讨论各个组成部分，并与先进实现一一对应。本章考察如何把传统大语言模型的指令调优、上下文学习、思维链提示（chain-of-thought prompting）和对齐调优等技术用于多模态情境，说明这些改进如何提高模型跨模态适应和推理的能力。书中详述各类基准、数据集以及架构差异，重点介绍 Flamingo、Video-LLaMA 和 NExT-GPT 三种领先的模型，全面概述这些模型并说明它们在通用框架中的对应关系。
+
+\noindent\textbf{第 10 章\quad 大语言模型的演进与新前沿}\enspace 全书最后一章回顾大语言模型的演进，重点梳理重要趋势和发展。它考察如何转向合成数据（synthetic data）以继续扩大模型规模，以及如何扩展上下文窗口（context window）以增强模型理解信息的能力。本章还讨论训练技术如何提高知识迁移（knowledge transfer）的效率、加深迁移程度，以及如何从传统 Transformer 架构转向状态空间模型（state space model）等具有更好可扩展性和效率的方法。本章也关注模型变小、效率提高、技术普及及领域专用模型兴起的趋势。这些趋势表明人工智能方案正变得更易定制、更易获取，也更贴合具体行业。此外，本章探讨大语言模型技术的前沿及其在基于智能体的应用和搜索引擎中的使用，这些应用正在逐步取代传统技术。
+
+\frontsection{如何阅读本书}
+本书提供灵活的阅读路径，以适应不同背景和兴趣的读者。例如，产业界数据科学家若着重关注如何用自定义数据集微调大语言模型、了解相关挑战及缓解措施，并把模型部署到生产环境，可以重点阅读第 1、3、4、7、8、9 章。
+
+我们尽量安排章节，使较复杂的主题建立在较基础的概念之上。阅读时也请留意，材料有时并非严格按先后依赖关系编排。例如，第 2 章提到一些基础大语言模型，它们所依赖的训练技术要到第 6 章才得到充分解释。遇到这类情况，我们常给出书内参照，指向对有关信息讲得更细的章节。读者可以围绕感兴趣的主题，按需要前后跳读。开始下一章之前，也无需完全掌握此前各章。
+
+每章的重要内容用灰底框突出显示，方便读者辨识并查找重要概念和信息。
+\begin{keypoint}
+这是一个重要概念。
+\end{keypoint}
+
+各章都设有带醒目标识的“实用提示”（Practical Tips）框，给出实际建议与策略。
+\begin{practicaltip}
+这些框介绍部署、调优、定制、工具和参数等方面的重要策略，给出将书中概念用于实际工作的具体做法。
+\end{practicaltip}
+
+书中的提示（prompt）统一采用标准清单样式。
+\begin{lstlisting}[caption={GLUE 的 BoolQ 示例}]
+passage: "Look What You Made Me Do" is a song recorded by
+   American singer-songwriter Taylor Swift, released on August
+   24, 2017 by Big Machine Records as the lead single from her
+   sixth studio album Reputation (2017). Swift wrote the song
+   with her producer Jack Antonoff. "Look What You Made Me Do"
+   is an electroclash and pop song, with lyrics about various
+   issues that built Swift's reputation. Right Said Fred band
+   members Fred Fairbrass, Richard Fairbrass, and Rob Manzoli
+   are also credited as songwriters, as it interpolates the
+   melody of their song "I'm Too Sexy" (1991).
+
+question: "did taylor swift write look what you made me do"
+
+label: 1
+\end{lstlisting}
+\transnote{清单保留任务输入。段落说明 Taylor Swift 与制作人 Jack Antonoff 共同创作了歌曲，问题询问 Swift 是否创作了这首歌，标签 \texttt{1} 表示肯定。}
+
+书中 Python 代码及清单采用清晰、统一的格式，便于读者理解和实践与主题有关的编程概念。
+\begin{lstlisting}[language=Python,caption={初始化 BERT 词元切分器和模型的 Python 代码}]
+from transformers import BertTokenizer, BertForMaskedLM
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+model = BertForMaskedLM.from_pretrained("bert-base-uncased")
+\end{lstlisting}
+
+本书所有教程都托管在专用的 GitHub 仓库 \url{https://github.com/springer-llms-deep-dive}。仓库按章分设文件夹，包含 Jupyter 笔记本和相关代码。读者可在 Google Colab 中使用 GPU 运行设置，以取得更好的效率。我们建议订阅 Colab Pro。相对于增加的计算能力，我们认为订阅费用不高。我们有意让不同算力预算的从业者都能使用这些教程。不过，若不为 Colab Pro 或性能相当的 GPU 资源支付少量费用，部分笔记本可能遇到内存不足的问题。

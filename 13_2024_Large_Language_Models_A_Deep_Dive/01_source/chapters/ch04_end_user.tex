@@ -1,0 +1,119 @@
+% PDF 191--197；原书第 162--168 页。
+\section{终端用户提示}
+\label{sec:ch04-end-user}
+本章迄今讨论的学习策略，或是调优大语言模型的全部参数，或是调优部分参数，或是调优附加的适配器。它们都属于第~1.5.2~节介绍的大语言模型适配。接下来讨论终端用户提示（end-user prompting），即利用大语言模型的自回归文本生成和上下文学习能力，得到期望的结果（\refcite{ch04-minaee}{Minaee et al., 2024}；\refcite{ch04-zhao}{Zhao et al., 2023}）。
+
+这些方法通常通过设计提示结构，在考虑大语言模型能力和限制的前提下，使输出尽可能满足具体应用的要求。设计提示，需要会理解和运用语言，尤其是相关领域的语言，还需要知道大语言模型的强项和弱项，并运用工程思维来组织和安排一条提示或一组提示中信息的顺序，从模型取得最有用的输出。与传统的数据科学和机器学习工程一样，提示工程既需要创造力，也需要仔细处理会影响结果的细节。
+
+\begin{practicaltip}
+可以把大语言模型的一次输出，想象成众多可能结果中的一个。提示是用户引导生成过程、使之偏向最有用结果的手段。在能力最强的大语言模型中，从单个子词词元到语法关系等更高层结构，用户都可以在这些层面影响模型输出，因为语言建模能够有效地学习这些结构（如 \refcite{ch04-jawahar}{Jawahar et al., 2019}）。有效的提示通常来自对内容和结构有步骤的试验。例如，考察领域专用词元或词语能否让大语言模型的回答更符合要求，或者比较正式语法和口语语法的影响（\refcite{ch04-chen}{Chen et al., 2023}）。
+\end{practicaltip}
+
+本章最后几节讨论常用的终端用户提示策略及其应用。我们介绍其中常见的技术和主要概念。其他技术可参阅 \refcite{ch04-chen}{Chen 等人（2023）}的综述及《提示工程指南》\footnote{\url{https://www.promptingguide.ai/}}。这些技术使用不同的结构安排，以更好地控制大语言模型输出与应用的契合程度。了解它们在不同条件下的效果，有助于在实际应用中用好大语言模型。
+
+\subsection{零样本提示}
+\label{sec:ch04-zero}
+只包含任务指令的提示称为零样本提示。提示中没有额外的解题样例或示范，因此要仔细设计，才能激发完成目标任务所需的知识或能力。情感分类是一个例子，可采用清单~\ref{lst:ch04-zero} 的提示。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={零样本情感分类提示},label={lst:ch04-zero}]
+Please classify the following sentence as either 'Positive ',
+'Neutral ' or 'Negative ' with respect to its sentiment.
+Sentence: I hated the color of the front door!
+Sentiment:
+\end{lstlisting}
+\end{minipage}\par
+
+如前所述，零样本提示直接利用大语言模型已有的知识和能力。在清单~\ref{lst:ch04-zero} 的情感分类中，前提是大语言模型已经了解情感这一概念，以及文本是怎样表达情感的。
+
+\subsection{少样本提示}
+\label{sec:ch04-few}
+如果零样本提示未能引出大语言模型已有的知识或能力，可以试用少样本提示。少样本提示既包含任务描述，也包含一个或多个解题示范。加入要模型完成的任务的示范，可以利用大语言模型的上下文学习能力，使任务表现优于零样本方法（\refcite{ch04-touvron}{Touvron et al., 2023}）。
+
+仍以第~\ref{sec:ch04-zero}~节的情感分类任务为例，清单~\ref{lst:ch04-few} 给出一条少样本提示。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={少样本情感分类提示},label={lst:ch04-few}]
+Sentence: I just love it when I wake up to the sun shining
+through my window.
+Sentiment: Positive
+Sentence: I was walking through the town yesterday.
+Sentiment: Neutral
+Sentence: I can't see a way to solve this problem without it
+costing a lot.
+Sentiment: Negative
+Sentence: That sounds like such an exciting opportunity.
+Sentiment:
+\end{lstlisting}
+\end{minipage}\par
+
+\refcite{ch04-min}{Min 等人（2022）}发现，少样本提示的某些属性比较重要，其他属性的影响似乎较小。例如，清单~\ref{lst:ch04-few} 的提示采用固定的格式，反复出现 \texttt{Sentence} 后跟 \texttt{Sentiment} 的序列，以示范任务。对于任务表现，这个结构比示范本身是否正确更重要。即便给出的标签不正确，效果也可能优于完全不给标签。少样本提示对分类或实体抽取等任务很有效，但在需要复杂推理时有明显局限。接下来会介绍这类任务所用的思维链和思维树提示。
+
+\subsection{提示链}
+提示链（prompt chaining）把解决问题时与大语言模型的交互分成模块，使交互更简单。若单条提示不起作用，通常是因为问题太复杂，大语言模型难以用一条提示解决，这时就可以用提示链。把较大的问题拆成多条提示，再考虑它们的先后依赖，将其逐条连接起来，往往可以更好地控制结果，也能提高结果质量。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={零样本情感分类提示},label={lst:ch04-finance-one}]
+Please provide a short summary of the financial dealings
+between each business entity pair within the following
+document:
+{{document}}
+Summaries:
+\end{lstlisting}
+\end{minipage}\par
+
+设想一项任务，需要为一篇文档中每对商业实体之间的各种财务往来写一段简短摘要。一种做法是构造清单~\ref{lst:ch04-finance-one} 的简单提示，让大语言模型在一次推理中解决整个问题。%
+\footnote{译注：原书清单 4.5 至 4.7 的标题均为“零样本情感分类提示”，清单内容实际用于处理财务往来。}
+在具体处理时，单条提示要求模型先理解指令，结合指令和文档作推理，再结合识别出的实体和文档作推理，最后为每对实体生成摘要。即使能力很强的大语言模型也可能难以完成。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={零样本情感分类提示},label={lst:ch04-finance-pairs}]
+Please list all business entity pairs within the following
+document. Only entity pairs recorded in the document as
+having had business dealings should be listed.
+Document: {{document}}
+Entity Pairs with business dealings:
+\end{lstlisting}
+\end{minipage}\par
+
+考虑到任务的复杂性，可以采用提示链。先用清单~\ref{lst:ch04-finance-pairs} 的提示找出并列出文档中存在财务往来的所有商业实体对，再把结果交给后续的一条或多条提示，例如清单~\ref{lst:ch04-finance-summary} 的模板，用来分别概括各对实体的财务往来。这样做可能改善任务表现，也能更好地控制结果。把大问题拆成较小的任务模块后，开发人员可以评估大语言模型在中间步骤上的表现，只修改需要修改的步骤，就能改善整体表现。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={零样本情感分类提示},label={lst:ch04-finance-summary}]
+Please summarize the financial dealings between two entities
+listed below, as recorded in the following document.
+Entities: {{entity-pair}}
+Document: {{document}}
+Summary:
+\end{lstlisting}
+\end{minipage}\par
+
+围绕提示链这一概念已经开发了多种框架，第~8~章会详细讨论。其中两种常用框架是 LangChain 和 DSPy，前者的抽象层次比后者高得多。它们旨在简化复杂提示链的开发，并使其开发流程更接近传统的软件开发实践。
+
+\subsection{思维链}
+\label{sec:ch04-cot}
+\refcite{ch04-wei-2023}{Wei 等人（2023）}首先突出介绍了思维链（chain-of-thought，CoT）提示。它组织提示的上下文与示例，以模仿人解决问题时通常采用的逐步思考和推理过程。通常，能够自然分解为一系列中间问题的问题，很适合思维链提示。该方法中效果最好的提示，使用少量示例展示解决所提问题所需的推理步骤。思维链提示主要有三种变体。
+
+\begin{itemize}
+\item \textbf{零样本思维链。}\refcite{ch04-kojima}{Kojima 等人（2023）}提出，是三种变体中最简单、最直接的一种。只需在提示末尾加上“Let's think step by step”（我们逐步思考）或类似表述。\refcite{ch04-kojima}{Kojima 等人（2023）}发现，仅这一处改动，就能使大语言模型在 MultiArith 数据集（\refcite{ch04-roy}{Roy and Roth, 2015}）上的准确率从 17.7\% 提升到 78.7\%，在 GSM8K 数据集（\refcite{ch04-cobbe}{Cobbe et al., 2021}）上从 10.4\% 提升到 40.7\%。
+\item \textbf{手工思维链。}提示由提示工程人员手工构造，含有一个或多个示范，表明希望大语言模型用哪些推理步骤解答样例。研究表明，在难度较大的数学问题上，加入这类示范可以达到当时的先进水平。
+\item \textbf{自动思维链。}\refcite{ch04-zhang-2022}{Zhang 等人（2022）}提出的一种技术，可减少设计有效思维链提示所需的人工工作。示范越多样，思维链提示通常越有效，但手工构造这类提示可能很费力。自动思维链对问题聚类，再从各簇抽样，尽量增加示范问题的多样性，同时借助零样本思维链提示，让大语言模型生成这些示范的推理过程。将自动生成的示范纳入提示模板，再用模板推理。\refcite{ch04-zhang-2022}{Zhang 等人（2022）}表明，在相关基准上，这种方法的表现达到或超过了手工思维链提示。
+\end{itemize}
+
+\begin{practicaltip}
+各种思维链提示策略都利用大语言模型涌现出的推理能力。研究表明，它们只有在模型超过一定规模（按参数数目计）时才有效。较小的大语言模型在任务表现上的提升不及更大的模型。例如，在 GSM8K 基准上，思维链提示相对于常规提示的最大提升，出现在具有 1750 亿参数的 GPT-3 模型上。常规提示的准确率为 15.6\%，思维链提示为 46.9\%。相较之下，具有 70 亿参数的 GPT-3 模型用这两种提示所得的准确率分别为 4\% 和 2.4\%（\refcite{ch04-wei-2023}{Wei et al., 2023}）。因此，开发人员需要验证思维链提示在所选大语言模型上是否有效。
+\end{practicaltip}
+
+\subsection{自一致性}
+如前所述，大语言模型的输出容易出现编造或幻觉。在对一致性或事实准确性要求较高的应用中，自一致性提示（self-consistency prompting）是一种有效方法。一般的思路是，大语言模型对同一个查询给出的回答越一致，回答就越可能正确（\refcite{ch04-wang-2023a}{Wang et al., 2023a}）。
+
+自一致性采用少样本思维链提示，多次以同一提示查询大语言模型，得到多个回答。再从这些回答中选出提示的答案，具体可以采用多种方法。在算术任务中，可用简单多数投票选择答案。对于问答等语言任务，可采用语义相似度或 $n$ 元组重叠等方法。
+
+\subsection{思维树}
+思维树（tree-of-thoughts，ToT）提示沿用思维链的基本思路，将大语言模型的注意力引向解题所需推理步骤的示范或描述。但思维树更接近人们寻找正确答案时所做的多路径探索（\refcite{ch04-long}{Long, 2023}）。它使大语言模型能沿着多条推理路径探索问题，摆脱线性推理链的限制。这样能减少因推导中的某一步出错而得到错误解的可能，也能通过探索更多解题路径来提高答对的可能。
+
+\begin{keypoint}
+思维树借鉴了关于人如何解题的研究。研究发现，人会在组合问题空间中进行认知搜索以找到解（\refcite{ch04-simon}{Simon and Newell, 1971}）。随着每个分支中的推理推进，一些路径被逐步排除，搜索范围越来越窄。思维树提示可以构造多条解题路径，还允许在这些路径上规划、前瞻和回溯，以确定效果最好的解题路线。
+\end{keypoint}
+
+思维树这一思想似乎由 \refcite{ch04-yao-2023}{Yao 等人（2023）}和 \refcite{ch04-long}{Long（2023）}独立提出。两项工作的主要区别，在于怎样在各个“思路”间搜索。前者采用广度优先搜索或深度优先搜索，后者采用通过强化学习训练的专用控制器模块。思维树可以看作自一致性的进一步扩展，除了可以通过多数投票选择答案，还可以抽样生成更多的中间推理步骤，最终得到正确答案。

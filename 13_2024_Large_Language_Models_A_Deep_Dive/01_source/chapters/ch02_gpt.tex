@@ -1,0 +1,96 @@
+% PDF 98--103；原书第 68--73 页。
+\subsection{GPT（解码器）}
+OpenAI 的生成式预训练 Transformer（Generative Pre-trained Transformer，GPT）系列以较强的语言建模能力改变了自然语言处理领域（\refcite{ch02-brown}{Brown et al., 2020}；\refcite{ch02-radford-2018}{Radford et al., 2018}, \refcite{ch02-radford-2019}{2019}）。值得注意的是，这些模型无需为目标任务进行监督训练，就能完成问答、文本蕴含和文本摘要等自然语言处理任务。本节考察三个关键版本 GPT-1、GPT-2 和 GPT-3，梳理它们的演进过程。GPT-3.5 等后续模型基于采用人类反馈强化学习的 InstructGPT 方法，第 5 章将详细讨论。
+
+\subsubsection{数据集}
+\begin{enumerate}
+\item GPT-1 最初在 BooksCorpus 数据集上预训练，随后针对多种语言理解任务分别微调。自然语言推断使用 SNLI、MultiNLI、Question NLI、RTE 和 SciTail 等数据集。问答使用 RACE 和 Story Cloze。为衡量语言模型在句子相似度任务上的表现，研究者选用了 MSR Paraphrase Corpus、Quora Question Pairs 和 STS Benchmark 等数据集。分类任务以 Stanford Sentiment Treebank-2 和 CoLA 为基准。
+\item 训练 GPT-2 时，作者从 Reddit 上获得较多赞同票的帖子中跟踪外部链接，提取数据，整理成 WebText 数据集。该数据集大小为 40\,GB，含 800 多万份文档，规模大于 GPT-1 使用的 BookCorpus。为保证测试集不受干扰，WebText 排除了维基百科文章。GPT-2 未针对各项任务微调，而是通过零样本推理取得结果。
+\item GPT-3 的训练使用五种不同语料，分别赋予特定的采样权重。质量较高的数据集采样更频繁，模型在这些数据上训练多个轮次。所用数据集包括 Common Crawl、WebText2、Books1、Books2 和维基百科。
+\end{enumerate}
+
+\subsubsection{架构}
+GPT 模型均采用纯解码器架构。表~\ref{tab:ch02-gpt} 列出了不同版本的架构差异。
+
+\sourcefigure{fig02_13.pdf}{GPT-1 的架构及其训练目标。为不同任务微调时，先把结构化输入转换为词元序列，经预训练模型处理，再接线性层与 softmax 层。图右由上到下分别为分类、蕴含、相似度和多项选择的输入结构。Start、Delim 和 Extract 分别标识序列起点、分隔符和用于提取表示的位置。}{fig:ch02-gpt}
+
+\begin{table}[!htbp]
+\centering
+\caption{GPT-1、GPT-2 和 GPT-3 的比较。}
+\label{tab:ch02-gpt}
+\small
+\begin{tabularx}{\linewidth}{@{}Xrrr@{}}
+\toprule
+特征 & GPT-1 & GPT-2 & GPT-3\\
+\midrule
+参数量 & 1.17 亿 & 15 亿 & 1\,750 亿\\
+解码器层数 & 12 & 48 & 96\\
+上下文词元数 & 512 & 1\,024 & 2\,048\\
+隐藏层宽度 & 768 & 1\,600 & 12\,288\\
+批量大小 & 64 & 512 & 320 万\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{enumerate}
+\item GPT-1 使用 12 层的纯解码器 Transformer，结构与原始 Transformer 解码器一致，区别是使用可学习的位置嵌入替代原有的固定位置嵌入，见图~\ref{fig:ch02-gpt}。
+\item GPT-2 保留 GPT-1 的架构设计，但规模明显更大。它有 15 亿个参数，比 GPT-1 的 1.17 亿大约多一个数量级。
+\item GPT-3 沿用 GPT-1 与 GPT-2 的架构基础，但上下文词元数、层数等与 GPT-2 不同。
+\end{enumerate}
+
+\subsubsection{训练}
+\begin{enumerate}
+\item GPT-1 采用两阶段训练，先无监督预训练，再监督微调。第一阶段在大规模文本语料库上训练容量较大的语言模型。给定无监督词元语料 $U=\{u_1,\ldots,u_n\}$，使用标准的语言建模目标。
+\begin{equation}
+\mathcal{L}_1(U)=\sum_i\log P(u_i\mid u_{i-k},\ldots,u_{i-1};\Theta),
+\tag{2.34}
+\end{equation}
+其中 $k$ 是上下文窗口大小，条件概率 $P$ 由参数为 $\Theta$ 的神经网络建模。这些参数通过随机梯度下降（stochastic gradient descent）训练。
+
+无监督预训练后，将模型参数适配到一个监督目标任务。给定有标签数据集 $C$，每个样例由输入词元序列 $x_1,\ldots,x_m$ 和标签 $y$ 组成。输入经过预训练模型，得到最后一个 Transformer 块的激活值 $hm_l$。
+\begin{equation}
+P(y\mid x_1,\ldots,x_m)=\operatorname{softmax}(hm_lW_y).
+\tag{2.35}
+\end{equation}
+相应的目标为
+\begin{equation}
+\mathcal{L}_2(C)=\sum_{(x,y)}\log P(y\mid x_1,\ldots,x_m).
+\tag{2.36}
+\end{equation}
+此外，在微调中把语言建模作为辅助目标，可以改善泛化和收敛。合成目标为
+\begin{equation}
+\mathcal{L}_3=\mathcal{L}_2(C)+\lambda\times\mathcal{L}_1(U),
+\tag{2.37}
+\end{equation}
+其中 $\mathcal{L}_1(U)$ 是无监督预训练目标，$\mathcal{L}_2(C)$ 是监督微调目标。合成目标 $\mathcal{L}_3$ 同时利用这两个阶段的目标。针对任务转换输入，使预训练模型能够处理多种任务的结构化输入，无须明显改动架构。
+
+\item GPT-2 的主要训练方法基于语言建模。可把它看作从一组样例 $(x_1,x_2,\ldots,x_n)$ 中进行无监督分布估计，其中各 $x_i$ 是一个符号序列。模型以输入和具体任务为条件，以便泛化到多种任务。形式上，模型旨在估计
+\begin{equation}
+p(\text{output}\mid\text{input},\text{task}).
+\tag{2.38}
+\end{equation}
+例如，翻译任务可在模型中表示为 \texttt{("translate to French", "English text", "French text")}。以往语言模型通常在单一领域上训练，而这里的方法强调使用涵盖多个领域与语境的多样化数据集，以捕捉数据集一节所述的多种自然语言模式。
+
+\item GPT-3 在上文所述的大规模语料库上，以自回归方式预测下一个词来训练。它用上下文学习改变了传统上利用专用训练数据针对特定任务微调的做法。GPT-3 可以只凭提示中的上下文或示例，动态适应未明确训练过的新任务。不同的学习方式进一步体现了 GPT-3 上下文学习的灵活性。在少样本学习中，提示包含多个示例来引导模型。例如，要将英语译成法语，可以先给出几对英法句子，再给出需要翻译的英语句子。单样本学习（one-shot learning）只给一个引导示例。零样本学习没有明确示例，GPT-3 根据描述性提示执行任务，展示出单凭预训练就能理解并完成任务的能力。接下来几章将深入讨论这个主题。
+\end{enumerate}
+
+\subsubsection{要点}
+\begin{keypoint}
+\begin{enumerate}
+\item GPT-1 证明了以语言建模作预训练的效果，模型由此具备较强的泛化能力。其架构支持迁移学习，只需少量微调即可处理多种自然语言处理任务。这个模型显示了生成式预训练的潜力，为后续模型利用更大的数据集和更多参数来发挥这些能力开辟了道路。
+\item GPT-2 证明了增加数据量和参数量可以增强语言模型的能力，在零样本情形中常常超过当时的先进结果。研究发现，表现随模型容量呈对数线性增长。模型的困惑度（perplexity）随参数量增加而持续下降，没有出现饱和迹象。GPT-2 对 WebText 数据欠拟合，这说明继续训练可能改善结果。该发现表明，进一步增大模型或能改善自然语言理解。
+\item 在零样本设置中，GPT-2 在 8 个语言建模数据集中的 7 个上超过当时的基准结果。在 Children’s Book 数据集上，普通名词和命名实体识别的准确率比当时的先进结果高约 7\%。在 LAMBADA 上，GPT-2 把困惑度从 99.8 显著降到 8.6，表明准确率明显提高。在阅读理解任务中，GPT-2 超过了四个基准模型中的三个。但在文本摘要方面，它的表现与传统上专门训练的摘要模型相当，甚至更低。
+\item 研究者在多个语言建模和自然语言处理数据集上评估了 GPT-3。它在 LAMBADA 和 Penn Tree Bank 等数据集上表现出色，经常达到或超过先进模型，少样本或零样本设置尤其如此。它并非总能超过最好的基准结果，但零样本表现持续改善。GPT-3 擅长多种自然语言处理任务，包括闭卷问答（closed-book question answering）与翻译，表现往往可以与微调模型相比或超过它们。它在少样本场景中通常比单样本或零样本场景表现更好。研究还用算术、打乱字母复原单词和新词用法等不常规任务测试 GPT-3。它在这些任务上的表现随参数量扩大而改善，在少样本设置下尤为明显。
+\item GPT-3 能生成高质量文本，但较长句子有时不够连贯，文本也容易重复。它难以完成自然语言推断、填空及部分阅读理解任务，原因可能是其单向结构。研究指出，双向模型将来或能解决这个问题。GPT-3 的目标对所有词元一视同仁，缺少面向特定任务的预测。研究讨论了扩充目标、强化学习或加入其他模态等做法，也指出 GPT-3 的架构规模大，推理复杂且昂贵，输出难以解释。此外，它能生成类似人类写作的文本，这也带来了被滥用于网络钓鱼或散布虚假信息的风险。
+\end{enumerate}
+\end{keypoint}
+
+\subsubsection{变体}
+\begin{enumerate}
+\item \textbf{Gopher。}这个模型有 2\,800 亿个参数，使用 MassiveText 数据集中的 3\,000 亿个词元训练，上下文窗口为 2\,048 个词元。数据集包含网页、图书、新闻和代码。在 100 项任务中，Gopher 有 81\% 的任务超过 GPT-3（1\,750 亿个参数）等当时的先进模型（\refcite{ch02-rae-2021}{Rae et al., 2021}）。
+\item \textbf{Chinchilla。}这个按算力最优原则训练的模型有 700 亿个参数，训练使用了 1.4 万亿个词元。它的表现超过规模更大的 Gopher，而且模型更小，显著降低了推理成本（\refcite{ch02-hoffmann}{Hoffmann et al., 2022}）。
+\item \textbf{Llama。}Meta 的 GPT 类 Llama 模型在本书写作时已到第 3 版，是一种有 80 亿和 700 亿参数两个版本的开源大语言模型。它提供预训练和指令调优模型，使用监督微调和基于人类反馈的强化学习来优化对话能力（\refcite{ch02-touvron}{Touvron et al., 2023}）。
+\item \textbf{Claude。}Anthropic 的 Claude 3 系列包括 Opus、Sonnet 和 Haiku，原书所列规模分别为 200 亿、700 亿和 2 万亿个参数，各自针对不同的性能需求（\refcite{ch02-anthropic}{Anthropic, 2023}）。它们支持多语言和视觉处理，且更易受指令引导。Opus 在复杂任务上提供最高水平的表现，Sonnet 兼顾表现和成本，Haiku 则最快且最便宜。当提示长度低于 32\,000 个词元，输入与输出词元之比为 1:5 时，Haiku 每秒处理 21\,000 个词元。
+\item \textbf{Command R。}Cohere 开发的 Command R 有 350 亿个参数，是面向检索增强生成、调用外部 API 和工具等长上下文任务优化的生成模型。它面向规模化应用设计，在检索增强生成和工具使用中有较高的准确率，延迟低、吞吐量高，上下文长度为 128\,000 个词元（\refcite{ch02-cohere}{Cohere, 2024}）。Command R 在 10 种主要语言中也表现出较强的能力。
+\item \textbf{Gemma。}Google 开发的 Gemma 系列包括 20 亿与 70 亿参数两个版本，使用 6 万亿个词元训练（\refcite{ch02-team}{Team et al., 2024}）。这些模型在语言理解、推理和安全方面表现突出，在 18 项任务中的 11 项超过规模相当的模型。
+\end{enumerate}

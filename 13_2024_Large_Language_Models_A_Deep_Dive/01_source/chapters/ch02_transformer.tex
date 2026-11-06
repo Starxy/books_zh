@@ -1,0 +1,158 @@
+% PDF 63--73；原书第 33--43 页。
+\section{Transformer}
+\label{sec:ch02-transformer}
+\refcite{ch02-vaswani}{Vaswani 等人（2017）}提出的 Transformer 模型，是序列到序列任务的基础架构之一。图~\ref{fig:ch02-transformer} 所示架构采用编码器—解码器结构。编码器与解码器各由若干结构相同的层组成，下面介绍其中的主要部件。
+
+\subsection{编码器}
+编码器负责处理输入序列，把信息压缩为供解码器使用的上下文或记忆（memory）。每个编码器层由三个主要部件组成。
+\begin{itemize}
+\item \textbf{多头注意力（multi-head attention）。}每个注意力头可以关注输入的不同部分，从而捕捉数据的多个方面。
+\item \textbf{前馈神经网络。}这是一个简单而有效的神经网络。它对注意力向量施加非线性变换，把结果传给下一个编码器层，也可供解码器层使用。
+\item \textbf{相加与归一化（Add \& Norm）。}该层结合残差连接（residual connection）和层归一化（layer normalization），使激活值更平稳，改善训练过程，并缓解编码器和解码器中的梯度消失问题。
+\end{itemize}
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_03}
+\caption{Transformer 架构包含编码器和解码器，两者都使用多头注意力。}
+\label{fig:ch02-transformer}
+\end{figure}
+
+\subsection{解码器}
+解码器接收编码器给出的上下文，并生成输出序列。它也由多层组成，与编码器有许多共同之处，但有几处改动。
+\begin{itemize}
+\item \textbf{掩码多头注意力（masked multi-head attention）。}与多头注意力类似，不过使用掩码机制，以确保对当前词的预测不依赖于序列中还未出现的词。
+\item \textbf{编码器—解码器注意力（encoder-decoder attention）。}该层利用编码器提供的上下文，使解码器能够关注输入序列中的相关部分。
+\item \textbf{前馈神经网络。}该层的架构与编码器中的相同，对注意力向量进一步变换，为生成输出序列作准备。
+\end{itemize}
+
+下面介绍 Transformer 架构的各个部件及其组成。
+
+\subsection{词元切分与表示}
+在 Transformer 模型中，词元切分通常把句子转换为机器可读的形式。根据具体应用需要的粒度，可以按词或按子词切分。按词切分时，句子中的每个词作为一个独立词元，然后映射为对应的向量表示，如词嵌入，用作 Transformer 的输入。这种办法处理词表外词（out-of-vocabulary word）时可能受到限制。字节对编码（Byte-Pair Encoding，BPE）或 WordPiece 等子词方法，通常能弥补按词切分的不足。这些方法把词分成更小的片段，即子词，使词表外词能够得到表示，也能捕捉词形上的细微差别。然后把各子词映射为嵌入并送入 Transformer。
+
+例如，单词“unhappiness”可以切成“un”和“happiness”等子词。再分别把这些子词映射为各自的嵌入。这种方法可以提高模型的泛化能力，让模型处理更广泛的词汇，包括训练中未出现的词。
+
+也可以采用结合按词和按子词切分的混合方法，兼顾子词表示的覆盖范围和词级词元的可解释性。
+
+\subsection{位置编码}
+Transformer 模型并行处理输入序列中的所有词元，模型本身没有考虑词元位置或顺序的机制。位置编码（positional encoding）为模型提供有关词元在序列中相对位置的信息。输入嵌入送入 Transformer 前，通常会先加上位置编码。
+
+若句子长度为 $l$，嵌入的维数或深度为 $d$，则位置编码 $\symbf{P}$ 是一个形状相同的二维矩阵，即 $\symbf{P}\in\mathbb{R}^{l\times d}$。对于每个位置，沿长度方向的索引为 $i$，沿嵌入维度方向的索引为 $j$，可写为
+\begin{equation}
+\symbf{P}_{i,2j}=\sin(i/1000^{2j/d}),
+\tag{2.13}
+\end{equation}
+\begin{equation}
+\symbf{P}_{i,2j+1}=\cos(i/1000^{2j/d}),
+\tag{2.14}
+\end{equation}
+其中 $i=0,\ldots,l-1$，$j=0,\ldots,\lfloor(d-1)/2\rfloor$。从函数定义可知，沿向量维度方向频率逐渐降低，波长从 $2\pi$ 到 $10000\cdot 2\pi$ 成等比数列。图~\ref{fig:ch02-position} 可视化了维数 $d=512$、最大位置长度 $l=100$ 时的位置编码。
+\transnote{式（2.13）和（2.14）中的底数 $1000$ 及原书下一页文字中的 $10000$ 均按印刷版保留。}
+
+\sourcefigure{fig02_04.pdf}{100 个位置、512 个维度的位置编码。横轴为嵌入维度索引，纵轴为位置索引。}{fig:ch02-position}
+
+\subsection{多头注意力}
+多头注意力使用 $h$ 个并行的自注意力头，取代单个自注意力头，以增强模型的表示能力。原始 Transformer 使用 $h=8$ 个头，使模型能够捕捉输入数据的不同方面和依赖关系，例如机器翻译任务中的语法与时态。
+
+在多头注意力中，每个头都有自己的一组可学习的查询、键和值的权重矩阵，从而得到各自的查询、键和值矩阵及输出矩阵。把这些输出矩阵拼接起来，再用一个权重矩阵对拼接结果作线性变换。各个头从输入到输出的并行变换见图~\ref{fig:ch02-multihead}。
+\begin{equation}
+\mathrm{head}_i
+=\operatorname{attention}(\symbf{W}_{Q_i}\symbf{Q},\symbf{W}_{K_i}\symbf{K},\symbf{W}_{V_i}\symbf{V}).
+\tag{2.15}
+\end{equation}
+\begin{equation}
+\operatorname{multihead}(\symbf{Q},\symbf{K},\symbf{V})
+=\symbf{W}_O\operatorname{concat}(\mathrm{head}_1,\ldots,\mathrm{head}_h).
+\tag{2.16}
+\end{equation}
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_05}
+\caption{多头注意力机制学习多组查询、键和值的变换矩阵，再把各头结果合并。}
+\label{fig:ch02-multihead}
+\end{figure}
+
+\subsection{逐位置前馈神经网络}
+注意力机制之后，Transformer 架构的下一部件是前馈神经网络。它进一步变换注意力向量，使其适合作为后续编码器层或解码器层的输入。前馈神经网络通常包含两层，在第一层之后使用整流线性单元（Rectified Linear Unit，ReLU）激活函数，引入非线性。设 $\symbf{z}$ 为输入的注意力向量，前馈神经网络施加的变换 $F(\symbf{z})$ 可表示为
+\begin{equation}
+F(\symbf{z})=\operatorname{ReLU}(\symbf{z}\symbf{W}_1+\symbf{b}_1)\symbf{W}_2+\symbf{b}_2,
+\tag{2.17}
+\end{equation}
+其中 $\symbf{W}_1$、$\symbf{W}_2$ 分别是第一、二层的权重矩阵，$\symbf{b}_1$、$\symbf{b}_2$ 分别是两层的偏置向量。Transformer 编码器和解码器的 $N$ 层中，每层对输入序列的各个词使用相同的线性变换，各层的权重参数 $(\symbf{W}_1,\symbf{W}_2)$ 和偏置参数 $(\symbf{b}_1,\symbf{b}_2)$ 则各自独立。
+
+\subsection{层归一化}
+Transformer 与残差网络（Residual Network，ResNet）类似，也使用残差连接，将输入 $\symbf{X}$ 加到输出 $\symbf{Z}$ 上（\refcite{ch02-he}{He et al., 2016}）。归一化过程使每层的激活值具有零均值和单位方差。对于每个隐藏单元 $h_i$，层归一化写作
+\begin{equation}
+h_i=\frac{g}{\sigma}(h_i-\mu),
+\tag{2.18}
+\end{equation}
+其中 $g$ 是增益变量（通常设为 1），均值 $\mu=\frac{1}{H}\sum_{i=1}^{H}h_i$，标准差 $\sigma=\sqrt{\frac{1}{H}\sum_{i=1}^{H}(h_i-\mu)^2}$。
+
+层归一化技术减小协变量偏移（covariate shift）。这里指层之间的梯度依赖。所需的迭代次数因而减少，收敛加快（\refcite{ch02-ba}{Ba et al., 2016}）。
+
+\subsection{掩码多头注意力}
+在 Transformer 中，解码器根据编码器的输出以及目标序列中已经见到的词元，预测序列中的下一个词元（词或字符）。解码器第一层采用一种特殊策略，只能访问在当前待预测词元之前的词元。这种机制称为掩码多头注意力。
+
+掩码用一个特定的权重矩阵 $\symbf{M}$ 实现。其中，与序列未来词元对应的元素设为 $-\infty$，与此前词元对应的元素设为 0。
+
+在计算查询矩阵 $\symbf{Q}$ 与键矩阵的转置 $\symbf{K}^{\mathrm{T}}$ 的乘积之后、应用 softmax 之前施加掩码。于是未来词元对应的 softmax 输出为零，从计算中被屏蔽。这样，解码器便无法预先访问序列中的未来词元，能够保持机器翻译等任务所要求的序列顺序。
+\begin{equation}
+\operatorname{maskedAttention}(\symbf{Q},\symbf{K},\symbf{V})
+=\operatorname{softmax}\left(\frac{\symbf{Q}\symbf{K}^{\mathrm{T}}+\symbf{M}}{\sqrt{d_k}}\right)\symbf{V}.
+\tag{2.19}
+\end{equation}
+
+\subsection{编码器—解码器注意力}
+编码器—解码器注意力机制连接编码器与解码器，把上下文信息从源序列传给目标序列。从概念上说，这一层的工作方式与标准多头注意力相似。关键区别在于，查询 $\symbf{Q}$ 来自解码器的当前状态，而键 $\symbf{K}$ 和值 $\symbf{V}$ 取自编码器的输出。这样，生成目标序列中的每个词元时，模型可以关注源序列的相关部分，从而捕捉源序列与目标序列之间复杂的关系。
+
+\subsection{Transformer 变体}
+研究者对上述原始 Transformer 作了多种改动，产生了许多 Transformer 模型（\refcite{ch02-lin}{Lin et al., 2022}）。如图~\ref{fig:ch02-taxonomy} 所示，可以把这些改动分为三类，即架构改动、预训练方法和应用。下面各节详细介绍不同变体之间的主要差别，表~\ref{tab:ch02-variants} 列出了部分变体。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_06}
+\caption{Transformer 已衍生出许多变体，可按架构改动、训练目标和输入类型来分类。}
+\label{fig:ch02-taxonomy}
+\end{figure}
+
+\paragraph{归一化方法}
+大语言模型在预训练阶段容易出现训练不稳定的问题。归一化方法有助于平稳训练。早期常用批归一化（Batch Normalization，BatchNorm），但在序列长度可变、批量较小的情形下效率不佳。因此引入了层归一化（Layer Normalization，LayerNorm 或 LN），按层归一化激活值，分别为各层重新计算均值和方差。后来提出均方根归一化（Root Mean Square Layer Normalization，RMSNorm），根据激活值的均方根重新缩放激活值，以加快层归一化的训练速度。这种方法在 Transformer 中展现出更快的训练速度和更好的表现。
+
+\begin{practicaltip}
+Gopher 和 Chinchilla 等模型采用了 RMSNorm。Microsoft 提出的 DeepNorm 能帮助深层 Transformer 在训练时保持平稳，使其可扩展到 1\,000 层。GLM-130B 等对训练稳定性和性能有要求的模型采用了这一方法。
+\end{practicaltip}
+
+\paragraph{归一化位置}
+归一化主要有三种放置方式，即后置层归一化（post-LN）、前置层归一化（pre-LN）和夹层式层归一化（sandwich-LN）。原始 Transformer 采用后置归一化，放在残差块之间。不过，由于输出层附近的梯度较大，采用后置归一化的 Transformer 往往在训练中不够平稳。因此，后置归一化在大语言模型中较少单独使用，但可以配合其他策略，例如在 GLM-130B 中与前置归一化结合。前置归一化放在各子层之前，在最终预测之前还额外作一次层归一化。
+
+\begin{practicaltip}
+采用前置归一化的 Transformer 比采用后置归一化的模型更容易平稳训练，但性能有所下降。尽管有这一取舍，前置归一化通常因训练较平稳而被采用。也有例外，例如参数量超过 1\,000 亿的 GLM 等模型采用前置归一化时，训练并不平稳。夹层式层归一化是前置归一化的扩展，在残差连接前额外加入一层 LN，以缓解 Transformer 层输出值爆炸。不过，这种做法并非总能使大语言模型的训练趋于平稳，也可能导致训练崩溃。
+\end{practicaltip}
+
+\paragraph{激活函数}
+恰当地选择激活函数，对于发挥前馈网络的性能很重要。已有的大语言模型通常采用高斯误差线性单元（Gaussian Error Linear Unit，GeLU）。
+
+\begin{practicaltip}
+PaLM、LaMDA 等较新的大语言模型采用门控线性单元（Gated Linear Unit，GLU）的变体，包括 SwiGLU 和 GeGLU，通常能改善表现。不过，与 GeLU 相比，这些变体所用的前馈网络参数约多 50\%。
+\end{practicaltip}
+
+\paragraph{位置嵌入}
+原始 Transformer 采用绝对位置嵌入（absolute position embedding），在编码器和解码器底部加到输入嵌入上。它有正弦式和学习式两种变体，后者在预训练语言模型中较为常见。
+
+\begin{practicaltip}
+相对位置嵌入（relative position embedding）根据键与查询之间的偏移生成，最早在 Transformer-XL 中引入，后来在 T5 中作了修改。T5 根据查询与键的位置距离，在注意力分数上加一个可学习的标量，以简化嵌入。采用相对位置嵌入的 Transformer 能处理比训练时所见序列更长的序列。旋转位置嵌入（Rotary Position Embedding，RoPE）使用取决于词元位置的旋转矩阵，从而能计算带有相对位置信息的分数。由于表现良好并具有长距离衰减性质，RoPE 被用于 PaLM 和 Llama 等较新的大语言模型。xPos 基于 RoPE，在旋转角度向量的各个维度引入特定的指数衰减，以增强 Transformer 的平移不变性（translation invariance）和长度外推（length extrapolation）能力，使训练在较远距离上更平稳。ALiBi 用取决于键与查询之间距离的惩罚项调整注意力分数，改善 Transformer 的外推能力，且无需可训练参数。与正弦位置编码、RoPE、T5 位置偏置等其他位置嵌入方法相比，它展现出更好的外推性能和训练稳定性。
+\end{practicaltip}
+
+\paragraph{注意力机制}
+原始 Transformer 使用全注意力（full attention），也就是对序列中的每一对词元计算注意力。它采用缩放点积注意力和多头注意力。各头对查询、键和值作不同的投影，然后拼接各头的输出，得到最终输出。全注意力的计算复杂度随序列长度呈二次增长，长序列的问题尤其突出，稀疏注意力（sparse attention）可以缓解这一问题。
+
+\begin{practicaltip}
+采用局部带状稀疏注意力（locally banded sparse attention）的高效 Transformer 变体，例如 GPT-3 的分解注意力（Factorized Attention），让每个查询只关注由位置确定的词元子集，降低计算复杂度。多查询注意力（multi-query attention）让各头共享键和值的线性变换矩阵，既节约计算，模型质量又几乎不受影响。PaLM 和 StarCoder 等模型采用了多查询注意力。FlashAttention 在不影响模型质量的前提下优化了 GPU 上注意力模块的速度和显存占用。它把输入分块并引入重计算，以便高效利用 GPU 上的快速存储器，即静态随机存取存储器（Static Random Access Memory，SRAM）。FlashAttention 集成在 PyTorch、DeepSpeed 和 Megatron-LM 等平台中，从考虑输入输出（I/O）开销的角度优化注意力模块。为了兼顾泛化和训练稳定性，建议用前置 RMSNorm（pre-RMSNorm）作层归一化，并用 SwiGLU 或 GeGLU 作激活函数。为避免性能下降，建议避免紧接在嵌入层之后使用层归一化。Realformer 和 Predictive Attention Transformer 等方法复用此前块的注意力分布来引导当前块，从而在网络中形成更直接的传播路径。透明注意力（Transparent Attention）在交叉注意力（cross-attention）模块中使用所有编码器层表示的加权和，使优化更容易。自适应计算时间（Adaptive Computation Time，ACT）根据输入的难度调整计算时间，衍生出 Universal Transformer 和 Conditional Computation Transformer 等方法。它们迭代地改进表示，或者利用门控机制优化计算资源。
+\end{practicaltip}
+
+\input{assets/tab02_01}
+
+\paragraph{结构改动}
+为了应对 Transformer 的计算需求，研究者提出多种整体结构上的改动。Lite Transformer 引入双分支结构，用注意力处理长程上下文，用卷积处理局部依赖，适用于移动设备。Funnel Transformer 引入漏斗状的编码器架构，DeLighT 则以专门模块取代标准 Transformer 块，分别力图降低浮点运算量（FLOPs）、内存占用和模型大小。由于计算复杂度呈二次增长，Transformer 难以处理长序列。循环式和分层式 Transformer 等分治策略应运而生。循环式 Transformer（recurrent Transformer）用缓存存储历史信息，Transformer-XL 等技术由此延长上下文。分层式 Transformer（hierarchical Transformer）把输入分成更小的片段，先处理低层特征，再聚合起来作高层处理，有助于处理长输入并生成更丰富的表示。

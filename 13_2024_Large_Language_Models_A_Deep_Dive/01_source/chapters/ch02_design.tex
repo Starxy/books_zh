@@ -1,0 +1,157 @@
+% PDF 78--91；原书第 48--61 页。
+\section{预训练大语言模型的设计选择}
+本节考察不同大语言模型在设计上的区别（\refcite{ch02-zhao}{Zhao et al., 2023}），讨论各种预训练方法和目标、Transformer 架构的选择，以及不同的解码策略。
+
+\subsection{预训练方法}
+了解各种预训练方法，对于在不同领域有效部署语言模型很重要。每种方法各有长处和难题，适用于特定任务和数据类型。下面介绍五种主要方法，说明它们如何工作、用在什么场合，以及各自的优缺点（\refcite{ch02-kalyan}{Kalyan et al., 2021}）。
+
+\subsubsection{从头预训练}
+从头预训练（Pre-training from Scratch，PTS）指用大量无标签文本，从头训练 Transformer 模型。这是构建基于 Transformer 的预训练语言模型的基础方法。这类模型通常由一个嵌入层和随后的多个 Transformer 层组成。从头预训练不依赖已有知识，因此可以作为多种应用的起点。不过，该方法需要大量算力和时间，尤其在模型和数据集都很大时。BERT、RoBERTa、ELECTRA 和 T5 等模型，都是在大量无标签文本上从头预训练的。
+
+\subsubsection{持续预训练}
+持续预训练（Continual Pre-training，CPT）是在从头预训练之后，使用特定领域的语料库进一步训练模型。此法有助于完成需要专门知识的任务，改善模型在特定领域的表现。例如，BioBERT 是 BERT 的一种变体，在生物医学文本上经过持续预训练，因而擅长生物医学和临床领域的任务。它的缺点是模型可能过拟合特定领域的语料库，从而失去部分泛化能力。
+
+\subsubsection{同步预训练}
+同步预训练（Simultaneous Pre-training，SPT）把特定领域语料与通用领域语料合在一起预训练模型。这种方法旨在取得平衡，让模型同时习得通用知识和专门知识。ClinicalBERT 是一个例子，它在临床记录与通用领域文本组成的混合语料库上预训练。同步预训练可以带来较均衡的知识结构。难点在于怎样选择和组合语料，以免模型偏向其中一个领域。
+
+\subsubsection{任务适应性预训练}
+任务适应性预训练（Task Adaptive Pre-training，TAPT）使用与任务相关的小规模语料库作预训练。它比其他方法耗费的资源少，尤其适用于特定任务可用数据有限的情形。任务适应性预训练可以补充其他方法，进一步调整经过从头预训练或持续预训练的模型，改善它们在特定任务上的表现。不过，效果在很大程度上取决于预训练语料与任务的相关程度及其质量。
+
+\subsubsection{知识继承预训练}
+知识继承预训练（Knowledge Inherited Pre-training，KIPT）是一种新方法，使用自监督学习，并从已有预训练模型中继承知识。这一思路源于人类的学习过程。人除了自学，也向有知识的人学习。知识继承预训练减少了从头预训练需要的时间和资源，因而效率较高。不过，能否成功取决于从已有模型继承的知识是否优质且相关。有效整合或迁移这些知识也未必容易。
+
+\subsection{预训练任务}
+监督学习对人工智能的发展至关重要，实际训练模型时，需要大量人工标注数据。这些模型虽然擅长特定任务，却往往需要大量有标签数据，因而训练过程费钱费时。医学、法律等专业领域中，这类数据稀缺，问题尤其明显。监督学习模型也缺乏泛化能力，往往只从给定的数据中学习，从而产生泛化误差和非预期的相关性。认识到这些局限，研究者开始探索自监督学习（Self-Supervised Learning，SSL）等其他范式。自监督学习依据数据属性和预训练任务的定义，自动生成标签。预训练任务提供伪监督信号，帮助模型学习通用知识。自监督学习主要利用大量可以自由获取的无标签数据，学习通用语言表示并提高泛化能力。
+
+自监督学习的损失函数为
+\begin{equation}
+\mathcal{L}_{\mathrm{SSL}}=
+\lambda_1\mathcal{L}_{\mathrm{PT}1}+
+\lambda_2\mathcal{L}_{\mathrm{PT}2}+\ldots+
+\lambda_m\mathcal{L}_{\mathrm{PT}m}.
+\tag{2.20}
+\end{equation}
+其中各项含义如下。
+\begin{itemize}
+\item $\mathcal{L}_{\mathrm{SSL}}$ 是自监督学习的总损失函数。
+\item $\mathcal{L}_{\mathrm{PT}1},\mathcal{L}_{\mathrm{PT}2},\ldots,\mathcal{L}_{\mathrm{PT}m}$ 分别是各项预训练任务的损失函数。
+\item $\lambda_1,\lambda_2,\ldots,\lambda_m$ 是分配给各预训练任务损失的权重，决定各自对总损失的贡献。
+\end{itemize}
+为训练不同的大语言模型，已有研究提出了许多自监督预训练任务（\refcite{ch02-kalyan}{Kalyan et al., 2021}）。下面考察其中一些常见任务。
+
+\subsubsection{因果语言模型}
+因果语言建模（Causal Language Modeling，CLM）根据上下文预测序列中的下一个词，可以从左到右，也可以从右到左。给定序列 $x=\{x_1,x_2,x_3,\ldots,x_{|x|}\}$，其中 $|x|$ 表示词元数量，CLM 的损失函数定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{CLM}}^{(x)}=-\frac{1}{|x|}\sum_{i=1}^{|x|}\log P(x_i\mid x_{<i}),
+\tag{2.21}
+\end{equation}
+其中 $x_{<i}$ 表示序列中先于 $x_i$ 的词元。
+
+\subsubsection{掩码语言模型}
+掩码语言建模（Masked Language Modeling，MLM）用于预训练阶段。它遮盖输入序列中选中的词元，再训练模型预测这些词元。令 $x_{\backslash M_x}$ 表示 $x$ 的掩码版本，$M_x$ 表示 $x$ 中被遮盖词元的位置集合。MLM 的损失定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{MLM}}^{(x)}=-\frac{1}{|M_x|}\sum_{i\in M_x}\log P(x_i/x_{\backslash M_x}).
+\tag{2.22}
+\end{equation}
+模型学习准确预测被遮盖的词元，使该损失最小，从而加深对语言结构的理解。BERT 是自然语言处理中的重要模型，它采用 MLM 作为预训练任务，以 0.15 的概率选取要遮盖的词元。
+
+\subsubsection{替换词元检测}
+替换词元检测（Replaced Token Detection，RTD）通过增强训练信号、缩小预训练与微调之间的差异，缓解 MLM 的局限。MLM 使用特殊掩码词元来破坏输入，而 RTD 用以 MLM 目标预训练的模型生成的词元来破坏句子。任务由此变为词元级二分类，判断每个词元是否被替换。过程分为两步，先用 MLM 目标训练生成器模型，再用 RTD 目标训练以生成器初始化的判别器模型。RTD 的损失写为
+\begin{equation}
+\mathcal{L}_{\mathrm{RTD}}^{(x)}
+=-\frac{1}{|\hat{x}|}\sum_{i=1}^{|\hat{x}|}\log P(d/\hat{x}_i),
+\tag{2.23}
+\end{equation}
+其中 $d\in\{0,1\}$ 表示词元是否被替换，替换为 1，未替换为 0。$\hat{x}$ 是被破坏的句子，$P(d/\hat{x}_i)$ 表示词元被替换或未被替换的概率。
+
+\subsubsection{打乱词元检测}
+打乱词元检测（Shuffled Token Detection，STD）旨在提高模型理解连贯句子结构的能力，进而改善模型在多种任务上的表现。该任务以 0.15 的概率打乱序列中的词元，其损失为
+\begin{equation}
+\mathcal{L}_{\mathrm{STD}}^{(x)}
+=-\frac{1}{|\hat{x}|}\sum_{i=1}^{|\hat{x}|}\log P(d/\hat{x}_i).
+\tag{2.24}
+\end{equation}
+式中 $d\in\{0,1\}$ 表示词元是否被替换，替换为 1，未替换为 0，$\hat{x}$ 是被破坏的句子。模型通过学习在序列上下文中有效辨识和理解被打乱的词元，使这一损失最小。
+\transnote{原书在 STD 的说明中仍用“替换”描述 $d$ 的取值。}
+
+\subsubsection{随机词元替换}
+随机词元替换（Random Token Substitution，RTS）由 \refcite{ch02-liello}{Liello 等人（2021）}提出，用来识别序列中被随机换掉的词元。该技术从词表中选择其他词元，随机替换给定序列中 15\% 的词元。这个方法效率较高，因为无须另设生成器模型破坏输入序列。RTS 的损失为
+\begin{equation}
+\mathcal{L}_{\mathrm{RTS}}^{(x)}
+=-\frac{1}{|\hat{x}|}\sum_{i=1}^{|\hat{x}|}\log P(d/\hat{x}_i),
+\tag{2.25}
+\end{equation}
+其中 $d\in\{0,1\}$ 表示词元是否被随机换掉，换掉为 1，未换掉为 0。$\hat{x}$ 是将原序列 $x$ 中 15\% 的词元随机换掉后所得的序列。
+
+\subsubsection{替换式语言建模}
+替换式语言建模（Swapped Language Modeling，SLM）处理 MLM 预训练任务中使用特殊掩码词元所造成的差异。这个差异出现在预训练与微调两个阶段之间。SLM 以 0.15 的概率用从词表随机选取的词元替换输入，从而减轻这种差异。SLM 与 MLM 都预测被破坏的词元，但 SLM 用随机词元替换原词元，MLM 则用掩码词元。SLM 和 RTS 都用随机词元破坏输入，但 SLM 的样本效率较低。这是因为 SLM 只在 15\% 的输入词元上计算目标，RTS 则使用序列中的每个词元。SLM 的损失定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{SLM}}^{(x)}
+=-\frac{1}{|R_x|}\sum_{i\in R_x}\log P(x_i/x_{\backslash R_x}),
+\tag{2.26}
+\end{equation}
+其中 $R_x$ 是被随机替换词元的位置集合，$x_{\backslash R_x}$ 是 $x$ 的破坏版本。
+
+\subsubsection{翻译语言建模}
+翻译语言建模（Translation Language Modeling，TLM）用于多语言模型的预训练。给定两个语言不同的句子，TLM 遮盖两个句子中的一部分词元，再训练模型预测这些词元。TLM 的损失定义为
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{\mathrm{TLM}}^{(x)}
+={}&-\frac{1}{|M_x|}\sum_{i\in M_x}\log P(x_i/x_{\backslash M_x},y_{\backslash M_y})\\
+ &-\frac{1}{|M_y|}\sum_{i\in M_y}\log P(y_i/x_{\backslash M_x},y_{\backslash M_y}).
+\end{aligned}
+\tag{2.27}
+\end{equation}
+其中 $M_x$ 和 $M_y$ 分别表示句子 $x$ 和 $y$ 中被遮盖位置的集合，$x_{\backslash M_x}$ 和 $y_{\backslash M_y}$ 分别是 $x$ 和 $y$ 的掩码版本。
+
+\subsubsection{交替语言建模}
+交替语言建模（Alternate Language Modeling，ALM）用于跨语言模型预训练。其做法是改变输入序列中各句子使用的语言。给定一对平行句子 $(x,y)$，随机选取 $x$ 中的一些短语，用 $y$ 中对应的译文替换，生成一个语码转换（code-switched）的句子。ALM 遵循标准 MLM 的掩码流程，选取要遮盖的词元。在这些语码转换句子上预训练模型，可以更有效地学习语言之间的关系。
+\begin{equation}
+\mathcal{L}_{\mathrm{ALM}}^{(z(x,y))}
+=-\frac{1}{|M|}\sum_{i\in M}\log P(z_i/z_{\backslash M}).
+\tag{2.28}
+\end{equation}
+其中 $z$ 是根据 $x$ 和 $y$ 生成的语码转换句子，$z_{\backslash M}$ 是 $z$ 的掩码版本，$M$ 是 $z_{\backslash M}$ 中被遮盖词元的位置集合。
+
+\subsubsection{句段边界目标}
+句段边界目标（Sentence Boundary Objective，SBO）根据片段边界词元和位置嵌入预测被遮盖的词元。SBO 的损失定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{SBO}}^{(x)}
+=-\frac{1}{|S|}\sum_{i\in S}\log P(x_i/f(x_{s-1},x_{e+1},p_{s-e+1})),
+\tag{2.29}
+\end{equation}
+其中 $f(\cdot)$ 是两层前馈神经网络，$S$ 表示连续片段内的词元位置，$s$ 和 $e$ 分别表示片段的起点和终点，$p$ 表示位置嵌入。
+
+\subsubsection{下一句预测}
+下一句预测（Next Sentence Prediction，NSP）是对句子对作二分类的任务，其损失函数定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{NSP}}^{(x,y)}=-\log P(d/x,y),
+\tag{2.30}
+\end{equation}
+其中 $d$ 是二值变量，表示句子 $(x,y)$ 是否连续。连续为 1，不连续为 0。
+
+\subsubsection{句序预测}
+句序预测（Sentence Order Prediction，SOP）关注句子是否连贯。下一句预测与它不同，还包含主题预测。ALBERT 引入了句序预测，用来判断句子是否按正确顺序排列，还是已经调换。训练样例保持平衡，有 50\% 的样例调换了顺序。SOP 的损失为
+\begin{equation}
+\mathcal{L}_{\mathrm{SOP}}^{(x,y)}=-\log P(d/x,y),
+\tag{2.31}
+\end{equation}
+其中 $d\in\{1,0\}$ 表示句子是否调换了顺序。
+
+\subsubsection{序列到序列语言建模}
+序列到序列语言建模（Sequence-to-Sequence Language Modeling，Seq2Seq）是 MLM 的扩展，用于预训练基于编码器—解码器的模型。损失定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{Seq2Seq}}^{(x)}
+=-\frac{1}{l_s}\sum_{s=i}^{j}\log P(x_s/\hat{x},x_{i:s-1}),
+\tag{2.32}
+\end{equation}
+其中 $\hat{x}$ 是 $x$ 的掩码版本，$l_s$ 表示被遮盖的 $n$ 元片段的长度。
+
+\subsubsection{去噪自编码器}
+去噪自编码器（Denoising Autoencoder，DAE）从被破坏的文本重建原始文本。DAE 的损失定义为
+\begin{equation}
+\mathcal{L}_{\mathrm{DAE}}
+=-\frac{1}{|x|}\sum_{i=1}^{|x|}\log P(x_i/\hat{x},x_{<i}),
+\tag{2.33}
+\end{equation}
+其中 $\hat{x}$ 是 $x$ 的破坏版本。

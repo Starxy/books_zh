@@ -1,0 +1,54 @@
+% 按原书第 121 页重排表 3.5。
+\begin{table}[p]
+\centering
+\makebox[\linewidth][c]{\rotatebox{90}{%
+\begin{minipage}{.94\textheight}
+\caption{多提示推理方法。}
+\label{tab:ch03-multi}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.14}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.095\linewidth}
+  >{\raggedright\arraybackslash}p{.173\linewidth}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{.16\linewidth}
+  >{\raggedright\arraybackslash}p{.17\linewidth}@{}}
+\toprule
+方法 & 概述 & 示例 & 优点 & 缺点\\
+\midrule
+集成 &
+用多个模板完成一项推理任务，以简单多数投票、平均、蒸馏等办法，将每个测试样例的各次预测汇总成最终答案。 &
+提示 1\enspace “I am in the capital of Canada, I am in [MASK] .”\par
+提示 2\enspace “[MASK] is located in Canada, and is its capital city .”\par
+提示 3\enspace “[MASK] is the capital of Canada”\par
+各提示的首选结果\enspace 1) Toronto，2) Ottawa，3) Ottawa\par
+简单多数投票\enspace Ottawa（正确） &
+对多个提示求平均，可以减轻个别提示失效带来的影响。\par
+可充分利用提示工程方法生成的多个候选模板。 &
+推理时，每个测试样例需要多次预测。\par
+效果受输入提示的质量限制，优化余地较小。\\
+\midrule
+上下文学习 &
+推理前，在尚未填入答案的模板之前或之后添加已填好查询—答案对的模板示例，引导大语言模型给出所需的预测。 &
+原提示\enspace “The capital of Canada is [MASK] .”\par
+上下文提示\enspace “The capital of France is Paris. The capital of Canada is [MASK] .”\par
+两种提示的首选结果\enspace 1) Ottawa（$p=0.284$），2) Ottawa（$p=0.341$） &
+推理时，每个测试样例只需预测一次。\par
+实现简单、直观。 &
+准确率很大程度上取决于所选的上下文示例。\par
+要得到好的效果，可能需要对上下文提示微调。\\
+\midrule
+提示分解 &
+构造多个子提示，分别探查复杂查询的不同方面，例如识别一句话中的各个命名实体。 &
+原提示\enspace \texttt{[x]} = “Serena won the tennis tournament”\par
+分解后的提示\par
+“[x] . ‘Serena’ is a [MASK]”（人名）\par
+“[x] . ‘Tennis’ is a [MASK]”（运动）\par
+“[x] . ‘the’ is a [MASK]”（非实体） &
+可探查查询中粒度更细的细节。 &
+推理时，每个测试样例需要多次预测。\par
+可能需要逐一优化多个子提示。\\
+\bottomrule
+\end{tabularx}
+\end{minipage}}}
+\end{table}

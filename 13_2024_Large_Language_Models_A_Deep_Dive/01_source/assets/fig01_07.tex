@@ -1,0 +1,14 @@
+% 重绘自原书第 17 页的图 1.7。
+\begin{tikzpicture}[font=\small\sffamily]
+\begin{scope}
+\clip (-3,-1.75) rectangle (3,2.35);
+\fill[cyan!30] (-2.23,.76) ellipse [x radius=2.94cm,y radius=1.86cm,rotate=-28];
+\fill[yellow!72!orange,opacity=.36] (2.42,-.20) ellipse [x radius=2.88cm,y radius=1.68cm,rotate=3];
+\fill[gray!55,opacity=.62] (-.6,.67) ellipse [x radius=1.30cm,y radius=.60cm,rotate=-50];
+\fill[black] (-.54,.41) ellipse [x radius=.65cm,y radius=.22cm,rotate=-39];
+\end{scope}
+\node at (-1.76,-.74) {目标领域};
+\node[align=center] at (1.78,-.65) {原大语言模型\\领域};
+\node (task) at (.14,2.00) {任务};
+\draw[-{Stealth[length=1.9mm]},black!70] (task.south) to[out=-92,in=84] (-.59,.61);
+\end{tikzpicture}

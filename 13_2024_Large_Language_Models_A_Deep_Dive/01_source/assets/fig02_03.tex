@@ -1,0 +1,63 @@
+% 重绘自原书第 34 页的图 2.3。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  layer/.style={draw=black!40,rounded corners=1.5pt,minimum width=26mm,minimum height=6.5mm,align=center,inner sep=2pt},
+  norm/.style={layer,fill=yellow!37},
+  ff/.style={layer,fill=cyan!19},
+  attn/.style={layer,fill=orange!25,minimum height=8mm},
+  embed/.style={layer,fill=red!20,minimum height=8mm},
+  plus/.style={circle,minimum size=4mm,draw=black!60,inner sep=0pt},
+  flow/.style={draw=black!63,line width=.56pt,-{Stealth[length=1.6mm]}},
+  wire/.style={draw=black!63,line width=.56pt}]
+\filldraw[fill=black!5,draw=black!20,rounded corners=3mm] (-1.56,1.45) rectangle (1.57,5.41);
+\filldraw[fill=black!5,draw=black!20,rounded corners=3mm] (2.53,1.45) rectangle (5.66,7.87);
+\node at (-1.91,3.55) {$N\times$};
+\node at (6.05,4.67) {$N\times$};
+
+\node (einput) at (0,-.50) {输入};
+\node[embed] (eembed) at (0,.24) {输入嵌入};
+\node[plus] (epos) at (0,1.16) {$+$};
+\node[plus,minimum size=6mm] (ewave) at (-.82,1.16) {$\sim$};
+\node[anchor=east,align=center] at (-1.16,1.16) {位置\\编码};
+\node[attn] (eattn) at (0,2.20) {多头注意力};
+\node[norm] (enorm1) at (0,3.12) {相加与归一化};
+\node[ff] (eff) at (0,4.10) {前馈网络};
+\node[norm] (enorm2) at (0,5.02) {相加与归一化};
+
+\node[align=center] (dinput) at (4.10,-.50) {输出（右移）};
+\node[embed] (dembed) at (4.10,.24) {输出嵌入};
+\node[plus] (dpos) at (4.10,1.16) {$+$};
+\node[plus,minimum size=6mm] (dwave) at (4.92,1.16) {$\sim$};
+\node[anchor=west,align=center] at (5.26,1.16) {位置\\编码};
+\node[attn] (dattn1) at (4.10,2.20) {掩码多头注意力};
+\node[norm] (dnorm1) at (4.10,3.12) {相加与归一化};
+\node[attn] (dattn2) at (4.10,4.28) {多头注意力};
+\node[norm] (dnorm2) at (4.10,5.22) {相加与归一化};
+\node[ff] (dff) at (4.10,6.24) {前馈网络};
+\node[norm] (dnorm3) at (4.10,7.20) {相加与归一化};
+\node[layer,fill=blue!17!gray!12] (linear) at (4.10,8.30) {线性变换};
+\node[layer,fill=green!21] (softmax) at (4.10,9.23) {Softmax};
+\node (output) at (4.10,10.02) {输出概率};
+
+\foreach \origin/\target in {einput/eembed,eembed/epos,epos/eattn,eattn/enorm1,enorm1/eff,eff/enorm2,
+ dinput/dembed,dembed/dpos,dpos/dattn1,dattn1/dnorm1,dattn2/dnorm2,
+ dnorm2/dff,dff/dnorm3,dnorm3/linear,linear/softmax,softmax/output} {
+  \draw[flow] (\origin.north) -- (\target.south);
+}
+\draw[wire] (ewave.east) -- (epos.west);
+\draw[wire] (dwave.west) -- (dpos.east);
+\foreach \x in {0,4.10} {
+  \foreach \off in {-.62,.62} {
+    \draw[flow] (\x,1.63) -- (\x+\off,1.63) -- (\x+\off,1.80);
+  }
+}
+\draw[flow] (0,1.56) -- (-1.45,1.56) |- (enorm1.west);
+\draw[flow] (0,3.58) -- (-1.45,3.58) |- (enorm2.west);
+\draw[flow] (4.10,1.56) -- (5.54,1.56) |- (dnorm1.east);
+\draw[flow] (4.10,3.55) -- (5.54,3.55) |- (dnorm2.east);
+\draw[flow] (4.10,5.71) -- (5.54,5.71) |- (dnorm3.east);
+\draw[wire] (enorm2.north) -- (0,5.54) -- (2.17,5.54) -- (2.17,3.64) -- (4.10,3.64);
+\draw[flow] (3.48,3.64) -- (3.48,3.88);
+\draw[flow] (4.10,3.64) -- (4.10,3.88);
+\draw[flow] (dnorm1.north) -- (4.10,3.49) -- (4.72,3.49) -- (4.72,3.88);
+\end{tikzpicture}

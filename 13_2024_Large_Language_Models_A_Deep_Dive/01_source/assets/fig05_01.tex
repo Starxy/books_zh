@@ -1,0 +1,50 @@
+% 重绘自原书第 185 页的图 5.1。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  flow/.style={draw=black!68,-{Stealth[length=1.35mm]},line width=.52pt},
+  layer/.style={draw=black!64,rounded corners=2pt,align=center,minimum width=31mm,
+    minimum height=5.0mm,inner sep=1.4pt,fill=green!15,font=\scriptsize\sffamily}]
+\node[layer,fill=yellow!35] (softmax) at (2.2,5.02) {Softmax};
+\node[layer,fill=yellow!35] (linear) at (2.2,4.48) {线性层};
+\node[layer] (norm3) at (2.2,3.90) {相加与归一化};
+\node[layer,fill=green!24] (ffn) at (2.2,3.32) {逐位置前馈网络};
+\node[layer] (norm2) at (2.2,2.74) {相加与归一化};
+\node[layer,fill=green!33] (cross) at (2.2,2.16) {编码器—解码器注意力};
+\node[layer] (norm1) at (2.2,1.58) {相加与归一化};
+\node[layer,fill=green!40] (mask) at (2.2,.99) {掩码多头注意力};
+\node[draw=black!60,densely dashed,rounded corners=4pt,fit=(norm3)(mask),
+      inner sep=3.6pt] (decoder) {};
+\node[layer,fill=cyan!13] (embed) at (2.2,-.17) {嵌入};
+\node[draw,circle,inner sep=0pt,minimum size=3.8mm] (plus) at (2.2,.39) {$+$};
+\node[layer,fill=blue!25,minimum width=16mm] (pos) at (4.72,.39) {位置编码};
+\node[anchor=west,align=left] (lab) at (4.02,4.66) {大语言模型\\智能体};
+\node[anchor=west,font=\scriptsize\sffamily,align=left] at (4.01,2.17) {$\times n$ 层\\解码器};
+\begin{scope}[on background layer]
+\node[draw=blue!30!black!62,fill=blue!8,rounded corners=9pt,
+      fit=(softmax)(embed)(pos)(lab),inner sep=5pt] (model) {};
+\end{scope}
+\foreach \first/\second in {embed/plus,plus/mask,mask/norm1,norm1/cross,cross/norm2,
+     norm2/ffn,ffn/norm3,norm3/linear,linear/softmax}{
+  \draw[flow] (\first) -- (\second);
+}
+\draw[flow] (pos.west) -- (plus.east);
+\foreach \first/\second in {mask/norm1,cross/norm2,ffn/norm3}{
+  \draw[flow] (\first.south east) -- ++(.20,-.08) |- (\second.east);
+}
+\node[align=center] at (-4.19,3.89) {人工标注者};
+\fill[orange!63!black!70] (-4.19,3.16) circle[radius=2.8mm];
+\fill[orange!63!black!70] (-4.79,2.31) -- (-4.79,2.56)
+  .. controls (-4.74,3.02) and (-3.64,3.02) .. (-3.59,2.56)
+  -- (-3.59,2.31) -- cycle;
+\foreach \x/\mark/\shade in {-4.54/\checkmark/green,-3.84/\times/red}{
+  \draw[blue!50!black] (\x-.19,1.89) rectangle (\x+.19,1.25);
+  \foreach \y in {1.42,1.54,1.66,1.78}{
+    \draw[blue!50!black,line width=.32pt] (\x-.12,\y) -- (\x+.12,\y);
+  }
+  \node[\shade!61!black] at (\x,1.01) {$\mark$};
+}
+\draw[flow] (-3.20,3.35) to[bend left=29] node[below] {反馈} (.04,3.35);
+\draw[flow] (.04,1.61) to[bend left=29] node[above] {模型输出} (-3.20,1.61);
+\node[draw=blue!50!black,fill=black!9,align=left,font=\scriptsize\sffamily,
+  inner sep=2.2pt] at (-1.55,4.46) {\textcolor{red}{$\times$}\enspace 不可微，无梯度};
+\end{tikzpicture}

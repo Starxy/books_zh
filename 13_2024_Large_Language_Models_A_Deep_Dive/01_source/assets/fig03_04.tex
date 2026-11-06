@@ -1,0 +1,28 @@
+% 重绘自原书第 88 页的图 3.4。提示、候选词和标签缩写取原图。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  block/.style={fill=yellow!26,align=center,inner sep=2.2pt},
+  flow/.style={draw=black!62,line width=.51pt,-{Stealth[length=1.5mm]}}]
+\node[text width=28mm,align=left,inner sep=0pt,font=\scriptsize\ttfamily] (prompt) at (0,0)
+  {Cannot watch this movie. This is [MASK]};
+\node[block] (model) at (3.14,0) {
+  \begin{tabular}{@{}c@{}}\textbf{语言模型}\\[2pt]
+  \begin{tabular}{|lc|}\hline
+  \rowcolor{blue!13}\textbf{词元} & $P$\\\hline
+  \rowcolor{blue!7}terrible & 0.97\\\hline
+  \rowcolor{blue!7}great & 0.03\\\hline
+  \end{tabular}
+  \end{tabular}};
+\node[block] (vocab) at (6.13,0) {
+  \begin{tabular}{@{}c@{}}\textbf{词表}\\[2pt]
+  \begin{tabular}{|lc|}\hline
+  \rowcolor{blue!13}\textbf{词元} & \textbf{类别}\\\hline
+  \rowcolor{blue!7}terrible & neg\\\hline
+  \rowcolor{blue!7}great & pos\\\hline
+  \end{tabular}
+  \end{tabular}};
+\node[align=left] (result) at (8.84,0) {负面\\类别};
+\draw[flow] (prompt.east) -- (model.west);
+\draw[flow] (model.east) -- (vocab.west);
+\draw[flow] (vocab.east) -- (result.west);
+\end{tikzpicture}

@@ -1,0 +1,29 @@
+% 重绘自原书第 74 页的图 2.14。
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  stage/.style={draw=orange!75!black,fill=yellow!32,rounded corners=2mm,
+    minimum width=18mm,minimum height=9mm,inner sep=1pt},
+  wire/.style={draw=black!60,line width=.55pt},
+  flow/.style={wire,-{Stealth[length=1.5mm]}}]
+\node (inputs) at (.1,0) {输入};
+\node[stage] (router) at (1.95,0) {路由器};
+\foreach \x/\y in {5.05/.62,5.31/.43,5.57/.24,5.83/.05} {
+  \node[stage,draw=orange!52!gray,densely dotted] at (\x,\y) {};
+}
+\node[stage,fill=yellow!29] (rear) at (5.17,.50) {};
+\node[stage] (front) at (6.09,-.16) {专家};
+\node[circle,draw=black!65,minimum size=5.4mm,inner sep=0pt] (sum) at (8.20,.03) {$+$};
+\node (outputs) at (9.65,.03) {输出};
+
+\draw[flow] (inputs.east) -- (router.west);
+\draw[wire] (router.east) -- (3.65,0);
+\draw[flow] (3.65,0) |- (rear.west);
+\draw[flow] (3.65,0) -- (3.93,0) |- (front.west);
+\draw[flow] (rear.east) -- (7.33,.50) |- (sum.west);
+\draw[flow] (front.east) -- (7.05,-.16) |- (8.20,-.55) -- (sum.south);
+\draw[wire] (router.north) -- (1.95,1.76) -- (7.72,1.76);
+\node[anchor=north west] at (2.02,1.76) {门控权重};
+\draw[flow] (7.46,1.76) -- (7.46,.03);
+\draw[flow] (7.72,1.76) -- (7.72,-.55);
+\draw[flow] (sum.east) -- (outputs.west);
+\end{tikzpicture}

@@ -1,0 +1,142 @@
+% PDF 335--339；原书第 307--311 页。
+\section{教程——构建自己的检索增强生成系统}
+\label{sec:ch07-tutorial}
+\subsection{概述}
+检索增强生成可以结合大语言模型的语义理解能力和直接来源材料的事实准确性。本章从基本做法、优化到核心功能的增强，再到表现评估，讨论了这类系统的多个方面。本节以一个常用的开源 RAG 应用为例，演示怎样实际构建和增强 RAG 系统。
+
+近几年，出现了多种这类开源库。它们提供高级功能，实现不同的 RAG 方法，并允许在构建自己的系统时充分定制。本教程用 LlamaIndex（\refcite{ch07-ref-012}{Liu, 2022}）构建 RAG 系统，试验部分可调参数，并评估系统表现。
+
+\begin{keypoint}
+\noindent\textbf{目标}
+\begin{itemize}
+\item 演示如何用 LlamaIndex 轻松搭建一个基本的 RAG 应用。
+\item 探索定制和改进 RAG 应用的多种可能。
+\item 评估 RAG 应用的上下文相关性、答案相关性和有据性。
+\end{itemize}
+\end{keypoint}
+
+这里给出教程的简明版本。完整版见 \url{https://github.com/springer-llms-deep-dive/llms-deep-dive-tutorials}。
+
+\subsection{实验设计}
+这个练习按步骤构建一个实验性 RAG 应用。文档语料使用 2024 年 1 月下旬的 OpenAI 条款与政策，取自 \url{https://openai.com/policies}。应用使用以下工具。
+
+\begin{itemize}
+\item \textbf{LlamaIndex。}该框架提供许多模块，易于纳入同一个 RAG 框架，处理文档解析、索引、搜索与生成。它与 Hugging Face 集成，便于灵活选择嵌入和生成模型（\refcite{ch07-ref-012}{Liu, 2022}）。
+\item \textbf{\texttt{BAAI/bge-small-en-v1.5}。}北京智源人工智能研究院（Beijing Academy of Artificial Intelligence，BAAI）文本嵌入模型系列中的小型英语版本。它在文本相似性任务上表现良好，参数量约为 3340 万，规模较小，便于微调。
+\item \textbf{OpenAI ChatGPT。}整个教程使用 OpenAI 的 \texttt{gpt-3.5-turbo} 与 \texttt{gpt-4} 模型作生成器，也用它们来比较 RAG 系统的输出。
+\end{itemize}
+
+首先，把 OpenAI 条款与政策中的各份文档载入 LlamaIndex。接着，选择分块策略和嵌入模型来生成向量索引。完成后，就可以通过 LlamaIndex 查询 RAG 数据库，并用 \texttt{gpt-3.5-turbo} 作生成模型。
+
+以初始应用为起点，接下来探索多种设计选择和改进。其中较重要的两项是微调嵌入模型和加入文档重排序器。每引入一种做法，就比较结果，考察应用有什么变化。最后，将改进后的 RAG 应用与未微调嵌入模型的早期版本作全面比较。
+
+\subsection{结果与分析}
+评估方法有很多，这里只考察第~\ref{sec:ch07-quality-metrics}~节的三项质量指标。
+
+\begin{enumerate}
+\item \textbf{上下文相关性。}检索到的上下文是否与查询相关？
+\item \textbf{答案相关性。}生成的答案是否与查询相关？
+\item \textbf{答案忠实度或有据性。}生成的答案是否有检索上下文支持？
+\end{enumerate}
+
+用这三项指标检查查询能否找到有用文档、生成的回答是否忠实于文档，以及它是否回答了原查询。
+
+先看上下文相关性。从大量语料块生成问题，构造测试集。再用 RAG 为各个生成的问题检索文档，检查该问题的来源文档是否被选中。这里使用两项指标。一项是 \texttt{mrr}，即平均倒数排名，对单个问题为 1 除以正确文档的名次。另一项是 \texttt{hit\_rate}，若正确文档位于前五项中，取 1，否则取 0（见第~\ref{sec:ch07-context-relevance}~节）。以下是一个问题的结果。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={上下文相关性示例},label={lst:ch07-context-example}]
+Total MRR = 1.0 / 1
+# Hits = 1.0 / 1
+Expected ID =
+['f712129a -a58d-4e36-b62f -22ebfeda56a8 ']
+Retrieved IDs =
+['f712129a -a58d-4e36-b62f -22ebfeda56a8 ',
+'1f95b363 -1002-4f2d-bf17-ab4842714072 ']
+\end{lstlisting}
+\end{minipage}\par
+
+可见，预期的文档 ID 在检索结果中排名第一，因此 MRR 和命中数均为 1/1。再看由 50 个验证问答对组成的样本。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={上下文相关性分数},label={lst:ch07-context-scores}]
+- Base model:
+  - Total MRR = 36.5 / 50
+  - # Hits = 42.0 / 50
+- Fine-tuned model:
+  - Total MRR = 40.0 / 50
+  - # Hits = 46.0 / 50
+\end{lstlisting}
+\end{minipage}\par
+
+多数情况下都能返回来源文档，而且它经常排在首位，但并非总是如此。此前用 OpenAI 条款与政策语料微调过嵌入模型的 RAG 系统表现略好。
+
+接着考察答案相关性，即 RAG 流程能否为查询给出切题的回答。提交一个查询，收到回答后，请 GPT-4 判断回答是否切合问题。这里返回简单的 \texttt{True} 或 \texttt{False}。以下是一项测试。
+
+\begin{lstlisting}[caption={答案相关性示例},label={lst:ch07-answer-example}]
+query = "How can individuals request corrections for factually
+inaccurate information about themselves in ChatGPT output?"
+results = run_answer_relevance_eval(index, [query ,])
+Response:
+Individuals can request corrections for factually inaccurate
+information about themselves in ChatGPT output by submitting
+a correction request through privacy.openai.com or by sending
+an email to dsar@openai.com. If the inaccuracy cannot be
+corrected due to the technical complexity of the models , they
+can request the removal of their Personal Information from
+’ChatGPTs output by filling out a specific form.
+Relevant:
+True
+\end{lstlisting}
+
+\begin{quote}\small
+\textbf{查询}\quad 如果 ChatGPT 输出了关于某个人的不准确信息，当事人如何请求更正？
+
+\textbf{回答}\quad 当事人可以通过 \nolinkurl{privacy.openai.com} 提交更正请求，或发送邮件至 \nolinkurl{dsar@openai.com}。如果模型的技术复杂性使错误无法更正，当事人可填写相应表格，请求从 ChatGPT 输出中移除其个人信息。
+
+\textbf{是否相关}\quad 是。
+\end{quote}
+
+这一回答确实回应了查询。用验证集的 50 个样本评估，结果如下。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={答案相关性分数},label={lst:ch07-answer-scores}]
+- Base model: 47 / 50
+- Fine-tuned model: 49 / 50
+\end{lstlisting}
+\end{minipage}\par
+
+微调再次带来了小幅改善。这次改善的是回答能否回应查询，可能是其中最重要的一项指标。
+
+最后一项评估指标是答案忠实度，也称“有据性”。它检查生成的回答是否以上下文为依据。这里从上下文生成回答的是 GPT-4，向量索引只负责检索，因此可预期两个模型的表现都不错，而且差异不大。结果符合预期。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={有据性分数},label={lst:ch07-grounding-scores}]
+- Base model: 48 / 50
+- Fine-tuned model: 49 / 50
+\end{lstlisting}
+\end{minipage}\par
+
+表~\ref{tab:ch07-tutorial-results} 汇总结果，并列出另外两种配置，即基础版和微调版分别结合重排序。先返回前 20 份文档，再重排序并取前两份。重排序明显改善了上下文相关性，命中数接近 100\%，总 MRR 分数也略有改善。不过，重排序使答案相关性和有据性下降。原因尚不清楚，但这一结果说明，加入重排序模块时，应检验它在当前应用中的作用。
+
+\begin{table}[!htbp]
+\centering
+\caption{基础版、微调版、基础版加重排序和微调版加重排序在 TruLens 三项 RAG 指标上的结果，满分为 50。}
+\label{tab:ch07-tutorial-results}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+模型 & \multicolumn{2}{c}{上下文相关性} & 答案相关性 & 有据性\\
+\cmidrule(lr){2-3}
+ & MRR & 命中数 & &\\
+\midrule
+基础版 & 36.5 & 42.0 & 47 & 48\\
+微调版 & 40.0 & 46.0 & 49 & 49\\
+基础版加重排序 & 37.5 & 49.0 & 43 & 47\\
+微调版加重排序 & 40.7 & 49.0 & 47 & 48\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{结论}
+本练习讨论了搭建一个具备基本功能的 RAG 应用的步骤，试用了较先进的方法来改善结果，并演示怎样评估回答，判断应用是否达到预期效果。LlamaIndex 等工具可以在投入较少工作、无需大量训练模型的情况下，丰富大语言模型可用的知识。

@@ -1,0 +1,132 @@
+% PDF 241--245；原书第 213--217 页。
+\section{教程——用 RLHF 让语言模型的回答更有帮助}
+\label{sec:ch05-tutorial}
+\subsection{概述}
+本教程演示如何用 RLHF 微调生成式语言模型。我们使用一组提示，反映人与聊天机器人交互的不同方式。另用一个奖励模型为生成的回答评分，再通过 PPO 算法使用奖励模型的输出更新语言模型的权重。最终得到更新后的语言模型，能较持续地从奖励模型获得更高的回报。
+
+\sourcefigure{fig05_18.pdf}{使用开源模型和数据演示 RLHF。将 Anthropic Helpful 数据交给预训练语言模型生成回答。OpenAssistant 奖励模型评估这些回答，再将评估交给 PPO 训练器，计算模型权重的更新量。}{fig:ch05-tutorial}
+
+本教程介绍的方法推动了生成式人工智能的普及，也带动了大量投资。InstructGPT 等成果使 RLHF 受到重视。在此之前，先进的大语言模型已能给出逼真的回答，符合语法，包含准确的事实知识。不过，这些回答往往不适合用来解决问题或完成任务。加入 RLHF 后，大语言模型的输出更符合用户意图。这使许多新应用成为可能，这些应用需要比此前的聊天机器人和虚拟助手更接近人类的交互。RLHF 也成为人工智能安全研究的重要组成部分。\refcite{ch05-bai-2022b}{Bai 等人（2022b）}围绕使用 RLHF 实现“有帮助、诚实且无害”的大语言模型交互开展了广泛研究。
+
+RLHF 需要大量人力和计算资源。与取得显著成果所需的训练相比，本教程的实验流程要短得多，也简单得多。即便规模很小，这个练习也足以展示这些技术在更大规模上为何能发挥作用。
+
+\begin{keypoint}
+\noindent\textbf{目标}
+\begin{itemize}
+\item 用缩小规模的示例展示 RLHF，它在实际使用中耗费时间和资源。
+\item 考察 RLHF 流程的组成部分和各个步骤。
+\item 试验 PPO 训练循环，观察它怎样改善所选生成式大语言模型的回答。
+\end{itemize}
+\end{keypoint}
+
+这里给出教程的简明版本。完整版见 \url{https://github.com/springer-llms-deep-dive/llms-deep-dive-tutorials}。
+
+\subsection{实验设计}
+RLHF 从已有的预训练模型开始。这里用一个称为 DLite 的类 GPT 模型。它相对较小，使用有限的 GPU 资源即可微调。为了节省另行训练奖励模型所需的时间，教程从 Hugging Face 下载 OpenAssistant 已经训练好的常用奖励模型。%
+\footnote{\url{https://huggingface.co/OpenAssistant/reward-model-deberta-v3-large-v2}}
+
+本教程使用的 Anthropic 数据集，最初主要为训练奖励模型开发。虽然我们没有自行训练奖励模型，但可以从文本中抽取提示，将这些数据改用于强化学习训练循环。这样就省去了构造提示这个困难且费用较高的初始步骤。
+
+监督微调（SFT）是常用步骤，本教程选择略过。就技术而言，强化学习并不要求监督微调，但通常会先做监督微调，为实际的强化学习训练准备模型。这可能改善结果。不过，RLHF 并非一定需要这一步，因此本实验不作考察。
+
+在强化学习训练练习中，以上述奖励模型为奖励函数的基础运行 PPO。训练循环将生成回答的长度设为 16 个词元。实验表明，这个长度足以让奖励模型对输出给出较为合理的评分，同时又足够短，避免 GPU 显存成为明显限制。也可以取更短或更长的值，或用某种抽样办法改变回答的长度。
+
+\subsection{结果与分析}
+策略模型和奖励模型的表现，都随每批所包含的训练样例而明显变化。尽管如此，奖励模型的评分仍呈上升趋势，见图~\ref{fig:ch05-reward-trend}。这表明，PPO 训练循环在根据奖励模型对人类价值观的理解，引导策略给出更受偏好的回答。
+
+\sourcefigure{fig05_19.pdf}{随着训练进行，策略模型越来越倾向于生成奖励模型认为较好的回答。}{fig:ch05-reward-trend}
+
+人工查看一些样例，可以进一步了解结果。下列查询及相应回答在奖励模型中获得了较高分数。作为比较，也给未经 RLHF 训练的原模型相同的提示。为提高效率，输出限制在 16 个词元，因此许多回答看起来并不完整。
+
+\begin{lstlisting}[caption={比较调优前后的回答},label={lst:ch05-comparison}]
+query: During which historical or societal events should I
+absolutely avoid investing money.
+response (before): If you want to go on a grand tour of the world
+and have a ton
+response (after): It is important to not invest money into events
+that have a major impact on international
+
+query: Should you listen to music while studying?
+response (before): Yes, it's important to listen to music during
+study and in conversation to keep
+response (after): Preferably without headphones or distractions ,
+but in certain situations , it is possible
+
+query: Can you recommend a good recipe for a vegetarian curry?
+response (before): A great plant-based recipe for a vegetarian
+curry is South Indian Veggie Curry
+response (after): A good recipe for a vegetarian curry would be a
+recipe like " Sweet Lamb K
+
+query: How do I make baked chicken?
+response (before): The easiest way to make baked chicken is to
+put the chicken in a baking dish
+response (after): To make baked chicken , preheat the oven to 425
+°F (190°
+
+query: Do Christmas lights really last longer if you keep them on
+all the time?
+response (before): ### Instruction:No, not really.### Instruction
+: According to research , lighting the Christmas tree###
+Instruction:
+response (after): No, Christmas lights can't last longer if you
+keep them all the time.
+\end{lstlisting}
+
+\begin{quote}\small
+\textbf{问题}\quad 遇到哪些历史事件或社会事件时，我绝对不该投资？
+
+\textbf{调优前}\quad 如果你想环游世界，而且有很多
+
+\textbf{调优后}\quad 重要的是，不要把钱投到对国际产生重大影响的事件中
+
+\medskip
+\textbf{问题}\quad 学习时该听音乐吗？
+
+\textbf{调优前}\quad 是的，学习时和交谈中听音乐很重要，这样可以保持
+
+\textbf{调优后}\quad 最好不用耳机，也没有分心的东西，但在某些情况下可以
+
+\medskip
+\textbf{问题}\quad 你能推荐一个好吃的素咖喱食谱吗？
+
+\textbf{调优前}\quad 南印度蔬菜咖喱是一个很棒的植物性素咖喱食谱
+
+\textbf{调优后}\quad 一个好的素咖喱食谱，可以是像“Sweet Lamb K
+
+\medskip
+\textbf{问题}\quad 怎样做烤鸡？
+
+\textbf{调优前}\quad 做烤鸡最简单的办法，就是把鸡放进烤盘
+
+\textbf{调优后}\quad 要做烤鸡，把烤箱预热至 425\,$^\circ$F（190$^\circ$
+
+\medskip
+\textbf{问题}\quad 圣诞灯一直开着，真的会用得更久吗？
+
+\textbf{调优前}\quad \texttt{\#\#\# Instruction:} 不，并不会。\texttt{\#\#\# Instruction:} 根据研究，点亮圣诞树\texttt{\#\#\# Instruction:}
+
+\textbf{调优后}\quad 不会，圣诞灯一直开着也不会用得更久。
+\end{quote}
+
+采用 PPO 训练的 RLHF 模型，定性地看有几项优势。首先，调优模型的回答似乎稍微更具体，甚至给出了烤鸡的确切温度，而且同时给出华氏和摄氏温度，尽管换算有偏差。它似乎也更切题，同时较少复述原提示的用词。回答里的信息并非都准确，例如把羊肉当作素食食谱，但能明显看出它试图回答每个问题。原模型能够给出看似合理的对话续写，却有时会偏离主题。
+
+为量化衡量 RLHF 所带来的改善，计算自回归模型常用的困惑度。评估数据来自用于训练强化学习策略的 Anthropic 数据集的测试子集。这样可以得到类型相近、两个模型却都没见过的提示。将 \texttt{chosen} 列中的文本分别交给原语言模型和在 Helpful 数据上调优的模型。由此可以比较，各模型在给定条件下生成被人工标注者认为有帮助的输出的能力。结果见表~\ref{tab:ch05-perplexity}。原书报告 Helpful 测试数据上的困惑度改善超过 20\%，并据此认为简短的强化学习训练使模型回答更符合人类偏好。%
+\footnote{译注：若按初始值计算困惑度的相对降幅，表中数据给出 $(31.351-25.680)/31.351\approx18.1\%$。}
+
+\begin{table}[!htbp]
+\centering
+\caption{在 Helpful 测试集上测得的原始 DLite 模型及 RLHF 调优 DLite 模型的推理困惑度。调优模型的困惑度更低，表明它给出的回答更符合人的偏好。}
+\label{tab:ch05-perplexity}
+\begin{tabular}{@{}lr@{}}
+\toprule
+大语言模型 & Helpful 困惑度（越低越好）\\
+\midrule
+原始 DLite 模型 & 31.351\\
+经 RLHF 调优的模型 & 25.680\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{结论}
+本教程的结果说明，RLHF 可用于让语言模型符合人所期望的价值观与意图。实际过程通常开销大得多，需要更大的模型及更长的训练过程。不过，对成功使用 RLHF 的公司来说，由此取得的进展值得付出这些成本。RLHF 在近期聊天机器人能力的进展中发挥了重要作用，至今仍是人工智能安全研究的一个重要领域。

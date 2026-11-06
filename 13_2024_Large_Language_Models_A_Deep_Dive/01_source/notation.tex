@@ -1,0 +1,73 @@
+% PDF 20--21: 符号表。
+\fronttocchapter{符号表}
+\begingroup
+\small
+\setlength{\LTpre}{0pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{@{}>{$}l<{$}>{\raggedright\arraybackslash}p{.70\linewidth}@{}}
+\multicolumn{2}{@{}l}{\textbf{微积分}}\\
+\approx & 近似相等\\
+\lvert\symbf{A}\rvert & 矩阵 $\symbf{A}$ 的 $L_1$ 范数（norm）\\
+\lVert\symbf{A}\rVert & 矩阵 $\symbf{A}$ 的 $L_2$ 范数\\
+\frac{\mathrm{d}a}{\mathrm{d}b} & $a$ 对 $b$ 的导数\\
+\frac{\partial a}{\partial b} & $a$ 对 $b$ 的偏导数\\
+\nabla_{\symbf{x}}Y & $Y$ 对 $\symbf{x}$ 的梯度\\
+\nabla_{\symbf{X}}Y & $Y$ 对 $\symbf{X}$ 的导数构成的矩阵\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{数据集}}\\
+\mathcal{D} & 数据集，样例与相应目标的集合
+$\{(\symbf{x}_1,y_1),(\symbf{x}_2,y_2),\ldots,(\symbf{x}_n,y_n)\}$\\
+\mathcal{X} & 所有可能输入构成的空间\\
+\mathcal{Y} & 所有可能输出构成的空间\\
+y_i & 第 $i$ 个样例的目标标签\\
+\hat{y}_i & 第 $i$ 个样例的预测标签\\
+\mathcal{L} & 对数似然损失（log-likelihood loss）\\
+\Omega & 学得的参数\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{函数}}\\
+f\colon\mathbb{A}\to\mathbb{B} & 将集合 $\mathbb{A}$ 中的值映射到集合 $\mathbb{B}$ 的函数 $f$\\
+f(\symbf{x};\theta) & 关于 $\symbf{x}$、以 $\theta$ 为参数的函数。为使记号简明，常简写为 $f(\symbf{x})$。\\
+\log x & $x$ 的自然对数\\
+\sigma(a) & 逻辑 S 形函数（logistic sigmoid），$\frac{1}{1+\exp(-a)}$\\
+{[\![a\ne b]\!]} & 括号内条件为真时取 $1$、否则取 $0$ 的函数\\
+{}_x f(x) & 使 $f(x)$ 最小的自变量的集合。
+\( {}_x f(x)=\{x\mid f(x)=\min_{x'} f(x')\}\)\\
+{}_x f(x) & 使 $f(x)$ 最大的自变量的集合。
+\( {}_x f(x)=\{x\mid f(x)=\max_{x'} f(x')\}\)\\
+\multicolumn{2}{@{}p{\linewidth}@{}}{\small \textbf{译注}\quad
+原书第 xxiii 页最后两个函数记号缺少算子，右侧集合分别定义了 $\arg\min$ 与 $\arg\max$。}\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{线性代数}}\\
+a & 标量（整数或实数）\\
+\begin{bmatrix} a_1\\ \vdots\\ a_n\end{bmatrix} &
+含有元素 $a_1$ 到 $a_n$ 的向量\\[3pt]
+\begin{bmatrix} a_{1,1}&\cdots&a_{1,n}\\
+\vdots&\ddots&\vdots\\ a_{m,1}&\cdots&a_{m,n}\end{bmatrix} &
+有 $m$ 行、$n$ 列的矩阵\\[3pt]
+A_{i,j} & 矩阵 $\symbf{A}$ 第 $i$ 行、第 $j$ 列的值\\
+\symbf{a} & 向量（维数由上下文确定）\\
+\symbf{A} & 矩阵（维数由上下文确定）\\
+\symbf{A}^{\top} & 矩阵 $\symbf{A}$ 的转置\\
+\symbf{A}^{-1} & 矩阵 $\symbf{A}$ 的逆\\
+\symbf{I} & 单位矩阵（维数由上下文确定）\\
+\symbf{A}\cdot\symbf{B} & 矩阵 $\symbf{A}$ 和 $\symbf{B}$ 的点积（dot product）\\
+\symbf{A}\times\symbf{B} & 矩阵 $\symbf{A}$ 和 $\symbf{B}$ 的叉积（cross product）\\
+\symbf{A}\circ\symbf{B} & 逐元素乘积（Hadamard product）\\
+\symbf{A}\otimes\symbf{B} & 矩阵 $\symbf{A}$ 和 $\symbf{B}$ 的克罗内克积（Kronecker product）\\
+\symbf{a};\symbf{b} & 向量 $\symbf{a}$ 与 $\symbf{b}$ 的拼接\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{概率}}\\
+\mathbb{E} & 期望值\\
+P(A) & 事件 $A$ 的概率\\
+X\sim\mathcal{N}(\mu,\sigma^2) & 从均值为 $\mu$、方差为 $\sigma^2$ 的高斯（正态）分布中抽取的随机变量 $X$\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{集合}}\\
+\mathbb{A} & 一个集合\\
+\mathbb{R} & 实数集\\
+\mathbb{C} & 复数集\\
+\varnothing & 空集\\
+\{a,b\} & 由元素 $a$ 和 $b$ 构成的集合\\
+\{1,2,\ldots,n\} & 从 $1$ 到 $n$ 的所有整数组成的集合\\
+\{a_1,a_2,\ldots,a_n\} & 含 $n$ 个元素的集合\\
+a\in\mathbb{A} & 值 $a$ 是集合 $\mathbb{A}$ 的元素\\
+{[a,b]} & 从 $a$ 到 $b$ 的实数构成的集合，包含 $a$ 和 $b$\\
+{[a,b)} & 从 $a$ 到 $b$ 的实数构成的集合，包含 $a$，不包含 $b$\\
+a_{1:m} & 元素集 $\{a_1,a_2,\ldots,a_m\}$（为便于书写）\\
+\end{longtable}
+\endgroup
+除非另有说明，本书大多采用上面的记号。

@@ -1,0 +1,20 @@
+% 重绘自原书第 91 页的图 3.7。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  block/.style={fill=black!14,align=center,inner sep=2pt,minimum width=13mm,minimum height=8mm},
+  flow/.style={draw=black!60,-{Stealth[length=1.3mm]},line width=.48pt},
+  bracket/.style={draw=black!49,line width=.45pt}]
+\node[font=\footnotesize\itshape] (input) at (0,0) {Cannot watch this movie.};
+\node[block] (lm) at (2.90,0) {语言\\模型};
+\node[block] (prompter) at (4.36,0) {提示\\流程};
+\node[draw=blue!28!gray!20,fit=(lm)(prompter),inner sep=1.8pt] (model) {};
+\node[anchor=west,text width=38mm,align=left,font=\footnotesize\itshape,inner sep=0pt] (output) at (5.45,0)
+  {Cannot watch this movie. This is [z].};
+\draw[flow] (input.east) -- (model.west);
+\draw[bracket] (input.south west) -- ++(0,-.16) -| (input.south east);
+\draw[bracket] (output.south west) -- ++(0,-.16) -| (output.south east);
+\node[below=2mm of input] {$\symbf{x}$};
+\node[below=2mm of output] {$\symbf{x}'$};
+\node[font=\footnotesize\rmfamily] at (3.63,-.89)
+  {$[z]\in\{\text{“great”},\text{“terrible”}\}$};
+\end{tikzpicture}

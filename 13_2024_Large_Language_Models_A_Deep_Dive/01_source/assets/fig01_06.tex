@@ -1,0 +1,52 @@
+% 重绘自原书第 14 页的图 1.6。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  flow/.style={draw=black!50,-{Stealth[length=1.6mm]},line width=.55pt},
+  choice/.style={diamond,draw=black!40,aspect=1.54,minimum height=12mm,align=center,inner sep=1.4pt},
+  process/.style={draw=black!40,rounded corners=2mm,fill=green!22!gray!18,
+    minimum width=18mm,minimum height=9mm,text width=16mm,align=center,inner sep=1pt},
+  stage/.style={font=\footnotesize\sffamily\bfseries},
+  app/.style={align=center,inner sep=1pt}]
+\node[stage] (scope) at (.56,5.75) {确定范围};
+\node[stage] (pretrain) at (3.0,5.75) {预训练};
+\node[stage] (adapt) at (6.53,5.75) {适配与对齐};
+\node[stage] (deploy) at (9.95,5.75) {应用};
+\draw[flow,dashed] (scope.east) -- (pretrain.west);
+\draw[flow,dashed] (pretrain.east) -- (adapt.west);
+\draw[flow,dashed] (adapt.east) -- (deploy.west);
+
+\node[choice,fill=orange!50] (llm) at (.65,2.74) {模型？};
+\node[process,fill=yellow!25,text width=19mm] (scratch) at (2.65,4.55)
+  {从头预训练\\[-1pt]{\scriptsize 图书、网页语料、代码}};
+\node[process,fill=yellow!45,text width=19mm] (ready) at (2.65,.76)
+  {预训练大语言模型\\[-1pt]{\scriptsize OpenAI、Llama、Claude}};
+\node[choice,fill=green!18!gray!14] (need) at (4.34,2.74) {适配？};
+\node[process] (prompt) at (6.47,4.55) {提示工程};
+\node[process] (finetune) at (6.47,2.74) {微调};
+\node[process] (align) at (6.47,.87) {对齐调优};
+\node[choice,fill=blue!16!gray!10,aspect=1.66] (augment) at (8.85,2.74) {增强？};
+\node[app] (user) at (10.55,4.55) {查询提示};
+\node[process,fill=blue!37!cyan!30,minimum width=9mm,text width=8mm] (rag) at (10.55,3.45) {RAG};
+\node[app,draw=blue!55!black,cylinder,shape border rotate=90,
+  aspect=.35,minimum height=7mm,minimum width=12mm,fill=blue!12] (db) at (10.55,2.06) {向量库};
+\node[app,draw=blue!55!black,minimum height=7mm] (docs) at (10.55,.7) {自定义文档};
+
+\draw[flow] (llm.north) |- (scratch.west);
+\draw[flow] (llm.south) |- (ready.west);
+\draw[flow] (scratch.east) -| (need.north);
+\draw[flow] (ready.east) -| (need.south);
+\coordinate (split) at (5.40,2.74);
+\draw[draw=black!50,line width=.55pt] (need.east) -- (split);
+\draw[flow] (split) |- (prompt.west);
+\draw[flow] (split) -- (finetune.west);
+\draw[flow] (split) |- (align.west);
+\draw[flow] (prompt.south) -- (finetune.north);
+\draw[flow] (finetune.south) -- (align.north);
+\draw[flow] (prompt.east) -| (augment.north);
+\draw[flow] (finetune.east) -- (augment.west);
+\draw[flow] (align.east) -| (augment.south);
+\draw[flow] (augment.east) -- (10.55,2.74) -- (rag.south);
+\draw[flow] (user.south) -- (rag.north);
+\draw[flow] (db.north) -- (10.55,2.74);
+\draw[flow] (docs.north) -- (db.south);
+\end{tikzpicture}

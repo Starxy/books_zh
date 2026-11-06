@@ -1,0 +1,93 @@
+% 按原书第 98--99 页重排表 3.1。
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\setlength{\LTcapwidth}{\linewidth}
+\renewcommand{\arraystretch}{1.07}
+\newcommand{\taskexample}[3]{%
+  \textbf{输入}\enspace #1\par
+  \textbf{模板}\enspace #2\par
+  \textbf{答案}\enspace #3}
+\newcommand{\inputslots}{[$\symbf{x}_1,\ldots,\symbf{x}_n$]}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.37\linewidth}>{\raggedright\arraybackslash}p{.60\linewidth}@{}}
+\caption{基于提示的自然语言处理方法。每行左侧给出任务及定义，右侧给出示例，其中包括待处理的输入句子、用于基于提示的推理的模板，以及一种可能的答案空间。任务分为文本分类、标注与文本生成三类。}
+\label{tab:ch03-tasks}\\
+\endfirsthead
+\multicolumn{2}{@{}l}{\textbf{表~\ref{tab:ch03-tasks}（续）}}\\
+\toprule
+\textbf{任务} & \textbf{示例}\\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r@{}}{\textit{续下页}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\multicolumn{2}{@{}l}{\textbf{文本分类}}\\
+\toprule
+\textbf{任务} & \textbf{示例}\\
+\midrule
+\textbf{情感分析}\enspace 将文本的情感判为正面、负面或中性。 &
+\taskexample{I hate this movie.}{\texttt{[x]} It was a \texttt{[z]} movie.}{great, terrible, \ldots}\\
+\midrule
+\textbf{作者归属识别}\enspace 从预先给定的作者集合中判断给定文本的作者。 &
+\taskexample{It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness}
+{The author of \texttt{[x]} is most likely \texttt{[z]}.}{Dickens, Carroll, Austin, \ldots}\\
+\midrule
+\textbf{垃圾消息检测}\enspace 判断邮件或短信是否属于垃圾消息。 &
+\taskexample{Congratulations! You have won! Click here to claim your free vacation.}
+{This message: \texttt{[x]} is classified as \texttt{[z]}.}{Spam, Non-Spam}\\
+\midrule
+\textbf{情绪分类}\enspace 从预定义的情绪集合中，判断文本表达了哪种情绪。 &
+\taskexample{I just won the lottery!}{This text: \texttt{[x]} expresses the emotion \texttt{[z]}.}
+{anger, surprise, sadness, happiness}\\
+\midrule
+\textbf{意图检测}\enspace 判断用户发出查询或消息的意图，常用于聊天机器人和虚拟助手。 &
+\taskexample{What’s the weather like today?}{\texttt{[x]} The user’s intent is \texttt{[z]}.}
+{\texttt{get\_weather}, \texttt{set\_alarm}}\\
+\midrule
+\textbf{语种识别}\enspace 判断给定文本以何种语言写成。 &
+\taskexample{¿Cómo estás?}{\texttt{[x]} The language is \texttt{[z]}.}{Spanish, French, \ldots}\\
+\midrule
+\textbf{仇恨言论检测}\enspace 判断给定文本是否含有仇恨言论。 &
+\taskexample{I can’t stand them.}{\texttt{[x]} The text contains \texttt{[z]} speech.}{hate, non-hate}\\
+\addlinespace[5pt]
+\multicolumn{2}{@{}l}{\textbf{标注}}\\
+\toprule
+\textbf{任务} & \textbf{示例}\\
+\midrule
+\textbf{词性标注（POS）}\enspace 给词分配语法类别，如名词、动词、形容词和副词。 &
+\taskexample{She is running in the park.}{In the sentence \inputslots, the word [$\symbf{x}_i$] has POS-tag [$\symbf{z}_j$].}{noun, verb, adjective, \ldots}\\
+\midrule
+\textbf{命名实体识别（NER）}\enspace 识别并分类文本中提到的人物、日期、地点、机构等实体。 &
+\taskexample{John met Mary in London.}{In the sentence \inputslots, the word [$\symbf{x}_i$] the named entity label is [$\symbf{z}_j$].}{location, organization, \ldots}\\
+\midrule
+\textbf{组块分析或浅层句法分析}\enspace 依据语法结构把相邻的词或词元组成较大的单元，即组块，例如名词短语或动词短语。 &
+\taskexample{She is running in the park.}{In the sentence \inputslots, the word [$\symbf{x}_i$] the chunk label is [$\symbf{z}_j$].}{’B-VP’（动词短语起点），’I-VP’（动词短语内部），\ldots}\\
+\midrule
+\textbf{依存句法分析}\enspace 找出句子中词语之间的句法依存关系，包括标注主语、宾语、修饰语等，并显示它们之间的关系。 &
+\taskexample{She is running in the park.}{In the sentence \inputslots, the word [$\symbf{x}_i$] the dependency relation is [$\symbf{z}_j$].}{’nsubj’（名词性主语），’root’（句子的根），’dobj’（直接宾语），\ldots}\\
+\midrule
+\textbf{成分句法分析或短语结构分析}\enspace 识别句子的成分结构，即词如何组成名词短语（NP）、动词短语（VP）等语法短语。 &
+\taskexample{She is running in the park.}{In the sentence \inputslots, the word [$\symbf{x}_i$] the constituent category is [$\symbf{z}_j$].}{’NP’（名词短语），’PP’（介词短语），’VP’（动词短语），\ldots}\\
+\midrule
+\textbf{语义角色标注（SRL）}\enspace 按照词或短语与谓词（通常为动词）之间的语义关系，为它们分配施事、工具等角色。 &
+\taskexample{John gave Mary a book.}{In the sentence \inputslots, the word [$\symbf{x}_i$] has semantic role [$\symbf{z}_j$].}{Agent, Theme, Location, \ldots}\\
+\midrule
+\textbf{共指消解}\enspace 识别文本中指向同一实体的词语或短语，并将它们关联起来。 &
+\taskexample{Jane is a talented software engineer. She was recently promoted to team lead.}{In the text with words: \inputslots, does the word [$\symbf{x}_i$] refer to the word $\symbf{x}_j$?}{Yes, No}\\
+\addlinespace[5pt]
+\multicolumn{2}{@{}l}{\textbf{文本生成}}\\
+\toprule
+\textbf{任务} & \textbf{示例}\\
+\midrule
+\textbf{摘要生成}\enspace 给定一篇长文本，生成保留原文要点或关键信息的较短版本。 &
+\taskexample{<Long text to be summarized.>}{Please provide a summary for the following text: \texttt{[x]}. Summary: \texttt{[z]}.}{<summarized version of the long text>}\\
+\midrule
+\textbf{问答}\enspace 给定问题和上下文，依据上下文中的信息生成答案。 &
+\taskexample{<Context or passage>, <question>}{Here is the context: \texttt{[x]} What is the answer to the question: \texttt{[w]} ? Answer: \texttt{[z]} .}{<answer to the question based on the context>}\\
+\midrule
+\textbf{机器翻译}\enspace 将文本从一种语言译成另一种语言，保留原意和语境。 &
+\taskexample{¿Cómo estás?}{Translate the following text from the source language to the target language: \texttt{[x]} Translation: \texttt{[z]}.}{<translated text in target language>}\\
+\end{longtable}
+\endgroup

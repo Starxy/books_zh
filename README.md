@@ -53,6 +53,7 @@ scripts/                          仓库维护检查工具
 | [A Definition and Roadmap for World Models](10_2026_A_Definition_and_Roadmap_for_World_Models/) | 世界模型的定义与发展路线图 | [PDF](00_books/A_Definition_and_Roadmap_for_World_Models_cn_translated.pdf) | 63 |
 | [Designing Clinical Research](11_2023_Designing_Clinical_Research/) | 临床研究设计 | [PDF](00_books/Designing_Clinical_Research_cn_translated.pdf) | 515 |
 | [Deep Generative Modeling](12_2024_Deep_Generative_Modeling/) | 深度生成建模（第二版） | [PDF](00_books/Deep_Generative_Modeling_cn_translated.pdf) | 341 |
+| [Large Language Models: A Deep Dive](13_2024_Large_Language_Models_A_Deep_Dive/) | 大语言模型深度解析：贯通理论与实践 | [PDF](00_books/Large_Language_Models_A_Deep_Dive_cn_translated.pdf) | 462 |
 
 《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 
@@ -74,6 +75,8 @@ scripts/                          仓库维护检查工具
 - **A Definition and Roadmap for World Models：** arXiv:2607.06401v1；8节、28个小节、1个定义、19个编号公式、10幅图、1张表，以及摘要、贡献者和253条被引文献。
 
 《临床研究设计》第五版于2026-11-02依据用户提供的786页电子PDF完成中文译排。版权页与CIP标为2023年，原文件名标为2022年；译文以所提供第五版内容为底本。包含三个分部、20章、全部章内附录与习题、习题答案、442条术语释义及分层索引。原书疑点在文内加注；索引保留英文纸本页码，并附英文PDF页序与中文章节起始页表。中文源码、术语及构建入口见[书籍工程](11_2023_Designing_Clinical_Research/)。
+
+《大语言模型深度解析》依据用户提供的 Springer 2024 年第一版 PDF 完成译排。包含书前材料、10 章、章末参考文献、附录 A、B 和 585 个索引词项。索引保留原版印刷页码，并提供译文章节链接和两版起始页对照。中文 LaTeX、术语表和构建说明见[书籍工程](13_2024_Large_Language_Models_A_Deep_Dive/)。
 
 ## 新增与维护书籍
 

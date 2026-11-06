@@ -1,0 +1,42 @@
+% 重绘自原书第 136 页的图 4.1。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  box/.style={draw=black!43,fill=yellow!38,align=center,inner sep=2pt,
+    minimum width=23mm,minimum height=5.8mm,rounded corners=1.5pt},
+  root/.style={box,minimum width=20mm,minimum height=15mm,rounded corners=0pt},
+  wire/.style={draw=blue!35!black!65,line width=.55pt},
+  flow/.style={wire,-{Stealth[length=1.4mm]}},
+  group/.style={draw=blue!35!black!65,densely dashed,rounded corners=4pt,inner sep=3pt}]
+\node[root] (adapt) at (0,0) {大语言模型\\适配};
+\node[box,fill=orange!20] (it) at (2.92,0) {指令调优};
+\node[box,fill=orange!40] (peft) at (5.64,.70) {参数高效微调};
+\node[box,fill=orange!40] (ceft) at (5.64,-.70) {计算高效微调};
+\node[box] (adapter) at (8.77,1.04) {适配器};
+\node[box] (repara) at (8.77,.36) {重参数化};
+\node[box] (ptq) at (8.77,-.36) {训练后量化};
+\node[box] (qat) at (8.77,-1.04) {量化感知微调};
+\draw[wire] (1.20,0) .. controls (1.91,.05) and (1.68,1.34) .. (2.15,1.34);
+\draw[wire] (1.20,0) .. controls (1.91,-.05) and (1.68,-1.34) .. (2.15,-1.34);
+\draw[wire] (it.east) -- ++(.20,0) |- (peft.west);
+\draw[wire] (it.east) -- ++(.20,0) |- (ceft.west);
+\draw[wire] (peft.east) -- ++(.32,0) |- (adapter.west);
+\draw[wire] (peft.east) -- ++(.32,0) |- (repara.west);
+\draw[wire] (ceft.east) -- ++(.32,0) |- (ptq.west);
+\draw[wire] (ceft.east) -- ++(.32,0) |- (qat.west);
+
+\node[root,fill=cyan!21] (use) at (0,-3.14) {大语言模型\\使用};
+\node[box,fill=blue!24] (chain) at (2.92,-3.14) {提示链};
+\draw[wire] (1.20,-3.14) .. controls (1.91,-3.09) and (1.68,-1.98) .. (2.15,-1.98);
+\draw[wire] (1.20,-3.14) .. controls (1.91,-3.19) and (1.68,-4.30) .. (2.15,-4.30);
+\node[box,fill=blue!8] (zero) at (5.64,-2.99) {零样本提示};
+\node[box,fill=blue!8] (few) at (5.64,-3.68) {少样本提示};
+\node at (5.64,-2.32) (context) {提示上下文};
+\node[group,fit=(zero)(few)(context)] (contextgroup) {};
+\node[box,fill=blue!15] (cot) at (8.77,-2.92) {思维链};
+\node[box,fill=blue!15] (sc) at (8.77,-3.61) {自一致性};
+\node[box,fill=blue!15] (tot) at (8.77,-4.30) {思维树};
+\node at (8.77,-2.25) (ensemble) {提示集成与结构};
+\node[group,fit=(cot)(sc)(tot)(ensemble)] (ensemblegroup) {};
+\draw[flow] (chain.east) -- (contextgroup.west |- chain.east);
+\draw[flow] (contextgroup.east |- chain.east) -- (ensemblegroup.west |- chain.east);
+\end{tikzpicture}

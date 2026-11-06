@@ -1,0 +1,62 @@
+% 按原书第 109 页重排表 3.3，保留横置阅读方向。
+\begin{table}[p]
+\centering
+\makebox[\linewidth][c]{\rotatebox{90}{%
+\begin{minipage}{.94\textheight}
+\caption{离散提示的自动设计方法。}
+\label{tab:ch03-discrete}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.14}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.10\linewidth}
+  >{\raggedright\arraybackslash}p{.155\linewidth}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{.174\linewidth}
+  >{\raggedright\arraybackslash}p{.182\linewidth}@{}}
+\toprule
+方法 & 概述 & 示例 & 优点 & 缺点\\
+\midrule
+提示挖掘 &
+在大型语料中搜索包含给定查询—答案对的句子，并用它们构造提示模板。 &
+\textbf{测试对}\enspace Poland :: Warsaw\par
+\textbf{挖掘到的句子}\enspace “Warsaw is the capital city of Poland, and has a population 1.86 million people”（见维基百科）\par
+\textbf{所得模板}\enspace “[z] is the capital city of [x] .” &
+程序实现简单。\par 可用更复杂的语言学抽取过程扩展。 &
+所得模板受语料中已有句子的领域限制。\par 难以保证优化效果。\\
+\midrule
+提示改写 &
+让种子提示经过多轮翻译，生成许多略有差异的变体，再选出表现最好的模板。 &
+\textbf{种子提示}\enspace [z] is the capital city of [x] .\par
+\textbf{回译变体}\par
+“[z], the capital city of [x] .”\par
+“[x]’s capital city is [z] .”\par
+“[x]’s capital, [z] .” &
+程序实现简单。\par 测试的提示多样，有助于优化。 &
+回答覆盖范围较窄。\par 难以保证优化效果。\\
+\midrule
+梯度搜索 &
+将一组可变的触发词元（本例为 [T]）和输入—预测对组合成模板，在训练中优化，使预测结果最好。 &
+\textbf{评论／情感对}\enspace “a real joy” :: positive\par
+\textbf{初始提示}\enspace “a real joy [T][T][T] [T][T] positive”\par
+\textbf{梯度优化后的提示}\enspace “a real joy atmosphere alot dialogue Clone totally positive”\par
+\textbf{优化后的模板}\enspace [x] atmosphere alot dialogue Clone totally [z] &
+可以找到高度优化的输入词元。\par 不依赖该领域已有的句子语料。 &
+计算开销大，程序实现复杂。\par 产生的模板不直观。\par 输出模板受人类语言的嵌入表示约束。\\
+\midrule
+提示生成 &
+编码器—解码器模型（如 T5）预测种子模板中的词元。种子模板由训练查询—回答对构造。再把预测结果转成模板并评估质量。 &
+\textbf{影评情感的种子模板}\par
+A pleasure to watch. <X> great <Y>\par
+No reason to watch. <X> terrible <Y>\par
+\textbf{T5 填充后的模板}\par
+A pleasure to watch. This is great .\par
+No reason to watch. A terrible one.\par
+\textbf{所得待测模板}\par
+[x] This is [z].\par
+[x] A [z] one. &
+测试的提示多样，有助于优化。\par 大语言模型生成的模板本身可能更适合大语言模型使用。 &
+计算开销大，程序实现复杂。\par 种子模板需要人工输入。\par 难以保证优化效果。\\
+\bottomrule
+\end{tabularx}
+\end{minipage}}}
+\end{table}

@@ -1,0 +1,17 @@
+% 重绘自原书第 238 页的图 6.3。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  link/.style={-{Stealth[length=1.55mm]},line width=.73pt},
+  nodebox/.style={draw=orange!39,fill=orange!17,rounded corners=3pt,minimum width=17mm,
+    minimum height=9.2mm,inner sep=3pt}]
+\node (input) at (0,0) {输入};
+\node[nodebox] (lm) at (4.14,0) {大语言模型};
+\node (output) at (8.80,0) {输出};
+\node[align=center] (fixed) at (8.12,2.02) {去偏后的\\输出};
+\draw[link,blue!62!black] (input.east) -- node[above] {预处理} (lm.west);
+\draw[link,violet!76] (lm.east) -- node[above] {内部处理} (output.west);
+\draw[link,green!45!black] (8.14,.23) -- node[right] {后处理} (fixed.south);
+\draw[link,red!56] ([xshift=4.5pt]lm.south) -- ++(0,-.49) -|
+  ([xshift=-4.5pt]lm.south);
+\node[text=red!59!black] at (4.14,-1.22) {训练阶段};
+\end{tikzpicture}

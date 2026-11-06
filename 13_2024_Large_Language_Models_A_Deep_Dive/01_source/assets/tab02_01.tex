@@ -1,0 +1,51 @@
+% 按原书第 42 页重排表 2.1。
+\begin{table}[!htbp]
+\centering
+\caption{Transformer 的网络配置。$\operatorname{Sublayer}$ 指 Transformer 层中的前馈神经网络（FFN）或自注意力模块。$d$ 表示网络隐藏状态的维数，$p_i$ 表示位置 $i$ 的嵌入。$A_{ij}$ 是给定查询与其对应键之间的注意力分数，$r_{i-j}$ 是表示查询与键之间位置差的可学习标量。$R_{\theta,t}$ 是旋转矩阵，旋转角度为 $t$ 与 $\theta$ 的乘积。}
+\label{tab:ch02-variants}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.23}
+\begin{tabularx}{\linewidth}{@{}p{.18\linewidth}p{.21\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+配置 & 方法 & 公式\\
+\midrule
+归一化位置 & 后置归一化 [1] & $\operatorname{Norm}(\symbf{x}+\operatorname{Sublayer}(\symbf{x}))$\\
+ & 前置归一化 [2] & $\symbf{x}+\operatorname{Sublayer}(\operatorname{Norm}(\symbf{x}))$\\
+ & 夹层式归一化 [3] & $\symbf{x}+\operatorname{Norm}(\operatorname{Sublayer}(\operatorname{Norm}(\symbf{x})))$\\
+\midrule
+归一化方法 & LayerNorm [4] &
+$\begin{aligned}[t]
+ & \tfrac{\symbf{x}-\mu}{\sqrt{\sigma}}\cdot\gamma+\beta,\quad
+ \mu=\tfrac{1}{d}\sum_{i=1}^{d}x_i,\\
+ & \sigma=\sqrt{\tfrac{1}{d}\sum_{i=1}^{d}(x_i-\mu)^2}
+\end{aligned}$\\
+ & RMSNorm [5] &
+$\tfrac{x}{\operatorname{RMS}(\symbf{x})}\cdot\gamma,\quad
+ \operatorname{RMS}(\symbf{x})=\sqrt{\tfrac{1}{d}\sum_{i=1}^{d}x_i^2}$\\
+ & DeepNorm [6] & $\operatorname{LayerNorm}(\alpha\cdot\symbf{x}+\operatorname{Sublayer}(\symbf{x}))$\\
+\midrule
+激活函数 & ReLU [7] & $\operatorname{ReLU}(\symbf{x})=\max(0,\symbf{x})$\\
+ & GeLU [8] &
+$\begin{aligned}[t]
+\operatorname{GeLU}(\symbf{x})={}&0.5\symbf{x}\otimes{}\\
+ & \left(1+\tanh\left(\sqrt{\tfrac{2}{\pi}}\,(x+0.044715x^3)\right)\right)
+\end{aligned}$\\
+ & Swish [9] & $f(x)=x\cdot\tfrac{1}{1+e^{-x}}$\\
+ & SwiGLU [10] & $f(x)=x\odot\sigma(Wx+b)$\\
+ & GeGLU [10] & 与 SwiGLU 类似，采用 GeLU\\
+\midrule
+位置嵌入 & 绝对位置 [1] & $x_i=x_i+p_i$\\
+ & 相对位置 [11] & $A_{ij}=W_qx_ix_j^{\mathrm{T}}W_k+r_{i-j}$\\
+ & RoPE [12] & $A_{ij}=W_qx_iR_{\theta,i-j}x_j^{\mathrm{T}}W_k$\\
+ & Alibi [13] & $A_{ij}=W_qx_ix_j^{\mathrm{T}}W_k-m(i-j)$\\
+\bottomrule
+\end{tabularx}
+
+\medskip
+\begin{minipage}{\linewidth}
+[1] Vaswani et al. (2017)，[2] Radford et al. (2019)，[3] Ding et al. (2021)，[4] Ba et al. (2016)，[5] Zhang and Sennrich (2019)，[6] Wang et al. (2022)，[7] Nair and Hinton (2010)，[8] Wang et al. (2019)，[9] Ramachandran et al. (2017)，[10] Shazeer (2020)，[11] Raffel et al. (2020)，[12] Su et al. (2021)，[13] Press et al. (2021)。
+\par\smallskip
+\textbf{译注}\quad LayerNorm 一行按原书印刷形式使用 $\sqrt{\sigma}$ 作分母，并用 $\sigma$ 表示标准差。正文式（2.18）的分母为 $\sigma$。
+\end{minipage}
+\end{table}

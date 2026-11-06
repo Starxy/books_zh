@@ -1,0 +1,28 @@
+% 重绘自原书第 37 页的图 2.5。
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  unit/.style={draw=black!38,rounded corners=1.4pt,minimum height=5.9mm,minimum width=15.5mm,align=center},
+  wire/.style={-{Stealth[length=1.5mm]},draw=black!62,line width=.52pt}]
+\foreach \offset in {.27,.14} {
+  \foreach \x in {-1.75,0,1.75} {
+    \node[unit,draw=green!35!gray!20,fill=green!12] at (\x+\offset,.95+\offset) {};
+    \draw[wire,opacity=.23] (\x+\offset,1.23+\offset) -- (\x+\offset,1.79+\offset);
+  }
+  \node[unit,minimum width=53mm,minimum height=10mm,fill=blue!12,draw=blue!18] at (\offset,2.30+\offset) {};
+  \draw[wire,opacity=.24] (\offset,2.80+\offset) -- (\offset,3.39);
+}
+\foreach \x/\symbol in {-1.75/V,0/K,1.75/Q} {
+  \node (input\symbol) at (\x,.15) {$\symbf{\symbol}$};
+  \node[unit,fill=green!17] (proj\symbol) at (\x,.95) {线性变换};
+  \draw[wire] (input\symbol.north) -- (proj\symbol.south);
+  \draw[wire] (proj\symbol.north) -- (\x,1.79);
+}
+\node[unit,minimum width=53mm,minimum height=10mm,fill=blue!22!violet!12] (attention) at (0,2.30) {缩放点积注意力};
+\draw[black!45] (2.99,2.27) -- (3.10,2.27) -- (3.10,3.02) -- (2.99,3.02);
+\node[anchor=west] at (3.12,2.65) {$h$};
+\node[unit,fill=yellow!32] (concat) at (0,3.67) {拼接};
+\node[unit,fill=green!17] (linear) at (0,4.56) {线性变换};
+\draw[wire] (attention.north) -- (concat.south);
+\draw[wire] (concat.north) -- (linear.south);
+\draw[wire] (linear.north) -- (0,5.23);
+\end{tikzpicture}

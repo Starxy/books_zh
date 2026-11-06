@@ -1,0 +1,142 @@
+% 原书第 9.6 节。
+\section{教程：微调图像到文本的多模态大语言模型}
+\label{sec:ch09-tutorial}
+
+\subsection{概述}
+讨论过多模态大语言模型的理论基础后，可以测试“文本与 X 到文本”的模型。本例用图像作为模态 X。图像与文本到文本的模型可用于识别图像特征、对图像中的事件分类和自动生成描述等任务。\footnote{原书此处误写为图像与文本到图像。按本节所用模型及任务，输出模态为文本。}本教程测试一种当时先进的多模态大语言模型在图像分类和描述生成方面的开箱能力，再考察如何通过微调与少样本提示改善表现。
+
+我们在同一个数据集上安排两个实验。首先，要求模型识别每张图像中的运动项目，比较零样本和微调两种方案的结果。然后让模型用简短文字描述图像中发生的事，比较零样本、少样本和微调三种方式。
+
+\begin{keypoint}
+\textbf{学习目标}
+\begin{itemize}
+\item 加载 90 亿参数的 IDEFICS 模型，用任意文本和图像组成的提示调用模型。
+\item 在 100SIC 测试集上生成零样本预测，尝试通过 QLoRA 微调改善表现。
+\item 为 100SIC 测试集生成零样本描述，并与微调和上下文学习生成的描述比较。
+\end{itemize}
+\end{keypoint}
+
+本节为教程的简版，完整版见
+\url{https://github.com/springer-llms-deep-dive/llms-deep-dive-tutorials}。
+
+\subsection{实验设计}
+可用的多模态大语言模型很多。为了缩小范围，我们考察能够在 Google Colab 笔记本中用 QLoRA 调优、且已与 Hugging Face 集成的模型，以便直接使用其 PEFT 和微调流程。基于这些条件，我们选择 90 亿参数的 IDEFICS（Image-aware Decoder Enhanced à la Flamingo with Interleaved Cross-attentionS）。它仿照 Flamingo 构建，是一种将文本和图像作为输入、输出文本的大语言模型（\refcite{ch09-ref-028}{Laurençon et al., 2023}）。模型可接受任意交错排列的文本和图像，并输出文本响应。
+
+实验采用 Kaggle 上的 100 项运动图像分类数据集（100 Sports Image Classification，100SIC）。\footnote{\url{https://www.kaggle.com/datasets/gpiosenka/sports-classification/data}}该数据集包含许多标有运动项目的小尺寸照片，共涉及 100 项运动，包含约 13,000 张训练图像，以及各 500 张测试和验证图像。为微调描述生成任务，我们补充使用 Flickr30k 数据集（\refcite{ch09-ref-066}{Young et al., 2014}）的一个子集。Flickr30k 收录了 30,000 多对图像与描述。这里采用 Shin Thant 筛出的 Flickr30k 运动图像子集。\footnote{\url{https://github.com/ShinThant3010/Captioning-on-Sport-Images}}
+
+\subsection{结果与分析}
+\subsubsection{预测运动项目}
+首先加载模型。IDEFICS 对于单块中等配置的 GPU 来说过大，难以高效地预测和调优。因此用 BitsAndBytes 将模型量化到 4 位，并采用 QLoRA 微调。运动分类采用以下提示模板。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={运动项目分类提示。},label={lst:ch09-sport-prompt}]
+<image>
+Question: What sport is in this image?
+Answer:
+\end{lstlisting}
+\end{minipage}\par
+
+用这个模板预测测试集中的每张图像，再将输出与数据集编制者给出的标签比较。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={测试集零样本预测结果。},label={lst:ch09-sport-zero}]
+- Zero-shot results:
+  - 212 / 500 correct
+\end{lstlisting}
+\end{minipage}\par
+
+模型在约 42\% 的图像上猜对了运动项目的名称。这里采用简单的精确匹配评估，所以即便模型猜出同一运动项目的另一个正确名称，也会记作预测错误。可在训练集上微调模型，改善预测。Llama 基础模型太大，不适合全参数微调，因此采用与第~4.6~节教程类似的 QLoRA 方法。每项运动选 10 个训练样本，用零样本示例中的模板构造问答对，微调模型，再对测试集进行预测。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={微调后的测试集预测结果。},label={lst:ch09-sport-tuned}]
+- Fine-tune results:
+  - 419 / 500 correct
+\end{lstlisting}
+\end{minipage}\par
+
+正确率从约 42\% 提高到约 84\%。表~\ref{tab:ch09-sport-outputs}选取了若干例子，具体说明这次改进的表现。
+
+\begin{table}[!htbp]
+\centering\fontsize{8.8pt}{11.5pt}\selectfont
+\caption{零样本和微调在三个特选运动类别上的预测。雪车项目（bobsled）中，零样本模型多能识别运动，却常用不同名称。马车赛（chuckwagon racing）较少见，模型把它猜成其他马术比赛。拔河（tug of war）中，微调使这组预测变差，继续微调可能改善结果。ZS 表示零样本，FT 表示微调。}
+\label{tab:ch09-sport-outputs}
+\setlength{\tabcolsep}{2.1pt}
+\renewcommand{\arraystretch}{1.14}
+\begin{tabular}{@{}r*{6}{>{\raggedright\arraybackslash}p{16.6mm}}@{}}
+\toprule
+& \multicolumn{2}{c}{bobsled} & \multicolumn{2}{c}{chuckwagon racing} & \multicolumn{2}{c}{tug of war}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+序号 & ZS & FT & ZS & FT & ZS & FT\\
+\midrule
+1 & bobsledding & bobsled & rodeo & chuckwagon racing & hurling & oxen pulling\\
+2 & the u & bobsled & horse-drawn carriage racing & chuckwagon racing & rugby & tug of war\\
+3 & bobsleigh & bobsled & calgary stampede rodeo & chuckwagon racing & tug of war & log rolling\\
+4 & bobsledding & bobsled & horseback riding & chuckwagon racing & tug of war & log rolling\\
+5 & bobsled & bobsled & chariot racing & chuckwagon racing & tug of war & axe throwing\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{为照片生成描述}
+图像到文本模型的另一种常见用途是自动生成图像描述。这里测试 IDEFICS 完成该任务的能力。与前面一样，可用一个简单的零样本提示模板要求模型生成描述。本练习选用一张美式橄榄球比赛的图像，其中身穿黑色球衣的维克森林大学四分卫正在传球。提示模板如下。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={运动照片描述生成提示。},label={lst:ch09-caption-prompt}]
+<image>
+Question: What is a caption for this photo?
+Answer:
+\end{lstlisting}
+\end{minipage}\par
+
+使用零样本提示时，得到以下响应。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={运动照片描述的零样本输出。},label={lst:ch09-caption-zero}]
+Question: What is a caption for this photo? Answer: Aaron Murray,
+     Georgia Bulldogs quarterback, throws a pass during the first
+     half of the Chick-fil-A Bowl NCAA college football game
+     against the Nebraska Cornhuskers
+\end{lstlisting}
+\end{minipage}\par
+
+照片确实显示一名四分卫正在传球，但响应中的其他细节都是错的。球员既不是阿龙·默里，也不属于佐治亚斗牛犬队。比赛也不是 Chick-fil-A 碗赛，对手并非内布拉斯加玉米剥壳人队。这些信息都是模型的幻觉。尤其是最后两项错误事实，仅凭图像本身就无法确定。理想的描述应直接说明图像中可以看见什么，少写照片上无法清楚辨认的身份信息。
+
+用上下文示例改善描述的成本较低。采用这种方法时，在目标图像之前提供几张训练图像及其人工编写的描述。得到的输出如下。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={运动照片描述的上下文提示。},label={lst:ch09-caption-icl}]
+<image1> Question: What is a caption for this photo? Answer: A
+    man prepares to throw an ax at a target.
+<image2> Question: What is a caption for this photo? Answer: A
+    woman rolls a bowling ball down a bowling alley.
+...
+<image5> Question: What is a caption for this photo? Answer:
+A man in a white jersey throws a football.
+\end{lstlisting}
+\end{minipage}\par
+
+少样本条件下，模型生成了“一名穿白色球衣的男子掷出橄榄球”。球衣实际为黑色，因此仍有一处小错误。不过，模型采用了我们希望的描述形式，也没有凭空补充球员身份或对手之类的细节。这个办法有改进空间。
+
+更昂贵的做法是用 Flickr30k 的运动图像和描述配对子集来微调。我们沿用上述 QLoRA 方法，采用零样本示例中的模板，用约 1,600 个样本微调 IDEFICS 基础模型。训练完成后，再为测试图像生成描述。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={微调后的运动照片描述输出。},label={lst:ch09-caption-tuned}]
+A football player in a black uniform is throwing a football.
+\end{lstlisting}
+\end{minipage}\par
+
+这次的输出与少样本输出一样简洁，也符合照片内容，即“一名身穿黑色队服的橄榄球运动员正在掷球”。最后，用三种方法分别为 20 张测试图像生成描述，并从准确性和风格两方面人工评定。以下是结果。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={测试集图像描述生成结果。},label={lst:ch09-caption-results}]
+- Zero-shot results:
+  - 7 / 20 acceptable
+- In-context results:
+  - 11 / 20 acceptable
+- Fine-tune results:
+  - 14 / 20 acceptable
+\end{lstlisting}
+\end{minipage}\par
+
+\subsection{结论}
+中等规模、以文本和图像为输入并输出文本的多模态大语言模型，已经具备相当的零样本能力，针对任务的微调可以大幅改善其表现。本教程说明，即使只做少量优化并使用常用参数，采用参数高效微调也能显著改善图像分类和开放式描述生成。生产应用需要更仔细地选择调优参数、训练集特性和多模态大语言模型架构。本练习表明，用现有的开源软件、投入较少工作，也可以构建一个表现尚可的图像分类器。

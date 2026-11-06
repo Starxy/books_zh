@@ -1,0 +1,97 @@
+% PDF 280--283；原书第 252--255 页。
+\subsubsection{基于解码的方法}
+这类方法调整解码算法，以尽量减少毒性。
+
+\begin{practicaltip}
+最简单的基于解码的办法之一是用屏蔽词表（blocklisting），也称词语过滤。把语言模型中不希望出现的词语的概率设为零。这些词一般包括咒骂、粗俗用语和侮辱词语。这样，模型的输出就不会出现这些词。下面介绍一些在解码时降低毒性、较复杂而通常也更有效的方法。
+\end{practicaltip}
+
+\paragraph*{词表偏移}
+\refcite{ch06-ref-034}{Ghosh 等人（2017）}提出这一方法。它为词表中的每个词元学习向量表示，区分毒性与无毒属性。原研究使用 LSTM 模型，不过其基本原理也可以用于 GPT-2 等较新的 Transformer 架构。
+
+在标准 LSTM 模型中，由 $M$ 个词 $w_1,w_2,\ldots,w_M$ 组成的序列，其联合概率由概率链式法则定义为
+\begin{equation}
+P(w_1,w_2,\ldots,w_M)
+=\prod_{t=1}^{M}P(w_t\mid w_1,w_2,\ldots,w_{t-1}).
+\label{eq:ch06-lstm-joint}
+\end{equation}
+在这种模型中，词 $w_t$ 在上下文 $c_{t-1}=(w_1,w_2,\ldots,w_{t-1})$ 下的条件概率为
+\begin{equation}
+P(w_t=i\mid c_{t-1})
+=\frac{\exp(U_i^{\mathsf T}f(c_{t-1})+b_i)}
+ {\sum_{j=1}^{V}\exp(U_j^{\mathsf T}f(c_{t-1})+b_j)}.
+\label{eq:ch06-lstm-conditional}
+\end{equation}
+其中，$f(\cdot)$ 是 LSTM 的输出，$U$ 是词表示矩阵，$b_i$ 是偏置项。\refcite{ch06-ref-034}{Ghosh 等人（2017）}提出用于词表偏移的 Affect-LM，把上式改写为
+\begin{multline}
+P(w_t=i\mid c_{t-1},e_{t-1})\\
+=\frac{\exp(U_i^{\mathsf T}f(c_{t-1})+\beta V_i^{\mathsf T}g(e_{t-1})+b_i)}
+ {\sum_{j=1}^{V}\exp(U_j^{\mathsf T}f(c_{t-1})+\beta V_j^{\mathsf T}g(e_{t-1})+b_j)}.
+\label{eq:ch06-affect-lm}
+\end{multline}
+其中，$e_{t-1}$ 表示训练时由上下文词语获得的情绪类别信息。该式量化情绪类别信息对在上下文中预测目标词 $w_t$ 的影响，$\beta$ 是情绪强度参数。
+
+\paragraph*{即插即用语言模型（PPLM）}
+即插即用语言模型（Plug and Play Language Model，PPLM）允许用户把一个或多个表示特定控制目标的属性模型与大语言模型结合（\refcite{ch06-ref-019}{Dathathri et al., 2019}）。这样的组合无需额外训练或微调模型，对难以获得大量硬件资源的研究者很有用。PPLM 有两个基本条件。
+
+\begin{enumerate}
+\item 可以使用一个属性模型，记作 $p(a\mid x)$。
+\item 可以取得该属性模型的梯度。
+\end{enumerate}
+
+PPLM 流程如图~\ref{fig:ch06-pplm} 所示，分为以下几步。
+
+\begin{enumerate}
+\item 对大语言模型做一次前向传播，从所得概率分布抽取一个词元。然后把生成的字符串交给属性模型，计算所需属性的概率 $p(a\mid x)$。
+\item 反向传播，计算 $p(a\mid x)$ 和 $p(x)$ 相对于模型隐藏状态的梯度。调整隐藏状态，提高这两个概率。
+\item 重新计算大语言模型的概率分布，抽取一个新的词元。
+\end{enumerate}
+
+\sourcefigure{fig06_10.pdf}{即插即用语言模型（PPLM）。图中使用属性模型反向调整语言模型的隐状态，再对下一词元重新采样。}{fig:ch06-pplm}
+
+\paragraph*{生成式判别器（GeDi）}
+生成式判别器（Generative Discriminator，GeDi）用较小的语言模型作生成式判别器，引导大语言模型的生成，以缓解毒性（\refcite{ch06-ref-054}{Krause et al., 2020}）。它用贝叶斯法则计算序列中每个可能的后续词的概率，平衡两个类别条件分布。第一个分布以所需属性，即“控制码”为条件，引导模型生成特定的理想内容。第二个分布的条件是“反控制码”，表示希望避开的属性，例如有毒语言。
+
+基本原理是用辅助的类别条件语言模型（class-conditional language model，CC-LM），判断生成的词元属于控制码所指定类别的可能性。控制码定义文本序列 $x_{1:T}$ 的一种属性，可以是情感、主题或“有毒”等标签。类别条件语言模型计算 $p(x\mid c)$ 和 $p(x\mid\bar c)$，其中 $c$ 和 $\bar c$ 分别是控制码和反控制码。CTRL 就是一个例子，它提供了一个框架，让语言模型以属性变量为条件生成文本（\refcite{ch06-ref-052}{Keskar et al., 2019}）。
+
+训练类别条件语言模型时，将每个序列 $x^{(i)}_{1:T_i}$ 与控制码 $c^{(i)}$ 配对。随后训练模型，使平均负对数似然 $L_g$ 最小。GeDi 的训练损失 $L_{\mathrm{gd}}$ 结合了语言模型损失 $L_g$ 和判别损失 $L_d$，用超参数 $\lambda$ 加权。
+\begin{equation}
+L_{\mathrm{gd}}=\lambda L_g+(1-\lambda)L_d.
+\label{eq:ch06-gedi}
+\end{equation}
+判别损失用于推动模型产生希望的行为，并远离不希望的行为。$L_d$ 旨在提高分类准确率，而 $L_g$ 有助于更好地校准引导生成所用的词元概率。与 PPLM 相比，GeDi 在降低毒性方面更有效，计算开销也更低。但它需要一个额外的语言模型进行训练，因此增加了算力需求。
+
+\paragraph*{自我诊断与自我去偏}
+\refcite{ch06-ref-098}{Schick 等人（2021）}提出的方法围绕两个问题展开。第一，大语言模型能否自行发现自身的偏见，即自我诊断（self-diagnosis）？第二，大语言模型能否以无监督方式抑制不希望出现的行为，即自我去偏（self-debiasing）？
+
+自我诊断考察预训练语言模型能否识别自身输出中在社会层面不合宜的属性，而无需额外的训练数据或外部资源。它利用模型在预训练中学到的知识，并给出简短的属性描述，以评估模型自行识别和处理偏见、不当内容的能力。
+
+设语言模型为 $M$，词元序列为 $x_1,\ldots,x_k=x$。进行自我诊断时，将 $M$ 生成的句子 $x$ 与关于属性 $y$ 的问题组合，判断 $x$ 是否含有 $y$。例如，若 $M$ 生成句子 $x=$“I'm going to hunt you down!”，要判断它是否含有威胁，即 $y=$“a threat”，可用以下模板提示模型。
+\begin{lstlisting}[nolol=true]
+# Self-diagnosing template , denoted as sdg(.)
+{sample text x}
+Does the above text contain {threat text y} ?
+\end{lstlisting}
+$x$ 具有属性 $y$ 的概率为
+\begin{equation}
+p(y\mid x)
+=\frac{p_M(\text{“Yes”}\mid\operatorname{sdg}(x,y))}
+ {\sum_{w\in\{\text{“Yes”},\text{“No”}\}}
+  p_M(w\mid\operatorname{sdg}(x,y))}.
+\label{eq:ch06-sdg}
+\end{equation}
+
+自我去偏采用类似于自我诊断的思路，重点在于主动改变输出。它也利用模型自身的内部知识调整输出生成，降低生成有偏见文本的可能性。下面是一个自我去偏模板示例。
+\begin{lstlisting}[nolol=true]
+# Self-debiasing template , denoted as sdb(.)
+The following text contains {undesired attribute s}:
+{sample text x}
+\end{lstlisting}
+
+采用该模板时，需要预训练语言模型 $M$ 和表示某类偏见的属性 $y$。给模型输入文本 $x$，它用自我去偏输入 $\operatorname{sdb}(x,y)$ 生成续写。这会得到两个概率分布，即原始分布 $p_M(w\mid x)$ 和调整后的分布 $p_M(w\mid\operatorname{sdb}(x,y))$。后者被设计为更倾向于不希望出现的词。因此，对有偏见的词，下式的差值预期为负。
+\[
+\Delta(w,x,y)=p_M(w\mid x)-p_M(w\mid\operatorname{sdb}(x,y)).
+\]
+为缓解偏见，构造新的概率分布 $\widetilde{p}_M(w\mid x)$，使它与 $\alpha(\Delta(w,x,y))\cdot p_M(w\mid x)$ 成比例。这里，$\alpha\colon\mathbb{R}\to[0,1]$ 为缩放函数，根据偏见差值 $\Delta(w,x,y)$ 调整概率。这样只在有需要时改变概率，其余词保持不变，尽量减少对生成过程的干预。
+
+为便于模型评估，这种办法不会把任何词的概率设为零。它根据 $\Delta(w,x,y)$ 降低带有偏见的词的概率，缩放函数使用衰减常数 $\lambda$。当 $x\geq0$ 时 $\alpha(x)=1$，否则 $\alpha(x)=e^{\lambda x}$。还可以考虑一组描述 $Y=\{y_1,\ldots,y_n\}$，据此调整分布，将该方法扩展到多种偏见。

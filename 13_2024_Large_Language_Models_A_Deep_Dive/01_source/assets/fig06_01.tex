@@ -1,0 +1,47 @@
+% 重绘自原书第 224 页的图 6.1，保留模型输入与输出示例。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  block/.style={draw=blue!42!black,fill=blue!14,rounded corners=3pt,align=center,
+     minimum height=6.5mm,inner sep=2.5pt},
+  group/.style={draw=blue!32!black,densely dashed,rounded corners=5pt,inner sep=4.4pt},
+  wire/.style={draw=black!75,-{Stealth[length=1.4mm]},line width=.52pt}]
+\node[font=\scriptsize\ttfamily,anchor=west,align=left] (prompt) at (0,0)
+  {\textbf{[PROMPT]} Fox 2000\\released the Film Soul food};
+\node[block,fill=yellow!48,minimum width=12mm] (lm) at (4.88,0) {语言模型};
+\node[font=\scriptsize\ttfamily,anchor=west,align=left] (reply) at (6.04,0)
+  {\textbf{[LM\_GEN]} Its leading case\\includes actress Emma\\Thompson, Tom Wilkinson, ...};
+\draw[wire] (prompt.east)--(lm.west);
+\draw[wire] (lm.east)--(reply.west);
+\node[anchor=west,text=green!44!black,font=\footnotesize\sffamily\bfseries]
+  at (0,-.64) {阶段 1　生成语言模型续写};
+\draw[black!70,densely dashed,line width=.55pt] (0,-.87)--(11.45,-.87);
+\node[anchor=west,text=green!44!black,font=\footnotesize\sffamily\bfseries]
+  at (0,-1.11) {阶段 2　评估};
+
+\node at (2.53,-1.64) {1.\ 筛选陈述};
+\node[block,fill=yellow!47,minimum width=17mm] (cls) at (1.35,-2.55) {陈述类型\\分类器};
+\node[align=left] (check) at (3.65,-2.30) {\textcolor{green!46!black}{值得核查}};
+\node[align=left] (nocheck) at (3.65,-2.84) {无需核查};
+\node[group,fit=(cls)(check)(nocheck)] (filter) {};
+\draw[wire] (cls.east)--(2.71,-2.55);
+\draw[black!65,line width=.4pt] (nocheck.west)--(nocheck.east);
+
+\node[block,fill=black!8] (wiki) at (1.28,-4.04) {维基文档};
+\node[block,fill=orange!23] (choose) at (3.65,-4.04) {依据选择器};
+\node[group,fit=(wiki)(choose),inner sep=4.7pt] (sources) {};
+\draw[wire] (wiki.east)--(choose.west);
+\draw[wire] (3.65,-3.14)--(choose.north);
+\node at (2.53,-4.88) {2.\ 选择事实依据};
+
+\node at (8.35,-1.64) {3.\ 评估事实性};
+\foreach \y/\leftlabel/\rightlabel/\shade in {
+  -2.22/命名实体模型/{$\mathrm{NE}_{\mathrm{ER}}$}/17,
+  -2.94/自然语言推断模型/蕴含百分比/23,
+  -3.66/13 亿参数语言模型/流畅度（困惑度）/29,
+  -4.38/基于 $n$ 元组的指标/多样性、重复/37}{
+  \node[block,fill=blue!\shade,minimum width=25mm] (measure) at (7.07,\y) {\leftlabel};
+  \node[anchor=west,font=\scriptsize\sffamily] (result) at (9.04,\y) {\rightlabel};
+  \draw[wire] (measure.east)--(result.west);
+}
+\node[group,fit={(5.48,-1.86) (11.38,-4.71)},inner sep=2pt] {};
+\end{tikzpicture}

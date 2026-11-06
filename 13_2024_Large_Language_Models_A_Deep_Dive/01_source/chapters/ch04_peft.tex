@@ -1,0 +1,198 @@
+% PDF 173--186；原书第 144--157 页。
+\section{参数高效微调}
+\label{sec:ch04-peft}
+大语言模型的规模对某些有价值的能力的涌现至关重要，却也带来了一些实际限制。最明显的是，怎样在不同环境之间高效传输大型模型，以及怎样存储它们（\refcite{ch04-ding}{Ding et al., 2023}）。如果每种任务、使用场景或应用都要保留多个模型副本，这些困难会进一步加重。即便 BERT 等较小的语言模型也会遇到类似的问题。BERT 是 Google Research 团队在 \refcite{ch04-houlsby}{Houlsby 等人（2019）}的工作中首次提出适配器的 Transformer 模型，下文会详细讨论适配器。
+
+除了部署方面的困难，如果微调策略针对大语言模型的全部参数，模型规模往往会使所需时间和费用超出可承受范围。这样的限制压缩了研究人员与开发人员试验和反复改进调优策略的空间。因此，必须事先投入相当的精力，尽量保证预算所能负担的少数几次试验有效且不出差错，因为出错的代价可能很高。
+
+大语言模型通过预训练获得很强的通用能力，而微调的目标，按定义，是使模型在一个或多个相对狭窄的能力范围内表现得更专门化。如果为了完成目标任务而微调大语言模型的所有参数，部分通用能力也必然发生改变。由此得到的模型，通用性不及只做预训练的模型。因此，需要保留多少版本和副本，可能取决于要覆盖的任务数量。
+
+参数高效微调（parameter-efficient fine-tuning，PEFT）是一组试图解决这些困难的微调技术。一般而言，它希望用尽可能少的可调参数取得尽可能好的任务结果。PEFT 系统通常也考虑保留大语言模型在预训练中得到的有用通用能力。常见做法是针对每项任务调优附加到模型的适配器（adapter）或其他扩展，而大语言模型的预训练参数保持不变（\refcite{ch04-houlsby}{Houlsby et al., 2019}）。
+
+\sourcefigure{fig04_05.pdf}{四种参数高效微调方法的模型架构细节。（a）基于提示的微调方法中的前缀调优。（b）重参数化微调方法中的 LoRA。（c）在 Transformer 的既有网络层中串联适配器。（d）将适配器与 Transformer 的既有网络层并联。}{fig:ch04-peft-types}
+
+依照 \refcite{ch04-hu-2023}{Hu 等人（2023）}的划分，PEFT 方法大体分为四类，如图~\ref{fig:ch04-peft-types} 所示。
+
+\begin{itemize}
+\item \textbf{提示方法。}这类方法与基于提示的学习方法有关，用于微调大语言模型。一般目标是构造可学习的提示向量，将其附加到输入嵌入中（提示调优，\refcite{ch04-lester}{Lester et al., 2021}），或附加到预训练语言模型各层的隐藏状态中（前缀调优，\refcite{ch04-li-liang}{Li and Liang, 2021}）。见图~\ref{fig:ch04-peft-types}。
+\item \textbf{串联适配器方法。}将额外的神经网络模块与预训练语言模型的既有层串联。以 \refcite{ch04-houlsby}{Houlsby 等人（2019）}为例，适配器网络直接接在 Transformer 的前馈层和注意力层之后。见图~\ref{fig:ch04-peft-types}（c）。
+\item \textbf{并联适配器方法。}同样使用小型的附加神经网络模块，但将它们与既有网络的子层并联。在这种配置下，预训练语言模型的中间激活值通过捷径连接传给适配器模块（如 \refcite{ch04-sung}{Sung et al., 2022}）。见图~\ref{fig:ch04-peft-types}（d）。
+\item \textbf{重参数化方法。}利用内在维度（intrinsic dimension）的概念，根据给定的微调任务对预训练网络重参数化（\refcite{ch04-aghajanyan}{Aghajanyan et al., 2020}）。LoRA（\refcite{ch04-hu-2021}{Hu et al., 2021}）和 VeRA（\refcite{ch04-kopiczko}{Kopiczko et al., 2023}）属于此类。见图~\ref{fig:ch04-peft-types}（b）。
+\end{itemize}
+
+\begin{practicaltip}
+选择 PEFT 方法时，主要要权衡计算需求和任务表现。一般来说，计算需求越低，任务表现的损失越大。按前面列出的类别，可以给出一种近似次序，从计算负担较重排到较轻，任务表现也相应降低。
+
+\begin{enumerate}
+\item 全参数微调。
+\item 基于提示的调优。
+\item 串联适配器。
+\item 并联适配器。
+\item 标准重参数化。
+\item 优化重参数化。
+\end{enumerate}
+
+标准重参数化指 LoRA 一类方法，采用标准浮点精度和标准优化算法，例如 Adam（\refcite{ch04-kingma}{Kingma and Ba, 2017}）。优化重参数化指 QLoRA 一类方法，为计算开销优化了浮点精度，并用优化算法有选择地更新参数。
+\end{practicaltip}
+
+下面考察几种常用 PEFT 方法在架构和任务表现上的得失，包括重参数化、串联适配器和并联适配器。基于提示的学习类 PEFT 方法，其基础已在第~\ref{ch:prompting}~章详细讨论。读者可查阅 Hugging Face 整理的 PEFT 方法\footnote{\url{https://github.com/huggingface/peft}}，从实际使用的角度了解它们。本章还提供带代码的教程，将比较其中几种方法的收益和开销。
+
+\subsection{适配器}
+\label{sec:ch04-adapters}
+适配器是在待适配的预训练模型各层中加入的小型神经网络模块。所谓“小型”，是相对于语言模型的参数数量而言（\refcite{ch04-houlsby}{Houlsby et al., 2019}）。从实际使用来看，适配器有以下优点。
+
+\begin{itemize}
+\item \textbf{任务表现。}在许多任务上，适配器只需调节少得多的参数，就能达到接近全参数微调的表现。
+\item \textbf{按任务独立调优。}适配器是纳入 Transformer 模型各层的任务专用模块，可以依次开发。要让语言模型适应多个任务，可以逐个任务调优，无需同时在代表所有任务的数据上训练。开发人员可以针对各任务的具体目标优化，避免只依赖所有任务上的综合指标。这一特点能减轻对原预训练语言模型做多任务全量或部分微调所带来的灾难性遗忘（\refcite{ch04-pfeiffer}{Pfeiffer et al., 2021}）。
+\item \textbf{可扩展的部署。}适配器的参数数目通常只占目标语言模型的一小部分，因此可在常规计算基础设施上部署任务专用的适配器模块。
+\end{itemize}
+
+将适配器与传统微调和基于特征的迁移调优作比较，有助于理解它的做法。考虑参数为 $w$ 的神经网络 $\phi_w(x)$。传统微调针对每项任务调整原参数 $w$，因此每项任务都需要保存一份新的 $w$，增加了存储需求。基于特征的迁移则用新的函数 $X_v$ 重新组织模型函数，得到 $x_v(\phi_w(x))$，其中只调优新的任务专用参数 $v$。原模型参数 $w$ 保持不变，因此存储开销较小。
+
+尽管计算开销远低于全参数微调，适配器已能取得相当甚至更好的表现。这归功于它组合任务专用部分 $x_v$ 和原模型参数 $w$ 的方式。设定新任务专用参数的初值 $v_0$，使新模型函数尽量接近原函数，即 $\psi_{w,v_0}(x)\approx\phi_w(x)$，训练时只调优 $v$（\refcite{ch04-houlsby}{Houlsby et al., 2019}）。
+
+微调大语言模型时，通常有 $|v|\ll|w|$。也就是说，适配器中的可调参数数量只占原大语言模型参数数量的一小部分。对 \refcite{ch04-houlsby}{Houlsby 等人（2019）}提出的适配器架构，可训练参数数目为 $2md+d+m$。其中，$d$ 是 Transformer 层前馈投影输出的原始特征维数，$m$ 是为适配器层选择的瓶颈维数。选用较小的 $m$，即可减少任务微调所需的附加参数。\refcite{ch04-houlsby}{Houlsby 等人（2019）}报告，在实际微调中，即便参数数目只有原预训练模型的 0.5\%，也能取得良好的效果。
+
+\subsubsection{串联适配器}
+串联适配器与预训练网络的既有层串联。这种 PEFT 方法将计算改写为
+\begin{equation}
+H_o\gets H_o+f(H_oW_{\mathrm{down}})W_{\mathrm{up}}.
+\label{eq:ch04-series}
+\end{equation}
+这里，$H_o$ 是给定网络层的输出。装入串联适配器后，输出先经 $W_{\mathrm{down}}\in\mathbb{R}^{d\times r}$ 向下投影到较低维度，其中 $r$ 为适配器瓶颈大小，通常较小。对降维投影应用非线性函数 $f$，再用 $W_{\mathrm{up}}\in\mathbb{R}^{d\times r}$ 将输出向上投影，恢复到 $H_o$ 的原始维数。%
+\footnote{译注：原文将 $W_{\mathrm{up}}$ 的形状也印为 $d\times r$。按式~\eqref{eq:ch04-series} 的右乘顺序和恢复到 $d$ 维的要求，$W_{\mathrm{up}}$ 的形状应为 $r\times d$。}
+$W_{\mathrm{down}}$、$f$ 和 $W_{\mathrm{up}}$ 这三部分组成串联适配器，在适配器调优时微调。
+
+图~\ref{fig:ch04-series} 给出适配器的放置位置。一处紧接在多头注意力层之后的前馈层后面，另一处紧接在 Transformer 输出归一化之前的两个前馈层后面。\refcite{ch04-hu-2023}{Hu 等人（2023）}指出，对于某些任务，这些位置未必是最佳选择。他们评估了适配器位置对任务表现的影响。在数学推理任务上，只把适配器放在前馈层之后，比只放在多头注意力层后，或在多头注意力层与前馈层后都放，表现更好。这与 \refcite{ch04-pfeiffer}{Pfeiffer 等人（2021）}提出的更高效的适配器变体一致。
+
+\sourcefigure{fig04_06.pdf}{Transformer 层中适配器位置的架构图。适配器装在两处。第一处位于紧接多头注意力层的前馈投影之后，第二处位于两个前馈层之后。适配器的主要特点是瓶颈结构。输入先被投影到更小的特征空间，经过非线性变换后，再投影回原来的输入维数。}{fig:ch04-series}
+
+除了放置位置，初次向下投影时采用的瓶颈大小 $r$，也是设计适配器时重要的超参数。通常，$r$ 太小会限制从适配器输入层到瓶颈层时能够保留的有用信息。$r$ 太大可能改善任务表现，却会降低微调的参数效率。不过，\refcite{ch04-hu-2023}{Hu 等人（2023）}发现，$r$ 过大也可能使任务表现变差。
+
+串联适配器通常能有效减少微调时的计算量。但由于预测时输入必须经过额外的串联层，有研究报告说，这会给推理带来不可忽略的开销。
+
+\subsubsection{并联适配器}
+最初提出适配器并联，是为解决多语言机器翻译的性能下降问题（\refcite{ch04-zhu}{Zhu et al., 2021}）。Zhu 等人希望借助并联适配器缩小表现差距。当时，多个分别处理两种语言的机器翻译模型，表现优于一个多语言机器翻译模型。他们在三个多语言机器翻译基准数据集中，有两个验证了这一办法的效果。图~\ref{fig:ch04-parallel} 给出 Zhu 等人所用的并联适配器架构和放置位置。
+
+并联适配器将计算改写为
+\begin{equation}
+H_o\gets H_o+f(H_iW_{\mathrm{down}})W_{\mathrm{up}},
+\label{eq:ch04-parallel}
+\end{equation}
+其中，$H_i$ 和 $H_o$ 分别是相应网络层及适配器的输入与输出。
+
+与串联适配器相比，将适配器与主干网络并联的一项主要优点是，训练的计算负担可以大幅降低。可调参数空间已经显著缩小，并且在更新参数时，通常无需沿预训练语言模型反向传播以求得梯度（\refcite{ch04-sung}{Sung et al., 2022}）。
+
+\sourcefigure{fig04_07.pdf}{为提高多语言机器翻译表现而微调的并联适配器，其位置与架构如图所示。架构中不含适配器的 Transformer 部分作为多语言模型进行预训练，同时用双语语料库微调各层适配器，以提高相应语言对的机器翻译表现。}{fig:ch04-parallel}
+
+\subsection{重参数化}
+\label{sec:ch04-reparameterization}
+与适配器不同，重参数化方法通常无需加入额外的神经网络模块，因此可以减轻适配器带来的推理延迟（\refcite{ch04-hu-2021}{Hu et al., 2021}）。这些方法所利用的基本事实是，许多自然语言处理任务的内在维度比预训练模型的维度低几个数量级，因此可用相对较少的参数有效地针对多种任务微调。
+
+重参数化方法一般先做某种秩分解，再在学习阶段优化预训练模型中较高维表示的低秩表示。下面介绍三种用于大语言模型参数高效微调的代表方法，即低秩适配器（Low-Rank Adapters，LoRA）（\refcite{ch04-hu-2021}{Hu et al., 2021}）、克罗内克适配器（Kronecker Adapters，KronA）（\refcite{ch04-edalati}{Edalati et al., 2022}），以及基于向量的随机矩阵适配（Vector-based Random Matrix Adaptation，VeRA）（\refcite{ch04-kopiczko}{Kopiczko et al., 2023}）。
+
+\subsubsection{低秩适配器}
+\label{sec:ch04-lora}
+低秩适配器微调通过学习低秩矩阵，近似表示针对当前任务所需的参数更新（\refcite{ch04-he-2022}{He et al., 2022}）。\refcite{ch04-he-2022}{He 等人（2022）}指出，LoRA 有四项主要优点。
+
+\begin{itemize}
+\item 同一个预训练模型可以由许多自然语言处理任务共享，每个任务分别学习自己的 LoRA 模块。替换学到的低秩矩阵即可切换任务，大幅减少存储开销和任务切换开销。
+\item 优化仅涉及加入的低秩矩阵，无须调整预训练语言模型的全部参数，因此训练所需算力和硬件资源可减至原来的约三分之一。
+\item LoRA 微调采用线性结构，因此学到的低秩矩阵可以与预训练语言模型的固定权重合并，不会增加推理延迟。
+\item LoRA 旨在寻找所微调任务的低维表示，因此可以与不针对秩优化的调优方法分别使用，也可以与其中许多方法组合使用。
+\end{itemize}
+
+这些优点如何实现？LoRA 针对每项需要微调的自然语言处理任务，优化一个小得多的参数集 $\Theta$。考虑全参数微调所优化的下列目标。
+\begin{equation}
+\max_{\Phi}\sum_{(x,y)\in Z}\sum_{t=1}^{|y|}
+  \log\bigl(P_{\Phi}(y_t\mid x,y_{<t})\bigr).
+\label{eq:ch04-full-tuning}
+\end{equation}
+这里，$Z=\{(x_i,y_i)\}_{i=1,\ldots,N}$ 是给定自然语言处理任务的 $N$ 个上下文—目标对。在摘要任务中，$x_i$ 是待摘要的全文，$y_i$ 是相应的摘要。微调时，以预训练模型权重初始化 $\Phi_0$，沿梯度反复更新到 $\Phi_0+\Delta\Phi$，以最大化式~\eqref{eq:ch04-full-tuning}。
+
+全参数微调直接更新预训练模型权重，因此如上所述，实际部署多个任务模型时可能因开销过高而难以实施。\refcite{ch04-hu-2021}{Hu 等人（2021）}提出用 $\Delta\Phi=\Delta\Phi(\Theta)$ 估计特定于任务的参数更新 $\Delta\Phi$。由于自然语言处理任务的内在维度相对于预训练模型较低，可以取 $|\Theta|\ll|\Phi_0|$。现在可以通过对 $\Theta$ 优化下式来估计 $\Delta\Phi$。
+\begin{equation}
+\max_{\Theta}\sum_{(x,y)\in Z}\sum_{t=1}^{|y|}
+  \log\bigl(p_{\Phi_0+\Delta\Phi(\Theta)}(y_t\mid x,y_{<t})\bigr).
+\label{eq:ch04-lora-objective}
+\end{equation}
+
+从算法角度看，\refcite{ch04-hu-2021}{Hu 等人（2021）}关注 Transformer 架构中的全连接层。他们假设，可以把预训练权重矩阵 $W_0\in\mathbb{R}^{d\times k}$ 的更新限制为较低秩的分解，即 $W_0+\Delta W=W_0+BA$，其中 $B\in\mathbb{R}^{d\times r}$、$A\in\mathbb{R}^{r\times k}$，且 $r$ 远小于 $k$ 和 $d$。$k$ 和 $d$ 是满秩的全连接层权重矩阵的维数。训练时只有 $A$ 和 $B$ 的参数可学习，$W_0$ 冻结。因此，对于给定输入 $x$，前向传播的输出为
+\begin{equation}
+h=W_0x+\Delta W x=W_0x+BAx.
+\label{eq:ch04-lora-forward}
+\end{equation}
+原书说，$A$ 和 $B$ 随机初始化（LoRA 原论文采用高斯随机初始化），同时满足 $\Delta W=BA=0$。%
+\footnote{译注：Hu 等人的 LoRA 论文第 4.1 节明确给出 $A$ 用高斯随机值初始化，$B$ 初始化为零。见 \url{https://arxiv.org/html/2106.09685}。}
+初始化后，如前所述，通过优化式~\eqref{eq:ch04-lora-objective} 来近似 $\Delta W$。
+
+理论上，LoRA 可以用于任何全连接层的权重矩阵。\refcite{ch04-hu-2021}{Hu 等人（2021）}在最初的应用中只适配自注意力权重。原书这里列出键、值权重矩阵 $W_k$ 和 $W_v$。%
+\footnote{译注：LoRA 原论文第 4.2 节举出的部署例子适配的是查询、值投影矩阵 $W_q$ 和 $W_v$，第 7.1 节另比较了不同注意力矩阵的选择。}
+尽管使用范围有限，将 LoRA 用于 GPT-3（\refcite{ch04-brown}{Brown et al., 2020}）后，在三个常用基准 GLUE、WikiSQL 和 SAMSum 上，表现达到或超过全参数微调。
+
+\refcite{ch04-hu-2021}{Hu 等人（2021）}还通过实验说明，用较低的秩 $r$ 适配多种层的矩阵，比只适配少数几种层的矩阵而采用较高秩，在参数数量和任务质量之间取得的折中更好。这表明以任务的内在维度解释微调的基本假定，在实验条件下成立（\refcite{ch04-hu-2021}{Hu et al., 2021}）。
+
+LoRA 的成效迅速催生了一些后续研究和应用。例如，LoRAHub（\refcite{ch04-huang}{Huang et al., 2023}）着力改善 LoRA 适配器模块在实际应用中组合使用的能力。第~\ref{sec:ch04-quantization}~节还会看到，将量化方法引入 LoRA，也是逐步降低大语言模型微调和部署开销的一项进展（\refcite{ch04-dettmers-2023}{Dettmers et al., 2023}）。
+
+LoRA 可以用于多种自然语言处理任务，即使模型规模很大，也能以较高的计算和数据效率完成这些任务，因此仍是一种常用的微调方法。后续研究在 LoRA 的低秩分解思想上作了改进，希望进一步提高参数效率与任务表现。例如，AdaLoRA（\refcite{ch04-zhang-2023b}{Zhang et al., 2023b}）按一项基于差异的重要性指标，针对给定任务动态分配总参数预算，有选择地更新微调参数。QLoRA（\refcite{ch04-dettmers-2023}{Dettmers et al., 2023}）则通过降低预训练语言模型的浮点精度实现量化，进一步提高梯度反向传播时的计算效率，详见第~\ref{sec:ch04-quantization}~节。
+
+这些低秩方法很有前景，但在某些场景中，秩太低不足以捕捉任务所需的重要模式，LoRA 的秩分解还有改进余地。下面讨论一种参数效率与 LoRA 相近、却无需 LoRA 的低秩假定的方法，即 KronA（\refcite{ch04-edalati}{Edalati et al., 2022}）。
+
+\subsubsection{克罗内克适配器}
+克罗内克适配器由 \refcite{ch04-edalati}{Edalati 等人（2022）}提出，利用克罗内克积（Kronecker product）分解进行参数高效微调，避免对自然语言处理任务内在维度作较强的假定。此前已有方法利用克罗内克积（\refcite{ch04-edalati}{Edalati et al., 2022}），例如 Compactor（\refcite{ch04-mahabadi}{Mahabadi et al., 2021}），它将秩为 1 的矩阵和克罗内克积结合，提高微调的参数效率。这些方法的任务表现良好，但训练与推理的计算效率都低于 KronA（\refcite{ch04-edalati}{Edalati et al., 2022}）。KronA 通过优化有关计算来改进这类重新分解方法（见图~\ref{fig:ch04-krona}）。一般而言，矩阵 $A$ 和 $B$ 的克罗内克积为
+\begin{equation}
+W=A\otimes B=
+\begin{bmatrix}
+a_{11}B & \cdots & a_{1n}B\\
+\vdots & \ddots & \vdots\\
+a_{m1}B & \cdots & a_{mn}B
+\end{bmatrix},
+\label{eq:ch04-kronecker}
+\end{equation}
+其中，$W$ 是 $A$ 和 $B$ 的克罗内克积所得的分块矩阵，$m$、$n$ 分别是 $A$ 的行数和列数。\refcite{ch04-edalati}{Edalati 等人（2022）}采用更高效的计算，无需直接构造 $W$。
+\begin{equation}
+(A\otimes B)x=\gamma\bigl(B\eta_{b_2\times a_2}(x)A^{\mathsf T}\bigr).
+\label{eq:ch04-kronecker-product}
+\end{equation}
+这里，$(A\otimes B)x$ 是矩阵 $A$ 和 $B$ 的克罗内克积与输入向量 $x\in\mathbb{R}^{d_h}$ 相乘的结果。$d_h$ 为输入嵌入维数，$A^{\mathsf T}$ 为矩阵 $A$ 的转置。$\eta_{m\times n}(x)$ 将向量 $x$ 变成 $m\times n$ 的矩阵，$\gamma(x)$ 则把矩阵的各列依次叠放成向量。
+
+在图~\ref{fig:ch04-krona}（a）中，对于给定的输入 $X$，输出 $Y$ 为
+\begin{equation}
+Y=XW+sX[A_k\otimes B_k],
+\label{eq:ch04-krona-output}
+\end{equation}
+其中，$s$ 为缩放因子，$W$ 是预训练语言模型被冻结的权重。因此，对给定自然语言处理任务使用 KronA 微调后，权重为
+\begin{equation}
+W_{\mathrm{tuned}}=W+s[A_k\otimes B_k].
+\label{eq:ch04-krona-weights}
+\end{equation}
+
+\sourcefigure{fig04_08.pdf}{（a）KronA 与（b）$\mathrm{KronA}^{\mathrm B}_{\mathrm{res}}$ 的架构。$\otimes$ 表示矩阵 $A$ 与 $B$ 的克罗内克积。$\mathrm{KronA}^{\mathrm B}_{\mathrm{res}}$ 含有残差连接 $S_{\mathrm{res}}$，去掉它便得到 $\mathrm{KronA}^{\mathrm B}$。}{fig:ch04-krona}
+
+$A_k$ 和 $B_k$ 替代了 LoRA 架构中的向下投影和向上投影（见图~\ref{fig:ch04-peft-types}（b））。和 LoRA 一样，它们可与大语言模型的权重合并。冻结大语言模型权重，并在最后合并权重，可实现高效微调而不增加推理延迟。
+
+\refcite{ch04-edalati}{Edalati 等人（2022）}还提出一种与预训练语言模型前馈网络模块并联的 KronA 适配器架构，记为 $\mathrm{KronA}^{\mathrm B}$，以及在同一架构中加入残差缩放因子以进一步提高任务表现的版本。不过，这两种架构在微调和推理时的计算效率都较低，本书不再详细讨论。感兴趣的读者可参阅 \refcite{ch04-edalati}{Edalati 等人（2022）}。
+
+与其他 PEFT 方法相比，KronA 在任务表现和计算方面如何？\refcite{ch04-edalati}{Edalati 等人（2022）}报告，将 KronA 用于 T5（\refcite{ch04-raffel}{Raffel et al., 2020}）并在 GLUE 基准上评估，其平均表现优于全参数微调、Compactor（\refcite{ch04-mahabadi}{Mahabadi et al., 2021}）、BitFit（\refcite{ch04-zaken}{Zaken et al., 2022}）、LoRA（\refcite{ch04-hu-2021}{Hu et al., 2021}）及 \refcite{ch04-he-2022}{He 等人（2022）}提出的并联适配器。与全参数微调相比，KronA 取得上述表现时，训练时间缩短了 25\%（LoRA 为 28\%），也没有增加推理延迟。在同一基准上，$\mathrm{KronA}^{\mathrm B}$ 和 $\mathrm{KronA}^{\mathrm B}_{\mathrm{res}}$ 均优于 KronA。
+
+\subsubsection{基于向量的随机矩阵适配}
+LoRA 一类的重参数化方法能将可训练参数数目降至原来的万分之一，GPU 显存需求最多可降至原来的约三分之一。但有些使用场景除了需要针对任务适配大语言模型，可能还需在各任务上适配每位用户，例如个性化助理、个性化推荐和边缘设备。\refcite{ch04-kopiczko}{Kopiczko 等人（2023）}指出，即使采用 LoRA 达到的参数效率，在生产环境运行时，存储和网络开销仍可能难以承受。受到 \refcite{ch04-aghajanyan}{Aghajanyan 等人（2020）}研究自然语言处理任务微调中内在维度的启发，他们提出了基于向量的随机矩阵适配，即 VeRA（图~\ref{fig:ch04-vera}）。与 LoRA 相比，VeRA 可进一步将微调时的可调参数数目降至约十分之一（图~\ref{fig:ch04-vera-comparison}），因而能减轻规模日益增大的语言模型在实际使用时所遇到的困难。
+
+\sourcefigure{fig04_09.pdf}{LoRA 与 VeRA 的理论显存需求（字节）和可训练参数数目的比较，秩取 $1$、$16$、$256$，模型为 RoBERTa-base、RoBERTa-large 和 GPT-3。原图假设两种方法都只适用于 Transformer 自注意力头的查询层和键层。VeRA 所需显存及可训练参数数目均较低。显存字节数和可训练参数数目用以 10 为底的对数刻度绘制。VeRA 的参数数目为 $|\Theta|=L_{\mathrm{tuned}}(d_{\mathrm{model}}+r)$，LoRA 为 $|\Theta|=2L_{\mathrm{tuned}}d_{\mathrm{model}}r$。其中 $L_{\mathrm{tuned}}$、$d_{\mathrm{model}}$ 和 $r$ 分别是微调的层数、这些层的维数和适配器矩阵的秩。}{fig:ch04-vera-comparison}
+
+这种方法与 LoRA（图~\ref{fig:ch04-peft-types}（b））一样使用一对随机初始化的矩阵 $A$ 和 $B$，初始化细节见下文。微调时，这两个矩阵冻结并由 Transformer 的所有层共享。为了学习微调所得的权重更新 $\Delta W$，VeRA 使用一对可调的缩放向量，即图~\ref{fig:ch04-vera} 中的 $d$ 和 $b$，使冻结的权重矩阵适应给定的自然语言处理任务。这一设计只存储较小的任务专用向量模块，省去保存 LoRA 重参数化矩阵的开销，因此可以在同一个计算节点上存放更多适配后的大语言模型版本。
+
+\sourcefigure{fig04_10.pdf}{VeRA 适配器各组件的架构。与图~\ref{fig:ch04-peft-types}（b）不同，VeRA 冻结 $A$ 和 $B$，并由网络各层共享。微调时只训练向量 $d$ 和 $b$，大幅减少可调参数数量。}{fig:ch04-vera}
+
+回到式~\eqref{eq:ch04-lora-forward}，其中通过调优两个低秩分解矩阵 $A$ 和 $B$ 的乘积来得到 $\Delta W$。VeRA 对给定输入 $x$ 的计算为
+\begin{equation}
+h=W_0x+\Delta W x=W_0x+\Lambda_b B\Lambda_d A x.
+\label{eq:ch04-vera-forward}
+\end{equation}
+与式~\eqref{eq:ch04-lora-forward} 不同，$A$ 和 $B$ 随机初始化后被冻结，由 Transformer 各层共享。VeRA 不要求 $A$ 和 $B$ 相对大语言模型一定是低秩的，不过这些矩阵的秩增大时，可训练参数数目线性增加。如下文所见，VeRA 的参数数目比 LoRA 少一个数量级以上，同时仍有良好的任务表现。缩放向量 $b$ 和 $d$ 分别写成对角矩阵 $\Lambda_b$ 和 $\Lambda_d$，微调时可训练。$b$ 初始化为全零向量，$d$ 的各元素都初始化为同一非零值。它们在不同层中分别调整矩阵 $A$ 和 $B$ 的行、列大小，使模型适应所关注的自然语言处理任务。
+
+如前所述，VeRA 中的矩阵 $A$ 和 $B$ 是随机初始化的，只需记录重现这些矩阵的随机数生成器种子。因此，VeRA 的存储和内存需求限于这个随机种子与训练得到的向量 $b$ 和 $d$，比 LoRA 少得多，见图~\ref{fig:ch04-vera-comparison}。VeRA 用 Kaiming 初始化（\refcite{ch04-he-2015}{He et al., 2015}）初始化矩阵，使矩阵的方差在不同秩下保持一致，从而减少了为不同的秩分别调节学习率的需要，也节省了训练时间。
+
+考虑到 VeRA 的参数数目比 LoRA 低一个数量级，它与其他 PEFT 方法相比仍有良好的任务表现。在 GLUE 基准上，使用 RoBERTa-base 时，VeRA 仅略逊于 LoRA，使用 RoBERTa-large 时，两者表现相当。在 E2E 基准上比较两者时，使用 GPT-2 的 VeRA 在五项 E2E 任务中的四项上优于 LoRA。
+
+接下来考察提高大语言模型适配和微调效率的其他方法。它们着眼于改进数据表示或使用更高效的优化函数，以减少训练所需内存。许多方法还可以与 PEFT 结合使用，进一步提高效率。

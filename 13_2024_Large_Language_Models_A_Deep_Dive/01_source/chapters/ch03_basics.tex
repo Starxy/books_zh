@@ -1,0 +1,98 @@
+% PDF 120--127；表 3.1 见 PDF 128--129。
+\section{基于提示的学习基础}
+\subsection{基于提示的学习的形式化描述}
+对语言模型使用提示，就是给模型一个初始输入或一系列文本线索，模型再根据这些输入生成符合上下文且连贯的回答。以情感分析中的影评句子“Cannot watch this movie”为例。本节用这句话比较监督学习、预训练再微调和基于提示的学习，说明它们的不同之处。
+
+如图~\ref{fig:ch03-formal-supervised} 所示，监督学习训练参数为 $\theta$ 的模型，使其从训练集中的配对样例 $(\symbf{x},\symbf{y})$ 学习。这个例子中，与 $(\symbf{x},\symbf{y})$ 对应的训练样例是（Cannot watch this movie，negative）。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig03_05}
+\caption{监督学习表示为给定输入 $\symbf{x}$ 时输出 $\symbf{y}$ 的概率。}
+\label{fig:ch03-formal-supervised}
+\end{figure}
+
+在预训练再微调中，修改输入以包含一个头词元 \texttt{[CLS]}。它对应模型试图预测的类别标签，如“positive”或“negative”，分别对应正面和负面的影评。微调也称基于任务头的调优（head-based tuning），用标签和输入学习这个分类器的参数 $\theta$，见图~\ref{fig:ch03-formal-ptft}。
+
+\begin{figure}[!htbp]
+\centering
+\scalebox{.99}{\input{assets/fig03_06}}
+\caption{预训练模型加微调。分类头作用于预训练模型对输入 $\symbf{x}$ 的嵌入，产生输出 $\symbf{y}$。}
+\label{fig:ch03-formal-ptft}
+\end{figure}
+
+基于提示的学习则把每个输入放入一个提示模板（prompt template）。模板既容纳输入，也为预测输出留出与推理任务相关的空位。例如，图~\ref{fig:ch03-formal-prompt} 的例子在输入之后附加“It is [z]”，再根据语言模型的概率，找出最可能填入空位的词元 $z$。
+
+因此，基于提示的推理包含两个主要部分。一是把下游任务转换为语言建模问题的模板，二是把语言模型文本输出转换成分类标签的一组标签词（label word）。这里选“great”和“terrible”作为两个可能输出。与“positive”和“negative”相比，这两个词填入提示更加自然，也更有可能被模型预测出来。图~\ref{fig:ch03-formal-prompt} 展示了模板变换和标签词的选择。这种做法无须引入新参数。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig03_07}
+\caption{基于提示的学习。用提示函数将任务由 $\symbf{x}$ 改写成 $\symbf{x}'$，使语言模型输出能够映射到 $\symbf{y}$。}
+\label{fig:ch03-formal-prompt}
+\end{figure}
+
+形式上，若标签词映射 $\mathcal{M}$ 将标签 $\symbf{y}$ 映射到单个词，给定原始输入 $\symbf{x}$ 与加提示后的输入 $\symbf{x}'$，可将基于提示的微调过程写为
+\begin{equation}
+p(\symbf{y}\mid\symbf{x})=p([\symbf{z}=\mathcal{M}(\symbf{y})\mid\symbf{x}']
+\tag{3.1}
+\end{equation}
+\begin{equation}
+p(\symbf{y}\mid\symbf{x})=
+\frac{\exp(\symbf{w}_{\mathcal{M}(\symbf{y})}\cdot\symbf{h}_z)}
+{\sum_{\symbf{y}'\in\symbf{y}}\exp(\symbf{w}_{\mathcal{M}(\symbf{y}')}\cdot\symbf{h}_z)}.
+\tag{3.2}
+\end{equation}
+这里 $\symbf{h}_z$ 是答案 $z$ 的隐藏向量，$\symbf{w}$ 是与映射到 $\symbf{y}$ 的词子集有关的 softmax 之前的向量。
+\transnote{式（3.1）末尾缺少与 $p$ 后开括号对应的右圆括号。式（3.2）的求和域按原书第 91 页保留。}
+
+\begin{practicaltip}
+基于提示的方法往往比第 2 章讨论的基于任务头的微调表现更好，尤其是在数据较少时。原因是 BERT 等预训练模型加入了随机初始化的新参数，只用有限的样例难以有效优化这些参数。第 3.6 节的教程将给出具体例子。
+\end{practicaltip}
+
+\subsection{基于提示的学习流程}
+仍以影评情感分类为例，说明数据流和输出类别预测的各个步骤。如图~\ref{fig:ch03-flow} 所示，基于提示的学习有三个主要步骤。
+\begin{enumerate}
+\item 提示函数（prompting function）$f_{\mathrm{prompt}}(\cdot)$ 将输入文本 $\symbf{x}$ 改写为提示 $\symbf{x}'(z)=f_{\mathrm{prompt}}(\symbf{x})(z)$。
+\item 函数 $f_{\mathrm{fill}}(\symbf{x}';z)$ 找出最可能填入空位 $z$ 的词元。
+\item 用映射函数把得分最高的答案 $z^*$ 与得分最高的输出 $\symbf{y}$ 对应起来。
+\end{enumerate}
+在这个例子中，输入句子“Cannot watch this movie”记为 $\symbf{x}$。模板是“[x] It was a [z] movie”，输出是情感预测“negative”，记为 $\symbf{y}$。下面分别讨论这些步骤。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig03_08}
+\caption{基于提示的学习流程。先将提示函数应用于输入，再填补所得文本中的掩码位置，并将输出映射到相应的答案。}
+\label{fig:ch03-flow}
+\end{figure}
+
+\subsubsection{添加提示}
+添加提示（prompt addition）可以表示成函数 $f_{\mathrm{prompt}}(\cdot)$。它接收输入文本 $\symbf{x}$ 和带答案空位 $z$ 的指定模板，生成提示 $\symbf{x}'=f_{\mathrm{prompt}}(\symbf{x})$。该函数包含两个阶段。
+\begin{enumerate}
+\item 使用预先确定的模板。模板是一段含两个空位的文本，输入空位 \texttt{[x]} 用于放入输入，答案空位 \texttt{[z]} 用于放入生成的中间答案文本。之后再把这个中间文本映射为输出 $\symbf{y}$。
+\item 用给定输入替换输入空位 \texttt{[x]}。
+\end{enumerate}
+沿用影评情感分类的例子，用模板“[x] It was a [z] movie”转换输入句子“Cannot watch this movie.”，就会得到提示“Cannot watch this movie. It was a [z] movie.”。
+
+\subsubsection{答案搜索}
+下一步计算提示中指定空位所有可能答案的概率。这个过程常称为答案搜索（answer search），是用模型进行推理的阶段。对上述提示模板，可以分别用“great”和“terrible”作为正面和负面类别的候选答案。概率最高的填空词元就是预测答案。
+
+形式上，答案搜索主要分两步。
+\begin{enumerate}
+\item 函数 $f_{\mathrm{fill}}(\symbf{x}',z)$ 把一个候选答案 \texttt{[z]} 填进指定空位。根据任务，可以从模型的整个词表或一个较小的词子集 $Z$ 中选取答案。这个过程得到的文本称为已填充提示（filled prompt）。
+\item 使用搜索函数，如 $\arg\max$ 搜索，找出得分最高的输出。做法是用预训练语言模型 $P(\mathord{\,};\theta)$ 计算相应已填充提示的概率。搜索函数选择概率最高的输出，找出最符合上下文、语义最连贯的答案，以满足提示要求。
+\end{enumerate}
+这个搜索函数可写为
+\begin{equation}
+\hat{z}=\operatorname*{search}_{z\in Z} P(f_{\mathrm{fill}}(\symbf{x},z);\theta).
+\tag{3.3}
+\end{equation}
+这里给定模板函数 $f_{\mathrm{fill}}$ 和模型参数 $\theta$，在所有可能的答案 $Z$ 中找出概率最高的答案 $z$。然后可把输出 $\hat{z}$ 映射到更自然、更容易解释的答案空间。
+\transnote{式（3.3）按原式使用 $\symbf{x}$，前文答案搜索的定义则使用 $\symbf{x}'$。}
+
+\subsubsection{答案映射}
+在答案搜索中得到中间文本或词元后，需要把它们映射为最终所需的输出形式。这称为答案映射（answer mapping）。
+
+例如，在影评情感分析任务中，基于提示的模型可能生成“terrible”或“great”等中间文本来填空。答案映射随后把这些文本对应到为任务定义的情感标签或数值，例如用 1 表示正面，0 表示负面。形式上，映射把得分最高的答案 $\hat{z}$ 变为得分最高的输出 $\hat{\symbf{y}}$。
+
+这一步之所以必要，是因为最适合填入模板的自然用词，未必与标签完全一致。例如，餐厅评论的情感分类通常用一星到五星表示。“one star”作为答案没有“terrible”自然，因此提示中可以使用后者作为候选，之后再把它映射到“一星”类别。答案搜索所用的词元，必须转换成符合任务目标的形式。

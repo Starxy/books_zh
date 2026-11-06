@@ -1,0 +1,45 @@
+% 原书第 292 页。
+\begin{table}[p]
+\centering
+\makebox[\linewidth][c]{\rotatebox{90}{%
+\begin{minipage}{.93\textheight}
+\caption{检索增强生成各阶段的特点。}
+\label{tab:ch07-enhancements}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.17}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.073\linewidth}
+ >{\raggedright\arraybackslash}p{.189\linewidth}
+ >{\raggedright\arraybackslash}p{.199\linewidth}
+ >{\raggedright\arraybackslash}X
+ >{\raggedright\arraybackslash}p{.197\linewidth}@{}}
+\toprule
+阶段 & 说明 & 优化项 & 干扰因素 & 增强办法\\
+\midrule
+建立索引 &
+把文档切分成文本块，生成各块的嵌入，并存入向量索引。 &
+文本规范化\par 表格解析\par 分块策略\par 元数据标签\par 嵌入模型选型\par 向量索引选型 &
+数据包含在 PDF 表格中。\par 数据包含在结构化数据库中。\par 文档包含嵌入模型不熟悉的技术语言。 &
+用 LlamaParse 做预处理。\par 自动生成数据库查询。\par 微调嵌入模型。\\
+\midrule
+查询 &
+用户输入可以用文档信息回答的问题，再由嵌入模型转换问题。 &
+改进查询策略 &
+措辞的细微变化可导致不同结果。\par 返回文档相关性低。\par 复杂查询需要多项信息。\par 不同查询需要不同策略。 &
+查询改写。\par 查询到文档扩展。\par 生成子查询。\par 路由。\\
+\midrule
+检索 &
+用查询嵌入搜索向量索引，返回语义最相似的文档，按余弦相似度判定。 &
+返回排名靠前的文档数\par 对排名靠前的文档重排序 &
+最相关的文档未排在前列。\par 多跳问题无法根据一份文档回答。 &
+重排序。\par 迭代检索。\\
+\midrule
+生成 &
+将查询和检索到的文档交给聊天机器人，根据检索所得信息生成回答。 &
+生成模型选型\par 生成模板和系统提示\par 文档的整合方式 &
+生成器输出未忠实采用返回的文档。\par 某些文档的信息在上下文中间被遗漏。 &
+改变提示模板。\par 上下文整合。\\
+\bottomrule
+\end{tabularx}
+\end{minipage}}}
+\end{table}

@@ -1,0 +1,105 @@
+% 原书第 9.5 节。
+\section{代表性的多模态大语言模型}
+\label{sec:ch09-models}
+本节概述若干当时先进的多模态大语言模型，展示它们如何把各种模态整合进框架。表~\ref{tab:ch09-models}列出常用模型，将各自的组件对应到前文的通用框架。接下来深入讨论三个模型，它们代表了处理多模态数据的复杂程度和能力的进展。首先讨论结合视觉与语言的 Flamingo，再讨论可处理文本以及视频和音频的 Video-LLaMA，最后讨论能够在多种模态之间转换的 NExT-GPT。\footnote{原书此处称 NExT-GPT 支持六种模态。其编码器 ImageBind 可处理六种模态，而 \href{https://arxiv.org/abs/2309.05519}{NExT-GPT 论文}描述的端到端输入与输出为文本、图像、视频和音频四种，与表~\ref{tab:ch09-models}和第~\ref{sec:ch09-next-gpt}~节相符。}
+
+\input{chapters/ch09_model_table}
+
+\subsection{Flamingo（图像、视频与文本）}
+Flamingo 是早期的视觉语言模型，在多项视觉与语言任务上推进了少样本学习（\refcite{ch09-ref-001}{Alayrac et al., 2022}）。在 16 项任务中，它有 6 项超过经过微调的先进模型，同时使用的任务专用训练数据少得多。下面按通用框架的组件介绍它的架构。该模型没有使用多模态 RLHF，输出为文本，因此也无需输出投影器和其他模态的生成器。
+
+\sourcefigure{fig09_07.pdf}{Flamingo 的架构。冻结的视觉编码器提取图像和视频特征，由 Perceiver 重采样器转换成定长视觉词元。可训练的门控交叉注意力层与冻结的语言模型层交错排列，以视觉特征为条件生成文本。}{fig:ch09-flamingo}
+
+\subsubsection{模态编码器}
+Flamingo 的视觉编码器是 F6 规格的无归一化 ResNet（Normalizer-Free ResNet，NFNet），通过视觉与文本的对比学习来编码视觉输入。在对比预训练阶段，底本描述其文本编码器为 BERT，有别于使用 GPT-2 的做法。对视觉和文本的嵌入进行均值池化，再投影到联合嵌入空间，便于整合两种模态。Flamingo 生成文本时使用的核心语言模型见下文。
+
+\subsubsection{输入投影器}
+Flamingo 可处理图像和视频，其视觉特征的数量也随输入而变。Perceiver 重采样器（Perceiver Resampler）把这些特征统一转为 64 个视觉词元，见图~\ref{fig:ch09-flamingo}。将门控交叉注意力层（GATED XATTN-DENSE）插入冻结的语言模型层之间，可实现语言与视觉模态的对齐，使模型在生成文本词元时关注视觉词元。
+
+\subsubsection{预训练：核心大语言模型、数据集和任务目标}
+Flamingo 以 Chinchilla 为基础，冻结预训练的语言模型层。\footnote{原书此处写作“冻结九个预训练的 Chinchilla 层”。\href{https://arxiv.org/abs/2204.14198}{Flamingo 论文}第 2.2 节说明冻结预训练语言模型，训练新插入的交叉注意力层。}训练使用四个不同的数据集，即 M3W（交错图文）、ALIGN（图文对）、LTIP（图文对）和 VTP（视频与文本对）。Flamingo 同时根据前序文本和视觉词元预测后续文本词元 $y$，其概率为
+\begin{equation}
+p(y\mid x)=\prod_{\ell=1}^{L}p(y_\ell\mid y_{<\ell},x_{\leq\ell}).
+\label{eq:ch09-flamingo-probability}
+\end{equation}
+训练损失是各数据集生成文本的期望负对数似然之加权和。
+\begin{equation}
+\sum_{m=1}^{M}\lambda_m\,
+\mathbb{E}_{(x,y)\sim D_m}\left[
+-\sum_{\ell=1}^{L}\log p(y_\ell\mid y_{<\ell},x_{\leq\ell})
+\right],
+\label{eq:ch09-flamingo-loss}
+\end{equation}
+其中 $D_m$ 是第 $m$ 个数据集，$\lambda_m$ 是相应的训练权重。
+
+\subsubsection{多模态大语言模型的调优与增强}
+Flamingo 在上下文学习中表现出色。它使用同一套模型权重和仅 32 个任务专用示例，少样本表现就超过了针对具体任务微调的先进模型。其示例数比当时先进方法所用的任务专用训练样本少约三个数量级。分析中把图像或视频（视觉输入）和对应文本（预期响应或问题等任务相关信息）配成示例，用来预测新视觉查询的响应。非问答任务的默认提示是 \texttt{Output: output}，问答或视觉对话任务的默认提示是 \texttt{Question: question Answer: answer}。
+
+\subsection{Video-LLaMA（图像、视频、音频与文本）}
+Zhang et al. (2023) 提出 Video-LLaMA 多模态框架，使大语言模型能理解视频中的视觉和听觉要素。此前的方法已让大语言模型处理视觉或音频信号。Video-LLaMA 利用冻结的预训练视觉编码器和音频编码器，以及冻结的大语言模型，开展跨模态训练，综合处理视听信息。它侧重视频理解，处理两个问题，即捕捉视觉场景随时间的变化，以及融合音视频信息。实验显示，它能基于音频和视频进行对话，可作为视听人工智能助手的原型。下面按通用框架的组件讨论其架构。模型也未使用多模态 RLHF，输出仅为文本，因此无需输出投影器和其他模态的生成器。
+
+\subsubsection{模态编码器}
+视觉分支采用冻结的视觉编码器，其中包括 EVA-CLIP 的 ViT-G/14 和 BLIP-2 的 Q-Former，以处理视频帧，见图~\ref{fig:ch09-video-llama}。每帧转换成一组图像嵌入向量，得到帧表征序列 $V=[v_1,v_2,\ldots,v_N]$。其中 $v_i\in\mathbb{R}^{K_f\times d_f}$ 表示第 $i$ 帧的 $K_f$ 个 $d_f$ 维图像嵌入。
+
+视频的音频部分采用预训练的 ImageBind 作为音频编码器（\refcite{ch09-ref-018}{Girdhar et al., 2023}）。从视频中均匀采样 $M$ 个长度为 2 秒的音频片段。将各片段转成带 128 个梅尔频带的频谱图，以提取频谱特征。音频编码器再把各频谱图转成稠密向量表征。因此，整个视频的音频表征为 $A=[a_1,a_2,\ldots,a_M]$，其中 $a_i$ 是第 $i$ 个音频片段经编码后的特征向量。
+
+\sourcefigure{fig09_08.pdf}{Video-LLaMA 的架构。视觉与音频分支分别编码图像或视频帧以及音频片段。两条分支各用位置嵌入、Q-Former 和线性层，将输入转成大语言模型可处理的软提示。}{fig:ch09-video-llama}
+
+\subsubsection{输入投影器}
+在视频和音频分支中，都使用 Q-Former 与线性投影相结合的方式，将编码后的模态与文本数据对齐。
+
+在视觉语言分支中，帧表征 $v_i$ 来自冻结的图像编码器，本身不带时间信息。因此先添加位置嵌入，再将加了位置编码的帧表征输入视频 Q-Former。它融合各帧表征，产生 $k_V$ 个 $d_v$ 维的视频嵌入向量，组成视频表征 $\hat{v}\in\mathbb{R}^{k_V\times d_v}$，同时捕捉视觉内容和时间变化。然后用线性层把视频嵌入向量转换为视频查询向量，与大语言模型的文本嵌入具有相同维度。前向传播时，将视频查询向量与文本嵌入拼接起来，作为视频软提示。这样，冻结的大语言模型可以在视频内容的条件下生成文本输出，将视频信息纳入多模态理解过程。
+
+音频语言分支采用类似方法。位置嵌入层为音频片段添加时间信息，模型因而能捕捉理解视频中声音的顺序和变化所需的时间特征。随后，音频 Q-Former 将不同片段的特征合成统一的音频表征，再由线性层把它映射到大语言模型的嵌入空间。
+
+\subsubsection{预训练：核心大语言模型、数据集和任务目标}
+Video-LLaMA 以 Vicuna-7B 为核心大语言模型，实现多模态理解和生成。
+
+Video-LLaMA 预训练的视觉语言分支使用 WebVid-2M，其中包含来自素材网站的短视频及其文本描述。另一个数据集是从 CC3M 派生、经 Liu et al. (2024) 筛选的 CC595k 图像描述数据集。这两个数据集为预训练中的视频到文本生成任务提供数据。音频语言分支的 ImageBind 音频编码器已经在多种模态之间实现对齐，因此不需要这一步预训练。
+
+\subsubsection{多模态大语言模型的调优与增强}
+完成视频语言分支预训练后，Video-LLaMA 已能较好地根据视频信息生成内容，但遵循具体指令的能力还有待增强。因此，研究人员进行了指令微调，使用以下数据集。
+\begin{enumerate}
+\item 来自 LLaVA 数据集的 150K 条基于图像的指令。
+\item 来自 MiniGPT-4 的 3K 条基于图像的指令。
+\item 来自 VideoChat 的 11K 条基于视频的指令。
+\end{enumerate}
+调优音频分支时，为了克服音频与文本配对数据不足的问题，研究人员也把上述视觉语言数据集纳入训练，使相关组件能够学习如何将 ImageBind 编码器产生的共享嵌入空间对齐到大语言模型的嵌入空间。
+
+\subsection{NExT-GPT（任意模态组合到任意模态组合）}
+\label{sec:ch09-next-gpt}
+NExT-GPT 是一种通用多模态大语言模型，将大语言模型与多模态适配器、扩散解码器结合，可以处理并生成文本、图像、视频和音频（\refcite{ch09-ref-059}{Wu et al., 2023c}）。微调只更新少量参数，训练成本较低，也便于扩展到新的模态。系统还采用模态切换指令调优及相应数据集，改善跨模态理解和生成，表明可以构建适用于多种模态的统一人工智能智能体。
+
+\subsubsection{模态编码器}
+NExT-GPT 使用 ImageBind 作为各输入模态的通用编码器。以往许多研究为不同模态分别采用专用编码器。ImageBind 可以建立涵盖多种模态的联合嵌入空间，无需对每一种可能的模态组合都提供训练数据，也能达到当时先进的表现。
+
+\subsubsection{输入投影器}
+NExT-GPT 使用一个有 400 万参数的线性投影层，把经 ImageBind 得到的输出转化为类似语言的表征，将各模态对齐到大语言模型易于理解和处理的格式。
+
+\subsubsection{预训练：核心大语言模型、数据集和任务目标}
+NExT-GPT 的核心大语言模型是 Vicuna-7B，一种常用于多模态大语言模型的开源文本大语言模型。\footnote{底本正文两处写作 Vicuna2。这里按表~\ref{tab:ch09-models}及 \href{https://arxiv.org/abs/2309.05519}{NExT-GPT 论文}的模型名称写作 Vicuna-7B。}
+
+预训练第一阶段冻结流水线中处理输入的编码器、处理输出的解码器以及大语言模型，只通过反向传播训练用于输入对齐的线性投影层。目标是用各模态专用的数据集，把图像、音频或视频与相应的文本描述对齐。图像模态对齐使用 CC3M，包含 300 万个图像与描述配对。视频模态对齐使用 WebVid-10M，包含 1,070 万个视频与描述配对，内容来自素材网站，总计 52,000 小时。音频模态使用 AudioCaps，其中约有 46,000 个音频片段和人工编写文本的配对，由众包方式在 AudioSet 数据集上整理。通过这种方法，NExT-GPT 学会根据输入模态生成描述，并与人工给定的参考描述匹配。
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[trim=0 173bp 0 172bp,clip,width=\linewidth]{assets/fig09_09.pdf}
+\caption{NExT-GPT 的架构。输入端用 ImageBind 和线性投影编码非文本数据。输出端把大语言模型产生的模态信号词元经相应的输出投影器转换，再交给图像、视频或音频扩散解码器。}
+\label{fig:ch09-next-gpt}
+\end{figure}
+
+训练第二阶段重点训练输出投影层。此时冻结 ImageBind、大语言模型及输入投影层，并继续使用第一阶段的数据集，即图像用 CC3M，视频用 WebVid-10M，音频用 AudioCaps。
+
+\subsubsection{多模态大语言模型的调优与增强}
+NExT-GPT 训练的第三阶段采用多模态指令调优，以改善模型理解和执行涉及不同模态的复杂指令的能力。此阶段以 LoRA 微调核心大语言模型 Vicuna-7B，同时微调输入和输出投影层，编码器和解码器仍保持冻结。所用数据集如下。
+\begin{enumerate}
+\item \textbf{“文本与 X 到文本”数据。}这里的 X 指 NExT-GPT 支持的任一非文本模态，即图像、视频或音频。将文本与其中一种模态组合后送入模型，模型生成能准确反映组合输入的文本响应。采用的数据集包括视觉语言数据集 LLaVA-Instruct-150K、MiniGPT-4 的图像描述数据集及 VideoChat 的视频指令数据集。
+\item \textbf{“文本到文本与 X”数据。}这一数据集用于训练模型根据文本生成文本及其他模态的内容。研究人员从 Conceptual Captions、MS COCO（Microsoft Common Objects in Context）、AudioCaps 等已有语料和基准收集“X 与描述”配对，构建文本到多模态（T2M）数据。再用模板和 GPT-4 编写包含这些描述的多种文本指令，得到可用于训练模型从文本提示同时生成文本和多模态内容的数据集。
+\item \textbf{MosIT 数据。}NExT-GPT 的一项创新是开发模态切换指令调优数据集（Modality-switching Instruction Tuning，MosIT），以提高模型跨模态遵循指令的能力。已有数据集未能充分反映用户与人工智能通过不同媒介交互时的复杂性，因此需要构造更丰富的数据。研究团队从外部来源收集材料，包括从 YouTube 收集视频，并用 Stable-XL 和 Midjourney 等人工智能生成内容（AIGC）工具制作图像和音频片段。MosIT 的每段对话有 3 至 7 轮，在人机交互的输入与输出之间切换模态，最终得到 5,000 段对话。
+\end{enumerate}
+
+\subsubsection{输出投影器}
+NExT-GPT 的输出投影器把大语言模型生成的词元转换为各模态解码器可处理的格式。为此，NExT-GPT 采用小型 Transformer（3100 万参数），针对各模态分别进行转换。这些投影器在整体训练过程的第二、第三阶段训练。
+
+\subsubsection{模态生成器}
+NExT-GPT 最后用专用解码器产生不同模态的输出。系统收到大语言模型生成的多模态信号和指令，经基于 Transformer 的层转换成解码器可以处理的格式。NExT-GPT 为各模态采用先进的扩散模型，图像用 Stable Diffusion，视频用 Zeroscope，音频用 AudioLDM。这些模型作为条件扩散模型集成到系统中，用转换后的信号表征作条件，生成所指定模态的内容。

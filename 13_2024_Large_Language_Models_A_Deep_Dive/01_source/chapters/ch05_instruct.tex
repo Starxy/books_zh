@@ -1,0 +1,99 @@
+% PDF 228--233；原书第 200--205 页。
+\subsection{用人类反馈使大语言模型有帮助、诚实且无害}
+\label{sec:ch05-instruct}
+\begin{keypoint}
+\noindent\textbf{主要贡献}\quad 这项研究在训练语言模型方面取得进展，所得模型比 GPT-3 更能遵循用户意图，同时更诚实，有毒内容更少。通过采用对齐技术，并让人参与训练过程，研究表明，微调有望改善模型生成符合上下文且对社会负责的文本的能力（\refcite{ch05-ouyang}{Ouyang et al., 2022}）。
+\end{keypoint}
+
+InstructGPT 研究的主要目标，是调整一个标准的大语言模型，即 GPT-3，使它更符合人类价值观和偏好。对齐旨在减少大语言模型的有毒输出，改善准确性，并减轻偏见。第~\ref{sec:ch05-alignment}~节已经将这个概念作为指令调优的一项应用加以介绍，这里讨论用 RLHF 实现对齐调优。
+
+\subsubsection{方法}
+\label{sec:ch05-instruct-method}
+InstructGPT 的研究方法大体沿用《从人类反馈中学习摘要》（\refcite{ch05-stiennon}{Stiennon et al., 2020}）的思路。整个训练过程可以分为三个阶段，如图~\ref{fig:ch05-rlhf-stages} 所示。
+
+\sourcefigure{fig05_10.pdf}{三步 RLHF 方法中各步所含的操作。先整理数据，再训练奖励模型，最后使用奖励模型和 PPO 算法优化大语言模型。}{fig:ch05-rlhf-stages}
+
+\paragraph*{第 1 步　监督微调模型}
+第一阶段聘请 40 名合同人员制作监督训练数据集，用于微调 GPT-3。数据集的输入来自真实用户通过 OpenAI API 提交的内容，并补充由合同人员撰写的理想人工输出。随后，用新建的监督数据集微调 GPT-3，得到原书所称的 GPT-3.5 模型，也称监督微调（supervised fine-tuning，SFT）模型。
+
+研究者采取多种办法保证数据集的多样性。例如，每个用户 ID 允许提供 200 条提示，删除有很长共同前缀的提示，并丢弃含个人身份信息（personally identifiable information，PII）的提示。通过 OpenAI API 收集提示之后，合同人员还需要编写样例提示，为真实样本不足的类别补充数据。主要要求撰写三类提示。
+
+\begin{itemize}
+\item \textbf{普通提示。}任意提出问题，如“Tell me about...”。
+\item \textbf{少样本提示。}含多组查询与回答的指令。例如，给出两个故事样例，要求再写一个同主题的故事。
+\item \textbf{基于用户的提示。}对应用户通过 OpenAI API 提出的特定用例。例如，给出故事的开头，要求写完整个故事。
+\end{itemize}
+
+最终的数据集由 OpenAI API 提示和合同人员编写的提示构成，为监督模型提供 13\,000 个输入与输出样例。
+
+\paragraph*{第 2 步　训练奖励模型}
+经过第一阶段的训练，SFT 模型可以生成更符合用户提示的回答。接下来训练一个“奖励模型”，进一步改进回答。该模型以提示与回答组成的序列为输入，输出一个称为“奖励”的标量值。实施强化学习时，需要训练模型生成使奖励最大的输出，因此需要这个奖励模型（见第 3 步）。训练奖励模型时，针对一条输入提示，给标注者看 SFT 模型的四至九条输出。标注者按从最合适到最不合适的顺序排列输出，得到一组排序。
+
+生成文本有多种排序方法。一种已被证明有效的方法是，向两个不同的语言模型输入相同提示，再由用户比较模型生成的文本。通过直接比较模型输出，可以用 Elo 系统对模型及其输出作相对排序。随后，将这些不同排序方法得到的结果规范成训练所用的标量奖励信号。
+
+在 RLHF 系统的这一阶段，已有一个能生成文本的初始语言模型，也有一个偏好模型，可评估给定的文本，并分配一个体现人对其质量看法的分数。随后，运用强化学习根据奖励模型优化初始语言模型。这里主要用奖励模型近似人工奖励标注，从而可以离线进行 RLHF 训练，无需人持续参与。
+
+给定文本提示 $x$ 与一对回答 $(y_w,y_l)$，训练奖励模型 $r_\theta$ 对更受偏好的回答 $y_w$ 给出较高奖励，对 $y_l$ 给出较低奖励。训练目标为
+\begin{equation}
+\mathcal{L}(\theta)
+=-\mathbb{E}_{(x,y_w,y_l)\sim D}
+  \bigl[\log\sigma(r_\theta(x,y_w)-r_\theta(x,y_l))\bigr].
+\label{eq:ch05-instruct-rm}
+\end{equation}
+
+\paragraph*{第 3 步　强化学习模型}
+这一步利用奖励模型提供的奖励，训练主要模型，即 SFT 模型。由于奖励不可微，需要用强化学习构造一个可以向语言模型反向传播的损失。如图~\ref{fig:ch05-rlhf-ppo} 所示，流程开始时创建 SFT 模型的精确副本，将其可训练权重设为常量，即“冻结”权重。这个副本用来限制可训练语言模型的权重发生剧烈变化，避免它为了利用奖励模型的弱点而生成胡言乱语。为此，计算冻结模型与可训练模型的文本输出概率之间的 Kullback–Leibler（KL）散度损失，使更新后的模型不会过度偏离初始训练所得的模型。将这项 KL 损失与奖励模型给出的奖励合并。
+
+若在实时环境中训练，即采用在线学习，可以直接用人给出的奖励分数代替奖励模型。这样有助于让模型输出更接近人的判断和偏好。
+
+奖励不可微，是因为它由以文本为输入的奖励模型计算，而文本来自对语言模型输出的对数概率进行解码。解码过程不可微，因此需要一种方法使损失可微，近端策略优化（PPO）就用于此处。PPO 算法计算用于小幅更新语言模型的损失如下。
+\begin{equation}
+\mathcal{L}(\phi)=
+-\mathbb{E}_{x\sim D,\,y\sim\pi_\phi^{\mathrm{RL}}(y\mid x)}
+\Bigl[
+r_\theta(x,y)-\beta\cdot\mathbb{D}_{\mathrm{KL}}
+\bigl(\pi_\phi^{\mathrm{RL}}(y\mid x)\,\|\,\pi^{\mathrm{REF}}(y\mid x)\bigr)
+\Bigr].
+\label{eq:ch05-instruct-ppo}
+\end{equation}
+其中，$\beta$ 是 KL 惩罚项的系数。通常，强化学习策略 $\pi_\phi^{\mathrm{RL}}$ 和参考模型 $\pi^{\mathrm{REF}}$ 均由监督微调模型 $\pi^{\mathrm{SFT}}$ 初始化。
+
+\sourcefigure{fig05_11.pdf}{RLHF 第 3 步的详细流程。将提示传给正在训练的模型，由模型生成输出。奖励由奖励模型对该输出的评分与 KL 损失共同决定。KL 损失通过将该输出与原始、未经强化学习调优的模型的输出比较得出。更新步骤接收奖励，按 PPO 算法计算损失，再反向传播损失以更新模型权重。这个过程最多重复 $N$ 次。}{fig:ch05-rlhf-ppo}
+
+\subsubsection{评估与结果}
+模型评估使用一个训练时留出的独立、未见过的测试集，旨在确认新模型在对齐方面是否优于其前身 GPT-3。主要从三个方面评估表现。
+
+\begin{enumerate}
+\item \textbf{有帮助性。}考察模型理解和遵循用户指令的能力。比较结果显示，标注者约有 $(85\pm3)\%$ 的时候更偏好 InstructGPT 的输出。
+\item \textbf{真实性。}评估模型产生“幻觉”或错误陈述的可能性。使用 TruthfulQA 数据集评估时，PPO 模型的输出在真实性和信息性上略有改善。
+\item \textbf{无害性。}评估模型避免生成冒犯、不尊重或贬低性内容的能力。使用 RealToxicityPrompts 数据集，在三种不同条件下考察模型能否避免冒犯。
+  \begin{enumerate}[label=\alph*.]
+  \item 要求生成尊重他人的回答时，模型显著减少了有毒输出。
+  \item 要求生成回答，但不具体要求尊重他人时，输出的有毒程度无显著变化。
+  \item 明确要求生成有毒回答时，回答的有毒程度显著高于 GPT-3 模型所生成的回答。
+  \end{enumerate}
+\end{enumerate}
+
+图~\ref{fig:ch05-instruct-eval} 给出各模型在 API 提示分布上的人工评估，衡量各模型的输出比具有 1750 亿参数的 SFT 模型的输出更受偏好的频率。InstructGPT 模型（PPO-ptx）及其不混入预训练数据的版本（PPO），均比 GPT-3 对照模型（GPT、GPT prompted）有明显改善。
+
+\sourcefigure{fig05_12.pdf}{在 API 提示数据集上比较不同模型。}{fig:ch05-instruct-eval}
+
+虽然没有专门训练模型处理代码或其他语言，它仍表现出适应这类任务的能力。具有 1750 亿参数的 PPO-ptx 模型能够较可靠地回答与代码有关的问题，也能理解用多种语言给出的指令，如图~\ref{fig:ch05-instruct-capabilities} 所示。
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=.93\linewidth]{assets/fig05_13_a.pdf}
+\par\smallskip
+\begin{minipage}{.93\linewidth}\small
+（a）与 GPT-3 相比，InstructGPT 能提供更可靠的摘要，也能更可靠地回答有关代码的问题。不过，它在本例中的回答并非完全准确。
+\end{minipage}
+
+\medskip
+\includegraphics[width=.93\linewidth]{assets/fig05_13_b.pdf}
+\par\smallskip
+\begin{minipage}{.93\linewidth}\small
+（b）InstructGPT 可以处理多种语言的指令，不过有时仍用英语回答。
+\end{minipage}
+\caption{比较评估具有 1750 亿参数的 PPO-ptx 模型回答代码问题和理解多语言指令的能力。}
+\label{fig:ch05-instruct-capabilities}
+\end{figure}

@@ -1,0 +1,116 @@
+% PDF 146--151；原书第 116--121 页。
+\section{多提示推理}
+\label{sec:ch03-multi}
+本章迄今讨论的提示形式都有一个隐含的共同点，即由一个查询和一处待填的回答组成，回答可以包含一个或多个词元。例如，“\texttt{The capital city of Poland is [MASK]}”只提出一个问题，也只要求一个答案。这样推理时，模型只能利用其预训练权重和这一条提示。若上下文十分有限，大语言模型的预测能力可能受到限制。在零样本场景下，模型尚未针对所请求的任务微调，这种限制尤为明显。此外，即使模板已经过优化，特定措辞带来的偏差仍可能造成预测不准确或难以消除的系统性错误。
+
+为解决这些问题，已有文献探讨了多种多提示推理（multi-prompt inference）方法。这些方法会在推理时把问答对作为额外上下文交给模型，或汇总不同提示或子提示的结果，以改善总体表现。下面简要介绍其中几种，并用实例说明它们的优点。
+
+\subsection{集成}
+集成（ensembling）是最简单的多提示推理方法。对一个给定的查询—答案对 $(x,z)$，使用多个提示模板 $f_{\mathrm{prompt}}$，再合并各次预测的分数，得到该推理问题的总体最佳猜测。不同的提示模板各有细微的偏差，单独使用时可能猜错，汇总后则可能比任一个模板都更准确。
+
+为说明集成的效果，我们重新使用第~3.3.2~节的任务和提示，仍用 AllenNLP 查询加拿大首都。四条掩码语言提示如下。
+\begin{lstlisting}[caption={查询加拿大首都的提示},label={lst:ch03-canada}]
+1. [MASK] is located in Canada, and is its capital city.
+2. I am in the capital of Canada, I am in [MASK].
+3. [MASK] is the capital city of Canada.
+4. The capital city of Canada is [MASK].
+\end{lstlisting}
+
+表~\ref{tab:ch03-ensemble} 列出每条提示分数最高的五项，其中包括几个加拿大城市，也包括“Canada”本身。提示 1 正确预测 Ottawa（渥太华），不过只略高于第二名 Winnipeg（温尼伯）。提示 3 情况相近。提示 4 识别首都 Ottawa 的效果最好。提示 2 将 Ottawa 排在第四，在多个其他加拿大城市之后。最下一行给出各个不同的回答词元在这些提示间的平均预测分数，未进入前五名时，按零分计（见表注）。集成结果正确给出了加拿大首都，其前两名的分数差大于提示 1、2 和 3。
+
+\begin{table}[!htbp]
+\centering
+\caption{按清单~\ref{lst:ch03-canada} 的提示，用 AllenNLP 进行零样本推理时，若干加拿大城市及“Canada”的预测分数。最下一行是各列的简单平均值。未进入前五名的城市以“—”表示，求平均时计作 0。由于只记录了前五项，这些平均值并非严格的全量平均值。例如，提示 2 很可能对 Winnipeg 给出非零分数，计入后该城市的平均分会略增。这个影响很小，不改变结论。}
+\label{tab:ch03-ensemble}
+\small
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+输入 & Otta. & Winn. & Mont. & Toro. & Calg. & Lond. & Canada & Edmo. & Vanc.\\
+\midrule
+提示 1 & 17.3 & 15.8 & 10 & 6.8 & 8.1 & — & — & — & —\\
+提示 2 & 7.3 & — & 5.5 & 11.3 & — & 13.4 & 12.2 & — & —\\
+提示 3 & 24.9 & 19.8 & 10 & 10.4 & 7.2 & — & — & — & —\\
+提示 4 & 29.8 & 10.6 & 14.4 & — & — & — & — & 7.6 & 6.2\\
+平均 & 19.83 & 11.55 & 9.98 & 7.13 & 3.83 & 3.35 & 3.05 & 1.9 & 1.55\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+用于集成的一组模板可通过多种途径得到，第~3.3.2--3.3.4~节介绍了其中几种。除了选择哪些提示参与集成，还要考虑怎样把多个提示算出的概率合成一个数值。文献中考察了几种分数汇总方法。
+
+\begin{itemize}
+\item \textbf{简单多数投票。}选择在最多提示中排在第一的回答 \texttt{[z]}（如 \refcite{ch03-lester}{Lester et al., 2021）}。长期以来，研究表明简单多数投票在许多场景下的表现与更复杂的集成方法相当（\refcite{ch03-lam}{Lam and Suen, 1997}），可以用它来比较更复杂的集成结果。
+\item \textbf{简单平均。}对每个不同的回答 \texttt{[z]}，把集成中所有填好的提示模板 $x'$ 上的概率 $P(z\mid x')$ 求和，再除以提示总数。然后选取平均分最高的回答。
+\item \textbf{加权平均。}可以为集成中的不同提示赋予权重，增大或减小它们在平均值中的贡献。这可以看作简单平均的推广。权重可按对表现的主观判断临时设定，也可根据测试集预测准确率等客观指标选择（如 \refcite{ch03-schick-2020a}{Schick and Schütze, 2020a}），还可与基于提示的学习一起调优（\refcite{ch03-jiang}{Jiang et al., 2020）}。
+\item \textbf{知识蒸馏。}最后一种方法是先在无标签数据集上生成集成预测，把这些预测用作另一个模型的训练输入，再以这个模型作为预测任务的分类器。推理时将集成缩减为一个模型，可以降低开销。由于新模型学习了集成结果的特征，还能保有集成的好处（\refcite{ch03-hinton}{Hinton et al., 2015）}。\refcite{ch03-schick-2021}{Schick 和 Schütze（2021）}等人已将这种方法用于提示学习。
+\end{itemize}
+
+\subsection{上下文学习}
+\label{sec:ch03-icl}
+多提示的第二种方法是上下文学习（in-context learning，ICL），又称提示扩充（prompt augmentation）或示例学习（demonstration learning）（\refcite{ch03-liu-2023}{Liu et al., 2023）}。在给定提示之前或之后附上一个或多个填好查询—答案对的模板实例，再把得到的多提示字符串交给模型推理。例如，可以把“\texttt{The capital of Canada is [MASK] .}”扩充为“\texttt{The capital of France is Paris. The capital of Canada is [MASK] .}”。利用语言模型识别模式的能力，增加上下文能大幅提高大语言模型在分类和生成任务上的准确率（如 \refcite{ch03-brown}{Brown et al., 2020）}。
+
+以下是 AllenNLP 对上一段的两条查询给出的分数。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={以加拿大和法国首都为例的上下文学习},label={lst:ch03-icl}]
+The capital of Canada is [MASK] .
+"Ottawa": 0.28438693284988403
+"Montreal": 0.1832585334777832
+...
+
+The capital of France is Paris. The capital of Canada is [MASK] .
+"Ottawa": 0.3411746919155121
+"Vancouver": 0.1890593022108078
+...
+\end{lstlisting}
+\end{minipage}\par
+
+填入一个上下文示例后，排在第一的正确答案分数略有增加，说明上下文学习有所帮助。选择哪些样例来扩充上下文，对准确程度的提升影响很大。用 \refcite{ch03-lu}{Lu 等人（2022）}的话说，这种选择“可使表现从近乎当时最佳水平跌至随机猜测”。例如，把另一个上下文样例放在待答提示的前面或后面，会得到以下结果。
+\begin{lstlisting}[caption={扩展上下文示例，包含法国、泰国和加拿大首都},label={lst:ch03-icl-extended}]
+The capital of France is Paris. The capital of Thailand is Bangkok. The capital of Canada is [MASK] .
+"Vancouver": 0.31520649790763855
+"Ottawa": 0.277070015668869
+...
+
+The capital of France is Paris. The capital of Canada is [MASK] . The capital of Thailand is Bangkok.
+"Ottawa": 0.4077857434749603
+"Vancouver": 0.2586808502674103
+...
+\end{lstlisting}
+
+把新增的上下文样例放在待答提示前面时，模型误把 Vancouver（温哥华）认作加拿大首都。若把它放在末尾，模型表现则进一步改善。预测分数对上下文样例及其位置的细微变化十分敏感。因此，构造上下文学习的提示模板时需要仔细考虑，也可以考虑自动优化（如 \refcite{ch03-lu}{Lu et al., 2022）}。
+
+\subsection{提示分解}
+最后一种多提示学习方法，是将一个复杂的提示任务拆成多个独立的子任务，为每个子任务分别构造提示。如果输入一串文本需要得到多个回答，这种方法通常很适用。例如，命名实体识别要给输入句子中不止一个词元分配标签。更一般地说，这种方法适用于词性识别等序列标注任务。
+
+以命名实体识别为例，看下面这个句子。
+\begin{lstlisting}[caption={Serena 在法拉盛草地获胜},label={lst:ch03-serena}]
+Serena won the tennis tournament at Flushing Meadows.
+\end{lstlisting}
+
+若想识别这句话中的每个命名实体，就很难用一条提示同时指出 Serena 是人名、tennis 是一种运动、Flushing Meadows 是地点。完形填空式提示尤其难做到这一点。可以把任务简化为一组提示，每条提示询问句子中的一个词元。
+
+\begin{lstlisting}[caption={提示分解示例},label={lst:ch03-decomp}]
+Serena won the tennis tournament at Flushing Meadows. Choosing between name, location , sport, or none, "Serena" is a [MASK] .
+"nickname": 0.17498865723609924
+"choice": 0.042668603360652924
+
+Serena won the tennis tournament at Flushing Meadows. Choosing between name, location , sport, or none, tennis is a [MASK] .
+"sport": 0.08051449060440063,
+"synonym": 0.03813215345144272
+
+Serena won the tennis tournament at Flushing Meadows. Choosing between name, location , sport, or none, "Flushing Meadows" is a [MASK] .
+"suburb": 0.1842394471168518,
+"neighborhood": 0.09695208817720413,
+
+Serena won the tennis tournament at Flushing Meadows. Choosing between name, location , sport, or none, "the" is a [MASK] .
+"suffix": 0.11233088374137878
+"noun": 0.08212842047214508
+\end{lstlisting}
+
+仅用这种粗略的方法，模型就能较准确地识别三个实体，并对非实体词元“the”给出非实体回答。在实际的命名实体识别系统中，可为输入句子的每个 $n$ 元组构造一条提示并生成回答，否则会漏掉 Flushing Meadows 这类由多个词元组成的实体。配合答案映射器（verbalizer）限制允许的选项，并用一系列同样拆成子提示的输入样例调优模型，可以进一步提高准确率。
+
+表~\ref{tab:ch03-multi} 汇总了本节介绍的三种方法及其优缺点。到这里，我们已经介绍了基于提示的学习文献中几种重要的提示工程方法。接下来通过实际操作，看看如何在自己的项目中试用这些方法。
+
+\input{assets/tab03_05}

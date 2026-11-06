@@ -1,0 +1,53 @@
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[
+  x=1cm,y=1cm,font=\sffamily\footnotesize,
+  condition/.style={ellipse,draw=cyan!50!black,fill=cyan!13,align=center,
+    text width=2.33cm,minimum width=3.3cm,minimum height=.78cm,inner sep=1pt},
+  choice/.style={rectangle,rounded corners=2pt,draw=orange!65!black,fill=orange!15,
+    align=center,text width=2.57cm,minimum height=.83cm,inner sep=3pt},
+  level/.style={align=center,text width=1.16cm,font=\sffamily\scriptsize,inner sep=0pt},
+  yes/.style={-{Stealth[length=1.7mm]},draw=green!50!black},
+  no/.style={-{Stealth[length=1.7mm]},draw=red!70!black},
+  next/.style={-{Stealth[length=1.7mm]},draw=black!80},
+  route/.style={font=\sffamily\scriptsize,fill=white,inner sep=1pt}]
+\node[condition] (private) at (0,0) {数据需要\\保密吗？};
+\node[condition] (examples) at (0,-1.78) {能提供若干\\任务示例吗？};
+\node[condition] (tools) at (0,-3.56) {有工具可辅助\\注入知识吗？};
+\node[condition] (domain) at (0,-5.34) {有领域数据\\可用于微调吗？};
+\node[condition] (budget) at (0,-7.28) {预算逾 100 万\\美元且有数十亿\\训练词元吗？};
+\node[choice] (own) at (-3.40,-.79) {1A 自行部署\\开源大语言模型};
+\node[choice] (api) at (3.40,-.79) {1B 使用第三方\\大语言模型（如 GPT-4）};
+\node[choice] (few) at (-3.40,-2.57) {2A 对选定模型\\采用少样本方法};
+\node[choice] (rag) at (-3.40,-4.35) {3A 用工具增强\\所选大语言模型};
+\node[choice] (tune) at (-3.40,-6.13) {3B 通过微调\\向模型注入知识};
+\node[choice] (train) at (-3.40,-8.25) {4A 从头训练\\自己的大语言模型};
+\node[draw,rounded corners,fill=black,text=white,font=\sffamily\scriptsize] (end) at (3.40,-8.25) {无可行方案};
+\draw[yes] (private.west) to[out=180,in=90] node[route,above,pos=.52]{是} (own.north);
+\draw[no] (private.east) to[out=0,in=90] node[route,above,pos=.52]{否} (api.north);
+\draw[no] (private) -- node[route,right]{否} (examples);
+\draw[next] (own.south) to[out=-90,in=180] (examples.north west);
+\draw[next] (api.south) to[out=-90,in=0] (examples.east);
+\foreach \question/\option/\following in {examples/few/tools,tools/rag/domain,domain/tune/budget}{
+  \draw[yes] (\question.south west) to[out=180,in=90] node[route,above,pos=.52]{是} (\option.north);
+  \draw[no] (\question) -- node[route,right]{否} (\following);
+  \draw[next] (\option.south) to[out=-90,in=180] (\following.north west);
+}
+\draw[yes] (budget.south west) to[out=180,in=90] node[route,above,pos=.52]{是} (train.north);
+\draw[no] (budget.east) to[out=0,in=90] node[route,above,pos=.52]{否} (end.north);
+\draw[next] (train.east) -- (end.west);
+\node[level] at (-5.42,-.79) {第 1 级\\零样本};
+\node[level] at (-5.42,-2.57) {第 2 级\\少样本};
+\node[level] at (-5.42,-5.24) {第 3 级\\RAG 或\\微调};
+\node[level] at (-5.42,-8.25) {第 4 级\\从头训练};
+\draw[next] (2.12,-2.82) -- (2.82,-2.82) node[right,font=\sffamily\scriptsize]{效果不满意};
+\node[font=\sffamily\scriptsize,draw=orange!65!black,fill=orange!15,rounded corners=2pt]
+  at (3.29,-3.47) {决策框};
+\node[font=\sffamily\scriptsize,ellipse,draw=cyan!50!black,fill=cyan!13]
+  at (3.29,-4.17) {方案框};
+\draw[-{Stealth[length=3mm]},line width=1.25pt,draw=orange!75!black]
+  (3.29,-4.77) -- node[right,font=\sffamily\scriptsize]{成本上升} (3.29,-6.85);
+\end{tikzpicture}
+\caption{金融服务领域中开源与闭源大语言模型的选型及定制流程。}
+\label{fig:ch08-selection}
+\end{figure}

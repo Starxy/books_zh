@@ -1,0 +1,36 @@
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  module/.style={draw=blue!50!black,rounded corners=3pt,
+    text width=2.35cm,minimum height=.67cm,align=center},
+  tool/.style={module,text width=1.55cm,minimum height=.65cm,fill=green!14},
+  exchange/.style={{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}},
+  request/.style={-{Stealth[length=1.6mm]}}]
+\node[module,fill=yellow!18] (core) at (0,0) {智能体核心};
+\node[module,fill=blue!12] (plan) at (-3.85,0) {规划};
+\node[module,fill=orange!16] (memory) at (3.85,0) {记忆};
+\node[module,fill=black!11] (user) at (0,-1.72) {用户};
+\node[tool] (web) at (-3.30,1.72) {网页搜索};
+\node[tool] (calc) at (-1.10,1.72) {计算器};
+\node[tool] (kb) at (1.10,1.72) {知识库};
+\node[tool] (other) at (3.30,1.72) {其他工具};
+\draw[exchange] (plan) -- (core);
+\draw[exchange] (memory) -- (core);
+\foreach \toolname in {web,calc,kb,other}{
+  \draw[exchange] (core) -- (\toolname.south);
+}
+\draw[request] ([xshift=-.48cm]user.north) --
+  node[left,font=\sffamily\scriptsize]{任务说明} ([xshift=-.48cm]core.south);
+\draw[request] ([xshift=.48cm]core.south) --
+  node[right,font=\sffamily\scriptsize]{汇总结果} ([xshift=.48cm]user.north);
+\node[below,align=left,font=\sffamily\scriptsize] at (plan.south)
+  {分解任务\\推理（思维链、Reflexion）};
+\node[below,align=left,font=\sffamily\scriptsize] at (memory.south) {短期记忆\\长期记忆};
+\draw (-4.17,2.25) -- (-.45,2.25) (0.45,2.25) -- (4.17,2.25);
+\draw (-4.17,2.13) -- (-4.17,2.37) (4.17,2.13) -- (4.17,2.37);
+\node at (0,2.25) {工具};
+\end{tikzpicture}
+\caption{大语言模型智能体的主要模块。核心接收用户任务，从记忆模块取得相关信息，交由规划模块分解子任务，再使用可用工具完成子任务。核心最后综合信息并将结果返回用户。}
+\label{fig:ch10-agent}
+\end{figure}

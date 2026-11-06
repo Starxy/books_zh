@@ -1,0 +1,70 @@
+% 重绘自原书第 56 页的图 2.8；轴标签是原示例中的六个英文词元。
+\begingroup
+\colorlet{prefixcell}{blue!24}
+\colorlet{crosscell}{green!32!gray!13}
+\colorlet{targetcell}{yellow!37!orange!12}
+\colorlet{maskedcell}{blue!12!gray!37}
+\newcommand{\attentiontiles}[2]{%
+  \node[font=\footnotesize\sffamily\bfseries] at (1.32,.49) {#2};
+  \foreach \row/\ca/\cb/\cc/\cd/\ce/\cf in {#1} {
+    \foreach \col/\tone in {0/\ca,1/\cb,2/\cc,3/\cd,4/\ce,5/\cf} {
+      \node[tile,fill=\tone] at ({.53*\col},{-.53*\row}) {};
+    }
+  }
+  \foreach \word [count=\idx] in {A,Survey,of,Large,Language,Models} {
+    \node[anchor=east] at (-.24,{-.53*(\idx-1)}) {\word};
+    \node[rotate=90,anchor=east] at ({.53*(\idx-1)},-2.91) {\word};
+  }
+}
+\newcommand{\decoderbrackets}{%
+  \draw[group] (-1.60,.17) -- (-1.73,.17) -- (-1.73,-2.82) -- (-1.60,-2.82);
+  \node[rotate=90] at (-1.97,-1.32) {解码器};
+  \draw[group] (-.19,-3.94) -- (-.19,-4.08) -- (2.83,-4.08) -- (2.83,-3.94);
+  \node at (1.32,-4.29) {解码器};
+}
+\begin{tikzpicture}[
+  font=\scriptsize\sffamily,
+  tile/.style={draw=black!56,minimum size=4.1mm,inner sep=0pt,rounded corners=1pt,line width=.48pt},
+  group/.style={draw=black!49,line width=.52pt,rounded corners=1pt}]
+\begin{scope}[shift={(2.74,5.13)}]
+\attentiontiles{
+  0/prefixcell/maskedcell/maskedcell/maskedcell/maskedcell/maskedcell,
+  1/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell/maskedcell,
+  2/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  3/crosscell/crosscell/crosscell/targetcell/maskedcell/maskedcell,
+  4/crosscell/crosscell/crosscell/targetcell/targetcell/maskedcell,
+  5/crosscell/crosscell/crosscell/targetcell/targetcell/targetcell%
+}{因果解码器}
+\decoderbrackets
+\end{scope}
+\begin{scope}
+\attentiontiles{
+  0/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  1/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  2/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  3/crosscell/crosscell/crosscell/targetcell/maskedcell/maskedcell,
+  4/crosscell/crosscell/crosscell/targetcell/targetcell/maskedcell,
+  5/crosscell/crosscell/crosscell/targetcell/targetcell/targetcell%
+}{前缀解码器}
+\decoderbrackets
+\end{scope}
+\begin{scope}[xshift=5.50cm]
+\attentiontiles{
+  0/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  1/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  2/prefixcell/prefixcell/prefixcell/maskedcell/maskedcell/maskedcell,
+  3/crosscell/crosscell/crosscell/targetcell/maskedcell/maskedcell,
+  4/crosscell/crosscell/crosscell/targetcell/targetcell/maskedcell,
+  5/crosscell/crosscell/crosscell/targetcell/targetcell/targetcell%
+}{编码器—解码器}
+\draw[group] (-1.60,.17) -- (-1.73,.17) -- (-1.73,-1.26) -- (-1.60,-1.26);
+\draw[group] (-1.60,-1.38) -- (-1.73,-1.38) -- (-1.73,-2.82) -- (-1.60,-2.82);
+\node[rotate=90] at (-1.97,-.55) {编码器};
+\node[rotate=90] at (-1.97,-2.10) {解码器};
+\draw[group] (-.19,-3.94) -- (-.19,-4.08) -- (1.26,-4.08) -- (1.26,-3.94);
+\draw[group] (1.38,-3.94) -- (1.38,-4.08) -- (2.83,-4.08) -- (2.83,-3.94);
+\node at (.53,-4.29) {编码器};
+\node at (2.12,-4.29) {解码器};
+\end{scope}
+\end{tikzpicture}
+\endgroup

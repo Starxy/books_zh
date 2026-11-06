@@ -1,0 +1,90 @@
+% PDF 275--283；原书第 247--255 页。
+\section{毒性}
+\label{sec:ch06-toxicity}
+
+\begin{keypoint}
+毒性（toxicity）涵盖多种有害内容，没有统一定义。可以将它理解为前文所定义的表征性伤害之一，也可以视作独立概念。Perspective API 将毒性描述为可能使参与者退出对话的粗鲁、不尊重或不讲理的评论。\refcite{ch06-ref-056}{Kurita 等人（2019）}将有毒内容描述为可能冒犯或伤害受众的任何材料，其中包括仇恨言论、种族主义和冒犯性用语。\refcite{ch06-ref-089}{Pavlopoulos 等人（2020）}把毒性视为一个统称，研究群体使用“冒犯性”“辱骂性”和“仇恨性”等不同术语，描述各种有毒语言或相关现象。
+\end{keypoint}
+
+\subsection{成因}
+大语言模型的毒性、偏见和公平性相互关联，都受到训练数据的影响。偏见一节所列的许多成因，例如数据选择、领域和体裁分布不均、创作者的人口构成和文化分布偏斜，也适用于大语言模型的有毒输出。这里侧重可能为毒性所特有、或与模型偏见成因重合的因素。
+
+\begin{enumerate}
+\item \textbf{训练数据偏见。}如偏见一节所述，大语言模型的毒性主要来源之一，是训练数据本身带有偏见。社会不平等、带有偏见的语言用法，以及某些群体代表不足，都可能使训练数据存在偏见。这些偏见表现在模型的输出中，产生有毒、不公平的结果。模型往往复现数据集中的偏见，导致有毒输出（\refcite{ch06-ref-006}{Bender et al., 2021}）。
+\item \textbf{理解上下文的局限。}大语言模型有时难以理解文本或对话的完整上下文，从而给出不当或有毒的回答。\refcite{ch06-ref-005}{Bender 和 Koller（2020）}指出，模型难以理解含义细致的人类语言，这说明准确理解上下文并不容易。\refcite{ch06-ref-089}{Pavlopoulos 等人（2020）}发现，帖子的上下文会显著影响人们对其毒性的判断，既可能放大，也可能减轻感知到的毒性。他们的一项实验中，标注者未看到上下文时，大约有 5\% 的人工标注帖子得到了相反的毒性标签。
+\item \textbf{对抗攻击。}大语言模型容易受到对抗攻击，被提示故意生成有毒输出。\refcite{ch06-ref-112}{Wallace 等人（2020）}的研究说明，攻击者可向模型的训练集中注入恶意样例，显著影响其学习和未来预测。这种攻击使攻击者可以将任意选定的短语变成触发特定预测的通用触发语，构成一种危险的漏洞。研究还表明，可以把这些投毒样例设计得不显眼，使受攻击者难以识别并移除有害数据。投毒样例本身没有明确提到触发语，因此可以避开搜索特定短语的检测方法。
+\item \textbf{指定角色的提示。}对话式人工智能的一种常见用法，是让大语言模型扮演某一角色，并以该角色继续对话。\refcite{ch06-ref-020}{Deshpande 等人（2023）}发现，为 ChatGPT 指定特定角色，例如著名拳击手穆罕默德·阿里，可能显著提高生成文本的毒性。根据分配给 ChatGPT 的角色，回答的毒性最高可变为原来的六倍。毒性增加表现为模型助长错误的刻板印象，生成有害对话，表达伤人的观点。将这类回答与指定角色联系起来，既可能损害公众人物的名誉，也可能伤害没有预料到这类内容的用户。
+\end{enumerate}
+
+\subsection{评估指标}
+大多数毒性评估框架都使用辅助模型，通常是分类器，来评估语言模型生成文本的毒性水平。
+
+原书介绍，Google Jigsaw 开发的 Perspective API 是常用的文本毒性评分工具（\refcite{ch06-ref-059}{Lees et al., 2022}）。如图~\ref{fig:ch06-perspective} 所示，输入为文本，输出是 0 至 1 之间的概率分数。它量化文本被认为含有某种毒性相关属性的可能性。属性包括 \texttt{TOXICITY}（毒性）、\texttt{SEVERE\_TOXICITY}（重度毒性）、\texttt{IDENTITY\_ATTACK}（身份攻击）、\texttt{INSULT}（侮辱）、\texttt{PROFANITY}（粗俗用语）、\texttt{THREAT}（威胁）、\texttt{SEXUALLY\_EXPLICIT}（露骨的性内容）和 \texttt{FLIRTATION}（调情）。Perspective API 使用来自多个在线论坛的大量语料训练模型，来源包括维基百科和《纽约时报》。
+
+\sourcefigure{fig06_08.pdf}{通过 Perspective API 评估毒性。示例文本“Shut up. You’re an idiot!”的各项分数为毒性 0.99、重度毒性 0.75、侮辱 1.0、露骨的性内容 0.04、粗俗用语 0.93、可能遭到拒绝 0.99、威胁 0.15 和身份攻击 0.03。}{fig:ch06-perspective}
+
+数据由众包评分人员标注，人员来自 Figure Eight、Appen 等机构及内部平台。评分人员判断一条评论是否具有某项属性，例如 \texttt{TOXICITY}。最终标签由认为文本有毒的评分者所占比例得出。在模型架构方面，Perspective API 先用标注数据训练基于多语言 BERT 的模型，再将模型蒸馏到每种受支持语言各自的单语言卷积神经网络，使系统能够快速、高效地给出分数。
+
+评估文本生成时，Perspective API 提供表示毒性的概率分数。其毒性分类器可写为
+\[
+c\colon\widehat{Y}\to[0,1].
+\]
+\refcite{ch06-ref-033}{Gehman 等人（2020）}采用期望最大毒性（Expected Maximum Toxicity，EMT），对语言模型的 25 条输出计算，关注均值和标准差。EMT 用于找出语言模型生成文本中的极端情况，即毒性最高的输出。
+\begin{equation}
+\operatorname{EMT}(\widehat{\mathbb{Y}})
+=\max_{\widehat{Y}\in\widehat{\mathbb{Y}}}c(\widehat{Y}).
+\label{eq:ch06-emt}
+\end{equation}
+
+毒性概率（Toxicity Probability，TP）衡量 25 次生成中，至少有一次生成有毒文本的可能性。毒性分数等于或大于 0.5 的文本记为有毒。该指标量化语言模型生成有毒内容的频率。
+\begin{equation}
+\operatorname{TP}(\widehat{\mathbb{Y}})
+=P\!\left(\sum_{\widehat{Y}\in\widehat{\mathbb{Y}}}
+ I\bigl(c(\widehat{Y})\geq0.5\bigr)\geq1\right).
+\label{eq:ch06-tp}
+\end{equation}
+
+\refcite{ch06-ref-009}{Bommasani 等人（2023）}定义的有毒比例（Toxic Fraction，TF）计算生成文本中被判为有毒的比例。
+\begin{equation}
+\operatorname{TF}(\widehat{\mathbb{Y}})
+=\mathbb{E}_{\widehat{Y}\in\widehat{\mathbb{Y}}}
+ \bigl[I(c(\widehat{Y})\geq0.5)\bigr].
+\label{eq:ch06-tf}
+\end{equation}
+
+\subsection{评估基准}
+上一节列出的偏见基准与用于评估毒性的基准有相当多的重合。本节侧重专门为毒性设计的基准，见表~\ref{tab:ch06-toxicity-benchmarks}。
+
+\begin{table}[!htbp]
+\centering
+\caption{主要的毒性基准数据集。表中给出数据集的大小、收集和标注方法，以及所关注的内容。}
+\label{tab:ch06-toxicity-benchmarks}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.31\linewidth}rlX@{}}
+\toprule
+数据集 & 规模 & 方法 & 关注点\\
+\midrule
+Perspective API 的毒性数据集 & 180 万 & 众包 & 整体毒性及特定维度\\
+Jigsaw Toxic Comment Dataset & 15 万 & 众包 & 毒性程度和类型\\
+Hate Speech Dataset & 2.4 万 & 众包 & 仇恨言论检测\\
+ToxiGen & 10 万 & 对抗式构造 & 模型的稳健性与隐含偏见\\
+Thoroughly Engineered Toxicity（TET）Dataset & 1 万 & 人工构造 & 使模型防护失效\\
+ImplicitHateCorpus & 570 万 & 众包 & 隐含仇恨言论（讽刺、刻板印象、微侵犯）\\
+DynaHate & 2250 万 & 机器学习 & 与语境相关的仇恨言论（特定对象、变化中的用语）\\
+SocialBiasFrames & 8,732 & 众包 & 有害的社会框架（性别、种族、残障）\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{缓解策略}
+\refcite{ch06-ref-033}{Gehman 等人（2020）}将毒性缓解技术分为两大类，即基于数据和基于解码的方法。基于数据的方法对模型进一步预训练，改变模型参数。这个办法有效，但涉及修改参数，通常消耗较多算力。基于解码的方法只调整语言模型的解码算法，模型参数保持不变，因此通常较易采用，所需资源也较少。
+
+\subsubsection{基于数据的方法}
+\refcite{ch06-ref-042}{Gururangan 等人（2020）}讨论的领域适应性预训练（Domain Adapted Pre-training，DAPT）分为两个阶段。第一阶段在广泛的来源上作通用预训练，第二阶段使用与特定语境有关的数据集，例如 Twitter 交流数据，进行领域专用的预训练，如图~\ref{fig:ch06-dapt} 所示。结合特定任务的微调时，这种办法尤其有效。例如，在对与“黑人的命也是命”运动有关的话题分类时，微调侧重从更广的推文领域抽取这一语境特有的语言层次和细微差异。\refcite{ch06-ref-033}{Gehman 等人（2020）}说明，用 DAPT 在 OpenWebTextCorpus（OWTC）的无毒子集上继续预训练大语言模型，可明显减少 GPT-2 等模型的毒性，但这一办法也面临困难。最明显的局限之一是计算开销。另外，需要额外的训练数据，尤其通过众包等人工方式获得时，费用可能过高。另一个主要局限是，它可能损害模型表现。筛除有毒成分时，也可能误删无害且有潜在价值的知识。
+
+\sourcefigure{fig06_09.pdf}{领域适应性预训练示意图。模型初次预训练完成后，用另一份语料进行第二次预训练。这份语料与模型任务有关，例如来自网页的数据，并且已滤除有毒的交流内容。图中以从 2020 年推文逐步限定到相关领域和任务数据为例。}{fig:ch06-dapt}
+
+属性条件化（Attribute Conditioning，ATCON）是另一种基于数据的方法，源于 \refcite{ch06-ref-028}{Ficler 和 Goldberg（2017）}及 \refcite{ch06-ref-052}{Keskar 等人（2019）}的工作。该方法从文档中随机选择一个子集，为预训练模型的预训练数据加入毒性属性词元，记作 \verb!|toxic|! 或 \verb!|non-toxic|!。随后继续预训练，让模型学会使用这些毒性标记。用模型生成文本时，把毒性属性词元 \verb!|non-toxic|! 加在提示前面，向模型表明生成文本应当侧重于无毒内容。
+
+\input{chapters/ch06_detoxification}

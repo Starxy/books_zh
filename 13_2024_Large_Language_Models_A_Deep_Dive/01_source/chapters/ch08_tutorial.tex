@@ -1,0 +1,65 @@
+% 原书第 8.9 节。
+\section{教程：准备将实验模型部署到生产环境}
+\label{sec:ch08-tutorial}
+
+\subsection{概述}
+本教程回顾第~4~章教程得到的实验模型。这次考察准备把其中一个模型部署到生产应用时可以采取的措施，演示本章讨论的若干工具和技术。整个操作仍在 Colab 笔记本环境中完成，因为许多读者可能希望避免实际部署生产级推理能力的开销。
+
+\begin{keypoint}
+\textbf{学习目标}
+\begin{itemize}
+\item 试用一种开源评估工具和一种开源监控工具。
+\item 探索这些工具提供的功能及其用途。
+\item 观察该过程是否揭示了可能影响模型能否部署到生产环境的新特征。
+\end{itemize}
+\end{keypoint}
+
+本节为教程的简版，完整版见
+\url{https://github.com/springer-llms-deep-dive/llms-deep-dive-tutorials}。
+
+\subsection{实验设计}
+本练习聚焦于把大语言模型能力从构想推进到生产时值得考虑的若干因素。设想我们在第~4~章的教程中得到两个候选模型。通过比较两者的长处和短处，确定哪一个更适合设想中的应用，并考察能否消除计算瓶颈来控制推理成本。然后考虑所选模型部署后的长期影响，展示如何检查它仍能完成原定任务，且没有意外后果。
+
+首先进行模型评估，以便在投入运行前充分考察模型行为。第~4~章手工向 GPT-4 提供评分规则来评估模型。这里采取相似的方法，改用开源工具 TruLens（\refcite{ch08-ref-079}{Reini et al., 2024}）。它提供可扩展的评估框架及用于比较模型指标的仪表板。市面上有若干类似方案，TruLens 的一项优点是免费。
+
+接着简要考察模型的推理速度。实际应用中，可以在不同 GPU 架构上进行基准测试，并考虑每种架构可采用的优化，以了解运行某个模型的成本。在本练习中，仅观察模型在 Colab GPU 上的运行情况。
+
+教程的最后假设模型已经在生产中运行了一段时间，希望查看它的行为是否仍符合预期，以及系统中是否发生了可能影响模型表现的变化。为演示这一点，有意调整一部分测试数据，使用户提示呈现逐渐变长的趋势。这一环节采用 WhyLabs 提供的另一款免费开源工具 LangKit。
+
+\subsection{结果与分析}
+首先用 TWEETSUMM 测试集中的一小部分样本演示 \texttt{trulens\_eval} 库。TruLens 使用反馈函数进行评估，既可用内置函数，也可用自定义函数。本练习选择内置的连贯性与简洁性反馈函数。TruLens 在内部封装了 OpenAI、LangChain 等 API，开发人员可选择希望采用的服务提供方。简洁性等指标通过提示模板获得。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=Python,caption={用于 TruLens 评估的系统提示模板示例。},label={lst:ch08-trulens-prompt}]
+f"""{supported_criteria['conciseness ']} Respond only as a
+number from 0 to 10 where 0 is the least concise and 10 is
+the most concise."""
+\end{lstlisting}
+\end{minipage}\par
+
+将 DistilGPT2 和 Llama-2 LoRA 模型用于测试样本，得到表~\ref{tab:ch08-trulens}所示的平均分。TruLens 的各项指标均按 0 到 1 评分。如预期，较大的 Llama-2 模型各项得分都较高。连贯性与简洁性得分看起来较合理，摘要质量得分可能偏低，DistilGPT2 尤其如此。此前的教程中，这些模型的表现看起来不错。这很可能部分是因为本练习自定义评估时，没有花太多时间设计提示模板。TruLens 的连贯性和简洁性评估则建立在经开发人员用一组测试用例检验过的提示模板上。这一示例说明评估并不容易，经过检验的现有方案因而很有价值。
+
+\begin{table}[htbp]
+\centering\small
+\caption{用 TruLens 评估两个候选模型的结果。连贯性和简洁性是工具内置指标，摘要质量是我们提供的自定义评估指标。}
+\label{tab:ch08-trulens}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+模型 & 平均连贯性 & 平均简洁性 & 平均摘要质量\\
+\midrule
+DistilGPT2-finetuned & 0.66 & 0.80 & 0.29\\
+Llama-2 LoRA & 0.80 & 0.83 & 0.60\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+采用统一的评估格式，并尽量复用现有提示，有若干好处。首先，可以节省设计评估方法的时间。定义这类抽象接口也可以使 LLMOps 系统的不同环节更容易实现自动化。例如，TruLens 可以接入应用，实时评估经过系统的用户输入和模型输出，以便立即提供反馈。本例未模拟这种操作。
+
+然后使用另一款免费的 LLMOps 工具 LangKit。它是 WhyLabs 监控与可观测性软件套件的一部分。这里考察它分析提示与响应随时间变化趋势的能力。为模拟变化，我们建立并比较两个独立的数据批次，即数据概况（profile）。把数据分为两个较小的集合，分别包含较长与较短的输入，使数据概况之间出现差异。随后连接 WhyLabs 仪表板，详细查看各项指标，见图~\ref{fig:ch08-whylabs}。
+
+\sourcefigure{fig08_08.pdf}{WhyLabs 监控仪表板。查看选定指标，了解模拟的提示数据漂移会产生怎样的影响。}{fig:ch08-whylabs}
+
+将 TruLens 和 LangKit 都用于 TWEETSUMM 模型和数据后，可以看到两款工具的功能有所重叠。不过，它们的实现方式很不相同，也各有长处。TruLens 偏重评估，LangKit 则偏重日志记录与监控。视应用而定，可以两款都用，也可以从中择一。它们只是众多 LLMOps 方案中的两种，通常还需要调研才能找到合适的做法。
+
+\subsection{结论}
+将大语言模型应用投入生产涉及大量工作，远超本简短练习能覆盖的范围。练习演示了可以降低这一过程复杂度的若干工具。判断模型能否投入生产要考虑许多方面，TruLens 和 LangKit 等工具的开发者已经为其中许多问题提供了可重复使用的方案。基于这些工具构建工作流，可以缩短应用达到较成熟状态所需的时间。

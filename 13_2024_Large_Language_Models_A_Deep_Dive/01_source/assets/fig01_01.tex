@@ -1,0 +1,25 @@
+% 重绘自原书第 4 页的图 1.1。
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  entity/.style={circle,minimum size=12mm,inner sep=0pt,fill=blue!53!cyan,text=white,align=center},
+  edge/.style={-{Stealth[length=2mm]},draw=black!62,thick},
+  relation/.style={font=\footnotesize\sffamily,fill=white,inner sep=1.2pt,align=center}]
+\node[entity] (tiger) at (2.6,3.1) {老虎};
+\node[entity] (predator) at (4.25,4.35) {捕食者};
+\node[entity] (human) at (7.5,4.55) {人};
+\node[entity,fill=orange!75!yellow,text=black] (self) at (7.7,1.85) {自身};
+\node[entity] (bush) at (1.2,1.1) {响动的\\灌木丛};
+\node[entity] (wind) at (4.25,.45) {风};
+\node[entity,fill=black!13,draw=black!55,densely dotted,text=black] (america) at (10.35,5.4) {北美洲};
+\draw[edge] (tiger.north east) to[bend left=25] node[relation,below right] {属于} (predator.west);
+\draw[edge] (predator.east) to[bend right=10] node[relation,above] {有些会吃} (human.west);
+\draw[edge] (self.north) to[bend left=13] node[relation,right] {是} (human.south);
+\draw[edge] (tiger.east) to[out=0,in=180] node[relation,pos=.43,above] {构成严重威胁} (self.west);
+\draw[edge] (tiger.west) to[out=180,in=90] node[relation,near start,left] {有时藏在其中\\并引起响动} (bush.north);
+\draw[edge] (bush.north east) to[out=24,in=180] node[relation,pos=.43,above] {可能构成威胁} (self.west);
+\draw[edge] (wind.west) to[out=170,in=-12] node[relation,pos=.48,below=2pt] {可能引起响动} (bush.east);
+\draw[edge] (wind.east) to[out=5,in=-90] node[relation,pos=.66,below] {威胁很小} (self.south);
+\draw[edge,densely dotted] (self.east) to[out=12,in=-92] node[relation,pos=.55,right] {身处} (america.south);
+\draw[edge,densely dotted] (america.north west) to[out=155,in=90,looseness=1.14]
+  node[relation,pos=.52,above] {在其自然分布区以外} (tiger.north);
+\end{tikzpicture}

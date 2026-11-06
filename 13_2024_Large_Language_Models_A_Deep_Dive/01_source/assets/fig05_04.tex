@@ -1,0 +1,21 @@
+% 重绘自原书第 191 页的图 5.4，保留各候选字符串和分数。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  chip/.style={draw=black!30,fill=black!6,align=center,rounded corners=2pt,
+    inner sep=2.3pt,minimum height=5mm},
+  flow/.style={draw=black!60,-{Stealth[length=1.25mm]},line width=.50pt}]
+\node[chip] (hi) at (0,0) {Hi};
+\node[chip,fill=blue!19,minimum width=15mm] (gen) at (1.38,0) {生成器};
+\node[chip,minimum width=28mm,font=\scriptsize\ttfamily] (first) at (4.03,.53) {"Hi! How's it going?"};
+\node[chip,minimum width=28mm,font=\scriptsize\ttfamily] (second) at (4.03,0) {"Hello! How are you?"};
+\node[chip,minimum width=28mm,font=\scriptsize\ttfamily] (third) at (4.03,-.53) {"Greetings!"};
+\node[chip,fill=red!19,minimum width=16mm] (cls) at (6.80,0) {分类器};
+\node[chip,fill=green!18,align=left,inner sep=3pt,font=\scriptsize\sffamily] (score) at (9.20,0)
+  {安全性 90\%\\合理性 80\%\\具体性 70\%\\趣味性 50\%};
+\draw[flow] (hi.east)--(gen.west);
+\draw[flow] (gen.east)--(2.47,0);
+\draw[flow] (5.59,0)--(cls.west);
+\draw[flow] (cls.east)--(score.west);
+\draw[black!65] (2.64,.82)--(2.46,.82)--(2.46,-.82)--(2.64,-.82)
+ (5.42,.82)--(5.60,.82)--(5.60,-.82)--(5.42,-.82);
+\end{tikzpicture}

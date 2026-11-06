@@ -1,0 +1,36 @@
+% 重绘自原书第 22 页的图 1.9。两个版本都保留例题与两个回答中的数值。
+\begingroup
+\small
+\tcbset{cotpanel/.style={arc=2mm,colback=white,colframe=black!40,
+  colbacktitle=black!82,coltitle=white,boxrule=.45pt,
+  fonttitle=\sffamily\bfseries\small,left=4pt,right=4pt,top=4pt,bottom=4pt,
+  before skip=5pt,after skip=5pt}}
+\begin{minipage}[t]{.466\linewidth}
+\centering{\sffamily\bfseries 标准提示}\par
+\begin{tcolorbox}[cotpanel,title={模型输入}]
+\textbf{问}\enspace Bob 举办聚会，买了 3 张披萨，每张切成 12 片。参加聚会的人吃掉了两整张披萨，以及另一张的三分之一。还剩多少片披萨？
+
+\textbf{答}\enspace 答案是 8。
+
+\textbf{问}\enspace Rebecca 举办聚会，买了 4 盒甜甜圈，每盒 12 个。聚会上有 12 人，每人吃 2 个甜甜圈。还剩多少盒甜甜圈？
+\end{tcolorbox}
+\begin{tcolorbox}[cotpanel,title={模型输出}]
+\textbf{答}\enspace 答案是 24。\par
+\hfill\textcolor{red!75!black}{\(\times\)}
+\end{tcolorbox}
+\end{minipage}\hfill
+\begin{minipage}[t]{.502\linewidth}
+\centering{\sffamily\bfseries 思维链提示}\par
+\begin{tcolorbox}[cotpanel,title={模型输入}]
+\textbf{问}\enspace Bob 举办聚会，买了 3 张披萨，每张切成 12 片。参加聚会的人吃掉了两整张披萨，以及另一张的三分之一。还剩多少片披萨？
+
+\textbf{答}\enspace Bob 一开始有 3 张披萨，每张 12 片，也就是 \(12+12+12=36\) 片。吃掉两整张，还剩 \(36-12-12=12\) 片。最后一张又吃了三分之一，所以剩 \(12-4=8\) 片，因为 \(12/3=4\)。答案是 8。
+
+\textbf{问}\enspace Rebecca 举办聚会，买了 4 盒甜甜圈，每盒 12 个。聚会上有 12 人，每人吃 2 个甜甜圈。还剩多少盒甜甜圈？
+\end{tcolorbox}
+\begin{tcolorbox}[cotpanel,title={模型输出}]
+\textbf{答}\enspace 4 盒甜甜圈每盒 12 个，共有 \(12+12+12+12=48\) 个。12 人每人吃 2 个，还剩 \(48-24=24\) 个。每盒 12 个，所以还剩 2 盒甜甜圈。\par
+\hfill\textcolor{green!50!black}{\bfseries 正确}
+\end{tcolorbox}
+\end{minipage}
+\endgroup

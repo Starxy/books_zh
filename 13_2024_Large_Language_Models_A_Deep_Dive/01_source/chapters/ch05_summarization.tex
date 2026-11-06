@@ -1,0 +1,55 @@
+% PDF 224--228；原书第 196--200 页。
+\subsection{从人类反馈中学习摘要}
+2019 年，OpenAI 的一项早期研究用人类偏好微调 GPT-2 模型，在风格化续写和摘要等自然语言处理任务的奖励学习方面取得进展（\refcite{ch05-ziegler}{Ziegler et al., 2019}）。风格化续写任务的结果令人满意。用于摘要的模型则倾向于逐字复述原文，但这仍是强化学习在实际场景中的早期应用。2020 年的后续工作进一步改进了用于摘要的强化学习，得到一个持续优于人工摘要的模型（\refcite{ch05-stiennon}{Stiennon et al., 2020}）。该研究表明，基于人类反馈的强化学习能有效地让大语言模型符合人类偏好。
+
+\begin{keypoint}
+\noindent\textbf{主要贡献}\quad 在英语摘要任务上，这项研究表明，采用人类反馈训练的模型，比表现较强的对照模型有明显优势。利用人类反馈训练的模型优于采用监督学习的模型。在多种领域中，前者也表现出更好的泛化能力，克服了仅用监督学习训练的模型的局限。
+\end{keypoint}
+
+\subsubsection{方法}
+训练过程分为以下几步。
+
+\paragraph*{第 1 步　收集人类反馈}
+研究人员使用 Reddit TL;DR 摘要数据集。针对数据集中的每一篇 Reddit 帖子，用一组模型生成 $N$ 份摘要。预训练模型作为零样本摘要生成器，另外在 Reddit TL;DR 数据集上对具有 120 亿、60 亿和 13 亿参数的模型作监督微调，再用它们生成摘要。样例中还包含一份人工撰写的 TL;DR，作为参考摘要。将每篇帖子的这 $N$ 份摘要两两配对，交给受聘的标注者。标注者用九分量表打分，表示有多确信摘要 A 优于摘要 B。
+
+\paragraph*{第 2 步　训练奖励模型}
+用上述人工质量评估数据集训练奖励模型。该模型为给定帖子和对应的候选摘要分配奖励 $r$。奖励模型也采用类似 GPT-3 的 Transformer 架构，由在 TL;DR 数据集上微调的监督模型初始化，再加上一个随机初始化、输出标量值的线性头。
+
+先考虑一个传统的强化学习情境，其中已给定奖励函数 $r\colon X\times Y\to\mathbb{R}$。这时，用预训练大语言模型 $\rho$ 初始化策略 $\pi$，即 $\pi=\rho$。在预设奖励函数的条件下，强化学习算法可以优化期望
+\[
+\mathbb{E}_{\pi}[r]=\mathbb{E}_{x\sim D,\,y\sim\pi(\cdot\mid x)}[r(x,y)].
+\]
+在这里，奖励函数需要学习，因此要用一个目标函数或损失函数。输入是一篇 Reddit 帖子和两份摘要，真实标签是区分两份摘要的人类反馈。由此汇集的数据集 $D$ 包含人的判断。
+
+损失函数定义如下。%
+\footnote{译注：原书式（5.1）的对数外括号未闭合，此处补齐。}
+\begin{equation}
+\operatorname{loss}(r_\theta)
+ =-\mathbb{E}_{(x,y_0,y_1,i)\sim D}
+   \bigl[\log\bigl(\sigma(r_\theta(x,y_i)-r_\theta(x,y_{1-i}))\bigr)\bigr].
+\label{eq:ch05-summarization-reward}
+\end{equation}
+在这个数学模型中，$y_i$ 表示人更偏好的摘要。只有两个候选项时，$i\in\{0,1\}$。奖励模型 $r_\theta$ 以 Reddit 帖子 $x$ 和摘要 $y$ 为输入，返回一个标量值。对两份候选摘要分别计算，将结果的差值送入 sigmoid 激活函数。sigmoid 将任意实数映射到 0 和 1 之间，随后计算负对数似然来训练奖励模型。
+
+\paragraph*{第 3 步　根据奖励模型训练策略}
+用专为 Reddit TL;DR 数据集微调的类 GPT-3 Transformer 初始化策略 $\pi$。随后按标准的强化学习策略训练方式进行训练，以奖励模型的输出作为奖励。采用近端策略优化（proximal policy optimization，PPO）来优化策略。由于奖励模型对整份摘要评分，只有当策略，即大语言模型，生成句末（end-of-sentence，EOS）词元时，才进行 PPO 的一步。
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[trim=0 170bp 0 167bp,clip,width=\linewidth]{assets/fig05_08.pdf}
+\caption{用人类反馈解决摘要问题的三步方法。详见第~\ref{sec:ch05-instruct-method}~节。}
+\label{fig:ch05-summarization}
+\end{figure}
+
+对于给定的 Reddit 帖子，用当前策略生成摘要。再将帖子及其摘要送入奖励模型，得到奖励分数，用该分数更新策略。这些操作按批执行。不过，强化学习训练可能引入一定噪声，尤其在初始阶段，可能使策略超出奖励有效的范围。为防止这种情况，在奖励函数中加入 Kullback–Leibler（KL）散度项作为惩罚。奖励函数为
+\begin{equation}
+R(x,y)=r_\theta(x,y)-\beta\log
+  \left[\frac{\pi_{\mathrm{RL}}(y\mid x)}{\pi_{\mathrm{SFT}}(y\mid x)}\right].
+\label{eq:ch05-summarization-ppo}
+\end{equation}
+其中，$\pi_{\mathrm{RL}}(y\mid x)$ 表示经 PPO 优化的策略，$\pi_{\mathrm{SFT}}(y\mid x)$ 表示经过监督微调的模型。引入 KL 散度项可使策略保持多样性，避免收敛到单一模式。它也避免策略生成与奖励模型训练时见到的内容相差过大的输出。
+
+\subsubsection{评估与结果}
+该研究比较了多种摘要模型，包括用大量互联网文本预训练的模型、通过监督微调来预测 TL;DR 的模型，以及用人类反馈微调的模型。任务是为验证集中的帖子生成摘要，并与人工摘要比较，请人评估。研究发现，采用人类反馈进行强化学习微调，显著影响摘要质量，表现优于监督微调和只扩大模型规模的办法，见图~\ref{fig:ch05-summarization-results}。
+
+\sourcefigure{fig05_09.pdf}{不同模型在不同规模下的表现。评估指标是各模型生成的摘要比人工参考摘要更受偏好的频率。}{fig:ch05-summarization-results}

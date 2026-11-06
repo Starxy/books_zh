@@ -1,0 +1,332 @@
+% 原书附录 B，印刷页 451--463。
+\chapter{强化学习基础}
+\label{app:reinforcement-learning}
+\chaptercredit{}
+
+强化学习（reinforcement learning，RL）是机器学习的一个分支。它通过奖励期望的行为、惩罚不期望的行为，或兼用两者，使智能体学习在动态环境中连续作出决策。监督学习依赖带标签的输入与输出对，强化学习则通过试错，让智能体直接与环境交互并从中学习。强化学习在当代研究中受到重视，是因为它在解决复杂的序贯决策问题时有许多实际用途。
+
+\section{马尔可夫决策过程}
+\label{sec:appb-mdp}
+马尔可夫决策过程（Markov decision process，MDP）是强化学习的基础数学框架，将问题建模为离散时间的随机控制过程。
+
+在马尔可夫决策过程中，负责决策的智能体与周围环境按时间顺序反复交互，见图~\ref{fig:appb-mdp}。在每个离散时刻，智能体取得环境状态的表征，并据此选择适当的动作。环境随后转移到一个新状态，智能体收到反映此前动作后果的奖励。在这一过程中，智能体的主要目标是尽可能提高在各种状态下执行动作得到的累积奖励。
+
+\sourcefigure{figb_01.pdf}{强化学习中的马尔可夫决策过程。从初始状态 $S_0$ 出发，策略 $\pi(A\mid S)$ 选取动作 $A_t$，经转移得到下一状态 $S_{t+1}$ 与环境给出的奖励 $R_{t+1}$，形成由状态与动作依次组成的轨迹 $\tau$。}{fig:appb-mdp}
+
+\begin{itemize}
+\item \textbf{状态。}状态表示强化学习问题中当前的情形或环境。状态集合记为 $S$。
+\item \textbf{动作。}动作是智能体作出的、会影响环境状态的决定，记为 $A_t$，动作集合记为 $A$。在每个时间步 $t$，智能体取得环境状态 $S_t$ 的某种表征，据此选择动作 $A_t$，得到状态—动作对 $(S_t,A_t)$。下一时刻为 $t+1$，环境转移到状态 $S_{t+1}$，智能体收到对应的数值奖励 $R_{t+1}$。
+\item \textbf{奖励。}奖励是智能体针对动作得到的数值反馈，记作 $R_t$，所有奖励值的集合记为 $\mathcal{R}$。可以用一个把状态—动作对映射到相应奖励的函数来概括。
+\begin{equation}
+f(S_t,A_t)=R_{t+1}.
+\label{eq:appb-reward}
+\end{equation}
+\end{itemize}
+
+当状态集合 $S$ 和奖励集合 $\mathcal{R}$ 有限时，取值于这些集合的随机变量 $S_t$ 和 $R_t$ 有定义明确的概率分布。给定状态 $s$、后续状态 $s'$、动作 $a$ 以及奖励 $r$，在状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 并取得奖励 $r$ 的联合概率为
+\begin{equation}
+p(s',r\mid s,a)
+=\Pr\{S_t=s',R_t=r\mid S_{t-1}=s,A_{t-1}=a\}.
+\label{eq:appb-transition}
+\end{equation}
+
+\subsection{任务}
+根据智能体与环境交互的持续时间，强化学习任务分为两类。
+\begin{enumerate}
+\item \textbf{回合式任务。}有明确的起点和终止状态，达到终止状态表示当前回合结束。每个回合由智能体与环境交互时经历的一系列状态、动作和奖励组成。达到终止状态后，本回合结束，环境重置到新的初始状态。
+\item \textbf{持续式任务。}又称非回合式任务，没有明确的终止状态，智能体与环境的交互无限延续。智能体不断感知状态、执行动作并收到奖励，交互过程无需重置。
+\end{enumerate}
+
+\subsection{奖励与回报}
+\label{sec:appb-return}
+在强化学习中，奖励与回报密切相关。两者一起衡量智能体行为的成效，引导学习过程改善智能体在环境中的决策能力。期望回报与折扣回报是衡量某个决定的长期价值所用的基本概念。
+\begin{enumerate}
+\item \textbf{期望回报。}从当前状态起，在有限或无限时域内，智能体预期累积的总奖励。对特定时间步 $t$，回报 $G_t$ 为从该步之后取得的各项奖励之和。
+\begin{equation}
+G_t=R_{t+1}+R_{t+2}+R_{t+3}+\cdots+R_T,
+\label{eq:appb-return}
+\end{equation}
+其中 $T$ 是最后一个时间步。期望回报是对这项随机和取期望。
+\item \textbf{折扣回报。}引入折扣因子 $\gamma$ 来体现智能体偏好较早取得奖励。折扣因子在 0 与 1 之间，取值越大，越重视未来奖励。时间步 $t$ 的折扣回报 $G_t$ 为
+\begin{equation}
+G_t=R_{t+1}+\gamma R_{t+2}+\gamma^2 R_{t+3}
++\cdots+\gamma^{T-t-1}R_T,
+\label{eq:appb-discounted-return}
+\end{equation}
+其中 $T$ 为最后一个时间步。\footnote{底本式~\eqref{eq:appb-discounted-return}和式~\eqref{eq:appb-recursive-expanded}把最后一项的指数分别写作 $T-1$、$T-2$。两式从时间步 $t$ 起计算，最后一项在括号外和括号内分别应为 $T-t-1$、$T-t-2$。}
+
+折扣回报更重视即时奖励，并在智能体与环境持续交互的情况下，有助于避免期望回报无限增大。通过优化折扣回报，智能体学习在短期与长期奖励之间作出权衡，从而在复杂环境中更有效地决策。
+\end{enumerate}
+
+改写上式，可看出相邻时间步回报之间的关系。
+\begin{align}
+G_t&=R_{t+1}+\gamma\bigl(R_{t+2}+\gamma R_{t+3}
+       +\cdots+\gamma^{T-t-2}R_T\bigr),
+\label{eq:appb-recursive-expanded}\\
+G_t&=R_{t+1}+\gamma G_{t+1}.
+\label{eq:appb-recursive-return}
+\end{align}
+
+即使时间步 $t$ 的回报是无穷多项之和，只要奖励有界且折扣因子 $\gamma<1$，回报仍然有限。\footnote{底本写作“奖励非零”。有限回报在这里由奖励有界及 $\gamma<1$ 保证。}这一性质对持续式任务尤为重要。此类任务没有确定的终点，如果不进行折扣，理论上可能累积无限的奖励。若每步奖励均为 1 且 $\gamma<1$，则
+\begin{equation}
+G_t=\sum_{k=0}^{\infty}\gamma^k=\frac{1}{1-\gamma},
+\label{eq:appb-geometric-return}
+\end{equation}
+其中 $k$ 表示延后的时间步数，奖励的折扣权重随 $k$ 增大而下降。
+
+\subsection{策略与价值函数}
+\label{sec:appb-policy-value}
+接下来讨论强化学习中的两个基本问题。一是在给定状态下选择某个动作的概率，由策略刻画。二是对智能体而言，处于某个状态或在该状态采取某个动作有多大价值，由价值函数刻画。
+
+\textbf{策略。}策略规定智能体在各个状态采取哪些动作，记为 $\pi(a\mid s)$，表示在状态 $s$ 采取动作 $a$ 的概率。对于每个 $s\in S$，$\pi$ 给出动作 $a\in A$ 上的一个概率分布。
+
+以穿越迷宫的机器人为例，随机策略可以在每一步以相等的概率选择向左、向右、向上或向下。更好的策略会根据具体状态调整这些概率。例如，朝某个方向移动会撞墙时，可以调低该方向的概率，甚至降为零。强化学习利用试验及所得奖励改进智能体的策略。
+
+\textbf{价值函数。}价值函数估计智能体从给定状态出发，遵循某一策略时可得到的期望累积奖励。记 $v_\pi(s)$ 为从状态 $s$ 出发遵循策略 $\pi$ 的期望累积回报。有两种基本的价值函数。
+\begin{enumerate}
+\item \textbf{状态价值函数。}表示智能体从特定状态 $s$ 出发，遵循策略 $\pi$ 可获得的期望回报，即折扣累积奖励的期望。策略 $\pi$ 的状态价值函数定义为
+\begin{align}
+v_\pi(s)&=\mathbb{E}_\pi[G_t\mid S_t=s],
+\label{eq:appb-state-value}\\
+v_\pi(s)&=\mathbb{E}_\pi\left[
+\sum_{k=1}^{\infty}\gamma^{k-1}R_{t+k}\,\middle|\, S_t=s
+\right],
+\label{eq:appb-state-value-expanded}
+\end{align}
+其中 $S_t$ 为时间步 $t$ 的状态，$k$ 遍历 $t$ 之后的步数，$R_{t+k}$ 为转移到状态 $S_{t+k}$ 时收到的奖励，$\gamma\in[0,1]$ 为决定即时奖励与未来奖励相对重要性的折扣因子。期望 $\mathbb{E}_\pi$ 对遵循策略 $\pi$ 所产生的全部可能轨迹求取。
+
+\item \textbf{动作价值函数。}又称 Q 函数，记作 $q_\pi(s,a)$，表示智能体在给定状态 $s$ 采取指定动作 $a$，随后遵循策略 $\pi$ 时可获得的期望长期回报。状态—动作对所对应的函数值称为 Q 值。这里的 Q 表示在特定状态采取某个动作的质量。策略 $\pi$ 的动作价值函数定义为
+\begin{align}
+q_\pi(s,a)&=\mathbb{E}_\pi[G_t\mid S_t=s,A_t=a],
+\label{eq:appb-action-value}\\
+q_\pi(s,a)&=\mathbb{E}_\pi\left[
+\sum_{k=0}^{\infty}\gamma^kR_{t+k+1}\,\middle|\, S_t=s,A_t=a
+\right],
+\label{eq:appb-action-value-expanded}
+\end{align}
+其中 $A_t$ 为时间步 $t$ 的动作。与状态价值函数一样，期望 $\mathbb{E}_\pi$ 对遵循策略 $\pi$ 所产生的全部可能轨迹求取。
+\end{enumerate}
+
+状态价值与动作价值密切相关，可以相互推导。可由动作价值函数求得状态价值函数。
+\begin{equation}
+v_\pi(s)=\sum_{a\in A}\pi(a\mid s)q_\pi(s,a),
+\label{eq:appb-state-from-action}
+\end{equation}
+其中 $s$ 是当前状态，$a$ 是动作，$A$ 为动作集合，$\pi(a\mid s)$ 为在策略 $\pi$ 下于状态 $s$ 采取动作 $a$ 的概率。
+
+式中 $\pi(a\mid s)q_\pi(s,a)$ 是在状态 $s$ 遵循策略 $\pi$ 时，动作 $a$ 的概率与其期望价值的乘积。对 $A$ 中所有可能动作求和，得到状态价值 $v_\pi(s)$，即从状态 $s$ 出发遵循策略 $\pi$ 的期望长期回报。
+
+也可由状态价值函数求得动作价值函数。
+\begin{equation}
+q_\pi(s,a)=\sum_{s'\in S}P(s'\mid s,a)\bigl[R(s,a,s')+\gamma v_\pi(s')\bigr],
+\label{eq:appb-action-from-state}
+\end{equation}
+其中 $s$ 是当前状态，$a$ 是所采取的动作，$s'$ 是下一状态，$R(s,a,s')$ 为在状态 $s$ 采取动作 $a$ 并转移到 $s'$ 时的即时奖励，$\gamma$ 是决定即时奖励与未来奖励相对重要性的折扣因子。$P(s'\mid s,a)$ 是状态转移概率，表示在 $s$ 执行动作 $a$ 后转移到 $s'$ 的概率。
+
+式中 $\sum_{s'\in S}P(s'\mid s,a)R(s,a,s')$ 计算在 $s$ 执行动作 $a$ 的期望即时奖励。$\gamma\sum_{s'\in S}P(s'\mid s,a)v_\pi(s')$ 用状态转移概率加权，计算后续状态的期望折扣回报。两项相加便得到动作价值函数 $q_\pi(s,a)$，表示在状态 $s$ 执行动作 $a$ 后遵循策略 $\pi$ 的期望长期回报。
+
+\subsection{最优性}
+强化学习算法的目标是找到使智能体累积奖励最大的策略。具体来说，要找到给智能体带来至少不低于其他任何策略的回报的策略。
+\begin{itemize}
+\item \textbf{最优策略。}若策略 $\pi$ 在所有状态下的期望回报都不低于策略 $\pi'$，便称 $\pi$ 优于或等同于 $\pi'$。用数学式表示为
+\begin{equation}
+\pi\succeq\pi'
+\quad\Longleftrightarrow\quad
+v_\pi(s)\geq v_{\pi'}(s)\quad\text{对所有 }s\in S.
+\label{eq:appb-policy-order}
+\end{equation}
+\footnote{底本式~\eqref{eq:appb-policy-order}用严格大于号。按原文定义中的“优于或等同于”，此处用非严格关系。}
+\item \textbf{最优状态价值函数。}记为 $v^*(s)$，表示从状态 $s$ 出发遵循最优策略时，智能体可以获得的最高期望长期回报。
+\begin{equation}
+v^*(s)=\max_{\pi}v_\pi(s),
+\label{eq:appb-optimal-state-value}
+\end{equation}
+适用于所有状态 $s\in S$。
+\item \textbf{最优动作价值函数。}又称最优 Q 函数，记为 $q^*(s,a)$，表示从状态 $s$ 出发、先采取动作 $a$ 再遵循最优策略时，智能体可以获得的最高期望长期回报。
+\begin{equation}
+q^*(s,a)=\max_{\pi}q_\pi(s,a),
+\label{eq:appb-optimal-action-value}
+\end{equation}
+适用于所有状态 $s\in S$ 和动作 $a\in A$。
+\item \textbf{贝尔曼最优性方程。}对给定状态—动作对，最优 Q 值等于在当前状态采取该动作所得的即时奖励，加上到达下一状态后可取得的最大期望折扣回报，再对奖励与状态转移取期望。用在状态 $s$ 执行动作 $a$ 所得的奖励 $R_{t+1}$ 及下一状态—动作对 $(s',a')$ 表示，Q 函数的贝尔曼最优性方程为
+\begin{equation}
+q^*(s,a)=\mathbb{E}\left[
+R_{t+1}+\gamma\max_{a'}q^*(s',a')\,\middle|\, S_t=s,A_t=a
+\right],
+\label{eq:appb-bellman-optimal}
+\end{equation}
+其中
+\begin{itemize}
+\item $R_{t+1}$ 为在状态 $s$ 采取动作 $a$ 时取得的即时奖励。
+\item $\gamma$ 为折扣因子，衡量即时奖励与未来奖励的相对重要性。
+\item $\max_{a'}q^*(s',a')$ 表示到达 $s'$ 后选择最有利的动作 $a'$ 并遵循最优策略时可取得的最大期望回报。式中的 $\gamma$ 再将这一项折算到当前时间步。
+\end{itemize}
+\end{itemize}
+
+\section{探索与利用的权衡}
+\label{sec:appb-exploration}
+强化学习的另一个重要概念是探索与利用之间的权衡。它们是算法取得奖励时的两种相对的策略。若明显偏向探索，智能体就会尝试到达不熟悉的状态，寻找较高的奖励。若更偏向利用，智能体就会反复选择已知有奖励的状态，可能错过未探索状态中更高的奖励。给予探索多大优先级是算法设计的一部分。
+
+最直接的策略是贪心策略，每一步总选取估计回报最高的动作。这种策略完全侧重利用。一般需要让智能体进行一定探索，因此常采用 $\epsilon$-贪心策略。它引入参数 $\epsilon$，决定智能体随机选择动作的概率，其余时候采用贪心策略。例如，$\epsilon=0.4$ 表示 40\% 的时候随机选取动作，其余 60\% 的时候选取估计回报最高的动作。
+
+在实践中，常随训练过程调整 $\epsilon$。早期迭代使用较大的值，尽量收集更多状态—动作对的反馈。随后减小 $\epsilon$，有助于收敛到较优策略。这一思路与深度学习多个领域采用的学习率调度原理相似。
+
+\section{强化学习算法}
+多种强化学习算法各有特点，适用于不同问题。基于价值的算法，如 Q 学习与深度 Q 网络（DQN），估计在各状态采取各动作的价值或质量。其核心是价值函数，它根据期望累积奖励为每个可能的状态—动作对赋值。
+
+基于策略的算法，如近端策略优化（PPO），直接优化策略，即从状态到动作的映射。这类算法能够处理高维动作空间，在连续控制任务中尤其有效。
+
+除了基于价值与基于策略的区别，强化学习算法还可以按是否采用环境模型分类。基于模型的方法将环境模型纳入学习过程，使智能体能够通过预测动作的后果来提前规划。无模型方法无需环境模型，只从与环境的直接交互中学习，包括 Q 学习、DQN 和 PPO。
+
+还可按如何使用数据来区分离策略（off-policy）与同策略（on-policy）算法。Q 学习与 DQN 等离策略算法可以用任何策略生成的历史数据学习，包括智能体当前策略以外的策略。PPO 等同策略算法需要由当前策略生成的数据，因此对新数据的需求更大，但学习过程往往更稳定。
+
+强化学习算法也可按其采样与探索策略分类。基于采样的方法生成并评估候选方案，以优化智能体的策略。蒙特卡洛树搜索就是一例。这些方法在动作空间较大而状态空间较小的环境中特别有效。
+
+\begin{center}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}p{23mm}p{16mm}p{13mm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+算法 & 类别 & 策略 & 说明\\
+\midrule
+Q 学习 & 基于价值 & 离策略 & 学习给定状态中各动作的价值，以尽量提高总奖励。\\
+深度 Q 网络 & 基于价值 & 离策略 & 把深度学习引入 Q 学习，提高基于价值的算法处理高维状态空间的能力。\\
+近端策略优化 & 基于策略 & 同策略 & 直接学习策略函数，并控制单次更新幅度，以改善训练的稳定性与表现。\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+以下各节讨论几种主要强化学习算法的基本概念和数学原理。Q 学习是基于价值的离策略方法。DQN 是结合深度学习的 Q 学习扩展。TRPO 和 PPO 等策略梯度方法已在复杂的连续控制任务中证明有效。
+
+\subsection{Q 学习}
+\label{sec:appb-q-learning}
+Q 学习（Q-learning）由克里斯·沃特金斯开发，是一种离策略强化学习算法。Q 表示质量（quality），体现了算法通过迭代学习各动作质量的目标，也就是确定某个动作在某个状态下有多大价值。
+
+Q 表是 Q 学习的核心。它是一个矩阵，每行表示一个可能状态，每列表示一个可能动作，见图~\ref{fig:appb-q-table}。Q 学习旨在估计动作价值函数 $q(s,a)$，即在状态 $s$ 执行动作 $a$，随后遵循最优策略时的期望累积折扣奖励。最优动作价值函数 $q^*(s,a)$ 满足贝尔曼最优性方程。
+
+\sourcefigure{figb_02.pdf}{Q 表。以状态 $S_1,\ldots,S_n$ 为行，动作 $A_1,\ldots,A_m$ 为列，每个单元存放对应状态—动作对的 Q 值。}{fig:appb-q-table}
+
+Q 学习是在线更新 $q(s,a)$ 估计值的迭代算法。每个时间步 $t$，智能体观察当前状态 $S_t$，选取并执行动作 $A_t$，随后得到奖励 $R_{t+1}$ 并观察下一状态 $S_{t+1}$。当前状态—动作对 $(S_t,A_t)$ 的 Q 值用观察到的奖励与最优未来价值的估计来更新。
+\begin{equation}
+\begin{aligned}
+q(S_t,A_t)\leftarrow q(S_t,A_t)+\alpha\bigl[&
+R_{t+1}+\gamma\max_a q(S_{t+1},a)\\
+&-q(S_t,A_t)\bigr].
+\end{aligned}
+\label{eq:appb-q-update}
+\end{equation}
+其中
+\begin{itemize}
+\item 更新箭头左侧的 $q(S_t,A_t)$ 为时间步 $t$ 的状态—动作对所对应的待更新 Q 值。
+\item $\alpha$ 为学习率，决定每次迭代的 Q 值变化幅度。
+\item $R_{t+1}$ 为在下一时间步 $t+1$ 得到的奖励。
+\item $\gamma$ 为折扣因子，决定未来奖励相对于即时奖励的重要性。
+\item $\max_a q(S_{t+1},a)$ 为在下一状态 $S_{t+1}$ 的所有可能动作 $a$ 中最大的 Q 值。
+\item 右侧的 $q(S_t,A_t)$ 为这一状态—动作对当前的 Q 值。
+\end{itemize}
+
+Q 学习中，智能体通常依据探索与利用的权衡来选择动作。常用 $\epsilon$-贪心策略，即以概率 $\epsilon$ 随机选择动作，以概率 $1-\epsilon$ 选择 Q 值估计最高的动作。随着学习推进，通常逐渐减小 $\epsilon$，让智能体更多利用已经学到的价值。
+
+\subsection{深度 Q 网络（DQN）}
+\label{sec:appb-dqn}
+深度 Q 网络（deep Q-network，DQN）是 Q 学习的扩展，用深度神经网络逼近 Q 函数。这样，Q 学习就能够用于视频游戏等具有高维状态空间的环境。
+
+\sourcefigure{figb_03.pdf}{状态—动作框架下的深度 Q 网络。图示包含智能体的深度神经网络、执行动作、环境反馈奖励及状态观测。原图把网络输出侧标为策略 $\pi_\theta(s,a)$，正文的 DQN 网络输出为各动作的 Q 值。}{fig:appb-dqn}
+
+在 DQN 中，深度神经网络代替 Q 表，以状态为输入，输出各动作的 Q 值，见图~\ref{fig:appb-dqn}。DQN 的一个重要改进是经验回放（experience replay）。智能体把每项经验存入回放缓冲区，随后采样一批经验来更新网络。这比每收到一项经验就单独更新网络更有效地利用数据，也有助于使学习过程更稳定 [4]。\footnote{底本在此标有 [4]，附录没有给出对应的文献表。}
+
+DQN 每次迭代 $i$ 的损失函数为
+\begin{equation}
+\begin{aligned}
+L(\theta)={}&\mathbb{E}_{(S_t,A_t,R,S_{t+1})\sim U(D)}\\[-2pt]
+&\Bigl[\Bigl(R+\gamma\max_{A_{t+1}}q_{\mathrm{target}}(S_{t+1},A_{t+1};\theta^-)\\
+&\qquad-q_{\mathrm{predicted}}(S_t,A_t;\theta)\Bigr)^2\Bigr].
+\end{aligned}
+\label{eq:appb-dqn-loss}
+\end{equation}
+其中
+\begin{itemize}
+\item $\theta$ 为深度 Q 网络的参数。
+\item $\mathbb{E}_{(S_t,A_t,R,S_{t+1})\sim U(D)}$ 是对从回放缓冲区抽取的一个小批次经验样本所取的期望。
+\item $(S_t,A_t,R,S_{t+1})$ 为当前状态、动作、奖励和下一状态。
+\item $U(D)$ 为回放缓冲区上的均匀分布。
+\item $R$ 为在状态 $S_t$ 执行动作 $A_t$ 后收到的即时奖励。
+\item $\gamma$ 是折扣因子，用于调整未来奖励的重要性。
+\item $\max_{A_{t+1}}$ 表示对下一步所有可能动作 $A_{t+1}$ 取最大值。
+\item $q_{\mathrm{target}}(S_{t+1},A_{t+1};\theta^-)$ 为由参数为 $\theta^-$ 的目标网络给出的 Q 值。
+\item $q_{\mathrm{predicted}}(S_t,A_t;\theta)$ 为由参数为 $\theta$ 的当前网络预测的 Q 值。
+\end{itemize}
+
+\subsection{基于策略梯度的方法}
+\label{sec:appb-policy-gradients}
+基于策略梯度（policy gradient，PG）的方法是多种直接优化策略的算法的基础。它们估计期望回报对策略参数的梯度，并用该梯度调整参数。沿期望回报增大的方向更新策略，智能体可学会采取在给定环境中获得更高奖励的动作，表现随之改善。
+
+基本策略梯度损失为动作的负对数概率乘以相应的优势估计。优势估计衡量某个动作相对于该状态下平均动作的优劣。
+\begin{equation}
+L_{\mathrm{PG}}=-\frac1N\sum_{i=1}^{N}
+\log\bigl(\pi(A_t\mid S_t)\bigr)\,A_{\mathrm{adv}}(S_t,A_t),
+\label{eq:appb-pg-loss}
+\end{equation}
+其中
+\begin{itemize}
+\item $N$ 是用于对梯度估计取平均的批次样本数，求和中的 $S_t,A_t$ 取自第 $i$ 个样本。
+\item $\log(\pi(A_t\mid S_t))$ 是在状态 $S_t$ 按策略选取动作 $A_t$ 的概率的对数。
+\item $A_{\mathrm{adv}}(S_t,A_t)$ 是优势估计，量化状态 $S_t$ 下动作 $A_t$ 的相对价值。
+\end{itemize}
+在策略梯度方法中，通常用随机梯度上升更新策略，可能导致更新幅度过大，学习过程出现不稳定。
+
+\subsubsection{信赖域策略优化（TRPO）}
+信赖域策略优化（trust region policy optimization，TRPO）将策略更新限制在可能改进表现且离当前策略不太远的范围内。其思想是在规定的信赖域内，使更新后的策略仍接近旧策略，同时最大化性能目标。更新前后策略之间允许的最大 KL 散度界定了这个信赖域。为此，TRPO 求解一个带约束的优化问题，在满足信赖域约束的前提下，计算使性能目标最大的策略更新。目标函数通常是近似预期性能提升的替代目标。TRPO 目标 $L_{\mathrm{TRPO}}$ 及其约束，是该算法的基本组成。算法在优化策略参数的同时，限制新旧策略间的变化幅度。TRPO 目标定义为
+\begin{equation}
+L_{\mathrm{TRPO}}=\mathbb{E}_t\left[
+\frac{\pi(A_t\mid S_t)}{\pi_{\mathrm{old}}(A_t\mid S_t)}\,
+A_{\mathrm{adv}}(S_t,A_t)\right],
+\label{eq:appb-trpo}
+\end{equation}
+其中
+\begin{itemize}
+\item $\mathbb{E}_t$ 为对时间步 $t$ 求期望，以评估策略更新。
+\item $\pi(A_t\mid S_t)$ 为按当前待优化策略在状态 $S_t$ 选择动作 $A_t$ 的概率。
+\item $\pi_{\mathrm{old}}(A_t\mid S_t)$ 为按旧策略在状态 $S_t$ 选择动作 $A_t$ 的概率，用于比较。
+\item $A_{\mathrm{adv}}(S_t,A_t)$ 为优势估计，表示动作 $A_t$ 相对于状态 $S_t$ 下平均动作带来的增益。
+\end{itemize}
+TRPO 还施加约束，使策略更新较为保守。约束表示为
+\begin{equation}
+\mathbb{E}_t\bigl[\mathrm{KL}\bigl[
+\pi_{\mathrm{old}}(\cdot\mid S_t),\pi(\cdot\mid S_t)\bigr]\bigr]\leq\delta,
+\label{eq:appb-trpo-constraint}
+\end{equation}
+其中
+\begin{itemize}
+\item $\mathrm{KL}$ 表示 Kullback–Leibler 散度，衡量两个概率分布的差异。
+\item $\pi_{\mathrm{old}}(\cdot\mid S_t)$ 是旧策略下的概率分布。
+\item $\pi(\cdot\mid S_t)$ 是更新后策略的概率分布。
+\item $\delta$ 是 KL 散度的阈值。原书给出约 0.1 作为可尝试的默认值，也可以通过超参数搜索来调整。
+\end{itemize}
+
+\subsubsection{近端策略优化（PPO）}
+\label{sec:appb-ppo}
+近端策略优化（proximal policy optimization，PPO）减少了 TRPO 的一部分计算开销，并能有效更新策略。TRPO 的一个主要难题是需要求解带约束的优化问题，计算开销可能很大。PPO 将其改为无约束优化，在目标函数中引入裁剪机制，以控制更新幅度。
+
+PPO 的思路是构造替代目标，以近似预期性能提升，同时把策略更新限制在合理范围。替代目标用新旧策略给出概率的比值乘以优势估计。优势估计表示在给定状态下采取动作的相对价值。PPO 在替代目标中采用裁剪，限制继续扩大概率比所能带来的收益，从而抑制过大的策略更新，使新策略保持在旧策略附近。
+\begin{equation}
+\begin{aligned}
+L_{\mathrm{PPO}}=\mathbb{E}_t\Bigl[\min\Bigl(&
+r_t(\theta)A_{\mathrm{adv}}(S_t,A_t),\\
+&\operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)
+  A_{\mathrm{adv}}(S_t,A_t)\Bigr)\Bigr].
+\end{aligned}
+\label{eq:appb-ppo}
+\end{equation}
+其中
+\begin{itemize}
+\item $\mathbb{E}_t$ 表示对时间步 $t$ 求期望。
+\item $A_{\mathrm{adv}}(S_t,A_t)$ 为优势估计，表示动作 $A_t$ 在状态 $S_t$ 下的相对价值。
+\item $\operatorname{clip}(\cdot,a,b)$ 把输入裁剪至区间 $[a,b]$。
+\item $\theta$ 表示策略参数。
+\item $S_t$ 是时间步 $t$ 的状态。
+\item $A_t$ 是时间步 $t$ 的动作。
+\item $\pi(A_t\mid S_t)$ 是按当前待优化策略在状态 $S_t$ 选择动作 $A_t$ 的概率。
+\item $\pi_{\mathrm{old}}(A_t\mid S_t)$ 是按旧策略在状态 $S_t$ 选择动作 $A_t$ 的概率，用作参照。两者之比为 $r_t(\theta)=\pi(A_t\mid S_t)/\pi_{\mathrm{old}}(A_t\mid S_t)$。
+\item $\epsilon$ 是控制裁剪幅度的超参数。
+\end{itemize}
+此外，PPO 在收集到的数据上执行多轮优化，以便更有效地更新策略和利用样本。这有助于提高算法的样本效率。

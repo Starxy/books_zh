@@ -1,0 +1,155 @@
+% PDF 321--329；原书第 293--301 页。
+\section{评估 RAG 应用}
+\label{sec:ch07-evaluation}
+有效的评估是构建 RAG 方案的重要部分。较复杂的 RAG 应用可能由许多模块组成，往往有不止一个评估目标，评估方法也通常按具体应用的要求选择。
+
+通常，RAG 评估把现有的质量指标和能力指标用于检索器、生成器或端到端输出。有多个评估目标时，要考虑评估对象，以及评估与优化发生在应用开发的哪个阶段，再选择适当的指标和准则。例如，开发早期单独评估生成器，可能会造成过早优化，因为生成器的表现很大程度上受检索器所提供上下文的质量影响，而检索器当时可能还未优化。因此，安排评估步骤的先后，与选对评估指标和能力同样重要（\refcite{ch07-ref-009}{Hoshi et al., 2023}）。
+
+LlamaIndex 文档给出的实用做法是，先做端到端评估。发现局限、边界情况和失败情形后，再逐项评估并优化造成问题的组件（\refcite{ch07-ref-012}{Liu, 2022}）。下面以已有合适的评估流程为前提，考察 RAG 应用常用的评估维度。
+
+\begin{keypoint}
+评估 RAG 应用通常有七个方面，可分为三项质量指标和四项系统能力（\refcite{ch07-ref-007}{Gao et al., 2024}）。
+\begin{itemize}
+\item \textbf{质量指标}
+  \begin{enumerate}
+  \item 上下文相关性。
+  \item 答案忠实度。
+  \item 答案相关性。
+  \end{enumerate}
+\item \textbf{系统能力}
+  \begin{enumerate}
+  \item 噪声鲁棒性。
+  \item 无答案时拒答。
+  \item 信息整合。
+  \item 反事实鲁棒性。
+  \end{enumerate}
+\end{itemize}
+\end{keypoint}
+
+接下来的两节定义这些方面，说明在典型 RAG 框架的何处以及如何评估它们，并在适当处介绍可用于相应评估的工具和框架。
+
+\subsection{RAG 质量指标}
+\label{sec:ch07-quality-metrics}
+本节介绍 RAG 的上下文相关性、答案忠实度和答案相关性。图~\ref{fig:ch07-quality} 汇总三者之间的关系。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig07_07}
+\caption{三项 RAG 质量指标之间的关系。上下文相关性衡量检索文档与原始查询的相关程度，答案相关性衡量生成回答与原始查询的相关程度，答案忠实度衡量生成回答对检索文档的忠实程度。}
+\label{fig:ch07-quality}
+\end{figure}
+
+\subsubsection{上下文相关性}
+\label{sec:ch07-context-relevance}
+上下文相关性（context relevance）衡量 RAG 检索器能否返回相关上下文，同时舍弃无关上下文。通常可用多项现有指标衡量。有些指标直接考察所有检索到的上下文，不考虑相关性排名，称为与排序无关的指标。另一些指标考虑上下文的相关性排名，称为考虑排序的指标。
+
+\paragraph*{衡量上下文相关性的常用指标}
+召回率（recall）是与排序无关的指标，只关注已经检索到的相关上下文数量，以及检索语料中相关上下文的总数。召回率是前者占后者的比例或百分比。检索设置常规定返回的上下文数量上限，因此通常计算召回率@$K$（recall@$K$），其中 $K$ 为取回的固定上下文数量。
+
+\begin{practicaltip}
+如果返回上下文的排名影响较小，例如生成阶段使用较短的上下文，或在下游采用重排序器（第~\ref{sec:ch07-reranking}~节），召回率是适用的上下文相关性指标。但如果生成器的提示上下文较长，容易遗漏位于中间的信息，那么只看检索上下文的召回率可能产生误导（\refcite{ch07-ref-013}{Liu et al., 2023}）。计算上下文召回率需要带标签的数据，通常是查询与相关文档的配对。不过，已有实际做法尝试用能力较强的大语言模型半自动计算召回率。例如，使用下面的提示，可让模型依据查询考察上下文。
+\begin{lstlisting}[nolol=true]
+is all of the required information to answer {query} available in {retrieved_context}
+\end{lstlisting}
+\end{practicaltip}
+
+精确率（precision）是另一种与排序无关的指标，衡量已检索文档中与查询相关的文档所占的比例或百分比。例如，检索器返回 100 段上下文，其中只有 60 段与查询相关，精确率便为 0.6，即 60\%。该指标有助于了解检索结果中混入了多少无关内容，使开发人员可以着手提高检索精确率，或在下游处理上下文中的额外噪声。下游处理包括检索后重排序（第~\ref{sec:ch07-reranking}~节）、上下文整合（图~\ref{fig:ch07-generation-augment}）和简单筛选规则。和召回率类似，也可以按固定的 $K$ 计算精确率@$K$（precision@$K$）。
+
+\begin{practicaltip}
+以往用带标签的查询与相关文档对评估检索上下文的精确率。与召回率一样，这项工作也越来越多地交给能力较强的大语言模型，可采用如下形式的提示。
+\begin{lstlisting}[nolol=true]
+how many of the search results below are relevant to the
+{query}? {retrieved_context}
+\end{lstlisting}
+模型需要推断具体上下文及其与查询的关系，因此也要考察遗漏中间信息的问题会在多大程度上影响这项指标。
+\end{practicaltip}
+
+平均倒数排名（mean reciprocal rank，MRR）衡量在一组查询上，最相关上下文在已排序检索结果中的平均位置。当 MRR 等于 1 时，对于每个受评估的查询，最相关的上下文都排在第一位。当检索器没有返回相关上下文时，MRR 可以为 0。%
+\footnote{译注：原书还将最相关上下文每次均排在最后一位列为 MRR 为 0 的情况。若最后一位的排名为有限的 $r$，其倒数仍为 $1/r>0$。}
+
+\begin{practicaltip}
+实践中，MRR 通常位于两个极端之间。RAG 应用只向生成器传送一个检索上下文，即 $K=1$ 时，MRR 尤其适合衡量检索效果。它直接反映检索器能否把最相关的上下文排在第一位。把 MRR 与后文的命中率结合起来，可以进一步判断 MRR 较低是因为取回的相关上下文太少，还是因为虽然取回了相关上下文，却排得靠后。例如，若命中率比 MRR 高，可以考虑是检索器的相关性排序不够好，并可在生成前引入重排序器等方法。
+\end{practicaltip}
+
+命中率（hit rate）衡量成功检索到最相关上下文的查询所占的比例。实践中，通常对应用选定的 $K$ 个检索上下文计算该指标。命中率容易解释，与 MRR 等指标结合时，可以帮助找出应用中的检索问题。
+
+归一化折损累积增益（normalized discounted cumulative gain，nDCG）是考虑排序的指标，衡量检索上下文的相关程度，并考虑它在结果中的位置。概念上，nDCG 按检索顺序衡量上下文的有用程度，即增益。实际计算时，从结果开头到末尾累加增益。相关性很高却排在后面的上下文所贡献的增益会被折减，再将结果归一化。
+
+使用 nDCG 并解释它与 RAG 结果的关系时，应考虑其假设。尤其是，指标的“折损”部分假定越相关的文档越应该出现在检索上下文的前面。因此，相关性高却排在后面的上下文，在计算中会受到惩罚。如果生成阶段使用所有检索上下文，这个度量可能未必合适，因为那些相关性高却排得靠后的上下文仍会提供给生成器。
+
+\begin{practicaltip}
+nDCG 可以理解为检索上下文的排序与理想排序有多接近。在理想排序中，最切题的上下文位于列表顶部，相关性自上而下逐渐降低。因此，nDCG 反映取回的上下文排得好不好。累积增益较低，可能说明上下文需要重新排序。若低分来自相关上下文太少、无关上下文过多，则可能需要提高检索召回率。nDCG 也可以评估 RAG 中的生成器。此时，对给定查询的一组可能回答，按相关性评估排序。
+\end{practicaltip}
+
+\subsubsection{答案忠实度}
+如第~\ref{sec:ch06-hallucination}~节所述，幻觉是大语言模型的常见缺点。即使表现最先进的大语言模型也会产生幻觉，使得在诚实性十分重要的生产环境中采用它们变得更复杂（见第~5.1.2~节）。RAG 主要就是在大语言模型上加入新的机制，试图缓解这一问题。不过，和任何以概率机制生成输出的系统一样，在开发以及应用继续演变的过程中，都需要评估它能在多大程度上缓解幻觉。
+
+答案忠实度（answer faithfulness）有时也称有据性（groundedness）。它是一个质量指标，用来衡量生成器能否依据检索到的上下文，尽可能准确地陈述事实。实质上，它衡量生成器的回答能在多大程度上以检索器提供的知识为根据。用于评估答案忠实度的指标可分为两类，即基于词语的指标和基于模型的指标。
+
+\paragraph*{基于词语的指标}
+基于词语的答案忠实度指标，衡量回答中的词元与提供给生成器的检索上下文或知识重合或以之为根据的程度。在实际应用中，这类办法已大多被后面讨论的基于模型的指标取代。下面列出常用的两种。
+
+\begin{itemize}
+\item \textbf{Knowledge-F1 或 K-F1} 用 $F_1$ 衡量生成答案与提供给生成器的检索上下文中的词元重叠。当生成器输出片段的长度与检索上下文长度相差较大时，该指标有局限。例如，生成器给出简洁的回答，而检索上下文通常比回答长。即使回答词元的精确率高，也已正确满足用户需求，仍可能因召回率较低而被扣分（\refcite{ch07-ref-001}{Adlakha et al., 2023}）。
+\item \textbf{Knowledge-precision 或 K-precision} 衡量生成器回答中也出现在检索上下文里的词元所占比例。这个指标可以衡量答案忠实度，并避免 K-F1 因度量不对称而可能造成的偏差。此处的不对称在于，忠实回答的事实性词元只能与检索上下文中的事实相同，或只涵盖其中一部分。
+\end{itemize}
+
+\paragraph*{基于模型的指标}
+在实践中，基于词语的答案忠实度指标已大多被基于模型的方法取代。原因之一是，通过标注生成带标签的上下文较困难，一些指标与人类判断的相关性也较低（\refcite{ch07-ref-001}{Adlakha et al., 2023}）。另一个更重要的原因是，大语言模型处理这类任务的能力不断提高。模型评估还不能解决所有问题（如 \refcite{ch07-ref-023}{Wang et al., 2023c}），但能力最强的大语言模型在判断答案忠实度时，已表现出与人工评估较高的相关性（\refcite{ch07-ref-001}{Adlakha et al., 2023}）。这说明，用较强的大语言模型有望提高 RAG 答案忠实度的评估效率。
+
+Q2 是较早的基于模型的答案忠实度评估方法之一（\refcite{ch07-ref-008}{Honovich et al., 2021}）。
+
+\begin{keypoint}
+先从答案中抽取信息丰富的片段，通常用某种命名实体识别（NER）方法。例如，假设 RAG 系统给出下面的回答。
+\begin{quote}
+\texttt{"Red wine is acidic"}（红葡萄酒是酸性的）
+\end{quote}
+使用 NER 系统抽取对应于命名实体和名词短语的信息片段，可得到“Red wine”（红葡萄酒）。然后把这些片段与其来源回答一起交给大型生成式模型，以片段及原回答为条件生成相关问题。在上例中，以“Red wine”为信息片段，结合上述回答，可生成这样的问题。
+\begin{quote}
+\texttt{"What is acidic?"}（什么是酸性的？）
+\end{quote}
+接着用微调过的问答模型回答这些生成的问题。
+\end{keypoint}
+
+原生成系统的答案忠实度，取决于从原回答抽取的信息片段与生成问题的答案有多相似。如果两者完全匹配，Q2 得 1 分。若不完全匹配，则通过自然语言推断（NLI）确定原回答的信息片段与生成问题答案的相似程度。在这一步，蕴含得 1 分，矛盾得 0 分。对于没有给出答案的问答结果，取词元级 $F_1$ 分数。系统的总体 Q2 分数是所有答案对的平均分（\refcite{ch07-ref-008}{Honovich et al., 2021}）。
+
+较新的基于模型的方法利用能力更强的生成式大语言模型，以更集中地衡量答案忠实度。例如，只用 GPT-4，可以大幅减少为问题生成、命名实体识别和问答各准备一个模型的需要（\refcite{ch07-ref-008}{Honovich et al., 2021}）。总体思路与 Q2 相似，但由于 GPT-4 更能利用自然语言理解能力完成整个任务，不必把流程分成那么多模块。
+
+\refcite{ch07-ref-001}{Adlakha 等人（2023）}提出的 LLMCritic 使用一种简单的提示方法，请 GPT-4 评估 RAG 系统的答案是否只包含在检索上下文中出现、或可从中推断的信息和事实陈述。作者给出的提示模板示例如下。
+
+\begin{lstlisting}[caption={评估答案忠实度的提示示例},label={lst:ch07-comparegpt}]
+System prompt: You are CompareGPT , a machine to verify the
+groundedness of predictions. Answer with only yes/no.
+You are given a question , the corresponding evidence and a
+prediction from a model. Compare the "Prediction" and the "
+Evidence" to determine whether all the information of the
+prediction in present in the evidence or can be inferred from
+the evidence. You must answer "no" if there are any specific
+details in the prediction that are not mentioned in the
+evidence or cannot be inferred from the evidence.
+Question: {Question}
+Prediction: {Model response}
+Evidence: {Reference passage}
+CompareGPT response:
+\end{lstlisting}
+
+这个提示要求 GPT-4 核查 RAG 答案中的全部信息，判断它们是否已在材料，即检索上下文中出现，或能否从该材料推断出来。如果预测包含材料没有提及或无法推断的具体细节，则回答“no”。一般而言，用大语言模型评估答案忠实度时，指标计算公式为
+\begin{equation}
+\text{忠实度}=
+\frac{|\text{答案中可由检索上下文推断的事实数}|}
+     {|\text{答案中的事实总数}|}.
+\label{eq:ch07-faithfulness}
+\end{equation}
+
+随着大语言模型能力提高，越来越多的这类 RAG 评估指标用大语言模型计算。LlamaIndex（\refcite{ch07-ref-012}{Liu, 2022}）、TruLens（\refcite{ch07-ref-019}{Reini et al., 2024}）和 Ragas（\refcite{ch07-ref-004}{Es et al., 2023}）等 RAG 评估框架或工具提供了多种这类方法，后面的教程将演示其中一些。
+
+\subsubsection{答案相关性}
+答案相关性（answer relevance）是评估 RAG 系统质量的另一项重要指标，回答“生成的答案与用户查询和检索上下文有多相关？”最常见的计算方法也使用能力较强的大语言模型。将生成器给出的答案、生成该答案所用的上下文，以及要求根据这些信息生成 $N$ 个合成问题的指令，交给评估模型。然后，在语义上将这些问题与最初的用户查询比较。用于生成合成问题的答案，正是为响应这条原查询而给出的。答案相关性取原始查询与 $N$ 个合成问题之间的平均语义相似度。因而，如果根据 RAG 答案生成的问题在语义上更接近原查询，该答案的相关性分数就更高，反之则更低。具体来说，Ragas 框架用下式计算这个指标。
+\begin{equation}
+\text{答案相关性}=\frac{1}{N}\sum_{i=1}^{N}
+  \operatorname{sim}(E_{g_i},E_o),
+\label{eq:ch07-answer-relevance}
+\end{equation}
+其中，$N$ 是评估模型生成的合成问题数，$E_{g_i}$ 是第 $i$ 个合成问题的嵌入，$E_o$ 是原始查询的嵌入，$\operatorname{sim}$ 是两者之间合适的相似度度量，例如余弦相似度。
+
+答案相关性可以通过与真实参考答案比较等方式评估。不过，对输出形式丰富的应用，定义真实参考答案通常复杂且开销较高。大语言模型评估器可以减少这项工作，因此正在成为常用方法。

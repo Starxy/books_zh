@@ -1,0 +1,117 @@
+% PDF 59--112；原书第 29--82 页。
+\chapter{语言模型预训练}
+\label{ch:pretraining}
+\chaptercredit{2}
+\chapterabstract{预训练是大语言模型能力的基础。借助大规模数据集，模型获得重要的语言理解和生成能力。数据集的规模和质量关系到能否充分发挥模型的潜力。有效的预训练也离不开合适的模型结构、加速方法和优化策略。本章先介绍编码器—解码器架构，说明它适用于哪些自然语言处理任务，以及有哪些局限。接着介绍注意力机制，帮助读者理解大多数大语言模型的核心架构 Transformer。然后讨论数据收集与处理，以及模型架构、预训练目标和优化策略等关系到预训练的设计要点。我们还考察 BERT、T5、GPT（第 1—3 代）和 Mixtral~8x7B 等衍生出众多变体的主要模型，对比它们的架构与训练方式。章末的教程将深入分析大语言模型架构，说明掩码模型和因果模型的区别，考察预训练模型如何产生输出，并简要介绍训练过程。}
+
+% PDF 59--61。
+\section{编码器—解码器架构}
+图~\ref{fig:ch02-encoder-decoder} 所示的编码器—解码器架构，是自然语言处理的重要进展，尤其适用于机器翻译、生成式摘要（abstractive summarization）和问答等序列到序列任务（\refcite{ch02-sutskever}{Sutskever et al., 2014}）。这个框架由编码器（encoder）和解码器（decoder）两个主要部分组成。
+
+\subsection{编码器}
+首先将输入文本切分为词元，单位可以是词或子词（subword）。然后把这些单位嵌入为特征向量 $\symbf{x}_1,\ldots,\symbf{x}_T$。单向编码器在每个时刻 $t$ 使用 $\symbf{h}_{t-1}$ 和 $\symbf{x}_t$ 更新隐藏状态（hidden state）$\symbf{h}_t$。
+\begin{equation}
+\symbf{h}_t=f(\symbf{h}_{t-1},\symbf{x}_t).
+\tag{2.1}
+\end{equation}
+编码器的最终状态 $\symbf{h}_t$ 称为上下文变量（context variable）或上下文向量（context vector），编码整个输入序列的信息，写为
+\begin{equation}
+\symbf{c}=m(\symbf{h}_1,\ldots,\symbf{h}_T),
+\tag{2.2}
+\end{equation}
+其中 $m$ 是映射函数。最简单的情形是用最后一个隐藏状态作为上下文变量。
+\begin{equation}
+\symbf{c}=m(\symbf{h}_1,\ldots,\symbf{h}_T)=\symbf{h}_T.
+\tag{2.3}
+\end{equation}
+进一步扩展架构可以得到双向编码器。此时，隐藏状态除了依赖上一个隐藏状态 $\symbf{h}_{t-1}$ 和输入 $\symbf{x}_t$，还依赖下一个状态 $\symbf{h}_{t+1}$。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_01}
+\caption{用于序列到序列处理的单向编码器—解码器。}
+\label{fig:ch02-encoder-decoder}
+\end{figure}
+
+\subsection{解码器}
+解码器取得编码器给出的上下文向量 $\symbf{c}$ 后，开始生成输出序列 $y=(y_1,y_2,\ldots,y_U)$，其中 $U$ 可以不同于 $T$。与编码器类似，解码器在任意时刻的隐藏状态为
+\begin{equation}
+\symbf{s}_{t'}=g(\symbf{s}_{t-1},\symbf{y}_{t'-1},\symbf{c}).
+\tag{2.4}
+\end{equation}
+解码器的隐藏状态传至输出层。时刻 $t'$ 的下一个词元的条件分布为
+\begin{equation}
+P(\symbf{y}_{t'}\mid \symbf{y}_{t'-1},\ldots,\symbf{y}_1,\symbf{c})
+=\operatorname{softmax}(\symbf{s}_{t-1},\symbf{y}_{t'-1},\symbf{c}).
+\tag{2.5}
+\end{equation}
+\transnote{式（2.4）和（2.5）保留原书第 31 页的下标。式中解码器上一状态写为 $\symbf{s}_{t-1}$，输出时间索引则用 $t'$。}
+
+\subsection{训练与优化}
+编码器—解码器模型通过监督学习（supervised learning）进行端到端（end-to-end）训练。常用的损失函数是预测输出序列与真实输出之间的类别交叉熵（categorical cross-entropy）。
+\begin{equation}
+\mathcal{L}=-\sum_{t=1}^{U}\log p(y_t\mid y_{t-1},\ldots,y_1,\symbf{c}).
+\tag{2.6}
+\end{equation}
+优化模型参数时，通常采用梯度下降（gradient descent）的变体，如 Adam 或 RMSprop。
+
+\subsection{编码器—解码器架构的问题}
+如上文所述，编码器把源句子的信息压缩到单一的上下文变量 $\symbf{c}$，供解码器使用。这种压缩不可避免地造成信息损失，输入越长，问题越突出。自然语言的句法和语义结构复杂，词元之间往往存在长程依赖（long-range dependency），很难用单个上下文向量充分表示。不过，编码器各时间步的隐藏状态仍然包含可供解码器使用的有价值信息。在每个解码时间步，这些隐藏状态可以发挥不同程度的作用，由此部分缓解只使用一个上下文变量带来的限制。循环神经网络是许多编码器—解码器模型的基础架构，却存在梯度消失（vanishing gradients）和梯度爆炸（exploding gradients）等问题（\refcite{ch02-hochreiter}{Hochreiter, 1998}）。此外，循环神经网络固有的顺序依赖使并行化更加困难，也制约了计算效率。
+
+% PDF 62--63。
+\section{注意力机制}
+注意力机制有助于解决基于循环神经网络的编码器—解码器架构中的问题。如图~\ref{fig:ch02-attention} 所示，可以把注意力机制看成一个存储库。收到查询时，它根据存储的键和值产生输出（\refcite{ch02-bahdanau}{Bahdanau et al., 2014}）。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_02}
+\caption{注意力机制中查询、键、值和输出向量之间的关系。}
+\label{fig:ch02-attention}
+\end{figure}
+
+设存储单元由 $n$ 个键值对（key-value pair）$(\symbf{k}_1,\symbf{v}_1),\ldots,(\symbf{k}_n,\symbf{v}_n)$ 组成，其中 $\symbf{k}_i\in\mathbb{R}^{d_k}$，$\symbf{v}_i\in\mathbb{R}^{d_v}$。注意力层接收查询（query）$\symbf{q}\in\mathbb{R}^{d_q}$，返回与值 $\symbf{v}$ 形状相同的输出 $\symbf{o}\in\mathbb{R}^{d_v}$。
+
+注意力层使用评分函数（score function）$\alpha$ 度量查询和键的相似程度。对键 $\symbf{k}_1,\ldots,\symbf{k}_n$，相应分数 $a_1,\ldots,a_n$ 由下式给出。
+\begin{equation}
+a_i=\alpha(\symbf{q},\symbf{k}_i).
+\tag{2.7}
+\end{equation}
+对分数应用 softmax 函数得到注意力权重。
+\begin{equation}
+\symbf{b}=\operatorname{softmax}(\symbf{a}).
+\tag{2.8}
+\end{equation}
+$\symbf{b}$ 的各个分量为
+\begin{equation}
+b_i=\frac{\exp(a_i)}{\sum_j\exp(a_j)}.
+\tag{2.9}
+\end{equation}
+输出是用注意力权重对值作加权求和的结果。
+\begin{equation}
+\symbf{o}=\sum_{i=1}^{n} b_i\symbf{v}_i.
+\tag{2.10}
+\end{equation}
+评分函数 $\alpha(\symbf{q},\symbf{k})$ 有多种形式，因而产生了多种注意力机制。最简单的是基于点积的评分函数，无需可调参数。一种变体是缩放点积（scaled dot product），即用 $\sqrt{d_k}$ 归一化点积，以减轻维数增大的影响（\refcite{ch02-luong}{Luong et al., 2015}；\refcite{ch02-vaswani}{Vaswani et al., 2017}）。
+\begin{equation}
+\alpha(\symbf{q},\symbf{k})=\frac{\symbf{q}\cdot\symbf{k}}{\sqrt{d_k}}.
+\tag{2.11}
+\end{equation}
+
+\subsection{自注意力}
+在自注意力（self-attention）中，每个输入向量 $\symbf{x}_i$ 都投影为三个不同的向量，分别是查询 $\symbf{q}_i$、键 $\symbf{k}_i$ 和值 $\symbf{v}_i$。用可学习的权重矩阵 $\symbf{W}_Q$、$\symbf{W}_K$ 和 $\symbf{W}_V$ 进行这些投影，分别得到 $\symbf{q}_i=\symbf{x}_i\symbf{W}_q$、$\symbf{k}_i=\symbf{x}_i\symbf{W}_k$ 和 $\symbf{v}_i=\symbf{x}_i\symbf{W}_v$。这些权重矩阵随机初始化，并在训练中优化。把查询、键和值各自组成矩阵后，可用一次矩阵计算写出这个过程。
+\begin{equation}
+\operatorname{attention}(\symbf{Q},\symbf{K},\symbf{V})
+=\operatorname{softmax}\left(\frac{\symbf{Q}\symbf{K}^{\mathrm{T}}}{\sqrt{d_k}}\right)\symbf{V}.
+\tag{2.12}
+\end{equation}
+
+\input{chapters/ch02_transformer}
+\input{chapters/ch02_data}
+\input{chapters/ch02_design}
+\input{chapters/ch02_architectures}
+\input{chapters/ch02_models}
+\input{chapters/ch02_t5}
+\input{chapters/ch02_gpt}
+\input{chapters/ch02_mixtral}
+\input{chapters/ch02_tutorial}
+\input{chapters/ch02_references}

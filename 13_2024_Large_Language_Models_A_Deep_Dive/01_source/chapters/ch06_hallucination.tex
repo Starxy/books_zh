@@ -1,0 +1,209 @@
+% PDF 247--257；原书第 219--229 页。
+\section{幻觉}
+\label{sec:ch06-hallucination}
+
+\begin{keypoint}
+语言模型的幻觉（hallucination）是指生成的文本虽然语法正确、表面连贯，却偏离事实或原始材料的意图。幻觉对大语言模型的可靠性及其在实际应用中的使用构成很大挑战。
+\end{keypoint}
+
+\refcite{ch06-ref-129}{Zhang 等人（2023）}的综述将大语言模型的幻觉主要分为三类。
+
+\begin{enumerate}
+\item \textbf{与输入冲突的幻觉（input-conflicting hallucination）。}大语言模型的输出偏离用户提供的输入，其中通常包括任务指令和实际待处理的内容。这类偏差可能表明模型误解了用户意图，或未忠实处理所给内容。机器翻译和摘要等传统自然语言处理任务中也常见这类问题。
+\item \textbf{与上下文冲突的幻觉（context-conflicting hallucination）。}在较长的对话或多轮交互中，大语言模型可能给出前后不一致的回答。这表明模型跟踪上下文或在长交互中保持连贯的能力可能不足，原因可能在于难以保留记忆或辨识上下文。
+\item \textbf{与事实冲突的幻觉（fact-conflicting hallucination）。}大语言模型生成与已知事实相悖的内容时，就会出现这类幻觉。它的成因多样，可能出现在模型生命周期的不同阶段。例如，询问历史事实时，大语言模型可能给出错误答案，传播错误信息。由于没有一套确切的知识库可供参照，与事实冲突的幻觉是三类幻觉中最复杂的问题。这类幻觉往往对大语言模型实际部署的影响更广，因此受到研究者更多关注。
+\end{enumerate}
+
+\subsection{成因}
+研究者考察大语言模型的幻觉时，发现以下几种促成因素。
+
+\begin{enumerate}
+\item \textbf{知识不足。}大语言模型可能缺少必要知识，或在预训练中吸收了错误信息。原因是它对本体知识的记忆和推理能力并不完善，见 \refcite{ch06-ref-061}{Li 等人（2022）}和 \refcite{ch06-ref-118}{Wu 等人（2023）}的研究。这些不足可能使大语言模型以过强的把握给出编造的回答。
+\item \textbf{训练数据偏差。}训练数据的性质会影响大语言模型产生幻觉的倾向。\refcite{ch06-ref-074}{McKenna 等人（2023）}发现，幻觉与训练数据分布有关，尤其是在模型倾向于确认训练集所支持的假设时。
+\item \textbf{人类语料可能有误。}人生成的语料也可能不准确，含有过时、带有偏差或编造的内容。在这些数据上训练的大语言模型，很可能在输出中复现这些错误（\refcite{ch06-ref-016}{Chang et al., 2019}；\refcite{ch06-ref-024}{Dziri et al., 2022}；\refcite{ch06-ref-065}{Liska et al., 2022}；\refcite{ch06-ref-090}{Penedo et al., 2023}）。
+\item \textbf{回答过于自信。}大语言模型常常高估自己的知识范围，给出过于自信而且错误的回答。\refcite{ch06-ref-051}{Kadavath 等人（2022）}和 \refcite{ch06-ref-122}{Yin 等人（2023）}指出了这一问题，即使 GPT-4 等先进模型的表现，与人类表现的参照也有明显差距。
+\item \textbf{对齐与迎合。}预训练后的对齐过程若没有考虑大语言模型已有的知识，可能诱发幻觉（\refcite{ch06-ref-099}{Schulman, 2023}）。这种偏差再加上大语言模型倾向于附和用户观点，即迎合（sycophancy），会使问题加剧（\refcite{ch06-ref-091}{Perez et al., 2022}）。
+\item \textbf{生成策略带来的风险。}大语言模型按序列生成，根据前面的词元逐个生成后续词元，可能放大早期的错误。这一过程被称为“幻觉滚雪球”（hallucination snowballing，\refcite{ch06-ref-091}{Perez et al., 2022}）。Top-$p$、Top-$k$ 等采样式生成策略所含的随机性，也是已知的幻觉来源（\refcite{ch06-ref-058}{Lee et al., 2022}）。
+\end{enumerate}
+
+\subsection{评估指标}
+本节概述评估大语言模型幻觉的若干方法。以往的幻觉评估高度依赖人类专家，专家按明确的原则进行评估（\refcite{ch06-ref-058}{Lee et al., 2022}；\refcite{ch06-ref-060}{Li et al., 2023a}；\refcite{ch06-ref-064}{Lin et al., 2021}；\refcite{ch06-ref-077}{Min et al., 2023}）。一般认为，人工评估最有助于保证评估的准确性。研究者也越来越关注自动评估，希望以更高效、更一致的方式评估大语言模型的幻觉。本节考察常用的人工评估技术和新出现的自动评估方法，说明它们的作用、效果和潜力。
+
+\subsubsection{人工评估}
+这种方法以专门制定的人工标注准则为基础，由标注者仔细检查模型生成的每段文本。例如，\refcite{ch06-ref-064}{Lin 等人（2021）}提出的 TruthfulQA 框架，用一组具体的指令指导标注者，把模型输出归入 13 个定性标签中的一个。这个过程还要用可靠的来源核查答案是否准确。\refcite{ch06-ref-058}{Lee 等人（2022）}同样使用人工标注，验证他们提出的自动评估指标是否有效。
+
+\refcite{ch06-ref-077}{Min 等人（2023）}提出的 FActScore 是另一个例子。它要求标注者根据知识来源，判断每项原子事实（atomic fact）是“有支持”还是“无支持”。若该事实与给定提示无关，则标作“不相关”。
+\begin{equation}
+\operatorname{FActScore}(\mathcal{M})
+ =\mathbb{E}_{x\in\mathcal{X}}\!\left[
+ \frac{1}{|A_y|}\sum_{a\in A_y} I[a\text{ 由 }C\text{ 支持}]
+ \;\middle|\; \mathcal{M}_x\text{ 给出回答}
+ \right].
+\label{eq:ch06-factscore}
+\end{equation}
+式中各量如下。
+
+\begin{itemize}
+\item $\mathcal{M}$ 是接受评估的语言模型。
+\item $\mathcal{X}$ 是供语言模型回答的一组提示。
+\item $C$ 是用于核查模型回答准确性的知识来源。
+\item $y=\mathcal{M}_x$ 是模型 $\mathcal{M}$ 针对 $\mathcal{X}$ 中的提示 $x$ 生成的回答。
+\item $A_y$ 是回答 $y$ 所含的原子事实列表。
+\item $I[a\text{ 由 }C\text{ 支持}]$ 是指示函数。原子事实 $a$ 得到知识来源 $C$ 支持时取 1，否则取 0。
+\end{itemize}
+
+按上述定义，FActScore 也可作为自动评估器，为检索系统评分。
+
+人工评估的结果通常可靠，也能作较细的解释，但仍有困难。一个重要问题是，人的判断带有主观性，可能造成结果不一致。不同标注者可能作不同的解读，使结果不够统一。此外，人工评估通常费时费力，成本较高，尤其是每引入一个新模型都要重新评估。
+
+\subsubsection{基于模型的自动评估}
+有些自动系统旨在模仿人的评估判断。例如，有研究将具有 67 亿参数的 GPT-3 微调，使其判断模型所生成答案的真实性，并在验证时取得了较高的准确率。
+
+AlignScore 是这类指标之一，用于评估文本的事实一致性。它比较两段文本 $a$ 和 $b$，判断 $b$ 是否包含 $a$ 中所有相关信息，并且没有矛盾（\refcite{ch06-ref-126}{Zha et al., 2023}）。定义一个对齐函数来分析文本对，确定两段文本的一致程度。数学上，该函数是一个映射 $f$，接收一对文本 $(a,b)$，为其赋予量化对齐程度的标签 $y$。
+\begin{equation}
+f\colon(a,b)\to y.
+\label{eq:ch06-align-mapping}
+\end{equation}
+
+为得到能够泛化的对齐函数，在多种语言任务上训练它，包括自然语言推断、事实核查、释义检测、文本语义相似性、问答、信息检索和摘要。为统一格式，将这些任务整理成文本对 $(a,b)$。
+
+训练函数预测对齐标签 $y$。任务可分为三种。
+\begin{itemize}
+\item \textbf{二分类。} $y_{\mathrm{bin}}\in\{\text{ALIGNED},\text{NOT ALIGNED}\}$。
+\item \textbf{三分类。} $y_{\mathrm{3way}}\in\{\text{ALIGNED},\text{CONTRADICT},\text{NEUTRAL}\}$。
+\item \textbf{回归。} $y_{\mathrm{reg}}\in[0,1]$。
+\end{itemize}
+用联合损失函数 $L_{\mathrm{total}}$ 衡量模型预测的准确程度。
+\begin{equation}
+L_{\mathrm{total}}=\lambda_1L_{\mathrm{3way}}
+  +\lambda_2L_{\mathrm{bin}}+\lambda_3L_{\mathrm{reg}},
+\label{eq:ch06-align-loss}
+\end{equation}
+其中，$\lambda_1$、$\lambda_2$ 和 $\lambda_3$ 是标量权重，分别控制各项损失的影响。
+
+\subsubsection{基于规则的自动评估}
+这种方法用预定义规则自动为大语言模型输出的事实准确性评分。可以直接用准确率指标衡量模型区分真伪陈述的能力。
+
+FactualityPrompt 将实体识别和蕴含指标结合起来，评估事实准确性的不同方面（\refcite{ch06-ref-058}{Lee et al., 2022}）。该框架分为几个阶段，见图~\ref{fig:ch06-factuality}。
+
+\begin{itemize}
+\item \textbf{生成续写。}大语言模型根据所给测试提示生成续写。
+\item \textbf{识别值得核查的续写。}重点找出含有需要核查的事实的续写。这一步很重要，因为语言模型也会生成非事实内容，例如个人观点或随意交谈。
+\item \textbf{准备参考事实。}为核查上一步找到的续写，准备相关的事实知识。
+\item \textbf{计算事实性和质量指标。}在最后一个阶段，计算续写的事实性和质量指标。
+\end{itemize}
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig06_01}
+\caption{FactualityPrompt 框架所定义的评估流程。}
+\label{fig:ch06-factuality}
+\end{figure}
+
+\subsection{评估基准}
+本节概述常用的基准，按其评估形式、任务形式和构造方法加以分类，见表~\ref{tab:ch06-hallucination-benchmarks}。
+
+\begin{table}[!htbp]
+\centering
+\caption{评估大语言模型幻觉的代表性基准及其关注点。各基准用于评估生成质量（Gen），或区分事实与非事实陈述（Dis）。不同指标适用于不同任务，包括问答（QA）、任务指令（TI）以及给定前缀的文本补全（TC）。}
+\label{tab:ch06-hallucination-benchmarks}
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}llrll@{}}
+\toprule
+基准 & 评估形式 & 规模 & 任务形式 & 指标\\
+\midrule
+TruthfulQA & Gen \& Dis & 817 & QA & 真实性\\
+FactualityPrompt & Gen & 16,000 & TC & 集成指标\\
+FActScore & Gen & 500 & TI & FActScore\\
+KoLA-KC & Gen & 190 & TI & 自对比\\
+HaluEval & Dis & 35,000 & QA \& TI & 准确率\\
+FACTOR & Dis & 4,030 & TC & 准确率\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{评估形式}
+评估幻觉时，主要考察大语言模型的两种能力。
+
+\begin{enumerate}
+\item \textbf{生成能力。}TruthfulQA、FactualityPrompt 和 FActScore 等基准考察大语言模型生成事实陈述的能力，关注生成文本的真实性与事实准确性。
+\item \textbf{辨别能力。}HaluEval 和 FACTOR 等基准考察大语言模型区分事实陈述与幻觉陈述（非事实陈述）的能力。
+\end{enumerate}
+
+\subsubsection{任务形式}
+评估幻觉时使用几类任务。
+
+\begin{enumerate}
+\item \textbf{问答任务。}TruthfulQA 等基准评估大语言模型能否为知识密集型问题给出准确答案。
+\item \textbf{传记生成和文本补全。}FActScore 考察生成传记的事实准确性。FACTOR 和 FactualityPrompt 则评估模型根据事实或非事实前缀补全文本时的表现。
+\end{enumerate}
+
+\subsubsection{构造方法}
+这类基准通常用以下办法构建。
+
+\begin{itemize}
+\item 由人工标注者创建并验证数据集，例如 FActScore 的人工流程。
+\item 其他方法既有人工标注大语言模型生成的文本，也有设计提示、自动生成文本并在之后进行人工评估，例如 HaluEval。
+\end{itemize}
+
+\subsection{缓解策略}
+本节介绍几种缓解策略，并指出它们适用于大语言模型开发过程的哪些阶段（图~\ref{fig:ch06-hallucination-mitigation}）。要了解各项技术的分类和细节，可参阅 \refcite{ch06-ref-129}{Zhang 等人（2023）}的综述。
+
+\subsubsection{预训练时的缓解措施}
+大语言模型的幻觉主要归因于预训练语料中有噪声或不可靠的数据。\refcite{ch06-ref-132}{Zhou 等人（2023）}等研究指出，大语言模型的参数知识（parametric knowledge），即嵌入已调参数中的知识，是在这一阶段形成的，对输出影响很大。在大语言模型出现之前，缓解幻觉主要依靠人工整理训练数据。\refcite{ch06-ref-031}{Gardent 等人（2017）}针对特定任务，借助筛选技术人工清理数据，减少了幻觉。
+
+\begin{practicaltip}
+大语言模型的预训练语料规模巨大，有数万亿个词元，人工整理并不现实。因此，通常依赖自动选择或筛选可靠数据。现有方法会自动选择高质量数据，或过滤噪声较多的数据。例如，按与高质量参考语料的相似程度清理 GPT-3 的预训练数据。Falcon（\refcite{ch06-ref-090}{Penedo et al., 2023}）和 phi-1.5（\refcite{ch06-ref-063}{Li et al., 2023c}）所用的是经过筛选的高质量数据，得到的模型更可靠。有些模型有选择地增加维基百科等事实性较强的来源的采样比例，提高预训练语料的质量（\refcite{ch06-ref-109}{Touvron et al., 2023}）。\refcite{ch06-ref-064}{Lin 等人（2021）}建议，在预训练时为事实性文档中的句子加上主题前缀。这样做提高了模型在 TruthfulQA 等基准上的表现。
+\end{practicaltip}
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig06_02}
+\caption{大语言模型生命周期各阶段的幻觉成因及相应的缓解策略。}
+\label{fig:ch06-hallucination-mitigation}
+\end{figure}
+
+\subsubsection{微调时的缓解措施}
+大语言模型通过微调学会运用预训练知识并与用户交互。与预训练相似，可以通过整理训练数据来减少微调中的幻觉。微调数据较少，人工和自动整理都可行。\refcite{ch06-ref-132}{Zhou 等人（2023）}构建了包含人工标注样例的数据集，也有研究者自动选择高质量的指令调优数据。
+
+\begin{practicaltip}
+在 TruthfulQA 等基准上，与使用未经整理的数据微调的模型相比，使用经过整理的指令数据微调的大语言模型，真实性和事实性更高。在微调数据中加入诚实作答的样例，例如用“Sorry, I don't know”（对不起，我不知道）承认自己无法回答，可以教模型拒绝回答超出其知识范围的问题，从而减少幻觉（\refcite{ch06-ref-105}{Sun et al., 2023}）。
+\end{practicaltip}
+
+\subsubsection{RLHF 时的缓解措施}
+RLHF 旨在使大语言模型符合人类偏好和具体的 3H 准则。3H 中的“诚实”侧重减少大语言模型回答中的幻觉。RLHF 主要包含两步，即（a）训练奖励模型和（b）优化语言模型。第一步用奖励模型代替人表达偏好，为大语言模型的各个回答分配适当的奖励值。接着使用奖励模型的反馈，借助 PPO 等强化学习算法优化语言模型，见第~\ref{ch:alignment}~章。
+
+\begin{practicaltip}
+RLHF 也能缓解监督微调中的行为克隆（behavior cloning）问题。在监督微调中，大语言模型可能模仿人类行为而没有理解背后的知识，从而产生幻觉。\refcite{ch06-ref-099}{Schulman（2023）}提出在 RLHF 中使用一种奖励函数减少幻觉，鼓励模型表达不确定性或承认自己无法回答。采用 RLHF 的模型使用合成幻觉数据后，在 TruthfulQA 等基准上的表现已有明显改善。
+\end{practicaltip}
+
+\subsubsection{推理时的缓解措施}
+与在训练时干预相比，推理时的缓解措施往往更节省成本，也更容易控制。贪心解码、束搜索解码和核采样等解码策略的选择，会显著影响大语言模型的输出。
+
+\begin{practicaltip}
+\refcite{ch06-ref-124}{Zarrieß 等人（2021）}讨论了解码策略如何改变模型生成的概率分布。\refcite{ch06-ref-058}{Lee 等人（2022）}评估大语言模型使用不同解码策略时生成内容的事实性。他们发现，\refcite{ch06-ref-046}{Holtzman 等人（2019）}提出的核采样所得内容，事实性不及贪心解码。这归因于 Top-$p$ 采样的随机性，它可能导致幻觉。为此，\refcite{ch06-ref-058}{Lee 等人（2022）}提出一种称为事实性核采样（factual-nucleus sampling）的解码算法，希望兼顾多样性和事实性。
+\end{practicaltip}
+
+另一种重要办法是用外部知识补充事实根据。做法是从可信来源获取知识，并用它指导大语言模型生成回答。\refcite{ch06-ref-095}{Ren 等人（2023）}和 \refcite{ch06-ref-076}{Mialon 等人（2023）}考察了这种方法，它通常包含知识获取和知识利用两步。
+
+\begin{enumerate}
+\item \textbf{知识获取。}大语言模型通过预训练和微调内化大量知识，形成参数知识。为避免错误或过时的参数知识引起幻觉，研究者建议从可信来源获取可靠且较新的知识。主要来源如下。
+  \begin{itemize}
+  \item \textbf{外部知识库。}从大规模非结构化语料（\refcite{ch06-ref-013}{Cai et al., 2021}）、结构化数据库（\refcite{ch06-ref-062}{Li et al., 2023b}）或维基百科等网站（\refcite{ch06-ref-121}{Yao et al., 2022}）检索信息。可使用多种检索器，例如 BM25（\refcite{ch06-ref-096}{Robertson et al., 2009}）或基于语言模型的方法（\refcite{ch06-ref-131}{Zhao et al., 2022}）。\refcite{ch06-ref-069}{Luo 等人（2023）}提出一个框架，从经过微调的白箱大语言模型的参数记忆中检索知识。\refcite{ch06-ref-026}{Feng 等人（2023）}研究怎样教大语言模型从外部知识图谱搜索相关领域知识。
+  \item \textbf{外部工具。}用外部工具提高大语言模型生成内容的事实性。例如，FacTool（\refcite{ch06-ref-017}{Chern et al., 2023}）在特定任务中使用相应方法检测幻觉。CRITIC（\refcite{ch06-ref-037}{Gou et al., 2023}）使大语言模型能够与多种工具交互，自行修改回答，提高真实性。
+  \end{itemize}
+\item \textbf{知识利用。}取得相关知识后，可以在不同阶段利用它减少大语言模型的幻觉。大体分为以下两种方式。
+  \begin{itemize}
+  \item \textbf{生成时补充。}在提示大语言模型之前，直接把检索到的知识或工具反馈接到用户查询上（\refcite{ch06-ref-100}{Shi et al., 2023}）。
+  \item \textbf{事后纠正。}构建辅助的“纠正器”，在后处理阶段修正幻觉（\refcite{ch06-ref-014}{Cao et al., 2020}）。
+  \end{itemize}
+\end{enumerate}
+
+估计大语言模型的不确定性，也是检测和减少幻觉的一个办法。它考察模型对输出有多大把握，大体可分为以下几种。
+
+\begin{enumerate}
+\item \textbf{基于 logit 的估计。}根据模型的 logit 计算词元级概率或熵。这种技术在机器学习中很常用（\refcite{ch06-ref-039}{Guo et al., 2017}）。
+\item \textbf{基于表述的估计。}用提示直接要求大语言模型表达自己的不确定性，例如给出置信度分数。采用思维链提示，可以进一步改善这一过程（\refcite{ch06-ref-116}{Wei et al., 2022}；\refcite{ch06-ref-119}{Xiong et al., 2023}）。\refcite{ch06-ref-079}{Mündler 等人（2023）}使用另一个大语言模型评估回答中有无逻辑矛盾。
+\item \textbf{基于一致性的估计。}这种办法假设，大语言模型不确定时会给出不一致的回答（\refcite{ch06-ref-100}{Shi et al., 2023}；\refcite{ch06-ref-130}{Zhao et al., 2023}）。SelfCheckGPT 在无额外资源的黑箱设置中采用基于一致性的方法，用多种指标衡量回答的一致程度（\refcite{ch06-ref-070}{Manakul et al., 2023}）。
+\end{enumerate}

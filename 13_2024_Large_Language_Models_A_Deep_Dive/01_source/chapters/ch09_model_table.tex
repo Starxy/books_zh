@@ -1,0 +1,45 @@
+% 横向版面保留原书七列与 18 个模型。
+\begin{landscape}
+\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.09}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{21mm}
+ >{\raggedright\arraybackslash}p{35mm}
+ >{\raggedright\arraybackslash}p{38mm}
+ >{\raggedright\arraybackslash}p{26mm}
+ >{\raggedright\arraybackslash}p{27mm}
+ >{\raggedright\arraybackslash}p{14mm}
+ >{\raggedright\arraybackslash}p{29mm}@{}}
+\caption{多模态大语言模型的输入与输出模态及其组件。I 为图像，V 为视频，A 为音频，T 为文本，3D 为三维数据，PT 为预训练，IT 为指令调优。}\label{tab:ch09-models}\\
+\toprule
+模型 & 输入到输出 & 模态编码器 & 输入投影器 & 核心大语言模型 & 输出投影器 & 模态生成器\\
+\midrule
+\endfirsthead
+\multicolumn{7}{@{}l}{表 \thetable\ （续）}\\
+\toprule
+模型 & 输入到输出 & 模态编码器 & 输入投影器 & 核心大语言模型 & 输出投影器 & 模态生成器\\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r@{}}{下页续}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Flamingo & I+V+T$\to$T & I/V：NFNet-F6 & 交叉注意力 & Chinchilla-\allowbreak 1.4B/7B/70B & — & —\\
+BLIP-2 & I+T$\to$T & I：CLIP/EVA-CLIP ViT@224 & Q-Former 与线性投影器 & Flan-T5/OPT & — & —\\
+LLaVA & I+T$\to$T & I：CLIP ViT-L/14 & 线性投影器 & Vicuna-7B/13B & — & —\\
+IDEFICS & I+T$\to$T & I：OpenCLIP ViT-H/14 & 交叉注意力 & LLaMA-v1 7B/65B & — & —\\
+MiniGPT-4 & I+T$\to$T & I：EVA-CLIP ViT-G/14 & Q-Former 与线性投影器 & Vicuna-13B & — & —\\
+X-LLM & I+V+A+T$\to$T & I/V：ViT-G，A：C-Former & Q-Former 与线性投影器 & ChatGLM-6B & — & —\\
+VideoChat & V+T$\to$T & V：ViT-G & Q-Former 与线性投影器 & Vicuna & — & —\\
+InstructBLIP & I+V+T$\to$T & I/V：ViT-G/14@224 & Q-Former 与线性投影器 & Flan-T5/Vicuna & — & —\\
+Video-LLaMA & I+V+A+T$\to$T & I/V：EVA-CLIP ViT-G/14，A：ImageBind & Q-Former 与线性投影器 & Vicuna/LLaMA & — & —\\
+BuboGPT & I+A+T$\to$T & I：CLIP/EVA-CLIP ViT，A：ImageBind & Q-Former 与线性投影器 & Vicuna（冻结） & — & —\\
+Qwen-VL-\allowbreak (Chat) & I+T$\to$T & I：以 OpenCLIP ViT-bigG 初始化的 ViT@448 & 交叉注意力 & Qwen-7B（PT 冻结，IT 用 PEFT） & — & —\\
+PaLM-E & I+3D+T$\to$T & I：ViT，3D：OSRT & 仿射变换 & PaLM（PT 冻结并协同训练） & — & —\\
+MACAW-LLM & I+V+A+T$\to$T & I/V：CLIP，A：Whisper & 线性投影器 & Llama-7B & — & —\\
+NExT-GPT & I+V+A+T$\to$\allowbreak I+V+A+T & I/V/A：ImageBind & 线性投影器 & Vicuna-7B（PEFT） & 小型 Trans\-former & I：Stable Diffusion，V：Zeroscope，A：AudioLDM\\
+MiniGPT-5 & I+T$\to$I+T & I：EVA-CLIP ViT-G/14 & Q-Former 与线性投影器 & Vicuna-7B（PEFT） & 小型 Trans\-former 与 MLP & I：Stable Diffusion 2\\
+LLaVA-1.5 & I+T$\to$T & I：CLIP ViT-L@336 & MLP & Vicuna-v1.5-\allowbreak 7B/13B（PT 冻结，IT 用 PEFT） & — & —\\
+X-InstructBLIP & I+V+A+3D+T$\to$T & I/V：EVA-CLIP ViT-G/14，A：BEATs，3D：ULIP-2 & Q-Former 与线性投影器 & Vicuna-v1.1-\allowbreak 7B/13B（冻结） & — & —\\
+CoDi-2 & I+V+A+T$\to$\allowbreak I+V+A+T & I/V/A：ImageBind & MLP & Llama-2-Chat-7B（PT 冻结，IT 用 PEFT） & MLP & I：Stable Diffusion 2.1，V：Zeroscope-v2，A：AudioLDM-2\\
+\end{longtable}
+\end{landscape}

@@ -1,0 +1,73 @@
+% PDF 290--293；原书第 262--265 页。
+\section{教程——衡量与缓解大语言模型的偏见}
+\label{sec:ch06-tutorial}
+\subsection{概述}
+第~\ref{sec:ch06-bias}~节讨论了大语言模型偏见的影响，以及为缓解偏见开发的一些技术。在这个教程中，我们将应用其中一种方法，观察模型行为的相应变化。这个练习参考了 \refcite{ch06-ref-075}{Meade 等人（2022）}的工作。他们考察了多种偏见缓解技术，并在 GitHub 仓库中提供了全部实验的代码。
+
+\begin{keypoint}
+\noindent\textbf{目标}
+\begin{itemize}
+\item 分析 CrowS 基准是怎样设计来衡量偏见的。
+\item 在 RoBERTa 上试用一种偏见缓解技术，评估改善程度。
+\item 在一项下游任务中应用去偏模型，考察其语言模型能力是否下降。
+\end{itemize}
+\end{keypoint}
+
+这里给出教程的简明版本。完整版见 \url{https://github.com/springer-llms-deep-dive/llms-deep-dive-tutorials}。
+
+\subsection{实验设计}
+本练习将演示如何用 \texttt{bias-bench} 库减少 RoBERTa 模型表现出的性别偏见。随后，用 CrowS 指标展示改善程度，并在情感分析任务中比较去偏模型与原始模型的能力。
+
+CrowS 基准的数据集由成对的句子组成。在每一对中，一个句子体现刻板印象，另一个句子替换相关词语，使之与刻板印象相反。例如，如果是种族刻板印象，可将“black”替换为“white”。如果是性别刻板印象，则可将“woman”替换为“man”，依此类推。除了这些词元，两句话的其他部分完全相同。用这些数据可衡量给定大语言模型的偏见，以及各种偏见缓解技术的相对效果。
+
+本实验选用 Sent-Debias 算法。它的出发点是，如果模型对性别等属性完全中立，那么“He was a slow runner”和“She was a slow runner”的嵌入一般很接近，甚至完全相同。嵌入之间的差异主要可归因于偏见。Sent-Debias 在许多样例中提取这种差异，通过主成分分析将它们映射到较低维的子空间，得到一组表示偏见方向的向量。学得子空间后，将它纳入前向传播。在返回最终输出之前，从任意文本表示中减去它在偏见子空间上的投影。
+
+Sent-Debias 需要一个规模较大、内容多样的数据集，来生成上述流程所用的句子。它有一组预定义的词用于增强数据，例如“boy”和“girl”。我们取维基百科的一批文本来学习模型偏见的表示，通过替换可能带有偏见的词元，从所得句子的嵌入差异中提取偏见信息。
+
+采用偏见缓解方法并评估性别偏见是否比原模型减少后，再比较模型在下游任务中接受微调的能力。这里使用 SST，它是 GLUE 基准中的标准情感分析数据集（\refcite{ch06-ref-102}{Socher et al., 2013}；\refcite{ch06-ref-113}{Wang et al., 2019}）。
+
+\subsection{结果与分析}
+开始去偏实验前，先评估 \texttt{roberta-base} 模型在 CrowS 上的表现。该指标反映在可能有偏见的句子中填入被遮盖词元时，模型选择刻板印象的可能性。在模型倾向刻板选项的情况下，数值越低越好。%
+\footnote{译注：按本节后文的比较，50.0 表示模型对两类选项无偏好。分数低于 50.0 时，不能再按越低越接近无偏好来解读。}
+能力较弱的语言模型也可能在该指标上接近理想表现，因为它对数据中偏见的学习不足，未能选出体现刻板印象的词元。按该指标衡量，能力较弱的大语言模型经常显得比能力更强的模型偏见更少。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={RoBERTa 的 CrowS 指标},label={lst:ch06-crows-original}]
+# Output
+-----------------------------------------------------------
+Total examples: 261
+Metric score: 60.15
+\end{lstlisting}
+\end{minipage}\par
+
+接着用 Sent-Debias 为 RoBERTa 计算性别偏见子空间。得到偏见方向后，再用 CrowS 基准评估性别偏见是否减少。结果已更接近 50.0，说明模型偏好刻板词元的频率低于原来。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={去偏后重新评估 CrowS 指标},label={lst:ch06-crows-debiased}]
+# Output
+-----------------------------------------------------------
+Total examples: 261
+Metric score: 52.11
+\end{lstlisting}
+\end{minipage}\par
+
+\begin{table}[!htbp]
+\centering
+\caption{比较不同模型在 CrowS 和 SST 基准上的表现，展示去偏的影响。}
+\label{tab:ch06-crows-sst}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+模型 & CrowS & SST\\
+\midrule
+基础 RoBERTa & 60.15 & 0.922\\
+采用 Sent-Debias 的 RoBERTa & 52.11 & 0.930\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+如上所述，模型在 CrowS 指标上的改善，可能与整体词元预测能力的下降有关。为确认减轻性别偏见后，大语言模型的任务表现仍然相近，对采用和未采用 Sent-Debias 的模型分别做情感分析微调，比较结果。重复运行训练过程时，数值有小幅变化，但无论是否采用 Sent-Debias，SST 测试数据上的准确率大致相同，见表~\ref{tab:ch06-crows-sst}。
+
+这些结果是积极的，但尚无法确定去偏是否已经成功，或经过处理的模型是否在微调过程中重新学到了一定程度的性别偏见。情感分析训练数据可能本身带有偏见，所用的 CrowS 指标未必容易反映它的影响。还需要更细致地分析这项任务，才能确定缓解偏见的尝试是否成功。
+
+\subsection{结论}
+本教程展示了一种有前景的缓解大语言模型偏见的方法，现有技术仍无法彻底解决这一问题。\refcite{ch06-ref-075}{Meade 等人（2022）}的一个重要发现是，虽然已有多种去偏策略，却没有一种能在不同模型和不同类型的偏见上始终有良好表现。他们还发现，用同一算法重复运行时，CrowS、StereoSet 和 SEAT 等基准的评估结果可能有较大波动。这使人们需要进一步研究，这些指标是否足以形成全面的偏见评估。衡量与缓解偏见都还需要进一步研究。

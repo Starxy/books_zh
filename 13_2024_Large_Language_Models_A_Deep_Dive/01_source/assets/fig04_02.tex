@@ -1,0 +1,20 @@
+% 重绘自原书第 138 页的图 4.2。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  stagebox/.style={draw=black!44,fill=cyan!20,align=center,inner sep=3pt,
+    minimum width=31mm,minimum height=12mm,rounded corners=2.4pt},
+  result/.style={stagebox,fill=green!23},
+  arrow/.style={draw=black!80,-{Stealth[length=1.4mm]},line width=.65pt}]
+\node[stagebox,fill=yellow!27,minimum width=24mm] (pre) at (0,0) {预训练\\语言模型};
+\node[stagebox] (ptft) at (3.20,1.66) {针对任务 A\\微调};
+\node[stagebox,fill=red!19] (prompt) at (3.20,0) {为任务 A 设计零样本\\或少样本提示};
+\node[stagebox] (it) at (3.20,-1.66) {在任务 B、C、D、\dots\\上微调};
+\foreach \item/\title in {ptft/预训练再微调,prompt/基于提示的学习,it/指令调优}{
+  \node[above=1pt of \item] {\title};
+  \node[result,right=5mm of \item] (\item-result) {在任务 A 上推理};
+  \draw[arrow] (\item.east) -- (\item-result.west);
+}
+\draw[arrow] (pre.east) to[out=13,in=190] (ptft.west);
+\draw[arrow] (pre.east) -- (prompt.west);
+\draw[arrow] (pre.east) to[out=-13,in=170] (it.west);
+\end{tikzpicture}

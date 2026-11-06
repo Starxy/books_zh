@@ -1,8 +1,8 @@
 {
-  "organized_on": "2026-11-02",
+  "organized_on": "2026-11-06",
   "root": ".",
   "operation": "保留TeX底本与必要PDF资料，完整中文译本统一保存在00_books。",
-  "status": "十一份中文PDF（十本书籍与一篇论文）已归档；《扩散模型原理》的中文TeX仍缺失，整本复核尚未启动。",
+  "status": "13 份中文 PDF 已归档。《扩散模型原理》的中文 TeX 仍缺失，整本复核尚未启动。",
   "subfolders": [
     "00_originals",
     "01_source",
@@ -383,16 +383,44 @@
       "build_command": "python \"12_2024_Deep_Generative_Modeling/01_source/build.py\"",
       "description": "书前材料、11 章及各章参考文献、附录 A、B 和中英索引。索引保留原书印刷页码并附中文章首页对照。",
       "source_route": "pdf"
+    },
+    {
+      "title": "Large Language Models: A Deep Dive",
+      "chinese_title": "大语言模型深度解析：贯通理论与实践",
+      "author": "Uday Kamath, Kevin Keenan, Garrett Somers, Sarah Sorenson",
+      "folder": "13_2024_Large_Language_Models_A_Deep_Dive",
+      "original_name": "[b]2024_Large Language Models-A deep dive.pdf",
+      "renamed_file": "2024_Large_Language_Models_A_Deep_Dive_1stEd_EN.pdf",
+      "relative_path": "13_2024_Large_Language_Models_A_Deep_Dive/00_originals/2024_Large_Language_Models_A_Deep_Dive_1stEd_EN.pdf",
+      "version": "First edition, Springer, 2024",
+      "doi": "10.1007/978-3-031-65647-7",
+      "pages": 496,
+      "bytes": 32174758,
+      "sha256": "c14da8038806dedeece9f5a2add5040412c05b11c8532df36865ce2bf6259fc2",
+      "translation_status": "全书中文译文已完成并编译",
+      "translated_pdf": "00_books/Large_Language_Models_A_Deep_Dive_cn_translated.pdf",
+      "translated_pages": 462,
+      "translated_bytes": 24302336,
+      "translated_sha256": "f288cc8ac5af9b9515909dc094a8278ce5caab091afaf13e5f208159c229e1af",
+      "chinese_source": "13_2024_Large_Language_Models_A_Deep_Dive/01_source",
+      "build_command": "python \"13_2024_Large_Language_Models_A_Deep_Dive/01_source/build.py\"",
+      "description": "书前材料、10 章及各章参考文献、附录 A、B 和 585 个中英索引词项。索引保留原版印刷页码，提供译文章节链接及两版起始页对照。",
+      "source_route": "pdf",
+      "source_metadata": "13_2024_Large_Language_Models_A_Deep_Dive/00_originals/source_metadata.json",
+      "split_directory": "13_2024_Large_Language_Models_A_Deep_Dive/00_originals/split",
+      "split_pdf_count": 14,
+      "glossary": "13_2024_Large_Language_Models_A_Deep_Dive/02_glossary/glossary_en_zh.md",
+      "translation_completed_on": "2026-11-06"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
   "split_summary": {
-    "scope": "仅有PDF底本的五本书保留分章文件；TeX底本按源码章节组织。",
-    "books": 5,
-    "total_pdfs": 101,
-    "total_chapters": 81,
-    "total_pages": 2563,
-    "verification_basis": "保留的分章文件沿用原拆分核验记录，本次未改变这些文件的内容。",
+    "scope": "六本 PDF 底本保留分章文件。TeX 底本按源码章节组织。",
+    "books": 6,
+    "total_pdfs": 115,
+    "total_chapters": 91,
+    "total_pages": 3059,
+    "verification_basis": "既有分章文件沿用原核验记录。《大语言模型深度解析》分章已逐页比较整书的文字和页码标签。",
     "overview_file": "00_chapter_split_overview.md"
   },
   "initial_organization": {
@@ -400,7 +428,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 4338,
+  "translated_pages_total": 4800,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -416,7 +444,7 @@
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 12,
+  "collection_count": 13,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",

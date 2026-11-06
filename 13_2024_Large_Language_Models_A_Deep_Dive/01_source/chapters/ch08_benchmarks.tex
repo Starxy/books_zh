@@ -1,0 +1,57 @@
+% 原书第 8.4 节。
+\section{大语言模型的基准数据集}
+\label{sec:ch08-benchmarks}
+基准通过一套标准化指标，使不同大语言模型之间的比较更公平。借助基准，可以找出在特定情境中表现最好的模型，跟踪同一个模型随时间取得的改进，也可以比较不同模型的长短。基准数据集可以由多项任务组成，也可以只包含一项任务。每项任务都有自己的评估指标，用于考察模型的特定语言能力。本节介绍若干重要数据集及其用途。
+
+
+\medskip\noindent\textbf{多任务或通用能力}\par\nobreak
+\textbf{基准}包括 MMLU（\refcite{ch08-ref-029}{Hendrycks et al., 2020}）、SuperGLUE（\refcite{ch08-ref-096}{Wang et al., 2019}）、BIG-bench（\refcite{ch08-ref-091}{Srivastava et al., 2022}）、GLUE（\refcite{ch08-ref-095}{Wang et al., 2018}）、BBH（\refcite{ch08-ref-091}{Srivastava et al., 2022}）、Blended Skill Talk（\refcite{ch08-ref-090}{Smith et al., 2020}）和 HELM（\refcite{ch08-ref-049}{Liang et al., 2022}）。
+\par\textbf{用途}是评估语言模型在多种任务上的表现，综合考察通用语言理解、推理、生成等能力。
+
+\medskip\noindent\textbf{语言理解}\par\nobreak
+\textbf{基准}包括 CoQA（\refcite{ch08-ref-078}{Reddy et al., 2019}）、WiC（\refcite{ch08-ref-071}{Pilehvar and Camacho-Collados, 2018}）、Wikitext103（\refcite{ch08-ref-056}{Merity et al., 2016}）、PG19（\refcite{ch08-ref-073}{Rae et al., 2019}）、QQP（\refcite{ch08-ref-043}{Le et al., 2021}）、CB（De \refcite{ch08-ref-022}{Marneffe et al., 2019}）、CNSS（\refcite{ch08-ref-051}{Liu et al., 2018}）、CKBQA（\refcite{ch08-ref-046}{Li et al., 2016}）、AQuA（\refcite{ch08-ref-050}{Ling et al., 2017}）、OntoNotes（\refcite{ch08-ref-099}{Weischedel et al., 2011}）、HeadQA（\refcite{ch08-ref-094}{Vilares and Gómez-Rodríguez, 2019}）和 Twitter Dataset（\refcite{ch08-ref-009}{Blodgett et al., 2016}）。
+\par\textbf{用途}是考察语言理解的不同方面，包括问答、语境中的词义消歧和情感分析。
+
+\medskip\noindent\textbf{故事填空与句子补全}\par\nobreak
+\textbf{基准}包括 StoryCloze（\refcite{ch08-ref-060}{Mostafazadeh et al., 2016}）、LAMBADA（\refcite{ch08-ref-066}{Paperno et al., 2016}）、AdGen（\refcite{ch08-ref-088}{Shao et al., 2019}）和 E2E（\refcite{ch08-ref-063}{Novikova et al., 2017}）。
+\par\textbf{用途}是测试模型补全故事和句子的能力。完成这类任务需要理解叙事语境，进行常识推理，并生成连贯文本。
+
+\medskip\noindent\textbf{物理知识与世界知识}\par\nobreak
+\textbf{基准}包括 PIQA（\refcite{ch08-ref-008}{Bisk et al., 2020}）、TriviaQA（\refcite{ch08-ref-034}{Joshi et al., 2017}）、ARC、ARC-Easy 和 ARC-Challenge（\refcite{ch08-ref-018}{Clark et al., 2018}）、PROST（\refcite{ch08-ref-005}{Aroca-Ouellette et al., 2021}）、OpenBookQA（\refcite{ch08-ref-058}{Mihaylov et al., 2018}）和 WebNLG（\refcite{ch08-ref-026}{Ferreira et al., 2020}）。
+\par\textbf{用途}是考察模型对物理概念和一般世界知识的理解，常采用问答形式。
+
+\medskip\noindent\textbf{语境中的语言理解}\par\nobreak
+\textbf{基准}包括 RACE、RACE-Middle 和 RACE-High（\refcite{ch08-ref-041}{Lai et al., 2017}）、QuAC（\refcite{ch08-ref-015}{Choi et al., 2018}）、StrategyQA（\refcite{ch08-ref-028}{Geva et al., 2021}）和 Quiz Bowl（\refcite{ch08-ref-011}{Boyd-Graber et al., 2012}）。
+\par\textbf{用途}是评估模型在语境中理解和解释语言的能力。这是聊天机器人和内容分析等应用所需的能力。
+
+\medskip\noindent\textbf{常识推理}\par\nobreak
+\textbf{基准}包括 WinoGrande（\refcite{ch08-ref-082}{Sakaguchi et al., 2021}）、HellaSwag（\refcite{ch08-ref-109}{Zellers et al., 2019}）、COPA（\refcite{ch08-ref-080}{Roemmele et al., 2011}）、WSC（\refcite{ch08-ref-044}{Levesque et al., 2012}）、CSQA（\refcite{ch08-ref-092}{Talmor et al., 2018}）、SIQA（\refcite{ch08-ref-083}{Sap et al., 2019}）和 ReCoRD（\refcite{ch08-ref-110}{Zhang et al., 2018}）。
+\par\textbf{用途}是考察模型能否在复杂的自然语言任务中运用常识推理、因果理解和现实世界知识。
+
+\medskip\noindent\textbf{阅读理解}\par\nobreak
+\textbf{基准}包括 SQuAD（\refcite{ch08-ref-074}{Rajpurkar et al., 2016}）、BoolQ（\refcite{ch08-ref-016}{Clark et al., 2019}）、SQuADv2（\refcite{ch08-ref-075}{Rajpurkar et al., 2018}）、DROP（\refcite{ch08-ref-025}{Dua et al., 2019}）、RTE（\refcite{ch08-ref-021}{Dagan et al., 2005}）、WebQA（\refcite{ch08-ref-013}{Chang et al., 2022}）、MultiRC（\refcite{ch08-ref-035}{Khashabi et al., 2018}）、Natural Questions（\refcite{ch08-ref-039}{Kwiatkowski et al., 2019}）、SciQ（\refcite{ch08-ref-100}{Welbl et al., 2017}）和 QA4MRE（\refcite{ch08-ref-070}{Peñas et al., 2013}）。
+\par\textbf{用途}是测试模型分析和理解文段，并根据文段回答问题的能力。
+
+\medskip\noindent\textbf{数学推理}\par\nobreak
+\textbf{基准}包括 MATH（\refcite{ch08-ref-030}{Hendrycks et al., 2021}）、Math23k（\refcite{ch08-ref-097}{Wang et al., 2017}）、GSM8K（\refcite{ch08-ref-019}{Cobbe et al., 2021}）、MathQA（\refcite{ch08-ref-006}{Austin et al., 2021}）、MGSM（\refcite{ch08-ref-089}{Shi et al., 2022}）、MultiArith（\refcite{ch08-ref-081}{Roy and Roth, 2016}）、ASDiv（\refcite{ch08-ref-057}{Miao et al., 2021}）、MAWPS（\refcite{ch08-ref-036}{Koncel-Kedziorski et al., 2016}）和 SVAMP（\refcite{ch08-ref-068}{Patel et al., 2021}）。
+\par\textbf{用途}是评估模型解答数学问题的能力，范围从基础算术到更复杂的代数和几何问题。
+
+\medskip\noindent\textbf{问题求解}\par\nobreak
+\textbf{基准}包括 HumanEval（\refcite{ch08-ref-014}{Chen et al., 2021}）、DS-1000（\refcite{ch08-ref-042}{Lai et al., 2023}）、MBPP（\refcite{ch08-ref-006}{Austin et al., 2021}）、APPS（\refcite{ch08-ref-030}{Hendrycks et al., 2021}）和 CodeContests（\refcite{ch08-ref-048}{Li et al., 2022}）。
+\par\textbf{用途}是测试模型运用逻辑和推理解决各种问题的能力，其中包括编程挑战。
+
+\medskip\noindent\textbf{自然语言推断与逻辑推理}\par\nobreak
+\textbf{基准}包括 ANLI（\refcite{ch08-ref-062}{Nie et al., 2019}）、MNLI-m 和 MNLI-mm（\refcite{ch08-ref-102}{Williams et al., 2017}）、QNLI（\refcite{ch08-ref-074}{Rajpurkar et al., 2016}）、WNLI（\refcite{ch08-ref-044}{Levesque et al., 2012}）、ANLI R1、ANLI R2 和 ANLI R3（\refcite{ch08-ref-062}{Nie et al., 2019}）、HANS（\refcite{ch08-ref-055}{McCoy et al., 2019}）、LogiQA（\refcite{ch08-ref-052}{Liu et al., 2020}）和 StrategyQA（\refcite{ch08-ref-028}{Geva et al., 2021}）。
+\par\textbf{用途}是考察模型根据给定文本作出推断的能力。这是理解自然语言和用自然语言推理的重要组成部分。
+
+\medskip\noindent\textbf{跨语言理解}\par\nobreak
+\textbf{基准}包括 MLQA（\refcite{ch08-ref-045}{Lewis et al., 2019}）、XNLI（\refcite{ch08-ref-020}{Conneau et al., 2018}）、PAWS-X（\refcite{ch08-ref-104}{Yang et al., 2019}）、XSum（\refcite{ch08-ref-061}{Narayan et al., 2018}）、XCOPA（\refcite{ch08-ref-072}{Ponti et al., 2020}）、XWinograd（\refcite{ch08-ref-093}{Tikhonov and Ryabinin, 2021}）、TyDiQAGoldP（\refcite{ch08-ref-017}{Clark et al., 2020}）和 MLSum（\refcite{ch08-ref-086}{Scialom et al., 2020}）。
+\par\textbf{用途}是评估模型理解和处理不同语言语境的能力，对多语言环境中的应用很重要。
+
+\medskip\noindent\textbf{语言翻译}\par\nobreak
+\textbf{基准}包括 WMT（\refcite{ch08-ref-010}{Bojar et al., 2016}）、WMT20 和 WMT20-enzh（\refcite{ch08-ref-054}{Loïc et al., 2020}）。
+\par\textbf{用途}是评估模型在不同语言之间翻译文本的熟练程度。翻译是自然语言处理的一项基本任务。
+
+\medskip\noindent\textbf{对话}\par\nobreak
+\textbf{基准}包括 Wizard of Wikipedia（\refcite{ch08-ref-023}{Dinan et al., 2018}）、Empathetic Dialogues（\refcite{ch08-ref-077}{Rashkin et al., 2018}）、DPC 生成的对话（\refcite{ch08-ref-031}{Hoffmann et al., 2022}）和 ConvAI（\refcite{ch08-ref-024}{Dinan et al., 2020}）。
+\par\textbf{用途}是评估模型进行连贯、符合语境的对话的能力，这对开发聊天机器人十分重要。

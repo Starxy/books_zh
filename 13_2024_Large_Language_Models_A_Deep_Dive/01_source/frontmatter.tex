@@ -1,0 +1,148 @@
+% PDF 1: 封面。
+\definecolor{coverblue}{HTML}{214358}
+\definecolor{coverlight}{HTML}{A4D2E8}
+\pagecolor{coverblue}
+\begin{titlepage}
+\color{white}
+\pdfbookmark[0]{封面}{cover}
+\noindent\includegraphics[width=\linewidth]{assets/cover_art.pdf}\par
+\vspace{21pt}
+\noindent{\sffamily\large\color{coverlight}Uday Kamath · Kevin Keenan\par
+\noindent Garrett Somers · Sarah Sorenson\par}
+\vspace{22pt}
+\noindent{\sffamily\bfseries\fontsize{28}{36}\selectfont 大语言模型深度解析\par}
+\vspace{10pt}
+\noindent{\sffamily\Large\color{coverlight}贯通理论与实践\par}
+\vspace{16pt}
+\noindent{\large Large Language Models: A Deep Dive\par}
+\noindent Bridging Theory and Practice\par
+\vfill
+\iftranslationcomplete\else
+\noindent{\sffamily 译排进行中}\par\medskip
+\fi
+\noindent 原版由 Springer 出版，2024\par
+\end{titlepage}
+\nopagecolor
+
+% PDF 2--3: 半书名页与书名页。
+\thispagestyle{empty}
+\vspace*{15mm}
+\noindent{\sffamily\bfseries\Large 大语言模型深度解析\par}
+\clearpage
+\thispagestyle{empty}
+\vspace*{15mm}
+\noindent{\large Uday Kamath · Kevin Keenan\par
+\noindent Garrett Somers · Sarah Sorenson\par}
+\vspace{23mm}
+\noindent{\sffamily\bfseries\Huge 大语言模型深度解析\par}
+\medskip
+\noindent{\sffamily\Large 贯通理论与实践\par}
+\vfill
+\noindent Springer · Cham
+\clearpage
+
+% PDF 4: 出版和版权信息。
+\thispagestyle{empty}
+\noindent
+\begin{tabularx}{\linewidth}{@{}XX@{}}
+Uday Kamath & Kevin Keenan\\
+Smarsh & Smarsh\\
+美国弗吉尼亚州阿什本 & 英国唐郡卡斯尔韦兰\\[8pt]
+Garrett Somers & Sarah Sorenson\\
+Smarsh & Smarsh\\
+美国田纳西州纳什维尔 & 美国弗吉尼亚州雷斯顿
+\end{tabularx}
+\vfill
+\begingroup
+\small
+\setlength{\parindent}{0pt}
+ISBN 978-3-031-65646-0\par
+ISBN 978-3-031-65647-7（电子书）\par
+\url{https://doi.org/10.1007/978-3-031-65647-7}\par\smallskip
+
+\textcopyright\ 编者（如有）及作者，2024 年独家许可予 Springer Nature Switzerland AG。
+
+本书受著作权保护。无论涉及全部材料还是其中一部分，所有权利均由出版方独占取得许可。这些权利尤其包括翻译、重印、再使用插图、朗诵、广播、以微缩胶片或其他实物方式复制、传输或存储和检索信息、电子改编、以计算机软件使用，以及采用任何已知或日后发展出的类似或不同方法使用的权利。
+
+本书使用一般性描述名称、注册名称、商标、服务标记等。即使未作专门说明，也不能据此认定这些名称不受有关保护性法律法规约束，可以自由使用。
+
+出版方、作者和编者认为，本书所载建议和信息在出版时真实、准确。出版方、作者和编者均不就本书所载材料或其中可能存在的错误或遗漏作出任何明示或默示保证。对于所刊地图和机构隶属关系中涉及的管辖权主张，出版方保持中立。\par\smallskip
+
+本书以 Springer 品牌出版，出版公司为 Springer Nature Switzerland AG。\par
+公司注册地址为 Gewerbestrasse 11, 6330 Cham, Switzerland。\par\smallskip
+若需处置本书，请将纸张回收。
+\endgroup
+\clearpage
+
+% PDF 5: 献词。
+\thispagestyle{empty}
+\vspace*{28mm}
+\begin{flushright}
+献给我的父母 Krishna 和 Bharathi、妻子 Pratibha、孩子 Aaroh 和 Brandy，以及我亲爱的家人和朋友 Anu、Jyoti、Maithilee、Munnu、Nana、Priyal、Shilpa、Sunila、Swati 和 Swetha。感谢你们始终如一的支持、爱和关怀，尤其是在我患病期间。\par
+——Uday Kamath\par\bigskip
+
+献给我的父母 Eugene 和 Evelyn，始终耐心、深爱着我的妻子 Kaitlin，以及我美丽的孩子 Éirinn 和 Méabh。你们欣然支持我做过许多事，而其中少有像写这本书这样雄心勃勃的事。\par
+——Kevin Keenan\par\bigskip
+
+献给我出色的女儿们 Octavia 和 Lyra。\par
+——Garrett Somers\par\bigskip
+
+献给我的丈夫 Matthew。写作期间，我常常抽不出时间，他一一体谅，只有偶尔才抱怨几句。\par
+——Sarah Sorenson
+\end{flushright}
+
+% PDF 6--7: 序。
+\frontchapter{序}
+大语言模型（Large Language Model，LLM）彻底改变了人工智能（Artificial Intelligence，AI）领域，正在改变人们与技术交互的方式，也在重塑多个行业。我在牛津大学（University of Oxford）担任多门人工智能课程的课程主任，同时参与世界各地多个创业项目，亲眼见到这些模型如何解决复杂问题、简化日常工作。本书面世正逢其时，为理解和使用大语言模型提供了全面的指引。作者把模型背后的复杂架构和算法逐步拆解，讲得明白，使不同背景的读者都能理解。
+
+我认识第一作者 Uday Kamath 博士已有一段时间，也一直关注他的工作。他在人工智能领域的专长和见解广受认可。本书体现了他对这一领域的深入理解和创新思考。从预训练（pre-training）与基于提示的学习（prompt-based learning）的基础，到微调（fine-tuning）方法和检索增强生成（Retrieval-Augmented Generation，RAG）等进阶主题，书中都作了详细介绍。我尤其看重它对实践的重视。每章都着眼于为读者提供在真实场景中应用大语言模型所需的知识和技能。通过动手教程和实际案例，读者可以理解理论，也会更有把握在工作中有效地应用这些模型。
+
+专门讲解大语言模型运维（Large Language Model Operations，LLMOps）和生产部署（productionizing）的一章尤其有价值。它细致说明怎样在实际环境中部署和运行这些模型，让读者把理论知识转化为实际成果。书中还汇集了大量数据集、基准和评估指标，可供读者探索大语言模型应用。多模态大语言模型（Multimodal Large Language Model，MMLLM）一章则将视野从文本扩展到音频、图像、视频以及机器人的输入和输出，展现了人工智能交互的新方向。本书也讨论了与大语言模型相关的伦理难题，包括偏见（bias）、公平性（fairness）和隐私。在发挥这些模型能力的同时，负责任地使用它们至关重要。作者提出了应对这些问题的策略，有助于使模型的使用符合人类价值观。
+
+总之，凡是对大语言模型感兴趣的读者，都可从本书获益。它深入讲解技术，提供实践经验，并讨论伦理问题，是了解人工智能未来发展的指南。作者考察详实，表述清楚。我相信，本书在未来多年都将是这一领域的重要参考。
+\reviewer{——Ajit Jaokar，牛津大学人工智能课程主任、访问研究员}
+
+% PDF 8--9: 推荐语。
+\frontchapter{推荐语}
+“作为一名资深技术高管和行业意见领袖，我意识到，大语言模型在产品开发各个环节中的作用越来越重要，从提高开发效率到推动产品和营销落地，无一例外。为了打牢基础，我读了这本大语言模型著作，发现它是一部难得的指南。在我和团队探索如何把大语言模型的能力用于产品时，它已经成了我随时查阅的参考书。
+
+“本书揭开了大语言模型的复杂面纱，从精细的架构讲到部署中的伦理考量，也着眼于多模态大语言模型的未来，说明模型怎样从文本扩展到音频、图像和视频。在今天这个由人工智能驱动的世界，任何想理解并运用大语言模型变革力量的人，都值得读一读这本内容全面、富有实践见解的书。”
+\reviewer{——Shalini Govil Pai，Google 副总裁兼总经理}
+
+“文字准确，技术性强，适合具有扎实机器学习（machine learning）和人工智能基础的读者。全书信息密集，作者假定读者熟悉较高阶的数学概念并具备编程能力。尽管技术内容深入，本书结构分明，解释清楚，论述循序展开。”
+\reviewer{——Sherry Marcus 博士，Amazon AWS 生成式人工智能应用科学总监}
+
+“生成式人工智能（Generative AI）是当下的热门话题。它究竟会改变社会与商业的面貌，还是仅仅又一个流行词？要理解生成式人工智能的巨大潜力、风险和挑战，这本书值得一读。它完整走过生成式人工智能的生命周期，非常适合寻找全面指南的读者。开头用语言模型的发展史交代背景，接着深入讲解 Transformer 架构、提示工程（prompt engineering）、微调与检索增强生成，最后介绍部署这些方案的实用步骤。我觉得本书用途广泛，读来引人入胜，开发人员和人工智能爱好者都适合读。末章对生成式人工智能未来的展望尤其有见地。我诚挚推荐。”
+\reviewer{——Eduardo Ordax，Amazon 生成式人工智能负责人、AWS 技术布道师}
+
+“本书的覆盖面和时效性令人印象深刻。作者细致梳理了大语言模型近年的发展，将各种技术放到实际情境中组织、讲解。因此，对专业人士和研究人员而言，这是一份重要的参考，尤其适用于改善信息系统中的用户体验和交互。”
+\reviewer{——Prithvi Prabhu，H2O.ai 首席技术专家}
+
+“Kamath 与合著者为想深入理解大语言模型的研究人员和学生提供了一份全面的资料。书中巧妙连接理论和实践，也纳入多模态模型等前沿进展，因此对学术研究人员和产业界科学家都很有吸引力，值得常备。”
+\reviewer{——Amarda Shehu 博士，乔治梅森大学（George Mason University）计算机科学教授，工程与计算学院分管人工智能创新的副院长}
+
+“本书概述了构建可靠的大语言模型软件所需的知识。即使数据相当复杂，你也可以了解如何围绕产品和业务目标选择、调整、评估模型，以及如何借助 RAG 补充大语言模型系统。推荐所有人工智能工程师阅读！”
+\reviewer{——Daniel Svonava，Superlinked 创始人兼首席执行官}
+
+\input{preface}
+
+% PDF 18: 致谢。
+\frontchapter{致谢}
+没有许多人的大力帮助，本书就无法成稿。首先感谢 Springer，特别是我们的编辑 Paul Drougas 和协调人 Jacob Shmulewitz。他们与我们密切合作，促成本书出版。感谢 Smarsh 给予我们处理现实世界中多模态、多语言难题的机会，也感谢公司培育的研究和创新氛围，它对本书的工作影响深远。
+
+我们衷心感谢以下人士（按英文字母顺序排列）。Felipe Blanco、Shekar Gothoskar、Gaurav Harode、Sarang Kayande 博士、Ankit Mittal、Sasi Mudigonda、Raj Pai、Gokul Patel、Sachin Phadnis、Ross Turner 博士、Sameer Vajre 和 Vedant Vajre 对内容提出的反馈、建议以及他们作出的贡献，对完成本书至关重要。最后，我们诚挚感谢阅读、审阅本书并为序言和推荐语供稿的行业专家和研究人员。你们的见解和专业知识弥足珍贵。特别感谢 Ajit Jaokar、Shalini Govil Pai、Sherry Marcus 博士、Prithvi Prabhu、Amarda Shehu 博士和 Daniel Svonava。
+
+% PDF 19: 声明。
+\frontchapter{声明}
+\noindent\textbf{利益冲突}\enspace 作者没有与本书内容相关的利益冲突需要申报。
+
+\noindent\textbf{图表重制}\enspace 本书中据研究论文重制或改编的图均由作者绘制。有些图可能没有在图中明确写出原始出处，正文相应各节均恰当引用了原作。书中所有表格也遵循同样的做法。
+
+\noindent\textbf{伦理审批}\enspace 本书不包含以人或动物为参与对象的一手研究，因此无须伦理审批。
+
+\input{notation}
+% PDF 22--29: 目录随中文分页生成。
+\clearpage
+\pdfbookmark[0]{目录}{contents}
+\tableofcontents
+\input{acronyms}

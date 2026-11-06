@@ -1,0 +1,17 @@
+% 重绘自原书第 295 页的图 7.7。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  box/.style={draw=black!59,inner sep=4pt,minimum width=21mm,align=center,
+    font=\footnotesize\sffamily\bfseries},
+  metric/.style={fill=yellow!26,inner sep=4pt,align=center},
+  wire/.style={draw=black!66,-{Stealth[length=1.6mm]},line width=.61pt}]
+\node[box,fill=cyan!19] (query) at (0,2.17) {原始查询};
+\node[box,fill=green!18] (docs) at (-3.00,0) {检索文档};
+\node[box,fill=violet!16] (resp) at (3.00,0) {生成回答};
+\draw[wire] (docs.north east) -- node[midway,fill=white,inner sep=1.4pt] {相关于} (query.west);
+\draw[wire] (resp.north west) -- node[midway,fill=white,inner sep=1.4pt] {相关于} (query.east);
+\draw[wire] (resp.west) -- node[midway,fill=white,inner sep=1.4pt] {忠实于} (docs.east);
+\node[metric] at (-3.40,1.68) {上下文相关性};
+\node[metric] at (3.40,1.68) {答案相关性};
+\node[metric] at (0,-.91) {答案忠实度};
+\end{tikzpicture}

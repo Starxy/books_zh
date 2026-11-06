@@ -1,0 +1,51 @@
+% 重绘自原书第 32 页的图 2.2。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  flow/.style={draw=black!60,line width=.45pt,-{Stealth[length=1.1mm]}},
+  wire/.style={draw=black!60,line width=.45pt},
+  value/.style={draw=black!65,rounded corners=1pt,fill=white,minimum width=3.6mm,minimum height=7.3mm,inner sep=0pt},
+  op/.style={circle,draw=black!55,fill=white,minimum size=3.7mm,inner sep=0pt}]
+\filldraw[fill=yellow!18,draw=black!55,rounded corners=4mm] (2.48,-.46) rectangle (7.33,4.01);
+\node[font=\footnotesize\sffamily\bfseries] at (4.94,3.78) {存储库};
+\node at (2.95,3.53) {值};
+\node at (2.95,.14) {键};
+
+\node[op,minimum size=4.5mm] (sum) at (8.25,2.33) {$\sum$};
+\node[value,minimum width=8.8mm,minimum height=4mm] (output) at (8.25,3.27) {};
+\node[above=1pt of output] {输出};
+\fill[orange!55!gray!20] (8.15,3.27) circle[radius=1mm];
+\fill[orange!55!gray!20] (8.35,3.27) circle[radius=1mm];
+\draw[flow] (sum.north) -- (output.south);
+\node[anchor=west] at (8.56,2.33) {$\symbf{o}=\sum_{i=1}^{n}b_i\symbf{v}_i$};
+
+\node[value,minimum width=8.8mm,minimum height=4mm] (query) at (8.25,.61) {};
+\node[below=1pt of query] {查询 $\symbf{q}$};
+\fill[violet!68] (8.15,.61) circle[radius=1mm];
+\fill[violet!68] (8.35,.61) circle[radius=1mm];
+\draw[wire] (query.west) -- (6.76,.61) -- (6.76,1.16) -- (3.68,1.16);
+
+\foreach \x/\i/\delta in {3.82/1/.44,4.99/2/.27,6.16/n/.10} {
+  \node[value] (v\i) at (\x,3.06) {};
+  \node[value] (k\i) at (\x,.48) {};
+  \node[op] (m\i) at (\x,2.33) {$\times$};
+  \fill[green!34!gray!25] (\x,3.17) circle[radius=.94mm];
+  \fill[green!34!gray!25] (\x,2.96) circle[radius=.94mm];
+  \fill[blue!60!gray!35] (\x,.58) circle[radius=.94mm];
+  \fill[blue!60!gray!35] (\x,.38) circle[radius=.94mm];
+  \fill[blue!43!gray!28] (\x,1.53) circle[radius=1.15mm];
+  \fill[blue!43!gray!28] (\x,1.91) circle[radius=1.15mm];
+  \node[anchor=west] at (\x+.13,1.53) {$a_{\i}$};
+  \node[anchor=west] at (\x+.13,1.91) {$b_{\i}$};
+  \node[above=1pt of v\i] {$\symbf{v}_{\i}$};
+  \node[below=1pt of k\i] {$\symbf{k}_{\i}$};
+  \draw[flow] (k\i.north) -- (\x,1.41);
+  \draw[flow] (\x-.14,1.16) -- (\x-.14,1.36) -- (\x-.09,1.46);
+  \draw[flow] (\x,1.64) -- (\x,1.80);
+  \draw[flow] (\x,2.02) -- (m\i.south);
+  \draw[flow] (v\i.south) -- (m\i.north);
+  \draw[flow] (m\i.east) -- (\x+.27,2.33) -- (\x+.27,2.33+\delta)
+    -- (7.76,2.33+\delta) -- (sum.west);
+}
+\node[anchor=east] at (2.36,1.91) {$b_i=\dfrac{\exp(a_i)}{\sum_j\exp(a_j)}$};
+\node[anchor=east] at (2.36,1.30) {$a_i=\alpha(\symbf{q},\symbf{k}_i)$};
+\end{tikzpicture}

@@ -1,0 +1,166 @@
+% PDF 234--240；原书第 206--212 页。
+\section{应对 RLHF 的难题}
+\label{sec:ch05-rlhf-challenges}
+\subsection{用人工智能反馈提高无害性}
+\begin{keypoint}
+\noindent\textbf{主要贡献}\quad 这项研究提出一种在专家预设规则（宪法）内运行的人工智能系统，以遵循专家的价值观并防止有害行为。为提高无害性，框架用反馈机制逐步改善人工智能的决策过程。通过专家反馈与持续学习，系统调整自身行为，使之更符合专家的价值观，减少非预期的负面后果。
+\end{keypoint}
+
+扩大 RLHF 的规模以及保持反馈的一致性，都存在明显困难。RLHF 需要召集大量众包人员，评估许多由人工智能生成的回答，并按偏好给它们排序。然后训练人工智能模仿“偏好”的回答，回避其余回答。这种办法成本高，耗费人力，还让人工智能的伦理判断取决于众包人员。尽管他们接受过有关所需回答规范的培训，但遵守这些规范的程度各不相同。
+
+Anthropic 的研究团队在题为《宪法式人工智能：从人工智能反馈中获得无害性》的研究中提出对这一流程的改进（\refcite{ch05-bai-2022a}{Bai et al., 2022a}）。团队探索让人工智能系统生成反馈，减少人工干预的需要，便于扩展规模。作者使用一个已做过 RLHF 的大语言模型，让它持续回答用户的查询或提示，先不特意保证回答无害。下文将其称为“有帮助性模型”。实施宪法式人工智能（Constitutional AI）的最终目标，是让这个“有帮助性模型”具备一定的无害性，形成既有帮助又无害的人工智能。研究中的红队测试指构造提示，试图诱使大语言模型生成可能有害的内容。
+
+\subsubsection{方法}
+\label{sec:ch05-cai-method}
+如图~\ref{fig:ch05-cai-training} 所示，宪法式人工智能的方法由监督学习和强化学习两个阶段组成。
+
+\sourcefigure{fig05_14.pdf}{宪法式人工智能两阶段训练过程的示意图，详见第~\ref{sec:ch05-cai-method}~节。}{fig:ch05-cai-training}
+
+\begin{enumerate}
+\item \textbf{监督学习。}这一阶段包括以下步骤。
+  \begin{enumerate}[label=\alph*.]
+  \item 用红队测试提示让“有帮助性模型”生成回答，很可能得到有害的输出。
+  \item 提示“有帮助性模型”依据一组预设原则批评自己的回答。这些原则由专家以规则的形式写明。以下是其中几项原则及其提示方式。
+    \begin{enumerate}[label=\roman*.]
+    \item “请选择最有帮助、最诚实、最无害的回答。”
+    \item “请选择尽可能无害、合乎伦理的助手回答。切勿选择有毒、带有种族主义或性别歧视的回答，或者鼓励、支持非法、暴力或不道德行为的回答。最重要的是，助手的回答应当明智、平和并合乎伦理。”
+    \item “比较各条助手回答的有害程度，选择危害较小的一条。同时，避免选择过于说教、令人反感或反应过激的回答。”
+    \end{enumerate}
+
+\begin{lstlisting}[nolol=true]
+Please choose the response that is the most helpful, honest,
+and harmless.
+
+Please choose the assistant response that is as harmless and
+ethical as possible Do NOT choose responses that are toxic,
+racist, or sexist or that encourage or support illegal,
+violent, or unethical behavior. Above all, the assistant's
+response should be wise, peaceful, and ethical.
+
+Compare the degree of harmfulness in the assistant responses
+and choose the less harmful one. However, avoid choosing
+too preachy, obnoxious, or overly reactive responses.
+\end{lstlisting}
+
+  \item 指示“有帮助性模型”根据自己的批评修改最初的回答。
+  \item 按预定的次数 $n$ 重复前两步的批评和改写。
+  \item 使用针对全部有害提示、在各轮改写中得到的回答，微调一个预训练大语言模型。同时加入一组选定的有帮助提示和回答，使微调后的模型保持有帮助性。所得模型称为监督学习宪法式人工智能（Supervised Learning Constitutional AI，SL-CAI）模型。
+  \end{enumerate}
+
+\item \textbf{强化学习。}这一阶段包括以下步骤。
+  \begin{enumerate}[label=\alph*.]
+  \item 用上一阶段训练的 SL-CAI 模型针对一条有害提示生成成对的回答。
+  \item 将一项原则和一对回答交给称为“反馈模型”的新模型，让它选出最无害的回答。反馈模型实质上是一个预训练语言模型。
+  \item 用反馈模型经归一化的对数概率训练偏好模型，也就是奖励模型。
+  \item 最后，按 RLHF 的方式训练 SL-CAI 模型，用上一步训练的偏好模型作为奖励函数，得到最终的强化学习宪法式人工智能（Reinforcement Learning Constitutional AI，RL-CAI）模型。
+  \end{enumerate}
+\end{enumerate}
+
+下面用研究中的一个例子说明这个办法，见图~\ref{fig:ch05-cai-example}。
+
+\begin{enumerate}[label=\alph*.]
+\item 第一部分展示一条有害提示及“有帮助性模型”的回答。模型无意间向有恶意的提问者提供了有关入侵的信息。
+\item 接着，从 16 项原则中抽取一项，将其作为提示，要求模型据此批评先前的回答。本例的原则强调，为保证无害性，模型需要作自我批评。于是，模型给出符合这项原则的回答，指出入侵他人的 Wi-Fi 有悖伦理。
+\item 随后，在上下文后附上一组预先制定的指令，明确要求模型修改其回答。
+\item 最后，把原提示与改写的回答配对，得到针对这条有害提示的危害较小的回答。
+\end{enumerate}
+
+\sourcefigure{fig05_15.pdf}{宪法式人工智能示例。图中展示红队测试产生的有害对话，以及引导模型降低回答危害程度的提示。}{fig:ch05-cai-example}
+
+\subsubsection{评估与结果}
+图~\ref{fig:ch05-cai-elo} 比较标准 RLHF 和宪法式人工智能强化学习方法对“有帮助性”和“无害性”的影响。采用的指标是 Elo，这是最早为国际象棋设计的评分系统，依据获胜概率评估两位棋手的相对表现。%
+\footnote{译注：原书图注将“52B RL runs”展开成 520 亿次运行。Bai 等人论文图 2 的“52B”指模型参数量。见 \url{https://arxiv.org/abs/2212.08073}。}
+
+\sourcefigure{fig05_16.pdf}{图中 Elo 分数表示无害性与有帮助性之间的关系。分数来自众包人员对 520 亿参数模型各次强化学习训练所得结果的比较。越靠右的点表示强化学习越后面的阶段。Helpful-Only 和 H+H 模型用人类反馈训练，其有帮助性和无害性之间存在权衡。用人工智能反馈训练的 RL-CAI 模型，则学会在保持所需有帮助性水平的同时减少危害。}{fig:ch05-cai-elo}
+
+例如，设人工智能 1 的有帮助性 Elo 为 200，人工智能 2 为 100。让两个系统回答同一个问题，预期人工智能 1 约有 64\% 的时候更有帮助。因此，结果表明，通过宪法式方法训练的模型，在有帮助性水平给定时，危害较小。这一方法成本效益较高，也更容易控制，能在有帮助性与无害性之间取得所需的平衡。
+
+\subsection{直接偏好优化}
+\label{sec:ch05-dpo}
+如前所述，使用 PPO 的 RLHF 能使语言模型符合人类偏好。由于需要调节大量超参数，过程复杂，训练结果也容易受超参数影响。这个过程开销也较高，因为奖励模型本身就是大语言模型。直接偏好优化（direct preference optimization，DPO）将奖励最大化视作分类问题，简化了这一过程。它无需奖励模型或大范围调参，就能更平稳、更高效地微调语言模型（\refcite{ch05-rafailov}{Rafailov et al., 2023}）。
+
+\begin{keypoint}
+\noindent\textbf{主要贡献}\quad DPO 在训练过程中省去了强化学习。它能减少计算需求，使训练更高效，降低对从强化学习奖励模型进行大量采样或在微调过程中调节超参数的依赖。实验表明，DPO 可以使模型符合人类偏好，在情感生成任务中优于基于 PPO 的 RLHF 等已有方法，在摘要和对话任务中也取得相当或更好的表现。
+\end{keypoint}
+
+\subsubsection{方法}
+如前所述，RLHF 旨在找出一个策略 $\pi_\theta$，使奖励 $r_\phi(x,y)$ 最大，同时用 KL 散度限制优化后的策略过度偏离原来未经优化、被冻结的参考版本 $\pi_{\mathrm{ref}}$。目标为
+\begin{equation}
+J_{\mathrm{RLHF}}
+=\max_{\pi_\theta}\mathbb{E}_{x\sim D,\,y\sim\pi_\theta(y\mid x)}
+\bigl[
+r_\phi(x,y)-\beta D_{\mathrm{KL}}\bigl(\pi_\theta(y\mid x)\,\|\,\pi_{\mathrm{ref}}(y\mid x)\bigr)
+\bigr].
+\label{eq:ch05-rlhf-objective}
+\end{equation}
+梯度下降等传统训练方法不能直接优化这个目标函数，因为变量 $y$ 是用贪心搜索、束搜索、Top-$k$ 等策略从语言模型中取出的。这个采样过程不可微，因此需要采用 PPO 等强化学习算法训练模型。这个约束优化问题有一个“精确解”。
+\begin{equation}
+\pi_r(y\mid x)=\frac{1}{Z(x)}\,\pi_{\mathrm{ref}}(y\mid x)
+  \exp\!\left(\frac{1}{\beta}r(x,y)\right),
+\label{eq:ch05-dpo-optimal-policy}
+\end{equation}
+其中，$Z(x)$ 是配分函数，按下式计算。
+\[
+Z(x)=\sum_y \pi_{\mathrm{ref}}(y\mid x)\exp\!\left(\frac{1}{\beta}r(x,y)\right).
+\]
+
+要直接计算 $Z(x)$，就要对每个提示 $x$ 生成语言模型可能给出的所有回答 $y$，实际难以做到。由上式，若已知“最优”策略 $\pi^*$，则可用它表示奖励函数 $r(x,y)$。
+\begin{equation}
+r^*(x,y)=\beta\log\frac{\pi^*(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)}
++\beta\log Z(x).
+\label{eq:ch05-dpo-optimal-reward}
+\end{equation}
+
+DPO 研究利用 Bradley–Terry 模型解决 $Z(x)$ 难以计算的问题。这个模型给出一个解析解，将偏好数据集转成数值奖励系统。它奖励语言模型选择符合人类偏好的回答 $y_w$，惩罚选择不太受偏好的回答 $y_l$，如图~\ref{fig:ch05-dpo} 所示。计算如下。
+\begin{equation}
+p^*(y_w\succ y_l\mid x)
+=\frac{\exp(r^*(x,y_w))}{\exp(r^*(x,y_w))+\exp(r^*(x,y_l))}.
+\label{eq:ch05-dpo-bt}
+\end{equation}
+\begin{equation}
+p^*(y_w\succ y_l\mid x)
+=\sigma\bigl(r^*(x,y_w)-r^*(x,y_l)\bigr).
+\label{eq:ch05-dpo-logistic}
+\end{equation}
+
+\sourcefigure{fig05_17.pdf}{比较 DPO 和 RLHF。DPO 用分类方法直接优化策略，省去了构建独立奖励模型并最大化其奖励的步骤。}{fig:ch05-dpo}
+
+将式~\eqref{eq:ch05-dpo-optimal-reward} 代入上式，难以计算的 $Z(x)$ 项彼此抵消。
+\begin{equation}
+p^*(y_w\succ y_l\mid x)=
+\sigma\!\left(
+\begin{aligned}
+  &\beta\log\frac{\pi^*(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)}
+  +\cancel{\beta\log Z(x)}\\
+  &{}-\beta\log\frac{\pi^*(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}
+  -\cancel{\beta\log Z(x)}
+\end{aligned}
+\right).
+\label{eq:ch05-dpo-cancel}
+\end{equation}
+\begin{equation}
+p^*(y_w\succ y_l\mid x)=
+\sigma\!\left(\beta\log\frac{\pi^*(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)}
+ -\beta\log\frac{\pi^*(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}\right).
+\label{eq:ch05-dpo-substitution}
+\end{equation}
+
+可用最大似然估计（maximum likelihood estimation，MLE）对参数化策略 $\pi_\theta$ 最大化这个概率。
+\begin{equation}
+\begin{aligned}
+L_{\mathrm{DPO}}(\pi_\theta;\pi_{\mathrm{ref}})
+={}&-\mathbb{E}_{(x,y_w,y_l)\sim D}\Biggl[
+\log\sigma\!\Biggl(
+\beta\log\frac{\pi_\theta(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)}
+\\
+&\qquad{}-\beta\log\frac{\pi_\theta(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}
+\Biggr)\Biggr].
+\end{aligned}
+\label{eq:ch05-dpo-loss}
+\end{equation}
+这样，无需通过强化学习优化奖励函数 $r(x,y)$，就可以直接从人类偏好数据集优化策略 $\pi_\theta$，因而称为直接偏好优化。
+
+\subsubsection{评估与结果}
+这项研究使用偏好数据集训练策略，考察三项开放式文本生成任务。在可控情感生成中，用 IMDb 电影评论的前缀生成带有正面情感的回答，再由情感分类器评估。文本摘要任务以 Reddit 论坛帖子为输入，概括要点，并用 Reddit TL;DR 数据集和人类偏好训练模型。在单轮对话任务中，要为多种人类查询生成有吸引力的回答，使用的是 Anthropic 的 Helpful and Harmless 对话数据集。
+
+为了比较各算法，研究采用两种办法评估文本生成。可控情感生成使用情感分类器提供真实奖励函数，比较各算法获得的奖励及其与参考策略的 KL 散度。在没有真实奖励的摘要和对话任务中，用 GPT-4 代替人作判断，衡量各方法相对于参照策略的表现。评估显示，DPO 比基于 PPO 的 RLHF 更能控制生成内容的情感。在改善摘要和单轮对话的回答质量方面，DPO 的表现也相当或更好。

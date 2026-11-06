@@ -1,0 +1,16 @@
+% 重绘自原书第 187 页的图 5.3。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  nodebox/.style={draw=blue!42!black,fill=cyan!16,rounded corners=3pt,align=center,
+    minimum width=23mm,minimum height=9mm,inner sep=2pt},
+  pathline/.style={draw=black!68,-{Stealth[length=1.35mm]},line width=.55pt}]
+\node[nodebox] (agent) at (0,0) {智能体};
+\node[nodebox,fill=yellow!24] (env) at (0,-2.78) {环境};
+\draw[pathline] (env.west) -- (-3.12,-2.78) -- (-3.12,0) -- (agent.west);
+\draw[pathline,densely dashed] ([yshift=1.7pt]env.west) --
+  (-2.24,-2.72) -- (-2.24,.13) -- ([yshift=3.7pt]agent.west);
+\draw[pathline,densely dotted] (agent.east) -- (3.07,0) -- (3.07,-2.78) -- (env.east);
+\node[anchor=east] at (-3.23,-1.40) {1.\ 状态 $S_t$};
+\node[anchor=west] at (3.13,-1.40) {2.\ 动作 $A_t$};
+\node[anchor=west] at (-2.10,-1.40) {3.\ 状态 $S_{t+1}$，奖励 $R_{t+1}$};
+\end{tikzpicture}

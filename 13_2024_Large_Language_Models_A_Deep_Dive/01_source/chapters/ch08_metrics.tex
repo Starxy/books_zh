@@ -1,0 +1,218 @@
+% PDF 349--356；原书第 322--329 页。
+\section{大语言模型评估指标}
+\label{sec:ch08-metrics}
+评估大语言模型，是系统衡量它们能否有效完成特定任务的过程。大语言模型的评估指标可按应用与方法，从不同维度分类。下面介绍其中几种。
+
+\begin{enumerate}
+\item \textbf{有参考与无参考}
+  \begin{itemize}
+  \item \textbf{有参考。}将模型输出与预定义的正确答案作比较。常用于翻译和摘要等任务。
+  \item \textbf{无参考。}根据模型输出的内部一致性与语言性质评估质量。
+  \end{itemize}
+\item \textbf{基于字符、基于词语与基于嵌入}
+  \begin{itemize}
+  \item \textbf{基于字符。}侧重字符层面的准确性，适用于某些文本生成任务。
+  \item \textbf{基于词语。}考察词语是否出现、出现频率及顺序。
+  \item \textbf{基于嵌入。}借助向量表示评估语义相似度，不限于词语的精确匹配。
+  \end{itemize}
+\item \textbf{通用指标与任务专用指标}
+  \begin{itemize}
+  \item \textbf{通用指标。}无需修改即可用于不同类型的任务。
+  \item \textbf{任务专用指标。}为特定应用设计，直接关系到任务输出的质量。
+  \end{itemize}
+\item \textbf{人工评估与大语言模型评估}
+  \begin{itemize}
+  \item \textbf{人工评估。}由人判断模型输出的质量或相关性。人工评估有主观性，但对判断自然语言是否流畅、前后连贯，以及在具体使用情境中是否切题十分重要。人工评估能看出自动指标可能忽略的方面，尤其是文本是否符合上下文，以及对人类语言细微含义的理解。
+  \item \textbf{大语言模型评估。}用第二个大语言模型评估模型输出，通常采用自动指标或让模型作判断。
+  \end{itemize}
+\item \textbf{传统指标与非传统指标}
+  \begin{itemize}
+  \item \textbf{传统指标。}关注模型输出在词汇与句法上的准确程度。常见指标包括字符串精确匹配、字符串编辑距离、BLEU 和 ROUGE，侧重词语与短语的顺序及准确性。
+  \item \textbf{非传统指标。}利用语言模型的能力，从更多方面评估生成文本的质量。例如，BERTScore 用嵌入比较语义相似度，G-Eval 等方法用另一个能力较强的大语言模型评估生成文本的质量。
+  \end{itemize}
+\end{enumerate}
+
+下面介绍一些常用于大语言模型评估的指标，说明它们的计算方法和具体应用。
+
+\subsection{困惑度}
+困惑度（perplexity）衡量模型在多大程度上能预测语料中的词元序列。困惑度越低，表明模型越能准确预测序列，实际数据越符合它的预期。困惑度较高，则表明根据模型生成的下一词元概率，这个序列较为出乎模型预期。
+
+给定分词后的序列 $X=(x_0,x_1,\ldots,x_N)$，原书以 $N$ 表示词元数。$X$ 的困惑度按下式计算。%
+\footnote{译注：原书同时使用 $N$ 作词元数，并将求和指标写为 $0$ 至 $N$，共 $N+1$ 项。计算时分母应与实际计入的预测项数一致。}
+\begin{equation}
+\operatorname{PPL}(X)=\exp\!\left\{-\frac{1}{N}
+ \sum_{i=0}^{N}\log p_\theta(x_i\mid x_{<i})\right\}.
+\label{eq:ch08-perplexity}
+\end{equation}
+其中，$\log p_\theta(x_i\mid x_{<i})$ 表示模型以所有前置词元 $x_{<i}$ 为条件，给第 $i$ 个词元分配的对数似然。它反映模型对序列中各个词元的预测准确程度。
+
+\subsection{BLEU}
+这一类指标中常用的是 \refcite{ch08-ref-067}{Papineni 等人（2002）}提出的双语评估替补分数（Bilingual Evaluation Understudy，BLEU），主要用于评估从一种自然语言翻译成另一种自然语言的文本质量。BLEU 考察机器生成文本与一份或多份参考译文中连续词语序列的出现情况及频率。这种连续序列称为 $n$ 元组。由此衡量两者的接近程度。
+
+BLEU 的计算包括以下几步。
+
+\begin{itemize}
+\item \textbf{计算精确率。}计算不同长度的 $n$ 元组的精确率。对于长度为 $n$ 的 $n$ 元组，精确率 $p_n$ 等于生成文本中与参考文本匹配的 $n$ 元组数，除以生成文本中的 $n$ 元组总数。每种 $n$ 元组的匹配计数，以它在任一参考文本中的最大出现次数为上限，避免过度计数。
+\begin{equation}
+p_n=\frac{\text{截断后的匹配 }n\text{ 元组数}}
+          {\text{生成文本中的 }n\text{ 元组总数}}.
+\label{eq:ch08-bleu-precision}
+\end{equation}
+\item \textbf{精确率的几何平均。}算出不同 $n$ 元组长度的精确率后，取所考虑长度上各精确率的几何平均，得到记作 BLEU-N 的分数。
+\begin{equation}
+\mathrm{BLEU\text{-}N}
+=\left(\prod_{n=1}^{N}p_n\right)^{1/N}.
+\label{eq:ch08-bleu-geomean}
+\end{equation}
+\item \textbf{长度惩罚。}较短的生成文本出错的机会较少，可能更容易得到较高的精确率。为减轻对短文本的偏好，BLEU 加入长度惩罚（brevity penalty）。生成文本长度 $c$ 短于参考长度 $r$ 时受到惩罚，以避免译文过度简短。
+\begin{equation}
+\mathrm{BP}=
+\begin{cases}
+1,& c>r,\\
+e^{(1-r/c)},& c\leq r.
+\end{cases}
+\label{eq:ch08-bleu-penalty}
+\end{equation}
+\item \textbf{最终 BLEU 分数。}把各精确率的几何平均值与长度惩罚结合，得到 0 至 1 之间的分数。1 表示与参考文本完全匹配。
+\begin{equation}
+\mathrm{BLEU}
+=\mathrm{BP}\cdot\exp\!\left(\sum_{n=1}^{N}\frac{1}{N}\log p_n\right).
+\label{eq:ch08-bleu}
+\end{equation}
+\end{itemize}
+
+BLEU 虽然应用广泛，但不考虑生成文本在语义上是否准确、语法上是否正确。因此，它可用于初步评估翻译质量。为更全面地反映语言生成的细微差别，还应辅以其他指标或人工评估。
+
+\subsection{ROUGE}
+面向召回率的摘要评估替补指标（Recall-Oriented Understudy for Gisting Evaluation，ROUGE）侧重召回率。它主要考察参考文本中有多少词也出现在机器生成的输出中，因此尤其适合评估自动摘要任务。
+
+ROUGE 有多种变体，各有侧重。
+
+\begin{itemize}
+\item \textbf{ROUGE-N。}ROUGE 包括一组指标，用于比较生成文本与一组人工参考摘要，以评估摘要和翻译效果。由于侧重召回率，ROUGE 主要衡量生成文本再现参考摘要中词语和短语的程度。在需要尽量涵盖参考内容时，这一特点尤其有用。
+\begin{equation}
+\mathrm{ROUGE\text{-}N}=
+\frac{\sum_{S\in\{\text{参考摘要}\}}\sum_{\mathrm{gram}_n\in S}
+       \operatorname{Count}_{\mathrm{match}}(\mathrm{gram}_n)}
+     {\sum_{S\in\{\text{参考摘要}\}}\sum_{\mathrm{gram}_n\in S}
+       \operatorname{Count}(\mathrm{gram}_n)}.
+\label{eq:ch08-rouge}
+\end{equation}
+式中，$\mathrm{gram}_n$ 表示长度为 $n$ 的 $n$ 元组，$\operatorname{Count}_{\mathrm{match}}(\mathrm{gram}_n)$ 是某种 $n$ 元组在候选摘要与参考摘要集合中共同出现的最大次数。例如，ROUGE-1 使用一元组，ROUGE-2 使用二元组。
+\item \textbf{ROUGE-L。}关注生成文本与参考文本的最长公共子序列（longest common subsequence，LCS）。与 $n$ 元组重叠不同，LCS 不要求序列连续，因而能捕捉更灵活的匹配。
+\item \textbf{ROUGE-W。}ROUGE-L 的扩展，在评估中考虑文本长度，以抵消长度偏差。
+\item \textbf{ROUGE-S。}度量跳跃二元组的共现，即按句子顺序取任意两个词，无论中间间隔多少词。该指标侧重内容出现的顺序，允许中间插入其他内容。
+\item \textbf{ROUGE-SU。}在 ROUGE-S 的基础上，同时使用跳跃二元组和一元组。
+\end{itemize}
+
+\subsection{BERTScore}
+\refcite{ch08-ref-111}{Zhang 等人（2020）}提出的 BERTScore 利用 BERT 模型的深层上下文嵌入来评估文本质量。BLEU 和 ROUGE 等传统指标考察词元或 $n$ 元组的重叠，BERTScore 则用这些上下文嵌入，计算候选文本各词元与参考文本各词元的相似度。
+
+BERTScore 用贪心匹配，使候选文本的每个词元与参考文本中最相似的词元配对，以得到较高的整体相似度。评估包括三项指标。
+
+\begin{itemize}
+\item \textbf{召回率（$R_{\mathrm{BERT}}$）。}对参考文本的每个词元取最大的相似度分数，再求和并除以参考文本中的词元数。它反映候选文本涵盖了多少参考文本内容。
+\begin{equation}
+R_{\mathrm{BERT}}=\frac{1}{|x|}\sum_{x_i\in x}
+ \max_{\widehat{x}_j\in\widehat{x}}\langle x_i,\widehat{x}_j\rangle.
+\label{eq:ch08-bert-recall}
+\end{equation}
+\item \textbf{精确率（$P_{\mathrm{BERT}}$）。}类似地，对候选文本中的每个词元取最大的相似度分数，求和后除以候选文本中的词元数。它衡量候选文本中的词元在参考文本中得到体现的程度。
+\begin{equation}
+P_{\mathrm{BERT}}=\frac{1}{|\widehat{x}|}\sum_{\widehat{x}_j\in\widehat{x}}
+ \max_{x_i\in x}\langle\widehat{x}_j,x_i\rangle.
+\label{eq:ch08-bert-precision}
+\end{equation}
+\item \textbf{$F_1$ 分数（$F_{\mathrm{BERT}}$）。}精确率与召回率的调和平均，兼顾完整性和精确程度。
+\begin{equation}
+F_{\mathrm{BERT}}=2\frac{P_{\mathrm{BERT}}\cdot R_{\mathrm{BERT}}}
+ {P_{\mathrm{BERT}}+R_{\mathrm{BERT}}}.
+\label{eq:ch08-bert-f1}
+\end{equation}
+\end{itemize}
+
+BERTScore 考虑语义，对改写有一定鲁棒性，适合评估翻译或摘要。不过，它需要较多算力，结果也未必总与人工判断一致，尤其在评估文本结构和连贯性时。
+
+\subsection{MoverScore}
+MoverScore 利用词移动距离（Word Mover's Distance，WMD）的概念，评估系统预测文本与参考文本的语义相似度（\refcite{ch08-ref-038}{Kusner et al., 2015}）。该指标有助于衡量词语和短语之间的语义距离，适用于文本评估。BERTScore 为词元选择单个匹配，即“硬对齐”。MoverScore 则使用多对一匹配，即“软对齐”，使词元间的匹配更灵活。
+
+MoverScore 的主要组成部分如下。
+
+\begin{itemize}
+\item \textbf{运输流量矩阵（$F$）。}元素 $F_{ij}$ 表示从预测序列 $x^n$ 的第 $i$ 个 $n$ 元组 $x_i^n$ 流向参考序列 $y^n$ 的第 $j$ 个 $n$ 元组 $y_j^n$ 的流量。
+\item \textbf{成本矩阵（$C$）。}运输成本矩阵的每个元素 $C_{ij}$ 表示预测文本第 $i$ 个 $n$ 元组与参考文本第 $j$ 个 $n$ 元组之间的距离 $d(x_i^n,y_j^n)$。
+\item \textbf{矩阵逐元素运算。}总运输成本为矩阵 $C\odot F$ 的各元素之和，其中 $\odot$ 表示逐元素相乘。
+\item \textbf{$n$ 元组序列。}把系统预测文本 $x$ 和参考文本 $y$ 看成词序列，计算时使用各自的 $n$ 元组，如一元组和二元组。
+\item \textbf{权重向量（$f_{x^n}$ 和 $f_{y^n}$）。}它们分别对应 $x^n$ 与 $y^n$ 中的 $n$ 元组，在各个 $n$ 元组上形成分布，通常归一化，使权重之和为 1。
+\end{itemize}
+
+WMD 是满足下列条件的运输成本最小值。
+\begin{equation}
+\begin{aligned}
+\operatorname{WMD}(\symbf{x}^n,\symbf{y}^n)
+&:=\min_{F\in\mathbb{R}^{|x^n|\times|y^n|}}\langle C,F\rangle,\\
+&\phantom{:}\text{约束为 }F\symbf{1}=f_{x^n},\quad F^{\mathsf T}\symbf{1}=f_{y^n}.
+\end{aligned}
+\label{eq:ch08-wmd}
+\end{equation}
+
+实际计算中，MoverScore 用 $n$ 元组嵌入之间的欧氏距离衡量语义距离。原书给出下式。
+\begin{equation}
+d(x_i^n,y_j^n)=\lVert E(x_i^n)-E(y_j^n)\rVert_2^2.
+\label{eq:ch08-mover-distance}
+\end{equation}
+其中，$E$ 是将 $n$ 元组映射为向量的嵌入函数。可以使用 word2vec 等传统方法，但 ELMo 和 BERT 等上下文嵌入能纳入句子层面的上下文，因此更常用。
+
+原书所列的 $n$ 元组嵌入计算式为
+\begin{equation}
+E(x_i^n)=\sum_{k=i}^{i+n-1}\operatorname{idf}(x_k),
+\label{eq:ch08-mover-embedding}
+\end{equation}
+其中，$\operatorname{idf}(x_k)$ 是 $x_k$ 的逆文档频率。%
+\footnote{译注：式~\eqref{eq:ch08-mover-embedding} 右侧只有标量权重，缺少词向量。MoverScore 论文式（1）的每项为 $\operatorname{idf}(x_k)E(x_k)$。论文中的距离采用 $\ell_2$ 范数，未取平方。见 \url{https://aclanthology.org/D19-1053/}。}
+每个 $n$ 元组的权重 $f_{x_i^n}$ 由下式确定。
+\begin{equation}
+f_{x_i^n}=\frac{1}{Z}\sum_{k=i}^{i+n-1}\operatorname{idf}(x_k),
+\label{eq:ch08-mover-weight}
+\end{equation}
+其中，$Z$ 是归一化常数，使 $\sum f_{x^n}=1$。当 $n$ 大于句子的长度、只剩一个 $n$ 元组时，MoverScore 简化为句子移动距离（Sentence Mover's Distance，SMD）。
+\begin{equation}
+\operatorname{SMD}(\symbf{x}^n,\symbf{y}^n)
+:=\lVert E(x_1^{l_x})-E(y^{l_y})_1\rVert,
+\label{eq:ch08-smd}
+\end{equation}
+其中，$l_x$ 和 $l_y$ 分别为两个句子的长度。%
+\footnote{译注：原书式~\eqref{eq:ch08-smd} 的后一项下标 1 印在括号外。MoverScore 论文将后一项写为 $E(y_1^{l_y})$。}
+
+\subsection{G-Eval}
+G-EVAL 用结构化、可随任务调整的方法评估生成文本，希望比传统方法更细致地衡量文本质量。它改进分数的计算与呈现方式，以应对评分差异及评估结果与人工判断的一致程度等问题。
+
+\sourcefigure{fig08_01.pdf}{G-EVAL 框架。先将任务说明与评估准则交给大语言模型，由模型生成列出详细评估步骤的思维链。再结合思维链和初始提示，用填写评分表的方式评估自然语言生成输出。最后，按各分值的概率计算加权和。图示的连贯性加权分为 2.59。}{fig:ch08-geval}
+
+如图~\ref{fig:ch08-geval} 所示，G-EVAL 的方法由三个主要部分组成。
+
+\begin{enumerate}
+\item \textbf{提示。}提示给出任务定义与具体评估准则。例如，评估文本摘要时，提示定义任务，指定连贯性等准则，请评分者从这些方面评价摘要。
+\item \textbf{思维链。}由大语言模型生成的一系列中间指令，给出执行评估的详细步骤。思维链指导评估过程，提高评估的一致性和细致程度。例如，评估连贯性时，可以指示评估者阅读原文和摘要，比较要点，核查逻辑顺序，再打分。
+\item \textbf{评分函数。}大语言模型结合提示、思维链、原文与目标文本执行评估。评分函数根据模型回答评估提示时返回词元的概率给出分数。
+\begin{equation}
+\operatorname{score}=\sum_{i=1}^{n}p(s_i)\times s_i,
+\label{eq:ch08-geval}
+\end{equation}
+其中，$s_i$ 为提示中预先规定的各个可能分值，$p(s_i)$ 为大语言模型给该分值分配的概率。
+\end{enumerate}
+
+\subsection{Pass@k}
+\refcite{ch08-ref-037}{Kulal 等人（2019）}最早提出 pass@$k$，可用来评估语言模型生成代码的功能正确性。对于每个编程问题，它用单元测试衡量多次尝试中至少生成一份正确代码的可能性。实施步骤如下。
+
+\begin{enumerate}
+\item 为每道题生成 $n$ 份代码样例，$n\geq k$。例如，$n=200$ 且 $k\leq100$。
+\item 统计成功通过单元测试的样例数，记作 $c$，其中 $c\leq n$。
+\item 用下式计算 pass@$k$ 的无偏估计量。
+\begin{equation}
+\mathrm{pass}@k=1-\frac{\binom{n-c}{k}}{\binom{n}{k}}.
+\label{eq:ch08-pass}
+\end{equation}
+\end{enumerate}
+
+计算结果表示，从 $n$ 份生成样例中选 $k$ 份，至少一份通过单元测试的概率，可用来衡量模型解决编程任务的能力。

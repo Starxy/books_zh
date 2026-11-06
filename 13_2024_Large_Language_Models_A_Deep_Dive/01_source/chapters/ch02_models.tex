@@ -1,0 +1,53 @@
+% PDF 91--105；原书第 61--75 页。
+\section{常用的预训练大语言模型}
+本节深入考察三种主要的大语言模型架构，讨论它们采用的数据集、与 Transformer 架构的关系、研究所得的主要结论，以及各自的变体。
+\transnote{原书在本节开头称将介绍三种架构，下文还列有第 2.6.4 节的混合专家模型 Mixtral。}
+
+\subsection{BERT（编码器）}
+\label{sec:ch02-bert}
+BERT，即 Transformer 双向编码器表示（Bidirectional Encoder Representation from Transformer），是一种使用注意力机制更好理解语言上下文的预训练模型（\refcite{ch02-devlin}{Devlin et al., 2019}）。BERT 由多个编码器部分组成，每一部分都为模型的稳健性作出贡献。BERT 问世时，在多种自然语言处理任务上刷新了基准成绩，包括 SQuAD v1.1 数据集上的问答和 MNLI 数据集上的自然语言推断（Natural Language Inference，NLI）。传统语言模型沿单一方向处理文本序列，而 BERT 的双向训练能让模型更全面地理解语言上下文和序列的衔接。
+
+\subsubsection{数据集}
+BERT 的训练数据主要来自维基百科，约有 25 亿词，以及 BooksCorpus，约有 8 亿词。
+
+\subsubsection{架构}
+BERT 是一个纯编码器 Transformer。它有不同架构规模的预训练模型，下面是两个例子。
+\begin{itemize}
+\item BERT-BASE 由 12 层组成，含 768 个隐藏单元、12 个注意力头和 1.10 亿个参数。
+\item BERT-LARGE 是较大的版本，含 24 层、1\,024 个隐藏单元、16 个注意力头和 3.40 亿个参数。
+\end{itemize}
+BERT-BASE 使用 4 个云端张量处理单元（Tensor Processing Unit，TPU）训练了 4 天。BERT-LARGE 使用 16 个 TPU，训练时间相同。
+
+\subsubsection{训练}
+如图~\ref{fig:ch02-bert} 所示，BERT 的训练分为预训练和微调两个阶段。预训练先在各种任务中用无标签数据学习，微调则以预训练取得的参数为起点，使用目标任务的有标签数据进一步优化参数。
+
+BERT 的训练方法结合了两个目标，即掩码语言建模和下一句预测。训练时最小化这两个目标合成的损失函数。对 BERT 来说，每个训练样例是一对句子。两个句子在原文中可能连续，也可能不连续。特殊词元 \texttt{[CLS]} 表示序列起始，\texttt{[SEP]} 表示句子之间的分隔。训练样例中的一部分词元会被 \texttt{[MASK]} 遮盖，或被随机词元替换。送入 BERT 前，词元先转为嵌入向量，再加上位置编码。BERT 还为它们加上分段嵌入（segment embedding），标明词元属于第一个还是第二个句子。
+
+预训练完成后，BERT 可以适配多种下游任务，包括输入为单段文本或一对文本的任务。BERT 在 2\,500 亿个词元上训练 3.50 亿个参数，由此获得的通用语言表示，显著提升了多种自然语言处理任务的先进水平。微调时，可以给 BERT 加入额外的层，并使用特定下游任务的训练数据，更新新增层和预训练的 BERT 参数。Transformer 编码器实质上是预训练 BERT，接收一个文本序列，使用 \texttt{[CLS]} 的表示来预测。例如，在情感分析或分类任务中，\texttt{[CLS]} 被替换为实际的分类标签。微调时，采用基于梯度的方法最小化预测与真实标签之间的交叉熵损失。新增层从头训练，预训练的 BERT 参数也随之更新。
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\linewidth,height=.80\textheight,keepaspectratio]{assets/fig02_10.pdf}
+\caption{BERT 可将预训练目标适配为使用特定任务输入数据的微调目标。上半部分是无标签句子对的预训练，NSP 表示下一句预测，Mask LM 表示掩码语言建模。下半部分为微调，SQuAD 示例以问题和段落为输入，预测答案片段的起点和终点，后方还示意 NER 与 MNLI 任务。}
+\label{fig:ch02-bert}
+\end{figure}
+
+\subsubsection{要点}
+\begin{keypoint}
+\begin{enumerate}
+\item 模型规模很重要。BERT-LARGE 含 3.45 亿个参数，是这一类模型中最大的。虽然与 BERT-BASE 的结构相同，它的表现更好，而 BERT-BASE “只有”1.10 亿个参数。
+\item 训练数据足够时，增加训练步数与准确率的提高有关。例如，在 MNLI 任务上，批量大小均为 128\,000 词，BERT-BASE 从训练 50 万步改为训练 100 万步，准确率提高了 1.0\%。
+\item 由于 BERT 的双向方法（MLM）每个批次只预测 15\% 的词，收敛可能比单向的从左到右方法慢，但经过有限次数的预训练迭代后，表现会超过后者。
+\end{enumerate}
+\end{keypoint}
+\transnote{原书在第 62 页的架构列表、训练说明和第 64 页的要点中分别给出 3.40 亿、3.50 亿和 3.45 亿个参数，译文按各处印刷值保留。}
+
+\subsubsection{变体}
+BERT 后续的发展和变体，旨在改进模型架构或预训练目标（\refcite{ch02-kamath}{Kamath et al., 2022}）。主要例子包括以下几种。
+\begin{itemize}
+\item \textbf{RoBERTa} 是同等规模的 BERT 变体，在 2\,000 亿个词元上预训练。研究者发现，在这种情况下，BERT 所用的损失函数影响较小。
+\item \textbf{ALBERT} 通过要求共享参数，提高效率。
+\item \textbf{SpanBERT} 着重表示和预测文本片段。
+\item \textbf{DistilBERT} 是利用知识蒸馏（knowledge distillation）得到的轻量版。
+\item \textbf{ELECTRA} 着重进行替换词元检测。
+\end{itemize}

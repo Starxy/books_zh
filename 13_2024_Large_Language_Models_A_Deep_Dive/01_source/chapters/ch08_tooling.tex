@@ -1,0 +1,122 @@
+% 原书第 8.6 节。
+\section{应用开发工具}
+\label{sec:ch08-tooling}
+大语言模型领域迅速创新，配套工具生态也随之扩张。许多工具专用于微调模型、优化提示等特定开发阶段，另一些功能更丰富，可以在多个阶段发挥作用。对不熟悉其演变的人来说，在这个生态中选择工具并不容易。表~\ref{tab:ch08-tools}列举了部分常用工具，可以看出创新的范围。\footnote{据 \url{https://github.com/langgenius/dify} 修改。}
+
+\begin{table}[htbp]
+\centering\small
+\caption{为构建和部署大语言模型应用提供支持的部分工具。}
+\label{tab:ch08-tools}
+\begin{tabularx}{\linewidth}{@{}p{36mm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+在大语言模型应用中的作用 & 常用工具\\
+\midrule
+嵌入与索引 & Pinecone、Weaviate、Milvus、Chroma\\
+数据标注 & Scale、Snorkel、Label Studio\\
+训练、开发与评估 & Hugging Face、Lightning AI、HumanLoop\\
+实验跟踪 & Weights \& Biases、MLflow、Comet\\
+隐私、安全与合规 & Lakera、Skyflow、Nomic\\
+监控与可观测性 & TruLens、WhyLabs、Arize\\
+托管与部署 & Lambda、Together.ai、Groq、Predibase、Anyscale\\
+提示串联与集成 & LlamaIndex、LangChain、DSPy\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+本节按功能介绍这一生态。首先介绍若干用于连接大语言模型应用各组件的重要工具。这些工具通常采用链式结构。与一个或多个模型的交互，以及应用设计中的其他组件，都可以模块化并依次串联起来，以支持丰富的工作流和用户交互。随后介绍大语言模型定制工具，具体考察预训练、适应性预训练和微调所用的库，指出其中较常用的工具和具备独特能力的工具。接下来讨论提示工程及其可选工具，再介绍开发人员可用的若干向量数据库，以及便于集成它们的工具。最后讨论应用开发中的评估与监控。
+
+\subsection{大语言模型应用框架}
+\label{sec:ch08-frameworks}
+大语言模型应用框架用来连接应用中数量往往很多的组件。这些工具通常对应用开发方式有一定约束，因此选择的框架应与应用所需的开发模式相符。有些框架的功能比另一些丰富。例如，表~\ref{tab:ch08-frameworks}从八项特征比较当时的三个框架，其中只有 Dify.ai 支持集成单点登录（single sign-on，SSO）等企业功能。如果应用有这项要求，选择 Dify.ai 可能比在采用 LangChain 开发的应用中自行构建 SSO 更合适。
+
+\begin{table}[htbp]
+\centering\small
+\caption{三个常用大语言模型应用开发框架的功能比较。}
+\label{tab:ch08-frameworks}
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}p{27mm}*{3}{>{\centering\arraybackslash}X}@{}}
+\toprule
+框架特征 & Dify.ai & LangChain & Flowise\\
+\midrule
+编程方式 & API 与面向应用 & Python 代码 & 面向应用\\
+支持的模型 & 种类丰富 & 种类丰富 & 种类丰富\\
+RAG 引擎 & 支持 & 支持 & 支持\\
+智能体 & 支持 & 支持 & 支持\\
+工作流 & 支持 & — & —\\
+可观测性 & 支持 & 支持 & —\\
+企业功能 & 支持 & — & —\\
+本地部署 & 支持 & 支持 & 支持\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+较早出现且较流行的框架之一是 LangChain。\footnote{\url{https://github.com/langchain-ai/langchain}}这一开源项目旨在帮助开发人员更快、更可靠地把想法变成生产应用。它围绕 Python 构建，Python 也是与 Hugging Face 等框架交互最成熟的语言，因此适合用这门语言开发的应用。LangChain 的主要优点是控制范围广、适应性强。应用与大语言模型及用户输入的交互较为复杂时，这类框架通常最有价值。LlamaIndex\footnote{\url{https://www.llamaindex.ai/}}是另一种应用开发框架，旨在让开发人员通过较高层的接口使用较复杂的功能。如第~7~章所示，LlamaIndex 提供多种 RAG 应用模式与组件，适合采用这种范式的应用。在通用大语言模型应用开发中，它也是 LangChain 之外的合适选择。
+
+Flowise\footnote{\url{https://github.com/FlowiseAI/Flowise}}是另一个值得关注的大语言模型应用开发框架。它基于 JavaScript 构建，用户可以在图形界面中拖放组件，以可视方式定制大语言模型工作流。无代码的流程设计和开发对于快速制作原型，或偏好低代码、无代码开发的项目尤其有用。Flowise 与 JavaScript 生态结合紧密，可以快速集成到 Web 应用中，从而缩短重视上市时间的项目获得收益所需的时间。
+
+上述框架大多围绕较高层次的顺序工作流组织，DSPy\footnote{\url{https://github.com/stanfordnlp/dspy}}采用了另一种方法。它提供较底层的模块，用户可自行组合，实现与 LangChain 预构建模块类似的功能。DSPy 的一个特点是编译器，它能自动优化多步流水线，提高流水线在各项任务上的表现。对于数据输入、控制流程、执行次序乃至所用大语言模型都可能发生变化的应用，这种自动优化很有用。DSPy 的功能并不依赖预构建的提示模板等组件，适合需要从底层控制应用与大语言模型交互的开发人员。
+
+最后介绍 Dify.ai。如表~\ref{tab:ch08-frameworks}所示，该框架功能较完整，适合企业级应用开发。它也支持 LLMOps，明确采用多种开发模式，使开发过程和应用行为可检验、可靠且可复现。对企业应用而言，这些模式十分重要，因为故障或低效率通常会造成更高的财务成本，也可能带来更大的社会影响，例如金融服务把大语言模型用作交易智能体时。
+
+了解辅助开发的平台后，以下各节继续介绍可在框架内使用的工具，用来完成提示工程、大语言模型定制和评估等较具体的工作。
+
+\subsection{大语言模型定制}
+如前所述，闭源与开源大语言模型的定制方式差别很大。闭源模型通常按照所有者规定的流程定制。开源模型的用户一般可采用任何技术上可行的方法。两者的技术复杂度也不同。对于没有深厚机器学习专业知识的应用开发团队，闭源模型的定制是可选方案。定制开源模型需要更多技术能力。
+
+OpenAI 当时通过 API 提供基础模型微调，开发人员可借助其软件开发工具包（SDK）库与 API 交互。微调流程包括准备数据集，按 OpenAI 的 Chat Completions API 规定设置数据格式，并划分训练集和测试集，以便在微调中评估模型。随后通过 OpenAI API 上传数据，启动微调。在这一过程中，用户可试验不同的超参数、数据质量和格式，迭代改善微调结果。开发人员应仔细考虑迭代的成本，因为费用由所用训练词元数、待微调的 OpenAI 模型的基础词元单价和训练轮数等多项因素共同决定。
+
+开源大语言模型的定制选择范围更广，复杂度也高得多。如果没有弄清其复杂度，试验中累积的额外算力开销可能使微调成本大幅增加。AWS Bedrock 或 Google Vertex AI 等云服务可为开发人员管理模型所需的计算资源。也有 AWS SageMaker JumpStart 等自主管理方案。采用后者时，开发人员大多可以自行选择微调或对齐工具包。PyTorch 等工具是这条定制路径的常用基础，Hugging Face Transformers 和 Hugging Face PEFT 等更高层工具可为其提供封装。围绕微调复杂性、计算和成本效率也涌现出越来越多的专用工具，例如 ggml 和 LLMZoo。有关定制的细节和使用示例，可重读第~4~章和第~5~章的教程。
+
+\subsection{向量数据库}
+语言模型的能力刚开始快速增强时，语义相似性很快成为其突出的用途之一。将两段文本分别输入模型，比较它们的嵌入，即可判断二者语义是否相似。通常可用两个嵌入之间的余弦距离。不过，如果要从大型知识库中找出最相似的文本，现场运行模型并计算数百万对向量的余弦距离会耗费很长时间。解决方法是预先计算每个文本块的嵌入，将它们存入向量数据库，以便高效检索。
+
+Facebook 的 FAISS（\refcite{ch08-ref-033}{Johnson et al., 2017}）是大规模向量搜索早期的成功实例之一，也是一个包含多种索引技术的开源库。此后出现了许多向量数据库方案，例如 Pinecone、Milvus 和 Chroma。向量数据库针对向量搜索的存储和检索两个环节进行优化（\refcite{ch08-ref-085}{\refcite{ch08-ref-085}{Schwaber-Cohen, 2023}}）。Postgres 和 Cassandra 等既有数据库也开始支持向量存储。
+
+向量数据库的使用场景广泛。最常见的场景之一是第~7~章的 RAG。RAG 应用的检索步骤往往要在向量数据库中找到回答用户所需的信息。另一个重要用途是问答。例如，客户对某种产品有一个常见问题，却在公司网站上找不到答案。如果其他用户问过类似问题，也许可以复用已有答案，无需再由人工查找。更一般地说，向量搜索可以补充传统关键词搜索。关键词搜索的结果较容易预判，且可具有较高召回率。向量搜索扩大了可能检出的文档范围，在一次检索中结合二者往往有效。
+
+\subsection{提示工程}
+第~3~章介绍过不同的提示形式。从更适合掩码语言模型的基本填空式、前缀式提示，到针对 GPT-4 或 Llama-2 等生成模型在连续空间优化过的提示，都属于提示工程的范畴。理论和方法可参阅前面的章节，本节重点介绍在应用开发项目中开发和维护提示的实用工具。
+
+快速发展的除了大语言模型，还有直接使用模型并将其集成到应用中的配套工具。工具的质量往往到实际使用时才会显现，这给开发人员带来了困难。希望了解更多提示工程工具的读者可以查阅 \url{https://www.promptingguide.ai/tools} 和 \url{https://learnprompting.org/docs/tooling/tools}。这里选取若干常用工具，说明它们能提供哪些功能，以及可用哪些方式开发提示。
+
+图~\ref{fig:ch08-prompt-workflow}在生产应用开发的整体背景下展示了提示工程的一种典型流程（\refcite{ch08-ref-007}{Benram, 2023}）。提示工程和改进通常依据若干评估标准开展，包括在基准或测试数据集上的分析表现，以及输出风格是否符合要求等定性指标。如何把提示集成进应用并传给模型，以及如何存储和维护提示，也在提示工程工具的功能范围内。
+
+\input{chapters/ch08_prompt_figure}
+
+如第~3~章所述，提示设计既可以是简单的手工过程，也可以是复杂的自动优化过程。通常可从手工设计的提示模板入手。OpenAI Playground\footnote{\url{https://platform.openai.com/playground}}等工具对此很有帮助。以 OpenAI Playground 为例，用户可以方便地在 OpenAI 的不同大语言模型之间切换，考察模板能否推广到其他模型。用户还可考察提示设计与温度等模型超参数的相互作用。生成序列时，温度较低会使选择集中于概率最高的词元。提高温度则会增加词元选择的随机性。用户可以借此了解模型设置如何影响给定提示的响应质量（\refcite{ch08-ref-084}{Saravia, 2022}）。
+
+另一种提示设计和优化工具是 Promptmetheus。\footnote{\url{https://promptmetheus.com/}}这是功能丰富的提示工程集成开发环境，支持编写、测试、优化及部署提示。原书当时的比较指出，OpenAI Playground 只支持与 OpenAI 的专有大语言模型交互，而 Promptmetheus 支持针对 70 多个专有和开源大语言模型开展开发。Promptmetheus 定位偏向开发工具，因此提供了更丰富的实验跟踪功能，也可与 LangChain 等开发工具集成。
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=Python,caption={构造 \texttt{ChatPromptTemplate} 的示例。来源链接见正文。},label={lst:ch08-chat-template}]
+from langchain_core.prompts import ChatPromptTemplate
+chat_template = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a helpful AI bot. Your name is {name}."),
+        ("human", "Hello, how are you doing?"),
+        ("ai", "I'm doing well, thanks!"),
+        ("human", "{user_input}"),
+    ]
+)
+messages = chat_template.format_messages(name="Bob", user_input="What is your name?")
+\end{lstlisting}
+\end{minipage}\par
+
+LangChain 也是一种功能较复杂的工具，具备提示优化与管理功能。第~\ref{sec:ch08-frameworks}~节介绍过，它还提供多项功能，可用于构建包含多个组件的大语言模型应用。LangChain 的提示开发功能本身也很常用，为用户提供了多种便捷方法。例如，用户可借助 \texttt{ChatPromptTemplate} 以编程方式构造传给大语言模型的提示消息，见清单~\ref{lst:ch08-chat-template}。\footnote{示例来自 \url{https://python.langchain.com/docs/modules/model_io/prompts/quick_start/}。原书在此误引作清单 9.8。}这段代码生成一段多轮聊天对话，便于通过 LangChain 的多种方法之一传给模型。
+
+设计提示时，还可以查阅已有提示库。提示库收录常用提示和设计或格式示例，通常稍作修改即可使用。例如，Prompt Hub\footnote{\url{https://www.promptingguide.ai/prompts}}覆盖多种任务和大语言模型交互模式，包含情感分类、SQL 查询生成、诗歌生成及实体抽取等任务的提示。库中未必有恰好符合需求的提示，但通常能找到有助于构造自己提示的示例，便于快速开始提示工程工作。
+
+\subsection{评估与测试}
+\label{sec:ch08-evaluation-testing}
+部署任何机器学习应用之前，都有必要评估模型表现。在有真实答案的简单情形中，这项工作很直接。生成式应用往往没有唯一正确的输出，评估因而带有主观判断。一种常用方式是建立自动评估流程，由大语言模型本身或另一个能力更强的模型来判断输出质量。首先需要创建涵盖多种提示的测试用例，再让大语言模型为每个用例生成响应。输出可按多种标准评估，包括以下方面。
+\begin{itemize}
+\item 相关性
+\item 全面性
+\item 有据性
+\item 幻觉
+\item 所含个人身份信息（PII）
+\item 情感倾向
+\item 毒性
+\end{itemize}
+
+TruLens 等工具为多种常见评估需求提供内置提示，可以简化这一过程（\refcite{ch08-ref-079}{Reini et al., 2024}）。例如，只需一行函数调用即可取得某个响应的幻觉得分。如果某个应用需要专门的评估方法，也可以扩展这一框架。

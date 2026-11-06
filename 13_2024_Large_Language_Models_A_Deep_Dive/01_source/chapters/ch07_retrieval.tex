@@ -1,0 +1,117 @@
+% PDF 315--321；原书第 287--293 页。
+\subsection{检索与生成}
+\begin{keypoint}
+检索的主要目标是为生成器提供回答查询所需的上下文。这个目标有一个重要前提，即按嵌入模型衡量，与查询语义最相近的文本块包含所需信息。如果这个前提不成立，本次 RAG 调用就会失败。检索增强旨在提高所选文档能够回应用户查询的可能性，是改进 RAG 系统较为有效的途径之一。
+\end{keypoint}
+
+\subsubsection{重排序}
+\label{sec:ch07-reranking}
+基本 RAG 的一个常见问题是，最切合查询的文本块往往没有排在语义相似度排序的前列。这种检索误差部分源于常用 RAG 嵌入模型的规模较小。可以用更大、表示能力更强的嵌入模型为语料生成嵌入，改善表现。但许多 RAG 语料规模很大，这样做的费用会很高。
+
+另一个相关问题有时称为“遗失在中间”（lost in the middle，\refcite{ch07-ref-013}{Liu et al., 2023}）。大语言模型较容易准确理解位于提示开头或末尾的上下文信息，较容易遗漏提示中间的信息。如果没有这个问题，只要增加返回的文档数，就有望在结果的某处取得相关信息。但由于中间位置的信息可能被遗漏，这种办法的效果会下降。
+
+重排序（reranking）是在这几项因素之间折中的办法。先用较小的嵌入模型完成初次检索，返回排名靠前的一批文档，例如 20 至 30 份，而基本 RAG 通常只返回几份。接着，用规模大得多、语义表示更丰富的模型重新为这些文档和原始查询生成嵌入，并根据新的向量重新排列前 $k$ 个文本块。
+
+\sourcefigure{fig07_05.pdf}{RAG 检索阶段的增强方法。检索函数（第~\ref{sec:ch07-optimizing}~节）决定收集排名最前的多少份文档。重排序（第~\ref{sec:ch07-reranking}~节）使用第二个、规模更大的嵌入模型，重新排列检索所得文档，使最相关的信息排在前面。迭代检索（第~\ref{sec:ch07-iterative}~节）依次执行多次查询，利用每次返回的文档回答多跳问题。}{fig:ch07-retrieval-augment}
+
+这样，先用成本较低的模型扩大候选范围，再用更好的模型对结果精细排序，便能更准确地选出排在前面的几份文档。这不仅使生成器能用到最相关的文档，也使它们位于列表最前端，避免中间位置的信息被遗漏。较昂贵的模型只用于已经返回的文档，因此可以大幅减轻额外开销，同时使相关文档排在前列。用嵌入对结果重排序并非新办法，\refcite{ch07-ref-015}{Ma 等人（2023b）}等作者推动了这一做法在稠密检索中的应用。LlamaIndex、LangChain 等 RAG 开发软件也广泛实现了它，见第~\ref{sec:ch07-tutorial}~节的教程。
+
+\subsubsection{迭代检索}
+\label{sec:ch07-iterative}
+有些问题必须综合多项信息才能回答，容易使 RAG 查询失败。需要回答某个主体的事实时，问题可能没有明确提到该主体，而是通过另一个关系间接指向它。\refcite{ch07-ref-020}{Shao 等人（2023）}给出下面的例子。
+
+\begin{quote}
+\texttt{Can you get Raclette in YMCA headquarters city?}
+
+在基督教青年会（YMCA）总部所在的城市能吃到 Raclette（拉克莱特奶酪料理）吗？
+\end{quote}
+
+在这个例子中，维基百科一类的信息库，可以提供 YMCA 总部在巴黎这一信息，也可以提供 Raclette 是一道在法国同样流行的瑞士菜这一信息。但要碰巧找到一段明确把 YMCA 总部与能否吃到 Raclette 联系起来的文本，并不容易。如果给基本 RAG 生成器一份把 YMCA 与法国关联起来的文档，再给一份把法国与 Raclette 关联起来的文档，它就能回答这个问题。但提示没有明确提到法国，检索时可能漏掉第二项信息。由于必须经过多个推理步骤才能答对，这类问题称为“多跳问题”（multi-hop question）。
+
+\begin{keypoint}
+迭代检索（iterative retrieval）是用稠密检索回答多跳推理查询的方法，步骤如下。
+\begin{enumerate}
+\item 针对查询执行一次检索，返回得分最高的文档。
+\item 将查询和文档交给生成器，生成问题的回答。
+\item 将回答与原查询组合，用建立索引时所用的语言模型生成嵌入，再查询向量索引（生成增强检索），返回得分最高的文档。
+\item 把第 1 步和第 3 步返回的文档合并，连同原查询交给生成器。
+\item 请生成模型判断文档及回答是否满足原查询。如果不满足，继续交替进行检索和生成。
+\end{enumerate}
+\end{keypoint}
+
+\begin{practicaltip}
+第二次查询向量索引时，上下文可能包含由幻觉造成的不准确内容。但由于它直接回应查询，有望在语义上接近 RAG 语料中含有正确信息的相关文档。通过多次查询向量索引，迭代检索可以逐步回答问题的不同部分。\refcite{ch07-ref-020}{Shao 等人（2023）}与 \refcite{ch07-ref-005}{Feng 等人（2023）}分别提出了这一思路的实现方法。
+\end{practicaltip}
+
+对于上面的例子，\refcite{ch07-ref-020}{Shao 等人（2023）}的迭代检索系统给出了以下结果。
+
+\begin{lstlisting}[nolol=true]
+Question: Can you get Raclette in YMCA headquarters city?
+*** Iteration 1 ***
+-- Retrieved Knowledge --
+(1) Title: YMCA Building (Racine , Wisconsin) Context: ... S-
+ince the ’50s, headquarters of the publishing house and the
+bookstore are located in 11 rue de la Montagne Sainte -Genev-
+iève 75005 Paris ...
+-- Generation --
+The YMCA headquarters is located in Paris, France. Raclette
+is a traditional Swiss dish, made with melted cheese served
+with potatoes , pickles , and other accompaniments. It is not
+a trad- itional French dish, so it is unlikely to be found
+in Paris. So the answer is No
+\end{lstlisting}
+
+\begin{quote}\small
+\textbf{第 1 轮检索}\quad 标题为“基督教青年会大楼（威斯康星州拉辛）”。上下文说，自 20 世纪 50 年代起，出版社总部和书店位于巴黎 75005 区圣热纳维耶芙山街 11 号。
+
+\textbf{第 1 轮生成}\quad YMCA 总部位于法国巴黎。Raclette 是传统的瑞士菜，将融化的奶酪与土豆、腌菜和其他配料一起食用。它不是法国传统菜，所以不太可能在巴黎吃到。因此答案是不能。
+\end{quote}
+
+生成器尝试回答巴黎能否吃到 Raclette，却因幻觉得出错误结论。把这次生成的回答与原查询一起转成嵌入，再做一轮检索。
+
+\begin{lstlisting}[nolol=true]
+*** Iteration 2 ***
+-- Retrieved Knowledge --
+(1) Title: Raclette Context: Raclette is a Swiss dish, also
+popular in France , based on heating cheese and scraping off
+the melted part ...
+(2) Title: YMCA Building (Racine , Wisconsin) Context: ... S-
+ince the ’50s, headquarters of the publishing house and the
+bookstore are located in 11 rue de la Montagne Sainte -Genev-
+iève 75005 Paris ...
+-- Generation --
+YMCA headquarters is located in Paris, France. Raclette is
+a dish native to parts of Switzerland , but it is also popu-
+lar in France. So it is likely that Raclette can be found
+in Paris. So the answer is Yes
+\end{lstlisting}
+
+\begin{quote}\small
+\textbf{第 2 轮检索}\quad 第一份文档的标题为“Raclette”。上下文说，Raclette 是一道在法国也很流行的瑞士菜，做法是加热奶酪并刮下融化的部分。第二份文档与第 1 轮相同。
+
+\textbf{第 2 轮生成}\quad YMCA 总部位于法国巴黎。Raclette 源自瑞士部分地区，在法国也很受欢迎。因此，很可能在巴黎吃到 Raclette，答案是能。
+\end{quote}
+
+第一轮 RAG 调用只返回 YMCA 位置的信息。为了回答查询，生成器对 Raclette 在法国是否流行作了一个没有根据的判断。第二轮把第一轮的生成结果与查询一同嵌入并用于检索。因为这次输入谈到在法国能否吃到这道菜，排名靠前的返回文档也涉及它在当地的流行程度。最后的生成利用了两轮取得的信息，依据上下文得出正确回答。
+
+\subsubsection{上下文整合}
+\label{sec:ch07-consolidation}
+选好文档后，需要把它们加入模板，再交给生成器。最简单的办法是把各个文本块和提示拼接在一起，由大语言模型整理细节。不过，如果合起来的文本块超过模型的上下文窗口，这个办法就无法使用。如果关键信息所处的位置不合适，模型可能漏掉它，这就是前面所说的中间位置问题。若文本块彼此割裂，还可能缺少把各块信息联系起来的内容。
+
+有多种方法可以更好地综合排名靠前的返回文档中的信息。这一过程称为上下文整合（context consolidation）。常见做法是调用大语言模型，提炼每个文本块的主要事实，缩短交给生成器的上下文（如 \refcite{ch07-ref-003}{Chen et al., 2023b}）。也可以提示模型逐块阅读，每读一块就更新同一份摘要，为全部返回文档构造一份总体摘要（如 \refcite{ch07-ref-026}{Xu et al., 2023}），或采用 LlamaIndex 实现的树形摘要方法\footnote{\url{https://docs.llamaindex.ai/en/latest/examples/response_synthesizers/tree_summarize.html}}（如 \refcite{ch07-ref-012}{Liu, 2022}）。
+
+把一系列相互割裂的检索片段整合成连贯且前后一致的文档，可以改善结果。在多项自然语言处理任务中，\refcite{ch07-ref-026}{Xu 等人（2023）}发现，与直接在提示上下文中拼接返回文档相比，用摘要压缩提示可降低平均困惑度，也就是提高回答的准确程度，同时大幅缩短输入上下文。有些情况下，输入长度可降至原来的 6\%。
+
+\sourcefigure{fig07_06.pdf}{RAG 生成阶段的增强方法。上下文整合（第~\ref{sec:ch07-consolidation}~节）在调用生成器之前，将多份检索文档中的信息提炼成一份文档。上下文组织（第~\ref{sec:ch07-optimizing}~节）为 RAG 系统选择适用的生成提示模板。还可以通过选型甚至微调，优化用于生成的大语言模型聊天机器人（第~\ref{sec:ch07-optimizing}~节）。}{fig:ch07-generation-augment}
+
+\input{assets/tab07_01}
+
+\subsection{小结}
+构建 RAG 系统时，有许多需要考虑的事项（第~\ref{sec:ch07-optimizing}~节），也有多种可改善特定环节的增强方法或模块。表~\ref{tab:ch07-enhancements} 汇总了这些优化与增强方法。RAG 的组件多种多样，没有一种构建方法能适用于所有情况。每项增强针对某种 RAG 局限加以改进，也各自有适用范围。
+
+\begin{keypoint}
+某个 RAG 模块能否发挥作用，要结合系统的使用场景来判断，并与模型复杂度增加所带来的代价权衡。增加模块可能需要投入更多实现与测试工作，增加出错的位置，使响应变慢，还可能因调用更多大语言模型智能体而增加计算和费用开销。%
+\footnote{译注：原书将“延迟降低”列为增加模块的代价。根据本段语意，此处按响应变慢处理。}
+
+可以先选取有可能适用的增强方法，再通过试验分别检验各模块对 RAG 表现的影响。下一节讨论评估表现的办法，并说明为了检验 RAG 系统能否达到使用要求，需要考虑哪些实际事项。
+\end{keypoint}

@@ -1,0 +1,24 @@
+% 重绘自原书第 93 页的图 3.8。
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  heading/.style={fill=black!18,inner sep=2.5pt,font=\small\sffamily\bfseries},
+  process/.style={anchor=west,align=left,inner sep=1pt},
+  flow/.style={line width=.66pt,draw=black!65,-{Stealth[length=1.75mm]}},
+  data/.style={font=\small\rmfamily\itshape,align=center,inner sep=2pt}]
+\node[heading] at (1.10,5.69) {提示流程};
+\node[heading] at (6.53,5.69) {数据流};
+\draw[flow,densely dotted] (2.84,5.78) -- (2.84,-.22);
+\node[process] at (0,5.03) {输入 $\symbf{x}$};
+\node[process] at (0,3.98) {模板};
+\node[process] at (0,2.86) {提示函数\\$\symbf{x}'=f_{\mathrm{prompt}}(\symbf{x})$};
+\node[process] at (0,1.74) {预测\\$f_{\mathrm{filled}}(\symbf{x}',z^*)$};
+\node[process] at (0,.40) {答案映射\\$z^*\Rightarrow \symbf{y}$};
+\node[data] (input) at (6.53,5.03) {Cannot watch this movie.};
+\node[data] (template) at (6.53,3.98) {[x] It was a [z] movie.};
+\node[data] (prompt) at (6.53,2.86) {Cannot watch this movie. It was a [z] movie.};
+\node[data] (filled) at (6.53,1.74) {Cannot watch this movie. It was a \colorbox{black!15}{terrible} movie.};
+\node[data] (class) at (6.53,.40) {\texttt{terrible => Negative}};
+\foreach \origin/\target in {input/template,template/prompt,prompt/filled,filled/class} {
+  \draw[flow] (\origin.south) -- (\target.north);
+}
+\end{tikzpicture}

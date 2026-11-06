@@ -1,0 +1,47 @@
+% 原书第 239 页，勾选位置按原表的行列重排。
+\begin{table}[p]
+\centering
+\caption{面向偏见评估的基准数据集。表中列出各数据集的大小、所针对的偏见问题和用于评估的社会群体。勾号表示原研究明确提及的问题或群体，也可以表示该数据集还能覆盖的情形。}
+\label{tab:ch06-bias-benchmarks}
+\footnotesize
+\setlength{\tabcolsep}{1.6pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.25\linewidth}r*{15}{c}@{}}
+\toprule
+数据集 & 规模 & \multicolumn{15}{c@{}}{偏见问题}\\
+\cmidrule(l){3-17}
+& & \rotatebox{90}{\scriptsize 失实表征} & \rotatebox{90}{\scriptsize 刻板印象} & \rotatebox{90}{\scriptsize 系统表现有差异} & \rotatebox{90}{\scriptsize 贬损性语言} & \rotatebox{90}{\scriptsize 排斥性规范} & \rotatebox{90}{\scriptsize 毒性} & \rotatebox{90}{\scriptsize 年龄} & \rotatebox{90}{\scriptsize 残障} & \rotatebox{90}{\scriptsize 性别（认同）} & \rotatebox{90}{\scriptsize 国籍} & \rotatebox{90}{\scriptsize 外貌} & \rotatebox{90}{\scriptsize 种族} & \rotatebox{90}{\scriptsize 宗教} & \rotatebox{90}{\scriptsize 性取向} & \rotatebox{90}{\scriptsize 其他}\\
+\midrule
+\multicolumn{17}{c}{\bfseries 反事实输入（掩码词元）}\\
+Winogender & 720 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+WinoBias & 3,160 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+WinoBias+ & 1,367 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+GAP & 8,908 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+GAP-Subjective & 8,908 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+BUG & 108,419 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+StereoSet & 16,995 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  &  &  & $\checkmark$ &  &  & $\checkmark$ & $\checkmark$ &  & $\checkmark$\\
+BEC-Pro & 5,400 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+\midrule
+\multicolumn{17}{c}{\bfseries 反事实输入（未加掩码的句子）}\\
+CrowS-Pairs & 1,508 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$\\
+WinoQueer & 45,540 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  &  &  &  &  &  &  &  & $\checkmark$ & \\
+RedditBias & 11,873 & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  &  & $\checkmark$ &  &  & $\checkmark$ & $\checkmark$ & $\checkmark$ & \\
+Bias-STS-B & 16,980 & $\checkmark$ & $\checkmark$ &  &  &  &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+PANDA & 98,583 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  & $\checkmark$ &  & $\checkmark$ &  &  & $\checkmark$ &  &  & \\
+Equity Evaluation Corpus & 4,320 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  &  &  & $\checkmark$ &  &  & $\checkmark$ &  &  & \\
+Bias NLI & 5,712,066 & $\checkmark$ & $\checkmark$ &  &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  & $\checkmark$ &  & \\
+\midrule
+\multicolumn{17}{c}{\bfseries 提示（句子补全）}\\
+RealToxicityPrompts & 100,000 &  &  &  & $\checkmark$ &  & $\checkmark$ &  &  &  &  &  &  &  &  & $\checkmark$\\
+BOLD & 23,679 &  &  &  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  & $\checkmark$ &  &  & $\checkmark$ & $\checkmark$ &  & $\checkmark$\\
+HolisticBias & 460,000 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$\\
+TrustGPT & 9 &  &  & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  & $\checkmark$ &  &  & $\checkmark$ & $\checkmark$ &  & \\
+HONEST & 420 & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+\midrule
+\multicolumn{17}{c}{\bfseries 提示（问答）}\\
+BBQ & 58,492 & $\checkmark$ & $\checkmark$ &  & $\checkmark$ & $\checkmark$ &  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$\\
+UnQover & 30 & $\checkmark$ & $\checkmark$ &  &  & $\checkmark$ &  &  &  & $\checkmark$ & $\checkmark$ &  & $\checkmark$ & $\checkmark$ &  & \\
+Grep-BiasIR & 118 & $\checkmark$ & $\checkmark$ &  &  & $\checkmark$ &  &  &  & $\checkmark$ &  &  &  &  &  & \\
+\bottomrule
+\end{tabular}
+\end{table}

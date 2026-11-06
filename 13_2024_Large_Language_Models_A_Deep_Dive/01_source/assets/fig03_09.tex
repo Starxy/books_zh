@@ -1,0 +1,52 @@
+% 重绘自原书第 95 页的图 3.9。
+\begin{tikzpicture}[
+  x=.97cm,font=\footnotesize\sffamily,
+  head/.style={font=\footnotesize\sffamily\bfseries},
+  vertex/.style={circle,inner sep=0pt,minimum size=3.2mm,draw=black!76,line width=.7pt},
+  wire/.style={draw=black!68,line width=.55pt},
+  flow/.style={wire,-{Stealth[length=1.4mm]}},
+  memory/.style={fill=yellow!22,align=center,minimum width=23mm,minimum height=8mm,inner sep=2pt}]
+\node[head] at (1.95,4.96) {记忆};
+\node[head] at (5.97,4.96) {查询};
+\node[head] at (9.80,4.96) {答案};
+\node[head,anchor=east] at (.05,3.47) {知识库};
+\node[vertex,fill=blue!35] (base) at (.40,3.47) {};
+\node[vertex,fill=green!30] (top) at (.95,4.12) {};
+\node[vertex,fill=green!30] (dante) at (1.85,3.47) {};
+\node[vertex,fill=green!30] (bottom) at (1.19,2.83) {};
+\node[vertex,fill=yellow!63] (topentity) at (2.65,4.20) {};
+\node[vertex,fill=yellow!63] (florence) at (2.65,2.66) {};
+\draw[wire] (base)--(top)--(bottom)--(base)--(dante)--(topentity);
+\draw[wire] (dante) -- node[font=\tiny\ttfamily,fill=white,inner sep=.8pt,sloped] {born-in} (florence);
+\node[anchor=west,font=\scriptsize] at (2.04,3.49) {Dante};
+\node[anchor=west,font=\scriptsize] at (2.83,2.65) {Florence};
+
+\node[memory] (kb) at (5.97,3.41) {访问符号记忆};
+\node[font=\scriptsize\ttfamily] (rel) at (5.97,4.23) {(Dante, born-in, X)};
+\node at (9.80,3.41) {Florence};
+\draw[wire] (3.53,3.41) -- (kb.west);
+\draw[flow] (rel.south) -- (kb.north);
+\draw[flow] (kb.east) -- (9.11,3.41);
+
+\draw[draw=black!62,densely dotted,line width=1pt] (-.62,2.13) -- (10.48,2.13);
+\node[head,anchor=east] at (.05,.88) {语言模型};
+\foreach \offset in {.32,.16,0} {
+  \begin{scope}[shift={(\offset,\offset)}]
+  \filldraw[draw=black!25,fill=black!6] (.58,.35) rectangle (1.82,1.59);
+  \foreach \x/\y/\tone in {.82/.59/blue,.82/.97/green,.82/1.35/green,
+   1.20/.59/green,1.20/.97/yellow,1.20/1.35/blue,
+   1.58/.59/green,1.58/.97/yellow,1.58/1.35/yellow} {
+    \filldraw[draw=black!67,fill=\tone!28] (\x,\y) circle[radius=1.88mm];
+  }
+  \end{scope}
+}
+\node[font=\scriptsize] at (1.28,.03) {如 ELMo/BERT};
+\node[memory] (lm) at (5.97,.80) {访问神经语言\\模型记忆};
+\node[font=\scriptsize\ttfamily] (prompt) at (5.97,1.68) {"Dante was born in [MASK]"};
+\node at (9.80,.80) {Florence};
+\draw[wire] (3.53,.80) -- (lm.west);
+\foreach \x/\y in {4.96/5.28,5.55/5.69,6.11/6.11,6.57/6.46,7.08/6.83} {
+  \draw[flow] (\x,1.49) -- (\y,1.21);
+}
+\draw[flow] (lm.east) -- (9.11,.80);
+\end{tikzpicture}

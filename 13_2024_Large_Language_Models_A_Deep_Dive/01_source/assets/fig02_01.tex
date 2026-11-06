@@ -1,0 +1,53 @@
+% 重绘自原书第 30 页的图 2.1。
+\begin{tikzpicture}[
+  x=.96cm,font=\footnotesize\sffamily,
+  flow/.style={-{Stealth[length=1.35mm]},draw=black!70,line width=.45pt},
+  wire/.style={draw=black!70,line width=.45pt},
+  state/.style={circle,minimum size=6.8mm,inner sep=0pt,draw=blue!32},
+  vector/.style={draw=black!58,rounded corners=1pt,minimum width=4mm,minimum height=9mm,inner sep=0pt},
+  coordinate label/.style={font=\footnotesize\rmfamily}]
+\draw[rounded corners=2mm,dashed,black!65] (.84,1.5) rectangle (6.16,3.12);
+\draw[rounded corners=2mm,black!60] (6.34,1.5) rectangle (11.55,3.12);
+\node at (3.45,2.94) {编码器};
+\node at (8.96,2.94) {解码器};
+
+\foreach \i/\x in {1/1.29,2/2.38,3/3.47,4/4.56,5/5.65} {
+  \node[state,fill=blue!15!gray!11] (e\i) at (\x,2.27) {};
+  \node[vector] (x\i) at (\x,.39) {};
+  \fill[green!22!gray!18,draw=green!40!gray] (\x,.55) circle[radius=1.13mm];
+  \fill[green!22!gray!18,draw=green!40!gray] (\x,.23) circle[radius=1.13mm];
+  \draw[flow] (x\i.north) -- (e\i.south);
+}
+\foreach \i/\j in {1/2,2/3,3/4,4/5} {
+  \draw[flow] (e\i.east) -- (e\j.west);
+}
+
+\foreach \i/\x in {1/6.81,2/7.86,3/8.91,4/9.96,5/11.01} {
+  \node[state,fill=yellow!22] (d\i) at (\x,2.27) {};
+  \node[vector] (in\i) at (\x+.11,.43) {};
+  \node[vector] (out\i) at (\x,4.03) {};
+  \foreach \offset in {-.16,.16} {
+    \fill[orange!20,draw=orange!55!gray] (\x+.11,.43+\offset) circle[radius=1.13mm];
+    \fill[orange!20,draw=orange!55!gray] (\x,4.03+\offset) circle[radius=1.13mm];
+  }
+  \draw[flow] (\x,1.12) -- (d\i.south);
+  \draw[flow] (in\i.north) -- (\x+.11,1.98);
+  \draw[flow] (d\i.north) -- (out\i.south);
+}
+
+\draw[wire,semithick] (e5.east) -- (6.42,2.27) |- (11.01,1.12);
+\node[align=right,anchor=east] at (1.1,3.62) {隐藏状态};
+\node[align=right,anchor=east] at (1.02,.48) {特征\\向量};
+\node[align=right,anchor=east] at (1.02,-.43) {输入};
+\node at (5.85,4.86) {输出};
+\foreach \x/\sym in {1.84/1,2.93/2,6.16/t} {
+  \node[coordinate label] at (\x,3.62) {$h_{\sym}$};
+  \draw[flow] (\x,3.44) -- (\x,2.33);
+}
+\node[coordinate label] at (1.29,-.43) {$x_1$};
+\node[coordinate label] at (5.65,-.43) {$x_T$};
+\node[coordinate label] at (6.92,-.40) {$y_1$};
+\node[coordinate label] at (11.12,-.40) {$y_U$};
+\node[coordinate label] at (6.81,4.86) {$y_1$};
+\node[coordinate label] at (11.01,4.86) {$y_U$};
+\end{tikzpicture}

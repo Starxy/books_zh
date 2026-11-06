@@ -1,0 +1,95 @@
+% PDF 127、130--133；原书第 97、100--103 页。
+\section{提示工程}
+上一节用几个简单的例子说明，如何利用提示解决不同的自然语言处理任务。提示的具体措辞对取得良好结果很重要。为提高模型在目标下游任务上的表现而设计合适的提示函数，就是提示工程。设计提示时，需要考虑并综合多个要素，包括选择预训练模型、确定合适的提示形式、设计提示模板和答案工程。模板的设计大致分为两类。
+\begin{itemize}
+\item 手工设计模板。
+\item 自动设计模板。
+\end{itemize}
+前者借助人的专业知识和反复尝试来优化提示，后者用各种自动化方法寻找适合给定任务的模板。图~\ref{fig:ch03-design} 概览了接下来两个节的结构。下面介绍提示分类的基本术语，概述手工提示工程，并详细讨论文献中的几种自动化方法。
+
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig03_10}
+\caption{基于提示的学习中，各种设计选择及决策之间的关系。}
+\label{fig:ch03-design}
+\end{figure}
+
+\subsection{提示形式}
+提示模板大致有两种形式，即前缀提示（prefix prompt）和完形填空提示（cloze prompt）。下文用“提示形式”（prompt shape）统称这种区分。
+
+\subsubsection{前缀提示}
+在前缀提示中，输入及描述输入的文本都位于答案空位之前，形成前缀。例如，在影评情感分析任务中，前缀提示模板可以写作
+\begin{equation}
+\text{“}\symbf{x}'=\text{[x] This movie is [z]}\text{”},
+\tag{3.5}
+\end{equation}
+将模板应用于输入，会得到“Cannot watch this movie. This movie is [z]”这样的提示。
+
+如果回答与输入可以按从左到右的顺序直接对应，两者之间的联系简单明确，前缀提示往往表现良好。例如，在机器翻译任务中，明确给出目标语言，前缀提示就可以有效地引导模型生成译文。考虑以下模板。
+\begin{equation}
+\begin{aligned}
+\text{“}\symbf{x}'={}&\text{Translate the following English sentence}\\
+ &\text{to French: [x][z]}\text{”},
+\end{aligned}
+\tag{3.6}
+\end{equation}
+前缀提示通过明确指定所需语言，向模型给出直接的指令，从而产生准确的译文。
+
+\subsubsection{完形填空提示}
+与前缀提示不同，完形填空提示的答案空位两侧都有模板词元，所以答案位于模板内部。例如，在影评情感分析任务中，完形填空提示模板可以表示为
+\begin{equation}
+\text{“}\symbf{x}'=\text{[x] This is a [z] movie.}\text{”},
+\tag{3.7}
+\end{equation}
+答案空位由上下文中的词语包围。把模板应用到输入上，就会得到提示“Cannot watch this movie. This is a [z] movie.”。这里的标点也算模板文本。因此，若模板在答案空位 \texttt{[z]} 之后只有一个句号，仍视为完形填空提示。
+
+完形填空提示形式灵活，可以构造出更自然的语言结构，尤其适合多项选择问答等任务。把答案空位放在一个有上下文的短语中，可以促使模型生成符合周围语言模式的输出。答案两侧的上下文让模型能考虑输入中的语言特征和情境线索，最终生成更准确、更有意义的内容。
+
+两种提示形式的区别如下。
+\begin{itemize}
+\item \textbf{前缀提示。}输入和模板文字都位于答案空位之前。例如“Cannot watch this movie. This movie is [z]”。
+\item \textbf{完形填空提示。}输入和模板文字围绕着答案空位。例如“Cannot watch this movie. It was a [z] movie.”。
+\end{itemize}
+
+\subsection{手工设计模板}
+现在转向模板的设计和优化。最直接的方法是手工设计模板，利用人的专业知识、直觉和对任务的理解，设计合适的模板。通常既要考虑任务本身的特点，也要用启发式方法确定合适的提示结构和措辞。为了改善表现，可能需要反复调整模板（\refcite{ch03-brown}{Brown et al., 2020}；\refcite{ch03-petroni}{Petroni et al., 2019}；\refcite{ch03-schick-2020a}{Schick and Schütze, 2020a},b）。最终应根据在有标签数据集上的表现作决定。
+
+手工生成提示没有通用做法，最重要的原则是试验多个候选。以返回各国首都的提示为例，可以看到反复尝试的重要性。下面给出四个候选模板。
+\begin{lstlisting}[caption={国家首都查询的提示模板},label={lst:ch03-capitals}]
+1. "the capital city of [x] is [z] ."
+2. "[z] is the capital city of [x] ."
+3. "what is the capital city of [x]? It is [z] ."
+4. "[z] is located in [x], and is its capital city ."
+\end{lstlisting}
+
+这四个模板看起来都说得通，效果是否一样？原书用 AllenNLP 掩码语言建模演示工具\footnote{\url{https://demo.allennlp.org/masked-lm}} 测试了一个输入样例。在这个演示工具中输入一个带掩码词元的句子，模型会返回最可能填入空位的若干词元。以 Poland 为输入 \texttt{[x]}，对每个模板预测前三个词元，结果见表~\ref{tab:ch03-capitals}。
+
+\begin{table}[!htbp]
+\centering
+\caption{在 AllenNLP 掩码语言模型演示中使用清单~\ref{lst:ch03-capitals} 各模板的预测分数。给定 \texttt{[x]} 为“Poland”，每行给出填入 \texttt{[z]} 的前三个预测词元的概率，以百分数表示。}
+\label{tab:ch03-capitals}
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+输入 & Warsaw & Kraków & Poznan & Poland & here & It\\
+\midrule
+模板 1 & 37.7 & 23.2 & 19.3 & — & — & —\\
+模板 2 & 55.7 & 14.8 & 15.0 & — & — & —\\
+模板 3 & 10.1 & — & — & 21.2 & 3.6 & —\\
+模板 4 & 29.3 & — & 12.3 & — & — & 33.0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+模板 1 和模板 2 的首选词元是正确答案“Warsaw”，模板 2 对“Warsaw”的预测优势更大。值得注意的是，它们是四个模板中最简单直接的两个，都没有多个句子或累赘的从句安排。模板 3 的首选答案是“Poland”，模板 4 则预测代词“It”。两者的第二选择都是“Warsaw”，但显然没有像前两种模板那样有效地激发大语言模型中隐含的知识。
+
+在手工设计提示时，设计者应当用多个模板和许多类似的有标签样例进行试验，以便作统计优化。应根据某项指标确定最优提示，例如采用选出首选预测的办法。
+\begin{equation}
+A(t_r,i)=
+\frac{\sum_{\langle x,y\rangle\in\mathcal{R}}
+ \delta\bigl(y=\arg\max_{y'}P_{\mathrm{LM}}(y'\mid x,t_{r,i})\bigr)}
+{\mathcal{R}}.
+\tag{3.8}
+\end{equation}
+这里 $\mathcal{R}$ 是由关系 $r$ 对应的带标签主语—宾语对组成的测试集。$\delta(\cdot)$ 是克罗内克的 $\delta$ 函数。当 $y$ 等于语言模型的首选预测时，函数返回 1，否则返回 0。最终选择在这组主语—宾语对训练样例上准确率最高的提示。
+\transnote{原书式（3.8）的分母印为 $\mathcal{R}$。若计算准确率，分母是集合大小 $|\mathcal{R}|$。本段也保留了原书先称“测试集”、后称“训练样例”的措辞差异。}

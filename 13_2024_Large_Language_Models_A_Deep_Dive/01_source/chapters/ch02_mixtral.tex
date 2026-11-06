@@ -1,0 +1,60 @@
+% PDF 103--106；原书第 73--76 页。
+\subsection{Mixtral 8x7B（混合专家）}
+自 \refcite{ch02-jacobs}{Jacobs 等人（1991）}提出混合专家模型以来，这类模型已有很大发展。最初，研究者用混合专家把复杂问题分成较容易处理的子问题，合并多个专家网络的输出。各个网络分别擅长整体任务的不同方面，门控网络（gating network）根据输入动态决定各专家的贡献权重。
+
+Shazeer 等人于 2017 年引入 Top-$k$ 路由（top-$k$ routing），是一次重要进展。此法只计算排名最前的 $k$ 个专家的输出，使模型可以拥有数十亿个参数，同时让计算成本保持在可承受的范围内，并在语言建模等任务上显著改善表现。
+
+Switch Transformer 又把 Top-$k$ 路由推进了一步，采用“硬路由”（hard routing），令 $k=1$，每个输入词元只选择一个最相关的专家（\refcite{ch02-lepikhin}{Lepikhin et al., 2020}）。这个模型用 128 个采取硬路由的专家取代 T5 Transformer 中传统的前馈网络层，并结合多种优化技术，提高训练效率以及在 GLUE 基准等任务上的表现。
+
+Mixtral 8x7B 是一个高质量的稀疏混合专家模型（Sparse Mixture of Experts Model，SMoE），以 Apache 2.0 许可证公开发布（\refcite{ch02-jiang}{Jiang et al., 2024}）。它在多数基准上的表现超过 Llama-2 70B，推理速度达到后者的 6 倍，并在多数标准基准上达到或超过 GPT-3.5。
+
+\subsubsection{数据集}
+原书未列出预训练细节。据报道，该模型使用从开放网页语料库收集的多语言数据集训练。它可以处理多种语言，包括英语、法语、意大利语、德语和西班牙语。
+
+\subsubsection{架构}
+\begin{figure}[!htbp]
+\centering
+\input{assets/fig02_14}
+\caption{Mixtral 的混合专家层。每个输入向量被路由到 8 个专家中的 2 个。该层输出是被选中专家的输出的加权和。专家采用传统 Transformer 架构中的标准前馈模块。}
+\label{fig:ch02-mixtral}
+\end{figure}
+
+如图~\ref{fig:ch02-mixtral} 所示，Mixtral 将传统 Transformer 的标准前馈网络子模块换成混合专家层，每个词元独立处理。对于输入向量 $\symbf{x}$，混合专家层的输出是多个专家网络输出的加权和。权重由门控网络的输出决定。设 $n$ 个专家网络为 $\{E_0,E_1,\ldots,E_{n-1}\}$，则混合专家层的输出为
+\begin{equation}
+y=\sum_{i=0}^{n-1}G(\symbf{x})_i\cdot E_i(\symbf{x}),
+\tag{2.39}
+\end{equation}
+其中 $G(\symbf{x})_i$ 是门控网络对第 $i$ 个专家的输出，$E_i(\symbf{x})$ 是第 $i$ 个专家网络的输出。若门控向量是稀疏的，则可以跳过权重为零的专家。
+
+$G(\symbf{x})$ 有多种实现（\refcite{ch02-clark}{Clark et al., 2022}；\refcite{ch02-hazimeh}{Hazimeh et al., 2021}）。一种简单而高效的方法是，取线性层输出中最大的 $k$ 个 logit，再对它们计算 softmax（\refcite{ch02-shazeer-2017}{Shazeer et al., 2017}）。门控函数定义为
+\begin{equation}
+G(\symbf{x}):=\operatorname{Softmax}(\operatorname{TopK}(\symbf{x}\cdot\symbf{W}_g)),
+\tag{2.40}
+\end{equation}
+其中，若 $\ell_i$ 是 logit 向量 $\ell\in\mathbb{R}^{n}$ 中最大的 $k$ 个分量之一，则 $\operatorname{TopK}(\ell)_i=\ell_i$，否则 $\operatorname{TopK}(\ell)_i=-\infty$。$k$ 表示每个词元使用的专家数，是控制每词元计算量的超参数。
+
+Mixtral 使用 SwiGLU 架构实现专家函数 $E_i(\symbf{x})$，并取 $k=2$。因此，每个词元会被送到两个权重不同的 SwiGLU 子模块。给定输入词元 $\symbf{x}$，输出 $y$ 的计算方式为
+\begin{equation}
+y=\sum_{i=0}^{n-1}\operatorname{Softmax}(\operatorname{Top2}(\symbf{x}\cdot\symbf{W}_g))_i
+\cdot\operatorname{SwiGLU}_i(\symbf{x}).
+\tag{2.41}
+\end{equation}
+
+\subsubsection{训练}
+研究者没有提供 Mixtral 8x7B 的数据预处理、训练方法或训练硬件信息。
+
+\subsubsection{要点}
+\begin{keypoint}
+\begin{enumerate}
+\item 研究发现，在预训练中大幅提高多语言数据的比例，使 Mixtral 在多语言基准上表现出色，同时保持良好的英语表现。与 Llama-2 70B 相比，Mixtral 在法语、德语、西班牙语和意大利语上表现明显更好。结果表明，在 ARC Challenge、HellaSwag 和 MMLU 等基准上，Mixtral 对这些语言的表现优于 Llama-2 70B。
+\item 使用专用的高性能计算内核，可以在单个 GPU 上高效执行混合专家层。MegaBlocks（\refcite{ch02-gale}{Gale et al., 2023}）提供的内核就是一例，它将混合专家层中的前馈网络运算作为大规模稀疏矩阵乘法来处理。也可以把混合专家层有效分布到多个 GPU，既使用标准并行方式，又使用称为专家并行（Expert Parallelism，EP）的专门分片方法（\refcite{ch02-shazeer-2017}{Shazeer et al., 2017}）。执行时，分给某位专家的词元由对应的 GPU 处理，输出随后被送回该词元在序列中的原位置。
+\item 这种设置需要大量显存（Video Random Access Memory，VRAM）。即使在某一时刻只有一两个专家参与运算，所有专家也必须载入显存。
+\end{enumerate}
+\end{keypoint}
+
+\subsubsection{变体}
+\begin{enumerate}
+\item \textbf{Mixtral 8x22B} 是规模较大的稀疏混合专家变体，共有至多 1\,410 亿个参数，推理时使用约 390 亿个。它提高了推理吞吐量，但也需要更多显存。这个模型可处理至多 64\,000 个词元。
+\item \textbf{Mixtral 8x7B--Instruct} 面向聊天，使用成对反馈数据进行监督微调和直接偏好优化，研究者没有公布具体数据集。LMSys 发布的人工评估结果表明，这一版本的 Elo 评分高于 GPT-3.5 Turbo 和 Claude 2.1。
+\item \textbf{MegaBlocks} 通过块稀疏运算（block-sparse operation）和定制的 GPU 内核，提高混合专家模型在 GPU 上的训练效率，改善词元利用率与硬件映射。它的训练速度比 Tutel 程序库最多快 40\%，可达 Megatron-LM 框架训练稠密神经网络的 2.4 倍，同时保持模型质量。
+\end{enumerate}

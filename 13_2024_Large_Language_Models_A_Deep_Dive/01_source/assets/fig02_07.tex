@@ -1,0 +1,16 @@
+% 重绘自原书第 45 页的图 2.7。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  sheet/.style={draw=black!37,fill=black!9,minimum width=14mm,minimum height=11mm,align=center},
+  filterstage/.style={single arrow,draw=black!38,fill=yellow!27,minimum width=17mm,
+    minimum height=8mm,single arrow head extend=1mm,inner sep=1pt,align=center}]
+\node[sheet] at (.17,.18) {};
+\node[sheet] at (.08,.09) {};
+\node[sheet] at (0,0) {原始\\数据};
+\node[filterstage] at (1.90,0) {质量过滤};
+\node[filterstage] at (3.86,0) {去重};
+\node[filterstage] at (5.82,0) {移除\\有害数据};
+\node[filterstage] at (7.78,0) {词元切分};
+\node[draw=green!42!gray,rounded corners=2.6mm,fill=green!21,
+  minimum width=19mm,minimum height=9.5mm,align=center] at (9.74,0) {训练\\大语言模型};
+\end{tikzpicture}

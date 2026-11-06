@@ -1,0 +1,42 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  operation/.style={draw=blue!50!black,rounded corners=3pt,
+    align=center,minimum height=.77cm,text width=3.00cm,fill=white},
+  decision/.style={diamond,draw=blue!50!black,aspect=2.85,inner sep=1pt,
+    align=center,font=\sffamily\scriptsize,minimum width=2.6cm,
+    minimum height=.72cm,fill=white},
+  stage/.style={rounded corners=6pt,inner xsep=9pt,inner ysep=8pt},
+  path/.style={-{Stealth[length=2mm]},draw=blue!50!black},
+  answer/.style={fill=white,inner sep=1.5pt,font=\sffamily\scriptsize}]
+\node[operation] (develop) at (0,0) {开发提示};
+\node[operation] (debug) at (3.65,0) {调试、运行并评估};
+\node[decision] (satisfied) at (3.65,-1.06) {结果满意？};
+\node[operation] (modify) at (0,-1.06) {修改提示};
+\node[operation] (dev) at (0,-2.68) {作为流水线步骤\\部署到开发环境};
+\node[operation] (run) at (3.65,-2.68) {运行并测试流水线};
+\node[decision] (qa) at (3.65,-3.74) {通过质量检查？};
+\node[operation] (deploy) at (0,-5.39) {部署到生产环境};
+\node[operation] (monitor) at (3.65,-5.39) {监控};
+\begin{scope}[on background layer]
+\node[stage,fill=blue!11,fit=(develop)(debug)(satisfied)(modify)] (design) {};
+\node[stage,fill=yellow!21,fit=(dev)(run)(qa)] {};
+\node[stage,fill=green!13,fit=(deploy)(monitor)] {};
+\end{scope}
+\node[above,anchor=south west,font=\sffamily\scriptsize] at (design.north west) {设计与开发};
+\draw[path] (develop) -- (debug);
+\draw[path] (debug) -- (satisfied);
+\draw[path] (satisfied) -- node[answer,above]{否} (modify);
+\draw[path] (satisfied.south) -- node[answer,above,sloped]{是} (dev.north east);
+\draw[path] (dev) -- (run);
+\draw[path] (run) -- (qa);
+\draw[path] (qa.west) -- node[answer,above,sloped]{否} (dev.south east);
+\draw[path] (qa.south) -- node[answer,above,sloped]{是} (deploy.north east);
+\draw[path] (deploy) -- (monitor);
+\draw[path] (monitor.south) to[out=-90,in=-90,looseness=.75] (-2.07,-5.37)
+  to[out=90,in=180] (design.west);
+\end{tikzpicture}
+\caption{提示工程工作流概览。}
+\label{fig:ch08-prompt-workflow}
+\end{figure}

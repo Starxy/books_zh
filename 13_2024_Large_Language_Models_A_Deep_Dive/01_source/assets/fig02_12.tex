@@ -1,0 +1,31 @@
+% 重绘自原书第 67 页的图 2.12。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  heading/.style={align=center,font=\footnotesize\sffamily\bfseries},
+  choice/.style={draw=black!38,rounded corners=1.7pt,minimum height=6mm,minimum width=22mm,align=center},
+  branch/.style={-{Stealth[length=1.35mm]},draw=black!58,line width=.47pt}]
+\node[heading] at (0,1.47) {总体方法};
+\node[heading] at (2.90,1.47) {输入破坏策略};
+\node[heading] at (5.80,1.47) {破坏比例};
+\node[heading] at (8.70,1.47) {受破坏的片段长度};
+
+\node[choice,fill=blue!18] at (0,.70) {语言建模};
+\node[choice,fill=blue!18] (bert) at (0,-.12) {BERT 式掩码};
+\node[choice,fill=blue!18] at (0,-.94) {恢复顺序};
+
+\node[choice,fill=yellow!27] (mask) at (2.90,.70) {遮盖};
+\node[choice,fill=yellow!27] (span) at (2.90,-.12) {替换片段};
+\node[choice,fill=yellow!27] (drop) at (2.90,-.94) {删除};
+
+\foreach \idx/\y/\rate in {1/.70/10,2/-.12/15,3/-.94/25,4/-1.76/50} {
+  \node[choice,fill=green!17] (rate\idx) at (5.80,\y) {\rate\%};
+  \draw[branch] (span.east) to[out=0,in=180] (rate\idx.west);
+}
+\foreach \idx/\y/\len in {1/.70/2,2/-.12/3,3/-.94/5,4/-1.76/10} {
+  \node[choice,fill=orange!22] (length\idx) at (8.70,\y) {\len};
+  \draw[branch] (rate2.east) to[out=0,in=180] (length\idx.west);
+}
+\foreach \target in {mask,span,drop} {
+  \draw[branch] (bert.east) to[out=0,in=180] (\target.west);
+}
+\end{tikzpicture}

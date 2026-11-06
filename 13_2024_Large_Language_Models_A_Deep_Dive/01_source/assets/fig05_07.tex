@@ -1,0 +1,17 @@
+% 重绘自原书第 195 页的图 5.7。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  block/.style={draw=cyan!29!black!45,fill=cyan!19,rounded corners=2.6pt,align=center,
+    minimum width=26mm,minimum height=12mm,inner sep=3pt},
+  wire/.style={draw=blue!25!black!66,-{Stealth[length=1.4mm]},line width=.52pt}]
+\node[block] (algo) at (0,0) {强化学习算法};
+\node[block] (env) at (7.33,0) {环境};
+\node[block,fill=yellow!30,minimum height=8mm,minimum width=31mm] (predict) at (3.66,2.36) {奖励预测器};
+\node[align=center] (hum) at (7.04,2.36) {人类反馈};
+\node[align=center] at (.0,2.33) {预测奖励};
+\draw[wire] (predict.west) to[out=180,in=78] (algo.north);
+\draw[wire,densely dotted] (hum.west) -- (predict.east);
+\draw[wire] ([yshift=2.9pt]env.west) to[out=180,in=-90] (predict.south);
+\draw[wire] ([yshift=2.9pt]env.west) -- node[below] {观测} ([yshift=2.9pt]algo.east);
+\draw[wire] ([yshift=-3.4pt]algo.east) -- node[below] {动作} ([yshift=-3.4pt]env.west);
+\end{tikzpicture}

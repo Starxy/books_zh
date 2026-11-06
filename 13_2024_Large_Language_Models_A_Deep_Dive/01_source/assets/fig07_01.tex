@@ -1,0 +1,29 @@
+% 重绘自原书第 277 页的图 7.1。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  stepbox/.style={draw=black!53,rounded corners=3pt,text width=37mm,minimum height=19mm,
+    inner sep=3.6pt,align=left},
+  title/.style={font=\footnotesize\sffamily\bfseries,text=blue!59!black},
+  group/.style={draw=blue!58,densely dashed,rounded corners=6pt,inner sep=3.5pt},
+  arrow/.style={draw=black!70,-{Stealth[length=1.5mm]},line width=.62pt}]
+\node[stepbox,fill=yellow!22] (index) at (0,0) {
+  \textbf{建立索引}\\文档分块，语言模型为各块生成向量并存入索引。};
+\node[title,above=2pt of index] (setup) {1）构建阶段};
+\node[stepbox,fill=cyan!16] (query) at (0,-3.00) {
+  \textbf{查询}\\用户输入查询，用同一个语言模型得到查询向量。};
+\node[title,above=2pt of query] (ui) {2）用户交互};
+\node[stepbox,fill=green!16] (retr) at (6.17,0) {
+  \textbf{检索}\\将查询向量与文档向量比较，返回匹配最接近的文档。};
+\node[stepbox,fill=violet!15] (gen) at (6.17,-3.00) {
+  \textbf{生成}\\把文档与原查询填入提示模板，交给聊天机器人回答。};
+\node[title,above=2pt of retr] (runtime) {3）运行阶段};
+\begin{scope}[on background layer]
+  \node[group,fill=cyan!5,fit=(index)(setup)] {};
+  \node[group,fill=red!6,fit=(query)(ui)] {};
+  \node[group,fill=yellow!7,fit=(retr)(gen)(runtime)] {};
+\end{scope}
+\draw[arrow] (index.east) -- ([yshift=4.4pt]retr.west);
+\draw[arrow] (query.east) -- ++(.94,0) |- ([yshift=-4.4pt]retr.west);
+\draw[arrow,densely dashed] (query.east) -- (gen.west);
+\draw[arrow] (retr.south) -- (gen.north);
+\end{tikzpicture}

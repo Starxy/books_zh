@@ -1,0 +1,16 @@
+% 重绘自原书第 7 页的图 1.3。模型输入及候选词保留英文。
+\begin{tikzpicture}[font=\small\sffamily,
+  candidate/.style={draw=black!55,rounded corners=1pt,text width=49mm,align=left,minimum height=4.4mm,inner sep=1.3pt,fill=yellow!23}]
+\node[text width=43mm,align=left,text=violet] (prompt) at (0,0) {ChatGPT is one of the\\large language \ldots};
+\node[candidate,fill=green!14] (title) at (5.5,1.65) {概率（\textcolor{red!80!black}{词}\,$\mid$\,前一个词）};
+\node[candidate] (models) at (5.5,.96) {$P(\text{\textcolor{red!80!black}{models}}\mid\text{language})=0.43$};
+\node[candidate] at (5.5,.49) {$P(\text{\textcolor{red!80!black}{processing}}\mid\text{language})=0.21$};
+\node[candidate] at (5.5,.02) {$P(\text{\textcolor{red!80!black}{translation}}\mid\text{language})=0.12$};
+\node[font=\footnotesize] at (5.5,-.42) {\ldots\hspace{14mm}\ldots\hspace{14mm}\ldots};
+\node[font=\footnotesize] at (5.5,-.76) {\ldots\hspace{14mm}\ldots\hspace{14mm}\ldots};
+\node[candidate] (barrier) at (5.5,-1.2) {$P(\text{\textcolor{red!80!black}{barrier}}\mid\text{language})=0.04$};
+\coordinate (split) at (2.52,0);
+\draw[thick,violet] (prompt.east) -- (split);
+\draw[thick,violet,-{Stealth[length=1.9mm]}] (split) |- (models.west);
+\draw[thick,violet,-{Stealth[length=1.9mm]}] (split) |- (barrier.west);
+\end{tikzpicture}

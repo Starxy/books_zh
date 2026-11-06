@@ -1,6 +1,6 @@
 # 英文 PDF 底本分章总览
 
-当前保留五本 PDF 底本的分章文件，共 **101 个 PDF、2,563 页**。文件位于各书 `00_originals/chapters_en/`，同目录的 `_chapter_manifest.md` 与 `_chapter_manifest.json` 记录原书页码映射。
+当前保留六本 PDF 底本的分章文件，共 **115 个 PDF、3,059 页**。分章位于相应工程的原版目录中，原书页码映射见各书的分章清单或原版元数据。
 
 Foundations of Large Language Models、Agentic Large Language Models、The Little Book of Generative AI Foundations 和 The Principles of Diffusion Models 均保留所提供的 TeX 源码包，按源码章节组织；英文整书 PDF 保留在各自 `00_originals/` 中。
 
@@ -160,6 +160,30 @@ Foundations of Large Language Models、Agentic Large Language Models、The Littl
 | 25 | 后置页 | References | References | 341–359 | 19 | 332–350 |
 | 26 | 后置页 | Index | Index | 360–365 | 6 | 351–356 |
 
+## 13_2024_Large_Language_Models_A_Deep_Dive
+
+- 书名：Large Language Models: A Deep Dive — Bridging Theory and Practice
+- 源文件：`2024_Large_Language_Models_A_Deep_Dive_1stEd_EN.pdf`（496 页）
+- 拆分：**10 章**，合计 14 个 PDF。
+- 文件及 SHA-256 见[原版元数据](13_2024_Large_Language_Models_A_Deep_Dive/00_originals/source_metadata.json)。
+
+| 分段 | 标题 | PDF 页序 | 页数 | 原书页码 |
+|---|---|---|---:|---|
+| frontmatter | Cover and front matter | 1–31 | 31 | C1–xxxiv |
+| ch01 | Chapter 1 Large Language Models: An Introduction | 32–58 | 27 | 1–27 |
+| ch02 | Chapter 2 Language Models Pre-training | 59–112 | 54 | 29–82 |
+| ch03 | Chapter 3 Prompt-based Learning | 113–163 | 51 | 83–133 |
+| ch04 | Chapter 4 LLM Adaptation and Utilization | 164–204 | 41 | 135–175 |
+| ch05 | Chapter 5 Tuning for LLM Alignment | 205–246 | 42 | 177–218 |
+| ch06 | Chapter 6 LLM Challenges and Solutions | 247–302 | 56 | 219–274 |
+| ch07 | Chapter 7 Retrieval-Augmented Generation | 303–341 | 39 | 275–313 |
+| ch08 | Chapter 8 LLMs in Production | 342–400 | 59 | 315–373 |
+| ch09 | Chapter 9 Multimodal LLMs | 401–447 | 47 | 375–421 |
+| ch10 | Chapter 10 LLMs: Evolution and New Frontiers | 448–463 | 16 | 423–438 |
+| appendix_a | Appendix A Deep Learning Basics | 464–475 | 12 | 439–450 |
+| appendix_b | Appendix B Reinforcement Learning Basics | 476–488 | 13 | 451–463 |
+| index | Index | 489–496 | 8 | 465–472 |
+
 ## 汇总
 
 | 书籍 | 原版页数 | 章数 | 分章 PDF 数 |
@@ -169,6 +193,7 @@ Foundations of Large Language Models、Agentic Large Language Models、The Littl
 | 03_2018_Big_Data_in_Omics_and_Imaging | 767 | 7 | 10 |
 | 04_2018_Targeted_Learning_in_Data_Science | 655 | 30 | 33 |
 | 07_2026_Causal_Inference_What_If | 365 | 23 | 26 |
-| **合计** | **2563** | **81** | **101** |
+| 13_2024_Large_Language_Models_A_Deep_Dive | 496 | 10 | 14 |
+| **合计** | **3059** | **91** | **115** |
 
-原拆分已进行逐页文字与页数核验；本次仅调整保留范围，未改变上述 PDF。中文源码在各书 `01_source/`，术语与校对记录保留在各书对应目录，完整中文译本统一存放于根目录 `00_books/`。
+分章文件已核对整书页序、文字和页数。中文源码在各书 `01_source/`，术语与校对记录保留在各书对应目录，完整中文译本统一存放于根目录 `00_books/`。

@@ -1,0 +1,32 @@
+% 重绘自原书第 226 页的图 6.2。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  reason/.style={draw=yellow!67!orange,fill=yellow!26,minimum width=33mm,
+    minimum height=6.8mm,align=center,inner sep=2pt},
+  remedy/.style={reason,draw=orange!43,fill=orange!16,minimum width=34mm},
+  phase/.style={draw=green!45!black,fill=green!30,circle,inner sep=0pt,minimum size=3mm},
+  link/.style={draw=blue!25!black!62,densely dashed,-{Stealth[length=1.4mm]},line width=.57pt}]
+\node[text=green!45!black] at (0,1.21) {时间轴};
+\draw[green!52!black,line width=.72pt,-{Stealth[length=1.55mm]}] (0,.84)--(0,-4.25);
+\node[phase] (pre) at (0,0) {};
+\node[phase] (sft) at (0,-1.18) {};
+\node[phase] (rl) at (0,-2.36) {};
+\node[phase] (inf) at (0,-3.54) {};
+\foreach \id/\name/\y in {pre/预训练/0,sft/SFT/-1.18,rl/RLHF/-2.36,inf/推理/-3.54}{
+  \node[anchor=south east,text=red!60!black,font=\scriptsize\sffamily] at (-.12,\y) {\name};
+}
+\node[reason] (memory) at (-3.60,0) {参数记忆};
+\node[reason] (confidence) at (-3.60,-1.18) {过于自信};
+\node[reason] (wrong) at (-3.60,-2.36) {对齐偏差};
+\node[reason] (decodingrisk) at (-3.60,-3.54) {生成过程的风险};
+\node[remedy] (curation) at (3.59,.19) {整理训练数据};
+\node[remedy] (honestsft) at (3.59,-.65) {以诚实为目标的 SFT};
+\node[remedy] (honestrl) at (3.59,-1.49) {以诚实为目标的强化学习};
+\node[remedy] (decode) at (3.59,-2.33) {解码策略};
+\node[remedy] (retr) at (3.59,-3.17) {知识检索};
+\node[remedy] (uncert) at (3.59,-4.01) {利用不确定性};
+\foreach \from/\to in {memory/pre,confidence/sft,wrong/sft,wrong/rl,decodingrisk/inf,
+  pre/curation,sft/curation,sft/honestsft,rl/honestrl,inf/decode,inf/retr,inf/uncert}{
+  \draw[link] (\from.east)--(\to.west);
+}
+\end{tikzpicture}

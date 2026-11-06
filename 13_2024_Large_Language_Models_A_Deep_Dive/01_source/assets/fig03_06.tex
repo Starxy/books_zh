@@ -1,0 +1,20 @@
+% 重绘自原书第 91 页的图 3.6。
+\begin{tikzpicture}[
+  x=.97cm,font=\footnotesize\sffamily,
+  block/.style={fill=black!14,align=center,inner sep=2pt,minimum width=14mm,minimum height=8mm},
+  flow/.style={draw=black!60,-{Stealth[length=1.3mm]},line width=.48pt},
+  bracket/.style={draw=black!49,line width=.45pt}]
+\node[font=\footnotesize\itshape] (input) at (0,0) {Cannot watch this movie.};
+\node[block] (ptm) at (3.22,0) {预训练\\模型};
+\node[block] (head) at (4.82,0) {微调\\分类器};
+\node[draw=blue!28!gray!20,fit=(ptm)(head),inner sep=1.8pt] (model) {};
+\node[anchor=west,font=\footnotesize\itshape,inner sep=0pt] (output) at (6.10,0)
+  {[CLS] Cannot watch this movie.};
+\node[anchor=west,font=\footnotesize\itshape,inner sep=0pt] at (6.10,.46) {negative};
+\draw[flow] (input.east) -- (model.west);
+\draw[flow] (model.east) -- (output.west);
+\draw[bracket] (input.south west) -- ++(0,-.20) -| (input.south east);
+\draw[bracket] (6.10,-.17) -- (6.10,-.35) -- (6.82,-.35) -- (6.82,-.17);
+\node at (0,-.58) {$\symbf{x}$};
+\node at (6.46,-.58) {$\symbf{y}$};
+\end{tikzpicture}

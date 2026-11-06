@@ -1,0 +1,32 @@
+% 重绘自原书第 186 页的图 5.2。
+\begin{tikzpicture}[
+  x=.61cm,y=.61cm,font=\footnotesize\sffamily,
+  wall/.style={draw=black,line width=3.25pt,line cap=round,line join=round},
+  guide/.style={draw=red!48,-{Stealth[length=1.3mm]},line width=.55pt},
+  callout/.style={draw=black!18,rounded corners=2pt,fill=black!5,align=center,inner sep=3pt}]
+\draw[wall] (1,5)--(5,5)--(5,0)--(4,0);
+\draw[wall] (3,0)--(0,0)--(0,5);
+\draw[wall] (2,5)--(2,4) (4,5)--(4,4) (0,3)--(3,3)--(3,4) (4,3)--(5,3);
+\draw[wall] (1,0)--(1,2)--(3,2)--(3,1) (2,1)--(4,1)--(4,2);
+\foreach \x/\y/\a in {.50/5.32/0,4.50/4.45/0,3.50/2.48/-90,3.50/-.34/0}{
+  \begin{scope}[shift={(\x,\y)},rotate=\a,scale=.67]
+  \draw[fill=black!12,line width=.35pt] (-.20,-.34) rectangle (.20,-.05);
+  \draw[fill=black!13,line width=.35pt,rounded corners=.8pt] (-.22,-.02) rectangle (.22,.29);
+  \draw[line width=.35pt] (0,.29)--(0,.40) (-.20,-.13)--(-.34,-.22) (.20,-.13)--(.34,-.22);
+  \fill (-.08,.16) circle[radius=.45pt] (.08,.16) circle[radius=.45pt] (0,.40) circle[radius=.5pt];
+  \draw[line width=.35pt] (-.11,-.34)--(-.11,-.43) (.11,-.34)--(.11,-.43);
+  \end{scope}
+}
+\node[callout,fill=red!15] (start) at (-2.24,5.32) {智能体起点};
+\node[above=1.5pt of start] {状态};
+\node[callout] (open) at (-2.72,2.48) {智能体面向空地};
+\node[above=1.5pt of open] {状态};
+\node[callout] (closed) at (7.67,4.45) {智能体面向墙};
+\node[above=1.5pt of closed] {状态};
+\node[callout,fill=green!18] (end) at (7.42,-.34) {智能体终点};
+\node[above=1.5pt of end] {状态};
+\draw[guide] (start.east)--(.19,5.32);
+\draw[guide] (open.east)--(3.16,2.48);
+\draw[guide] (closed.west)--(4.80,4.45);
+\draw[guide] (end.west)--(3.82,-.34);
+\end{tikzpicture}

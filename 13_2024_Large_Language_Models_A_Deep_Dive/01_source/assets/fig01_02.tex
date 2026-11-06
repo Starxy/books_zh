@@ -1,0 +1,28 @@
+% 重绘自原书第 6 页的图 1.2。
+\begin{tikzpicture}[
+  font=\footnotesize\sffamily,
+  band/.style={minimum height=6.5mm,minimum width=22.8mm,inner sep=0pt,text=white,font=\scriptsize\sffamily\bfseries},
+  event/.style={text width=19.8mm,inner sep=1.3mm,rounded corners=1pt,
+    align=left,fill=black!5,font=\scriptsize\sffamily},
+  phase/.style={font=\footnotesize\sffamily\bfseries,text width=21mm,align=center,inner sep=1pt}]
+\node[band,fill=red!55!black] (p1) at (0,0) {\hspace{2mm}1950--80 年代};
+\node[band,fill=blue!48!black] (p2) at (2.28,0) {\hspace{2mm}1980--2000 年代};
+\node[band,fill=orange!80!black] (p3) at (4.56,0) {\hspace{2mm}2000--10 年代};
+\node[band,fill=violet!70!black] (p4) at (6.84,0) {\hspace{2mm}2010--20 年代};
+\node[band,fill=yellow!62!orange,text=black] (p5) at (9.12,0) {\hspace{2mm}2020 年代起};
+
+\foreach \period in {1,...,5} {
+  \node[circle,fill=white,text=black!84,inner sep=.7pt,font=\tiny\sffamily\bfseries]
+    at ([xshift=2.15mm]p\period.west) {\period};
+}
+\node[phase,below=2mm of p1] (t1) {基于句法\\和文法};
+\node[event,below=2mm of t1] {1. 乔姆斯基的《句法结构》\\2. ELIZA 聊天机器人\\3. 基于规则的 SHRDLU};
+\node[event,above=2mm of p2] (e2) {1. 基于规则与本体的系统\\2. 统计模型\\3. $n$ 元模型结合机器学习算法};
+\node[phase,above=2mm of e2] {专家系统\\与统计模型};
+\node[phase,below=2mm of p3] (t3) {神经模型\\与稠密表示};
+\node[event,below=2mm of t3] {1. Bengio 等人的稠密向量表示\\2. Mikolov 等人的循环神经网络语言模型\\3. 预训练词嵌入};
+\node[event,above=2mm of p4] (e4) {1. word2vec、GloVe 等词嵌入\\2. 预训练与微调式迁移学习\\3. Bahdanau 等人的注意力机制\\4. Vaswani 等人的 Transformer\\5. BERT、GPT 等模型};
+\node[phase,above=2mm of e4] {深度学习革命};
+\node[phase,below=2mm of p5] (t5) {大语言模型时代};
+\node[event,below=2mm of t5] {1. OpenAI 发布 GPT-2、GPT-3.5 和 GPT-4\\2. 用 RLHF 与人类价值观对齐，如安全性和有据可依\\3. 开源大语言模型与框架};
+\end{tikzpicture}

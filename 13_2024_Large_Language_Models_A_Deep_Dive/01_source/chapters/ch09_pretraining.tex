@@ -1,0 +1,254 @@
+% 原书第 9.3.3 节。
+\subsection{预训练：核心大语言模型、数据集和任务目标}
+\label{sec:ch09-pretraining}
+生成响应的大语言模型是多模态大语言模型的核心。输入既可能包含文本数据，也可能包含非文本数据，因而需要新的技术，让语言模型以多种模态为条件生成响应。大语言模型处理来自各模态的表征，以理解输入语义、进行推理和作出决策。它产生两种主要输出。
+\begin{enumerate}
+\item 直接输出的文本，记为 $t$。
+\item 其他模态的信号词元，记为 $S_X$。
+\end{enumerate}
+这些信号词元作为指令，告诉生成器是否要生成多模态内容。其数学表示为
+\begin{equation}
+(t,S_X)=\mathrm{LLM}(P_X,F_T),
+\label{eq:ch09-mmlm-output}
+\end{equation}
+其中，$P_X$ 可视为对大语言模型进行软提示调优所用的提示。
+
+多模态大语言模型可以分为纯编码器、纯解码器和编码器—解码器三类。表~\ref{tab:ch09-base-models}列出常用于多模态训练的一些大语言模型及相关细节。
+
+{\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.13}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{31mm} >{\raggedright\arraybackslash}p{22mm} >{\raggedright\arraybackslash}p{56mm}@{}}
+\caption{多模态系统采用的基础大语言模型。}\label{tab:ch09-base-models}\\
+\toprule
+大语言模型 & 架构 & 说明\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{表 \thetable\ （续）}\\
+\toprule
+大语言模型 & 架构 & 说明\\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{下页续}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Flan-T5（\refcite{ch09-ref-012}{Chung et al., 2022}） & 编码器—解码器 & 探索对 T5 进行指令调优，展示了较强的零样本学习和思维链（CoT）能力。\\
+ChatGLM2（\refcite{ch09-ref-068}{Zeng et al., 2022}） & 自回归 & 中英双语对话模型，针对中文问答与对话优化。\\
+UL2（\refcite{ch09-ref-050}{Tay et al., 2022}） & 编码器—解码器 & 用去噪目标训练，在基准上超过 T5。\\
+Qwen（\refcite{ch09-ref-003}{Bai et al., 2023}） & 纯解码器 & 侧重中英双语能力，采用对齐技术改善对话表现。\\
+Chinchilla（\refcite{ch09-ref-022}{Hoffmann et al., 2022}） & 因果解码器 & 主张模型规模随数据集规模扩展，在大规模文本语料上训练。\\
+OPT（\refcite{ch09-ref-074}{Zhang et al., 2022}） & 因果解码器 & 尝试以开源方式复现 GPT-3 的性能。\\
+PaLM（\refcite{ch09-ref-011}{Chowdhery et al., 2022}） & 因果解码器 & 注意力层和前馈层并行，采用 RoPE 嵌入、SwiGLU 激活函数等方式加快训练。\\
+Llama（\refcite{ch09-ref-052}{Touvron et al., 2023}） & 纯解码器 & 在纯解码器架构中使用高效的因果注意力。\\
+Llama-2（\refcite{ch09-ref-052}{Touvron et al., 2023}） & 纯解码器 & 相对 Llama 增加 40\% 训练数据，并改进了对话生成。\\
+Vicuna（\refcite{ch09-ref-009}{Chiang et al., 2023}） & 纯解码器 & 以 Llama 为基础，利用用户对话数据训练，以增强对话能力。\\
+\end{longtable}
+}
+
+在预训练阶段，模型通常使用包含图文、视频与文本、音频与文本等多种模态的数据集。这一阶段的重点是训练输入投影器与输出投影器，使不同模态的特征对齐。优化一般集中于这两个组件，有时也会对大语言模型进行参数高效微调，进一步改善模型处理多模态信息的能力。
+
+表~\ref{tab:ch09-pretraining-data}列出预训练中常用的数据集（\refcite{ch09-ref-055}{Wang et al., 2023}; \refcite{ch09-ref-063}{Yin et al., 2023}）。表中 K、M 和 B 分别表示千、百万和十亿。
+
+{\small\renewcommand{\arraystretch}{1.04}
+\begin{longtable}{@{}p{49mm}p{30mm}l@{}}
+\caption{预训练中常用的数据集。}\label{tab:ch09-pretraining-data}\\
+\toprule
+数据集 & 模态 & 规模\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{表 \thetable\ （续）}\\
+\toprule
+数据集 & 模态 & 规模\\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{下页续}\\
+\endfoot
+\bottomrule
+\endlastfoot
+ALIGN & 图像—文本 & 1.8B\\
+LTIP & 图像—文本 & 312M\\
+MS-COCO & 图像—文本 & 620K\\
+VisualGenome & 图像—文本 & 4.5M\\
+CC3M & 图像—文本 & 3.3M\\
+CC12M & 图像—文本 & 12.4M\\
+SBU & 图像—文本 & 1M\\
+LAION-400M & 图像—文本 & 400M\\
+Flickr30k & 图像—文本 & 158K\\
+AIChallengerCaptions & 图像—文本 & 1.5M\\
+COYO & 图像—文本 & 747M\\
+Wukong & 图像—文本 & 101M\\
+COCOCaption & 图像—文本 & 1M\\
+WebLI & 图像—文本 & 12B\\
+EpisodicWebLI & 图像—文本 & 400M\\
+CC595k & 图像—文本 & 595K\\
+RefCOCO+ & 图像—文本 & 142K\\
+Visual-7W & 图像—文本 & 328K\\
+OCR-VQA & 图像—文本 & 1M\\
+ST-VQA & 图像—文本 & 32K\\
+DocVQA & 图像—文本 & 50K\\
+TextVQA & 图像—文本 & 45.3K\\
+DataComp & 图像—文本 & 1.4B\\
+GQA & 图像—文本 & 22M\\
+VQAv2 & 图像—文本 & 1.4M\\
+DVQA & 图像—文本 & 3.5M\\
+OK-VQA & 图像—文本 & 14K\\
+A-OKVQA & 图像—文本 & 24.9K\\
+TextCaptions & 图像—文本 & 145K\\
+M3W（交错） & 图像—文本 & 43.3M 个实例\\
+MMC4（交错） & 图像—文本 & 101.2M 个实例\\
+MSRVTT & 视频—文本 & 200K\\
+WebVid & 视频—文本 & 10M\\
+VTP & 视频—文本 & 27M\\
+AISHELL-2 & 音频 & 128K\\
+WaveCaps & 音频 & 403K\\
+VSDial-CN & 图像—音频—文本 & 1.2M\\
+\end{longtable}
+}
+
+针对任务和模态设计学习目标，是多模态预训练的重要工作。下面介绍预训练中常用的学习目标。
+
+\subsubsection{对比学习}
+CLIP 出现之前，视觉语言模型主要采用分类或语言建模目标。分类方法受限于预定义类别，模型的响应形式和对不同任务的适应性也受限制。语言建模目标更灵活，但着重于为每张图像生成特定文本，训练有一定难度。
+
+CLIP 的对比学习试图克服以往模型的局限，将目标从预测每张图像对应的确切文本，转为判断给定文本与某张图像的关联是否强于其他图像（\refcite{ch09-ref-042}{Radford et al., 2021}）。对于一个包含 $N$ 对图文样本的批次，CLIP 生成 $N$ 个文本嵌入和 $N$ 个图像嵌入。记 $V_1,V_2,\ldots,V_N$ 为这 $N$ 张图像的嵌入，$L_1,L_2,\ldots,L_N$ 为这 $N$ 段文本的嵌入。CLIP 计算 $V_i$ 和 $L_j$ 的 $N^2$ 种可能配对的余弦相似度。训练目标是最大化 $N$ 个正确配对的相似度，同时最小化 $N^2-N$ 个错误配对的相似度。
+\begin{align}
+L_{\mathrm{i2t}}&=-\frac{1}{N}\sum_i
+\log\frac{\exp(V_i^{T}L_i/\sigma)}{\sum_j\exp(V_i^{T}L_j/\sigma)},
+\label{eq:ch09-image-to-text-loss}\\
+L_{\mathrm{t2i}}&=-\frac{1}{N}\sum_i
+\log\frac{\exp(L_i^{T}V_i/\sigma)}{\sum_j\exp(L_i^{T}V_j/\sigma)},
+\label{eq:ch09-text-to-image-loss}\\
+L_{\mathrm{CL}}&=L_{\mathrm{i2t}}+L_{\mathrm{t2i}}.
+\label{eq:ch09-contrastive-loss}
+\end{align}
+这里 $L_{\mathrm{i2t}}$ 和 $L_{\mathrm{t2i}}$ 分别为图像到文本与文本到图像的分类损失，$L_{\mathrm{CL}}$ 为总对比损失。$V_i$ 和 $L_i$ 分别表示归一化的图像嵌入与文本嵌入，$N$ 为批大小，$\sigma$ 为温度参数。
+
+\subsubsection{模态匹配损失}
+模态匹配损失（modality matching loss，MML）在大型多模态模型的预训练中起重要作用，可以捕捉不同模态间显式或隐式的对齐关系。Unicoder-VL 等模型采用这种损失函数，通过视觉语言匹配（visual linguistic matching，VLM）进行视觉语言预训练（\refcite{ch09-ref-029}{Li et al., 2020a}）。VLM 方法抽取图像与句子的正、负配对，训练模型识别配对是否对齐。其目标是预测给定样本对的匹配分数。
+\begin{equation}
+\begin{aligned}
+L_{\mathrm{MML}}={}&-\sum_{(x,y)\in\mathrm{Pos}}
+  \log p(\text{对齐}\mid x,y)\\
+&-\sum_{(x',y')\in\mathrm{Neg}}
+  \log p(\text{未对齐}\mid x',y').
+\end{aligned}
+\label{eq:ch09-modality-matching-loss}
+\end{equation}
+其中 $(x,y)$ 表示图像与句子的正配对，$(x',y')$ 表示负配对。模型预测配对已经对齐的概率 $p(\text{对齐}\mid x,y)$ 和未对齐的概率 $p(\text{未对齐}\mid x',y')$。
+
+InterBERT 提出了采用困难负例的图文匹配变体 ITM-hn（\refcite{ch09-ref-036}{Lin et al., 2020}）。它从 TF-IDF 相似度最高的样本中选择负例，有别于常规的负例采样策略。
+\begin{equation}
+\begin{aligned}
+L_{\mathrm{ITM\text{-}hn}}={}&-\sum_{(x,y)\in\mathrm{Pos}}
+  \log p(\text{对齐}\mid x,y)\\
+&-\sum_{(x',y')\in\text{Hard Neg}}
+  \log p(\text{未对齐}\mid x',y').
+\end{aligned}
+\label{eq:ch09-hard-negative-matching-loss}
+\end{equation}
+纳入 TF-IDF 相似度较高的困难负例后，模型必须区分关系紧密但没有正确对齐的配对，学习因而更困难，也更有效。
+
+\subsubsection{掩码语言建模}
+掩码语言建模（MLM）是预训练框架中的常用目标。研究人员通常随机用特殊词元掩盖输入词，并要求模型补全被掩盖的词。模型利用周围的词和相关图像区域作为上下文。Wang et al. (2021) 开发的 SIMVLM 将这种方法与前缀语言建模（PrefixLM）结合。PrefixLM 对前缀序列施加双向注意力，并对后续词元采用自回归分解。这里将词记作 $w=\{x_1,\ldots,x_K\}$，图像区域记作 $v=\{v_1,\ldots,v_T\}$。在 MLM 中，随机生成一组索引 $m$，掩盖占比为 $p\%$ 的输入词 $x_m$。其目标是利用未掩盖的词 $x_{\neg m}$ 和全部图像区域 $v$ 预测这些词，通过最小化负对数似然来实现。
+\begin{equation}
+L_{\mathrm{MLM}}(\theta)=-\mathbb{E}_{(x,v)}
+\log P_\theta(x_m\mid x_{\neg m},v),
+\label{eq:ch09-mlm-loss}
+\end{equation}
+其中 $\theta$ 为可训练参数。
+
+除了 MLM，SIMVLM 中的 PrefixLM 也是一种预训练视觉语言表征的策略。给定前缀，其目标是预测文本序列的后续部分。
+\begin{equation}
+L_{\mathrm{PrefixLM}}(\theta)=-\mathbb{E}_{x\sim D}
+\log P_\theta(x_{\geq T_p}\mid x_{<T_p}),
+\label{eq:ch09-prefixlm-loss}
+\end{equation}
+其中 $x$ 是文本序列，$D$ 表示预训练数据，$T_p$ 是前缀词元序列的长度。
+
+\subsubsection{掩码物体分类}
+这种技术有选择地掩盖图像的部分区域，通常将相应特征值置零，然后将物体检测器预测的标签用作被掩盖区域的真实标签。
+
+掩码物体分类（MOC）与自然语言处理中的 MLM 方法相似。MOC 以一定概率 $p\%$ 修改图像区域的视觉特征，以遮蔽特定区域。主要目标是正确预测被掩盖的图像区域 $v_m^i$ 中的物体类别。将这些区域对应的编码器输出送入全连接层（FC），计算 $T$ 个物体类别的分数（\refcite{ch09-ref-029}{Li et al., 2020a}）。再用 softmax 函数将分数转化为归一化分布 $g_\theta(v_m^i)$。MOC 目标形式化为
+\begin{equation}
+L_{\mathrm{MOC}}(\theta)=-\mathbb{E}_{(w,v)}
+\left[\sum_{i=1}^M \mathrm{CE}\bigl(c(v_m^i),g_\theta(v_m^i)\bigr)\right],
+\label{eq:ch09-moc-loss}
+\end{equation}
+其中 $c(v_m^i)$ 是被掩盖图像区域的真实标签，$\mathrm{CE}$ 为交叉熵损失函数，$\theta$ 为模型参数，期望 $\mathbb{E}$ 对词 $w$ 和视觉特征 $v$ 的分布求取。MOC 旨在增强模型在视觉内容仅部分可见或被遮挡时推断并分类物体的能力，从而提高其理解视觉信息的能力。\footnote{式~\eqref{eq:ch09-moc-loss}保留底本的负号。若 $\mathrm{CE}$ 按通常定义表示非负交叉熵，则最小化交叉熵时不再额外取负号。}
+
+\subsubsection{图文匹配}
+图文匹配（image-text matching，ITM）是开发能理解视觉内容及其文本描述之间关系的模型的重要环节。ITM 需要生成负训练数据，通常为每张图像配上不相关的句子，或为每个句子配上不相关的图像。目标是提高模型区分正确配对与错误配对的能力。
+
+每个图文对 $(v,t)$ 带有一个真实标签 $y$，表示配对是否正确，即是正例还是负例。ITM 使用二分类损失函数优化模型，衡量模型能否正确判断这种对齐。其损失函数 $L_{\mathrm{ITM}}(\theta)$ 为
+\begin{equation}
+\begin{aligned}
+L_{\mathrm{ITM}}(\theta)=-\mathbb{E}_{(v,t)}
+\bigl[&y\log s_\theta(v,t)\\
+&+(1-y)\log\bigl(1-s_\theta(v,t)\bigr)\bigr],
+\end{aligned}
+\label{eq:ch09-itm-loss}
+\end{equation}
+其中 $s_\theta(v,t)$ 是参数为 $\theta$ 的模型算得的图文相似度分数。期望 $\mathbb{E}_{(v,t)}$ 对图文对的分布求取。此损失函数衡量模型区分正确与错误配对的能力，以改善对视觉与文本模态之间复杂关系的理解。
+
+\subsubsection{图像到文本的生成}
+图像到文本的生成（image-text generation，ITG）是视觉语言预训练的一项重要任务，利用已对齐的图文对训练模型，让它能根据给定图像生成文本。例如，Xu et al. (2021) 用 ITG 目标训练 E2E-VLP 模型。ITG 目标表示为
+\begin{equation}
+L_{\mathrm{ITG}}=-\sum_{(x,y)\in(X,Y)}
+\log\prod_{t=1}^{n}P(y_t\mid y_{<t},x).
+\label{eq:ch09-itg-loss}
+\end{equation}
+其中 $X$ 表示带有上下文的视觉序列，$Y$ 表示生成文本的集合，$n$ 为文本 $y$ 的词元数。该目标旨在最大化正确生成文本词元序列的概率。每个词元 $y_t$ 的生成以前序词元 $y_{<t}$ 和视觉输入 $x$ 为条件。
+
+\subsubsection{视频与字幕匹配}
+视频与字幕匹配（video-subtitle matching，VSM）可用于视频与文本的预训练。以 HERO 为例，它考虑局部与全局对齐两个目标（\refcite{ch09-ref-031}{Li et al., 2020b}）。评分函数分别衡量视频与字幕在局部和全局上的对齐程度。优化时，模型要分辨正确匹配的视频与字幕对（正例）和错误匹配的配对（负例）。
+
+在 HERO 中，局部对齐分数函数与全局对齐分数函数为
+\[
+\begin{aligned}
+S_{\mathrm{local}}(s_q,v)&=V^{\mathrm{temp}}q\in\mathbb{R}^{N_v},\\
+S_{\mathrm{global}}(s_q,v)&=\max\left(
+  \frac{V^{\mathrm{temp}}}{\lVert V^{\mathrm{temp}}\rVert}
+  \cdot\frac{q}{\lVert q\rVert}
+\right).
+\end{aligned}
+\]
+正负查询—视频对的铰链损失、局部对齐损失与全局对齐损失为
+\[
+\begin{aligned}
+L_h(S_{\mathrm{pos}},S_{\mathrm{neg}})
+ &=\max(0,\delta+S_{\mathrm{neg}}-S_{\mathrm{pos}}),\\
+L_{\mathrm{local}}
+ &=-\mathbb{E}_D\bigl[\log p_{\mathrm{st}}[y_{\mathrm{st}}]
+                      +\log p_{\mathrm{ed}}[y_{\mathrm{ed}}]\bigr],\\
+L_{\mathrm{global}}
+ &=\mathbb{E}_D\bigl[
+    L_h\bigl(S_{\mathrm{global}}(s_q,v),S_{\mathrm{global}}(\hat{s}_q,v)\bigr)\\
+ &\hspace{4.9em}{}+L_h\bigl(S_{\mathrm{global}}(s_q,v),S_{\mathrm{global}}(s_q,\hat{v})\bigr)
+    \bigr].
+\end{aligned}
+\]
+合并得到 VSM 损失
+\[
+L_{\mathrm{VSM}}=\lambda_1 L_{\mathrm{local}}+\lambda_2 L_{\mathrm{global}}.
+\]
+\transnote{底本把铰链项写成 $\delta+S_{\mathrm{pos}}-S_{\mathrm{neg}}$，在全局损失的期望前加负号，局部损失的第一个对数括号也未闭合。此处依 \href{https://github.com/linjieli222/HERO/blob/master/model/pretrain.py}{HERO 作者的实现}排式，即局部损失是起点与终点交叉熵之和，全局损失最小化正例分数未高出负例分数至少 $\delta$ 时的惩罚。}
+
+在该模型中，$s_q$ 是从所有字幕句子中抽取的查询，$v$ 是完整视频片段，$V^{\mathrm{temp}}\in\mathbb{R}^{N_v\times d}$ 是时间 Transformer 最终生成的视频帧表征。查询向量 $q\in\mathbb{R}^d$，起点和终点索引 $y_{\mathrm{st}},y_{\mathrm{ed}}\in\{1,\ldots,N_v\}$，概率向量 $p_{\mathrm{st}},p_{\mathrm{ed}}\in\mathbb{R}^{N_v}$ 来自对齐分数。铰链损失 $L_h$ 比较正例与负例的查询—视频对，其中 $(s_q,v)$ 为正例，$(s_q,\hat{v})$ 与 $(\hat{s}_q,v)$ 为负例。间隔超参数 $\delta$ 和权重系数 $\lambda_1,\lambda_2$ 用于控制这套方法。
+
+\subsubsection{帧顺序建模}
+在 HERO 中，帧顺序建模（frame order modeling，FOM）被视为一个分类问题，目标是正确预测一组给定视频帧的时间顺序（\refcite{ch09-ref-031}{Li et al., 2020b}）。FOM 主要用于确定从视频中抽出的一部分帧的原始时间戳序列，以考察模型理解视频时间变化和叙事顺序的能力。
+
+FOM 目标表示为损失函数
+\begin{equation}
+L_{\mathrm{FOM}}=-\mathbb{E}\left[\sum_{i=1}^{R}\log P[r_i,t_i]\right],
+\label{eq:ch09-frame-order-loss}
+\end{equation}
+其中各符号含义如下。
+\begin{itemize}
+\item $R$ 表示顺序被打乱、需要分类的帧的总数。
+\item $i$ 是这组帧中的索引，取值为 $1$ 至 $R$。
+\item $t_i$ 表示第 $i$ 帧在视频中的真实时间戳位置，取值为 $1$ 至 $N_v$，其中 $N_v$ 为视频的总帧数。
+\item $r_i$ 是第 $i$ 帧在重新排序后的位置索引。
+\item $P$ 是 $N_v\times N_v$ 的概率矩阵，元素 $P[r_i,t_i]$ 表示模型预测重排后位置 $r_i$ 的帧对应时间戳 $t_i$ 的概率。
+\end{itemize}

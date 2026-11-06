@@ -1,0 +1,142 @@
+% 原书第 9 章，印刷页 375--421。
+\chapter{多模态大语言模型}
+\label{ch:multimodal}
+\chaptercredit{9}
+\chapterabstract{多模态大语言模型整合文本、图像和音频等多类数据，以模拟人类的感知方式，显著增强人工智能的理解和交互能力。本章介绍多模态大语言模型框架及其组件，结合理论与实际模型，说明每个组件在代表性模型中的不同实现。随后介绍如何把指令调优、上下文学习、思维链和对齐调优等传统大语言模型技术用于多模态情境，以提高跨模态适应性与推理能力。本章详细介绍 Flamingo、Video-LLaMA 和 NExT-GPT 三个当时先进的多模态大语言模型，并说明其各组件如何对应通用框架。在讨论理论基础后，本章以教程展示“文本与其他模态到文本”模型的行为，其中其他模态为图像。教程包括图像分类与描述生成实验，比较零样本、少样本和微调方案，以评估并改善模型表现。}
+
+\section{引言}
+人类在现实世界中很少只依赖一种沟通方式。我们通过视觉、听觉和其他感觉输入感知环境，并综合这些信息来理解周围事物并作出反应。多模态大语言模型（multimodal large language model，MMLLM）旨在模拟这种多方面的处理方式，提高模型在实际应用中理解和作出准确响应的能力。此类模型整合文本、图像、音频和其他传感输入等多种数据类型或模态，是人工智能技术的一项重要发展。传统模型只处理单一类型的数据，多模态模型可以处理并解释来自多种模态的复杂数据，输出也可属于不同模态。这模拟了人通过多种感官理解世界并与之互动的认知能力。
+
+跨模态学习涵盖一系列输入与输出涉及不同感知模态的任务，例如视觉和文本数据之间的任务。以下是其中几项。
+\begin{enumerate}
+\item \textbf{图像与文本检索。}用文本检索相关图像，或用图像检索相关文本描述。
+\item \textbf{视频与文本检索。}用文本查找相关视频，或用视频生成文本描述。
+\item \textbf{图像和视频描述生成。}为给定图像或视频生成描述性文本。输入是图像或视频等视觉内容，输出是对应的文本描述。
+\item \textbf{视觉问答（VQA）。}同时向系统提供图像或视频作为视觉输入，以及以文本形式提出的相关问题。模型需结合视觉和文本输入，根据视觉内容作答。
+\item \textbf{带音频反馈的手势控制。}解释手势等视觉输入，并提供相应音频反馈。输入是视觉手势，输出是音频响应或系统所采取的动作，结合了视觉和听觉模态。
+\end{enumerate}
+
+\section{简史}
+如 Wu et al. (2023c) 所述，随着多模态研究的发展，多模态自动处理领域经历了四个不同的演变阶段。
+
+第一阶段为 1980 至 2000 年，以单模态和统计方法为主。20 世纪 80 年代，统计与图像处理算法广泛用于人脸识别系统的开发。IBM 的研究团队采用隐马尔可夫模型，大幅提高了语音识别的准确性和可靠性（\refcite{ch09-ref-002}{Bahl et al., 1986}）。20 世纪 90 年代，金出武雄的团队率先探索特征脸方法，以主成分分析等统计方法分析人脸图像，有效识别身份（\refcite{ch09-ref-046}{Satoh and Kanade, 1997}）。Dragon Systems 等公司推进了语音识别技术，提高了把口语转换成书面文本的准确率（\refcite{ch09-ref-027}{LaRocca et al., 1999}）。
+
+2000 至 2010 年是第二阶段，其特点是模态转换，尤其重视人机交互。2001 年，AMI 项目探索用计算机记录和处理会议数据，以改善信息检索和协作（\refcite{ch09-ref-005}{Carletta et al., 2005}）。2003 年，认知助理学习与组织项目（Cognitive Assistant that Learns and Organizes，CALO）引入了早期聊天机器人技术，希望创建能够理解并响应人类语言的虚拟助手。它是 Siri 等系统的先驱（\refcite{ch09-ref-053}{Tur et al., 2010}）。社会信号处理（Social Signal Processing，SSP）项目深入分析面部表情、语调等非语言线索，使人机交互更自然（\refcite{ch09-ref-054}{Vinciarelli et al., 2008}）。
+
+2010 至 2020 年是模态融合的第三阶段。深度学习和神经网络融入多模态研究，带来多项突破。2011 年，Ngiam et al. (2011) 提出一种多模态深度学习算法，可联合分析图像和文本等不同模态，改善图像分类、视频分析和语音识别等任务。2012 年，研究人员利用深度玻尔兹曼机捕捉不同模态间的关系，并利用其生成能力（\refcite{ch09-ref-021}{Hinton and Salakhutdinov, 2012}）。2016 年，出现了采用语义注意力的神经图像描述生成算法，可为图像生成描述性文本，从而改善可访问性并支持自动图像标注等应用（\refcite{ch09-ref-065}{You et al., 2016}）。
+
+第四阶段始于 2020 年，其特点是大规模多模态模型的发展，并在本书写作时持续推进。2021 年，对比语言—图像预训练（CLIP）模型改变了以往的做法，以图文配对本身作为学习信号，不依赖预先规定的类别标签（\refcite{ch09-ref-042}{Radford et al., 2021}）。次年，OpenAI 的 DALL-E 2 利用基于 CLIP 图像嵌入的扩散模型，从文本提示生成高质量图像。2023 年，微软发布 KOSMOS-1，这是一种能处理多种模态的信息并通过上下文学习加以适配的多模态大语言模型（\refcite{ch09-ref-023}{Huang et al., 2024}）。PaLM-E 将语言模型与视觉模型相结合，无需针对具体任务微调，在目标检测到代码生成等多种视觉和语言任务上表现出色，成为视觉语言模型的代表（\refcite{ch09-ref-015}{Driess et al., 2023}）。ImageBind 提出为图像、文本、音频、深度、热成像和惯性测量单元（IMU）数据六种模态学习统一的嵌入。它表明只需将其他模态分别与图像配对，就能将这些模态联系起来，用于跨模态检索和生成（\refcite{ch09-ref-018}{Girdhar et al., 2023}）。NExT-GPT 是一个端到端多模态大语言模型，可处理图像、视频、音频和文本输入输出的任意组合（\refcite{ch09-ref-059}{Wu et al., 2023c}）。
+
+\section{多模态大语言模型框架}
+\label{sec:ch09-framework}
+多模态大语言模型的架构多种多样，取决于其采用的组件，以及为不同功能和模态所作的选择。本节逐一介绍多模态大语言模型的架构组件，并说明每个组件的具体实现方法，见图~\ref{fig:ch09-framework}。该框架综合了多项多模态大语言模型研究，包括 Chip (2023)、Wang et al. (2023)、Wu et al. (2023b)、Xu et al. (2023)、Yin et al. (2023) 和 Zhang et al. (2024a)。
+
+\sourcefigure{fig09_01.pdf}{多模态大语言模型的通用框架，各组件均可采用不同实现。图中图像、音频、视频与三维点云经过模态编码和模态对齐，进入由预训练大语言模型、多模态提示调优、多模态 RLHF 组成的模块。其结果经输出投影器和模态生成器转为所需模态。文本直接送入或由大语言模型输出。}{fig:ch09-framework}
+
+\subsection{模态编码器}
+\label{sec:ch09-modality-encoder}
+\begin{keypoint}
+模态编码器（modality encoder，ME）通常是映射各类数据模态的第一个处理单元。一般来说，图像、视频或音频等每类数据都经过相应的专用编码器。这些编码器将不同数据类型的特有属性转化为嵌入，即模型后续各层可以统一理解和处理的向量表示。
+\end{keypoint}
+
+模态编码器的运算可表示为
+\begin{equation}
+F_X=\mathrm{ME}_X(I_X),
+\label{eq:ch09-modality-encoder}
+\end{equation}
+其中，$I_X$ 表示图像、视频、音频或三维物体等模态的输入数据，$F_X$ 表示提取的特征。下面讨论研究中用于不同数据流的若干常见编码器。
+
+Dosovitskiy et al. (2020) 提出的视觉 Transformer（ViT）把此前常用于自然语言处理的 Transformer 架构用于图像分析。ViT 将图像划分为图块并作线性投影，再用 Transformer 块对视觉信息编码。基于 ViT，Radford et al. (2021) 的 CLIP ViT 利用自然语言监督学习视觉概念。CLIP ViT 在大量图文配对数据上进行对比学习，改善图像与相应文本描述之间的对齐，大幅提高模型理解视觉内容并分类的能力。许多多模态大语言模型使用 CLIP 编码器处理图像数据。Fang et al. (2023) 提出的 EVA-CLIP ViT 进一步改进了这一方法，解决了训练 CLIP 等大规模模型时遇到的部分问题。
+
+\begin{practicaltip}
+EVA-CLIP ViT 改善了训练过程的稳定性，可高效扩展模型规模，并改善视觉识别任务中多模态基础模型的训练，因而适合作为图像编码器。
+\end{practicaltip}
+
+处理视频时，常见做法是采样固定数量的帧（通常为五帧），再采用与图像相同的预处理步骤。统一处理使不同视觉模态的特征提取方式保持一致。
+
+音频领域已有多种用于变换声音数据的编码器，如 C-Former、HuBERT、BEATs 和 Whisper。Chen et al. (2023) 的 C-Former 结合连续积分发放（continuous integrate-and-fire，CIF）对齐机制和 Transformer 架构来执行序列转换，从原始声音数据中提取细致的音频特征。Shi et al. (2022) 提出的 HuBERT 采用源自 BERT 框架的自监督学习方法，预测被掩码的音频片段，以学习可服务于不同下游任务的语音表示。Chen et al. (2022) 的 BEATs 则采用迭代式音频预训练框架。
+
+三维视觉理解可用于增强现实与虚拟现实（AR 与 VR）、自动驾驶导航、元宇宙和机器人等领域，因而受到重视。继 ULIP 框架之后，ULIP-2 为三维物体自动生成描述语言，在不依赖人工标注的情况下构建大规模三模态数据集，成为三维视觉理解的代表性方法。三维点云模态可用 ULIP-2 模型的编码器编码（\refcite{ch09-ref-062}{Xue et al., 2023}）。
+
+\subsection{输入投影器}
+\label{sec:ch09-input-projector}
+\begin{keypoint}
+模态对齐 $\mathrm{IN\_ALIGN}_{X\to T}$ 的核心是使用输入投影器，将不同模态的编码特征 $F_X$ 对齐到文本特征空间 $T$。对齐后得到提示 $P_X$，与文本特征 $F_T$ 一起输入大语言模型。
+\end{keypoint}
+
+\transnote{此处原文把待投影的特征也写作 $F_T$。据式~\eqref{eq:ch09-input-projection}，非文本输入特征应记为 $F_X$。}
+
+给定多模态与文本的配对数据集 $\{(I_X,t)\}$，主要目标是最小化在模态 $X$ 条件下生成文本的损失 $L_{\text{txt-gen}}$。
+\begin{equation}
+\arg\min_{\mathrm{IN\_ALIGN}_{X\to T}}
+L_{\text{txt-gen}}\bigl(\mathrm{LLM}(P_X,F_T),t\bigr).
+\label{eq:ch09-input-loss}
+\end{equation}
+其中，对非文本特征应用输入投影器，就得到作为提示的对齐特征 $P_X$。
+\begin{equation}
+P_X=\mathrm{IN\_ALIGN}_{X\to T}(F_X).
+\label{eq:ch09-input-projection}
+\end{equation}
+
+多模态预训练模型用多层 Transformer 架构提取各模态特征，并让特征相互作用。按照整合多模态信息的方式，可将这些架构分为单流和跨流两类。
+\begin{itemize}
+\item \textbf{单流架构。}将图像、文本等多模态输入同等对待，在统一模型中融合。先从各模态提取单模态特征，再将特征表示为词元并用分隔符拼接，如图~\ref{fig:ch09-single-stream}所示。拼接后的特征输入多模态 Transformer。多头自注意力机制让各单模态特征交互并融合，生成多模态融合特征（\refcite{ch09-ref-034}{Li et al., 2020c}）。通常用 Transformer 的分类词元取得这类特征，该词元汇集了各模态的信息，提高模型的表征能力。
+\item \textbf{跨流架构。}不同模态的特征由独立模型并行提取，再通过下文介绍的自监督对比学习完成对齐，如图~\ref{fig:ch09-cross-stream}所示。跨流架构主要对齐各个单模态特征，单流架构则产生多模态融合特征。\footnote{原文该句的关系从句误把单流架构说成着重对齐单模态特征，此处按相邻两段及图~\ref{fig:ch09-single-stream}、图~\ref{fig:ch09-cross-stream}所述的过程译写。}采用跨流结构的大规模多模态语言模型有 BriVL 与 CLIP（\refcite{ch09-ref-025}{Huo et al., 2021}; \refcite{ch09-ref-042}{Radford et al., 2021}）。它们的一个重要特点是将不同模态的特征对齐到同一个高维特征空间。跨流模型很灵活，改变一种模态的结构不会影响其他模态，因而更容易用于实际应用。这些模型主要用于嵌入层面的匹配，通常利用所谓的“弱语义相关性”，并考虑多模态数据之间的差异与互补关系。此类预训练模型的结构还取决于具体的预训练目标。执行重建掩码图像或根据文本描述生成图像等生成任务时，模型会在编码器后接解码器，把多模态融合特征转换成相应输出，以完成预训练。
+\end{itemize}
+
+\sourcefigure{fig09_02.pdf}{单流架构。将文本、图像和音频分别编码、嵌入并词元化，拼成同一序列，经多模态 Transformer 融合以执行预训练任务。}{fig:ch09-single-stream}
+\sourcefigure{fig09_03.pdf}{跨流架构。不同模态由独立编码器产生嵌入，并用对比学习对齐。图中也给出了将嵌入拼接送入多模态 Transformer 的路径。}{fig:ch09-cross-stream}
+
+多模态 Transformer 通过自注意力机制及其变体实现融合、对齐等跨模态交互。自注意力可以处理来自任意模态的词元嵌入，不受模态、词元化方法和嵌入方式的限制。给定来自两种不同模态的输入 $X_A$ 和 $X_B$，用 $Z^{(A)}$ 和 $Z^{(B)}$ 表示各自的词元嵌入。下面以两种模态为例说明各种方法及其数学形式。这些方法可推广到更多模态。
+
+\begin{enumerate}
+\item \textbf{早期求和。}在 Transformer 各层处理之前，将不同模态的词元嵌入在每个位置加权求和。
+\[
+Z\leftarrow T_f\bigl(\alpha Z^{(A)}\oplus\beta Z^{(B)}\bigr)
+=\mathrm{MHSA}\bigl(Q^{(AB)},K^{(AB)},V^{(AB)}\bigr),
+\]
+其中，$\oplus$ 表示逐元素求和。这种方法简单有效，无需增加计算复杂度（\refcite{ch09-ref-017}{Gavrilyuk et al., 2020}）。
+\item \textbf{早期拼接（Co-Transformer）。}将不同模态的词元嵌入序列拼接起来。
+\[
+Z\leftarrow T_f\bigl(C(Z^{(A)},Z^{(B)})\bigr).
+\]
+这种全注意力或 Co-Transformer 方法将拼接结果作为一个序列处理，用其他模态提供的上下文增强各模态的编码（\refcite{ch09-ref-048}{Sun et al., 2019}）。
+\item \textbf{分层注意力（多流到单流）。}先由各自的 Transformer 流编码多模态输入，再拼接并融合它们的输出。
+\[
+Z\leftarrow T_{f3}\bigl(C(T_{f1}(Z^{(A)}),T_{f2}(Z^{(B)}))\bigr).
+\]
+该方法是一种后期交互或融合，也可视为早期拼接的特例（\refcite{ch09-ref-032}{Li et al., 2021}）。
+\item \textbf{分层注意力（单流到多流）。}先用共享的单流 Transformer 编码拼接后的多模态输入，再用各自的流对每个模态编码。
+\[
+\begin{aligned}
+C(Z^{(A)},Z^{(B)})&\leftarrow T_{f1}\bigl(C(Z^{(A)},Z^{(B)})\bigr),\\
+Z^{(A)}&\leftarrow T_{f2}(Z^{(A)}),\\
+Z^{(B)}&\leftarrow T_{f3}(Z^{(B)}).
+\end{aligned}
+\]
+InterBERT 采用此结构捕捉跨模态交互，同时保留单模态表征的独立性（\refcite{ch09-ref-036}{Lin et al., 2020}）。
+\item \textbf{交叉注意力。}双流 Transformer 交换各流的查询嵌入，以增强跨模态交互。
+\[
+\begin{aligned}
+Z^{(A)}&\leftarrow\mathrm{MHSA}(Q_B,K_A,V_A),\\
+Z^{(B)}&\leftarrow\mathrm{MHSA}(Q_A,K_B,V_B).
+\end{aligned}
+\]
+这种方法首先在 ViLBERT 中提出，兼顾计算效率和跨模态感知（\refcite{ch09-ref-039}{Lu et al., 2019}）。
+\item \textbf{交叉注意力后拼接。}将交叉注意力的各流拼接后进一步处理，以建模全局上下文。
+\[
+\begin{aligned}
+Z^{(A)}&\leftarrow\mathrm{MHSA}(Q_B,K_A,V_A),\\
+Z^{(B)}&\leftarrow\mathrm{MHSA}(Q_A,K_B,V_B),\\
+Z&\leftarrow T_f\bigl(C(Z^{(A)},Z^{(B)})\bigr).
+\end{aligned}
+\]
+这种分层跨模态交互减轻了单用交叉注意力的缺点（\refcite{ch09-ref-069}{Zhan et al., 2021}）。
+\end{enumerate}
+
+\input{chapters/ch09_pretraining}
+\input{chapters/ch09_tuning}
+\input{chapters/ch09_benchmarks}
+\input{chapters/ch09_models}
+\input{chapters/ch09_tutorial}
+\input{chapters/ch09_references}
