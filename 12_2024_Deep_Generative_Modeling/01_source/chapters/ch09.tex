@@ -1,0 +1,220 @@
+\chapter{基于得分的生成模型}
+\label{chap:09}
+\sourcechapter{9}
+
+% 原书印刷页 217–218，附件 PDF 第 232–233 页。
+\section{引言}
+\label{sec:09-01}
+
+我们从文献\citeref{1}摘要中的一句话开始。
+\begin{quote}
+  \emph{从数据产生噪声很容易。从噪声生成数据，就是生成建模。}
+\end{quote}
+
+我得说，要给当今的生成建模下一个更简洁的定义，实在不容易。只要看看不同类型的模型，就会马上发现，我们想做的正是从噪声生成数据！不信吗？那就看看各类生成模型怎样工作。
+\begin{itemize}
+  \item GAN。从已知的 $p(\mathbf z)$ 采样噪声 $\mathbf z$，再用生成器 $G(\mathbf z)$ 得到数据。
+  \item VAE。从先验 $p(\mathbf z)$ 采样噪声 $\mathbf z$，再用解码器 $p(\mathbf x\mid\mathbf z)$ 采样数据。
+  \item 归一化流。从基分布 $p(\mathbf z)$ 采样噪声 $\mathbf z$，再通过可逆变换 $f$ 得到数据 $\mathbf x=f^{-1}(\mathbf z)$。
+\end{itemize}
+
+好奇的读者，希望你已经看出了这里的规律。一般来说，我们在寻找一种变换 $\psi$，将噪声 $\mathbf z$ 映射为数据 $\mathbf x$，即 $\mathbf x=\psi(\mathbf z)$。\figref{fig:09-01} 给出了一个示例。
+
+\dgmfig{fig_09_01}{\linewidth}{从噪声映射到数据的生成建模示意图。通过某种变换 $\psi$，把噪声（左图中的黑色叉号）映射为数据（右图中聚集在橙色月牙附近的黑色叉号）。}{fig:09-01}
+
+在 GAN、VAE 和归一化流中，这个变换由某个神经网络“一步”完成，分别通过生成器、解码器或 $f$ 的逆映射把噪声变成数据。我们也可以设想一种迭代过程，而且已经知道有一类模型正是这么做的，那就是基于扩散的模型！在正向扩散中，每一步都给数据点加入高斯噪声，直到数据点变成纯高斯噪声，即 $\mathbf x_0\sim p_{\mathit{data}}(\mathbf x)$，$\mathbf x_1\sim\mathcal N(\mathbf 0,\mathbf I)$。回顾一下记号，数据点 $\mathbf x\equiv\mathbf x_0$，噪声 $\mathbf z\equiv\mathbf x_1$。接下来，生成部分（也称逆向扩散）从 $\mathbf x_1$（即纯高斯噪声）出发，每一步去掉少量噪声，直到得到数据 $\mathbf x_0$。最初的扩散模型实现\citerefs{2,3}只采用有限步数 $T<+\infty$，所以可以把基于扩散的模型看作具有固定编码器的层次 VAE，参见第~5~章和文献\citeref{4}。
+
+在实践中，扩散模型的成功部分来自其深度。换句话说，我们能够学习极深的层次模型（例如 $T=1000$），因为生成过程被定义为在两个相邻变量之间去掉一小部分噪声。训练时，对 $t\in[0,1]$ 采样，然后优化如下损失，以随机方式训练一个共享网络来预测这微乎其微的噪声。
+\begin{equation}
+  \mathcal L_t(\mathbf x_t)=\mathbb E_{\mathcal N(\epsilon\mid\mathbf 0,\mathbf I)}
+  \bigl[\gamma_t\lVert\epsilon-\epsilon_\theta(\mathbf x_t,t)\rVert^2\bigr],
+  \tag{9.1}\label{eq:09-01}
+\end{equation}
+其中 $\epsilon_t$ 是来自标准高斯分布的样本，$\gamma_t$ 是由噪声调度确定的方差，$\epsilon_\theta(\cdot)$ 是所有 $t$ 共享的神经网络，旨在根据给定的 $\mathbf x_t$ 和 $t$ 预测 $\epsilon$，而 $\mathbf x_t$ 可用给定数据 $\mathbf x_0$ 和 $\epsilon$ 表示。为简单起见，可将 $\gamma_t$ 设为 1，得到所谓的简化目标（simplified objective）\citeref{3}，也可以学习 $\gamma_t$\citeref{5}。
+
+我知道，好奇的读者，你的问题马上就要来了。既然扩散模型效果这么好是因为步数 $T$ 很大，何不索性取无穷多步，即 $T=+\infty$？这个想法合情合理，却带来了一些问题。首先，得处理连续的 $t\in[0,1]$。我们其实已经知道，微分方程可以处理这个问题。于是又出现了第二个问题，怎样通过微分方程定义生成模型？理想情况下，我们想找到一种简单的训练方法，使用类似式 \eqref{eq:09-01} 的损失。事实证明，这可以做到！但我们先来看另一种把噪声变成数据的方法，即得分匹配（score matching）。之后，我们就有了处理连续时间（即无穷深的生成模型）的学习策略。最后还会讨论另一种方法，称为流匹配（flow matching）。
+
+% 原书印刷页 219–225，附件 PDF 第 234–240 页。
+\section{得分匹配}
+\label{sec:09-02}
+
+\subsection{建模与目标}
+
+请记住，我们的目标是构造一个模型，以迭代的方式把噪声变成数据。下面是第一次尝试。设想有这样一种情形。
+\begin{itemize}
+  \item 我们能够访问真实分布 $p_{\mathit{real}}(\mathbf x)$，其中 $\mathbf x\in\mathcal X$。
+  \item 在数据空间随机取任意一点 $\hat{\mathbf x}\in\mathcal X$，例如从 $\mathcal X$ 上的均匀分布采样。$p_{\mathit{real}}(\hat{\mathbf x})$ 很可能接近 0，即 $p_{\mathit{real}}(\hat{\mathbf x})\approx0$。
+  \item \textbf{问题}是，怎样把 $\hat{\mathbf x}$ 变成一个像样的数据点，即现实中可能观测到的对象？
+\end{itemize}
+
+实际上，有一种较快、也有理论依据的方法，称为\textbf{随机梯度朗之万动力学}（stochastic gradient Langevin dynamics，SGLD），也称朗之万动力学（Langevin dynamics）\citeref{6}。它可以从 $p_{\mathit{real}}(\mathbf x)$ 采样。从 $\mathbf x_0\equiv\hat{\mathbf x}$ 出发，按以下过程更新。
+\begin{equation}
+  \mathbf x_{t+\Delta}=\mathbf x_t+\alpha\nabla_{\mathbf x_t}\ln p_{\mathit{real}}(\mathbf x)
+    +\eta\cdot\epsilon,
+  \tag{9.2}\label{eq:09-02}
+\end{equation}
+其中 $\Delta$ 是增量，$\alpha>0$，$\eta>0$，且 $\epsilon\sim\mathcal N(\mathbf 0,\mathbf I)$。最后将到达一点 $\mathbf x_0$，满足 $p_{\mathit{real}}(\mathbf x_0)>0$，而且位于某个众数附近。\footnote{译注：原书此处将起点和终点均记为 $\mathbf x_0$。后文第~9.2.3~节的采样框将终点记为 $\mathbf x_1$。}
+
+这很好！不过有一个大问题，我们不知道真实分布 $p_{\mathit{real}}(\mathbf x)$。我们又回到起点，似乎得用 GAN、VAE、归一化流等方法求一个模型 $p_\theta(\mathbf x)$。真要这么做吗？再看式 \eqref{eq:09-02}。我们所需的是实际分布对数的梯度 $\nabla_{\mathbf x}\ln p_{\mathit{real}}(\mathbf x)$。这个量称为\textbf{得分函数}（score function），$\mathbf s(\mathbf x)\overset{\mathrm{df}}{=}\nabla_{\mathbf x}\ln p_{\mathit{real}}(\mathbf x)$。知道 $\mathbf s(\mathbf x)$ 后，就可以运行 SGLD 找到新的点，这些点最终服从真实分布。\figref{fig:09-02} 给出了多峰分布的得分函数示例。\figref{fig:09-02}（a）在网格上用向量表示得分函数。可以看出，得分函数指向各个众数，从而引导朗之万动力学，如\figref{fig:09-02}（b）所示。
+
+\dgmfig{fig_09_02}{.89\linewidth}{（a）得分函数 $\mathbf s(\mathbf x)$ 的示意图。在规则网格上绘制多峰分布的得分向量（白色箭头），颜色越深，概率越低，颜色越亮，概率越高。（b）应用 SGLD 得到的一条轨迹。沿途各点用白色叉号表示，其得分用灰色箭头表示。}{fig:09-02}
+
+因此，\textbf{我们可以拟合得分函数}，从而绕开对数据分布本身的拟合。记住，得分函数是梯度，所以返回的对象与 $\mathbf x$ 形状相同，可以表示为向量。因此，优化如下回归问题，就能找到得分函数的最佳模型\citerefs{7,8}。
+\begin{equation}
+  \mathcal J(\theta)=\frac12\int
+    \lVert\mathbf s_\theta(\mathbf x)-\nabla_{\mathbf x}\ln p_{\mathit{data}}(\mathbf x)\rVert^2
+    p_{\mathit{data}}(\mathbf x)\,\mathrm d\mathbf x.
+  \tag{9.3}\label{eq:09-03}
+\end{equation}
+这个积分很常见，就是回归中经常使用的均方误差损失。
+
+式 \eqref{eq:09-03} 的问题是，$p_{\mathit{data}}(\mathbf x)=\frac1N\sum_{n=1}^{N}\delta(\mathbf x-\mathbf x_n)$，其中 $\delta(\cdot)$ 是狄拉克 $\delta$。由于狄拉克 $\delta$ 作为 $\mathbf x$ 的函数不可微，我们无法用自动求导求解式 \eqref{eq:09-03}。解决办法是对数据加上一些方差为 $\sigma^2$ 的小幅高斯噪声，即 $\tilde{\mathbf x}_n=\mathbf x_n+\sigma\cdot\epsilon$，其中 $\epsilon\sim\mathcal N(\mathbf 0,\mathbf I)$。得到的分布是高斯分布 $\mathcal N(\tilde{\mathbf x}_n\mid\mathbf x_n,\sigma^2)$。换句话说，我们可以把 $p_{\mathit{data}}(\mathbf x)$ 变成一个高斯混合模型，以数据点为均值，以较小的 $\sigma^2$ 为方差，即
+\begin{equation}
+  q_{\mathit{data}}(\tilde{\mathbf x}_n)=\frac1N\sum_{n=1}^{N}
+    \mathcal N(\tilde{\mathbf x}_n\mid\mathbf x_n,\sigma^2).
+  \tag{9.4}\label{eq:09-04}
+\end{equation}
+
+最后，在式 \eqref{eq:09-03} 中用 $q_{\mathit{data}}(\tilde{\mathbf x}_n)$ 替换 $p_{\mathit{data}}(\mathbf x_n)$，就可以构造可微的目标，取代原先的不可微目标\citerefs{7,8,9}。
+\begin{equation}
+  \begin{aligned}
+    \mathcal L(\theta)=\frac{1}{2N}\sum_{n=1}^{N}\int
+    &\bigl\lVert\mathbf s_\theta(\tilde{\mathbf x})
+        -\nabla_{\tilde{\mathbf x}}\ln\mathcal N(\tilde{\mathbf x}\mid\mathbf x_n,\sigma^2)
+      \bigr\rVert^2\\[-2pt]
+    &{}\cdot\mathcal N(\tilde{\mathbf x}_n\mid\mathbf x_n,\sigma^2)\,\mathrm d\tilde{\mathbf x}.
+  \end{aligned}
+  \tag{9.5}\label{eq:09-05}
+\end{equation}
+也许你会说，还有一个问题，因为这里要算一个梯度。不过，高斯分布的得分函数有闭式表达式。
+\begin{align}
+  \nabla_{\tilde{\mathbf x}}\ln\mathcal N(\tilde{\mathbf x}_n\mid\mathbf x_n,\sigma^2)
+    &=\nabla_{\tilde{\mathbf x}}
+      \left(-\ln(2\pi\sigma^D)-\frac{1}{2\sigma^2}(\tilde{\mathbf x}_n-\mathbf x_n)^2\right)
+      \tag{9.6}\label{eq:09-06}\\
+    &=-\nabla_{\tilde{\mathbf x}}\frac{1}{2\sigma^2}(\tilde{\mathbf x}_n-\mathbf x_n)^2
+      \tag{9.7}\label{eq:09-07}\\
+    &=-\frac{1}{\sigma^2}(\tilde{\mathbf x}_n-\mathbf x_n)
+      \tag{9.8}\label{eq:09-08}\\
+    &=-\frac{1}{\sigma^2}(\mathbf x_n+\sigma\cdot\epsilon-\mathbf x_n)
+      \tag{9.9}\label{eq:09-09}\\
+    &=-\frac{1}{\sigma}\epsilon,
+      \tag{9.10}\label{eq:09-10}
+\end{align}
+其中第四个等式用到了 $\tilde{\mathbf x}$ 的定义 $\tilde{\mathbf x}_n=\mathbf x_n+\sigma\cdot\epsilon$。因此，得分为
+\begin{equation}
+  \nabla_{\tilde{\mathbf x}}\ln\mathcal N(\tilde{\mathbf x}_n\mid\mathbf x_n,\sigma^2)
+  =-\frac{1}{\sigma}\epsilon,
+  \tag{5}\label{eq:09-original-5}
+\end{equation}
+将式 \eqref{eq:09-original-5} 代入式 \eqref{eq:09-05}，得到可微目标的最终形式。
+\begin{align}
+  \mathcal L(\theta)
+    &=\frac{1}{2N}\sum_{n=1}^{N}\int
+      \left\lVert\mathbf s_\theta(\tilde{\mathbf x})+\frac{1}{\sigma}\epsilon\right\rVert^2
+      \mathcal N(\epsilon\mid\mathbf 0,\sigma^2\mathbf I)\,\mathrm d\epsilon
+      \tag{9.11}\label{eq:09-11}\\
+    &=\frac{1}{2N}\sum_{n=1}^{N}\mathbb E_{\mathcal N(\epsilon\mid\mathbf 0,\mathbf I)}
+      \left[\left\lVert\mathbf s_\theta(\tilde{\mathbf x})+\frac{1}{\sigma}\epsilon\right\rVert^2\right]
+      \tag{9.12}\label{eq:09-12}\\
+    &=\frac{1}{N}\sum_{n=1}^{N}\mathbb E_{\mathcal N(\epsilon\mid\mathbf 0,\mathbf I)}
+      \left[\frac{1}{2\sigma}\left\lVert\epsilon-\tilde{\mathbf s}_\theta(\tilde{\mathbf x})\right\rVert^2\right],
+      \tag{9.13}\label{eq:09-13}
+\end{align}
+最后一行改用了得分模型 $\tilde{\mathbf s}_\theta(\mathbf x)=-\sigma\mathbf s_\theta(\tilde{\mathbf x})$，并利用了 $\sigma$ 为正的性质（别忘了，标准差总是正的！）。\footnote{译注：原书式 \eqref{eq:09-11} 的高斯协方差与式 \eqref{eq:09-12} 及前面定义的标准高斯 $\epsilon$ 不一致。按本段所给的重参数化，式 \eqref{eq:09-13} 从式 \eqref{eq:09-12} 提出的因子应为 $1/(2\sigma^2)$。公式及后续算法和代码保留印刷写法。} 实现时，当然可以直接用神经网络参数化 $\tilde{\mathbf s}_\theta(\tilde{\mathbf x})$，省去先参数化 $\mathbf s_\theta(\mathbf x)$ 再缩放的步骤。只要清楚这里推导的每一步即可。通过优化式 \eqref{eq:09-13} 的目标来学习得分模型 $\tilde{\mathbf s}_\theta(\tilde{\mathbf x})$，称为（去噪）\textbf{得分匹配}（denoising score matching）\citerefs{7,8,10}。
+
+得分匹配让我们以一种全新的方式学习生成模型。通过求解回归问题，可以把\textbf{匹配分布}的任务转成\textbf{匹配得分}的任务。这给生成模型的训练带来了新的视角。但要记住，最终目的是应用朗之万动力学，从噪声生成数据。下面汇总得分匹配在实践中所需的信息。
+
+\subsection{训练}
+
+可以重复以下步骤来学习得分模型。
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{得分匹配的训练}
+  \begin{enumerate}
+    \item 选取一个数据点 $\mathbf x$。
+    \item 从 $\mathcal N(\epsilon\mid\mathbf 0,\mathbf I)$ 采样 $\epsilon$。
+    \item 计算加噪后的数据 $\tilde{\mathbf x}=\mathbf x+\sigma\cdot\epsilon$。
+    \item 计算得分 $\tilde{\mathbf s}_\theta(\tilde{\mathbf x})$。
+    \item 计算得分匹配目标关于 $\theta$ 的梯度，即
+      $\Delta_\theta=\nabla_\theta\frac{1}{2\sigma}
+      \lVert\epsilon-\tilde{\mathbf s}_\theta(\tilde{\mathbf x})\rVert^2$。
+      我们用自动微分完成这一步。
+    \item 更新得分模型 $\theta:=\theta-\Delta_\theta$。返回第 1 步，直至满足停止条件。
+  \end{enumerate}
+\end{booknote}
+实际应用中会采用小批量，但整体过程相同。
+
+\subsection{采样（生成）}
+
+学到得分模型后，就可以借助朗之万动力学进行采样。生成过程如下。
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{用朗之万动力学从得分匹配模型采样}
+  \begin{enumerate}
+    \item 随机采样一个点 $\mathbf x_0$，例如从均匀分布采样。
+    \item 运行朗之万动力学 $T$ 步，其中 $\Delta=1/T$。
+      \begin{equation}
+        \mathbf x_{t+\Delta}=\mathbf x_t+\alpha\tilde{\mathbf s}_\theta(\mathbf x_t)+\eta\cdot\epsilon.
+        \tag{9.14}\label{eq:09-14}
+      \end{equation}
+    \item 返回最终的点 $\mathbf x_1$。
+  \end{enumerate}
+\end{booknote}
+
+最终的点应服从数据分布。请注意，为保持朗之万动力学的形式，我们这里用的是 $\mathbf s_\theta(\mathbf x_t)$，而非 $\tilde{\mathbf s}_\theta(\mathbf x_t)$。\footnote{译注：这里的原文说明与式 \eqref{eq:09-14} 不一致，式中印为 $\tilde{\mathbf s}_\theta(\mathbf x_t)$。} 这不成问题，因为已知两者的关系为 $\tilde{\mathbf s}_\theta(\mathbf x_t)=-\sigma\mathbf s_\theta(\mathbf x_t)$，所以 $\mathbf s_\theta(\mathbf x_t)=-\frac1\sigma\tilde{\mathbf s}_\theta(\mathbf x_t)$。
+
+\subsection{得分匹配与基于扩散的模型}
+
+好奇的读者，我敢说你已经看出了一些端倪。看看式 \eqref{eq:09-03} 中基于扩散的模型的目标，以及式 \eqref{eq:09-13} 中得分模型的目标，可以清楚看到二者几乎完全相同，尤其是取 $\gamma_t=1/\sigma$ 时！\footnote{译注：这里的式号 \eqref{eq:09-03} 沿用原书引用，基于扩散的模型的目标见式 \eqref{eq:09-01}。} 实际上，我们可以把得分匹配变成一种（近似的）基于扩散的方法。需要做三件事。
+\begin{enumerate}
+  \item 引入方差 $\sigma_t^2$ 的调度，其中
+    \[
+      t\in\mathcal T=\{t\colon t\text{ 从 }0\text{ 开始，按增量 }\Delta=1/T\text{ 递增到 }1\}.
+    \]
+  \item 修改得分模型，让它能够感知这一调度，即 $\tilde{\mathbf s}_\theta(\mathbf x,\sigma_t^2)$。
+  \item 修改目标，使它也能感知这一调度。
+    \begin{equation}
+      \mathcal L(\theta)=\frac{1}{2N}\sum_{n=1}^{N}\sum_{t\in\mathcal T}
+      \lambda_t\,\mathbb E_{\mathcal N(\epsilon\mid\mathbf 0,\mathbf I)}
+      \left[\frac{1}{\sigma}\left\lVert\epsilon-\tilde{\mathbf s}_\theta(\tilde{\mathbf x},\sigma_t^2)\right\rVert^2\right],
+      \tag{8}\label{eq:09-original-8}
+    \end{equation}
+    其中 $\lambda_t$ 为加权系数，例如 $\lambda_t=\sigma_t^2$。
+\end{enumerate}
+
+对此类模型采样需要做些调整。例如，可以采用退火朗之万动力学（annealed Langevin dynamics），见文献\citeref{10}的算法 1。最终得到的采样过程与基于扩散的模型非常相似。差别在于采样方案针对每个 $\sigma_t^2$ 执行多步朗之万动力学，而基于扩散的模型每次“去噪”只执行一步。
+
+\subsection{用代码实现得分匹配}
+
+我们已经概述了如何用得分匹配实现训练和采样（生成）。代码相当直接，唯一的技巧是把数据变换到 $[-1,1]$。下面的代码相比上面的分析只改了一点，使用 $\frac{1}{2\sigma}\lVert\epsilon+\tilde{\mathbf s}_\theta(\tilde{\mathbf x})\rVert^2$，使朗之万动力学仍采用标准形式 $\mathbf x_{t+\Delta}=\mathbf x_t+\alpha\tilde{\mathbf s}_\theta(\mathbf x_t)+\eta\cdot\epsilon$。
+
+\bookcode{code/ch09_01_score_matching.py}{得分匹配类。}{lst:09-01}
+
+得分模型采用多层感知机（MLP），超参数设为 $\alpha=0.1$、$\sigma=0.1$、$\eta=0.05$、$T=100$。运行代码后，可得到类似\figref{fig:09-03} 的结果。
+
+\dgmfig{fig_09_03}{\linewidth}{得分匹配的结果。（a）真实图像的样本。（b）生成图像的样本。（c）验证集上计算的得分匹配损失示例。}{fig:09-03}[（c）中横轴 epochs 为训练轮次，纵轴 score matching loss 为得分匹配损失。]
+
+\subsection{得分匹配能用来做什么？}
+
+\textbf{改进得分匹配。} 可以看到，极其简单的代码就能得到一些相当像样的生成结果。不过，原论文\citeref{10}指出，得分匹配还有以下几个问题。
+\begin{itemize}
+  \item 首先也是最重要的一点是，低密度区域（很少有数据或没有数据的区域）会给得分估计带来困难。再看\figref{fig:09-02}（a）中颜色较暗区域的真实得分。在这些区域里，几乎看不到任何数据点。因此，得分函数的估计可能很不准确。
+  \item 第二个问题由第一个引起。得分模型训练得差，朗之万动力学就可能生成质量较差的样本。在\figref{fig:09-03}（b）的示例中可以多少看出这一点。
+  \item 第三，如果真实数据分布的各个众数相隔很远，朗之万动力学就要走许多步才能到达这些位置。这是所谓的\emph{混合缓慢}（slow mixing）问题。
+\end{itemize}
+
+为了克服这些问题，可以采用如下方法。
+\begin{itemize}
+  \item 可以采用一系列方差，并使用前面讨论过的退火朗之万动力学。详细做法请参阅文献\citeref{10}以及介绍了其他实用技巧的后续论文\citeref{11}。
+  \item 采用\emph{切片得分匹配}（sliced score matching）\citeref{12}，可以训练出更好的得分模型，尤其是在高维情形下。它的思想类似于切片 Wasserstein 距离（sliced Wasserstein distance）\citeref{13}，把得分函数和得分模型投影到某一随机方向。这样，新的切片得分匹配目标更容易计算，只需做向量乘法。这个新目标与 Hutchinson 迹估计量（Hutchinson's trace estimator）密切相关。
+\end{itemize}
+
+\textbf{其他扩展。} 得分匹配是一个通用框架，可以进一步扩展。下面是一些例子。
+\begin{itemize}
+  \item 得分匹配适用于基于能量的模型。这一思想已用于训练玻尔兹曼机\citerefs{14,15}和其他基于能量的模型\citeref{16}。
+  \item 匹配随机变量分布得分的思想也可以用来学习离散随机变量的分布\citeref{17}。为此，需要采用一种适合概率质量函数的得分定义。
+  \item 得分匹配的应用可以超出图像范围。文献\citeref{18}提出了一种点云建模方法，采用了适于处理点云的特定得分模型。
+\end{itemize}
+
+\input{chapters/ch09_sde}
+\input{chapters/ch09_flow}
+
+\FloatBarrier
+\input{chapters/ch09_references}

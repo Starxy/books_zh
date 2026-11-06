@@ -1,0 +1,222 @@
+\chapter{用于神经压缩的深度生成建模}
+\label{chap:10}
+\sourcechapter{10}
+
+% 原书印刷页 259–260，附件 PDF 第 273–274 页。
+\section{引言}
+\label{sec:10-01}
+
+2020 年 12 月，Facebook 报告说，它约有 18 亿日活跃用户和 28 亿月活跃用户\citeref{1}。假设用户平均每天上传一张照片，按由此产生的数据量粗略估算，我要强调是\textbf{非常粗略}地估算，每天新增图像大约有 3000 TB。单是 Facebook 这一个例子，就表明数据的存储和传输可能带来巨大的成本。在数字时代，简单来说，更高效地处理数据，即处理\textbf{更快}、数据量\textbf{更小}，就能省下更多钱。
+
+要达到数据量更小、处理更快的目标，最直接的办法是压缩，尤其是使用能够缩小图像的图像编解码算法（codec）。只要缩小图像，就能高效地存储和传输它们，省去改动基础设施。说白了，图像压得越小，我们能传得越多、越快，占用的磁盘空间也越少！
+
+提到图像压缩，你首先想到的可能是 JPEG 或 PNG，这是大家日常使用的标准。这里不详述这些标准（介绍见文献\citerefs{2,3}），但有一点值得了解，它们使用一些预先确定的数学变换，例如离散余弦变换。JPEG 等标准编解码器的主要优点是可解释。各步骤都由人工设计，行为可以预测。代价是灵活性不足，性能可能因此大幅下降。那怎样提高变换的灵活性？有人想到办法了吗？我听到有人说深度学习\citerefs{4,5}？没错！如今很多图像压缩算法都借助神经网络来改进。
+
+利用神经网络构造压缩算法的新兴领域称为\textbf{神经压缩}（neural compression）。在开发新的编解码器时，神经压缩正在成为主要方向。可以用神经网络替换标准编解码器的一部分\citeref{6}，也可以把基于神经网络的编解码器\citeref{7}与量化（quantization）\citeref{8}、熵编码（entropy coding）\citerefs{9,10,11,12}一起训练。
+
+下一节会详述通用压缩方案。不过，这里要先了解深度生成建模为何对神经压缩如此重要。克劳德·香农（Claude Shannon）很早就在文献\citeref{13}中给出了答案。用不太正式的话来说，可以概括为下面一句话。
+\begin{quote}
+  \centering 表示源数据的消息长度与该数据的熵成正比。
+\end{quote}
+
+由于不知道数据的概率分布 $p(\mathbf x)$，我们也就不知道数据的熵。但可以用迄今讨论过的某种深度生成模型来估计它！因此，近年来，利用深度生成建模改进神经压缩受到越来越多关注。可以用深度生成模型为熵编码器建立概率分布模型\citerefs{9,10,11,12}，也可以引入新的推断方案\citeref{14}和重建方案\citeref{15}，显著改善最终的重建和压缩效果。
+
+% 原书印刷页 260–262，附件 PDF 第 274–276 页。
+\section{通用压缩方案}
+\label{sec:10-02}
+
+在进入神经压缩之前，最好先回顾一下什么是图像压缩，或者更一般地说，什么是数据压缩。复习基础知识也能有所收获！图像压缩方法可分为两类\citeref{16}。
+\begin{itemize}
+  \item \emph{无损压缩}（lossless compression）。保留全部信息，重建没有误差。
+  \item \emph{有损压缩}（lossy compression）。压缩方法只能保留部分信息。
+\end{itemize}
+
+设计算法的一般做法，是构造一种唯一可译码（uniquely decodable）的码，使其期望长度尽量接近数据的熵\citeref{13}。一般的压缩系统由\textbf{编码器}和\textbf{解码器}两个部分组成\citerefs{16,17}。请把它与确定性的 VAE 区分开来。虽然二者有一些相似之处，但压缩任务真正关心的是发送\textbf{比特流}（bitstream），而在 VAE 中通常完全不用考虑这一点。在 VAE 中，我们操作的是浮点数，称其为码只是为了便于理解。要变成“真正的”压缩方案，还得增加几个步骤。下面几节就来解释这些步骤。现在开始！
+
+\subsection{编码器}
+
+编码器的目标是把图像变换为离散信号。要注意，信号可以是二进制，也可以采用其他离散形式。所用的变换可以可逆，但没有这个要求。如果变换可逆，就可以在解码器中使用逆变换，原则上能够实现无损压缩。为什么？可以回顾基于流的模型中对可逆性的讨论。如果变换不可逆，就会丢失一些信息，所用的方法也就属于有损压缩。对输入图像应用变换后，再将离散信号无损地编码为比特流。换句话说，将离散符号映射为二进制变量（比特）。熵编码器通常会利用符号出现的概率信息，Huffman 编码器（Huffman coder）和算术编码器（arithmetic coder）就是这样\citeref{16}。要认识到，许多熵编码器需要知道 $p(\mathbf x)$，这正是深度生成模型的用武之地。
+
+\subsection{解码器}
+
+消息（即比特）发送并接收后，由熵解码器把比特流解码为离散信号。熵解码器执行的是熵编码器的逆操作。熵编码方法可以让我们从比特流恢复原有符号。最后，应用一个逆向变换来重建原始图像。这个变换可以是编码器变换的逆，也可以采用其他形式。
+
+\subsection{完整方案}
+
+通用压缩系统（编解码器）的流程见\figref{fig:10-01}。标准编解码器主要使用多尺度图像分解（multiscale image decomposition），例如小波表示（wavelet representation）\citerefs{3,18}，然后再量化。选用某种特定的离散变换，例如离散余弦变换（discrete cosine transform，DCT），就得到一种特定的编解码器，例如 JPEG\citeref{2}。
+
+\subsection{目标}
+
+编解码器的最终性能按重建误差和压缩率评价。重建误差称为\textbf{失真度量}（distortion measure），用来计算原始图像和重建图像之间的差异。可以用均方误差（mean squared error，MSE），通常报告峰值信噪比（peak signal-to-noise ratio，PSNR），即 $10\log_{10}\frac{255^2}{\mathit{MSE}}$。也可以用多尺度结构相似性指标（multi-scale structural similarity index，MS-SSIM）等感知度量\citeref{19}。这里将压缩率称为\textbf{码率}（rate），通常用\textbf{每像素比特数}（bits per pixel，bpp）表示，即编码器输出的总比特数除以编码器输入的总像素数\citeref{17}。通常，通过查看率失真平面来比较编解码器的性能，在图上以码率为横轴、失真为纵轴绘制曲线。
+
+\dgmfig{fig_10_01}{.95\linewidth}{通用图像压缩系统（编解码器）。}{fig:10-01}[上方编码器（Encoder）将原始图像（original image）变换（Transformation）为离散信号（discrete signal），再经熵编码（Entropy encoding）得到比特流（bitstream）。下方解码器（Decoder）进行熵解码（Entropy decoding）和逆向变换（Inverse Transformation），得到重建图像（reconstructed image）。]
+
+形式上，我们假设采用自编码器架构（再看\figref{fig:10-01}）。其中，编码变换 $f_e\colon\mathcal X\to\mathcal Y$ 接收输入 $\mathbf x$，返回离散信号 $\mathbf y$（即码）。消息发送后，由解码器 $f_d\colon\mathcal Y\to\mathcal X$ 给出重建 $\hat{\mathbf x}$。此外，还有一个（自适应的）熵编码模型学习分布 $p(\mathbf y)$，再由熵编码器（例如 Huffman 编码或算术编码）利用这一分布，把离散信号 $\mathbf y$ 变成比特流。如果压缩方法含有可调的参数或超参数，就可以通过优化下列目标函数来学习它们。
+\begin{equation}
+  \mathcal L(\mathbf x)=d(\mathbf x,\hat{\mathbf x})+\beta r(\mathbf y),
+  \tag{10.1}\label{eq:10-01}
+\end{equation}
+其中 $d(\cdot,\cdot)$ 为\textbf{失真}度量（例如 PSNR、MS-SSIM），$r(\cdot)$ 为\textbf{码率}度量（例如 $r(\mathbf y)=-\ln p(\mathbf y)$），$\beta>0$ 是控制码率和失真之间权衡的权重因子。注意，计算失真需要编码器和解码器，计算码率则需要编码器和熵模型。
+
+% 原书印刷页 262–263，附件 PDF 第 276–277 页。
+\section{插叙：JPEG}
+\label{sec:10-03}
+
+图像压缩所需的概念都已讨论过，现在可以深入神经压缩了。不过在此之前，首先要问的是，在压缩中使用神经网络能带来什么好处，以及可以在哪些地方、以什么方式使用它们。前面说过，标准编解码器使用一系列预先确定的变换和数学运算。这些运算是怎样起作用的呢？
+
+\dgmfig{fig_10_02}{.96\linewidth}{JPEG 压缩系统。}{fig:10-02}[编码器（Encoder）依次进行 YCbCr 变换、Cb 和 Cr 缩小（downscaling）、DCT、量化（quantizer）和 Huffman 编码（Huffman encoding）。比特流（bitstream）送入解码器（Decoder），依次进行 Huffman 解码、反量化（dequantizer）、逆 DCT、Cb 和 Cr 放大（upscaling），最后由 YCbCr 恢复 RGB 图像。]
+
+我们简要讨论一种最常用的编解码器，JPEG。在 JPEG 编解码器中，首先对 RGB 图像进行线性变换，得到 YCbCr 格式。\footnote{译注：式 \eqref{eq:10-02} 第三行第二个系数保留原书的 $-0.48688$。若按同一行其余两个系数并要求灰色输入 $R=G=B$ 时 $Cr$ 恒为 128，该系数应为 $-0.418688$。}
+\begin{equation}
+  \begin{bmatrix}Y\\Cb\\Cr\end{bmatrix}
+  =
+  \begin{bmatrix}0\\128\\128\end{bmatrix}
+  +
+  \begin{bmatrix}
+    0.299&0.587&0.114\\
+    -0.168736&-0.331264&0.5\\
+    0.5&-0.48688&-0.081312
+  \end{bmatrix}
+  \begin{bmatrix}R\\G\\B\end{bmatrix}
+  \tag{10.2}\label{eq:10-02}
+\end{equation}
+随后缩小 Cb 和 Cr 两个通道，通常缩小两到三倍（第一阶段压缩）。然后，将各通道划分成若干块，例如 $8\times8$ 的块，对各块做离散余弦变换（DCT），并量化变换结果（第二阶段压缩）。最后可以使用 Huffman 编码。解码时使用逆 DCT，放大 Cb 和 Cr 通道，恢复 RGB 表示。整个系统如\figref{fig:10-02} 所示。可以看出，每一步都容易理解。如果你知道 DCT 的原理，整个流程就是一个白箱。其中有一些超参数，但也都具有十分清楚的解释，例如 Cb 和 Cr 通道缩小多少倍、块的大小是多少。
+
+% 原书印刷页 263–273，附件 PDF 第 277–287 页。
+\section{神经压缩的组成部分}
+\label{sec:10-04}
+
+现在我们知道标准编解码器怎样工作了。不过，它们的一个问题是灵活性有限。有人可能会问，DCT 对所有图像都是最优变换吗？很可能并非如此。如果我们愿意舍弃精心设计的白箱，可以用神经网络代替所有数学运算，把它变成黑箱。这样可能获得更高的灵活性，也可能在失真和码率两方面都表现得更好。
+
+不过要记住，学习神经网络要求整个方法\textbf{可微}。但这里还要求神经网络输出离散值，这会阻断反向传播！为此，必须构造\textbf{可微量化}（differentiable quantization）过程。此外，为了得到性能良好的模型，还需要一个自适应熵编码模型（adaptive entropy coding model）。它是神经压缩流程中的重要组成部分，既优化压缩率（即码率），也有助于学习实用的码本（codebook）。接下来详细讨论这两个组成部分。
+
+\subsection{编码器和解码器}
+
+神经压缩中的编码器和解码器与 VAE 中的不同，都只由神经网络组成，无需附加函数。因此，我们关注的是网络架构，比如无需考虑如何参数化分布。编码器输出连续的码（浮点数），解码器输出重建后的图像。下面给出编码器和解码器的 PyTorch 类，以及神经网络的示例。
+
+\bookcode{code/ch10_01_encoder_decoder.py}{编码器类和解码器类。}{lst:10-01}
+
+\bookcode{code/ch10_02_architectures.py}{编码器与解码器所用神经网络的示例。}{lst:10-02}
+
+\subsection{可微量化}
+
+用神经网络进行压缩时，有一个问题需要解决。必须保证能够通过反向传播训练，这等价于只使用可微运算。可惜，处理神经网络的离散输出会破坏可微性，需要采用梯度近似，例如直通估计量（straight-through estimator）。不过，我们可以量化码 $\mathbf y$，并用比较简单的技巧让量化过程可微。
+
+假设编码器给出码 $\mathbf y\in\mathbb R^M$。此外，假设有一个码本 $\mathbf c\in\mathbb R^K$。可以把码本看作一个由额外参数组成的向量。没错，是参数，也可以学习！现在，整个想法就在于把 $\mathbf y$ 量化为码本 $\mathbf c$ 中的值。简单吧？虽说简单，但这么说还没有说明怎么做。这里所谓量化，就是取 $\mathbf y$ 的每个元素，在码本中找出与之最近的值，再用该码本值替换它。可以用矩阵运算来实现。首先，把 $\mathbf y$ 重复 $K$ 次，把 $\mathbf c$ 重复 $M$ 次，得到两个矩阵 $\mathbf Y\in\mathbb R^{M\times K}$ 和 $\mathbf C\in\mathbb R^{M\times K}$。现在就可以计算相似度矩阵，例如
+\[
+  \mathbf S=\exp\bigl\{-\sqrt{(\mathbf Y-\mathbf C)^2}\bigr\}\in\mathbb R^{M\times K}.
+\]
+当 $\mathbf y$ 的第 $m$ 个值 $y_m$ 与 $\mathbf c$ 的第 $k$ 个值 $c_k$ 最接近时，矩阵 $\mathbf S$ 的对应元素取最高值。到目前为止，各项运算都是可微的，不过还没有进行量化，数值仍是连续的。既然有了相似度矩阵 $\mathbf S\in\mathbb R^{M\times K}$，就可以沿 $\mathbf S$ 的第二个维度施加带温度参数的 softmax 非线性变换，即 $\hat{\mathbf S}=\operatorname{softmax}_2(\tau\cdot\mathbf S)$（下标表示沿第二个维度计算 softmax），其中 $\tau\gg1$（例如 $\tau=10^7$）。由于对乘了很大数值的相似度矩阵应用 softmax，得到的矩阵 $\hat{\mathbf S}$ 虽然仍由浮点数组成，但在数值上每行只有一个 1，其余为 0。\footnote{译注：这里描述的是数值上的独热近似。有限温度下 softmax 的输出一般仍连续，最大相似度并列时也不会选出唯一的 1。} 这种量化的示例见\figref{fig:10-03}。
+
+\dgmfig{fig_10_03}{.89\linewidth}{码的量化示例。（a）距离。（b）索引。（c）量化后的码。}{fig:10-03}[code 为码，codebook 为码本，indices to codebook 表示把索引映射为码本中的值。]
+
+重要的是，softmax 非线性函数可微，因而整个过程可微。最后，将码本与 0–1 相似度矩阵相乘，就能得到量化后的码。
+\begin{equation}
+  \hat{\mathbf y}=\hat{\mathbf S}\mathbf c.
+  \tag{10.3}\label{eq:10-03}
+\end{equation}
+得到的码 $\hat{\mathbf y}$ 只含码本里的值。
+
+我们可以问，$\hat{\mathbf y}$ 中的值仍是浮点数，这样做真的有收获吗？换句话说，要转成比特流的离散信号在哪里？可以从两个角度回答。第一，码本只有 $K$ 个可能值。因此，这些值是离散的，只是用有限个浮点数表示。第二，真正起作用的是计算矩阵 $\hat{\mathbf S}$。请注意，这个矩阵确实是离散的！每行仅有一个位置为 1，其他位置均为 0。因此，从码本或相似度矩阵两个角度看，都可以确认，任意实值向量都能变成一个各实数分量取自有限集合的向量。最重要的是，整个量化过程允许使用反向传播算法！许多神经压缩方法使用了这种量化方法或很相似的方法，例如文献\citerefs{8,11,10}。也可以用其他可微量化技术，例如向量量化（vector quantization）\citeref{16}。不过这里选择简单的码本，实践表明它相当有效。
+
+\bookcode{code/ch10_03_quantizer.py}{量化器类。}{lst:10-03}
+
+代码清单~\ref{lst:10-03} 沿用印刷写法。\footnote{译注：其中 \texttt{indices\_to\_onehot} 构造了 \texttt{indices\_hard}，但没有返回它，因此外部赋值取得的是 \texttt{None}。清单保留该函数原貌。}
+
+\subsection{自适应熵编码模型}
+
+整个方案的最后一个部分是熵编码。这里使用 Huffman 编码、算术编码之类的熵编码器。无论用哪一种，都要求估计码的概率分布 $p(\mathbf y)$。有了这个分布，熵编码器就能将离散信号无损压缩成比特流。一般来说，可以将各离散符号分别编码成比特，例如 Huffman 编码，也可以将整个离散信号编码成比特表示，例如算术编码。在压缩系统中，算术编码优于 Huffman 编码，因为它速度更快，编码更精确，也就是压缩效果更好\citeref{16}。
+
+这里不回顾或详细解释算术编码的工作原理。细节请参阅文献\citeref{16}或其他介绍数据压缩的书。需要知道并记住两点。第一，如果提供了符号的概率，算术编码无需再遍历一遍信号来估计这些概率。第二，算术编码有一种自适应变体，可以在依次压缩符号时修改概率，也称为\emph{渐进编码}（progressive coding）。
+
+这两点很重要，因为正如前面所说，可以用深度生成模型估计 $p(\mathbf y)$。学到深度生成模型后，算术编码就可以利用这个分布来无损压缩编码。此外，如果使用将分布因子分解的模型，例如自回归模型，也可以利用渐进编码的思想。
+
+在这里的例子中，自回归模型接收量化后的码，返回码本中每个值（即各个索引）的概率。换句话说，自回归模型输出的是码本取值的概率。值得说明的是，实现中用“熵编码”一词来指熵编码模型。此外，也有专门用于压缩的分布，例如尺度超先验（scale hyperprior）\citeref{9}。这里关心的是如何将深度生成建模用于神经压缩。
+
+\bookcode{code/ch10_04_entropy_model.py}{使用自回归模型类的自适应熵编码模型。}{lst:10-04}
+
+\subsection{一个神经压缩系统}
+
+我们已经讨论了神经压缩系统的所有组件，并给出了一些具体的实现示例。还有许多其他构造方法，从精心设计的编码器和解码器神经网络架构，到各种量化方案和熵编码模型。不过，这里给出的神经压缩器应该能让你清楚地了解，如何利用神经网络来压缩图像，或者更一般地压缩数据。
+
+\dgmfig{fig_10_04}{.96\linewidth}{神经压缩系统。}{fig:10-04}[上方编码器（Encoder）用神经网络和量化器（quantizer）得到离散码，再进行熵编码（Entropy encoding）。下方解码器（Decoder）进行熵解码（Entropy decoding），再经反量化（dequantizer）和神经网络重建图像。bitstream 为比特流。]
+
+\figref{fig:10-04} 展示了一个神经压缩系统。其中用神经网络和（可微的）量化过程取代了\figref{fig:10-01} 中的变换。图中还突出显示了对浮点数进行量化得到离散信号的过程。总体来看，比较\figref{fig:10-01} 和\figref{fig:10-04}，可以发现两套流程相同，区别在于变换的实现方式。
+
+主要差别或许在于，神经压缩器可以端到端训练，并针对给定数据做专门调整。实际上，神经压缩器的目标可看作带有惩罚项的自编码器重建误差。假设训练数据为 $\mathcal D=\{\mathbf x_1,\ldots,\mathbf x_N\}$，对应的经验分布为 $p_{\mathit{data}}(\mathbf x)$。此外，权重为 $\phi$ 的编码器网络给出 $\mathbf y=f_{e,\phi}(\mathbf x)$，带码本 $\mathbf c$ 的可微量化器给出 $\hat{\mathbf y}=Q(\mathbf y;\mathbf x)$。\footnote{译注：此处量化器的第二个参数保留印刷本的 $\mathbf x$。随后的公式均以码本 $\mathbf c$ 为第二个参数。} 权重为 $\theta$ 的解码器网络给出 $\hat{\mathbf x}=f_{d,\theta}(\hat{\mathbf y})$，权重为 $\lambda$ 的熵编码模型给出 $p_\lambda(\hat{\mathbf y})$。可以通过最小化以下目标来端到端训练模型（$\beta>0$）。
+\begin{align}
+  \mathcal L(\theta,\phi,\lambda,\mathbf c)
+    &=\mathbb E_{\mathbf x\sim p_{\mathit{data}}(\mathbf x)}
+    \bigl[(\mathbf x-f_{d,\theta}(Q(f_{e,\phi}(\mathbf x);\mathbf c)))^2\bigr]+
+    \notag\\
+    &\quad+\beta\mathbb E_{\hat{\mathbf y}\sim p_{\mathit{data}}(\mathbf x)
+      \delta(Q(f_{e,\phi}(\mathbf x);\mathbf c)-\hat{\mathbf y})}
+      [-\ln p_\lambda(\hat{\mathbf y})]
+      \tag{10.4}\label{eq:10-04}\\
+    &=\mathbb E_{\mathbf x\sim p_{\mathit{data}}(\mathbf x)}
+      \bigl[(\mathbf x-\hat{\mathbf x})^2\bigr]\notag\\
+    &\quad+\beta\mathbb E_{\hat{\mathbf y}\sim p_{\mathit{data}}(\mathbf x)
+      \delta(Q(f_{e,\phi}(\mathbf x);\mathbf c)-\hat{\mathbf y})}
+      [-\ln p_\lambda(\hat{\mathbf y})].
+      \tag{10.5}\label{eq:10-05}
+\end{align}
+细看目标就会发现，第一项 $\mathbb E_{\mathbf x\sim p_{\mathit{data}}(\mathbf x)}[(\mathbf x-\hat{\mathbf x})^2]$ 是均方误差（MSE）损失，也就是重建误差。第二项 $\mathbb E_{\mathbf x\sim p_{\mathit{data}}(\mathbf x)}[-\ln p_\lambda(\hat{\mathbf y})]$ 是 $q(\hat{\mathbf y})$ 与 $p_\lambda(\hat{\mathbf y})$ 之间的交叉熵（cross-entropy），其中
+\[
+  q(\hat{\mathbf y})=p_{\mathit{data}}(\mathbf x)\delta\bigl(Q(f_{e,\phi}(\mathbf x);\mathbf c)-\hat{\mathbf y}\bigr),
+\]
+$\delta(\cdot)$ 为狄拉克 $\delta$。为了看清这一点，我们逐步写出来。
+\begin{align}
+  \mathbb{CE}[q(\hat{\mathbf y})\Vert p_\lambda(\hat{\mathbf y})]
+    &=-\sum_{\hat{\mathbf y}}q(\hat{\mathbf y})\ln p_\lambda(\hat{\mathbf y})
+      \tag{10.6}\label{eq:10-06}\\
+    &=-\sum_{\hat{\mathbf y}}p_{\mathit{data}}(\mathbf x)
+      \delta\bigl(Q(f_{e,\phi}(\mathbf x);\mathbf c)-\hat{\mathbf y}\bigr)\ln p_\lambda(\hat{\mathbf y})
+      \tag{10.7}\label{eq:10-07}\\
+    &=-\frac1N\sum_{n=1}^N
+      \ln p_\lambda\bigl(Q(f_{e,\phi}(\mathbf x_n);\mathbf c)\bigr).
+      \tag{10.8}\label{eq:10-08}
+\end{align}
+最后，将期望替换为求和，可显式写出训练目标。\footnote{译注：原书式 \eqref{eq:10-07} 的 $p_{\mathit{data}}(\mathbf x)\delta(\cdots)$ 尚含 $\mathbf x$。对 $\mathbf x$ 边缘化得到 $q(\hat{\mathbf y})$，以经验分布代入后，才得到式 \eqref{eq:10-08}。前面的原式和定义保留印刷写法。}
+\begin{align}
+  \mathcal L(\theta,\phi,\lambda,\mathbf c)
+    &=\underbrace{\frac1N\sum_{n=1}^N
+      \bigl(\mathbf x_n-f_{d,\theta}(Q(f_{e,\phi}(\mathbf x_n);\mathbf c))\bigr)^2}_{\text{失真}}+
+      \notag\\
+    &\quad+\underbrace{\frac{\beta}{N}\sum_{n=1}^N
+      \left[-\ln p_\lambda\bigl(Q(f_{e,\phi}(\mathbf x_n);\mathbf c)\bigr)\right]}_{\text{码率}}.
+      \tag{10.9}\label{eq:10-09}
+\end{align}
+训练目标是失真与码率之和。请注意，训练时完全无需使用熵编码。若要在实践中使用神经压缩，则需要熵编码。\footnote{译注：下框中，定长编码共有 $K^M=2^{\kappa M}$ 种完整的码，等概率时每种码的概率为 $2^{-\kappa M}$，故 bpp 为 $\kappa M/D$。原书写为 $1/(\kappa\times M)$，下框保留原式。}
+
+\begin{booknote}{每像素比特数}
+这里有必要讨论如何计算\textbf{每像素比特数}（bpp）。它的定义是编码器输出的总比特数除以编码器输入的总像素数。在这个例子中，编码器返回长度为 $M$ 的码，每个值被映射到 $K$ 个值之一，假设 $K=2^\kappa$。于是可以用索引，即整数，表示量化后的码。因为有 $K$ 个可能的整数，所以每个整数可用 $\kappa$ 比特表示，从而用 $\kappa\times M$ 比特描述整个码。换句话说，可以使用概率为 $1/(\kappa\times M)$ 的均匀分布，得到的 bpp 为 $-\log_2(1/(\kappa\times M))/D$。不过，使用熵编码还可以改善这个数值。于是，可以用码率除以图像大小 $D$ 得到 bpp，即 $-\log_2p(\hat{\mathbf y})/D$。
+\end{booknote}
+\bookcode{code/ch10_05_neural_compressor.py}{神经压缩类。}{lst:10-05}
+
+最后概括一下神经压缩器。假设模型已经训练好，完整的压缩流程包括以下步骤。\footnote{译注：第 2 步沿用原书的输入 $\hat{\mathbf y}$。按第 1 步和式 \eqref{eq:10-04}，这里应把未量化的 $\mathbf y$ 送入 $Q$。}
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{压缩流程}
+  \begin{enumerate}
+    \item 对输入图像编码，$\mathbf y=f_{e,\phi}(\mathbf x)$。
+    \item 对码量化，$\hat{\mathbf y}=Q(\hat{\mathbf y};\mathbf c)$。
+    \item 利用 $p_\lambda(\hat{\mathbf y})$ 和算术编码等方法，将量化后的码 $\hat{\mathbf y}$ 转成比特流。
+    \item 发送比特。
+    \item 利用 $p_\lambda(\hat{\mathbf y})$ 和算术解码等方法，将比特解码为 $\hat{\mathbf y}$。
+    \item 对 $\hat{\mathbf y}$ 解码，$\hat{\mathbf x}=f_{d,\theta}(\hat{\mathbf y})$。
+  \end{enumerate}
+\end{booknote}
+\subsection{示例}
+
+用 $\beta=1$ 训练整个神经压缩系统后，可以得到类似\figref{fig:10-05} 的结果。
+
+有趣的是，熵编码器也是一个深度生成模型，因此可以从中采样。\figref{fig:10-05}（c）给出四个样本。它们表明，该模型确实能学到量化码的数据分布！
+
+\dgmfig{fig_10_05}{.95\linewidth}{训练后的结果示例。（a）失真曲线。（b）码率曲线。（c）真实图像（左列）、对应的重建图像（中列）以及从自回归熵编码器取得的样本（右列）。}{fig:10-05}[曲线横轴 epochs 为训练轮次，纵轴 distortion 和 rate 分别为失真和码率。图像上方的 original、reconstruction、sample 分别为原图、重建、样本。]
+
+% 原书印刷页 273，附件 PDF 第 287 页。
+\section{接下来呢？}
+\label{sec:10-05}
+
+神经压缩是个迷人的领域。用神经网络进行压缩，为开发新的编码方案打开了新的可能性。在图像压缩上，神经压缩取得了与标准编解码器相当、甚至有时更好的结果\citeref{20}。视频或音频压缩仍有改进空间，尽管近来的尝试很有前景\citerefs{21,22}。这里还有许多有趣的研究方向没有提到。我强烈推荐文献\citeref{20}这篇神经压缩方法综述。最后要强调，这里用的是深度自回归生成模型，但也可以采用其他深度生成模型，例如流模型和 VAE。
+
+\FloatBarrier
+\input{chapters/ch10_references}

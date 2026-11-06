@@ -1,0 +1,220 @@
+\chapter{生成对抗网络}
+\label{chap:08}
+\sourcechapter{8}
+
+% 原书印刷页 201–203，附件 PDF 第 217–219 页。
+\section{引言}
+\label{sec:08-01}
+
+讨论潜变量模型时，我们曾说，这类模型自然定义了一个生成过程。先采样潜变量 $\mathbf z\sim p(\mathbf z)$，然后生成观测量 $\mathbf x\sim p_\theta(\mathbf x\mid\mathbf z)$。这很好！不过，一想到训练，问题就出现了。确切地说，问题出在训练目标上。为什么？按照概率论，我们要对所有未观测的随机变量做边缘化，把它们消去。对于潜变量模型，这等价于计算如下形式的（边缘）对数似然函数。
+\begin{equation}
+  \log p_\theta(\mathbf x)=\log\int p_\theta(\mathbf x\mid\mathbf z)\,p(\mathbf z)\,\mathrm d\mathbf z.
+  \tag{8.1}\label{eq:08-01}
+\end{equation}
+
+正如讨论 VAE 时所说的（见第~5.3~节），难点在于计算积分。除非所有分布都是高斯分布，且 $\mathbf x$ 与 $\mathbf z$ 的依赖关系是线性的，否则积分难以解析求解。不过，且把这些问题放在一边，看看在这里能做些什么。首先，我们可以用从先验 $p(\mathbf z)$ 抽取的蒙特卡洛样本近似积分，得到
+\begin{align}
+  \log p_\theta(\mathbf x)
+    &=\log\int p_\theta(\mathbf x\mid\mathbf z)\,p(\mathbf z)\,\mathrm d\mathbf z
+      \tag{8.2}\label{eq:08-02}\\
+    &\approx\log\frac{1}{S}\sum_{s=1}^{S}p_\theta(\mathbf x\mid\mathbf z_s)
+      \tag{8.3}\label{eq:08-03}\\
+    &=\log\sum_{s=1}^{S}\exp\bigl(\log p_\theta(\mathbf x\mid\mathbf z_s)\bigr)-\log S
+      \tag{8.4}\label{eq:08-04}\\
+    &=\operatorname{LogSumExp}_s\{p_\theta(\mathbf x\mid\mathbf z_s)\}-\log S,
+      \tag{8.5}\label{eq:08-05}
+\end{align}
+其中 $\operatorname{LogSumExp}_s\{f(s)\}=\log\sum_{s=1}^{S}\exp(f(s))$ 为对数和指数函数（log-sum-exp function）。\footnote{译注：按这里给出的定义，从式 \eqref{eq:08-04} 得到式 \eqref{eq:08-05} 时，$\operatorname{LogSumExp}_s$ 的自变量应为 $\log p_\theta(\mathbf x\mid\mathbf z_s)$。式 \eqref{eq:08-05} 保留原书写法。}
+
+暂且假定这个近似很好（即很紧），我们就把计算积分的问题变成了从先验采样的问题。为简便起见，可以假定先验比较容易采样，例如标准高斯分布 $p(\mathbf z)=\mathcal N(\mathbf z\mid\mathbf 0,\mathbf I)$。换句话说，我们只需对 $p_\theta(\mathbf x\mid\mathbf z)$ 建模，即为它选择一种参数化方式。你可能已经猜到了，我们又要用神经网络！如果对图像建模，可以用类别分布表示条件似然，再用神经网络参数化各个概率。或者，如果像基于能量的模型和基于扩散的深度生成模型那样采用高斯分布，$p_\theta(\mathbf x\mid\mathbf z)$ 也可以是高斯分布，神经网络就输出方差、均值或两者。对数和指数函数可微（使用相应的计算技巧还可以提高数值稳定性），所以这个模型可以端到端地学习。这种方法是许多深度生成模型的先驱，称为\emph{密度网络}（density network）\citeref{1}，其示意见\figref{fig:08-01}。
+
+密度网络是一类重要的深度生成模型，可惜常被低估。了解它至少有三个理由。第一，弄清它的工作方式，有助于理解其他潜变量模型以及如何改进这些模型。第二，它是理解指定分布模型（prescribed model）和隐式模型（implicit model）之间区别的好起点。第三，它让我们能够构造非线性潜变量模型，并用反向传播（更一般地说，用梯度下降）训练它。
+
+一路上我们引入了几个假设，有些可能让你感到困惑。这里的主要假设如下。
+\begin{itemize}
+  \item 必须指定先验分布 $p(\mathbf z)$，例如标准高斯分布。
+  \item 必须指定条件似然 $p(\mathbf x\mid\mathbf z)$ 的形式。通常使用高斯分布或高斯混合模型。因此，密度网络是\emph{指定分布模型}，因为我们需要事先写出所有分布的解析形式。
+\end{itemize}
+这样，我们就有了以下几点。
+\begin{itemize}
+  \item 目标函数是（近似的）对数似然函数。
+  \item 可以借助基于梯度的优化方法和自动求导工具来优化目标。
+  \item 可以用深度神经网络参数化条件似然。
+\end{itemize}
+
+\dgmfig{fig_08_01}{\linewidth}{密度网络示意图。}{fig:08-01}
+
+不过，要享受密度网络这种构造带来的种种好处，就要付出相当大的代价。
+\begin{itemize}
+  \item 没有解析解（与概率主成分分析等价的情形除外）。
+  \item 得到的是对数似然函数的近似。
+  \item 要从先验抽取大量样本，才能得到可靠的对数似然近似。
+  \item 受到维数灾难（curse of dimensionality）的影响。
+\end{itemize}
+
+你可以看到，维数尤其限制了模型的用途。如果一个模型不能高效处理较高维的问题，我们还能用它做什么？像图像或音频的分析与合成这样有意思的应用就都无从谈起了！那该怎么办？一种可能的方向是继续使用指定分布模型，并采用变分推断（见第~5.3~节）。另一个方向是放弃基于似然的方法。我知道这听上去很荒唐，但确实可行，而且说来遗憾，它在实践中相当有效。
+
+% 原书印刷页 203–206，附件 PDF 第 219–222 页。
+\section{用生成对抗网络（GAN）进行隐式建模}
+\label{sec:08-02}
+
+\subsection{摆脱 KL 散度}
+
+再想一想密度网络告诉了我们什么。首先，它定义了一个很好的生成过程，先采样潜变量，然后生成观测量。这很清楚！接下来，训练使用（边缘）对数似然函数。换句话说，对数似然函数衡量某个训练数据点与生成对象之间的差异。更准确地说，我们先为条件似然 $p_\theta(\mathbf x\mid\mathbf z)$ 选定具体的概率分布，由此确定如何计算训练点与生成的观测量之间的差异。
+
+我们不妨问，有没有别的方式可以计算真实数据和生成对象之间的差异？回顾对层次 VAE 的讨论（见第~5.5.2~节），训练基于似然的模型等价于优化经验分布与模型之间的 Kullback–Leibler 散度（KL 散度），$\mathrm{KL}[p_{\mathit{data}}(\mathbf x)\Vert p_\theta(\mathbf x)]$。由于使用对数，基于 KL 散度的方法要求分布具有良好的性质。我们还可以把它看成一种\emph{局部}比较方法，用来比较经验分布（即给定的数据）和生成数据（即由我们的指定分布模型生成的数据）。所谓局部，是指每次考虑一个点，再将各点的误差相加。比较样本（即多项个体的集合）则可称为\emph{全局}比较。不过，我们并非只能用 KL 散度！还可以选用着眼于一组点（即由一组点表示的分布）的其他度量，如积分概率度量（integral probability metric）\citeref{2}，最大均值差异（maximum mean discrepancy，MMD）\citeref{3} 就是其中一例，也可以用其他散度\citeref{4}。
+
+不过，上述所有度量都需要明确定义怎样衡量误差。我们能否参数化损失函数，并在学习模型的同时学习它呢？既然我们一直在讲神经网络，能否更进一步，用神经网络来计算差异？
+
+\subsection{摆脱预先指定的分布}
+
+我们已经知道，KL 散度只是许多可能的损失函数之一，也考虑了能否使用可学习的损失函数。不过，仍有一个悬而未决的问题。我们起初就有必要使用指定分布模型吗？既然密度网络接收噪声，并将其转换为观测空间中的分布，我们真的需要输出一个完整的分布吗？如果只返回一个点呢？换句话说，可以把条件似然定义为狄拉克 $\delta$（Dirac's delta）吗？
+\begin{equation}
+  p_\theta(\mathbf x\mid\mathbf z)=\delta\bigl(\mathbf x-NN_\theta(\mathbf z)\bigr).
+  \tag{8.6}\label{eq:08-06}
+\end{equation}
+这相当于说，$NN_\theta(\mathbf z)$ 只输出均值。一个高斯分布则需要给出均值和方差。有趣的是，如果考虑 $\mathbf x$ 的边缘分布，就会得到一个性质良好的分布。我们先计算边缘分布。
+\begin{equation}
+  p_\theta(\mathbf x)=
+  \int\delta\bigl(\mathbf x-NN_\theta(\mathbf z)\bigr)\,p(\mathbf z)\,\mathrm d\mathbf z.
+  \tag{8.7}\label{eq:08-07}
+\end{equation}
+再看看这到底意味着什么！边缘分布是无穷多个 $\delta$ 峰的混合。也就是说，我们取一个 $\mathbf z$，在观测空间中画出一个峰（为了便于想象，可以看成二维空间中的一个点）。将这个过程无限延续，观测空间会布满越来越多的点，有些区域比其他区域更密集。这种分布建模方式也称为\emph{隐式建模}（implicit modeling）。
+
+那么问题在哪里呢？如果沿用指定分布建模的设定，$\log\delta(\mathbf x-NN_\theta(\mathbf z))$ 的定义就会出问题。我们无法用它计算损失函数，因此，许多概率度量都用不了这一项，包括 KL 散度项。我们或许可以另行定义自己的损失函数？甚至用神经网络来参数化它！这个想法听上去确实很吸引人。该怎么实现呢？
+
+\subsection{对抗损失}
+
+我们从一个故事说起。有一位造假者（骗子），他有一位朋友（专家），这位朋友对艺术了解不多。另外还有一位已经去世的真画家，例如巴勃罗·毕加索（Pablo Picasso）。造假者竭力模仿毕加索的风格。专家朋友找来毕加索的画，与造假者交给他的画比较。造假者试图骗过朋友，专家则试图区分毕加索真迹和赝品。渐渐地，造假者的技艺越来越高，专家也学会了怎样判断一幅画是否为赝品。到最后，造假者的作品可能与毕加索的画难以区分。这对艺术界来说并非好事，连专家也可能完全拿不准眼前的画是真是假。
+
+现在，我们来形式化这场恶作剧般的博弈。我们把专家称为\emph{判别器}（discriminator）。它接收一个对象 $\mathbf x$，返回该对象为真的概率，即来自经验分布的概率，$D_\alpha\colon\mathcal X\to[0,1]$。我们把造假者称为\emph{生成器}（generator）。它接收噪声，并将其转换为对象 $\mathbf x$，$G_\beta\colon\mathcal Z\to\mathcal X$。来自经验分布 $p_{\mathit{data}}(\mathbf x)$ 的所有 $\mathbf x$ 都称为\emph{真实样本}，由 $G_\beta(\mathbf z)$ 生成的所有 $\mathbf x$ 都称为\emph{生成样本}（fake）。目标函数的构造如下。
+\begin{itemize}
+  \item 我们有两个数据来源，$\mathbf x\sim p_\theta(\mathbf x)=\int G_\beta(\mathbf z)\,p(\mathbf z)\,\mathrm d\mathbf z$ 和 $\mathbf x\sim p_{\mathit{data}}(\mathbf x)$。\footnote{译注：这里保留原书的积分写法。按式 \eqref{eq:08-07}，用 $\delta(\mathbf x-G_\beta(\mathbf z))$ 作为被积式中乘 $p(\mathbf z)$ 的因子才表示生成分布。这里原样写出的积分是生成器输出的期望。}
+  \item 判别器解决分类任务，把所有生成数据点标为 0，把所有真实数据点标为 1。
+  \item 判别器可以看作分类器，因此可以采用如下形式的二元交叉熵（binary cross-entropy）损失函数。
+  \begin{equation}
+    \begin{aligned}
+      \ell(\alpha,\beta)={}&
+      \mathbb E_{\mathbf x\sim p_{\mathit{real}}}[\log D_\alpha(\mathbf x)]\\
+      &+\mathbb E_{\mathbf z\sim p(\mathbf z)}
+        \bigl[\log\bigl(1-D_\alpha(G_\beta(\mathbf z))\bigr)\bigr].
+    \end{aligned}
+    \tag{8.8}\label{eq:08-08}
+  \end{equation}
+  第一项对应真实数据来源，第二项包含生成数据来源。
+  \item 对 $\alpha$（即判别器的参数）最大化 $\ell(\alpha,\beta)$。简单说，我们希望判别器表现得尽可能好。
+  \item 生成器试图骗过判别器，因此，对 $\beta$（即生成器的参数）最小化 $\ell(\alpha,\beta)$。
+\end{itemize}
+
+最后，得到如下学习目标。
+\begin{equation}
+  \min_\beta\max_\alpha
+  \mathbb E_{\mathbf x\sim p_{\mathit{real}}}[\log D_\alpha(\mathbf x)]
+  +\mathbb E_{\mathbf z\sim p(\mathbf z)}
+  \bigl[\log\bigl(1-D_\alpha(G_\beta(\mathbf z))\bigr)\bigr].
+  \tag{8.9}\label{eq:08-09}
+\end{equation}
+我们把 $\ell(\alpha,\beta)$ 称为\emph{对抗损失}（adversarial loss），因为两方追求的目标彼此相反。
+
+\subsection{生成对抗网络}
+
+现在把这些组成部分放在一起。
+\begin{itemize}
+  \item 用生成器将噪声转换为生成数据。
+  \item 用判别器判断给定的输入是真实数据还是生成数据。
+  \item 用深度神经网络参数化生成器和判别器。
+  \item 用对抗损失学习这些神经网络，也就是求解极小极大（min-max）优化问题。
+\end{itemize}
+
+\dgmfig{fig_08_02}{\linewidth}{生成对抗网络示意图。注意生成器部分，以及它与密度网络的相似之处。}{fig:08-02}[图中 OR 表示在两路输入中任选一路，fake or real 表示判断其为生成样本或真实样本。]
+
+得到的这类模型称为\emph{生成对抗网络}（Generative Adversarial Networks，GAN）\citeref{5}。\figref{fig:08-02} 展示了 GAN 的思想以及它们与密度网络的联系。请注意，生成器部分构成一个隐式分布。我们不知道这个分布属于哪一个分布族，也不知道它的解析形式，但可以从中采样。
+
+% 原书印刷页 206–211，附件 PDF 第 222–227 页。
+\section{实现 GAN}
+\label{sec:08-03}
+
+信不信由你，实现 GAN 所需的组成部分已经齐备。我们逐一来看。事实上，理解这些组成部分最简单的办法就是把它们实现出来。
+
+\subsection{生成器}
+
+第一个部分是生成器 $G_\beta(\mathbf z)$，它就是一个深度神经网络。下面给出生成器类的代码。注意，代码把生成函数和采样函数分开。生成函数将 $\mathbf z$ 转换为 $\mathbf x$，采样函数先从 $\mathbf z\sim\mathcal N(\mathbf 0,\mathbf I)$ 采样，再调用 \texttt{generate}。
+
+\bookcode{code/ch08_01_generator.py}{生成器类。}{lst:08-01}
+
+\subsection{判别器}
+
+第二个部分是\emph{判别器}。这里的代码更简单，因为它只包含一个神经网络。判别器类的代码如下。
+
+\bookcode{code/ch08_02_discriminator.py}{判别器类。}{lst:08-02}
+
+\subsection{GAN}
+
+现在可以把这两个部分组合起来了。在我们的实现中，GAN 输出生成器或判别器的对抗损失。下面的代码可能写得略多，但多写几行能让你弄清它在做什么，省去理解一些来历不明的技巧的功夫。
+
+\bookcode{code/ch08_03_gan.py}{GAN 类。}{lst:08-03}
+
+下面的代码给出了生成器和判别器的架构示例。
+
+\bookcode{code/ch08_04_architectures.py}{架构示例。}{lst:08-04}
+
+\subsection{训练}
+
+你可能以为 GAN 的训练过程比基于似然的模型都要复杂。其实两者只有一点区别，训练 GAN 需要两个优化器。下面是训练循环的代码示例。
+
+\Needspace{6\baselineskip}
+\bookcode{code/ch08_05_training.py}{训练循环。}{lst:08-05}
+
+\subsection{结果和评述}
+
+在实验中，我们像处理 EBM 的数据时一样，对图像做了归一化，并将数值缩放到 $[-1,1]$。运行代码后，可以预期得到与\figref{fig:08-03} 类似的结果。
+
+此前几章里，我们没有评论实验结果，这里破个例。好奇的读者，请留意，这里的目标函数并没有平顺地收敛。对抗损失，或者其中生成器对应的部分，忽上忽下。这是极小极大优化问题的一个已知现象。而且，现在损失本身是可学习的。我们也在更新损失函数，所以很难说最优解在哪里。
+
+另一个要点是，训练 GAN 确实很棘手。第一，对抗损失的数值很难解读。第二，学习过程相当慢，需要大量迭代，少则数百次，多则数千次。看到最初几个训练轮次生成的结果时（例如\figref{fig:08-04}），你可能会泄气，因为模型看起来像是过拟合了。问题就在这里。必须很有耐心，才能看出训练方向是否正确。此外，你可能还要格外留意超参数，比如学习率。这需要一些经验，或者干脆花点时间，在自己的问题上试一试不同的学习率取值。
+
+\dgmfig{fig_08_03}{\linewidth}{训练 GAN 后的结果示例。（a）真实图像。（b）生成图像。（c）判别器的验证曲线。（d）生成器的验证曲线。}{fig:08-03}[两条曲线的横轴 epochs 表示训练轮次。]
+
+\dgmfig{fig_08_04}{.77\linewidth}{训练（a）10 轮和（b）50 轮后生成的图像。}{fig:08-04}
+
+一旦熬过 GAN 的训练过程，回报确实令人惊叹。在这个问题里，只用极其简单的神经网络，就能合成高质量的数字图像。这是 GAN 最大的优点！
+
+% 原书印刷页 211–213，附件 PDF 第 227–229 页。
+\section{各式各样的 GAN}
+\label{sec:08-04}
+
+GAN 的开创性论文\citeref{5}发表后，基于 GAN 的想法和论文如潮水般涌现，不过对抗问题的思想可以追溯到\citeref{6}。即使只说其中一小部分，我也不敢在这里贸然尝试。用 GAN 进行隐式建模的领域仍在不断发展。下面我介绍几篇重要的论文。
+\begin{itemize}
+  \item \emph{条件 GAN（conditional GAN）。} GAN 的一项重要扩展是使模型能在给定条件时生成数据\citeref{7}。
+  \item \emph{带编码器的 GAN。} 能否把条件 GAN 扩展成带编码器的框架？这是一个有趣的问题。事实证明可以，详见 BiGAN\citeref{8}和 ALI\citeref{9}。
+  \item \emph{StyleGAN 和 CycleGAN。} GAN 的灵活性可以用来构造专门的图像合成器。例如，StyleGAN 的设计让它能够在图像之间迁移风格\citeref{10}。CycleGAN 则尝试把一种图像“翻译”成另一种，比如把马变成斑马\citeref{11}。
+  \item \emph{Wasserstein GAN。} 文献\citeref{12}指出，可使用 Wasserstein 距离（Wasserstein distance，也称推土机距离，earth-mover distance）以另一种方式构造对抗损失，即
+  \begin{equation}
+    \ell_W(\alpha,\beta)=
+    \mathbb E_{\mathbf x\sim p_{\mathit{real}}}[D_\alpha(\mathbf x)]
+    -\mathbb E_{\mathbf z\sim p(\mathbf z)}[D_\alpha(G_\beta(\mathbf z))],
+    \tag{8.10}\label{eq:08-10}
+  \end{equation}
+  其中 $D_\alpha(\cdot)$ 必须是 1-Lipschitz 函数。比较简单的做法是以一个小值 $c$ 为阈值裁剪判别器的权重。另一种做法是用幂迭代法（power iteration method）进行\emph{谱归一化}（spectral normalization）\citeref{13}。总体而言，将判别器限制为 1-Lipschitz 函数能让训练更稳定，但学习过程仍难以理解。
+  \item \emph{$f$-GAN。} Wasserstein GAN 表明，我们可以从其他方向寻找对抗损失的表达形式。文献\citeref{14}主张为此使用 $f$-散度（$f$-divergence）。
+  \item \emph{生成矩匹配网络（generative moment matching networks）}\citerefs{15,16}。如前所述，除了似然函数，还可以使用其他度量。我们可以固定判别器，把它定义为在给定核函数下的最大均值差异。问题由此简化，因为无需训练判别器，也就免去了繁琐的极小极大优化。不过，最终合成的图像质量通常较差。
+  \item \emph{密度差与密度比。} 文献\citerefs{17,18}提出了一个有趣的视角，可以把不同的 GAN 看成密度之差或密度之比。更多细节请参阅原论文。
+  \item \emph{层次隐式模型（hierarchical implicit models）。} 定义隐式模型的思想可以扩展到层次模型\citeref{19}。
+  \item \emph{GAN 和 EBM。} 回想一下 EBM，你可能会注意到，对抗损失与玻尔兹曼分布的对数有明显联系。文献\citerefs{20,21}指出，对观测量引入变分分布 $q(\mathbf x)$，就得到如下目标。
+  \begin{equation}
+    \mathcal J(\mathbf x)=
+    \mathbb E_{\mathbf x\sim p_{\mathit{data}}(\mathbf x)}[E(\mathbf x)]
+    -\mathbb E_{\mathbf x\sim q(\mathbf x)}[E(\mathbf x)]+\mathbb H[q(\mathbf x)],
+    \tag{8.11}\label{eq:08-11}
+  \end{equation}
+  其中 $E(\cdot)$ 是能量函数，$\mathbb H[\cdot]$ 是熵。问题再次归结为极小极大优化，也就是对能量函数求极小，对变分分布求极大。在这里，对抗损失与变分下界之间的第二个区别是熵项，它通常难以计算。
+  \item \emph{该用哪种 GAN？} 这的确是个问题！有趣的是，GAN 的训练似乎主要取决于初始化和神经网络，对抗损失或其他技巧的影响较小。详见文献\citeref{22}。
+  \item \emph{训练不稳定。} GAN 的主要问题是学习过程不稳定，以及一种称为\emph{模式坍塌}（mode collapse）的现象。模型能采样出漂亮的图像，但这些图像只来自观测空间中的部分区域。许多人长期研究这个问题（例如文献\citerefs{23,24,25}），它仍有待解决。
+  \item \emph{指定分布 GAN（prescribed GAN）。} 有趣的是，GAN 的似然竟然也可以计算！详见文献\citeref{26}。
+  \item \emph{正则化 GAN（regularized GAN）。} 可以用多种方法对 GAN 加以正则化，以达到特定目标。例如，InfoGAN 引入基于互信息的正则项来学习解耦表示\citeref{27}。
+\end{itemize}
+
+这些想法各自形成一个研究方向，有成千上万的研究人员在探索。如果你对其中某个方向感兴趣，我建议选一篇这里提到的论文，开始深入研究！
+
+\FloatBarrier
+\input{chapters/ch08_references}

@@ -52,6 +52,7 @@ scripts/                          仓库维护检查工具
 | [The Principles of Diffusion Models](09_2026_The_Principles_of_Diffusion_Models/) | 扩散模型原理 | [PDF](00_books/The_Principles_of_Diffusion_Models_cn_translated.pdf) | 450 |
 | [A Definition and Roadmap for World Models](10_2026_A_Definition_and_Roadmap_for_World_Models/) | 世界模型的定义与发展路线图 | [PDF](00_books/A_Definition_and_Roadmap_for_World_Models_cn_translated.pdf) | 63 |
 | [Designing Clinical Research](11_2023_Designing_Clinical_Research/) | 临床研究设计 | [PDF](00_books/Designing_Clinical_Research_cn_translated.pdf) | 515 |
+| [Deep Generative Modeling](12_2024_Deep_Generative_Modeling/) | 深度生成建模（第二版） | [PDF](00_books/Deep_Generative_Modeling_cn_translated.pdf) | 341 |
 
 《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 

@@ -360,6 +360,29 @@
       "build_command": "python \"11_2023_Designing_Clinical_Research/01_source/build.py\"",
       "description": "三个分部、20章、章内附录与习题、习题答案、442条术语释义及分层索引；索引保留原纸本定位，另附章节起始页对照。",
       "source_route": "pdf"
+    },
+    {
+      "title": "Deep Generative Modeling",
+      "chinese_title": "深度生成建模（第二版）",
+      "author": "Jakub M. Tomczak",
+      "folder": "12_2024_Deep_Generative_Modeling",
+      "original_name": "[b]2024_Deep Generative Modeling-v2.pdf",
+      "renamed_file": "2024_Deep_Generative_Modeling_2ndEd_EN.pdf",
+      "relative_path": "12_2024_Deep_Generative_Modeling/00_originals/2024_Deep_Generative_Modeling_2ndEd_EN.pdf",
+      "version": "Second edition, Springer, 2024",
+      "doi": "10.1007/978-3-031-64087-2",
+      "pages": 325,
+      "bytes": 19198500,
+      "sha256": "b3655c0ddda7345f020b132e57e826687b0f3dbbc67a3bca23f2738e29ffeed4",
+      "translation_status": "全书中文译文已完成并编译",
+      "translated_pdf": "00_books/Deep_Generative_Modeling_cn_translated.pdf",
+      "translated_pages": 341,
+      "translated_bytes": 19867401,
+      "translated_sha256": "3dcb3c991c21b944e966306c8242149f06f94f56f6e06cf3fda1ab5a07fa5fab",
+      "chinese_source": "12_2024_Deep_Generative_Modeling/01_source",
+      "build_command": "python \"12_2024_Deep_Generative_Modeling/01_source/build.py\"",
+      "description": "书前材料、11 章及各章参考文献、附录 A、B 和中英索引。索引保留原书印刷页码并附中文章首页对照。",
+      "source_route": "pdf"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
@@ -377,7 +400,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 3997,
+  "translated_pages_total": 4338,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -393,7 +416,7 @@
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 11,
+  "collection_count": 12,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",

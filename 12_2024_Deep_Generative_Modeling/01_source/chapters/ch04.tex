@@ -1,0 +1,539 @@
+% <<<PDFPAGE 82>>>
+\chapter{基于流的模型}
+\sourcechapter{4}
+\section{连续随机变量的流}
+\subsection{引言}
+
+到目前为止，我们讨论了一类以自回归方式直接对分布 $p(\mathbf{x})$ 建模的深度生成模型。ARM 的主要优点是可以学习长程统计关系，因此能够构造表达能力强的密度估计器。它的缺点也来自自回归参数化方式，即采样相当慢。此外，这些模型缺少潜在表示，所以难以直接操纵模型内部的数据表示，在压缩或度量学习（metric learning）等任务中的吸引力也就小一些。本章介绍另一种直接对 $p(\mathbf{x})$ 建模的方法。在正式讨论前，先看一个简单的例子。
+
+\begin{booknote}{例}
+取一个随机变量 $z\in\mathbb{R}$，其分布为 $\pi(z)=\mathcal{N}(z\mid 0,1)$。现在对 $z$ 作线性变换，得到新随机变量 $x=0.75z+1$。
+
+\begin{center}
+\emph{$x$ 的分布 $p(x)$ 是什么？}
+\end{center}
+
+我们可以利用高斯分布的性质猜出结果，也可以回想一下如何用\textbf{变量变换公式}（change of variables formula）来计算这个分布。
+\begin{equation}
+p(x)=\pi\bigl(z=f^{-1}(x)\bigr)\left|\frac{\partial f^{-1}(x)}{\partial x}\right|,
+\tag{4.1}\label{eq:04-01}
+\end{equation}
+其中 $f$ 是可逆函数，也就是双射（bijection）。这是什么意思？函数把一个点映射到一个有唯一对应关系的点，总可以用逆函数恢复原来的点。
+
+% <<<PDFPAGE 83>>>
+\figref{fig:04-01}给出了一个双射的例子。注意，两个定义域的体积无须相等！请记住这一点，结合 $\bigl|\frac{\partial f^{-1}(x)}{\partial x}\bigr|$ 想一想。
+
+回到刚才的例子，我们有
+\begin{equation}
+f(z)=0.75z+1,
+\tag{4.2}\label{eq:04-02}
+\end{equation}
+而 $f$ 的逆为
+\begin{equation}
+f^{-1}(x)=\frac{x-1}{0.75}.
+\tag{4.3}\label{eq:04-03}
+\end{equation}
+于是，描述\textbf{体积变化}的导数为
+\begin{equation}
+\left|\frac{\partial f^{-1}(x)}{\partial x}\right|=\frac{4}{3}.
+\tag{4.4}\label{eq:04-04}
+\end{equation}
+把这些结果合在一起，得到
+\begin{equation}
+p(x)=\pi\left(z=\frac{x-1}{0.75}\right)\frac{4}{3}
+=\frac{1}{\sqrt{2\pi\,0.75^2}}\exp\bigl\{-(x-1)^2/0.75^2\bigr\}.
+\tag{4.5}\label{eq:04-05}
+\end{equation}
+马上就能看出，得到的还是高斯分布。
+\begin{equation}
+p(x)=\mathcal{N}(x\mid 1,0.75).
+\tag{4.6}\label{eq:04-06}
+\end{equation}
+此外，变换 $f$ 作用于 $\pi(z)$ 后，因子 $\bigl|\frac{\partial f^{-1}(x)}{\partial x}\bigr|$ 负责把分布\textbf{归一化}。换句话说，它抵消了 $f$ 可能造成的体积变化。
+
+\emph{译注。} 式\eqref{eq:04-05}的指数按原书保留。标准正态密度的指数是 $-z^2/2$，代入 $z=(x-1)/0.75$ 后，式中的指数还应除以 2。变换后的标准差为 $0.75$，方差为 $0.75^2$。
+\end{booknote}
+
+\dgmfig{fig_04_01}{.49\linewidth}{双射示例。蓝色集合中的每个点在紫色集合中恰有一个对应点，反之亦然。}{fig:04-01}
+
+% <<<PDFPAGE 84>>>
+首先，这个例子表明，对分布已知的随机变量 $z\sim p(z)$ 施加已知的双射变换 $f$，就能计算新的连续随机变量的分布。多个变量的情形也一样。对 $\mathbf{x},\mathbf{z}\in\mathbb{R}^D$，有
+\begin{equation}
+p(\mathbf{x})=p\bigl(\mathbf{z}=f^{-1}(\mathbf{x})\bigr)
+\left|\frac{\partial f^{-1}(\mathbf{x})}{\partial\mathbf{x}}\right|,
+\tag{4.7}\label{eq:04-07}
+\end{equation}
+其中
+\begin{equation}
+\left|\frac{\partial f^{-1}(\mathbf{x})}{\partial\mathbf{x}}\right|
+=\left|\det\mathbf{J}_{f^{-1}}(\mathbf{x})\right|,
+\tag{4.8}\label{eq:04-08}
+\end{equation}
+雅可比矩阵（Jacobian matrix）$\mathbf{J}_{f^{-1}}$ 的定义为
+\begin{equation}
+\mathbf{J}_{f^{-1}}=
+\begin{bmatrix}
+\dfrac{\partial f_1^{-1}}{\partial x_1} & \cdots & \dfrac{\partial f_1^{-1}}{\partial x_D}\\
+\vdots & \ddots & \vdots\\
+\dfrac{\partial f_D^{-1}}{\partial x_1} & \cdots & \dfrac{\partial f_D^{-1}}{\partial x_D}
+\end{bmatrix}.
+\tag{4.9}\label{eq:04-09}
+\end{equation}
+此外，由\textbf{反函数定理}（inverse function theorem）可得
+\begin{equation}
+\left|\mathbf{J}_{f^{-1}}(\mathbf{x})\right|
+=\left|\mathbf{J}_{f}(\mathbf{z})\right|^{-1}.
+\tag{4.10}\label{eq:04-10}
+\end{equation}
+由于 $f$ 可逆，可以用反函数定理把式\eqref{eq:04-07}改写为
+\begin{equation}
+p(\mathbf{x})=p\bigl(\mathbf{z}=f^{-1}(\mathbf{x})\bigr)
+\left|\mathbf{J}_{f}(\mathbf{z})\right|^{-1}.
+\tag{4.11}\label{eq:04-11}
+\end{equation}
+\emph{译注。} 式\eqref{eq:04-08}给出的是雅可比行列式的绝对值。式\eqref{eq:04-10}和式\eqref{eq:04-11}沿用原书的简写 $|\mathbf{J}|$ 表示这个量。
+
+要直观理解雅可比行列式（Jacobian determinant）的作用，可以看\figref{fig:04-02}。其中三种可逆变换分别作用于定义在一个正方形上的均匀分布。
+
+在最上面的情形中，变换把正方形变成菱形而体积不变，因此其雅可比行列式为 1。这类变换称为\textbf{保体积变换}（volume-preserving transformation）。注意，变换后仍是均匀分布，体积与原分布所占的体积相同，所以颜色相同。
+
+在中间的情形中，变换缩小了体积，因此所得均匀分布“更密”，即\figref{fig:04-02}中的颜色更深。此外，雅可比行列式小于 1。
+
+最后一种情形中，变换扩大了体积，所以均匀分布定义在更大的区域上，即\figref{fig:04-02}中的颜色更浅。体积增大，雅可比行列式也就大于 1。
+
+注意，平移算子是保体积的。想象一下，把任意一个数（例如 5）加到正方形的所有点上。这会改变体积吗？完全不会！因此，雅可比行列式等于 1。
+
+% <<<PDFPAGE 85>>>
+\dgmfig{fig_04_02}{.49\linewidth}{三种可逆变换示例。（上）保体积的双射。（中）缩小原区域的双射。（下）扩大原区域的双射。}{fig:04-02}
+
+\subsection{深度生成建模中的变量变换}
+
+一个自然的问题是，能否借助变量变换，对图像、音频或其他数据的复杂高维分布建模。考虑一个层次模型，等价地，考虑一系列可逆变换 $f_k\colon\mathbb{R}^D\to\mathbb{R}^D$。从已知分布 $\pi(\mathbf{z}_0)=\mathcal{N}(\mathbf{z}_0\mid\mathbf{0},\mathbf{I})$ 出发，依次应用各个可逆变换，就能得到灵活的分布\citerefs{1,2}。
+\begin{equation}
+p(\mathbf{x})=\pi\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\bigr)
+\prod_{i=1}^K\left|\det\frac{\partial f_i(\mathbf{z}_{i-1})}{\partial\mathbf{z}_{i-1}}\right|^{-1},
+\tag{4.12}\label{eq:04-12}
+\end{equation}
+或者，用第 $i$ 个变换的雅可比记号，可写为
+\begin{equation}
+p(\mathbf{x})=\pi\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\bigr)
+\prod_{i=1}^K\left|\mathbf{J}_{f_i}(\mathbf{z}_{i-1})\right|^{-1}.
+\tag{4.13}\label{eq:04-13}
+\end{equation}
+\figref{fig:04-03}展示了通过可逆变换把高斯分布之类的单峰基分布（base distribution）变成多峰分布的例子。原则上，我们应该能够得到几乎任意复杂的分布，并将其变回简单分布。
+
+设 $\pi(\mathbf{z}_0)$ 为 $\mathcal{N}(\mathbf{z}_0\mid\mathbf{0},\mathbf{I})$，那么 $p(\mathbf{x})$ 的对数为
+% <<<PDFPAGE 86>>>
+\begin{equation}
+\ln p(\mathbf{x})=\ln\mathcal{N}\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\mid\mathbf{0},\mathbf{I}\bigr)
+-\sum_{i=1}^K\ln\left|\mathbf{J}_{f_i}(\mathbf{z}_{i-1})\right|.
+\tag{4.14}\label{eq:04-14}
+\end{equation}
+\dgmfig{fig_04_03}{\linewidth}{用一系列可逆变换 $f_i$ 将单峰分布（潜在空间）变成多峰分布（数据空间，例如像素空间）的示例。}{fig:04-03}[“latent” space 表示“潜在”空间，pixel space 表示像素空间。]
+
+有意思的是，第一项 $\ln\mathcal{N}\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\mid\mathbf{0},\mathbf{I}\bigr)$ 对应于 $\mathbf{0}$ 与 $f^{-1}(\mathbf{x})$ 之间的\emph{均方误差}（Mean Square Error，MSE）损失再加一个常数。第二项 $\sum_{i=1}^K\ln\left|\mathbf{J}_{f_i}(\mathbf{z}_{i-1})\right|$ 的作用与前面的例子一样，保证分布得到正确归一化。由于它对体积变化施加惩罚（再看看前面的例子！），也可以把它看成可逆变换 $\{f_i\}$ 的一种正则项（regularizer）。
+
+明确了如何利用变量变换表示密度函数后，还要回答两个问题。
+\begin{itemize}
+\item 如何对可逆变换建模？
+\item 这种建模有什么困难？
+\end{itemize}
+第一个问题的答案可以是神经网络，因为神经网络灵活且易于训练。不过，不能随便用一个神经网络，原因有两个。第一，变换必须\textbf{可逆}，所以必须选用\textbf{可逆神经网络}（invertible neural network）。第二，即便神经网络可逆，还得计算式\eqref{eq:04-14}的第二项 $\sum_{i=1}^K\ln\left|\mathbf{J}_{f_i}(\mathbf{z}_{i-1})\right|$。对于任意一系列可逆变换，这项很难计算，甚至无法在可接受的计算量下求得。因此，我们需要寻找既可逆、又能相对容易计算雅可比行列式的对数的神经网络。由这类可逆变换（神经网络）组成、雅可比行列式易于计算的模型称为\emph{归一化流}或\emph{基于流的模型}。
+
+有多种雅可比行列式易于计算的可逆神经网络，例如平面归一化流（planar normalizing flow）\citeref{1}、Sylvester 归一化流\citeref{3}、残差流（residual flow）\citerefs{4,5}和可逆 DenseNet\citeref{6}。不过，这里先讨论一类很重要的模型，即\textbf{RealNVP}，也就是实值非保体积流（Real-valued Non-Volume Preserving flows）\citeref{7}。许多其他基于流的生成模型都以它为起点，例如 GLOW\citeref{8}。
+
+% <<<PDFPAGE 87>>>
+\subsection{RealNVP 的组成模块}
+\subsubsection{耦合层}
+
+RealNVP 的主要组件是\emph{耦合层}。这种变换的思路如下。把输入分成两部分，记为 $\mathbf{x}=[\mathbf{x}_a,\mathbf{x}_b]$。可以把向量 $\mathbf{x}$ 分成 $\mathbf{x}_{1:d}$ 和 $\mathbf{x}_{d+1:D}$，也可以用更精细的方式分割，例如按棋盘格模式（checkerboard pattern）划分\citeref{7}。耦合层的变换定义如下。
+\begin{align}
+\mathbf{y}_a&=\mathbf{x}_a
+\tag{4.15}\label{eq:04-15}\\
+\mathbf{y}_b&=\exp(s(\mathbf{x}_a))\odot\mathbf{x}_b+t(\mathbf{x}_a),
+\tag{4.16}\label{eq:04-16}
+\end{align}
+其中 $s(\cdot)$ 和 $t(\cdot)$ 是\textbf{任意神经网络}，分别称为缩放网络（scaling）和平移网络（translation）。
+
+这个变换在设计上就是可逆的，其逆变换为
+\begin{align}
+\mathbf{x}_b&=(\mathbf{y}_b-t(\mathbf{y}_a))\odot\exp(-s(\mathbf{y}_a))
+\tag{4.17}\label{eq:04-17}\\
+\mathbf{x}_a&=\mathbf{y}_a.
+\tag{4.18}\label{eq:04-18}
+\end{align}
+重要的是，雅可比行列式的对数很容易计算，因为
+\begin{equation}
+\mathbf{J}=
+\begin{bmatrix}
+\mathbf{I}_{d\times d} & \mathbf{0}_{d\times(D-d)}\\
+\dfrac{\partial\mathbf{y}_b}{\partial\mathbf{x}_a} & \operatorname{diag}(\exp(s(\mathbf{x}_a)))
+\end{bmatrix},
+\tag{4.19}\label{eq:04-19}
+\end{equation}
+于是有
+\begin{equation}
+\det(\mathbf{J})=\prod_{j=1}^{D-d}\exp(s(\mathbf{x}_a))_j
+=\exp\left(\sum_{j=1}^{D-d}s(\mathbf{x}_a)_j\right).
+\tag{4.20}\label{eq:04-20}
+\end{equation}
+因此，耦合层看起来既灵活又有很强的表达能力，雅可比行列式也易于计算！不过，只变换了一半的输入，所以还要考虑给耦合层配上合适的变换。
+
+\subsubsection{置换层}
+
+可以和耦合层结合使用的一种简单有效的变换是\textbf{置换层}（permutation layer）。由于置换是保体积的，即雅可比行列式的绝对值等于 1，所以每个耦合层之后都可以接一个置换层。例如，可以颠倒各变量的顺序。
+
+\emph{译注。} 原书写的是行列式等于 1。奇置换的行列式为 $-1$，变量变换公式取其绝对值。
+
+把耦合层与置换层组合起来，就得到一个可逆模块。\figref{fig:04-04}给出了示意图。
+
+% <<<PDFPAGE 88>>>
+\dgmfig{fig_04_04}{\linewidth}{结合耦合层与置换层，将 $[\mathbf{x}_a,\mathbf{x}_b]$ 变为 $[\mathbf{z}_a,\mathbf{z}_b]$。（a）模块的正向计算。（b）模块的逆向计算。}{fig:04-04}[Coupling layer 表示耦合层，Permutation layer 表示置换层。]
+
+\subsubsection{去量化}
+
+前面讨论的基于流的模型假定 $\mathbf{x}$ 是实值随机变量组成的向量。但实际中许多对象是离散的。例如，图像通常用整数表示，取值于 $\{0,1,\ldots,255\}^D$。文献\citeref{9}指出，可以在原始数据 $\mathbf{y}\in\{0,1,\ldots,255\}^D$ 上加均匀噪声 $\mathbf{u}\in[-0.5,0.5]^D$，再对 $\mathbf{x}=\mathbf{y}+\mathbf{u}$ 进行密度估计。这个过程称为\emph{均匀去量化}（uniform dequantization）。后来还提出了不同的去量化方案，详见文献\citeref{10}。
+
+\figref{fig:04-05}以两个二元随机变量为例，展示了均匀去量化。给每个离散值加上 $\mathbf{u}\in[-0.5,0.5]^2$ 后，就得到连续空间。原来集中在没有体积的点上的概率质量，现在“分散”到了小正方形区域上。
+
+\dgmfig{fig_04_05}{.50\linewidth}{两个二元随机变量的均匀去量化示意图。（左）概率质量分配给离散点。（右）均匀去量化后，概率质量分配给正方形区域。颜色表示概率值。}{fig:04-05}
+
+\subsection{动手实现流模型}
+
+我们把数学变成代码吧！先讨论对数似然函数，也就是学习目标，以及数学公式和代码的对应关系。首先，弄清学习目标，也就是对数似然函数，至关重要。
+% <<<PDFPAGE 89>>>
+这个例子采用前面介绍的耦合层与置换层。将各耦合层雅可比行列式的对数代入式\eqref{eq:04-14}（对于置换层，绝对值为 1，因此 $\ln(1)=0$），得到
+\begin{equation}
+\ln p(\mathbf{x})=\ln\mathcal{N}\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\mid\mathbf{0},\mathbf{I}\bigr)
+-\sum_{i=1}^K\left(\sum_{j=1}^{D-d}s_k\bigl(\mathbf{x}_a^k\bigr)_j\right),
+\tag{4.21}\label{eq:04-21}
+\end{equation}
+其中 $s_k$ 是第 $k$ 个耦合层的缩放网络，$\mathbf{x}_a^k$ 表示该层的输入。注意，取对数后，雅可比行列式中的 $\exp$ 就被消去了。
+
+\emph{译注。} 式\eqref{eq:04-21}保留了原书外层求和的下标 $i$ 和内层的层索引 $k$。按逐层求和的含义，两者应使用同一下标。
+
+再从实现的角度来看看学习目标。首先，必须计算 $f^{-1}(\mathbf{x})$ 得到 $\mathbf{z}$，然后计算 $\ln\mathcal{N}\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\mid\mathbf{0},\mathbf{I}\bigr)$。这一步很简单，得到
+\begin{equation}
+\ln\mathcal{N}\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\mid\mathbf{0},\mathbf{I}\bigr)
+=-\mathit{const}-\frac{1}{2}\bigl\|f^{-1}(\mathbf{x})\bigr\|^2,
+\tag{4.22}\label{eq:04-22}
+\end{equation}
+其中 $\mathit{const}=\frac{D}{2}\ln(2\pi)$ 是标准高斯分布的归一化常数，且 $\frac{1}{2}\bigl\|f^{-1}(\mathbf{x})\bigr\|^2=\mathit{MSE}(\mathbf{0},f^{-1}(\mathbf{x}))$。
+
+好，现在来看目标函数的第二部分，即雅可比行列式的对数。可以看出，需要对各个变换求和，而且对每个耦合层，只需考虑缩放网络的输出。因此，实现耦合层时，记得同时返回该层的输出和缩放网络的结果。
+
+\subsection{代码}
+
+现在，自行实现 RealNVP 所需的组件已经齐全了！下面的代码包含大量注释，可以帮助理解每一行。
+
+
+% <<<PDFPAGE 90>>>
+% <<<PDFPAGE 91>>>
+\bookcode{code/ch04_realnvp.py}{RealNVP 的一种实现。}{lst:04-01}
+
+% <<<PDFPAGE 92>>>
+\bookcode{code/ch04_realnvp_networks.py}{网络示例。}{lst:04-02}
+
+好了！现在可以运行完整代码。训练 RealNVP 后，应能得到类似\figref{fig:04-06}的结果。
+
+\subsection{真的就这些吗？}
+
+可以说是，也可以说不是。说“是”，因为这确实是 RealNVP 的简化实现示例。说“不是”，因为还可以在本例的基础上作多种改进。
+
+\begin{itemize}
+\item \emph{分出变量}（factoring out）\citeref{7}。在正向计算（从 $\mathbf{x}$ 到 $\mathbf{z}$）时，可以拆分变量，只继续处理其中一部分。这样便能利用中间层的输出来参数化基分布，得到自回归基分布。
+\dgmfig{fig_04_06}{\linewidth}{训练结果示例。（a）随机选取的真实图像。（b）RealNVP 无条件生成的图像。（c）训练期间的验证曲线。}{fig:04-06}[epochs 表示训练轮次，nll 表示负对数似然。]
+
+% <<<PDFPAGE 93>>>
+\item \emph{Rezero 技巧}\citeref{11}。给耦合层加入额外参数，例如 $\mathbf{y}_b=\exp(\alpha s(\mathbf{x}_a))\odot\mathbf{x}_b+\beta t(\mathbf{x}_a)$，并将 $\alpha,\beta$ 初始化为零。这样能让这些变换在训练开始时起到恒等映射的作用。文献\citeref{12}表明，这种方法能让输入信息在训练初期穿过所有层，从而学到更好的变换。
+\item \emph{掩码}或\emph{棋盘格模式}\citeref{7}。$[\mathbf{x}_{1:D/2},\mathbf{x}_{D/2+1:D}]$ 这种两段式分割也可以改用棋盘格模式，有助于更好地学习局部统计关系。
+\item \emph{挤压}（squeezing）\citeref{7}。也可以“挤压”某些维度。例如，一幅图像有 $C$ 个通道，宽为 $W$、高为 $H$，可以变成有 $4C$ 个通道，宽为 $W/2$、高为 $H/2$ 的图像。
+\item \emph{可学习的基分布}（learnable base distribution）。可以考虑用其他模型，例如自回归模型，替代标准高斯基分布。
+\item \emph{可逆 $1\times1$ 卷积}（invertible $1\times1$ convolution）\citeref{8}。可以像 GLOW 模型\citeref{8}那样，用可学习的可逆 $1\times1$ 卷积取代固定置换。
+\item \emph{变分去量化}（variational dequantization）\citeref{13}。也可以选用不同的去量化方案，例如变分去量化。这能得到好得多的评分，代价是得到的是对数似然函数的下界。
+\end{itemize}
+
+此外，还有许多有趣的新研究方向！下面列出几个，并附上可供进一步了解的论文。
+\begin{itemize}
+\item \emph{用流做数据压缩}\citeref{14}。基于流的模型能计算精确似然，因此很适合压缩。文献\citeref{14}提出了把流用于类似比特回传（bits-back）的压缩方案的方法。
+\item \emph{条件流}（conditional flow）\citerefs{15,16,17}。本节介绍的是无条件 RealNVP，但基于流的模型也能用于条件分布。例如，可以把条件信息作为缩放网络和平移网络的输入。
+\item \emph{用流做变分推断}\citerefs{1,3,18,19,20,21}。可以用条件流模型构造灵活的变分后验分布族，从而让对数似然函数的下界更紧。第~5~章第~5.4.2~节会再次讨论这一点。
+\item \emph{整数离散流}（integer discrete flow）\citerefs{12,22,23}。另一有趣方向是适用于整数值数据的 RealNVP 版本。我们将在第~4.2~节解释这一思路。
+\item \emph{流形上的流}\citeref{24}。通常在欧氏空间中考虑基于流的模型，也可以在非欧空间中研究它们，从而得到（部分）可逆变换的新性质。
+\item \emph{用流做近似贝叶斯计算}\citeref{25}。近似贝叶斯计算（approximate Bayesian computation，ABC）所考虑的情形是，感兴趣的量的后验分布难以计算。一种办法是用基于流的模型近似该后验，例如文献\citeref{25}使用的掩码自回归流（masked autoregressive flow）\citeref{26}。
+\end{itemize}
+
+文献\citeref{27}的综述还介绍了许多其他关于基于流的模型的内容。
+
+% <<<PDFPAGE 94>>>
+\subsection{ResNet 流与 DenseNet 流}
+\subsubsection[ResNet 流]{ResNet 流\citerefs{4,5}}
+
+在前几节中，我们讨论了具有预先设计架构的流模型，即由耦合层与置换层组成的模块。采用这些结构，便于计算雅可比行列式。不过，还可以换一种思路，考虑怎样对几乎任意的架构近似计算雅可比行列式。此外，应该施加哪些要求，才能让架构可逆？
+
+文献\citeref{4}研究了广泛使用的残差神经网络（residual neural network，ResNet），构造了仅受 Lipschitz 连续性（Lipschitz continuity）约束的可逆 ResNet 层。ResNet 定义为 $F(\mathbf{x})=\mathbf{x}+g(\mathbf{x})$，其中 $g$ 由（卷积）神经网络建模，$F$ 表示通常不可逆的 ResNet 层。不过，可以用文献\citerefs{28,29}的谱归一化（spectral normalization）构造 $g$，使它的 Lipschitz 常数严格小于 1，即 $\operatorname{Lip}(g)<1$。
+\begin{equation}
+\operatorname{Lip}(g)<1,\qquad\text{若 }\lVert W_i\rVert_2<1,
+\tag{4.23}\label{eq:04-23}
+\end{equation}
+其中 $\lVert\cdot\rVert_2$ 是 $\ell_2$ 矩阵范数。于是 $\operatorname{Lip}(g)=K<1$，且 $\operatorname{Lip}(F)<1+K$。原书称，只有在这一情形下，Banach 不动点定理（Banach fixed-point theorem）才适用，ResNet 层 $F$ 才有唯一的逆。因此，可以用不动点迭代（fixed-point iteration）近似求逆\citeref{4}。
+\emph{译注。} $\operatorname{Lip}(g)<1$ 是这里用收缩映射求逆的充分条件。三角不等式给出的是 $\operatorname{Lip}(F)\le 1+K$。
+
+估计对数行列式的计算代价很大，特别是在高维空间中，直接计算难以实行。由于 ResNet 块的 Lipschitz 常数受到约束，雅可比行列式的对数计算代价降低，可以用保证收敛的方法近似\citeref{4}。
+\begin{equation}
+\ln p(\mathbf{x})=\ln p(f(\mathbf{x}))+
+\operatorname{tr}\left(\sum_{k=1}^\infty\frac{(-1)^{k+1}}{k}[J_g(\mathbf{x})]^k\right),
+\tag{4.24}\label{eq:04-24}
+\end{equation}
+其中 $J_g(\mathbf{x})$ 是 $g$ 在 $\mathbf{x}$ 处的雅可比矩阵，满足 $\lVert J_g\rVert<1$。与完整求出雅可比矩阵的迹相比，Skilling–Hutchinson 迹估计量（Skilling–Hutchinson trace estimator）\citerefs{30,31}计算迹的代价更低。残差流\citeref{5}采用一种改进方法，利用文献\citeref{32}的“俄罗斯轮盘赌”（Russian roulette）无偏估计量，以更低的代价估计幂级数。直观地说，这种方法通过求有限项来估计幂级数的无穷和。与可逆残差网络相比，需要计算的项数更少。为了避免导数饱和，也就是二阶导数在很大范围内为零，文献\citeref{4}提出了 LipSwish 激活函数。
+
+% <<<PDFPAGE 95>>>
+\subsubsection[DenseNet 流]{DenseNet 流\citeref{6}}
+
+既然能为 ResNet 架构构造流，自然会问，能否也为密集连接网络（densely connected network，DenseNet）\citeref{33}做到这一点。文献\citeref{6}表明，确实可以！
+
+DenseNet 流的主要组件是 DenseBlock，将其定义为函数 $F\colon\mathbb{R}^d\to\mathbb{R}^d$，其中 $F(\mathbf{x})=\mathbf{x}+g(\mathbf{x})$，$g$ 由密集层 $\{h_i\}_{i=1}^n$ 组成。为了使模型可逆，一处重要改动是输出 $\mathbf{x}+g(\mathbf{x})$，而标准的 DenseBlock 只输出 $g(\mathbf{x})$。函数 $g$ 表示为
+\begin{equation}
+g(\mathbf{x})=h_{n+1}\circ h_n\circ\cdots\circ h_1(\mathbf{x}),
+\tag{4.25}\label{eq:04-25}
+\end{equation}
+其中 $h_{n+1}$ 表示一个 $1\times1$ 卷积，用来使输出维数与 $\mathbb{R}^d$ 匹配。每层 $h_i$ 由两部分拼接而成，上半部分是输入信号的副本，下半部分是变换后的输入。变换先以（卷积）权重 $W_i$ 乘以输入信号，再应用满足 $\operatorname{Lip}(\phi)\le 1$ 的非线性函数 $\phi$，例如 ReLU、ELU、LipSwish 或 tanh。举例来说，密集层 $h_2$ 可以按下式构造。
+\begin{equation}
+h_1(x)=\begin{bmatrix}x\\\phi(W_1x)\end{bmatrix},
+\qquad
+h_2(h_1(x))=\begin{bmatrix}h_1(x)\\\phi(W_2h_1(x))\end{bmatrix}.
+\tag{4.26}\label{eq:04-26}
+\end{equation}
+
+DenseNet 流\citeref{6}使用与 ResNet 流相同的技巧来近似雅可比行列式。两者的主要区别在于如何归一化权重，使变换的 Lipschitz 常数小于 1，从而让变换可逆。形式上，由于 $\operatorname{Lip}(g)\le\operatorname{Lip}(h_{n+1})\cdot\ldots\cdot\operatorname{Lip}(h_1)$，为了使 $\operatorname{Lip}(g)<1$，需要对全部 $n$ 层施加 $\operatorname{Lip}(h_i)<1$ 的约束。因此，首先要确定密集层 $h_i$ 的 Lipschitz 常数。我们知道，函数 $f$ 是 $K$-Lipschitz 的，若对所有点 $v,w$ 有
+\begin{equation}
+d_Y(f(v),f(w))\le Kd_X(v,w),
+\tag{4.27}\label{eq:04-27}
+\end{equation}
+这里假定距离度量 $d_X=d_Y=d$ 选用 $\ell_2$ 范数。进一步设 $h$ 拼接了两个函数 $f_1$ 和 $f_2$。
+\begin{equation}
+h_v=\begin{bmatrix}f_1(v)\\f_2(v)\end{bmatrix},
+\qquad
+h_w=\begin{bmatrix}f_1(w)\\f_2(w)\end{bmatrix},
+\tag{4.28}\label{eq:04-28}
+\end{equation}
+其中 $f_1$ 是上半部分，$f_2$ 是下半部分。现在可以按式\eqref{eq:04-27}求出该密集层的 $K$ 的上界的解析式。
+\begin{equation}
+\begin{aligned}
+d(h_v,h_w)^2 &= d(f_1(v),f_1(w))^2+d(f_2(v),f_2(w))^2,\\
+d(h_v,h_w)^2 &\le (K_1^2+K_2^2)d(v,w)^2,
+\end{aligned}
+\tag{4.29}\label{eq:04-29}
+\end{equation}
+其中 $h$ 的 Lipschitz 常数由两部分决定，即 $\operatorname{Lip}(f_1)=K_1$ 和 $\operatorname{Lip}(f_2)=K_2$。
+% <<<PDFPAGE 96>>>
+因此，层 $h$ 的 Lipschitz 常数可写为
+\begin{equation}
+\operatorname{Lip}(h)=\sqrt{(K_1^2+K_2^2)}.
+\tag{4.30}\label{eq:04-30}
+\end{equation}
+\emph{译注。} 式\eqref{eq:04-30}保留原书的等号。由式\eqref{eq:04-29}可知，根式给出的是上界，实际 Lipschitz 常数可以更小。
+
+用式\eqref{eq:04-23}的谱归一化，可以约束（卷积）权重 $W_i$ 至多为 1-Lipschitz。因此，对所有 $n$ 个密集层的下半部分作谱归一化，使各层满足 $\operatorname{Lip}(f_2)=K_2<1$。此外，我们约束每层 $h_i$ 至多为 1-Lipschitz，而在第一层 $h_1$ 中 $f_1(x)=x$，所以 $\operatorname{Lip}(f_1)=1$。因此，整层的 Lipschitz 常数至多为 $\operatorname{Lip}(h)=\sqrt{1^2+1^2}=\sqrt{2}$。除以这个上界，就能使每层至多为 1-Lipschitz。关于 DenseNet 流及其进一步改进，请参阅原论文\citeref{6}。
+
+\section{离散随机变量的流}
+\subsection{引言}
+
+上一节把基于流的模型介绍为\emph{密度估计器}，即表示连续随机变量之间的随机依赖关系的模型。我们介绍了\emph{变量变换}公式，它通过可逆映射（双射）$f$ 把随机变量与概率密度函数已知的随机变量联系起来。其形式为
+\begin{equation}
+p(\mathbf{x})=p\bigl(\mathbf{z}=f^{-1}(\mathbf{x})\bigr)
+\left|\mathbf{J}_f(\mathbf{z})\right|^{-1},
+\tag{4.31}\label{eq:04-31}
+\end{equation}
+其中 $\mathbf{J}_f(\mathbf{z})$ 是 $f$ 在 $\mathbf{z}$ 处的雅可比矩阵。
+
+不过，这种方法也有一些潜在问题。首先，在许多问题中，例如图像处理，我们考虑的随机变量（对象）是离散的。例如，图像的取值通常在 $\{0,1,\ldots,255\}\subset\mathbb{Z}$ 内。为了应用流模型，必须作去量化\citeref{10}，得到的是原概率分布的下界。
+
+连续空间还有其他可能的难题。其一是，如果变换是双射（流就是如此），有些连续形变就无法实现。这与\emph{拓扑学}（topology）密切相关，更具体地说，与同胚（homeomorphism）和微分同胚（diffeomorphism）有关。同胚是拓扑空间之间的连续函数，其逆函数也连续。微分同胚是可微流形之间的可逆映射，函数及其逆都光滑。这里不需要掌握拓扑学，但有兴趣的读者可以先去读一读相关内容。这个领域确实有意思，我也想多了解一些！先来看三个例子。
+
+想象把一个正方形的边界变成圆周，如\figref{fig:04-07}a 所示。可以找到一个同胚，即一个既能把正方形边界变成圆周、又能变回去的双射。想象手里有一把锤子和一个正方形铁框。
+% <<<PDFPAGE 97>>>
+如果用锤子敲铁框无穷多次，就可以得到一个圆铁环。然后把这个过程“倒着”做，又能恢复正方形铁框。我知道这在现实中不可行，不过，这里说的是数学！
+
+\dgmfig{fig_04_07}{.69\linewidth}{（a）同胚空间示例。（b）非同胚空间示例。红叉表示无法作逆变换。}{fig:04-07}
+
+如果换成线段和圆周，情形就更复杂一些，见\figref{fig:04-07}b。可以把线段变成圆周，却不能反向变回去。为什么？把圆周变成线段时，无法确定圆周上的哪一点对应线段的起点或终点。因此，这个变换不可逆！
+
+\dgmfig{fig_04_08}{.75\linewidth}{用小圆盘（品红色）“换掉”圆环（蓝色）的示例。}{fig:04-08}
+
+另一个我很喜欢的例子也更贴近连续流的潜在问题，即像\figref{fig:04-08}那样把圆环变成小圆盘。目标是用品红色小圆盘替换蓝色圆环。为了让变换成为双射，在把蓝色圆环变到品红色小圆盘所在的位置时，必须让新的品红色“圆环”实际有一处“缺口”，使新的蓝色“小圆盘”能进到里面！为什么？如果品红色圆环没有缺口，就无法说明蓝色圆盘是怎样进到里面的，双射性也就被破坏了！用拓扑学的话说，这两个空间不同胚，所以无法实现这一变换。
+
+
+% <<<PDFPAGE 98>>>
+\dgmfig{fig_04_09}{.77\linewidth}{均匀去量化后的离散随机变量（左）和基于流的模型（右）。真实分布给两个橙色区域分配相等的概率质量，其余两个黑色区域的概率质量为零。流模型却在原先概率质量非零的区域之外也分配了概率质量。}{fig:04-09}
+
+那么，这会怎样影响流模型呢？希望有些读者也问到了这一点，或者已经想到了流模型的学习可能会受妨碍的情形。一般来说，我认为问题不大，没必要在没有问题或几乎没有问题的地方挑毛病。不过，如果使用需要去量化的流，可能会发现\figref{fig:04-09}这样的情形。在这个简单例子中，两个离散随机变量经过均匀去量化后，有两个区域的概率质量相等，其余两个区域的概率质量为零\citeref{10}。训练流模型后，得到的密度估计器却会在真实分布的密度为零的地方分配非零概率质量！此外，流中的变换必须是双射，所以两个正方形之间有连续的连接，见\figref{fig:04-09}右图。我们在哪里见过这一点？对，在\figref{fig:04-08}！我们必须知道怎样对变换求逆，所以各区域之间转移概率质量时会留下“痕迹”。
+
+还可以再问一句，这有多糟糕？我觉得问题其实不大，不过，如果考虑更多随机变量，而这里那里总有一点误差，就会造成\emph{概率质量泄漏}（probability mass leakage），得到的模型可能远不理想。总体上，模型可能无法正确分配概率。
+
+\subsection[实数空间的流还是整数空间的流？]{在 $\mathbb{R}$ 中构造流，还是在 $\mathbb{Z}$ 中？}
+
+在讨论具体情形和离散流之前，先回答一个问题。离散随机变量有变量变换公式吗？好在答案是肯定的！考虑 $\mathbf{x}\in\mathcal{X}^D$，其中 $\mathcal{X}$ 是离散空间，例如 $\mathcal{X}=\{0,1\}$ 或 $\mathcal{X}=\mathbb{Z}$。变量变换公式为
+% <<<PDFPAGE 99>>>
+\begin{equation}
+p(\mathbf{x})=\pi\bigl(\mathbf{z}_0=f^{-1}(\mathbf{x})\bigr),
+\tag{4.32}\label{eq:04-32}
+\end{equation}
+其中 $f$ 是可逆变换，$\pi(\cdot)$ 是基分布。我们马上就会发现，雅可比行列式“不见了”。这样写是对的！为什么？因为现在处于离散空间，概率质量分配给没有“形状”的点，双射不能改变体积。因此，雅可比行列式总是等于 1！这听起来是个好消息，对吧？我们可以取任何双射变换，都不用管雅可比矩阵。不过，要记住变换的输出仍必须是离散的，即 $\mathbf{z}\in\mathcal{X}^D$。所以，不能随便用一个可逆神经网络。马上就会讨论这一点，不过先谈谈离散流的表达能力。
+
+\emph{译注。} 这里“雅可比行列式等于 1”是与连续情形的类比。式\eqref{eq:04-32}直接把离散点的概率质量重新分配到像点，无须计算导数。
+
+假设有一个可逆变换 $f\colon\mathcal{X}^D\to\mathcal{X}^D$，并且 $\mathcal{X}=\{0,1\}$。如文献\citeref{27}所指出的，离散流只能置换各点的概率质量。由于没有雅可比矩阵，或者说雅可比行列式等于 1，不能调大或调小各个概率质量，只能改变它们对应的取值。\figref{fig:04-10}画出了这种情况。可以把空间想象成魔方，把手的动作想象成流。只要把动作录下来，总可以倒放视频，所以变换可逆。不过，你只能调换各个颜色的位置！因此，应用离散流并没有带来额外收益，学习离散流就等价于学习基分布 $\pi$。\footnote{这并不完全准确。我们还是可以学到一些相关关系，不过能力的确很有限。}于是又回到了起点。
+
+不过，正如文献\citeref{12}指出的，在扩展后的空间或 $\mathbb{Z}$ 这样的无限空间中，情形就不同了。离散流仍然只能重新排列各个概率，但现在它可以把这些概率排成能够作因子分解的形式！换句话说，基分布可以写成边缘分布的乘积 $\pi(\mathbf{z})=\prod_{d=1}^D\pi_d(z_d\mid\theta_d)$，变量间的依赖关系则编码在可逆变换中。\figref{fig:04-11}给出了一个例子。更深入的讨论及相应引理见文献\citeref{12}。
+
+\dgmfig{fig_04_10}{.75\linewidth}{两个二元随机变量的离散流示例。颜色表示不同的概率，所有方格对应的概率之和为 1。}{fig:04-10}
+
+% <<<PDFPAGE 100>>>
+\dgmfig{fig_04_11}{.75\linewidth}{扩展空间中两个二元随机变量的离散流示例。颜色表示不同的概率，所有方格对应的概率之和为 1。}{fig:04-11}
+
+这个结果很有意思！它说明在离散空间中构造流模型是可行的。现在可以考虑怎样在离散空间中构造一个可逆神经网络，而我们已经有了办法！
+
+\subsection{整数离散流}
+
+现在我们知道，离散流是可行的，只要使用扩展空间或 $\mathbb{Z}$ 这样的无限空间，就具有一定的灵活性。不过，问题在于怎样构造能输出离散值的可逆变换，更具体地说，怎样构造这种可逆神经网络。
+
+Hoogeboom 等人\citeref{22}提出专门考虑整数，因为可以把整数看成离散化的连续取值。因此，考虑耦合层\citeref{7}并对其作相应修改。先回顾 $\mathbf{x}\in\mathbb{R}^D$ 时的二分耦合层（bipartite coupling layer）的定义。
+\begin{align}
+\mathbf{y}_a&=\mathbf{x}_a
+\tag{4.33}\label{eq:04-33}\\
+\mathbf{y}_b&=\exp(s(\mathbf{x}_a))\odot\mathbf{x}_b+t(\mathbf{x}_a),
+\tag{4.34}\label{eq:04-34}
+\end{align}
+其中 $s(\cdot)$ 和 $t(\cdot)$ 是任意神经网络，分别称为缩放网络和平移网络。
+
+考虑整数值变量 $\mathbf{x}\in\mathbb{Z}^D$ 时，需要修改这个变换。首先，使用缩放可能有麻烦。两个整数相乘没有问题，但对变换求逆时需要除以整数，而两个整数相除的结果未必是整数。因此，要去掉缩放以避免这个问题。其次，平移由任意神经网络实现，但这个网络必须返回整数！文献\citeref{22}采用了一个简单办法，把 $t(\cdot)$ 的输出取整到最近的整数。这样，在正向变换中把整数相加，在逆向变换中把整数相减，结果都仍是整数。最终得到以下二分耦合层。
+% <<<PDFPAGE 101>>>
+\begin{align}
+\mathbf{y}_a&=\mathbf{x}_a
+\tag{4.35}\label{eq:04-35}\\
+\mathbf{y}_b&=\mathbf{x}_b+\lfloor t(\mathbf{x}_a)\rceil,
+\tag{4.36}\label{eq:04-36}
+\end{align}
+其中 $\lfloor\cdot\rceil$ 是取整算子。好奇的读者可能会问，有了取整算子还能用反向传播算法吗？也就是说，取整算子可微吗？答案是\textbf{不可微}，但文献\citeref{22}表明，使用梯度的直通估计量（straight-through estimator，STE）就够了。顺便一提，这里的 STE 在网络的前向计算中使用取整后的 $\lfloor t(\mathbf{x}_a)\rceil$，但在反向传播计算梯度时使用 $t(\mathbf{x}_a)$。文献\citeref{12}进一步表明，STE 确实有效，其偏差对训练的妨碍不大。下面是用 STE 实现的取整算子。
+
+\bookcode{code/ch04_round_straight_through.py}{用 STE 实现取整算子。}{lst:04-03}
+
+文献\citeref{23}说明了怎样推广二分耦合层等可逆变换。以下用 $\mathcal{X}_{i:j}$ 表示 $\mathcal{X}$ 中第 $i$ 维到第 $j$ 维变量 $\mathbf{x}_{i:j}$ 对应的子集，并假设 $\mathcal{X}_{1:0}=\emptyset$、$\mathcal{X}_{n+1:n}=\emptyset$。
+
+% <<<PDFPAGE 102>>>
+\begin{booknote}{命题\citeref{23}}
+\textbf{命题 4.1}\quad 取 $\mathbf{x},\mathbf{y}\in\mathcal{X}$。设二元变换 $\circ$ 和 $\triangleright$ 的逆运算分别为 $\bullet$ 和 $\blacktriangleleft$。又设 $g_2,\ldots,g_D$ 与 $f_1,\ldots,f_D$ 是任意函数，其中 $g_i\colon\mathcal{X}_{1:i-1}\to\mathcal{X}_i$，$f_i\colon\mathcal{X}_{1:i-1}\times\mathcal{X}_{i+1:n}\to\mathcal{X}_i$。那么，以下从 $\mathbf{x}$ 到 $\mathbf{y}$ 的变换可逆。
+\begin{align*}
+y_1&=x_1\circ f_1(\emptyset,\mathbf{x}_{2:D})\\
+y_2&=(g_2(y_1)\mathbin{\triangleright}x_2)\circ f_2(y_1,\mathbf{x}_{3:D})\\
+&\ldots\\
+y_d&=(g_d(\mathbf{y}_{1:d-1})\mathbin{\triangleright}x_d)
+  \circ f_d(\mathbf{y}_{1:d-1},\mathbf{x}_{d+1:D})\\
+&\ldots\\
+y_D&=(g_D(\mathbf{y}_{1:D-1})\mathbin{\triangleright}x_D)
+  \circ f_D(\mathbf{y}_{1:D-1},\emptyset)
+\end{align*}
+\textbf{证明}\quad 为了从 $\mathbf{y}$ 反求 $\mathbf{x}$，从最后一个元素开始，得到
+\[
+x_D=g_D(\mathbf{y}_{1:D-1})\mathbin{\blacktriangleleft}
+\bigl(y_D\bullet f_D(\mathbf{y}_{1:D-1},\emptyset)\bigr).
+\]
+接下来，按递减次序（从 $D-1$ 到 1）依次求解，最终得到
+\begin{align*}
+x_{D-1}&=g_{D-1}(\mathbf{y}_{1:D-2})\mathbin{\blacktriangleleft}
+\bigl(y_{D-1}\bullet f_{D-1}(\mathbf{y}_{1:D-2},x_D)\bigr)\\
+&\ldots\\
+x_d&=g_d(\mathbf{y}_{1:d-1})\mathbin{\blacktriangleleft}
+\bigl(y_d\bullet f_d(\mathbf{y}_{1:d-1},\mathbf{x}_{d+1:D})\bigr)\\
+&\ldots\\
+x_2&=g_2(y_1)\mathbin{\blacktriangleleft}\bigl(y_2\bullet f_2(y_1,\mathbf{x}_{3:D})\bigr)\\
+x_1&=y_1\bullet f_1(\emptyset,\mathbf{x}_{2:D}).
+\end{align*}
+\hfill$\square$
+\end{booknote}
+
+例如，可以把 $\mathbf{x}$ 分成四部分，即 $\mathbf{x}=[\mathbf{x}_a,\mathbf{x}_b,\mathbf{x}_c,\mathbf{x}_d]$，那么下列变换（四分耦合层，quadripartite coupling layer）可逆\citeref{23}。
+\begin{align}
+\mathbf{y}_a&=\mathbf{x}_a+\lfloor t(\mathbf{x}_b,\mathbf{x}_c,\mathbf{x}_d)\rceil
+\tag{4.37}\label{eq:04-37}\\
+\mathbf{y}_b&=\mathbf{x}_b+\lfloor t(\mathbf{y}_a,\mathbf{x}_c,\mathbf{x}_d)\rceil
+\tag{4.38}\label{eq:04-38}\\
+\mathbf{y}_c&=\mathbf{x}_c+\lfloor t(\mathbf{y}_a,\mathbf{y}_b,\mathbf{x}_d)\rceil
+\tag{4.39}\label{eq:04-39}\\
+\mathbf{y}_d&=\mathbf{x}_d+\lfloor t(\mathbf{y}_a,\mathbf{y}_b,\mathbf{y}_c)\rceil.
+\tag{4.40}\label{eq:04-40}
+\end{align}
+可以把这个新的可逆变换看成一种自回归处理，因为先用 $\mathbf{y}_a$ 计算 $\mathbf{y}_b$，再用 $\mathbf{y}_a$ 和 $\mathbf{y}_b$ 计算
+% <<<PDFPAGE 103>>>
+$\mathbf{y}_c$，依此类推。这样得到的变换比二分耦合层更灵活。
+
+如果继续用耦合层，记得用置换层反转变量顺序，否则一些输入只能得到部分处理。这适用于任何耦合层，无论用于连续流还是整数值流。
+
+最后要考虑的组件是基分布。与前面的流模型类似，可以用各种技巧提高模型性能，例如挤压、分出变量以及用混合模型作为基分布\citeref{22}。不过，本节尽量保持模型简单，因此采用边缘分布的乘积作为基分布。对于用整数表示的图像，取
+\begin{align}
+\pi(\mathbf{z})&=\prod_{d=1}^D\pi_d(z_d)
+\tag{4.41}\label{eq:04-41}\\
+&=\prod_{d=1}^D\operatorname{DL}(z_d\mid\mu_d,\nu_d),
+\tag{4.42}\label{eq:04-42}
+\end{align}
+其中 $\pi_d(z_d)=\operatorname{DL}(z_d\mid\mu_d,\nu_d)$ 是离散化逻辑斯蒂分布，定义为逻辑斯蒂分布的累积分布函数（cumulative distribution function，CDF）在两处的差\citeref{34}。
+\begin{equation}
+\pi(z)=\operatorname{sigm}((z+0.5-\mu)/\nu)-\operatorname{sigm}((z-0.5-\mu)/\nu),
+\tag{4.43}\label{eq:04-43}
+\end{equation}
+其中 $\mu\in\mathbb{R}$ 和 $\nu>0$ 分别表示均值和尺度，$\operatorname{sigm}(\cdot)$ 是 sigmoid 函数。注意，这等价于计算 $z$ 落入长度为 1 的区间的概率，所以第一个 CDF 中加上 $0.5$，第二个 CDF 中减去 $0.5$。\figref{fig:04-12}给出了这一离散化分布的例子，下面给出其实现。
+
+\dgmfig{fig_04_12}{.73\linewidth}{离散化逻辑斯蒂分布示例，其中 $\mu=0$、$\nu=1$。纵轴上的品红色区段对应宽度为 1 的区间的概率质量。}{fig:04-12}[CDF 表示累积分布函数。]
+
+% <<<PDFPAGE 104>>>
+有趣的是，可以像文献\citeref{18}那样用这个分布代替第~3~章的类别分布。还可以用离散化逻辑斯蒂分布的混合分布进一步提高性能\citerefs{22,35}。
+
+\bookcode{code/ch04_discretized_logistic.py}{离散化逻辑斯蒂分布的对数概率。\citeref{34}}{lst:04-04}
+
+最终，对数似然函数为
+\begin{align}
+\ln p(\mathbf{x})
+&=\sum_{d=1}^D\ln\operatorname{DL}(z_d=f^{-1}(\mathbf{x})\mid\mu_d,\nu_d)
+\tag{4.44}\label{eq:04-44}\\
+&=\sum_{d=1}^D\ln\Bigl(\operatorname{sigm}((z_d+0.5-\mu_d)/\nu_d)
+\notag\\
+&\hspace{3.8em}{}-\operatorname{sigm}((z_d-0.5-\mu_d)/\nu_d)\Bigr),
+\tag{4.45}\label{eq:04-45}
+\end{align}
+其中所有 $\mu_d$ 和 $\nu_d$ 都是可学习的参数。注意，$\nu_d$ 必须为正数，严格大于 0。因此，实现时用尺度的对数作为参数，因为对对数尺度取 $\exp$ 能保证所得值严格为正。
+
+\subsection{代码}
+
+现在，实现我们自己的整数离散流（IDF）所需的组件已经齐全！下面的代码包含大量注释，可以帮助理解每一行。
+
+
+% <<<PDFPAGE 105>>>
+% <<<PDFPAGE 106>>>
+% <<<PDFPAGE 107>>>
+\bookcode{code/ch04_integer_discrete_flow.py}{网络示例。}{lst:04-05}
+
+\emph{译注。} 代码清单~\ref{lst:04-05}沿用原书。第 108 行向 \texttt{prior\_sample} 传入 \texttt{intMax}，但第 119 行的方法定义没有这一参数。
+
+下面给出一些可用于运行 IDF 的神经网络示例。
+
+% <<<PDFPAGE 108>>>
+\bookcode{code/ch04_idf_networks.py}{网络示例。}{lst:04-06}
+
+这样就完成了，所需的内容都已具备！运行代码并训练 IDF 后，应该能得到类似\figref{fig:04-13}的结果。
+
+\dgmfig{fig_04_13}{.95\linewidth}{训练结果示例。（a）随机选取的真实图像。（b）使用二分耦合层的 IDF 无条件生成的图像。（c）使用四分耦合层的 IDF 无条件生成的图像。}{fig:04-13}
+
+% <<<PDFPAGE 109>>>
+\subsection{接下来呢？}
+
+与 RealNVP 的例子一样，这里给出的 IDF 实现也比较简单。可以用 RealNVP 部分介绍的许多技巧，见第~4.1.6~节。关于 IDF 的进一步发展，也可以参阅文献\citeref{12}。
+
+整数离散流在数据压缩方面很有潜力。由于 IDF 直接学习整数值对象上的分布 $p(\mathbf{x})$，很适合做无损压缩。文献\citeref{22}表明，与其他图像无损压缩编解码器相比，IDF 也很有竞争力。
+
+文献\citeref{12}进一步表明，梯度直通估计可能带来的偏差没有最初设想的那么大\citeref{22}，IDF 仍能学习灵活的分布。这一结果表明，IDF 值得特别关注，尤其是在数据压缩等实际应用中。
+
+下一步似乎是考虑更有表现力的离散变量变换，例如文献\citeref{23}，并开发能力更强的架构。另一个有趣的方向是采用其他学习算法，在其中更好地估计梯度\citeref{36}，甚至用其他量替代梯度\citeref{37}。
+
+\FloatBarrier
+\input{chapters/ch04_references.tex}

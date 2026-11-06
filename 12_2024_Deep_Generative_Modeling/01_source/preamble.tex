@@ -1,0 +1,131 @@
+\PassOptionsToPackage{no-math}{fontspec}
+\documentclass[UTF8,10pt,twoside,openany,scheme=plain,fontset=fandol]{ctexbook}
+\usepackage[paperwidth=155mm,paperheight=235mm,textwidth=332bp,
+ top=55bp,bottom=56bp,inner=51bp,headheight=13pt,headsep=10pt,footskip=22pt]{geometry}
+\usepackage{amsmath,newtxmath}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+\usepackage{graphicx,tabularx,booktabs,longtable,array,multicol}
+\usepackage[table]{xcolor}
+\usepackage{enumitem,needspace,fancyhdr,emptypage,caption,fvextra,placeins}
+\usepackage[most]{tcolorbox}
+\usepackage{etoolbox,xurl}
+\usepackage[unicode,hidelinks,bookmarksnumbered]{hyperref}
+\usepackage{bookmark}
+
+\hypersetup{pdftitle={深度生成建模（第二版）},pdfauthor={Jakub M. Tomczak}}
+\urlstyle{same}
+\renewcommand{\contentsname}{目录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\indexname}{索引}
+\ctexset{
+  chapter={name={第,章},number=\arabic{chapter},
+    format=\raggedright\sffamily\bfseries\fontsize{16}{22}\selectfont,
+    beforeskip=0pt,afterskip=106pt},
+  section={format=\raggedright\sffamily\bfseries\fontsize{12}{16}\selectfont,
+    beforeskip=15pt plus 2pt,afterskip=8pt},
+  subsection={format=\raggedright\sffamily\bfseries\fontsize{11}{15}\selectfont,
+    beforeskip=13pt plus 2pt,afterskip=6pt},
+  subsubsection={format=\raggedright\sffamily\bfseries\fontsize{10.5}{15}\selectfont,
+    beforeskip=11pt plus 2pt,afterskip=4pt},
+  paragraph={runin=false,format=\raggedright\sffamily\bfseries\fontsize{10.5}{15}\selectfont,
+    beforeskip=8pt plus 2pt,afterskip=4pt}
+}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\makeatletter
+\renewcommand{\normalsize}{%
+  \@setfontsize\normalsize{10.5pt}{15pt}%
+  \abovedisplayskip 9pt plus 2pt minus 3pt%
+  \abovedisplayshortskip 4pt plus 2pt%
+  \belowdisplayskip 9pt plus 2pt minus 3pt%
+  \belowdisplayshortskip 5pt plus 2pt minus 2pt%
+  \let\@listi\@listI}
+\renewcommand{\small}{\@setfontsize\small{9.5pt}{13.5pt}}
+\renewcommand{\footnotesize}{\@setfontsize\footnotesize{9pt}{12.5pt}}
+\newcommand{\dgmcontents}{%
+  \chapter*{\contentsname}\markboth{\contentsname}{\contentsname}%
+  \pdfbookmark[0]{\contentsname}{dgm-contents}%
+  \@starttoc{toc}}
+\makeatother
+\AtBeginDocument{\normalsize\setlength{\parindent}{2\ccwd}}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{1em}
+\clubpenalty=7500
+\widowpenalty=7500
+\raggedbottom
+\setlist{leftmargin=2em,topsep=4pt,itemsep=2pt,parsep=0pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\footnotesize\thepage}
+\fancyhead[RE]{\footnotesize\nouppercase{\leftmark}}
+\fancyhead[LO]{\footnotesize\nouppercase{\rightmark}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{\ifnum\value{chapter}>0 \thechapter\quad\fi #1}{#1}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\quad #1}}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[LE,RO]{\footnotesize\thepage}%
+  \renewcommand{\headrulewidth}{0pt}}
+
+\captionsetup{font=footnotesize,labelfont=bf,labelsep=quad,
+  justification=raggedright,singlelinecheck=false,skip=5pt}
+\captionsetup[table]{position=top}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.16}
+\definecolor{notegreen}{HTML}{087817}
+\newtcolorbox{booknote}[2][]{
+  enhanced,breakable,colframe=notegreen,colback=notegreen!5,coltitle=white,
+  fonttitle=\sffamily\bfseries,arc=1mm,boxrule=.5pt,title={#2},
+  before skip=6pt,after skip=6pt,left=7pt,right=7pt,top=5pt,bottom=5pt,#1}
+\newcounter{booklisting}[chapter]
+\renewcommand{\thebooklisting}{\thechapter.\arabic{booklisting}}
+\newcommand{\bookcode}[3]{%
+  \par\medskip
+  \VerbatimInput[fontsize=\footnotesize,numbers=left,numbersep=6pt,
+    xleftmargin=2em,breaklines,breakanywhere,frame=single,framerule=.2pt,
+    rulecolor=\color{black!35}]{#1}%
+  \nopagebreak\refstepcounter{booklisting}\label{#3}%
+  {\footnotesize\noindent\textbf{代码清单~\thebooklisting}\quad #2\par}%
+  \medskip}
+
+\newcommand{\frontchapter}[1]{%
+  \chapter*{#1}\markboth{#1}{#1}\addcontentsline{toc}{chapter}{#1}}
+\newcommand{\bookimprint}[2][作者]{%
+  \insert\footins{\normalfont\footnotesize
+    \hsize=\columnwidth\parindent=0pt
+    \noindent © #1独家授权 Springer Nature Switzerland AG，2024。%
+    \newline J.~M.~Tomczak，《深度生成建模》，%
+    \url{#2}。\par}}
+\newcommand{\sourcechapter}[1]{%
+  \label{chapter:start:#1}%
+  \bookimprint{https://doi.org/10.1007/978-3-031-64087-2_#1}}
+\newcommand{\citeref}[1]{\hyperref[ref:\thechapter-#1]{[#1]}}
+\newcommand{\citerefs}[1]{%
+  \begingroup
+  \def\refsep{}%
+  \def\chaptercite##1{\refsep\hyperref[ref:\thechapter-##1]{##1}\def\refsep{, }}%
+  [\forcsvlist{\chaptercite}{#1}]%
+  \endgroup}
+\newenvironment{chapterreferences}{%
+  \section*{参考文献}\markright{参考文献}\addcontentsline{toc}{section}{参考文献}%
+  \small\raggedright
+  \begin{enumerate}[label=\arabic*.,leftmargin=2.2em,itemsep=3pt]%
+}{\end{enumerate}}
+\newcommand{\refentry}[1]{\item\label{ref:\thechapter-#1}}
+\newcommand{\figref}[1]{图~\ref{#1}}
+\newcommand{\tabref}[1]{表~\ref{#1}}
+\NewDocumentCommand{\dgmfig}{m m m m o}{%
+  \begin{figure}[htbp]
+    \centering\includegraphics[width=#2,clip]{figures/#1.pdf}
+    \caption{#3}\label{#4}
+    \IfValueT{#5}{\diagramlabels{#5}}%
+  \end{figure}%
+}
+\newcommand{\diagramlabels}[1]{\par\smallskip{\raggedright\footnotesize\noindent #1\par}}

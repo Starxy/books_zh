@@ -1,0 +1,366 @@
+% <<<PDFPAGE 200>>>
+\chapter{基于能量的模型}
+\label{ch:ebm}
+\sourcechapter{7}
+\providecommand{\LogSumExp}{\operatorname{LogSumExp}}
+
+\section{引言}
+到目前为止，我们讨论了多种为可观测变量（如图像）的边缘分布 $p(\mathbf{x})$ 建模的深度生成模型，包括自回归模型（ARM）、基于流的模型（简称流）、变分自编码器（VAE），以及层次化 VAE、基于扩散的深度生成模型（diffusion-based deep generative model，DDGM）等层次模型。不过，从本书一开始，我们就提倡用深度生成建模寻找可观测变量和决策变量的联合分布，并将它分解为 $p(\mathbf{x},y)=p(y\mid\mathbf{x})p(\mathbf{x})$。对联合分布取对数，得到相加的两个分量：$\ln p(\mathbf{x},y)=\ln p(y\mid\mathbf{x})+\ln p(\mathbf{x})$。我们已经概述了如何在混合建模的框架中构造和训练这种联合模型（见第~6~章）。不过，混合建模的缺点是必须给两种分布加权，即 $\ell(\mathbf{x},y;\lambda)=\ln p(y\mid\mathbf{x})+\lambda\ln p(\mathbf{x})$。当 $\lambda\ne 1$ 时，这个目标并不对应联合分布的对数似然。问题在于，能不能构造一个在 $\lambda=1$ 时也能学习的模型？这里我们用概率能量模型（EBM）讨论一种可能的解法\citeref{1}。
+
+EBM 由来已久，可以追溯到 20 世纪 80 年代，当时研究者提出了称为\textbf{玻尔兹曼机}的模型\citerefs{2,3}。有趣的是，玻尔兹曼机背后的思想来自统计物理学，却由认知科学家提出。这样的结合挺有意思，对吧？简单来说，我们可以定义一个\textbf{能量函数} $E(\mathbf{x})$，给每个状态赋一个值（能量），而无须先选定高斯或伯努利分布之类的具体分布。能量函数没有固定的形式，你已经可以想到用神经网络来参数化它。然后，将能量变为未归一化概率 $e^{-E(\mathbf{x})}$，再用 $Z=\sum_{\mathbf{x}}e^{-E(\mathbf{x})}$（即配分函数）归一化，就得到玻尔兹曼分布，也称吉布斯分布（Gibbs distribution）。
+\begin{equation}
+p(\mathbf{x})=\frac{e^{-E(\mathbf{x})}}{Z}.
+\tag{7.1}\label{eq:07-01}
+\end{equation}
+
+% <<<PDFPAGE 201>>>
+如果考虑连续随机变量，就应把求和换成积分。在物理学中，能量还需乘以温度的倒数\citeref{4}。这里略去这一点，以简化记号。玻尔兹曼分布的工作原理比较容易理解。想象一个 $5\times5$ 的网格，再给其中 25 个点各赋一个值（能量），值越大，点的能量越高。对能量取指数，就不会得到负值。为了算出各点的概率，需要把指数化的各个值除以它们的和，和计算 softmax 一样。对于连续随机变量，则必须计算积分（也就是对所有无穷小的区域求和）来进行归一化。例如，高斯分布也可以写成一个玻尔兹曼分布，其配分函数可解析求得，能量函数如下。
+\begin{equation}
+E(x;\mu,\sigma^2)=\frac{1}{2\sigma^2}(x-\mu)^2,
+\tag{7.2}\label{eq:07-02}
+\end{equation}
+于是得到
+\begin{align}
+p(x)&=\frac{e^{-E(x)}}{\int e^{-E(x)}\,\mathrm{d}x}
+              \tag{7.3}\label{eq:07-03}\\
+    &=\frac{e^{\frac{1}{2\sigma^2}(x-\mu)^2}}{\sqrt{2\pi\sigma^2}}.
+              \tag{7.4}\label{eq:07-04}
+\end{align}
+\emph{译注。} 式（7.4）保留了原书的正指数。由式（7.2）和式（7.3）可知，高斯密度的分子指数应带负号。
+
+在实践中，大多数能量函数给不出容易计算的配分函数。通常，配分函数正是学习能量模型时遇到的主要难题。第二个问题是一般很难从这类模型中采样。为什么？我们知道每个点的概率，却没有自回归模型、流或 VAE 那样的生成过程。不清楚从哪里开始，也不清楚 EBM 对应怎样的图模型。可以把 EBM 想成一个盒子，给定 $\mathbf{x}$，它会告诉我们这一点的（未归一化）概率。注意，能量函数并不区分各个变量，也不关心 $\mathbf{x}$ 的任何结构。它仿佛只说，把 $\mathbf{x}$ 给我，我就返回一个值。就这样！换句话说，能量函数在随机变量的空间里定义了山峰和山谷。
+
+好奇的读者（对，说的就是你！）可能会问，我们何必费心研究 EBM？前面讨论的模型至少在一定程度上可计算、易理解，因为它们规定了一些随机依赖关系。现在，我们突然把思路倒过来，不再为结构建模，而要为一个能返回未归一化概率的能量函数建模。这样做有好处吗？有，至少有三个理由。第一，原则上，能量函数不受固定函数形式的约束，可以是任意函数！没错，你大概已经猜到，它可以是神经网络。第二，能量函数无须像混合分布那样预先规定多峰结构，自身就可以有多个峰。第三，定义在离散变量上还是连续变量上，处理思路没有区别。希望你现在看到了 EBM 的许多优点！它们也有不少缺点，不过在开始之前，先看看好的方面吧。
+% <<<PDFPAGE 202>>> 上一段跨原页。
+
+\section{模型形式}
+如前所述，我们在可观测随机变量和决策随机变量上构造参数为 $\theta$ 的能量函数 $E(\mathbf{x},y;\theta)$。它为每个二元组 $(\mathbf{x},y)$ 分配一个值（能量），其中 $\mathbf{x}\in\mathbb{R}^{D}$，$y\in\{0,1,\ldots,K-1\}$。用返回 $K$ 个值的神经网络 $NN_\theta(\mathbf{x})$ 参数化 $E(\mathbf{x},y;\theta)$，即 $NN_\theta\colon\mathbb{R}^{D}\to\mathbb{R}^{K}$。换句话说，能量可定义为
+\begin{equation}
+E(\mathbf{x},y;\theta)=-NN_\theta(\mathbf{x})[y],
+\tag{7.5}\label{eq:07-05}
+\end{equation}
+其中 $[y]$ 表示取神经网络 $NN_\theta(\mathbf{x})$ 对应于 $y$ 的输出。于是将联合概率分布定义为玻尔兹曼分布：
+\begin{align}
+p_\theta(\mathbf{x},y)&=
+ \frac{\exp\{NN_\theta(\mathbf{x})[y]\}}
+      {\sum_{\mathbf{x},y}\exp\{NN_\theta(\mathbf{x})[y]\}}
+      \tag{7.6}\label{eq:07-06}\\
+ &=\frac{\exp\{NN_\theta(\mathbf{x})[y]\}}{Z_\theta},
+      \tag{7.7}\label{eq:07-07}
+\end{align}
+其中，配分函数定义为 $Z_\theta=\sum_{\mathbf{x},y}\exp\{NN_\theta(\mathbf{x})[y]\}$。
+
+有了联合分布，就可以计算边缘分布和条件分布。先来看边缘分布 $p(\mathbf{x})$。对联合分布应用求和法则，得到
+\begin{align}
+p_\theta(\mathbf{x})&=\sum_y p_\theta(\mathbf{x},y)
+                    \tag{7.8}\label{eq:07-08}\\
+ &=\frac{\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}}
+         {\sum_{\mathbf{x},y}\exp\{NN_\theta(\mathbf{x})\}[y]}
+                    \tag{7.9}\label{eq:07-09}\\
+ &=\frac{\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}}{Z_\theta}.
+                    \tag{7.10}\label{eq:07-10}
+\end{align}
+\emph{译注。} 式（7.9）分母的下标取值 $[y]$ 按原书保留在指数括号外。依前文对 $Z_\theta$ 的定义，可以先取第 $y$ 个分量，再对其取指数，两者在此处等价。
+
+注意，这个分布还有另一种表示。先把分子改写为
+\begin{align}
+\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}
+ &=\exp\left\{\log\left(\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}\right)\right\}
+       \tag{7.11}\label{eq:07-11}\\
+ &=\exp\bigl\{\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\bigr\},
+       \tag{7.12}\label{eq:07-12}
+\end{align}
+其中 $\LogSumExp_y\{f(y)\}=\ln\sum_y\exp\{f(y)\}$。换句话说，边缘分布的能量函数可以写成 $-\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}$。于是，边缘分布定义如下。
+% <<<PDFPAGE 203>>>
+\begin{equation}
+p_\theta(\mathbf{x})
+ =\frac{\exp\bigl\{\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\bigr\}}{Z_\theta}.
+\tag{7.13}\label{eq:07-13}
+\end{equation}
+现在可以计算条件分布 $p_\theta(y\mid\mathbf{x})$。已知 $p_\theta(\mathbf{x},y)=p_\theta(y\mid\mathbf{x})p_\theta(\mathbf{x})$，所以
+\begin{align}
+p_\theta(y\mid\mathbf{x})&=\frac{p_\theta(\mathbf{x},y)}{p_\theta(\mathbf{x})}
+                        \tag{7.14}\label{eq:07-14}\\
+ &=\frac{\exp\{NN_\theta(\mathbf{x})[y]\}/Z_\theta}
+         {\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}/Z_\theta}
+                        \tag{7.15}\label{eq:07-15}\\
+ &=\frac{\exp\{NN_\theta(\mathbf{x})[y]\}}{\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}}.
+                        \tag{7.16}\label{eq:07-16}
+\end{align}
+最后一行看起来眼熟吗？对，你看出来了，这就是 \textbf{softmax 函数}！我们已经证明，基于能量的模型既可以用作分类器，也可以给出边缘分布。只定义一个神经网络就够了！是不是很漂亮？\citeref{5}也得出了同样的结论，任何分类器都可以视为基于能量的模型。
+
+有趣的是，联合分布的对数可写成
+\begin{align}
+\ln p_\theta(\mathbf{x},y)&=\ln p_\theta(y\mid\mathbf{x})+\ln p_\theta(\mathbf{x})
+                         \tag{7.17}\label{eq:07-17}\\
+ &=\ln\frac{\exp\{NN_\theta(\mathbf{x})[y]\}}{\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}}
+   +\ln\frac{\sum_y\exp\{NN_\theta(\mathbf{x})[y]\}}{Z_\theta}
+                         \tag{7.18}\label{eq:07-18}\\
+ &=\ln\operatorname{softmax}\{NN_\theta(\mathbf{x})[y]\}\notag\\
+ &\quad+\bigl(\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}-\ln Z_\theta\bigr),
+                         \tag{7.19}\label{eq:07-19}
+\end{align}
+其中 $\LogSumExp_y\{f(y)\}=\ln\sum_y\exp\{f(y)\}$。显然，模型用一个共享神经网络来计算两种分布。要得到其中某种分布，只需选定最后的激活函数（activation function）。\figref{fig:07-01}给出了模型的示意图。
+
+% <<<PDFPAGE 204>>> 图 7.1 位于原页顶部。
+\dgmfig{fig_07_01}{.48\linewidth}{基于能量的模型示意图。我们用 $\tilde p_\theta(\mathbf{x})$ 表示 $\LogSumExp_y$ 的输出，以强调它表示未归一化的分布，因为配分函数不易计算。}{fig:07-01}
+[\emph{译注。} 图中 $\LogSumExp_y$ 的输出是未归一化量的对数。取指数才得到式（7.13）的分子。]
+
+\section{训练}
+我们只需训练一个神经网络，训练目标为联合分布的对数。这个目标是条件分布 $p_\theta(y\mid\mathbf{x})$ 的对数与边缘分布 $p_\theta(\mathbf{x})$ 的对数之和，因此计算关于参数 $\theta$ 的梯度时，需要分别计算每个分量的梯度。学习分类器本身没有困难，我们仔细看第二个分量。
+% <<<PDFPAGE 204>>> 上一段跨原页。
+\begin{align}
+\nabla_\theta\ln p_\theta(\mathbf{x})
+ &=\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}-\nabla_\theta\ln Z_\theta
+     \tag{7.20}\label{eq:07-20}\\
+ &=\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\notag\\
+ &\quad-\nabla_\theta\ln\sum_{\mathbf{x}}
+           \exp\bigl\{\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\bigr\}
+     \tag{7.21}\label{eq:07-21}\\
+ &=\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\notag\\
+ &\quad-\sum_{\mathbf{x}'}
+   \frac{\exp\{\LogSumExp_y\{NN_\theta(\mathbf{x}')[y]\}\}}
+        {\sum_{\mathbf{x}'',y''}\exp\{NN_\theta(\mathbf{x}'')[y'']\}}
+        \notag\\
+ &\qquad\qquad{}\times\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x}')[y]\}
+     \tag{7.22}\label{eq:07-22}\\
+ &=\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\notag\\
+ &\quad-\mathbb E_{\mathbf{x}'\sim p_\theta(\mathbf{x})}
+          \bigl[\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x}')[y]\}\bigr].
+     \tag{7.23}\label{eq:07-23}
+\end{align}
+我们来理清刚才做了什么。第一部分 $\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}$ 是在给定数据点 $\mathbf{x}$ 上求梯度。LSE 函数可微，因此可以用自动微分工具。第二部分，即式（7.23）中的期望项，情况完全不同，有两个原因。
+\begin{itemize}
+\item 第一，配分函数的对数的梯度变成了对服从模型分布的 $\mathbf{x}$ 求期望！这确实是个难题，因为无法解析计算这一期望，而且从边缘分布 $p_\theta(\mathbf{x})$ 采样并不容易。
+% <<<PDFPAGE 205>>>
+\item 第二，需要计算 $NN_\theta(\mathbf{x})$ 的 LSE 所对应的期望。这是个好消息，因为其中的梯度可以用自动微分工具计算。
+\end{itemize}
+
+因此，唯一的难题在于期望。通常以蒙特卡洛样本来近似期望，但如何有效、高效地从 EBM 采样并不清楚。Grathwohl 等人\citeref{5}提出使用朗之万动力学\citeref{6}，这是一种马尔可夫链蒙特卡洛（Markov chain Monte Carlo，MCMC）方法。这里的朗之万动力学从随机初始化的 $\mathbf{x}_0$ 开始，利用能量函数曲面的信息，也就是梯度，寻找新的 $\mathbf{x}$：
+\begin{equation}
+\mathbf{x}_{t+1}=\mathbf{x}_t+\alpha\nabla_{\mathbf{x}_t}
+  \LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}+\sigma\cdot\epsilon,
+\tag{7.24}\label{eq:07-24}
+\end{equation}
+其中 $\alpha>0$、$\sigma>0$，且 $\epsilon\sim\mathcal{N}(0,I)$。可以把朗之万动力学看成可观测变量空间中的随机梯度下降（stochastic gradient descent），每一步都加上少量高斯噪声。把这个过程应用 $\eta$ 步，就可以如下近似梯度：
+\begin{equation}
+\begin{aligned}
+\nabla_\theta\ln p_\theta(\mathbf{x})
+ &\approx\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\\
+ &\quad-\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x}_\eta)[y]\},
+\end{aligned}
+\tag{7.25}\label{eq:07-25}
+\end{equation}
+其中 $\mathbf{x}_\eta$ 表示朗之万动力学过程的最后一步。
+
+现在可以把这些部分合在一起了！请记住，训练目标是
+\begin{equation}
+\begin{aligned}
+\ln p_\theta(\mathbf{x},y)
+ &=\ln\operatorname{softmax}\{NN_\theta(\mathbf{x})[y]\}\\
+ &\quad+\bigl(\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}-\ln Z_\theta\bigr),
+\end{aligned}
+\tag{7.26}\label{eq:07-26}
+\end{equation}
+其中第一部分用来学习分类器，第二部分可以说是用来学习生成器。因此，这个完全共享的模型有两个相加的目标。关于参数的梯度是
+\begin{equation}
+\begin{aligned}
+\nabla_\theta\ln p_\theta(\mathbf{x},y)
+ &=\nabla_\theta\ln\operatorname{softmax}\{NN_\theta(\mathbf{x})[y]\}\\
+ &\quad+\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\\
+ &\quad-\mathbb E_{\mathbf{x}'\sim p_\theta(\mathbf{x})}
+           \bigl[\nabla_\theta\LogSumExp_y\{NN_\theta(\mathbf{x}')[y]\}\bigr].
+\end{aligned}
+\tag{7.27}\label{eq:07-27}
+\end{equation}
+最后两项来自边缘分布的梯度。请记住，只有最后一项难以求出！我们用朗之万动力学这一采样过程，取单个样本来近似这一项。最终训练过程如下。
+
+% <<<PDFPAGE 206>>>
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{基于能量的模型的训练}
+\begin{enumerate}
+\item 从数据集中抽取 $\mathbf{x}_n$ 和 $y_n$。
+\item 计算 $NN_\theta(\mathbf{x}_n)[y]$。
+\item 初始化 $\mathbf{x}_0$，例如从均匀分布中取样。
+\item 运行 $\eta$ 步朗之万动力学：
+\begin{equation}
+\mathbf{x}_{t+1}=\mathbf{x}_t+\alpha\nabla_{\mathbf{x}_t}
+   \LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}+\sigma\cdot\epsilon.
+\tag{7.28}\label{eq:07-28}
+\end{equation}
+\item 计算目标：
+\begin{align}
+L_{\mathit{clf}}(\theta)
+ &=\sum_y\mathbb{1}[y=y_n]\,\theta_y\ln\{NN_\theta(\mathbf{x}_n)[y]\}
+        \tag{7.29}\label{eq:07-29}\\
+L_{\mathit{gen}}(\theta)
+ &=\LogSumExp_y\{NN_\theta(\mathbf{x})[y]\}\notag\\
+ &\quad-\LogSumExp_y\{NN_\theta(\mathbf{x}_\eta)[y]\}
+        \tag{7.30}\label{eq:07-30}\\
+L(\theta)&=L_{\mathit{clf}}(\theta)+L_{\mathit{gen}}(\theta).
+        \tag{7.31}\label{eq:07-31}
+\end{align}
+\item 使用自动微分工具计算梯度 $\nabla_\theta L(\theta)$，并更新神经网络。
+\end{enumerate}
+\end{booknote}
+注意，$L_{\mathit{clf}}(\theta)$ 就是交叉熵损失（cross-entropy loss），而 $L_{\mathit{gen}}(\theta)$ 是对 $\mathbf{x}$ 的对数边缘分布的（粗略）近似。
+
+\emph{译注。} 式（7.29）按原书保留了额外的 $\theta_y$ 和对 $NN_\theta(\mathbf{x}_n)[y]$ 直接取对数的写法。以式（7.16）的 softmax 概率计算交叉熵，应为 $-\ln p_\theta(y_n\mid\mathbf{x}_n)$。后面的代码清单 7.1 用的是这个分类损失，并对生成目标取负后最小化。
+
+\section{代码}
+那么，需要编写什么代码？首先，必须指定定义能量函数的神经网络，我们称它为\emph{能量网络}（energy net）。用能量网络分类相当直接。主要难点在于用朗之万动力学从模型中采样。幸运的是，自动微分工具可以轻松给出关于 $\mathbf{x}$ 的梯度！在下面的代码里，它实际上只占一行。然后需要写一个循环，以步长 $\alpha$ 和噪声水平 $\sigma$ 运行 $\eta$ 步朗之万动力学。在代码中，我们像\citeref{5}那样，假定数据已经归一化并缩放到 $[-1,1]$。
+
+% <<<PDFPAGE 206>>>–<<<PDFPAGE 208>>> 代码清单 7.1。
+\bookcode{code/ch07_ebm.py}{基于能量的模型类。}{lst:07-01}
+
+这样就完成了，所需的东西都在这里！运行代码、训练 EBM 后，应当得到与\figref{fig:07-02}类似的结果。
+
+\section{受限玻尔兹曼机}
+用能量函数定义模型，是玻尔兹曼机（Boltzmann machine，BM）这一大类模型的基础\citerefs{2,7}。玻尔兹曼机如下定义能量函数。
+% <<<PDFPAGE 209>>>
+\dgmfig{fig_07_02}{.83\linewidth}{训练结果的一个例子。(a) 随机选取的真实图像。(b) 对 EBM 应用 $\eta=20$ 步朗之万动力学后得到的无条件生成图像。(c) 目标 $L_{\mathit{clf}}+L_{\mathit{gen}}$ 的一条验证曲线。(d) 生成目标 $L_{\mathit{gen}}$ 的一条验证曲线。}{fig:07-02}
+[(c)、(d) 的横轴为训练轮数，纵轴为对应的验证目标。]
+
+\begin{equation}
+E(\mathbf{x};\theta)=-\bigl(\mathbf{x}^{\mathsf T}\mathbf{W}\mathbf{x}+
+                                 \mathbf{b}^{\mathsf T}\mathbf{x}\bigr),
+\tag{7.32}\label{eq:07-32}
+\end{equation}
+其中 $\theta=\{\mathbf{W},\mathbf{b}\}$。$\mathbf{W}$ 是权重矩阵，$\mathbf{b}$ 是偏置向量（偏置权重），与霍普菲尔德网络（Hopfield network）和伊辛模型（Ising model）的形式相同。玻尔兹曼机的问题是由于配分函数而难以训练。不过，引入潜变量、限制可观测变量之间的连接，可以缓解这个问题。
+
+\subsection{对玻尔兹曼机施加限制}
+考虑一个由二元可观测变量 $\mathbf{x}\in\{0,1\}^{D}$ 和二元潜（隐藏）变量 $\mathbf{z}\in\{0,1\}^{M}$ 构成的玻尔兹曼机。变量之间的关系由下列能量函数指定：
+\begin{equation}
+E(\mathbf{x},\mathbf{z};\theta)
+ =-\mathbf{x}^{\mathsf T}\mathbf{W}\mathbf{z}
+  -\mathbf{b}^{\mathsf T}\mathbf{x}-\mathbf{c}^{\mathsf T}\mathbf{z},
+\tag{7.33}\label{eq:07-33}
+\end{equation}
+其中 $\theta=\{\mathbf{W},\mathbf{b},\mathbf{c}\}$ 是一组参数。$\mathbf{W}\in\mathbb{R}^{D\times M}$、$\mathbf{b}\in\mathbb{R}^{D}$、$\mathbf{c}\in\mathbb{R}^{M}$ 分别为权重、可观测变量的偏置和隐藏变量的偏置。对于式（7.33）中的能量函数，用\emph{吉布斯分布}定义受限玻尔兹曼机：
+\begin{equation}
+p(\mathbf{x},\mathbf{z}\mid\theta)
+ =\frac{1}{Z_\theta}\exp\bigl(-E(\mathbf{x},\mathbf{z};\theta)\bigr),
+\tag{7.34}\label{eq:07-34}
+\end{equation}
+其中
+% <<<PDFPAGE 210>>>
+\begin{equation}
+Z_\theta=\sum_{\mathbf{x}}\sum_{\mathbf{z}}
+               \exp\bigl(-E(\mathbf{x},\mathbf{z};\theta)\bigr)
+\tag{7.35}\label{eq:07-35}
+\end{equation}
+是配分函数。可观测变量的边缘概率（观测的似然）为
+\begin{equation}
+p(\mathbf{x}\mid\theta)=\frac1{Z_\theta}\exp\bigl(-F(\mathbf{x};\theta)\bigr),
+\tag{7.36}\label{eq:07-36}
+\end{equation}
+其中 $F(\cdot)$ 为\emph{自由能}（free energy）。\footnote{记号约定：对于矩阵 $\mathbf{A}$，$A_{ij}$ 是位置 $(i,j)$ 的元素，$\mathbf{A}_{\cdot j}$ 为第 $j$ 列，$\mathbf{A}_{i\cdot}$ 为第 $i$ 行。对于向量 $\mathbf{a}$，$a_i$ 是第 $i$ 个元素。}
+\begin{equation}
+F(\mathbf{x};\theta)=-\mathbf{b}^{\mathsf T}\mathbf{x}
+ -\sum_j\log\bigl(1+\exp(c_j+(\mathbf{W}_{\cdot j})^{\mathsf T}\mathbf{x})\bigr).
+\tag{7.37}\label{eq:07-37}
+\end{equation}
+这个模型称为受限玻尔兹曼机（RBM）。它有一个很有用的性质：给定可观测变量，隐藏变量的条件分布可因子分解，反过来也一样。由此得到
+\begin{align}
+p(z_m=1\mid\mathbf{x},\theta)&=\operatorname{sigm}\bigl(c_m+(\mathbf{W}_{\cdot m})^{\mathsf T}\mathbf{x}\bigr),
+              \tag{7.38}\label{eq:07-38}\\
+p(x_d=1\mid\mathbf{z},\theta)&=\operatorname{sigm}\bigl(b_d+\mathbf{W}_{d\cdot}\mathbf{z}\bigr).
+              \tag{7.39}\label{eq:07-39}
+\end{align}
+
+\subsection{学习受限玻尔兹曼机}
+给定数据 $\mathcal{D}=\{\mathbf{x}_n\}_{n=1}^{N}$，可以采用最大似然（maximum likelihood）方法训练 RBM，即最大化下列对数似然函数：
+\begin{equation}
+\ell(\theta)=\frac1N\sum_{\mathbf{x}_n\in\mathcal{D}}\log p(\mathbf{x}_n\mid\theta).
+\tag{7.40}\label{eq:07-40}
+\end{equation}
+学习目标 $\ell(\theta)$ 关于 $\theta$ 的梯度为
+\begin{equation}
+\nabla_\theta\ell(\theta)=-\frac1N\sum_{n=1}^{N}
+  \left(\nabla_\theta F(\mathbf{x}_n;\theta)-
+    \sum_{\hat{\mathbf{x}}}p(\hat{\mathbf{x}}\mid\theta)
+           \nabla_\theta F(\hat{\mathbf{x}};\theta)\right).
+\tag{7.41}\label{eq:07-41}
+\end{equation}
+一般来说，式（7.41）的梯度不能解析求得，因为第二项要对可观测变量的所有配置求和。一种解决办法是使用通常的随机近似（stochastic approximation），用从 $p(\mathbf{x}\mid\theta)$ 抽取的 $S$ 个样本 $\{\hat{\mathbf{x}}_1,\ldots,\hat{\mathbf{x}}_S\}$ 的和代替在该分布下的期望\citeref{8}：
+\begin{equation}
+\nabla_\theta\ell(\theta)\approx-
+ \left(\frac1N\sum_{n=1}^{N}\nabla_\theta F(\mathbf{x}_n;\theta)-
+       \frac1S\sum_{s=1}^{S}\nabla_\theta F(\hat{\mathbf{x}}_s;\theta)\right).
+\tag{7.42}\label{eq:07-42}
+\end{equation}
+
+% <<<PDFPAGE 211>>>
+另一种方法称为\emph{对比散度}（contrastive divergence，CD）。它用样本 $\bar{\mathbf{x}}_n$ 的和近似式（7.41）中在 $p(\mathbf{x}\mid\theta)$ 下的期望。这些样本抽自分块吉布斯采样（block Gibbs sampling）运行 $K$ 步后得到的分布：
+\begin{equation}
+\nabla_\theta\ell(\theta)\approx-\frac1N\sum_{n=1}^{N}
+   \left(\nabla_\theta F(\mathbf{x}_n;\theta)-\nabla_\theta F(\bar{\mathbf{x}}_n;\theta)\right).
+\tag{7.43}\label{eq:07-43}
+\end{equation}
+
+\begin{booknote}{旁注}
+原始 CD 算法\citeref{9}从每个数据点 $\mathbf{x}_n$ 出发，沿吉布斯链运行 $K$ 步，得到样本 $\bar{\mathbf{x}}_n$。每次参数更新后都重新启动这条链。另一种方法称为\emph{持续对比散度}（persistent contrastive divergence，PCD），每次更新后继续原有的链。这样通常收敛较慢，但最终性能更好\citeref{10}。
+\end{booknote}
+
+\subsection{用能量函数定义高阶关系}
+能量函数是一个有趣的概念，因为它允许对变量之间的高阶依赖关系建模。例如，可以引入两类隐藏变量，即子空间单元（subspace unit）和门控单元（gate unit），将二元 RBM 扩展到三阶乘性交互。子空间单元是反映某个特征不同变化的隐藏变量，因此有助于获得更好的不变性。门控单元负责激活子空间单元，可视为由子空间特征组成的池化特征（pooling feature）。
+
+考虑随机变量 $\mathbf{x}\in\{0,1\}^{D}$、$\mathbf{h}\in\{0,1\}^{M}$、$\mathbf{S}\in\{0,1\}^{M\times K}$。我们关心由三个变量相连的情形，即一个可观测变量 $x_i$，以及两类二元隐藏单元，门控单元 $h_j$ 和子空间单元 $s_{jk}$。每个门控单元关联一组子空间隐藏单元。于是，联合配置的能量函数定义为\footnote{这里用求和而非矩阵乘积。三阶乘积用矩阵记号表示会比较繁琐。}
+\begin{equation}
+\begin{aligned}
+E(\mathbf{x},\mathbf{h},\mathbf{S};\boldsymbol{\theta})
+ &=-\sum_{i=1}^{D}\sum_{j=1}^{M}\sum_{k=1}^{K} W_{ijk}x_ih_js_{jk}
+            -\sum_{i=1}^{D}b_ix_i\\
+ &\quad-\sum_{j=1}^{M}c_jh_j-\sum_{j=1}^{M}h_j\sum_{k=1}^{K}D_{jk}s_{jk},
+\end{aligned}
+\tag{7.44}\label{eq:07-44}
+\end{equation}
+其中参数为 $\boldsymbol{\theta}=\{\mathbf{W},\mathbf{b},\mathbf{c},\mathbf{D}\}$，且 $\mathbf{W}\in\mathbb{R}^{D\times M\times K}$、$\mathbf{b}\in\mathbb{R}^{D}$、$\mathbf{c}\in\mathbb{R}^{M}$、$\mathbf{D}\in\mathbb{R}^{M\times K}$。
+
+将式（7.44）作为能量函数的吉布斯分布称为\emph{子空间受限玻尔兹曼机}（subspace restricted Boltzmann machine，subspaceRBM）\citeref{11}。对于 subspaceRBM，有如下条件依赖关系：\footnote{$\operatorname{softplus}(a)=\log\bigl(1+\exp(a)\bigr)$。}
+% <<<PDFPAGE 212>>>
+\begin{align}
+p(x_i=1\mid\mathbf{h},\mathbf{S})
+ &=\operatorname{sigm}\left(\sum_j\sum_k W_{ijk}h_js_{jk}+b_i\right),
+          \tag{7.45}\label{eq:07-45}\\
+p(s_{jk}=1\mid\mathbf{x},h_j)
+ &=\operatorname{sigm}\left(\sum_i W_{ijk}x_ih_j+h_jD_{jk}\right),
+          \tag{7.46}\label{eq:07-46}\\
+p(h_j=1\mid\mathbf{x})
+ &=\operatorname{sigm}\left(-K\log 2+c_j+
+    \sum_{k=1}^{K}\operatorname{softplus}\left(\sum_i W_{ijk}x_i+D_{jk}\right)\right),
+          \tag{7.47}\label{eq:07-47}
+\end{align}
+这些关系可以直接用来构建类似对比散度的学习算法。注意，式（7.47）中的 $-K\log 2$ 自然会惩罚隐藏单元的激活，惩罚的大小随子空间隐藏变量数线性增长。因此，只有当总输入的 softplus 值之和超过惩罚项和偏置项时，门控单元才会激活。
+
+subspaceRBM 的例子说明，能量函数十分方便，可以用来为各种随机关系建模。subspaceRBM 曾用于对不变特征建模，而对 RBM 的能量函数作其他修改，还可以用来学习空间变换\citeref{12}或尖峰与厚板特征（spike-and-slab feature）\citeref{13}。
+
+\section{结语}
+\citeref{5}是 EBM 研究中的一个里程碑，因为它表明，我们可以使用神经网络参数化的\emph{任意}能量函数。不过，在得到这个结果之前，人们已对能量模型做了大量研究。
+
+\noindent\textbf{受限玻尔兹曼机。} RBM 有若干有用的特点。第一，二部图结构有利于训练，进而可以利用分块吉布斯采样，构造一种高效的训练过程，即对比散度\citeref{9}。如前所述，可以在随机点或潜变量样本处初始化马尔可夫链，然后根据条件分布处理另一组变量。过程好比打乒乓球，给定一组变量，采样另一组变量，来回进行，直到收敛或决定停止。第二，潜变量的分布可解析计算，还可以看作由逻辑斯蒂回归（logistic regression）参数化。有意思的是，sigmoid 函数由能量函数的定义自然产生！第三，对连接的限制表明，我们仍然可以构建能力很强、能够（部分）解析处理的模型。这开辟了一个新的研究方向，旨在构造结构更复杂的模型，如尖峰与厚板 RBM\citeref{13}、高阶 RBM\citerefs{11,12}、处理类别型观测量的 RBM\citeref{14}，或处理实值观测量的 RBM\citeref{15}。此外，还可以修改 RBM 来处理时间数据\citeref{16}，例如用于跟踪人体运动\citeref{17}。分类 RBM 的研究\citerefs{18,19}是\citeref{5}中思想的先驱。RBM 的训练基于 MCMC 技术，例如对比散度算法。不过，也可以用正则化\citeref{20}或其他学习算法训练 RBM，使模型获得特定特征。其他算法包括扰动与 MAP 方法（perturb-and-MAP）\citerefs{21,22}、最小概率流（minimum probability flow）\citeref{23}，以及\citerefs{8,24}中的算法。
+% <<<PDFPAGE 213>>> 上一段跨原页。
+
+\noindent\textbf{深度玻尔兹曼机。} BM 的一种自然扩展是使用深层架构，也就是层次化的 BM。许多研究者指出，层次模型的思想在人工智能中至关重要\citeref{25}。因此，BM 有许多采用层次（深层）架构的扩展\citerefs{15,26,27}。
+
+由于配分函数更复杂，训练深度 BM 更有挑战\citeref{28}。一种主要方法是把相邻两层看作一个 RBM，逐层训练，并把其中较低的层视为可观测层\citeref{27}。关于神经网络无监督预训练的开创性论文\citeref{29}成功使用了这一过程。
+
+\noindent\textbf{近似配分函数。} 配分函数是 EBM 中至关重要的量，因为有了它才能计算玻尔兹曼分布。遗憾的是，对随机变量的所有取值求和在计算上不可行。不过，可以采用现有的一些近似技术。
+\begin{itemize}
+\item \emph{变分方法。} 一些变分方法用 Bethe 近似（Bethe approximation）给出对数配分函数的下界\citerefs{30,31}，或者用树重加权和积算法（tree-reweighted sum-product algorithm）给出对数配分函数的上界\citeref{32}。
+
+\emph{扰动与 MAP 方法。} 另一种做法是将配分函数与随机变量最大值的统计量联系起来，再应用扰动与 MAP 方法\citeref{33}。
+\item \emph{随机近似。} 另一种也许最直接的方法是使用采样过程。一项广泛使用的技术是退火重要性采样（annealed importance sampling）\citeref{28}。
+\end{itemize}
+有些近似方法适用于特定的 BM，例如变量为二元的 BM，或结构特定的 BM。但一般而言，如何近似配分函数仍是一个开放问题，也是在实际应用中大规模使用 EBM 的主要障碍。
+
+\section{基于能量的模型是未来吗？}
+EBM 无疑很有潜力，至少有两个理由。
+\begin{enumerate}
+\item 它们无须像混合建模方法那样，引入人为系数来平衡分类损失与生成损失。
+\item \citeref{5}的结果清楚表明，EBM 能达到当时最先进的分类错误率，能合成高保真图像，也对筛选分布外数据（out-of-distribution selection）大有用处。
+\end{enumerate}
+
+不过，还有一个主要问题未能解决，即如何计算 $p(\mathbf{x})$。正如我一直强调的，深度生成建模之所以有用，既是因为我们能够合成好看的图像，也是因为生成式人工智能系统能评估周围环境的不确定性，并把这些信息告诉我们或其他人工智能系统。由于 EBM 的边缘分布很难计算，能否在许多应用中使用这类模型还很难说。不过，这是极有意思的研究方向。如何高效计算配分函数，如何高效地从模型中采样，对训练能力强大的 EBM 至关重要。
+% <<<PDFPAGE 214>>> 上一段跨原页。
+
+\input{chapters/ch07_references}

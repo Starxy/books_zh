@@ -1,0 +1,364 @@
+% <<<PDFPAGE 56>>>
+\chapter{自回归模型}
+\sourcechapter{3}
+\section{引言}
+
+在讨论如何对分布 $p(\mathbf{x})$ 建模之前，我们先回顾概率论的两条基本规则，即\textbf{求和规则}（sum rule）和\textbf{乘积规则}（product rule）。引入两个随机变量 $\mathbf{x}$ 和 $\mathbf{y}$，它们的联合分布为 $p(\mathbf{x},\mathbf{y})$。根据乘积规则，我们可以用两种方式对联合分布作\emph{因子分解}（factorization）。
+\begin{align}
+p(\mathbf{x},\mathbf{y})&=p(\mathbf{x}\mid\mathbf{y})p(\mathbf{y})
+\tag{3.1}\label{eq:03-01}\\
+&=p(\mathbf{y}\mid\mathbf{x})p(\mathbf{x}).
+\tag{3.2}\label{eq:03-02}
+\end{align}
+换句话说，可以把联合分布表示为边缘分布与条件分布的乘积。按照求和规则，若要求某个变量的边缘分布，就必须对另一个变量积分（或求和），即
+\begin{equation}
+p(\mathbf{x})=\sum_{\mathbf{y}}p(\mathbf{x},\mathbf{y}).
+\tag{3.3}\label{eq:03-03}
+\end{equation}
+这两条规则在概率论和统计学中至关重要，构造深度生成模型时尤其如此。
+
+现在考虑高维随机变量 $\mathbf{x}\in\mathcal{X}^D$，其中 $\mathcal{X}=\{0,1,\ldots,255\}$（例如像素取值）或 $\mathcal{X}=\mathbb{R}$。我们的目标是对 $p(\mathbf{x})$ 建模。在考虑如何具体参数化之前，先用乘积规则把联合分布写成另一种形式。
+\begin{equation}
+p(\mathbf{x})=p(x_1)\prod_{d=2}^D p(x_d\mid\mathbf{x}_{<d}),
+\tag{3.4}\label{eq:03-04}
+\end{equation}
+其中 $\mathbf{x}_{<d}=[x_1,x_2,\ldots,x_{d-1}]^\top$。例如，若 $\mathbf{x}=[x_1,x_2,x_3]^\top$，则 $p(\mathbf{x})=p(x_1)p(x_2\mid x_1)p(x_3\mid x_1,x_2)$。
+
+% <<<PDFPAGE 57>>>
+可见，反复对联合分布应用乘积规则，就能有根据地把它分解成多个条件分布。这下有办法了！然而，把所有条件分布 $p(x_d\mid\mathbf{x}_{<d})$ 分别建模，根本行不通。这样会得到 $D$ 个独立的模型，而且随着所依赖的条件增多，模型会越来越复杂。自然会问，有没有更好的办法？答案是肯定的。
+
+\section{用神经网络参数化自回归模型}
+
+如前所述，我们想利用条件分布对联合分布 $p(\mathbf{x})$ 建模。避免使用 $D$ 个独立模型的一种办法是对条件分布共用同一个模型。但要做到这一点，就得引入一些假设。换句话说，我们要寻找一个\textbf{自回归模型}（ARM）。接下来将介绍采用不同神经网络参数化的 ARM。毕竟我们讨论的是深度生成模型，用到神经网络也就不奇怪了，对吧？
+
+\subsection{有限记忆}
+
+为了限制条件模型的复杂度，首先可以假定它只有\emph{有限记忆}（finite memory）。例如，我们可以假定每个变量最多只依赖另外两个变量，即
+\begin{equation}
+p(\mathbf{x})=p(x_1)p(x_2\mid x_1)\prod_{d=3}^D p(x_d\mid x_{d-1},x_{d-2}).
+\tag{3.5}\label{eq:03-05}
+\end{equation}
+于是可以用小型神经网络，例如多层感知机（multilayered perceptron，MLP），来预测 $x_d$ 的分布。若 $\mathcal{X}=\{0,1,\ldots,255\}$，MLP 以 $x_{d-1},x_{d-2}$ 为输入，输出 $x_d$ 的类别分布（categorical distribution）的各项概率 $\theta_d$。\figref{fig:03-01}展示了一个例子。
+
+\begin{booknote}{旁注}
+MLP 可以采用以下结构。
+\[
+\begin{aligned}
+\left[x_{d-1},x_{d-2}\right] &\to \mathrm{Linear}(2,M)\to \mathrm{ReLU}\\
+&\to \mathrm{Linear}(M,256)\to \mathrm{softmax}\to\theta_d,
+\end{aligned}
+\]
+其中 $M$ 表示隐藏单元数，例如 $M=300$。
+\end{booknote}
+
+% <<<PDFPAGE 58>>>
+\dgmfig{fig_03_01}{\linewidth}{使用依赖最近两个输入的共享 MLP 的示例。蓝色节点（底部）表示输入，橙色节点（中间）表示中间表示，绿色节点（顶部）表示输出概率。注意，概率 $\theta_d$ 不依赖于 $x_d$。}{fig:03-01}
+
+要注意的是，现在我们用同一个共享的 MLP 来预测 $x_d$ 的各项概率。这个模型既是非线性的，又因为待训练的权重较少，便于参数化。不过，这种方法有一个明显缺点，即\textbf{记忆有限}。在这个例子中，只能记住最近两个变量。而且，我们事先也不知道应该用多少变量作为条件。在许多问题中，例如图像处理，要理解数据中的复杂模式，学习长程统计关系至关重要，因此必须具备长程记忆。
+
+\subsection{用循环神经网络实现长程记忆}
+
+解决 MLP 只能建立短程记忆的一种办法是采用循环神经网络（recurrent neural network，RNN）\citerefs{1,2}。条件分布的模型可写成下式\citeref{3}。
+\begin{equation}
+p(x_d\mid\mathbf{x}_{<d})=p(x_d\mid\mathrm{RNN}(x_{d-1},h_{d-1})),
+\tag{3.6}\label{eq:03-06}
+\end{equation}
+其中 $h_d=\mathrm{RNN}(x_{d-1},h_{d-1})$。$h_d$ 是一个隐藏的上下文，起到\emph{记忆}的作用，使模型能够学习长程依赖（long-range dependency）。\figref{fig:03-02}给出了使用 RNN 的例子。
+
+这种方法只需要一套参数，因而效率较高，同时也解决了记忆有限的问题。到这里进展顺利！可惜，RNN 还有两个问题。
+\begin{itemize}
+\item 它们必须按顺序计算，因此速度慢。
+\item 当权重矩阵的条件不佳时，原书以其特征值大于或小于 1 为例，会分别出现梯度爆炸（exploding gradient）或梯度消失（vanishing gradient），妨碍学习长程依赖。
+\end{itemize}
+
+% <<<PDFPAGE 59>>>
+\dgmfig{fig_03_02}{\linewidth}{使用依赖最近两个输入的 RNN 的示例。蓝色节点（底部）表示输入，橙色节点（中间）表示中间表示，绿色节点（顶部）表示输出概率。与共享 MLP 的方法相比，中间节点 $h_d$ 之间多了一层依赖关系。}{fig:03-02}[RNN block 表示 RNN 块。]
+
+有些办法可以帮助训练 RNN，例如梯度裁剪（gradient clipping），或更广义的梯度正则化（gradient regularization）\citeref{4}，又如正交权重（orthogonal weights）\citeref{5}。不过，这里不打算钻研这些新问题的具体解法。我们想找的是另一种参数化方式，解决最初的问题，也就是对 ARM 中的长程依赖建模。
+
+\subsection{用卷积网络实现长程记忆}
+
+文献\citerefs{6,7}指出，可以用卷积神经网络（convolutional neural network，CNN）替代 RNN 来建模长程依赖。更具体地说，可以堆叠一维卷积层（one-dimensional convolutional layer，Conv1D），用来处理序列数据。这种方法有以下优点。
+\begin{itemize}
+\item 卷积核共享，参数利用率高。
+\item 可以并行处理，显著加快计算。
+\item 堆叠更多层时，有效卷积核的大小随网络深度增加。
+\end{itemize}
+这三个特点使得基于 Conv1D 的神经网络看起来很适合解决我们的问题。不过，真能直接使用吗？
+
+Conv1D 可以像文献\citeref{7}那样用来计算嵌入（embedding），却不能直接用于自回归模型。为什么？因为我们需要\textbf{因果卷积}\citeref{8}。这里的因果是指，Conv1D 层依赖最近 $k$ 个输入，可以排除当前输入（A 型），也可以纳入当前输入（B 型）。换句话说，我们必须把卷积核“切掉一半”，不让它看到后续变量，也就是不让它看到未来。要特别注意，第一层必须使用 A 型，因为最终输出的概率 $\theta_d$ 不能依赖于 $x_d$。此外，如果关注有效卷积核的大小，还可以把膨胀率（dilation）设为大于 1 的值。
+
+% <<<PDFPAGE 60>>>
+\dgmfig{fig_03_03}{\linewidth}{使用因果卷积的示例。卷积核的大小为 2，但在较高层采用膨胀卷积后，网络能处理范围大得多的输入（红色边），从而利用更长的记忆。注意，第一层必须采用 A 型，才能保证处理方式正确。}{fig:03-03}[CausalConv1D(A) 和 CausalConv1D(B) 分别表示 A 型和 B 型一维因果卷积。]
+
+\figref{fig:03-03}给出了一个由三层因果 Conv1D 组成的神经网络。第一层 CausalConv1D 是 A 型，只考虑此前的 $k$ 个输入，排除当前位置。接下来两层采用 B 型 CausalConv1D，膨胀率分别为 2 和 3。膨胀率通常取 1、2、4 和 8\citeref{9}，不过在图中画 2 和 4 不太方便。图中把从输出层回溯到输入层的连接全部标成红色。可以看到，堆叠膨胀率大于 1 的 CausalConv1D 层后，就能学习长程依赖。在这个例子中，模型能看到此前七个输入。
+\emph{译注。} 原书描述第一层时多了一个否定词，此处依据前页对 A 型的定义及下方代码译出。
+
+下面给出 CausalConv1D 层的一种实现。如果你还是分不清 A 型和 B 型，可以逐步分析这段代码。
+
+% <<<PDFPAGE 61>>>
+\bookcode{code/ch03_causal_conv1d.py}{一维因果卷积。}{lst:03-01}
+
+CausalConv1D 层比 RNN 更适合对序列数据建模。它们不仅能取得更好的结果，例如更高的分类准确率，还能更高效地学习长程依赖\citeref{8}。此外，它们没有梯度爆炸或梯度消失的问题。因此，它们似乎很适合用来参数化自回归模型。这种优势已经在许多场合得到验证，例如用由 CausalConv1D 层组成的 WaveNet 处理音频\citeref{9}，以及用含有 CausalConv2D 组件的 PixelCNN 处理图像\citeref{10}。
+
+那么，用因果卷积参数化自回归模型有没有缺点？遗憾的是，有，而且和采样有关。对给定输入求概率时，只需做一次前向计算，所有计算都能并行完成。然而，要采样生成新对象，就必须遍历所有位置。可以想象一个从第一个变量循环到最后一个变量的 \texttt{for} 循环，每次都预测概率，再采样得到新值。由于模型由卷积参数化，要得到最终样本就得做 $D$ 次完整的前向计算。这样会浪费很多计算，但享用卷积参数化带来的种种好处，就必须付出这个代价。好在提高计算速度的研究仍在继续，例如见文献\citeref{11}。
+
+% <<<PDFPAGE 62>>>
+\subsection{动手实现深度生成自回归模型}
+
+好，下面详细说说如何实现 ARM。这里以及全书其余部分都以图像为主，例如 $\mathbf{x}\in\{0,1,\ldots,15\}^{64}$。由于图像用整数表示，我们将用类别分布来表示它们。在后面几章中，我们会讨论图像分布的选择，并介绍其他一些方案。这里用由 CausalConv1D 层参数化的 ARM 对 $p(\mathbf{x})$ 建模。因此，各条件分布为
+\begin{align}
+p(x_d\mid\mathbf{x}_{<d})&=\operatorname{Categorical}\bigl(x_d\mid\theta_d(\mathbf{x}_{<d})\bigr)
+\tag{3.7}\label{eq:03-07}\\
+&=\prod_{l=1}^L(\theta_{d,l})^{[x_d=l]},
+\tag{3.8}\label{eq:03-08}
+\end{align}
+其中 $[a=b]$ 是艾弗森括号（Iverson bracket），即当 $a=b$ 时 $[a=b]=1$，当 $a\ne b$ 时 $[a=b]=0$。$\theta_d(\mathbf{x}_{<d})\in[0,1]^{16}$ 是以 CausalConv1D 为基础的神经网络的输出。最后一层采用 softmax，所以 $\sum_{l=1}^L\theta_{d,l}=1$。具体来说，最后一层必须有 16 个输出通道，因为每个像素有 16 种可能取值。softmax 在这 16 个值上计算。我们堆叠多个 CausalConv1D 层，在层间使用非线性激活函数，例如带泄漏的修正线性单元（Leaky ReLU）。当然，记得第一层要用 A 型 CausalConv1D！否则就会违背预测 $\theta_d$ 时对输入范围的假定。
+
+目标函数又如何呢？ARM 是基于似然的模型。给定 $N$ 个独立同分布的数据点 $\mathcal{D}=\{\mathbf{x}_1,\ldots,\mathbf{x}_N\}$，我们的目标是最大化对数似然。这里再次用到乘积规则和求和规则。
+\begin{align}
+\ln p(\mathcal{D})
+&=\ln\prod_n p(\mathbf{x}_n)
+\tag{3.9}\label{eq:03-09}\\
+&=\sum_n\ln p(\mathbf{x}_n)
+\tag{3.10}\label{eq:03-10}\\
+&=\sum_n\ln\prod_d p(x_{n,d}\mid\mathbf{x}_{n,<d})
+\tag{3.11}\label{eq:03-11}\\
+&=\sum_n\left(\sum_d\ln p(x_{n,d}\mid\mathbf{x}_{n,<d})\right)
+\tag{3.12}\label{eq:03-12}\\
+&=\sum_n\left(\sum_d\ln\operatorname{Categorical}\bigl(x_d\mid\theta_d(\mathbf{x}_{<d})\bigr)\right)
+\tag{3.13}\label{eq:03-13}\\
+&=\sum_n\left(\sum_d\left(\sum_{l=1}^L[x_d=l]\ln\theta_d(\mathbf{x}_{<d})\right)\right).
+\tag{3.14}\label{eq:03-14}
+\end{align}
+为简便起见，假定 $\mathbf{x}_{<1}=\emptyset$，即没有条件。可以看到，目标函数的形式很简洁！首先，对独立同分布的数据 $\mathcal{D}$ 取对数后，可以把各个 $p(\mathbf{x}_n)$ 的对数按数据点求和。其次，应用乘积规则并取对数，又得到一重求和，这次是对各维求和。
+% <<<PDFPAGE 63>>>
+最后，用 CausalConv1D 参数化条件分布后，只需一次前向计算就能得到所有 $\theta_d$，再按像素值选取相应概率，见 $\ln p(\mathcal{D})$ 的最后一行。理想情况下，若 $x_d=l$，就希望 $\theta_{d,l}$ 尽可能接近 1。
+
+\emph{译注。} 式\eqref{eq:03-13}和式\eqref{eq:03-14}保留了原书省略样本下标 $n$ 的写法。式\eqref{eq:03-14}对类别求和时，按式\eqref{eq:03-08}应取概率向量的第 $l$ 个分量 $\theta_{d,l}$。
+
+
+\subsection{代码}
+
+呼……好，来看看代码。完整代码见 \url{https://github.com/jmtomczak/intro_dgm}。这里只看模型本身的代码，细节写在注释里。
+
+% <<<PDFPAGE 64>>>
+\bookcode{code/ch03_causal_conv_arm.py}{用一维因果卷积参数化的自回归模型。}{lst:03-02}
+\bookcode{code/ch03_causal_conv_network.py}{网络示例。}{lst:03-03}
+
+\emph{译注。} 代码清单~\ref{lst:03-03}按原书保留了 \texttt{M = 256} 与后面的 \texttt{MM}。若在独立代码中用 \texttt{M} 表示隐藏通道数，需要在这些卷积层中统一变量名。
+
+很好！现在可以运行完整代码了。训练 ARM 后，应该会得到类似\figref{fig:03-04}的结果。
+
+% <<<PDFPAGE 65>>>
+\dgmfig{fig_03_04}{\linewidth}{训练结果示例。（a）随机选取的真实图像。（b）ARM 无条件生成的图像。（c）训练期间的验证曲线。}{fig:03-04}[epochs 表示训练轮次，nll 表示负对数似然。]
+\dgmfig{fig_03_05}{\linewidth}{掩码 $3\times3$ 卷积核（即二维因果卷积核）示例。（左）标准卷积核与掩码卷积核的区别。标准卷积核使用全部权重（绿色），掩码卷积核屏蔽一些权重，即不使用红色标出的权重。掩码卷积核中心的节点（像素）标为紫色，因为在 A 型中它会被屏蔽，在 B 型中则会保留。（中）一幅图像及一个掩码卷积核（A 型）的示例。图像中的浅橙色节点表示 0，浅蓝色节点表示 1。（右）用掩码卷积核对图像进行卷积的结果，填充量为 1。}{fig:03-05}[3x3 kernel 表示 $3\times3$ 卷积核，masked 3x3 kernel 表示 $3\times3$ 掩码卷积核，input image 表示输入图像，masked kernel 表示掩码卷积核，feature map 表示特征图。]
+
+\subsection{就这些吗？还有！}
+
+首先，我们讨论的是一维因果卷积，通常不足以对图像建模，因为图像具有二维空间依赖。若考虑多个通道，则为三维，为简单起见，我们只看二维情形。文献\citeref{10}提出了二维因果卷积（CausalConv2D）。思路与前面类似，只是现在还要确保卷积核在 $x$ 轴和 $y$ 轴上都看不到未来的像素。\figref{fig:03-05}比较了使用全部权重的标准卷积核与将部分权重置零（或屏蔽）的掩码卷积核。请注意，CausalConv2D 的第一层也必须使用 A 型，即跳过中心像素，其余层可以选 B 型。\figref{fig:03-06}用具体数值展示了\figref{fig:03-05}中的同一个例子。
+
+文献\citeref{12}又提出了一种改进因果卷积的方法。基本思路是构造一个由垂直和水平卷积层组成的模块。此外，还采用以下门控非线性函数（gated non-linearity function）。
+\begin{equation}
+\mathbf{h}=\tanh(\mathbf{W}\mathbf{x})\odot\sigma(\mathbf{V}\mathbf{x}).
+\tag{3.15}\label{eq:03-15}
+\end{equation}
+
+% <<<PDFPAGE 66>>>
+\dgmfig{fig_03_06}{.47\linewidth}{用具体数值表示\figref{fig:03-05}中的同一示例。}{fig:03-06}
+细节见文献\citeref{12}的图 2。
+
+文献\citeref{13}进一步改进了应用于图像的 ARM。作者提出用离散化逻辑斯蒂分布（discretized logistic distribution）代替对像素值建模的类别分布，还建议使用离散化逻辑斯蒂分布的混合分布，进一步提高 ARM 的灵活性。
+
+因果卷积的引入为深度生成建模开辟了多种可能，生成和密度估计的结果都达到了当时的先进水平。这里无法综述所有论文，只列几个值得记住的研究方向和应用。
+\begin{itemize}
+\item 文献\citeref{14}提出了另一种像素顺序。它以“之”字形顺序代替从左到右的顺序，让像素能够依赖左侧和上方先前已采样的像素。
+\item ARM 可以作为独立模型，也可以与其他方法结合。例如，可以用 ARM 对（变分）自编码器中的先验建模\citeref{15}。
+\item ARM 也可用于视频建模\citeref{16}。视频这样的序列数据很自然地适合做因子分解，因此 ARM 很适合这种情形。
+\item ARM 的一个可能缺点是缺少潜在表示（latent representation），因为所有条件分布都直接根据数据显式建模。为此，文献\citeref{17}提出在变分自编码器中采用基于 PixelCNN 的解码器。
+\item 另一个有趣且重要的方向是提出新的 ARM 架构或组件，或者提高其计算速度。如前所述，ARM 的采样可能很慢，可以考虑利用预测式采样（predictive sampling）加速\citerefs{11,18}。
+\item 也可以用其他相似性度量代替似然函数，例如分位数回归（quantile regression）使用的分布之间的 Wasserstein 距离。文献\citeref{19}把分位数回归用于 ARM，只对架构作了少量修改，就提高了质量评分。
+\item Transformer\citeref{20}是一类重要的模型。它用自注意力层（self-attention layer）代替因果卷积。
+\item 有人提出用多尺度 ARM 处理高质量图像，将计算规模的增长从二次降到对数。思路是作出局部独立性假设\citeref{21}，或者在空间维度上划分区域\citeref{22}。虽然这些方法能降低内存需求，采样仍然相当慢。
+\end{itemize}
+
+% <<<PDFPAGE 67>>>
+\section{基于 Transformer 的自回归模型}
+\subsection{引言}
+
+如前所述，自回归模型（ARM）的原理比较简单，即反复应用乘积规则对联合分布进行因子分解。
+\begin{equation}
+p(\mathbf{x})=\left(\prod_{d=1}^D p(x_d\mid\mathbf{x}_{<d})\right)p(x_1),
+\tag{3.16}\label{eq:03-16}
+\end{equation}
+其中 $\mathbf{x}_{<d}=[x_1,x_2,\ldots,x_{d-1}]$。
+\emph{译注。} 式\eqref{eq:03-16}保留了原书的求积下限 $d=1$ 和求积式外的 $p(x_1)$。按式\eqref{eq:03-04}，保留求积式外的因子时，求积下限应为 $d=2$。
+
+我们已经指出，这类模型在参数化上的难点在于构造一个灵活的模型，能够方便地处理条件分布 $p(x_d\mid\mathbf{x}_{<d})$。所谓\emph{方便}，是指用同一个模型，不论输入 $\mathbf{x}_{<d}$ 是什么，都能输出各项概率。一般来说，这个要求并不容易满足。不过，我们已经看到，用神经网络参数化 ARM 有助于完成这项工作。尤其是，\textbf{因果卷积}既能大大简化条件分布的实现，又能通过一次前向计算得到给定 $\mathbf{x}$ 的条件概率，从而加快计算。此外，它还能学习长程依赖！对于图像这样复杂的对象，这一点极为重要。我们还需要别的方法吗？问题解决了吗？
+
+从某种意义上说，答案是“是的”。用因果卷积参数化的自回归模型能力很强，长期以来在许多任务上都达到了当时最好的性能（state of the art，SOTA）！不过，有好奇心的研究者可不能认定问题已经解决，就此停止探索。特别是现在来了一个新角色，即\textbf{注意力机制}（attention mechanism）！注意力最初用于神经机器翻译（neural machine translation）\citerefs{23,24}，后来又有了许多用途，例如处理图像集合\citeref{25}。人们普遍发现，卷积层在固定的邻域网格上运算，而自然语言处理（natural language processing，NLP）中词与词的联系并不规则。例如，荷兰语语法要求词语以特定顺序排列，而波兰语的语序灵活得多。因此，预先设定邻域似乎有很大局限，而可以学习长程联系的注意力机制看起来要合适得多。文献\citeref{20}把注意力机制进一步推广到集合和序列的处理，提出了 \textbf{Transformer}。这种架构由三个主要组件组成，即注意力层、全连接层（fully connected layer）和层归一化（layer normalization）。Dropout 也可能有用，其他技巧也一样。毕竟这是深度学习，技巧和变通办法随处可见！不过，关键是这三个组件，它们改变了许多应用的做法，尤其是自然语言处理。接下来我们看看 Transformer 如何用于参数化 ARM。
+
+% <<<PDFPAGE 68>>>
+\subsection{Transformer，因为你只需要注意力！}
+
+正如文献\citeref{20}的标题所说，“你只需要注意力”。前面已经提到，可以把注意力机制看成对卷积层的一种推广。暂且假定确实如此，那么我们就应该能单凭注意力机制构建神经网络，注意力也就成了唯一需要的组件。马上就会看到，这话差一点就全对了。
+
+\subsubsection{自注意力}
+
+注意力机制，特别是\textbf{自注意力}机制，是许多架构的核心，Transformer 也以它为基础。那么该怎么定义呢？为了理解自注意力的运作方式，请记住，卷积层的卷积核沿着序列、图像等对象移动，并根据一个固定邻域计算响应（输出）。而在自注意力中，这个邻域要由模型来学习。类似于 CNN 中的多个卷积核，自注意力也可以有多个版本，称为\textbf{头}（head），这就是\textbf{多头自注意力}（multi-head self-attention）。
+
+先讨论\textbf{单头自注意力}（single-head self-attention），因为推广到多头很直接。下文始终假定数据已经准备好，即已有一个\textbf{词元化器}（tokenizer），输入文本、分子或图像之类的对象后，输出张量 $\mathbf{X}\in\mathcal{X}^{B\times T\times D}$。其中 $B$ 为批量大小，$T$ 为词元（token）数，例如句子中的字符数，$D$ 为单个词元的嵌入维数。之后便可用现有神经网络处理这个张量。设计词元化器是整个系统中极为重要的一环，可以把它理解为特征提取器或预处理步骤。基于 Transformer 的人工智能系统之所以有效，很大程度上归功于能力强的词元化器。回到正题，我们先假定已经有了词元化器，后面再简要介绍一种用于分子的词元化器。
+
+好，来看自注意力！自注意力其实比较简单，只需要矩阵运算的基础知识。用深度学习的话说，就是要知道线性层如何工作。首先用线性层对 $\mathbf{X}$ 进行变换，得到三个新的张量，即\textbf{值}（value）、\textbf{键}（key）和\textbf{查询}（query）。为与代码一致，用 $\otimes$ 表示批量矩阵乘法（batch matrix multiplication），即沿批维度执行 \texttt{for} 循环，对批中每个元素做矩阵乘法。这相当于 PyTorch 的 \texttt{bmm} 函数。
+\begin{itemize}
+\item 值 $\mathbf{V}=\mathbf{X}\otimes\mathbf{W}_v+\mathbf{b}_v$。
+\item 键 $\mathbf{K}=\mathbf{X}\otimes\mathbf{W}_k+\mathbf{b}_k$。
+\item 查询 $\mathbf{Q}=\mathbf{X}\otimes\mathbf{W}_q+\mathbf{b}_q$。
+\end{itemize}
+
+% <<<PDFPAGE 69>>>
+\begin{booknote}{旁注}
+来直观理解一下批量矩阵乘法 $\otimes$。若张量 $\mathbf{X}$ 的大小为 $B\times T\times D$（在 PyTorch 或 NumPy 中写作 \texttt{X.shape = (B, T, D)}），矩阵 $\mathbf{W}$ 的大小为 $D\times M$，则 $\mathbf{X}\otimes\mathbf{W}$ 所得张量的大小为 $B\times T\times M$。换句话说，$\otimes$ 对 $b=1,2,\ldots,B$ 分别计算矩阵乘积 $\mathbf{X}_b\mathbf{W}$，再拼接所有输出。如果 $\mathbf{W}$ 是 $B\times D\times M$ 的张量，就拼接 $b=1,2,\ldots,B$ 的所有输出 $\mathbf{X}_b\mathbf{W}_b$。
+\end{booknote}
+
+这里说的是\textbf{自}注意力，所以我们变换的是同一个输入 $\mathbf{X}$。一般情形下没有这个限制。其实，注意力的思路深受信息检索（information retrieval）的影响，三个张量的名称也由此而来。例如，把搜索文本映射为查询，再把数据库中的信息映射为键，匹配得最好的对象就是值。这样便可把注意力机制看成一个检索系统。如果这个比喻让你困惑，只要记住我们给这三个线性层起了这样的名字就够了。
+
+对 $\mathbf{X}$ 作完线性变换，就可以进入自注意力的核心，即\textbf{注意力权重}（attention weight）$\mathbf{A}\in[0,1]^{B\times T\times T}$。注意力权重决定词元间联系的强弱。可以把 $\mathbf{A}$ 看成图的软邻接矩阵（soft adjacency matrix），它决定了边及其强度。这也是前面说自注意力可能优于卷积层的原因，因为自注意力不用堆叠多层就能学习长程依赖。注意力权重定义如下。
+\begin{equation}
+\mathbf{A}=\operatorname{softmax}(\mathbf{Q}\otimes\mathbf{K}^\top),
+\tag{3.17}\label{eq:03-17}
+\end{equation}
+其中 softmax 在最后一维（即索引 2）上计算，转置交换索引为 1 和 2 的两个维度（在 PyTorch 中写作 \texttt{X.transpose(1, 2)}）。另外，为了避免矩阵乘积的数值过大，用维数 $D$ 的平方根缩放 softmax 的输入，即
+\begin{equation}
+\mathbf{A}=\operatorname{softmax}\left(\frac{\mathbf{Q}\otimes\mathbf{K}^\top}{\sqrt{D}}\right).
+\tag{3.18}\label{eq:03-18}
+\end{equation}
+最后，要得到自注意力的输出，需将注意力权重与值相乘，几乎总是默认使用缩放。
+\begin{equation}
+\mathbf{Y}=\operatorname{softmax}\left(\frac{\mathbf{Q}\otimes\mathbf{K}^\top}{\sqrt{D}}\right)\otimes\mathbf{V},
+\tag{3.19}\label{eq:03-19}
+\end{equation}
+$\mathbf{Y}$ 的大小为 $B\times T\times D$。如果还不清楚，请再逐步看一遍。\figref{fig:03-07}给出了整个过程的示意图。
+
+到这里，我们已经知道自注意力怎样工作了！而且原书在\figref{fig:03-01}中画出了全部运算，基本上可以直接写成代码！现在只剩最后一块拼图，即怎样定义多个头。其实很简单。
+\emph{译注。} 此处原书写的是图 3.1，自注意力运算图见\figref{fig:03-07}。
+
+% <<<PDFPAGE 70>>>
+\dgmfig{fig_03_07}{\linewidth}{自注意力运算示意图。}{fig:03-07}[bmm 表示批量矩阵乘法，dim=2 表示在索引为 2 的维度上计算 softmax。]
+
+我们定义 $H$ 次自注意力，其中
+\[
+\mathbf{Y}_h=\operatorname{softmax}\left(\frac{\mathbf{Q}_h\otimes\mathbf{K}_h^\top}{\sqrt{D}}\right)\otimes\mathbf{V}.
+\]
+下标 $h$ 表示各有一套权重。随后沿第一维拼接它们，$\mathbf{Y}=\mathbf{Y}_1\oplus\cdots\oplus\mathbf{Y}_H$，其中 $\oplus$ 表示拼接，所得 $\mathbf{Y}\in\mathbb{R}^{B\times T\times H\cdot D}$。最后将 $\mathbf{Y}$ 与权重矩阵 $\mathbf{W}_c\in\mathbb{R}^{H\cdot D\times D}$ 相乘，得到多头自注意力的输出。
+\[
+\mathbf{M}=\mathbf{Y}\otimes\mathbf{W}_c.
+\]
+\emph{译注。} 上式组沿用原书的 $\mathbf{V}$ 与“第一维”。按各头有独立权重及本段给出的输出形状，每头应乘 $\mathbf{V}_h$，再沿最后一个特征维度拼接。
+
+这下真的讲完了！没有那么难，对吧？所用的都是线性层！那么，为什么大家如此关注自注意力？还是因为它能够学习软邻接矩阵 $\mathbf{A}$。模型可以自己找出各个量之间的关系，一步就能学到长程依赖。我喜欢把注意力想成是以某种方式学习\emph{知识图谱}（knowledge graph）。我知道这个比喻有点牵强，但仔细想想，一层多头自注意力就能找出输入数据中的模式，每个头好比一组概念。再堆叠多层多头自注意力，就能得到数据中更高层次的模式。好奇的读者，你得承认，这个方法妙就妙在简单！
+
+\subsubsection{实现 Transformer}
+\par\medskip\noindent 多头自注意力\par\nobreak\smallskip
+
+前面介绍自注意力的方式已经很接近代码。不过，在实现时有几个简单的办法可以加速计算。最重要的一点与计算键、查询和值有关。我们可以定义输出 $D\times H$ 个值的线性层，再把张量重塑为 $B\times T\times H\times D$，用来做批量矩阵乘法，这样就无须分别定义单头自注意力。完整实现见代码清单~\ref{lst:03-04}。
+
+
+% <<<PDFPAGE 71>>>
+% <<<PDFPAGE 72>>>
+\bookcode{code/ch03_multi_head_self_attention.py}{多头自注意力。}{lst:03-04}
+
+\par\medskip\noindent 因果性\par\nobreak\smallskip
+一切都清楚了吗？应该清楚了！不过等等，标志 \texttt{causal} 是什么？细心的读者，你发现了我们还没谈到它。毕竟，我们想用自注意力替换\textbf{因果}卷积层！要用自注意力参数化 ARM，就必须保证看不到未来。好在实现因果自注意力比较简单，只需用掩码\textbf{屏蔽}键和查询的乘积中的一部分，从而保证因果计算。例如，假定第一个词元是\emph{占位词元}，对应序列起始标记（Beginning Of Sequence，BOS），我们就屏蔽键和查询的乘积中对角线上方的值。这样就能保证注意力权重不会泄漏未来词元的信息。
+
+\par\medskip\noindent 位置编码\par\nobreak\smallskip
+聪明的读者，你可能还注意到另一点。要把自注意力用在序列上，就必须保证模型不具有置换等变性（permutation equivariance）。自注意力确实是置换等变的，这意味着重新排列输入词元会使输出词元按同样的方式重新排列。为了避免这一点，通常把位置信息加入 $\mathbf{X}$。最简单的做法是用嵌入层对绝对位置编码，即以一个实值向量表示每个整数。然后把这个\textbf{位置编码}（positional encoding）$\mathbf{P}$ 加到输入上，得到 $\mathbf{X}+\mathbf{P}$。加上 $\mathbf{P}$ 便破坏了置换等变性。
+
+\par\medskip\noindent 组合成 Transformer 块\par\nobreak\smallskip
+可以想象，与其他深度学习架构一样，Transformer 由更简单的组件组成，称为\textbf{Transformer 块}（transformer block）。一个 Transformer 块包含以下操作。
+
+% <<<PDFPAGE 73>>>
+\begingroup
+\colorlet{notegreen}{blue!60!black}
+\begin{booknote}{Transformer 块}
+\begin{itemize}
+\item \textbf{多头自注意力}。$f_{\mathit{mhsa}}(\mathbf{X})=\mathbf{Y}\otimes\mathbf{W}_c$，其中 $\mathbf{Y}=\mathbf{Y}_1\oplus\cdots\oplus\mathbf{Y}_H$，且
+\[
+\mathbf{Y}_h=\mathbf{V}_h\otimes\operatorname{softmax}\left(\frac{\mathbf{Q}_h\otimes\mathbf{K}_h^\top}{\sqrt{D}}\right).
+\]
+\item \textbf{层归一化}。$f_{\mathit{ln}}(\mathbf{X})=\gamma\frac{\mathbf{X}-\mathbf{m}}{\mathbf{s}+\epsilon}+\delta$，其中所有参数，即 $\mathbf{m},\mathbf{s},\gamma,\delta$，都按层计算，而非按批次计算。$\epsilon>0$ 用来保证数值稳定性。
+\item \textbf{MLP}。后面的代码采用以下架构。
+\[
+f_{\mathit{mlp}}(\mathbf{X})=\mathit{linear}(\mathit{GELU}(\mathit{linear}(\mathbf{X}))).
+\]
+\end{itemize}
+单个 Transformer 块按以下方式计算输出词元。
+\begin{align}
+1.\quad\mathbf{M}&=f_{\mathit{mhsa}}(\mathbf{X})
+\tag{3.20}\label{eq:03-20}\\
+2.\quad\mathbf{U}&=f_{\mathit{ln1}}(\mathbf{X}+\mathbf{M})
+\tag{3.21}\label{eq:03-21}\\
+3.\quad\mathbf{Z}&=f_{\mathit{mlp}}(\mathbf{U})
+\tag{3.22}\label{eq:03-22}\\
+4.\quad\mathbf{X}&=f_{\mathit{ln2}}(\mathbf{Z}+\mathbf{U})
+\tag{3.23}\label{eq:03-23}
+\end{align}
+\end{booknote}
+\endgroup
+\emph{译注。} 框内 $\mathbf{Y}_h$ 的乘法次序沿用原书。按式\eqref{eq:03-19}和代码清单~\ref{lst:03-04}，应将注意力权重放在 $\mathbf{V}_h$ 的左侧。
+
+代码清单~\ref{lst:03-05}给出了一个 Transformer 块的实现示例。
+% <<<PDFPAGE 74>>>
+\bookcode{code/ch03_transformer_block.py}{Transformer 块。}{lst:03-05}
+
+使用\textbf{层归一化}有两个理由。首先，它比批归一化（batch normalization）更便于并行计算，在自然语言处理应用中通常更常用。其次，如文献\citeref{26}所详细讨论的，层归一化在控制梯度量级方面起着重要作用。因此，要训练好 Transformer，离不开层归一化。
+
+\subsubsection{用 Transformer 实现自回归模型}
+
+\par\medskip\noindent 实现约定\par\nobreak\smallskip
+有了 Transformer 块的代码，就可以组合所有组件，定义一个 Transformer 架构了。下面的代码采用如下设定。
+\begin{itemize}
+\item 假定输入（即词元）为整数，但整数的大小顺序不起作用。第一个词元是“占位”词元，只表示序列开始。
+\item 用嵌入层把输入整数变成实值向量，另用一个嵌入层做位置编码。这两个嵌入层都可以学习。
+\item 在应用 Transformer 块之前，先用丢弃概率为 $0.1$ 的 dropout 层。这迫使模型应对词元缺失的情况。许多 Transformer 架构在所有 Transformer 块内都用 dropout。为使代码简洁，我们省略了块内的 dropout。
+\item 假定词元用整数表示，不过请记住，整数的大小顺序无关紧要。因此，我们用类别分布对所有条件分布 $p(x_t\mid\mathbf{x}_{<t})$ 建模。目标函数就是由类别分布定义的各项条件似然之和。
+\item 由于第一个词元是“占位”词元，计算损失函数时要记得移位 Transformer 的输出，并略去第一个输入词元。
+\end{itemize}
+
+\par\medskip\noindent 采样\par\nobreak\smallskip
+请记住，这里用 Transformer 来参数化 ARM。因此，采样过程与使用因果卷积的 ARM 非常相似。用一个 \texttt{for} 循环，从只含“占位”词元的序列开始，每次采样一个词元。
+
+% <<<PDFPAGE 75>>>
+\par\medskip\noindent Transformer 自回归模型\par\nobreak\smallskip
+代码清单~\ref{lst:03-06}给出了基于 Transformer 的 ARM 的完整代码。
+% <<<PDFPAGE 76>>>
+\bookcode{code/ch03_transformer_arm.py}{基于 Transformer 的 ARM。}{lst:03-06}
+
+% <<<PDFPAGE 77>>>
+\dgmfig{fig_03_08}{.92\linewidth}{运行代码后的结果示例。（a）从训练好的 Transformer 采样的示例。（b）负对数似然。（c）重构准确率。}{fig:03-08}[epochs 表示训练轮次，nll 表示负对数似然，rec 表示重构准确率。]
+
+\par\medskip\noindent 结果\par\nobreak\smallskip
+实验的任务是学习分子的生成模型。有趣的是，分子可以写成称为 SMILES 的字符串，其中包含依次书写的原子及括号等附加字符\citeref{27}。使用专用词元化器（例如 DeepChem\citeref{28}中的实现）后，可以把分子表示为整数序列。每个整数编码一个原子，或一个表示结构所需的字符。把分子表示为 SMILES 的过程可逆，即给定 SMILES 后可以恢复分子的图形表示。类似地，用整数编码 SMILES 也是可逆的。此外，我们使用名为 Tox21 的简单数据集，其中有约 7400 个分子。我们将其分为训练集（6600 个分子）、验证集（400 个分子）和测试集（略多于 400 个分子）。可以监测多个指标，这里主要看两个，即负对数似然（negative log-likelihood，nll）和重构准确率（reconstruction accuracy，rec）。后者通过取 Transformer 输出中概率最高的值来计算，无须采样。
+
+运行一个较简单的 Transformer 架构（约 100 万个权重）后，可以得到类似\figref{fig:03-08}a 的生成结果，验证集的 nll 和 rec 分别如\figref{fig:03-08}b 和 c 所示。
+
+\subsubsection{Transformer（几乎）自成一门领域}
+
+如今，Transformer 成就了生成式人工智能的许多成果！你大概听说过 GPT（生成式预训练 Transformer，generative pre-trained transformer）\citeref{29} 和 ChatGPT。是的，它们都使用了 Transformer。我想可以说，生成式人工智能的兴起，在很大程度上得益于基于 GPT 的模型。还有其他因素，不过这类模型功不可没！自 Transformer 取得成功以来，许多研究者用同一个术语指代自然语言处理中的深度神经网络，其中主要是基于 Transformer 的架构，也就是\textbf{大语言模型}（LLM）。大语言模型或其他大型 Transformer 通常先进行预训练（pretraining），再针对下游任务或特定数据进行微调（fine-tuning），因此称为\textbf{基础模型}（foundation model）。
+
+我只列出很少几篇有意思的读物，否则这份清单几乎列不完。
+% <<<PDFPAGE 78>>>
+\begin{itemize}
+\item 我强烈推荐读一读文献\citeref{30}中讲 Transformer 的一章。这本书对 Transformer 的介绍很好，还讲了大量扩展和应用。
+\item 本章重点讨论 ARM，不过也可以用 Transformer 处理序列，然后完成下游任务（如性质预测或分类）。最知名的大语言模型之一是\textbf{基于 Transformer 的双向编码器表示}（Bidirectional Encoder Representations from Transformers，BERT）\citeref{31}。它不使用因果掩码，学习的是条件分布 $p(\mathbf{x}'\mid\mathbf{x})$。这相当于一种自编码式的学习。先重构给定的词元（预训练阶段），再用与“占位”输入词元对应的第一个输出词元训练预测器（微调阶段）。为防止过拟合，对输入词元应用 dropout。
+\item Transformer 大体有三类。（i）\emph{解码器}（decoder），例如 GPT，是使用因果掩码的 ARM。（ii）\emph{编码器}（encoder），例如 BERT，不使用因果掩码。（iii）\emph{编码器—解码器}（encoder-decoder），是采用交叉注意力（cross-attention）的条件 ARM。原书描述其查询来自编码器 Transformer 处理后的条件信息。编码器—解码器广泛用于机器翻译。
+\item 有趣的是，在自然语言处理任务中，可以通过调整提示（prompt），也就是输入文本，来得到特定输出。例如，文献\citeref{32}指出，在提示中给出新的例子，大语言模型可以进行零样本学习（zero-shot learning）。由此产生了一个有趣的研究方向，即修改提示来控制大语言模型的行为，在不更新模型权重的情况下得到指定的输出。文献\citeref{33}给出了一篇很好的综述。
+\item 如果你对分子生成感兴趣，我强烈建议先熟悉这篇关于药物发现的论文及其代码\citeref{34}。接着可以看使用 Transformer 生成分子的论文\citeref{35}，以及有关性质预测和从头药物设计（de novo drug design）等下游任务的论文\citeref{36}。
+\item Transformer 也用于图像处理。简而言之，把图像划分为小块（例如 $16\times16$ 像素），再按类似于处理序列的方式处理它们。这种方法称为视觉 Transformer（visual transformer，ViT）\citeref{37}。
+\end{itemize}
+\emph{译注。} 文中关于编码器—解码器交叉注意力的表述沿用原书。文献\citeref{20}的架构以编码器输出作为键和值，查询来自解码器。
+
+好奇的读者，如前所说，我有意把这份清单写得很短。希望你也对 Transformer 及其能力产生了兴趣。这里用不到一千行代码，就能生成新的分子！有了这几条线索，你已经可以深入探索 Transformer 的世界了。
+
+\FloatBarrier
+\input{chapters/ch03_references.tex}

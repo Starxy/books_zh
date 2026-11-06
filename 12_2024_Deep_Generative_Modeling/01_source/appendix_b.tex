@@ -1,0 +1,165 @@
+% <<<PDFPAGE 319>>>
+\chapter{概率论与统计学常用结论}
+\label{app:probability}
+\bookimprint{https://doi.org/10.1007/978-3-031-64087-2}
+
+\section{常用概率分布}
+\subsection{伯努利分布}
+\[
+\begin{aligned}
+\mathrm{B}(x\mid\theta)&=\theta^x(1-\theta)^{1-x},
+  \qquad \text{其中 }x\in\{0,1\}\text{，}\theta\in[0,1]\\
+\mathbb{E}[x]&=\theta\\
+\operatorname{Var}[x]&=\theta(1-\theta)
+\end{aligned}
+\]
+
+\subsection{类别分布（Multinoulli 分布）}
+\[
+\mathrm{M}(\mathbf{x}\mid\boldsymbol{\theta})=\prod_{d=1}^D\theta_d^{x_d},
+\]
+其中对所有 $d=1,2,\ldots,D$，有 $x_d\in\{0,1\}$、$\theta_d\in[0,1]$，且 $\sum_{d=1}^D\theta_d=1$。
+\[
+\begin{aligned}
+\mathbb{E}[x_d]&=\theta_d\\
+\operatorname{Var}[x_d]&=\theta_d(1-\theta_d)
+\end{aligned}
+\]
+\emph{译注。} 这里的 $\mathbf{x}$ 是独热向量，恰有一个分量等于 1。
+
+\subsection{正态分布}
+\[
+\begin{aligned}
+\mathcal{N}(x\mid\mu,\sigma^2)
+ &=\frac{1}{\sqrt{2\pi}\,\sigma}
+   \exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}\\
+\mathbb{E}[x]&=\mu\\
+\operatorname{Var}[x]&=\sigma^2
+\end{aligned}
+\]
+
+% <<<PDFPAGE 320>>>
+\subsection{多元正态分布}
+\[
+\mathcal{N}(\mathbf{x}\mid\boldsymbol{\mu},\boldsymbol{\Sigma})
+=\frac{1}{(2\pi)^{D/2}}\frac{1}{|\boldsymbol{\Sigma}|^{1/2}}
+ \exp\left\{-\tfrac12(\mathbf{x}-\boldsymbol{\mu})^{\mathsf T}
+ \boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})\right\},
+\]
+其中 $\mathbf{x}$ 为 $D$ 维向量，$\boldsymbol{\mu}$ 为 $D$ 维均值向量，$\boldsymbol{\Sigma}$ 为 $D\times D$ 的协方差矩阵。
+\[
+\begin{aligned}
+\mathbb{E}[\mathbf{x}]&=\boldsymbol{\mu}\\
+\operatorname{Cov}[\mathbf{x}]&=\boldsymbol{\Sigma}.
+\end{aligned}
+\]
+
+\subsection{Beta 分布}
+\[
+\operatorname{Beta}(x\mid a,b)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}
+                             x^{a-1}(1-x)^{b-1},
+\]
+其中 $x\in[0,1]$、$a>0$、$b>0$，且 $\Gamma(x)=\int_0^\infty t^{x-1}e^{-t}\,\mathrm{d}t$。
+\[
+\begin{aligned}
+\mathbb{E}[x]&=\frac{a}{a+b}\\
+\operatorname{Var}[x]&=\frac{ab}{(a+b)^2(a+b+1)}.
+\end{aligned}
+\]
+
+\subsection{边缘分布}
+连续情形：
+\[
+p(x)=\int p(x,y)\,\mathrm{d}y
+\]
+离散情形：
+\[
+p(x)=\sum_y p(x,y)
+\]
+
+\subsection{条件分布}
+\[
+p(y\mid x)=\frac{p(x,y)}{p(x)}
+\]
+
+\subsection{多元正态分布的边缘分布和条件分布}
+假设 $\mathbf{x}\sim\mathcal{N}(\mathbf{x}\mid\boldsymbol{\mu},\boldsymbol{\Sigma})$，其中
+% <<<PDFPAGE 321>>>
+\[
+\mathbf{x}=\begin{bmatrix}\mathbf{x}_a\\\mathbf{x}_b\end{bmatrix},
+\qquad
+\boldsymbol{\mu}=\begin{bmatrix}\boldsymbol{\mu}_a\\\boldsymbol{\mu}_b\end{bmatrix},
+\qquad
+\boldsymbol{\Sigma}
+=\begin{bmatrix}\boldsymbol{\Sigma}_a&\boldsymbol{\Sigma}_c\\
+                \boldsymbol{\Sigma}_c^{\mathsf T}&\boldsymbol{\Sigma}_b\end{bmatrix}.
+\]
+那么有以下关系：
+\[
+\begin{aligned}
+p(\mathbf{x}_a)&=\mathcal{N}(\mathbf{x}_a\mid\boldsymbol{\mu}_a,\boldsymbol{\Sigma}_a),\\
+p(\mathbf{x}_a\mid\mathbf{x}_b)
+ &=\mathcal{N}(\mathbf{x}_a\mid\hat{\boldsymbol{\mu}}_a,\hat{\boldsymbol{\Sigma}}_a),
+\end{aligned}
+\]
+其中
+\[
+\begin{aligned}
+\hat{\boldsymbol{\mu}}_a
+ &=\boldsymbol{\mu}_a+\boldsymbol{\Sigma}_c\boldsymbol{\Sigma}_b^{-1}
+   (\mathbf{x}_b-\boldsymbol{\mu}_b),\\
+\hat{\boldsymbol{\Sigma}}_a
+ &=\boldsymbol{\Sigma}_a-\boldsymbol{\Sigma}_c\boldsymbol{\Sigma}_b^{-1}
+                                   \boldsymbol{\Sigma}_c^{\mathsf T}.
+\end{aligned}
+\]
+
+\subsection{求和法则}
+\[
+p(x)=\sum_y p(x,y)
+\]
+
+\subsection{乘积法则}
+\[
+\begin{aligned}
+p(x,y)&=p(x\mid y)p(y)\\
+      &=p(y\mid x)p(x)
+\end{aligned}
+\]
+
+\subsection{贝叶斯法则}
+\[
+p(y\mid x)=\frac{p(x\mid y)p(y)}{p(x)}
+\]
+
+\section{统计学}
+\subsection{最大似然估计量}
+给定来自同一分布 $p(\mathbf{x}\mid\theta)$ 的 $N$ 个独立样本 $\mathcal{D}=\{\mathbf{x}_1,\ldots,\mathbf{x}_N\}$。似然函数为
+\[
+p(\mathcal{D}\mid\theta)=\prod_{n=1}^{N}p(\mathbf{x}_n\mid\theta).
+\]
+似然函数 $p(\mathcal{D}\mid\theta)$ 的对数为
+\[
+\log p(\mathcal{D}\mid\theta)=\sum_{n=1}^{N}\log p(\mathbf{x}_n\mid\theta).
+\]
+原文称参数的最大似然估计量（maximum likelihood estimator）$\theta_{\mathrm{ML}}$ 使似然函数最小。给出的式子为
+% <<<PDFPAGE 322>>>
+\[
+p(\mathcal{D}\mid\theta_{\mathrm{ML}})=\max_\theta p(\mathcal{D}\mid\theta).
+\]
+\emph{译注。} 按原式，应是使似然函数最大。
+
+\subsection{最大后验估计量}
+给定来自同一分布 $p(\mathbf{x}\mid\theta)$ 的 $N$ 个独立样本 $\mathcal{D}=\{\mathbf{x}_1,\ldots,\mathbf{x}_N\}$。原文称参数的最大后验估计量（maximum a posteriori estimator，MAP）$\theta_{\mathrm{MAP}}$ 使后验分布最小。给出的式子为
+\[
+p(\theta_{\mathrm{MAP}}\mid\mathcal{D})=\max_\theta p(\theta\mid\mathcal{D}).
+\]
+\emph{译注。} 按原式，应是使后验分布最大。
+
+\subsection{决策中的风险}
+风险（risk）即期望损失，定义为
+\[
+\mathcal{R}[\bar{y}]=\iint L(y,\bar{y}(\mathbf{x}))\,p(\mathbf{x},y)\,
+                         \mathrm{d}\mathbf{x}\,\mathrm{d}y,
+\]
+其中 $L(\cdot,\cdot)$ 是损失函数。

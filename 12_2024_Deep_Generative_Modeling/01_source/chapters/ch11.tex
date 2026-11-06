@@ -1,0 +1,315 @@
+% <<<PDFPAGE 290>>>
+\chapter{从大语言模型到生成式人工智能系统}
+\label{ch:genaisys}
+\sourcechapter{11}
+
+\section{引言}
+好奇的读者，我们为什么能彼此分享想法？我们怎么能讨论生成建模、概率论或其他有趣的概念？原因何在？答案很简单，就是语言。人类能够交流，是因为我们发展出一种颇为独特的本领，能把声音组织得十分复杂，从而表达思想和经历。在历史上的某个时刻，有人意识到，人会遗忘，也会撒谎，再怎么大声喊，几百米之外的人还是听不懂。解决方法是一项了不起的突破，即书写。我在这里絮叨了这么多，可以用一个词来概括，那就是文本。我们知道怎样写（也知道怎样读）。可以用“文本”指语言，或说\emph{自然语言}（natural language），以免与 Python 等人工语言或形式语言（formal language）混淆。
+
+交流是生活不可或缺的一部分。因此，人工智能领域自诞生之日起就十分关注文本处理，更广泛地说，是自然语言处理。这并不令人意外。自 20 世纪 50 年代以来，人们一直着迷于构建能与人交流的机器人。我们甚至有一个以艾伦·图灵（Alan Turing）命名的著名测试：如果机器能够与人交谈而不被认出来是机器，就可以说它具有\emph{智能}。早在 20 世纪 60 年代就出现了第一个聊天机器人。它叫 ELIZA，能匹配模式，模仿一场“可以听懂”的交谈。不过，它离智能还差得很远，给出的回答终究骗不过图灵博士。我们花了 60 多年，才走到今天这一步。对人类历史来说，60 多年不算什么，对人工智能史来说却极其漫长。如今，我们可以讨论智能、原创性、新颖性，以及许多过去为人类所独有的特征。这一切之所以成为可能，要归功于生成建模。
+
+显然，我们用来交流的还有图像、音频、图表和各种各样的语言，例如化学反应和数学。正因如此，多模态（multimodality）对发展下一代人工智能系统至关重要。接下来，我们会讨论自然语言处理（natural language processing，NLP），以及它如何受到深度学习的影响。深度学习和 NLP 结合，催生了大语言模型。最后，我们会概述大语言模型如何改变人们思考人工智能系统的方式，由此谈到生成式人工智能系统（generative AI system，GenAISys）。
+% <<<PDFPAGE 291>>> 上一段跨原页。
+
+开始之前，还要说一句。生成式人工智能涵盖所有模态，而大语言模型处理的是某种语言，两者并不等同。我并不爱当“术语警察”，对用词相当宽容，但今天竟有专家仍在重复这种荒唐的说法，实在让人遗憾。这对研究领域和行业都不利。好了，我这个爱唠叨的老家伙就说到这里，接下来谈大语言模型和生成式人工智能系统！
+
+\section{大语言模型}
+\subsection{什么是大语言模型？}
+\subsubsection{自然语言处理与深度学习}
+自然语言处理（NLP）研究如何构建能够处理人类语言的机器，目标是开发处理书面语言（即文本）的方法与技术。NLP 的任务（见\figref{fig:11-01}）包括文本分类（如情感分析、垃圾邮件检测）、文本纠错（如语法纠错）、机器翻译（如使用序列到序列模型，即 sequence-to-sequence 或 Seq2Seq）、语义分析（如主题建模）、文本生成（如聊天机器人）、文本摘要、命名实体识别（named entity recognition，NER）、信息检索（information retrieval，IR）、问答和聊天机器人。不过，NLP 的主要问题是怎样表示文本，才能对下游任务（downstream task）有用。
+
+经典 NLP 方法十分注重句法（syntax），即语法和句子结构\citeref{1}。然而，恰当的交流也极其依赖语义（semantics），理解语义长期以来一直是个挑战。
+\dgmfig{fig_11_01}{.54\linewidth}{自然语言处理中的一些常见任务。}{fig:11-01}
+[图中任务包括文档分类、对话系统、文本理解、摘要与生成、共指消解、情感分析、问答和机器翻译。]
+
+% <<<PDFPAGE 292>>>
+早期为了理解一段文本的意思，人们构造了词元化器（tokenizer），这是一类把文本表示成机器可读形式的专用模块。最早的词元化器对文档中的词计数，得到所谓的\textbf{词袋}（bag of words），也可以对 $n$ 元组（$n$-gram，即连续 $n$ 个词组成的序列）计数，从而得到文本的数值表示。不过，这种表示依赖文档长度，因此似乎更适合考察归一化的量，例如词频（term frequency，tf）和逆文档频率（inverse document frequency，idf）。词频是一个词在一篇文档中的出现次数除以该文档的总词数。逆文档频率体现该词在整个语料库中的重要性，等于语料库的文档总数与包含该词的文档数之比的对数。通常使用 tf-idf 表示。这类表示提供了大量与文档有关的信息，机器也容易处理。不过，它们受所选 $n$ 元组的限制，并且很依赖可用的文档语料库。更简单的词元化器用整数替换字符或字符的 $n$ 元组，使文本可以视为数字序列。这类词元化器不提供文本的含义，不过正如我们即将看到的，它们在当代 NLP 方法中起着关键作用。
+
+好奇的读者，我想你已经猜到接下来要说什么了。我简直能读懂你的想法。你在小声说什么？如果有一种方法能从数据学到语义，那就太好了。最好还能用神经网络来做？你说得对！Word2Vec 方法\citeref{2}带来了 NLP 的重大突破。它能够在给定上下文的情况下，用神经网络从原始文本中学习词嵌入（word embedding）。从某种意义上说，这篇论文打开了潘多拉的盒子，结果却是好的。它推动了由神经网络参数化的语言模型的发展。这些神经网络曾有数百万个权重，后来乃至本书写作时甚至有数十亿个权重。许多研究者和从业者于是开始称它们为大语言模型，以区别于更经典的语言模型。
+
+\subsubsection{大语言模型的一般架构}
+在进一步讨论如何参数化大语言模型（即使用哪种神经网络）、如何学习它们之前，先简要看看它们的一般架构。无论如何，每个大语言模型都需要词元化器来把文本转成数字（例如整数），还需要嵌入模块（embedding）最终把数字变成实值向量。有时也把两个模块视为一个，例如 scikit-learn 中的向量化器（vectorizer）。
+
+一种常见的词元化方法是字节对编码（byte pair encoding，BPE），按出现频率贪心地合并常见子串\citeref{3}。嵌入模块的用途很明确，即把独热向量（one-hot vector）表示的词元（token）映射成 $D$ 维实值向量。神经网络处理嵌入之后，再对输出进行反词元化（de-tokenization），使它重新成为字符串。
+
+一般可以区分三类大语言模型。
+\begin{enumerate}
+\item \textbf{编码器。} 这类大语言模型输入一段文本（字符串），返回编码，也就是输入的数值表示。编码器可在处理过程中的任意时刻访问整个输入，无须施加特殊限制。在训练和推理（inference）时，它们都只需一次前向计算就能给出输出。
+% <<<PDFPAGE 293>>> 上一条跨原页。
+\item \textbf{解码器。} 这类大语言模型用于生成新文本，因而用途相当明确。它们可以看作自回归模型，所以用来参数化它们的神经网络必须是因果的。对解码器来说，采样是一个迭代过程，通常相当慢。
+\item \textbf{编码器—解码器和编码器—编码器。} 大语言模型可以有条件输入。这时，需要把处理条件的编码器与另一个编码器或解码器组合起来。后者分别提供输入文本的编码，或生成新文本。
+\end{enumerate}
+\figref{fig:11-02}(a) 给出编码器或解码器的示意图，\figref{fig:11-02}(b) 给出编码器—编码器或编码器—解码器的示意图。接下来的问题是如何参数化大语言模型。
+
+\dgmfig{fig_11_02}{\linewidth}{大语言模型的示意图。(a) 无条件大语言模型。(b) 有条件大语言模型。}{fig:11-02}
+[图中由输入字符串经过词元化器、嵌入和编码器／解码器，得到输出 logits，再经词元化模块得到输出词元。(b) 还包含处理条件输入的编码器。占位字符串保持原样。]
+
+\subsubsection{参数化方式}
+任何大语言模型的关键组成部分都是参数化。无论是编码器还是解码器，模型之所以“大”，是因为它用了具有层次结构的（非常）深的神经网络。不过，我们处理的是文本（即序列），神经网络不能任意选取。神经网络必须能够处理向量，对于解码器，还必须以所谓的因果方式生成新文本，即不能“看到未来”。
+
+% <<<PDFPAGE 294>>>
+回顾自回归模型，我们知道可以用循环神经网络（recurrent neural network，RNN）和卷积层（CNN）处理文本。RNN 内在的顺序结构似乎与语言建模十分契合。\citeref{4}用它构造了一种早期的基于 RNN 的解码器，之后还有基于 RNN 的编码器—解码器\citeref{5}。如\citeref{6}所示，结合 CNN 和 RNN 可以改善语言建模效果。不过，这并不出人意料，因为最早获得成功的编码器完全由卷积层构成\citeref{7}，后来卷积层才被用于解码器\citeref{8}和编码器—解码器\citeref{9}。不过，基于 RNN 或 CNN 的语言模型要么容易遗忘，要么难以扩大规模。
+
+大语言模型的重大突破来自 Transformer\citeref{10}及其（多头）注意力层。具体来说，Transformer 提出了几种重要的实现方法。多头注意力（multi-head attention）从输入词元中学习多种模式，层归一化（layer normalization）防止梯度爆炸，位置嵌入（positional embedding）保证模型把词元当作序列处理，而非无序集合。实践表明，Transformer 很适合扩大模型规模，得以构建具有数十亿权重的模型。不过，Transformer 所需时间和内存都随词元数二次增长（原文称使用 FlashAttention\citeref{11}可将其降为线性）。\footnote{译注：\citeref{11}中的精确 FlashAttention 通过分块减少显存占用和内存读写。它仍然计算所有词元对的注意力，计算量对序列长度仍为二次量级。}
+
+近来，许多大语言模型研究者致力于让模型更精简。可以把这类模型称为精简大语言模型（lean large language model，L3M）。构造 L3M 主要从三个方面着手：（i）量化大语言模型，用更少的比特表示每个权重，从而减少磁盘占用；（ii）加快训练；（iii）加快推理。
+
+\textbf{量化}（quantization）是深度学习中由来已久的问题，给各种架构带来了新的挑战。在 Transformer 上已有许多成功做法，如使用经过修改的自注意力进行量化感知训练（quantization-aware training）\citeref{12}。近期有研究表明，把 Transformer 线性层的权重限制为 $\{-1,0,1\}$ 中的值，可以让模型更精简。内存需求约为原来的三分之一，以毫秒计的延迟约减半，性能则与使用 float16 的模型相当。
+
+为了加快训练和推理，人们提出了多种方法。例如，FlashAttention 考虑 GPU 不同层级内存之间的输入／输出（读取和写入）操作，从而加快注意力层的运行\citeref{11}。另一种方法把注意力机制改写为核特征映射（kernel feature map）的线性点积。所得的线性 Transformer（linear transformer）\citeref{13}进一步利用矩阵乘积的结合律，把输入序列长度的大 $O$ 复杂度从二次降低为线性。不过，基于 Transformer 的语言模型并不是我们所需要（和拥有）的全部！其他一些大语言模型推理时像 RNN 一样运行，训练时则可完全并行。选择性状态空间模型（selective state space model，S3M）建立在状态空间模型（state space model）之上，后者是一种带隐藏变量或隐藏状态的线性动力系统\citeref{14}。
+% <<<PDFPAGE 295>>> 上一段跨原页。
+
+“选择性”一词来自 S3M 使用注意力机制这一点。S3M 的一种扩展 Mamba\citeref{15}超过了某些 Transformer。受到 S3M 启发的其他模型，如保留网络（retentive network，RetNet）\citeref{16}或 RWKV\citeref{17}，在保持训练复杂度为线性、推理复杂度为常数的同时，可以与规模最大的基于 Transformer 的模型竞争。Jamba\citeref{18}是一个有趣的大语言模型，它把 Mamba 层与 Transformer 层结合起来。这种混合做法是一个有前景的方向。
+
+当代大语言模型的另一项重要扩展基于混合专家（mixture of experts，MoE）的思想\citeref{19}。这是机器学习中广为人知的概念\citeref{20}。我们训练多个大语言模型（专家），而非只学习一个模型。不同专家可以擅长处理不同主题。对于给定的输入词元，由路由器（router）选择多个专家，最终结果是各专家给出结果的加权平均。Mixtral of Experts\citeref{21}是混合专家大语言模型的一个实现示例。
+
+\tabref{tab:11-01}概述了大语言模型的多种参数化方式。
+
+\begin{table}[htbp]
+\caption{不同大语言模型参数化方式在推理和训练时的时间、内存复杂度比较。序列长度记为 $N$。据\citeref{17}改编。}
+\label{tab:11-01}
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}Yccccc@{}}
+\toprule
+ & \multicolumn{2}{c}{推理} & & \multicolumn{2}{c}{训练}\\
+\cmidrule(lr){2-3}\cmidrule(lr){5-6}
+架构 & 时间 & 内存 & 可并行 & 时间 & 内存\\
+\midrule
+RNN & $O(1)$ & $O(1)$ & 否 & $O(N)$ & $O(N)$\\
+Transformer & $O(N)$ & $O(N)$ & 是 & $O(N^2)$ & $O(N)$\\
+线性 Transformer & $O(1)$ & $O(1)$ & 是 & $O(N)$ & $O(N)$\\
+S4M & $O(1)$ & $O(1)$ & 是 & $O(N\log N)$ & $O(N)$\\
+RWKV／RetNet／Mamba & $O(1)$ & $O(1)$ & 是 & $O(N)$ & $O(N)$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{学习大语言模型}
+好奇的读者，你大概能想象，训练大语言模型似乎比训练普通语言模型或其他模型（尤其是小模型）要复杂一些。答案是既是也不是。说不是，是因为它们终究是做编码或生成的模型，这些我们都处理过。说是，是因为大语言模型的规模很\emph{大}，需要\emph{大量}数据。大语言模型通常被视为基础模型（foundation model，FM）\citeref{22}，其训练分为两个阶段。
+
+% <<<PDFPAGE 296>>>
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{基础模型和大语言模型的训练过程}
+\begin{enumerate}
+\item \textbf{预训练}（pre-training）。这是让大语言模型为后续任务做好准备的初始阶段。一种训练方法使用掩码损失（masked loss）：
+\[
+\ell_{\mathit{masked}}(\theta)
+=-\mathbb{E}_{\mathbf{x}\sim p_{\mathit{data}}(\mathbf{x})}
+ \mathbb{E}_{M}\left[\sum_{m\in M}\ln p_\theta(x_m\mid\mathbf{x}_{-m})\right].
+\]
+其中 $M$ 指定从 $\mathbf{x}$ 移除哪些词元，目标是重构被掩盖的词元。另一种方法是最小化负对数似然
+\[
+\ell_{\mathit{gen}}(\theta)=-\mathbb{E}_{\mathbf{x}\sim p_{\mathit{data}}(\mathbf{x})}
+                         [\ln p_\theta(\mathbf{x})].
+\]
+掩码损失用于编码器，负对数似然通常用于解码器。预训练阶段需要很多数据（真的是\emph{很多}！），因为这一阶段的目标是学到数据中的一般规律，例如语法、词语共现，或某种特定的编程语言。
+\item \textbf{微调}（fine-tuning）。在另一个数据集上进一步训练预训练模型，使它专门完成某项下游任务。例如，可以用特定数据训练大语言模型，使它能根据法律数据生成法律文书，或处理一种新的编程语言。还可以微调模型以完成其他任务，如文本摘要、问答、文本分类或情感分析。视任务而定，可以用 $\ell_{\mathit{masked}}(\theta)$ 或 $\ell_{\mathit{gen}}(\theta)$ 优化大语言模型，也可以把它用作另一个任务所需的新模型的起点。对于前一种情形，通常用附加神经网络优化一个不同的目标：
+\[
+\ell_{\mathit{pred}}(\theta,\phi)
+=-\mathbb{E}_{\mathbf{x},y\sim p_{\mathit{data}}(\mathbf{x},y)}
+       [\ln p_{\theta,\phi}(\mathbf{x},y)].
+\]
+\end{enumerate}
+\end{booknote}
+
+这两个步骤相当通用，具体做法完全取决于任务。例如，最早的生成式预训练 Transformer（generative pre-trained Transformer，GPT）\citeref{23}使用负对数似然进行预训练，也可以像 Transformer 双向编码器表示（bidirectional encoder representations from transformers，BERT）\citeref{24}那样，先用掩码损失训练来初始化。最后，GPT 用负对数似然损失微调。也可以组合不同的损失，如 $\ell_\alpha(\theta)=\ell(\theta)+\alpha\ell_{\mathit{masked}}(\theta)$，把它视为带惩罚项的负对数似然目标。这一思想曾用于为多种问题同时预训练大语言模型\citeref{25}，也曾在 $\alpha=1$ 时用于预训练处理分子的大语言模型\citeref{26}。
+
+微调的难题在于大语言模型的规模。理想情况下，微调应该又快又便宜，但面对有数十亿个权重的模型很难做到。一个可能的办法是低秩适配（low-rank adaptation，LoRA）\citeref{27}。这个想法相当简单，却非常巧妙！我们把满秩权重矩阵 $\mathbf{W}$ 固定下来，微调时引入一组新的可学习矩阵 $\mathbf{A}$、$\mathbf{B}$，保持 $\mathbf{W}$ 冻结。前向计算为
+\begin{equation}
+\mathbf{h}_{l}=\mathbf{W}\mathbf{h}_{l-1}+\mathbf{B}\mathbf{A}\mathbf{h}_{l-1}.
+\tag{11.1}\label{eq:11-01}
+\end{equation}
+
+% <<<PDFPAGE 297>>>
+\begin{booknote}{旁注}
+LoRA 通常只更新注意力矩阵，因为这些矩阵是最大的瓶颈。不过，使用 LoRA 时到底更新 Transformer 的哪些组件，做法并不相同。
+\end{booknote}
+
+那么，诀窍从何而来？来自矩阵的大小！如果 $\mathbf{W}$ 是 $D\times d$ 的矩阵，$\mathbf{B}$ 就是 $D\times k$ 的矩阵，$\mathbf{A}$ 是 $k\times d$ 的矩阵，其中 $k\ll d$。这样，维数 $k$ 就像一个旋钮，可以控制 $\mathbf{A}$ 和 $\mathbf{B}$ 的权重数，而乘积 $\mathbf{B}\mathbf{A}$ 与 $\mathbf{W}$ 一样大。应用 LoRA 后，微调时只需更新相当于原权重数一小部分的参数。通常，在大语言模型中加入不到原权重数 $1\%$ 的新可训练权重，就足以获得与全参数微调相同的结果。
+
+\subsection{一些知名的大语言模型}
+大语言模型为数众多，其中有一些前面已经提到。我甚至不敢开始一一列举。\tabref{tab:11-02}只列出我选中的一些模型，选择非常主观！
+
+% <<<PDFPAGE 298>>> 表 11.2 位于原页顶部。
+\begin{table}[htbp]
+\caption{部分大语言模型及其类型、规模、参考文献或发布日期。规模沿用原书的 B（十亿参数）记法。}
+\label{tab:11-02}
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{8.3em}L{6.6em}L{6.9em}Y@{}}
+\toprule
+名称 & 类型 & 规模 & 参考文献或发布日期\\
+\midrule
+BERT & 编码器 & 0.11B–0.34B & \citeref{24}\\
+BioGPT & 解码器 & 0.35B & \citeref{28}\\
+Claude-3 & 解码器 & 20B–$\sim$2000B & 2024 年 3 月 4 日\\
+Falcon & 解码器 & 7B–180B & \citeref{29}\\
+GPT-2 & 解码器 & $\sim$1.5B & \citeref{30}\\
+GPT-3 & 解码器 & $\sim$175B & 2020 年 9 月\\
+GPT-4 & 解码器 & $\sim$1000B & 2023 年 3 月 14 日\\
+LLaMA-2 & 解码器 & 7B–70B & \citeref{31}\\
+LLaMA-3 & 解码器 & 8B–70B & 2024 年 4 月 18 日\\
+Mamba & 解码器 & 3B & \citeref{15}\\
+Mistral & 解码器 & 7B & 2023 年 9 月 27 日\\
+Mixtral & 解码器 & $8\times$7B & \citeref{21}\\
+PaLM & 解码器 & 8B–540B & \citeref{32}\\
+RoBERTa & 编码器 & 0.125B–0.355B & \citeref{33}\\
+RWKV-5 (Eagle) & 解码器 & 0.4B–7B & \citeref{17}\\
+RWKV-6 (Finch) & 解码器 & 1.6B–3B & \citeref{17}\\
+T5 & 编码器—解码器 & 0.06B–11B & \citeref{34}\\
+XLNet & 解码器 & 0.11B–0.34B & \citeref{35}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% <<<PDFPAGE 297>>>
+\subsection{编写我们自己的 teenyGPT}
+呼……刚才的文字真不少。不过，讨论大语言模型，怎么可能没有一大堆文字呢？言归正传，来写点代码吧！接下来讨论我们自己的 GPT 模型，可以叫它 teenyGPT。这是一个（极其）小的解码器大语言模型实现。我们选用一个小型报纸标题数据集和简单的字符级词元化器。数据包括批量维、词元数和词元取值，损失函数就是负对数似然。
+
+% <<<PDFPAGE 297>>>–<<<PDFPAGE 298>>> 代码清单 11.1。
+\bookcode{code/ch11_loss.py}{损失函数类。}{lst:11-01}
+
+关键组件是 Transformer 块。我们用 PyTorch 中的多头注意力层实现来定义这些块。
+
+% <<<PDFPAGE 298>>>–<<<PDFPAGE 299>>> 代码清单 11.2。
+\bookcode{code/ch11_transformer.py}{Transformer 块类。}{lst:11-02}
+
+最后，需要定义 teenyGPT，包括 Transformer 的前向计算和采样过程。此外，还可以定义一个辅助指标，称为首选重构准确率（top-one reconstruction accuracy）。它取概率最高的词元，并检查是否与输入词元相同。
+
+% <<<PDFPAGE 299>>>–<<<PDFPAGE 301>>> 代码清单 11.3。
+\bookcode{code/ch11_teenygpt.py}{teenyGPT 类。}{lst:11-03}
+
+把多层感知机（multilayer perceptron，MLP）的神经元数设为 128，使用 8 个注意力头、4 个 Transformer 块和 32 维嵌入，就得到一个约有 100 万个权重的模型。模型的表现见\figref{fig:11-03}、\tabref{tab:11-03}和\tabref{tab:11-04}。
+
+\dgmfig{fig_11_03}{.88\linewidth}{结果示例。(a) 验证集上的负对数似然。(b) 验证集上的首选重构准确率。}{fig:11-03}
+[横轴是训练轮数。(a) 的纵轴为负对数似然，(b) 的纵轴为首选重构准确率。]
+
+好奇的读者，你可以看到，即使只有少量数据、约 100 万个权重，这个小小的大语言模型也训练成功了！负对数似然顺利下降（\figref{fig:11-03}(a)），重构准确率也提高了（\figref{fig:11-03}(b)）。
+% <<<PDFPAGE 302>>> 上一段跨原页。
+
+\begin{table}[htbp]
+\caption{温度为 0.1 时采样所得的新闻标题示例。}\label{tab:11-03}
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}rY@{}}
+\toprule
+编号 & 生成结果\\
+\midrule
+1 & British announces star market star market contract coronavirus case\\
+2 & British announces show announces set series\\
+3 & Breaking say court coronavirus test positive\\
+4 & Coronavirus death trump court star reade say say announcement say\\
+5 & Coronavirus death test positive coronavirus case state state state state state state court\\
+6 & Coronavirus case start star reade country test positive\\
+7 & British announces set coronavirus test positive\\
+8 & Coronavirus case show death committee\\
+9 & Michigan pro recovered country coronavirus test positive\\
+10 & Coronavirus case star set state state state state state state state state allegation\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\caption{温度为 1.0 时采样所得的新闻标题示例。}\label{tab:11-04}
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}rY@{}}
+\toprule
+编号 & 生成结果\\
+\midrule
+1 & Waterment share brand fabst dailey available hystering\\
+2 & pm rate murder test personn hirr kannish reported homeless tested decision\\
+3 & Torotteney headlines sentencer everyone\\
+4 & Milamican combinize give test pair catch attack\\
+5 & ugc harry first bitcoin boat wuhan chip man end masking precain\\
+6 & True fansed andrap new full forecasts\\
+7 & Galaxy nigeria check police liverpool dam new deal threatens order\\
+8 & Senator addeedly discharge tonie\\
+9 & Grime everdille get improves reveals fan talk new revela false\\
+10 & UK coronavirus delivery due five aviversau despite return horror year\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+比较\tabref{tab:11-03}和\tabref{tab:11-04}中的样本，可以清楚地看到，随机性太大（原文称温度取值过小）时，标题变得不知所云。总的来看，虽然模型表现并不完美，但它已经学会把字符组合起来，多数时候能组成单词，有些标题甚至说得通。\footnote{译注：按代码清单 11.3，用温度除 logits 再做 softmax。温度越小，分布越集中。\tabref{tab:11-04}中较大的温度产生了更多非词。}
+
+\subsection{大语言模型的其他若干主题}
+如今，大语言模型有太多话题，几乎不可能全部涵盖。下面强调几个重要进展。它们值得分别写文章讨论，就留待其他人展开。大语言模型领域的几个主题如下。
+\begin{itemize}
+\item \textbf{提示工程（prompt engineering）。} 提示工程有些棘手。我在这里提到它，只是为了把大语言模型的热门话题列全。我个人认为，提示工程更像是一种“伪工程”，即针对目前训练出的模型积累的一些有用技巧。从实际应用出发，分享如何给大语言模型写提示的常见做法是有用的。然而，从长远看，目前所知的提示工程可能完全失去用处。不管怎样，我的总体建议是，认真写提示，措辞准确，语气友善（即使你在对机器说话！），给出明确指令，对模型给出的内容保持审慎。毕竟，大语言模型只是模型，会出错，而且经常出错！
+% <<<PDFPAGE 303>>> 上一条跨原页。
+\item \textbf{指令与人类反馈。} 给大语言模型下达指令并提供人类反馈，带来了一次重大突破\citeref{36}。早期的 InstructGPT 是 ChatGPT 的前身，其思想是用人类评估者为模型输出给出的排序数据来微调 GPT。这种做法称为基于人类反馈的强化学习（reinforcement learning from human feedback，RLHF）。微调时先用排序训练奖励模型（reward model），再依照近端策略优化（proximal policy optimization，PPO）算法\citeref{37}用奖励模型评价生成结果。后来，人们注意到，可以直接用大语言模型建立对两个生成结果的偏好概率，无须另外训练奖励模型来充当人类评估者的替代。这就是直接偏好优化（direct preference optimization，DPO）背后的思想，其数学也很巧妙\citeref{38}。
+\item \textbf{上下文学习（in-context learning）。} 大语言模型有一项很吸引人的能力，即所谓上下文学习\citeref{39}。基本做法是在提示中给出几个示例和一个问题，让模型根据很少的数据推断答案。为增强模型的上下文学习能力，应当在训练中培养它，例如在微调时这样做。
+\item \textbf{知识图谱与大语言模型。} 知识图谱（knowledge graph，KG）提供了一种组织数据及其关系的方法。不过，它们的主要缺点是泛化能力不足（事实缺失时无法提供任何近似解），也缺乏语言理解。用大语言模型增强知识图谱，或者用知识图谱增强大语言模型，是个有意思的办法。大语言模型很灵活，但缺少可靠的事实依据\citeref{40}。
+\item \textbf{对抗攻击（adversarial attack）。} 与图像类似，也可以为大语言模型构造对抗攻击\citeref{41}。通过特定提示，既可能取得会危害他人的信息，也可能得到原始训练数据，例如个人数据。
+\item \textbf{用于编程的大语言模型。} 还有不少大语言模型处理其他类型的语言。例如，可以针对编程语言训练编程工具，以提高程序员的工作能力。生成式人工智能的发展使“无代码编程”（no-code programming）受到很多关注。一些重要的代码大语言模型或相关工具包括 CodeBERT\citeref{42}和 GitHub Copilot\citeref{43}。
+\end{itemize}
+
+这些主题只是冰山一角。大语言模型以空前的速度演进，出现了许多极有意思的新概念，不过我认为，有些方向的确被过度炒作了。尽管如此，生成式人工智能在很大程度上受益于大语言模型，因为它们改变了人工智能的格局，把生成建模推进到了一个全新的阶段。
+
+% <<<PDFPAGE 304>>>
+\section{生成式人工智能系统}
+\subsection{引言}
+大语言模型打开了通往新一代应用的大门，使我们能用自然语言和机器交流。这无疑是一次技术跃进，也大大改变了我们思考人工智能的方式。生成式人工智能的一些近期进展，例如 GPT 系列中的 GPT-4V（带视觉能力的 GPT-4），以及 Google 开发的 Gemini 等模型，使多模态学习重新成为深度学习的重要方向，也表明大语言模型可望成为多模态系统。新开发的大语言模型能够处理多种模态的数据，包括文本、图像、音频和视频，还能生成不同类型的数据！因此，用“生成式人工智能系统”来描述它们，比“大语言模型”更恰当。文本或自然语言可以用来交流，取代预先定义的形式协议。模态编码器则充当输入／输出接口，处理不同来源的数据。还可以更进一步，接入数据库（例如知识图谱）或外部专用工具（例如计算器，或查找从 A 到 B 路线的应用）。它们通过信息检索与存储模块和系统通信。\citeref{44}提出的工具增强 Seq2Seq 模型便是一个例子。它用微调过的 T5 大语言模型作主干，处理某些外部工具的输入和输出。另一个更具体的例子是将大语言模型与外部工具结合用于化学\citeref{45}。该系统依靠外部数据库和工具给出可靠答案、绘制分子，并完成其他任务。
+
+接下来，我们考察采用生成式人工智能模块的各种系统，称之为生成式人工智能系统（GenAISys）。从较高层次讨论这些系统很有意思，因为我们对其构件还远未达到充分理解，甚至对神经网络最简单的单元也没有完全理解。研究界有理由认为，深度学习的强大之处在于其\emph{可组合性}（compositionality）\citerefs{46,47,59}，但其中许多说法仍只能视为假说。这并不妨碍我们像控制理论，或更广义的系统科学与工程那样\citeref{48}，从较高层次讨论可组合性。那就开始吧！
+
+\subsection{生成式人工智能系统的一般架构}
+一说到系统，往往会马上想到多个模块，或者为实现一组目标而组合起来的若干部件。有时讨论的边界有点模糊。假设把两个各只有一行代码的函数复合起来，这已经算一个系统吗？算，因为系统由可区分的部件组成。换句话说，系统是可以由更简单部件组装出来的复杂事物。好奇的读者，如果你对此感兴趣，范畴论（category theory）\citerefs{49,59}为系统和可组合性提供了一个有趣的视角。不过，这里将用更直观的方式继续讨论。
+
+% <<<PDFPAGE 305>>>
+我们已经提到生成式人工智能系统由什么组成，现在说得具体一些。一个 GenAISys 包含以下部件。
+\begin{itemize}
+\item \textbf{数据编码器（data encoder，DE）。} 所有输入（原始）数据都由模型处理，编码成张量（tensor）。这些编码器通常先预训练，再保持冻结，即不继续训练。任意基础模型都可以充当编码器，例如用 BERT 编码文本，用去掉预测头的 ConvNeXT 编码图像。编码器也可以由其他模块（编码器）组成。例如，先用 Whisper 把语音转换成文本，再用 BERT 等模型把文本表示成张量。数据编码器在构建 GenAISys 时起着关键作用。它的引入促进了我们今天所见的这类系统的发展。
+\item \textbf{生成式人工智能模型（GenAI model，GeM）。} GenAISys 的\emph{中央单元}是一个生成式人工智能模型，例如一个大语言模型。它处理经过编码的输入数据，与外部记忆（数据库）和外部工具通信，并生成输出。它是整个架构的核心。它可以有自己的短期记忆（缓存），例如以当前可用的输入词元为形式，也可以有与其他部件通信的内置指令。此外，还可以配置执行其他任务的模型或子模型，如通过命名实体识别找出输入中的特定指令。在最简单的情形下，可以训练模型，让自然语言中的特定指令触发特定动作，例如运行计算器。总的来说，GeM 本身也可能是一个复杂系统，由包含各个独立模型在内的多个模块组成。
+\item \textbf{检索／存储模块（retrieval/storage module，R/S）。} 该模块承担一项极其重要的功能，即帮助 GeM 检索事实（长期记忆），同时使用数据编码器已经处理过的输入。该模块还可以有自己的模型，例如用 BERT 为内部指令中的一段输入文本生成嵌入，也可以有自己的指令集，例如路由算法。
+\end{itemize}
+
+\figref{fig:11-04}给出 GenAISys 的一般架构。请记住，这是一个简化架构，只突出主要部件。每个方块都可能由多个子模块、模型和过程（算法）组成。图看起来像计算机的一般架构，并不奇怪。毕竟，这类架构很自然。不过，GenAISys 与计算机有所不同。它由可训练的部件组成，因此在功能上极其灵活。
+
+% <<<PDFPAGE 306>>> 图 11.4 位于原页顶部。
+\dgmfig{fig_11_04}{.75\linewidth}{生成式人工智能系统的一般架构。各模态有自己的编码器，检索／存储模块用于访问外部工具和数据库，中央生成式人工智能模型产生新内容（输出）。雪花图标表示模块已“冻结”，即已经完成训练。}{fig:11-04}
+[图中四个数据编码器分别处理文本、图像、音频和视频。DB 表示数据库。]
+
+\subsection{训练}
+训练 GenAISys 并不容易，因为至少原则上，所有部件都可以训练。可以设想对 GenAISys 进行端到端训练（end-to-end training），但以当时所用的硬件还无法做到。广泛采用的一种方案是利用分别预训练的基础模型来构造数据编码器和检索／存储模块，最终只训练 GeM。不过，随着硬件的改进，或许也会出现新的训练方法，使 GenAISys 能用更好的方式训练，并最终通过同时利用多种数据模态而改进。
+% <<<PDFPAGE 306>>> 上一段跨原页。
+
+\begin{booknote}{旁注}
+\figref{fig:11-04}中的总体架构很像一张人脑功能图。目前，我们已很接近可以采用坐标下降算法（coordinate descent）来优化整个系统，每次只优化一个模态或一个块。这样能使复杂度保持在相对较低的水平，不超过我们现有方法的复杂度。然而，主要问题在于，系统可能\emph{遗忘}之前学到的表示。我们还没有完全令人满意的\textbf{持续学习}（continual learning）方法，不过正在取得进展\citerefs{50,51}。一旦解决这一问题，人工智能就会取得真正的突破！
+\end{booknote}
+
+\subsection{生成式人工智能系统示例}
+参照\figref{fig:11-04}中的一般架构，可以看出现在使用的生成式人工智能方法如何符合这个架构。我们重点讨论大视觉模型，以及一种基于大语言模型生成可靠文本的具体方案。还有许多例子。好奇的读者，一旦熟悉最成功的几个例子，你一定也能在其他模型中认出这个架构。
+% <<<PDFPAGE 307>>> 上一段跨原页。
+
+\subsubsection{检索增强生成}
+基于解码器的大语言模型的主要缺点是，当提示使模型离开它的“舒适区”（即表示空间中训练数据所在的区域）时，会产生幻觉（hallucination）。适当微调可以在一定程度上缓解这一点，不过大语言模型仍倾向于编造或跳过某些事实。它们的回答往往生动多彩，用词独特，甚至不同寻常，人容易忽略其中的一些缺陷和错误说法。因此，我有时会把 LLM 称为“撒谎的语言模型”（Lying Language Model）。有些应用不能容忍虚假消息，或者说，不能接受不可信的结果。例如在健康相关场景、医学、药物发现或制造业（如诊断）中，根本容不下编造的事实。尽管生成式大语言模型备受追捧，其较高的幻觉风险意味着它们难以独自成为这些场景的解决办法。
+
+\citeref{52}提出的检索增强生成（retrieval-augmented generation，RAG）带来了一次重大突破，在实际应用中尤为如此。其思想是利用两个大语言模型（一个编码器模型和一个解码器模型），以及一个文本数据库。编码器有两种用途：（i）为数据库中的所有文本生成嵌入，（ii）为收到的查询生成嵌入。有了新查询，就根据查询嵌入与库中文档嵌入之间的距离，选出最接近的文档。最后，把这些文档和查询一起交给解码器模型，生成结果。由于生成结果来自解码器模型和真实文档，出现幻觉的可能性低得多。此外，稍作调整，就能让 RAG 更充分地依据检索阶段提供的事实。
+
+\figref{fig:11-05}给出 RAG 的示意图，与\figref{fig:11-04}中 GenAISys 的一般架构高度一致。在这里，解码器模型是 GeM，编码器模型既是 DE，也用作 R/S 模块的一部分。
+
+% <<<PDFPAGE 308>>> 图 11.5、11.6 位于原页顶部。
+\dgmfig{fig_11_05}{.74\linewidth}{检索增强生成（RAG）架构示意图。}{fig:11-05}
+[图中包括输入、文本编码器、大语言模型、检索／存储模块、数据库和输出。]
+
+\subsubsection{语音转文本}
+Whisper\citeref{53}是把语音转换成文本（Speech2Txt）的 GenAISys 的一个好例子。它是编码器—解码器 Transformer，采用特定形式的编码器。它先用对数幅度梅尔频谱图（log-magnitude Mel spectrogram）表示原始语音（音频），再交给编码器 Transformer 处理音频信号，之后交给解码器 Transformer 生成文本。该模型是一个自动语音识别（automatic speech recognition，ASR）系统，权重从 3900 万（微型版）到 15.5 亿（大型版）不等。训练数据从网上收集，共 68 万小时，包含多语言、多任务的有监督数据。它发布时达到了当时最先进的表现，在本书写作时仍属于最好的语音转文本模型之一。微型版甚至可以部署到边缘设备。Whisper 很好地说明了如何构建 GenAISys，也说明在自动语音识别等更复杂的任务中，组合不同部件有多么重要。语音转文本的示意图见\figref{fig:11-06}。
+% <<<PDFPAGE 308>>> 上一段跨原页。
+\dgmfig{fig_11_06}{.74\linewidth}{语音转文本架构示意图。}{fig:11-06}
+[图中输入经音频编码器进入大语言模型，再得到输出。雪花标记表示编码器冻结。]
+
+\subsubsection{大视觉模型}
+除了大语言模型，大视觉模型（large vision model，LVM）也是很典型的 GenAISys。有许多模型属于图像到图像（Img2Img）或图像到文本（Img2Txt），但当时最流行的大视觉模型是文本到图像（Txt2Img）。自潜空间扩散模型（latent diffusion model）的原始论文\citeref{54}问世以来，由此发展出的 Stable Diffusion 2、当时新近推出的 Stable Diffusion 3 等模型，广泛用于根据给定提示生成图像。潜空间扩散模型（Stable Diffusion）和采用基于扩散的先验的 DALL·E~2\citeref{55}，都很符合\figref{fig:11-07}(a) 中的架构。将这些大视觉模型与一般的 GenAISys 对照，可以看到文本编码器和图像编码器（用于训练或重构）是 DE，扩散模型与解码器的组合则是 GeM。这些模型不使用数据库或外部工具，不过，也可以利用它们对图像作某种修改。
+
+文本到图像的大视觉模型还有一个例子，即 ImaGen\citeref{56}。它使用基于 T5 的文本编码器，以及由扩散模型和超分辨率（superresolution）模块构成的系统。对应的架构见\figref{fig:11-07}(b)。超分辨率模块分多步处理，把 $64\times64$ 的图像变成 $1024\times1024$ 的图像。尽管它只有三个模块，仍然是一个复杂的 GenAISys。它约有 130 亿个权重，其中 T5 占 110 亿，扩散模型和超分辨率模块所用的 UNet 约占 20 亿。从权重数看，这是个大型模型。
+% <<<PDFPAGE 309>>> 上一段跨原页。
+\dgmfig{fig_11_07}{.91\linewidth}{大视觉模型的例子。(a) Stable Diffusion，即潜空间扩散。(b) ImaGen。}{fig:11-07}
+[(a) 含文本编码器、图像编码器、扩散模型和解码器。(b) 含文本编码器、扩散模型和超分辨率模块。雪花图标表示模块冻结。]
+
+\subsection{生成式人工智能系统是人工智能的未来}
+以大语言模型作操作系统的主干、把智能体（agent）当应用程序的想法，受到许多关注\citeref{57}。这里考虑的系统更广，包含各种以生成式人工智能为基础的部件，也可以超出基于大语言模型的部件。不管采用哪种方式，向以生成式人工智能为基础的（操作）系统发展，看来是未来方向，也是云系统的下一步。GenAISys 确实既可部署在本地，也可部署在云服务器上，还可采用混合方式。例如，GeM、缓存和数据编码器在本地，而外部工具和存储在云端。最后一种方案对制造业尤其有吸引力，因为现实中的所有操作必须实时执行，而数据存储和其他操作可交给外部服务或智能体完成。
+
+另一个受到广泛炒作的概念是智能体人工智能（Agentic AI），即开发能自主运行、以 GenAISys 为基础的智能体。许多大型科技企业都在推动这个想法。例如，Microsoft 提出了一个名为 AutoGen 的框架，用于构建基于大语言模型的会话智能体\citeref{58}。OpenAI 将自己的聊天机器人（包括 ChatGPT）视为智能体。为它们配置各种工具和功能后，便可充当副驾驶（copilot，即提出部分解法来协助人类操作者），或充当自动驾驶仪（autopilot，即提出完整解法来协助操作者）。这里借用的是驾驶飞机的比喻。副驾驶协助平稳飞行，而自动驾驶仪负责驾驶。不论哪种情况，人类驾驶员都可以随时接管。
+% <<<PDFPAGE 310>>> 上一段跨原页。
+
+好奇的读者，希望我已经带你领略了（深度）生成建模的精彩世界，也让你相信，生成式人工智能系统必将成为人工智能演进的下一步。我甚至敢说，它们除了能协助完成许多工作，从办公室事务、医疗和教育到制造业等行业，还会引导我们构建第一个\emph{真正的}人工智能。此外还有具身人工智能（embodied AI）等许多方面。不过，依我这个并不那么谦虚的看法，要给机器造一个人工大脑，不论机器是否具身，GenAISys 都不可或缺。至于遥远的未来会发生什么（在人工智能的世界里，这是指未来 6 到 12 个月），我们拭目以待。无论如何，我相信我们正处在一个前所未有、极其令人着迷的时代。
+
+\input{chapters/ch11_references}

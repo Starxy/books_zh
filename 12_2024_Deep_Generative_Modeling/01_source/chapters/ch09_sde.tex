@@ -1,0 +1,280 @@
+% 原书印刷页 226–237，附件 PDF 第 241–252 页。
+\section[用随机／常微分方程定义生成模型]{以随机微分方程／常微分方程定义生成模型}
+\label{sec:09-03}
+
+\subsection{回顾基于扩散的模型}
+
+再来想一想基于扩散的模型。此前，我们将其介绍为层次 VAE，其变分后验有一种特定的构造方式，先对前面的潜变量做线性变换，然后加上高斯噪声。也可以把这类模型看成时间离散化的动力系统。为说明这一点，设我们把数据点 $\mathbf x_0$（$\mathbf x_0\sim p_0(\mathbf x)\equiv p_{\mathit{data}}(\mathbf x)$）变成从已知分布 $\pi$ 采样的噪声 $\mathbf x_1$（$\mathbf x_1\sim p_1(\mathbf x)\equiv\pi(\mathbf x)$）。用 $t\in[0,1]$ 表示“时间”，$\mathbf x_0$ 和 $\mathbf x_1$ 之间有 $T$ 步，步长为 $\Delta=1/T$。于是，\emph{正向扩散}可以表示为
+\begin{equation}
+  \mathbf x_{t+\Delta}=\sqrt{1-\beta_t}\,\mathbf x_t+\sqrt{\beta_t}\,\epsilon_t,
+  \tag{9.15}\label{eq:09-15}
+\end{equation}
+其中 $\epsilon_t\sim\mathcal N(\mathbf 0,\mathbf I)$。好奇的读者，你可以看出，这是一个时间离散化的动力系统。请记住这一点，稍后我们还会回到这个问题。
+
+基于扩散的模型有一个有趣的性质。由于具有线性和高斯性质，可以从数据 $\mathbf x_0$ 直接计算 $\mathbf x_t$。
+\begin{equation}
+  \mathbf x_t=\sqrt{\alpha_t}\,\mathbf x_0+\sqrt{1-\alpha_t}\,\epsilon_t,
+  \tag{9.16}\label{eq:09-16}
+\end{equation}
+其中 $\alpha_t=\prod_{\tau=1}^{t}(1-\beta_\tau)$。进一步，可以按如下方式反算数据点。
+\begin{equation}
+  \mathbf x_0=\frac{1}{\sqrt{\alpha_t}}\mathbf x_t-
+    \frac{\sqrt{1-\alpha_t}}{\sqrt{\alpha_t}}\epsilon_t.
+  \tag{9.17}\label{eq:09-17}
+\end{equation}
+正向扩散时，可以采样 $\epsilon_t$。从 $\mathbf x_t$ 逆推 $\mathbf x_0$ 时，却无法访问噪声 $\epsilon_t$。通常是这样，正向扩散一直进行到 $\mathbf x_t$，此前的所有 $\mathbf x$ 和 $\epsilon$ 都不再保留。还有办法！毕竟，我们可以引入神经网络 $\epsilon_\theta(\mathbf x_t,t)$ 来预测噪声。
+
+怎样学习这个神经网络？在奠基论文\citeref{3}中，损失是以下各项损失的和。
+\begin{equation}
+  \mathcal L_t(\theta)=\lVert\epsilon_\theta(\mathbf x_t,t)-\epsilon_t\rVert^2,
+  \tag{9.18}\label{eq:09-18}
+\end{equation}
+论文表明，它等价于 ELBO。不过请等一等，好奇的读者，你看到我看到的东西了吗？这个损失还等价于另一种损失！没错，就是上一节介绍的得分匹配。得分模型和噪声模型之间有如下对应关系（对标准差为 $\sigma$ 的高斯去噪分布）。
+\begin{equation}
+  \mathbf s_\theta(\mathbf x,t)=-\frac{\epsilon_\theta(\mathbf x_t,t)}{\sigma}.
+  \tag{9.19}\label{eq:09-19}
+\end{equation}
+
+把前面的观察归纳如下。
+\begin{itemize}
+  \item 正向扩散定义了一个离散时间动力系统。
+  \item 基于扩散的模型的损失函数与得分匹配损失（几乎）相同。
+  \item 基于扩散的模型实际上与得分模型相对应。
+  \item 基于扩散的模型与采用 $\sigma$ 调度训练的得分模型非常相似，因为两者都以迭代方式运行，且每一步考虑的噪声都更多。
+\end{itemize}
+这些相似之处表明，也许存在一个能推广得分模型和扩散模型的通用框架。
+
+\subsection{寻求通用框架}
+
+在解答得分模型与基于扩散的模型能否共用一个框架之前，先回到最初的那句话。“也可以把基于扩散的模型看成时间离散化的动力系统”，因为正向扩散具有如下形式（我们再写一遍，重复一次也无妨）。
+\begin{equation}
+  \mathbf x_{t+\Delta}=\sqrt{1-\beta_t}\,\mathbf x_t+\sqrt{\beta_t}\,\epsilon_t.
+  \tag{9.20}\label{eq:09-20}
+\end{equation}
+
+好奇的读者，我们可以坦诚相告。有人没有学过动力系统，有人学过却已经忘了。在着手写本节之前，我对常微分方程（ordinary differential equation，ODE）和随机微分方程（stochastic differential equation，SDE）的记忆已经非常、非常生疏了。因此，我们先简短地探访一下微分方程的世界！对于更好奇的读者（没错，说的就是你！），我强烈推荐文献\citeref{19}这本书，基础和进阶内容兼顾。
+
+先透露一点后面的内容。事实证明，SDE 和 ODE 在生成建模中大有用处。所以，请跟我继续往下读，我们将发现一类新的生成模型，以及它所带来的崭新而美妙的世界！
+
+\subsubsection{常微分方程和数值方法}
+
+我们从 ODE 开始。一般来说，可以将它定义如下。
+\begin{equation}
+  \frac{\mathrm d\mathbf x_t}{\mathrm dt}=f(\mathbf x_t,t),
+  \tag{9.21}\label{eq:09-21}
+\end{equation}
+给定某个初始条件 $\mathbf x_0$。有时将 $f(\mathbf x_t,t)$ 称为\emph{向量场}（vector field）。
+
+可以用某种数值方法求解这个 ODE，以特定方式对时间进行离散化。例如，欧拉法（Euler's method）如下进行，从 $t=0$ 出发，以 $\Delta$ 为步长推进到 $t=1$。
+\begin{align}
+  \mathbf x_{t+\Delta}-\mathbf x_t&=f(\mathbf x_t,t)\cdot\Delta
+    \tag{9.22}\label{eq:09-22}\\
+  \mathbf x_{t+\Delta}&=\mathbf x_t+f(\mathbf x_t,t)\cdot\Delta.
+    \tag{9.23}\label{eq:09-23}
+\end{align}
+有时需要从 $t=1$ 回到 $t=0$，这时可以用反向欧拉法（backward Euler's method）。
+\begin{equation}
+  \mathbf x_t=\mathbf x_{t+\Delta}-f(\mathbf x_{t+\Delta},t+\Delta)\cdot\Delta.
+  \tag{9.24}\label{eq:09-24}
+\end{equation}
+聪明的读者，你一定看出了其中的联系。如果把 $\mathbf x_0$ 当作数据，把 $\mathbf x_1$ 当作噪声，那么，\emph{只要}知道 $f(\mathbf x_t,t)$，就可以运行反向欧拉法，得到一个生成模型！请先记下这个想法。没错，你想到的正是这样！
+
+\subsubsection{随机微分方程与概率流常微分方程}
+
+现在来看 SDE。一般而言，可以把 SDE 想象成轨迹为随机的 ODE，在每个 $t$，状态按某种概率分布 $p_t(\mathbf x)$ 分布。SDE 可以定义为
+\begin{equation}
+  \mathrm d\mathbf x_t=f(\mathbf x_t,t)\,\mathrm dt+g(t)\,\mathrm d\mathbf v_t,
+  \tag{9.25}\label{eq:09-25}
+\end{equation}
+其中 $\mathbf v$ 是标准维纳过程（standard Wiener process）。在这一语境中，$f(\cdot,t)$ 称为\emph{漂移}（drift），$g(\cdot)$ 是称为\emph{扩散}（diffusion）的标量函数。漂移分量是确定的（可参照上面的 ODE 写法），扩散分量由于标准维纳过程而具有随机性。关于维纳过程的更多内容，请参阅文献\citeref{19}。在这里，只需知道它具有高斯性质即可。例如，$\mathbf v_{t+\Delta}-\mathbf v_t$ 服从正态分布，$\mathbf v_{t+\Delta}-\mathbf v_t\sim\mathcal N(0,\Delta)$。顺带一提，这里假定漂移和扩散的形式都是\textbf{已知的}。后面会给出一个例子，好奇的读者，现在只要记住它们是给定的。
+
+这个 SDE 有一个重要性质，存在一个对应的常微分方程，其解服从相同的分布！如果从数据点 $\mathbf x_0$ 出发，求解以下概率流常微分方程（probability flow ODE，PF-ODE）\citeref{1}，就能得到噪声 $\mathbf x_1\sim p_1(\mathbf x)$。
+\begin{equation}
+  \frac{\mathrm d\mathbf x_t}{\mathrm dt}
+  =\left(f(\mathbf x_t,t)-\frac12g^2(t)\nabla_{\mathbf x_t}\ln p_t(\mathbf x_t)\right).
+  \tag{9.26}\label{eq:09-26}
+\end{equation}
+再仔细看看这个结果。
+\begin{itemize}
+  \item 首先，维纳过程不再出现。因此，现在处理的是 ODE，随机项已经消去。
+  \item 其次，漂移和扩散分量仍在，但扩散分量平方后乘以 $-\frac12$。
+  \item 第三，出现了得分函数！要看推导，请参阅文献\citeref{1}。这里直接采用这个结果。它看起来也合情合理。SDE 的解服从 $p_t(\mathbf x)$，因此得分函数出现在这里并不奇怪。毕竟，得分函数表明按 $p_t(\mathbf x)$ 形成的轨迹应当是什么样子。
+\end{itemize}
+
+\subsubsection{将概率流常微分方程用作基于得分的生成模型}
+
+等等！这里得到了什么？暂且假设得分函数已知，就可以从 $\mathbf x_1\sim\pi(\mathbf x)$ 出发，应用反向欧拉法，把这个 PF-ODE 用作生成模型。
+\begin{equation}
+  \mathbf x_t=\mathbf x_{t+\Delta}-
+  \left(f(\mathbf x_{t+\Delta},t+\Delta)-
+    \frac12g^2(t+\Delta)\nabla_{\mathbf x_{t+\Delta}}\ln p_t(\mathbf x_{t+\Delta})\right)\cdot\Delta.
+  \tag{9.27}\label{eq:09-27}
+\end{equation}
+太好了！现在的问题是得分函数，但我们已经知道怎样处理。可以用去噪得分匹配来学习它，也就是用以数据点为中心的高斯混合模型作为加噪后的经验分布，再进行得分匹配。与前面介绍的去噪得分匹配相比，这里还需要考虑时间 $t$。
+\begin{equation}
+  \mathcal L(\theta)=\int_0^1\mathcal L_t(\theta)\,\mathrm dt.
+  \tag{9.28}\label{eq:09-28}
+\end{equation}
+怎样定义 $\mathcal L_t(\theta)$？按得分匹配的思想，应考虑 $\lambda_t\lVert\mathbf s_\theta(\mathbf x_t,t)-\nabla_{\mathbf x_t}\ln p_t(\mathbf x_t)\rVert^2$。但我们算不出 $p_t(\mathbf x_t)$，所以要另想办法。可以定义分布 $p_{0t}(\mathbf x_t\mid\mathbf x_0)$，用于对原始数据点 $\mathbf x_0$ 的加噪版本采样。综合起来，得到
+\begin{equation}
+  \begin{aligned}
+    \mathcal L_t(\theta)={}&\tfrac12\mathbb E_{\mathbf x_0\sim p_{\mathit{data}}(\mathbf x)}
+      \mathbb E_{\mathbf x_t\sim p_{0t}(\mathbf x_t\mid\mathbf x_0)}\\
+    &\left[\lambda_t\lVert\mathbf s_\theta(\mathbf x_t,t)
+      -\nabla_{\mathbf x_t}\ln p_{0t}(\mathbf x_t\mid\mathbf x_0)\rVert^2\right].
+  \end{aligned}
+  \tag{9.29}\label{eq:09-29}
+\end{equation}
+重要的是，如果 $p_{0t}(\mathbf x_t\mid\mathbf x_0)$ 取高斯分布，就可以解析计算得分函数。马上会看到一个例子。此外，计算 $\mathcal L_t(\theta)$ 时可以只用一个样本，即取蒙特卡洛估计。
+
+找到 $\mathbf s_\theta(\mathbf x_t,t)$ 后，就可以运行反向欧拉法来采样数据。
+\begin{equation}
+  \mathbf x_t=\mathbf x_{t+\Delta}-
+  \left(f(\mathbf x_{t+\Delta},t+\Delta)-
+    \frac12g^2(t+\Delta)\mathbf s_\theta(\mathbf x_{t+\Delta},t+\Delta)\right)\cdot\Delta.
+  \tag{9.30}\label{eq:09-30}
+\end{equation}
+请记住，这里假定漂移和扩散都是已知的。此外，我们沿用（反向）欧拉法，但你尽管选择其他 ODE 求解器，放开手脚试一试！这里我们希望尽量讲得清楚简单。
+
+\figref{fig:09-04} 展示了用反向欧拉法采样的例子。对于某个 PF-ODE 和给定的得分函数，可以从一个多峰分布得到样本。可以想象，ODE 求解器会“走向”众数。这个简单的例子表明，定义 PF-ODE 是一种有力的生成手段！只要得分函数近似得好，就能直接从原始分布采样。
+
+\dgmfig{fig_09_04}{.48\linewidth}{对多峰分布运行反向欧拉法的示例。这里取 $f(\mathbf x,t)=0$、$g(t)=9^t$、$T=100$。得分函数（函数本身，无需模型！）通过自动求导计算。绿色方块表示 $\mathbf x_1\sim\pi$，蓝色圆点是样本 $\mathbf x_0$。}{fig:09-04}
+
+\subsection[基于得分的生成模型示例]{基于得分的生成模型示例：方差爆炸型概率流常微分方程}
+
+\subsubsection{模型的构造}
+
+要定义自己的基于得分的生成模型（score-based generative model，SBGM），需要以下要素。
+\begin{itemize}
+  \item 漂移 $f(\mathbf x,t)$。
+  \item 扩散 $g(t)$。
+  \item $p_{0t}(\mathbf x_t\mid\mathbf x_0)$ 的形式。
+\end{itemize}
+在文献\citerefs{1,20}中可以找到三种 SBGM 示例，分别是方差爆炸型（variance exploding，VE）SDE、方差保持型（variance preserving，VP）SDE 和 sub-VP SDE。这里重点讨论 VE SDE，其漂移和扩散取为
+\begin{itemize}
+  \item $f(\mathbf x,t)=0$。
+  \item $g(t)=\sigma^t$，其中 $\sigma>0$ 是超参数。注意，$\sigma$ 的指数是时间 $t\in[0,1]$。
+\end{itemize}
+根据上面的讨论，把所选的 $f(\mathbf x,t)$ 和 $g(t)$ 代入 PF-ODE 的一般形式，得到
+\begin{equation}
+  \frac{\mathrm d\mathbf x_t}{\mathrm dt}
+    =-\frac12\sigma^{2t}\nabla_{\mathbf x_t}\ln p_t(\mathbf x_t).
+  \tag{9.31}\label{eq:09-31}
+\end{equation}
+
+接下来，要学习得分模型，需要定义产生 $\mathbf x_0$ 的加噪版本所用的条件分布。好在 SDE 理论（例如文献\citeref{19}的第 5 章）告诉我们如何计算 $p_{0t}(\mathbf x_t\mid\mathbf x_0)$！具体公式见文献\citeref{1}的附录。这里给出最终的解。
+\begin{equation}
+  p_{0t}(\mathbf x_t\mid\mathbf x_0)=
+  \mathcal N\left(\mathbf x_t\mid\mathbf x_0,
+    \frac{1}{2\ln\sigma}(\sigma^{2t}-1)\mathbf I\right).
+  \tag{9.32}\label{eq:09-32}
+\end{equation}
+所以，方差随时间变化的函数为
+\begin{equation}
+  \sigma_t^2=\frac{1}{2\ln\sigma}(\sigma^{2t}-1).
+  \tag{9.33}\label{eq:09-33}
+\end{equation}
+当 $\sigma$ 足够大时，最终分布 $p_{01}(\mathbf x)$ 接近以下高斯分布。
+\begin{align}
+  p_{01}(\mathbf x)
+    &=\int p_0(\mathbf x_0)*\mathcal N\left(\mathbf x\mid\mathbf x_0,
+      \frac{1}{2\ln\sigma}(\sigma^2-1)\mathbf I\right)
+      \tag{9.34}\label{eq:09-34}\\
+    &\approx\mathcal N\left(\mathbf x\mid\mathbf 0,
+      \frac{1}{2\ln\sigma}(\sigma^2-1)\mathbf I\right).
+      \tag{9.35}\label{eq:09-35}
+\end{align}
+我们会用 $p_{01}(\mathbf x)$ 采样噪声 $\mathbf x_1$，再将其逆推为数据 $\mathbf x_0$。\footnote{译注：式 \eqref{eq:09-34} 保留原书写法。该边缘化积分应以 $p_0(\mathbf x_0)\mathcal N(\mathbf x\mid\mathbf x_0,\frac{\sigma^2-1}{2\ln\sigma}\mathbf I)$ 为被积函数，对 $\mathbf x_0$ 积分。}
+
+\dgmfig{fig_09_05}{.49\linewidth}{不同 $\sigma$ 取值下，$p_{0t}(\mathbf x_t\mid\mathbf x_0)$ 的标准差随 $t$ 的变化。}{fig:09-05}[原书图注称“标准差”，但纵轴标的是方差 $\sigma_t^2$。]
+
+\begin{booknote}{旁注}
+为了更好地理解 $\sigma$ 的各种取值如何影响 $\sigma_t$，可以看看\figref{fig:09-05} 中的曲线。显然不能取 $\sigma=1$（你问为什么？因为 $\ln(1)=0$，会遇到除以 0 的问题），不过，取 $\sigma=1.01$ 时，得到的 $p_1(\mathbf x)$ 接近标准高斯分布。
+\end{booknote}
+
+\subsubsection{怎样选择 \texorpdfstring{$\lambda_t$}{λₜ}}
+
+进入训练过程之前，最后说一下如何选择 $\mathcal L_t(\theta)$ 定义中的 $\lambda_t$。到目前为止我一直略过这一点，是有原因的。Ho 等人\citeref{3}直接取 $\lambda_t\equiv1$。这就完了！真是这样吗？聪明的读者，你也许想得到，事情没那么简单。Song 和 Kingma\citeref{21}表明，对于 VE PF-ODE，设 $\lambda_t=\sigma_t^2$ 实际上有好处。甚至可以用各项 $\mathcal L_t(\theta)$ 的和作为对数似然函数的代理量。我们会利用这一点在训练中实施提前停止。
+
+\subsubsection{训练}
+
+下面以所选的 VE SBGM 为例介绍训练过程。正如前面讨论得分匹配时所说，过程相对简单直接，包含以下步骤。
+\Needspace{11\baselineskip}
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{VE SBGM 的训练过程}
+  \begin{enumerate}
+    \item 选取一个数据点 $\mathbf x_0$。
+    \item 采样 $\mathbf x_1\sim\pi(\mathbf x)=\mathcal N(\mathbf x\mid\mathbf 0,\mathbf I)$。
+    \item 采样 $t\sim\operatorname{Uniform}(0,1)$。
+    \item 计算 $\mathbf x_t=\mathbf x_0+\sqrt{\frac{1}{2\ln\sigma}(\sigma^{2t}-1)}\cdot\mathbf x_1$。这是从 $p_{0t}(\mathbf x_t\mid\mathbf x_0)$ 抽取的样本。
+    \item 在 $\mathbf x_t$ 和 $t$ 处计算得分模型 $\mathbf s_\theta(\mathbf x_t,t)$ 的值。
+    \item 计算单个样本的得分匹配损失 $\mathcal L_t(\theta)=\sigma_t^2\lVert\mathbf x_1-\sigma_t\mathbf s_\theta(\mathbf x_t,t)\rVert^2$。
+    \item 利用 $\nabla_\theta\mathcal L_t(\theta)$，用基于梯度的方法更新 $\theta$。
+  \end{enumerate}
+\end{booknote}
+针对可用的训练数据重复这七步，直到满足某个停止条件。显然，实际训练采用小批量，逐步处理成批的数据点。
+
+在这一训练过程中，我们有意使用 $-\sigma_t\mathbf s_\theta(\mathbf x_t,t)$，因为 $-\sigma_t\mathbf s_\theta(\mathbf x_t,t)=\epsilon_\theta(\mathbf x_t,t)$，所以准则 $\sigma_t^2\lVert\mathbf x_1-\epsilon_\theta(\mathbf x_t,t)\rVert^2$ 与基于扩散的模型相对应\citerefs{4,5}。\footnote{译注：若按本段的得分和噪声关系代入最后的平方范数，训练框第 6 步中的减号应为加号。原框和正文各自的写法均保留。} 现在你明白为什么我们坚持要把基于扩散的模型看作动力系统了吧！
+
+\subsubsection{采样}
+
+得分模型训练完成后，终于可以生成了！为此，需要运行反向欧拉法（别忘了，也可以用其他 ODE 求解器）。对于 VE PF-ODE，它采取如下形式。
+\begin{align}
+  \mathbf x_t
+    &=\mathbf x_{t+\Delta}+\left(\frac12\sigma^{2(t+\Delta)}
+      \left\{-\frac{1}{\sigma^{t+\Delta}}\mathbf s_\theta(\mathbf x_{t+\Delta},t+\Delta)\right\}\right)
+      \cdot\Delta
+      \tag{9.36}\label{eq:09-36}\\
+    &=\mathbf x_{t+\Delta}-\left(\frac12\sigma^{t+\Delta}
+      \mathbf s_\theta(\mathbf x_{t+\Delta},t+\Delta)\right)\cdot\Delta,
+      \tag{9.37}\label{eq:09-37}
+\end{align}
+起点为 $\mathbf x_1\sim p_{01}(\mathbf x)=\mathcal N\bigl(\mathbf x\mid\mathbf 0,\frac{1}{2\ln\sigma}(\sigma^2-1)\mathbf I\bigr)$。注意，第一行用的是加号，因为 VE PF-ODE 的扩散项是 $-\frac12\sigma^{2t}$，因此反向欧拉法中的减号变成了加号。读者也许觉得这十分明显，可我总会搞混加号和减号，所以宁愿在这里写得明确一点。
+
+\subsection{终于到了代码！}
+
+实现 VE SBGM 的条件已经齐备！与得分匹配类似，我们把数据变换到 $[-1,1]$。你会注意到，这段代码与得分匹配的代码有不少相似之处。这在意料之中，因为两者在概念上非常相似。
+
+\Needspace{6\baselineskip}
+\bookcode{code/ch09_02_ve_pf_ode.py}{VE PF-ODE 模型类。}{lst:09-02}
+
+得分模型采用 MLP，超参数设为 $\sigma=1.01$ 和 $T=20$。运行代码后，可以得到与\figref{fig:09-06} 类似的结果。
+
+我很少评论结果，尤其是因为我所用的数据集过于简单（这是有意为之，让你能很快运行代码！）。不过，我想指出两点。
+\begin{itemize}
+  \item VE SBGM 用起来并不容易，因为噪声相当大。查看生成图像，就能对可能的问题有大致的认识。这里让 ODE 求解器运行 20 步，但 SBGM 通常需要数百步，甚至数千步。
+  \item 看看代理量在验证集上的取值。众所周知，SBGM 的收敛速度较慢。
+\end{itemize}
+
+\dgmfig{fig_09_06}{\linewidth}{VE PF-ODE 模型的结果。（a）真实图像的样本。（b）生成图像的样本。（c）验证集上计算的得分匹配损失示例。}{fig:09-06}[（c）中横轴 epochs 为训练轮次，纵轴 proxy 为代理量。]
+
+\subsection{基于得分的生成模型还有许多精彩之处！}
+
+\textbf{其他 SBGM。} 除了方差爆炸型，还有其他类型的 SBGM\citeref{1}。
+\begin{itemize}
+  \item 方差保持型（VP）。漂移为 $f(\mathbf x,t)=-\frac12\beta_t\mathbf x$，扩散为 $g(t)=\sqrt{\beta_t}$，损失权重为 $\lambda_t=1-\exp\{-\int_0^t\beta_s\,\mathrm ds\}$，其中 $\beta_t$ 是时间 $t$ 的某个函数。
+  \item Sub-VP。漂移为 $f(\mathbf x,t)=-\frac12\beta_t\mathbf x$，扩散和损失权重分别为
+  \[
+    \begin{aligned}
+      g(t)&=\sqrt{\beta_t\left(1-\exp\left\{-2\int_0^t\beta_s\,\mathrm ds\right\}\right)},\\
+      \lambda_t&=\left(1-\exp\left\{-\int_0^t\beta_s\,\mathrm ds\right\}\right)^2,
+    \end{aligned}
+  \]
+  其中 $\beta_t$ 是时间 $t$ 的某个函数。
+\end{itemize}
+这些模型有多种版本，尤其是 $\lambda_t$ 和其他依赖于 $t$ 的函数可以有不同的定义方式，例如 VE 的 $\sigma_t$ 和 VP 的 $\beta_t$。综述见文献\citeref{5}。
+
+\textbf{更好的求解器。} 前面简要提到过，SBGM 的一个缺点是采样步数（即 ODE 求解器的步数）很多。文献\citeref{22}介绍了专门的 ODE 求解器，在 $T=10$ 步内就能达到很好的性能。文献\citeref{23}又把步数降到了 $T=5$！通常，选用更合适的求解器可以得到更好的结果，例如采用 Heun 法（Heun's method）\citeref{24}。
+
+\textbf{其他改进。} 基于得分的模型领域还有很多想法！这里只举几例。
+\begin{itemize}
+  \item 在潜在空间中使用 SBGM\citeref{25}。
+  \item 实际上，可以用类似神经常微分方程（neural ODE）的方法计算 SBGM 的对数似然函数\citeref{26}。Song 等人\citeref{20}表明，适当修改得分匹配损失，可以得到对数似然函数的上界。
+  \item 用去量化（dequantization）、重要性加权（importance weighting）等多种技巧改进对数似然的估计\citeref{27}。
+  \item 文献\citeref{28}提出了一种新模型，称为\emph{一致性模型}（consistency model）。其思想是学习一个能一步把噪声匹配到数据的模型。
+  \item 文献\citeref{29}提出了把 SBGM 扩展到黎曼流形的方法。
+\end{itemize}
+
+\textbf{已经有了大量工作！} 有关 SBGM 的论文还在源源不断地发表。可以在这个网页查看关于 SBGM 的最新概况。
+\begin{center}
+  \url{https://scorebasedgenerativemodeling.github.io/}
+\end{center}

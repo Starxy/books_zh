@@ -1,0 +1,1334 @@
+% <<<PDFPAGE 112>>>
+\chapter{潜变量模型}
+\label{ch:latent-variables}
+\sourcechapter{5}
+
+\section{引言}
+前面几章讨论了学习 $p(\mathbf{x})$ 的两种方法，即第~3~章的自回归模型（ARM）和第~4~章的基于流的模型，后者简称为流。这两种方法都直接对似然函数建模。ARM 对分布作因子分解，再对条件分布 $p(x_d\mid\mathbf{x}_{<d})$ 作参数化。流则使用可逆变换（神经网络），借助变量变换公式建模。现在我们讨论第三种方法，它会引入潜变量。
+
+来看这样一种情形。我们有一组马的图像，希望学习 $p(\mathbf{x})$，例如用它生成新图像。在动手之前，我们可以先问自己，该怎样生成一匹马？换句话说，假如我们自己就是这样一个生成模型，会怎么做？也许我们会先勾勒马的大致轮廓、大小和形状，再画上马蹄，补上头部的细节，着色，等等。最后再考虑背景。一般来说，数据中有一些因素（例如轮廓、颜色、背景）对生成对象（这里是一匹马）至关重要。一旦选定这些因素，我们就可以添上细节，把它们画出来。我无意展开哲学或认知层面的讨论，不过我想大家都会同意，我们作画时大致就是这样生成一幅画的。
+
+现在用数学来描述这个生成过程。我们关注的是高维对象 $\mathbf{x}\in\mathcal{X}^{D}$（例如对于图像，$\mathcal{X}\in\{0,1,\ldots,255\}$），以及低维潜变量 $\mathbf{z}\in\mathcal{Z}^{M}$（例如 $\mathcal{Z}=\mathbb{R}$），后者可以称为数据中隐藏的因素。用数学语言说，可以把 $\mathcal{Z}^{M}$ 称为一个低维流形（low-dimensional manifold）。于是，生成过程可以写成两步\footnote{\textbf{译注}\quad 原书在图像例中使用 $\mathcal{X}\in\{0,1,\ldots,255\}$。这里的 $\mathcal{X}$ 表示单个像素的取值集合，后文写作 $\mathcal{X}=\{0,1,\ldots,L-1\}$。}。
+\begin{enumerate}
+\item $\mathbf{z}\sim p(\mathbf{z})$（\figref{fig:05-01}中的红色部分）。
+\item $\mathbf{x}\sim p(\mathbf{x}\mid\mathbf{z})$（\figref{fig:05-01}中的蓝色部分）。
+\end{enumerate}
+
+% <<<PDFPAGE 113>>>
+\dgmfig{fig_05_01}{.74\linewidth}{潜变量模型及其生成过程。注意，低维流形（这里是二维的）嵌在高维空间（这里是三维的）中。}{fig:05-01}
+
+通俗地说，我们先对 $\mathbf{z}$ 采样（例如想象马的大小、形状和颜色），然后生成一幅包含所需细节的图像，也就是从条件分布 $p(\mathbf{x}\mid\mathbf{z})$ 中采样 $\mathbf{x}$。你可能会问，这里有必要用概率吗？不妨试着画出两幅\emph{一模一样}的图像。外部因素多种多样，想画出两幅完全相同的图像几乎是不可能的。概率论的美妙之处就在于，它让我们能够描述这样的现实！
+
+潜变量模型（latent variable model）的思想是引入潜变量 $\mathbf{z}$，把联合分布分解为 $p(\mathbf{x},\mathbf{z})=p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})$。这个分解自然地描述了上述生成过程。可是训练时我们只能观测 $\mathbf{x}$。因此，按概率推断的规则，我们要对未知的 $\mathbf{z}$ 求和消去，也就是将它边缘化。由此得到（边缘）似然函数
+\begin{equation}
+p(\mathbf{x})=\int p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})\,\mathrm{d}\mathbf{z}.
+\tag{5.1}\label{eq:05-01}
+\end{equation}
+
+接下来自然要问，怎样计算这个积分？一般来说，这并不容易。有两个可能的方向。第一种情形是积分可以求出。我们先简要讨论这种情形，再介绍第二种方法，即采用一种特定的近似推断（approximate inference）方法，称为变分推断（variational inference）。
+
+\section{概率主成分分析}
+\label{sec:ppca}
+考虑如下情形。
+\begin{itemize}
+\item 只考虑连续随机变量，即 $\mathbf{z}\in\mathbb{R}^M$ 且 $\mathbf{x}\in\mathbb{R}^D$。
+\item $\mathbf{z}$ 服从标准高斯分布，即 $p(\mathbf{z})=\mathcal{N}(\mathbf{z}\mid 0,\mathbf{I})$。
+\item $\mathbf{z}$ 与 $\mathbf{x}$ 之间的依赖关系是线性的，并假设有高斯加性噪声。
+\end{itemize}
+% <<<PDFPAGE 114>>>
+\begin{equation}
+\mathbf{x}=\mathbf{W}\mathbf{z}+\mathbf{b}+\varepsilon,
+\tag{5.2}\label{eq:05-02}
+\end{equation}
+其中 $\varepsilon\sim\mathcal{N}(\varepsilon\mid 0,\sigma^2\mathbf{I})$。由高斯分布的性质可知\citeref{1}
+\begin{equation}
+p(\mathbf{x}\mid\mathbf{z})=\mathcal{N}\bigl(\mathbf{x}\mid\mathbf{W}\mathbf{z}+\mathbf{b},\sigma^2\mathbf{I}\bigr).
+\tag{5.3}\label{eq:05-03}
+\end{equation}
+这个模型称为\emph{概率主成分分析}（probabilistic principal component analysis，pPCA）\citeref{2}。
+
+接着，可以利用两个正态随机向量的线性组合的性质，直接求出积分\citeref{1}。
+\begin{align}
+p(\mathbf{x})&=\int p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})\,\mathrm{d}\mathbf{z} \tag{5.4}\label{eq:05-04}\\
+ &=\int \mathcal{N}\bigl(\mathbf{x}\mid\mathbf{W}\mathbf{z}+\mathbf{b},\sigma^2\mathbf{I}\bigr)
+       \mathcal{N}(\mathbf{z}\mid 0,\mathbf{I})\,\mathrm{d}\mathbf{z} \tag{5.5}\label{eq:05-05}\\
+ &=\mathcal{N}\bigl(\mathbf{x}\mid\mathbf{b},\mathbf{W}\mathbf{W}^\top+\sigma^2\mathbf{I}\bigr). \tag{5.6}\label{eq:05-06}
+\end{align}
+现在，我们就可以计算（边缘）似然函数的对数 $\ln p(\mathbf{x})$ 了！关于如何学习 pPCA 模型的参数，详见\citerefs{1,2}。此外，pPCA 有意思的地方还在于，借助高斯分布的性质，可以解析地算出 $\mathbf{z}$ 的真实后验分布。
+\begin{equation}
+p(\mathbf{z}\mid\mathbf{x})=\mathcal{N}\bigl(\mathbf{M}^{-1}\mathbf{W}^\top(\mathbf{x}-\mathbf{b}),\sigma^{-2}\mathbf{M}\bigr),
+\tag{5.7}\label{eq:05-07}
+\end{equation}
+其中 $\mathbf{M}=\mathbf{W}^\top\mathbf{W}+\sigma^2\mathbf{I}$。只要找出能使对数似然函数最大化的 $\mathbf{W}$，且矩阵 $\mathbf{W}$ 的维数在计算能力允许的范围内，就可以求出 $p(\mathbf{z}\mid\mathbf{x})$。为什么这一点如此重要？因为给定一个观测 $\mathbf{x}$，我们就能算出潜在因素的分布！\footnote{\textbf{译注}\quad 式~\eqref{eq:05-07} 保留原书写法。$\sigma^{-2}\mathbf{M}$ 是后验精度矩阵。若沿用式~\eqref{eq:05-03} 的记法，以协方差作为高斯分布的第二个参数，则这里应为 $\sigma^2\mathbf{M}^{-1}$。}
+
+\begin{booknote}{旁注}
+在我看来，概率主成分分析是一个极为重要的潜变量模型，有两个原因。首先，所有量都可以\emph{手算}，所以用它练习，可以很好地建立对潜变量模型的直觉。其次，它是个线性模型。好奇的你此时或许已经想问，如果改用非线性依赖关系，会怎样？如果采用高斯分布以外的分布，又会怎样？这两种情形的答案相同。积分都无法精确求出，需要采用某种近似。总之，对潜变量模型感兴趣的人都应深入研究 pPCA，用它建立对概率建模的直觉。
+\end{booknote}
+
+% <<<PDFPAGE 115>>>
+\section{变分自编码器：非线性潜变量模型的变分推断}
+\label{sec:vae}
+\subsection{模型与目标函数}
+再来看一次这个积分，设想一般情形下无法解析地求出它。最简单的方法是采用蒙特卡洛近似（Monte Carlo approximation）。
+\begin{align}
+p(\mathbf{x})&=\int p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})\,\mathrm{d}\mathbf{z} \tag{5.8}\label{eq:05-08}\\
+ &=\mathbb{E}_{\mathbf{z}\sim p(\mathbf{z})}[p(\mathbf{x}\mid\mathbf{z})] \tag{5.9}\label{eq:05-09}\\
+ &\approx\frac{1}{K}\sum_k p(\mathbf{x}\mid\mathbf{z}_k), \tag{5.10}\label{eq:05-10}
+\end{align}
+其中最后一行用到的样本来自潜变量的先验分布，即 $\mathbf{z}_k\sim p(\mathbf{z})$。这种方法比较简单，而且算力增长很快，我们可以在不太长的时间里采很多点。不过从统计学可知，如果 $\mathbf{z}$ 是多维的，且 $M$ 比较大，就会遇到\emph{维数灾难}（curse of dimensionality）。要充分覆盖这个空间，样本数必须随 $M$ 指数增长。样本取少了，近似就会很差。
+
+可以用更先进的蒙特卡洛方法\citeref{3}，但它们仍会受到维数灾难的影响。另一种办法是用变分推断\citeref{4}。考虑以 $\phi$ 参数化的一族变分分布（variational distribution）$\{q_\phi(\mathbf{z})\}_\phi$。例如，可以考虑参数为均值和方差 $\phi=\{\mu,\sigma^2\}$ 的高斯分布。我们知道这些分布的形式，并假设它们给所有 $\mathbf{z}\in\mathcal{Z}^M$ 分配非零的概率质量。于是，边缘分布的对数可以按下面的方法近似。
+\begin{align}
+\ln p(\mathbf{x})&=\ln\int p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})\,\mathrm{d}\mathbf{z} \tag{5.11}\label{eq:05-11}\\
+ &=\ln\int\frac{q_\phi(\mathbf{z})}{q_\phi(\mathbf{z})}
+        p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})\,\mathrm{d}\mathbf{z} \tag{5.12}\label{eq:05-12}\\
+ &=\ln\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z})}
+        \left[\frac{p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})}{q_\phi(\mathbf{z})}\right] \tag{5.13}\label{eq:05-13}\\
+ &\geq\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z})}\ln
+        \left[\frac{p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})}{q_\phi(\mathbf{z})}\right] \tag{5.14}\label{eq:05-14}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z})}
+        \bigl[\ln p(\mathbf{x}\mid\mathbf{z})+\ln p(\mathbf{z})-\ln q_\phi(\mathbf{z})\bigr] \tag{5.15}\label{eq:05-15}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z})}[\ln p(\mathbf{x}\mid\mathbf{z})]-
+        \mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z})}\bigl[\ln q_\phi(\mathbf{z})-\ln p(\mathbf{z})\bigr]. \tag{5.16}\label{eq:05-16}
+\end{align}
+第四行用到了 Jensen 不等式（Jensen's inequality）。
+
+% <<<PDFPAGE 116>>>
+如果采用摊销变分后验（amortized variational posterior），即用 $q_\phi(\mathbf{z}\mid\mathbf{x})$ 代替分别为每个 $\mathbf{x}$ 设定的 $q_\phi(\mathbf{z})$，就得到
+\begin{equation}
+\begin{aligned}
+\ln p(\mathbf{x})\geq{}&\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p(\mathbf{x}\mid\mathbf{z})]\\
+ &-\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+      \bigl[\ln q_\phi(\mathbf{z}\mid\mathbf{x})-\ln p(\mathbf{z})\bigr].
+\end{aligned}
+\tag{5.17}\label{eq:05-17}
+\end{equation}
+摊销（amortization）很有用，因为只需训练一个模型（例如一个由权重确定的神经网络），它就能为给定的输入返回相应的分布参数。下文都假设使用摊销变分后验。不过请记住，这只是一种选择！\citeref{5}考虑的是半摊销变分推断（semi-amortized variational inference）。
+
+这样，我们得到一个类似自编码器的模型，其中有随机编码器（stochastic encoder）$q_\phi(\mathbf{z}\mid\mathbf{x})$ 和随机解码器（stochastic decoder）$p(\mathbf{x}\mid\mathbf{z})$。称它们为“随机的”，是为了强调编码器和解码器都是概率分布，并把它们与确定性自编码器区分开来。带有摊销变分后验的这种模型称为\textbf{变分自编码器}（variational autoencoder，VAE）\citerefs{6,7}。对数似然函数的这个下界称为证据下界（evidence lower bound，ELBO）。
+
+ELBO 的第一部分 $\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p(\mathbf{x}\mid\mathbf{z})]$ 称为（负）重构误差（reconstruction error），因为先把 $\mathbf{x}$ 编码为 $\mathbf{z}$，再将其解码回去。第二部分 $\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln q_\phi(\mathbf{z}\mid\mathbf{x})-\ln p(\mathbf{z})]$ 可视作正则项（regularizer），它恰好等于 Kullback–Leibler 散度（KL）。请记住，对于更复杂的模型（例如层次模型），其中的正则项可能无法解释为 KL 项。因此，我们倾向于使用含义更一般的“正则项”。
+
+\subsection{看待 ELBO 的另一个角度}
+为完整起见，我们再给出 ELBO 的一种推导。这样可以理解为什么这个下界有时难以处理。
+\begin{align}
+\ln p(\mathbf{x})&=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p(\mathbf{x})] \tag{5.18}\label{eq:05-18}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+       \left[\ln\frac{p(\mathbf{z}\mid\mathbf{x})p(\mathbf{x})}{p(\mathbf{z}\mid\mathbf{x})}\right] \tag{5.19}\label{eq:05-19}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+       \left[\ln\frac{p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})}{p(\mathbf{z}\mid\mathbf{x})}\right] \tag{5.20}\label{eq:05-20}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+       \left[\ln\frac{p(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})}{p(\mathbf{z}\mid\mathbf{x})}
+           \frac{q_\phi(\mathbf{z}\mid\mathbf{x})}{q_\phi(\mathbf{z}\mid\mathbf{x})}\right] \tag{5.21}\label{eq:05-21}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+       \left[\ln p(\mathbf{x}\mid\mathbf{z})\frac{p(\mathbf{z})}{q_\phi(\mathbf{z}\mid\mathbf{x})}
+           \frac{q_\phi(\mathbf{z}\mid\mathbf{x})}{p(\mathbf{z}\mid\mathbf{x})}\right] \tag{5.22}\label{eq:05-22}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+       \left[\ln p(\mathbf{x}\mid\mathbf{z})-\ln\frac{q_\phi(\mathbf{z}\mid\mathbf{x})}{p(\mathbf{z})}
+          +\ln\frac{q_\phi(\mathbf{z}\mid\mathbf{x})}{p(\mathbf{z}\mid\mathbf{x})}\right] \tag{5.23}\label{eq:05-23}\\
+ &=\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p(\mathbf{x}\mid\mathbf{z})]
+       -\mathrm{KL}[q_\phi(\mathbf{z}\mid\mathbf{x})\|p(\mathbf{z})]\notag\\
+ &\quad+\mathrm{KL}[q_\phi(\mathbf{z}\mid\mathbf{x})\|p(\mathbf{z}\mid\mathbf{x})]. \tag{5.24}\label{eq:05-24}
+\end{align}
+
+% <<<PDFPAGE 117>>>
+注意，上面的推导只用到了和法则、乘法法则和乘以 $1=q_\phi(\mathbf{z}\mid\mathbf{x})/q_\phi(\mathbf{z}\mid\mathbf{x})$，全是基本运算！请自己一步步推导一遍。弄懂这套推导，会很有助于你看清 VAE，乃至一般潜变量模型的潜在问题出在哪里。
+
+看完这套推导，再来细看结果。
+\begin{equation}
+\begin{aligned}
+\ln p(\mathbf{x})
+ &=\underbrace{\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p(\mathbf{x}\mid\mathbf{z})]
+       -\mathrm{KL}[q_\phi(\mathbf{z}\mid\mathbf{x})\|p(\mathbf{z})]}_{\mathrm{ELBO}}\\
+ &\quad+\underbrace{\mathrm{KL}[q_\phi(\mathbf{z}\mid\mathbf{x})\|p(\mathbf{z}\mid\mathbf{x})]}_{\geq 0}.
+\end{aligned}
+\tag{5.25}\label{eq:05-25}
+\end{equation}
+最后一项 $\mathrm{KL}[q_\phi(\mathbf{z}\mid\mathbf{x})\|p(\mathbf{z}\mid\mathbf{x})]$ 衡量变分后验与真实后验的差异，然而我们不知道真实后验是什么！不过，由于 Kullback–Leibler 散度按定义总是大于或等于 0，略去这一项，就剩下 ELBO。可以把 $\mathrm{KL}[q_\phi(\mathbf{z}\mid\mathbf{x})\|p(\mathbf{z}\mid\mathbf{x})]$ 看成 ELBO 与真实对数似然之间的差距。
+
+这个结果很漂亮。可是它为什么重要？如果用来近似 $p(\mathbf{z}\mid\mathbf{x})$ 的 $q_\phi(\mathbf{z}\mid\mathbf{x})$ 很差，KL 项就会变大。即使把 ELBO 优化得很好，它与真实对数似然之间的差距也可能很大！简单来说，如果选的后验过于简单，到头来得到的 VAE 仍可能很差。这里的“差”是什么意思？见\figref{fig:05-02}。如果 ELBO 是对数似然的一个较松的下界，两者的最优解可能完全不同。后面会讨论如何处理这个问题，此处先知道有这个问题即可。
+
+\subsection{VAE 的组成部分}
+总结一下目前知道的内容。首先，我们用一族摊销变分后验 $\{q_\phi(\mathbf{z}\mid\mathbf{x})\}_\phi$ 近似真实后验 $p(\mathbf{z}\mid\mathbf{x})$。可以把这些变分后验看成随机编码器。
+% <<<PDFPAGE 118>>> 上一段跨原页。
+其次，条件似然 $p(\mathbf{x}\mid\mathbf{z})$ 可以看成随机解码器。第三个组成部分 $p(\mathbf{z})$ 是边缘分布，也称为先验（prior）。最后，目标函数是 ELBO，即对数似然函数的下界。
+\begin{equation}
+\begin{aligned}
+\ln p(\mathbf{x})\geq{}&\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p(\mathbf{x}\mid\mathbf{z})]\\
+ &-\mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\mid\mathbf{x})}
+      [\ln q_\phi(\mathbf{z}\mid\mathbf{x})-\ln p(\mathbf{z})].
+\end{aligned}
+\tag{5.26}\label{eq:05-26}
+\end{equation}
+
+\dgmfig{fig_05_02}{.61\linewidth}{ELBO 是对数似然的下界。因此，使 ELBO 最大的 $\hat\theta$ 与使 $\ln p(\mathbf{x})$ 最大的 $\theta^*$ 可能不同。ELBO 越松，模型参数的最大似然估计受它影响所产生的偏差就可能越大。}{fig:05-02}
+
+要完整理解 VAE，还剩两个问题。
+\begin{enumerate}
+\item 怎样对分布作参数化？
+\item 怎样计算期望？毕竟这些积分仍然存在！
+\end{enumerate}
+
+\subsubsection{分布的参数化}
+你现在大概已经猜到，我们用神经网络对编码器和解码器作参数化。不过在使用神经网络之前，要先知道采用什么分布。好在 VAE 框架几乎允许我们自由选择任何分布。我们只需注意，所选分布要适合正在考虑的问题。到目前为止，我们一直拿图像来解释，就接着用这个例子。如果 $\mathbf{x}\in\{0,1,\ldots,255\}^D$，就不能用正态分布，因为它的支撑集（support）和离散取值图像的支撑集完全不同。可以用的一种分布是类别分布（categorical distribution），即
+\begin{equation}
+p_\theta(\mathbf{x}\mid\mathbf{z})=\operatorname{Categorical}\bigl(\mathbf{x}\mid\theta(\mathbf{z})\bigr),
+\tag{5.27}\label{eq:05-27}
+\end{equation}
+其中的概率由神经网络 $\mathrm{NN}$ 给出，即 $\theta(\mathbf{z})=\operatorname{softmax}(\mathrm{NN}(\mathbf{z}))$。$\mathrm{NN}$ 可以是多层感知机（MLP）、卷积神经网络、循环神经网络（RNN）等。
+
+潜变量的分布如何选择，取决于我们想怎样表示数据中的潜在因素。为方便起见，通常把 $\mathbf{z}$ 取为连续随机变量构成的向量，即 $\mathbf{z}\in\mathbb{R}^M$。于是，变分后验和先验都可以用高斯分布。
+\begin{align}
+q_\phi(\mathbf{z}\mid\mathbf{x})&=\mathcal{N}\bigl(\mathbf{z}\mid\mu_\phi(\mathbf{x}),
+                           \operatorname{diag}[\sigma^2_\phi(\mathbf{x})]\bigr)
+                          \tag{5.28}\label{eq:05-28}\\
+p(\mathbf{z})&=\mathcal{N}(\mathbf{z}\mid 0,\mathbf{I}), \tag{5.29}\label{eq:05-29}
+\end{align}
+其中 $\mu_\phi(\mathbf{x})$ 和 $\sigma^2_\phi(\mathbf{x})$ 像解码器中的参数一样，都是神经网络的输出。实际中，可以用一个共享的神经网络 $\mathrm{NN}(\mathbf{x})$ 输出 $2M$ 个值，再拆成两组，每组 $M$ 个值，分别作为均值 $\mu$ 和方差 $\sigma^2$。为方便起见，我们用的是对角协方差矩阵，也可以采用更灵活的后验，见\ref{sec:vae-posteriors}节。此外，这里使用标准高斯先验，后面会再讨论，见\ref{sec:vae-priors}节。
+
+% <<<PDFPAGE 119>>>
+\subsubsection{重参数化技巧}
+到目前为止，我们对对数似然作了一系列变换，最后得到 ELBO。不过计算期望仍是个问题，因为它包含积分！我们该怎样计算这个期望？相比直接对对数似然作蒙特卡洛近似、完全不使用变分后验的办法，这样做又有什么优势？其实我们还是要使用蒙特卡洛近似，只是现在改从变分后验 $q_\phi(\mathbf{z}\mid\mathbf{x})$ 采样，先验 $p(\mathbf{z})$ 则不再用于采样。这样做更好吗？是的，因为和先验相比，变分后验往往把更多概率质量分配给较小的区域。如果你试着运行自己的 VAE 代码，看看方差，就很可能发现变分后验几乎是确定的（这是好是坏，尚无定论）。因此，我们应该能得到更好的近似！不过，近似的方差仍有问题。简单来说，如果从 $q_\phi(\mathbf{z}\mid\mathbf{x})$ 采样 $\mathbf{z}$，代入 ELBO，再计算对神经网络参数 $\phi$ 的梯度，梯度的方差可能仍然很大！统计学家最先发现了一种解决办法（例如见\citeref{8}），即对分布作重参数化（reparameterization）。这种方法的思想是，可以把一个随机变量表示为对另一个独立、服从简单分布的随机变量作若干基本变换（如算术运算、取对数等）的复合。例如，考虑均值为 $\mu$、方差为 $\sigma^2$ 的高斯随机变量 $z$，以及独立的随机变量 $\epsilon\sim\mathcal{N}(\epsilon\mid 0,1)$，那么下式成立（见\figref{fig:05-03}）。
+\begin{equation}
+z=\mu+\sigma\cdot\epsilon.
+\tag{5.30}\label{eq:05-30}
+\end{equation}
+现在，如果从标准高斯分布采样 $\epsilon$，并施加上面的变换，就得到一个来自 $\mathcal{N}(z\mid\mu,\sigma)$ 的样本！\footnote{\textbf{译注}\quad 此处保留原书的 $\mathcal{N}(z\mid\mu,\sigma)$。由式~\eqref{eq:05-30} 可知，标准差为 $\sigma$，方差为 $\sigma^2$。}
+
+如果你不记得统计学里的这个事实，或者就是不信我，可以写段简单的代码试试看。实际上，这个想法还适用于许多其他分布\citeref{9}。
+
+\textbf{重参数化技巧}（reparameterization trick）可用在编码器 $q_\phi(\mathbf{z}\mid\mathbf{x})$ 中。正如\citerefs{6,7}所指出的，对高斯分布使用这种重参数化，可以大幅降低梯度的方差。
+% <<<PDFPAGE 120>>> 上一段跨原页。
+为什么？因为随机性来自独立的来源 $p(\epsilon)$，我们求梯度时所针对的是确定性函数（即神经网络）。更方便的是，我们使用随机梯度下降训练 VAE，因此训练中每次只需采样一个 $\mathbf{z}$！
+
+\dgmfig{fig_05_03}{.51\linewidth}{高斯分布重参数化的一个例子。将服从标准高斯分布的 $\epsilon$ 乘以 $\sigma$，再平移 $\mu$。}{fig:05-03}
+
+\subsection{动手实现 VAE}
+我们讲了不少理论，讨论了许多问题。你可能会觉得实现 VAE 无从下手。其实它比看起来简单。先把目前知道的内容归拢一下，看看具体要用的分布和神经网络。
+
+首先，我们使用以下分布。
+\begin{itemize}
+\item $q_\phi(\mathbf{z}\mid\mathbf{x})=\mathcal{N}\bigl(\mathbf{z}\mid\mu_\phi(\mathbf{x}),\sigma_\phi^2(\mathbf{x})\bigr)$。
+\item $p(\mathbf{z})=\mathcal{N}(\mathbf{z}\mid 0,\mathbf{I})$。
+\item $p_\theta(\mathbf{x}\mid\mathbf{z})=\operatorname{Categorical}(\mathbf{x}\mid\theta(\mathbf{z}))$。
+\end{itemize}
+我们假设 $x_d\in\mathcal{X}=\{0,1,\ldots,L-1\}$。
+
+接下来使用以下网络。
+\begin{itemize}
+\item 编码器网络。
+\[
+\begin{aligned}
+\mathbf{x}\in\mathcal{X}^D &\to \operatorname{Linear}(D,256)
+      \to\operatorname{LeakyReLU}\\
+ &\to\operatorname{Linear}(256,2\cdot M)\to\operatorname{split}
+      \to\mu\in\mathbb{R}^M,\ \log\sigma^2\in\mathbb{R}^M
+\end{aligned}
+\]
+注意，最后一层输出 $2M$ 个值，因为均值需要 $M$ 个值，（对数）方差也需要 $M$ 个值。此外，方差必须为正。这里考虑方差的对数，这样输出可以取任意实数，无需另行约束方差为正。也可以使用 softplus 一类的非线性函数。
+\item 解码器网络。
+\[
+\begin{aligned}
+\mathbf{z}\in\mathbb{R}^M &\to\operatorname{Linear}(M,256)\to\operatorname{LeakyReLU}\\
+ &\to\operatorname{Linear}(256,D\cdot L)\to\operatorname{reshape}\\
+ &\to\operatorname{softmax}\to\theta\in[0,1]^{D\times L}
+\end{aligned}
+\]
+\end{itemize}
+由于 $\mathbf{x}$ 使用类别分布，解码器网络的输出就是概率。因此，最后一层必须输出 $D\cdot L$ 个值，其中 $D$ 是像素数，$L$ 是一个像素的可能取值数。接着，要把输出重排成形状为 $(B,D,L)$ 的张量，其中 $B$ 是批大小。然后使用 softmax 激活函数得到概率。
+
+最后，给定数据集 $\mathcal{D}=\{\mathbf{x}_n\}_{n=1}^N$，训练的目标函数是 ELBO，其中只用来自变分后验的一个样本 $\mathbf{z}_{\phi,n}=\mu_\phi(\mathbf{x}_n)+\sigma_\phi(\mathbf{x}_n)\odot\epsilon$。要记住，几乎所有现成的软件包默认都是做最小化，因此必须加上负号\footnote{\textbf{译注}\quad 式~\eqref{eq:05-31} 保留原书在方括号前的加号。按式~\eqref{eq:05-26}，花括号内为 ELBO 的单样本估计时，方括号前应为减号。}。
+% <<<PDFPAGE 121>>>
+\begin{equation}
+\begin{aligned}
+-\mathrm{ELBO}(\mathcal{D};\theta,\phi)
+ &=\sum_{n=1}^N -\Bigl\{
+       \ln\operatorname{Categorical}\bigl(\mathbf{x}_n\mid\theta(\mathbf{z}_{\phi,n})\bigr)\\
+ &\qquad+\bigl[\ln\mathcal{N}\bigl(\mathbf{z}_{\phi,n}\mid\mu_\phi(\mathbf{x}_n),\sigma_\phi^2(\mathbf{x}_n)\bigr)\\
+ &\hspace{5.6em}-\ln\mathcal{N}(\mathbf{z}_{\phi,n}\mid 0,\mathbf{I})\bigr]\Bigr\}.
+\end{aligned}
+\tag{5.31}\label{eq:05-31}
+\end{equation}
+可见，上述数学最终归结为一个比较简单的学习过程。
+\begin{enumerate}
+\item 取 $\mathbf{x}_n$，使用编码器网络得到 $\mu_\phi(\mathbf{x}_n)$ 和 $\ln\sigma_\phi^2(\mathbf{x}_n)$。
+\item 用重参数化技巧计算 $\mathbf{z}_{\phi,n}=\mu_\phi(\mathbf{x}_n)+\sigma_\phi(\mathbf{x}_n)\odot\epsilon$，其中 $\epsilon\sim\mathcal{N}(0,\mathbf{I})$。
+\item 把解码器网络应用于 $\mathbf{z}_{\phi,n}$，得到概率 $\theta(\mathbf{z}_{\phi,n})$。
+\item 代入 $\mathbf{x}_n$、$\mathbf{z}_{\phi,n}$、$\mu_\phi(\mathbf{x}_n)$ 和 $\ln\sigma_\phi^2(\mathbf{x}_n)$，计算 ELBO。
+\end{enumerate}
+
+\subsection{代码}
+现在，各个组成部分都可以写成代码了！这里仅关注 VAE 模型本身的代码，细节见注释。代码分为四个类，即 \texttt{Encoder}、\texttt{Decoder}、\texttt{Prior} 和 \texttt{VAE}。这样拆分看起来也许有些繁琐，却有助于把 VAE 理解为由三部分构成的模型，进而看清整个方法。
+
+\bookcode{code/ch05_encoder.py}{编码器类。}{lst:05-01}
+% <<<PDFPAGE 122>>> 代码清单 5.1 的第 25--64 行。
+% <<<PDFPAGE 123>>>
+\bookcode{code/ch05_decoder.py}{解码器类。}{lst:05-02}
+% <<<PDFPAGE 124>>> 代码清单 5.2 的第 46--88 行。
+% <<<PDFPAGE 125>>>
+\bookcode{code/ch05_prior.py}{先验类。}{lst:05-03}
+\bookcode{code/ch05_vae.py}{VAE 类。}{lst:05-04}
+% <<<PDFPAGE 126>>> 代码清单 5.4 的第 30--31 行。
+\bookcode{code/ch05_networks.py}{网络示例。}{lst:05-05}
+
+很好！现在可以运行完整代码了。训练 VAE 后，应该得到类似\figref{fig:05-04}的结果。
+
+\subsection{VAE 的常见问题}
+VAE 是一类功能很强的模型，主要得益于其灵活性。与基于流的模型相比，VAE 无需神经网络可逆，所以编码器、解码器的架构可以任意选择。与 ARM 相比，VAE 能学习低维数据表示，我们可以控制瓶颈（bottleneck），也就是潜在空间的维数。不过，VAE 也面临一些问题。前面提到过，积分需要高效地估计，而且变分后验过于简单时，ELBO 与对数似然之间会出现较大的差距。除此之外，还有以下潜在问题。
+
+\dgmfig{fig_05_04}{\linewidth}{训练结果示例。（a）随机选出的真实图像。（b）VAE 无条件生成的图像。（c）训练期间的验证曲线。}{fig:05-04}
+[（c）的横轴为训练轮数（\textit{epochs}）。]
+
+% <<<PDFPAGE 127>>>
+\begin{itemize}
+\item 先看 ELBO 和其中的正则项。对标准高斯这样的不可训练先验，如果 $\forall\mathbf{x}\ q_\phi(\mathbf{z}\mid\mathbf{x})=p(\mathbf{z})$，正则项就会最小化。如果解码器足够强，以至于把 $\mathbf{z}$ 当作噪声，比如用 ARM 作为解码器时，就可能出现这种情况\citeref{10}。这称为后验坍塌（posterior collapse）\citeref{11}。
+\item 另一个问题涉及聚合后验（aggregated posterior）$q_\phi(\mathbf{z})=\frac{1}{N}\sum_n q_\phi(\mathbf{z}\mid\mathbf{x}_n)$ 与先验 $p(\mathbf{z})$ 的不匹配。设想我们有一个标准高斯先验以及聚合后验，后者是对所有训练数据的变分后验取平均。于是，某些区域的先验概率较高，聚合后验概率却很低，反过来也可能如此。从这些空洞中采样会得到不切实际的潜变量值，解码器生成的图像质量就会很差。这称为空洞问题（hole problem）\citeref{12}。
+\item 最后一个问题更为普遍，实际上会影响所有深度生成模型。正如\citeref{13}所指出的，包括 VAE 在内的深度生成模型难以正确检测分布外样本（out-of-distribution example）。这类数据点服从与模型所用训练数据完全不同的分布。例如，假设模型用 MNIST 训练，FashionMNIST 样本就属于分布外。直觉上，一个训练得当的深度生成模型应当给分布内样本分配较高的概率，给分布外样本分配较低的概率。遗憾的是，\citeref{13}展示的结果并非如此。分布外问题至今仍是深度生成建模尚待解决的主要问题之一\citeref{14}。
+\end{itemize}
+
+\subsection{还有更多！}
+关于扩展 VAE 以及将它应用于不同问题的论文很多。下面选列若干论文，只涉及这一领域大量文献中的一小部分！
+
+\textbf{用重要性加权估计对数似然}\quad 前面多次指出，ELBO 是对数似然的下界，通常不宜把它当成对数似然的良好估计。\citerefs{7,15}提倡用重要性加权（importance weighting）来改善对数似然的近似，即
+\begin{equation}
+\ln p(\mathbf{x})\approx\ln\frac{1}{K}\sum_{k=1}^K
+        \frac{p(\mathbf{x},\mathbf{z}_k)}{q_\phi(\mathbf{z}_k\mid\mathbf{x})},
+\tag{5.32}\label{eq:05-32}
+\end{equation}
+其中 $\mathbf{z}_k\sim q_\phi(\mathbf{z}_k\mid\mathbf{x})$。注意，对数在期望的\textbf{外面}。如\citeref{15}所示，当 $K$ 足够大时，重要性加权能给出较好的对数似然估计。在实践中，只要计算资源允许，通常将 $K$ 取为 $512$ 或更大。
+
+% <<<PDFPAGE 128>>>
+\textbf{改进 VAE 的编码器}\quad 自 VAE 的思想提出以来，许多论文致力于构造灵活的变分后验族。其中最主要的方向是使用条件流模型\citerefs{16,17,18,19,20,21}。我们将在\ref{sec:vae-posteriors}节进一步讨论。
+
+\textbf{改进 VAE 的解码器}\quad VAE 允许用任意神经网络对解码器作参数化。因此，可以用全连接网络、全卷积网络、ResNet 或 ARM。例如，\citeref{22}在 VAE 中采用了基于 PixelCNN 的解码器。
+
+\textbf{改进 VAE 的先验}\quad 如前所述，聚合后验和先验差别太大可能带来严重问题。许多论文尝试缓解这个问题，例如使用模拟聚合后验的多峰先验 VampPrior\citeref{23}、基于流的先验（例如\citerefs{24,25}）、基于 ARM 的先验\citeref{26}，或采用重采样（resampling）的思想\citeref{27}。我们将在\ref{sec:vae-priors}节介绍各种先验。
+
+\textbf{扩展 VAE}\quad 这里介绍的是 VAE 的无监督版本。它也可以引入标签或其他变量。\citeref{28}提出了半监督 VAE（semi-supervised VAE）。这一思想进一步扩展到公平表示（fair representation）\citerefs{29,30}。\citeref{30}提出了一种特定的潜在表示，使 VAE 具备域泛化（domain generalization）能力。\citeref{31}将变分推断和重参数化技巧用于贝叶斯神经网络（Bayesian neural network）。Blundell 等人\citeref{31}采用的是一种类似 VAE 的方式来处理贝叶斯神经网络，它未必就是 VAE。
+
+\textbf{非图像数据的 VAE}\quad 到目前为止，我们都用图像来解释，但 VAE 的用途远不止于此！\citeref{11}提出了一种处理序列数据（例如文本）的 VAE，编码器和解码器都用长短期记忆网络（LSTM）参数化。\citeref{32}给出了 VAE 框架的另一个有趣应用，用它生成分子图。\citeref{26}的作者提出了一种用于视频压缩的类 VAE 模型。
+
+\textbf{不同的潜在空间}\quad 通常考虑的是欧氏潜在空间。VAE 框架也允许我们考虑其他空间。例如，\citerefs{33,34}采用了超球面潜在空间（hyperspherical latent space），\citeref{35}采用了双曲潜在空间（hyperbolic latent space）。关于超球面 VAE，详见\ref{sec:hyperspherical-vae}节。\citeref{36}将超球面潜在空间用于等变 VAE（equivariant VAE），以学习具有几何意义的表示。
+
+\textbf{离散潜在空间}\quad 我们讨论的是具有连续潜变量的 VAE 框架。不过，怎样处理离散潜变量也是一个有意思的问题。困难在于这里无法继续使用重参数化技巧。可能的解决办法有两种。第一种是松弛离散变量，例如使用 Gumbel–Softmax 技巧（Gumbel–Softmax trick）\citerefs{37,38}。第二种是采用梯度估计方法\citeref{39}。
+
+\textbf{后验坍塌}\quad 已有许多办法来应对后验坍塌。例如，\citeref{40}提议提高变分后验相对于解码器的更新频率。\citeref{41}则提出一种新的解码器架构，引入跳跃连接（skip connection），让信息和梯度在解码器中更容易传递。
+
+% <<<PDFPAGE 129>>>
+\textbf{从不同角度看目标函数}\quad VAE 的核心是 ELBO，不过也可以考虑不同的目标函数。例如，\citeref{42}提出一种基于卡方散度的对数似然上界（chi-square upper bound，CUBO）。\citeref{10}从信息论的角度研究了 ELBO。Higgins 等人\citeref{43}提出了 $\beta$-VAE，用一个调节系数 $\beta$ 为正则项加权，但由此得到的目标函数已不再对应对数似然的下界。
+
+\textbf{确定性正则化自编码器}\quad 根据前面对 VAE 及其目标函数的讨论，可以把它看作带随机编码器和随机解码器的正则化自编码器。Ghosh 等人\citeref{44}从 VAE 中“剥去”所有随机性，指出确定性正则化自编码器（deterministic regularized autoencoder）与 VAE 的相似之处，也凸显了 VAE 的潜在问题。他们还指出，经验分布本身具有随机性，因此即使采用确定性编码器，仍然可以拟合聚合后验。这样，从聚合后验的模型 $p_\lambda(\mathbf{z})$ 采样，再把 $\mathbf{z}$ 确定性地映射到观测变量 $\mathbf{x}$ 所在的空间，就能把确定性（正则化）自编码器变成一个生成模型。我认为这个方向值得进一步探索。一个重要的问题是，我们究竟需不需要任何随机性？
+
+\textbf{层次 VAE}\quad 近来出现了很多具有深层潜变量结构的 VAE，取得了显著成果。其中最重要的当数 BIVA\citeref{45}、NVAE\citeref{46} 和极深 VAE（very deep VAE）\citeref{47}。\citeref{25}提供了观察深层层次 VAE 的另一个角度，在模型中另用了一系列确定性函数。我们在\ref{sec:hierarchical-vae}节深入讨论这个主题。
+
+\textbf{对抗自编码器}\quad \citeref{48}提供了理解 VAE 的另一个有意思的角度。有些论文（例如\citerefs{23,49}）把学习聚合后验作为先验看得很重要。还有一种做法是用对抗损失（adversarial loss）训练先验。此外，\citeref{48}还介绍了多种借助对抗学习来改进自编码器的想法。
+
+\textbf{对抗攻击}\quad VAE 容易受到对抗攻击（adversarial attack），这一点已广为人知。也就是说，潜在空间的一点小变化就会造成很大的重构误差。一种可能的补救措施是在推断时应用马尔可夫链蒙特卡洛（MCMC）方法\citeref{50}。
+
+\section{改进变分自编码器}
+\subsection{先验}
+\label{sec:vae-priors}
+\subsubsection{重写 ELBO 得到的启示}
+VAE 的一个重要组成部分是 $\mathbf{z}$ 的边缘分布，也称为先验。现在来细看这个分布。考虑怎样改进它之前，再看一次 ELBO。可以写成
+% <<<PDFPAGE 130>>>
+\begin{equation}
+\begin{aligned}
+\mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}[\ln p(\mathbf{x})]
+ \geq{}&\mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}\Bigl[
+  \mathbb{E}_{q_\phi(\mathbf{z}\mid\mathbf{x})}\bigl[\ln p_\theta(\mathbf{x}\mid\mathbf{z})\\
+ &+\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x})\bigr]\Bigr],
+\end{aligned}
+\tag{5.33}\label{eq:05-33}
+\end{equation}
+其中明确写出了对训练数据求和的操作，即对服从经验分布 $p_{\mathrm{data}}(\mathbf{x})=\frac{1}{N}\sum_{n=1}^N\delta(\mathbf{x}-\mathbf{x}_n)$ 的 $\mathbf{x}$ 取期望，$\delta(\cdot)$ 为狄拉克 $\delta$ 函数。
+
+ELBO 由两部分组成。第一部分是重构误差
+\begin{equation}
+\mathrm{RE}\stackrel{\Delta}{=}\mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}
+ \bigl[\mathbb{E}_{q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p_\theta(\mathbf{x}\mid\mathbf{z})]\bigr],
+\tag{5.34}\label{eq:05-34}
+\end{equation}
+第二部分是编码器与先验之间的正则项
+\begin{equation}
+\Omega\stackrel{\Delta}{=}\mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}
+ \bigl[\mathbb{E}_{q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x})]\bigr].
+\tag{5.35}\label{eq:05-35}
+\end{equation}
+接着，对正则项 $\Omega$ 作一些变换。
+\begin{align}
+\Omega &= \mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}
+ \bigl[\mathbb{E}_{q_\phi(\mathbf{z}\mid\mathbf{x})}[\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x})]\bigr]
+ \tag{5.36}\label{eq:05-36}\\
+ &= \int p_{\mathrm{data}}(\mathbf{x})\int q_\phi(\mathbf{z}\mid\mathbf{x})
+ [\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x})]\,\mathrm{d}\mathbf{z}\,\mathrm{d}\mathbf{x}
+ \tag{5.37}\label{eq:05-37}\\
+ &= \iint p_{\mathrm{data}}(\mathbf{x})q_\phi(\mathbf{z}\mid\mathbf{x})
+ [\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x})]\,\mathrm{d}\mathbf{z}\,\mathrm{d}\mathbf{x}
+ \tag{5.38}\label{eq:05-38}\\
+ &= \iint\frac{1}{N}\sum_n\delta(\mathbf{x}-\mathbf{x}_n)q_\phi(\mathbf{z}\mid\mathbf{x})
+ [\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x})]\,\mathrm{d}\mathbf{z}\,\mathrm{d}\mathbf{x}
+ \tag{5.39}\label{eq:05-39}\\
+ &= \int\frac{1}{N}\sum_{n=1}^N q_\phi(\mathbf{z}\mid\mathbf{x}_n)
+ [\ln p_\lambda(\mathbf{z})-\ln q_\phi(\mathbf{z}\mid\mathbf{x}_n)]\,\mathrm{d}\mathbf{z}
+ \tag{5.40}\label{eq:05-40}\\
+ &= \int\frac{1}{N}\sum_{n=1}^N q_\phi(\mathbf{z}\mid\mathbf{x}_n)\ln p_\lambda(\mathbf{z})\,\mathrm{d}\mathbf{z}
+ \notag\\
+ &\quad-\int\frac{1}{N}\sum_{n=1}^N q_\phi(\mathbf{z}\mid\mathbf{x}_n)\ln q_\phi(\mathbf{z}\mid\mathbf{x}_n)\,\mathrm{d}\mathbf{z}
+ \tag{5.41}\label{eq:05-41}\\
+ &= \int q_\phi(\mathbf{z})\ln p_\lambda(\mathbf{z})\,\mathrm{d}\mathbf{z}-
+ \int\sum_{n=1}^N\frac{1}{N}q_\phi(\mathbf{z}\mid\mathbf{x}_n)\ln q_\phi(\mathbf{z}\mid\mathbf{x}_n)\,\mathrm{d}\mathbf{z}
+ \tag{5.42}\label{eq:05-42}\\
+ &= -\mathbb{CE}[q_\phi(\mathbf{z})\|p_\lambda(\mathbf{z})]
+       +\mathbb{H}[q_\phi(\mathbf{z}\mid\mathbf{x})], \tag{5.43}\label{eq:05-43}
+\end{align}
+其中用到了狄拉克 $\delta$ 函数的性质 $\int\delta(a-a')f(a)\,\mathrm{d}a=f(a')$，以及聚合后验\citerefs{48,49}，定义为
+\begin{equation}
+q(\mathbf{z})=\frac{1}{N}\sum_{n=1}^N q_\phi(\mathbf{z}\mid\mathbf{x}_n).
+\tag{5.44}\label{eq:05-44}
+\end{equation}
+\figref{fig:05-05}给出了聚合后验的示意图。最终得到两项。
+
+% <<<PDFPAGE 131>>>
+\dgmfig{fig_05_05}{.48\linewidth}{聚合后验示例。各数据点在二维潜在空间中编码为高斯分布（品红色），等值线表示变分后验的混合，也就是聚合后验。}{fig:05-05}
+
+\begin{enumerate}[label=(\roman*)]
+\item 第一项 $\mathbb{CE}[q_\phi(\mathbf{z})\|p_\lambda(\mathbf{z})]$ 是聚合后验和先验之间的交叉熵（cross-entropy）。
+\item 第二项 $\mathbb{H}[q_\phi(\mathbf{z}\mid\mathbf{x})]$ 是按经验分布 $p_{\mathrm{data}}(\mathbf{x})$ 计算的 $q_\phi(\mathbf{z}\mid\mathbf{x})$ 的条件熵（conditional entropy）。
+\end{enumerate}
+
+我建议你逐步做一遍推导，这会有助于弄明白这里发生了什么。有意思的是，还可以把 $\Omega$ 改写成三项，其中包括总相关（total correlation）\citeref{51}。这里用不到它，就留作“作业”。
+
+为什么值得重写 ELBO？答案很简单，这样就可以从不同角度分析它！本节的重点是先验。它是生成部分的一个重要组成，却常被忽略。许多贝叶斯学派的研究者认为先验不应通过学习得到。请记住，VAE 并不属于贝叶斯模型！再说，谁规定不能学习先验呢？马上就会看到，不可学习的先验会带来不少麻烦，尤其是生成时。
+
+\subsubsection{ELBO 能告诉我们什么关于先验的信息？}
+现在知道 $\Omega$ 由交叉熵和熵组成。熵较容易分析，先看熵。优化的目的是最大化 ELBO，因此要最大化熵
+\begin{equation}
+\mathbb{H}[q_\phi(\mathbf{z}\mid\mathbf{x})]
+ =-\int\sum_{n=1}^N\frac{1}{N}
+    q_\phi(\mathbf{z}\mid\mathbf{x}_n)\ln q_\phi(\mathbf{z}\mid\mathbf{x}_n)\,\mathrm{d}\mathbf{z}.
+\tag{5.45}\label{eq:05-45}
+\end{equation}
+
+% <<<PDFPAGE 132>>>
+作结论前，要记得这里考虑的是高斯编码器 $q_\phi(\mathbf{z}\mid\mathbf{x})=\mathcal{N}(\mathbf{z}\mid\mu(\mathbf{x}),\sigma^2(\mathbf{x}))$。对角协方差矩阵的高斯分布的熵等于 $\frac12\sum_i\ln(2e\pi\sigma_i^2)$。那么，这个量何时最大？答案是 $\sigma_i^2\to+\infty$。也就是说，熵项会尽可能增大方差，把编码器的分布拉宽！当然，实际上并不会无限拉宽，因为在 $\mathrm{RE}$ 项中，编码器和解码器一起使用，而解码器希望编码器的分布尽量尖锐。理想情况下，每个 $\mathbf{z}$ 对应一个 $\mathbf{x}$，就像确定性自编码器那样。
+
+$\Omega$ 中的第二项是交叉熵
+\begin{equation}
+\mathbb{CE}[q_\phi(\mathbf{z})\|p_\lambda(\mathbf{z})]
+ =-\int q_\phi(\mathbf{z})\ln p_\lambda(\mathbf{z})\,\mathrm{d}\mathbf{z}.
+\tag{5.46}\label{eq:05-46}
+\end{equation}
+交叉熵项以另一种方式影响 VAE。首先，可以问问怎样理解 $q_\phi(\mathbf{z})$ 与 $p_\lambda(\mathbf{z})$ 之间的交叉熵。一般而言，若采用 $p_\lambda(\mathbf{z})$ 所对应的编码方案，交叉熵就是标识一个从 $q_\phi(\mathbf{z})$ 抽取的事件所需的平均比特数。这里用的是自然对数，更准确地说单位是纳特（nat）。注意，$\Omega$ 中出现的是交叉熵的负值。既然要最大化 ELBO，就要最小化 $\mathbb{CE}[q_\phi(\mathbf{z})\|p_\lambda(\mathbf{z})]$。这很合理，因为我们希望 $q_\phi(\mathbf{z})$ 匹配 $p_\lambda(\mathbf{z})$。我们由此碰到了最重要的问题，我们究竟希望达到什么目的？交叉熵迫使聚合后验\textbf{匹配}先验！这就是这一项的作用。想一想，这个漂亮的结果在 VAE 和信息论之间建立了又一条联系。
+
+知道交叉熵的作用后，再看两种可能的情形。第一种是固定的（不可学习的）先验，例如标准高斯先验。这时，优化交叉熵会推动聚合后验匹配先验，见\figref{fig:05-06}。先验就像锚，形状像变形虫的聚合后验向它移动，试图贴合它。实践中，这个优化过程并不容易，因为解码器迫使编码器的分布变得尖锐，最终几乎不可能匹配形状固定的先验。结果就会出现\emph{空洞}，即潜在空间中聚合后验概率很低、先验概率却相对较高的区域（见\figref{fig:05-06}中的深灰色椭圆）。生成时这个问题尤其明显，从先验的空洞中采样，可能得到质量极低的样本。详见\citeref{12}。
+
+如果考虑可学习的\textbf{先验}，情况就不同了。优化可以同时改变聚合后验和先验，因此两个分布会试着彼此匹配（见\figref{fig:05-07}）。这样，空洞问题就没那么明显，尤其当先验足够灵活时。不过，先验和聚合后验相互追逐，又可能引发其他优化问题。实践中，可学习的先验似乎是更好的选择，但是否应一次训练所有组成部分，仍是一个开放问题。此外，可学习的先验不会给潜在表示施加特定约束，例如稀疏性（sparsity）。
+% <<<PDFPAGE 133>>> 上一段跨原页。
+这也可能带来不希望出现的情形，比如编码器不光滑。
+
+\dgmfig{fig_05_06}{.48\linewidth}{使用不可学习的先验时，优化交叉熵的效果示例。聚合后验（紫色等值线）试图匹配不可学习的先验（蓝色）。紫色箭头表示聚合后验如何变化。深灰色椭圆是一个空洞。}{fig:05-06}
+\dgmfig{fig_05_07}{.49\linewidth}{使用可学习的先验时，优化交叉熵的效果示例。聚合后验（紫色等值线）试图匹配可学习的先验（蓝色等值线）。聚合后验向先验靠拢（紫色箭头），先验也随之更新，以覆盖聚合后验（橙色箭头）。}{fig:05-07}
+
+最后可以问一个根本问题，究竟什么是\emph{最好的先验}？答案藏在交叉熵项中，我们已经知道了，就是聚合后验。如果取 $p_\lambda(\mathbf{z})=\sum_{n=1}^N\frac{1}{N}q_\phi(\mathbf{z}\mid\mathbf{x}_n)$，那么在理论上，交叉熵等于 $q_\phi(\mathbf{z})$ 的熵，正则项 $\Omega$ 最小。\footnote{\textbf{译注}\quad 原书说 $\Omega$ 最小。给定编码器时，$p_\lambda=q_\phi$ 最小化交叉熵 $\mathbb{CE}[q_\phi\|p_\lambda]$。由式~\eqref{eq:05-43}，此时 $\Omega$ 最大。} 但在实际中，这样做不可行，理由如下。
+% <<<PDFPAGE 134>>>
+\begin{itemize}
+\item 我们无法对数万个数据点求和，再通过它们反向传播。
+\item 这个结果在理论上成立，但优化过程是随机的，可能引入额外的误差。
+\item 如前所述，把聚合后验用作先验，无法以明显的方式约束潜在表示，因此编码器的行为可能难以预测。
+\item 当数据点数 $N\to+\infty$ 时，聚合后验也许会表现很好，因为此时可以得到任意分布。然而实践中数据量并非如此，而且这样做也与第一条冲突。
+\end{itemize}
+因此，可以记住这个理论解，再构造计算上可行的近似。接下来讨论其中的几种。
+
+\subsubsection{标准高斯分布}
+最基本的 VAE 实现假设 $\mathbf{z}$ 的边缘分布（先验）是标准高斯分布，即 $p_\lambda(\mathbf{z})=\mathcal{N}(\mathbf{z}\mid 0,\mathbf{I})$。这种先验简单、不可训练（即无需学习额外参数），而且容易实现。可以说相当好用！不过，前面讨论过，标准正态分布有可能得到很差的隐表示。聚合后验和先验不匹配会留下空洞。
+
+为说明这一点，我们用标准高斯先验和二维潜在空间训练了一个小型 VAE。\figref{fig:05-08}显示了从测试数据的编码器分布中采出的样本（黑点）和标准先验的等值线图。可以看到一些没有聚合后验样本的空洞，这正是先验和聚合后验不匹配的地方。
+
+\dgmfig{fig_05_08}{.43\linewidth}{标准高斯先验（等值线）和从聚合后验中抽取的样本（黑点）。}{fig:05-08}
+
+下面是标准高斯先验的代码。
+% <<<PDFPAGE 135>>>
+\bookcode{code/ch05_standard_prior.py}{标准高斯先验类。}{lst:05-06}
+
+\subsubsection{高斯混合模型}
+仔细看聚合后验，就会发现它是一个混合模型，更确切地说，是一个高斯混合模型。因此，可以用包含 $K$ 个分量的高斯混合（MoG）先验
+\begin{equation}
+p_\lambda(\mathbf{z})=\sum_{k=1}^K w_k\mathcal{N}(\mathbf{z}\mid\mu_k,\sigma_k^2),
+\tag{5.47}\label{eq:05-47}
+\end{equation}
+其中 $\lambda=\bigl\{\{w_k\},\{\mu_k\},\{\sigma_k^2\}\bigr\}$ 为可训练参数。
+
+和标准高斯先验的情形类似，我们用高斯混合先验（$K=16$）和二维潜在空间训练了一个小型 VAE。\figref{fig:05-09}显示了从测试数据的编码器分布中采出的样本（黑点），以及 MoG 先验的等值线图。与标准高斯先验相比，MoG 先验和聚合后验更匹配，因而可以填补空洞。
+
+下面给出一个代码示例。
+\bookcode{code/ch05_mog_prior.py}{高斯混合先验类。}{lst:05-07}
+% <<<PDFPAGE 136>>> 代码清单 5.7 的第 10--54 行。
+
+% <<<PDFPAGE 137>>>
+\dgmfig{fig_05_09}{.43\linewidth}{MoG 先验（等值线）和从聚合后验中抽取的样本（黑点）。}{fig:05-09}
+
+\subsubsection{VampPrior：后验的变分混合先验}
+\citeref{23}指出，可以通过引入伪输入（pseudo-input）来改进 MoG 先验，近似聚合后验。
+\begin{equation}
+p_\lambda(\mathbf{z})=\frac{1}{K}\sum_{k=1}^K q_\phi(\mathbf{z}\mid\mathbf{u}_k),
+\tag{5.48}\label{eq:05-48}
+\end{equation}
+其中 $\lambda=\bigl\{\phi,\{\mathbf{u}_k^2\}\bigr\}$ 是可训练参数，$\mathbf{u}_k\in\mathcal{X}^D$ 是伪输入。\footnote{\textbf{译注}\quad 此处原书的参数集合中写作 $\{\mathbf{u}_k^2\}$，而式~\eqref{eq:05-48} 及下文用作编码器输入的是 $\mathbf{u}_k$。} 注意，$\phi$ 也是可训练参数的一部分。伪输入的思想是，随机初始化一些模仿观测变量（例如图像）的对象，再通过反向传播学习它们。
+
+这种对聚合后验的近似称为\textbf{后验的变分混合先验}（variational mixture of posteriors prior），简称 VampPrior。\citeref{23}介绍了 VampPrior 的一些有意思的性质，并作了进一步分析。VampPrior 的主要不足在于伪输入的初始化，不过它能很好地近似聚合后验，改善 VAE 的生成质量，例如见\citerefs{10,52,53}。
+
+Alemi 等人\citeref{10}说明了 VampPrior 和 VAE 的信息论解释之间的联系。他们进一步提议引入可学习的分量概率
+\begin{equation}
+p_\lambda(\mathbf{z})=\sum_{k=1}^K w_k\,q_\phi(\mathbf{z}\mid\mathbf{u}_k),
+\tag{5.49}\label{eq:05-49}
+\end{equation}
+使 VampPrior 能够选取更相关的分量，也就是伪输入。
+
+与前面的情形一样，我们用 VampPrior（$K=16$）和二维潜在空间训练了一个小型 VAE。
+% <<<PDFPAGE 138>>> 上一段跨原页。
+\figref{fig:05-10}显示了从测试数据的编码器分布中采出的样本（黑点），以及 VampPrior 的等值线图。和 MoG 先验类似，VampPrior 更贴近聚合后验，留下的空洞也更少。这里还可以看到，VampPrior 允许编码器分布铺展到潜在空间的各处（注意坐标值）。
+
+\dgmfig{fig_05_10}{.90\linewidth}{VampPrior（等值线）和从聚合后验中抽取的样本（黑点）。}{fig:05-10}
+
+下面给出一种 VampPrior 的实现。
+\bookcode{code/ch05_vamp_prior.py}{VampPrior 类。}{lst:05-08}
+% <<<PDFPAGE 139>>> 代码清单 5.8 的第 33--59 行。
+
+\subsubsection{GTM：生成式拓扑映射}
+实际上，可以用任何密度估计器为先验建模。\citeref{54}提出了一种名为\textbf{生成式拓扑映射}（generative topographic mapping，GTM）的密度估计方法，在低维空间 $\mathbf{u}\in\mathbb{R}^C$ 中定义由 $K$ 个点组成的网格，即
+\begin{equation}
+p(\mathbf{u})=\sum_{k=1}^{K} w_k\,\delta(\mathbf{u}-\mathbf{u}_k),
+\tag{5.50}\label{eq:05-50}
+\end{equation}
+再用变换 $g_\gamma$ 将网格映射到更高维的空间。$g_\gamma$ 预测某个分布的参数，例如高斯分布的参数，因而有 $g_\gamma\colon\mathbb{R}^C\to\mathbb{R}^{2\times M}$。最终可以把分布定义为
+% <<<PDFPAGE 140>>>
+\begin{align}
+p_\lambda(\mathbf{z})
+ &=\int p(\mathbf{u})\mathcal{N}\bigl(\mathbf{z}\mid\mu_g(\mathbf{u}),\sigma_g^2(\mathbf{u})\bigr)\,\mathrm{d}\mathbf{u}
+ \tag{5.51}\label{eq:05-51}\\
+ &=\sum_{k=1}^K w_k\mathcal{N}\bigl(\mathbf{z}\mid\mu_g(\mathbf{u}_k),\sigma_g^2(\mathbf{u}_k)\bigr),
+ \tag{5.52}\label{eq:05-52}
+\end{align}
+其中 $\mu_g(\mathbf{u})$ 和 $\sigma_g^2$ 是变换 $g_\gamma(\mathbf{u})$ 的输出。
+
+例如，取 $C=2$、$K=3$，可以定义下面的网格\footnote{\textbf{译注}\quad 这里的 $K=3$ 及网格点按原书保留。每轴取 $-1,0,1$ 的 $3\times3$ 网格共有 9 个点。原书列出的 $[0,1]$ 和 $[1,-1]$ 各重复一次，完整网格还应有 $[0,0]$ 和 $[1,1]$。}。
+\[
+\begin{aligned}
+\mathbf{u}\in\{&[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],\\
+       &[0,1],[1,-1],[1,0],[1,-1]\}.
+\end{aligned}
+\]
+注意，网格是固定的，只有变换 $g_\gamma$（例如神经网络）参与训练。
+
+和前面的情形一样，我们用基于 GTM 的先验（$K=16$，即 $4\times4$ 网格）和二维潜在空间训练了一个小型 VAE。\figref{fig:05-11}显示了从测试数据的编码器分布中采出的样本（黑点），以及基于 GTM 的先验的等值线图。与 MoG 先验和 VampPrior 一样，基于 GTM 的先验能学出相当灵活的分布。
+
+\dgmfig{fig_05_11}{.43\linewidth}{基于 GTM 的先验（等值线）和从聚合后验中抽取的样本（黑点）。}{fig:05-11}
+
+下面给出一种基于 GTM 的先验的实现。
+\bookcode{code/ch05_gtm_prior.py}{基于 GTM 的先验类。}{lst:05-09}
+% <<<PDFPAGE 141>>> 代码清单 5.9 的第 15--63 行。
+% <<<PDFPAGE 142>>> 代码清单 5.9 的第 64--66 行。
+
+\subsubsection{GTM-VampPrior}
+如前所述，VampPrior 的主要问题是伪输入的初始化。可以用 GTM 的思想来学习伪输入。把两种方法结合起来，得到如下先验。
+\begin{equation}
+p_\lambda(\mathbf{z})=\sum_{k=1}^K w_k\,q_\phi\bigl(\mathbf{z}\mid g_\gamma(\mathbf{u}_k)\bigr),
+\tag{5.53}\label{eq:05-53}
+\end{equation}
+其中先在低维空间定义网格 $\{\mathbf{u}_k\}$，然后使用变换 $g_\gamma$ 将这些网格点映射到 $\mathcal{X}^D$。
+
+现在，用 GTM-VampPrior（$K=16$，即 $4\times4$ 网格）和二维潜在空间训练一个小型 VAE。\figref{fig:05-12}显示了从测试数据的编码器分布中采出的样本（黑点），以及 GTM-VampPrior 的等值线图。这个基于混合模型的先验也能覆盖这些点，即聚合后验的样本，并把概率分配给适当的区域。
+
+下面给出一种 GTM-VampPrior 的实现。\footnote{\textbf{译注}\quad 代码清单~\ref{lst:05-10} 第 38--43 行依照原书排版，与 \texttt{sample} 的定义行同级。按 Python 语法，作为函数体的这几行应再缩进一级。}
+\bookcode{code/ch05_gtm_vamp_prior.py}{GTM-VampPrior 先验类。}{lst:05-10}
+% <<<PDFPAGE 143>>> 代码清单 5.10 的第 24--70 行。
+% <<<PDFPAGE 144>>> 代码清单 5.10 的第 71--73 行。
+
+\dgmfig{fig_05_12}{.43\linewidth}{GTM-VampPrior（等值线）和从聚合后验中抽取的样本（黑点）。}{fig:05-12}
+
+\subsubsection{基于流的先验}
+这里要讨论的最后一个分布是基于流的先验。基于流的模型可以用来估计任意分布，用它近似聚合后验也就很自然了。这里使用前面介绍的 RealNVP 实现，详见第~4~章。
+
+% <<<PDFPAGE 145>>>
+\dgmfig{fig_05_13}{.89\linewidth}{基于流的先验（等值线）和从聚合后验中抽取的样本（黑点）。}{fig:05-13}
+
+和前面的情形一样，我们用基于流的先验和二维潜在空间训练了一个小型 VAE。\figref{fig:05-13}显示了从测试数据的编码器分布中采出的样本（黑点），以及基于流的先验的等值线图。与前面基于混合模型的先验相似，基于流的先验可以很好地近似聚合后验。这与许多在 VAE 中用流作先验的论文一致\citerefs{24,25}。不过要记得，基于流的先验的灵活性也有代价。参数数量会增加，训练也可能遇到流模型本身的问题。
+
+下面给出一种基于流的先验的实现。
+\bookcode{code/ch05_flow_prior.py}{基于流的先验类。}{lst:05-11}
+% <<<PDFPAGE 146>>> 代码清单 5.11 的第 25--54 行。
+
+\subsubsection{几点说明}
+实际上，可以用任何密度估计器为 $p_\lambda(\mathbf{z})$ 建模。例如，可以用自回归模型\citeref{26}，也可以用更复杂的方法，如重采样先验（resampled prior）\citeref{27}或层次先验（hierarchical prior）\citeref{53}。可选的方法很多！不过，\textbf{怎样}构造先验（边缘分布），以及它究竟应起到\textbf{什么}作用，仍是开放问题。如开头所说，贝叶斯学派认为，边缘分布应该给潜在空间施加某种约束，换句话说，它应该反映我们对潜在空间的先验知识。我内心深处是个贝叶斯主义者，也很喜欢这种思路。不过，怎样才算好的潜在表示，目前还不清楚。这个问题和数学建模本身一样古老。我认为研究优化方法会很有意思，也许同时对所有参数或权重应用基于梯度的方法，并非最佳解法。无论如何，我很确定，先验建模比很多人以为的更重要，在 VAE 中起着关键作用。
+
+% <<<PDFPAGE 147>>>
+\subsection{变分后验}
+\label{sec:vae-posteriors}
+一般而言，变分推断在一个参数化分布族中寻找最好的后验近似。因此，只有当真实后验恰好属于所选的分布族时，才有可能恢复它。尤其是采用具有对角协方差矩阵的高斯分布这类常用的变分分布族时，变分近似很可能不够好。所以，设计计算可行、表达能力更强的变分分布族，是 VAE 中的一个重要问题。这里介绍两种可用于此目的的条件归一化流（conditional normalizing flow），即 Householder 流\citeref{20}和 Sylvester 流\citeref{16}。还有其他有趣的分布族，例如广义 Sylvester 流\citeref{17}和逆自回归流（inverse autoregressive flow）\citeref{18}，读者可参阅相应的原始论文。
+
+用归一化流参数化变分后验，基本思想是先选取相对简单的分布，比如对角协方差高斯分布，再用一系列可逆变换把它变成复杂分布\citeref{19}。形式上，我们从服从 $\mathcal{N}(\mathbf{z}^{(0)})\mid\mu(\mathbf{x},\sigma^2(\mathbf{x}))$ 的潜变量 $\mathbf{z}^{(0)}$ 开始\footnote{\textbf{译注}\quad 原书此处的括号和条件符号如正文所示。按上下文，起始分布是 $\mathcal{N}\bigl(\mathbf{z}^{(0)}\mid\mu(\mathbf{x}),\sigma^2(\mathbf{x})\bigr)$。}。施加一系列可逆变换 $\mathbf{f}^{(t)}$（$t=1,\ldots,T$）之后，最后一步得到随机变量 $\mathbf{z}^{(T)}$，它的分布更灵活。选取雅可比行列式可算的变换 $\mathbf{f}^{(t)}$ 后，要优化如下目标函数\footnote{\textbf{译注}\quad 保留式~\eqref{eq:05-54} 的 KL 记法。这个项涉及两处变换点。按归一化流的变量变换公式，它应读作在 $q(\mathbf{z}^{(0)}\mid\mathbf{x})$ 下取期望的 $\ln q(\mathbf{z}^{(0)}\mid\mathbf{x})-\ln p(\mathbf{z}^{(T)})$，其本身一般不能视作 KL 散度。}。
+\begin{equation}
+\begin{aligned}
+\ln p(\mathbf{x})\geq{}&\mathbb{E}_{q(\mathbf{z}^{(0)}\mid\mathbf{x})}
+ \left[\ln p(\mathbf{x}\mid\mathbf{z}^{(T)})+
+   \sum_{t=1}^T\ln\left|\det\frac{\partial\mathbf{f}^{(t)}}
+                                     {\partial\mathbf{z}^{(t-1)}}\right|\right]\\
+ &-\mathrm{KL}\bigl(q(\mathbf{z}^{(0)}\mid\mathbf{x})\|p(\mathbf{z}^{(T)})\bigr).
+\end{aligned}
+\tag{5.54}\label{eq:05-54}
+\end{equation}
+实际上，只要对编码器和解码器的架构稍作修改，甚至保持架构不动，就可以用归一化流增强 VAE 后验的表达能力。
+
+\subsubsection[用 Householder 流构造变分后验]{用 Householder 流构造变分后验 \citeref{20}}
+\noindent 动机\par\smallskip
+首先注意到，任何完整协方差矩阵（full-covariance matrix）$\boldsymbol{\Sigma}$ 都可以利用特征向量和特征值作特征值分解
+\begin{equation}
+\boldsymbol{\Sigma}=\mathbf{U}\mathbf{D}\mathbf{U}^{\top},
+\tag{5.55}\label{eq:05-55}
+\end{equation}
+其中 $\mathbf{U}$ 是以特征向量为列的正交矩阵，$\mathbf{D}$ 是以特征值为对角元的对角矩阵。在基本 VAE 中，一个自然的想法是给矩阵 $\mathbf{U}$ 建模，以得到完整协方差矩阵。为此，要用正交矩阵 $\mathbf{U}$ 对随机变量作线性变换。由于正交矩阵的雅可比行列式的绝对值为 $1$，对于 $\mathbf{z}^{(1)}=\mathbf{U}\mathbf{z}^{(0)}$，得到 $\mathbf{z}^{(1)}\sim\mathcal{N}\bigl(\mathbf{U}\mu,\mathbf{U}\operatorname{diag}(\sigma^2)\mathbf{U}^\top\bigr)$。
+% <<<PDFPAGE 148>>> 上一段跨原页。
+如果 $\operatorname{diag}(\sigma^2)$ 恰好等于真实的 $\mathbf{D}$，就能再现真实的完整协方差矩阵。因此，主要目标是给由特征向量构成的正交矩阵建模。
+
+一般而言，有系统地构造正交矩阵并不容易。不过，先注意到任何正交矩阵都可以表示成下面的形式\citerefs{55,56}。
+\begin{booknote}{定理}
+\textbf{\hypertarget{thm:05-01}{定理 5.1}（正交矩阵的基—核表示）}\quad 对任意 $M\times M$ 正交矩阵 $\mathbf{U}$，存在一个满秩的 $M\times K$ 矩阵 $\mathbf{Y}$（基）和一个非奇异的 $K\times K$ 三角矩阵 $\mathbf{S}$（核），其中 $K\leq M$，使得
+\begin{equation}
+\mathbf{U}=\mathbf{I}-\mathbf{Y}\mathbf{S}\mathbf{Y}^\top.
+\tag{5.56}\label{eq:05-56}
+\end{equation}
+\end{booknote}
+
+$K$ 称为正交矩阵的度（degree）。还可以证明，任何度为 $K$ 的正交矩阵，都可以表示为 Householder 变换的乘积\citerefs{55,56}。
+\begin{booknote}{定理}
+\textbf{\hypertarget{thm:05-02}{定理 5.2}}\quad 若一个正交矩阵的基作用于 $K$ 维子空间，则该正交矩阵可以表示为恰好 $K$ 个 Householder 矩阵的乘积
+\begin{equation}
+\mathbf{U}=\mathbf{H}_K\mathbf{H}_{K-1}\cdots\mathbf{H}_1,
+\tag{5.57}\label{eq:05-57}
+\end{equation}
+其中 $\mathbf{H}_k=\mathbf{I}-\mathbf{S}_{kk}\mathbf{Y}_{\cdot k}(\mathbf{Y}_{\cdot k})^\top$，$k=1,\ldots,K$。
+\end{booknote}
+
+从理论上讲，\hyperlink{thm:05-02}{定理~5.2}表明，我们可以用 $K$ 个 Householder 变换有系统地构造任意正交矩阵。此外，Householder 矩阵 $\mathbf{H}_k$ 本身就是正交矩阵\citeref{57}。这一性质加上\hyperlink{thm:05-02}{定理~5.2}，使得 Householder 变换很适合用来构造保体积的流（volume-preserving flow），从而近似、甚至准确表示真实的完整协方差矩阵。
+
+\medskip\noindent Householder 流\par\smallskip
+Householder 变换（Householder transformation）定义如下。给定向量 $\mathbf{z}^{(t-1)}$，可以用一个与反射超平面正交的向量 $\mathbf{v}_t\in\mathbb{R}^M$ 来定义这个超平面。$\mathbf{v}_t$ 称为 Householder 向量（Householder vector）。给定点关于该超平面的反射为\citeref{57}
+% <<<PDFPAGE 149>>>
+\begin{align}
+\mathbf{z}^{(t)}
+ &=\left(\mathbf{I}-2\frac{\mathbf{v}_t\mathbf{v}_t^\top}{\|\mathbf{v}_t\|^2}\right)\mathbf{z}^{(t-1)}
+ \tag{5.58}\label{eq:05-58}\\
+ &=\mathbf{H}_t\mathbf{z}^{(t-1)}, \tag{5.59}\label{eq:05-59}
+\end{align}
+其中 $\mathbf{H}_t=\mathbf{I}-2\frac{\mathbf{v}_t\mathbf{v}_t^\top}{\|\mathbf{v}_t\|^2}$ 称为 Householder 矩阵（Householder matrix）。
+
+$\mathbf{H}_t$ 最重要的性质是它为正交矩阵，因而雅可比行列式的绝对值等于 $1$。这大大简化了目标函数~\eqref{eq:05-54}，因为对 $t=1,\ldots,T$，都有 $\ln\bigl|\det\frac{\partial\mathbf{H}_t\mathbf{z}^{(t-1)}}{\partial\mathbf{z}^{(t-1)}}\bigr|=0$。从 $\mathbf{z}^{(0)}$ 的简单对角协方差后验出发，式~\eqref{eq:05-58}给出的 $T$ 次线性变换定义了一种新的保体积流，称为 \emph{Householder 流}（Householder flow，HF）。编码器网络除了给出均值和方差，还使用以 $\mathbf{v}_{t-1}$ 为输入的线性层产生向量 $\mathbf{v}_t$（$t=1,\ldots,T$），其中 $\mathbf{v}_0=\mathbf{h}$ 是编码器网络最后一个隐藏层的输出。\figref{fig:05-14}示意了 Householder 流的思想。编码器返回第一个 Householder 向量后，Householder 流要做 $T$ 次线性运算，才能从一个更灵活、具有近似完整协方差矩阵的后验中产生一个样本。
+
+\dgmfig{fig_05_14}{\linewidth}{带 Householder 流的编码器网络。（a）VAE+HF 的整体架构。编码器返回后验的均值、方差和用于构造 Householder 流的第一个 Householder 向量。（b）Householder 流的一步，使用线性 Householder 变换。两个分图中的实线均对应编码器网络，虚线表示 HF 另需的量。}{fig:05-14}
+[图内小标题（a）为“编码器网络与 Householder 流”，（b）为“Householder 流的一步”。NN 表示神经网络，HF 表示 Householder 流。]
+
+\subsubsection[用 Sylvester 流构造变分后验]{用 Sylvester 流构造变分后验 \citeref{16}}
+\noindent 动机\par\smallskip
+Householder 流只能给完整协方差的高斯分布建模，这样的分布族未必足够丰富。现在来看 Householder 流的一种推广。为此，考虑以下变换，它类似于一个具有 $M$ 个隐藏单元和残差连接（residual connection）的单层 MLP
+\begin{equation}
+\mathbf{z}^{(t)}=\mathbf{z}^{(t-1)}+\mathbf{A} h\bigl(\mathbf{B}\mathbf{z}^{(t-1)}+\mathbf{b}\bigr),
+\tag{5.60}\label{eq:05-60}
+\end{equation}
+% <<<PDFPAGE 150>>>
+其中 $\mathbf{A}\in\mathbb{R}^{D\times M}$、$\mathbf{B}\in\mathbb{R}^{M\times D}$、$\mathbf{b}\in\mathbb{R}^M$，且 $M\leq D$。可以借助 Sylvester 行列式恒等式（Sylvester's determinant identity）求出这个变换的雅可比行列式。这个恒等式是矩阵行列式引理（matrix determinant lemma）的推广。
+
+\begin{booknote}{定理}
+\textbf{\hypertarget{thm:05-03}{定理 5.3}（Sylvester 行列式恒等式）}\quad 对任意 $\mathbf{A}\in\mathbb{R}^{D\times M}$ 和 $\mathbf{B}\in\mathbb{R}^{M\times D}$，有
+\begin{equation}
+\det(\mathbf{I}_D+\mathbf{A}\mathbf{B})=\det(\mathbf{I}_M+\mathbf{B}\mathbf{A}),
+\tag{5.61}\label{eq:05-61}
+\end{equation}
+其中 $\mathbf{I}_M$ 和 $\mathbf{I}_D$ 分别是 $M$ 维和 $D$ 维单位矩阵。
+\end{booknote}
+
+当 $M<D$ 时，一个 $D\times D$ 矩阵的行列式因此可化为一个 $M\times M$ 矩阵的行列式来求。
+
+利用 Sylvester 行列式恒等式，式~\eqref{eq:05-60}中变换的雅可比行列式为
+\begin{equation}
+\det\left(\frac{\partial\mathbf{z}^{(t)}}{\partial\mathbf{z}^{(t-1)}}\right)
+ =\det\Bigl(\mathbf{I}_M+\operatorname{diag}\bigl(h'(\mathbf{B}\mathbf{z}^{(t-1)}+\mathbf{b})\bigr)
+             \mathbf{B}\mathbf{A}\Bigr).
+\tag{5.62}\label{eq:05-62}
+\end{equation}
+由于 Sylvester 行列式恒等式对这一类归一化流至关重要，我们称其为 \emph{Sylvester 归一化流}（Sylvester normalizing flow，SNF）。
+
+\medskip\noindent $\mathbf{A}$ 和 $\mathbf{B}$ 的参数化\par\smallskip
+式~\eqref{eq:05-60}中的变换通常不可逆。因此，考虑上述变换的如下特例。
+\begin{equation}
+\mathbf{z}^{(t)}=\mathbf{z}^{(t-1)}+\mathbf{Q}\mathbf{R}
+       h(\tilde{\mathbf{R}}\mathbf{Q}^\top\mathbf{z}^{(t-1)}+\mathbf{b}),
+\tag{5.63}\label{eq:05-63}
+\end{equation}
+其中 $\mathbf{R}$ 和 $\tilde{\mathbf{R}}$ 是 $M\times M$ 上三角矩阵，且
+\[
+\mathbf{Q}=(\mathbf{q}_1\ \cdots\ \mathbf{q}_M),
+\]
+各列 $\mathbf{q}_m\in\mathbb{R}^D$ 构成一组标准正交向量。根据\hyperlink{thm:05-03}{定理~5.3}，该变换的雅可比矩阵 $\mathbf{J}$ 的行列式可化为
+\begin{equation}
+\begin{aligned}
+\det(\mathbf{J})
+ &=\det\Bigl(\mathbf{I}_M+\operatorname{diag}\bigl(
+    h'(\tilde{\mathbf{R}}\mathbf{Q}^\top\mathbf{z}^{(t-1)}+\mathbf{b})\bigr)
+    \tilde{\mathbf{R}}\mathbf{Q}^\top\mathbf{Q}\mathbf{R}\Bigr)\\
+ &=\det\Bigl(\mathbf{I}_M+\operatorname{diag}\bigl(
+    h'(\tilde{\mathbf{R}}\mathbf{Q}^\top\mathbf{z}^{(t-1)}+\mathbf{b})\bigr)
+    \tilde{\mathbf{R}}\mathbf{R}\Bigr).
+\end{aligned}
+\tag{5.64}\label{eq:05-64}
+\end{equation}
+由于 $\tilde{\mathbf{R}}\mathbf{R}$ 也是上三角矩阵，计算只需 $O(M)$ 时间。下一个定理给出了这个变换可逆的一个充分条件。
+
+% <<<PDFPAGE 151>>>
+\begin{booknote}{定理 \citeref{16}}
+\textbf{\hypertarget{thm:05-04}{定理 5.4}}\quad 设 $\mathbf{R}$ 和 $\tilde{\mathbf{R}}$ 为上三角矩阵，$h\colon\mathbb{R}\to\mathbb{R}$ 为光滑函数，且其导数为正并有界。如果 $\mathbf{R}$ 与 $\tilde{\mathbf{R}}$ 的对角元满足 $r_{ii}\tilde r_{ii}>-1/\|h'\|_\infty$，且 $\tilde{\mathbf{R}}$ 可逆，则式~\eqref{eq:05-63}给出的变换可逆。
+\end{booknote}
+定理的证明见\citeref{16}。
+
+\medskip\noindent 保持 $\mathbf{Q}$ 的正交性\par\smallskip
+正交性在数学上是一条便利的性质，实际中却难以做到。这里讨论三种基于上述定理的流，它们以不同方式保持 $\mathbf{Q}$ 的正交性。前两种明确给出可微的正交矩阵构造，第三种使用一个特定的固定置换矩阵作为正交矩阵。
+
+\textbf{正交 Sylvester 流}\quad 第一种 Sylvester 流采用具有 $M$ 个正交列的矩阵，称为正交 Sylvester 流（orthogonal Sylvester flow，O-SNF）。在这种流中，可以选择 $M<D$，以引入一个灵活的瓶颈。与\citeref{58}类似，我们采用\citerefs{59,60}提出的可微迭代方法来保证 $\mathbf{Q}$ 的正交性
+\begin{equation}
+\mathbf{Q}^{(k+1)}=\mathbf{Q}^{(k)}
+  \left(\mathbf{I}+\frac12\left(\mathbf{I}-\mathbf{Q}^{(k)\top}\mathbf{Q}^{(k)}\right)\right).
+\tag{5.65}\label{eq:05-65}
+\end{equation}
+其收敛的充分条件是 $\|\mathbf{Q}^{(0)\top}\mathbf{Q}^{(0)}-\mathbf{I}\|_2<1$。这里矩阵 $\mathbf{X}$ 的 2-范数指 $\|\mathbf{X}\|_2=\lambda_{\max}(\mathbf{X})$，其中 $\lambda_{\max}(\mathbf{X})$ 表示 $\mathbf{X}$ 的最大奇异值。在实验中，我们运行这个迭代过程，直到 $\|\mathbf{Q}^{(k)\top}\mathbf{Q}^{(k)}-\mathbf{I}\|_F\leq\epsilon$，其中 $\|\mathbf{X}\|_F$ 是 Frobenius 范数，$\epsilon$ 是较小的收敛阈值。我们观察到，对于这一阈值，至多迭代 30 步就足以收敛。为了降低正交化带来的计算开销，我们并行处理所有流的正交化。
+
+由于这个正交化过程可微，可以通过反向传播计算关于 $\mathbf{Q}^{(0)}$ 的梯度。因此，可以用随机梯度下降等任何标准优化方法来更新流的参数。
+
+\textbf{Householder Sylvester 流}\quad 第二种是 Householder Sylvester 流（Householder Sylvester flow，H-SNF），其中的正交矩阵由 Householder 反射的乘积构成。Householder 变换是关于超平面的反射。设 $\mathbf{v}\in\mathbb{R}^D$，则关于与 $\mathbf{v}$ 正交的超平面的反射由式~\eqref{eq:05-58}给出。
+
+值得注意的是，单次 Householder 变换的计算开销很低，只需要 $D$ 个参数。把多个 Householder 变换连起来，就能得到更一般的正交矩阵。
+% <<<PDFPAGE 152>>> 上一段跨原页。
+根据\hyperlink{thm:05-02}{定理~5.2}，任何 $M\times M$ 正交矩阵都可以表示为 $M-1$ 个 Householder 变换的乘积。\footnote{\textbf{译注}\quad 这里保留原书的 $M-1$。定理~5.2 给出的是 $K\leq M$。例如二维的 $-\mathbf{I}$ 行列式为 $+1$，而一次 Householder 反射的行列式为 $-1$，故需要两次反射。} 在我们的 Householder Sylvester 流中，Householder 变换的次数 $H$ 是一个超参数，用于在参数数量和正交变换的普适性之间取舍。注意，Householder 变换给出的是方阵，所以必须取 $M=D$。
+
+\textbf{三角 Sylvester 流}\quad 第三种是三角 Sylvester 流（triangular Sylvester flow，T-SNF）。其中的正交矩阵 $\mathbf{Q}$ 在连续的变换中交替取单位矩阵和将 $\mathbf{z}$ 的次序反转的置换矩阵。这相当于对每一步流变换，让 $\tilde{\mathbf{R}}$ 和 $\mathbf{R}$ 在下三角矩阵与上三角矩阵之间交替。
+
+\medskip\noindent 流参数的摊销\par\smallskip
+在摊销推断（amortized inference）中使用归一化流时，基分布的参数和流参数都可以是数据点 $\mathbf{x}$ 的函数\citeref{19}。\figref{fig:05-15}左图给出了 SNF 的一步及其参数摊销过程。推断网络以数据点 $\mathbf{x}$ 为输入，输出 $\mathbf{z}^{(0)}$ 的均值和方差，使得 $\mathbf{z}^{(0)}\sim\mathcal{N}(\mathbf{z}\mid\mu^0,\sigma^0)$。接着施加多步 SNF 变换 $\mathbf{z}^{(0)}\to\mathbf{z}^{(1)}\to\cdots\to\mathbf{z}^{(T)}$，从而给 $\mathbf{z}^{(T)}$ 产生一个灵活的后验分布。所有流参数，即每一步变换的 $\mathbf{R}$、$\tilde{\mathbf{R}}$ 和 $\mathbf{Q}$，都是推断网络的输出，因此是完全摊销的。
+
+\dgmfig{fig_05_15}{\linewidth}{Sylvester 归一化流和逆自回归流的不同摊销策略。（a）推断网络产生摊销的流参数。平面流也采用这一策略。（b）逆自回归流\citeref{18}引入上下文变量 $\mathbf{h}(\mathbf{x})$，从而使变换带有一定程度的 $\mathbf{x}$ 依赖。这个上下文作为每步变换的额外输入，而流参数本身与 $\mathbf{x}$ 无关。}{fig:05-15}
+[图中框内文字分别是“SNF 变换”和“IAF 变换”。IAF 表示逆自回归流。]
+
+% <<<PDFPAGE 153>>>
+\subsubsection{超球面潜在空间}
+\label{sec:hyperspherical-vae}
+\noindent 动机\par\smallskip
+在 VAE 框架中，为了便于数学处理，通常选用高斯先验和高斯后验，由此得到欧氏潜在空间。不过，这样的选择可能有局限，原因如下。
+\begin{itemize}
+\item 在低维空间，标准高斯分布的概率质量集中在均值附近，促使数据点向中心聚集。若数据分成多个簇，这一现象尤其麻烦。均匀分布会是更合适的先验，但是在整个超平面上，无法定义这样的均匀先验。
+\item 有一个众所周知的现象。高维标准高斯分布往往类似于超球面上的均匀分布，绝大部分概率质量集中在超球壳上。这就是所谓的肥皂泡效应（soap bubble effect）。一个自然的问题是，直接采用定义在超球面上的分布会不会更好？
+\end{itemize}
+能同时解决这两个问题的一种分布是 von Mises–Fisher 分布。\citeref{33}提倡把它用于 VAE。
+
+\medskip\noindent von Mises–Fisher 分布\par\smallskip
+\emph{von Mises–Fisher 分布}（vMF）常被称为超球面上的高斯分布。类似于高斯分布，它的参数是表示平均方向的 $\mu\in\mathbb{R}^m$，以及衡量在 $\mu$ 附近集中程度的 $\kappa\in\mathbb{R}_{\geq 0}$。特别地，当 $\kappa=0$ 时，vMF 分布表示均匀分布。对于随机单位向量 $\mathbf{z}\in\mathbb{R}^m$（或 $\mathbf{z}\in\mathcal{S}^{m-1}$），vMF 分布的概率密度函数定义为
+\begin{align}
+q(\mathbf{z}\mid\mu,\kappa)&=C_m(\kappa)\exp(\kappa\mu^\top\mathbf{z}) \tag{5.66}\label{eq:05-66}\\
+C_m(\kappa)&=\frac{\kappa^{m/2-1}}
+ {(2\pi)^{m/2}I_{m/2-1}(\kappa)}, \tag{5.67}\label{eq:05-67}
+\end{align}
+其中 $\|\mu\|^2=1$，$C_m(\kappa)$ 是归一化常数，$I_v$ 表示 $v$ 阶第一类修正 Bessel 函数（modified Bessel function of the first kind）。
+
+有意思的是，既然在超球面上定义分布，就可以在同一个超球面上定义均匀先验。以 vMF 分布为变分后验，还可以解析地算出 vMF 分布和 $\mathcal{S}^{m-1}$ 上均匀分布之间的 Kullback–Leibler 散度\citeref{33}\footnote{\textbf{译注}\quad 式~\eqref{eq:05-68}保留原书的第一项 $\kappa$。由式~\eqref{eq:05-66}对对数密度取期望，第一项一般应为 $\kappa\mathbb{E}_{\operatorname{vMF}(\mu,\kappa)}[\mu^\top\mathbf{z}]$。}。
+\begin{equation}
+\mathrm{KL}[\operatorname{vMF}(\mu,\kappa)\|\operatorname{Unif}(\mathcal{S}^{m-1})]
+ =\kappa+\log C_m(\kappa)-\log\left(\frac{2(\pi^{m/2})}{\Gamma(m/2)}\right)^{-1}.
+\tag{5.68}\label{eq:05-68}
+\end{equation}
+% <<<PDFPAGE 154>>>
+从 vMF 分布采样，可以按照\citeref{61}的方法。要注意的是，vMF 分布的重参数化不容易构造。好在\citeref{62}可以把重参数化技巧扩展到一大类可用拒绝采样（rejection sampling）模拟的分布。Davidson 等人\citeref{33}介绍了如何构造基于接受–拒绝采样的重参数化。有了采样方法、重参数化技巧和 Kullback–Leibler 散度的解析形式，构建超球面 VAE 的条件就齐备了。不过请注意，这些步骤都比高斯分布中的相应步骤复杂。有兴趣的读者可以参阅\citeref{33}了解详情。
+
+\section{层次潜变量模型}
+\label{sec:hierarchical-vae}
+\subsection{引言}
+人工智能的主要目标，是构建并实现能够与环境互动、处理信息、存储信息和传递信息的系统。换句话说，我们希望人工智能系统能识别并解耦所观测的低层感知数据中的隐藏因素，从而\emph{理解}周围世界\citeref{63}。如果把问题表述为学习一个概率模型，就是学习观测数据 $\mathbf{x}$ 与隐藏因素 $\mathbf{z}$ 的联合分布 $p(\mathbf{x},\mathbf{z})$。这样，学习\emph{有用的表示}（useful representation），就等价于求出隐藏因素的后验分布 $p(\mathbf{z}\mid\mathbf{x})$。不过，这里的“有用”究竟是什么意思，并不明确。Ferenc Huszár 在一篇精彩的博文\citeref{64}中说明了，为什么最大化似然函数学到的潜变量模型，从表示学习的角度看未必有用。我们以此为出发点，讨论层次潜变量模型（hierarchical latent variable model）可能有哪些好处。
+
+先明确问题的设定。假设有经验分布 $p_{\mathrm{data}}(\mathbf{x})$ 和潜变量模型 $p_\theta(\mathbf{x},\mathbf{z})$。我们对潜变量模型的参数化方式不加限制，但假定用深度神经网络（deep neural network，DNN）参数化分布。这一点重要，有两个理由。
+\begin{enumerate}
+\item DNN 是非线性变换，因此很灵活，可以参数化范围很广的一类分布。
+\item 要记住，DNN \textbf{不能}替我们解决所有问题！我们最终要考虑的是整个模型，包括所选择的分布、随机变量之间的相互作用，等等。DNN 确实有用，但许多潜在的陷阱（后面会讨论其中几个）即使最大、最先进的 DNN 也处理不了。
+\end{enumerate}
+
+% <<<PDFPAGE 155>>>
+值得记住，联合分布可以用两种方式作因子分解。
+\begin{align}
+p_\theta(\mathbf{x},\mathbf{z})&=p_\theta(\mathbf{x}\mid\mathbf{z})p_\theta(\mathbf{z}) \tag{5.69}\label{eq:05-69}\\
+ &=p_\theta(\mathbf{z}\mid\mathbf{x})p_\theta(\mathbf{x}). \tag{5.70}\label{eq:05-70}
+\end{align}
+此外，学习 $\theta$ 的训练问题可以定义为无约束优化，训练目标为
+\begin{align}
+\mathrm{KL}[p_{\mathrm{data}}(\mathbf{x})\|p_\theta(\mathbf{x})]
+  &=-\mathbb{H}[p_{\mathrm{data}}(\mathbf{x})]
+    +\mathbb{CE}[p_{\mathrm{data}}(\mathbf{x})\|p_\theta(\mathbf{x})] \tag{5.71}\label{eq:05-71}\\
+  &=\mathrm{const}+\mathbb{CE}[p_{\mathrm{data}}(\mathbf{x})\|p_\theta(\mathbf{x})], \tag{5.72}\label{eq:05-72}
+\end{align}
+其中 $p_\theta(\mathbf{x})=\int p_\theta(\mathbf{x},\mathbf{z})\,\mathrm{d}\mathbf{z}$，$\mathbb{H}[\cdot]$ 表示熵，$\mathbb{CE}[\cdot\|\cdot]$ 表示交叉熵。注意，经验分布的熵只是个常数，因为它不含 $\theta$。交叉熵可以进一步改写为
+\begin{align}
+\mathbb{CE}[p_{\mathrm{data}}(\mathbf{x})\|p_\theta(\mathbf{x})]
+  &=-\int p_{\mathrm{data}}(\mathbf{x})\ln p_\theta(\mathbf{x})\,\mathrm{d}\mathbf{x} \tag{5.73}\label{eq:05-73}\\
+  &=-\frac{1}{N}\sum_{n=1}^N\ln p_\theta(\mathbf{x}_n). \tag{5.74}\label{eq:05-74}
+\end{align}
+最后得到的就是一直在用的目标函数，即负对数似然函数。
+
+考虑一个表示（即隐藏因素 $\mathbf{z}$）是否\emph{有用}时，我们直觉上会想到 $\mathbf{z}$ 和 $\mathbf{x}$ 共享的某种信息。然而，这里的无约束训练问题，即最小化负对数似然函数，并不一定能告诉我们潜在表示的任何性质。由于没有潜变量的取值可用，我们实际优化的是观测变量的边缘分布。而且，通常也不知道这些隐藏因素是什么，或应该是什么！结果是，潜变量模型可能学会……彻底忽略潜变量。接下来详细看这个问题。
+
+\medskip\noindent 潜变量模型的一个潜在问题\par\smallskip
+沿着\citeref{64}的讨论，可以把采用潜变量模型的深度生成建模中两种相当常见的情形画出来。深入讨论之前，先看整体情况。我们想依据潜变量的有用程度，以及目标函数 $\mathrm{KL}[p_{\mathrm{data}}(\mathbf{x})\|p_\theta(\mathbf{x})]$ 的值，分析一类潜变量模型。\figref{fig:05-16}展示了允许所有可能模型的情形，在这个搜索空间中，依据训练目标（横轴）和有用程度（纵轴）评估模型。理想模型位于左上角，在两项标准上都表现最佳。然而，也可能找到一个完全忽略潜变量的模型（左下角），同时它又能最好地拟合数据。
+% <<<PDFPAGE 156>>> 上一段跨原页。
+这已经暴露出一个可能很严重的问题！运行（数值）优化程序，可能得到无穷多个在 $\mathrm{KL}[p_{\mathrm{data}}(\mathbf{x})\|p_\theta(\mathbf{x})]$ 上同样优秀、对潜变量却有截然不同的后验的模型！这让潜变量模型是否适用受到质疑。然而，实践中学到的潜变量确实有用，换句话说，它们包含观测变量的信息。这又怎么解释？
+
+\dgmfig{fig_05_16}{.50\linewidth}{所有可能的潜变量模型中，有用程度与目标函数值的关系示意图。颜色越深，目标函数值越好。根据\citeref{64}复现。}{fig:05-16}
+[图上方为“所有可能的潜变量模型”，纵轴为 $p_\theta(\mathbf{z}\mid\mathbf{x})$ 的有用程度。]
+
+正如\citeref{64}指出的，原因在于所选模型族的归纳偏置（inductive bias）。选取特定的一类 DNN，就给搜索空间加上了隐含的约束。首先，\figref{fig:05-16}最左侧的模型通常无法得到。不过，在模型族中引入某种瓶颈，有可能迫使潜变量包含关于观测变量的一些信息。潜变量就由此变得有用。\figref{fig:05-17}就是这样的例子。运行训练算法之后，我们可能到达两个“尖峰”之一，那里训练目标表现最好，有用程度也不为零。仍然有可能得到表现相同、有用程度却不同的模型，但至少信息从 $\mathbf{x}$ 流到了 $\mathbf{z}$。显然，这个情形只是假设，却表明即使目标函数没有明确要求学习表示，模型的归纳偏置也能为此提供很大帮助。请记住这一点，后面会用到它！
+
+下一种情况更棘手。假设模型族受到约束，而条件似然 $p(\mathbf{x}\mid\mathbf{z})$ 由一个非常灵活的大型 DNN 参数化。一个潜在危险是，这个模型可能学会完全忽略 $\mathbf{z}$，把它当作噪声。结果，$p(\mathbf{x}\mid\mathbf{z})$ 就变成了几乎完美拟合 $p_{\mathrm{data}}(\mathbf{x})$ 的无条件分布。乍看之下，这种情形似乎不太现实，但在这个领域已是众所周知的现象。例如，\citeref{10}对变分自编码器做了详尽的实验，使用基于 PixelCNN++ 的解码器，结果 VAE 无法重构图像。他们的结论也是如此，如果模型族中的 $p(\mathbf{x}\mid\mathbf{z})$ 过于灵活，就可能得到\figref{fig:05-18}左下角的模型。
+
+% <<<PDFPAGE 157>>>
+\dgmfig{fig_05_17}{.50\linewidth}{一类受约束的模型中，有用程度与目标函数值的关系示意图。颜色越深，目标函数值越好。根据\citeref{64}复现。}{fig:05-17}
+[图上方为“一类潜变量模型”，纵轴为 $p_\theta(\mathbf{z}\mid\mathbf{x})$ 的有用程度。]
+\dgmfig{fig_05_18}{.47\linewidth}{在一类具有灵活的 $p(\mathbf{x}\mid\mathbf{z})$ 的模型中，有用程度与目标函数值的关系示意图。颜色越深，目标函数值越好。根据\citeref{64}复现。}{fig:05-18}
+[图上方为“一类具有灵活的 $p(\mathbf{x}\mid\mathbf{z})$ 的模型”，纵轴为 $p_\theta(\mathbf{z}\mid\mathbf{x})$ 的有用程度。]
+
+\medskip\noindent 怎样定义合适的模型族？\par\smallskip
+讲到这里，你可能已经有点困惑。整体情况似乎不太乐观，因为选取合适的模型族，也就是能得到\emph{有用的}潜在表示的一类模型，并不容易。而且，这件事听起来就像在黑暗中摸索，试用各种 DNN 架构，希望能碰巧得到有意义的表示。
+
+好在问题并没有乍看那么可怕。有些方法构造有约束的优化问题\citerefs{12,65}，或者加入辅助正则项\citerefs{66,67}，从而（隐含地）定义潜变量的有用程度。我们这里讨论一种可能的方法，利用层次架构（hierarchical architecture）。不过值得记住，学习\emph{有用的表示}仍是一个开放问题，也是很活跃的研究方向。
+
+层次模型在深度生成建模和深度学习中已有很长的历史，许多知名研究者都提倡使用它，例如见\citerefs{68,69,70}。主要假设是，描述周围世界的概念可以按层次组织。结合前面的讨论，如果潜变量模型采用层次结构，就可能引入归纳偏置，约束模型族，最终促使潜变量与观测变量之间传递信息。
+% <<<PDFPAGE 158>>> 上一段跨原页。
+至少理论上如此。马上会看到，在设计层次结构中的随机依赖关系时，必须非常谨慎。接下来几节将重点讨论采用变分推断的层次潜变量模型，即层次变分自编码器。
+
+\begin{booknote}{旁注}
+人们可能会把层次建模和贝叶斯层次建模（Bayesian hierarchical modeling）联系起来。这两个术语未必等价。贝叶斯层次建模把（超）参数当作随机变量，给它们定义分布\citeref{71}。这里没有采用贝叶斯建模，所考虑的是潜变量之间的层次结构。
+\end{booknote}
+
+\subsection{层次 VAE}
+\subsubsection{两层 VAE}
+从具有两个潜变量 $\mathbf{z}_1$ 和 $\mathbf{z}_2$ 的 VAE 开始。联合分布可以按如下方式作因子分解。
+\begin{equation}
+p(\mathbf{x},\mathbf{z}_1,\mathbf{z}_2)=p(\mathbf{x}\mid\mathbf{z}_1)p(\mathbf{z}_1\mid\mathbf{z}_2)p(\mathbf{z}_2).
+\tag{5.75}\label{eq:05-75}
+\end{equation}
+这个模型定义了一个简单明了的生成过程。先采样 $\mathbf{z}_2$，再给定 $\mathbf{z}_2$ 采样 $\mathbf{z}_1$，最后给定 $\mathbf{z}_1$ 采样 $\mathbf{x}$。
+
+我们已经知道，即使只有一个潜变量，其后验也难以求解（线性高斯情形除外，值得记住）。因此，可以采用一族变分后验 $Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})$ 来做变分推断。关键是如何定义变分后验。一个相当自然的办法是反转依赖关系，按下面的方式分解后验。
+\begin{equation}
+Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})=q(\mathbf{z}_1\mid\mathbf{x})q(\mathbf{z}_2\mid\mathbf{z}_1,\mathbf{x}).
+\tag{5.76}\label{eq:05-76}
+\end{equation}
+还可以进一步简化，去掉第二个潜变量对 $\mathbf{x}$ 的依赖。
+\begin{equation}
+Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})=q(\mathbf{z}_1\mid\mathbf{x})q(\mathbf{z}_2\mid\mathbf{z}_1).
+\tag{5.77}\label{eq:05-77}
+\end{equation}
+如果选用连续潜变量，就可以使用高斯分布。
+\begin{align}
+p(\mathbf{z}_1\mid\mathbf{z}_2)&=\mathcal{N}\bigl(\mathbf{z}_1\mid\mu(\mathbf{z}_2),\sigma^2(\mathbf{z}_2)\bigr) \tag{5.78}\label{eq:05-78}\\
+p(\mathbf{z}_2)&=\mathcal{N}(\mathbf{z}_2\mid 0,1) \tag{5.79}\label{eq:05-79}\\
+q(\mathbf{z}_1\mid\mathbf{x})&=\mathcal{N}\bigl(\mathbf{z}_1\mid\mu(\mathbf{x}),\sigma^2(\mathbf{x})\bigr) \tag{5.80}\label{eq:05-80}\\
+q(\mathbf{z}_2\mid\mathbf{z}_1)&=\mathcal{N}\bigl(\mathbf{z}_2\mid\mu(\mathbf{z}_1),\sigma^2(\mathbf{z}_1)\bigr), \tag{5.81}\label{eq:05-81}
+\end{align}
+% <<<PDFPAGE 159>>>
+其中 $\mu_i(\mathbf{v})$ 表示由以随机变量 $\mathbf{v}$ 为输入的神经网络参数化的均值。方差也以相同方式参数化，即对角协方差矩阵。可见，这只是对前面讨论的 VAE 的一种直接扩展。
+
+两层 VAE 如\figref{fig:05-19}所示。注意随机依赖关系的定义，这里每次都只依赖一个随机变量。
+\dgmfig{fig_05_19}{.31\linewidth}{两层 VAE 的一个示例。（a）生成部分。（b）变分部分。}{fig:05-19}
+
+\medskip\noindent 一个可能的陷阱\par\smallskip
+这样就完成了吗？我们得到了一类更好的 VAE 吗？遗憾的是，还没有。我们看到，两层 VAE 只是对单层 VAE 的直接扩展。因而前面讨论的潜变量模型的潜在问题仍然存在。看看两层 VAE 的 ELBO，还能进一步弄清问题。如果你忘了怎样推导 ELBO，请先回顾前面关于 VAE 的几节。
+\begin{equation}
+\begin{aligned}
+\mathrm{ELBO}(\mathbf{x})=\mathbb{E}_{Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})}\Biggl[
+ &\ln p(\mathbf{x}\mid\mathbf{z}_1)-\ln\frac{q(\mathbf{z}_1\mid\mathbf{x})}{p(\mathbf{z}_1\mid\mathbf{z}_2)}\\
+ &-\mathrm{KL}[q(\mathbf{z}_2\mid\mathbf{z}_1)\|p(\mathbf{z}_2)]\Biggr].
+\end{aligned}
+\tag{5.82}\label{eq:05-82}
+\end{equation}
+为了理解两层 VAE 的 ELBO，注意下面几点。
+\begin{enumerate}
+\item 所有条件变量（$\mathbf{z}_1,\mathbf{z}_2,\mathbf{x}$）都是从 $Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})$ 或 $p_{\mathrm{data}}(\mathbf{x})$ 中抽取的样本。
+\item 我们得到最后一层，即 $\mathbf{z}_2$ 层的 Kullback–Leibler 散度项。中间项无法写成 Kullback–Leibler 散度，因为必须先从 $q(\mathbf{z}_1\mid\mathbf{x})$ 采样 $\mathbf{z}_1$，然后才能从 $q(\mathbf{z}_2\mid\mathbf{z}_1)$ 采样 $\mathbf{z}_2$。因此，不能“交换”两个分布以得到 Kullback–Leibler 散度项。建议你逐步推导 ELBO，这是熟悉变分推断的好练习。
+\item 值得记住，Kullback–Leibler 散度总是非负的。
+\end{enumerate}
+理论上，一切都应该正常工作，但有几个潜在问题。首先，所有用于参数化分布的 DNN 都是随机初始化的，因而这些高斯分布基本上都是标准高斯分布。
+% <<<PDFPAGE 160>>> 上一段跨原页。
+其次，如果解码器很强、很灵活，模型很可能利用最后一个 KL 项 $\mathrm{KL}[q(\mathbf{z}_2\mid\mathbf{z}_1)\|p(\mathbf{z}_2)]$ 的最优点，即 $q(\mathbf{z}_2\mid\mathbf{z}_1)\approx p(\mathbf{z}_2)\approx\mathcal{N}(0,1)$。由于 $q(\mathbf{z}_2\mid\mathbf{z}_1)\approx\mathcal{N}(0,1)$，第二层完全用不上，只是高斯噪声，于是又回到了单层 VAE 架构中遇到的问题。结果表明，两层 VAE 比只有一层潜变量的 VAE 更难训练，即使解码器相对简单，第二层的潜变量 $\mathbf{z}_2$ 也大多用不上\citerefs{15,72}。这种现象称为后验坍塌。
+
+\subsubsection{自顶向下的 VAE}
+对两层 VAE 的讨论表明，比起单层 VAE，多加一层未必能带来好处。不过，到目前为止，我们只考虑了一类变分后验
+\begin{equation}
+Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})=q(\mathbf{z}_1\mid\mathbf{x})q(\mathbf{z}_2\mid\mathbf{z}_1).
+\tag{5.83}\label{eq:05-83}
+\end{equation}
+一个自然的问题是，能不能做得更好？你可能已经猜到答案，不过先别急着说，再想一想。在生成部分，依赖关系是自顶向下（top-down）的，从抽象层级最高的潜变量，一直通向观测变量。再写一遍。
+\begin{equation}
+p(\mathbf{x},\mathbf{z}_1,\mathbf{z}_2)=p(\mathbf{x}\mid\mathbf{z}_1)p(\mathbf{z}_1\mid\mathbf{z}_2)p(\mathbf{z}_2).
+\tag{5.84}\label{eq:05-84}
+\end{equation}
+也许可以在变分后验中采用同样的依赖关系。这样就得到
+\begin{equation}
+Q(\mathbf{z}_1,\mathbf{z}_2\mid\mathbf{x})=q(\mathbf{z}_1\mid\mathbf{z}_2,\mathbf{x})q(\mathbf{z}_2\mid\mathbf{x}).
+\tag{5.85}\label{eq:05-85}
+\end{equation}
+看出相似之处了吗？变分后验多了一个 $\mathbf{x}$，而依赖关系指向相同的方向。这样做有什么好处？现在，我们可以让变分后验和生成部分共享一条自顶向下的路径，通过共享参数化把二者联系起来。这可能是一种很有用的归纳偏置！
+
+ResNet VAE\citeref{18}和 Ladder VAE\citeref{73}最早提出了这个思想。BIVA\citeref{45}、NVAE\citeref{46}和极深 VAE\citeref{47}又进一步发展了它。这些方法的实现和参数化方式（即 DNN 架构）不同，但都可以看作\emph{自顶向下的 VAE}（top-down VAE）。如前所述，其主要思想是让变分后验与生成分布共享自顶向下的路径，同时使用一条从 $\mathbf{x}$ 通往最上层潜变量的旁路，这条路径是确定性的。下面来具体写出这个过程。
+
+首先，自顶向下的路径定义 $p(\mathbf{x}\mid\mathbf{z}_1)$、$p(\mathbf{z}_1\mid\mathbf{z}_2)$ 和 $p(\mathbf{z}_2)$。因此需要一个 DNN，在给定 $\mathbf{z}_2$ 时输出 $\mu_1$ 和 $\sigma_1^2$，还需要另一个 DNN，
+% <<<PDFPAGE 161>>> 上一段跨原页。
+在给定 $\mathbf{z}_1$ 时输出 $p(\mathbf{x}\mid\mathbf{z}_1)$ 的参数。由于 $p(\mathbf{z}_2)$ 是无条件分布（例如标准高斯分布），这里无需为它单独配备 DNN。
+
+其次，确定性旁路产生两个确定性变量，$\mathbf{r}_1=f_1(\mathbf{x})$ 和 $\mathbf{r}_2=f_2(\mathbf{r}_1)$。两个变换 $f_1$ 和 $f_2$ 都是 DNN。接着，可以用另外的 DNN 返回均值和方差的调整量，即 $\Delta\mu_1,\Delta\sigma_1^2$ 和 $\Delta\mu_2,\Delta\sigma_2^2$。这些调整量有很多种定义方式。这里沿用 NVAE\citeref{46}的做法，以自顶向下路径给出的值为基准，调整位置和尺度。如果你还没完全理解这个思想，等写出变分后验时就会清楚。
+
+现在可以定义整个过程。我们给神经网络加上不同下标以示区别。采样时走自顶向下的路径。
+\begin{booknote}[colframe=blue!70!black,colback=blue!5]{自顶向下路径}
+\begin{enumerate}
+\item $\mathbf{z}_2\sim\mathcal{N}(0,1)$
+\item $[\mu_1,\sigma_1^2]=\mathrm{NN}_1(\mathbf{z}_2)$
+\item $\mathbf{z}_1\sim\mathcal{N}(\mu_1,\sigma_1^2)$
+\item $\vartheta=\mathrm{NN}_x(\mathbf{z}_1)$
+\item $\mathbf{x}\sim p_\vartheta(\mathbf{x}\mid\mathbf{z}_1)$
+\end{enumerate}
+\end{booknote}
+下面请仔细看怎样从变分后验中采样。
+\begin{booknote}[colframe=blue!70!black,colback=blue!5]{自底向上路径}
+\begin{enumerate}
+\item （自底向上的确定性路径）$\mathbf{r}_1=f_1(\mathbf{x})$ 且 $\mathbf{r}_2=f_2(\mathbf{r}_1)$
+\item $[\Delta\mu_1,\Delta\sigma_1^2]=\mathrm{NN}_{\Delta 1}(\mathbf{r}_1)$
+\item $[\Delta\mu_2,\Delta\sigma_2^2]=\mathrm{NN}_{\Delta 2}(\mathbf{r}_2)$
+\item $\mathbf{z}_2\sim\mathcal{N}(0+\Delta\mu_2,1\cdot\Delta\sigma_2^2)$
+\item $[\mu_1,\sigma_1^2]=\mathrm{NN}_1(\mathbf{z}_2)$
+\item $\mathbf{z}_1\sim\mathcal{N}(\mu_1+\Delta\mu_1,\sigma_1^2\cdot\Delta\sigma_1^2)$
+\item $\vartheta=\mathrm{NN}_x(\mathbf{z}_1)$
+\item $\mathbf{x}\sim p_\vartheta(\mathbf{x}\mid\mathbf{z}_1)$
+\end{enumerate}
+\end{booknote}
+这些运算如\figref{fig:05-20}所示。
+
+注意，自底向上的确定性路径调整自顶向下路径的参数。正如\citeref{46}所指出的，这个思想特别有用，因为“先验移动时，近似后验也会随之移动，前提是调整量保持不变”。此外，如\citeref{46}所述，两个高斯分布之间的 Kullback–Leibler 散度可以简化如下，为清楚起见省去一些额外的依赖关系。
+\[
+\mathrm{KL}\bigl(q(z_i\mid\mathbf{x})\|p(z_i)\bigr)
+ =\frac12\left(\frac{\Delta\mu_i^2}{\sigma_i^2}+
+       \Delta\sigma_i^2-\log\Delta\sigma_i^2-1\right)
+\]
+
+% <<<PDFPAGE 162>>>
+\dgmfig{fig_05_20}{.26\linewidth}{自顶向下 VAE 的一个示例。红色节点表示确定性路径，蓝色节点表示随机变量。}{fig:05-20}
+
+最终，我们在变分后验与生成部分之间建立了隐含的紧密联系。这种归纳偏置有助于把观测变量的信息编码到潜变量中。由于潜变量负责提取数据的要点，也就无需使用过于灵活的解码器。我知道，这样说还是有些含糊，因为我们没有为所谓的“有用程度”给出定义，但希望你已经明白大意。自顶向下的 VAE 将变分后验与生成路径联系在一起，Kullback–Leibler 散度项因此不会坍塌，也就是会大于零。实验研究有力地支持了这个假设\citerefs{45,46,47,73}。
+
+\subsubsection{代码}
+接下来实现自顶向下的 VAE。我们沿用两层 VAE，以对应前面的说明。代码严格按照上述两套过程中的步骤编写。为了便于阅读，使用单个类，使代码尽可能接近上面的数学表达式。采样使用重参数化技巧。数学写法和代码有一处区别，代码用的是 $\log\Delta\sigma$，对应上面的 $\Delta\sigma$。于是用 $\log\sigma+\log\Delta\sigma$ 表示乘法调整 $\sigma\cdot\Delta\sigma$，因为 $e^{\log a+\log b}=e^{\log a}\cdot e^{\log b}=a\cdot b$。
+
+\bookcode{code/ch05_top_down_vae.py}{自顶向下的 VAE 类。}{lst:05-12}
+% <<<PDFPAGE 163>>> 代码清单 5.12 的第 14--60 行。
+% <<<PDFPAGE 164>>> 代码清单 5.12 的第 61--107 行。
+% <<<PDFPAGE 165>>> 代码清单 5.12 的第 108--134 行。
+
+就是这样！现在可以运行完整代码了。训练自顶向下的 VAE 后，应该得到类似\figref{fig:05-21}的结果。
+
+\subsubsection{延伸阅读}
+我们这里只初步接触了这一主题。层次模型似乎是概率建模的一个重要研究方向和建模范式。
+% <<<PDFPAGE 166>>> 上一段跨原页。
+此外，要达到当时最先进的性能，技术细节也很重要。我建议阅读 NVAE\citeref{46}、ResNet VAE\citeref{18}、Ladder VAE\citeref{73}、BIVA\citeref{45}和极深 VAE\citeref{47}，比较它们所用的技巧和参数化方法。这些模型的基本思想相同，实现却差别很大。
+
+\dgmfig{fig_05_21}{\linewidth}{自顶向下 VAE 的训练结果示例。（a）随机选出的真实图像。（b）自顶向下 VAE 无条件生成的图像。（c）训练期间的验证曲线。}{fig:05-21}
+[（c）的横轴为训练轮数（\textit{epochs}）。]
+
+层次生成建模是一个很活跃、发展很快的方向，很难列举哪怕一小部分有意思的论文。这里只提几篇值得注意的论文。
+\begin{itemize}
+\item Pervez 和 Gavves\citeref{74}分析了层次 VAE 的一个潜在问题。KL 散度项与参数化函数的谐波（harmonics）密切相关。换句话说，用 DNN 会给 KL 项带来高频成分，最终导致后验坍塌。作者提出用 Ornstein–Uhlenbeck 半群（Ornstein–Uhlenbeck semigroup，OU）对 VAE 作平滑处理。细节见原论文。
+\item Wu 等人\citeref{75}提出贪心逐层学习（greedy layer-wise learning）来训练层次 VAE。他们把这一思想用于视频预测，其做法可能也受到计算资源的限制。贪心逐层训练的思想过去已被广泛使用\citerefs{68,69,70}。
+\item Gatopoulos 和 Tomczak\citeref{25}讨论了把缩小图像等预定义变换纳入模型。其思想是用随机的方式学习反向变换，例如学习如何逆转缩小过程。得到的 VAE 有一组辅助变量（例如观测数据的低分辨率版本），还有一组潜变量，用来编码辅助变量中丢失的信息。这种方法的假设是，尺寸较小或已经预处理的观测变量更容易建模，因此可以把原问题分解成若干学习较简单分布的问题。\figref{fig:05-22}给出了这种方法的示意图。
+\end{itemize}
+潜变量建模的妙处在于，可以改变对象间的随机关系，从而建立有用的数据表示。后续章节还会看到，借助扩散模型和能量函数，也能构造其他有意思的模型类别。
+
+\subsection{基于扩散的深度生成模型}
+\label{sec:ddgm}
+\subsubsection{引言}
+在\ref{sec:hierarchical-vae}节，我们讨论了潜变量模型如何学习有用的表示，并深入看了层次变分自编码器。我们的假设是，采用层次潜变量模型，能够得到\emph{有用的}数据表示。我们也指出了层次 VAE 中一个实际存在的问题，即变分后验坍塌为先验，因而学到了没有意义的表示。换句话说，采用自底向上的变分后验（即从观测变量通往最上层潜变量的随机依赖）
+% <<<PDFPAGE 167>>> 上一段跨原页。
+和自顶向下的生成分布，似乎只提供了一般的归纳偏置，模型也相当难训练。一种可能的解决办法是采用自顶向下的 VAE。不过，基本结构还有改进的余地吗？你可能已经想到，还有办法。有些方法同时利用自底向上和自顶向下的结构。这里讨论\emph{基于扩散的深度生成模型}（diffusion-based deep generative model，DDGM），也叫\emph{深度扩散概率模型}（deep diffusion probabilistic model）\citerefs{76,77}。
+
+\dgmfig{fig_05_22}{.51\linewidth}{带有一组确定性辅助变量 $\mathbf{y}$ 的两层 VAE。例如，$\mathbf{y}$ 可以是缩小后的图像。}{fig:05-22}
+
+DDGM 可以简单地理解为一种层次 VAE。自底向上的路径，也就是变分后验，由一个扩散过程（例如高斯扩散）定义。自顶向下的路径是反向扩散，由 DNN 参数化。有意思的是，可以固定自底向上的路径，使它没有任何可学习的参数。\figref{fig:05-23}给出了施加高斯扩散的一个例子。变分后验既然固定，就可以把它看成在每一层加入高斯噪声。最后一层会近似于高斯噪声，见\figref{fig:05-23}中的 $\mathbf{z}_5$。回想层次 VAE 可能遇到的后验坍塌，这里它应该不会再成为问题。原因是，根据设计，最后一层本就应服从标准高斯分布。很巧妙，对吧？
+
+DDGM 近年来很流行。它至少有两个吸引人的地方。
+% <<<PDFPAGE 168>>>
+\dgmfig{fig_05_23}{.98\linewidth}{对猫的图像 $\mathbf{x}$ 施加高斯扩散的示例。}{fig:05-23}
+\begin{enumerate}
+\item 它们在图像合成\citerefs{76,78,79}和音频合成\citeref{80}上取得了很好的结果，在文本合成\citerefs{81,82}上也表现出潜力，同时还比较容易实现。
+\item 它们与随机微分方程（stochastic differential equation）密切相关，因此其理论性质尤其值得研究\citerefs{83,84,85}。
+\end{enumerate}
+不过，它们也有两个可能的不足。
+\begin{enumerate}
+\item DDGM 无法学习表示，至少目前如此。
+\item 与基于流的模型类似，整个模型始终维持输入维数，途中没有瓶颈。
+\end{enumerate}
+
+\subsubsection{模型的构造}
+深度扩散概率模型最早由\citeref{77}提出，灵感来自非平衡统计物理。基本思想是通过前向扩散过程（forward diffusion process）逐步破坏数据中的结构，再学习一个反向扩散过程（reverse diffusion process）来恢复这些结构。后续论文\citeref{76}利用深度学习的新进展，训练了一个表达能力强、灵活的基于扩散的深度生成模型，在图像合成任务上取得了当时最先进的结果。这里会稍微改变原有的记号，让层次潜变量模型与 DDGM 的联系更清楚。和前面一样，我们要找的是数据的分布 $p_\theta(\mathbf{x})$，但假设另有一组潜变量 $\mathbf{z}_{1:T}=[\mathbf{z}_1,\ldots,\mathbf{z}_T]$。对所有潜变量积分消去，就得到边缘似然。
+\begin{equation}
+p_\theta(\mathbf{x})=\int p_\theta(\mathbf{x},\mathbf{z}_{1:T})\,\mathrm{d}\mathbf{z}_{1:T}.
+\tag{5.86}\label{eq:05-86}
+\end{equation}
+联合分布建模为具有高斯转移的一阶马尔可夫链（first-order Markov chain），即
+\begin{equation}
+p_\theta(\mathbf{x},\mathbf{z}_{1:T})=p_\theta(\mathbf{x}\mid\mathbf{z}_1)
+ \left(\prod_{i=1}^{T-1}p_\theta(\mathbf{z}_i\mid\mathbf{z}_{i+1})\right)p_\theta(\mathbf{z}_T),
+\tag{5.87}\label{eq:05-87}
+\end{equation}
+其中 $\mathbf{x}\in\mathbb{R}^D$，且对 $i=1,\ldots,T$，有 $\mathbf{z}_i\in\mathbb{R}^D$。注意，潜变量与观测变量的维数相同，这和基于流的模型一样。所有分布都用 DNN 参数化。
+
+% <<<PDFPAGE 169>>>
+到目前为止，还没有引入任何新东西！这仍然是一个层次潜变量模型。与层次 VAE 一样，可以引入如下的一族变分后验。
+\begin{equation}
+Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})=q_\phi(\mathbf{z}_1\mid\mathbf{x})
+ \left(\prod_{i=2}^T q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})\right).
+\tag{5.88}\label{eq:05-88}
+\end{equation}
+关键是如何定义这些分布。之前使用的是由 DNN 参数化的正态分布，现在则把它们构造为如下的高斯扩散过程\citeref{77}。
+\begin{equation}
+q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})
+ =\mathcal{N}\bigl(\mathbf{z}_i\mid\sqrt{1-\beta_i}\mathbf{z}_{i-1},\beta_i\mathbf{I}\bigr),
+\tag{5.89}\label{eq:05-89}
+\end{equation}
+其中 $\mathbf{z}_0=\mathbf{x}$。扩散的一步 $q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})$ 很简单。取上一步生成的对象 $\mathbf{z}_{i-1}$，把它乘以 $\sqrt{1-\beta_i}$，再加入方差为 $\beta_i$ 的噪声。用重参数化技巧可以把它写得更明确。
+\begin{equation}
+\mathbf{z}_i=\sqrt{1-\beta_i}\mathbf{z}_{i-1}+\sqrt{\beta_i}\odot\epsilon,
+\tag{5.90}\label{eq:05-90}
+\end{equation}
+其中 $\epsilon\sim\mathcal{N}(0,\mathbf{I})$。原则上，$\beta_i$ 可以通过反向传播学习。不过，正如\citerefs{76,77}指出的，也可以把它固定下来。例如，\citeref{76}建议让 $\beta_i$ 从 $\beta_1=10^{-4}$ 线性变化到 $\beta_T=0.02$。
+
+既然 DDGM 和层次 VAE 只是变分后验的定义、潜变量的维数不同，整体构造基本相同，我们也就能猜到学习目标是什么。还记得吗？就是 ELBO！可以如下推导。
+\begin{align}
+\ln p_\theta(\mathbf{x})
+ &=\ln\int Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})
+    \frac{p_\theta(\mathbf{x},\mathbf{z}_{1:T})}{Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})}
+    \,\mathrm{d}\mathbf{z}_{1:T}\notag\\
+ &\geq\mathbb{E}_{Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})}
+   \biggl[\ln p_\theta(\mathbf{x}\mid\mathbf{z}_1)\notag\\
+ &\qquad+\sum_{i=1}^{T-1}\ln p_\theta(\mathbf{z}_i\mid\mathbf{z}_{i+1})
+             +\ln p_\theta(\mathbf{z}_T)\notag\\
+ &\qquad-\sum_{i=2}^T\ln q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})
+             -\ln q_\phi(\mathbf{z}_1\mid\mathbf{x})\biggr]\notag\\
+ &=\mathbb{E}_{Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})}
+   \biggl[\ln p_\theta(\mathbf{x}\mid\mathbf{z}_1)
+             +\ln p_\theta(\mathbf{z}_1\mid\mathbf{z}_2)\notag\\
+ &\qquad+\sum_{i=2}^{T-1}\ln p_\theta(\mathbf{z}_i\mid\mathbf{z}_{i+1})
+             +\ln p_\theta(\mathbf{z}_T)\notag\\
+ &\qquad-\sum_{i=2}^{T-1}\ln q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})
+             -\ln q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1})\notag\\
+ &\qquad-\ln q_\phi(\mathbf{z}_1\mid\mathbf{x})\biggr]\notag\\
+ &=\mathbb{E}_{Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})}\biggl[
+   \ln p_\theta(\mathbf{x}\mid\mathbf{z}_1)\notag\\
+ &\qquad+\sum_{i=2}^{T-1}
+      \bigl(\ln p_\theta(\mathbf{z}_i\mid\mathbf{z}_{i+1})-\ln q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})\bigr)
+      \notag\\
+ &\qquad+\ln p_\theta(\mathbf{z}_T)-\ln q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1})\notag\\
+% <<<PDFPAGE 170>>> 上一组推导跨原页。
+ &\qquad+\ln p_\theta(\mathbf{z}_1\mid\mathbf{z}_2)-\ln q_\phi(\mathbf{z}_1\mid\mathbf{x})\biggr]
+   \tag{5.91}\label{eq:05-91}\\
+ &\stackrel{\mathrm{df}}{=}\mathcal{L}(\mathbf{x};\theta,\phi). \notag
+\end{align}
+可以用 Kullback–Leibler 散度改写 ELBO。注意，这里写出关于 $Q_\phi(\mathbf{z}_{-i}\mid\mathbf{x})$ 的期望，以表明定义 Kullback–Leibler 散度时使用了适当的变分后验。\footnote{\textbf{译注}\quad 式~\eqref{eq:05-92}保留原书。对 $Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})$ 取期望时，给定其余潜变量后的 $\mathbf{z}_i$ 分布通常还依赖于后继状态 $\mathbf{z}_{i+1}$。因此，中间层和第一层的 KL 写法一般不能直接由式~\eqref{eq:05-91}逐项得出。}
+\begin{equation}
+\begin{aligned}
+\mathcal{L}(\mathbf{x};\theta,\phi)
+ &=\mathbb{E}_{Q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})}[\ln p_\theta(\mathbf{x}\mid\mathbf{z}_1)]\\
+ &\quad-\sum_{i=2}^{T-1}\mathbb{E}_{Q_\phi(\mathbf{z}_{-i}\mid\mathbf{x})}
+       \bigl[\mathrm{KL}[q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})\|p_\theta(\mathbf{z}_i\mid\mathbf{z}_{i+1})]\bigr]\\
+ &\quad-\mathbb{E}_{Q_\phi(\mathbf{z}_{-T}\mid\mathbf{x})}
+       \bigl[\mathrm{KL}[q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1})\|p_\theta(\mathbf{z}_T)]\bigr]\\
+ &\quad-\mathbb{E}_{Q_\phi(\mathbf{z}_{-1}\mid\mathbf{x})}
+       \bigl[\mathrm{KL}[q_\phi(\mathbf{z}_1\mid\mathbf{x})\|p_\theta(\mathbf{z}_1\mid\mathbf{z}_2)]\bigr].
+\end{aligned}
+\tag{5.92}\label{eq:05-92}
+\end{equation}
+
+\begin{booknote}{例}
+取 $T=5$。这不多（例如\citeref{76}使用 $T=1000$），但用具体的模型解释起来更容易。此外，令 $\beta_t\equiv\beta$，取固定值。于是得到如下 DDGM。
+\begin{equation}
+\begin{aligned}
+p_\theta(\mathbf{x},\mathbf{z}_{1:5})
+ &=p_\theta(\mathbf{x}\mid\mathbf{z}_1)p_\theta(\mathbf{z}_1\mid\mathbf{z}_2)p_\theta(\mathbf{z}_2\mid\mathbf{z}_3)\\
+ &\quad{}\cdot p_\theta(\mathbf{z}_3\mid\mathbf{z}_4)p_\theta(\mathbf{z}_4\mid\mathbf{z}_5)p_\theta(\mathbf{z}_5),
+\end{aligned}
+\tag{5.93}\label{eq:05-93}
+\end{equation}
+变分后验为
+\begin{equation}
+\begin{aligned}
+Q_\phi(\mathbf{z}_{1:5}\mid\mathbf{x})
+ &=q_\phi(\mathbf{z}_1\mid\mathbf{x})q_\phi(\mathbf{z}_2\mid\mathbf{z}_1)q_\phi(\mathbf{z}_3\mid\mathbf{z}_2)\\
+ &\quad{}\cdot q_\phi(\mathbf{z}_4\mid\mathbf{z}_3)q_\phi(\mathbf{z}_5\mid\mathbf{z}_4).
+\end{aligned}
+\tag{5.94}\label{eq:05-94}
+\end{equation}
+在这种情况下，ELBO 具有如下形式。
+\begin{equation}
+\begin{aligned}
+\mathcal{L}(\mathbf{x};\theta,\phi)
+ &=\mathbb{E}_{Q_\phi(\mathbf{z}_{1:5}\mid\mathbf{x})}[\ln p_\theta(\mathbf{x}\mid\mathbf{z}_1)]\\
+ &\quad-\sum_{i=2}^4\mathbb{E}_{Q_\phi(\mathbf{z}_{-i}\mid\mathbf{x})}
+       \bigl[\mathrm{KL}[q_\phi(\mathbf{z}_i\mid\mathbf{z}_{i-1})\|p_\theta(\mathbf{z}_i\mid\mathbf{z}_{i+1})]\bigr]\\
+ &\quad-\mathbb{E}_{Q_\phi(\mathbf{z}_{-i}\mid\mathbf{x})}
+       \bigl[\mathrm{KL}[q_\phi(\mathbf{z}_5\mid\mathbf{z}_4)\|p_\theta(\mathbf{z}_5)]\bigr]\\
+ &\quad-\mathbb{E}_{Q_\phi(\mathbf{z}_{-i}\mid\mathbf{x})}
+       \bigl[\mathrm{KL}[q_\phi(\mathbf{z}_1\mid\mathbf{x})\|p_\theta(\mathbf{z}_1\mid\mathbf{z}_2)]\bigr],
+\end{aligned}
+\tag{5.95}\label{eq:05-95}
+\end{equation}
+其中\footnote{\textbf{译注}\quad 式~\eqref{eq:05-95}的末两行沿用原书的 $\mathbf{z}_{-i}$。若按式~\eqref{eq:05-92}对应位置代入 $T=5$，这里应分别写 $\mathbf{z}_{-5}$ 和 $\mathbf{z}_{-1}$。}
+\begin{equation}
+p_\theta(\mathbf{z}_5)=\mathcal{N}(\mathbf{z}_5\mid 0,\mathbf{I}).
+\tag{5.96}\label{eq:05-96}
+\end{equation}
+最后一个有意思的问题是怎样为输入建模，最终又该用什么分布来表示 $p(\mathbf{x}\mid\mathbf{z}_1)$。前面采用类别分布，是因为像素取值为整数。对于 DDGM，
+% <<<PDFPAGE 171>>> 例框跨原页。
+我们则假设它们是连续的，并采用一个简单的技巧。先把输入归一化到 $-1$ 至 $1$ 之间，然后采用方差为 $1$ 的高斯分布，用 $\tanh$ 非线性函数把均值限制在 $[-1,1]$ 内。
+\begin{equation}
+p(\mathbf{x}\mid\mathbf{z}_1)=\mathcal{N}\bigl(\mathbf{x}\mid\tanh(\mathrm{NN}(\mathbf{z}_1)),\mathbf{I}\bigr),
+\tag{5.97}\label{eq:05-97}
+\end{equation}
+其中 $\mathrm{NN}(\mathbf{z}_1)$ 是神经网络。方差为 $1$，因此 $\ln p(\mathbf{x}\mid\mathbf{z}_1)=-\mathrm{MSE}(\mathbf{x},\tanh(\mathrm{NN}(\mathbf{z}_1)))+\mathrm{const}$，相当于（负）均方误差（mean squared error，MSE）！我知道，这个办法并不完美，但它简单而且有效。\footnote{\textbf{译注}\quad 单位协方差高斯分布的对数密度等于负的平方欧氏距离的一半加一个常数。若按各维平方误差的平均值定义 MSE，则两者还相差固定的尺度因子。}
+\end{booknote}
+
+就是这样！可以看到，这里没有什么神秘的技巧，现在可以着手实现 DDGM 了。实际上，可以在层次 VAE 的代码上作相应修改。DDGM 的便利之处在于，前向扩散，也就是变分后验，是固定的，我们只需从这些分布中采样。只有反向扩散需要使用 DNN。话说到这里，来看代码吧！
+
+\subsubsection{代码}
+讲到这里，你也许觉得这种模型相当复杂，涉及很多数学。不过，如果跟上了前面对 VAE 的讨论，现在要做的事应该已经比较清楚。
+
+\bookcode{code/ch05_ddgm.py}{DDGM 类。}{lst:05-13}
+% <<<PDFPAGE 172>>> 代码清单 5.13 的第 20--64 行。
+% <<<PDFPAGE 173>>> 代码清单 5.13 的第 65--97 行。
+
+就是这样！现在可以运行完整代码了。训练 DDGM 之后，应该得到类似\figref{fig:05-24}的结果。\footnote{\textbf{译注}\quad 代码清单~\ref{lst:05-13}保留原书。第 62、65 行计算前向转移密度时，均值使用待求密度的状态本身。按式~\eqref{eq:05-89}，均值应取该状态的前一状态乘以 $\sqrt{1-\beta_i}$。另外，第 46--50 行按由高层到低层的顺序存储反向转移的参数，而第 64--65 行将它们按相同下标与正向状态配对，所对应的层次顺序不同。}
+
+\subsubsection{讨论}
+\noindent 扩展\par\smallskip
+DDGM 是目前很流行的一类深度生成模型。这里介绍的内容与 DDGM 的最初构造\citeref{77}很接近。不过，\citeref{76}给出了许多有意思的见解和对原方法的改进，下面列举其中几项。
+
+% <<<PDFPAGE 174>>>
+\dgmfig{fig_05_24}{\linewidth}{训练结果。（a）随机选出的真实图像。（b）DDGM 无条件生成的图像。（c）施加前向扩散后，最后一个随机层的可视化结果。如预期所示，得到的图像接近纯噪声。（d）ELBO 的验证曲线示例。}{fig:05-24}
+[（d）的横轴为训练轮数（\textit{epochs}）。]
+
+\begin{itemize}
+\item 前向扩散由高斯分布和对均值的线性变换组成，因此可以解析地边缘化中间步骤，得到
+\begin{equation}
+q(\mathbf{z}_t\mid\mathbf{x})=\mathcal{N}\bigl(\mathbf{z}_t\mid\sqrt{\bar\alpha_t}\,\mathbf{x},(1-\bar\alpha_t)\mathbf{I}\bigr),
+\tag{5.98}\label{eq:05-98}
+\end{equation}
+其中 $\alpha_t=1-\beta_t$，$\bar\alpha_t=\prod_{s=1}^t\alpha_s$。这是一个很有意思的结果，因为无需采样所有中间步骤，就可以采样 $\mathbf{z}_t$！
+\item 进一步还可以求出如下分布。
+\begin{equation}
+q(\mathbf{z}_{t-1}\mid\mathbf{z}_t,\mathbf{x})
+ =\mathcal{N}\bigl(\mathbf{z}_{t-1}\mid\tilde{\boldsymbol{\mu}}_t(\mathbf{z}_t,\mathbf{x}),\tilde\beta_t\mathbf{I}\bigr),
+\tag{5.99}\label{eq:05-99}
+\end{equation}
+其中
+\begin{equation}
+\tilde{\boldsymbol{\mu}}_t(\mathbf{z}_t,\mathbf{x})
+ =\frac{\sqrt{\bar\alpha_{t-1}}\beta_t}{1-\bar\alpha_t}\mathbf{x}
+  +\frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}\mathbf{z}_t,
+\tag{5.100}\label{eq:05-100}
+\end{equation}
+以及
+\begin{equation}
+\tilde\beta_t=\frac{1-\bar\alpha_{t-1}}{1-\bar\alpha_t}\beta_t.
+\tag{5.101}\label{eq:05-101}
+\end{equation}
+% <<<PDFPAGE 175>>>
+于是，ELBO 可以改写如下。\footnote{\textbf{译注}\quad 式~\eqref{eq:05-102}沿用原书 $\mathcal{L}$ 的记法。右边的 KL 项均为正号，重构项是负对数似然，整体对应的是要最小化的负 ELBO。按式~\eqref{eq:05-91}的定义，ELBO 取相反的符号。}
+\begin{equation}
+\begin{aligned}
+\mathcal{L}(\mathbf{x};\theta,\phi)
+ =\mathbb{E}_Q\Biggl[&
+ \underbrace{\mathrm{KL}[q(\mathbf{z}_T\mid\mathbf{x})\|p(\mathbf{z}_T)]}_{L_T}\\
+ &+\sum_{t>1}\underbrace{\mathrm{KL}[q(\mathbf{z}_{t-1}\mid\mathbf{z}_t,\mathbf{x})
+                                   \|p_\theta(\mathbf{z}_{t-1}\mid\mathbf{z}_t)]}_{L_{t-1}}\\
+ &+\underbrace{-\log p_\theta(\mathbf{x}\mid\mathbf{z}_1)}_{L_0}\Biggr].
+\end{aligned}
+\tag{5.102}\label{eq:05-102}
+\end{equation}
+现在，无需对目标函数的所有组成部分求导，可以随机选取一个 $L_t$ 作为目标。这样做的明显好处是不用把所有梯度都保存在内存里，每次只更新一层。我们的训练本来就是随机的，通常使用随机梯度下降，因此训练时可以引入这种额外的随机性。其好处很大，我们就能训练极深的模型，甚至像\citeref{76}那样训练 1000 层的模型。
+\item 如果试试这里的代码，你可能会发现，反向扩散很难训练。为什么？因为增加潜变量的层数会增加 KL 项。在模型远未达到理想状态时，每个 KL 项都严格大于零。于是，每增加一步随机转移，就会增大原书这里所写的 ELBO。正因如此，怎样构造反向扩散十分重要。Ho 等人\citeref{76}又给出了一个有意思的思路！这里略去完整的推理过程。结果表明，要使模型 $p_\theta(\mathbf{z}_{t-1}\mid\mathbf{z}_t)=\mathcal{N}(\mathbf{z}_{t-1}\mid\mu_\theta(\mathbf{z}_t),\sigma_t^2\mathbf{I})$ 更强，应当使 $\mu_\theta(\mathbf{z}_t)$ 尽可能接近 $\tilde{\boldsymbol{\mu}}_t(\mathbf{z}_t,\mathbf{x})$。按照\citeref{76}的推导，得到
+\[
+\mu_\theta(\mathbf{z}_t)=\frac{1}{\sqrt{\alpha_t}}\left(
+ \mathbf{z}_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\epsilon_\theta(\mathbf{z}_t)\right),
+\]
+其中 $\epsilon_\theta(\mathbf{z}_t)$ 由 DNN 参数化，用来从 $\mathbf{z}_t$ 估计噪声。
+\item 还可以进一步将每个 $L_t$ 简化为
+\[
+L_{t,\mathrm{simple}}=\mathbb{E}_{t,\mathbf{x}_0,\epsilon}\left[
+ \left\|\epsilon-\epsilon_\theta\left(
+    \sqrt{\bar\alpha_t}\,\mathbf{x}_0+\sqrt{1-\bar\alpha_t}\,\epsilon,t\right)
+ \right\|^2\right].
+\]
+Ho 等人\citeref{76}的实验表明，这样的目标可能有助于训练，并能提高最终合成的图像质量。
+\end{itemize}
+
+\citeref{76}之后有很多后续研究，这里只提其中几项。
+\begin{itemize}
+\item \emph{改进 DDGM}\quad Nichol 和 Dhariwal\citeref{86}提出了进一步改善 DDGM 训练稳定性和性能的办法，包括学习反向扩散的协方差矩阵，以及采用不同的噪声调度（noise schedule）等。
+% <<<PDFPAGE 176>>> 上一项跨原页。
+\citeref{78}的作者提出，把 Fourier 特征（Fourier feature）作为额外通道加入观测变量（即像素）和潜变量。理由是，高频特征可以让神经网络更好地处理噪声。此外，他们还引入了新的噪声调度方法，并使用特定的函数来改善前向扩散的数值稳定性。
+\item \emph{加速采样}\quad Kong 和 Ping\citeref{87}与 Watson 等人\citeref{88}研究了怎样加快采样过程。
+\item \emph{超分辨率}\quad Saharia 等人\citeref{79}把 DDGM 用于超分辨率（superresolution）任务。
+\item \emph{与基于得分的生成模型的联系}\quad 研究表明，基于得分的生成模型\citeref{89}与 DDGM 密切相关，见\citerefs{89,90}。从这个角度看，可以把 DDGM 与随机微分方程联系起来\citerefs{83,85}。
+\item \emph{从变分角度看 DDGM}\quad \citerefs{78,83}提出了理解 DDGM 的变分视角，既能直观解释这类模型，又能在图像合成任务中取得很好的结果。\citeref{78}还给出了许多有意思的改进，值得进一步阅读。
+\item \emph{去噪与生成的视角}\quad 可以把基于扩散的模型看成一个带有层次先验的去噪自编码器（denoising autoencoder）。把模型分成去噪和生成两部分的做法由\citeref{91}提出。
+\item \emph{离散 DDGM}\quad 迄今为止，DDGM 主要用在连续空间上。Austin 等人\citeref{81}和 Hoogeboom 等人\citeref{82}提出了定义在离散空间上的 DDGM。
+\item \emph{用于音频的 DDGM}\quad Kong 等人\citeref{80}提出将 DDGM 用于音频合成。
+\item \emph{VAE 的扩散先验}\quad Vahdat 等人\citeref{92}以及 Wehenkel 和 Louppe\citeref{93}提出将 DDGM 作为 VAE 的灵活先验。
+\end{itemize}
+
+\medskip\noindent DDGM、VAE 与流模型\par\smallskip
+最后，有必要比较一下 DDGM、VAE 和基于流的模型。\tabref{tab:05-01}按下面几条标准比较，这些标准带有一定的主观性。
+\begin{itemize}
+\item 训练过程是否稳定。
+\item 能否计算似然。
+\item 能否进行重构。
+\item 模型是否可逆。
+\item 潜在表示的维数能否低于输入空间的维数，即模型能否有瓶颈。
+\end{itemize}
+\begin{table}[htbp]
+\caption{DDGM、VAE 和流模型的比较。}
+\label{tab:05-01}
+\centering
+\begin{tabular}{l|l|l|l|l|l}
+\hline
+模型 & 训练 & 似然 & 重构 & 可逆 & 瓶颈（潜变量）\\
+\hline
+DDGM & 稳定 & 近似 & 困难 & 否 & 无\\
+\hline
+VAE & 稳定 & 近似 & 容易 & 否 & 可以有\\
+\hline
+流模型 & 稳定 & 精确 & 容易 & 是 & 无\\
+\hline
+\end{tabular}
+\end{table}
+
+% <<<PDFPAGE 177>>>
+这三类模型有许多相似之处。总体上训练比较稳定，虽然每类模型都可能出现数值问题。层次 VAE 可以看成 DDGM 的推广。为了使用固定的变分后验而放弃引入瓶颈的可能性，这样做是否更有利，仍是一个开放问题。流模型和 DDGM 之间也有联系。这两类模型都力图把数据变成噪声。流通过可逆变换做到这一点，DDGM 则通过扩散过程。在基于流的模型中，逆变换已知，代价是要计算雅可比行列式。DDGM 需要用灵活的方法参数化反向扩散，没有这种额外的计算负担。研究这些模型之间的联系，是一个有意思的研究方向。
+
+\subsubsection{进一步讨论}
+基于扩散的模型在（条件）图像合成中取得的成果，引起了广泛关注\citerefs{94,95}。自最初提出以来\citeref{77}，已有很多研究采用表达能力更强的参数化方式或调整训练细节来改进性能，例如\citerefs{76,78,86}。
+
+有意思的是，可以把基于扩散的模型看成一类用变分推断训练的层次潜变量模型，其中有 $T$ 层随机变量，每个 $\mathbf{z}_t$ 都属于 $\mathcal{X}$。这类模型的变分后验族有一个特别之处，即它由高斯扩散定义。
+\begin{equation}
+q_\phi(\mathbf{z}_{1:T}\mid\mathbf{x})=\left[\prod_{t=1}^{T-1}q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})\right]
+ q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1}),
+\tag{5.103}\label{eq:05-103}
+\end{equation}
+其中 $q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})=\mathcal{N}\bigl(\mathbf{z}_t\mid\sqrt{1-\beta_t}\,\mathbf{z}_{t-1},\beta_t\mathbf{I}\bigr)$，定义 $\mathbf{z}_0\equiv\mathbf{x}$。对基于扩散的模型而言，变分后验构成\emph{前向扩散}。前向扩散的目标是逐步加入（高斯）噪声，使最后的 $\mathbf{z}_T$ 服从标准高斯分布。
+
+\emph{生成}部分，也称为\emph{反向扩散}，定义如下。
+\begin{equation}
+p_\lambda(\mathbf{z}_{1:T})=
+ \left[\prod_{t=1}^{T-1}p_\lambda(\mathbf{z}_t\mid\mathbf{z}_{t+1})\right]p_\lambda(\mathbf{z}_T),
+\tag{5.104}\label{eq:05-104}
+\end{equation}
+其中所有分布都由神经网络参数化，也可以用一个共享的神经网络\citeref{76}。与前向扩散的作用相反，反向扩散的目标是去除噪声，最终得到一个对象（例如一幅图像）。
+
+基于扩散的模型是带有变分后验的潜变量模型，因此可以从单层潜变量模型的 ELBO 出发推导它的 ELBO。
+% <<<PDFPAGE 178>>>
+\begin{align}
+&\mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}[\ln p_{\mathrm{model}}(\mathbf{x})]\notag\\
+ &\quad\geq\underbrace{\mathbb{E}_{\mathbf{x},\mathbf{z}_1\sim q_\phi(\mathbf{x},\mathbf{z}_1)}
+                         [\ln p_\theta(\mathbf{x}\mid\mathbf{z}_1)]}
+             _{\stackrel{\mathrm{df}}{=}\mathrm{RE}(\phi,\theta)}\notag\\
+ &\qquad-D_{\mathrm{KL}}\bigl[q_\phi(\mathbf{z}_{1:T})\|p_\lambda(\mathbf{z}_{1:T})\bigr]
+     -\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_{1:T}] \tag{5.105}\label{eq:05-105}\\
+ &\quad\geq\mathrm{RE}(\phi,\theta)-\mathbb{E}_{\mathbf{x},\mathbf{z}_{1:T}\sim q_\phi(\mathbf{z}_{1:T},\mathbf{x})}
+     \biggl[\sum_{t=1}^{T-1}\ln\frac{q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})}{p_\lambda(\mathbf{z}_t\mid\mathbf{z}_{t+1})}\notag\\
+ &\qquad+\ln\frac{q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1})}{p_\lambda(\mathbf{z}_T)}\biggr]
+     -\sum_{t=1}^T\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{z}_t;\mathbf{x}\mid\mathbf{z}_{1:t-1}]
+    \tag{5.106}\label{eq:05-106}\\
+ &\quad=\mathrm{RE}(\phi,\theta)-\mathbb{E}_{\mathbf{x},\mathbf{z}_{1:T}\sim q_\phi(\mathbf{z}_{1:T},\mathbf{x})}
+     \biggl[\sum_{t=1}^{T-1}\ln\frac{q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})}{p_\lambda(\mathbf{z}_t\mid\mathbf{z}_{t+1})}\notag\\
+ &\qquad+\ln\frac{q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1})}{p_\lambda(\mathbf{z}_T)}\biggr]\notag\\
+ &\qquad-\sum_{t=2}^T\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_t\mid\mathbf{z}_{1:t-1}]
+    -\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_1)}[\mathbf{x};\mathbf{z}_1] \tag{5.107}\label{eq:05-107}\\
+ &\quad=\mathrm{RE}(\phi,\theta)-\mathbb{E}_{\mathbf{x},\mathbf{z}_{1:T}\sim q_\phi(\mathbf{z}_{1:T},\mathbf{x})}
+     \biggl[\sum_{t=1}^{T-1}\ln\frac{q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})}{p_\lambda(\mathbf{z}_t\mid\mathbf{z}_{t+1})}\notag\\
+ &\qquad+\ln\frac{q_\phi(\mathbf{z}_T\mid\mathbf{z}_{T-1})}{p_\lambda(\mathbf{z}_T)}\biggr]\notag\\
+ &\qquad-\sum_{t=2}^T\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_t\mid\mathbf{z}_{t-1}]
+    -\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_1)}[\mathbf{x};\mathbf{z}_1]. \tag{5.108}\label{eq:05-108}
+\end{align}
+上述等式用到了以下事实。
+\begin{enumerate}
+\item Kullback–Leibler 散度的凸性
+\[
+D_{\mathrm{KL}}\left[\sum_i\pi_i q_i(\mathbf{z})\,\middle\|\,\sum_i\pi_i p_i(\mathbf{z})\right]
+ \leq\sum_i\pi_iD_{\mathrm{KL}}[q_i(\mathbf{z})\|p_i(\mathbf{z})],
+\]
+其中 $\sum_i\pi_i=1$。
+\item 互信息（mutual information）的链式法则（chain rule）$\mathbb{I}[\mathbf{z}_{1:T};\mathbf{x}]=\sum_{t=1}^T\mathbb{I}[\mathbf{z}_t;\mathbf{x}\mid\mathbf{z}_{1:t-1}]$。
+\item 由于 $q_\phi(\mathbf{z}_t\mid\mathbf{z}_{1:t-1})=q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})$，得到
+\[
+\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_t\mid\mathbf{z}_{1:t-1}]
+ =\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_t\mid\mathbf{z}_{t-1}].
+\]
+\end{enumerate}
+
+\textbf{互信息项是常数！}\quad 先简要回顾一下分析一般潜变量模型的 ELBO 后得到的结果。最让人困惑的是，带负号的互信息项推动潜变量与观测变量相互独立。但在基于扩散的模型里，情况完全不同，因为变分后验族是固定的，无法训练。这有两个后果。首先，从优化角度看，给定 $\mathbf{x}$ 时，带负号的互信息项 $\sum_{t=2}^T\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_t\mid\mathbf{z}_{t-1}]$ 和 $\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_1)}[\mathbf{x};\mathbf{z}_1]$ 都是常数。因为前向扩散不会随训练调整，它只加入给定大小的高斯噪声。
+% <<<PDFPAGE 179>>> 上一段跨原页。
+其次，$\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_1)}[\mathbf{x};\mathbf{z}_1]$ 是非零的常数项。有意思的是，其他所有互信息项实际上都是零！要看清这一点，记得变分后验中假定的随机依赖关系如下。
+\begin{equation}
+\mathbf{x}\to\mathbf{z}_1\to\cdots\to\mathbf{z}_{t-1}\to\mathbf{z}_t\to\cdots\to\mathbf{z}_T,
+\tag{5.109}\label{eq:05-109}
+\end{equation}
+因此，一旦给定 $\mathbf{z}_{t-1}$，就有 $q(\mathbf{z}_t\mid\mathbf{z}_{1:t-1},\mathbf{x})=q(\mathbf{z}_t\mid\mathbf{z}_{t-1})$。于是，单个互信息项可写成
+\begin{align}
+\mathbb{I}_{q_\phi(\mathbf{x},\mathbf{z}_{1:T})}[\mathbf{x};\mathbf{z}_t\mid\mathbf{z}_{t-1}]
+ &=D_{\mathrm{KL}}\bigl[q_\phi(\mathbf{x},\mathbf{z}_t\mid\mathbf{z}_{t-1})\notag\\
+ &\qquad\|q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})q_\phi(\mathbf{x}\mid\mathbf{z}_{t-1})\bigr] \tag{5.110}\label{eq:05-110}\\
+ &=D_{\mathrm{KL}}\bigl[q_\phi(\mathbf{z}_t\mid\mathbf{x},\mathbf{z}_{t-1})q_\phi(\mathbf{x}\mid\mathbf{z}_{t-1})\notag\\
+ &\qquad\|q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})q_\phi(\mathbf{x}\mid\mathbf{z}_{t-1})\bigr] \tag{5.111}\label{eq:05-111}\\
+ &=D_{\mathrm{KL}}\bigl[q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})q_\phi(\mathbf{x}\mid\mathbf{z}_{t-1})\notag\\
+ &\qquad\|q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t-1})q_\phi(\mathbf{x}\mid\mathbf{z}_{t-1})\bigr] \tag{5.112}\label{eq:05-112}\\
+ &=0, \tag{5.113}\label{eq:05-113}
+\end{align}
+其中利用了随机结构的性质，即 $q(\mathbf{z}_t\mid\mathbf{x},\mathbf{z}_{t-1})=q(\mathbf{z}_t\mid\mathbf{z}_{t-1})$。下一篇还会考察这个结果。
+
+现在可以看看我们关于潜变量模型的假设。
+\begin{booknote}{假设}
+要用变分推断成功地学习潜变量模型，需要定义这样一个变分分布族，使潜变量与观测变量之间的互信息不被最小化。
+\end{booknote}
+
+基于扩散的模型恰好做到了这一点！用高斯扩散这种特定的方式构造变分后验，互信息项就完全不参与优化。有人也许马上会说，这类模型之所以成功，还有其他重要因素，确实如此。不过，互信息项无需最小化，优化过程就会集中在进一步减小重构误差和各个 Kullback–Leibler 散度项上。这正是我们希望达到的效果！一方面，重构应尽可能准确。另一方面，每个 Kullback–Leibler 散度项应尽可能小，这对于基于扩散的模型，就相当于去除高斯噪声。
+
+接下来的问题是，单靠满足这个假设，能否学到好的潜变量模型？显然还不够，因为还有其他项要优化。因此，怎样参数化反向扩散是另一个重要问题。参数化的方式影响模型的最终表现。但从优化的角度看，目标函数极为重要。正如上面所说，现在优化器把全部注意力放在重构误差和 Kullback–Leibler 散度项上。这正是基于扩散的模型的优势！
+
+% <<<PDFPAGE 180>>>
+用变分推断训练潜变量模型似乎并不容易。而且，想用变分推断把潜变量学成数据的表示，看来意义不大。ELBO 中的互信息清楚地表明，目标是尽可能减弱 $\mathbf{x}$ 和 $\mathbf{z}$ 之间的随机依赖关系，这与我们期待的目标正好相反。我想大家都会同意，这个目标显然无助于表示学习。
+
+\textbf{自监督视角}\quad 基于扩散的模型还有一个有意思的特殊视角。借助高斯性和线性，可以解析地计算 $q_\phi(\mathbf{z}_t\mid\mathbf{x})$ 与 $q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t+1},\mathbf{x})$，详情见\citeref{76}，因此可以把 ELBO 写成\footnote{\textbf{译注}\quad 式~\eqref{eq:05-114}的求和项沿用原书的期望下标 $q(\mathbf{z}_t,\mathbf{x})$。KL 对 $\mathbf{z}_t$ 积分后，依赖的变量为 $\mathbf{z}_{t+1}$ 和 $\mathbf{x}$，相应的期望应按 $q(\mathbf{z}_{t+1},\mathbf{x})$ 计算。}
+\begin{equation}
+\begin{aligned}
+\mathbb{E}_{\mathbf{x}\sim p_{\mathrm{data}}(\mathbf{x})}[\ln p_{\mathrm{model}}(\mathbf{x})]
+ &\geq\mathrm{RE}(\phi,\theta)\\
+ &\quad-\sum_{t=1}^{T-1}\mathbb{E}_{q(\mathbf{z}_t,\mathbf{x})}
+     \bigl[D_{\mathrm{KL}}\bigl[q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t+1},\mathbf{x})\\
+ &\hspace{7em}\|p_\lambda(\mathbf{z}_t\mid\mathbf{z}_{t+1})\bigr]\bigr]\\
+ &\quad-\mathbb{E}_{q(\mathbf{z}_T,\mathbf{x})}
+      \bigl[D_{\mathrm{KL}}\bigl[q_\phi(\mathbf{z}_T\mid\mathbf{x})\|p_\lambda(\mathbf{z}_T)\bigr]\bigr].
+\end{aligned}
+\tag{5.114}\label{eq:05-114}
+\end{equation}
+我们现在可以很容易地采样 $\mathbf{z}_t$，因为知道 $q_\phi(\mathbf{z}_t\mid\mathbf{x})$ 的解析形式，它依然是高斯分布。此外，$q_\phi(\mathbf{z}_t\mid\mathbf{z}_{t+1},\mathbf{x})$ 也有闭式表达，由于高斯性，每个 $D_{\mathrm{KL}}$ 项都可以解析地算出。因此，正如\citeref{76}所述，可以抽样选取 $t$，随机地优化 ELBO，无需优化全部 $T$ 步。这样做有什么用？因为它可以看成自监督学习（self-supervised learning）！给定 $\mathbf{x}$，可以得到它的加噪版本 $\mathbf{z}_t$，然后通过优化第 $(t-1)$ 层的 $D_{\mathrm{KL}}$ 学习怎样去除噪声。换句话说，拿一张原始图像，选定要加多少噪声（相当于选取 $t$），再训练一个模型去除其中一部分噪声（即从 $\mathbf{z}_{t+1}$ 到 $\mathbf{z}_t$）。这样，第 $t$ 层的含噪像素可视为第 $(t+1)$ 层噪声更强的像素的标签。
+
+自监督学习的视角与上面的假设未必相关，它更像是事后观察。自监督学习还涉及许多方面，所以它是否是基于扩散的模型效果良好的主要原因，仍可讨论。尽管如此，选择恰当的变分分布族，由此构造基于扩散的模型，肯定很重要，甚至可能必不可少。
+
+\FloatBarrier
+\input{chapters/ch05_references.tex}

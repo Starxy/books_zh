@@ -1,0 +1,211 @@
+% <<<PDFPAGE 187>>>
+\chapter{混合建模}
+\sourcechapter{6}
+\section{引言}
+
+在第~1~章，我试着说服你，只学习条件分布 $p(y\mid\mathbf{x})$ 还不够，我们应该关注联合分布 $p(\mathbf{x},y)$，其因子分解为
+\begin{equation}
+p(\mathbf{x},y)=p(y\mid\mathbf{x})p(\mathbf{x}).
+\tag{6.1}\label{eq:06-01}
+\end{equation}
+为什么？先回顾一下理由。条件分布 $p(y\mid\mathbf{x})$ 会尽可能给出一个决策，但它无法说明 $\mathbf{x}$ 本身的情况。因此，即便输入的是一个过去从未见过的对象，$p(y\mid\mathbf{x})$ 仍可能对其决策很有把握，即给某一类分配很高的概率。另一方面，一旦训练好 $p(\mathbf{x})$，至少在理论上，我们应该能计算给定对象的概率，进而判断决策是否可靠。
+
+前面几章的重点一直是如何单独学习 $p(\mathbf{x})$。由于考虑到需要用它求概率，我们只讨论了基于似然的模型，即自回归模型（ARM）、基于流的模型（流）和变分自编码器（VAE）。现在自然会问，怎样把深度生成模型和分类器（或回归器）结合起来？为简单起见，先以分类任务为例，想一想有哪些办法。
+
+\subsection{方法一　用最直接的办法}
+
+先从简单、近乎朴素的方法开始。最直接的办法是分别训练 $p(y\mid\mathbf{x})$ 和 $p(\mathbf{x})$。这样就有了一个分类器，以及对象的边缘分布。\figref{fig:06-01}给出了这种方法的示意图，其中用紫色和蓝色区分分别参数化两个分布的神经网络。
+
+% <<<PDFPAGE 188>>>
+\dgmfig{fig_06_01}{.36\linewidth}{分别建模两个分布来学习联合分布的朴素方法。}{fig:06-01}[Neural Net 表示神经网络。]
+
+对联合分布取对数，得到
+\begin{equation}
+\ln p(\mathbf{x},y)=\ln p_\alpha(y\mid\mathbf{x})+\ln p_\beta(\mathbf{x}),
+\tag{6.2}\label{eq:06-02}
+\end{equation}
+其中 $\alpha$ 和 $\beta$ 表示两个分布各自的参数化，即相应的神经网络。开始训练并对 $\alpha$ 和 $\beta$ 求梯度时，可以清楚地看到
+\begin{equation}
+\nabla_\alpha\ln p(\mathbf{x},y)=\nabla_\alpha\ln p_\alpha(y\mid\mathbf{x})
++\underbrace{\nabla_\alpha\ln p_\beta(\mathbf{x})}_{=0},
+\tag{6.3}\label{eq:06-03}
+\end{equation}
+因为 $\ln p_\beta(\mathbf{x})$ 不依赖 $\alpha$。同时，
+\begin{equation}
+\nabla_\beta\ln p(\mathbf{x},y)=\underbrace{\nabla_\beta\ln p_\alpha(y\mid\mathbf{x})}_{=0}
++\nabla_\beta\ln p_\beta(\mathbf{x}),
+\tag{6.4}\label{eq:06-04}
+\end{equation}
+因为 $\ln p_\alpha(y\mid\mathbf{x})$ 不依赖 $\beta$。
+
+换句话说，可以先用所有带标签的数据训练 $p_\alpha(y\mid\mathbf{x})$，再用全部可用数据训练 $p_\beta(\mathbf{x})$。这种方法有什么隐患？直观上，无法保证两个分布会以相同方式处理 $\mathbf{x}$，因而可能引入误差。而且，由于训练具有随机性，随机变量 $\mathbf{x}$ 和 $y$ 之间没有信息传递，两个神经网络会各自寻找（局部）极小值。打个比方，它们就像一只鸟的两只翅膀，各动各的，完全不同步。另外，分别训练两个模型的效率也不高。我们必须用两个不同的神经网络，权重无法共享。考虑到训练的随机性，本来就要担心陷入不佳的局部最优，现在要担心两次。
+
+% <<<PDFPAGE 189>>>
+这样做一定会失败吗？这个问题没有简单的答案。它也许效果不错，也可能得到离最优解很远的模型。无论如何，谁愿意在训练模型时心里没底呢？至少我不愿意。
+
+\subsection{方法二　共享参数化}
+
+既然我一直在说要共享参数化，那么第二种方法当然就是（鼓声响起）共享参数化！更具体地说，部分共享参数化（partially shared parameterization）假定先有一个神经网络处理 $\mathbf{x}$，然后将其输出送进两个神经网络。一个用于分类器，另一个用于对象 $\mathbf{x}$ 的边缘分布。\figref{fig:06-02}是这种方法的示例，共享神经网络标为紫色。
+
+现在对联合分布取对数，得到
+\begin{equation}
+\ln p(\mathbf{x},y)=\ln p_{\alpha,\gamma}(y\mid\mathbf{x})+\ln p_{\beta,\gamma}(\mathbf{x}),
+\tag{6.5}\label{eq:06-05}
+\end{equation}
+值得强调的是，两个分布共用部分参数化 $\gamma$，也就是\figref{fig:06-02}中的紫色神经网络。这样一来，训练时 $\mathbf{x}$ 和 $y$ 之间就有了信息共享！直观上，两个分布以相同方式处理 $\mathbf{x}$，再各自根据得到的表示给出类别或对象的概率。
+
+也许有人会问，费这么多事是为了什么？首先，现在两个分布紧密联系。用前面那只鸟来比喻，两只翅膀可以同步运动了。其次，从优化的角度看，梯度经过网络 $\gamma$，所以这个网络同时包含 $\mathbf{x}$ 和 $y$ 的信息。这可能有助于找到更好的解。
+
+\dgmfig{fig_06_02}{.27\linewidth}{使用部分共享的参数化来学习联合分布。}{fig:06-02}[Neural Net 表示神经网络。]
+
+% <<<PDFPAGE 190>>>
+\section{混合建模}
+
+乍看起来，用下面的目标函数训练似乎没有问题。
+\begin{equation}
+\ln p(\mathbf{x},y)=\ln p_{\alpha,\gamma}(y\mid\mathbf{x})+\ln p_{\beta,\gamma}(\mathbf{x}).
+\tag{6.6}\label{eq:06-06}
+\end{equation}
+不过，想一想 $y$ 和 $\mathbf{x}$ 的维数。如果 $y$ 是二元变量，那么只用一个比特表示类别标签。若 $\mathbf{x}$ 是二元向量，就有 $D$ 个比特。两者的规模明显不同！先看对 $\gamma$ 的梯度。
+\begin{equation}
+\nabla_\gamma\ln p(\mathbf{x},y)=\nabla_\gamma\ln p_{\alpha,\gamma}(y\mid\mathbf{x})
++\nabla_\gamma\ln p_{\beta,\gamma}(\mathbf{x}).
+\tag{6.7}\label{eq:06-07}
+\end{equation}
+想一想，在训练时，网络 $\gamma$ 从 $\ln p_{\beta,\gamma}(\mathbf{x})$ 得到的信号要强得多。沿用二元变量的例子，假定神经网络输出的概率全是 $0.5$，那么对独立的伯努利变量有
+\begin{align*}
+\ln\mathit{Bern}(y\mid0.5)&=y\ln 0.5+(1-y)\ln 0.5\\
+&=-\ln 2.
+\end{align*}
+这里用到了对数的性质，即 $\ln 0.5=\ln 2^{-1}=-\ln 2$。$y$ 的取值无关紧要，因为无论 $y=0$ 还是 $y=1$，神经网络给出的概率都是 $0.5$。同样，对 $\mathbf{x}$ 有
+\begin{align*}
+\ln\prod_{d=1}^D\mathit{Bern}(x_d\mid0.5)&=\sum_{d=1}^D\ln\mathit{Bern}(x_d\mid0.5)\\
+&=-D\ln 2.
+\end{align*}
+因此，$\ln p_{\beta,\gamma}(\mathbf{x})$ 这一项的幅度是 $\ln p_{\alpha,\gamma}(y\mid\mathbf{x})$ 的 $D$ 倍！这会怎样影响训练时最终得到的梯度？想象一个高为 $\ln 2$ 的柱子，另一个柱子有它的 $D$ 倍高。现在想象这两根柱子“流”过 $\gamma$。看出来了吗？网络 $\gamma$ 将从边缘分布获得更多信息，这可能妨碍分类部分的训练。换句话说，最终模型总会\emph{偏向边缘分布}。有办法处理吗？好在确实有！
+
+\emph{译注。} 这个例子给出了两个对数概率的量级之比。实际梯度还取决于网络输出对共享参数的导数。
+
+文献\citeref{1}提出，以 $\ln p(y\mid\mathbf{x})$ 和 $\ln p(\mathbf{x})$ 的凸组合（convex combination）作为目标函数。
+\begin{equation}
+\mathcal{L}(\mathbf{x},y;\lambda)=(1-\lambda)\ln p(y\mid\mathbf{x})+\lambda\ln p(\mathbf{x}),
+\tag{6.8}\label{eq:06-08}
+\end{equation}
+其中 $\lambda\in[0,1]$。可惜，这个加权方案并非由一个定义完备的概率分布推导而来，破坏了基于似然的方法原有的简洁性。不过，如果你不在意这一点，这种方法应该会有效！
+
+% <<<PDFPAGE 191>>>
+文献\citeref{2}提出了另一种方法，只给 $\ln p(\mathbf{x})$ 加权。
+\begin{equation}
+\ell(\mathbf{x},y;\lambda)=\ln p(y\mid\mathbf{x})+\lambda\ln p(\mathbf{x}),
+\tag{6.9}\label{eq:06-09}
+\end{equation}
+其中 $\lambda\ge 0$。以前就提出过多种形式的这类加权方法，例如文献\citerefs{3,4}。这个人为调整的因子 $\lambda$ 依然没有从概率角度推导出来。不过，文献\citeref{2}认为，可以将 $\lambda$ 理解为增强模型对输入变化的鲁棒性（robustness）的一种手段。他们也指出，缩放 $\ln p(\mathbf{x})$ 可以看成一种基于雅可比矩阵的正则化惩罚。由于这相当于取 $p(\mathbf{x})^\lambda$，一般仍无法得到有效的概率分布，不过至少可以给出一些解释。
+
+文献\citeref{2}沿着混合建模（hybrid modeling）的思路，用流对 $p(\mathbf{x})$ 建模（论文中使用 GLOW\citeref{5}），再把得到的潜变量 $\mathbf{z}$ 作为分类器的输入。换句话说，用流模型对 $p(\mathbf{x})$ 建模，并让流模型与分类器共享可逆神经网络，例如由耦合层组成的网络。然后，用接在可逆神经网络上方的最后几层作出决策 $y$。目标函数是式\eqref{eq:06-09}定义的 $\ell(\mathbf{x},y;\lambda)$。\figref{fig:06-03}给出了示意图。
+
+这种方法有几个有意思的性质。第一，可逆神经网络可以同时服务于模型的生成部分和判别部分，因此流模型能充分利用标签信息。第二，权重 $\lambda$ 可以控制模型更侧重判别还是生成。第三，可以使用\emph{任意}基于流的模型！文献\citeref{2}使用了 GLOW，文献\citeref{6}使用了残差流，文献\citeref{7}则应用了可逆 DenseNet。第四，正如文献\citeref{2}所示，可以使用\emph{任意}分类器（或回归器），例如贝叶斯分类器（Bayesian classifier）。
+
+这种方法的一个潜在缺点是必须确定 $\lambda$，于是多了一个需要调节的超参数。而且，如先前的文献\citerefs{2,6,7}所指出的，$\lambda$ 的取值会显著改变模型在判别和生成任务中的表现。如何处理这一点仍是开放问题。
+
+\dgmfig{fig_06_03}{.27\linewidth}{使用可逆神经网络和基于流的模型进行混合建模。}{fig:06-03}[Neural Net 表示神经网络，Invertible Neural Net 表示可逆神经网络。]
+
+% <<<PDFPAGE 192>>>
+\section{动手实现混合模型}
+
+现在把思路具体化，构造一个混合模型。先从分类器开始，考虑用全连接神经网络对条件分布 $p(y\mid\mathbf{x})$ 建模。
+\[
+\begin{aligned}
+\mathbf{z}&\to\mathrm{Linear}(D,M)\to\mathrm{ReLU}\to\mathrm{Linear}(M,M)\to\mathrm{ReLU}\\
+&\to\mathrm{Linear}(M,K)\to\mathrm{Softmax}.
+\end{aligned}
+\]
+其中 $D$ 是 $\mathbf{x}$ 的维数，$K$ 是类别数。softmax 给出每个类别的概率。记住，$\mathbf{z}=f^{-1}(\mathbf{x})$，其中 $f$ 是可逆神经网络。
+
+这个例子采用分类器，所以用类别分布表示条件分布 $p(y\mid\mathbf{x})$。
+\begin{equation}
+p(y\mid\mathbf{x})=\prod_{k=1}^K\theta_k(\mathbf{x})^{[y=k]},
+\tag{6.10}\label{eq:06-10}
+\end{equation}
+其中 $\theta_k(\mathbf{x})$ 是第 $k$ 类的 softmax 值。$[y=k]$ 是艾弗森括号，即当 $y=k$ 时 $[y=k]=1$，否则为 0。
+
+接下来对 $p(\mathbf{x})$ 建模。可以用任何边缘分布模型，例如应用流和变量变换公式。
+\begin{equation}
+p(\mathbf{x})=\pi\bigl(\mathbf{z}=f^{-1}(\mathbf{x})\bigr)\left|\mathbf{J}_f(\mathbf{x})\right|^{-1},
+\tag{6.11}\label{eq:06-11}
+\end{equation}
+其中 $\mathbf{J}_f(\mathbf{x})$ 表示变换（即神经网络）$f$ 在 $\mathbf{x}$ 处的雅可比矩阵。对于流，通常用 $\pi(\mathbf{z})=\mathcal{N}(\mathbf{z}\mid0,1)$，也就是标准高斯分布。
+
+把这些分布代入混合建模的目标函数 $\ell(\mathbf{x},y;\lambda)$，得到
+\begin{equation}
+\begin{aligned}
+\ell(\mathbf{x},y;\lambda)
+&=\sum_{k=1}^K[y=k]\ln\theta_{k,g,f}(\mathbf{x})
++\lambda\mathcal{N}\bigl(\mathbf{z}=f^{-1}(\mathbf{x})\mid0,1\bigr)\\
+&\quad-\ln\left|\mathbf{J}_f(\mathbf{x})\right|.
+\end{aligned}
+\tag{6.12}\label{eq:06-12}
+\end{equation}
+这里特意写出 $\theta_{k,g,f}$，表示它由两个神经网络参数化，即流中的 $f$ 和用于最终分类的 $g$。
+
+\emph{译注。} 式\eqref{eq:06-11}和式\eqref{eq:06-12}沿用原书写法。既然 $\mathbf{z}=f^{-1}(\mathbf{x})$，正向变换 $f$ 的雅可比矩阵应在 $\mathbf{z}$ 处求值。按式\eqref{eq:06-09}，高斯密度应取对数，且权重 $\lambda$ 应乘整个 $\ln p(\mathbf{x})$，包括雅可比项。
+
+如果按照文献\citeref{2}的办法，可以用耦合层作为 $f$ 的组件，最后用 RealNVP 或 GLOW 之类的模型对 $p(\mathbf{x})$ 建模。不过，这里想换一种做法，使用整数离散流（IDF）\citerefs{8,9}。为什么？因为我们可以这样做，而且 IDF 不需要计算雅可比矩阵。此外，还可以练习构造不同的混合模型。
+
+快速回顾一下 IDF。第一，IDF 在整数空间 $\mathbb{Z}^D$ 上运算。第二，要选择合适的 $\pi(\mathbf{z})$，本例可以用离散化逻辑斯蒂分布（DL）$\operatorname{DL}(\mathbf{z}\mid\mu,\nu)$，其中 $\mu$ 是均值，$\nu$ 是尺度。由于离散随机变量的变量变换公式
+% <<<PDFPAGE 193>>>
+不需要计算雅可比矩阵（记住这里没有体积变化！），可以把混合建模的目标改写为
+\begin{equation}
+\ell(\mathbf{x},y;\lambda)=\sum_{k=1}^K[y=k]\ln\theta_{k,g,f}(\mathbf{x})
++\lambda\operatorname{DL}\bigl(\mathbf{z}=f^{-1}(\mathbf{x})\mid\mu,\nu\bigr).
+\tag{6.13}\label{eq:06-13}
+\end{equation}
+\emph{译注。} 式\eqref{eq:06-13}保留了原书的 $\operatorname{DL}$。按式\eqref{eq:06-09}，这一概率质量也应取对数。下面的代码计算的是基分布的对数概率。
+
+就这样！如果你跟着做完了这些步骤，恭喜，你得到了一种新的混合模型，它使用 IDF 对 $\mathbf{x}$ 的分布建模。注意，分类器的输入是整数。
+
+\section{代码}
+
+我们已经具备自行实现混合整数离散流（hybrid integer discrete flow，HybridIDF）的全部组件！下面的代码包含大量注释，可以帮助理解每一行。
+
+
+% <<<PDFPAGE 194>>>
+% <<<PDFPAGE 195>>>
+% <<<PDFPAGE 196>>>
+\bookcode{code/ch06_hybrid_idf.py}{HybridIDF 类。}{lst:06-01}
+
+\emph{译注。} 代码清单~\ref{lst:06-01}采用原书的运算次序，先取整再乘可学习的 \texttt{beta}。若 \texttt{beta} 取非整数值，平移量和潜变量也可能变成非整数。
+
+% <<<PDFPAGE 197>>>
+\bookcode{code/ch06_hybrid_idf_networks.py}{神经网络示例。}{lst:06-02}
+
+这样就完成了，所需的内容都已具备！运行代码并训练 HybridIDF 后，应能得到类似\figref{fig:06-04}的结果。
+
+\dgmfig{fig_06_04}{\linewidth}{训练结果示例。（a）随机选取的真实图像。（b）HybridIDF 无条件生成的图像。（c）分类错误率的验证曲线示例。（d）负对数似然 $-\ln p(\mathbf{x})$ 的验证曲线示例。}{fig:06-04}[epochs 表示训练轮次，nll 表示负对数似然。原图（c）的纵轴也标为 nll，原图注将该曲线说明为分类错误率。]
+
+% <<<PDFPAGE 198>>>
+\section{接下来呢？}
+
+\noindent\textbf{混合 VAE}\quad 混合建模的思想并不限于用流对 $p(\mathbf{x})$ 建模。例如，可以选用 VAE，再应用变分推断，得到混合建模目标的下界。
+\begin{equation}
+\begin{aligned}
+\tilde{\ell}(\mathbf{x},y;\lambda)
+&=\ln p(y\mid\mathbf{x})\\
+&\quad+\lambda\,\mathbb{E}_{\mathbf{z}\sim q(\mathbf{z}\mid\mathbf{x})}
+  \bigl[\ln p(\mathbf{x}\mid\mathbf{z})+\ln p(\mathbf{z})-\ln q(\mathbf{z}\mid\mathbf{x})\bigr].
+\end{aligned}
+\tag{6.14}\label{eq:06-14}
+\end{equation}
+其中 $p(y\mid\mathbf{x})$ 内部使用了编码器 $q(\mathbf{z}\mid\mathbf{x})$。
+
+\noindent\textbf{半监督混合学习}\quad 混合建模很适合半监督（semi-supervised）情形。对带标签的数据，可以使用目标函数 $\ell(\mathbf{x},y;\lambda)=\ln p(y\mid\mathbf{x})+\lambda\ln p(\mathbf{x})$。对于无标签的数据，只需考虑 $\ln p(\mathbf{x})$ 这一项。例如，文献\citeref{10}就把这种方法用于 VAE。
+
+文献\citeref{11}给出了一个很有意思的半监督 VAE 学习视角。作者最终得到的目标类似于混合建模的目标，却省去了麻烦的 $\lambda$！
+
+\noindent\textbf{因子 $\lambda$}\quad 如前所述，人为调整的因子 $\lambda$ 可能带来麻烦。首先，它并非由适当的概率分布推导而来。其次，需要额外调节它。不过，正如前面所说，文献\citeref{11}表明，我们可以去掉 $\lambda$！
+
+\noindent\textbf{新的参数化方式}\quad 一个有趣的开放研究方向是，能否用不同的学习算法或其他参数化方式（例如某些特殊的神经网络）来去掉 $\lambda$。结果表明，这确实可行。一种办法是使用 UNet 来参数化扩散模型，并把预测用的神经网络接到 UNet 的编码器上\citeref{12}。这篇论文明确表明，可以用联合似然函数作为目标来训练模型。
+
+\noindent\textbf{这种因子分解好吗？}\quad 我几乎可以肯定，有些读者在想，把联合分布写成 $p(\mathbf{x},y)=p(y\mid\mathbf{x})p(\mathbf{x})$，是否真比写成 $p(\mathbf{x},y)=p(\mathbf{x}\mid y)p(y)$ 好？如果要从指定类别 $y$ 中采样 $\mathbf{x}$，后一种分解更好。不过，如果回到第~1~章，你会发现我在意的并非\emph{生成}。我更希望得到一个能为现实世界中的对象赋予恰当概率的好模型。这就是我更倾向于 $p(\mathbf{x},y)=p(y\mid\mathbf{x})p(\mathbf{x})$ 的原因。
+
+\FloatBarrier
+\input{chapters/ch06_references.tex}

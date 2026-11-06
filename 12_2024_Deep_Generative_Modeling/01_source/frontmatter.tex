@@ -1,0 +1,156 @@
+% <<<PDFPAGE 1>>> 封面。上部原版图形取自附件封面。
+\thispagestyle{empty}
+\noindent\includegraphics[width=\textwidth,clip]{figures/cover_art.pdf}\par
+\vspace{2.6em}
+{\noindent\fontsize{29}{39}\selectfont\sffamily\bfseries 深度生成建模\par}
+\vspace{1em}
+{\noindent\Large 第二版\par}
+\vspace{2em}
+{\noindent\large Jakub M. Tomczak 著\par}
+\vfill
+{\noindent\small Deep Generative Modeling · Second Edition\par}
+{\noindent\small 中文译本\par}
+\clearpage
+
+% <<<PDFPAGE 2>>> 半书名页
+\thispagestyle{empty}
+{\noindent\Large 深度生成建模\par}
+\clearpage
+
+% <<<PDFPAGE 3>>> 扉页
+\thispagestyle{empty}
+{\noindent\large Jakub M. Tomczak\par}
+\vspace{4em}
+{\noindent\fontsize{24}{33}\selectfont 深度生成建模\par}
+\vspace{1.5em}
+{\noindent\large 第二版\par}
+\vfill
+{\noindent 原著由 Springer 出版\par}
+\clearpage
+
+% <<<PDFPAGE 4>>> 出版信息
+\thispagestyle{empty}
+{\small\noindent Jakub M. Tomczak\\
+埃因霍温理工大学（Eindhoven University of Technology）\\
+荷兰埃因霍温\par}
+\vfill
+\begingroup
+\small
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+ISBN 978-3-031-64086-5 \qquad ISBN 978-3-031-64087-2（电子版）\\
+\url{https://doi.org/10.1007/978-3-031-64087-2}
+
+© 编者（如适用）及作者，独家授权 Springer Nature Switzerland AG，2022、2024。
+
+本作品受版权保护。无论涉及本作品的全部还是部分，所有权利均由出版者单独享有独家许可，尤其包括翻译、重印、再利用插图、朗诵、广播、以缩微胶片或其他实体方式复制、传输或信息的存储与检索、电子改编、计算机软件，以及采用现有或将来开发的类似或不同方法处理本作品的权利。
+
+本出版物使用一般描述性名称、注册名称、商标、服务标志等，即使未另作说明，也并不意味着这些名称不受相关法律法规保护而可任意使用。
+
+出版者、作者与编者认为，本书所载建议和信息在出版之日真实、准确。对于书中材料及可能存在的错误或遗漏，出版者、作者和编者均不作任何明示或默示的保证。出版者对出版地图中的管辖权主张及机构隶属关系保持中立。
+
+本书由注册公司 Springer Nature Switzerland AG 以 Springer 品牌出版。\\
+公司注册地址为 Gewerbestrasse 11, 6330 Cham, Switzerland。
+
+如需丢弃本书，请将纸张回收。
+\endgroup
+\clearpage
+
+% <<<PDFPAGE 5>>> 献词
+\thispagestyle{empty}
+\vspace*{7em}
+\begin{flushright}
+献给我挚爱的妻子 Ewelina，\\
+我的父母，以及我的兄弟。
+\end{flushright}
+\clearpage
+
+% <<<PDFPAGE 6>>>
+\frontchapter{序}
+过去十年，随着深度学习（deep learning）的发展，机器学习（machine learning）取得了巨大进展。计算机视觉（computer vision）、语音识别（speech recognition）和自然语言处理（natural language processing）等人工智能（artificial intelligence，AI）的整个分支都因此发生了根本变化。就在我们谈论这些进展的此刻，机器人技术、无线通信和自然科学等更多领域也在经历变革。
+
+大多数进展源于监督学习（supervised learning）。训练时，输入（如图像）和目标标签（如“猫”）都是已知的。如今，深度神经网络（deep neural network）在识别画面中的物体和进行语言翻译时表现出令人惊讶的能力。然而，为这类模型获取训练标签，往往耗时、昂贵，有时不符合伦理，甚至根本不可能。因此，研究界意识到，无监督学习（unsupervised learning）或自监督学习（self-supervised learning）是取得进一步进展的关键。
+
+人类学习也是如此。儿童成长时用来认识世界的信息大多没有标签。平日所见所闻，有多少真的会有人告诉你该怎样标注呢？\footnote{译注：原句缺少相应动词，此处依上下文理解为给所见所闻加上标签。}我们必须在没有监督的情况下学习世界的规律，方法就是在数据中寻找模式和结构。
+
+这样的结构非常多！举个例子，设想我们对一幅图像中每个像素的三个颜色分量都独立地均匀随机取值。得到的图像几乎必然像一片杂乱的噪声。图像空间中的绝大多数图像，与我们睁开眼睛看到的任何事物都毫不相像。这意味着有大量的结构可以发现，孩子们因此有很多东西要学！
+
+当然，孩子并不只是注视世界。他们不断与世界互动。玩耍时，他们在检验自己关于物理、社会和心理规律的假设。如果预测不对，他们会感到惊讶，想来还会更新自己的内部模型，让下次预测更准确。我们有理由认为，有身体的智能体通过玩耍与环境互动，至少对于形成我们所熟悉的人类智能至关重要。这种学习与强化学习（reinforcement learning）显然相通。例如，机器制订下棋计划，观察输赢，再更新关于世界的模型和在其中采取行动的策略。
+% <<<PDFPAGE 7>>> 上一段跨原页。
+
+然而，要让机器人在现实世界中走动、检验假设并主动获取自己的标注，并不容易。面对大量数据，无监督学习因而是较为实际的方法。近年来，这一领域受到广泛关注，取得了惊人的进展。只要看看现在能够毫不费力地生成怎样逼真的虚构人脸，就能体会这种进步有多令人惊异。
+
+无监督学习有很多种。本书讨论的这一种叫作概率生成建模（probabilistic generative modeling），目标是为输入数据估计一个概率模型。一旦有了这个模型，我们就可以从中生成新的样本，比如为不存在的人生成人脸图像。
+
+另一个目标是学出输入的抽象表示。这一领域称为表示学习（representation learning）。高层表示把输入自行组织成相互“解耦”的概念，比如我们熟悉的汽车、猫，以及它们之间的关系。
+
+解耦（disentangling）的直观意思很清楚，却很难给出恰当的定义。20 世纪 90 年代，人们考虑的是统计独立的潜变量（latent variable）。在这种观点下，大脑的任务是把高度依赖的像素表示变换成由独立潜变量构成的、更高效而少冗余的表示。这样既压缩了输入，也使大脑更高效地利用能量和信息。
+
+学习和压缩有着深刻联系。学习需要对数据做有损压缩（lossy compression），因为我们关心的是泛化（generalization），无需存下全部数据。从数据集的层面看，机器学习本身就是把数据集所含的一小部分信息转移到模型参数中，忘掉其余信息。
+
+对单个数据点而言也是如此。比如在处理一幅输入图像时，我们最终关心的是图像中的抽象概念，如物体及其关系，而不是逐像素的细节。借助内部模型，我们可以对这些物体进行推理（reasoning），在头脑中摆弄它们，并想象它们可能具有的反事实未来（counterfactual futures）。智能要从涌入感官的、相互关联且混杂的像素级信息中提取有预测价值的部分，再把这些信息表示成便于在头脑中操作的形式。
+
+不过，日常生活中我们所熟悉的对象并没有那么独立。一只正在追鸟的猫与那只鸟并非统计独立。于是，人们也尝试从不同角度定义解耦。例如，输入发生变换时，变量的子空间遵循某种简单的变换规律，这称为等变表示（equivariant representation）。也有人考虑可以独立控制、从而操纵周围世界的变量，或能激活描述世界的某些独立机制的因果变量（causal variable）。
+
+在没有标签的情况下，训练模型最简单的办法是学习输入数据的概率生成模型（或概率密度）。概率生成模型的许多方法直接最大化数据在生成模型下的对数概率，或者最大化对数概率的下界。
+% <<<PDFPAGE 8>>> 上一段跨原页。
+除了变分自编码器（variational autoencoder，VAE）和生成对抗网络（generative adversarial network，GAN），本书还讲解归一化流（normalizing flow）、自回归模型（autoregressive model）、基于能量的模型（energy-based model），以及最新引人注目的深度扩散模型（deep diffusion model）。
+
+即使从未训练过生成模型，我们也可以学习适用于多种后续预测任务的表示。其思路是为表示设计一些无需获取标注即可完成的任务。例如，对随时间变化的数据，可以直接预测未来，幸好接下来发生的事总会到来。还可以设计更特别的任务，例如预测一个图像块位于另一个图像块的左边还是右边，辨别一段影片是在正放还是倒放，或根据句子中一个词周围的词来预测这个词。这样的无监督学习通常称为自监督学习，不过我得承认，不同的人对这个词的用法也并不相同。
+
+确实有很多方法可以从无监督学习中的“辅助任务”这个角度来理解，其中也包括一些概率生成模型。例如，可以把 VAE 理解为先让信息通过信息瓶颈（information bottleneck），再预测它自身的输入。可以把 GAN 理解为预测给定的输入是真实图像（数据点）还是假图像（自己生成的样本）。噪声对比估计（noise-contrastive estimation）则可以看成在潜在空间（latent space）中作预测，判断输入图像块的嵌入（embedding）在空间上、时间上或两者上相距近还是远。
+
+本书以容易理解的方式讨论深度概率生成模型的最新进展。它的特别之处在于，正如孩子搭积木以理解物理规律，读者也可以通过动手试验代码来学习深度概率生成模型。作者在这一领域发表过大量成果，积累了扎实的研究经验，这也使本书受益良多。它是课堂上教授这个主题的好教材。
+
+我们这个领域将迎来怎样的未来？通用人工智能（artificial general intelligence，AGI）的进展看来会在很大程度上依赖无监督学习。有趣的是，科学界似乎分成了两派。“规模派”认为，只要不断扩大现有技术的规模，用更多数据和算力训练更大的模型，就能实现 AGI，智能会随规模扩大而自动涌现。另一派认为，要取得进一步进展，还需要新的理论和思想，例如操纵离散符号（也就是推理）、因果性（causality），以及明确纳入常识知识。
+
+\Needspace{12\baselineskip}
+当然，还有一个越来越重要和紧迫的问题，即人与这些模型将如何互动。人们还能理解模型的内部工作方式吗？我们应当就此放弃可解释性（interpretability）吗？如果模型比我们自己更懂我们，而听从算法建议的人又比拒绝照做的人更成功，生活会发生怎样的变化？如果深度伪造（deepfake）逼真到我们无法分辨真伪，还有什么信息可信？面对铺天盖地的虚假新闻，民主制度还能运转吗？有一点可以肯定，这个领域十分热门，而本书正是开始了解这个领域的优秀入门读物。掌握这种技术也意味着要对社会承担新的责任，每个人都应该清楚地认识到这一点。让我们审慎地推动这个领域发展。
+% <<<PDFPAGE 9>>> 上一段跨原页。
+\begin{flushright}
+Max Welling\\
+2021 年 10 月 30 日
+\end{flushright}
+
+% <<<PDFPAGE 10>>>
+\frontchapter{前言}
+我们生活在一个“人工智能”一词已被广泛使用的世界。电影讲人工智能，记者写人工智能，首席执行官也谈论人工智能。更重要的是，它进入了日常生活，把手机、电视、冰箱和吸尘器变成智能手机、智能电视、智能冰箱和扫地机器人。我们在使用人工智能，却还没有完全理解“AI”是什么，也没有完全弄清该如何对它作出形式化描述，尽管它早在 20 世纪 50 年代就已经成为一门独立学科。此后，许多研究者一直追求一个极具挑战性的目标，即构建一种能够处理数据和知识，从而模仿、理解并帮助人类的人工智能系统。在不少特定任务上，我们的确已经在速度和准确率上超过了人类！
+
+当前的人工智能方法未必模仿人类处理信息的过程，无论从生物层面还是认知层面来看都是如此。它们的目标往往是迅速、准确地作出决定，比如清扫房间时规划行动，或提高所播放影片的画面质量。在这类任务中，概率论至关重要，因为数据有限、质量不佳，或系统本身的行为特性，都使我们不得不量化不确定性（uncertainty）。与此同时，深度学习已经成为一种主流的学习范式，可以学出数据的层次化表示。它受到生物神经网络的启发，不过要把深度学习与生物神经元一一对应，未免牵强。尽管如此，深度学习推动了人工智能的发展，使其在许多决策任务中达到了当时的最佳水平。下一步看来是把概率论与深度学习结合起来，构建能够量化其对所处环境的不确定性的强大人工智能系统。
+
+\emph{关于新版。} 自本书上一版于 2022 年 2 月出版以来，人工智能领域发生了巨大变化，生成式人工智能（generative AI，GenAI）尤其如此。如今，每家公司都希望在产品组合中纳入生成式人工智能，对新模型的需求非常大，在生产环境中尤为如此。作为主要的开源模型平台之一，Hugging Face 上的模型在 2022 年 8 月还不足 7 万个，而截至 2024 年 5 月 2 日已超过 60 万个。这一大幅增长很好地反映了市场需求。此外，生成式人工智能出现了两个主要趋势，即基于得分的生成模型（score-based generative model）和大语言模型（large language model，LLM）。第一版没有涉及这两个主题，因此我们增设新章补上这部分内容。热心的读者还发现了多处错误，新版已经改正。很可能还有新的错误，不过正如我的一位老师常说的：“没有文字，就没有错误。”
+% <<<PDFPAGE 11>>> 上一段跨原页。
+
+\emph{那么，本书讲什么？} 本书讨论如何结合概率建模（probabilistic modeling）与深度学习来构建人工智能系统。它还超越通常的预测建模，把监督学习与无监督学习结合起来。由此产生的范式称为深度生成建模（deep generative modeling），它从生成的角度看待周围世界。它假设每种现象都由某个潜在的生成过程（generative process）驱动。这个过程定义随机变量（random variable）及其随机相互作用的联合分布（joint distribution），也就是事件如何发生以及按什么顺序发生。“深度”这个形容词源于我们用深度神经网络对分布进行参数化。深度生成建模有两个鲜明特征。第一，使用深度神经网络可以对分布进行丰富而灵活的参数化。第二，依据概率论对随机依赖关系建模，能使形式化表述准确，并避免推理中可能出现的漏洞。此外，概率论给出了统一的框架，其中似然函数（likelihood function）在量化不确定性和定义目标函数（objective function）时起着关键作用。
+
+\emph{那么，本书适合谁阅读？} 本书面向有求知欲的学生、工程师和研究人员。读者应具备本科微积分、线性代数和概率论的基本数学知识，也应了解机器学习和深度学习的基础，并具备使用 Python 和 PyTorch（或其他深度学习库）编程的基础。本书也适合希望了解深度生成建模、来自计算机科学、工程、数据科学、物理和生物信息学等不同背景的学生和研究人员。为帮助读者理解，本书用具体例子和代码片段介绍基本概念。
+
+本书的完整配套代码可在线获取。
+\begin{center}
+\url{https://github.com/jmtomczak/intro_dgm}
+\end{center}
+
+本书的最终目的是介绍深度生成建模中最重要的技术，并使读者最终能够提出新的模型，动手实现它们。
+
+\emph{本书的结构。} 本版更新了内容。第一版由八章组成，各章可以独立阅读，阅读顺序也几乎不受限制。第~1~章引入主题，概述重要的深度生成模型类别和一般概念。第~3、4、5~章讨论边缘分布（marginal distribution）的建模，第~6、7~章概述联合分布的建模。第~8~章介绍一类不以似然为目标来学习的潜变量模型。第~10~章说明深度生成建模如何用于快速发展的神经压缩（neural compression）领域。新版新增关于 Transformer 的内容（第~3.3~节和第~5.5.3.5~节），并新增第~2~章、讨论基于得分的生成模型的第~9~章，以及讨论大语言模型和生成式人工智能系统（generative AI system）的第~11~章。每章都附有代码片段，帮助读者了解怎样实现书中介绍的方法。参考文献通常用于指明材料的原始出处，也供读者进一步阅读。深度生成建模是一个广阔的研究领域，要涵盖所有精彩的思想几乎不可能。因此，如有论文未能收入，谨致歉意。如果有人觉得被遗漏了，那并非有意为之。
+% <<<PDFPAGE 12>>> 上一段跨原页。
+
+最后，我要感谢妻子 Ewelina。她的帮助与陪伴给了我继续写作的力量。我也感谢一直支持我的父母，以及花了很多时间检查本书第一版及其代码的兄弟。
+
+\begin{flushright}
+Jakub M. Tomczak\\
+荷兰埃因霍温\\
+2024 年 5 月 2 日
+\end{flushright}
+
+% <<<PDFPAGE 13>>>
+\frontchapter{致谢}
+和许多其他书一样，若没有众多人士的贡献和帮助，本书不可能问世。在我的职业生涯中，我非常荣幸，也非常幸运，能与一群优秀的同行一起研究深度生成建模。在此向他们致谢（按原文的字母顺序排列）：Erik Bekkers、Rianne van den Berg、Francesco Paolo Casale、Taco Cohen、Tim Davidson、Nicola De Cao、Kamil Deja、Babak Esmaeili、Luka Falorsi、Eliseo Ferrante、Patrick Forré、Ioannis Gatopoulos、Efstratios Gavves、Adam Gonczarek、Amirhossein Habibian、Leonard Hasenclever、Emiel Hoogeboom、Maximilian Ilse、Adam Izdebski、Thomas Kipf、Anna Kuzina、Christos Louizos、Yura Perugachi-Diaz、Ties van Rozendaal、Victor Satorras、Ewa Szczurek、Jerzy Świątek、Tomasz Trzciński、Sharvaree Vadgama、Max Welling、Szymon Zaręba 和 Maciej Zięba。
+
+我还想感谢其他与我共同研究人工智能、并同我有过许多精彩讨论的同事（按原文的字母顺序排列）：Davide Abati、Tameem Adel、Ilze Auzina、Babak Ehteshami Bejnordi、Erik Bekkers、Sandjai Bhulai、Tijmen Blankevoort、Johannes Brandstetter、Matteo De Carlo、Haotian Chen、Fuda van Diggelen、A.E. Eiben、Ali El Hassouni、Jacintha Ellers、Jan Engelmann、Jes Frellsen、Arkadiusz Gertych、Russ Greiner、Albert Gu、Frank van Harmelen、Mark Hoogendoorn、Emile van Krieken、David Knigge、Gongjin Lan、Falko Lavitt、Romain Lepert、Jie Luo、ChangYong Oh、Piotr Miłoś、Karine Miras、Alessandro Palma、Siamak Ravanbakhsh、Diederik Roijers、David W. Romero、Florian Shkurti、Jan-Jakob Sonke、Aart Stuurman、Annette ten Teije、Thiviyan Thanapalasingam、Fabian Theis、Auke Wiggers、Michał Zając 和 Alessandro Zonta。
+
+我要特别感谢我的兄弟 Kasper。他耐心读完了本书第一版的每一节，并逐行运行和检查了代码。你想象不到我有多感激！
+
+我要感谢妻子 Ewelina 一直以来的支持，她给了我完成两版书稿的力量。没有她的帮助和理解，我几乎不可能完成这个项目。我也要感谢父母 Elżbieta 和 Ryszard 在我人生的各个阶段给予我的支持。没有他们，就没有今天的我。
+
+% <<<PDFPAGE 14>>> 至 <<<PDFPAGE 20>>> 为原目录。译本由 main.tex 按实际章节生成目录。

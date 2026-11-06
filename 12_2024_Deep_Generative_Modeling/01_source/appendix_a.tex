@@ -1,0 +1,87 @@
+% <<<PDFPAGE 316>>>
+\chapter{代数与微积分常用结论}
+\label{app:algebra}
+\bookimprint{https://doi.org/10.1007/978-3-031-64087-2}
+
+\section{范数与内积}
+\subsection{范数的定义}
+范数（norm）是具有以下性质的函数 $\lVert\cdot\rVert\colon\mathcal{X}\to\mathbb{R}_+$。
+\begin{enumerate}
+\item $\lVert\mathbf{x}\rVert=0\iff\mathbf{x}=0$。
+\item $\lVert\alpha\mathbf{x}\rVert=|\alpha|\lVert\mathbf{x}\rVert$，其中 $\alpha\in\mathbb{R}$。
+\item $\lVert\mathbf{x}+\mathbf{y}\rVert\le\lVert\mathbf{x}\rVert+\lVert\mathbf{y}\rVert$。
+\end{enumerate}
+
+\subsection{内积的定义}
+内积（inner product）是具有以下性质的函数 $\langle\cdot,\cdot\rangle\colon\mathcal{X}\times\mathcal{X}\to\mathbb{R}$。
+\begin{enumerate}
+\item $\langle\mathbf{x},\mathbf{x}\rangle\ge 0$。
+\item $\langle\mathbf{x},\mathbf{y}\rangle=\langle\mathbf{y},\mathbf{x}\rangle$。
+\item $\langle\alpha\mathbf{x},\mathbf{y}\rangle=\alpha\langle\mathbf{x},\mathbf{y}\rangle$。
+\item $\langle\mathbf{x}+\mathbf{z},\mathbf{y}\rangle=\langle\mathbf{x},\mathbf{y}\rangle+\langle\mathbf{z},\mathbf{y}\rangle$。
+\end{enumerate}
+\emph{译注。} 对内积还要求 $\langle\mathbf{x},\mathbf{x}\rangle=0$ 仅在 $\mathbf{x}=0$ 时成立，原书第一条仅列出非负性。
+
+\subsection{范数和内积的若干性质}
+\begin{itemize}
+\item $\langle\mathbf{x},\mathbf{x}\rangle=\lVert\mathbf{x}\rVert^2$。
+\item $|\langle\mathbf{x},\mathbf{y}\rangle|\le\lVert\mathbf{x}\rVert\lVert\mathbf{y}\rVert$。对于 $\mathbb{R}^D$ 中的向量，$\langle\mathbf{x},\mathbf{y}\rangle=\lVert\mathbf{x}\rVert\lVert\mathbf{y}\rVert\cos\theta$。
+\item $\lVert\mathbf{x}+\mathbf{y}\rVert^2=\lVert\mathbf{x}\rVert^2+2\langle\mathbf{x},\mathbf{y}\rangle+\lVert\mathbf{y}\rVert^2$。
+\item $\lVert\mathbf{x}-\mathbf{y}\rVert^2=\lVert\mathbf{x}\rVert^2-2\langle\mathbf{x},\mathbf{y}\rangle+\lVert\mathbf{y}\rVert^2$。
+\end{itemize}
+\emph{译注。} 这些性质中的范数由相应内积诱导。
+
+% <<<PDFPAGE 317>>>
+\section{矩阵微积分}
+\subsection{线性依赖}
+设 $\phi_m$ 为非线性变换，$\mathbf{x}\in\mathbb{R}^M$。这两个向量的线性乘积为
+\[
+\begin{aligned}
+\boldsymbol{\phi}(\mathbf{x})^{\mathsf T}\mathbf{w}
+ &=w_0\phi_0(\mathbf{x})+w_1\phi_1(\mathbf{x})
+    +\cdots+w_{M-1}\phi_{M-1}(\mathbf{x})\\
+ &=\sum_{m=0}^{M-1}w_m\phi_m(\mathbf{x}),
+\end{aligned}
+\]
+其中 $\mathbf{w}=(w_0\ w_1\ \cdots\ w_{M-1})^{\mathsf T}$，且 $\boldsymbol{\phi}(\mathbf{x})=(\phi_0(\mathbf{x})\ \phi_1(\mathbf{x})\ \cdots\ \phi_{M-1}(\mathbf{x}))^{\mathsf T}$。
+
+\subsection{正交和标准正交向量}
+如果 $\langle\mathbf{x},\mathbf{y}\rangle=0$，则向量 $\mathbf{x}$ 和 $\mathbf{y}$ 是正交（orthogonal）的。如果还满足 $\lVert\mathbf{x}\rVert=\lVert\mathbf{y}\rVert=1$，则称这些向量是标准正交（orthonormal）的。
+
+\subsection{矩阵微积分的若干性质}
+\begin{itemize}
+\item $(\mathbf{A}\mathbf{B})^{-1}=\mathbf{B}^{-1}\mathbf{A}^{-1}$。
+\item $(\mathbf{A}\mathbf{B})^{\mathsf T}=\mathbf{B}^{\mathsf T}\mathbf{A}^{\mathsf T}$。
+\item 矩阵 $\mathbf{A}$ 正定，当且仅当对所有满足 $\mathbf{x}\ne0$ 的向量，有 $\mathbf{x}^{\mathsf T}\mathbf{A}\mathbf{x}>0$。
+\item $\nabla_{\mathbf{x}}\mathbf{x}^{\mathsf T}\mathbf{x}=2\mathbf{x}$。
+\item $\nabla_{\mathbf{x}}\lVert\mathbf{W}^{1/2}(\mathbf{b}-\mathbf{A}\mathbf{x})\rVert_2^2
+   =-2\mathbf{A}^{\mathsf T}\mathbf{W}(\mathbf{b}-\mathbf{A}\mathbf{x})$，其中 $\mathbf{W}$ 是对称矩阵。
+\end{itemize}
+给定向量 $\mathbf{x}$、$\mathbf{y}$ 和对称正定矩阵 $\mathbf{A}$，有
+\begin{itemize}
+\item $\dfrac{\partial}{\partial\mathbf{y}}(\mathbf{x}-\mathbf{y})^{\mathsf T}\mathbf{A}(\mathbf{x}-\mathbf{y})=-2\mathbf{A}(\mathbf{x}-\mathbf{y})$。
+\item $\dfrac{\partial(\mathbf{x}-\mathbf{y})^{\mathsf T}\mathbf{A}^{-1}(\mathbf{x}-\mathbf{y})}
+             {\partial\mathbf{A}}
+       =-\mathbf{A}^{-1}(\mathbf{x}-\mathbf{y})(\mathbf{x}-\mathbf{y})^{\mathsf T}\mathbf{A}^{-1}$。
+\item $\dfrac{\partial\ln\det(\mathbf{A})}{\partial\mathbf{A}}=\mathbf{A}^{-1}$。
+\end{itemize}
+
+% <<<PDFPAGE 318>>>
+\subsection{可逆矩阵的特殊情形}
+\[
+\mathbf{A}^{-1}
+ =\begin{bmatrix}a&b\\c&d\end{bmatrix}^{-1}
+ =\frac{1}{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}
+\]
+\[
+\begin{aligned}
+\mathbf{A}^{-1}
+ &=\begin{bmatrix}a&b&c\\d&e&f\\g&h&k\end{bmatrix}^{-1}\\
+ &=\frac{1}{\det\mathbf{A}}
+ \begin{bmatrix}
+ ek-fh & ch-bk & bf-ce\\
+ fg-dk & ak-cg & cd-af\\
+ dh-eg & bg-ah & ae-bd
+ \end{bmatrix}
+\end{aligned}
+\]

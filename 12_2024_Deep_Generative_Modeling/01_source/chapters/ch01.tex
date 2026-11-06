@@ -1,0 +1,201 @@
+% <<<PDFPAGE 21>>>
+\chapter{为什么需要深度生成建模？}
+\label{ch:motivation}
+\sourcechapter{1}
+
+\section{人工智能不只关乎决策}
+\label{sec:decision}
+在讨论（深度）生成建模之前，我们先看一个简单的例子。设想我们训练了一个深度神经网络，用于给动物图像（$\mathbf{x}\in\mathbb{Z}^{D}$）分类（$y\in\mathcal{Y}$，其中 $\mathcal{Y}=\{\mathit{cat},\mathit{dog},\mathit{horse}\}$）。再假设该网络训练得很好，总能以很高的概率 $p(y\mid\mathbf{x})$ 给出正确类别。到这里似乎一切顺利，对吧？但问题可能由此产生。正如\citeref{1}所指出的，往图像里加入噪声，可能会使分类结果完全错误。\figref{fig:01-01}就是一个例子。加噪改变了模型对各标签给出的概率，可图像本身几乎没变，至少我们肉眼看来如此。
+
+\dgmfig{fig_01_01}{\linewidth}{给一幅原本几乎能正确分类的图像加入噪声，导致预测标签改变。}{fig:01-01}
+[图中 \textit{cat}、\textit{dog}、\textit{horse} 分别指猫、狗、马，中间一项是噪声。]
+
+这个例子表明，用于参数化条件分布 $p(y\mid\mathbf{x})$ 的神经网络，似乎没有理解图像的语义。我们甚至进一步假设，仅学习判别模型（discriminative model），还不足以作出恰当的决策、构建人工智能。一个机器学习系统不能只学会如何作决策，同时对现实缺乏理解，也不能表达它对周围世界的不确定性。少量噪声就能改变系统的内部信念，使它从确信一个决策变为确信另一个决策，我们又怎能信任它？如果它不能恰当地表达对周围环境是否陌生的判断，我们又怎么与这样的系统交流？
+% <<<PDFPAGE 22>>> 上一段跨原页。
+
+\dgmfig{fig_01_02}{\linewidth}{数据示例（左）与两种决策方法。中图采用判别方法，右图采用生成方法。}{fig:01-02}
+[左图为数据。中图中 $p(\mathit{blue}\mid\mathbf{x})$ 较高，决策确定。右图中 $p(\mathit{blue}\mid\mathbf{x})$ 较高而 $p(\mathbf{x})$ 较低，决策不确定。]
+
+为了说明不确定性与理解之类的概念对决策的重要性，再考虑一个分类系统，这次把对象分成橙色和蓝色两类。假设我们有一些二维数据（\figref{fig:01-02}左），还有一个待分类的新数据点（图中的黑色叉号）。我们可以用两种方法决策。第一种方法对条件分布 $p(y\mid\mathbf{x})$ 建模，直接构建分类器（\figref{fig:01-02}中）。第二种方法考虑联合分布 $p(\mathbf{x},y)$，它可以进一步分解为 $p(\mathbf{x},y)=p(y\mid\mathbf{x})p(\mathbf{x})$（\figref{fig:01-02}右）。
+
+按照判别方法训练条件分布模型 $p(y\mid\mathbf{x})$ 后，我们得到一条清晰的决策边界。黑色叉号离橙色区域较远，因而分类器给蓝色标签分配了较高的概率。于是，分类器对这个决策很有把握！
+
+另一方面，如果我们再拟合分布 $p(\mathbf{x})$，就会看到黑色叉号既远离决策边界，又离蓝色数据点所在的区域很远。也就是说，它远离概率质量（probability mass）较高的区域。因此，黑色叉号的（边缘）概率 $p(\mathbf{x}=\text{黑色叉号})$ 较低，联合分布在 $p(\mathbf{x}=\text{黑色叉号},y=\text{蓝色})$ 处的值也低，于是这项决策具有不确定性！
+
+这个简单例子清楚地表明，要构建能够可靠决策、又能与人类交流的人工智能系统，系统首先必须\emph{理解}环境。为此，系统除了学会如何决策，还应能用概率语言量化对周围环境的信念\citerefs{2,3}。我们认为，要做到这一点，估计对象的分布 $p(\mathbf{x})$ 至关重要。
+
+从生成的角度看，了解分布 $p(\mathbf{x})$ 十分重要，因为它可以用来
+\begin{itemize}
+\item 评估过去是否观测过给定对象。
+\item 帮助对决策赋予恰当的权重。
+% <<<PDFPAGE 23>>>
+\item 评估对环境的不确定性。
+\item 通过与环境互动来主动学习（active learning），例如请求给 $p(\mathbf{x})$ 较低的对象加上标签。
+\item 最终生成（合成）新的对象。
+\end{itemize}
+
+在深度学习文献中，生成模型通常被当作生成新数据的工具。这里我们想传达一个新的观点：获得 $p(\mathbf{x})$ 后，用途要广泛得多，而且这可能是构建成功的人工智能系统的关键。最后，我们也想指出这与机器学习中的生成建模有明显联系。恰当地建立生成过程，对于理解所关心的现象至关重要\citerefs{3,4}。不过，在许多情况下，考虑另一种分解，即 $p(\mathbf{x},y)=p(\mathbf{x}\mid y)p(y)$，会更容易。我们认为，考虑 $p(\mathbf{x},y)=p(y\mid\mathbf{x})p(\mathbf{x})$ 有前面提到的明显优势。
+
+\section{（深度）生成建模可以用在哪里？}
+\label{sec:uses}
+随着神经网络的发展和算力的提升，深度生成建模已成为人工智能的主要方向之一。应用范围很广，既包括机器学习中的典型模态，如文本分析（例如\citeref{5}）、图像分析（例如\citeref{6}）和音频分析（例如\citeref{7}），也包括主动学习（例如\citeref{8}）、强化学习（例如\citeref{9}）、图分析（例如\citeref{10}）和医学成像（例如\citeref{11}）等问题。\figref{fig:01-03}以图示呈现深度生成建模的一些潜在应用。
+
+\dgmfig{fig_01_03}{\linewidth}{深度生成建模的多种潜在应用。}{fig:01-03}
+[图中应用包括文本、图像、主动学习、图结构、强化学习、音频和医学成像。主动学习示意图的节点分别为已标注数据、学习、未标注数据和查询。文本面板保留原生成示例。]
+
+在有些应用中，生成（合成）对象，或改变对象的特征以得到新对象，确实很重要。比如有的应用能把年轻人的样貌变成老年人的样貌。不过在主动学习等其他应用中，重要的是询问那些具有不确定性的对象，即 $p(\mathbf{x})$ 较低、需要由标注者（oracle）提供标签的对象。另一方面，在强化学习中，生成下一步最可能出现的情形（状态），对智能体（agent）采取行动至关重要。在医疗应用中，解释一项决策，例如说明标签与对象各自的概率，显然比只给出诊断标签能为医生提供更多信息。如果人工智能系统能说明自己有多确定，也能量化对象是否可疑（即 $p(\mathbf{x})$ 是否较低），它就可能像一位独立专家那样提供自己的意见。
+% <<<PDFPAGE 24>>> 上一段跨原页。
+
+这些例子清楚地表明，即便不能说所有领域，至少许多领域都能从（深度）生成建模中大大受益。人工智能系统显然需要具备多种机制。我们认为，正如上述情形所示，生成建模能力无疑是其中最重要的能力之一。
+
+\section{怎样构建（深度）生成模型？}
+\label{sec:formulation}
+介绍了（深度）生成建模的重要性和广泛用途之后，我们应该问问自己，该怎样构建（深度）生成模型？换句话说，我们该怎样表示已经多次提到的 $p(\mathbf{x})$？
+
+（深度）生成建模可以分成四大类（见\figref{fig:01-04}）。
+\begin{itemize}
+\item 自回归生成模型（autoregressive generative model，ARM）。
+\item 基于流的模型（flow-based model）。
+\item 潜变量模型（latent variable model）。
+\item 基于能量的模型。
+\end{itemize}
+
+我们把“深度”放在括号内，是因为前面讨论的大部分内容不用神经网络也可以建模。不过，神经网络灵活且功能强大，因而被广泛用于参数化生成模型。接下来，我们专门讨论深度生成模型。
+
+顺便说一句，这个分类只是阅读本书时的指引，可以随讨论需要调整。我个人不太喜欢花太多时间给科学划分类别、贴标签，因为这样往往会引发对立，甚至造成排斥。另外，还有一类基于得分匹配（score matching）原理的模型\citerefs{12,13,14}，不一定能归入这套简单的分类。不过，正如\citeref{14}指出的，如果把随机过程的连续各步看成潜变量，这些模型与潜变量模型有许多相似之处，因此我们也按这个思路处理。
+
+% <<<PDFPAGE 25>>>
+\dgmfig{fig_01_04}{.96\linewidth}{深度生成模型的一种分类。}{fig:01-04}
+[图中的自回归分支含卷积网络、循环神经网络和 Transformer。流模型分支含整数、归一化及连续归一化流。潜变量分支含指定分布模型（VAE 与扩散模型）和隐式模型（GAN）。能量模型分支含玻尔兹曼机和联合模型。得分模型分支含得分模型、随机微分方程和流匹配。]
+\FloatBarrier
+
+\subsection{自回归模型}
+第一类深度生成模型利用\textbf{自回归建模}（autoregressive modeling，ARM）的思想。也就是说，$\mathbf{x}$ 的分布采用自回归方式表示：
+\begin{equation}
+p(\mathbf{x})=p(x_0)\prod_{i=1}^{D}p(x_i\mid\mathbf{x}_{<i}),
+\tag{1.1}\label{eq:01-01}
+\end{equation}
+其中 $\mathbf{x}_{<i}$ 表示下标 $i$ 之前的所有 $x$。
+
+% <<<PDFPAGE 26>>>
+分别为所有条件分布 $p(x_i\mid\mathbf{x}_{<i})$ 建模，计算效率不高。不过，我们可以利用\citeref{7}在音频上和\citerefs{15,16}在图像上使用的\emph{因果卷积}（causal convolution）。第~3~章会更深入地讨论自回归模型。
+
+\subsection{基于流的模型}
+变量变换公式（change of variables formula）给出一种有数学依据的表示方法。通过对随机变量施加可逆变换 $f$，可以把它的密度写成\citeref{17}
+\begin{equation}
+p(\mathbf{x})=p\bigl(\mathbf{z}=f(\mathbf{x})\bigr)\lvert\mathbf{J}_{f(\mathbf{x})}\rvert,
+\tag{1.2}\label{eq:01-02}
+\end{equation}
+其中 $\mathbf{J}_{f(\mathbf{x})}$ 表示雅可比矩阵（Jacobian matrix）。
+
+我们可以用深度神经网络参数化 $f$。不过，由于必须能够计算雅可比矩阵，这里的神经网络不能任意选取。早期利用变量变换公式的方法主要考虑保体积的线性变换，使得 $\lvert\mathbf{J}_{f(\mathbf{x})}\rvert=1$\citerefs{18,19}。后续研究借助关于矩阵行列式的定理，得到了一些特定的非线性变换，即平面流（planar flow）\citeref{20}和 Sylvester 流（Sylvester flow）\citerefs{21,22}。另一种方法着眼于构造雅可比行列式容易求出的可逆变换，例如 RealNVP 中的耦合层（coupling layer）\citeref{23}。近来的方法则给一般神经网络施加约束，使之可逆，再近似计算雅可比行列式\citerefs{24,25,26}。
+
+对于离散分布（例如定义在整数上的分布），概率质量函数（probability mass function）不存在体积变化，因此变量变换公式具有以下形式：
+\begin{equation}
+p(\mathbf{x})=p\bigl(\mathbf{z}=f(\mathbf{x})\bigr).
+\tag{1.3}\label{eq:01-03}
+\end{equation}
+
+整数离散流（integer discrete flow）提出使用带取整算子（rounding operator）的仿射耦合层（affine coupling layer），以保证输出为整数\citeref{27}。\citeref{28}进一步研究了仿射耦合层的推广。
+
+凡是利用变量变换公式的生成模型，都称为\textbf{基于流的模型}，简称为\emph{流}（flow）。我们将在第~4~章讨论流。
+
+\subsection{潜变量模型}
+\textbf{潜变量模型}的思想是引入一个较低维的潜在空间，并假定如下生成过程：
+\[
+\begin{aligned}
+\mathbf{z}&\sim p(\mathbf{z})\\
+\mathbf{x}&\sim p(\mathbf{x}\mid\mathbf{z}).
+\end{aligned}
+\]
+
+% <<<PDFPAGE 27>>>
+也就是说，潜变量对应于数据中隐藏的因素，条件分布 $p(\mathbf{x}\mid\mathbf{z})$ 可以视为一个\emph{生成器}（generator）。
+
+最为人熟知的潜变量模型是\textbf{概率主成分分析}（probabilistic principal component analysis，pPCA）\citeref{29}。其中 $p(\mathbf{z})$ 和 $p(\mathbf{x}\mid\mathbf{z})$ 都是高斯分布（Gaussian distribution），$\mathbf{z}$ 与 $\mathbf{x}$ 的依赖关系是线性的。
+
+\textbf{变分自编码器}框架\citerefs{30,31}将 pPCA 推广到可采用任意分布的非线性情形。为了使推断在计算上可行，采用变分推断（variational inference）近似后验分布（posterior distribution）$p(\mathbf{z}\mid\mathbf{x})$，并用神经网络对分布作参数化。自\citerefs{30,31}的开创性论文发表以来，已经有多种扩展，包括增强变分后验（variational posterior）\citerefs{19,21,22,32}、先验（prior）\citerefs{33,34}以及解码器（decoder）\citeref{35}的表达能力。值得关注的方向还包括研究不同的潜在空间拓扑，例如超球面潜在空间（hyperspherical latent space）\citeref{36}。在 VAE 和 pPCA 中，所有分布都必须预先指定，所以它们被称为\emph{指定分布模型}（prescribed model）。第~5~章将重点讨论这类深度生成模型。
+
+到目前为止，自回归模型、流、pPCA 和 VAE 都是以\emph{对数似然函数}（log-likelihood function）为目标函数的概率模型。这个目标与数据分布和模型分布之间的 Kullback–Leibler 散度（Kullback–Leibler divergence）密切相关。另一种方法使用\emph{对抗损失}（adversarial loss），由判别器（discriminator）$D(\cdot)$ 区分真实数据与生成器给出的合成数据。生成器以隐式形式给出合成数据，即 $p(\mathbf{x}\mid\mathbf{z})=\delta\bigl(\mathbf{x}-G(\mathbf{z})\bigr)$，其中 $\delta(\cdot)$ 是狄拉克 $\delta$ 函数（Dirac delta）。这类模型称为\emph{隐式模型}（implicit model）。生成对抗网络\citeref{6}是最早成功合成逼真对象（如图像）的深度生成模型之一。更多细节见第~8~章。
+
+\subsection{基于能量的模型}
+物理学为定义一类生成模型提供了一个有趣的角度。先定义一个\emph{能量函数}（energy function）$E(\mathbf{x})$，进而得到玻尔兹曼分布（Boltzmann distribution）：
+\begin{equation}
+p(\mathbf{x})=\frac{\exp\{-E(\mathbf{x})\}}{Z},
+\tag{1.4}\label{eq:01-04}
+\end{equation}
+其中 $Z=\sum_{\mathbf{x}}\exp\{-E(\mathbf{x})\}$ 是配分函数（partition function）。
+
+换句话说，先对负能量取指数，再归一化，使其取值在 0 和 1 之间（即为概率）。从物理学角度看还有更多内容，不过这里无须深入讨论。我推荐\citeref{37}作为很好的入门读物。
+
+由能量函数定义的模型称为\emph{基于能量的模型}（energy-based model，EBM）\citeref{38}。基本思想是构造能量函数，计算（更确切地说是近似计算）配分函数。EBM 中最大的一类是\emph{玻尔兹曼机}（Boltzmann machine），它用双线性形式将 $\mathbf{x}$ 的各个分量联系起来，即 $E(\mathbf{x})=\mathbf{x}^{\mathsf{T}}\mathbf{W}\mathbf{x}$\citerefs{39,40}。引入潜变量并令 $E(\mathbf{x},\mathbf{z})=\mathbf{x}^{\mathsf{T}}\mathbf{W}\mathbf{z}$，便得到受限玻尔兹曼机（restricted Boltzmann machine，RBM）\citeref{41}。
+% <<<PDFPAGE 28>>>
+玻尔兹曼机的思想还能推广到 $\mathbf{x}$ 与 $y$ 的联合分布，例如用于分类的受限玻尔兹曼机\citeref{42}。近期研究表明，可以用任意神经网络定义联合分布\citeref{43}。第~7~章将讨论如何实现这一点。
+
+\subsection{基于得分的生成模型}
+除了匹配分布，我们还可以用二范数（也就是均方误差损失）来匹配\emph{得分函数}（score function）$\nabla_{\mathbf{x}}\ln p(\mathbf{x})$ 及其模型 $s_\theta(\mathbf{x})$。但是，我们无法直接取得\emph{真实}分布，因此可以给样本加上少量高斯噪声，得到加噪的经验分布（empirical distribution）。令 $\tilde{\mathbf{x}}_n=\mathbf{x}_n+\sigma\cdot\epsilon$，有
+\begin{equation}
+q_{\mathit{data}}(\tilde{\mathbf{x}}_n)
+=\frac{1}{N}\sum_{n=1}^{N}\mathcal{N}(\tilde{\mathbf{x}}_n\mid\mathbf{x}_n,\sigma^2).
+\tag{1.5}\label{eq:01-05}
+\end{equation}
+\emph{译注。} 式（1.5）按原书保留了下标 $n$。若把右边写成以样本为中心的高斯混合密度，左边的求值点应与右边的求和下标区分。
+
+对于高斯噪声，得分函数有解析表达式，即 $\nabla_{\tilde{\mathbf{x}}}\ln\mathcal{N}(\tilde{\mathbf{x}}_n\mid\mathbf{x}_n,\sigma^2)=-\frac{1}{\sigma}\epsilon$。最终目标函数为
+\begin{equation}
+\mathcal{L}(\theta)=\frac{1}{2N}\sum_{n=1}^{N}
+\mathbb{E}_{\mathcal{N}(\epsilon\mid 0,\mathbf{I})}
+\left[\left\|s_\theta(\tilde{\mathbf{x}})+\frac{1}{\sigma}\epsilon\right\|^2\right].
+\tag{1.6}\label{eq:01-06}
+\end{equation}
+
+优化这个目标便得到一个\textbf{得分模型}（score model）$s_\theta(\tilde{\mathbf{x}})$，这种方法称为\textbf{得分匹配}\citerefs{13,14}。从模型中采样需要执行一个辅助过程，例如朗之万动力学（Langevin dynamics）\citeref{44}。
+
+得分匹配背后的思想也用于训练写成随机微分方程（stochastic differential equation）的生成模型。这是基于扩散的模型在连续时间上的推广。此时，采样可借助求解微分方程的数值方法，例如后向欧拉法（backward Euler's method）。另一种与利用微分方程的得分匹配类似的方法，称为\textbf{流匹配}（flow matching）\citeref{45}。第~9~章会讨论这三种框架。
+
+\subsection{概览}
+\tabref{tab:01-01}比较了四大类模型，并区分隐式潜变量模型和指定分布的潜变量模型。我们选取了一些比较标准：
+\begin{itemize}
+\item 训练通常是否稳定。
+\item 能否计算似然函数。
+\item 能否用模型实现有损压缩或无损压缩（lossless compression）。
+\item 能否用模型进行表示学习。
+\end{itemize}
+
+% <<<PDFPAGE 29>>>
+\begin{table}[tbp]
+\caption{深度生成模型的比较。}\label{tab:01-01}
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{7.5em}llllY@{}}
+\toprule
+生成模型 & 训练 & 似然 & 采样 & 压缩 & 表示学习\\
+\midrule
+自回归模型 & 稳定 & 精确 & 慢 & 无损 & 否\\
+基于流的模型 & 稳定 & 精确 & 快／慢 & 无损 & 是\\
+隐式模型 & 不稳定 & 无 & 快 & 否 & 否\\
+指定分布模型 & 稳定 & 近似 & 快 & 有损 & 是\\
+基于能量的模型 & 稳定 & 未归一化 & 慢 & 不太适合 & 是\\
+基于得分的模型 & 稳定 & 近似 & 快／慢 & 否 & 否\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+所有基于似然的模型（即自回归模型、流、EBM、VAE 等指定分布模型，以及基于得分的模型）都可以稳定地训练，而 GAN 等隐式模型存在训练不稳定的问题。对于 VAE 等非线性的指定分布模型，需要注意，似然函数无法精确计算，只能给出下界。类似地，EBM 需要计算配分函数，而配分函数一般无法解析求解。因此，我们能得到未归一化的概率，至多可以得到近似的归一化概率。自回归模型是表现最好的基于似然的模型之一，但因其以自回归方式生成新内容，采样极慢。EBM 需要运行蒙特卡洛方法（Monte Carlo method）才能获得样本。由于处理的对象往往是高维的，这妨碍了 EBM 在实践中广泛使用。
+
+其他方法相对较快。就压缩而言，VAE 可以使用一个瓶颈，即潜在空间。另一方面，自回归模型和流可以用来进行无损压缩，因为它们能估计密度，并给出精确的似然值。隐式模型不能直接用于压缩，不过近期有工作使用 GAN 改善图像压缩\citeref{46}。流、指定分布模型以及使用潜变量的 EBM 可以用于表示学习，也就是学习一组能以某种方式概括数据或解耦数据中因素的随机变量。怎样才算好的表示是另一个问题。有兴趣的读者可参阅文献，例如\citeref{47}。目前，基于得分的生成模型达到了最先进的性能，但它们不提供表示，或无法用于压缩。
+
+\section{本书的目的和内容}
+\label{sec:purpose}
+本书旨在作为深度生成建模的入门读物。亲爱的读者，我们想让你理解并认同生成建模的理念，领略它的魅力！深度生成建模是一种有趣的结合，把概率论、统计学、概率机器学习和深度学习纳入同一个框架。不过，为了读懂本书介绍的思想，建议你掌握代数与微积分、概率论与统计学、机器学习和深度学习的基础知识，并会用 Python 编程。强烈建议你熟悉 PyTorch\footnote{\url{https://pytorch.org/}}，因为所有代码片段都用 PyTorch 编写。不过，如果你熟悉 Keras、TensorFlow 或 JAX 等其他深度学习框架，也应该能读懂这些代码。
+% <<<PDFPAGE 30>>> 上一段跨原页。
+
+本书只有在理解某个主题确有必要时，才回顾机器学习概念或深度学习的基本组件。我们将重点讲深度生成模型的模型形式和训练算法。我们会讨论边缘分布模型，例如混合模型和概率电路（第~2~章），自回归模型（第~3~章），以及基于流的模型（第~4~章），包括 RealNVP、整数离散流、残差流（residual flow）和 DenseNet 流（DenseNet flow）。然后讨论潜变量模型（第~5~章），包括变分自编码器及其组件、层次化 VAE（hierarchical VAE）和基于扩散的深度生成模型，还会介绍用于联合分布建模的框架，如混合建模（hybrid modeling，第~6~章）和基于能量的模型（第~7~章）。之后，我们将概述 GAN（第~8~章）。接下来深入讨论基于得分的生成模型，包括得分匹配、基于得分的随机微分方程和流匹配（第~9~章）。随后，介绍如何在神经压缩框架中利用深度生成建模压缩数据（第~10~章）。最后讨论大语言模型和生成式人工智能系统（第~11~章）。总的来说，各章可以独立阅读，读者可按最适合自己的顺序阅读。
+
+那么，本书面向哪些读者？希望所有对人工智能感兴趣的人都能读这本书。其中有两类读者尤其能从本书获益。第一类是希望超越机器学习和深度学习常规课程的大学生。第二类是希望扩展人工智能知识，或希望在职业生涯中更进一步、了解下一代人工智能系统的研究工程师。
+
+无论是哪一类，本书都面向对人工智能有好奇心、既想学理论又想学会实现相关方法的读者。为此，每个主题都有一般性讨论和介绍，随后给出形式化描述以及一段 PyTorch 代码。本书的用意是真正理解深度生成建模。在作者看来，要达到这个目的，既要能推导模型，也要能实现模型。因此，本书附有以下代码仓库。
+\begin{center}
+\url{https://github.com/jmtomczak/intro_dgm}
+\end{center}
+
+\input{chapters/ch01_references}

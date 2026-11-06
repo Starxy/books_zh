@@ -1,0 +1,426 @@
+% 原书印刷页 238–254，附件 PDF 第 253–269 页。
+\section{流匹配}
+\label{sec:09-04}
+
+\subsection[从常微分方程看连续归一化流]{从另一视角看基于常微分方程的生成模型：连续归一化流（CNF）}
+
+\subsubsection{再谈常微分方程}
+
+前面讨论了如何通过随机微分方程（SDE），或者等价地通过相应的概率流常微分方程（PF-ODE），定义生成模型。我们说明了用反向欧拉法之类的数值方法求解 SDE 或 ODE，可以得到一个将噪声迭代地转换为数据的生成过程。不过，有一个问题，我们是否必须先写出 SDE 及其等价的 PF-ODE，或者能否用任意 ODE 来定义生成模型？好奇的读者，我知道你的意思！之所以用 SDE，是因为我们知道可以用得分匹配来训练。那么，若取任意 ODE，该怎样学习这类生成模型呢？
+
+我们说得具体一些。回顾 ODE 的定义。
+\begin{equation}
+  \frac{\mathrm d\mathbf x_t}{\mathrm dt}=v(\mathbf x_t,t),
+  \tag{9.38}\label{eq:09-38}
+\end{equation}
+其中，\emph{向量场} $v(\mathbf x_t,t)$ 定义了动力学。用权重为 $\theta$ 的神经网络 $v_\theta(\mathbf x_t,t)$ 参数化向量场，得到所谓的\textbf{神经常微分方程}\citeref{26}。将这个神经 ODE 的初始条件（例如噪声）记为 $\mathbf x_0$，求解方程，也就是沿时间 $t$ 积分，便得到输出（例如数据）。\footnote{译注：按式 \eqref{eq:09-38} 的初值问题，积分给出 $\mathbf x_1-\mathbf x_0$。式 \eqref{eq:09-39} 保留印刷形式。}
+\begin{equation}
+  \mathbf x_1=\int_0^1 v_\theta(\mathbf x_t,t)\,\mathrm dt.
+  \tag{9.39}\label{eq:09-39}
+\end{equation}
+到目前为止一切顺利，但与基于得分的生成模型相比，（几乎）没多出什么新东西。后者匹配的是得分，分布匹配则是让模型拟合经验分布。我们能否构造一种基于似然的训练方法？简短的回答是能。容易吗？简短的回答又是，不容易。下面就详细看看这两个答案。
+
+\subsubsection{从连续性方程（质量守恒）到瞬时变量变换}
+
+再说一遍，只要有向量场的模型，从 ODE 采样，也就是从 $t=0$ 积分到 $t=1$，就不难。可以用欧拉法，也可以用其他数值求解器。但是，如果希望把 $v_\theta(\mathbf x,t)$ 诱导出的分布拟合到数据分布，怎样获得这样的模型就是个问题。毕竟，从已知分布 $\mathbf x_0\sim\pi(\mathbf x)$（如标准高斯分布）出发，求解 ODE 会得到另一个分布！我们可以用\textbf{连续性方程}（continuity equation）写出这个诱导分布的解析形式。接下来要用一点数学，甚至还要用点物理，准备好，我们开始吧。
+
+暂且把概率想象成质量，是一种手指可以触到的东西。我总想到黏土，你也可以想成水。现在设想一根管道，沿长度方向的横截面积处处相同，我们的物质（例如水）在其中流动。每一时刻都有一定的质量通量（flux）$f_t$，也就是说，（概率）质量按照向量场（或速度）移动，$f_t(\mathbf x_t)=p_t(\mathbf x_t)v(\mathbf x_t,t)$。既然说的是概率质量，或沿等截面管道流动的水，质量是守恒的。没有新的质量（水）出现或消失，既没有漏出去，也没有倒进来。用数学语言说，质量的变化率 $\frac{\partial p_t(\mathbf x_t)}{\partial t}$ 加上所有方向上通量的变化率（也称通量的散度），其和保持为零，即质量守恒。
+\begin{equation}
+  \frac{\partial p_t(\mathbf x_t)}{\partial t}
+    +\operatorname{div}\bigl(p_t(\mathbf x_t)v(\mathbf x_t,t)\bigr)=0,
+  \tag{9.40}\label{eq:09-40}
+\end{equation}
+其中 $\operatorname{div}(\cdot)$ 是散度（divergence），定义为
+\[
+  \operatorname{div}(V(x_1,\ldots,x_D))
+    =\sum_{d=1}^{D}\frac{\partial V_d(x_1,\ldots,x_D)}{\partial x_d},
+\]
+即 $V$ 的各分量分别对相应变量求一阶偏导数，再求和。
+
+\begin{booknote}{旁注}
+向量场的散度等于雅可比矩阵的迹！对于二维空间中的向量场 $V(x_1,x_2)$，有
+\[
+  \operatorname{div}(V(x_1,x_2))=
+  \frac{\partial V_1(x_1,x_2)}{\partial x_1}+
+  \frac{\partial V_2(x_1,x_2)}{\partial x_2}
+  =\operatorname{Tr}\left(\frac{\partial V_i(x_1,x_2)}{\partial x_i}\right),
+\]
+其中
+\[
+  \frac{\partial V_i(x_1,x_2)}{\partial x_i}=
+  \begin{bmatrix}
+    \frac{\partial V_1}{\partial x_1}&\frac{\partial V_1}{\partial x_2}\\
+    \frac{\partial V_2}{\partial x_1}&\frac{\partial V_2}{\partial x_2}
+  \end{bmatrix}
+\]
+是雅可比矩阵，$\operatorname{Tr}(\mathbf A)=\sum_i A_{ii}$ 是矩阵 $\mathbf A$ 的迹。
+\end{booknote}
+
+利用向量微积分的恒等式和散度的性质，可以用概率分布的对数来写连续性方程，这也称为\textbf{瞬时变量变换}（instantaneous change of variables）\citeref{26}。
+\begin{equation}
+  \frac{\mathrm d\ln p(\mathbf x_t)}{\mathrm dt}+
+  \operatorname{Tr}\left(\frac{\partial v(\mathbf x_t,t)}{\partial\mathbf x_t}\right)=0.
+  \tag{9.41}\label{eq:09-41}
+\end{equation}
+
+\begin{booknote}{旁注}
+我知道，好奇的读者，你不喜欢别人只告诉你结论，却不给出证明。这是旁注，如果没时间可以直接跳过。不过，我觉得这个结果挺有意思，也有助于后面的讨论。那我们需要什么呢？首先，有一个一般性质，$\frac{\partial\ln p_t}{\partial t}=\frac{1}{p_t}\frac{\partial p_t}{\partial t}$，或者 $p_t\frac{\partial\ln p_t}{\partial t}=\frac{\partial p_t}{\partial t}$。其次，$\operatorname{div}(p_tv)=\langle\nabla_{\mathbf x}p_t,v\rangle+p_t\operatorname{div}(v)$，所以 $\frac{\operatorname{div}(p_tv)}{p_t}=\langle\nabla_{\mathbf x}\ln p_t,v\rangle+\operatorname{div}(v)$。第三，已经看到向量场的散度等于其雅可比矩阵的迹。现在把这三点代入连续性方程。
+\begin{gather}
+  \frac{\partial p_t(\mathbf x_t)}{\partial t}+
+  \operatorname{div}\bigl(p_t(\mathbf x_t)v(\mathbf x_t,t)\bigr)=0
+  \tag{9.42}\label{eq:09-42}\\
+  \frac{1}{p_t(\mathbf x_t)}\frac{\partial p_t(\mathbf x_t)}{\partial t}+
+  \frac{1}{p_t(\mathbf x_t)}\operatorname{div}\bigl(p_t(\mathbf x_t)v(\mathbf x_t,t)\bigr)=0
+  \tag{9.43}\label{eq:09-43}\\
+  \frac{\partial\ln p_t(\mathbf x_t)}{\partial t}+
+  \langle\nabla_{\mathbf x}\ln p_t,v\rangle+\operatorname{div}\bigl(v(\mathbf x_t,t)\bigr)=0
+  \tag{9.44}\label{eq:09-44}\\
+  \langle\nabla_{\mathbf x}\ln p_t,v\rangle=
+  -\frac{\partial\ln p_t(\mathbf x_t)}{\partial t}-\operatorname{div}\bigl(v(\mathbf x_t,t)\bigr).
+  \tag{9.45}\label{eq:09-45}
+\end{gather}
+接下来，计算 $\ln p_t(\mathbf x_t)$ 的全导数，再把上面求得的 $\langle\nabla_{\mathbf x}\ln p_t,v\rangle$ 代入，就得到\citeref{30}
+\begin{align}
+  \frac{\mathrm d\ln p(\mathbf x_t)}{\mathrm dt}
+  &=\left\langle\frac{\partial\ln p(\mathbf x_t)}{\partial t},
+    \frac{\partial t}{\partial t}\right\rangle+
+    \left\langle\nabla_{\mathbf x}\ln p(\mathbf x_t),
+    \frac{\partial\mathbf x_t}{\partial t}\right\rangle
+    \tag{9.46}\label{eq:09-46}\\
+  &=\frac{\partial\ln p(\mathbf x_t)}{\partial t}+
+    \left\langle\nabla_{\mathbf x}\ln p(\mathbf x_t),
+    \frac{\partial\mathbf x_t}{\partial t}\right\rangle
+    \tag{9.47}\label{eq:09-47}\\
+  &=\frac{\partial\ln p(\mathbf x_t)}{\partial t}+
+    \bigl\langle\nabla_{\mathbf x}\ln p(\mathbf x_t),v(\mathbf x_t,t)\bigr\rangle
+    \tag{9.48}\label{eq:09-48}\\
+  &=\frac{\partial\ln p(\mathbf x_t)}{\partial t}-
+    \frac{\partial\ln p_t(\mathbf x_t)}{\partial t}
+    -\operatorname{div}\bigl(v(\mathbf x_t,t)\bigr)
+    \tag{9.49}\label{eq:09-49}\\
+  &=-\operatorname{div}\bigl(v(\mathbf x_t,t)\bigr)
+    \tag{9.50}\label{eq:09-50}\\
+  &=-\operatorname{Tr}\left(\frac{\partial v(\mathbf x_t,t)}{\partial\mathbf x_t}\right).
+    \tag{9.51}\label{eq:09-51}
+\end{align}
+\end{booknote}
+
+随后沿时间积分，便可计算对数密度的总变化。
+\begin{gather}
+  \int_0^1\left(\frac{\mathrm d\ln p(\mathbf x_t)}{\mathrm dt}+
+    \operatorname{Tr}\left(\frac{\partial v(\mathbf x_t,t)}{\partial\mathbf x_t}\right)\right)
+    \,\mathrm dt=0
+    \tag{9.52}\label{eq:09-52}\\
+  \ln p(\mathbf x_1)-\ln\pi(\mathbf x_0)+
+    \int_0^1\operatorname{Tr}\left(\frac{\partial v(\mathbf x_t,t)}{\partial\mathbf x_t}\right)
+    \,\mathrm dt=0
+    \tag{9.53}\label{eq:09-53}\\
+  \ln p(\mathbf x_1)=\ln\pi(\mathbf x_0)-
+    \int_0^1\operatorname{Tr}\left(\frac{\partial v(\mathbf x_t,t)}{\partial\mathbf x_t}\right)
+    \,\mathrm dt.
+    \tag{9.54}\label{eq:09-54}
+\end{gather}
+
+为什么费心把所有量都表示成对数概率？因为最后一行正是归一化流所用变量变换的连续版本！这里对雅可比矩阵的迹沿时间积分，离散版本则将雅可比矩阵的对数行列式求和。因此，训练神经 ODE 与训练归一化流相似，只是这里的时间连续。所以，这一语境中的神经 ODE 称为\textbf{连续归一化流}（continuous normalizing flows，CNF）。
+
+\subsubsection{计算连续归一化流的对数似然}
+
+这里和离散时间归一化流有一点不同，我们并不要求 $v$ \emph{可逆}。因此，给定数据点 $\mathbf x_1$，通常不能简单地将变换求逆来得到 $\mathbf x_0$。不过，在相当宽松的条件下，即 $v$ 及其一阶导数均为 Lipschitz 连续（例如使用 SELU、SiLU 等 Lipschitz 连续激活函数的神经网络），就可以唯一地求解下面的问题\citeref{31}。
+\begin{equation}
+  \begin{bmatrix}
+    \mathbf x_0\\
+    \ln p_1(\mathbf x_1)-\ln\pi(\mathbf x_0)
+  \end{bmatrix}=
+  \int_1^0
+  \begin{bmatrix}
+    v_\theta(\mathbf x_t,t)\\
+    -\operatorname{Tr}\left(\dfrac{\partial v_\theta(\mathbf x_t,t)}{\partial\mathbf x_t}\right)
+  \end{bmatrix}\,\mathrm dt,
+  \tag{9.55}\label{eq:09-55}
+\end{equation}
+其初始条件如下。
+\begin{equation}
+  \begin{bmatrix}
+    \mathbf x_1\\
+    \ln p_1(\mathbf x_{\mathit{data}})-\ln p_1(\mathbf x_1)
+  \end{bmatrix}=
+  \begin{bmatrix}
+    \mathbf x_{\mathit{data}}\\
+    0
+  \end{bmatrix},
+  \tag{9.56}\label{eq:09-56}
+\end{equation}
+其中 $\mathbf x_1$ 是数据点 $\mathbf x_{\mathit{data}}$，对数概率之差为零。注意，我们是按反向次序求解的，即从数据 $\mathbf x_1$ 回到噪声 $\mathbf x_0$。\footnote{译注：按式 \eqref{eq:09-38} 和式 \eqref{eq:09-54}，式 \eqref{eq:09-55} 右侧的反向积分分别给出 $\mathbf x_0-\mathbf x_1$ 和 $\ln\pi(\mathbf x_0)-\ln p_1(\mathbf x_1)$。左侧保留原书印刷形式。}
+
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{计算对数似然函数}
+归纳起来，需要完成以下步骤。
+\begin{enumerate}
+  \item 取一个数据点 $\mathbf x_1=\mathbf x_{\mathit{data}}$。
+  \item 用求解器求解式 \eqref{eq:09-55}，得到 $\mathbf x_0$ 并记录随时间变化的迹。
+  \item 把 $\ln\pi(\mathbf x_0)$ 与负的迹之和
+    $-\int_0^1\operatorname{Tr}\bigl(\frac{\partial v_\theta(\mathbf x_t,t)}{\partial\mathbf x_t}\bigr)\,\mathrm dt$
+    相加，算出对数似然。
+\end{enumerate}
+\end{booknote}
+
+现在，我们可以通过求解器反向传播，事情就成了！真是这样吗？整个过程的复杂度如何？乍一看，开销似乎很大。
+
+\subsubsection{Hutchinson 迹估计量}
+
+好奇的读者，如果你记得，归一化流的问题在于计算大小为 $D\times D$ 的雅可比矩阵的对数行列式。一般情形下，成本为 $O(D^3)$。计算迹需要 $O(D^2)$，因为要把对角线元素相加，而每个元素都需要一次单独的前向传播，因此复杂度为二次。比离散情形好一些，不过还有一个问题，我们必须通过数值求解器反向传播！恐怕天下没有免费的午餐。Chen 等人\citeref{26}提出使用\emph{伴随灵敏度法}（adjoint sensitivity method），可以将它看作连续时间的反向传播。随后，通过最大化对数似然 $\ln p(\mathbf x_1)$ 来训练神经 ODE。然而，每来一个新数据点，都需要先用数值方法求解 ODE，再通过求解过程反向传播。这项操作的成本很高！
+
+因此，需要尽可能寻找降低成本的办法。其中一个技巧涉及如何计算迹。利用\textbf{Hutchinson 迹估计量}\citeref{31}，可以把二次复杂度降到 $O(D)$。对于任意方阵 $\mathbf A$，这个估计量相对容易计算。
+\begin{equation}
+  \operatorname{Tr}(\mathbf A)=\mathbb E_\epsilon[\epsilon^\top\mathbf A\epsilon],
+  \tag{9.57}\label{eq:09-57}
+\end{equation}
+其中 $\epsilon$ 服从均值为零、方差为一的分布，例如 $\epsilon\sim\mathcal N(\mathbf 0,\mathbf I)$。对某个特定的 $\epsilon$，乘积 $\mathbf A\epsilon$ 可通过一次前向传播计算，也可以对其反向传播。因此，可以取 $M$ 个蒙特卡洛样本来估计迹。
+\begin{equation}
+  \operatorname{Tr}(\mathbf A)\approx\frac1M\sum_{m=1}^{M}\epsilon_m^\top\mathbf A\epsilon_m.
+  \tag{9.58}\label{eq:09-58}
+\end{equation}
+在实践中取 $M=1$，即每来一个新数据点，只取一个 $\epsilon$ 样本。这个估计量显然带有噪声，不过它是无偏的。所以，用随机梯度类方法训练时，影响不大。
+
+最终，得到的过程需要 $O(D)$ 的开销，再加上运行伴随灵敏度法（一种特定的数值求解方法）的成本。总的来说还不错，但远算不上出色。这里甚至不给出代码，因为扩大 CNF 的规模是个已知难题。那有没有其他选择？能做得更好吗？当然，好奇的读者，当然可以！
+
+\subsection{顺流而行：流匹配}
+
+\subsubsection{基本思想}
+
+再看一遍前面介绍的 ODE。
+\begin{equation}
+  \frac{\mathrm d\mathbf x_t}{\mathrm dt}=v(\mathbf x_t,t).
+  \tag{9.59}\label{eq:09-59}
+\end{equation}
+除了这个 ODE，再假设有一个\emph{已知}分布 $q_0(\mathbf x)$（例如标准高斯分布）和一个数据分布 $q_1(\mathbf x)$。
+
+\begin{booknote}{旁注}
+为与流匹配文献的惯例一致，现在从噪声（$t=0$）走向数据（$t=1$）。这一方向定义了正向动力学，也定义了生成过程。扩散模型和基于得分的模型采用相反的时间方向，从数据走向噪声。
+\end{booknote}
+
+从上面对 CNF 的讨论可知，任意时刻 $t$ 的分布由连续性方程刻画。利用瞬时变量变换，还可以求出一个解，即一个概率分布。不过，这些步骤听上去相当复杂，而且如前所述，训练的计算开销很大。那该怎么办？也可以换个问法。假如已知向量场 $v(\mathbf x_t,t)$ 和分布 $p_t(\mathbf x)$，能做些什么？我们该如何训练模型？模型又是什么？还记得得分匹配方法吗？再看看去噪得分匹配的损失。如果在这里采用类似方法，直接寻找向量场的模型 $v_\theta(\mathbf x_t,t)$ 呢？与得分匹配类似，我们求解如下形式的回归问题。
+\begin{equation}
+  \ell_{\mathit{FM}}(\theta)=
+  \mathbb E_{t\sim U(0,1),\,\mathbf x_t\sim p_t(\mathbf x)}
+  \bigl[\lVert v_\theta(\mathbf x_t,t)-v(\mathbf x_t,t)\rVert^2\bigr],
+  \tag{9.60}\label{eq:09-60}
+\end{equation}
+这样就避开了 CNF 中寻找分布的过程。简单说，对任意均匀随机采样的时刻 $t$，从分布 $p_t(\mathbf x)$（假定已知！）采样 $\mathbf x_t$，使模型 $v_\theta(\mathbf x_t,t)$ 与\emph{真实}向量场 $v(\mathbf x_t,t)$（也假定已知！）之间的差异尽可能小。这个目标称为\textbf{流匹配}（FM）。
+
+\dgmfig{fig_09_07}{.91\linewidth}{数据点（橙色的两弯月牙）周围，向量场模型（蓝色箭头）随时间变化的示例。}{fig:09-07}
+
+为什么这样能奏效？理由很简单。如果 $\ell_{\mathit{FM}}(\theta)=0$，即模型完美模仿真实向量场，我们就能把任意噪声分布变换为数据分布！为什么？因为向量场会随着时间把各点\emph{推向}数据分布。看看\figref{fig:09-07}，蓝色箭头（向量场）表明，各点应如何随时间从噪声分布 $q_0(\mathbf x)$（例如标准高斯分布）\emph{演变}到数据分布 $q_1(\mathbf x)$（图中橙色月牙）。
+
+第二个问题是，这个方法的好处在哪里？答案同样简单。这是一个回归问题，用的是均方误差损失！过程很直接，损失是性质良好的凸函数。可以用自动求导，并用任意深度学习库实现它。太好了！
+
+不过，问题来了。我们并不知道 $p_t(\mathbf x)$ 和 $v(\mathbf x_t,t)$。好奇的读者，我知道，前面的讨论里你一直没忘这一点。你很客气，耐心等到了现在。换作我，早就说“胡扯”了。假设向量场和分布 $p_t(\mathbf x)$ 都已知，简直是胡扯。那该怎么办，你问？下面就来说明怎样处理！
+
+\subsubsection{条件流匹配}
+
+先考虑一个改写后的问题。引入从给定分布 $q(\mathbf z)$ 采样的附加变量 $\mathbf z$。\emph{条件} ODE 具有以下形式。
+\begin{equation}
+  \frac{\mathrm d\mathbf x_t}{\mathrm dt}=v(\mathbf x_t,t;\mathbf z).
+  \tag{9.61}\label{eq:09-61}
+\end{equation}
+目前，可以把这个问题看作前面无条件 ODE 问题的替代。一般来说，只要条件信息相关，条件问题通常更容易处理。$\mathbf z$ 可以看成额外信息，例如数据 $\mathbf x_1$，也可以是类别标签、一段文本、一个音频信号或一幅附加图像。由于还需要从某个分布 $q(\mathbf z)$ 采样 $\mathbf z$，\textbf{条件流匹配}（conditional flow matching，CFM）的损失可以定义为
+\begin{equation}
+  \begin{aligned}
+    \ell_{\mathit{CFM}}(\theta)
+      ={}&\mathbb E_{t\sim U(0,1),\,\mathbf x_t\sim p_t(\mathbf x\mid\mathbf z),\,\mathbf z\sim q(\mathbf z)}
+      \\[-1pt]
+      &\bigl[\lVert v_\theta(\mathbf x_t,t)-v(\mathbf x_t,t;\mathbf z)\rVert^2\bigr],
+  \end{aligned}
+  \tag{9.62}\label{eq:09-62}
+\end{equation}
+这里仍用无条件模型来拟合条件向量场。
+
+在 CFM 损失中，要定义每个 $t$ 的条件分布 $p_t(\mathbf x\mid\mathbf z)$，真实向量场也以 $\mathbf z$ 为条件，即 $v(\mathbf x_t,t;\mathbf z)$。乍看之下，CFM 问题似乎对 FM 问题没有什么用。为什么加上条件会有助于学习一个应当在无条件情形下工作的模型？文献\citerefs{32,33}证明，两种损失只相差一个与 $\theta$ 无关的常数，所以梯度相等！
+
+\begin{booknote}{定理 \citeref{32}}
+\textbf{定理 1}\quad 若对所有 $\mathbf x\in\mathbb R^D$ 和 $t\in[0,1]$ 都有 $p_t(\mathbf x)>0$，则 $\ell_{\mathit{FM}}$ 和 $\ell_{\mathit{CFM}}$ 只相差一个与 $\theta$ 无关的常数。因此，
+\[
+  \nabla_\theta\ell_{\mathit{FM}}(\theta)=\nabla_\theta\ell_{\mathit{CFM}}(\theta).
+\]
+\hfill\(\square\)
+\end{booknote}
+
+这个结果真妙！它意味着，用条件版本的损失训练的模型 $v_\theta(\mathbf x,t)$ 本身是无条件的，并且与无条件流匹配问题的解一致。太好了！一个问题解决了，我们可以用 CFM 代替 FM。现在又有了另一个问题，条件 $\mathbf z$ 该取什么，它的分布 $q(\mathbf z)$ 又是什么？好在有多种选择（例如参见文献\citeref{33}），这里集中介绍其中两种。
+\begin{enumerate}
+  \item 在文献\citeref{32}的 CNF 中，$\mathbf z$ 是一个数据点 $\mathbf x_1$，所以 $q(\mathbf z)=q_1(\mathbf z)$。换句话说，$q(\mathbf z)$ 是数据分布。
+  \item 在文献\citeref{33}的 CNF 中，也就是独立条件流匹配（independent CFM，iCFM），$\mathbf z$ 是一对噪声与数据 $\mathbf z=(\mathbf x_0,\mathbf x_1)$，二者独立采样，即 $q_0(\mathbf z)=q(\mathbf x_0)q_1(\mathbf x_1)$。\footnote{译注：此处保留原书的下标写法。下文第~9.4.2.3~节对 iCFM 的定义为 $q(\mathbf z)=q_0(\mathbf x_0)q_1(\mathbf x_1)$。}
+\end{enumerate}
+iCFM 的一种扩展是通过求解最优传输（optimal transport）问题来采样 $\mathbf z=(\mathbf x_0,\mathbf x_1)$。感兴趣的读者（没错，就是你！）可以参阅文献\citeref{33}了解详情。
+
+\subsubsection{条件概率路径}
+
+现在知道，条件流匹配问题可以作为无条件流匹配问题的理想替代。不过，最后一块拼图是怎样获得条件分布 $p_t(\mathbf x\mid\mathbf z)$，即所谓的（条件）概率路径（conditional probability path）。从前面对 CNF 的讨论可知，可以通过连续性方程计算概率路径，但为此需要知道向量场。这是一个典型的循环论证。怎样避开它？
+
+好奇的读者，你已经了解了不少人工智能知识，可能已经猜到这里能用什么最简单的方法了。我没听错吧，你在小声说“高斯分布”？没错！我们先考虑 $p_t(\mathbf x\mid\mathbf z)$ 的形式，再由此推导向量场 $v(\mathbf x,t;\mathbf z)$。这或许会限制整个方法的适用范围，可我们总得算出点什么，还有比高斯分布更好的选择吗？来看看下面形式的条件概率路径。
+\begin{equation}
+  p_t(\mathbf x\mid\mathbf z)=
+  \mathcal N(\mathbf x\mid\mu(\mathbf z,t),\sigma^2(\mathbf z,t)\mathbf I),
+  \tag{9.63}\label{eq:09-63}
+\end{equation}
+这是一个高斯分布，均值函数为 $\mu(\mathbf z,t)$，协方差矩阵为对角矩阵，标准差函数为 $\sigma(\mathbf z,t)$。一般来说，生成这些分布的 ODE 并不唯一。然而，下面的定理表明，可以由唯一的向量场得到这些分布！\footnote{译注：原书称“唯一的向量场”。式 \eqref{eq:09-64} 给出了一个仿射向量场。若在维数至少为 2 时不限制向量场的形式，可以加入绕均值旋转的速度场而保持相同的各向同性高斯路径。}
+
+\begin{booknote}{定理 \citeref{32}}
+\textbf{定理 2}\quad 在初始条件 $p_0(\mathbf x)=\mathcal N(\mu_0,\sigma_0^2\mathbf I)$ 下，产生
+$p_t(\mathbf x\mid\mathbf z)=\mathcal N(\mathbf x\mid\mu(\mathbf z,t),\sigma^2(\mathbf z,t)\mathbf I)$
+的唯一向量场具有以下形式。
+\begin{equation}
+  v(\mathbf x,t;\mathbf z)
+  =\frac{\sigma'(\mathbf z,t)}{\sigma(\mathbf z,t)}
+  \bigl(\mathbf x-\mu(\mathbf z,t)\bigr)+\mu'(\mathbf z,t),
+  \tag{9.64}\label{eq:09-64}
+\end{equation}
+其中 $\sigma'(\mathbf z,t)$ 和 $\mu'(\mathbf z,t)$ 分别表示 $\sigma(\mathbf z,t)$ 和 $\mu(\mathbf z,t)$ 对时间的导数。
+\end{booknote}
+
+可以停下来想一想，或者再读一遍。明白了吗？没错，这个定理给了我们一个不可思议的结果！如果考虑高斯形式的一类条件概率路径，只要均值和标准差可微，就能\textbf{解析地}计算条件向量场。换句话说，我们有了流匹配的一套通用做法。第一，把均值和标准差定义为 $\mathbf z$ 与时间 $t$ 的函数。第二，对给定的均值和标准差函数形式，计算条件向量场。第三，针对给定的向量场模型，优化条件流匹配损失。就这样，非常简单。为了更好地理解它怎样工作，我们来看两种具体的条件流匹配形式。
+\begin{itemize}
+  \item \textbf{Lipman 等人的 CFM。} 后续代码中记为 \texttt{fm}。令 $\mathbf z\equiv\mathbf x_1$ 为从数据分布采样的数据，$\mathbf x_1\sim q_1(\mathbf x)$。然后将均值和标准差函数定义如下。
+  \begin{align}
+    \mu(\mathbf z,t)&=t\mathbf x_1,
+      \tag{9.65}\label{eq:09-65}\\
+    \sigma(\mathbf z,t)&=t\sigma_{\mathit{const}}-t+1,
+      \tag{9.66}\label{eq:09-66}
+  \end{align}
+  其中 $\sigma_{\mathit{const}}>0$ 为平滑常数。因此，得到以下条件概率路径和条件向量场。
+  \begin{align}
+    p_t(\mathbf x\mid\mathbf z)
+      &=\mathcal N\bigl(\mathbf x\mid t\mathbf x_1,(t\sigma_{\mathit{const}}-t+1)^2\mathbf I\bigr),
+      \tag{9.67}\label{eq:09-67}\\
+    v(\mathbf x,t;\mathbf z)
+      &=\frac{\mathbf x_1-(1-\sigma_{\mathit{const}})\mathbf x}
+        {1-(1-\sigma_{\mathit{const}})t}.
+      \tag{9.68}\label{eq:09-68}
+  \end{align}
+  要求 $v(\mathbf x,t;\mathbf z)$ 的解析形式，需要应用上面的定理。这样得到一条概率路径，从标准高斯分布 $p_0(\mathbf x)=\mathcal N(\mathbf x\mid\mathbf 0,\mathbf I)$，到以某个数据点为中心、标准差为 $\sigma_{\mathit{const}}$ 的高斯分布 $p_1(\mathbf x)=\mathcal N(\mathbf x\mid\mathbf x_1,\sigma_{\mathit{const}}^2\mathbf I)$\citeref{32}。
+  \item \textbf{Tong 等人的 iCFM。} 令 $\mathbf z\equiv(\mathbf x_0,\mathbf x_1)$，且 $q(\mathbf z)=q_0(\mathbf x_0)q_1(\mathbf x_1)$。接下来选择以下均值和标准差。
+  \begin{align}
+    \mu(\mathbf z,t)&=t\mathbf x_1+(1-t)\mathbf x_0,
+      \tag{9.69}\label{eq:09-69}\\
+    \sigma(\mathbf z,t)&=\sigma_{\mathit{const}},
+      \tag{9.70}\label{eq:09-70}
+  \end{align}
+  其中 $\sigma_{\mathit{const}}>0$ 为平滑常数。因为 $t\in[0,1]$，均值函数是噪声与数据之间的\emph{插值}。得到的条件概率路径和条件向量场如下。
+  \begin{align}
+    p_t(\mathbf x\mid\mathbf z)
+      &=\mathcal N\bigl(\mathbf x\mid t\mathbf x_1+(1-t)\mathbf x_0,
+        \sigma_{\mathit{const}}^2\mathbf I\bigr),
+      \tag{9.71}\label{eq:09-71}\\
+    v(\mathbf x,t;\mathbf z)&=\mathbf x_1-\mathbf x_0.
+      \tag{9.72}\label{eq:09-72}
+  \end{align}
+  有趣的是，得到的向量场是数据点与所采样噪声的差。这是因为假设概率路径上的标准差固定，所以应用定理 2 后只剩均值函数的导数。Tong 等人\citeref{33}表明（见该文的命题 3.3），边界分布为 $p_0(\mathbf x)=q_0(\mathbf x)*\mathcal N(\mathbf x\mid\mathbf 0,\sigma_{\mathit{const}}^2\mathbf I)$ 和 $p_1(\mathbf x)=q_1(\mathbf x)*\mathcal N(\mathbf x\mid\mathbf 0,\sigma_{\mathit{const}}^2\mathbf I)$，其中 $*$ 表示卷积算子。例如，若取 $q_0(\mathbf x)=\mathcal N(\mathbf x\mid\mathbf 0,\mathbf I)$，则 $p_0(\mathbf x)=\mathcal N(\mathbf x\mid\mathbf 0,(\sigma_{\mathit{const}}^2+1)\mathbf I)$。不过，$q_0(\mathbf x)$ 可以是任意分布，高斯分布只是一个例子。若 $q_1(\mathbf x)$ 是数据分布，另一个边界分布为 $p_1(\mathbf x)=\mathcal N(\mathbf x\mid\mathbf x_1,\sigma_{\mathit{const}}^2\mathbf I)$，与 Lipman 等人的 CFM 相同。\footnote{译注：给定数据点 $\mathbf x_1$ 时，终点的条件分布是这里的单个高斯分布。对 $\mathbf x_1$ 边缘化后，终点分布是前面给出的 $q_1$ 与高斯分布的卷积。}
+\end{itemize}
+
+\dgmfig{fig_09_08}{.95\linewidth}{流匹配方法的工作原理示意图。（a）Lipman 等人的 CNF 示例。（b）Tong 等人的 iCNF 示例。点线表示噪声与数据之间的插值。}{fig:09-08}[图中 time、noise distribution 和 data distribution 分别表示时间、噪声分布和数据分布。]
+
+Lipman 等人的 CFM 与 Tong 等人的 iCFM 之间差异相当微妙。不过，这些细微差异会导致概率路径表现不同。\figref{fig:09-08} 展示了这两种 CFM 的示例。Lipman 等人的 CFM 从标准高斯分布出发，随时间演变为数据空间中较窄的高斯分布，即标准差减小，见\figref{fig:09-08}（a）。Tong 等人的 CFM 则定义一个较窄的高斯分布，并使它随时间\emph{移动}到数据空间，见\figref{fig:09-08}（b）。
+
+\subsubsection{训练}
+
+定义向量场模型的训练所需的组件已经齐备。通用算法如下。
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{流匹配的训练}
+  \begin{enumerate}
+    \item 采样 $t\sim\operatorname{Uniform}(0,1)$。
+    \item 采样 $\mathbf z\sim q(\mathbf z)$。
+    \item 计算 $\mu_t(\mathbf z)$ 和 $\sigma_t(\mathbf z)$。
+    \item 采样 $\mathbf x_t\sim\mathcal N(\mathbf x\mid\mu(\mathbf z,t),\sigma(\mathbf z,t))$。
+    \item 计算向量场 $v(\mathbf x_t,t;\mathbf z)$。
+    \item 计算损失 $\ell_{\mathit{CFM}}(\theta)=\lVert v_\theta(\mathbf x_t,t)-v(\mathbf x_t,t;\mathbf z)\rVert^2$。
+    \item 更新参数 $\theta\gets\operatorname{Update}(\theta,\nabla_\theta\ell_{\mathit{CFM}}(\theta))$。
+  \end{enumerate}
+\end{booknote}
+选择不同的均值函数和标准差函数，会得到特定形式的向量场。最终，第 3 步和第 5 步得到相应的具体公式，其余步骤相同。
+
+\subsubsection{从流匹配模型采样}
+
+好奇的读者，再提醒一句，我们学到的是向量场的模型。有了这个模型，采样就很直接。
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{采样}
+  \begin{enumerate}
+    \item 采样 $\mathbf x\sim q_0(\mathbf x)$。
+    \item 以 $\Delta$ 为步长运行正向欧拉法，直到 $t=1$。
+    \[
+      \mathbf x_{t+\Delta}=\mathbf x_t+v_\theta(\mathbf x_t,t)\Delta.
+    \]
+  \end{enumerate}
+\end{booknote}
+请注意，流匹配假定时间从 $t=0$（即噪声）走向 $t=1$（即数据），与基于得分的生成模型所取的方向相反。因此，向量场模型训练完成后，采用正向欧拉法。基于得分的生成模型则采用反向欧拉法。
+
+\subsubsection{计算对数似然函数}
+
+讨论 CNF 时，我们说明了如何计算（对数）似然函数。流匹配训练时不需要对数似然函数，所以至今没有考虑它。然而，能够计算对数似然函数值，对评估尤其有用，在许多实际应用中也有好处。流匹配对数似然函数的完整推导见文献\citeref{32}附录 C。主要思想与 CNF 类似。为了使计算切实可行，采用 Hutchinson 迹估计量，得到
+\begin{equation}
+  \ln p_1(\hat{\mathbf x}_1)\approx\ln p_0(\hat{\mathbf x}_0)-f_0,
+  \tag{9.73}\label{eq:09-73}
+\end{equation}
+其中 $\hat{\mathbf x}_1$ 是一个数据点，$\hat{\mathbf x}_0$ 是与 $\hat{\mathbf x}_1$ 对应的噪声，$f_0$ 是向量场雅可比矩阵的迹的近似。注意，给定的只有 $\hat{\mathbf x}_1$，但可以通过以下过程得到 $\hat{\mathbf x}_0$ 和 $f_0$\citeref{32}。
+\begin{booknote}[colframe=blue!65!black,colback=blue!4]{计算流匹配模型的对数似然}
+  \begin{enumerate}
+    \item 对给定数据点 $\hat{\mathbf x}_1$，设置初始条件。
+    \[
+      \begin{bmatrix}\phi_1\\f_1\end{bmatrix}
+      =\begin{bmatrix}\hat{\mathbf x}_1\\0\end{bmatrix}.
+    \]
+    \item 定义如下 ODE。
+    \[
+      \frac{\mathrm d}{\mathrm ds}
+      \begin{bmatrix}\phi_{1-s}\\f_{1-s}\end{bmatrix}
+      =\begin{bmatrix}
+        -v_\theta(\phi_{1-s},1-s)\\
+        \epsilon^\top\nabla_\phi v_\theta(\phi_{1-s},1-s)\epsilon
+      \end{bmatrix}
+    \]
+    其中 $\epsilon\sim\mathcal N(\mathbf 0,\mathbf I)$。
+
+    \emph{注意。} 用自动求导计算 $\nabla_\phi v_\theta(\phi_{1-s},1-s)$。
+    \item 用反向欧拉法求解第 2 步的 ODE。
+
+    \emph{注意。} 这里需要从 $t=1$ 回到 $t=0$，所以采用反向欧拉法。
+    \item 输出结果。
+    \[
+      \begin{bmatrix}\phi_0\\f_0\end{bmatrix}
+      =\begin{bmatrix}\hat{\mathbf x}_0\\\hat c\end{bmatrix}.
+    \]
+  \end{enumerate}
+\end{booknote}
+将这个过程的输出代入式 \eqref{eq:09-73}，得到
+\begin{equation}
+  \ln p_1(\hat{\mathbf x}_1)\approx\ln p_0(\hat{\mathbf x}_0)-\hat c.
+  \tag{9.74}\label{eq:09-74}
+\end{equation}
+好奇的读者，请记住，由于使用了迹估计量，这是一个近似。不过，这个估计量是无偏的。对给定数据点运行这个过程 $M$ 次，再取平均，可以减小方差。
+
+\subsection{计算对数似然函数}
+
+我们已经概述了如何用流匹配实现训练和采样（生成）。代码相当直接，见下面的代码片段。这个实现选择标准高斯噪声分布，但请记住，其他分布也可以。
+
+\Needspace{6\baselineskip}
+\bookcode{code/ch09_03_flow_matching.py}{条件流匹配类。}{lst:09-03}
+
+在展示生成图像之前，先看看流匹配在双月牙数据集上的表现，见\figref{fig:09-09}。从按标准高斯分布生成的数据出发，向量场模型将各点推向两弯橙色月牙。\footnote{译注：代码清单~\ref{lst:09-03} 保留原书写法。其 \texttt{log\_prob} 函数逐步覆盖 \texttt{f\_t}，未累加各步的迹估计。第 135 行的注释说切回训练模式，但该行仍调用 \texttt{eval()}。}
+
+\dgmfig{fig_09_09}{.91\linewidth}{用流匹配训练出的向量场模型采样的示例。采样点（黑色叉号）向数据（橙色月牙）演变。}{fig:09-09}
+
+\dgmfig{fig_09_10}{\linewidth}{部分结果。（a）真实图像的样本。（b）生成图像的样本。（c）验证集上计算的得分匹配损失示例。}{fig:09-10}[（c）横轴 epochs 为训练轮次，纵轴 nll 为负对数似然。原书图注称“得分匹配损失”，正文说明报告的是估计的负对数似然。]
+
+向量场模型采用 MLP，超参数设为 $\sigma_{\mathit{const}}=0.1$ 和 $T=100$。运行代码后，可以得到类似\figref{fig:09-10} 的结果。注意，这里报告的是按前述过程估计的负对数似然。
+
+\subsection{流匹配的未来是什么？}
+
+流匹配这个框架最早见于 2022 年秋发表的文献\citeref{32}。此后已经有人提出多种扩展。这里我会指出其中几种，不过，好奇的读者，我强烈建议你自己查一查新的进展，因为我觉得这个框架格外有意思！请留意以下论文。
+\begin{itemize}
+  \item 与潜在扩散类似，文献\citeref{34}在自编码器设定中将流匹配用作“先验”。先训练自编码器，再在潜在空间中训练向量场模型。之后，从 FM 模型中采样，将样本解码回数据空间。
+  \item CFM 中的插值思想进一步扩展为文献\citerefs{35,36}提出的\emph{随机插值量}（stochastic interpolants）。我强烈建议查阅这些论文，它们给出了许多有趣的扩展，既有理论方面的，也有实践方面的。
+  \item 如前所述，可以用最优传输（OT）提出更好的分布 $q(\mathbf z)$。由此得到 OT-CFM\citeref{33}和薛定谔桥（Schrödinger bridge）CFM\citerefs{29,37}。
+  \item 文献\citeref{38}提出的作用量匹配（action matching）与 CFM 密切相关。它可以学习各点随时间移动的底层机制，省去对每一步分布的建模。
+  \item 这里考虑的是欧氏空间中的插值。Chen 和 Lipman\citeref{39}提出了将 CFM 扩展到一般黎曼流形的方法。
+  \item 为利用数据的对称性，文献\citeref{40}修改了 OT-CFM 中的代价函数，将这些对称性考虑进去。研究者还使用等变图神经网络，构造了等变流匹配（equivariant flow matching）。
+  \item 这里讨论了连续随机变量的情形。不过，在实践中经常要处理离散数据，例如分子、蛋白质和像素值。Campbell 等人\citeref{41}提出了离散流模型（discrete flow models），可将其看作处理离散数据的 CFM 版本。
+  \item 还有研究把 CFM 用于基于仿真的推断（simulation-based inference）\citeref{42}。这类问题允许访问模拟器，但似然函数未知或难以计算。
+  \item 基于得分的生成模型与流匹配联系非常紧密。要了解更多细节，我强烈推荐文献\citerefs{33,5}，后一篇的附录实在精彩！
+\end{itemize}
+
+还有许多优秀的论文没能提到。这并非有意遗漏，要跟上所有研究实在太难了。这也表明，流匹配正在成为生成式人工智能的主流研究方向。依我看，这是一个迷人的框架，可能带来多项突破！

@@ -1,0 +1,426 @@
+% <<<PDFPAGE 34>>>
+\chapter{概率建模：从混合模型到概率电路}
+\label{ch:probabilistic-modeling}
+\sourcechapter{2}
+
+\section{建模的概率视角：随机变量、学习、泛化与推断}
+\label{sec:probabilistic-perspective}
+\subsection{随机变量与概率分布}
+我们来想象一下猫。大多数人都喜欢猫，有些人甚至爱猫爱得不得了。猫有橘猫、黑猫、大猫、小猫、毛茸茸的猫和无毛猫。猫确实有许多种。不过，当我说到“一只猫”，每个人脑海中都会浮现某种猫的模样。你可以闭上眼睛，\emph{生成}一幅猫的图像，想的是自家的猫也好，邻居家的猫也好。想象出来的猫也总在某处，也许在沙发上睡觉，也许在花园里追苍蝇。时间可能是晚上，也可能是白天。谈到这里，我们大概都同意，猫在各种环境中可能出现的情形有无穷多种。
+
+为什么要想猫？其实，世界上任何别的对象都可以。形式上，可用空间 $\Omega$ 表示世界中的所有对象，其中 $\omega\in\Omega$。为简单起见，我们只考虑人工智能系统（具身或非具身）能通过传感器感知的物理对象。不失一般性，我认为，即使是由人工智能驱动的应用程序，也会借助相机或用户用相机拍摄的图像等接触物理对象。人工智能系统用某些函数处理输入信号。这些函数可以返回连续值（例如模拟信号）、离散值（例如对话中的文本）或比特（例如数字信号）。这类函数称为\textbf{随机变量}。例如，配有相机的机器人可以拍摄一张高 $H$、宽 $W$ 的 RGB 照片（如猫的照片），由此定义一个随机变量。随机变量通常记作 $\mathbf{x}(\omega)$，简记为 $\mathbf{x}$。对于数码相机拍摄的图像，这个例子中有 $\mathbf{x}\colon\Omega\to\{0,\ldots,255\}^{3\times H\times W}$。一般而言，$\mathbf{x}\colon\Omega\to\mathcal{E}$，其中 $\mathcal{E}$ 是测度论意义下的 $D$ 维可测空间（measurable space），如 $\mathcal{E}=\mathbb{R}^{D}$ 或 $\mathcal{E}=\{0,1\}^{D}$。
+
+随机变量之所以称为\emph{随机}的，是因为存在未观测到的因素，因而其取值未必可以预测。
+
+% <<<PDFPAGE 35>>>
+\begin{booknote}{旁注}
+如果认真追问什么是\emph{随机性}，这一点简单的介绍很快就可能变成一场深刻的哲学讨论。好奇的读者，如果你不同意我，也没关系！不过，我希望我们能先接受上面的说法，继续往下读。
+\end{booknote}
+
+换句话说，如果你给自家的猫连拍一组照片，像素值可能因为光照、猫的呼吸、手的抖动等有所不同。这些因素通常既没有受到控制，也没有被明确测量。我们把一天中不同时间、甚至在不同日子拍摄的一组照片称为\emph{观测}（observation），记作 $\mathcal{D}=\{\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_N\}$。拍照的过程带有某种随机性，但有些像素值极不可能出现，甚至根本不可能出现。比如，猫有四条腿、一个脑袋，猫毛也不会天然呈粉红色。因此，可以说像素取值（随机变量的取值）存在一个分布，有些取值较不可能，有些取值较可能。形式上，随机变量 $\mathbf{x}$ 有某种\emph{概率分布}（probability distribution），记为 $p(\mathbf{x})$，满足 $\forall\mathbf{x}\enspace p(\mathbf{x})\in[0,1]$，并且在离散情形下 $\sum_{\mathbf{x}} p(\mathbf{x})=1$，在连续情形下 $\int_{\mathbf{x}}p(\mathbf{x})\,\mathrm{d}\mathbf{x}=1$。\footnote{译注：连续情形中的 $p(\mathbf{x})$ 表示概率密度。密度值可以大于 $1$，下文对条件分布的描述也应区分离散概率与连续密度。}概率分布具有许多良好性质，其中两条对建模和推断尤其有用。为简单起见，以两个随机变量 $\mathbf{x}=(x_1,x_2)$ 为例。
+\begin{itemize}
+\item \textbf{求和法则}（sum rule）：$p(x_1)=\sum_{x_2}p(x_1,x_2)$。
+\item \textbf{乘积法则}（product rule）：$p(x_1,x_2)=p(x_1\mid x_2)p(x_2)$，或 $p(x_1,x_2)=p(x_2\mid x_1)p(x_1)$。
+\end{itemize}
+求和法则告诉我们如何在概率意义下“消去”某个随机变量。乘积法则告诉我们如何用条件分布表示联合分布。
+
+乘积法则中出现了\emph{条件分布}（conditional distribution），也就是已知一个随机变量的某些信息时，另一个随机变量的分布。条件分布本身也是分布，取值在 0 到 1 之间，求和等于 1。如果两个随机变量在统计上独立（independent），例如 $x_1$ 与 $x_2$ 独立，就有 $p(x_1\mid x_2)=p(x_1)$。直白地说，无论我们提供什么关于 $x_2$ 的信息，$x_1$ 的分布都不变。因此，乘积法则给出 $p(x_1,x_2)=p(x_1)p(x_2)$。
+
+\subsection{建模}
+一般来说，设想给定随机变量有某个真实概率分布是有用的。不过，这种想法也可能产生误导。这个平淡的说法同样可以引出一场长篇讨论。因此，有需要时我们会提到某个抽象的\emph{真实分布}（true distribution），实际操作中则采用由观测 $\mathcal{D}$ 定义的\emph{经验分布}。形式上，我们把经验分布定义成一系列峰的叠加：
+% <<<PDFPAGE 36>>>
+\begin{equation}
+p_{\mathit{data}}(\mathbf{x})=\frac1N\sum_{n=1}^{N}\delta(\mathbf{x}-\mathbf{x}_n),
+\tag{2.1}\label{eq:02-01}
+\end{equation}
+其中，当 $\mathbf{x}\neq\mathbf{x}_n$ 时，$\delta(\mathbf{x}-\mathbf{x}_n)=0$。当 $\mathbf{x}=\mathbf{x}_n$ 时，连续情形下为 $+\infty$（狄拉克 $\delta$），离散情形下为 $1$（克罗内克 $\delta$，Kronecker delta）。\footnote{译注：原书用点值描述狄拉克 $\delta$ 是一种直观说法。连续情形应把它理解为集中在一点的单位质量，或在积分中作用于测试函数的广义函数。}
+
+请记住，好奇的读者，这就是数学。我们需要它，才能方便地交流，清楚地表达想法。数学有时听起来复杂，其实没什么神秘的。如果这些术语对你还很陌生，也不用担心。你会慢慢熟悉它们，也会看到它们相当有用。
+
+我们常常假设，所有观测都来自同一\emph{真实}分布，并且是独立取得的。这样的数据称为\emph{独立同分布}（independently and identically distributed，iid）数据。这意味着（i）所有 $\mathbf{x}_n\in\mathcal{D}$ 服从同一个分布，（ii）所有 $\mathbf{x}_n$ 相互独立，即 $p(\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_N)=\prod_{n=1}^{N}p(\mathbf{x}_n)$。
+
+好了，为什么要引入这些概念呢？什么时候它们才会变得有趣？好奇的读者，这些问题想必已经萦绕在你脑中。若能为世界（或者我们所考虑的那一小部分世界）写出一个模型分布（model distribution），简称模型，即 $p(\mathbf{x};\theta)$，这些概念就会变得很有意思。你会发现，我们引入了一个新的量 $\theta$ 来表示模型的\textbf{参数}（parameter）。这个模型究竟是什么，长什么样？这取决于观测数据的性质。例如，对于实值数据，合适的分布可以是\textbf{高斯（正态）分布}（Gaussian or normal distribution）。
+\begin{align}
+p(\mathbf{x};\theta)
+ &= \frac{1}{\sqrt{(2\pi)^D|\boldsymbol{\Sigma}|}}
+    \exp\!\left(-\frac12(\mathbf{x}-\mu)^{\mathsf T}
+       \boldsymbol{\Sigma}^{-1}(\mathbf{x}-\mu)\right),
+       \tag{2.2}\label{eq:02-02}\\
+ &\overset{\mathit{df}}{=} \mathcal{N}(\mathbf{x}\mid\mu,\boldsymbol{\Sigma}),
+       \tag{2.3}\label{eq:02-03}
+\end{align}
+其中 $\theta=(\mu,\boldsymbol{\Sigma})$。$\mu$ 表示位置参数（即均值），$\boldsymbol{\Sigma}$ 表示尺度参数（即对角线为方差的协方差矩阵，covariance matrix）。
+
+如果数据是离散的，对于二元数据（$x_d\in\{0,1\}$），我们可以使用\textbf{伯努利分布}（Bernoulli distribution）。
+\begin{align}
+p(\mathbf{x};\theta)&=\prod_{d=1}^{D}\theta_d^{x_d}(1-\theta_d)^{1-x_d},
+   \tag{2.4}\label{eq:02-04}\\
+ &\overset{\mathit{df}}{=}\operatorname{Bern}(\mathbf{x}\mid\theta),
+   \tag{2.5}\label{eq:02-05}
+\end{align}
+对于类别数据（即离散且无序的数据，$x_d\in\{0,1,\ldots,K-1\}$），可以使用\textbf{类别分布}（categorical distribution）。
+\begin{align}
+p(\mathbf{x};\theta)
+ &=\prod_{d=1}^{D}\prod_{k=1}^{K}\theta_{dk}^{\mathbb{1}[x_d=k]},
+     \tag{2.6}\label{eq:02-06}\\
+ &\overset{\mathit{df}}{=}\operatorname{Cat}(\mathbf{x}\mid\theta),
+     \tag{2.7}\label{eq:02-07}
+\end{align}
+
+% <<<PDFPAGE 37>>>
+其中 $\mathbb{1}[x=k]$ 是示性函数（indicator function），$x=k$ 时返回 1，否则返回 0。值得注意的是，伯努利分布和类别分布中的 $\theta$ 各有明确含义，分别为 $\theta_d=p(x_d=1;\theta)$ 和 $\theta_{dk}=p(x_d=k;\theta)$。\footnote{译注：式（2.6）的内层乘积从 $1$ 到 $K$，而前文的类别取值从 $0$ 到 $K-1$。实际使用时，求积下标应与类别的编号一致。}
+
+\subsection{学习}
+为模型选好分布之后，我们就可以问一个基本问题。如何获得参数 $\theta$ 的取值，也就是如何估计 $\theta$？人工智能研究者把这个过程称为\textbf{学习}（learning）或\textbf{训练}（training）。在概率框架下，通常通过最小化某种距离度量，把模型拟合到经验分布上。例如，可以对参数 $\theta$ 最小化 Kullback–Leibler 散度。
+\begin{align}
+\operatorname{KL}[p_{\mathit{data}}(\mathbf{x})\mathbin{\|}p(\mathbf{x};\theta)]
+ &=\sum_{\mathbf{x}}p_{\mathit{data}}(\mathbf{x})\log
+        \frac{p_{\mathit{data}}(\mathbf{x})}{p(\mathbf{x};\theta)}
+        \tag{2.8}\label{eq:02-08}\\
+ &=\sum_{\mathbf{x}}p_{\mathit{data}}(\mathbf{x})\log p_{\mathit{data}}(\mathbf{x})
+       -\sum_{\mathbf{x}}p_{\mathit{data}}(\mathbf{x})\log p(\mathbf{x};\theta)
+        \tag{2.9}\label{eq:02-09}\\
+ &=C-\sum_{\mathbf{x}}p_{\mathit{data}}(\mathbf{x})\log p(\mathbf{x};\theta)
+        \tag{2.10}\label{eq:02-10}\\
+ &=C-\frac1N\sum_{\mathbf{x}}\sum_{n=1}^{N}
+        \delta(\mathbf{x}-\mathbf{x}_n)\log p(\mathbf{x};\theta)
+        \tag{2.11}\label{eq:02-11}\\
+ &=C-\frac1N\sum_{n=1}^{N}\log p(\mathbf{x}_n;\theta).
+        \tag{2.12}\label{eq:02-12}
+\end{align}
+其中 $C$ 为经验分布的负熵（negative entropy）。它与参数 $\theta$ 无关，因而不影响模型学习。最后一步利用了 $\delta$ 函数的性质。
+
+\begin{booknote}{旁注}
+好奇的读者，请记住，Kullback–Leibler 散度是不对称的，所以经验分布和模型分别放在哪一边很重要！
+\end{booknote}
+
+对于 iid 数据，$\sum_{n=1}^{N}\log p(\mathbf{x}_n;\theta)$ 对应\textbf{对数似然函数}。
+% <<<PDFPAGE 38>>>
+\begin{align}
+\log p(\mathcal{D};\theta)&\overset{\mathit{df}}{=}
+   \log p(\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_N;\theta)
+       \tag{2.13}\label{eq:02-13}\\
+ &\overset{\mathit{iid}}{=}\log\prod_{n=1}^{N}p(\mathbf{x}_n;\theta)
+       \tag{2.14}\label{eq:02-14}\\
+ &=\sum_{n=1}^{N}\log p(\mathbf{x}_n;\theta).
+       \tag{2.15}\label{eq:02-15}
+\end{align}
+第二步利用了观测来自同一分布且相互独立这一事实。似然函数在概率建模中有特殊作用，是构建许多深度生成模型的出发点。
+
+\subsection{泛化}
+英国著名统计学家乔治·博克斯（George Box）说过，所有模型都是错的，但有些模型有用。模型是错的，这没问题。可有些模型有用，是什么意思呢？我们来看\figref{fig:02-01}中的例子。我们有一些来自真实分布的观测数据（这里采用所谓的双月形问题，two-moon problem），如\figref{fig:02-01}(a) 所示。用这些数据拟合模型后，得到\figref{fig:02-01}(b) 中的密度估计器（density estimator）。你会看到，模型主要在数据所在的地方分配概率质量，也在很少或完全没有观测到数据的区域分配了一些概率质量。这是好事吗？我的答案是肯定的。我们正是希望模型能泛化到几乎没有观测数据的区域。
+
+机器学习中的泛化，是指模型恰当地适应未见过的新数据的能力。这些新数据来自与建模数据相同的分布\citeref{1}。在这里，“适应”是指采样，或者给数据赋予概率或似然。因此，拥有一个概率模型（即模型分布），是能够泛化的关键！现在我们明白了，某些模型更\emph{有用}，因为它们的泛化能力更强。在考虑各种深度生成模型时，请记住这一点。
+% <<<PDFPAGE 39>>> 上一段跨原页。
+
+\dgmfig{fig_02_01}{.9\linewidth}{用数据 (a) 拟合概率模型（模型分布）(b) 的一个例子。}{fig:02-01}
+[(a) 观测数据。(b) 模型。]
+
+\subsection{推断}
+用数据拟合模型后，我们（终于！）可以使用模型了！概率模型无论是条件模型还是联合模型，最简单的用途都是获取新数据和计算似然函数 $p(\mathbf{x})$。这个量也称为证据（evidence）。好奇的读者，我说它们简单，但细想起来，它们的用处相当大。
+
+等等，条件模型能用来生成新数据吗？比如，若 $x_2$ 表示猫的体重，$x_1$ 表示猫的身高，从 $p(x_2\mid x_1)$ 中采样也算是在生成新数据，也就是生成 $(x_1,x_2)$ 对。判别（预测）模型和生成模型之间的分界并不清晰，从概率视角看更是如此。毕竟我们处理的都是概率分布，把一部分模型叫作“判别式”、另一部分叫作“生成式”，未必有助于理解。不过，这里先把这个问题放在一旁，接着关注\emph{推断}（inference）。
+
+在概率建模中，推断是对随机依赖关系和随机量得出结论的关键。我们可以把推断定义为回答概率查询（probabilistic query）。按照\citeref{2}，概率查询可以分成下列几类。
+\begin{itemize}
+\item （EVI）计算证据 $p(\mathbf{x})$。
+\item （MAR）计算边缘分布 $p(\mathbf{x}_{-d})=\int p(\mathbf{x})\,\mathrm{d}x_d$。
+\item （MAP）计算最可能的取值 $\arg\max_{\mathbf{x}}p(\mathbf{x})$。
+\item 计算更复杂的查询，例如关于逻辑事件的查询。
+\end{itemize}
+有趣的是，并非当代所有类型的深度生成模型都能执行 EVI，只有少数模型能完成 MAR 或 MAP，或两者兼能。稍后我们会简要介绍一类叫作概率电路（probabilistic circuit）的模型\citeref{2}，它可以执行 EVI、MAR 和 MAP。其余深度生成模型则至多能执行 EVI。
+
+\section{插曲：概率图模型}
+你可以想象，好奇的读者，当变量数 $D$ 很大，变量之间又有特定的结构，也就是复杂的随机依赖关系时，使用概率模型有时会相当困难。为表示这类概率分布，人们提出了\textbf{概率图模型}（probabilistic graphical model，PGM）\citeref{3}。简而言之，PGM 是一种用图表示随机变量之间条件依赖结构的概率模型。有一类\textbf{无向图模型}（undirected graphical model），节点表示随机变量，边表示某种依赖关系，也称为马尔可夫网络（Markov network）。
+% <<<PDFPAGE 40>>> 上一段跨原页。
+比较直观的一类 PGM 是\textbf{贝叶斯网络}（Bayesian network）。贝叶斯网络是有向无环图（directed acyclic graph）。有向边表示条件依赖关系，节点表示随机变量。
+
+这里不详细介绍各种 PGM。感兴趣而又好奇的读者可以读\citeref{3}，那是一本很好的入门读物。不过要知道，贝叶斯网络有助于我们用生成的方式思考建模。为什么？因为图是无环的，也就是没有从同一随机变量出发又回到该变量的路径。有环显然就无法构成这种生成过程。如果随机变量 $x_A$ 依赖 $x_B$，而 $x_B$ 又依赖 $x_A$，该怎样生成它们呢？
+
+\begin{booknote}{旁注}
+请注意，贝叶斯网络并不能表示所有概率分布！因此，有些生成模型超出了贝叶斯网络的范围。不过，要初步了解生成过程，从贝叶斯网络入手很好。
+\end{booknote}
+
+\begin{booknote}{例}
+\figref{fig:02-02}给出一个贝叶斯网络的例子。灰色节点是可观测变量，白色节点是潜变量，箭头表示条件依赖关系。\figref{fig:02-02}所示例子相应的联合分布是
+\begin{equation}
+p(A,B,C)=p(C\mid A,B)p(A)p(B).
+\tag{2.16}\label{eq:02-16}
+\end{equation}
+若要计算可观测变量的边缘分布，需要对潜变量求和，将它消去。
+\begin{align}
+p(A,C)&=\sum_B p(A,B,C) \tag{2.17}\label{eq:02-17}\\
+ &=\sum_B p(C\mid A,B)p(A)p(B). \tag{2.18}\label{eq:02-18}
+\end{align}
+\end{booknote}
+
+\dgmfig{fig_02_02}{.5\linewidth}{三个随机变量组成的贝叶斯网络示例。灰色节点为可观测变量，白色节点为潜变量。}{fig:02-02}
+
+\section{混合模型}
+\subsection{用高斯混合模型建模}
+先深吸一口气。好奇的读者，我知道，到这里信息已经很多了。如果需要，可以休息一下，泡杯咖啡。然后坐稳了，我们要把这些知识汇集起来，提出最简单却很有效的生成模型之一，即\textbf{混合模型}（mixture model）。开始吧！
+
+% <<<PDFPAGE 41>>>
+\dgmfig{fig_02_03}{.24\linewidth}{潜变量模型的一个例子。}{fig:02-03}
+
+考虑这样的情形。随机变量 $x$ 表示猫的体重。猫有雌雄之分，体重也有差别。我们用一个高斯分布为母猫的真实体重分布建模，另用一个高斯分布为公猫的真实体重分布建模。这时，有人问起所有猫的体重分布，不区分母猫和公猫。我们手头有猫体重的 iid 数据，但不知道观测到的猫各是什么性别，只有一些体重数值。该怎么解决这个问题？
+
+可以先从随机变量入手。$x$ 表示体重，它是一个可观测的随机变量。我们稍微放宽现实约束，假设 $x\in\mathbb{R}$。接着，猫具有生理性别 $z\in\{0,1\}$，其中母猫对应 $z=0$，公猫对应 $z=1$。不过，$z$ 是一个未观测到的变量，也就是潜变量。我们还知道，性别 $z$ 会影响体重 $x$。由此得到\figref{fig:02-03}所示的概率图模型。
+
+我们来写出联合分布，根据\figref{fig:02-03}中的概率图模型应用乘积法则。
+\begin{equation}
+p(x,z)=p(x\mid z)p(z).
+\tag{2.19}\label{eq:02-19}
+\end{equation}
+
+% <<<PDFPAGE 42>>>
+到这里一切顺利！$x$ 取实值，$z$ 是二元变量，因此可以分别用高斯分布和伯努利分布来建模。
+\begin{equation}
+p(x,z)=\mathcal{N}\bigl(x\mid\mu(z),\sigma^2(z)\bigr)\operatorname{Bern}(z\mid\omega),
+\tag{2.20}\label{eq:02-20}
+\end{equation}
+其中，$x$ 和 $z$ 的依赖关系由均值与方差体现。也就是说，$z$ 取不同的值时，高斯分布的参数不同。
+
+好奇的读者，请记住，我们有一些观测 $\mathcal{D}=\{x_1,x_2,\ldots,x_N\}$。由于没有观测到 $z$，应当用求和法则将它边缘化（marginalize out）。
+\begin{align}
+p(x)&=\sum_z p(x,z) \tag{2.21}\label{eq:02-21}\\
+ &=\sum_z\mathcal{N}\bigl(x\mid\mu(z),\sigma^2(z)\bigr)
+          \operatorname{Bern}(z\mid\omega) \tag{2.22}\label{eq:02-22}\\
+ &=\mathcal{N}\bigl(x\mid\mu(z=0),\sigma^2(z=0)\bigr)
+          \operatorname{Bern}(z=0\mid\omega)\notag\\
+ &\quad+\mathcal{N}\bigl(x\mid\mu(z=1),\sigma^2(z=1)\bigr)
+          \operatorname{Bern}(z=1\mid\omega) \tag{2.23}\label{eq:02-23}\\
+ &=(1-\omega)\mathcal{N}(x\mid\mu_0,\sigma_0^2)
+          +\omega\mathcal{N}(x\mid\mu_1,\sigma_1^2), \tag{2.24}\label{eq:02-24}
+\end{align}
+其中，用 $\mu_i\equiv\mu(z=i)$、$\sigma_i^2\equiv\sigma^2(z=i)$ 简化记号。
+
+回到猫和它们的体重。先说明一下，这里的所有数值都是编造的，只用于教学！\figref{fig:02-04}给出两个高斯分布的混合示例。\figref{fig:02-04}(a) 分别画出两个混合分量，\figref{fig:02-04}(b) 给出边缘分布 $p(x)$。注意，两个分量的概率不同，分别为 $\omega_0$ 和 $\omega_1=1-\omega_0$。在\figref{fig:02-04}(b) 中，两个分量相互重叠的部分相加。
+
+\dgmfig{fig_02_04}{\linewidth}{猫的体重分布示例。(a) 母猫（左侧蓝色）和公猫（右侧橙色）体重各自的高斯分布，分别对应两个分量。(b) 猫体重的边缘分布 $p(x)$。}{fig:02-04}
+
+一般地，具有 $K$ 个分量的高斯混合模型（mixture of Gaussians，MoG）定义如下。
+% <<<PDFPAGE 43>>>
+\begin{align}
+p(x;\theta)
+ &=\sum_z\mathcal{N}\bigl(x\mid\mu(z),\sigma^2(z)\bigr)
+                 \operatorname{Cat}(z\mid\omega)
+                   \tag{2.25}\label{eq:02-25}\\
+ &=\sum_{k=0}^{K=1}\omega_k\,\mathcal{N}(x\mid\mu_k,\sigma_k^2).
+                   \tag{2.26}\label{eq:02-26}
+\end{align}
+\emph{译注。} 式（2.26）按原书印为 $K=1$。这里共有 $K$ 个分量，参照式（2.37），求和上限应为 $K-1$。
+
+\subsection{训练：对数似然函数}
+我们接着考虑两个分量的例子，想想如何训练高斯混合模型。首先要做好准备，也就是求出对数似然函数。给定数据 $\mathcal{D}$，似然函数为
+\begin{align}
+p(\mathcal{D};\mu_0,\mu_1,\sigma_0^2,\sigma_1^2,\omega)
+ &=\prod_{n=1}^{N}p(x_n;\mu,\sigma^2,\omega)
+                       \tag{2.27}\label{eq:02-27}\\
+ &=\prod_{n=1}^{N}\Bigl(
+     (1-\omega)\mathcal{N}(x_n\mid\mu_0,\sigma_0^2)
+      +\omega\mathcal{N}(x_n\mid\mu_1,\sigma_1^2)\Bigr).
+                       \tag{2.28}\label{eq:02-28}
+\end{align}
+相应的对数似然函数如下。取对数使我们处理的是和而非积，并且不会改变最优值所在的位置。
+\begin{equation}
+\begin{aligned}
+&\log p(\mathcal{D};\mu_0,\mu_1,\sigma_0^2,\sigma_1^2,\omega)\\
+&\quad=\sum_{n=1}^{N}\log\Bigl(
+ (1-\omega)\mathcal{N}(x_n\mid\mu_0,\sigma_0^2)
+ +\omega\mathcal{N}(x_n\mid\mu_1,\sigma_1^2)\Bigr).
+\end{aligned}
+\tag{2.29}\label{eq:02-29}
+\end{equation}
+这里有几点说明。
+\begin{enumerate}
+\item 模型的参数是 $\theta=(\mu_0,\mu_1,\sigma_0^2,\sigma_1^2,\omega)$。
+\item （对数）似然函数有一个直观的解释。给定参数 $\theta$ 的取值，观测数据有多可能出现？
+\item 可以把对数似然函数作为训练的目标函数，对参数 $\theta$ 进行优化，从而找到最有可能生成观测数据的参数。
+\end{enumerate}
+
+再想一步，我们（没错，就是你和我，好奇的读者！）会发现，处理 $\log\mathcal{N}(x\mid\mu,\sigma^2)$ 比处理 $\mathcal{N}(x\mid\mu,\sigma^2)$ 更容易，因为高斯分布的指数项比较麻烦。取对数可得
+\begin{align}
+\log\mathcal{N}(x\mid\mu,\sigma^2)
+ &= \log\!\left(\frac{1}{\sigma\sqrt{2\pi}}
+       \exp\!\left\{-\frac12\left(\frac{x-\mu}{\sigma}\right)^2\right\}\right)
+                      \tag{2.30}\label{eq:02-30}\\
+ &= -\frac12\log 2\pi-\frac12\log\sigma^2
+                     -\frac{1}{2\sigma^2}(x-\mu)^2.
+                      \tag{2.31}\label{eq:02-31}
+\end{align}
+
+% <<<PDFPAGE 44>>>
+如果能把对数移进求和符号里面，那就容易多了！可是不能……不过，非得那样做吗？可以利用指数和对数的性质 $\exp(\log(x))=x$。把它用在对数似然函数中，得到
+\begin{equation}
+\begin{aligned}
+&\log p(\mathcal{D};\mu_0,\mu_1,\sigma_0^2,\sigma_1^2,\omega)\\
+&\quad=\sum_{n=1}^{N}\log\Bigl(
+  \exp\bigl(\log((1-\omega)\mathcal{N}(x_n\mid\mu_0,\sigma_0^2))\bigr)\\
+&\hspace{7em}+\exp\bigl(\log(\omega\mathcal{N}(x_n\mid\mu_1,\sigma_1^2))\bigr)\Bigr)
+\end{aligned}
+\tag{2.32}\label{eq:02-32}
+\end{equation}
+\begin{align}
+&=\sum_{n=1}^{N}\log\Bigl(
+    \exp\bigl(\log(1-\omega)+\log\mathcal{N}(x_n\mid\mu_0,\sigma_0^2)\bigr)
+    \notag\\
+&\hspace{5em}+\exp\bigl(\log(\omega)+\log\mathcal{N}(x_n\mid\mu_1,\sigma_1^2)\bigr)
+    \Bigr) \tag{2.33}\label{eq:02-33}\\
+&=\sum_{n=1}^{N}\log\left(\sum_{i=0}^{1}
+  \exp\bigl(\log(\omega_i)+\log\mathcal{N}(x_n\mid\mu_i,\sigma_i^2)\bigr)\right)
+     \tag{2.34}\label{eq:02-34}\\
+&=\sum_{n=1}^{N}\log\left(\sum_{i=0}^{1}\exp(a_i)\right).
+     \tag{2.35}\label{eq:02-35}
+\end{align}
+有几点要说明。
+\begin{enumerate}
+\item 好奇的读者，你已经注意到，我们引入了 $a_i\overset{\mathit{df}}{=}\log(\omega_i)+\log\mathcal{N}(x_n\mid\mu_i,\sigma_i^2)$。一会儿就能看出这样做的理由。
+\item 我们特意又引入一个求和式，让你熟悉这个记号，也让你看到可以用同样的方法处理两个以上的分量。
+\item 在机器学习中，函数 $\log\!\bigl(\sum_{i=1}^{I-1}\exp(a_i)\bigr)$ 有专门的名字，叫作……\textbf{对数和指数函数}（log-sum-exp，LSE）。直接计算这个函数可能下溢或上溢，也就是数值不稳定。为避免这个问题，可以用下面的技巧：
+\begin{equation}
+\operatorname{LSE}(a_0,\ldots,a_{I-1})
+=a^*+\operatorname{LSE}(a_0-a^*,\ldots,a_{I-1}-a^*),
+\tag{2.36}\label{eq:02-36}
+\end{equation}
+其中 $a^*=\max\{a_0,\ldots,a_{I-1}\}$。请记住这个函数，它在人工智能的许多主题中都很重要。为了避免出错，可以先看看你使用的库是否提供 LSE 函数。多数库都提供！\footnote{译注：原文介绍 LSE 的行内求和从 $i=1$ 开始。若按式（2.36）的参数列表计算，应对 $i=0,\ldots,I-1$ 求和。}
+\end{enumerate}
+一般地，$K$ 个分量的高斯混合模型的对数似然函数定义为
+\begin{equation}
+\log p(\mathcal{D};\theta)
+=\sum_{n=1}^{N}\log\left(\sum_{k=0}^{K-1}
+       \exp\bigl(\log\omega_k+\log\mathcal{N}(x\mid\mu_k,\Sigma_k)\bigr)\right).
+\tag{2.37}\label{eq:02-37}
+\end{equation}
+
+% <<<PDFPAGE 45>>>
+\subsection{训练：算法}
+现在可以动手实现训练算法了。我们已经知道对数似然函数的形式，因而可以选用想用的优化算法。实践中有两种选择。
+\begin{enumerate}
+\item 使用著名的\textbf{期望最大化}（expectation-maximization，EM）算法。训练分两步进行。第一步计算数据点属于各特定分量的期望概率。第二步更新分量参数。我们这些做深度学习的懒家伙就不在这里讨论这个算法了。不过，我强烈建议你从教科书（如\citerefs{1,4,5}）查阅 EM 算法的细节，自己实现一下。
+\item 使用基于梯度的方法（gradient-based method）进行优化。
+\end{enumerate}
+这里我们选第二条路，因为只要用支持自动微分（Autograd）的库，就比较容易实现。过程很直接。计算对数似然对参数的梯度，然后更新参数。就这么多！唯一需要记住的是使用 LSE 函数。
+
+\figref{fig:02-05}给出了以不同分量数拟合双月形数据的几个高斯混合模型示例。好奇的读者，你可以看到，分量太少（\figref{fig:02-05}(a)）会得到泛化能力很差的模型。分量\emph{太多}则可能造成数值不稳定，例如某个分量的中心落在一个数据点上，而方差坍缩到 0。通常，增加分量数（例如\figref{fig:02-05}(d)）可使拟合更好、对数似然值更高。说到这里，有时需要用某种正则化（regularization），不过我们不进一步讨论。好奇的读者，可以阅读一本教科书，例如\citeref{1}关于高斯混合模型的贝叶斯处理。
+
+\subsection{其他混合模型}
+这里讨论的是高斯混合模型。根据观测数据的性质，我们也可以构造其他混合模型。例如，对于二元数据，可以使用伯努利混合模型：
+\begin{equation}
+p(x;\theta)=\sum_{k=1}^{K}\pi_k\operatorname{Bern}(x\mid\theta).
+\tag{2.38}\label{eq:02-38}
+\end{equation}
+用类似的方法可以构造其他混合模型。一般而言，混合指数族（exponential family）中的分布相当容易，因为可以用 LSE 技巧构造在计算上可行的、基于对数似然的训练目标。
+
+% <<<PDFPAGE 46>>>
+\dgmfig{fig_02_05}{.91\linewidth}{不同分量数的高斯混合模型示例。(a) $K=2$，(b) $K=12$，(c) $K=50$，(d) $K=100$。}{fig:02-05}
+\dgmfig{fig_02_06}{.33\linewidth}{几个微型手写图像示例（$8\times8$ 像素）。}{fig:02-06}
+
+\subsection{编写高斯混合模型的代码}
+好了，好奇的读者，闲聊到这里就够了。我懂你的心情，我们该写一个高斯混合模型了！我们将用简单的数据，也就是微型手写图像训练高斯混合模型。\figref{fig:02-06}给出几个例子。它们并不复杂，尺寸也很小，但我们会看到，训练模型生成这类对象仍然并不容易。
+
+回到正题！下面的代码片段给出 MoG 的一种实现。好奇的读者，请仔细看看，试着理解每一行。例如，我们用均值和对角协方差矩阵来参数化高斯分量。实际用的是对数方差（log variance），便于数值计算。分量概率有两种设定。$\omega$ 可以训练，也可以固定为等概率，即对所有 $k=0,\ldots,K-1$ 有 $\omega_k=1/K$。注意，必须保持 $\sum_k\omega_k=1$，并且每个 $\omega_k\in[0,1]$。如果用基于梯度的方法训练 $\omega$，很难保证这些约束。为此，我们在代码中引入参数 $w$，再用 softmax 函数把它们转成 $\omega$。这个简单技巧总能奏效。
+% <<<PDFPAGE 47>>> 上一段跨原页。
+
+好，可以开始了。准备动手写代码吧！
+
+% <<<PDFPAGE 47>>>–<<<PDFPAGE 48>>> 代码清单 2.1，保留原清单的 74 行。
+\bookcode{code/ch02_mog.py}{高斯混合模型的一种实现。}{lst:02-01}
+
+用 $K=25$、分量概率可训练的设定运行高斯混合模型后，我们应当得到类似于\figref{fig:02-07}的结果。有几点值得说明。
+
+\begin{enumerate}
+\item 生成的图像并不出色（\figref{fig:02-07}(a)），不过看起来确实像图像（也许需要稍微眯起眼睛）。这里的目的在于学习原理，无需追求当时最先进的结果。要是想得到更好的结果，尽管动手试试这段代码！
+% <<<PDFPAGE 49>>>
+\item 看看各分量的均值（\figref{fig:02-07}(b)）！这里的现象很有趣。首先，许多分量发生了坍缩（collapse），它们的 $\omega_k$ 接近 0。\figref{fig:02-07}(b) 把各分量的概率标在其均值的上方。这些分量几乎没有用处，甚至可以从混合模型中去掉。其次，概率非零的分量有的很具体，例如专门对应数字 5 或 4，有的则很一般，例如 $\omega$ 较大的两个均值。
+\item 训练过程非常平顺（见\figref{fig:02-07}(c)），负对数似然（negative log-likelihood，NLL）顺利下降。不过，还可以使用其他技巧、调整超参数，或两者都做，从而得到更好的结果。好奇的读者，请记住，在生成式人工智能中，千万别被漂亮的曲线或损失值蒙住。要实际看看模型生成了什么。
+\item 注意，我们在这里找到的是局部解。存在多个没有发生坍缩的解，要找到其中最好的那个（全局解）很难，几乎不可能。此外，如果某个分量发生坍缩，即 $\sigma_k^2=0$，就会得到无界的似然。为缓解这个问题，可以加入正则项（regularization term）\citeref{6}。
+\end{enumerate}
+
+\dgmfig{fig_02_07}{.93\linewidth}{(a) 训练好的高斯混合模型生成的一组图像。(b) 训练后各分量均值的示例。(c) 训练所得高斯混合模型的负对数似然示例。}{fig:02-07}
+[(c) 的横轴为训练轮数（epoch），纵轴为负对数似然。]
+
+% <<<PDFPAGE 50>>>
+\section{概率电路}
+混合模型是潜变量模型，因为它含有表示分量编号的潜变量。这里讨论\textbf{有限混合模型}（finite mixture model），其 $z$ 是类别变量。也有\textbf{无限混合模型}（infinite mixture model），例如 $z$ 取连续值的模型。此类模型留待以后讨论。此外，以上介绍的混合模型并不很深，因为潜变量只有一层。接下来，我们简要考察一大类层次化混合模型（hierarchical mixture model），即\textbf{概率电路}。在此之前，先简单介绍一种最简单的模型，即完全因子分解模型。
+
+\subsection{完全因子分解模型}
+高斯混合模型的能力相当强，可以计算证据。然而，对高斯混合模型求 MAP 一般在计算上不可行，因为
+\begin{align}
+\max_x p(x)&=\max_x\sum_k\omega_k p_k(x)
+       \tag{2.39}\label{eq:02-39}\\
+ &\ne\sum_k\max_x\omega_k p_k(x),
+       \tag{2.40}\label{eq:02-40}
+\end{align}
+也就是说，求和与取最大值的顺序不能交换。
+
+如果采用一个非常简单的模型，将其完全因子分解（fully factorized），即所有变量在统计上相互独立，则有
+\begin{equation}
+p(\mathbf{x})=\prod_i p_i(x_i),
+\tag{2.41}\label{eq:02-41}
+\end{equation}
+这样，计算 EVI、MAR 和 MAP 的复杂度都是线性的！可它的表达能力有限……那么，能不能把混合模型和完全因子分解模型结合起来，取两者之长？答案是……可以！
+
+\subsection{层次化混合模型，也就是概率电路}
+\subsubsection{基本构件}
+先约定下列语义\citeref{7}。
+\begin{itemize}
+\item 节点对应分布或某种运算（求和或求积）。
+\item 边指定概率流动的方向。
+% <<<PDFPAGE 51>>>
+\item 节点的输入是随机变量（其取值）或概率。
+\item 输出是概率。
+\end{itemize}
+
+接下来定义以下基本单元（见\figref{fig:02-08}）。
+\begin{itemize}
+\item \textbf{基本单元}（base unit，\figref{fig:02-08}(a)）的输入是随机变量的一个取值，输出是其概率。换句话说，这个单元实现一个概率分布。
+\item \textbf{和单元}（sum unit，\figref{fig:02-08}(b)）的输入是一个随机变量的取值，输出是混合模型给出的概率。
+\item \textbf{积单元}（product unit，\figref{fig:02-08}(c)）的输入是不同随机变量的取值，输出是完全因子分解分布给出的概率。
+\end{itemize}
+
+\dgmfig{fig_02_08}{\linewidth}{概率电路的基本单元。(a) 基本单元。(b) 和单元。(c) 积单元。}{fig:02-08}
+
+为了用这些单元构造可高效计算的概率分布，需要施加一些约束。
+\begin{itemize}
+\item \textbf{可分解性}（decomposability）。积单元的子节点所依赖的变量集两两不交时，该积单元可分解。
+\item \textbf{平滑性}（smoothness）。和单元的子节点依赖于同一组变量时，该和单元是平滑的。
+\end{itemize}
+满足这两个条件后，便可高效计算 MAR 和 CON。要高效计算 MAP，还需要其他性质，详见\citeref{2}。\footnote{译注：本段原文未展开 CON，它指条件概率查询。}
+
+\subsubsection{构建概率电路}
+现在，我们有了能够定义概率分布的简单构件。与神经网络类似，可以用它们构造复杂的分布。这些分布实际定义了层次化混合模型，也就是混合的混合，再继续往上混合。原则上，只要 $K$ 足够大，混合模型就可以为任何分布建模。但是，我们知道，当 $K>N$，即分量多于数据点时，模型会坍缩而无法泛化。因此，采用层次化混合模型，有望在保留表达能力的同时提高泛化能力。\figref{fig:02-09}给出几个由简单单元构成的概率电路（probabilistic circuits，PCs）示例。
+
+% <<<PDFPAGE 52>>>
+\dgmfig{fig_02_09}{\linewidth}{概率电路的几个示例，从左侧的简单单元到右侧更复杂的网络。}{fig:02-09}
+
+\begin{booknote}{例}
+我们用一篇很好的教程\citeref{8}中的例子，简要说明概率电路的一些优良性质。好奇的读者，如果你对概率电路感兴趣，这篇教程是个很好的起点！这里先简要展示概率电路的能力。
+
+设想有一个如\figref{fig:02-10}(a) 所示的概率电路，定义四个随机变量的概率分布 $p(x_1,x_2,x_3,x_4)$，其中所有基本单元都是已知的分布。我们的目标是求边缘分布 $p(x_2,x_4)$。该怎么做呢？很简单，只需以下步骤。
+\begin{enumerate}
+\item 对于被边缘化掉的变量，将基本单元的值设为 1（\figref{fig:02-10}(b) 的绿色节点）。
+\item 对给定的 $x_2$、$x_4$ 取值，计算概率（\figref{fig:02-10}(c) 的橙色节点）。
+\item 自底向上，也就是从所有叶节点到根节点，前馈计算各个单元。
+\end{enumerate}
+给定 $x_2$、$x_4$ 的取值后，根节点就是边缘分布的最终值。概率电路的妙处在于，每一步都可以高效计算，运算也非常基本，并且得到最终结果的时间随电路规模线性增长！
+\end{booknote}
+
+% <<<PDFPAGE 53>>>
+\dgmfig{fig_02_10}{\linewidth}{一个向量场模型（蓝色箭头）在数据点（橙色双月形）周围随时间变化的例子。}{fig:02-10}
+[\emph{译注。} 上面的图题按原书译出，和图中内容不符。图中四个面板实际展示上一例中用概率电路计算边缘分布的步骤。]
+
+% <<<PDFPAGE 52>>>–<<<PDFPAGE 53>>> 本节列表跨原页。
+\subsubsection{关于概率电路的几点补充}
+概率电路领域内容丰富，近年来受到更多关注，主要是因为它具有良好的计算性质。下面给出一些线索和想法。
+\begin{itemize}
+\item 概率电路与逻辑电路（logical circuit）密切相关\citeref{9}。例如，和单元可视为“或”单元在概率情形下的推广，积单元与“与”单元密切相关。
+\item 如果知道概率电路的结构，可以用期望最大化算法\citerefs{10,11}或基于梯度的方法\citeref{12}进行训练，即估计基本单元的参数。
+\item 从数据学习概率电路的结构更具挑战，通常需要其他约束或假设\citeref{13}。
+\item 有专门的软件包和代码仓库可用来构建及训练概率电路，例如 PyTorch 中的 Einsum Networks\citeref{12}、Julia 中的 Juice\citeref{14}和 Python 中的 SPFlow\citeref{15}。
+\item 有意思的是，概率电路可以推广决策树（decision tree）、随机森林（random forest）等熟知的方法。\citeref{16}表明，决策树和随机森林可以转成概率电路，还可以作为生成模型使用！
+\end{itemize}
+
+这里仅仅介绍了精彩的概率电路世界的一小部分。好奇的读者，希望你已经产生兴趣，愿意继续探索这类深度（层次化）、可高效计算的概率模型。
+
+\input{chapters/ch02_references}
