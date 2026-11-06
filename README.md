@@ -1,43 +1,10 @@
 # 书籍中文翻译
 
-用于持续开展书籍的中文翻译、校订、排版与成品归档。每本书独立维护底本、中文源码、术语表和校对记录，共用翻译规范与工具，支持不断加入新的书籍和领域。
-
-翻译根据底本选择流程：有 TeX 源码时，以原工程的整体模板和结构为基础，按中文阅读习惯调整字体、字号、行距与段落间距；图表有源码时只译文字、保留布局，无源码时原样使用成图。只有文本 PDF 或扫描 PDF 时，先提取或识别内容，再重建中文排版。译文以忠于原意、术语准确和符合中文阅读习惯为目标，保留章节结构、数学公式、图表、代码及书前书后材料。
-
-## 阅读与工作入口
-
-- **阅读译本：** [00_books](00_books/) 集中存放已完成的完整中文 PDF。
-- **查看或修改某本书：** 从下方书目进入对应目录，查阅源码、术语表、编译说明和校对记录。
-- **开展翻译或校订：** 阅读 [AGENTS.md](AGENTS.md) 和 [书籍翻译 skill](.agents/skills/technical-book-translation/SKILL.md)。
-- **核对文件与来源：** 查看 [文件整理记录](00_file_organization.json)；[分章拆分总览](00_chapter_split_overview.md) 记录英文原版分章情况。
-
-## 目录组织
-
-```text
-00_books/                         已完成的完整中文 PDF 汇总
-NN_YYYY_English_Book_Title/        每本书的独立目录
-├── 00_originals/                  原版 PDF、原版 TeX、版次与来源信息
-├── 01_source/                     中文 TeX、图表、文献、构建脚本和编译说明
-├── 02_glossary/                   本书的中英术语与用法约定
-├── 03_reviews/                    内容覆盖、疑点、核验和交付记录
-└── 05_references/                 辅助文献和参考材料
-.agents/skills/                    共用翻译流程、模板与工具
-scripts/                          仓库维护检查工具
-```
-
-目录和文件名统一使用英文 ASCII 字符。新增维护文件使用小写英文与下划线，例如 `translation_style.md`、`glossary_en_zh.md`、`ch01_review.json`；书籍目录、成品名与原版英文工程资产保留既有命名。文档正文和说明仍使用中文，参考资料目录保留 `05` 编号以延续归档结构。
-
-中文 TeX 是正式译文，直接在 `01_source/` 中维护。完整成品命名为 `English_Book_Title_cn_translated.pdf`，英文单词用下划线连接，每本书仅在根目录 `00_books/` 保留一份完整译本。
-
-有有效 TeX 底本的书保留源码包和英文整书 PDF，按源码章节组织翻译；只有 PDF 底本的书保留用于译校的分章 PDF。
-
-尚未完成的书在自己的校对记录中注明进度。阶段预览、单章测试、提取文本和编译中间文件放在 `work/` 或系统临时目录；完整译本通过核验后再进入成品目录。
-
-校对记录中的 `work/`、`outputs/` 和旧构建目录名称用于追溯历史制作过程，其中临时产物未随仓库归档。记录内的阶段页数、文件名和哈希对应当时的检查结果；当前源码与完整成品以各书正式目录为准。
+本项目整理技术书籍的中文译本，涵盖因果推断、人工智能、临床研究等领域。每本书独立维护原版资料、中文 LaTeX 源码、术语表和校对记录，完整中文 PDF 集中存放在 [00_books](00_books/)。
 
 ## 当前书目
 
-以下为已归档的中文译本。书名链接进入对应工程，PDF 链接打开汇总目录中的成品；页数为中文排版页数。
+点击 PDF 阅读译本，点击原书名查看源码与相关资料。页数为中文 PDF 页数。
 
 | 原书与工程 | 中文书名 | 完整译本 | 页数 |
 |---|---|---|---:|
@@ -57,68 +24,39 @@ scripts/                          仓库维护检查工具
 | [Efficient LLM Inference](14_2026_Efficient_LLM_Inference/) | 大语言模型高效推理 | [PDF](00_books/Efficient_LLM_Inference_cn_translated.pdf) | 55 |
 | [Mathematical Foundations of Artificial Intelligence: Basics of Manifold Theory](15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/) | 人工智能的数学基础：流形理论基础 | [PDF](00_books/Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory_cn_translated.pdf) | 359 |
 
-《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
+《扩散模型原理》目前收录用户提供的中文 PDF，中文 TeX 缺失，源码恢复与整本复核尚未完成。各书的底本与校订说明见对应目录。
 
-《扩散模型原理》于2026-10-25初始化：归档英文v3源码与PDF、用户提供的450页中文PDF，并整理[术语表](09_2026_The_Principles_of_Diffusion_Models/02_glossary/glossary_en_zh.md)。对应中文TeX已缺失，整本复核与源码重建尚未启动；汇总目录中的PDF沿用用户提供的文件。
+## 目录组织
 
-《因果推断：如果》于2026-11-04修正边注排版：边注按实际高度自动避让，处理PDF第42、71、119、283页的文字重叠和第46、279页等处的页底越界。检查全书364条边注后重新编译，成品仍为346页，目录书签及其页码未变。排版规则见[本书维护说明](07_2026_Causal_Inference_What_If/01_source/translation_style.md)。
+```text
+00_books/                         完整中文 PDF
+NN_YYYY_English_Book_Title/        每本书的独立目录
+├── 00_originals/                  原版资料与来源说明
+├── 01_source/                     中文 LaTeX 源码、图表与编译入口
+├── 02_glossary/                   中英术语表
+├── 03_reviews/                    校对记录与进度
+└── 05_references/                 辅助参考资料
+```
 
-《世界模型的定义与发展路线图》于2026-10-26依据用户提供的arXiv:2607.06401v1源码完成全文翻译，在原article/COLM模板上调整中文排字：正文11pt、行距17.6pt，宋体正文配黑体标题。包含八节正文、十幅原图、中文图注与表格、贡献者及253条参考文献。十幅图没有图内源码，保持原图及图内英文；专业术语首次出现保留英文括注，PDF链接边框隐藏且保留点击跳转。中文TeX、术语表和构建入口见[论文工程](10_2026_A_Definition_and_Roadmap_for_World_Models/)。原文明确笔误按译排体例说明。
+中文译文直接在 `01_source/` 中维护。阶段稿和编译中间文件放在 `work/` 等临时目录，不纳入 Git。
 
-当前底本与内容范围：
+## 获取 PDF
 
-- **Causality：** 2009 年第二版，11 章与结语。
-- **Elements of Causal Inference：** 10 章、附录 A—C、参考文献及索引。
-- **Big Data in Omics and Imaging：** 7 章、书前材料、参考文献与索引；索引保留原版定位页码。
-- **Targeted Learning in Data Science：** 8 个分部、30 章、基础附录和参考文献。
-- **Foundations of Large Language Models：** 依据 arXiv:2501.09223v4 源码，6 章、参考文献及中文索引。目录中的 2025 是归档年份，具体底本以 v4 为准。
-- **Agentic Large Language Models：** 依据 arXiv:2610.13455v1 源码，23 章、7 个分部引言及按章参考文献。
-- **Causal Inference: What If：** 3 个分部、23 章、引言、参考文献及索引；当前中文成品为包含书后材料的 346 页版本。
-- **The Little Book of Generative AI Foundations：** arXiv:2605.29713v2，2026-09-08；8章、前言、结语、附录A—B和参考文献，已对照英文源码校订并重新编译。
-- **The Principles of Diffusion Models：** 英文底本为arXiv:2510.21890v3，封面日期2026-08-27；四个分部、第1—12章（第12章属尾声与展望）、附录A—D和参考文献，另有摘要、致谢、前言及符号说明。中文PDF已归档，中文TeX待恢复。
-- **A Definition and Roadmap for World Models：** arXiv:2607.06401v1；8节、28个小节、1个定义、19个编号公式、10幅图、1张表，以及摘要、贡献者和253条被引文献。
+仓库中的 PDF 使用 Git LFS 管理。克隆仓库后，安装 Git LFS 并在仓库根目录运行以下命令，获取实际 PDF 文件：
 
-《临床研究设计》第五版于2026-11-02依据用户提供的786页电子PDF完成中文译排。版权页与CIP标为2023年，原文件名标为2022年；译文以所提供第五版内容为底本。包含三个分部、20章、全部章内附录与习题、习题答案、442条术语释义及分层索引。原书疑点在文内加注；索引保留英文纸本页码，并附英文PDF页序与中文章节起始页表。中文源码、术语及构建入口见[书籍工程](11_2023_Designing_Clinical_Research/)。
+```powershell
+git lfs install --local
+git lfs pull
+```
 
-《大语言模型深度解析》依据用户提供的 Springer 2024 年第一版 PDF 完成译排。包含书前材料、10 章、章末参考文献、附录 A、B 和 585 个索引词项。索引保留原版印刷页码，并提供译文章节链接和两版起始页对照。中文 LaTeX、术语表和构建说明见[书籍工程](13_2024_Large_Language_Models_A_Deep_Dive/)。
+## 编译与维护
 
-《大语言模型高效推理》依据用户提供的 2026 年第二版 PDF 完成译排。包含封面和目录、14 章、70 道模拟面试问答及附录 A–D。在译注中说明原书推测解码算例、每百万词元成本公式和硬件表的口径差异。中文 LaTeX、术语表与构建入口见[书籍工程](14_2026_Efficient_LLM_Inference/)。
-
-《人工智能的数学基础：流形理论基础》依据用户提供的 CRC Press 2026 年第一版 PDF 译排，涵盖书前材料、6 章、章内附录、习题、章末文献与全书索引，共 359 页。索引的 724 个词项保留原版印刷定位页，附两版章首页对照。中文 LaTeX、术语表与构建说明见[书籍工程](15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/)。
-
-## 新增与维护书籍
-
-1. 按现有命名方式建立独立书籍目录，记录原书名称、作者、版次、来源和翻译范围。归档年份与底本版本分别记录。
-2. 使用翻译 skill 中的体例模板，先确定专业术语、章节结构及公式、图表、框注等内容的处理方式。校对模板仅在用户明确要求独立报告时使用。
-3. 在书籍目录内维护源码和进度，逐章核对原文覆盖、语言、技术内容及版面；完整交付还需检查书前书后材料。
-4. 从干净源码编译并核验最终 PDF，发布到根目录 `00_books/`，记录 SHA-256，更新当前书目及文件整理记录。
-
-整理文件或更新清单后，在仓库根目录运行 `python scripts/check_repository.py`，检查英文路径、必要目录、构建入口、书目清单、PDF 与原始资料哈希及 LFS 属性。加 `--include-local` 可同时检查 `work/` 和 `outputs/` 中的路径。该检查不能代替译文校对或整书编译。
-
-## 编译
-
-先阅读目标书 `01_source/README_build.txt`，确认引擎、字体、文献和索引工具。前八本工程在 Windows、Python 3、TeX Live 2026 及相应中文字体环境下验证；《扩散模型原理》因中文TeX缺失，当前入口只说明缺失状态并退出。《世界模型的定义与发展路线图》使用XeLaTeX、BibTeX和TeX Live自带的Fandol字体，已从新的临时源码目录编译。新增或待恢复工程按自身说明记录依赖。
-
-进入对应书籍的 `01_source/`，运行：
+先阅读目标书的 `01_source/README_build.txt`，准备所需的 TeX 引擎、字体和其他依赖，再进入该书的 `01_source/` 运行：
 
 ```powershell
 python build.py
 ```
 
-也可使用工程提供的 `build.ps1`。现有构建脚本在系统临时目录编译，成功后将完整 PDF 输出到根目录 `00_books/`，编译失败保留已有成品。Foundations of Large Language Models 还使用 BibTeX 和 upmendex；The Little Book of Generative AI Foundations 使用 Biber，由 latexmk 调用。具体依赖和执行顺序以各书说明为准。
+也可使用 `build.ps1`。编译成功后，完整 PDF 输出到根目录 `00_books/`。
 
-修改正文、文献或图表后，重新核对目录、引用、页码、索引及受影响版面。源码中的图形 PDF、数据、样式和固定文献排版源可能是必要构建输入，清理时依据工程依赖判断。
-
-## Git 与 Git LFS
-
-中文源码、术语表、校对记录、原始资料和必要资产纳入版本管理。所有 PDF 使用 Git LFS，包括原版、分章、图形资产和中文成品；原始 TeX 压缩包作为底本证据保留。过程目录、编译缓存和重复成品压缩包由 [.gitignore](.gitignore) 排除。
-
-安装 Git LFS 后，首次使用仓库执行：
-
-```powershell
-git lfs install --local
-```
-
-从支持 Git LFS 的远端克隆后，用 `git lfs pull` 获取实际 PDF。新增或更新 PDF 时正常执行 `git add` 和 `git commit`，用 `git lfs ls-files` 检查追踪状态。
-
-仓库说明统一维护在本文件；具体书籍的编译细节和校对结论保留在各自目录。
+翻译、校订或新增书籍，请先阅读 [项目约定](AGENTS.md) 和 [翻译流程](.agents/skills/technical-book-translation/SKILL.md)。文件来源与归档信息见 [文件清单](00_file_organization.json)，英文原版的分章情况见 [分章总览](00_chapter_split_overview.md)。整理文件或更新清单后，在仓库根目录运行 `python scripts/check_repository.py` 检查。
