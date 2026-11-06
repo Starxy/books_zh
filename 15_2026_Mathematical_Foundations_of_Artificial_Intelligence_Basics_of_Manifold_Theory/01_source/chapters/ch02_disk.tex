@@ -1,0 +1,237 @@
+% PDF p. 70
+\needspace{8\baselineskip}
+\subsection{庞加莱圆盘模型}
+\begin{statement}{定义 2.7}{庞加莱圆盘模型}
+在几何学中，庞加莱圆盘模型也称共形圆盘模型，定义为 $\mathbb H^n$ 中的开单位圆盘
+\begin{equation*}
+  \mathbb H^n=\{x\in\R^n:\lVert x\rVert<1\}.
+  \tag{2.46}\label{eq:2.46}
+\end{equation*}
+为了理解庞加莱圆盘，先介绍双曲几何中的一条性质。给定一条直线，在它之外取一点，过该点至少有两条直线与给定直线平行（图~\ref{fig:2.4}）。
+
+图~\ref{fig:2.4} 用庞加莱圆盘直观展示了双曲平行公设。
+\begin{itemize}
+  \item \textbf{测地线} $L$ 是圆盘的竖直直径。
+  \item \textbf{黑点} $p$ 在圆盘内且不在 $L$ 上。
+  \item \textbf{曲线}是过 $p$ 的两条不同的双曲直线，由与圆盘边界正交的圆给出，均不与 $L$ 相交。
+\end{itemize}
+% PDF p. 71
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch02/fig02_04}
+  \FigureCaption{2.4}{庞加莱圆盘。过 $p$ 的两条双曲平行线。}
+\end{figure}
+
+因此，过同一点 $p$ 至少存在两条不与 $L$ 相交的直线。这是双曲几何的一个特征。
+
+在双曲几何中，直线表示为端点处与圆盘边界垂直的圆弧，直径也是允许的。类似于欧氏几何中的平行线，互不相交的两条圆弧对应于平行射线。正交相交的两条圆弧对应于垂线（见 Wolfram MathWorld 的 Poincaré Hyperbolic Disk）。
+
+双曲几何中没有矩形。双曲几何的另一条重要性质是，任一三角形的内角和小于 $180^\circ$。
+\end{statement}
+
+\begin{statement}{命题 2.2}{}
+庞加莱圆盘模型配有如下黎曼度量。
+\begin{equation*}
+  g=\frac{4\,dx\cdot dx}{(1-\lVert x\rVert^2)^2}.
+  \tag{2.47}\label{eq:2.47}
+\end{equation*}
+
+\textbf{证明。}庞加莱圆盘模型是双曲几何的一种表示，其中双曲空间 $\mathbb H^2$ 映到 $\R^2$ 中的单位圆盘 $D^2$。回顾双曲空间 $\mathbb H^2$ 的定义为
+\begin{equation*}
+  -x_0^2+x_1^2+x_2^2=-1,\qquad x_0>0,
+  \tag{2.48}\label{eq:2.48}
+\end{equation*}
+% PDF p. 72
+从而
+\begin{equation*}
+  x_1^2+x_2^2=x_0^2-1
+  \quad\text{或}\quad
+  \frac{x_1^2}{x_0^2-1}+\frac{x_2^2}{x_0^2-1}=1.
+  \tag{2.49}\label{eq:2.49}
+\end{equation*}
+注意
+\[
+  x_0+1>\sqrt{(x_0+1)(x_0-1)}=\sqrt{x_0^2-1}.
+\]
+因而
+\begin{equation*}
+  \frac{1}{(x_0+1)^2}<\frac{1}{x_0^2-1}.
+  \tag{2.50}\label{eq:2.50}
+\end{equation*}
+由式~\eqref{eq:2.49} 与式~\eqref{eq:2.50} 得
+\begin{equation*}
+  \frac{x_1^2}{(x_0+1)^2}+\frac{x_2^2}{(x_0+1)^2}
+  <\frac{x_1^2}{x_0^2-1}+\frac{x_2^2}{x_0^2-1}=1.
+  \tag{2.51}\label{eq:2.51}
+\end{equation*}
+令
+\begin{equation*}
+  u=\frac{x_1}{1+x_0}\quad\text{且}\quad v=\frac{x_2}{1+x_0}.
+  \tag{2.52}\label{eq:2.52}
+\end{equation*}
+结合式~\eqref{eq:2.51} 和式~\eqref{eq:2.52}，得到
+\begin{equation*}
+  u^2+v^2<1.
+  \tag{2.53}\label{eq:2.53}
+\end{equation*}
+用映射\translatornote{原书在本段用 $\varnothing$ 记映射名称。式~\eqref{eq:2.49} 右式和式~\eqref{eq:2.50} 的分母在 $x_0=1$ 时为零。此时 $(x_0,x_1,x_2)=(1,0,0)$ 直接映到圆盘的原点。}
+\begin{equation*}
+  \varnothing\colon(x_0,x_1,x_2)\longmapsto
+  \left(\frac{x_1}{1+x_0},\frac{x_2}{1+x_0}\right),
+  \tag{2.54}\label{eq:2.54}
+\end{equation*}
+得到庞加莱圆盘
+\begin{equation*}
+  D^2=\{(u,v)\in\R^2:u^2+v^2<1\}.
+  \tag{2.55}\label{eq:2.55}
+\end{equation*}
+
+接下来说明如何利用映射 $\varnothing$ 的拉回和双曲面度量，在圆盘上诱导黎曼度量。\translatornote{映射 $\varnothing$ 从双曲面指向圆盘。将双曲面度量拉回到圆盘时，用的是 $\varnothing^{-1}$。原文随后先计算圆盘欧氏内积经 $\varnothing$ 拉回到双曲面所得的双线性形式。}
+
+回顾在微分几何中，映射 $\varnothing$ 的拉回可把微分形式、度量等张量从一个流形拉回到另一个流形。拉回记为 $\varnothing^*$，作用在微分形式或张量的空间上。
+
+设 $\varnothing\colon M\to N$ 是两个流形之间的光滑映射，$g$ 是 $N$ 上的度量。$N$ 上微分形式（或度量）$g$ 的\textbf{拉回} $\varnothing^*$ 定义为
+\begin{equation*}
+  \varnothing^*g(\rho,w)=g\bigl(d\varnothing(\rho),d\varnothing(w)\bigr),
+  \tag{2.56}\label{eq:2.56}
+\end{equation*}
+% PDF p. 73
+其中 $\rho,w\in T_pM$ 是点 $p\in M$ 处的切向量，$d\varnothing\colon T_pM\to T_{\varnothing(p)}N$ 是映射 $\varnothing$ 的推前。
+
+回顾
+\[
+  \begin{pmatrix}u\\v\end{pmatrix}
+  =\varnothing(x_0,x_1,x_2)
+  =\begin{pmatrix}\varnothing_1(x_0,x_1,x_2)\\
+                   \varnothing_2(x_0,x_1,x_2)\end{pmatrix}
+  =\begin{pmatrix}\dfrac{x_1}{1+x_0}\\[5pt]\dfrac{x_2}{1+x_0}\end{pmatrix}.
+\]
+现在计算雅可比矩阵 $d\varnothing$。
+\begin{equation*}
+  \begin{aligned}
+    d\varnothing
+      &=\begin{pmatrix}du\\dv\end{pmatrix}
+      =\begin{pmatrix}
+        \dfrac{\partial u}{\partial x_0}\,dx_0+\dfrac{\partial u}{\partial x_1}\,dx_1\\[5pt]
+        \dfrac{\partial v}{\partial x_0}\,dx_0+\dfrac{\partial v}{\partial x_2}\,dx_2
+       \end{pmatrix}\\[4pt]
+      &=\begin{pmatrix}
+        -\dfrac{x_1\,dx_0}{(1+x_0)^2}+\dfrac{dx_1}{1+x_0}\\[5pt]
+        -\dfrac{x_2\,dx_0}{(1+x_0)^2}+\dfrac{dx_2}{1+x_0}
+       \end{pmatrix}.
+  \end{aligned}
+  \tag{2.57}\label{eq:2.57}
+\end{equation*}
+
+设 $\rho=(\rho_0,\rho_1,\rho_2)\in T_pM$，$w=(w_0,w_1,w_2)\in T_pM$。于是
+\begin{equation*}
+  \begin{aligned}
+    \rho_0&=dx_0,&\rho_1&=dx_1,&\rho_2&=dx_2,\\
+    w_0&=dx_0,&w_1&=dx_1,&w_2&=dx_2.
+  \end{aligned}
+  \tag{2.58}\label{eq:2.58}
+\end{equation*}
+把式~\eqref{eq:2.58} 代入式~\eqref{eq:2.57}，得到
+\begin{equation*}
+  d\varnothing(\rho)=\begin{pmatrix}du\\dv\end{pmatrix}
+  =\begin{pmatrix}
+    -\dfrac{x_1\rho_0}{(1+x_0)^2}+\dfrac{\rho_1}{1+x_0}\\[5pt]
+    -\dfrac{x_2\rho_0}{(1+x_0)^2}+\dfrac{\rho_2}{1+x_0}
+  \end{pmatrix},
+  \tag{2.59}\label{eq:2.59}
+\end{equation*}
+\begin{equation*}
+  d\varnothing(w)
+  =\begin{pmatrix}
+    -\dfrac{x_1w_0}{(1+x_0)^2}+\dfrac{w_1}{1+x_0}\\[5pt]
+    -\dfrac{x_2w_0}{(1+x_0)^2}+\dfrac{w_2}{1+x_0}
+  \end{pmatrix}.
+  \tag{2.60}\label{eq:2.60}
+\end{equation*}
+
+回顾庞加莱圆盘中的点 $(u,v)$ 属于 $\R^2$。因而，黎曼度量即内积，取 $d\varnothing(\rho)$ 与 $d\varnothing(w)$ 之间的度量。$g(d\varnothing(\rho),d\varnothing(w))$ 由下式给出。
+% PDF p. 74
+\begin{equation*}
+  \begin{aligned}
+    &g\bigl(d\varnothing(\rho),d\varnothing(w)\bigr)\\
+    &\quad=\left(-\frac{x_1\rho_0}{(1+x_0)^2}+\frac{\rho_1}{1+x_0}\right)
+      \left(-\frac{x_1w_0}{(1+x_0)^2}+\frac{w_1}{1+x_0}\right)\\
+    &\qquad+\left(-\frac{x_2\rho_0}{(1+x_0)^2}+\frac{\rho_2}{1+x_0}\right)
+      \left(-\frac{x_2w_0}{(1+x_0)^2}+\frac{w_2}{1+x_0}\right).
+  \end{aligned}
+  \tag{2.61}\label{eq:2.61}
+\end{equation*}
+双曲面 $\mathbb H^2$ 上洛伦兹度量所对应的拉回度量 $g^*(\rho,w)$ 为
+\begin{equation*}
+  g^*(\rho,w)=g\bigl(d\varnothing(\rho),d\varnothing(w)\bigr).
+  \tag{2.62}\label{eq:2.62}
+\end{equation*}
+最后化简式~\eqref{eq:2.61}，得到 $g^*(\rho,w)$。展开式~\eqref{eq:2.61} 的第一项，得
+\begin{equation*}
+  \begin{aligned}
+    &\left(-\frac{x_1\rho_0}{(1+x_0)^2}+\frac{\rho_1}{1+x_0}\right)
+     \left(-\frac{x_1w_0}{(1+x_0)^2}+\frac{w_1}{1+x_0}\right)\\
+    &\quad=\frac{x_1^2\rho_0w_0}{(1+x_0)^4}
+      -\frac{x_1\rho_0w_1}{(1+x_0)^3}
+      -\frac{x_1\rho_1w_0}{(1+x_0)^3}
+      +\frac{\rho_1w_1}{(1+x_0)^2}.
+  \end{aligned}
+  \tag{2.63}\label{eq:2.63}
+\end{equation*}
+类似地，展开式~\eqref{eq:2.62} 的第二项。\translatornote{原文引用式~\eqref{eq:2.62}。此处展开的是式~\eqref{eq:2.61} 右侧的第二项。}
+\begin{equation*}
+  \begin{aligned}
+    &\left(-\frac{x_2\rho_0}{(1+x_0)^2}+\frac{\rho_2}{1+x_0}\right)
+     \left(-\frac{x_2w_0}{(1+x_0)^2}+\frac{w_2}{1+x_0}\right)\\
+    &\quad=\frac{x_2^2\rho_0w_0}{(1+x_0)^4}
+      -\frac{x_2\rho_0w_2}{(1+x_0)^3}
+      -\frac{x_2w_0\rho_2}{(1+x_0)^3}
+      +\frac{\rho_2w_2}{(1+x_0)^2}.
+  \end{aligned}
+  \tag{2.64}\label{eq:2.64}
+\end{equation*}
+将式~\eqref{eq:2.63} 与式~\eqref{eq:2.64} 相加，得到
+\begin{equation*}
+  \begin{aligned}
+    &\frac{(x_1^2+x_2^2)\rho_0w_0}{(1+x_0)^4}
+       -\frac{\rho_0(x_1w_1+x_2w_2)}{(1+x_0)^3}\\
+    &\qquad-\frac{w_0(x_1\rho_1+x_2\rho_2)}{(1+x_0)^3}
+       +\frac{\rho_1w_1+\rho_2w_2}{(1+x_0)^2}.
+  \end{aligned}
+  \tag{2.65}\label{eq:2.65}
+\end{equation*}
+由式~\eqref{eq:2.52} 得
+\begin{equation*}
+  \begin{aligned}
+    1-u^2-v^2&=1-\left(\frac{x_1}{1+x_0}\right)^2
+                 -\left(\frac{x_2}{1+x_0}\right)^2
+      =\frac{(1+x_0)^2-x_1^2-x_2^2}{(1+x_0)^2}\\
+    &=\frac{(1+x_0)^2-x_0^2+1}{(1+x_0)^2}
+      =\frac{2(1+x_0)}{(1+x_0)^2}
+      =\frac{2}{1+x_0}.
+  \end{aligned}
+  \tag{2.66}\label{eq:2.66}
+\end{equation*}
+由式~\eqref{eq:2.66} 可知
+\begin{equation*}
+  (1-u^2-v^2)^2=\frac{4}{(1+x_0)^2}.
+  \tag{2.67}\label{eq:2.67}
+\end{equation*}
+
+% PDF p. 75
+于是
+\begin{equation*}
+  \frac{4}{(1-u^2-v^2)^2}=(1+x_0)^2.
+  \tag{2.68}\label{eq:2.68}
+\end{equation*}
+可以证明
+\begin{equation*}
+  du^2+dv^2=\frac{1}{(1+x_0)^2}\varnothing^*g(\rho,w).
+  \tag{2.69}\label{eq:2.69}
+\end{equation*}
+$D^2$ 上的黎曼度量为
+\begin{equation*}
+  g=\frac{4}{(1-u^2-v^2)^2}(du^2+dv^2).
+  \tag{2.70}\label{eq:2.70}
+\end{equation*}
+\end{statement}

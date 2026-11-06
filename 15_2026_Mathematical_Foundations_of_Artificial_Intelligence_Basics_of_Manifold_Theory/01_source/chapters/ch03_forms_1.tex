@@ -1,0 +1,228 @@
+% PDF pp. 99–105
+\section{引言}
+\label{sec:3.1}
+
+引入微分形式的动机，源于最简单的积分概念，即一元黎曼积分（single-variable Riemann integral）。用它可以计算一个区间上曲线 $y=f(x)$ 下方的面积。这种方法适用于一维的基本函数。到了更高维，尤其是在处理曲线、曲面或复杂的几何对象时，积分的概念就更难刻画了。微分形式提供了一个与坐标无关的统一框架，把在空间上积分的思想推广到各种类型的空间。它将曲线下方面积这一直观概念推广为更抽象的体积、通量（flux）和环量（circulation），使我们可以用一致而简洁的方法系统地在曲线、曲面以及更一般的对象上积分。微分几何、物理和工程等领域经常需要在较复杂的空间上积分，因此这种推广十分重要（Mazurowski 2025）。
+
+\begin{statement}{例 3.1}{}
+设 $I$ 为实直线上的一个区间，$f\colon I\to\R$ 为连续函数。我们想计算积分
+\[
+  \int_I f(x)\,dx.
+\]
+图 \ref{fig:3.1} 画出了 $f(x)=e^x$ 在 $[0,1]$ 上的图像下方的面积。曲线表示函数 $f(x)$，阴影部分表示从 $x=0$ 到 $x=1$ 的曲线下方面积。阴影的面积就是 $f(x)$ 在这个区间上的积分，它直观地显示了什么是“曲线下方的面积”。
+\end{statement}
+
+% PDF p. 100
+\begin{figure}[tbp]
+\centering
+\input{assets/ch03/fig03_01}
+\FigureCaption{3.1}{函数 $f(x)=e^x$ 在 $[0,1]$ 上的图像下方的面积。}
+\end{figure}
+
+% PDF p. 99
+\begin{statement}{例 3.2}{}
+考虑连续函数 $f(x,y,z)=x^2+y^2$。求 $f$ 在单位球面 $S^2$ 上的平均值。
+
+连续函数 $f(x,y,z)$ 在球面 $S^2$ 上的平均值可用下式计算
+\[
+  f\text{ 的平均值}
+  =\frac{1}{\operatorname{Area}(S^2)}\int_{S^2} f\,dS,
+\]
+其中 $dS$ 是 $S^2$ 上的面积元（area element），$\operatorname{Area}(S^2)$ 是单位球面 $S^2$ 的总表面积。单位球面 $S^2$ 由满足 $x^2+y^2+z^2=1$ 的所有点构成。
+
+% PDF p. 100
+\textbf{对于函数 $f(x,y,z)=x^2+y^2$}
+\begin{itemize}
+\item 单位球面 $S^2$ 的总面积为 $4\pi$。
+\item $S^2$ 上的积分可以用球面坐标（spherical coordinates）$(\theta,\varnothing)$ 表示，其中
+\[
+\begin{gathered}
+  x=\sin\theta\cos\varnothing,\quad
+  y=\sin\theta\sin\varnothing,\quad z=\cos\theta,\\
+  \theta\in[0,\pi],\quad \varnothing\in[0,2\pi].
+\end{gathered}
+\]
+\end{itemize}
+于是，该积分化为
+\begin{align*}
+ \int_{S^2} f\,ds
+ &=\int_0^{2\pi}\!\!\int_0^\pi
+   (\sin^2\theta\cos^2\varnothing+\sin^2\theta\sin^2\varnothing)
+   \sin\theta\,d\theta\,d\varnothing\\
+ &=\int_0^{2\pi}\!\!\int_0^\pi\sin^3\theta\,d\theta\,d\varnothing\\
+ &=2\pi\int_0^\pi\sin^3\theta\,d\theta\\
+ &=-2\pi\int_0^\pi\sin^2\theta\,d(\cos\theta)\\
+ &=-2\pi\int_1^{-1}(1-x^2)\,dx\\
+ &=\frac{8\pi}{3}.
+\end{align*}
+因而 $f$ 的平均值为 $\dfrac{1}{4\pi}\dfrac{8\pi}{3}=\dfrac{2}{3}$。
+\end{statement}
+
+% PDF p. 101
+\section{\texorpdfstring{$\R^n$}{Rⁿ} 中的微分 1-形式}
+\label{sec:3.2}
+\subsection{引言}
+
+直观地说，$\R^n$ 中的微分 1-形式（differential 1-form）可以看成一个函数，它在空间各点对微小的位移或移动给出一个“度量值”。具体而言，在 $\R^n$ 的每一点 $P$，1-形式接收一个小向量（或移动方向），返回一个数。这个数可以解释为某个量沿该向量的变化率。
+
+\begin{statement}{定义 3.1}{微分 1-形式（非正式定义）}
+$\R^n$ 上的微分 1-形式是一条规则，它以适当的方式给 $\R^n$ 中每条有向线段赋一个数。
+
+更形式化地说，$\R^n$ 中的微分 1-形式 $\omega$ 可以表示为各坐标微分的线性组合
+\[
+  \omega=f_1(x)\,dx_1+f_2(x)\,dx_2+\cdots+f_n(x)\,dx_n,
+\]
+其中每个 $f_i(x)$ 都是坐标的光滑函数，$dx_i$ 表示第 $i$ 个坐标方向的无穷小变化。
+\end{statement}
+
+\Subheading{基本思想}
+\begin{itemize}
+\item \textbf{度量变化。} 1-形式度量一个量沿特定方向移动一小段距离时的变化。
+\item \textbf{对微小位移线性。} 对于点 $P$ 处的小向量（或位移）$v$，1-形式 $\omega$ 返回的数是 $v$ 各分量的线性组合。
+\item \textbf{示例。} 在 $\R^2$ 中，可以将一个 1-形式写成 $\omega=f_1(x,y)\,dx+f_2(x,y)\,dy$。在点 $(x_0,y_0)$，沿向量 $v=(v_x,v_y)$ 所给的方向移动时，1-形式 $\omega$ 给出的数形如
+\[
+  \omega(v)=f_1(x_0,y_0)v_x+f_2(x_0,y_0)v_y.
+\]
+这个数反映形式 $\omega$ 沿向量 $v$ 的变化。
+\end{itemize}
+因此，微分 1-形式可以根据无穷小位移在 $\R^n$ 中的方向和位置给它赋予权重。
+
+\begin{statement}{例 3.3}{}
+考虑向量场 $F\colon\R^n\to\R^n$。把 $F$ 看作一个力场（force field），则处于位置 $p$ 的粒子受到一个大小和方向由 $F(p)$ 给出的力。粒子在这种力场中运动时，力会对粒子做一定的功。如果力 $F$ 助推运动，它所做的功为正。如果力 $F$ 阻碍运动，它所做的功为负。力场 $F$ 是 $\R^n$ 中的向量场，给 $\R^n$ 中每一点 $p$ 赋一个力向量。研究力场对沿路径运动的粒子所做的功时，我们希望刻画在路径的每一点上力与运动的相互作用。这就是 1-形式的用武之地。这种计算也称为第二类曲线积分（line integral of the second kind）。
+\end{statement}
+
+% PDF p. 102
+\subsection{与力场对应的微分 1-形式}
+
+我们可以给向量场 $F$ 配上一个微分 1-形式 $\omega$。这个 1-形式表示力场在每一点所做的“功”。
+
+\begin{statement}{定义 3.2}{与力场对应的微分 1-形式}
+给定力场 $\symbf{F}=(F_1,F_2,\dots,F_n)$，其中每个 $F_i$ 都是坐标 $(x_1,x_2,\dots,x_n)$ 的函数，定义与之对应的微分 1-形式 $\omega$ 为
+\[
+  \omega=F_1\,dx_1+F_2\,dx_2+\cdots+F_n\,dx_n.
+\]
+式中
+\begin{itemize}
+\item $F_i$ 是向量场 $\symbf{F}$ 的第 $i$ 个分量。
+\item $dx_i$ 表示第 $i$ 个坐标方向的无穷小变化。
+\end{itemize}
+\end{statement}
+
+\Subheading{1-形式 $\omega$ 的直观意义}
+当粒子发生无穷小位移 $(dx_1,dx_2,\dots,dx_n)$ 时，1-形式 $\omega$ 描述力场 $\symbf{F}$ 做了多少“功”。粒子沿路径运动时，$\omega$ 度量 $\symbf{F}$ 在这条路径的无穷小线段上所做的无穷小功。
+
+\Subheading{计算沿路径所做的功}
+如果粒子沿由 $t$ 参数化的路径 $\gamma(t)$ 运动（$t$ 从 $a$ 变到 $b$），则 $\symbf{F}$ 沿这条路径所做的总功由 1-形式 $\omega$ 沿 $\gamma$ 的积分给出
+\[
+  \text{功}=\int_\gamma\omega.
+\]
+具体来说，令 $\gamma(t)=(x_1(t),x_2(t),\dots,x_n(t))$，则沿路径的无穷小位移为
+\[
+  d\gamma=\left(\frac{dx_1}{dt},\frac{dx_2}{dt},\dots,\frac{dx_n}{dt}\right)dt.
+\]
+因此 $\symbf{F}$ 所做的功为
+\[
+  \text{功}=\int_a^b\left(F_1\frac{dx_1}{dt}+F_2\frac{dx_2}{dt}+\cdots+F_n\frac{dx_n}{dt}\right)dt.
+\]
+1-形式 $\omega$ 概括了力场与运动之间的相互作用，提供了一种数学工具来度量 $\symbf{F}$ 对在 $\R^n$ 中运动的粒子所做的功。
+
+% PDF p. 103
+\begin{statement}{例 3.4}{}
+给定光滑函数 $f\colon\R^n\to\R$，在 $\R^n$ 上定义如下的微分 1-形式 $df$。
+\end{statement}
+
+\begin{statement}{定义 3.3}{作为函数微分 $df$ 的微分 1-形式}
+微分 1-形式 $df$ 由下式给出
+\[
+  df=\frac{\partial f}{\partial x_1}\,dx_1
+     +\frac{\partial f}{\partial x_2}\,dx_2
+     +\cdots+\frac{\partial f}{\partial x_n}\,dx_n.
+\]
+\end{statement}
+
+\Subheading{说明}
+\begin{itemize}
+\item $\dfrac{\partial f}{\partial x_i}$ 表示函数 $f$ 关于第 $i$ 个坐标 $x_i$ 的偏导数。
+\item $dx_i$ 表示第 $i$ 个坐标的无穷小变化。
+\end{itemize}
+
+\subsection{沿光滑曲线积分 1-形式}
+注意，按定义，1-形式只给线段赋值。不过，原则上也应该能给光滑曲线赋值。
+
+要定义沿光滑曲线的 1-形式积分，我们需要把给无穷小线段赋值的思想推广到 $\R^n$ 中的连续光滑曲线。
+
+\subsubsection{沿曲线积分 1-形式}
+设 $\R^n$ 上的 1-形式 $\omega$ 定义为
+\[
+  \omega=f_1(x)\,dx_1+f_2(x)\,dx_2+\cdots+f_n(x)\,dx_n,
+\]
+其中每个 $f_i(x)$ 都是光滑函数，$x=(x_1,x_2,\dots,x_n)$ 表示 $\R^n$ 中的坐标。
+
+设 $\gamma\colon[a,b]\to\R^n$ 是以变量 $t$ 为参数的光滑曲线，可表示为
+\[
+  \gamma(t)=(x_1(t),x_2(t),\dots,x_n(t)),\quad t\in[a,b].
+\]
+
+\begin{statement}{定义 3.4}{$\omega$ 沿 $\gamma$ 的积分}
+1-形式 $\omega$ 沿曲线 $\gamma$ 的积分定义为
+\[
+  \int_\gamma\omega=\int_a^b
+  \left[f_1(\gamma(t))\frac{dx_1}{dt}
+       +f_2(\gamma(t))\frac{dx_2}{dt}
+       +\cdots+f_n(\gamma(t))\frac{dx_n}{dt}\right]dt.
+\]
+\end{statement}
+
+% PDF p. 104
+\Subheading{说明}
+\begin{enumerate}
+\item \textbf{把 1-形式拉回到曲线上。} 曲线 $\gamma$ 给出一个参数化，使得每个坐标 $x_i$ 的变化都能表示为 $t$ 的函数，即写成 $dx_i=\dfrac{dx_i}{dt}\,dt$。
+\item \textbf{代入 1-形式。} 代入 $dx_i$ 的表达式，就把 1-形式转换为对参数 $t$ 积分的形式。
+\item \textbf{按 1-形式的分量加权。} 被积表达式中的每一项都表示 1-形式 $\omega$ 沿曲线的贡献，权重取决于曲线沿相应坐标方向的变化。
+\end{enumerate}
+
+\Subheading{直观解释}
+沿曲线 $\gamma$ 积分 1-形式 $\omega$，就是在曲线穿过空间时，把 $\omega$ 的无穷小贡献加起来。1-形式 $\omega$ 度量曲线上每一点的无穷小变化，积分则沿整条 $\gamma$ 累加这些贡献。
+
+\begin{statement}{例 3.5}{$\R^2$ 中的例子}
+设 $\omega=P(x,y)\,dx+Q(x,y)\,dy$ 是 $\R^2$ 中的 1-形式，令 $\gamma(t)=(x(t),y(t))$，其中 $t\in[a,b]$。那么 $\omega$ 沿 $\gamma$ 的积分为
+\[
+  \int_\gamma\omega=\int_a^b
+  \left[P(x(t),y(t))\frac{dx}{dt}+Q(x(t),y(t))\frac{dy}{dt}\right]dt.
+\]
+这相当于沿曲线 $\gamma$ 从 $t=a$ 运动到 $t=b$ 时，求 1-形式 $\omega$ 的总累积量。
+
+这一过程将 1-形式给线段赋值的思想推广到连续光滑曲线。
+\end{statement}
+
+\begin{statement}{例 3.6}{}
+考虑函数 $f(x,y,z)=xyz$。于是
+\[
+  df=yz\,dx+xz\,dy+xy\,dz,
+\]
+\[
+  df_{(1,0,1)}(1,2,1)^T=0*1+1*1*2+0*1=2.
+\]
+\end{statement}
+
+\begin{statement}{例 3.7}{}
+考虑光滑函数 $f\colon\R^n\to\R$。对于任意曲线 $\gamma\colon[a,b]\to\R^n$，有
+\[
+  \int_\gamma df=f(\gamma(b))-f(\gamma(a)).
+\]
+% PDF p. 105
+\textbf{证明}
+\begin{align*}
+  \int_\gamma df
+   &=\int_a^b
+      \left[\frac{\partial f(\gamma(t))}{\partial x_1}\frac{dx_1}{dt}
+          +\frac{\partial f(\gamma(t))}{\partial x_2}\frac{dx_2}{dt}
+          +\cdots+\frac{\partial f(\gamma(t))}{\partial x_n}\frac{dx_n}{dt}\right]dt,\\
+   &=\int_a^b
+      \left[\frac{\partial f(\gamma(t))}{\partial\gamma_1}\frac{d\gamma_1}{dt}
+          +\frac{\partial f(\gamma(t))}{\partial\gamma_2}\frac{d\gamma_2}{dt}
+          +\cdots+\frac{\partial f(\gamma(t))}{\partial\gamma_n}\frac{d\gamma_n}{dt}\right]dt,\\
+   &=\int_a^b\frac{df(\gamma(t))}{dt}\,dt,\\
+   &=\left.f(\gamma(t))\right|_a^b=f(\gamma(b))-f(\gamma(a)).
+\end{align*}
+\end{statement}

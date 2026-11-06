@@ -1,0 +1,417 @@
+% PDF p. 117
+\section{微分形式积分的数学公式}
+\label{sec:3.6}
+在流形上对微分形式积分，推广了微积分中曲线积分、曲面积分和体积分的概念。微分形式提供了与坐标无关的方法，可以在曲线、曲面和更高维流形上积分。
+
+% PDF p. 118
+\subsection{曲线上的 1-形式积分（曲线积分）}
+\subsubsection{数学公式}
+给定由 $\gamma\colon[a,b]\to\R^n$ 参数化的光滑曲线 $C$ 和微分 1-形式 $\omega$，$\omega$ 在 $C$ 上的曲线积分为
+\[
+  \int_C\omega=\int_a^b\omega_{\gamma(t)}\bigl(\gamma'(t)\bigr)\,dt.
+\]
+\noindent\textbf{说明}\par
+$\gamma(t)$ 是曲线 $C$ 的参数化，其中 $t\in[a,b]$。$\gamma'(t)$ 是 $\gamma$ 关于 $t$ 的导数，表示曲线在点 $\gamma(t)$ 处的切向量。$\omega_{\gamma(t)}(\gamma'(t))$ 是点 $\gamma(t)$ 处的 1-形式 $\omega$ 作用在切向量 $\gamma'(t)$ 上的值。
+
+下面给出详细的计算步骤。
+
+\noindent\textbf{详细步骤}
+\begin{enumerate}
+\item \textbf{参数化曲线。}
+\[
+  \gamma(t)=(x^1(t),x^2(t),\dots,x^n(t)).
+\]
+\item \textbf{计算切向量。}
+\[
+  \gamma'(t)=\left(\frac{dx^1}{dt},\frac{dx^2}{dt},\dots,\frac{dx^n}{dt}\right).
+\]
+\item \textbf{写出 1-形式 $\omega$。}
+\[
+  \omega=\omega_i\,dx^i.
+\]
+\item \textbf{计算 $\omega$ 作用在 $\gamma'(t)$ 上的值。}
+\[
+  \omega_{\gamma(t)}(\gamma'(t))=\omega_i(\gamma(t))\frac{dx^i}{dt}.
+\]
+\item \textbf{在区间 $[a,b]$ 上积分。}
+\[
+  \int_C\omega=\int_a^b\omega_i(\gamma(t))\frac{dx^i}{dt}\,dt.
+\]
+\end{enumerate}
+
+\begin{statement}{例 3.14}{}
+设 $\omega=y\,dx+x\,dy$ 是 $\R^2$ 中的形式，$C$ 是由 $\gamma(t)=(t,t^2)$、$t\in[0,1]$ 参数化的曲线。
+\begin{enumerate}
+\item \textbf{计算 $\gamma'(t)$。}
+\[
+  \gamma'(t)=(1,2t).
+\]
+\item \textbf{计算 $\omega$ 作用在 $\gamma'(t)$ 上的值。}
+\[
+  \omega_{\gamma(t)}(\gamma'(t))=y(t)\cdot 1+x(t)\cdot(2t)
+    =t^2\cdot 1+t\cdot(2t)=3t^2.
+\]
+% PDF p. 119
+\item \textbf{积分。}
+\[
+  \int_C\omega=\int_0^1 3t^2\,dt=\left.t^3\right|_0^1=1.
+\]
+\end{enumerate}
+\end{statement}
+
+\subsubsection{曲面上的 2-形式积分（曲面积分）}
+\noindent\textbf{数学公式}\par
+给定由 $\sigma\colon D\subset\R^2\to\R^n$ 参数化的光滑有向曲面 $S$ 及微分 2-形式 $\omega$，$\omega$ 在 $S$ 上的曲面积分为
+\[
+  \int_S\omega=\int_D\omega_{\sigma(u,v)}
+  \left(\frac{\partial\sigma}{\partial u},\frac{\partial\sigma}{\partial v}\right)du\,dv.
+\]
+\noindent\textbf{说明}
+\begin{itemize}
+\item $\sigma(u,v)$ 是定义域 $D$ 上曲面 $S$ 的参数化。切向量 $\dfrac{\partial\sigma}{\partial u}$ 和 $\dfrac{\partial\sigma}{\partial v}$ 张成 $S$ 上各点的切平面。
+\item $\omega_{\sigma(u,v)}\left(\dfrac{\partial\sigma}{\partial u},\dfrac{\partial\sigma}{\partial v}\right)$ 是点 $\sigma(u,v)$ 处的 2-形式 $\omega$ 作用在这对切向量上的值。
+\end{itemize}
+
+\noindent\textbf{详细步骤}
+\begin{enumerate}
+\item \textbf{参数化曲面。}
+\[
+  \sigma(u,v)=(x^1(u,v),x^2(u,v),\dots,x^n(u,v)).
+\]
+\item \textbf{计算切向量。}
+\[
+  \frac{\partial\sigma}{\partial u},\quad \frac{\partial\sigma}{\partial v}.
+\]
+\item \textbf{写出 2-形式 $\omega$。}
+\[
+  \omega=\frac12\omega_{ij}\,dx^i\wedge dx^j.
+\]
+\item \textbf{计算 $\omega$ 作用在切向量上的值。}%
+\translatornote{若两式中的重复指标都遍历全部 $i,j$，右边也须乘以 $1/2$。若改为仅对 $i<j$ 求和，则右边的表达式成立。}%
+\[
+  \omega_{\sigma(u,v)}
+  \left(\frac{\partial\sigma}{\partial u},\frac{\partial\sigma}{\partial v}\right)
+  =\omega_{ij}(\sigma(u,v))
+  \left[\frac{\partial x^i}{\partial u}\frac{\partial x^j}{\partial v}
+       -\frac{\partial x^i}{\partial v}\frac{\partial x^j}{\partial u}\right].
+\]
+\item \textbf{在区域 $D$ 上积分。}
+\[
+  \int_S\omega=\int_D\left[\omega_{\sigma(u,v)}
+  \left(\frac{\partial\sigma}{\partial u},\frac{\partial\sigma}{\partial v}\right)\right]du\,dv.
+\]
+\end{enumerate}
+
+% PDF p. 120
+\begin{statement}{例 3.15}{}
+设 $\omega=x\,dy\wedge dz+y\,dz\wedge dx+z\,dx\wedge dy$ 为 $\R^3$ 中的形式，$S$ 为单位球面 $x^2+y^2+z^2=1$。
+\begin{enumerate}
+\item \textbf{用球面坐标参数化 $S$。}
+\[
+  \sigma(\theta,\varnothing)
+  =(\sin\varnothing\cos\theta,\sin\varnothing\sin\theta,\cos\varnothing),
+  \quad\theta\in[0,2\pi],\quad\varnothing\in[0,\pi].
+\]
+\item \textbf{计算切向量。}
+\[
+  \frac{\partial\sigma}{\partial\theta},\quad
+  \frac{\partial\sigma}{\partial\varnothing}.
+\]
+\begin{enumerate}[label=\alph*.]
+\item \textbf{关于 $\theta$ 的偏导数。}
+\[
+  \frac{\partial\sigma}{\partial\theta}
+    =\left(\frac{\partial x}{\partial\theta},\frac{\partial y}{\partial\theta},
+      \frac{\partial z}{\partial\theta}\right).
+\]
+计算各个分量
+\begin{gather*}
+  \frac{\partial x}{\partial\theta}=-\sin\varnothing\sin\theta,\qquad
+  \frac{\partial y}{\partial\theta}=\sin\varnothing\cos\theta,\qquad
+  \frac{\partial z}{\partial\theta}=0.
+\end{gather*}
+于是
+\[
+  \frac{\partial\sigma}{\partial\theta}
+    =(-\sin\varnothing\sin\theta,\sin\varnothing\cos\theta,0).
+\]
+\item \textbf{关于 $\varnothing$ 的偏导数。}
+\[
+  \frac{\partial\sigma}{\partial\varnothing}
+    =\left(\frac{\partial x}{\partial\varnothing},\frac{\partial y}{\partial\varnothing},
+      \frac{\partial z}{\partial\varnothing}\right).
+\]
+\end{enumerate}
+\item \textbf{计算各个分量。}%
+\translatornote{第二项按原书保留。由 $y=\sin\varnothing\sin\theta$ 得 $\partial y/\partial\varnothing=\cos\varnothing\sin\theta$，下文的向量使用了这一正确分量。}%
+\begin{gather*}
+  \frac{\partial x}{\partial\varnothing}=\cos\varnothing\cos\theta,\qquad
+  \frac{\partial y}{\partial\varnothing}=\cos\varnothing\cos\theta,\qquad
+  \frac{\partial z}{\partial\varnothing}=-\sin\varnothing.
+\end{gather*}
+于是
+\[
+  \frac{\partial\sigma}{\partial\varnothing}
+    =(\cos\varnothing\cos\theta,\cos\varnothing\sin\theta,-\sin\varnothing).
+\]
+\end{enumerate}
+
+\noindent\textbf{步骤 3。计算 $\omega$ 作用在切向量上的值。}\par
+需要计算
+\[
+  \omega_{\sigma(u,v)}\left(\frac{\partial\sigma}{\partial u},\frac{\partial\sigma}{\partial v}\right).
+\]
+
+% PDF p. 121
+\noindent\textbf{点 $\sigma(\theta,\varnothing)$ 处的各分量}\par
+在点 $\sigma(\theta,\varnothing)$ 处，
+\begin{gather*}
+  x=\sin\varnothing\cos\theta,\qquad
+  y=\sin\varnothing\sin\theta,\qquad z=\cos\varnothing.
+\end{gather*}
+
+\noindent\textbf{计算微分形式作用在切向量上的值}
+\begin{itemize}
+\item 对于 2-形式 $\omega$，它作用在两个向量 $u,v$ 上的值为
+\[
+  \omega(u,v)=\omega_{ij}u^iv^j.
+\]
+\item 但这里 $\omega$ 由楔积给出，所以可以计算%
+\translatornote{原书末项漏写 $(u,v)$。以下第三项的计算中补有这两个自变量。}%
+\[
+  \omega(u,v)=x(dy\wedge dz)(u,v)+y(dz\wedge dx)(u,v)+z(dx\wedge dy).
+\]
+\end{itemize}
+
+令
+\[
+  u=\frac{\partial\sigma}{\partial\theta}=(u_x,u_y,u_z),\qquad
+  v=\frac{\partial\sigma}{\partial\varnothing}=(v_x,v_y,v_z).
+\]
+\noindent\textbf{计算 $u$ 和 $v$ 的各分量}
+\begin{align*}
+  u_x&=-\sin\varnothing\sin\theta,& v_x&=\cos\varnothing\cos\theta,\\
+  u_y&=\sin\varnothing\cos\theta,& v_y&=\cos\varnothing\sin\theta,\\
+  u_z&=0,& v_z&=-\sin\varnothing.
+\end{align*}
+
+\noindent\textbf{计算各微分作用在向量上的值}
+\begin{gather*}
+  dx(u)=u_x,\quad dy(u)=u_y,\quad dz(u)=u_z,\\
+  dx(v)=v_x,\quad dy(v)=v_y,\quad dz(v)=v_z.
+\end{gather*}
+
+\noindent\textbf{第一项 $x(dy\wedge dz)(u,v)$}\par
+计算 $(dy\wedge dz)(u,v)$
+\[
+  (dy\wedge dz)(u,v)=dy(u)dz(v)-dy(v)dz(u)=u_yv_z-v_yu_z.
+\]
+代入各值
+\[
+  u_y=\sin\varnothing\cos\theta,\qquad
+% PDF p. 122
+  v_z=-\sin\varnothing,\qquad v_y=\cos\varnothing\sin\theta,\qquad u_z=0.
+\]
+计算得
+\begin{align*}
+  (dy\wedge dz)(u,v)&=u_yv_z-v_yu_z\\
+     &=\sin\varnothing\cos\theta(-\sin\varnothing)
+       -\cos\varnothing\sin\theta(0)=-\sin^2\varnothing\cos\theta.
+\end{align*}
+乘以 $x$
+\[
+  x(dy\wedge dz)(u,v)=\sin\varnothing\cos\theta(-\sin^2\varnothing\cos\theta)
+  =-\sin^3\varnothing\cos^2\theta.
+\]
+
+\noindent\textbf{第二项 $y(dz\wedge dx)(u,v)$}\par
+计算 $(dz\wedge dx)(u,v)$
+\[
+  (dz\wedge dx)(u,v)
+  =\begin{vmatrix}
+    \dfrac{\partial z}{\partial\theta}&\dfrac{\partial x}{\partial\theta}\\[5pt]
+    \dfrac{\partial z}{\partial\varnothing}&\dfrac{\partial x}{\partial\varnothing}
+   \end{vmatrix}
+  =\begin{vmatrix}u_z&u_x\\v_z&v_x\end{vmatrix}
+  =u_zv_x-u_xv_z.
+\]
+代入各值
+\[
+  u_z=0,\qquad v_x=\cos\varnothing\cos\theta,\qquad
+  v_z=-\sin\varnothing,\qquad u_x=-\sin\varnothing\sin\theta.
+\]
+计算得
+\begin{align*}
+  (dz\wedge dx)(u,v)&=(0)(\cos\varnothing\cos\theta)
+    -(-\sin\varnothing\sin\theta)(-\sin\varnothing)\\
+    &=-\sin^2\varnothing\sin\theta.
+\end{align*}
+乘以 $y$
+\[
+  y(dz\wedge dx)(u,v)=(\sin\varnothing\sin\theta)(-\sin^2\varnothing\sin\theta)
+    =-\sin^3\varnothing\sin^2\theta.
+\]
+
+\noindent\textbf{第三项 $z(dx\wedge dy)(u,v)$}\par
+计算得
+\[
+  (dx\wedge dy)(u,v)
+  =\begin{vmatrix}
+    \dfrac{\partial x}{\partial\theta}&\dfrac{\partial y}{\partial\theta}\\[5pt]
+    \dfrac{\partial x}{\partial\varnothing}&\dfrac{\partial y}{\partial\varnothing}
+   \end{vmatrix}
+  =u_xv_y-v_xu_y.
+\]
+代入各值
+\begin{itemize}
+\item $u_x=-\sin\varnothing\sin\theta$。
+% PDF p. 123
+\item $v_y=\cos\varnothing\sin\theta$。
+\item $v_x=\cos\varnothing\cos\theta$。
+\item $u_y=\sin\varnothing\cos\theta$。
+\end{itemize}
+计算得
+\begin{align*}
+  (dx\wedge dy)(u,v)&=(-\sin\varnothing\sin\theta)(\cos\varnothing\sin\theta)\\
+    &\quad-(\cos\varnothing\cos\theta)(\sin\varnothing\cos\theta)\\
+    &=-\sin\varnothing\cos\varnothing.
+\end{align*}
+乘以 $z$
+\[
+  z(dx\wedge dy)(u,v)=\cos\varnothing(-\sin\varnothing\cos\varnothing)
+  =-\sin\varnothing\cos^2\varnothing.
+\]
+把各项相加，得到
+\begin{align*}
+  \omega(u,v)&=-\sin^3\varnothing\cos^2\theta
+    -\sin^3\varnothing\sin^2\theta-\sin\varnothing\cos^2\varnothing\\
+    &=-\sin\varnothing(\sin^2\varnothing+\cos^2\varnothing)=-\sin\varnothing.
+\end{align*}
+
+\noindent\textbf{步骤 5。在参数区域上积分。}\par
+计算曲面积分%
+\translatornote{原书两重积分的上下限与微分次序颠倒，下一行实际采用 $\theta\in[0,2\pi]$、$\varnothing\in[0,\pi/2]$，即只积分上半球面。按 $(u,v)=(\partial_\theta\sigma,\partial_\varnothing\sigma)$ 的顺序，$u\times v=-\sin\varnothing\,\sigma$ 指向球内。故 $-2\pi$ 为上半球面按内向定向的通量，整球按同一定向的通量为 $-4\pi$。}%
+\begin{align*}
+  \text{通量}&=\int_S\omega
+   =\int_0^{\pi/2}\int_0^{2\pi}\omega(u,v)\,d\varnothing\,d\theta
+   =\int_0^{\pi/2}\int_0^{2\pi}(-\sin\varnothing)\,d\varnothing\,d\theta\\
+   &=2\pi\int_0^{\pi/2}(-\sin\varnothing)\,d\varnothing
+   =\left.2\pi\cos\varnothing\right|_0^{\pi/2}=-2\pi.
+\end{align*}
+
+\noindent\textbf{步骤 6。解释结果。}\par
+负号表示通量相对于曲面定向的方向。由于在参数化中 $\varnothing$ 从 $0$ 增至 $\pi/2$，定向朝上，负通量表明相对于这一定向，净流量指向内部。
+\end{statement}
+
+\subsection{高维积分（在 \texorpdfstring{$k$}{k} 维流形上积分 \texorpdfstring{$k$}{k}-形式）}
+\subsubsection{数学公式}
+给定由 $\psi\colon D\subset\R^k\to\R^n$ 参数化的光滑有向 $k$ 维流形 $M$ 及微分 $k$-形式 $\omega$，$\omega$ 在 $M$ 上的积分为
+\[
+  \int_M\omega=\int_D\omega_{\psi(u^1,u^2,\dots,u^k)}
+  \left(\frac{\partial\psi}{\partial u^1},\frac{\partial\psi}{\partial u^2},
+  \dots,\frac{\partial\psi}{\partial u^k}\right)du^1\cdots du^k.
+\]
+
+% PDF p. 124
+\paragraph{说明}
+\begin{itemize}
+\item $\psi(u^1,u^2,\dots,u^k)$ 是流形 $M$ 的参数化。
+\item $\dfrac{\partial\psi}{\partial u^i}$ 是 $M$ 上各点处的切向量。
+\item $\omega_{\psi(u^1,u^2,\dots,u^k)}
+  \left(\dfrac{\partial\psi}{\partial u^1},\dfrac{\partial\psi}{\partial u^2},
+  \dots,\dfrac{\partial\psi}{\partial u^k}\right)$ 是点 $\psi(u^1,u^2,\dots,u^k)$
+  处的 $k$-形式 $\omega$ 作用在这 $k$ 个切向量上的值。
+\end{itemize}
+
+\paragraph{详细步骤}
+\begin{enumerate}
+\item \textbf{参数化流形。}
+\[
+  \psi(u^1,u^2,\dots,u^k)=(x^1(u),x^2(u),\dots,x^n(u)).
+\]
+\item \textbf{计算切向量。}
+\[
+  \frac{\partial\psi}{\partial u^1},\quad\frac{\partial\psi}{\partial u^2},
+   \quad\dots,\quad\frac{\partial\psi}{\partial u^k}.
+\]
+\item \textbf{写出 $k$-形式 $\omega$。}
+\[
+  \omega=\frac{1}{k!}\omega_{i_1i_2\dots i_k}\,
+  dx^{i_1}\wedge dx^{i_2}\wedge\cdots\wedge dx^{i_k}.
+\]
+\item \textbf{计算 $\omega$ 作用在切向量上的值。}
+\[
+  \omega_{\psi(u)}
+  \left(\frac{\partial\psi}{\partial u^1},\frac{\partial\psi}{\partial u^2},
+  \dots,\frac{\partial\psi}{\partial u^k}\right)
+  =\omega_{i_1i_2\dots i_k}
+  \left(\frac{\partial x^{i_1}}{\partial u^1}
+       \frac{\partial x^{i_2}}{\partial u^2}\cdots
+       \frac{\partial x^{i_k}}{\partial u^k}\right).
+\]
+（对排列作反对称化。）
+\item \textbf{在区域 $D$ 上积分。}%
+\translatornote{这里的行列式应理解为雅可比子矩阵
+  $\left[\partial\psi^{i_a}/\partial u^b\right]_{a,b=1}^k$ 的行列式。}%
+\[
+  \int_D\left[\omega_{\psi(u)}
+  \left(\frac{\partial\psi}{\partial u^1},\frac{\partial\psi}{\partial u^2},
+  \dots,\frac{\partial\psi}{\partial u^k}\right)\right]du^1\,du^2\cdots du^k,
+\]
+\begin{align*}
+  \omega_{\psi(u)}&\left(\frac{\partial\psi}{\partial u^1},
+   \frac{\partial\psi}{\partial u^2},\dots,\frac{\partial\psi}{\partial u^k}\right)\\
+  &=\sum_{1\le i_1<\cdots<i_k\le n}\omega_{i_1i_2\dots i_k}(\psi(u))\,
+    \det\left(\frac{\partial\psi^{i_1}}{\partial u^1},
+              \frac{\partial\psi^{i_2}}{\partial u^2},\dots,
+              \frac{\partial\psi^{i_k}}{\partial u^k}\right).
+\end{align*}
+当 $\omega=dx^1\wedge\cdots\wedge dx^k$ 时，就得到经典的雅可比行列式公式。
+\end{enumerate}
+
+\begin{statement}{例 3.16}{}
+下面在 $\R^3$ 中的一个三维流形上积分体积形式。
+\begin{itemize}
+\item \textbf{体积形式} $\omega=dx\wedge dy\wedge dz$。
+\item \textbf{流形 $M$。} 由 $x,y,z\in[0,1]$ 定义的单位立方体。
+\begin{enumerate}
+\item \textbf{参数化 $M$。}
+\[
+  \psi(u^1,u^2,u^3)=(u^1,u^2,u^3).
+\]
+% PDF p. 125
+\item \textbf{计算切向量。}
+\[
+  \frac{\partial\psi}{\partial u^1}=(1,0,0),\qquad
+  \frac{\partial\psi}{\partial u^2}=(0,1,0),\qquad
+  \frac{\partial\psi}{\partial u^3}=(0,0,1).
+\]
+\item \textbf{计算 $\omega$ 作用在切向量上的值。}
+\[
+  \omega_{\psi(u)}\left(\frac{\partial\psi}{\partial u^1},
+  \frac{\partial\psi}{\partial u^2},\frac{\partial\psi}{\partial u^3}\right)
+   =\begin{vmatrix}1&0&0\\0&1&0\\0&0&1\end{vmatrix}=1.
+\]
+\item \textbf{在 $D$ 上积分。}
+\[
+  \int_M\omega=\int_0^1\!\!\int_0^1\!\!\int_0^1
+   1\,du^1\,du^2\,du^3=1.
+\]
+\end{enumerate}
+\end{itemize}
+这验证了单位立方体的体积为 1。
+
+\noindent\textbf{要点}
+\begin{itemize}
+\item 微分形式提供了一种统一且与坐标无关的流形积分方法。
+\item 积分需要求出微分形式作用在各点处张成流形切空间的切向量上的值。
+\item 参数化 $\gamma,\sigma,\varnothing$ 把参数区域 $D$ 映到流形中。%
+\translatornote{原书此处印为 $\varnothing$。第 3.6.2 节中的参数化记为 $\psi$。}
+\end{itemize}
+
+\noindent\textbf{应用}
+\begin{itemize}
+\item \textbf{物理学。} 计算沿路径所做的功、通过曲面的通量，以及电磁学与流体动力学中的量。
+\item \textbf{数学。} 推广微积分基本定理和斯托克斯定理，并理解流形上的积分。
+\end{itemize}
+\end{statement}

@@ -1,0 +1,233 @@
+% PDF p. 125
+\section{斯托克斯定理}
+\label{sec:3.7}
+\subsection{经典斯托克斯定理}
+经典斯托克斯定理是向量微积分的基本结果。它将向量场的旋度在曲面上的曲面积分，与向量场沿该曲面边界的曲线积分联系起来。
+
+\subsubsection{经典斯托克斯定理的陈述}
+设 $S$ 是 $\R^3$ 中的有向光滑曲面，其边界 $\partial S$ 是一条取正向的分段光滑简单闭曲线。设 $\symbf{F}$ 是向量场，其分量在包含 $S$ 的开区域上有连续偏导数。则
+\[
+  \int_C\symbf{F}\cdot d\symbf{r}
+    =\int_S(\nabla\times\symbf{F})\cdot\symbf{n}\,dS,
+\]
+% PDF p. 126
+其中
+\begin{itemize}
+\item $F\,dr$ 表示 $F$ 沿 $C$ 的曲线积分，且 $F=(F_x,F_y,F_z)$。
+\item $\nabla\times F$ 是 $\symbf{F}$ 的旋度（curl），$\nabla=\left(\dfrac{\partial}{\partial x},\dfrac{\partial}{\partial y},\dfrac{\partial}{\partial z}\right)$。
+\item $\symbf{n}$ 是 $S$ 的单位法向量，其方向与 $C$ 的定向相容。
+\item $ds$ 是 $S$ 上的曲面面积微元。
+\end{itemize}
+
+\subsubsection{斯托克斯定理的证明}
+下面分几个步骤证明该定理。考虑 $\R^3$ 中光滑曲面 $S$ 上定义的向量场 $\symbf{F}$。
+\begin{enumerate}
+\item \textbf{曲面和边界的参数化。}
+\begin{enumerate}[label=\alph*.]
+\item \textbf{曲面 $S$。}
+设光滑曲面 $S$ 的参数化为
+\[
+  r(u,v)=(x(u,v),y(u,v),z(u,v)),
+\]
+其中 $(u,v)$ 在 $uv$ 平面上的区域 $D$ 中变动。
+\item \textbf{边界曲线 $C$。}
+边界 $C$ 是 $S$ 的边缘，其参数化为
+\[
+  r_C(t)=r(u(t),v(t)),\qquad t\in[a,b],
+\]
+其中 $(u(t),v(t))$ 沿 $uv$ 平面上的 $D$ 的边界描出一条曲线。
+\end{enumerate}
+\item \textbf{写出积分。}
+\begin{enumerate}[label=\alph*.]
+\item \textbf{沿 $C$ 的曲线积分。}
+$\symbf{F}$ 沿 $C$ 的曲线积分为
+\[
+  \int_C\symbf{F}\cdot d\symbf{r}
+    =\int_a^b\symbf{F}(\symbf{r}_C(t))\cdot\frac{d\symbf{r}_C(t)}{dt}\,dt.
+\]
+\item \textbf{在 $S$ 上的曲面积分。}
+$\nabla\times F$ 在 $S$ 上的曲面积分为
+\[
+  \int_S(\nabla\times F)\cdot n\,dS
+   =\int_S(\nabla\times F)(r(u,v))\cdot(r_u\times r_v)\,du\,dv,
+\]
+其中
+\[
+  r_u=\frac{\partial r}{\partial u},\qquad r_v=\frac{\partial r}{\partial v},
+\]
+% PDF p. 127
+\[
+  \symbf{n}\,dS=(r_u\times r_v)\,du\,dv.
+\]
+接下来，通过证明两个积分相等来证明该定理。
+\end{enumerate}
+\item \textbf{证明相等。}
+\begin{enumerate}[label=\alph*.]
+\item \textbf{向量恒等式。}
+使用如下向量恒等式%
+\translatornote{式中差的次序按原书保留。给定法向 $r_u\times r_v$ 时，由链式法则，右端应为
+  $\partial_u(\symbf{F}\cdot\symbf{r}_v)-\partial_v(\symbf{F}\cdot\symbf{r}_u)$。用这一顺序与 $\partial D$ 的正向一致。}%
+\[
+  \nabla\times\symbf{F}\cdot(\symbf{r}_u\times\symbf{r}_v)
+   =\frac{\partial}{\partial v}(\symbf{F}\cdot\symbf{r}_u)
+    -\frac{\partial}{\partial u}(\symbf{F}\cdot\symbf{r}_v).
+\]
+这个恒等式将 $\symbf{F}$ 的旋度与涉及 $\symbf{F}$ 的标量函数的导数联系起来。
+\item \textbf{应用恒等式。}
+考虑标量函数 $\varnothing(u,v)=\symbf{F}(\symbf{r}(u,v))\cdot(\symbf{r}_u(u,v))$。计算它对 $v$ 的偏导数
+\[
+  \frac{\partial\varnothing}{\partial v}
+  =\frac{\partial}{\partial v}(\symbf{F}\cdot\symbf{r}_u)
+  =\symbf{F}_v\cdot\symbf{r}_u+\symbf{F}\cdot\symbf{r}_{uv}.
+\]
+类似地，定义 $\psi(u,v)=\symbf{F}(\symbf{r}(u,v))\cdot\symbf{r}_v(u,v)$，计算 $\dfrac{\partial\psi}{\partial u}$
+\[
+  \frac{\partial\psi}{\partial u}
+  =\symbf{F}_u\cdot\symbf{r}_v+\symbf{F}\cdot\symbf{r}_{vu}.
+\]
+两导数相减，得到
+\[
+  \frac{\partial\varnothing}{\partial v}-\frac{\partial\psi}{\partial u}
+  =\nabla\times\symbf{F}\cdot(\symbf{r}_u\times\symbf{r}_v).
+\]
+\item \textbf{在 $D$ 上积分。}
+对两端在 $D$ 上积分
+\[
+  \int_D\left(\frac{\partial\varnothing}{\partial v}-\frac{\partial\psi}{\partial u}\right)\,du\,dv
+  =\int_D\nabla\times\symbf{F}\cdot(\symbf{r}_u\times\symbf{r}_v)\,du\,dv.
+\]
+左边化为
+\[
+  \int_D\left(\frac{\partial\varnothing}{\partial v}-\frac{\partial\psi}{\partial u}\right)\,du\,dv
+  =\int_D\frac{\partial\varnothing}{\partial v}\,du\,dv
+  -\int_D\frac{\partial\psi}{\partial u}\,du\,dv.
+\]
+交换第二项的积分次序，可写为
+\begin{align*}
+  \int_D\frac{\partial\varnothing}{\partial v}\,du\,dv
+     &-\int_D\frac{\partial\psi}{\partial u}\,du\,dv\\
+     &=\int_{u_1}^{u_2}\varnothing(u,v_2)\,du-\int_{u_1}^{u_2}\varnothing(u,v_1)\,du\\
+     &\quad-\int_{v_1}^{v_2}\psi(u_2,v)\,dv+\int_{v_1}^{v_2}\psi(u_1,v)\,dv.
+\end{align*}
+% PDF p. 128
+注意%
+\translatornote{上述逐边计算对应矩形 $[u_1,u_2]\times[v_1,v_2]$。原书 $\partial D$ 上两个积分均印作 $du\,dv$，它们是曲线积分，第一项的微分应为 $du$，第二项为 $dv$。两行左端按矩形的负向计算。}%
+\[
+  \int_{u_1}^{u_2}\varnothing(u,v_2)\,du-\int_{u_1}^{u_2}\varnothing(u,v_1)\,du
+   =\int_{\partial D}\varnothing(u,v)\,du\,dv
+\]
+及
+\[
+  -\int_{v_1}^{v_2}\psi(u_2,v)\,dv+\int_{v_1}^{v_2}\psi(u_1,v)\,dv
+    =\int_{\partial D}\psi(u,v)\,du\,dv.
+\]
+于是
+\begin{align*}
+  \int_D\left(\frac{\partial\varnothing}{\partial v}
+       -\frac{\partial\psi}{\partial u}\right)du\,dv
+   &=\int_{\partial D}\varnothing(u,v)\,du\,dv
+     +\int_{\partial D}\psi(u,v)\,du\,dv\\
+   &=\int_{\partial D}\symbf{F}(\symbf{r}(u,v))\cdot(\symbf{r}_u\,du+\symbf{r}_v\,dv).
+\end{align*}
+这等价于
+\[
+  \int_C F\cdot dr=\int_D\nabla\times F\cdot(r_u\times r_v)\,du\,dv.
+\]
+\item \textbf{结论。}
+由此证明了斯托克斯定理。%
+\translatornote{原书此处的右端积分域印作 $D$。用曲面面积元 $dS$ 时积分域应为 $S$，用 $du\,dv$ 时才在参数域 $D$ 上积分。}%
+\[
+  \int_C F\cdot dr=\int_D\nabla\times F\cdot n\,dS.
+\]
+\end{enumerate}
+\end{enumerate}
+
+\noindent\textbf{补充说明}
+\begin{itemize}
+\item \textbf{定向一致。} 为保证定理成立，参数化必须保持 $S$ 和 $C$ 的定向。
+\item \textbf{光滑性要求。} 向量场 $\symbf{F}$ 与曲面 $S$ 必须足够光滑（连续可微），以保证相关导数和积分存在。
+\item \textbf{推广。} 对由多个曲面片组成的曲面，可以分别考虑各片，然后把结果相加，从而推广这一证明。
+\end{itemize}
+
+\subsection{流形上的广义斯托克斯定理}
+广义斯托克斯定理统一了微分几何中的多项结果，推广了向量微积分中的几个经典定理，如微积分基本定理、格林定理（Green's theorem）、经典斯托克斯定理和散度定理。它为流形上的微分形式积分提供了框架，将流形上的积分与其边界上的积分联系起来。
+
+% PDF p. 129
+\subsubsection{广义斯托克斯定理的陈述}
+设 $M$ 是边界为 $\partial M$ 的 $n$ 维有向光滑流形，$\omega$ 是 $M$ 上的一个紧支撑光滑 $(n-1)$-形式。则
+\[
+  \int_M d\omega=\int_{\partial M}\omega.
+\]
+其中
+\begin{itemize}
+\item $d\omega$ 是 $\omega$ 的外微分。
+\item $\partial M$ 是流形 $M$ 的边界，取诱导定向。
+\item 两个积分分别在 $M$ 及其边界上计算。
+\end{itemize}
+
+\noindent\textbf{直观图景}
+\begin{itemize}
+\item \textbf{流动类比。} 设想一种流体流经 $M$。外微分 $d\omega$ 度量 $M$ 内的“源”或“汇”的强度，而 $\partial M$ 上的 $\omega$ 度量穿过边界的净“流量”。
+\item \textbf{边界积分。} $\partial M$ 上的积分给出 $\omega$ 沿边界的累积效应，类似于度量绕闭合路径的总环量。
+\end{itemize}
+
+\noindent\textbf{数学表示}\par
+设 $M$ 是边界为 $\partial M$ 的 $k$ 维有向光滑流形，$\omega$ 是 $M$ 上定义的一个 $(k-1)$-形式。斯托克斯定理断言
+\[
+  \int_{\partial M}\omega=\int_M d\omega,
+\]
+其中
+\begin{itemize}
+\item $\partial M$ 为流形 $M$ 的边界。
+\item $d\omega$ 是 $(k-1)$-形式 $\omega$ 的外微分，因而为一个 $k$-形式。
+\item $\displaystyle\int_{\partial M}\omega$ 是 $\omega$ 在边界 $\partial M$ 上的积分。
+\item $\displaystyle\int_M d\omega$ 是 $d\omega$ 在流形 $M$ 上的积分。
+\end{itemize}
+
+\subsubsection{特例}
+\paragraph{微积分基本定理}
+\begin{itemize}
+\item \textbf{一维流形。} 设 $M$ 是区间 $[a,b]$，$\omega$ 是一个 0-形式（函数）。
+\item \textbf{结论。}
+\[
+  \int_a^b df(x)=f(b)-f(a).
+\]
+\end{itemize}
+
+% PDF p. 130
+\paragraph{格林定理}
+\begin{itemize}
+\item \textbf{二维流形。} 设 $M$ 是 $\R^2$ 中的一个区域，$\omega=P(x,y)\,dx+Q(x,y)\,dy$ 为一个 1-形式。
+\item \textbf{结论。} 将沿简单闭曲线 $C$ 的曲线积分与区域 $D$ 上的二重积分联系起来。
+\end{itemize}
+
+对于 $\R^n$ 中的 1-形式 $\omega=P_i\,dx^i$，外微分 $d\omega$ 定义为
+\[
+  d\omega=d(P_i\,dx^i)=\sum_i dp_i\wedge dx^i.
+\]
+对于 $\omega=P(x,y)\,dx+Q(x,y)\,dy$，有
+\begin{align*}
+  d\omega&=d(P(x,y)\,dx)+d(Q(x,y)\,dy),\\
+  &=\left(\frac{\partial P}{\partial x}\,dx+\frac{\partial P}{\partial y}\,dy\right)\wedge dx
+    +\left(\frac{\partial Q}{\partial x}\,dx+\frac{\partial Q}{\partial y}\,dy\right)\wedge dy,\\
+  &=\frac{\partial P}{\partial y}\,dy\wedge dx+\frac{\partial Q}{\partial x}\,dx\wedge dy,\\
+  &=\left(\frac{\partial Q}{\partial x}-\frac{\partial P}{\partial y}\right)\,dx\wedge dy.
+\end{align*}
+因此
+\begin{equation*}
+  \oint_C P(x,y)\,dx+Q(x,y)\,dy
+  =\iint_D\left(\frac{\partial Q}{\partial x}-\frac{\partial P}{\partial y}\right)\,dx\,dy.
+  \tag{3.1}\label{eq:3.1}
+\end{equation*}
+
+\paragraph{经典斯托克斯定理}
+经典斯托克斯定理把向量场沿闭曲线的曲线积分，与该向量场的旋度在以该曲线为边界的曲面上的积分联系起来。设
+\begin{itemize}
+\item $S$ 是 $\R^3$ 中的有向光滑曲面，边界曲线为 $C=\partial S$。
+\item $\symbf{F}$ 是包含 $S$ 的开区域上定义的光滑向量场。
+\end{itemize}
+则经典斯托克斯定理给出
+\begin{equation*}
+  \int_C\mathrm{F}\cdot dr=\iint_S(\nabla\times\mathrm{F})\cdot dS.
+  \tag{3.2}\label{eq:3.2}
+\end{equation*}

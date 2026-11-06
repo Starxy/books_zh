@@ -1,6 +1,6 @@
 # 英文 PDF 底本分章总览
 
-当前保留 7 本 PDF 底本的分章文件，共 **134 个 PDF、3,116 页**。分章位于相应工程的原版目录中，原书页码映射见各书的分章清单或原版元数据。
+当前保留 8 本 PDF 底本的分章文件，共 **142 个 PDF、3,500 页**。分章位于相应工程的原版目录中，原书页码映射见各书的分章清单或原版元数据。
 
 Foundations of Large Language Models、Agentic Large Language Models、The Little Book of Generative AI Foundations 和 The Principles of Diffusion Models 均保留所提供的 TeX 源码包，按源码章节组织；英文整书 PDF 保留在各自 `00_originals/` 中。
 
@@ -212,6 +212,21 @@ Foundations of Large Language Models、Agentic Large Language Models、The Littl
 | appendix_c | Appendix C: Glossary | 55–56 | 2 | 51–52 |
 | appendix_d | Appendix D: Hardware Comparison | 57 | 1 | 53 |
 
+## 15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory
+
+底本为用户提供的 CRC Press 2026 年第一版电子 PDF。分章文件位于该书的 00_originals/split/。PDF 页序从 1 起计，附录、习题和参考文献随各章保留。
+
+| 文件 | 原书范围 | PDF 页序 | 页数 | 印刷页码 |
+|---|---|---:|---:|---|
+| frontmatter | Cover and front matter | 1–17 | 17 | Cover–xvi |
+| ch01 | Smooth Manifold | 18–57 | 40 | 1–40 |
+| ch02 | Riemannian Geometry | 58–98 | 41 | 41–81 |
+| ch03 | Differential Forms | 99–163 | 65 | 82–146 |
+| ch04 | Lie Derivatives | 164–222 | 59 | 147–205 |
+| ch05 | Advanced Topics in Riemannian Geometry | 223–271 | 49 | 206–254 |
+| ch06 | Statistical Theory on Manifolds | 272–375 | 104 | 255–358 |
+| index | Index | 376–384 | 9 | 359–367 |
+
 ## 汇总
 
 | 书籍 | 原版页数 | 章数 | 分章 PDF 数 |
@@ -223,6 +238,7 @@ Foundations of Large Language Models、Agentic Large Language Models、The Littl
 | 07_2026_Causal_Inference_What_If | 365 | 23 | 26 |
 | 13_2024_Large_Language_Models_A_Deep_Dive | 496 | 10 | 14 |
 | 14_2026_Efficient_LLM_Inference | 57 | 14 | 19 |
-| **合计** | **3116** | **105** | **134** |
+| 15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory | 384 | 6 | 8 |
+| **合计** | **3500** | **111** | **142** |
 
 分章文件已核对整书页序、文字和页数。中文源码在各书 `01_source/`，术语与校对记录保留在各书对应目录，完整中文译本统一存放于根目录 `00_books/`。

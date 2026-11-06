@@ -1,0 +1,475 @@
+% PDF p. 185
+\subsection{一般张量场的李导数}
+\subsubsection{一般张量场李导数的数学表达}
+流形 $M$ 上一点 $p$ 处的 $(r,s)$ 型张量是多重线性映射
+\[
+  T_p\colon
+    \overbrace{T_pM\times T_pM\times\cdots\times T_pM}^{r}
+    \times\underbrace{T_p^*M\times T_p^*M\times\cdots\times T_p^*M}_{s}
+    \longrightarrow\R.
+\]
+\begin{itemize}
+  \item \textbf{输入}
+  \item \textbf{$r$ 个向量。}切空间 $T_pM$ 中的元素。
+  \item \textbf{$s$ 个协向量。}余切空间 $T_p^*M$ 中的元素。
+  \item \textbf{输出。}一个实数。
+\end{itemize}
+张量 $T$ 可用下式表示。\translatornote{原书此处一方面让 $(r,s)$ 型张量接受 $r$ 个向量与 $s$ 个协向量，另一方面给出了含 $r$ 个向量因子和 $s$ 个协向量因子的基展开。依下文分量公式的指标约定，后者对应 $r$ 个协向量与 $s$ 个向量作为自变量。}
+\[
+  T=T^{i_1,\ldots,i_r}_{j_1,\ldots,j_s}
+      \left(\frac{\partial}{\partial x^{i_1}}\otimes\cdots\otimes
+        \frac{\partial}{\partial x^{i_r}}\otimes dx^{j_1}\otimes
+        \cdots\otimes dx^{j_s}\right).
+\]
+
+设 $T$ 是分量为 $T^{i_1,\ldots,i_r}_{j_1,\ldots,j_s}$ 的 $(r,s)$ 型张量场。$T$ 沿 $X$ 的李导数为
+\[
+  \begin{aligned}
+  (\mathcal L_X T)^{i_1\ldots i_r}_{j_1\ldots j_s}
+    &=X^k\frac{\partial T^{i_1,\ldots,i_r}_{j_1,\ldots,j_s}}{\partial x^k}\\
+    &\quad-\sum_{m=1}^{r}T^{i_1,\ldots,k,\ldots,i_r}_{j_1,\ldots,j_s}
+                   \frac{\partial X^{i_m}}{\partial x^k}\\
+    &\quad+\sum_{n=1}^{s}T^{i_1,\ldots,i_r}_{j_1,\ldots,k,\ldots,j_s}
+                   \frac{\partial X^k}{\partial x^{j_n}}.
+  \end{aligned}
+\]
+其中
+\begin{itemize}
+  \item $(\mathcal L_X T)^{i_1\ldots i_r}_{j_1\ldots j_s}$ 是李导数张量场的分量。
+  \item $X^k$ 是向量场 $X$ 在坐标基 $\{\partial/\partial x^k\}$ 下的分量。
+  \item 向量场 $X$ 可写作 $X=X^k\partial/\partial x^k$。
+  \item 若一个指标在同一项中既作上标又作下标，就对该指标的所有可能取值求和。
+  \item 指标 $k$ 在相应范围内求和。
+\end{itemize}
+
+\subsubsection{一般性质}
+\begin{itemize}
+  \item \textbf{线性。}李导数关于向量场 $X$ 和张量场 $T$ 都是线性的。
+  \item \textbf{莱布尼茨法则。}李导数满足莱布尼茨法则，即它作为一个导子起作用。
+  \[
+    \mathcal L_X(T\otimes S)=(\mathcal L_X T)\otimes S+T\otimes(\mathcal L_X S),
+  \]
+  其中 $T,S$ 都是张量场。
+  \item \textbf{与缩并可交换。}李导数与张量的缩并可交换，
+  \[
+    \mathcal L_X\bigl(\operatorname{Contract}(T)\bigr)
+        =\operatorname{Contract}(\mathcal L_X T).
+  \]
+\end{itemize}
+
+% PDF p. 186
+李导数度量张量场沿向量场生成的流的变化。它是微分几何和理论物理中的基本概念，尤其用于研究对称性和守恒定律。下面举几个例子，说明如何计算各种张量场的李导数。
+
+我们依次计算 $(1,0)$、$(0,1)$、$(1,1)$ 和 $(0,2)$ 型张量场的李导数，说明如何使用一般公式。每种情形都按下列步骤处理。
+\begin{enumerate}
+  \item 定义所涉及的张量场和向量场。
+  \item 应用李导数的一般公式。
+  \item 解释计算中的每一步。
+\end{enumerate}
+
+\subsubsection{向量场（$(1,0)$ 型）的李导数}
+\paragraph{一般表达}
+给定
+\begin{itemize}
+  \item \textbf{向量场 $Y$。}原书将其分量写作 $i$，下面的公式记为 $Y^i$。
+  \item \textbf{向量场 $X$。}沿此场计算李导数，其分量为 $X^k$。
+\end{itemize}
+目标是计算 $\mathcal L_X Y$。应用一般公式时，向量场 $Y$ 是 $(1,0)$ 型张量，
+\begin{itemize}
+  \item $r=1$（逆变指标个数）。
+  \item $s=0$（协变指标个数）。
+\end{itemize}
+将 $(1,0)$ 代入一般公式得到
+\[
+  (\mathcal L_X Y)^i=X^k\frac{\partial Y^i}{\partial x^k}
+             -Y^k\frac{\partial X^i}{\partial x^k}.
+\]
+
+\paragraph{计算实例}
+现在逐项计算。设在 $\R^3$ 中，坐标为 $(x^1,x^2,x^3)$。
+\begin{itemize}
+  \item $X=x^2\partial/\partial x^1-x^1\partial/\partial x^2$，是旋转向量场。
+  \item 分量为 $X^1=x^2$、$X^2=-x^1$、$X^3=0$。
+  \item $Y^3=\partial/\partial x^3$，是沿 $x^3$ 方向的常向量场。\translatornote{原式左侧写作 $Y^3$。这里的向量场是 $Y=\partial/\partial x^3$，第三个分量为 $Y^3=1$。}
+  \item 分量为 $Y^1=0$、$Y^2=0$、$Y^3=1$。
+\end{itemize}
+计算 $(\mathcal L_X Y)^i$。
+\begin{itemize}
+  \item 计算 $X^k\partial Y^i/\partial x^k$。
+  % PDF p. 187
+  由于 $Y^i$ 是常数（0 或 1），其导数为零。
+  \[
+    X^k\frac{\partial Y^i}{\partial x^k}=0.
+  \]
+  \item 计算 $Y^k\partial X^i/\partial x^k$。由于 $Y^1=Y^2=0$、$Y^3=1$，
+  \begin{itemize}
+    \item 对于 $i=1$，
+    \[
+      Y^k\frac{\partial X^i}{\partial x^k}
+      =Y^3\frac{\partial X^1}{\partial x^3}=0.
+    \]
+    \item 对于 $i=2$，
+    \[
+      Y^k\frac{\partial X^i}{\partial x^k}
+      =Y^3\frac{\partial X^2}{\partial x^3}=0.
+    \]
+    \item 对于 $i=3$，
+    \[
+      Y^k\frac{\partial X^i}{\partial x^k}
+      =Y^3\frac{\partial X^3}{\partial x^3}=0.
+    \]
+  \end{itemize}
+  \item 因此，
+  \[
+    (\mathcal L_X Y)^i=0.
+  \]
+\end{itemize}
+
+\textbf{结论}
+\begin{itemize}
+  \item 在此情形中，李导数 $\mathcal L_XY$ 为零。
+  \item 这表明 $Y$ 沿 $X$ 生成的流保持不变。
+\end{itemize}
+
+\subsubsection{协向量场（$(0,1)$ 型）的李导数}
+\paragraph{问题设定}
+给定
+\begin{itemize}
+  \item \textbf{协向量场 $\omega$。}分量为 $\omega^i$。\translatornote{原书此处将分量写为上标。按以下坐标表达，协向量分量应为 $\omega_i$。}
+  \item \textbf{向量场 $X$。}沿此场计算李导数，其分量为 $X^k$。
+\end{itemize}
+目标是计算 $\mathcal L_X\omega$。
+
+\paragraph{应用一般公式}
+协向量场 $\omega$ 为 $(0,1)$ 型张量，
+\begin{itemize}
+  \item $r=0$（逆变指标个数）。
+  \item $s=1$（协变指标个数）。
+\end{itemize}
+% PDF p. 188
+代入一般公式得到下式。\translatornote{此处原式将第二项中的向量场分量写为小写 $x^k$。按一般公式和下文实例，该分量应为 $X^k$。}
+\[
+  (\mathcal L_x\omega)_i=X^k\frac{\partial\omega_i}{\partial x^k}
+                        +\omega_k\frac{\partial x^k}{\partial x^i}.
+\]
+\textbf{各项解释}
+\begin{enumerate}
+  \item 第一项 $X^k\partial\omega_i/\partial x^k$。
+  \begin{itemize}
+    \item 表示 $\omega$ 沿 $X$ 的流发生的变化。
+    \item 是 $\omega$ 沿 $X$ 的方向导数。
+  \end{itemize}
+  \item 第二项 $+\omega_k\partial x^k/\partial x^i$。
+  \begin{itemize}
+    \item 计入基协向量由 $X$ 引起的变化。
+    \item 对 $X$ 作用于坐标系的影响进行修正。
+  \end{itemize}
+\end{enumerate}
+
+\paragraph{计算实例}
+设在 $\R^2$ 中，坐标为 $(x_1,x_2)$。
+\begin{itemize}
+  \item $X=x^1\partial/\partial x^1+x^2\partial/\partial x^2$，即径向向量场。
+  \item 分量为 $X^1=x^1$、$X^2=x^2$。
+  \item $\omega=x^1\,dx^1-x^2\,dx^2$。
+  \item 分量为 $\omega_1=x^1$、$\omega_2=-x^2$。
+\end{itemize}
+
+\textbf{计算 $(\mathcal L_X\omega)_i$。}先计算 $X^k\partial\omega_i/\partial x^k$。
+\begin{itemize}
+  \item 对于 $i=1$，
+  \[
+    \begin{aligned}
+      X^k\frac{\partial\omega_i}{\partial x^k}
+      &=X^k\frac{\partial\omega_1}{\partial x^k}
+       =X^1\frac{\partial\omega_1}{\partial x^1}
+        +X^2\frac{\partial\omega_1}{\partial x^2}\\
+      &=x^1\cdot1+x^2\cdot0=x^1.
+    \end{aligned}
+  \]
+  \item 对于 $i=2$，
+  \[
+    \begin{aligned}
+      X^k\frac{\partial\omega_i}{\partial x^k}
+      &=X^k\frac{\partial\omega_2}{\partial x^k}
+       =X^1\frac{\partial\omega_2}{\partial x^1}
+        +X^2\frac{\partial\omega_2}{\partial x^2}\\
+      &=x^1\cdot0+x^2\cdot(-1)=-x^2.
+    \end{aligned}
+  \]
+\end{itemize}
+计算 $\omega_k\partial X^k/\partial x^i$。
+\begin{itemize}
+  \item 对于 $i=1$，
+  \[
+    \begin{aligned}
+      \omega_k\frac{\partial X^k}{\partial x^i}
+      &=\omega_k\frac{\partial X^k}{\partial x^1}
+       =\omega_1\frac{\partial X^1}{\partial x^1}
+        +\omega_2\frac{\partial X^2}{\partial x^1}\\
+      &=x^1\cdot1+(-x^2)\cdot0=x^1.
+    \end{aligned}
+  \]
+  \item 对于 $i=2$，
+  \[
+    \begin{aligned}
+      \omega_k\frac{\partial X^k}{\partial x^i}
+      &=\omega_k\frac{\partial X^k}{\partial x^2}
+       =\omega_1\frac{\partial X^1}{\partial x^2}
+        +\omega_2\frac{\partial X^2}{\partial x^2}\\
+      &=x^1\cdot0+(-x^2)\cdot1=-x^2.
+    \end{aligned}
+  \]
+\end{itemize}
+
+% PDF p. 189
+将各项相加。
+\begin{itemize}
+  \item 对于 $i=1$，
+  \[
+    (\mathcal L_X\omega)_1=x^1+x^1=2x^1.
+  \]
+  \item 对于 $i=2$，
+  \[
+    (\mathcal L_X\omega)_2=-x^2-x^2=-2x^2.
+  \]
+\end{itemize}
+
+\textbf{结论}
+\begin{itemize}
+  \item 李导数 $\mathcal L_X\omega$ 的分量为
+  \[
+    (\mathcal L_X\omega)_1=2x^1,\qquad(\mathcal L_X\omega)_2=-2x^2.
+  \]
+  \item 这一结果表明 $\omega$ 如何沿 $X$ 的流发生变化。
+\end{itemize}
+
+\subsubsection{$(1,1)$ 型张量场的李导数}
+\paragraph{问题设定}
+给定
+\begin{itemize}
+  \item \textbf{张量场 $T$。}分量为 $T^i_j$。
+  \item \textbf{向量场 $X$。}沿此场计算李导数，其分量为 $X^k$。
+\end{itemize}
+目标是计算 $\mathcal L_X T$。
+
+\paragraph{应用一般公式}
+对 $(1,1)$ 型张量场 $T$，
+\begin{itemize}
+  \item $r=1$（逆变指标个数）。
+  \item $s=1$（协变指标个数）。
+\end{itemize}
+代入一般公式得到
+\[
+  (\mathcal L_X T)^i_j
+      =X^k\frac{\partial T^i_j}{\partial x^k}
+       -T^k_j\frac{\partial X^i}{\partial x^k}
+       +T^i_k\frac{\partial X^k}{\partial x^j}.
+\]
+下面解释各项。
+\begin{enumerate}
+  \item 第一项 $X^k\partial T^i_j/\partial x^k$ 是 $T^i_j$ 沿 $X$ 的方向导数。
+  \item 第二项 $-T^k_j\partial X^i/\partial x^k$ 修正逆变指标 $i$ 的变化。
+  \item 第三项 $+T^i_k\partial X^k/\partial x^j$ 修正协变指标 $j$ 的变化。
+\end{enumerate}
+
+% PDF p. 190
+\subsubsection{计算实例}
+设在 $\R^2$ 中，坐标为 $(x^1,x^2)$。
+\begin{itemize}
+  \item $X=x^1\partial/\partial x^2$。
+  \item 分量为 $X^1=0$、$X^2=x^1$。
+  \item $T$ 由 $T^i_j=\delta^i_j$ 定义，即恒等张量。
+\end{itemize}
+计算 $(\mathcal L_X T)^i_j$。
+
+\begin{itemize}
+  \item \textbf{计算} $X^k\partial T^i_j/\partial x^k$。
+
+  因为 $T^i_j=\delta^i_j$（常数），它们的导数为零。
+  \[
+    X^k\frac{\partial T^i_j}{\partial x^k}=0.
+  \]
+\end{itemize}
+
+\textbf{计算} $-T^k_j\partial X^i/\partial x^k$。
+\begin{itemize}
+  \item 因为 $T^i_j=\delta^i_j$，
+  \[
+    -T^k_j\frac{\partial X^i}{\partial x^k}
+       =-\delta^k_j\frac{\partial X^i}{\partial x^k}.
+  \]
+  已知 $X^1=0$、$X^2=x^1$。
+  \item 对于 $i=1$，
+  \[
+    -\delta^k_j\frac{\partial X^i}{\partial x^k}=-\delta^k_j\cdot0=0.
+  \]
+  \item 对于 $i=2$，
+  \[
+    -\delta^k_j\frac{\partial X^i}{\partial x^k}
+       =-\delta^k_j\frac{\partial X^2}{\partial x^k}
+       =-\delta^k_j\frac{\partial x^1}{\partial x^k}
+       =-\delta^k_j\delta^1_k=-\delta^1_j.
+  \]
+\end{itemize}
+
+\textbf{计算} $+T^i_k\partial X^k/\partial x^j$。因为 $T^i_k=\delta^i_k$，
+\[
+  +\delta^i_k\frac{\partial X^k}{\partial x^j}=+\frac{\partial X^i}{\partial x^j}.
+\]
+\begin{itemize}
+  \item 对于 $i=1$，
+  \[
+    \frac{\partial X^1}{\partial x^j}=0.
+  \]
+  \item 对于 $i=2$，
+  \[
+    \frac{\partial X^2}{\partial x^j}=\frac{\partial x^1}{\partial x^j}=\delta^1_j.
+  \]
+\end{itemize}
+
+% PDF p. 191
+\begin{itemize}
+  \item \textbf{合并各项}
+  \item 对于 $i=1$，
+  \[
+    (\mathcal L_X T)^1_j=0+0+0=0.
+  \]
+  \item 对于 $i=2$，
+  \[
+    (\mathcal L_X T)^2_j=0-(-\delta^1_j)+\delta^1_j=2\delta^1_j.
+  \]
+\end{itemize}
+
+\textbf{结论}
+\begin{itemize}
+  \item 李导数 $\mathcal L_X T$ 的分量为
+  \[
+    (\mathcal L_X T)^1_j=0,\qquad
+    (\mathcal L_X T)^2_j=2\delta^1_j.
+  \]
+  \item 因此
+  \[
+    (\mathcal L_X T)^2_1=2,\qquad(\mathcal L_X T)^2_2=0.
+  \]
+\end{itemize}
+这说明恒等张量 $T$ 如何沿 $X$ 的流变化。\translatornote{计算第二项时已计入负号，合并时原式又对该项取了负。按前两步得到的项，$(\mathcal L_X T)^2_j=0-\delta^1_j+\delta^1_j=0$。恒等张量在任意流的拉回下都不变。}
+
+\subsubsection{$(0,2)$ 型张量场的李导数}
+回顾在微分几何中，流形 $M$ 上的\textbf{度量张量} $g$ 是 $(0,2)$ 型张量场，为 $M$ 上每一点 $p$ 的切空间 $T_pM$ 指定一个内积。
+\[
+  g_p\colon T_pM\times T_pM\longrightarrow\R.
+\]
+借助度量张量，可将长度、角度、体积等几何概念推广到弯曲空间。
+
+在 $n$ 维欧氏空间 $\R^n$ 中，标准欧氏度量由分量为 $g_{ij}=\delta_{ij}$ 的\textbf{度量张量}给出。其中
+\begin{itemize}
+  \item $g_{ij}$ 是度量张量 $g$ 的分量。
+  \item $\delta_{ij}$ 为\textbf{克罗内克 $\delta$}，定义为
+  \[
+    \delta_{ij}=\begin{cases}1&i=j,\\0&i\ne j.\end{cases}
+  \]
+\end{itemize}
+这表示在标准笛卡儿坐标系中，度量张量由\textbf{单位矩阵}表示。
+
+% PDF p. 192
+\paragraph{问题设定}
+\textbf{给定}
+\begin{itemize}
+  \item \textbf{张量场 $T$。}分量为 $T_{ij}$。
+  \item \textbf{向量场 $X$。}沿此场计算李导数，其分量为 $X^k$。
+\end{itemize}
+\textbf{目标。}计算 $\mathcal L_X T$。
+
+\paragraph{应用一般公式}
+对于 $(0,2)$ 型张量场 $T$，
+\begin{itemize}
+  \item $r=0$（逆变指标个数）。
+  \item $s=2$（协变指标个数）。
+\end{itemize}
+代入一般公式可得
+\[
+  (\mathcal L_X T)_{ij}
+      =X^k\frac{\partial T_{ij}}{\partial x^k}
+       +T_{kj}\frac{\partial X^k}{\partial x^i}
+       +T_{ik}\frac{\partial X^k}{\partial x^j}.
+\]
+
+\paragraph{计算实例}
+\textbf{设定。}设 $T_{ij}$ 是 $\R^2$ 中的\textbf{度量张量}分量，$T_{ij}=\delta_{ij}$，即标准欧氏度量。令
+\[
+  X=-x^2\frac{\partial}{\partial x^1}+x^1\frac{\partial}{\partial x^2}.
+\]
+\textbf{分量。}$X^1=-x^2$、$X^2=x^1$。
+
+\textbf{计算 $(\mathcal L_X T)_{ij}$。}先计算 $X^k\partial T_{ij}/\partial x^k$。因为 $T_{ij}=\delta_{ij}$（常数），其导数为零。
+\[
+  X^k\frac{\partial T_{ij}}{\partial x^k}=0.
+\]
+\textbf{计算} $T_{kj}\partial X^k/\partial x^i$。\translatornote{以下第一行依原书为 $T_{kj}=\delta_{ij}$，应为 $T_{kj}=\delta_{kj}$，与第二行一致。}
+\[
+  \begin{aligned}
+    T_{kj}&=\delta_{ij},\\
+    T_{kj}\frac{\partial X^k}{\partial x^i}
+       &=\delta_{kj}\frac{\partial X^k}{\partial x^i}
+        =\frac{\partial X^j}{\partial x^i}.
+  \end{aligned}
+\]
+\textbf{计算} $T_{ik}\partial X^k/\partial x^j$。
+\[
+  T_{ik}=\delta_{ik},
+\]
+% PDF p. 193
+\[
+  T_{ik}\frac{\partial X^k}{\partial x^j}
+    =\delta_{ik}\frac{\partial X^k}{\partial x^j}
+    =\frac{\partial X^i}{\partial x^j}.
+\]
+
+\textbf{合并各项}
+\[
+  (\mathcal L_X T)_{ij}=0+\frac{\partial X^j}{\partial x^i}
+                           +\frac{\partial X^i}{\partial x^j}.
+\]
+
+\textbf{计算各偏导数}
+\[
+  \begin{aligned}
+    \frac{\partial X^1}{\partial x^1}&=\frac{\partial(-x^2)}{\partial x^1}=0,\\
+    \frac{\partial X^1}{\partial x^2}&=\frac{\partial(-x^2)}{\partial x^2}=-1,\\
+    \frac{\partial X^2}{\partial x^1}&=\frac{\partial x^1}{\partial x^1}=1,\\
+    \frac{\partial X^2}{\partial x^2}&=\frac{\partial x^1}{\partial x^2}=0.
+  \end{aligned}
+\]
+
+\textbf{计算 $(\mathcal L_X T)_{ij}$}
+\begin{itemize}
+  \item 对于 $i=1$、$j=1$，
+  \[
+    (\mathcal L_X T)_{11}=0+\frac{\partial X^1}{\partial x^1}
+         +\frac{\partial X^1}{\partial x^1}=0+0+0=0.
+  \]
+  \item 对于 $i=1$、$j=2$，
+  \[
+    (\mathcal L_X T)_{12}=0+\frac{\partial X^2}{\partial x^1}
+         +\frac{\partial X^1}{\partial x^2}=0+1-1=0.
+  \]
+  \item 对于 $i=2$、$j=1$，
+  \[
+    (\mathcal L_X T)_{21}=0+\frac{\partial X^1}{\partial x^2}
+         +\frac{\partial X^2}{\partial x^1}=0-1+1=0.
+  \]
+  \item 对于 $i=2$、$j=2$，
+  \[
+    (\mathcal L_X T)_{22}=0+\frac{\partial X^2}{\partial x^2}
+         +\frac{\partial X^2}{\partial x^2}=0+0+0=0.
+  \]
+\end{itemize}
+
+\textbf{结论}
+\begin{itemize}
+  \item $\mathcal L_X T$ 的所有分量都为零。原书在此列出 $(\mathcal L_X T)_{ij}$。
+  % PDF p. 194
+  \item 这意味着度量张量 $T$ 沿 $X$ 生成的流\textbf{不变}。
+  \item 在这个例子中，$X$ 表示欧氏平面的等距变换（旋转），度量在这样的变换下保持不变。
+\end{itemize}

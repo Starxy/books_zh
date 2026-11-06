@@ -1,0 +1,387 @@
+% PDF p. 177
+\subsection{不同类型张量场的李导数}
+对于不同类型的张量场，李导数定义如下。
+
+\subsubsection{标量函数的李导数}
+对流形 $M$ 上的光滑函数 $f\colon M\to\R$ 和向量场 $X$，$f$ 沿 $X$ 的李导数就是 $X$ 对 $f$ 的作用。
+\[
+  \mathcal L_X f=X(f).
+\]
+这就是函数 $f$ 沿 $X$ 的方向导数。
+
+\begin{statement}{例 4.4}{}
+设 $f\colon\R^3\to\R$ 是光滑标量函数，例如房间中的温度分布。
+\[
+  f(x,y,z)=x^2+y^2+z^2.
+\]
+令 $X$ 为表示流的向量场，例如
+\[
+  X=x\frac{\partial}{\partial x}
+    +y\frac{\partial}{\partial y}
+    +z\frac{\partial}{\partial z}.
+\]
+\textbf{计算李导数。}$f$ 沿 $X$ 的李导数是 $f$ 在 $X$ 方向的方向导数。
+\[
+  \mathcal L_X f=X(f)=x\frac{\partial f}{\partial x}
+              +y\frac{\partial f}{\partial y}
+              +z\frac{\partial f}{\partial z}.
+\]
+计算偏导数，
+\[
+  \frac{\partial f}{\partial x}=2x,\qquad
+  \frac{\partial f}{\partial y}=2y,\qquad
+  \frac{\partial f}{\partial z}=2z.
+\]
+因此
+\[
+  \mathcal L_X f=x(2x)+y(2y)+z(2z)=2(x^2+y^2+z^2)=2f.
+\]
+
+\textbf{解释。}李导数 $\mathcal L_X f=2f$ 表示沿 $X$ 的流移动时，函数 $f$ 按因子 $2$ 缩放。
+% PDF p. 178
+这里 $X$ 沿径向指向外侧，所以 $f$（距原点的距离的平方）的增长速率与其当前值成正比。
+
+\textbf{标量场。}用等值线图表示，其值类似温度或势。定义标量场 $f(x,y)=\sin\sqrt{x^2+y^2}$，它具有径向对称性。
+
+\textbf{向量场。}用箭头表示旋转流 $(y,-x)$。此向量场生成绕原点的旋转流。向量场 $X$ 为
+\[
+  X=y\frac{\partial}{\partial x}-x\frac{\partial}{\partial y}.
+\]
+$f$ 沿 $X$ 的李导数为
+\[
+  \begin{aligned}
+    X(f)
+      &=y\frac{\partial\sin\sqrt{x^2+y^2}}{\partial x}
+        -x\frac{\partial\sin\sqrt{x^2+y^2}}{\partial y}\\
+      &=\cos\sqrt{x^2+y^2}
+        \left(\frac{xy}{\sqrt{x^2+y^2}}-\frac{xy}{\sqrt{x^2+y^2}}\right)=0.
+  \end{aligned}
+\]
+\end{statement}
+
+\subsubsection{向量场的李导数}
+\paragraph{定义}
+对于 $M$ 上的两个向量场 $X,Y$，$Y$ 沿 $X$ 的李导数由二者的\textbf{李括号}（Lie bracket），亦称交换子，给出。
+\[
+  \mathcal L_XY=[X,Y].
+\]
+这里 $[X,Y]$ 是向量场 $X$ 和 $Y$ 的李括号。令
+$X=x^i\partial/\partial x^i$，$Y=y^j\partial/\partial x^j$，则李括号 $[X,Y]$ 按下式计算。
+\[
+  \begin{aligned}
+    [X,Y]&=X(Y)-Y(X)\\
+      &=x^i\frac{\partial Y}{\partial x^i}-y^i\frac{\partial X}{\partial x^i}\\
+      &=x^i\frac{\partial(y^j\partial/\partial x^j)}{\partial x^i}
+        -y^i\frac{\partial(x^j\partial/\partial x^j)}{\partial x^i}\\
+      &=x^i\frac{\partial y^j}{\partial x^i}\frac{\partial}{\partial x^j}
+        -y^i\frac{\partial x^j}{\partial x^i}\frac{\partial}{\partial x^j}\\
+      &=\left(x^i\frac{\partial y^j}{\partial x^i}
+              -y^i\frac{\partial x^j}{\partial x^i}\right)\frac{\partial}{\partial x^j}.
+  \end{aligned}
+\]
+
+\begin{statement}{例 4.5}{}
+设 $Y$ 为 $\R^3$ 上的向量场
+\[
+  Y=y\frac{\partial}{\partial x}-x\frac{\partial}{\partial y}.
+\]
+% PDF p. 179
+这个向量场表示绕 $z$ 轴旋转。另取向量场
+\[
+  X=z\frac{\partial}{\partial x}+x\frac{\partial}{\partial y}
+          -y\frac{\partial}{\partial z}.
+\]
+
+\textbf{计算李导数。}$Y$ 沿 $X$ 的李导数由李括号给出。
+\[
+  \mathcal L_XY=[X,Y].
+\]
+计算李括号 $[X,Y]$，
+\[
+  [X,Y]=X(Y)-Y(X).
+\]
+注意
+\[
+  X(Y)=X(y)\frac{\partial}{\partial x}-X(x)\frac{\partial}{\partial y}.
+\]
+而 $X(y)=x$，$X(x)=z$。代入上式得到
+\[
+  X(Y)=x\frac{\partial}{\partial x}-z\frac{\partial}{\partial y}.
+\]
+类似地得到下式。\translatornote{原书此行左侧为 $Y(x)$。按李括号的计算应为 $Y(X)$。}
+\[
+  Y(x)=y\frac{\partial}{\partial y}+x\frac{\partial}{\partial z}.
+\]
+因此
+\[
+  \mathcal L_XY=[X,Y]
+     =x\frac{\partial}{\partial x}-(z+y)\frac{\partial}{\partial y}
+          -x\frac{\partial}{\partial z}.
+\]
+\end{statement}
+
+\subsubsection{\texorpdfstring{$[X,Y]$ 的几何意义}{[X,Y] 的几何意义}}
+两个向量场 $X,Y$ 的\textbf{李括号} $[X,Y]$，也就是\textbf{李导数} $\mathcal L_XY$，具有深刻的几何意义，并反映底层流形结构的各个方面。其主要解释和应用如下。
+\begin{enumerate}
+  \item \textbf{流的不可交换性}
+  \begin{itemize}
+    \item 李括号度量 $X,Y$ 生成的流不交换的程度。如果先沿 $X$ 流动时间 $t$，再沿 $Y$ 流动时间 $s$，与把次序反过来相比，终点一般不同。李括号刻画这个差异，反映一个向量场怎样“扭转”或“变形”另一个向量场。
+  \end{itemize}
+  \item \textbf{局部对称性与几何}
+  \begin{itemize}
+    \item $[X,Y]$ 为零意味着 $X,Y$ 局部可交换，表明流形结构具有某种对称性。
+    % PDF p. 180
+    \item 在李群的语境中，$[X,Y]=0$ 表明 $X,Y$ 张成的子代数是阿贝尔的（abelian），反映李群结构中的对称性。
+  \end{itemize}
+  \item \textbf{可积性的障碍}
+  \begin{itemize}
+    \item 对于由向量场给出的分布（distribution），例如子流形的切空间族，$[X,Y]$ 可以检验该分布是否\textbf{对合}（involutive）。
+    \item 根据\textbf{弗罗贝尼乌斯定理}（Frobenius' theorem），分布能够积分成子流形，当且仅当它在李括号下封闭。非零李括号意味着存在“扭转”或“弯曲”，从而阻碍可积性。\translatornote{按照该定理，障碍在于括号不落在分布内。仅有 $[X,Y]\ne0$ 不足以判定分布不可积。}
+  \end{itemize}
+  \item \textbf{内在曲率}
+  \begin{itemize}
+    \item 李括号与流形的内在几何有关。例如在黎曼几何中，弯曲流形上平行向量场的交换子通常不为零，反映空间的曲率。在嘉当的几何表述中，李括号在定义挠率张量（torsion tensor）和曲率张量中发挥作用。\translatornote{若“平行向量场”指对无挠联络的协变导数处处为零的场，则其李括号为零。曲率体现为协变导数的交换关系或沿闭路的平行移动。}
+  \end{itemize}
+  \item \textbf{雅可比恒等式与李代数结构}
+  \begin{itemize}
+    \item 李括号满足\textbf{雅可比恒等式}（Jacobi identity），从而赋予向量场空间\textbf{李代数}（Lie algebra）结构。
+    \item 这个代数记录流形对称性及其向量场相互作用的重要信息。
+  \end{itemize}
+  \item \textbf{变形理论}
+  \begin{itemize}
+    \item 在物理学和微分几何中，李括号用于对向量场的无穷小变形建模。它描述沿 $X$ 的小扰动怎样与沿 $Y$ 的小扰动相互作用。
+  \end{itemize}
+  \item \textbf{与坐标无关}
+  \begin{itemize}
+    \item 李括号是内在几何对象，取决于流形的可微结构，与坐标选择无关。
+  \end{itemize}
+  \item \textbf{剪切、涡量和流的解释}
+  \begin{itemize}
+    \item 在流体动力学和力学中，当 $X,Y$ 是速度场时，李括号可表示\textbf{剪切}和\textbf{涡量}等量，有助于描述复杂的流动形态。
+  \end{itemize}
+  \item \textbf{几何控制理论}
+  \begin{itemize}
+    \item 在研究控制系统的可达性与可控性时会用到李括号。它决定了用控制向量场能否到达流形上的某些点。
+  \end{itemize}
+  为说明\textbf{李括号} $[X,Y]$ 或\textbf{李导数} $\mathcal L_XY$ 怎样支配流形上的可达性，考虑一个\textbf{二维平面上的控制系统}，用控制向量场 $X,Y$ 在平面上移动。
+\end{enumerate}
+
+\begin{statement}{例 4.6}{}
+定义向量场 $X,Y$ 为
+\[
+  X=\frac{\partial}{\partial x},\qquad
+  Y=\frac{\partial}{\partial y}+x\frac{\partial}{\partial x}.
+\]
+% PDF p. 181
+由李括号的定义得到
+\[
+  \begin{aligned}
+    [X,Y]&=X(Y)-Y(X)\\
+         &=\frac{\partial}{\partial x}-0
+          =\frac{\partial}{\partial x}.
+  \end{aligned}
+\]
+\end{statement}
+
+\begin{statement}{例 4.7}{利用两个 RNA 速率场的李括号研究可达性}
+设定在二维潜在主成分（principal component，PC）空间中。
+\begin{itemize}
+  \item 基因 A 的速率场 $X=\partial_x$，使细胞水平移动。
+  \item 基因 B 的速率场 $Y=x\partial_y$，使细胞竖直移动，强度随 $X$ 缩放。
+  \item 李括号 $[X,Y]$。
+  \begin{enumerate}[label=\arabic*.]
+    \item \textbf{计算李括号}
+    \[
+      [X,Y]=X(Y)-Y(X)=\partial_x(x\partial_y)-x\partial_y(\partial_x)
+          =\partial_y.
+    \]
+    因此，虽然 $X=0$ 时，$X$ 和 $Y$ 都不能让系统只沿 $Y$ 方向移动，它们的交换子可以。\translatornote{原书此处用大写 $X$ 和 $Y$。在给出的向量场中，控制竖直分量的是坐标 $x$，这里所指为 $x=0$ 及 $y$ 方向。}
+    \item \textbf{可达性的解释}
+
+    直接控制只能产生水平移动和按 $X$ 加权的竖直移动。但根据周–拉舍夫斯基定理（Chow–Rashevskii theorem），若 $X,Y$ 生成的李代数张成切空间，则每一点都是可达的。
+  \end{enumerate}
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 4.8}{“肿瘤”区域中的退化 RNA 速率}
+考虑一个具有下列向量场和括号的模型。
+\[
+  X=y\partial_x,\qquad Y=y\partial_y,\qquad [X,Y]=-y\partial_x.
+\]
+在 $y\ne0$ 的任一点，都可以水平移动（$X$）或竖直移动（$Y$）。但在 $y=0$ 处，三个向量场都为零，因而控制或括号的任何组合都无法越过这条屏障。
+
+因此，肿瘤的调控程序缺乏逃离当前转录吸引域所需的“方向”，也就是基因相互作用方式。这说明李代数的秩可以用来诊断\emph{不可逆的}恶性子状态。
+\end{statement}
+
+\subsubsection{协向量场（1-形式）的李导数}
+协向量场的李导数定义为
+\[
+  (\mathcal L_X\omega)(Y)=X\bigl(\omega(Y)\bigr)-\omega([X,Y]).
+\]
+理解这个公式的关键是符号 $\omega(Y)$。它表示在流形的每个点上，\textbf{将微分形式 $\omega$ 作用于向量场 $Y$}。这一记号对于理解李导数等概念及其他张量运算至关重要。下面先定义 $\omega(Y)$。为方便起见，用 $X$ 代替 $Y$，定义 $\omega(X)$。
+
+% PDF p. 182
+\paragraph{\texorpdfstring{$\omega(X)$ 的定义}{ω(X) 的定义}}
+\begin{itemize}
+  \item 光滑流形 $M$ 上的一个\textbf{微分形式}，通常是 \textbf{1-形式}，即协向量场。
+  \item $M$ 上的一个\textbf{向量场}。
+\end{itemize}
+$\omega(X)$ 表示在流形的每一点上\textbf{将微分形式 $\omega$ 作用于向量场 $X$}。它给出从流形到实数的光滑函数。
+\[
+  \omega(X)\colon M\to\R,\qquad p\longmapsto\omega_p(X_p).
+\]
+这里
+\begin{itemize}
+  \item $\omega_p$ 是点 $p$ 处的协向量（线性泛函）。
+  \item $X_p$ 是点 $p$ 处的切向量。
+  \item $\omega_p$ 是将协向量 $\omega_p$ 作用于向量 $X_p$ 所得的实数。\translatornote{本项开头依原书写作 $\omega_p$。实数应记为 $\omega_p(X_p)$。}
+\end{itemize}
+
+\textbf{逐步定义 $\omega(X)$}
+\begin{enumerate}
+  \item \textbf{在点 $p\in M$}
+  \begin{itemize}
+    \item \textbf{切空间 $T_pM$} 是 $p$ 处所有切向量组成的向量空间。
+    \item \textbf{余切空间 $T_p^*M$} 是 $T_pM$ 的对偶空间，由 $p$ 处所有线性泛函（协向量）组成。
+  \end{itemize}
+  \item \textbf{给定}
+  \begin{itemize}
+    \item $\omega_p\in T_p^*M$，即 $p$ 处的一个线性泛函。
+    \item $X_p\in T_pM$，即 $p$ 处的一个切向量。
+  \end{itemize}
+  \item \textbf{计算 $\omega_p(X_p)$}
+  \begin{itemize}
+    \item 将线性泛函 $\omega_p$ 作用于向量 $X_p$，得到实数。
+  \end{itemize}
+  \item \textbf{结果}
+  \begin{itemize}
+    \item $\omega(X)$ 收集所有 $p\in M$ 上的这些实数，形成一个光滑函数。
+  \end{itemize}
+\end{enumerate}
+
+\paragraph{\texorpdfstring{$\omega(X)$ 的计算}{ω(X) 的计算}}
+现在的问题是怎样计算 $\omega(X)$。回顾，微分形式与向量场分别有基 $dx$ 和 $\partial/\partial x$。于是
+\[
+  dx^i\!\left(\frac{\partial}{\partial x^j}\right)=\delta_{ij}=
+    \begin{cases}1&i=j,\\0&i\ne j.\end{cases}
+\]
+一般来说，1-形式 $\omega$ 可写为基形式的线性组合
+\[
+  \omega=\sum_i\omega_i\,dx^i.
+\]
+向量 $X$ 也可表示为基向量 $\partial/\partial x^j$ 的线性组合
+\[
+  X=\sum_j x^j\frac{\partial}{\partial x^j}.
+\]
+% PDF p. 183
+由此得到
+\[
+  \begin{aligned}
+    \omega(X)&=\sum_i\omega_i\,dx^i(X)\\
+      &=\sum_i\omega_i\,dx^i\!\left(\sum_j x^j\frac{\partial}{\partial x^j}\right)\\
+      &=\sum_i\omega_i x^i.
+  \end{aligned}
+\]
+\textbf{例子}
+
+\begin{statement}{例 4.9}{$\R^2$ 上的标准坐标}
+考虑坐标 $(x,y)$。
+
+\textbf{1-形式 $\omega$。}$\omega=y\,dx+x\,dy$。
+
+\textbf{向量场 $X$。}$X=x\,\partial/\partial x-y\,\partial/\partial y$。
+
+\textbf{计算 $\omega(X)$。}将 $\omega$ 作用于 $X$ 得 $\omega(X)=y\,dx(X)+x\,dy(X)$。计算 $dx(X)$ 和 $dy(X)$，
+\[
+  \begin{aligned}
+    dx(X)&=dx\!\left(x\frac{\partial}{\partial x}-y\frac{\partial}{\partial y}\right)=x,\\
+    dy(X)&=dy\!\left(x\frac{\partial}{\partial x}-y\frac{\partial}{\partial y}\right)=-y.
+  \end{aligned}
+\]
+所以 $\omega(X)=yx-xy=0$。
+
+\textbf{结果。}在每一点上都有 $\omega(X)=0$。
+\end{statement}
+
+\begin{statement}{例 4.10}{函数的微分}
+设 $f\colon M\to\R$ 是光滑函数，令 $\omega=df$，即 $f$ 的微分。
+\begin{itemize}
+  \item \textbf{计算 $\omega(X)$。}$\omega(X)=df(X)=X(f)$。
+  \item \textbf{解释。}$X(f)$ 是 $f$ 沿 $X$ 的方向导数。因此，$\omega(X)$ 给出 $f$ 沿 $X$ 方向的变化率。
+\end{itemize}
+\end{statement}
+
+\paragraph{\texorpdfstring{与内积算子 $i_X\omega$ 的关系}{与内积算子 iₓω 的关系}}
+\begin{itemize}
+  \item \textbf{内积算子（缩并）。}$i_X\omega$ 表示微分形式 $\omega$ 与向量场 $X$ 的缩并。对 1-形式 $\omega$，$i_X\omega=\omega(X)$。
+\end{itemize}
+
+\textbf{含义。}内积算子将微分形式的次数降低一。对 1-形式，内积算子给出标量函数。
+
+\paragraph*{4.3.2.4.3.1\quad 在李导数中的作用}
+\begin{itemize}
+  \item 计算 1-形式 $\omega$ 沿向量场 $X$ 的李导数 $\mathcal L_X\omega$ 时，$\omega(X)$ 出现在公式 $(\mathcal L_X\omega)(Y)=X(\omega(Y))-\omega([X,Y])$ 中。
+  % PDF p. 184
+  \item \textbf{各组成部分}
+
+  $\omega(Y)$ 是 1-形式 $\omega$ 在另一个向量场 $Y$ 上的取值。
+
+  $X(\omega(Y))$ 是标量函数 $\omega(Y)$ 沿 $X$ 的导数。
+
+  $\omega([X,Y])$ 是 $\omega$ 在 $X,Y$ 的李括号（交换子）上的取值。
+\end{itemize}
+
+\begin{statement}{例 4.11}{}
+\begin{itemize}
+  \item \textbf{设定}
+
+  考虑 $\R^3$ 上的 1-形式
+  \[
+    \omega=x\,dx+y\,dy+z\,dz.
+  \]
+  令向量场 $X$ 为
+  \[
+    X=x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}
+                                    +z\frac{\partial}{\partial z}.
+  \]
+  \item \textbf{计算李导数}
+
+  使用 1-形式的李导数公式。\translatornote{括号范围按原式保留。由本节开头的定义，$X$ 只作用于 $\omega(Y)$。}
+  \[
+    (\mathcal L_X\omega)(Y)=X\bigl(\omega(Y)-\omega([X,Y])\bigr).
+  \]
+
+  \textbf{也可用嘉当公式}
+  \[
+    \mathcal L_X\omega=d(i_X\omega)+i_Xd\omega.
+  \]
+  注意
+  \[
+    \begin{aligned}
+      dx(X)&=dx\!\left(x\frac{\partial}{\partial x}
+                      +y\frac{\partial}{\partial y}+z\frac{\partial}{\partial z}\right)\\
+      &=x\,dx\!\left(\frac{\partial}{\partial x}\right)
+          +y\,dx\!\left(\frac{\partial}{\partial y}\right)
+          +z\,dx\!\left(\frac{\partial}{\partial z}\right)\\
+      &=x\cdot1+y\cdot0+z\cdot0=x.
+    \end{aligned}
+  \]
+  类似地，$dy(X)=y$，$dz(X)=z$。先计算 $i_X\omega$，
+  \[
+    i_X\omega=\omega(X)=x\cdot x+y\cdot y+z\cdot z=x^2+y^2+z^2.
+  \]
+  再计算 $d(i_X\omega)$，
+  \[
+    d(x^2+y^2+z^2)=2x\,dx+2y\,dy+2z\,dz.
+  \]
+  接下来计算 $d\omega$，
+  \[
+    d\omega=d(x\,dx+y\,dy+z\,dz)=dx\wedge dx+dy\wedge dy+dz\wedge dz=0.
+  \]
+  因此
+  \[
+    \mathcal L_X\omega=d(i_X\omega)+i_Xd\omega
+        =2x\,dx+2y\,dy+2z\,dz+i_X(0)=2\omega.
+  \]
+\end{itemize}
+\end{statement}

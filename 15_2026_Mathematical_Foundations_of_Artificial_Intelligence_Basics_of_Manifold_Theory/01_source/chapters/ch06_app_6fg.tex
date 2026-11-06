@@ -1,0 +1,254 @@
+% PDF p. 347
+\AppendixSection{6F}{小球的体积}
+
+为得到小球体积公式，先用正规坐标表示测地球的体积，再对度量及其行列式作泰勒展开。下面给出详细证明。
+
+\AppendixHeading{6F1}{正规坐标中的设定}
+
+固定 $n$ 维黎曼流形 $M$ 上一点 $p\in M$。通过指数映射引入 $p$ 附近的正规坐标 $(x^1,\ldots,x^n)$，
+\[
+  x=(x^i)=\exp_p^{-1}(q)\in T_pM\cong\R^n,
+\]
+从而 $x(p)=\exp_p^{-1}(p)=\log_p(p)=0$，$g_{ij}(0)=\delta_{ij}$，且 $\Gamma^k_{ij}(0)=0$。
+
+% PDF p. 348
+在这些坐标中，黎曼体积元为
+\[
+  d\mu(q)=\sqrt{\det(g_{ij}(x))}\,dx^1\cdots dx^n.
+\]
+我们希望对较小的 $r$ 计算
+\[
+  \mu(B_r(p))=\int_{\{|x|\leq r\}}\sqrt{\det(g_{ij}(x))}\,dx^1\cdots dx^n.
+\]
+
+\AppendixHeading{6F2}{度量的展开}
+
+在 $p$ 附近的正规坐标中，泰勒展开为
+\[
+  g_{ij}(x)=\delta_{ij}-\tfrac13 R_{ikjl}x^kx^l+o(|x|^3),
+\]
+其中 $R_{ikjl}$ 为 $p$ 处的黎曼曲率张量。
+
+\AppendixHeading{6F3}{行列式的展开}
+
+写作 $g(x)=I+A(x)$，其中 $A_{ij}(x)=-\tfrac13R_{ikjl}x^kx^l+o(|x|^3)$。
+
+对小矩阵 $A$，有 $\det(I+A)=I+\operatorname{Tr}(A)+o(\lVert A\rVert^2)$。\translatornote{原书把展开的常数项写成 $I$。行列式为标量，常数项是 1，通常的一阶展开余项为 $O(\lVert A\rVert^2)$。}因此
+\[
+  \det g(x)=|I+A(x)|=1+\operatorname{Tr}(A(x))+o(|x|^3).
+\]
+又有
+\[
+  \operatorname{Tr}(A)
+    =-\frac13\sum_{i=1}^n R_{ikil}(p)x^kx^l
+    =-\frac13\operatorname{Ric}_{kl}(p)x^kx^l,
+\]
+其中 $\operatorname{Ric}_{kl}=R_{ikil}$。合并上面两式，得到
+\begin{equation*}
+  \det g(x)=1-\tfrac13\operatorname{Ric}_{kl}(p)x^kx^l+o(|x|^3).
+  \tag{6F1}\label{eq:6F1}
+\end{equation*}
+
+\AppendixHeading{6F4}{平方根的展开}
+
+用 $\sqrt{1+u}=1+\tfrac12u$ 的一阶近似与式 \eqref{eq:6F1} 得到
+\begin{equation*}
+  \sqrt{\det g(x)}=1-\tfrac16\operatorname{Ric}_{kl}(p)x^kx^l+o(|x|^3).
+  \tag{6F2}\label{eq:6F2}
+\end{equation*}
+因此，体积元为
+\begin{equation*}
+  \begin{aligned}
+  d\mu(q)&=\sqrt{\det(g_{ij}(x))}\,dx^1\cdots dx^n\\
+         &=\left(1-\tfrac16\operatorname{Ric}_{kl}(p)x^kx^l+o(|x|^3)\right)d^nx.
+  \end{aligned}
+  \tag{6F3}\label{eq:6F3}
+\end{equation*}
+
+\AppendixHeading{6F5}{在极坐标中积分}
+
+先介绍一些记号和基本的积分公式。令
+% PDF p. 349
+\[
+  \begin{aligned}
+   x_1&=r\cos\varphi_1,\\
+   x_2&=r\sin\varphi_1\cos\varphi_2,\\
+     &\ \vdots\\
+   x_n&=\sin\varphi_1\sin\varphi_2\cdots\sin\varphi_{n-1},
+  \end{aligned}
+\]
+其中 $\varphi_1,\ldots,\varphi_{n-2}\in[0,\pi]$，$\varphi_{n-1}\in[0,2\pi]$。\translatornote{原书的 $x_n$ 行缺少半径因子 $r$，下文用 $x=r\omega$ 表示各分量与半径的关系。}
+
+定义点 $\omega=(\omega^1,\ldots,\omega^n)\in S^{n-1}$ 为
+\[
+  \begin{aligned}
+   \omega^1&=\cos\varphi_1,\\
+   \omega^2&=\sin\varphi_1\cos\varphi_2,\\
+          &\ \vdots\\
+   \omega^n&=\sin\varphi_1\sin\varphi_2\cdots\sin\varphi_{n-1}.
+  \end{aligned}
+\]
+等价地，对于 $1\leq k\leq n$，可以写作
+\[
+  \omega^k=\left(\prod_{i=1}^{k-1}\sin\varphi_i\right)
+  \times\begin{cases}
+     \cos\varphi_k,&k<n,\\
+     \sin\varphi_{n-1},&k=n,
+  \end{cases}
+\]
+约定 $\prod_{i=1}^0\sin\varphi_i=1$。\translatornote{当 $k=n$ 时，原分段式把 $\sin\varphi_{n-1}$ 乘了两次。$\omega^n$ 的乘积以上一式为准。}
+
+在这些坐标中，$S^{n-1}$ 上的标准曲面面积元为
+\[
+  dS(\omega)=\left(\prod_{i=1}^{n-2}\sin^{n-1-i}\varphi_i\right)
+             d\varphi_1\cdots d\varphi_{n-1}.
+\]
+特别地，$n=3$ 时化为熟知的 $dS(\varphi_1,\varphi_2)=\sin\varphi_1\,d\varphi_1\,d\varphi_2$，得到通常的球面参数化。
+
+令 $x=r\omega$，其中 $\omega\in S^{n-1}$。于是 $d^nx=r^{n-1}dr\,dS(\omega)$，并且
+\begin{equation*}
+  \mu(B_r(p))=\int_0^r\int_{S^{n-1}}
+     \left(1-\tfrac16\operatorname{Ric}_{kl}(p)r^2\omega^k\omega^l+o(r^3)\right)
+      r^{n-1}\,dS(\omega)\,dr.
+  \tag{6F4}\label{eq:6F4}
+\end{equation*}
+单位球面的平均满足
+\[
+  \int_{S^{n-1}}\omega^k\omega^l\,dS
+  =\frac{\operatorname{Vol}(S^{n-1})}{n}\delta^{kl}.
+\]
+其中 $\operatorname{Vol}(S^{n-1})=\dfrac{\pi^{n/2}}{\Gamma(n/2+1)}r^n$，且 $\operatorname{Ric}_{kk}=R(p)$ 为标量曲率，因此
+\begin{equation*}
+  \int_{S^{n-1}}\operatorname{Ric}_{kl}\omega^k\omega^l\,dS
+   =\int_{S^{n-1}}R(p)\omega^{2k}\,dS
+   =\frac{\operatorname{Vol}(S^{n-1})}{n}R(p).
+  \tag{6F5}\label{eq:6F5}
+\end{equation*}
+\translatornote{原书此处写出的 $\pi^{n/2}r^n/\Gamma(n/2+1)$ 是半径为 $r$ 的欧氏 $n$ 维球的体积。单位球面面积为 $n\pi^{n/2}/\Gamma(n/2+1)$。式 \eqref{eq:6F5} 最后一个等号可直接用上一式中的 $\delta^{kl}$ 缩并里奇张量得到。}
+
+将式 \eqref{eq:6F5} 代入式 \eqref{eq:6F4} 得到
+% PDF p. 350
+\begin{equation*}
+  \begin{aligned}
+    \mu(B_r(p))&=\int_0^r\int_{S^{n-1}}
+        \left(1-\tfrac16\operatorname{Ric}_{kl}(p)r^2\omega^k\omega^l+o(r^3)\right)
+        r^{n-1}\,dS(\omega)\,dr\\
+    &=\int_0^r\biggl(\int_{S^{n-1}}dS(\omega)
+        -\frac{r^2}{6}\int_{S^{n-1}}\operatorname{Ric}_{kl}\omega^k\omega^l\,dS\\
+    &\hspace{8em}+\int_{S^{n-1}}o(r^3)\,dS\biggr)r^{n-1}\,dr\\
+    &=\operatorname{Vol}(S^{n-1})\int_0^r
+        \left(1-\frac{R(p)}{6n}r^2+o(r^3)\right)r^{n-1}\,dr.
+  \end{aligned}
+  \tag{6F6}\label{eq:6F6}
+\end{equation*}
+将基本积分 $\int_0^r r^{n-1}\,dr=r^n/n$ 和 $\int_0^r r^{n+1}\,dr=r^{n+2}/(n+2)$ 代入式 \eqref{eq:6F6}，得到
+\[
+  \mu(B_r(p))=\frac{\operatorname{Vol}(S^{n-1})}{n}r^n
+        \left(1-\frac{R(p)}{6(n+2)}r^2+o(r^3)\right).
+\]
+注意
+\[
+  \omega_n=\operatorname{Vol}(B_1(0)\subset\R^n)
+       =\frac{\operatorname{Vol}(S^{n-1})}{n}
+       =\frac{n^{n/2-1}}{\Gamma(n/2+1)}r^n.
+\]
+\translatornote{末项照录原式。单位球体积 $\omega_n=\pi^{n/2}/\Gamma(n/2+1)$，不含 $r^n$。}
+这意味着
+\[
+  \mu(B_r(p))=\omega_n r^n\left(1-\frac{R(p)}{6(n+2)}r^2+o(r^3)\right),
+\]
+其中 $R(p)$ 是 $p$ 处的标量曲率。
+
+如果希望用“平均截面曲率” $K(p)$ 表示修正项，注意对 $n$ 维流形有 $R(p)=n(n-1)K(p)$。因此，等价地，
+\[
+  \mu(B_r(p))=\omega_n r^n
+     \left[1-\frac{n(n-1)}{6(n+2)}K(p)r^2+o(r^3)\right].
+\]
+
+\AppendixSection{6G}{带曲率修正的多项分布协方差}
+
+下面推导带曲率修正的多项分布协方差。我们在较小的“单元格区域尺度” $r$ 下展开到二阶。
+
+\AppendixHeading{6G1}{带曲率修正的单元格比例概率}
+
+假定在无关联的零假设下，落入单元格 $(ij)$ 的概率与以其中心 $x_{ij}$ 为球心、半径为 $r$ 的小测地球的体积成比例。根据 $n$ 维空间中的小球体积展开，
+% PDF p. 351
+\[
+  \mu(B_r(x_{ij}))=\omega_n r^n
+      \left(1-\frac{R(x_{ij})}{6(n+2)}r^2+o(r^3)\right),
+\]
+其中 $R(x_{ij})$ 为 $x_{ij}$ 处的标量曲率。因此，该概率为
+\begin{equation*}
+  p_{ij}=\frac{\mu(B_r(x_{ij}))}{\mu(M)}=p_{ij}^0(1+\delta_{ij}),
+  \tag{6G1}\label{eq:6G1}
+\end{equation*}
+其中 $p_{ij}^0=\omega_n r^n/\mu(M)$（“平坦”情形的概率），$\delta_{ij}=-\dfrac{R(x_{ij})}{6(n+2)}r^2,\ o(r^3)$。
+
+\AppendixHeading{6G2}{无曲率时的多项分布协方差}
+
+若 $\hat p_{ij}$ 是观测到的单元格比例，则在真实概率为 $p_{ij}$ 的多项模型下，
+\[
+  \Cov(\hat p_{ij},\hat p_{kl})
+   =\frac1N\bigl(p_{ij}\delta_{(ij),(kl)}-p_{ij}p_{kl}\bigr).
+\]
+因此，真实多项分布协方差为
+\begin{equation*}
+  \Sigma_{(ij),(kl)}=\frac1N\bigl(p_{ij}\delta_{(ij),(kl)}-p_{ij}p_{kl}\bigr).
+  \tag{6G2}\label{eq:6G2}
+\end{equation*}
+定义欧氏空间中的协方差矩阵
+\[
+  \Sigma^0_{(ij),(kl)}
+   =\frac1N\bigl(p_{ij}^0\delta_{(ij),(kl)}-p_{ij}^0p_{kl}^0\bigr).
+\]
+
+\AppendixHeading{6G3}{\texorpdfstring{$\delta_{ij}\ne0$}{δij ≠ 0} 时的展开}
+
+回顾
+\begin{equation*}
+  p_{ij}=p_{ij}^0+p_{ij}^0\delta_{ij}=p_{ij}^0+\Delta_{ij},
+  \tag{6G3}\label{eq:6G3}
+\end{equation*}
+其中 $\Delta_{ij}=-\dfrac{p_{ij}^0R(x_{ij})}{6(n+2)}r^2$。
+
+将式 \eqref{eq:6G3} 代入式 \eqref{eq:6G2}，得到包含曲率修正的多项分布协方差矩阵，
+\[
+  \begin{aligned}
+  \Sigma_{(ij),(kl)}
+   &=\frac1N\left[(p_{ij}^0+\Delta_{ij})\delta_{(ij),(kl)}
+               -(p_{ij}^0+\Delta_{ij})(p_{kl}^0+\Delta_{kl})\right]\\
+   &=\frac1N\bigl[p_{ij}^0\delta_{(ij),(kl)}-p_{ij}^0p_{kl}^0
+               +\Delta_{ij}\delta_{(ij),(kl)}
+               -(p_{ij}^0\Delta_{kl}+p_{kl}^0\Delta_{ij})\bigr]+o(r^4).
+  \end{aligned}
+\]
+% PDF p. 352
+与欧氏空间的 $\Sigma^0$ 比较，曲率修正为
+\begin{equation*}
+  \gamma_{(ij),(kl)}(K)=\frac1N
+       \bigl[\Delta_{ij}\delta_{(ij),(kl)}-(p_{ij}^0\Delta_{kl}+p_{kl}^0\Delta_{ij})\bigr].
+  \tag{6G4}\label{eq:6G4}
+\end{equation*}
+
+\AppendixHeading{6G4}{用曲率表示 \texorpdfstring{$\Delta_{ij}$}{Δij}}
+
+将 $\Delta_{ij}=-\dfrac{p_{ij}^0R(x_{ij})}{6(n+2)}r^2$ 代入式 \eqref{eq:6G4}，得到以下两种情形。
+
+对角修正 $(ij)=(kl)$：
+\begin{equation*}
+  \begin{aligned}
+   \gamma_{(ij),(ij)}(K)
+      &=\tfrac1N(\Delta_{ij}-2p_{ij}^0\Delta_{ij})
+       =\tfrac1N\Delta_{ij}(1-2p_{ij}^0)\\
+      &=\frac{-p_{ij}^0r^2}{N}\frac{R(x_{ij})}{6(n+2)}(2p_{ij}^0-1).
+  \end{aligned}
+  \tag{6G5a}\label{eq:6G5a}
+\end{equation*}
+非对角情形 $(ij)\ne(kl)$：
+\begin{equation*}
+  \gamma_{(ij),(kl)}(K)
+  =-\tfrac1N(p_{ij}^0\Delta_{kl}+p_{kl}^0\Delta_{ij})
+  =\frac1N\frac{p_{ij}^0p_{kl}^0 r^2}{6(n+2)}\bigl(R(x_{ij})+R(x_{kl})\bigr).
+  \tag{6G5b}\label{eq:6G5b}
+\end{equation*}
+\translatornote{式 \eqref{eq:6G5a} 末行若保留因子 $(2p_{ij}^0-1)$，则前系数应取正号，与正文式 \eqref{eq:6.39a} 一致。式 \eqref{eq:6G5b} 含 $r^2$，正文式 \eqref{eq:6.39b} 缺此因子。}

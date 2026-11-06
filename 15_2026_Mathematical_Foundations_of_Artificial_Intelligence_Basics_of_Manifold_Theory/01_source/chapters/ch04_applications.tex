@@ -1,0 +1,171 @@
+% PDF p. 194
+\section{应用}
+\subsection{李导数的实际用途}
+李导数用于分析动力系统、几何结构和微分方程的行为并为之建模。它可以量化函数、向量或张量沿向量场的变化，因而有多方面的实际用途。下面列举主要用途。
+
+\subsubsection{几何与物理}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{动力系统}
+  \begin{itemize}
+    \item 用李导数描述能量、动量等量沿动力系统的流的变化率。
+    \item 分析由微分方程支配的系统的稳定性、对称性和不变量。
+  \end{itemize}
+  \item \textbf{广义相对论}
+  \begin{itemize}
+    \item 度量几何量（如度量张量）沿特定方向的变化。
+    \item 分析时空的对称性，例如基林向量场（Killing vector field）。
+  \end{itemize}
+  \item \textbf{流体动力学}
+  \begin{itemize}
+    \item 描述标量（如温度、压力）或向量场（如速度）沿流场的演化。
+    \item 有助于表述守恒定律及理解涡量。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{机器学习与图神经网络（GNN）}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{考虑几何信息的 GNN}
+  \begin{itemize}
+    \item 李导数将几何信息和方向信息纳入消息传递方案。
+    \item 应用包括分子性质预测、三维点云处理及几何深度学习。
+  \end{itemize}
+  \item \textbf{等变性与对称性}
+  \begin{itemize}
+    \item 用于设计遵循数据对称性的模型，例如具有旋转或平移不变性的模型。
+    \item 例如，几何约束在蛋白质折叠中很重要。
+  \end{itemize}
+\end{enumerate}
+
+% PDF p. 195
+\subsubsection{机器人与控制系统}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{运动规划}
+  \begin{itemize}
+    \item 李导数用来计算机器人系统中控制输入的演化，特别是欠驱动或有约束的系统。
+    \item 例如，为无人机、机械臂或自动驾驶车辆规划轨迹。
+  \end{itemize}
+  \item \textbf{非线性控制}
+  \begin{itemize}
+    \item 用于反馈线性化（feedback linearization），简化非线性系统的控制。
+    \item 分析动力系统的可控性和稳定性。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{计算机视觉}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{目标跟踪}
+  \begin{itemize}
+    \item 李导数可度量纹理或形状沿运动场的变形，辅助目标检测和跟踪。
+    \item 用于光流（optical flow）和图像稳像。
+  \end{itemize}
+  \item \textbf{三维重建}
+  \begin{itemize}
+    \item 有助于理解曲面和纹理怎样随空间变换演化。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{微分几何与拓扑}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{向量场分析}
+  \begin{itemize}
+    \item 用来研究流形上的向量场，例如曲面或更高维空间中的动力学。
+    \item 例如，分析动力系统中的相图。
+  \end{itemize}
+  \item \textbf{对称性与守恒定律}
+  \begin{itemize}
+    \item 利用诺特定理（Noether's theorem）确定物理学中的守恒量，其中用李导数分析对称性。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{工程应用}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{信号处理}
+  \begin{itemize}
+    \item 分析信号（例如波形）在随时间变化的变换或空间变换下怎样演化。
+    \item 例如，天线中电磁场的演化。
+  \end{itemize}
+  \item \textbf{结构力学}
+  \begin{itemize}
+    \item 利用描述应力或应变的向量场，评估材料在外力作用下的变形。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{\texorpdfstring{李导数 $\approx$“生物场沿生物流的变化”}{李导数近似表示生物场沿生物流的变化}}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{蛋白质折叠}
+  \begin{itemize}
+    \item 为蛋白质折叠路径中的几何变换建模。
+    % PDF p. 196
+    \item 量化构象变化如何沿能量梯度所确定的向量场传播。
+  \end{itemize}
+  \item \textbf{酶动力学}
+  \begin{itemize}
+    \item 分析催化时活性位点如何变形，以及运动如何在酶内传播。
+  \end{itemize}
+  \item \textbf{单细胞 RNA 速率场}
+  \begin{itemize}
+    \item 找出标记准稳态吸引子状态的\emph{速率不变}基因，或按李导数对基因排序，找出驱动进一步分化的基因。
+  \end{itemize}
+  \item \textbf{空间转录组学（二维组织切片）}
+  \begin{itemize}
+    \item 校正通量图中的组织运动。协变通量的散度等于生物产生量减去降解量，由此将该量与机械平流区分开来。
+  \end{itemize}
+  \item \textbf{多组学（空间 RNA 与蛋白质组学）}
+  \begin{itemize}
+    \item 跨模态相关张量的李导数较大的点，标出转录与翻译的耦合关系正在重组的区域。
+  \end{itemize}
+  \item \textbf{细胞病理图像分析}
+  \begin{itemize}
+    \item 李导数用于检测各向异性重塑。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{自主系统}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{路径优化}
+  \begin{itemize}
+    \item 用李导数度量路径在速度场作用下如何变化，为无人机、车辆或机器人优化路径。
+    \item 用于强化学习中的轨迹优化。
+  \end{itemize}
+  \item \textbf{稳定性分析}
+  \begin{itemize}
+    \item 李导数有助于评估扰动对系统稳定性的影响，这对自动驾驶车辆或航天器等安全攸关的系统很重要。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{经济学与博弈论}
+\begin{itemize}
+  \item 分析经济系统的动态或博弈策略的动态，其中效用、成本等量沿时间相关的轨迹演化。
+\end{itemize}
+
+\subsubsection{数据科学与分析}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{特征传播}
+  \begin{itemize}
+    \item 在基于图的机器学习中，用李导数使特征沿边传播，并纳入几何约束。
+    \item 例如，分析社交网络或分子相互作用网络。
+  \end{itemize}
+  \item \textbf{形状分析}
+  \begin{itemize}
+    \item 在计算几何中度量形状的变形，可用于三维建模和动画。
+  \end{itemize}
+\end{enumerate}
+
+% PDF p. 197
+\subsubsection{李导数的优点}
+\begin{enumerate}
+  \item \textbf{通用性}
+  \begin{itemize}
+    \item 可应用于函数、张量、流形等任何光滑结构。
+  \end{itemize}
+  \item \textbf{几何解释}
+  \begin{itemize}
+    \item 可用流和变换清楚地解释。
+  \end{itemize}
+  \item \textbf{等变性}
+  \begin{itemize}
+    \item 可使方法与系统的对称性和不变性一致。
+  \end{itemize}
+\end{enumerate}
+
+李导数的用途广泛，连接了微分几何与物理、工程、生物学、机器学习和人工智能等领域的实际问题。它能表示方向性的变化及对称性，这对理解复杂系统和设计高效算法不可或缺。

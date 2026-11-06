@@ -1,0 +1,447 @@
+% PDF p. 75
+\subsection{双曲几何的庞加莱圆盘模型及其在系统发育学中的应用}
+下面介绍双曲几何的庞加莱圆盘模型及其在系统发育学（phylogenetics）中的应用，分三个要点讨论。
+
+\subsubsection{庞加莱圆盘模型及其测地线}
+回顾双曲平面的庞加莱圆盘模型是开单位圆盘
+\[
+  D=\{z\in\C:|z|<1\},
+\]
+等价地，
+\[
+  D=\{(u,v)\in\R^2:u^2+v^2<1\}.
+\]
+$D$ 上的双曲度量（线元）由下式给出。
+\begin{equation*}
+  ds^2=4\,\frac{dz\,d\bar z}{(1-|z|^2)^2}
+      =\frac{4(du^2+dv^2)}{(1-u^2-v^2)^2}.
+  \tag{2.71}\label{eq:2.71}
+\end{equation*}
+
+\subsubsection{两点之间的测地距离}
+下面证明，两个不同的点 $z_1,z_2\in D$ 之间的双曲距离（hyperbolic distance）$d_D(z_1,z_2)$ 为
+\begin{equation*}
+  d_D(z_1,z_2)=\operatorname{arcosh}\!\left(
+    1+\frac{2|z_1-z_2|^2}{(1-|z_1|^2)(1-|z_2|^2)}\right),
+  \tag{2.72}\label{eq:2.72}
+\end{equation*}
+或
+\begin{equation*}
+  d_D(z_1,z_2)=2\tanh^{-1}\!\bigl(|\varphi_{z_1}(z_2)|\bigr),
+  \tag{2.73}\label{eq:2.73}
+\end{equation*}
+% PDF p. 76
+其中
+\begin{equation*}
+  \varphi_{z_1}(z_2)=\frac{z_2-z_1}{1-\bar z_1z_2}.
+  \tag{2.74}\label{eq:2.74}
+\end{equation*}
+
+\textbf{证明。} $D$ 上的双曲度量（线元），亦即庞加莱圆盘度量，写作
+\begin{equation*}
+  ds=\frac{2|dz|}{1-|z|^2},
+  \tag{2.75}\label{eq:2.75}
+\end{equation*}
+或等价地，在 $z=x+iy$ 的实坐标 $(x,y)$ 下，黎曼线元为
+\begin{equation*}
+  ds^2=4\,\frac{dx^2+dy^2}{(1-x^2-y^2)^2}.
+  \tag{2.76}\label{eq:2.76}
+\end{equation*}
+$D$ 的保定向等距映射是莫比乌斯变换（Möbius transformation），形式如下。
+\begin{equation*}
+  \varphi_a(z)=\frac{z-a}{1-\bar a z},\qquad |a|<1.
+  \tag{2.77}\label{eq:2.77}
+\end{equation*}
+\translatornote{式~\eqref{eq:2.77} 给出一族保定向等距映射。若要写出全部这类映射，还需允许右侧乘以单位复数，即再复合绕原点的旋转。}
+
+式~\eqref{eq:2.75} 给出的 $\mathbb D$ 上的双曲度量（线元），让我们可以先计算\emph{原点} $z=0$ 与任一点 $z\in\mathbb D$ 的双曲距离。用径向直线 $\gamma(t)=tz$（$0\leq t\leq 1$，$|z|\leq 1$）描述这段路径。\translatornote{原书写作 $|z|\leq1$。这里的点在开圆盘内，有限距离对应 $|z|<1$。} 已知对于同一条过原点直线上的两点，该模型中的测地线是连接它们的直线段（LDSGmini2 2025）。因此双曲距离 $d(0,z)$ 等于庞加莱度量下曲线 $\gamma(t)$ 的长度。由式~\eqref{eq:2.75}，对 $\gamma(t)=tz$（$0\leq t\leq1$）计算其线元并积分，得到弧长。\translatornote{式~\eqref{eq:2.78} 的最后两个分母依原书保留。代入式~\eqref{eq:2.75} 时应为 $1-|\gamma(t)|^2$ 和 $1-|tz|^2$。}
+\begin{equation*}
+  \begin{aligned}
+    \gamma\text{ 的长度}
+      &=\int_0^1 ds=\int_0^1\frac{2|dz|}{1-|z|^2}
+        =\int_0^1\frac{2|\gamma'(t)|}{1-\gamma(t)^2}\,dt\\
+      &=2\int_0^1\frac{|z|}{1-(tz)^2}\,dt.
+  \end{aligned}
+  \tag{2.78}\label{eq:2.78}
+\end{equation*}
+令 $\sigma=|z|$。式~\eqref{eq:2.78} 化为
+\[
+  2\int_0^1\frac{|z|}{1-(tz)^2}\,dt
+    =2\int_0^1\frac{d(\sigma t)}{1-(\sigma t)^2}
+    =2\tanh^{-1}(|z|),
+\]
+或
+\[
+  2\int_0^1\frac{|z|}{1-(tz)^2}\,dt
+    =\log\!\left(\frac{1+|z|}{1-|z|}\right).
+\]
+% PDF p. 77
+换言之，我们证明了
+\begin{equation*}
+  d(0,z)=2\tanh^{-1}(|z|),
+  \tag{2.79}\label{eq:2.79}
+\end{equation*}
+或
+\begin{equation*}
+  d(0,z)=\log\!\left(\frac{1+|z|}{1-|z|}\right).
+  \tag{2.80}\label{eq:2.80}
+\end{equation*}
+
+最后，通过莫比乌斯等距映射计算一般的两点距离。回顾莫比乌斯等距映射的一个性质，
+\begin{equation*}
+  \varphi_{z_1}(z)=\frac{z-z_1}{1-\bar z_1z},
+  \tag{2.81}\label{eq:2.81}
+\end{equation*}
+是从 $\mathbb D$ 到 $\mathbb D$ 的双射。
+
+我们简要证明这一点。首先，对任意 $z\in\mathbb D$，有 $1-\bar z_1z\neq0$。否则 $1-\bar z_1z=0$，也就是 $1=\bar z_1z$，这意味着
+\begin{equation*}
+  1=\bar z_1z.
+  \tag{2.82}\label{eq:2.82}
+\end{equation*}
+对式~\eqref{eq:2.82} 两边取模，得到 $1=|\bar z_1z|=|\bar z_1||z|<1$，矛盾。因此分母在 $\mathbb D$ 内不为零，$\varphi_{z_1}(z)$ 有定义。
+
+接下来证明只要 $|z|<1$，就有 $|\varphi_{z_1}(z)|<1$。为证明
+\begin{equation*}
+  |\varphi_{z_1}(z)|=
+  \left|\frac{z-z_1}{1-\bar z_1z}\right|=
+  \frac{|z-z_1|}{|1-\bar z_1z|}<1,
+  \tag{2.83}\label{eq:2.83}
+\end{equation*}
+需证明
+\[
+  |z-z_1|<|1-\bar z_1z|
+  \quad\text{或}\quad |z-z_1|^2<|1-\bar z_1z|^2.
+\]
+而
+\[
+  \begin{aligned}
+    |z-z_1|^2&=(z-z_1)\overline{(z-z_1)},\\
+    |1-\bar z_1z|^2&=(1-\bar z_1z)\overline{(1-\bar z_1z)}.
+  \end{aligned}
+\]
+注意
+\[
+  \begin{aligned}
+    &(1-\bar z_1z)\overline{(1-\bar z_1z)}
+      -(z-z_1)\overline{(z-z_1)}\\
+    &\qquad=1-z\bar z-z_1\bar z_1+z\bar z z_1\bar z_1
+       =(1-z_1\bar z_1)(1-z\bar z)>0,
+  \end{aligned}
+\]
+因此
+\begin{equation*}
+  |z-z_1|^2<|1-\bar z_1z|^2.
+  \tag{2.84}\label{eq:2.84}
+\end{equation*}
+由式~\eqref{eq:2.84} 得 $|\varphi_{z_1}(z)|<1$。
+
+% PDF p. 78
+于是
+\begin{equation*}
+  \varphi_{z_1}(\mathbb D)\subseteq\mathbb D.
+  \tag{2.85}\label{eq:2.85}
+\end{equation*}
+
+接着证明单射性，即若 $\varphi_{z_1}(z)=\varphi_{z_1}(w)$，则 $z=w$。假设
+\begin{equation*}
+  \begin{gathered}
+    \varphi_{z_1}(z)=\varphi_{z_1}(w),\qquad\text{即}\\
+    \frac{z-z_1}{1-\bar z_1z}=\frac{w-z_1}{1-\bar z_1w}.
+  \end{gathered}
+  \tag{2.86}\label{eq:2.86}
+\end{equation*}
+交叉相乘得到
+\[
+  (z-z_1)(1-\bar z_1w)=(1-\bar z_1z)(w-z_1).
+\]
+展开上式得到
+\begin{equation*}
+  z-z\bar z_1w-z_1+z_1\bar z_1w=w-z_1-\bar z_1zw+\bar z_1zz_1.
+  \tag{2.87}\label{eq:2.87}
+\end{equation*}
+消去式~\eqref{eq:2.87} 两边的公因项，得到 $z+z_1\bar z_1w=w+\bar z_1zz_1$，也就是 $(1-z_1\bar z_1)z=(1-z_1\bar z_1)w$，从而 $z=w$。因此 $\varphi_{z_1}$ 是单射。
+
+最后证明满射性。也就是说，对每个 $\rho\in\mathbb D$，\emph{都能找到原像} $z\in\mathbb D$，使得
+\begin{equation*}
+  \rho=\frac{z-z_1}{1-\bar z_1z}.
+  \tag{2.88}\label{eq:2.88}
+\end{equation*}
+为求出 $z$，将式~\eqref{eq:2.88} 两边乘以分母，得
+\begin{equation*}
+  \rho(1-\bar z_1z)=z-z_1.
+  \tag{2.89}\label{eq:2.89}
+\end{equation*}
+式~\eqref{eq:2.89} 可进一步化为下式。\translatornote{括号内末尾的 $z$ 在原式中出现，按上式移项后应删去。}
+\begin{equation*}
+  z(1+\rho\bar z_1z)=\rho+z_1.
+  \tag{2.90}\label{eq:2.90}
+\end{equation*}
+由式~\eqref{eq:2.90} 解得
+\begin{equation*}
+  z=\frac{\rho+z_1}{1+\rho\bar z_1}.
+  \tag{2.91}\label{eq:2.91}
+\end{equation*}
+用与证明式~\eqref{eq:2.85} 相似的方法，可以证明
+\begin{equation*}
+  \left|\frac{\rho+z_1}{1+\rho\bar z_1}\right|<1
+    \qquad\text{当 }|\rho|<1,\quad |z_1|<1.
+  \tag{2.92}\label{eq:2.92}
+\end{equation*}
+也就是说，可以证明 $z\in\mathbb D$。
+
+综上，莫比乌斯变换 $\varphi_{z_1}$ 是圆盘的双射全纯自映射，且 $\varphi_{z_1}$ 保持距离。
+
+% PDF p. 79
+因而两点 $z_1,z_2$ 之间的距离为
+\begin{equation*}
+  d_D(z_1,z_2)=d_D\bigl(\varphi_{z_1}(z_1),\varphi_{z_1}(z_2)\bigr)=d_D(0,\sigma),
+  \tag{2.93}\label{eq:2.93}
+\end{equation*}
+其中
+\begin{equation*}
+  \sigma=\varphi_{z_1}(z_2)=\frac{z_2-z_1}{1-\bar z_1z_2}.
+  \tag{2.94}\label{eq:2.94}
+\end{equation*}
+利用式~\eqref{eq:2.79} 与式~\eqref{eq:2.80}，得到
+\begin{equation*}
+  d_D(z_1,z_2)=2\tanh^{-1}(|\sigma|)
+      =2\tanh^{-1}\!\left(\left|\frac{z_2-z_1}{1-\bar z_1z_2}\right|\right),
+  \tag{2.95}\label{eq:2.95}
+\end{equation*}
+或
+\begin{equation*}
+  d_D(z_1,z_2)=\log\!\left(\frac{1+|\sigma|}{1-|\sigma|}\right).
+  \tag{2.96}\label{eq:2.96}
+\end{equation*}
+接下来化简 $\log\bigl((1+|\sigma|)/(1-|\sigma|)\bigr)$。回顾
+\begin{equation*}
+  |\sigma|^2=\left|\frac{z_2-z_1}{1-\bar z_1z_2}\right|^2
+     =\frac{|z_2-z_1|^2}{|1-\bar z_1z_2|^2}.
+  \tag{2.97}\label{eq:2.97}
+\end{equation*}
+注意
+\begin{equation*}
+  1-\bar z_1z_2=1-\bar z_1z_1+\bar z_1z_1-\bar z_1z_2
+     =1-|z_1|^2+\bar z_1(z_1-z_2).
+  \tag{2.98}\label{eq:2.98}
+\end{equation*}
+类似地，
+\begin{equation*}
+  1-z_1\bar z_2=1-|z_2|^2+\bar z_2(z_2-z_1).
+  \tag{2.99}\label{eq:2.99}
+\end{equation*}
+经代数化简得到
+\begin{equation*}
+  |1-\bar z_1z_2|^2=(1-|z_1|^2)(1-|z_2|^2)+|z_1-z_2|^2.
+  \tag{2.100}\label{eq:2.100}
+\end{equation*}
+结合式~\eqref{eq:2.97} 和式~\eqref{eq:2.100} 得
+\begin{equation*}
+  |\sigma|^2=\frac{|z_2-z_1|^2}{(1-|z_1|^2)(1-|z_2|^2)+|z_1-z_2|^2}.
+  \tag{2.101}\label{eq:2.101}
+\end{equation*}
+所以
+\begin{equation*}
+  1+|\sigma|^2=\frac{(1-|z_1|^2)(1-|z_2|^2)+2|z_1-z_2|^2}
+                     {(1-|z_1|^2)(1-|z_2|^2)+|z_1-z_2|^2},
+  \tag{2.102}\label{eq:2.102}
+\end{equation*}
+\begin{equation*}
+  1-|\sigma|^2=\frac{(1-|z_1|^2)(1-|z_2|^2)}
+                     {(1-|z_1|^2)(1-|z_2|^2)+|z_1-z_2|^2}.
+  \tag{2.103}\label{eq:2.103}
+\end{equation*}
+
+% PDF p. 80
+由式~\eqref{eq:2.102} 与式~\eqref{eq:2.103} 得
+\begin{equation*}
+  \begin{aligned}
+    \frac{1+|\sigma|^2}{1-|\sigma|^2}
+      &=\frac{(1-|z_1|^2)(1-|z_2|^2)+2|z_1-z_2|^2}{(1-|z_1|^2)(1-|z_2|^2)}\\
+      &=1+\frac{2|z_1-z_2|^2}{(1-|z_1|^2)(1-|z_2|^2)}.
+  \end{aligned}
+  \tag{2.104}\label{eq:2.104}
+\end{equation*}
+注意
+\begin{equation*}
+  \frac{(1+|\sigma|)^2+(1-|\sigma|)^2}{2(1-|\sigma|^2)}
+      =\frac{1+|\sigma|^2}{1-|\sigma|^2}.
+  \tag{2.105}\label{eq:2.105}
+\end{equation*}
+由式~\eqref{eq:2.94}–\eqref{eq:2.96} 和 $\cosh$ 的定义，得到
+\begin{equation*}
+  \cosh\bigl(2\tanh^{-1}(|\sigma|)\bigr)
+    =\frac{\dfrac{1+|\sigma|}{1-|\sigma|}+\dfrac{1-|\sigma|}{1+|\sigma|}}{2}
+    =\frac{1+|\sigma|^2}{1-|\sigma|^2}.
+  \tag{2.106}\label{eq:2.106}
+\end{equation*}
+把式~\eqref{eq:2.104} 代入式~\eqref{eq:2.106}，得到
+\begin{equation*}
+  \cosh\bigl(2\tanh^{-1}(|\sigma|)\bigr)
+    =1+\frac{2|z_1-z_2|^2}{(1-|z_1|^2)(1-|z_2|^2)}.
+  \tag{2.107}\label{eq:2.107}
+\end{equation*}
+因此，结合式~\eqref{eq:2.95} 与式~\eqref{eq:2.107}，得到
+\[
+  d_D(z_1,z_2)=2\tanh^{-1}(|\sigma|)
+    =\operatorname{arcosh}\!\left(1+\frac{2|z_1-z_2|^2}{(1-|z_1|^2)(1-|z_2|^2)}\right).
+\]
+\textbf{综上，庞加莱圆盘模型中两点 $z_1,z_2$ 之间的双曲距离为}
+\begin{equation*}
+  d_D(z_1,z_2)=2\tanh^{-1}\!\left(\left|\frac{z_2-z_1}{1-\bar z_1z_2}\right|\right),
+  \tag{2.108}\label{eq:2.108}
+\end{equation*}
+或
+\begin{equation*}
+  d_D(z_1,z_2)=\operatorname{arcosh}\!\left(
+    1+\frac{2|z_1-z_2|^2}{(1-|z_1|^2)(1-|z_2|^2)}\right).
+  \tag{2.109}\label{eq:2.109}
+\end{equation*}
+
+\subsubsection{推断双曲系统发育树}
+系统发育树（phylogenetic tree）描述物种的演化历史。更重要的是，它定义了一个空间，使我们能计算生物实体之间的距离，并用路径长度恰当地度量物种之间的距离（Jiang 等，2022）。把树以低失真嵌入双曲空间，是推断系统发育树的关键。双曲表示可在低维空间中良好地嵌入树状数据，是重建演化树的有力工具（Macaulay 等，2023）。
+
+% PDF p. 81
+\Subheading{步骤 0 \quad 输入与记号}
+\noindent\begin{tabularx}{\linewidth}{@{}l X@{}}
+  $n$ & 分类单元（DNA 序列）的数量。\\
+  $L$ & 比对长度。\\
+  $\Sigma=\{A,C,G,T\}$ & 核苷酸字母表，必要时可扩展为密码子。\\
+  $\mathbb H^k_{-1}$ & 曲率为 $-1$ 的 $k$ 维庞加莱球。\\
+  $d^{\mathrm{tree}}_{ij}$ & 分类单元 $i,j$ 之间真实但未知的树路径长度。\\
+  $D_{ij}$ & 由序列求得的经验相异度。
+\end{tabularx}
+
+假设已经完成多序列比对（multiple-sequence alignment，MSA）。下面依次介绍六个编号步骤。
+
+\Subheading{步骤 1 \quad 计算经验距离矩阵 $D$}
+\emph{1-a \quad 对数行列式距离（快速）}
+\[
+  D_{ij}=-\tfrac12\log\det(P_{ij}P_{jj}^{-1}P_{ji}P_{ii}^{-1}),
+\]
+其中 $P_{ij}$ 是序列 $i$ 和 $j$ 的核苷酸联合观测频率矩阵，大小为 $4\times4$。当序列相当接近（分歧小于 $20\%$）时，这种方法效果较好。
+
+\emph{1-b \quad 最大似然树路径距离（精确）}
+
+对每一对 $(i,j)$，关于枝长 $l_{ij}$ 最大化
+\[
+  l(l_{ij})=\sum_{c=1}^{L}\log\!\left[\pi^{T}\exp(Ql_{ij})e_{ic}\right],
+\]
+其中 $Q$ 是 $4\times4$ 的广义时间可逆（general time reversible，GTR）速率矩阵，$\pi$ 是其平稳分布，$e_A$ 等为相应向量。使用牛顿法或布伦特搜索（Brent search），得到对称矩阵 $D=[l_{ij}]$。
+
+\emph{输出} $D\in\R^{n\times n}$ 只近似满足三角不等式。
+
+\Subheading{步骤 2 \quad 双曲多维尺度分析（H-MDS）}
+\textbf{目标。}嵌入 $n$ 个点 $x_i\in\mathbb H^k$，使
+\[
+  d_H(x_i,x_j)\approx D_{ij}.
+\]
+\emph{2-a \quad 庞加莱球的几何}
+
+球 $\mathbb B^k=\{x\in\R^k:\lVert x\rVert<1\}$。测地距离为
+\[
+  d_H(u,v)=\operatorname{arcosh}\!\left(
+    1+\frac{2\lVert u-v\rVert^2}{(1-\lVert u\rVert^2)(1-\lVert v\rVert^2)}
+  \right).
+\]
+
+\emph{2-b \quad 应力泛函}
+
+为了初始化分类单元的嵌入，先最小化嵌入相对于距离矩阵的应力。给定一组两两距离 $D_{ij}$，点 $x_i\in\mathbb H^k$ 的嵌入应力如下。\translatornote{应力式依原书保留。下一步把残差定义为 $d_H(x_i,x_j)-D_{ij}$。应力式的平方项按该定义应为 $[d_H(x_i,x_j)-D_{ij}]^2$。}
+% PDF p. 82
+\[
+  S(x)=\frac12\sum_{i<j} w_{ij}\bigl[d_H(x_i,x_j-D_{ij})\bigr]^2,
+  \qquad w_{ij}=D_{ij}^{-2}\quad\text{（MDS 的取法）}.
+\]
+最小化该应力是一个棘手的非凸问题，这里采用基于梯度的优化。
+
+\emph{2-c \quad 黎曼梯度}
+
+令
+\[
+  \begin{aligned}
+    \Delta_{ij}&=d_H(x_i,x_j)-D_{ij},\\
+    \lambda_{ij}&=\frac{4}{(1-\lVert x_i\rVert^2)(1-\lVert x_j\rVert^2)},\\
+    A_{ij}&=1+\frac{2\lVert x_i-x_j\rVert^2}
+                     {(1-\lVert x_i\rVert^2)(1-\lVert x_j\rVert^2)}.
+  \end{aligned}
+\]
+于是
+\[
+  \nabla^{\mathrm{Euc}}_{x_i}S
+    =\sum_{j\neq i}w_{ij}\Delta_{ij}\,
+        \frac{\lambda_{ij}(x_i-x_j)}{\sqrt{A_{ij}^2-1}}.
+\]
+转换成\textbf{黎曼梯度}（Riemannian gradient），得到
+\[
+  \operatorname{grad}_{x_i}S
+  =\frac{(1-\lVert x_i\rVert^2)^2\nabla^{\mathrm{Euc}}_{x_i}S}{4}.
+\]
+
+\emph{2-d \quad 黎曼随机梯度下降更新}
+
+\[
+  x_i^{(t+1)}=\operatorname{proj}\!\left(x_i^{(t)}
+      -\eta\operatorname{grad}_{x_i}S\right),
+  \qquad \eta\sim 10^{-2}\text{–}10^{-3}.
+\]
+若 $\lVert x_i\rVert\geq1$，通过缩放作投影
+\[
+  x\leftarrow\frac{x}{\lVert x\rVert}\times0.999.
+\]
+当 $|S_{t+1}-S_t|/S_t<10^{-4}$ 时停止。输出 $x^*=\{x_i\}$。
+
+\Subheading{步骤 3 \quad 双曲邻接法（HNJ）}
+这一步从嵌入中解码出树，同时得到枝长和树的拓扑。邻接法（neighbor joining，NJ）以两两距离为输入。在双曲空间的双曲面模型中，可以用线性代数高效计算这些距离（Macaulay 等，2023）。
+
+\emph{3-a \quad 双曲空间中的 $Q$ 矩阵}
+\[
+  Q_{ij}=d_H(x_i,x_j)-\frac{1}{n-2}\left(\sum_r d_H(x_i,x_r)+\sum_r d_H(x_j,x_r)\right).
+\]
+选择使 $Q_{ij}$ 最小的一对 $(i,j)$。
+
+% PDF p. 83
+\emph{3-b \quad 放置父节点}
+
+穿过 $x_i,x_j$ 的唯一测地线是一条与边界正交的欧氏圆。这条测地线上的\textbf{双曲中点}（hyperbolic midpoint）$m_{ij}$ 由下式给出。
+\[
+  m_{ij}=\operatorname{gyr}_{x_i}^{-1}\!\left(
+       x_i\oplus\tfrac12\otimes(x_j\ominus x_i)\right),
+\]
+这里用到莫比乌斯加法 $\oplus$、标量乘法 $\otimes$、双曲减法 $\ominus$ 以及旋转映射（gyration）。
+
+加入 $m_{ij}$ 作为新的内部节点，记录枝长
+\[
+  l_i=d_H(x_i,m_{ij}),\qquad l_j=d_H(x_j,m_{ij}).
+\]
+按标准邻接法更新距离矩阵，但使用\emph{双曲距离}。重复上述过程，直到只剩一个节点，得到无根双曲树 $(\mathcal T,l)$。
+
+\Subheading{步骤 4 \quad 在 $\mathbb H^k$ 中放置根}
+采用中点定根法，选择使下式最小的根 $r$。
+\[
+  \max_i d_H(r,x_i).
+\]
+可用双曲空间中类似魏斯费尔德法（Weiszfeld method）的质心迭代求解。
+
+\Subheading{步骤 5 \quad 曲空间上的最大似然细化}
+\emph{5-a \quad 变量}
+
+内部节点的位置 $y_1,\ldots,y_{n-2}\in\mathbb H^k$。
+
+\emph{5-b \quad 似然}
+\[
+  \log L(y)=\sum_{\text{边 }(u,v)}
+     \log P_r\bigl(\mathrm{seq}_u\to\mathrm{seq}_v\mid d_H(u,v),Q\bigr).
+\]
+使用\textbf{黎曼 Adam}（Riemannian Adam）的旋向量实现来最大化此式。约束为 $y$ 保持在 $\mathbb H^k$ 中，每次更新后投影。
+
+\begin{statement}{例 2.4}{五分类单元的简单例子}
+\begin{itemize}
+  \item 星形树，由一个中心和五个叶节点组成。
+  \item 解析嵌入，将叶节点以相等的角间距放在半径 $r=0.9$ 处。
+  \item 测地线弦表明，每对叶节点之间的路径长度都为 $2$。
+\end{itemize}
+
+图~\ref{fig:2.5} 展示了庞加莱圆盘中的五分类单元星形树。五个分类单元 $S_0,\ldots,S_4$ 等间距分布在庞加莱圆盘边界附近，半径约为 $0.9$。欧氏直线弦表示星形树的双曲测地线。\translatornote{图中保留原书连接各叶节点的直线弦。按第 2.9.3 节所述，庞加莱圆盘中的测地线为直径或与边界正交的圆弧。} 任一对叶节点的树路径长度相同，均包含两条边。
+\end{statement}

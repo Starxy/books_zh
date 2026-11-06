@@ -1,0 +1,294 @@
+% PDF p. 47
+\subsubsection{受扩散模型启发的 CGR 扩展}
+受扩散模型（diffusion model）的启发，我们引入受控的高斯噪声并逐步细化，以修改 CGR。形式上，定义两个扩散过程，即前向扩散过程（forward diffusion process）与反向扩散过程（reverse diffusion process）。
+
+扩散模型大致以非平衡热力学为建模依据。在那里，扩散指粒子从高浓度区域流向低浓度区域（Strümke 和 Langseth，2023）。扩散过程使数据样本偏离数据流形，反向过程则恢复一条返回数据流形的轨迹。
+
+% PDF p. 48
+\begin{itemize}
+  \item \textbf{前向扩散（受 CGR 启发的噪声）}\quad 假设我们能从某个分布中抽取数据样本 $x_0$。在前向扩散过程中，分 $T$ 步逐渐向样本加入噪声，生成噪声越来越大的样本 $x_1,x_2,\ldots,x_T$，其中 $x_T\sim p_{\mathrm{prior}}$。换言之，$T$ 足够大时，样本 $x_T$ 服从预先规定的分布 $p_{\mathrm{prior}}$（Strümke 和 Langseth，2023）。为以适当的速率加噪，用方差调度（variance schedule）$\{\beta_t\}_{t=1}^T$ 对扩散步骤进行参数化。具体做法是反复应用一个马尔可夫扩散核（Markov diffusion kernel），将数据分布逐步转化为另一分布：
+  \[
+    q(x_t\mid x_{t-1})=K(x_t\mid x_{t-1};\beta_t),
+  \]
+  其中 $\beta_t$ 为扩散速率。
+
+  取高斯马尔可夫扩散核 $K$，得到所谓高斯扩散（Gaussian diffusion）：
+  \begin{equation*}
+    q(x_t\mid x_{t-1})
+    =N\bigl(x_t;\sqrt{1-\beta_t}\,x_{t-1},\beta_t I\bigr).
+    \tag{1.1}\label{eq:1.1}
+  \end{equation*}
+  这里 $N$ 表示高斯分布。当 $T\to\infty$ 时，得到
+  \[
+    q(x_T)\approx p_{\mathrm{prior}}(x_T)=N(x_T;0,I).
+  \]
+  由式~\eqref{eq:1.1} 可以将 $x_t$ 写成
+  \begin{equation*}
+    x_t=\sqrt{\alpha_t}\,x_{t-1}+\sqrt{1-\alpha_t}\,z_t,
+    \tag{1.2}\label{eq:1.2}
+  \end{equation*}
+  其中 $\alpha_t=1-\beta_t$，$z_t\sim N(0,I)$。
+
+  可以用递推式~\eqref{eq:1.2} 正式定义前向扩散过程：
+  \begin{equation*}
+    X_k^{(t)}
+      =\sqrt{\bar\alpha_t}\,X_k^{(0)}+\sqrt{1-\bar\alpha_t}\,\varepsilon_t,
+    \qquad \varepsilon_t\sim N(0,I).
+    \tag{1.3}\label{eq:1.3}
+  \end{equation*}
+  这里 $X_k^{(t)}$ 表示时间步 $t$ 的点，并且
+  \begin{itemize}
+    \item $X_k^{(0)}$ 是位置 $k$ 的原始 CGR 点。
+    \item $\alpha_t=1-\beta_t$，$\bar\alpha_t=\prod_{i=1}^t\alpha_i$，二者随扩散方差调度变化。
+  \end{itemize}
+  这种迭代扩散将确定性的 CGR 点转化为含噪分布，提高了模型的鲁棒性和表达能力。
+
+  \item \textbf{反向（去噪）扩散}\quad 反向扩散是一个可以逆转扩散过程的生成模型（Strümke 和 Langseth，2023）。换言之，从样本 $X_T$ 中逐渐去除噪声，最终得到来自原分布的数据样本 $X_0$。
+
+  反向扩散（去噪）步骤在实践中十分重要，因为学习就在这一步发生。具体来说，反向扩散过程用于从含噪样本中恢复原始的
+% PDF p. 49
+  结构化基因组数据（CGR 表示）。去噪扩散概率模型（denoising diffusion probabilistic model，DDPM）（Ho 等，2020；Nichol 和 Dhariwal，2021）学习一个参数模型，例如神经网络、Transformer 或双曲 Transformer，用来近似反向扩散的条件概率：
+  \begin{equation*}
+    \begin{aligned}
+      X_k^{(t-1)} &\sim p_\theta\bigl(X_k^{(t-1)}\mid X_k^{(t)}\bigr)\\
+      &=N\bigl(X_k^{(t-1)};
+        \mu_\theta(X_k^{(t)},t),\Sigma_\theta(X_k^{(t)},t)\bigr).
+    \end{aligned}
+    \tag{1.4}\label{eq:1.4}
+  \end{equation*}
+  经过代数运算，可得
+  \begin{equation*}
+    q\bigl(X_k^{(t-1)}\mid X_k^{(t)},X_k^{(0)}\bigr)
+      =N\bigl(X_k^{(t-1)};\tilde\mu(X_k^{(t)},t),\tilde\Sigma(X_k^{(t)},t)\bigr).
+    \tag{1.5}\label{eq:1.5}
+  \end{equation*}
+  为简化起见，令 $\Sigma_\theta(X_k^{(t)},t)=(\sigma_k^{(t)})^2I$，且取
+  $(\sigma_k^{(t)})^2=\beta_k^{(t)}$ 或
+  \[
+    (\sigma_k^{(t)})^2=\tilde\beta_k^{(t)}
+      =\frac{1-\bar\alpha_k^{(t-1)}}{1-\bar\alpha_k^{(t)}}\beta_k^{(t)}.
+  \]
+  损失函数定义为
+  \begin{equation*}
+    L_{t-1}
+      =E_q\left[
+        \frac{1}{2(\sigma_k^{(t)})^2}
+        \left\lVert\tilde\mu(X_k^{(t)},X_k^{(0)},t)
+                  -\mu_\theta(X_k^{(t)},t)\right\rVert^2
+      \right].
+    \tag{1.6}\label{eq:1.6}
+  \end{equation*}
+  损失函数还可简化为
+  \begin{equation*}
+    \mathcal L(\theta)
+      =E_{X_k^{(0)},t,\varepsilon}\left[
+        \left\lVert
+          \varepsilon-\varepsilon_\theta\left(
+            \sqrt{\bar\alpha_k^{(t)}}\,X_k^{(0)}
+            +\sqrt{1-\bar\alpha_k^{(t)}}\,\varepsilon,t
+          \right)
+        \right\rVert^2
+      \right].
+    \tag{1.7}\label{eq:1.7}
+  \end{equation*}
+  由此得到算法 1.1 中的训练过程。
+\end{itemize}
+
+\needspace{5\baselineskip}
+\Subheading{算法 1.1\quad 使用学习率 $\eta$ 训练}
+\begin{enumerate}
+  \item 重复以下步骤。
+  \item $X_k^{(0)}\leftarrow$\translatornote{本行在原书中只印出左箭头，右端留空。上文将 $X_k^{(0)}$ 解释为原始 CGR 点。}
+  \item $t\sim\operatorname{Uniform}(\{1,\ldots,T\})$。
+  \item $\varepsilon\sim N(0,I)$。
+  \item $X_k^{(t)}\leftarrow
+    \sqrt{\bar\alpha_k^{(t)}}\,X_k^{(0)}+\sqrt{1-\bar\alpha_k^{(t)}}\,\varepsilon$。
+  \item $\theta\leftarrow\theta-\eta\nabla_\theta
+    \lVert\hat\varepsilon_\theta(X_k^{(t)},t)-\varepsilon\rVert^2$。
+  \item 直到收敛。
+\end{enumerate}
+
+反向 DDPM 学习 $X_k^{(t-1)}$ 的过程见算法 1.2。
+
+\Subheading{算法 1.2\quad 反向 DDPM}
+\begin{enumerate}
+  \item $X_k^T\sim N(0,I)$。
+  \item 对 $t=T,\ldots,1$ 逐步执行。
+% PDF p. 50
+  \item 若 $t>1$，则
+  \item $\lambda\leftarrow1$。
+  \item 否则
+  \item $\lambda\leftarrow0$。
+  \item 条件分支结束。
+  \item $z\sim N(0,I)$。
+  \item \(\displaystyle
+    X_k^{(t-1)}\leftarrow
+      \frac{1}{\sqrt{\alpha_k^{(t)}}}
+      \left(
+        X_k^{(t)}
+        -\frac{1-\alpha_k^{(t)}}{\sqrt{1-\bar\alpha_k^{(t)}}}
+          \varepsilon_\theta(X_k^{(t)},t)
+      \right)
+      +\lambda\sqrt{\tilde\beta_k^{(t)}}\,z
+    \)。
+  \item 循环结束。
+  \item 返回 $X_k^{(0)}$。
+\end{enumerate}
+
+\subsubsection{用格拉斯曼流形分析 FCGR}
+现在，每条基因组序列都表示为一个 FCGR 矩阵，可以将它理解为一个特征矩阵。格拉斯曼几何把这些特征矩阵视为流形中的子空间。考虑由一个嘌呤（purine）和一个嘧啶（pyrimidine）组成的碱基对，即 A 与 T 配对，或 C 与 G 配对，我们只关注各 FCGR 矩阵的列空间。由此考察相应 FCGR 的列空间，便可将一条基因组序列视为适当的格拉斯曼流形上的一个点。
+
+\paragraph{格拉斯曼距离}
+\noindent\textit{1.9.4.7.1.1\quad 定义}\quad
+若两个列空间的维数相同，格拉斯曼流形中两点之间的距离称为格拉斯曼距离（Grassmannian distance），即对应点在格拉斯曼流形上的测地距离。格拉斯曼距离是衡量 $\R^n$ 中两个 $k$ 维子空间相距多远的度量。设两个子空间 $U,V$ 各由一个列标准正交的 $n\times k$ 矩阵表示，即 $U^TU=I_k$、$V^TV=I_k$。该距离通常由子空间之间的主角（principal angle）定义。
+
+\smallskip
+\noindent\textit{1.9.4.7.1.2\quad 主角}\quad
+子空间 $U,V$ 之间的主角 $\theta_1,\theta_2,\ldots,\theta_k$ 递归地定义为
+\begin{equation*}
+  \cos(\theta_i)=\max_{u\in U}\max_{v\in V}u^Tv,
+  \tag{1.8}\label{eq:1.8}
+\end{equation*}
+约束为 $\lVert u\rVert=\lVert v\rVert=1$，且 $u$ 与 $u_1,\ldots,u_i$ 正交，$v$ 的约束类似。\translatornote{原书写成与 $u_1,\ldots,u_i$ 正交。求第 $i$ 对主向量时，应只要求与前 $i-1$ 个已求出的主向量正交。} 数值上，可通过计算以下奇异值分解（singular value decomposition，SVD）得到这些角：
+\[
+  M=U^TV=L\Sigma R^T,
+\]
+其中 $\Sigma=\diag(\sigma_1,\sigma_2,\ldots,\sigma_k)$，奇异值满足 $0\le\sigma_i\le1$，$i=1,\ldots,k$。主角定义为
+\begin{equation*}
+  \theta_i=\arccos(\sigma_i),\qquad i=1,\ldots,k.
+  \tag{1.9}\label{eq:1.9}
+\end{equation*}
+
+\smallskip
+\noindent\textit{1.9.4.7.1.3\quad 测地距离（格拉斯曼距离）}\quad
+格拉斯曼流形上的测地距离（geodesic distance）定义为主角向量的欧氏范数：
+% PDF p. 51
+\begin{equation*}
+  d_g(U,V)=\sqrt{\sum_{i=1}^k\theta_i^2}.
+  \tag{1.10}\label{eq:1.10}
+\end{equation*}
+这个距离衡量格拉斯曼流形上两点（子空间）之间最短路径（测地线）的长度。图~\ref{fig:1.2} 给出两个子空间之间的测地路径。两支深色箭头表示子空间 $U$ 的基向量，两支浅色箭头表示子空间 $V$ 的基向量，黑色虚弧示意子空间之间的测地路径。\translatornote{颜色说明依原书正文。原图的图例实际用蓝、浅蓝表示 $U$，红、黄表示 $V$，路径为蓝色虚线。译图沿用原图图例。}
+
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch01/fig01_02}
+  \FigureCaption{1.2}{两个子空间之间的测地路径示意。}
+\end{figure}
+
+\paragraph{广义格拉斯曼距离}
+当两个子空间的维数不同时，可以把测地距离（格拉斯曼距离）扩展为广义格拉斯曼距离（generalized Grassmannian distance）。该距离归结为格拉斯曼流形上的一个点到其中某个特定舒伯特簇（Schubert variety）的距离。
+
+广义格拉斯曼距离度量格拉斯曼流形 $\Gr(k,n)$ 中两个子空间之间的“距离”。它可以对主角采用不同的范数或权重。一种常见形式是
+\begin{equation*}
+  d_{\mathrm{gen}}(U,V)=\left(\sum_{i=1}^kw_i\theta_i^p\right)^{1/p},
+  \tag{1.11}\label{eq:1.11}
+\end{equation*}
+其中，
+\begin{itemize}
+  \item $w_i\ge0$ 是权重，为简便常取 $1$。
+  \item $p\ge1$ 是定义范数的参数，$p=2$ 对应通常的欧氏范数。
+\end{itemize}
+\textbf{说明}\quad 当所有 $w_i=1$ 且 $p=2$ 时，广义距离化为标准测地距离，
+\[
+  d_{\mathrm{gen}}(U,V)=\sqrt{\sum_{i=1}^k\theta_i^2}=d_g(U,V).
+\]
+其他 $p$ 值（如 $p=1$ 或 $p=\infty$）有不同的几何解释，可用于多种应用。
+
+% PDF p. 52
+\begin{statement}{例 1.24}{}
+设 $\R^3$ 中有两个二维子空间，分别由列标准正交的矩阵 $U,V$ 表示：
+\[
+  U=\begin{bmatrix}1&0\\0&1\\0&0\end{bmatrix},\qquad
+  V=\begin{bmatrix}
+    \cos\varnothing&-\sin\varnothing\\
+    \sin\varnothing&\cos\varnothing\\
+    0&0
+  \end{bmatrix},
+\]
+其中 $\varnothing$ 表示某个旋转角。计算得
+\[
+  M=U^TV=\begin{bmatrix}
+    \cos\varnothing&-\sin\varnothing\\
+    \sin\varnothing&\cos\varnothing
+  \end{bmatrix}.
+\]
+旋转矩阵的两个奇异值都是 $1$，所以 $\sigma_1=\sigma_2=1$。由式~\eqref{eq:1.9} 得到主角
+\[
+  \theta_1=\arccos(1)=0,\qquad
+  \theta_2=\arccos(1)=0,\qquad
+  \text{从而 }d_g(U,V)=0.
+\]
+\end{statement}
+
+\paragraph{在格拉斯曼几何中将特征矩阵视为流形中的子空间}
+\begin{itemize}
+  \item 每条基因组序列现在表示为一个 FCGR 矩阵，可将它理解为一个特征矩阵。
+  \item 概括地说，格拉斯曼几何把这些特征矩阵视为流形中的子空间。
+\end{itemize}
+将每个矩阵 $F\in\R^{m\times m}$ 作为一个高维嵌入。应用奇异值分解（SVD），
+\[
+  F=U\Sigma V^T,\qquad U\in\R^{m\times k}.
+\]
+矩阵 $U$ 确定格拉斯曼流形上的一个子空间。
+
+\paragraph{商结构}
+格拉斯曼流形 $\Gr(k,n)$ 是 $\R^n$ 中全体 $k$ 维子空间组成的空间。每个子空间可以有许多不同的标准正交基，即标架（frame），而不同的基表示同一个子空间。
+
+\smallskip
+\noindent\textit{1.9.4.7.4.1\quad 直观例子}\quad
+为了理解商结构，举例如下。
+\begin{itemize}
+  \item 一组可能的标准正交基
+  \[
+    U_1=\begin{bmatrix}1&0\\0&1\\0&0\end{bmatrix}
+  \]
+  （即标准的 $x$ 轴与 $y$ 轴方向）。
+  \item 另一组可能的基（在平面内旋转而得）
+% PDF p. 53
+  \[
+    U_2=U_1R,\qquad R\in O(2)
+  \]
+  （$R$ 为二维正交矩阵）。$U_1,U_2$ 张成同一个二维平面，但它们的列，即基向量，各不相同。
+\end{itemize}
+
+\smallskip
+\noindent\textit{1.9.4.7.4.2\quad 商结构}
+\begin{itemize}
+  \item \textbf{施蒂费尔流形}\quad 施蒂费尔流形记为 $\operatorname{St}(k,n)$，定义为所有列标准正交的 $n\times k$ 矩阵（标架）组成的集合：
+  \[
+    \operatorname{St}(k,n)=\{U\in\R^{n\times k}\mid U^TU=I_k\}.
+  \]
+  \item \textbf{等价关系}\quad 我们将由 $R\in O(k)$ 右乘得到的矩阵归入同一等价类，
+  \[
+    U\sim UR,\qquad \text{对任意 }R\in O(k).
+  \]
+  于是，格拉斯曼流形就是此关系下标架的等价类组成的空间。
+\end{itemize}
+
+\smallskip
+\noindent\textit{1.9.4.7.4.3\quad 数学表达}
+\[
+  \Gr(k,n)=\operatorname{St}(k,n)/O(k).
+\]
+也就是说，格拉斯曼流形是施蒂费尔流形对正交群 $O(k)$ 的作用取商而得。
+
+\begin{itemize}
+  \item \textbf{直观理解}
+\end{itemize}
+可以这样想象。
+\begin{itemize}
+  \item 施蒂费尔流形包含所有可能的标准正交标架。
+  \item 把表示同一个子空间的所有标架，即仅相差内部旋转的标架，“收缩”在一起，视为相同。
+\end{itemize}
+这一收缩过程就是形成商空间。这样，我们便可以只研究各个不同的子空间，无须逐一处理所有可能的标架。商结构赋予格拉斯曼流形一个定义良好的光滑流形结构。
+
+最后得出结论，等价嵌入（标准正交标架 $U$）的集合构成格拉斯曼流形上的点：
+\[
+  \Gr(k,m)=\frac{O(m)}{O(k)\times O(m-k)}.
+\]
+因此，等价嵌入（标准正交标架 $U$）的集合构成商结构，其含义如下。
+\begin{itemize}
+  \item 许多不同标架表示同一个子空间。
+  \item 通过取商，将所有这类标架等同，便形成格拉斯曼流形。
+  \item 取商将多余的标架收缩为代表子空间的单个点，由此得到结构清楚、定义良好的子空间流形。
+\end{itemize}

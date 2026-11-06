@@ -1,0 +1,675 @@
+% PDF p. 334
+\AppendixSection{6E}{体积展开}
+\AppendixHeading{6E1}{黎曼曲率张量}
+\AppendixSubheading{6E1.1}{下指标（协变指标）与上指标（逆变指标）}
+降低指标是张量微积分中的一种运算。它利用度量张量 $g_{ij}$ 把逆变指标（上指标）转换为协变指标（下指标）。这一步是流形上张量运算的基础，因为它使不同指标类型的张量能够以一致的方式比较和组合。
+
+\AppendixSubheading{6E1.2}{逆变分量}
+在微分几何和张量微积分中，逆变分量是向量（或张量）中随坐标变换而“逆向”变换的分量。逆变分量描述流形切空间中的方向和大小，通常与位移或速度有关。
+
+\begin{statement}{定义 6E.1}{}
+给定流形上的向量场 $V$，其逆变分量 $V^i$ 的定义使得向量可以在坐标基下表示为
+\[
+  V=V^i\frac{\partial}{\partial x^i}
+    =\sum_i V^i\frac{\partial}{\partial x^i}.
+\]
+换言之，在任意坐标系中，向量可表示为基向量 $\dfrac{\partial}{\partial x^i}$ 的线性组合，系数是 $V^i$。这些系数就是逆变分量。
+
+在从 $x^i$ 到新坐标 $x^{\prime i}$ 的坐标变换下，逆变分量按下式变换
+\[
+ V=V^j\frac{\partial}{\partial x^j}
+   =V^j\frac{\partial}{\partial x^{\prime i}}
+          \frac{\partial x^{\prime i}}{\partial x^j}
+   =\frac{\partial x^{\prime i}}{\partial x^j}V^j
+        \frac{\partial}{\partial x^{\prime i}},
+\]
+因此
+\[
+  V^{\prime i}=\frac{\partial x^{\prime i}}{\partial x^j}V^j.
+\]
+这一变换规则意味着，当坐标改变时，向量的分量会相应调整，从而“补偿”基向量的变换。尽管分量可能改变，几何对象 $V$ 本身保持不变，与坐标系的选取无关。
+\end{statement}
+
+% PDF p. 335
+\begin{statement}{例 6E.1}{}
+设在二维空间中，向量 $V$ 在坐标 $(x^1,x^2)$ 下的分量为 $V^1$、$V^2$。若变换到新坐标 $(x^{\prime 1},x^{\prime 2})$，则新的分量 $V^{\prime 1}$、$V^{\prime 2}$ 由下式给出
+\begin{align*}
+  V^{\prime 1}
+     &=\frac{\partial x^{\prime 1}}{\partial x^1}V^1
+        +\frac{\partial x^{\prime 1}}{\partial x^2}V^2,\\
+  V^{\prime 2}
+     &=\frac{\partial x^{\prime 2}}{\partial x^1}V^1
+        +\frac{\partial x^{\prime 2}}{\partial x^2}V^2.
+\end{align*}
+这一规则保证各个分量虽有变化，向量作为几何对象保持不变。
+\end{statement}
+
+\AppendixSubheading{6E1.3}{协变分量 \texorpdfstring{$(x_1,\dots,x_n)$}{(x1, …, xn)}}
+协变分量通常是某些对象（如余向量或 1-形式）按逆雅可比矩阵变换的分量。余向量通常记为 $\omega$。对于分量为 $\omega_i$ 的余向量 $\omega$，在坐标变换下有
+\[
+  \omega_i'=\frac{\partial x^j}{\partial x^{\prime i}}\omega_j,
+\]
+其中带下指标的坐标（或分量）是“协变的”。
+
+可以看到，逆变坐标通常用上指标书写，用于指定位置或方向（切空间的元素）。协变坐标用下指标书写，用于描述梯度或线性泛函（余切空间的元素）。
+
+\AppendixHeading{6E2}{通过度量联系两类分量}
+逆变坐标与协变坐标可通过度量 $g_{ij}$ 相互转换
+\begin{equation*}
+  x_i=g_{ij}x^j.
+  \tag{E1}\label{eq:6E1}
+\end{equation*}
+这种转换只通过度量联系两者，各自的变换性质保持不变。
+
+\AppendixSubheading{6E2.1}{降指标与升指标}
+降指标和升指标是张量微积分中的两种运算，是流形上张量操作的基础。借助它们，可以用一致的方式比较和组合不同指标类型的张量。
+
+% PDF p. 336
+\begin{statement}{定义 6E.1}{降指标}
+对于逆变分量为 $V^i$ 的向量（一阶张量），它的协变分量 $V_i$ 通过与度量张量缩并得到
+\begin{equation*}
+  V_i=g_{ij}V^j.
+  \tag{6E2}\label{eq:6E2}
+\end{equation*}
+这条规则可推广到更一般的张量，对每个指标分别应用。考虑以下三种张量 $T^{ij}$、$T^i_j$ 和 $T_{ij}$。
+\begin{itemize}
+\item $T^{ij}$ 是 $(2,0)$ 型张量。它有两个逆变指标（上指标），是两个位置都逆变的二阶张量。可将 $T^{ij}$ 看成作用在两个余向量（对偶空间的元素）上并返回标量的双线性映射。例如，对两个余向量 $\omega_i$ 和 $\eta_j$，
+\[
+  T(\omega,\eta)=T^{ij}\omega_i\eta_j.
+\]
+\item $T^i_j$ 是 $(1,1)$ 型张量。它是混合张量，带一个逆变指标（上指标 $i$）和一个协变指标（下指标 $j$）。$(1,1)$ 型张量可解释为切空间到自身的线性映射。例如，对于分量为 $V^j$ 的向量 $V$，张量 $T$ 在 $V$ 上的作用为
+\[
+  (TV)^i=T^i_jV^j.
+\]
+\item $T_{ij}$ 是 $(0,2)$ 型张量。它有两个协变指标（下指标），是两个位置都协变的二阶张量。可将 $T_{ij}$ 看成以两个向量为输入、返回标量的双线性形式。一个常见例子是用于度量长度和角度的度量张量 $g_{ij}$，它给出的内积为
+\[
+  g(V,W)=g_{ij}V^iW^j.
+\]
+\end{itemize}
+\end{statement}
+这三种类型的张量可借助降指标相互转换。例如，给定二阶张量 $T^{ij}$，可降低其中一个指标
+\[
+  T^i_j=g_{jk}T^{ik},
+\]
+也可将两个指标都降低
+\[
+  T_{ij}=g_{ik}g_{jl}T^{kl}.
+\]
+
+\AppendixSubheading{6E2.2}{降指标规则}
+\begin{itemize}
+\item \textbf{线性。} 这一运算是线性的。给定两个张量 $A^i$ 和 $B^i$ 及一个标量 $a$，
+\[
+  (aA^i+B^i)_j=ag_{jk}A^k+g_{jk}B^k.
+\]
+\item \textbf{度量的对称性。} 度量张量是对称的，即 $g_{ij}=g_{ji}$。这种对称性保证降指标时不受度量张量指标次序的影响
+% PDF p. 337
+\[
+  V_i=g_{ij}V^j=g_{ji}V^j.
+\]
+\item \textbf{与坐标变换相容。} 在坐标变换下，度量张量以某种方式变换，使降指标运算保持对象的张量性质。也就是说，如果 $V^i$ 按向量的规则变换，则由 $V_i=g_{ij}V^j$ 定义的 $V_i$ 按余向量的规则变换。
+\item \textbf{逆运算为升指标。} 降指标的逆运算是升指标，用到逆度量 $g^{ij}$。给定协变向量 $V_i$，由
+\[
+  V^i=g^{ij}V_j
+\]
+得到逆变向量。
+
+同理，对于张量，每个指标都可以单独升高或降低。
+\end{itemize}
+
+\AppendixSubheading{6E2.3}{黎曼曲率张量}
+黎曼曲率张量有几种等价的表达形式。常见的一种用克里斯托费尔符号给出
+\begin{equation*}
+  R^i_{jkl}=\partial_k\Gamma^i_{jl}-\partial_l\Gamma^i_{jk}
+       +\Gamma^i_{km}\Gamma^m_{jl}-\Gamma^i_{lm}\Gamma^m_{jk},
+  \tag{6E3}\label{eq:6E3}
+\end{equation*}
+用度量 $g_{im}$ 降低指标，得到
+\begin{equation*}
+  R_{ikjl}=g_{im}R^m_{kjl}.
+  \tag{6E4}\label{eq:6E4}
+\end{equation*}
+若采用以点 $p$ 为中心的正规（测地）坐标，克里斯托费尔符号在 $p$ 处为零，即 $\Gamma^i_{jk}(p)=0$。由此得到 $p$ 处黎曼曲率张量分量的另一种公式
+\[
+  R_{ikjl}(p)=\frac12(\partial_k\partial_jg_{il}+\partial_i\partial_lg_{kj}
+         -\partial_i\partial_jg_{kl}-\partial_k\partial_lg_{ij})(p).
+\]
+
+\noindent\textbf{说明}
+\begin{itemize}
+\item \textbf{克里斯托费尔符号的方法。} 在任意坐标系中，克里斯托费尔符号由下式给出
+\begin{equation*}
+  \Gamma^i_{jk}=\frac12g^{il}(\partial_jg_{kl}+\partial_kg_{jl}-\partial_lg_{jk}).
+  \tag{6E5}\label{eq:6E5}
+\end{equation*}
+\item \textbf{用正规坐标简化。} 在选为正规坐标中心的点 $p$，有 $\Gamma^i_{jk}(p)=0$。这意味着二次项（克里斯托费尔符号的乘积）消失，只留下度量的二阶导数。由此得到公式
+\[
+  R_{ikjl}(p)=\frac12(\partial_k\partial_jg_{il}+\partial_i\partial_lg_{kj}
+         -\partial_i\partial_jg_{kl}-\partial_k\partial_lg_{ij})(p).
+\]
+\end{itemize}
+
+% PDF p. 338
+\AppendixSubheading{6E2.4}{克里斯托费尔符号的一阶导数}
+下面直接证明，在以点 $p$ 为原点的黎曼正规坐标中，克里斯托费尔符号的一阶导数满足
+\begin{equation*}
+  \partial_l\Gamma^i_{kj}(0)=-\frac13\bigl(R^i_{kjl}(0)+R^i_{jkl}(0)\bigr).
+  \tag{6E6}\label{eq:6E6}
+\end{equation*}
+以下仅用克里斯托费尔符号和黎曼曲率张量的定义，以及正规坐标的性质，从头推导这一关系。
+\begin{enumerate}
+\item \textbf{黎曼正规坐标的性质。}
+
+在点 $p$（即 $x=0$），有下列性质。度量满足
+\begin{equation*}
+  g_{ij}(0)=\delta_{ij}.
+  \tag{6E7}\label{eq:6E7}
+\end{equation*}
+度量的一阶导数消失
+\begin{equation*}
+  \partial_k g_{ij}(0)=0.
+  \tag{6E8}\label{eq:6E8}
+\end{equation*}
+克里斯托费尔符号消失
+\begin{equation*}
+  \Gamma^i_{jk}(0)=0.
+  \tag{6E9}\label{eq:6E9}
+\end{equation*}
+利用这些性质，曲率和克里斯托费尔符号导数的表达式在 0 处得以简化。
+\item \textbf{用正规坐标表示曲率。}
+
+回顾黎曼曲率张量由式 \eqref{eq:6E3} 给出
+\begin{equation*}
+  R^i_{jkl}=\partial_k\Gamma^i_{jl}-\partial_l\Gamma^i_{jk}
+       +\Gamma^i_{km}\Gamma^m_{jl}-\Gamma^i_{lm}\Gamma^m_{jk}.
+  \tag{6E10}\label{eq:6E10}
+\end{equation*}
+在 $x=0$ 处，克里斯托费尔符号消失，故二次项为零。因而在 0 处有
+\begin{equation*}
+  R^i_{jkl}(0)=\partial_k\Gamma^i_{jl}(0)-\partial_l\Gamma^i_{jk}(0).
+  \tag{6E11}\label{eq:6E11}
+\end{equation*}
+类似地，交换指标 $j$ 和 $k$ 的作用，并回顾克里斯托费尔符号的两个下指标对称，可得
+\begin{equation*}
+  R^i_{kjl}(0)=\partial_j\Gamma^i_{kl}(0)-\partial_l\Gamma^i_{kj}(0).
+  \tag{6E12}\label{eq:6E12}
+\end{equation*}
+\item \textbf{将曲率的两个表达式相加。}
+
+将式 \eqref{eq:6E11} 和式 \eqref{eq:6E12} 相加，得
+\begin{equation*}
+\begin{aligned}
+  R^i_{jkl}(0)+R^i_{kjl}(0)
+   &=\partial_k\Gamma^i_{jl}(0)-\partial_l\Gamma^i_{jk}(0)
+      +\partial_j\Gamma^i_{kl}(0)-\partial_l\Gamma^i_{kj}(0),\\
+   &=\partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)
+      -\bigl[\partial_l\Gamma^i_{jk}(0)+\partial_l\Gamma^i_{kj}(0)\bigr].
+\end{aligned}
+\tag{6E13}\label{eq:6E13}
+\end{equation*}
+
+% PDF p. 339
+由于克里斯托费尔符号关于下指标对称，即 $\Gamma^i_{jk}=\Gamma^i_{kj}$，它们对任一坐标的导数也对称
+\[
+  \partial_l\Gamma^i_{jk}(0)=\partial_l\Gamma^i_{kj}(0).
+\]
+因此式 \eqref{eq:6E13} 化为
+\begin{equation*}
+  R^i_{jkl}(0)+R^i_{kjl}(0)
+   =\partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)-2\partial_l\Gamma^i_{jk}(0).
+  \tag{6E14}\label{eq:6E14}
+\end{equation*}
+\item \textbf{求解 $\partial_l\Gamma^i_{jk}(0)$。}
+
+重排式 \eqref{eq:6E14}，解出所求导数
+\begin{equation*}
+  \partial_l\Gamma^i_{jk}(0)
+   =\frac12\bigl[\partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)\bigr]
+      -\frac12\bigl[R^i_{jkl}(0)+R^i_{kjl}(0)\bigr].
+  \tag{6E15}\label{eq:6E15}
+\end{equation*}
+由于 $j$、$k$ 的选取是任意的（且克里斯托费尔符号关于这两个指标对称），交换 $j$ 与 $k$ 后同样成立。也就是说，左边也可以写成 $\partial_l\Gamma^i_{kj}(0)$。目标是仅用曲率表示 $\partial_l\Gamma^i_{kj}(0)$。因此，只需证明
+\begin{equation*}
+  \partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)
+    =\frac13\bigl[R^i_{jkl}(0)+R^i_{kjl}(0)\bigr].
+  \tag{6E16}\label{eq:6E16}
+\end{equation*}
+回顾式 \eqref{eq:6A23}，
+\begin{equation*}
+  \Gamma^i_{jl}=\frac12g^{im}(\partial_jg_{lm}+\partial_lg_{jm}-\partial_mg_{jl}).
+  \tag{6E17}\label{eq:6E17}
+\end{equation*}
+对 $x_k$ 求导，并在 0 处取值。由于在正规坐标的 0 处有 $g_{ij}(0)=\delta_{ij}$ 和 $\partial_pg_{qr}(0)=0$，式 \eqref{eq:6E17} 的导数中只剩 $g$ 的二阶导数
+\begin{equation*}
+  \partial_k\Gamma^i_{jl}(0)=\frac12\bigl[\partial_k\partial_jg_{il}(0)
+             +\partial_k\partial_lg_{ij}(0)-\partial_k\partial_i g_{jl}(0)\bigr].
+  \tag{6E18}\label{eq:6E18}
+\end{equation*}
+类似地得到
+\begin{equation*}
+  \partial_j\Gamma^i_{kl}(0)=\frac12\bigl[\partial_j\partial_kg_{li}(0)
+             +\partial_j\partial_lg_{ki}(0)-\partial_j\partial_i g_{kl}(0)\bigr].
+  \tag{6E19}\label{eq:6E19}
+\end{equation*}
+假设下列关系成立（稍后证明）
+\begin{equation*}
+  \partial_p\partial_qg_{rs}(0)=-\frac13\bigl(R_{prqs}(0)+R_{psqr}(0)\bigr).
+  \tag{6E20}\label{eq:6E20}
+\end{equation*}
+
+将式 \eqref{eq:6E18} 和式 \eqref{eq:6E19} 相加，得
+% PDF p. 340
+\begin{equation*}
+\begin{aligned}
+ &\partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)\\
+ &\quad=\frac12\bigl[\partial_k\partial_jg_{il}(0)+\partial_k\partial_lg_{ij}(0)
+                       -\partial_k\partial_i g_{jl}(0)\bigr]\\
+ &\qquad+\frac12\bigl[\partial_j\partial_k g_{li}(0)+\partial_j\partial_lg_{ki}(0)
+                       -\partial_j\partial_i g_{kl}(0)\bigr]\\
+ &\quad=\frac12\left[
+   \begin{aligned}
+     &2\partial_k\partial_jg_{il}(0)+\partial_k\partial_l g_{ij}(0)-\partial_k\partial_i g_{jl}(0)\\
+     &\quad+\partial_j\partial_lg_{ki}(0)-\partial_j\partial_i g_{kl}(0)
+   \end{aligned}\right].
+\end{aligned}
+\tag{6E21}\label{eq:6E21}
+\end{equation*}
+将式 \eqref{eq:6E20} 代入式 \eqref{eq:6E21}，得
+\begin{equation*}
+\begin{aligned}
+ &\partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)\\
+ &\quad=-\frac16\left[
+ \begin{aligned}
+   &2\bigl(R_{kijl}(0)+R_{klji}(0)\bigr)+R_{kilj}(0)+R_{kjli}(0)\\
+   &\quad-R_{kjil}(0)-R_{klij}(0)+R_{jilk}(0)+R_{jkli}(0)\\
+   &\quad-R_{jkil}(0)-R_{jlik}(0)
+ \end{aligned}
+ \right].
+\end{aligned}
+\tag{6E22}\label{eq:6E22}
+\end{equation*}
+利用标准的对称性 $R_{ikjl}=-R_{kijl}$ 和指标对互换的对称性 $R_{ikjl}=R_{jlik}$，有
+\begin{equation*}
+\begin{aligned}
+ R_{kijl}(0)&=-R_{ikjl}(0),\quad R_{klji}(0)=R_{jikl}(0)=-R_{ijkl}(0),\\
+ R_{kilj}(0)-R_{jlik}(0)&=R_{jlik}(0)-R_{jlik}(0)=0,\\
+ R_{kjli}(0)+R_{jkli}(0)&=-R_{jkli}(0)+R_{jkli}(0)=0,\\
+ -R_{kjil}(0)-R_{jkil}(0)&=R_{jkil}(0)-R_{jkil}(0)=0,\\
+ -R_{klij}(0)+R_{jilk}(0)&=-R_{ijkl}(0)+R_{jilk}(0)\\
+   &=-R_{ijkl}(0)+R_{ijkl}(0)=0.
+\end{aligned}
+\tag{6E23}\label{eq:6E23}
+\end{equation*}
+将式 \eqref{eq:6E23} 代入式 \eqref{eq:6E22}，得
+\begin{equation*}
+\begin{aligned}
+ \partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)
+  &=-\frac13\bigl(R_{kijl}(0)+R_{klji}(0)\bigr),\\
+  &=\frac13\bigl(R_{ikjl}(0)+R_{ijkl}(0)\bigr),\\
+  &=\frac13\bigl(R^i_{kjl}+R^i_{jkl}(0)\bigr).
+\end{aligned}
+\tag{6E24}\label{eq:6E24}
+\end{equation*}
+将式 \eqref{eq:6E24} 代入式 \eqref{eq:6E15}，得
+\begin{equation*}
+\begin{aligned}
+ \partial_l\Gamma^i_{jk}(0)
+  &=\frac12\bigl[\partial_k\Gamma^i_{jl}(0)+\partial_j\Gamma^i_{kl}(0)\bigr]\\
+  &\qquad-\frac12\bigl[R^i_{jkl}(0)+R^i_{kjl}(0)\bigr],\\
+  &=\frac13\frac12\bigl(R^i_{kjl}+R^i_{jkl}(0)\bigr)
+     -\frac12\bigl[R^i_{jkl}(0)+R^i_{kjl}(0)\bigr],\\
+  &=-\frac13\bigl[R^i_{jkl}(0)+R^i_{kjl}(0)\bigr].
+\end{aligned}
+\tag{6E25}\label{eq:6E25}
+\end{equation*}
+% PDF p. 341
+又因为 $\partial_l\Gamma^i_{jk}(0)=\partial_l\Gamma^i_{kj}(0)$，所以式 \eqref{eq:6E25} 化为
+\begin{equation*}
+  \partial_l\Gamma^i_{kj}(0)=-\frac13\bigl[R^i_{jkl}(0)+R^i_{kjl}(0)\bigr].
+  \tag{6E26}\label{eq:6E26}
+\end{equation*}
+\end{enumerate}
+
+\AppendixHeading{6E3}{指数映射与雅可比场}
+现在通过指数映射“拉回”度量，并利用雅可比场理论证明式 \eqref{eq:6E20}
+\[
+  \partial_p\partial_qg_{rs}(0)=-\frac13\bigl(R_{prqs}(0)+R_{psqr}(0)\bigr).
+\]
+
+\AppendixSubheading{6E3.1}{指数映射与黎曼正规坐标}
+设 $\exp_p\colon T_pM\to M$ 是 $p$ 处的指数映射。在 $p$ 的一个邻域内，指数映射是微分同胚，可以利用 $T_pM$ 上的线性坐标 $x^i$ 诱导出 $M$ 上的黎曼正规坐标。在这组坐标中，有以下性质。
+\begin{itemize}
+\item $g_{ij}(0)$（度量在 $p$ 处为欧氏度量）。
+\item $\partial_k g_{ij}(0)$（度量的一阶导数在 $p$ 处为零）。
+\end{itemize}
+因此，度量在 $p$ 处的泰勒展开为%
+\translatornote{本附录将二次展开后的余项印为 $o(|x|^3)$。一般光滑黎曼度量可含非零三次项，余项宜写为 $O(|x|^3)$。}%
+\begin{equation*}
+  g_{ij}(x)=\delta_{ij}+\frac12\partial_k\partial_l g_{ij}(0)x^k x^l+o(|x|^3).
+  \tag{6E27}\label{eq:6E27}
+\end{equation*}
+目标是计算二次项的系数。
+
+\AppendixSubheading{6E3.2}{通过指数映射拉回的度量}
+在 $T_pM$ 上定义拉回度量
+\[
+  \widetilde g=\exp_p^*(g).
+\]
+在黎曼正规坐标中，$\widetilde g$ 的分量为
+\[
+  \widetilde g_{ij}(x)=g_{ij}(\exp_p(x)).
+\]
+由于 $\exp_p(0)=p$ 且微分 $d\exp_p|_0$ 是恒等映射，有
+\[
+  \widetilde g_{ij}(0)=\delta_{ij},\qquad \partial_k\widetilde g_{ij}(0)=0.
+\]
+因此，$\widetilde g_{ij}(x)$ 的泰勒展开式的二阶项与 $g_{ij}(x)$ 的完全相同
+% PDF p. 342
+\begin{equation*}
+  \widetilde g_{ij}(x)=\delta_{ij}+\frac12\partial_k\partial_lg_{ij}(0)x^kx^l+o(|x|^3).
+  \tag{6E28}\label{eq:6E28}
+\end{equation*}
+
+\AppendixSubheading{6E3.3}{用雅可比场表示二阶导数}
+设 $v\in T_pM$ 是任意切向量，考虑从 $p$ 出发、初切向量为 $v$ 的测地线 $\gamma(t)=\exp_p(tv)$。要定义沿 $\gamma(t)$ 的雅可比场，通常考虑一个使 $v$ 发生变化的单参数测地线族。例如，取向量 $w\in T_pM$，定义测地线变分
+\begin{equation*}
+  \gamma(s,t)=\exp_p(t(v+sw)).
+  \tag{6E29}\label{eq:6E29}
+\end{equation*}
+回顾第 5 章，沿 $\gamma$ 的雅可比场 $J(t)$ 定义为对变分关于 $s$ 求导，再令 $s=0$
+\begin{equation*}
+  J(t)=\left.\frac{\partial}{\partial s}\gamma(s,t)\right|_{s=0}.
+  \tag{6E30}\label{eq:6E30}
+\end{equation*}
+将式 \eqref{eq:6E30} 用于式 \eqref{eq:6E29}，得到%
+\translatornote{原式保留。按链式法则，此处应写为 $J(t)=(d\exp_p)_{tv}(tw)$。}%
+\begin{equation*}
+  J(t)=tw\exp_p(tv),
+  \tag{6E31}\label{eq:6E31}
+\end{equation*}
+于是
+\[
+  J(0)=0,\qquad \dot J(0)=w.
+\]
+沿 $\gamma$ 的雅可比场 $J(t)$ 描述测地线的变分，满足雅可比方程%
+\translatornote{沿曲线的二阶导数应理解为二阶协变导数。若用沿 $\gamma$ 平行移动得到的标架表示分量，它就是对分量逐项求二阶导数。}%
+\begin{equation*}
+  \frac{d^2J}{dt^2}+R(J,\dot\gamma)\dot\gamma=0.
+  \tag{6E32}\label{eq:6E32}
+\end{equation*}
+
+\AppendixSubheading{6E3.4}{用截面曲率求解雅可比方程}
+接下来简化项 $R(J,\dot\gamma)\dot\gamma$。回顾由 $U,V$ 张成的二维平面的截面曲率 $K(U,V)$ 定义为
+\begin{equation*}
+  K(U,V)=\frac{\langle R(U,V)V,U\rangle}
+  {\langle U,U\rangle\langle V,V\rangle-\langle U,V\rangle^2}.
+  \tag{6E33}\label{eq:6E33}
+\end{equation*}
+若流形 $M$ 的截面曲率恒为 $K$，则对每一对线性无关的 $U,V$，都有%
+\translatornote{原书此式在右角括号与 $K$ 之间漏写等号。按式 \eqref{eq:6E33}，左边内积等于 $K$ 乘以括号内的量。}%
+\begin{equation*}
+  \langle R(U,V)V,U\rangle\,K
+    \bigl(\langle U,U\rangle\langle V,V\rangle-\langle U,V\rangle^2\bigr),
+  \tag{6E34}\label{eq:6E34}
+\end{equation*}
+或者，对于所有 $U,V,W\in T_pM$，
+\begin{equation*}
+  R(U,V)W=K\bigl(\langle V,W\rangle U-\langle U,W\rangle V\bigr).
+  \tag{6E35}\label{eq:6E35}
+\end{equation*}
+
+% PDF p. 343
+现在用式 \eqref{eq:6E35} 推导 $R(J,\dot\gamma)\dot\gamma$ 的公式。设 $X$ 为任意切向量，$\dot\gamma$ 为 $M$ 上测地线 $\gamma(t)$（或任意曲线）的切向量。将 $U=X$、$V=\dot\gamma$ 和 $W=\dot\gamma$ 代入式 \eqref{eq:6E35}，得
+\begin{equation*}
+  R(X,\dot\gamma)\dot\gamma=K\bigl(\langle\dot\gamma,\dot\gamma\rangle X
+      -\langle X,\dot\gamma\rangle\dot\gamma\bigr).
+  \tag{6E36}\label{eq:6E36}
+\end{equation*}
+若假定 $X$ 与 $\dot\gamma$ 正交且 $\langle\dot\gamma,\dot\gamma\rangle=1$，则式 \eqref{eq:6E36} 简化为
+\begin{equation*}
+  R(X,\dot\gamma)\dot\gamma=KX.
+  \tag{6E37}\label{eq:6E37}
+\end{equation*}
+将式 \eqref{eq:6E37} 代入式 \eqref{eq:6E32}，得到雅可比方程
+\begin{equation*}
+  \ddot J+KJ(t)=0,
+  \tag{6E38}\label{eq:6E38}
+\end{equation*}
+这是一个普通的二阶线性微分方程。
+
+\AppendixSubheading{6E3.5}{用泰勒展开求解雅可比方程}
+雅可比方程的第二种近似解法基于泰勒展开。
+\begin{itemize}
+\item \textbf{$t=0$ 附近的雅可比方程。}
+
+设 $\gamma(t)$ 为满足 $\gamma(0)=p$、$\dot\gamma(0)=v$ 的测地线（必要时重新参数化，使 $v$ 为单位速度）。若曲率项计算适当，以下计算也适用于一般情形。雅可比方程为
+\begin{equation*}
+  \ddot J(t)+R(v,J(t))v=0,
+  \tag{6E39}\label{eq:6E39}
+\end{equation*}
+其中 $R(v,J(t))v$ 表示曲率项。这里利用了在 $t=0$ 处可以用 $v$ 代替沿 $\gamma$ 的 $\dot\gamma(t)$，随后利用连续性。
+\translatornote{按式 \eqref{eq:6E32}，曲率项的前两个变量应按 $R(J,\dot\gamma)$ 排列。比较 $t$ 的低次项时，可在平行标架下取 $v=\dot\gamma(0)$，曲率算子在 $p$ 处取值。}
+\item \textbf{对 $J(t)$ 作泰勒展开。}
+
+假定 $J(t)$ 在 $t=0$ 附近的泰勒展开为
+\begin{equation*}
+  J(t)=a_1t+a_2t^2+a_3t^3+o(t^4),
+  \tag{6E40}\label{eq:6E40}
+\end{equation*}
+其中 $a_1,a_2,a_3\in T_pM$ 为常向量。利用初始条件确定展开系数，得到
+\[
+  a_1=\dot J(0)=w.
+\]
+\item \textbf{展开曲率项。}
+
+曲率项 $R(v,J(t))v$ 对其第二个自变量是线性的，因此
+\begin{equation*}
+  R(v,J(t))v=tR(v,w)v+t^2R(v,a_2)v+t^3R(v,a_3)v+o(t^4).
+  \tag{6E41}\label{eq:6E41}
+\end{equation*}
+\item \textbf{令雅可比方程中同次幂的系数相等。}
+
+将展开式代入式 \eqref{eq:6E39}，得
+% PDF p. 344
+\begin{equation*}
+\begin{aligned}
+ [2a_2+6a_3t+o(t)]&+
+ [tR(v,w)v+t^2R(v,a_2)v+t^3R(v,a_3)v+o(t^4)]\\
+  &=0.
+\end{aligned}
+\tag{6E42}\label{eq:6E42}
+\end{equation*}
+将式 \eqref{eq:6E42} 两边 $t$ 的同次幂系数分别相等，得到
+\[
+  a_2=0,\qquad a_3=-\frac16R(v,w)v.
+\]
+于是最终得到%
+\translatornote{式 \eqref{eq:6E43} 在 $(v,w)$ 前漏印曲率算子 $R$。前三次项之后的一般光滑余项为 $O(t^4)$。曲率项的符号见式 \eqref{eq:6E39} 处的译注。}%
+\begin{equation*}
+  J(t)=tw-\frac16t^3(v,w)v+o(t^4).
+  \tag{6E43}\label{eq:6E43}
+\end{equation*}
+定义 $\gamma(s,t)=\exp_p(tv+sw)$，则
+\begin{equation*}
+  J(t)=\left.\frac{\partial}{\partial s}\gamma(s,t)\right|_{s=0}
+     =w\exp_p(tv).
+  \tag{6E44}\label{eq:6E44}
+\end{equation*}
+换言之，指数映射的微分将 $p$ 处的向量 $w$ 送到时刻 $t$ 的相应雅可比场（式 \eqref{eq:6E44}），表达式为%
+\translatornote{式 \eqref{eq:6E44} 重新定义了变分，其导数应为 $(d\exp_p)_{tv}(w)$。若以 $J_0(t)$ 表示式 \eqref{eq:6E29} 的测地线变分所得的雅可比场，则对 $t\ne0$ 有 $(d\exp_p)_{tv}(w)=J_0(t)/t$。沿 $\gamma$ 平行移回 $T_pM$ 后，按式 \eqref{eq:6E32} 展开，得到 $w-\frac{t^2}{6}R(w,v)v+O(t^3)$。原式的 $\dot J(t)$、系数及曲率项次序不能据该雅可比场推出。}%
+\begin{equation*}
+  d\exp_p(tv)(w)=\dot J(t)=w-\frac{t^2}{3}R(v,w)v+o(t^3).
+  \tag{6E45}\label{eq:6E45}
+\end{equation*}
+
+\item \textbf{计算拉回度量。}
+
+拉回度量为
+\begin{equation*}
+  \widetilde g_{ij}(tv)=
+   \bigl\langle d\exp_p(tv)e_i,d\exp_p(tv)e_j\bigr\rangle,
+  \tag{6E46}\label{eq:6E46}
+\end{equation*}
+其中 $\{e_i\}$ 是 $T_pM$ 关于 $g_p$ 的一组正交归一基。用 $d\exp_p(tv)$ 的展开式和式 \eqref{eq:6E45}，得
+\begin{equation*}
+  d\exp_p(tv)(e_i)=e_i-\frac{t^2}{3}R(v,e_i)v+o(t^3).
+  \tag{6E47}\label{eq:6E47}
+\end{equation*}
+所以由式 \eqref{eq:6E46} 和式 \eqref{eq:6E47} 得
+\begin{equation*}
+ \widetilde g_{ij}(tv)=\delta_{ij}-\frac{t^2}{3}
+ \bigl(\langle R(v,e_i)v,e_j\rangle+\langle R(v,e_j)v,e_i\rangle\bigr)+o(t^3).
+ \tag{6E48}\label{eq:6E48}
+\end{equation*}
+在所选正交归一基 $\{e_i\}$ 下写出曲率分量，得到（见习题 6.1）
+\begin{equation*}
+  \langle R(v,e_i)v,e_j\rangle=R_{ikjl}v^kv^l.
+  \tag{6E49}\label{eq:6E49}
+\end{equation*}
+将式 \eqref{eq:6E49} 代入式 \eqref{eq:6E48}，得
+\begin{equation*}
+  \widetilde g_{ij}(tv)=\delta_{ij}-\frac{t^2}{3}
+      \bigl(R_{ikjl}v^kv^l+R_{jkil}v^kv^l\bigr)+o(t^3).
+  \tag{6E50}\label{eq:6E50}
+\end{equation*}
+令
+\begin{equation*}
+  x^k=tv^k,\qquad x^l=tv^l.
+  \tag{6E51}\label{eq:6E51}
+\end{equation*}
+
+% PDF p. 345
+将式 \eqref{eq:6E51} 代入式 \eqref{eq:6E50}，得
+\begin{equation*}
+  \widetilde g_{ij}(x)=\delta_{ij}-\frac13
+      \bigl(R_{ikjl}x^kx^l+R_{jkil}x^kx^l\bigr)+o(|x|^3).
+  \tag{6E52}\label{eq:6E52}
+\end{equation*}
+比较式 \eqref{eq:6E52} 与式 \eqref{eq:6E28}，得到
+\begin{equation*}
+  \frac12\partial_p\partial_q g_{ij}(0)x^px^q
+     =-\frac13\bigl(R_{ikjl}x^kx^l+R_{jkil}x^kx^l\bigr).
+  \tag{6E53}\label{eq:6E53}
+\end{equation*}
+由于关于 $x$ 的二次型是任意的，如果将曲率项写成完整的、未经对称化的指标形式，就可得出
+\begin{equation*}
+  \partial_k\partial_l g_{ij}(0)
+     =-\frac23\bigl(R_{ikjl}(0)+R_{jkil}(0)\bigr).
+  \tag{6E54}\label{eq:6E54}
+\end{equation*}
+但应注意，泰勒展开中关于 $x$ 的二次型在指标 $k,l$ 下对称。因此，只应写成
+\begin{equation*}
+  \partial_k\partial_l g_{ij}(0)
+     =-\frac13\bigl(R_{ikjl}(0)+R_{jkil}(0)\bigr).
+  \tag{6E55}\label{eq:6E55}
+\end{equation*}
+最后，重命名哑指标并采用更标准的记号，得到所要证明的结果%
+\translatornote{原书式 \eqref{eq:6E54} 到式 \eqref{eq:6E55} 的系数变化不能仅由指标对称推出。按式 \eqref{eq:6E3}–\eqref{eq:6E4} 的曲率约定，应在式 \eqref{eq:6E49} 左端用 $R(e_i,v)v$。采用式 \eqref{eq:6E45} 译注给出的 $1/6$ 系数后，度量的两个二次贡献相加为 $-\frac13 R_{ikjl}x^kx^l$。对这个二次型求两次导数才得到式 \eqref{eq:6E55}–\eqref{eq:6E56}。}%
+\begin{equation*}
+  \partial_p\partial_q g_{rs}(0)
+    =-\frac13\bigl(R_{prqs}(0)+R_{psqr}(0)\bigr).
+  \tag{6E56}\label{eq:6E56}
+\end{equation*}
+\end{itemize}
+
+\AppendixHeading{6E4}{体积展开}
+设 $(M,g)$ 是 $n$ 维黎曼流形。这里的“体积”用度量 $g$ 定义。下面介绍黎曼流形上体积的定义，说明体积展开的基本思想，着重讨论正规坐标下体积元的二阶展开。
+
+\AppendixSubheading{6E4.1}{黎曼流形上体积的定义}
+给定 $M$ 上的坐标卡 $(U,x^1,\dots,x^n)$ 以及该坐标卡中的度量分量 $g_{ij}(x)$，黎曼体积元定义为
+\begin{equation*}
+  d\mu(x)=\sqrt{\det(g(x))}\,dx^1\,dx^2\cdots dx^n.
+  \tag{6E57}\label{eq:6E57}
+\end{equation*}
+这一体积元是一个内在测度，使得在 $M$ 上对函数积分时无需依赖坐标的选择。例如，若 $f\colon M\to\R$ 可积，则它在 $M$ 上的积分为%
+\translatornote{式 \eqref{eq:6E58} 的单坐标卡表达式适用于该坐标卡覆盖积分区域的情形，例如 $f$ 的支撑包含在 $U$ 内。一般情形可借助单位分解合并局部积分。}%
+\begin{equation*}
+  \int_M f(x)\,d\mu(x)
+  =\int_U f(x)\sqrt{\det(g(x))}\,dx^1\,dx^2\cdots dx^n.
+  \tag{6E58}\label{eq:6E58}
+\end{equation*}
+
+% PDF p. 346
+\AppendixSubheading{6E4.2}{度量张量的展开}
+回顾在黎曼几何中，常用以点 $p$ 为中心的正规（或测地）坐标，以简化许多表达式。在这组坐标下，度量张量 $g_{ij}(x)$ 在 $p$（取为原点）附近的展开式为
+\begin{equation*}
+  g_{ij}(x)=\delta_{ij}-\frac13R_{ikjl}(p)x^kx^l+o(|x|^3),
+  \tag{6E59}\label{eq:6E59}
+\end{equation*}
+其中 $R_{ikjl}(p)$ 为黎曼曲率张量在 $p$ 处的分量，$\delta_{ij}$ 为克罗内克符号。由于度量的一阶导数在 $p$ 处消失，首个修正项出现在 $x$ 的二阶。
+
+\AppendixSubheading{6E4.3}{推导体积元展开}
+首先定义黎曼流形上的体积元
+\begin{equation*}
+  dV=\sqrt{\det g(x)}\,d^n x.
+  \tag{6E60}\label{eq:6E60}
+\end{equation*}
+式 \eqref{eq:6E59} 可以改写为
+\begin{equation*}
+  g_{ij}(x)=\delta_{ij}+a_{ij}(x),\qquad
+  a_{ij}(x)=-\frac13R_{ikjl}(p)x^kx^l+o(|x|^3).
+  \tag{6E61}\label{eq:6E61}
+\end{equation*}
+可用小扰动公式近似行列式
+\begin{equation*}
+  \det(\delta_{ij}+a_{ij})=1+\operatorname{Tr}(a)+o(a^2),
+  \tag{6E62}\label{eq:6E62}
+\end{equation*}
+其中
+\[
+  \operatorname{Tr}(a)=a_{ii}=-\frac13R_{ikil}(p)x^kx^l.
+\]
+利用里奇曲率张量的定义 $R_{ikil}(p)=R_{kl}(p)$，得到
+\begin{equation*}
+  \operatorname{Tr}(a)=-\frac13R_{kl}(p)x^kx^l.
+  \tag{6E63}\label{eq:6E63}
+\end{equation*}
+因此，合并式 \eqref{eq:6E61} 至式 \eqref{eq:6E63}，得到修正后的行列式
+\begin{equation*}
+  \det g(x)=1-\frac13R_{kl}(p)x^kx^l+o(|x|^3).
+  \tag{6E64}\label{eq:6E64}
+\end{equation*}
+为得到体积元，取平方根
+\begin{equation*}
+  \sqrt{\det g(x)}=\sqrt{1-\frac13R_{kl}(p)x^kx^l+o(|x|^3)}.
+  \tag{6E65}\label{eq:6E65}
+\end{equation*}
+对小量 $t$ 使用展开式 $\sqrt{1+t}\approx1+\frac12 t$，得到
+\begin{equation*}
+  \sqrt{\det g(x)}=1-\frac16R_{kl}(p)x^kx^l+o(|x|^3).
+  \tag{6E66}\label{eq:6E66}
+\end{equation*}
+
+% PDF p. 347
+将式 \eqref{eq:6E66} 代入式 \eqref{eq:6E60}，得到正规坐标下体积元的二阶展开
+\begin{equation*}
+  dV=\left(1-\frac16R_{kl}(p)x^kx^l+o(|x|^3)\right)d^n x.
+  \tag{6E67}\label{eq:6E67}
+\end{equation*}
+
+\AppendixSubheading{6E4.4}{例子}
+\begin{statement}{例 6E.1}{欧氏空间}
+在平坦空间中，曲率为零，即 $R_{kl}(p)=0$。展开式于是化为
+\[
+  dV=\bigl(1+o(|x|^3)\bigr)d^n x,
+\]
+这就是通常的勒贝格测度。
+\end{statement}
+
+\begin{statement}{例 6E.2}{常曲率流形}
+考虑常曲率为 $K$ 的空间。在这样的空间中，里奇张量与度量成比例
+\[
+  R_{kl}(p)=(n-1)K\delta_{kl}.
+\]
+将这个里奇张量代入式 \eqref{eq:6E67}，得到体积元的展开式
+\[
+  dV=\left(1-\frac{(n-1)K}{6}|x|^2+\bigl(|x|^3\bigr)\right)d^n x.
+\]
+在二维球面上（$n=2$），它化为
+\[
+  dV=\left(1-\frac K6|x|^2+\bigl(|x|^3\bigr)\right)dx^1\,dx^2,
+\]
+其中 $K$ 为高斯曲率。%
+\translatornote{这两式的括号内最后一项按原书排作 $(|x|^3)$。结合式 \eqref{eq:6E67}，应将它理解为展开式的余项。}
+这个二阶展开在黎曼几何理论中很有用，在实际应用中也发挥重要作用。
+\end{statement}

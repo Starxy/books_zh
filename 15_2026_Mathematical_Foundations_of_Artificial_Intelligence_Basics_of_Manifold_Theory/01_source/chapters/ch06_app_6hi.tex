@@ -1,0 +1,157 @@
+% PDF p. 352
+\AppendixSection{6H}{\texorpdfstring{$2\times I$}{2×I} 列联表中检验统计量的渐近分布}
+
+\AppendixHeading{6H1}{单元格比例向量的渐近正态性}
+
+设 $\hat p=(\hat p_{11},\hat p_{12},\ldots,\hat p_{I1},\hat p_{I2})^{\mathsf T}$ 为 $2\times I$ 列联表中观测到的单元格比例向量，$p=(p_{11},p_{12},\ldots,p_{I1},p_{I2})^{\mathsf T}$ 为独立性零假设 $H_0$ 下的真实概率向量，采用经过曲率修正的协方差 $\Sigma(K)/n$。由多项分布的多元中心极限定理，有
+\[
+  \sqrt n(\hat p-p)\xrightarrow{d}N(0,\Sigma(K)),
+\]
+其中 $\Sigma(K)$ 为 $2I\times 2I$ 协方差矩阵，其 $((i,j),(k,l))$ 元素为
+\[
+  \Sigma_{(ij),(kl)}(K)=p_{ij}\delta_{(ij),(kl)}-p_{ij}p_{kl}+\text{曲率修正}.
+\]
+
+% PDF p. 353
+\AppendixHeading{6H2}{将皮尔逊 \texorpdfstring{$X^2$}{X²} 改写为二次型}
+
+回顾通常的皮尔逊卡方统计量，
+\begin{equation*}
+  X^2=\sum_{i,j}\frac{(n_{ij}-np_{ij})^2}{np_{ij}}
+       =n\sum_{i,j}\frac{(\hat p_{ij}-p_{ij})^2}{p_{ij}}.
+  \tag{6H1}\label{eq:6H1}
+\end{equation*}
+定义 $D=\diag(p_{11},p_{12},\ldots,p_{I2})$。式 \eqref{eq:6H1} 可以改写为二次型
+\begin{equation*}
+  X^2=n(\hat p-p)^{\mathsf T}D^{-1}(\hat p-p).
+  \tag{6H2}\label{eq:6H2}
+\end{equation*}
+
+\AppendixHeading{6H3}{用德尔塔方法得到渐近分布}
+
+由于 $\sqrt n(\hat p-p)\xrightarrow{d}N(0,\Sigma(K))$，可知
+\[
+  X^2=\bigl(\sqrt n(\hat p-p)\bigr)^{\mathsf T}D^{-1}
+       \bigl(\sqrt n(\hat p-p)\bigr)\xrightarrow{d}Z^{\mathsf T}D^{-1}Z,
+\]
+其中 $Z\sim N(0,\Sigma(K))$。令 $Z=D^{1/2}W$，则
+\[
+  W=D^{-1/2}Z\sim N(0,D^{-1/2}\Sigma(K)D^{-1/2}).
+\]
+因此，
+\[
+  X^2=W^{\mathsf T}D^{1/2}D^{-1}D^{1/2}W
+     =W^{\mathsf T}W=\sum_{r=1}^{2I}W_r^2,
+\]
+并有约束 $\sum_r W_r=0$（因为各比例之和为 1）。这消去两个自由度，剩下 $(I-1)(2-1)=I-1$ 个自由分量。\translatornote{原文这里将比例总和约束与独立性检验的自由度混在一起。由 $W=D^{-1/2}Z$，总和约束给出 $\sum_r\sqrt{p_r}W_r=0$，这一约束只消去一个维度。通常的独立性检验还从同一列联表估计边际概率，才得到 $(2-1)(I-1)$ 个自由度。}
+
+\AppendixHeading{6H4}{用特征分解得到加权卡方分布}
+
+令 $A=D^{-1/2}\Sigma(K)D^{-1/2}$，则 $W\sim N(0,A)$。通过特征分解将 $A$ 对角化，$A=U\Lambda U^{\mathsf T}$，其中 $\Gamma=\diag(\lambda_1,\ldots,\lambda_{I-1})$。作变量变换 $V=U^{\mathsf T}W$，得到 $V\sim N(0,\Lambda)$。经过一些代数运算，有 $W^{\mathsf T}W=V^{\mathsf T}V$。因此，
+\begin{equation*}
+  X^2\xrightarrow{d}W^{\mathsf T}W
+    =V^{\mathsf T}V\xrightarrow{d}\sum_{r=1}^{I-1}\lambda_r\chi_{1,r}^2,
+  \tag{6H3}\label{eq:6H3}
+\end{equation*}
+其中各 $\chi_{1,r}^2$ 为相互独立且自由度为 1 的卡方随机变量。
+
+回顾 $A=D^{-1/2}\Sigma(K)D^{-1/2}$、$A=U\Lambda U^{\mathsf T}$，其中 $\Lambda=\diag(\lambda_1,\ldots,\lambda_{I-1})$。令 $Z\sim N(0,I)$。于是
+\begin{equation*}
+  \begin{aligned}
+    Z^{\mathsf T}\bigl[D^{-1/2}\Sigma(K)D^{-1/2}\bigr]^{-1}Z
+      &=Z^{\mathsf T}[U\Lambda U^{\mathsf T}]^{-1}Z\\
+      &=(U^{\mathsf T}Z)^{\mathsf T}\Lambda^{-1}U^{\mathsf T}Z
+       =Y^{\mathsf T}\Lambda^{-1}Y,
+  \end{aligned}
+  \tag{6H4}\label{eq:6H4}
+\end{equation*}
+其中 $Y=U^{\mathsf T}Z\sim N(0,I)$。所以
+% PDF p. 354
+\begin{equation*}
+  \begin{aligned}
+    Y^{\mathsf T}\Lambda^{-1}Y
+       &\xrightarrow{d}\sum_{r=1}^{I-1}\lambda_r^{-1}\chi_{1,r}^2,\\
+    X^2&\xrightarrow{d}Z^{\mathsf T}\bigl[D^{-1/2}\Sigma(K)D^{-1/2}\bigr]^{-1}Z
+       =Y^{\mathsf T}\Lambda^{-1}Y
+       \xrightarrow{d}\sum_{r=1}^{I-1}\lambda_r^{-1}\chi_{1,r}^2.
+  \end{aligned}
+  \tag{6H5}\label{eq:6H5}
+\end{equation*}
+\translatornote{式 \eqref{eq:6H4}–\eqref{eq:6H5} 使用了逆矩阵，给出逆特征值权重。对式 \eqref{eq:6H2} 的二次型，前述式 \eqref{eq:6H3} 的推导给出的权重是归一化协方差矩阵的特征值。}
+
+\AppendixSection{6I}{格拉斯曼流形上的测地距离、检验统计量和渐近分布}
+
+下面从头推导如何通过主角比较两个 $k$ 维子空间 $S_0,S_{\mathrm{obs}}\in\Gr(k,n)$，如何用这些角构造格拉斯曼流形上的测地距离，以及如何用该距离定义检验统计量。统计量的渐近分布为 $\chi_1^2$ 随机变量的加权和。
+
+\AppendixHeading{6I1}{两个子空间之间的主角}
+
+设 $U\in\R^{n\times k}$、$V\in\R^{n\times k}$ 分别为 $S_0$、$S_{\mathrm{obs}}$ 的标准正交基矩阵。因此 $U^{\mathsf T}U=I_k$，$V^{\mathsf T}V=I_k$。构造 $k\times k$ 矩阵
+\[
+  M=U^{\mathsf T}V.
+\]
+计算其奇异值分解，
+\[
+  M=W\Sigma Z^{\mathsf T},\qquad W,Z\in O(k),\quad
+  \Sigma=\diag(\sigma_1,\ldots,\sigma_k),\quad
+  1\geq\sigma_1\geq\cdots\geq\sigma_k\geq0.
+\]
+于是 $S_0$ 和 $S_{\mathrm{obs}}$ 之间的主角 $\theta_i$ 定义为
+\[
+  \theta_i=\arccos(\sigma_i),\qquad i=1,\ldots,k.
+\]
+按构造有 $0\leq\theta_i\leq\pi/2$，并满足变分定义
+\[
+  \cos\theta_i=\max_{\substack{u\in S_0,\,v\in S_{\mathrm{obs}},\
+                  u^{\mathsf T}u=v^{\mathsf T}v=1\\
+                  u\perp u_1,\ldots,u_{i-1},\quad v\perp v_1,\ldots,v_{i-1}}}
+                   u^{\mathsf T}v.
+\]
+
+\AppendixHeading{6I2}{\texorpdfstring{$\Gr(k,n)$}{Gr(k,n)} 上的测地距离}
+
+格拉斯曼流形 $\Gr(k,n)$ 带有典范黎曼度量。在该度量下，两个子空间的测地距离是主角向量的欧氏长度，
+% PDF p. 355
+\[
+  d_G(S_0,S_{\mathrm{obs}})=\left(\sum_{i=1}^k\theta_i^2\right)^{1/2},
+\]
+也可以写成矩阵形式
+\[
+  d_G^2(S_0,S_{\mathrm{obs}})=\lVert\Theta\rVert_F^2,\qquad
+  \Theta=\diag(\theta_1,\ldots,\theta_k).
+\]
+
+\AppendixHeading{6I3}{检验统计量}
+
+假设在零假设 $H_0:S_{\mathrm{obs}}=S_0$ 下，用 $n$ 个独立观测估计 $S_{\mathrm{obs}}$。令 $\hat S$ 为该子空间的样本估计，计算它与 $S_0$ 之间的主角 $\hat\theta_i$。定义统计量
+\begin{equation*}
+  T^2=nd_G^2(S_0,\hat S)=n\sum_{i=1}^k\hat\theta_i^2.
+  \tag{6I1}\label{eq:6I1}
+\end{equation*}
+当 $\hat\theta_i$ 很小时，$\theta_i\approx\sigma_i^\perp$（切空间坐标），所以 $T^2$ 实质上是切空间中范数平方乘以 $n$。
+
+\AppendixHeading{6I4}{用德尔塔方法得到渐近分布}
+
+设 $\xi\in T_{S_0}\Gr(k,n)$ 为估计 $S_0$ 时抽样噪声的切空间表示。在较弱的正则性条件下，可以证明 $\sqrt n\,\xi\xrightarrow{d}N(0,\Sigma_T)$，其中 $\Sigma_T$ 是切空间估计量的协方差。从 $\hat S$ 到 $T_{S_0}\Gr(k,n)$ 的对数映射将主角 $\theta$ 映为一个反对称矩阵，其弗罗贝尼乌斯范数（Frobenius norm）恰好等于 $d_G$。由德尔塔方法可得
+\[
+  T^2=n\lVert\xi\rVert^2\xrightarrow{d}Z^{\mathsf T}\Sigma_T^{-1}Z,
+   \qquad Z\sim N(0,I).
+\]
+\translatornote{由本段的正态极限，若统计量是 $n\lVert\xi\rVert^2$，则标准正态变量的二次型应使用 $\Sigma_T$。原文在此及下文用 $\Sigma_T^{-1}$。}
+等价地，借助正交矩阵 $Q$ 将对称正定矩阵 $A=\Sigma_T^{-1}$ 对角化，
+\[
+  A=Q\Lambda Q^{\mathsf T},\qquad
+  \Lambda=\diag(\lambda_1,\ldots,\lambda_m),
+\]
+其中 $m=\dim(\Gr(k,n))=k(n-k)$。若令 $W=Q^{\mathsf T}Z$，则
+$Z^{\mathsf T}\Sigma_T^{-1}Z=W^{\mathsf T}\Lambda W$，且 $W\sim N(0,I)$。注意
+\[
+  W^{\mathsf T}\Lambda W=\sum_{r=1}^m\lambda_r W_r^{\mathsf T}W_r,
+  \qquad W=\begin{bmatrix}W_1\\\vdots\\W_m\end{bmatrix}.
+\]
+% PDF p. 356
+因此，
+\[
+  T^2=n\lVert\xi\rVert^2\xrightarrow{d}
+  \sum_{r=1}^m\lambda_r W_r^{\mathsf T}W_r=\sum_{r=1}^m\lambda_r\chi_{1,r}^2.
+\]
+至此，主角、格拉斯曼测地距离、检验统计量及其渐近加权卡方分布均已导出。

@@ -1,0 +1,240 @@
+% PDF p. 226
+\subsection{基本形式与主曲率}
+第一基本形式是诱导度量，第二基本形式描述弯曲程度。我们将说明它们的定义和计算公式。主曲率刻画曲面在给定点处的弯曲程度，我们也会说明主曲率如何帮助理解欧氏空间中曲面的几何性质。例子和数学推导将说明这些概念为何对曲面分析至关重要。
+
+% PDF p. 227
+\subsubsection{第一基本形式}
+\paragraph{几何设定}
+设
+\[
+  X\colon U\subset\R^2\longrightarrow\R^3,\qquad
+  (u,v)\longmapsto X(u,v)
+\]
+为一个正则参数曲面（regular parametrized surface），即处处 $X_u\times X_v\ne0$。下文统一记
+\[
+  X_u=\frac{\partial X}{\partial u},\qquad X_v=\frac{\partial X}{\partial v}.
+\]
+
+\paragraph{由诱导度量构造第一基本形式}
+\begin{itemize}
+  \item \textbf{切向量}
+  \[
+    T_{(u,v)}S=\operatorname{Span}\{X_u,X_v\}\subset\R^3.
+  \]
+  \item 将欧氏内积 $\langle\cdot,\cdot\rangle$ 拉回到每个切平面：
+  \[
+    \begin{aligned}
+      &g_{(u,v)}(aX_u+bX_v,cX_u+dX_v)\\
+      &\qquad=\langle aX_u+bX_v,cX_u+dX_v\rangle_{\R^3}.
+    \end{aligned}
+  \]
+  \item \textbf{系数函数}
+  \[
+    E=\langle X_u,X_u\rangle,\qquad
+    F=\langle X_u,X_v\rangle,\qquad
+    G=\langle X_v,X_v\rangle.
+  \]
+  \item \textbf{二次型（第一基本形式）}\quad
+  $\mathrm I=E\,du^2+2F\,du\,dv+G\,dv^2$。设 $\gamma(t)=(u(t),v(t))$，则曲面上的曲线为 $X\circ\gamma=X(u(t),v(t))$，其长度为
+  \begin{equation*}
+    L=\int\sqrt{E\dot u^2+2F\dot u\dot v+G\dot v^2}\,dt.
+    \tag{5.5}\label{eq:5.5}
+  \end{equation*}
+  因此，$\mathrm I$ 编码了曲面内部的所有度量，包括长度、角度和面积。
+\end{itemize}
+
+\begin{statement}{例 5.5}{碗形曲面与切向量——第一基本形式}
+线框“碗”由以下函数图像给出：
+\[
+  X(u,v)=\bigl(u,v,0.2(u^2+v^2)\bigr),\qquad -1\le u,\ v\le1.
+\]
+\begin{itemize}
+  \item 在标出的点 $(u_0,v_0)=(0.5,0.3)$ 处，切空间的一组基为
+  \[
+    X_u=(1,0,0.4u_0),\qquad X_v=(0,1,0.4v_0).
+  \]
+  箭头表示这两个提升到曲面上的向量。
+  \item 勾出边界的小平行四边形是参数域中小矩形 $\Delta u\times\Delta v$ 的像。
+\end{itemize}
+\end{statement}
+
+\subsubsection{第二基本形式与曲面的弯曲}
+第二基本形式（亦称形状张量，shape tensor）是三维欧氏空间中光滑曲面的切平面上的一个二次型。第二基本形式可对黎曼流形中的光滑浸入子流形定义。
+
+% PDF p. 228
+\begin{itemize}
+  \item \textbf{法向量场}\quad 回顾一下，$X(u,v)$ 是 $\R^3$ 中曲面的正则参数化，是两个变量的光滑向量值函数。参数化正则，意味着对任意 $(u,v)$，$X_u,X_v$ 都线性无关，因而在每个点张成 $S$ 的切平面。叉积 $X_u\times X_v$ 是曲面的非零法向量。定义单位法向量场 $N$：
+  \[
+    N=\frac{X_u\times X_v}{\lVert X_u\times X_v\rVert},
+  \]
+  其中符号的选取决定了定向。
+  \item \textbf{将曲面的海森矩阵投影到法方向}
+
+  \textbf{设定}\quad 正则曲面由浸入给出：
+  \[
+    X(u,v)=\bigl(x(u,v),y(u,v),z(u,v)\bigr).
+  \]
+  写出一阶偏导：
+  \[
+    \begin{aligned}
+      X_u&:=\frac{\partial X}{\partial u}
+        =\left(\frac{\partial x}{\partial u},\frac{\partial y}{\partial u},
+                \frac{\partial z}{\partial u}\right),\\
+      X_v&:=\frac{\partial X}{\partial v}
+        =\left(\frac{\partial x}{\partial v},\frac{\partial y}{\partial v},
+                \frac{\partial z}{\partial v}\right),
+    \end{aligned}
+  \]
+  以及二阶偏导：
+  \[
+    \begin{aligned}
+      X_{uu}&:=\frac{\partial^2X}{\partial u^2}
+        =\left(\frac{\partial^2x}{\partial u^2},\frac{\partial^2y}{\partial u^2},
+                \frac{\partial^2z}{\partial u^2}\right),\\
+      X_{uv}&:=\frac{\partial^2X}{\partial u\partial v}
+        =\left(\frac{\partial^2x}{\partial u\partial v},
+                \frac{\partial^2y}{\partial u\partial v},
+                \frac{\partial^2z}{\partial u\partial v}\right),\\
+      X_{vv}&:=\left(\frac{\partial^2x}{\partial v^2},
+                \frac{\partial^2y}{\partial v^2},\frac{\partial^2z}{\partial v^2}\right).
+    \end{aligned}
+  \]
+  定义单位法向量
+  \[
+    N=\frac{X_u\times X_v}{\lVert X_u\times X_v\rVert},
+  \]
+  其中
+  \[
+    X_u\times X_v=
+    \begin{vmatrix}
+      i&j&k\\[2pt]
+      \dfrac{\partial x}{\partial u}&\dfrac{\partial y}{\partial u}&\dfrac{\partial z}{\partial u}\\[6pt]
+      \dfrac{\partial x}{\partial v}&\dfrac{\partial y}{\partial v}&\dfrac{\partial z}{\partial v}
+    \end{vmatrix}.
+  \]
+\end{itemize}
+
+% PDF p. 229
+这里 $W:=\lVert X_u\times X_v\rVert=\sqrt{EG-F^2}$ 表示未归一化的面积元素，其中 $E,G,F$ 是第一基本形式的系数。
+
+\Subheading{投影到 $N$ 与第二基本形式的系数}
+二阶偏导到 $N$ 的投影为
+\[
+  e=\langle X_{uu},N\rangle,\qquad
+  f=\langle X_{uv},N\rangle,\qquad
+  g=\langle X_{vv},N\rangle.
+\]
+现在显式地计算投影：
+\begin{equation*}
+  e=\langle X_{uu},N\rangle=N\cdot X_{uu}
+    =\frac{(X_u\times X_v)\cdot X_{uu}}{\lVert X_u\times X_v\rVert}
+    =\frac{\det(X_u,X_v,X_{uu})}{\sqrt{EG-F^2}},
+  \tag{5.6}\label{eq:5.6}
+\end{equation*}
+其中行列式为\translatornote{原式的最后一行只在分母印有平方。由行向量 $X_{uu}$ 的定义，这一行各项应为二阶偏导，即 $\partial^2x/\partial u^2$ 等。}
+\[
+  \det(X_u,X_v,X_{uu})=
+  \begin{vmatrix}
+    \dfrac{\partial x}{\partial u}&\dfrac{\partial y}{\partial u}&\dfrac{\partial z}{\partial u}\\[6pt]
+    \dfrac{\partial x}{\partial v}&\dfrac{\partial y}{\partial v}&\dfrac{\partial z}{\partial v}\\[6pt]
+    \dfrac{\partial x}{\partial u^2}&\dfrac{\partial y}{\partial u^2}&\dfrac{\partial z}{\partial u^2}
+  \end{vmatrix}.
+\]
+类似地，
+\[
+  \begin{aligned}
+    f&=\langle X_{uv},N\rangle=N\cdot X_{uv}
+       =\frac{\det(X_u,X_v,X_{uv})}{\sqrt{EG-F^2}},\\
+    g&=\langle X_{vv},N\rangle=N\cdot X_{vv}
+       =\frac{\det(X_u,X_v,X_{vv})}{\sqrt{EG-F^2}}.
+  \end{aligned}
+\]
+
+\begin{statement}{例 5.6}{抛物面 $z=\frac12(u^2+v^2)$}
+\[
+  X(u,v)=\bigl(u,v,\tfrac12(u^2+v^2)\bigr).
+\]
+\textbf{一阶导数}\quad $X_u=(1,0,u)$，$X_v=(0,1,v)$。
+
+\textbf{二阶导数}\quad $X_{uu}=(0,0,1)$，$X_{uv}=(0,0,0)$，$X_{vv}=(0,0,1)$。
+
+\textbf{叉积}
+\[
+  X_u\times X_v=\begin{vmatrix}i&j&k\\1&0&u\\0&1&v\end{vmatrix}
+    =(-u,-v,1),\qquad W=\sqrt{1+u^2+v^2}.
+\]
+\textbf{点积}\quad $(X_u\times X_v)\cdot X_{uu}=1$。因此\translatornote{式中的 $e(u,u)$ 沿用原书记号。按右端变量应为 $e(u,v)$。}
+\[
+  e(u,u)=\frac{1}{\sqrt{1+u^2+v^2}}.
+\]
+% PDF p. 230
+在原点，$e(0,0)=1$。离开顶点后 $e$ 逐渐减小，反映出抛物面逐渐变平。
+\end{statement}
+
+\begin{itemize}
+  \item \textbf{二次型}\quad 第二基本形式为
+  \begin{equation*}
+    \mathrm{II}=e\,du^2+2f\,du\,dv+g\,dv^2.
+    \tag{5.7}\label{eq:5.7}
+  \end{equation*}
+  \item \textbf{第二基本形式本质上是曲面在某点附近的泰勒展开的二次项}
+
+  \textbf{1.\quad 局部泰勒展开}\quad 取光滑定向曲面 $S\subset\R^3$，固定一点 $p\in S$。选取正规坐标，使 $p$ 位于原点 $(0,0,0)$，切平面 $T_pS$ 为 $(x,y)$ 平面，$p$ 处的单位法向量沿 $z$ 轴。
+\end{itemize}
+
+在 $p$ 附近，可把曲面写成高度函数的图像：
+\[
+  z=f(x,y),\qquad f(0,0)=0,\qquad \nabla f(0,0)=0.
+\]
+通常的泰勒展开给出
+\begin{equation*}
+  f(x,y)=\frac12[x\ \ y]\operatorname{Hess}f(0,0)
+          \begin{bmatrix}x\\y\end{bmatrix}+O((x,y)^3),
+  \tag{5.8}\label{eq:5.8}
+\end{equation*}
+其中
+\[
+  \operatorname{Hess}f(0,0)=
+  \left.
+  \begin{bmatrix}
+    \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{\partial x\partial y}\\[6pt]
+    \dfrac{\partial^2 f}{\partial y\partial x} & \dfrac{\partial^2 f}{\partial y^2}
+  \end{bmatrix}
+  \right|_{(x,y)=(0,0)}.
+\]
+注意
+\[
+  e=(X_x\times X_y)\cdot X_{xx}
+    =\left(-\frac{\partial f}{\partial x},-\frac{\partial f}{\partial y},1\right)
+      \begin{pmatrix}0\\0\\\dfrac{\partial^2 f}{\partial x^2}\end{pmatrix}
+    =\frac{\partial^2 f}{\partial x^2}.
+\]
+类似地，$f=\frac{\partial^2 f}{\partial x\partial y}$，$g=\frac{\partial^2 f}{\partial y^2}$。代入式~\eqref{eq:5.7}，得到
+\[
+  \mathrm{II}=e\,dx^2+2f\,dx\,dy+g\,dy^2
+    =\frac{\partial^2 f}{\partial x^2}x^2
+      +2\frac{\partial^2 f}{\partial x\partial y}xy
+      +\frac{\partial^2 f}{\partial y^2}y^2.
+\]
+因此
+\[
+  f(x,y)=\frac12\mathrm{II}+O\bigl(\lVert(x,y)\rVert^3\bigr).
+\]
+
+% PDF p. 231
+\begin{statement}{例 5.7}{鞍形曲面}
+考虑鞍形曲面（saddle surface）$z=u^2-v^2$，以及它的主曲率和第二基本形式。
+\begin{itemize}
+  \item 法向量（竖直箭头）确定法方向，第二基本形式衡量曲面在该方向的弯曲程度。
+  \item 沿 $x,y$ 方向的切向箭头表示原点处的主方向。
+  \item 两条突出的曲线一条向上弯曲、另一条向下弯曲，是沿各主方向移动得到的曲面截线：
+  \[
+    \gamma_x=(t,0,t^2),\qquad\gamma_y=(0,t,-t^2).
+  \]
+\end{itemize}
+第二基本形式的系数为
+\[
+  e=2,\qquad f=0,\qquad g=-2.
+\]
+因此第二基本形式为 $\mathrm{II}=2\,du^2-2\,dv^2$。
+\end{statement}

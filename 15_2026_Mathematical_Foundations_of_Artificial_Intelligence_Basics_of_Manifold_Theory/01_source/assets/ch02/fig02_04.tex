@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=3.25cm,y=3.25cm]
+  \draw[thick] (0,0) circle (1);
+  \draw[red!85!black,thick] (0,-1)--(0,1);
+  \pgfmathsetmacro{\arcx}{1.14}
+  \pgfmathsetmacro{\arcy}{.60}
+  \pgfmathsetmacro{\arcr}{sqrt(\arcx*\arcx+\arcy*\arcy-1)}
+  \pgfmathsetmacro{\middleangle}{atan2(\arcy,\arcx)+180}
+  \pgfmathsetmacro{\anglewidth}{asin(1/sqrt(\arcx*\arcx+\arcy*\arcy))}
+  \pgfmathsetmacro{\startangle}{\middleangle-\anglewidth}
+  \pgfmathsetmacro{\endangle}{\middleangle+\anglewidth}
+  \foreach \sign in {1,-1} {
+    \begin{scope}[yscale=\sign]
+      \draw[blue!65!black,thick]
+      ({\arcx+\arcr*cos(\startangle)},{\arcy+\arcr*sin(\startangle)})
+      arc[start angle=\startangle,end angle=\endangle,radius=\arcr];
+    \end{scope}
+  }
+  \fill ({\arcx-sqrt(\arcr*\arcr-\arcy*\arcy)},0) circle (1pt)
+    node[above right,inner sep=2pt] {$p$};
+  \node[draw=black!25,inner sep=2pt,anchor=south west,font=\small] at (-1,1)
+    {\tikz[baseline=-.35ex]\draw[red!85!black,thick] (0,0)--(.24cm,0); 直线 $L$};
+\end{tikzpicture}

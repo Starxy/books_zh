@@ -1,0 +1,152 @@
+% PDF p. 256
+\AppendixSection{5A}{测地三角形的高斯映射与球面几何}
+\textbf{思路}\quad 高斯映射把曲率积分转化为球面三角形的面积。在单位球面 $S^2$ 上，测地三角形（边为大圆弧）的面积等于其球面角盈（spherical excess）$(\theta_1+\theta_2-\theta_3)$，这是吉拉尔定理（Girard's theorem）。整理各项便得证明。\translatornote{原书在此写出角盈 $(\theta_1+\theta_2-\theta_3)$，下一式还将内角和加到积分上。按本附录后面的式~\eqref{eq:5A8} 和式~\eqref{eq:5A10}，角盈是 $\theta_1+\theta_2+\theta_3-\pi$。}
+
+\textbf{第 1 步}\quad 设 $T$ 是定向曲面 $(M,g)$ 上的一个测地三角形，内角为 $(\theta_1,\theta_2,\theta_3)$。证明
+\[
+  \iint_T K\,dA+(\theta_1+\theta_2+\theta_3)=\pi.
+\]
+先证明：对于定向曲面 $M\subset\R^3$ 的任一正则曲面片 $T$，若高斯映射
+\[
+  N\colon M\to S^2,\qquad
+  N(p)=\left.\frac{X_u\times X_v}{\lVert X_u\times X_v\rVert}\right|_p
+\]
+为单射，即 $N$ 在 $T$ 上没有自身重叠，则
+\[
+  \operatorname{Area}(N(T))=\iint_T\lvert\det(dN_p)\rvert\,dA.
+\]
+
+% PDF p. 257
+下面用换元证明上面的等式。直观上，关键在于相对于曲面的面积元素，法向量映射 $N$ 的雅可比行列式为 $\lvert\det(dN_p)\rvert$。
+\begin{itemize}
+  \item \textbf{设定：一张局部参数化}
+
+  设
+  \[
+    X(u,v)=\bigl(x(u,v),y(u,v),z(u,v)\bigr),\qquad
+    (u,v)\in\Omega\subset\R^2,
+  \]
+  为正则坐标卡，其像恰为曲面片 $T=X(\Omega)$。写出一阶偏导 $X_u,X_v\in\R^3$，令
+  $W=\lVert X_u\times X_v\rVert>0$。$T$ 上的诱导面积元素为
+  \begin{equation*}
+    dA=W\,du\,dv.
+    \tag{5A1}\label{eq:5A1}
+  \end{equation*}
+  \item \textbf{坐标下的高斯映射}
+
+  将 $N$ 与 $X$ 复合，得到
+  \[
+    N(u,v)=\frac{X_u\times X_v}{W},\qquad N\colon\Omega\to S^2.
+  \]
+  计算一阶偏导 $N_u=\partial_uN$，$N_v=\partial_vN$。
+  \item \textbf{高斯像的面积}
+
+  在球面上，参数曲面片 $N(\Omega)$ 的面积元素为
+  \[
+    dA_{S^2}=\lVert N_u\times N_v\rVert\,du\,dv.
+  \]
+  因此
+  \begin{equation*}
+    \operatorname{Area}(N(T))=\iint_\Omega \lVert N_u\times N_v\rVert\,du\,dv.
+    \tag{5A2}\label{eq:5A2}
+  \end{equation*}
+  我们需要 $\lVert N_u\times N_v\rVert$ 的显式表达式。下面推导该式。
+  \item \textbf{把 $\lVert N_u\times N_v\rVert$ 与 $\det(dN_p)$ 联系起来}
+
+  固定 $(u,v)$。微分 $dN_p\colon T_pM\to T_{N(p)}S^2$ 在切基 $\{X_u,X_v\}$ 上的作用为
+  \[
+    dN_p(X_u)=N_u,\qquad dN_p(X_v)=N_v.
+  \]
+  对任意由列向量 $Ae_1,Ae_2$ 表示的线性映射 $A\colon\R^2\to\R^2$，欧氏面积的放大因子为
+  \[
+    \frac{Ae_1\times Ae_2}{e_1\times e_2}.
+  \]
+  定义
+  \[
+    e_1=X_u,\quad e_2=X_v,\quad Ae_1=dN_p(X_u)=N_u,\quad
+      Ae_2=dN_p(X_v)=N_v.
+  \]
+  于是
+  \[
+    \frac{\lVert Ae_1\times Ae_2\rVert}{\lVert e_1\times e_2\rVert}
+       =\frac{\lVert N_u\times N_v\rVert}{\lVert X_u\times X_v\rVert}.
+  \]
+% PDF p. 258
+  由换元定理，$dN_p$ 的雅可比行列式（绝对值）满足
+  \begin{equation*}
+    \begin{gathered}
+      \lvert\det(dN_p)\rvert
+         =\frac{\lVert N_u\times N_v\rVert}{\lVert X_u\times X_v\rVert},\\
+      \text{从而}\quad\lVert N_u\times N_v\rVert
+         =\lvert\det(dN_p)\rvert\lVert X_u\times X_v\rVert
+         =\lvert\det(dN_p)\rvert W.
+    \end{gathered}
+    \tag{5A3}\label{eq:5A3}
+  \end{equation*}
+  \item \textbf{代入面积积分}
+
+  将式~\eqref{eq:5A1} 和式~\eqref{eq:5A3} 代入式~\eqref{eq:5A2}，得
+  \begin{equation*}
+    \operatorname{Area}(N(T))
+      =\iint_\Omega\lvert\det(dN_p)\rvert W\,du\,dv
+      =\iint_\Omega\lvert\det(dN_p)\rvert\,dA.
+    \tag{5A4}\label{eq:5A4}
+  \end{equation*}
+  由于 $X(\Omega)=T$，式~\eqref{eq:5A4} 右端的积分给出
+  \begin{equation*}
+    \operatorname{Area}(N(T))=\iint_T\lvert\det(dN_p)\rvert\,dA.
+    \tag{5A5}\label{eq:5A5}
+  \end{equation*}
+  原书援引式 (5.50) 得\translatornote{此处应参见第 5.1.4.2 节对形状算子的定义和式~\eqref{eq:5.20}。原书所引的式 (5.50) 是雅可比方程。}
+  \begin{equation*}
+    S=-dN,\qquad K=\det S.
+    \tag{5A6}\label{eq:5A6}
+  \end{equation*}
+  将式~\eqref{eq:5A6} 代入式~\eqref{eq:5A5}，得
+  \begin{equation*}
+    \operatorname{Area}(N(T))=\iint_T K\,dA,
+    \tag{5A7}\label{eq:5A7}
+  \end{equation*}
+  其符号与所选的定向相合。\translatornote{式~\eqref{eq:5A5} 的普通面积对应 $\iint_T|K|\,dA$。若要写成 $\iint_TK\,dA$，应采用带定向的面积，或另有 $K\ge0$ 的条件。}
+
+  \textbf{吉拉尔恒等式}\par
+  \textbf{吉拉尔定理}\quad 一个球面三角形的内角为 $\theta_1,\theta_2,\theta_3$ 时，面积是
+  \begin{equation*}
+    \theta_1+\theta_2+\theta_3-\pi.
+    \tag{5A8}\label{eq:5A8}
+  \end{equation*}
+  应用吉拉尔定理，得到
+  \begin{equation*}
+    \operatorname{Area}(N(T))=\theta_1+\theta_2+\theta_3-\pi.
+    \tag{5A9}\label{eq:5A9}
+  \end{equation*}
+  合并式~\eqref{eq:5A7} 与式~\eqref{eq:5A9}，得到
+  \begin{equation*}
+    \iint_TK\,dA+\pi=\theta_1+\theta_2+\theta_3,
+    \tag{5A10}\label{eq:5A10}
+  \end{equation*}
+% PDF p. 259
+  等价地，
+  \begin{equation*}
+    \iint_TK\,dA+\varnothing_1+\varnothing_2+\varnothing_3=2\pi,
+    \tag{5A11}\label{eq:5A11}
+  \end{equation*}
+  其中 $\varnothing_i=\pi-\theta_i$ 为外角。
+  \item \textbf{测地线在高斯映射下的像}
+
+  设 $\gamma(s)$ 是 $T$ 的一条单位速率测地边。因为 $\ddot\gamma$ 是 $M$ 的法向量，法向量场 $N(\gamma(s))$ 始终位于过原点且与 $\dot\gamma(0)$ 垂直的固定平面内。这个平面与单位球面的交集是大圆。因此，$T$ 的每条测地边在 $N$ 下都映为一段大圆弧。\translatornote{测地线条件只保证 $N(\gamma(s))$ 与当前的 $\dot\gamma(s)$ 垂直，不能推出与固定向量 $\dot\gamma(0)$ 垂直。下文抛物面子午线是特殊例子，不能据此断定一般高斯像 $N(T)$ 是球面测地三角形。}
+
+  在抛物面片 $z=\frac12(x^2+y^2)$ 上，所选测地边是一条子午线，因而确是测地线。其高斯映射为
+  \[
+    N(p)=\frac{(-x,-y,1)}{\sqrt{x^2+y^2+1}}.
+  \]
+  考虑竖直平面 $y=0$。这个平面与单位球面（浅青色）相交成一个大圆。因此，高斯映射将该测地边映为大圆的一段弧，用来说明“$T$ 的每条测地边在 $N$ 下都映为大圆弧”。由此，原书得出 $N(T)$ 是以大圆弧为边的球面三角形。
+  \item \textbf{曲面上的角与球面上的角}
+
+  考虑在顶点 $p$ 相交的两条测地边，其内角为 $\theta$。设 $v,w$ 为向外的切向量。由于 $N$ 垂直于 $v,w$，有
+  \[
+    \langle v,w\rangle=\cos\theta,\qquad
+    \langle N_v,N_w\rangle=\cos\varnothing,
+  \]
+  其中 $\varnothing$ 为球面三角形在 $N(p)$ 处的内角。\translatornote{计算角的余弦需要先归一化向量。一般的 $dN_p$ 不保角，本段的两项公式不能推出两个角相等，故不能用同一组内角得到式~\eqref{eq:5A9}。}
+\end{itemize}

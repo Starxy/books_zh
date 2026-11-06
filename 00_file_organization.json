@@ -1,8 +1,8 @@
 {
-  "organized_on": "2026-11-06",
+  "organized_on": "2026-11-07",
   "root": ".",
   "operation": "保留TeX底本与必要PDF资料，完整中文译本统一保存在00_books。",
-  "status": "14 份中文 PDF 已归档。《扩散模型原理》的中文 TeX 仍缺失，整本复核尚未启动。",
+  "status": "15 份中文 PDF 已归档。《扩散模型原理》的中文 TeX 仍缺失，整本复核尚未启动。",
   "subfolders": [
     "00_originals",
     "01_source",
@@ -440,16 +440,56 @@
       "split_pdf_count": 19,
       "glossary": "14_2026_Efficient_LLM_Inference/02_glossary/glossary_en_zh.md",
       "translation_completed_on": "2026-11-06"
+    },
+    {
+      "title": "Mathematical Foundations of Artificial Intelligence: Basics of Manifold Theory",
+      "chinese_title": "人工智能的数学基础：流形理论基础",
+      "author": "Momiao Xiong",
+      "folder": "15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory",
+      "original_name": "Mathematical Foundations of Artificial Intelligence Basics of Manifold Theory (Momiao Xiong) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "renamed_file": "2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory_1stEd_EN.pdf",
+      "relative_path": "15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/00_originals/2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory_1stEd_EN.pdf",
+      "version": "First edition, CRC Press, 2026",
+      "doi": "10.1201/9781003641452",
+      "pages": 384,
+      "bytes": 26299275,
+      "sha256": "650b8a83beb885126c8a4b87bdc497f023fb4845951524e7d5a167de5de05a42",
+      "translation_status": "全书中文译文已完成并编译",
+      "translated_pdf": "00_books/Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory_cn_translated.pdf",
+      "translated_pages": 359,
+      "translated_bytes": 7763549,
+      "translated_sha256": "4a62d81e5b394970bad00a027ded87729581536294af85f685210493ac6c0523",
+      "chinese_source": "15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/01_source",
+      "build_command": "python \"15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/01_source/build.py\"",
+      "description": "书前材料、6 章、20 个章内附录、章末习题和参考文献，以及 724 个索引词项。索引保留英文原版印刷页码并附两版章首页对照。",
+      "source_route": "pdf",
+      "source_metadata": "15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/00_originals/source_metadata.json",
+      "split": {
+        "output_dir": "15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/00_originals/split",
+        "manifest": [
+          "frontmatter.pdf",
+          "ch01.pdf",
+          "ch02.pdf",
+          "ch03.pdf",
+          "ch04.pdf",
+          "ch05.pdf",
+          "ch06.pdf",
+          "index.pdf"
+        ]
+      },
+      "split_pdf_count": 8,
+      "glossary": "15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/02_glossary/glossary_en_zh.md",
+      "translation_completed_on": "2026-11-07"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
   "split_summary": {
-    "scope": "7 本 PDF 底本保留分章文件。TeX 底本按源码章节组织。",
-    "books": 7,
-    "total_pdfs": 134,
-    "total_chapters": 105,
-    "total_pages": 3116,
-    "verification_basis": "既有分章文件沿用原核验记录。《大语言模型深度解析》分章已逐页比较整书的文字和页码标签。《大语言模型高效推理》分章已逐页与整书比较文字、页码标签和页面图像。",
+    "scope": "8 本 PDF 底本保留分章文件。TeX 底本按源码章节组织。",
+    "books": 8,
+    "total_pdfs": 142,
+    "total_chapters": 111,
+    "total_pages": 3500,
+    "verification_basis": "既有分章文件沿用原核验记录。《大语言模型深度解析》分章已逐页比较整书的文字和页码标签。《大语言模型高效推理》分章已逐页与整书比较文字、页码标签和页面图像。《人工智能的数学基础：流形理论基础》的分章逐页比对了原版的可见文字、页码标签和页面图像。",
     "overview_file": "00_chapter_split_overview.md"
   },
   "initial_organization": {
@@ -457,7 +497,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 4855,
+  "translated_pages_total": 5214,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -473,7 +513,7 @@
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 14,
+  "collection_count": 15,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",

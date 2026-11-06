@@ -1,0 +1,230 @@
+% PDF p. 58
+\section{黎曼度量}
+本节介绍黎曼度量。它规定流形中向量和曲线的长度，是研究流形几何的重要工具。黎曼度量将欧氏空间的内积推广到流形。流形的切空间具有类似欧氏空间的性质，因而流形上的内积定义在各点的切空间上。
+
+\begin{statement}{定义 2.1}{黎曼度量}
+设 $M$ 是 $d$ 维光滑流形，且 $X,Y\in T_pM$。黎曼度量在 $X,Y$ 上的取值定义为二者的内积，记作 $g(X,Y)=\langle X,Y\rangle$。这个内积须满足下列三个条件。
+\begin{enumerate}
+  \item 对所有 $X,Y\in T_pM$，有 $g(X,Y)=g(Y,X)$。
+  \item 对所有 $X\in T_pM$，有 $g(X,X)\geq 0$。
+  \item $g(X,X)=0$ 当且仅当 $X=0$。
+\end{enumerate}
+
+给定黎曼度量的流形称为黎曼流形，通常记为 $(M,g)$。这里 $M$ 是可微流形，$g$ 是 $M$ 上的黎曼度量。\translatornote{原书此处在每个切空间上定义内积。作为黎曼度量，这族内积还须随基点光滑变化。}
+
+有了黎曼度量，就可定义任意切向量 $X\in T_pM$ 的\textbf{长度或范数}。
+\[
+  |X|=\sqrt{\langle X,X\rangle}.
+\]
+与欧氏空间类似，两个向量 $X,Y\in T_pM$ 的夹角是满足下式的唯一角 $\theta\in[0,\pi]$。
+\[
+  \cos\theta=\frac{\langle X,Y\rangle}{|X||Y|}.
+\]
+\end{statement}
+
+% PDF p. 59
+\begin{statement}{定义 2.2}{正交与标准正交}
+若向量 $X,Y$ 的夹角为 $\pi/2$，等价地，若 $\langle X,Y\rangle=0$，则称二者正交（orthogonal）。若 $X,Y$ 正交且长度均为 $1$，则称二者标准正交（orthonormal）。
+\end{statement}
+
+\begin{statement}{定义 2.3}{微分同胚}
+直观地说，微分同胚是两个流形之间满足下列两个条件的一类映射。
+
+\textbf{双射。}映射既是单射也是满射。
+
+\textbf{光滑。}映射及其逆映射都可微，并且各阶导数存在且连续。
+\end{statement}
+
+\begin{statement}{例 2.1}{线性映射}
+考虑线性映射 $f(x)=\lambda x+c$（$\lambda>0$）。显然，$f^{-1}(y)=(y-c)/\lambda$。$f$ 与 $f^{-1}$ 都是光滑的，因而该线性映射是微分同胚。
+\end{statement}
+
+\begin{statement}{例 2.2}{$f(x)=x^n$（$n>0$）}
+逆函数 $f^{-1}(y)=y^{1/n}$（$n>0$）在 $x=0$ 处不可微，因而该映射不是微分同胚。\translatornote{原文只给出 $n>0$。例如 $n=1$ 时这是恒等映射。此处还需根据 $n$ 说明定义域、值域及逆函数在原点的可微性。}
+\end{statement}
+
+\Subheading{微分}
+回顾一下，设 $\varphi\colon M\to N$ 为光滑流形之间的光滑映射。对每一点 $p\in M$，$\varphi$ 在 $p$ 处的微分（differential），也称推前（push-forward），记为 $d\varphi_p$，它是切空间之间的线性映射
+\[
+  d\varphi_p\colon T_pM\longrightarrow T_{\varphi(p)}N.
+\]
+
+设 $v\in T_pM$，$f\in C^\infty(M)$ 是光滑函数，记切向量或导子作用于 $f$ 为 $v[f]$。则微分 $d\varphi_p$ 由下式给出。\translatornote{该式沿用原书的写法。按导子的定义，取 $f\in C^\infty(N)$，应写成 $(d\varphi_p(v))[f]=v[f\circ\varphi]$。}
+\[
+  d\varphi_p(v[f])=v[f\circ\varphi].
+\]
+
+等价地，若 $\gamma\colon(-\varepsilon,\varepsilon)\to M$ 是满足 $\gamma(0)=p$、$\dot\gamma(0)=v$ 的光滑曲线，则
+\[
+  d\varphi_p(v)=(\varphi\circ\gamma)'(0)\in T_{\varphi(p)}N.
+\]
+分别在 $p$ 和 $\varphi(p)$ 附近选坐标卡 $(U,x)$ 和 $(V,y)$。在坐标 $x=(x^1,\ldots,x^m)$ 和 $y=(y^1,\ldots,y^n)$ 下，映射写作 $y^\alpha\circ\varphi\circ x^{-1}=\varphi^\alpha(x)$。于是
+\[
+  d\varphi_p(\partial_{x^i})=
+    \frac{\partial\varphi^\alpha}{\partial x^i}(x(p))
+    \left.\partial_{y^\alpha}\right|_{\varphi(p)}.
+\]
+
+% PDF p. 60
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch02/fig02_01}
+  \FigureCaption{2.1}{黎曼度量 $g$ 的拉回 $\varphi^*g$ 示意图。}
+\end{figure}
+因此，微分的矩阵表示是雅可比矩阵
+\[
+  [J\varphi(p)]_{\alpha i}=
+  \frac{\partial\varphi^\alpha}{\partial x^i}(x(p)).
+\]
+
+黎曼度量 $g$ 的\textbf{拉回}（pullback）$\varphi^*g$ 定义如下（见图~\ref{fig:2.1}）。
+\[
+  (\varphi^*g)_p(X,Y)
+  =g_{\varphi(p)}\bigl(d\varphi_p(X),d\varphi_p(Y)\bigr),
+\]
+其中 $X,Y\in T_pM$ 是 $p\in M$ 处的切向量，微分 $d\varphi\colon T_pM\to T_{\varphi(p)}M$（即 $\varphi$ 的推前）把 $p$ 处的切向量映到 $\varphi(p)$ 处的切向量。\translatornote{原书此处将微分的值域写作 $T_{\varphi(p)}M$。图中所用映射 $\varphi\colon M\to N$ 的值域切空间为 $T_{\varphi(p)}N$。}
+为了在 $p$ 处度量 $X,Y$，先通过 $\varphi$ 把它们送到已给定度量 $g$ 的 $N$ 上，然后用 $g$ 取所得向量的内积。
+
+图~\ref{fig:2.1} 示意了拉回度量的定义。我们可以分开来看。
+
+\needspace{4\baselineskip}
+\textbf{左图（流形 $M$）}
+\begin{itemize}
+  \item 点 $p$。
+  \item 两个切向量 $X$ 和 $Y$。
+\end{itemize}
+
+\textbf{箭头 $\varphi$} \quad 光滑映射 $M\to N$。
+
+\needspace{4\baselineskip}
+\textbf{右图（流形 $N$）}
+\begin{itemize}
+  \item 像点 $\varphi(p)$。
+  \item 推前所得的向量 $d\varphi_p(X),d\varphi_p(Y)$。
+\end{itemize}
+
+\textbf{度量的使用。}用 $g$ 度量 $N$ 上这对向量的夹角或长度，所得的量就是 $M$ 上对应的 $(\varphi^*g)_p(X,Y)$。
+
+由此，拉回刻画了映射在每一点对各方向的拉伸、收缩或扭转程度，这在流形学习、几何深度网络和生成式潜空间扩散中不可或缺。
+
+设 $(M,g)$ 和 $(\widetilde M,\widetilde g)$ 是黎曼流形。若微分同胚 $\varphi\colon M\to\widetilde M$ 满足 $\varphi^*\widetilde g=g$，则称其为\textbf{等距映射}（isometry）。
+
+% PDF p. 61
+\begin{statement}{定义 2.4}{等距}
+若黎曼流形 $(M,g)$ 与 $(\widetilde M,\widetilde g)$ 之间存在等距映射，就称二者等距。
+
+等距映射是黎曼流形中的基本概念，在黎曼流形这一类对象上定义了等价关系。黎曼几何主要关注等距映射所保持的性质。
+\end{statement}
+
+\section{黎曼度量的局部表示}
+设 $(M,g)$ 是黎曼流形，$(U,\varphi=(x^1,\ldots,x^n))$ 是 $M$ 的一张坐标卡。类似于用 $x^1,\ldots,x^n$ 表示点 $p\in M$ 的欧氏坐标，我们以
+$\bigl(\partial/\partial x^1,\ldots,\partial/\partial x^n\bigr)$
+为切空间的基，从而在光滑流形的每一点 $p$ 附近，以选定坐标 $(x^1,\ldots,x^n)$ 给出流形的线性近似。设 $(e_1,\ldots,e_n)$ 是坐标系 $(x^1,\ldots,x^n)$ 的基。于是任意点 $p\in M$ 可以写成
+\begin{equation*}
+  X=\sum_{i=1}^n x^i e_i.
+  \tag{2.1}\label{eq:2.1}
+\end{equation*}
+
+\begin{statement}{定义 2.5}{爱因斯坦求和约定}
+按照爱因斯坦求和约定（Einstein summation convention），同一指标同时出现在上标和下标处时，默认对它求和，写作
+\begin{equation*}
+  X=x^i e_i.
+  \tag{2.2}\label{eq:2.2}
+\end{equation*}
+\end{statement}
+
+令 $\{\partial/\partial x^1,\ldots,\partial/\partial x^n\}$ 为坐标向量场。给定 $p\in U$ 以及 $u,v\in T_pM$，可写成
+\begin{equation*}
+  u=\sum_i u^i \left.\frac{\partial}{\partial x^i}\right|_p
+  \quad\text{且}\quad
+  v=\sum_j v^j \left.\frac{\partial}{\partial x^j}\right|_p.
+  \tag{2.3}\label{eq:2.3}
+\end{equation*}
+于是，由黎曼度量得到
+\begin{equation*}
+  \begin{aligned}
+    g_p(u,v)
+    &=g_p\!\left(\sum_i u^i\frac{\partial}{\partial x^i},
+                \sum_j v^j\frac{\partial}{\partial x^j}\right)\\
+    &=\sum_i\sum_j u^iv^j
+      g_p\!\left(\frac{\partial}{\partial x^i},\frac{\partial}{\partial x^j}\right)\\
+    &=\sum_i\sum_j g_{ij}(p)u^iv^j,
+  \end{aligned}
+  \tag{2.4}\label{eq:2.4}
+\end{equation*}
+% PDF p. 62
+其中 $g_{ij}(p)=g_p(\partial/\partial x^i,\partial/\partial x^j)$。注意 $g_{ij}=g_{ji}$。
+
+\section{标架和对偶余标架}
+标架和余标架（coframe）与基和对偶基密切相关。标架和余标架分别是切空间和余切空间的基。具体来说，$M$ 的标架是一组线性无关的向量场，记作 $\{e_1,\ldots,e_n\}$，它们在每一点 $p\in M$ 构成切空间 $T_pM$ 的一组基。余标架是余切空间 $T_p^*M$ 的一组 1-形式，记作 $\{\omega^1,\ldots,\omega^n\}$。二者满足
+\begin{equation*}
+  \omega^i(e_j)=\delta_j^i,
+  \tag{2.5}\label{eq:2.5}
+\end{equation*}
+其中 $\delta_j^i$ 为克罗内克 $\delta$（Kronecker delta）。
+
+考虑一个 $n$ 维流形，其标架 $\{e_1,\ldots,e_n\}$ 满足 $e_i=\partial/\partial x^i$，相应的对偶余标架 $\{\omega^1,\ldots,\omega^n\}$ 满足 $\omega^i=dx^i$。于是有下式。\translatornote{原式左侧分母的上标为 $i$。若与右侧的 $\delta_j^i$ 对应，分母的上标应为 $j$。}
+\begin{equation*}
+  dx^i\!\left(\frac{\partial}{\partial x^i}\right)=\delta_j^i.
+  \tag{2.6}\label{eq:2.6}
+\end{equation*}
+
+\section{换标架时的对偶余标架}
+假设两个标架 $\{e_i\}$ 和 $\{e_i'\}$ 由线性变换联系起来。
+\begin{equation*}
+  e_i'=\sum_j a_i^j e_j.
+  \tag{2.7}\label{eq:2.7}
+\end{equation*}
+令
+\[
+  E'=\begin{bmatrix}e_1'\\ \vdots\\ e_n'\end{bmatrix},
+  \qquad
+  E=\begin{bmatrix}e_1\\ \vdots\\ e_n\end{bmatrix},
+  \qquad
+  A=\begin{bmatrix}a_1^1&\cdots&a_1^n\\ \vdots&\vdots&\vdots\\ a_n^1&\cdots&a_n^n\end{bmatrix}.
+\]
+由式~\eqref{eq:2.7} 得
+\begin{equation*}
+  E'=AE.
+  \tag{2.8}\label{eq:2.8}
+\end{equation*}
+对偶余标架和标架须满足
+\[
+  \omega^i(e_j)=\delta_j^i.
+\]
+% PDF p. 63
+上式可写成矩阵形式
+\begin{equation*}
+  WE^{\mathsf T}=I,
+  \tag{2.9}\label{eq:2.9}
+\end{equation*}
+其中
+\[
+  W=\begin{bmatrix}\omega^1\\ \vdots\\ \omega^n\end{bmatrix}.
+\]
+类似地，
+\begin{equation*}
+  W'(E')^{\mathsf T}=I,
+  \tag{2.10}\label{eq:2.10}
+\end{equation*}
+从而
+\begin{equation*}
+  W'=(E')^{-\mathsf T}.
+  \tag{2.11}\label{eq:2.11}
+\end{equation*}
+把式~\eqref{eq:2.8} 代入式~\eqref{eq:2.11}，得到
+\begin{equation*}
+  W'=A^{-\mathsf T}E^{-\mathsf T}.
+  \tag{2.12}\label{eq:2.12}
+\end{equation*}
+结合式~\eqref{eq:2.9} 与式~\eqref{eq:2.12}，得到
+\begin{equation*}
+  W'=A^{-\mathsf T}W,
+  \tag{2.13}\label{eq:2.13}
+\end{equation*}
+因而
+\begin{equation*}
+  (\omega')^i=\sum_j(a^{-1})^i_j\,\omega^j,
+  \tag{2.14}\label{eq:2.14}
+\end{equation*}
+其中 $(a^{-1})^i_j$ 是变换矩阵 $A$ 的逆矩阵的分量。

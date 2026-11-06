@@ -1,0 +1,20 @@
+\begin{tikzpicture}[x=.026cm,y=-.026cm]
+\coordinate (star) at (121,100);
+\draw[blue!65!black,thick]
+  (0,55) .. controls (19,57) and (48,42) .. (48,29)
+  .. controls (48,15) and (76,-5) .. (96,1)
+  .. controls (122,3) and (140,9) .. (141,21)
+  .. controls (140,30) and (169,41) .. (189,40)
+  .. controls (190,63) and (198,81) .. (210,86)
+  .. controls (226,85) and (238,111) .. (238,133)
+  .. controls (214,131) and (185,154) .. (173,180)
+  .. controls (170,186) and (175,214) .. (151,233)
+  .. controls (138,244) and (122,250) .. (106,251)
+  .. controls (104,201) and (82,161) .. (61,154)
+  .. controls (34,157) and (20,131) .. (15,118)
+  .. controls (4,100) and (1,74) .. cycle;
+\foreach \starend in {(0,55),(60,10),(115,3),(189,40),(210,86),
+  (216,136),(173,180),(133,246),(61,154),(15,118)}
+  \draw[red] (star)--\starend;
+\node[red,above right,inner sep=1pt] at (star) {$x_0$};
+\end{tikzpicture}

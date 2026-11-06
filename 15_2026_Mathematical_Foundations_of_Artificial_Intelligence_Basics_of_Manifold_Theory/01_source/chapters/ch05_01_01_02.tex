@@ -1,0 +1,185 @@
+% PDF p. 223
+\section{黎曼子流形与基本定理}
+\subsection{黎曼子流形}
+\begin{statement}{定义 5.1}{黎曼子流形}
+设 $(M,g)$ 是一个 $m$ 维黎曼流形。黎曼子流形是一个维数为 $n\le m$ 的光滑流形 $N$，带有一个浸入（通常是嵌入）
+\[
+  \iota\hookrightarrow M,
+\]
+使得 $N$ 上的度量是 $g$ 的拉回：
+\[
+  g^N_p(v,w)=g^M_{\iota(p)}\bigl(d\iota_p(v),d\iota_p(w)\bigr),
+  \qquad \forall p\in N,\ v,w\in T_pN.
+\]
+换句话说，$N$ 中切向量的长度与夹角，就是在环境流形（ambient manifold）$M$ 中量得的这些向量的像的长度与夹角。当 $\iota$ 是嵌入时，$N$ 作为一张“曲面”位于 $M$ 内。你用环境空间的尺子度量，但只沿保持在 $N$ 内的方向。
+\end{statement}
+
+\begin{statement}{例 5.1}{单位球面 $S^n\subset\R^{n+1}$}
+想象 $\R^3$ 中的二维球面 $S^2$。你沿着表面行走来测量距离，得到的是大圆距离（great-circle distance），而不是穿过空气走直线的距离。
+\end{statement}
+
+\begin{statement}{例 5.2}{平面 $\R^2\subset\R^3$}
+三维空间内有一张平坦薄片。虽位于三维空间中，它的诱导几何就是普通的二维欧氏几何。
+\end{statement}
+
+\begin{statement}{例 5.3}{函数图像 $\{(x,f(x))\mid x\in\R^n\}\subset\R^{n+1}$}
+想象一处丘陵地形。沿地表的距离计入坡度，沿坡走过的路比其水平投影更长。
+\end{statement}
+
+\begin{statement}{例 5.4}{旋转环面 $S^1\times S^1\subset\R^3$}
+甜甜圈形曲面的几何取决于它在三维空间中的嵌入方式。沿经线和沿纬线的曲率不同。
+\end{statement}
+
+% PDF p. 224
+为了说明黎曼子流形的概念，以球面 $S^2\subset\R^3$ 及其北极处的切平面为例。一个经典黎曼子流形的几何示意如下。\translatornote{本段和本章随后几例以图示的方式描述曲面，但所据版本在这些位置只印有文字。}
+\begin{itemize}
+  \item \textbf{环境流形}\quad 线框球面 $S^2\subset\R^3$。
+  \item \textbf{子流形度量}\quad 距离沿曲面测量（大圆几何），而不沿三维空间中的直线测量。
+  \item \textbf{切平面}\quad 北极处的半透明圆盘表示二维切空间 $T_p S^2$。
+
+  诱导度量就是欧氏点积在这个平面上的限制。
+  \item \textbf{向量}\quad 一支箭头位于切平面内（切向量）。另一支沿径向朝外（法向量）。法向量与每个切向量正交，表明环境度量如何把方向分为“内在”与“外在”两部分。
+\end{itemize}
+这些特征说明，黎曼子流形的几何来自它在环境空间中的位置关系。沿曲面内的方向，就可以用环境空间的尺子读出长度、角度和曲率。
+
+\subsection{黎曼几何基本定理}
+黎曼几何基本定理（fundamental theorem of Riemannian geometry）涉及黎曼流形上的列维-奇维塔联络。该定理指出，对任意黎曼度量 $g$，恰有一个无挠（torsion-free）且与度量相容（metric-compatible）的联络。简单地说，这个联络保持度量，并且无挠，由此保证了光滑的几何结构。先引入一些记号。
+
+\subsubsection{预备知识与记号}
+\textbf{光滑流形 $M$}\quad 维数为 $m$。
+
+\textbf{黎曼度量 $g$}\quad 每个切空间 $T_pM$ 都有内积 $g_p(\cdot,\cdot)$，它随 $p$ 光滑变化。
+
+\textbf{仿射联络（affine connection）$\nabla$}\quad 双线性映射
+$\nabla\colon\Gamma(TM)\times\Gamma(TM)\to\Gamma(TM)$，其中 $\Gamma(TM)$ 表示 $M$ 上的向量场空间。对任意光滑函数 $f$，它满足以下性质。
+\begin{itemize}
+  \item 对向量场的实双线性：
+  \[
+    \nabla_{aX+bY}Z=a\nabla_XZ+b\nabla_YZ.
+  \]
+  \item 对第一个变元的 $C^\infty(M)$ 线性：
+  \[
+    \nabla_{fX}Y=f\nabla_XY.
+  \]
+  \item 对第二个变元的莱布尼茨法则：
+  \[
+    \nabla_X(fY)=(Xf)Y+f\nabla_XY,\qquad\text{或}\qquad
+    \nabla_X(fY)=(\partial_Xf)Y+f\nabla_XY.
+  \]
+\end{itemize}
+
+% PDF p. 225
+由这条法则，$\nabla_XY$ 依赖于 $Y$ 的系数函数的一阶导数，因此该映射对第二个变元不具备 $C^\infty$ 线性。真正的 $(1,2)$ 型张量 $T$ 须满足
+\[
+  T(fX,Y)=fT(X,Y)=T(X,fY).
+\]
+
+\textbf{挠率张量}\quad $T^\nabla(X,Y)=\nabla_XY-\nabla_YX-[X,Y]$。
+
+\textbf{度量相容性（metric compatibility）}
+\[
+  X[g(Y,Z)]=g(\nabla_XY,Z)+g(Y,\nabla_XZ),
+  \qquad \forall X,Y,Z\in\Gamma(TM).
+\]
+
+\subsubsection{黎曼几何基本定理}
+\begin{statement}{定理}{（Levi–Civita，1926）}
+设 $(M,g)$ 为黎曼流形。存在唯一仿射联络 $\nabla$，满足
+\begin{itemize}
+  \item 无挠，即 $T^\nabla=0$。
+  \item 与度量相容，即 $\nabla g=0$，也就是说，对任意向量场 $X,Y,Z\in\Gamma(TM)$，
+  \[
+    \nabla_Xg(Y,Z)=X[g(Y,Z)]-g(\nabla_XY,Z)-g(Y,\nabla_XZ)=0.
+  \]
+\end{itemize}
+其中 $X[g(Y,Z)]$ 表示函数 $g(Y,Z)$ 沿向量场 $X$ 的导数。标量函数 $g(Y,Z)$ 沿 $X$ 的方向导数 $X[g(Y,Z)]$，恰由沿 $X$ 分别对 $Z$ 和 $Y$ 求导的两项抵消。
+
+这个联络称为度量 $g$ 的列维-奇维塔联络。
+\end{statement}
+
+\Subheading{证明}
+\begin{itemize}
+  \item \textbf{唯一性}\quad 设 $\nabla$ 与 $\tilde\nabla$ 都无挠且与度量相容。定义 $\mathcal A(X,Y)=\tilde\nabla_XY-\nabla_XY$。
+  \begin{enumerate}[label=\arabic*.]
+    \item \textbf{张量性}\quad 两个联络都满足同一莱布尼茨法则。下面说明 $\mathcal A$ 具有 $C^\infty(M)$ 双线性。确实，
+    \[
+      \begin{aligned}
+        \mathcal A(fX,Y)
+          &=\tilde\nabla_{fX}Y-\nabla_{fX}Y\\
+          &=f\tilde\nabla_XY-f\nabla_XY\\
+          &=f(\tilde\nabla_XY-\nabla_XY)=f\mathcal A(X,Y),\\
+        \mathcal A(X,fY)
+          &=\tilde\nabla_X(fY)-\nabla_X(fY)\\
+          &=(\partial_X f)Y+f\tilde\nabla_XY-(\partial_X f)Y-f\nabla_XY\\
+          &=f(\tilde\nabla_XY-\nabla_XY)=f\mathcal A(X,Y).
+      \end{aligned}
+    \]
+    这表明 $\mathcal A$ 是 $C^\infty(M)$ 双线性的，因而是一个 $(1,2)$ 型张量。
+    \item \textbf{对称性}\quad 由无挠性得到 $\mathcal A(X,Y)=\mathcal A(Y,X)$。
+    \item \textbf{关于 $g$ 的反对称性}\quad 两个联络各自的度量相容性蕴含
+    \begin{equation*}
+      \begin{aligned}
+        0&=(\tilde\nabla_X-\nabla_X)g(Y,Z)
+           =\tilde\nabla_Xg(Y,Z)-\nabla_Xg(Y,Z)\\
+         &=g(\tilde\nabla_XY,Z)+g(Y,\tilde\nabla_XZ)
+           -g(\nabla_XY,Z)-g(Y,\nabla_XZ)\\
+         &=g(\mathcal A(X,Y),Z)+g(Y,\mathcal A(X,Z)).
+      \end{aligned}
+      \tag{5.1}\label{eq:5.1}
+    \end{equation*}
+  \end{enumerate}
+% PDF p. 226
+  将 $Z=Y$ 代入式~\eqref{eq:5.1}，有
+  \[
+    \begin{aligned}
+      &g(\mathcal A(X,Y),Y)+g(Y,\mathcal A(X,Y))\\
+      &\qquad=g(\mathcal A(X,Y),Y)+g(\mathcal A(X,Y),Y)=0.
+    \end{aligned}
+  \]
+  因此，$g(\mathcal A(X,Y),Y)=0$ 对任意 $X,Y$ 成立。原书由极化得出
+  \[
+    g(\mathcal A(X,Y),Z)=0,\qquad \text{对任意 }X,Y,Z.
+  \]
+  由 $g$ 非退化，$\mathcal A(X,Y)=0$，因此 $\nabla=\tilde\nabla$。\translatornote{单独极化只能得到 $a(X,Y,Z)=-a(X,Z,Y)$，其中 $a(X,Y,Z)=g(\mathcal A(X,Y),Z)$。用第一、第二个变元间的对称性，先得到 $a(X,Y,Z)=a(Y,X,Z)=-a(Y,Z,X)$，再得 $-a(Y,Z,X)=-a(Z,Y,X)=a(Z,X,Y)$，最后有 $a(Z,X,Y)=a(X,Z,Y)=-a(X,Y,Z)$，从而 $a=0$。}
+
+  \item \textbf{存在性}\quad 取一张局部坐标卡 $(x^1,\ldots,x^m)$。令 $g_{ij}=g(\partial_i,\partial_j)$，$g^{ij}$ 为逆矩阵的元素。定义克里斯托费尔符号
+  \[
+    \Gamma^k_{ij}=\frac12 g^{kl}
+       \bigl(\partial_i g_{jl}+\partial_j g_{il}-\partial_l g_{ij}\bigr).
+  \]
+  令 $\nabla_{\partial_i}\partial_j=\Gamma^k_{ij}\partial_k$，再由线性和莱布尼茨法则延拓。
+
+  \textbf{检验挠率}\quad 在坐标下，
+  \[
+    \begin{aligned}
+      T(\partial_i,\partial_j)
+       &=\nabla_{\partial_i}\partial_j-\nabla_{\partial_j}\partial_i
+         -[\partial_i,\partial_j]\\
+       &=\Gamma^k_{ij}\partial_k-\Gamma^k_{ji}\partial_k-0
+         =0-0=0.
+    \end{aligned}
+  \]
+  \textbf{检验度量相容性}\quad 注意到
+  \begin{equation*}
+    \partial_i g_{jk}=\partial_i g(\partial_j,\partial_k)
+       =g(\nabla_{\partial_i}\partial_j,\partial_k)
+        +g(\partial_j,\nabla_{\partial_i}\partial_k).
+    \tag{5.2}\label{eq:5.2}
+  \end{equation*}
+  令
+  \begin{equation*}
+    X=\partial_i,\qquad Y=\partial_j,\qquad Z=\partial_k.
+    \tag{5.3}\label{eq:5.3}
+  \end{equation*}
+  将式~\eqref{eq:5.3} 代入式~\eqref{eq:5.2}，得到
+  \begin{equation*}
+    X[g(Y,Z)]=g(\nabla_XY,Z)+g(Y,\nabla_XZ).
+    \tag{5.4}\label{eq:5.4}
+  \end{equation*}
+  这表明
+  \[
+    \nabla g=\nabla_Xg(Y,Z)
+       =X[g(Y,Z)]-g(\nabla_XY,Z)-g(Y,\nabla_XZ)=0.
+  \]
+  因此所得联络满足度量相容性。
+\end{itemize}

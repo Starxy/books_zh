@@ -1,0 +1,200 @@
+% PDF p. 363
+\AppendixSection{6L}{伊藤扩散的生成元}
+
+\AppendixHeading{6L1}{引言}
+
+扩散过程在连续时间中演化。要作出预测，就要知道状态函数的期望如何随很小的时间步长 $dt$ 而变化。生成元将这些信息归纳到一个线性算子 $\mathcal L$ 中。
+% PDF p. 364
+通常，可对能写成随机微分方程的扩散过程或跳跃扩散过程应用伊藤引理来计算无穷小生成元。可以将生成元理解为“扩散过程所实现的微分算子”。知道 $\mathcal L$ 后，可以做以下工作。
+\begin{enumerate}
+  \item \textbf{求解偏微分方程}，如前向柯尔莫哥洛夫方程（福克–普朗克方程）或后向柯尔莫哥洛夫方程。
+  \item \textbf{为衍生品定价，或求解最优停止与控制问题}，方法是将概率问题转化为偏微分方程。
+  \item \textbf{刻画过程的分布}，无需模拟样本路径。
+  \item \textbf{从数据学习或估计未知的漂移或扩散}，先确定 $\mathcal L$，再求出漂移 $g$ 和扩散系数 $\sigma$。
+\end{enumerate}
+
+\AppendixHeading{6L2}{伊藤扩散}
+
+回顾 $[0,T]$ 上一般的 $d$ 维 SDE，
+\begin{equation*}
+  dX_t=g(X_t,t)\,dt+\Sigma(X_t,t)\,dW_t,
+  \tag{6L1}\label{eq:6L1}
+\end{equation*}
+其中 $g\colon\R^d\times[0,T]\to\R^d$ 为漂移，$\Sigma\colon\R^d\times[0,T]\to\R^{d\times m}$ 为扩散矩阵，$W$ 为 $m$ 维布朗运动。记 $a(t,x)=\tfrac12\Sigma(X_t,t)\Sigma(X_t,t)^{\mathsf T}$，这是一个对称半正定的 $d\times d$ 矩阵。
+
+\AppendixHeading{6L3}{生成元的定义}
+
+\AppendixSubheading{6L3.1}{基本思想}
+
+若 $f\colon\R^d\to\R$ 二次连续可微，且性质“良好”，即有界且导数有界，或者至多按多项式增长，则
+\[
+  \mathcal L_t f(x)=\lim_{h\downarrow0}
+           \frac{E[f(X_{t+h})\mid X_t=x]-f(x)}{h}.
+\]
+对于伊藤扩散，这个极限存在，并等于一个显式的二阶微分算子。
+
+\AppendixSubheading{6L3.2}{显式公式}
+
+\[
+  \mathcal L_t f(x)=g(x,t)^{\mathsf T}\nabla_xf(x)
+      +\tfrac12\operatorname{Tr}\bigl(a(x,t)\nabla_{xx}^2f(x)\bigr).
+\]
+\translatornote{原书本附录在 $a=\tfrac12\Sigma\Sigma^{\mathsf T}$ 与 $a=\Sigma\Sigma^{\mathsf T}$ 两种约定之间交替使用。若 $a$ 已包含 $\tfrac12$，生成元迹项前无需再乘 $\tfrac12$。}
+下面用伊藤公式和生成元的定义证明该公式。
+
+% PDF p. 365
+\textbf{步骤 1}\quad 对 $f(X_{t+s})$ 应用伊藤公式。
+
+对 $s\geq0$，令 $Y_s:=X_{t+s}$，并令 $Y_0=x$。注意
+\begin{equation*}
+  \begin{aligned}
+    dW_s\,dW_s^{\mathsf T}&\approx I_d\,ds,\\
+    dY_s\,dY_s^{\mathsf T}
+      &\approx\Sigma(Y_s,t+s)\,dW_s\,dW_s^{\mathsf T}\Sigma(Y_s,t+s)^{\mathsf T}\\
+      &\approx\Sigma(Y_s,t+s)\Sigma(Y_s,t+s)^{\mathsf T}\,ds.
+  \end{aligned}
+  \tag{6L2}\label{eq:6L2}
+\end{equation*}
+\translatornote{第一行的 $W$ 为 $m$ 维时，原书写出的 $I_d$ 应为 $I_m$。}
+对函数 $f(Y_s)$ 应用伊藤公式，得到
+\begin{equation*}
+  df(Y_s)=(dY_s)^{\mathsf T}\nabla f(Y_s)
+        +\tfrac12\operatorname{Tr}(dY_s\,dY_s^{\mathsf T}\nabla^2_{yy}).
+  \tag{6L3}\label{eq:6L3}
+\end{equation*}
+将式 \eqref{eq:6L1} 改写为以 $s$ 为时间变量的形式，得到
+\begin{equation*}
+  \begin{aligned}
+   (dY_s)^{\mathsf T}\nabla f(Y_s)
+    &=g(Y_s,t+s)^{\mathsf T}\nabla f(Y_s)\,ds\\
+    &\quad+\nabla f(Y_s)^{\mathsf T}\Sigma(Y_s,t+s)\,dW_{t+s}.
+  \end{aligned}
+  \tag{6L4}\label{eq:6L4}
+\end{equation*}
+将式 \eqref{eq:6L2} 和 \eqref{eq:6L4} 代入式 \eqref{eq:6L3}，得到
+\begin{equation*}
+  \begin{aligned}
+    df(Y_s)&=\bigl(g(Y_s,t+s)^{\mathsf T}\nabla f(Y_s)
+                  +\operatorname{Tr}(a(Y_s,t+s)\nabla^2 f(Y_s))\bigr)\,ds\\
+           &\quad+\nabla f(Y_s)^{\mathsf T}\Sigma(Y_s,t+s)\,dW_{t+s}.
+  \end{aligned}
+  \tag{6L5}\label{eq:6L5}
+\end{equation*}
+
+\textbf{步骤 2}\quad 在短区间 $[0,h]$ 上积分。
+
+令
+\begin{equation*}
+  A(Y_s,t+s)=g(Y_s,t+s)^{\mathsf T}\nabla f(Y_s)
+       +\operatorname{Tr}(a(Y_s,t+s)\nabla^2 f(Y_s)).
+  \tag{6L6}\label{eq:6L6}
+\end{equation*}
+将式 \eqref{eq:6L5} 从 $s=0$ 积分到 $s=h>0$，得到
+\begin{equation*}
+  \begin{aligned}
+    f(X_{t+h})-f(x)
+     &=\int_0^h A(Y_s,t+s)\,ds\\
+     &\quad+\int_0^h\nabla f(Y_s)^{\mathsf T}\Sigma(Y_s,t+s)\,dW_{t+s}.
+  \end{aligned}
+  \tag{6L7}\label{eq:6L7}
+\end{equation*}
+
+\textbf{步骤 3}\quad 在给定 $X_t=x$ 时取条件期望。
+
+由于
+\[
+  E\left[\int_0^h\nabla f(Y_s)^{\mathsf T}\Sigma(Y_s,t+s)\,dW_{t+s}\,\middle|\,X_t=x\right]=0,
+\]
+得到
+\begin{equation*}
+  E[f(X_{t+h})-f(x)\mid X_t=x]
+     =E\left[\int_0^h A(Y_s,t+s)\,ds\,\middle|\,X_t=x\right].
+  \tag{6L8}\label{eq:6L8}
+\end{equation*}
+
+\textbf{步骤 4}\quad 除以 $h$，取 $h\downarrow0$ 的极限。
+
+回顾
+\begin{equation*}
+  \mathcal L_t f(x)=\lim_{h\downarrow0}
+        \frac{E[f(X_{t+h})\mid X_t=x]-f(x)}{h}.
+  \tag{6L9}\label{eq:6L9}
+\end{equation*}
+直观上有
+\begin{equation*}
+  \int_0^h A(Y_s,t+s)\,ds\approx A(X_{t+\tau},t+\tau)h,\qquad 0\leq\tau\leq h.
+  \tag{6L10}\label{eq:6L10}
+\end{equation*}
+% PDF p. 366
+将式 \eqref{eq:6L10} 代入式 \eqref{eq:6L9}，得到
+\begin{equation*}
+  \begin{aligned}
+    \mathcal L_t f(x)&=\lim_{h\downarrow0}
+       \frac{E\bigl[\int_0^h A(Y_s,t+s)\,ds\mid X_t=x\bigr]}{h}\\
+     &=\lim_{h\downarrow0}\frac{E[A(X_{t+\tau},t+\tau)h\mid X_t=x]}{h}\\
+     &=A(x,t).
+  \end{aligned}
+  \tag{6L11}\label{eq:6L11}
+\end{equation*}
+将 $s=0$ 代入式 \eqref{eq:6L6}，得到
+\[
+  A(Y_0,t)=A(x,t)=g(x,t)^{\mathsf T}\nabla f(x)
+              +\tfrac12\operatorname{Tr}(a(x,t)\nabla^2 f(x)).
+\]
+因此，
+\[
+  \mathcal L_t f(x)=g(x,t)^{\mathsf T}\nabla f(x)+\operatorname{Tr}(a(x,t)\nabla^2 f(x)),
+  \qquad a(t,x)=\tfrac12\Sigma(X_t,t)\Sigma(X_t,t)^{\mathsf T}.
+\]
+
+\textbf{步骤 5}\quad 坐标形式（可选检查）。
+
+记 $a_{ij}(x,t)=\sum_{k=1}^{m}\Sigma_{ik}(x,t)\Sigma_{jk}(x,t)$。生成元可以写作
+\begin{equation*}
+  \mathcal L_t f(x)=\sum_{i=1}^d g_i(x,t)\partial_{x_i} f(x)
+       +\tfrac12\sum_{i=1}^d\sum_{j=1}^d a_{ij}(x,t)\partial_{x_i}\partial_{x_j}f(x).
+  \tag{L162}\label{eq:L162}
+\end{equation*}
+
+\AppendixHeading{6L4}{示例}
+
+\begin{statement}{例 6L.1}{带漂移的一维布朗运动}
+假定 $dX_t=\mu\,dt+\sigma\,dW_t$。则
+\[
+  \mathcal Lf(x)=\mu\frac{\partial f}{\partial x}
+                   +\tfrac12\sigma^2\frac{\partial^2 f}{\partial x^2}.
+\]
+\end{statement}
+
+\begin{statement}{例 6L.2}{对数坐标中的几何布朗运动（GBM）}
+假定 $dS_t=\mu S_t\,dt+\sigma S_t\,dW_t$，$S_t>0$。令 $x=\log s$，$f(x)=f(\log s)$。则
+\[
+  \begin{aligned}
+   \mathcal L f(x)
+      &=\mu S_t\frac{\partial f(x)}{\partial x}\frac{1}{S_t}
+        +\tfrac12\sigma^2 S_t^2\left(
+          \frac{\partial^2 f}{\partial x^2}\frac1{S_t^2}
+            -\frac{\partial f(x)}{\partial x}\frac1{S_t^2}\right)\\
+      &=\left(\mu-\tfrac12\sigma^2\right)\frac{\partial f(x)}{\partial x}
+          +\tfrac12\sigma^2\frac{\partial^2 f}{\partial x^2}.
+  \end{aligned}
+\]
+这正是期权定价 PDE 中使用的布莱克–斯科尔斯算子（Black–Scholes operator）。
+\end{statement}
+
+% PDF p. 367
+\begin{statement}{例 6L.3}{圆盘中的二维各向同性布朗运动}
+假定
+\[
+  \begin{bmatrix}dX_t\\dY_t\end{bmatrix}
+    =\begin{bmatrix}1&0\\0&1\end{bmatrix}
+      \begin{bmatrix}dW_t^{(1)}\\dW_t^{(2)}\end{bmatrix}.
+\]
+则
+\[
+  df(x,y)=\tfrac12\operatorname{Tr}(\nabla^2 f(x,y))
+    =\tfrac12\left(\frac{\partial^2 f}{\partial x^2}+\frac{\partial^2 f}{\partial y^2}\right)
+    =\tfrac12\Delta f(x,y).
+\]
+\translatornote{左端 $df(x,y)$ 为原书写法，右端是生成元 $\mathcal Lf(x,y)$。}
+\end{statement}

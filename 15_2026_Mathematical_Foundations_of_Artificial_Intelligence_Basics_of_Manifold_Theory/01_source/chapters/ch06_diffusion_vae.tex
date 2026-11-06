@@ -1,0 +1,422 @@
+% PDF p. 305
+\section{流形扩散变分自编码器（MD-VAE）}
+
+近期研究扩展了变分自编码器（variational autoencoder，VAE）框架，使它能够同时学习高维数据空间中的低维潜流形，以及该流形上的显式黎曼度量。主要有以下五类方法。
+\begin{enumerate}
+  \item 布朗运动（Brownian motion）先验用学习得到的流形上的扩散过程代替标准高斯先验（Kalatzis et al.\ 2020）。
+  \item 度量张量正则化对由解码器雅可比矩阵拉回的度量施加约束，使之具有良好性质，包括“平坦”或“厚实”流形约束（Chen et al.\ 2020）。
+  \item 加权子流形学习借助内在流形 VAE，对取值于流形的数据（如对称正定矩阵）建立内在生成过程的模型（Miolane and Holmes 2019）。
+  \item 完全几何化的 VAE 将潜空间视为黎曼流形，利用诱导体积形式和距离进行采样和插值（Chadebec and Allassonnière 2022）。
+  \item 快速近似计算测地线的方法和代码实现，使深度生成模型中的度量学习可以实际应用（Chen et al.\ 2018）。
+\end{enumerate}
+
+关于黎曼 VAE 的研究已相当丰富，这类模型既能发现数据的流形结构，也能学习相应的黎曼度量。相关工作涉及理论形式、实用算法和代码库。这些进展可以更准确地表示低维结构、按几何性质进行采样，并改善视觉、科学和医学成像等领域的生成效果。
+
+下面介绍流形扩散变分自编码器（Manifold Diffusion Variational Autoencoder，MD-VAE）。这是一种混合变分自编码器，具有以下特点（Giovanis et al.\ 2025，Arvanitidis et al.\ 2018，Falorsi et al.\ 2018，Rozo et al.\ 2025，Shamsolmoali et al.\ 2023）。
+\begin{enumerate}
+  \item 学习高维观测所依赖的低维潜流形。
+  \item 结合扩散生成建模和流形学习，从潜空间中的数据密度高效采样。
+  \item 通过解码器的拉回为潜空间赋予学习得到的黎曼度量，为测地线、插值、曲率分析等下游任务建立几何结构。
+\end{enumerate}
+
+% PDF p. 306
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch06/fig06_02}
+  \FigureCaption{6.2}{MD-VAE 流程}
+\end{figure}
+
+图 \ref{fig:6.2} 展示 MD-VAE 的流程。该框架对定义在低维流形上的数据密度进行采样。流形由扩散映射（diffusion maps）发现，采样方法包括基于得分的扩散模型（score-based generative model，SGM）和伊藤随机微分方程（Itô stochastic differential equation，SDE）。流形学习的假设是，高维数据通常位于嵌入高维空间的低维流形上。接着，用双重扩散映射（Double Diffusion Maps）将生成的数据提升回原空间，使之符合流形结构。我们通过解码器的拉回，为潜空间赋予学习得到的黎曼度量。
+
+\subsection{模型架构}
+
+模型架构如下。由神经网络建模的编码器 $q_{\varnothing}(x)$ 将数据 $x\in\R^D$ 映为低维潜流形中的潜坐标 $z\in\R^d$。以 $\varphi$ 为参数的编码器输出均值 $\mu_\varphi(x)$ 和尺度 $\sigma_\varphi(x)$。为了使映入潜空间的数据位于流形上，我们使用流形正则项。具体来说，施加坐标卡投影 $\pi\colon\R^d\to\mathcal M$，例如使用归一化后的指数映射，使得重参数化后的样本 $z$ 位于 $\mathcal M$ 上。标准神经解码器由 $p_\theta(x\mid z)$ 建模，它从压缩后的潜空间表示重建原始数据，返回 $\hat x=f_\theta(z)$。
+
+下面通过拉回度量定义潜流形空间中的黎曼度量。直观地说，设 $\mathcal M$（潜流形，$z\in\mathcal M(\R^d)$）和 $\mathcal N$（解码器的原始环境空间，$\hat x\in\R^D$）为光滑流形，并设 $x=f_\theta(z)$，即 $f_\theta\colon\mathcal M\to\mathcal N$ 为光滑映射。如果 $\mathcal N$ 具有某种“几何”，以黎曼度量的形式给出，就可以通过 $f_\theta$ 将这套几何拉回，定义 $\mathcal M$ 上的几何。环境空间 $\R^D$ 带有由欧氏黎曼度量 $g_{\R^D}$ 给出的标准几何，在 $\R^D$ 的恒等坐标卡中的分量为 $(g_{\R^D})_{\alpha\beta}=\delta_{\alpha\beta}$。潜流形空间并不先验地带有几何结构。根据流形假设，可以把潜空间视为环境空间 $\R^D$ 的一个子流形。环境空间 $\R^D$ 的几何在潜空间上诱导出几何，潜空间因而带有 $\R^D$ 的度量诱导的拉回度量。
+
+严格地说，若 $g$ 为 $\mathcal N(\R^D)$ 上的黎曼度量，则 $\mathcal M(\R^d)$ 上的拉回度量 $f^*g$ 逐点定义为
+% PDF p. 307
+\[
+  \begin{aligned}
+    G_z=(f^*g)_p
+     &=g_{f(p)}\bigl(df_p(Z_1),df_p(Z_2)\bigr),\\
+     &=g_{f(p)}\bigl(J_\theta(Z)Z_1,J_\theta(Z)Z_2\bigr),\\
+     &=J_\theta(Z)^{\mathsf T}G_{\mathcal X}J_\theta(Z)
+       =J_\theta(Z)^{\mathsf T}J_\theta(Z),
+  \end{aligned}
+\]
+其中 $p\in\mathcal M$，$z_1,z_2\in T_pM$，$df_p\colon T_pM\to T_pN$ 为 $f$ 的微分，$J_\theta=\partial f_\theta/\partial z$ 为雅可比矩阵，$G_{\mathcal X}=I$ 为 $\R^D$ 中的黎曼度量，$G_z$ 为潜空间中的黎曼度量。\translatornote{等式中间两行将度量作用于两个切向量，末行则给出度量矩阵。微分的目标切空间在 $f(p)$ 处，原文印作 $T_pN$。}在损失中加入 $\lambda\lVert G_z-I_d\rVert_F^2$，以鼓励得到局部等距嵌入。
+
+\subsection{训练目标}
+
+Kingma 和 Welling（2014）提出的变分自编码器是一种简单而有效的生成模型（Arvanitidis et al.\ 2017）。形式上，VAE 为潜表示定义先验分布 $p(z)=N(0,I_d)$，并有映射函数 $\mu_\theta\colon\mathcal Z\to\mathcal X$ 在 $\mathcal X$ 中生成一个曲面。此外，假定另一函数 $\sigma_\theta\colon\mathcal Z\to\R_+^D$ 刻画实际观测 $x\in\mathcal X$ 与其重建值之间的误差，写作 $x=\mu_\theta(z)+\sigma_\theta\odot\varepsilon$，其中 $\varepsilon\sim N(0,I_D)$，$\odot$ 为逐元素乘积。映射函数 $\mu_\theta$ 和 $\sigma_\theta$ 通常由参数为 $\theta$ 的深度神经网络建模。
+
+然而，对应的后验分布 $p_\theta(z\mid x)$ 未知，因为边际似然 $p_\theta(x)$ 难以计算。为克服这一限制，使用变分分布 $q_{\varnothing}(z\mid x)=N(\mu_{\varnothing}(x),I_d\sigma_{\varnothing}^2(x))$ 近似后验，其中函数 $\mu_{\varnothing}(x)$ 和 $\sigma_{\varnothing}^2(x)$ 同样由参数为 $\varnothing$ 的深度神经网络给出。
+
+定义 $p_\theta(z\mid x)$ 和 $q_{\varnothing}(z\mid x)$ 后，可将训练目标函数定义为
+\[
+  \mathcal L=\operatorname{ELBO}(x;\theta,\varnothing)
+  +\lambda_{\mathrm{metric}}E_q\bigl[\lVert G_z-I_d\rVert_F^2\bigr],
+\]
+其中
+\[
+  \operatorname{ELBO}(x;\theta,\varnothing)
+   =E_{q_{\varnothing}}\bigl[\log p_\theta(x\mid z)\bigr]
+      -KL[q_{\varnothing}(z\mid x)\mathbin{\|}p(z)].
+\]
+$p(z)$ 将通过扩散训练进一步改进（第 6.6.3 节）。ELBO 是边际似然 $p(x)$ 的证据下界（evidence lower bound，ELBO）。\translatornote{通常 ELBO 是边际对数似然的下界。若把度量误差作为惩罚，最小化损失时使用负 ELBO 加该惩罚，最大化 ELBO 时则减去该惩罚。}
+
+\subsection{潜空间密度建模与采样}
+
+通过学习数据的密度，生成模型（generative model，GM）可以产生体现观测现象统计性质的新样本（Giovanis et al.\ 2025）。用生成模型进行密度估计，通常不需要显式标签。生成模型的一个局限是，当数据集规模小、类别不均衡，或者数据具有类似流形的结构时，从密度中采样会有困难。经典生成模型产生的数据可能无法准确保留流形的内在几何，也可能在数据分布的某些区域采样不足。为克服这一局限，可以利用非线性降维（即流形学习）将生成样本限制在流形上。流形学习假定高维数据通常位于嵌入高维空间的低维流形上。流形学习方法包括扩散映射，它可以为概率分布集中在高维空间中未知低维流形上的随机向量生成新的实现值。
+
+% PDF p. 308
+本节介绍一种从限制在低维流形上的数据密度中采样的框架。它将双重扩散映射与两种方法结合，即基于得分的 SGM 和伊藤 SDE（Giovanis et al.\ 2025）。双重扩散映射最初用于构建降阶动力学模型，也可以用来发现降维后的潜空间。对这些潜坐标再进行一轮扩散映射，可以通过尼斯特龙延拓（Nyström extension）将潜空间坐标提升回完整的环境空间。扩散模型从扩散映射发现的潜空间密度中采样。随后，无论用上述哪种方法生成数据，都可借助双重扩散映射将其提升回原空间，使之符合流形结构。
+
+\subsubsection{基于得分的扩散模型}
+
+假设观测到从概率密度函数 $f_X(x_1,x_2,\ldots,x_d)$ 独立同分布抽取的样本集 $\mathcal X=\{X_1,X_2,\ldots,X_N,\ X_i\in\R^d\}$。目标是从这个密度生成样本。可以定义连续时间扩散过程，使 $x(0)\sim f_X(\cdot)$ 对应目标数据分布，而 $x(T)\sim f_y(\cdot)$，其中 $f_y(\cdot)\in\R^d$ 为易于采样的某种“先验”分布。可用前向与反向时间的伊藤随机微分方程来描述该过程，定义在标准时间区间 $t\in[0,1]$ 上。前向 SDE 定义为
+\begin{equation*}
+  dx_t=g(x,t)\,dt+\sigma(t)\,dW_t,\qquad x_0=x(0),\quad x_1=x(1).
+  \tag{6.45}\label{eq:6.45}
+\end{equation*}
+其中 $g(\cdot,t)\colon\R^d\to\R^d$ 为漂移系数，$\sigma(\cdot)\colon\R\to\R$ 为扩散系数，$x_0=x(0)$ 是初始状态，$x_1=x(1)$ 是扩散过程的终止状态。为简便起见，假定 $\sigma$ 是与 $x$ 无关的标量函数，这个假定可以推广。前向 SDE 实现映射 $f_X(\cdot)\to f_t(x)\equiv f(x_t)\equiv f(x,t)\to f_y(\cdot)$，其中 $f_t$ 是时刻 $t$ 的中间密度。漂移和扩散系数有多种选法，可以保证扩散过程的终止状态服从 $f_y(\cdot)\sim N(0,I_d)$。
+
+扩散过程的反向过程本身也是扩散过程，具有以下反向时间 SDE（Ho et al.\ 2020，附录 6J），
+\begin{equation*}
+  \begin{aligned}
+    dx &= \bigl[g(x,t)-\sigma^2(t)\nabla_{x_t}\log f_t(x)\bigr]\,dt+\sigma(t)\,d\bar W_t,\\
+    x_0&=x(0),\qquad x_1=x(1).
+  \end{aligned}
+  \tag{6.46}\label{eq:6.46}
+\end{equation*}
+其中 $\bar W_t$ 是从 $t$ 到 0 沿时间反向运行的标准维纳过程（Wiener process），$dt$ 是负的无穷小时间步长。将 $\nabla_{x_t}\log f_t(x)$ 定义为得分，记作 $S(x_t,t)=\nabla_{x_t}\log f_t(x)$。若对所有 $t\in[0,1]$ 都知道得分，就可由式 \eqref{eq:6.45} 导出反向扩散过程，并用它从密度 $f_0=f_X(\cdot)$ 采样。在附录 6J、6K、6M 和 6L 中，我们介绍并考察概率密度 $f_t$ 的演化，它由福克–普朗克方程（Fokker–Planck equation）描述，
+\begin{equation*}
+  \frac{\partial f(x,t)}{\partial t}
+  =-\nabla\cdot\left[g(x,t)-\sigma^2(t)\nabla_{x_t}\log f_t(x)
+                     -\frac{\sigma^2(t)}{2}\nabla f(x,t)\right],
+  \tag{6.47}\label{eq:6.47}
+\end{equation*}
+其中 $S(x_t,t)=\nabla_{x_t}\log f_t(x)$ 是对数概率密度函数相对于 $x_t$ 的梯度，称为得分函数（score function）。\translatornote{式 \eqref{eq:6.47} 按原印式保留。式 \eqref{eq:6.45} 的前向密度演化为 $-\nabla\cdot(gf)+\tfrac12\sigma^2(t)\Delta f$，见附录 6M 的生成元伴随形式。}得分函数的估计方法包括得分匹配（score matching）、去噪得分匹配（denoising score matching）和切片得分匹配（sliced score matching）。扩散模型的近期研究着重用神经网络逼近得分函数。
+
+% PDF p. 309
+\subsubsection{漂移 \texorpdfstring{$g(x,t)$}{g(x,t)} 和扩散 \texorpdfstring{$\Sigma(x,t)$}{Σ(x,t)} 的七类选法}
+
+以下七类漂移和扩散满足通常的利普希茨（Lipschitz）与线性增长条件，保证 SDE
+\begin{equation*}
+  dX_t=g(X_t,t)\,dt+\Sigma(X_t,t)\,dW_t
+  \tag{6.48}\label{eq:6.48}
+\end{equation*}
+有唯一强解。这类 SDE 在物理、金融、基于得分的生成模型及控制等实际问题中经常出现。
+
+\begin{enumerate}
+  \item \textbf{常数漂移和扩散}
+  \[
+    g(X_t,t)=\mu,\qquad \Sigma(X_t,t)=\sigma^2.
+  \]
+  这是最简单的非平凡 SDE，转移核有闭式表达。可用作显式米尔斯坦（Milstein）或欧拉–丸山（Euler–Maruyama）方法的测试构件。
+
+  \item \textbf{线性–仿射族}
+  \[
+    g(X_t,t)=A(t)+b(t),\qquad \Sigma(X_t,t)=\sigma_0^2.
+  \]
+  若 $A$ 为负定，得到奥恩斯坦–乌伦贝克（Ornstein–Uhlenbeck）过程，其平稳分布为
+  $N(0,\sigma_0^2/(2|A|))$。\translatornote{原式第一项印作 $A(t)$。线性–仿射漂移应含 $A(t)X_t$。所列平稳分布对应标量、齐次、零常数漂移且噪声方差率为 $\sigma_0^2$ 的情形。}这类过程广泛用于传感器融合（卡尔曼滤波，Kalman filter）和短期利率模型（Vasicek 模型）。
+
+  \item \textbf{梯度流朗之万模型}
+  \[
+    g(X_t,t)=-\nabla U(X_t,t),\qquad \Sigma(X_t,t)=2.
+  \]
+  它满足细致平衡，密度为 $\pi(x,t)\propto e^{-U(x,t)}$。在凸性条件下，模型在瓦瑟斯坦距离（Wasserstein distance）下具有压缩性（Bakry–Émery）。
+
+  \item \textbf{基于得分的前向扩散（DDPM/DDIM）}
+  \[
+    g(X_t,t)=0,\qquad \Sigma(X_t,t)=\beta(t),\qquad
+    \beta(t)=\beta_{\min}+(\beta_{\max}-\beta_{\min})t.
+  \]
+  \begin{itemize}
+    \item 漂移为零，方差按调度 $\beta(t)$ 增大。
+    \item 无论初始数据分布 $f_X$ 如何，$t=1$ 时的分布都接近 $N(0,I)$。
+    \item 反向时间漂移是学习得到的得分项 $\sigma^2(t)\nabla_{x_t}\log f_t$。
+  \end{itemize}
+
+  \item \textbf{乘性噪声逻辑斯蒂模型}
+  \[
+    g(X_t,t)=rX\left(1-\frac{X_t}{K}\right),\qquad
+    \Sigma(X_t,t)=\sigma_0^2X_t^2.
+  \]
+  漂移在 $(0,\infty)$ 上全局利普希茨，扩散关于 $x$ 线性。该模型用于描述带有种群随机性的种群，只要 $X_0>0$ 就保持非负。\translatornote{原式中的逻辑斯蒂二次漂移在整个 $(0,\infty)$ 上不满足全局利普希茨条件。这里的 $\sigma_0^2X_t^2$ 是线性噪声振幅 $\sigma_0 X_t$ 的平方。}
+
+  \item \textbf{矩阵值各向异性噪声}
+  \[
+    g(X_t,t)=A(t)X_t,\qquad \Sigma(X_t,t)=R(t)+S(t)X_t.
+  \]
+  模型允许波动率随方向而变，也允许一致椭圆性，即 $a=\tfrac12\Sigma\Sigma^{\mathsf T}$ 的最小特征值避免退化。
+
+% PDF p. 310
+  \item \textbf{神经 SDE 参数化}
+  \[
+    g(X_t,t)=NN_\theta(X_t,t),\qquad \Sigma(X_t,t)=\beta(t).
+  \]
+  用通过 SDE 的随机反向传播（伴随方法）训练模型。
+\end{enumerate}
+
+\subsubsection{得分函数的估计}
+
+\paragraph{基于蒙特卡罗模拟（MCS）的估计}
+
+定义以下扩散模型，
+\begin{equation*}
+  \begin{aligned}
+   g(X_t,t)&=b(t)X_t=\frac{d\log\alpha_t}{dt}X_t,\\
+   \sigma^2(t)&=\frac{d\beta_t^2}{dt}-2\frac{d\log\alpha_t}{dt}\beta_t^2.
+  \end{aligned}
+  \tag{6.49}\label{eq:6.49}
+\end{equation*}
+其中选择 $\alpha_t=1-t$、$\beta_t^2=t$、$t\in[0,1]$ 以保证终止状态为高斯分布。按这种方式参数化后，前向 SDE 仍为线性的，因此固定 $x_0$ 时，条件密度 $f(x_t\mid x_0)$ 为高斯密度，
+\begin{equation*}
+  f(x_t\mid x_0)\sim N(\alpha_t x_0,\beta_t I_d).
+  \tag{6.50}\label{eq:6.50}
+\end{equation*}
+\translatornote{原书式 \eqref{eq:6.50} 的协方差含 $\beta_t$，下文的条件高斯及式 \eqref{eq:6.52} 则使用 $\beta_t^2$。}
+由全概率公式，联合概率密度与边际密度 $f(x_t)$ 的关系为
+\[
+  f(x_t)=\int_{\R^d}f(x_t,x_0)\,dx_0
+        =\int_{\R^d}f(x_t\mid x_0)f(x_0)\,dx_0,
+\]
+其中 $f(x_t\mid x_0)$ 表示给定 $x_0$ 时 $x_t$ 的条件概率密度，$f(x_0)$ 为 $x_0$ 的概率密度。应用链式法则，可将得分函数写为
+\begin{equation*}
+  \begin{aligned}
+  S(x_t,t)&=\nabla_{x_t}\log f_t(x),\\
+    &=\nabla_{x_t}\log\left(\int_{\R^d} f(x_t\mid x_0)f(x_0)\,dx_0\right),\\
+    &=\frac{\nabla_{x_t}\int_{\R^d} f(x_t\mid x_0)f(x_0)\,dx_0}
+            {\int_{\R^d} f(x_t\mid x_0)f(x_0)\,dx_0},\\
+    &=\frac{\int_{\R^d} \nabla_{x_t} f(x_t\mid x_0)f(x_0)\,dx_0}
+            {\int_{\R^d} f(x_t\mid x_0)f(x_0)\,dx_0}.
+  \end{aligned}
+  \tag{6.51}\label{eq:6.51}
+\end{equation*}
+由于条件分布为高斯，即 $f(x_t\mid x_0)\sim N(\alpha_t x_0,\beta_t^2 I)$，相对于 $x_t$ 的梯度 $\nabla_{x_t}$ 给出
+\begin{equation*}
+  \nabla_{x_t}f(x_t\mid x_0)
+  =-\frac{x_t-\alpha_t x_0}{\beta_t^2}f(x_t\mid x_0).
+  \tag{6.52}\label{eq:6.52}
+\end{equation*}
+将式 \eqref{eq:6.52} 代入式 \eqref{eq:6.51}，得
+% PDF p. 311
+\begin{equation*}
+  \begin{aligned}
+  S(x_t,t)&=-\frac{\int_{\R^d}\dfrac{x_t-\alpha_t x_0}{\beta_t^2}
+                        f(x_t\mid x_0)f(x_0)\,dx_0}
+                     {\int_{\R^d}f(x_t\mid x_0)f(x_0)\,dx_0},\\
+           &=-\int_{\R^d}\frac{x_t-\alpha_t x_0}{\beta_t^2}
+                         w_t(x_t\mid x_0)f(x_0)\,dx_0.
+  \end{aligned}
+  \tag{6.53}\label{eq:6.53}
+\end{equation*}
+其中权重函数定义为
+\begin{equation*}
+  w_t(x_t\mid x_0)=\frac{f(x_t\mid x_0)}
+                        {\int_{\R^d}f(x_t\mid x_0)f(x_0)\,dx_0}.
+  \tag{6.54}\label{eq:6.54}
+\end{equation*}
+接下来，基于已有样本 $\{\boldsymbol x_1,\boldsymbol x_2,\ldots,\boldsymbol x_N\}$，用小批量 MCS 近似权重函数，
+\[
+  w_t(x_t,x_j^n)\approx\bar w(x_t,x_j^n)
+   =\frac{f(x_t\mid x_j^n)}{\sum_{m=1}^N f(x_t\mid x_j^m)},
+\]
+其中 $\{x_j^n\}_{n=1}^{N_m}$ 表示一个数据小批量，$N_m\leq N$。于是
+\[
+  \tilde S(x_t,t)=\sum_{n=1}^{N_m}
+       \frac{x_t-\alpha_t x_j^n}{\beta_t^2}\,\bar w(x_t,x_j^n).
+\]
+\translatornote{小批量得分近似保留原式。根据式 \eqref{eq:6.53}，应在求和前加负号。若权重只在该批样本中归一化，分母的求和上限应为 $N_m$。}
+
+综上，从 $N(0,I_d)$ 抽取样本 $\{y_m\}_{m=1}^{M}$ 后，通过求解从 $t=1$ 到 $t=0$ 的反向时间 SDE，生成带标签数据 $\{x_m\}_{m=1}^{M}$。用数据集 $D_{\mathrm{train}}=\{(y_m,x_m)\}_{m=1}^{M}$ 监督训练前馈神经网络，通过最小化均方误差学习映射 $N(0,I_d)\to f_x(\cdot)$。
+
+由于我们希望生成用于训练神经网络的带标签数据，期望映射 $N(0,I_d)\to f_x(\cdot)$ 是“光滑”的。与 SDE 相比，常微分方程（ordinary differential equation，ODE）可使初始状态与终止状态的函数关系平滑得多。为此考虑描述确定性流下概率密度演化的刘维尔方程（Liouville equation），
+\begin{equation*}
+  \frac{\partial f(x,t)}{\partial t}
+    =-\nabla\cdot\bigl[h(x,t)f(x,t)\bigr],
+  \tag{6.55}\label{eq:6.55}
+\end{equation*}
+其中 $h(x,t)=b(t)x-\sigma^2S(x,t)-\frac{\sigma^2(t)}2\nabla\log f(x,t)$。
+
+作为求解式 \eqref{eq:6.46} 的反向时间 SDE 的替代，可以求解以下 ODE 来近似反向时间 SDE，
+\begin{equation*}
+  dx_t=\left(g(x,t)-\frac12\sigma^2(t)S(x_t,t)\right)\,dt.
+  \tag{6.56}\label{eq:6.56}
+\end{equation*}
+有了准确的神经网络得分和高阶 ODE 积分器（例如自适应龙格–库塔积分器），求解 ODE 比模拟数千个带噪声的 SDE 步骤快得多。
+% PDF p. 312
+这个 ODE 是现代扩散模型中 DDIM/ODE 采样器的基础。神经网络训练完成后，该方法生成 $f_x(\cdot)$ 的样本时无需再求解反向时间 ODE 或 SDE，计算效率因此较高。
+
+\paragraph{得分匹配估计}
+
+文献中估计得分函数更常用的做法，是用神经网络逼近 $\nabla_x\log\hat f_t(x)$，其中 $\hat f_t(x)$ 是分布 $f_t(x)$ 的近似。可以通过得分匹配来实现，得到用于神经网络近似反向 SDE 漂移的损失
+\[
+  L(\theta)=E_{\substack{t\sim\mathcal U(0,T),\ x(0)\sim p(x(0))\\
+                      x(t)\sim f(x(t)\mid x(0))}}
+  \left[\lambda(t)\left\|\nabla\log\hat f_t(x)-S_\theta(x(t),t)\right\|_2^2\right],
+\]
+其中 $\mathcal U(0,T)$ 是时间区间 $[0,T]$ 上的均匀分布，$\lambda(t)$ 是正的加权函数，$x(0)$ 表示 $t=0$ 时的 $x(t)$。
+
+\subsubsection{从具有低维内在结构的密度采样}
+
+我们的目标是使用双重扩散映射，为位于低维流形上的高维数据建立一种算法。整个算法包括以下步骤。
+\begin{itemize}
+  \item 在高维数据 $x\in\R^D$ 中发现低维潜流形 $\Phi(x)\in\R^d$。
+  \item 估计内在密度 $f_\Phi$。
+  \item 抽取新的潜样本 $\tilde\varphi\sim f_\Phi$。
+  \item 用双重扩散映射（Double Diffusion Maps，DDM）将这些样本提升回环境空间，得到 $\tilde x\in\R^D$。
+\end{itemize}
+
+\paragraph{用于降维的扩散映射}
+
+扩散映射算法可以揭示数据集 $\mathcal X=\{\boldsymbol x_1,\boldsymbol x_2,\ldots,\boldsymbol x_N\}$ 的内在几何。它依据 $\mathcal X$ 中样本点之间的局部相似性，利用核函数构建加权图 $K\in\R^{N\times N}$（Giovanis et al.\ 2025）。图中的加权边连在数据点之间。这里引入以下扩散核，
+\[
+  K(\boldsymbol x_i,\boldsymbol x_j)
+    =\exp\left(-\frac{\lVert\boldsymbol x_i-\boldsymbol x_j\rVert^2}{2\varepsilon}\right),
+\]
+其中超参数 $\varepsilon$ 指定核带宽的平方。用该核函数构造加权图。满足 $\lVert\boldsymbol x_i-\boldsymbol x_j\rVert^2<\varepsilon$ 的点 $\boldsymbol x_i,\boldsymbol x_j$ 被视为相似（相连），距离大于 $\varepsilon$ 的点实际可视为没有连接。也可以用其他度量代替欧氏距离。扩散映射近似热核 $e^{-t\Delta}$，其中 $\Delta$ 是流形 $\mathcal M$ 上的拉普拉斯–贝尔特拉米算子。为去除抽样密度和其他不可控因素的影响，需要两次归一化才能得到所需算子。第一次归一化为
+% PDF p. 313
+\[
+  \tilde K=P^{-\alpha}KP^{-\alpha},
+\]
+其中 $P$ 为对角矩阵，其元素为 $P_{ii}=\sum_j P_{ij}$。\translatornote{原书右端印作 $P_{ij}$。这里用于核矩阵的第一次归一化，通常取 $P_{ii}=\sum_jK_{ij}$。}$\alpha$ 是控制抽样密度对几何影响的偏置参数，$\alpha=0$ 表示密度影响最大，$\alpha=1$ 表示去除密度影响。
+
+第二次归一化将 $\tilde K$ 变成行随机的马尔可夫矩阵 $M=D^{-1}\tilde K$，其中 $D$ 为对角矩阵，对角元 $D_{ii}=\sum_j\tilde K_{ij}$。关键一步是对 $M$ 作特征分解，
+\[
+  M=\Phi\Lambda\Phi^{-1},
+\]
+其中 $\Lambda$ 为对角矩阵，对角元为相应的特征值 $\Lambda_{ii}=\lambda_i$。为不同的特征方向选取独立特征向量 $\phi_i$，可得到简洁的数据表示。不过，特征向量的选择不能仅依赖于特征值，尽管在某些情形下，特征值间隔（eigengap）可提供线索。有些特征值可能对应多个特征向量。原文将对应同一特征值的这些特征向量称为谐波特征向量，将沿不同方向作参数化的特征向量称为非谐波特征向量。最小特征向量集只选取非谐波特征向量。具体地说，如果独立非谐波特征向量的数量 $k$ 小于环境空间的维数，为简化记号，仍将它们记作 $\Phi=\{\phi_l\}$，$l=i_1,i_2,\ldots,i_k$，$i_j\in\Z_+$，从而为原始数据集提供一个低维参数化。
+
+\paragraph{用于提升的扩散映射（双重扩散映射）}
+
+双重扩散映射用扩散映射完成降维和函数延拓。该方法先得到若干降维后的非谐波坐标 $\Phi$，再构造称为潜谐波（latent harmonics）的基 $\Psi$。下面说明如何根据 $\Phi$ 计算潜谐波 $\Psi$。
+
+对坐标集 $\{\phi_i\}_{i=1}^N\in\Phi$，计算
+\[
+  K^*(\varnothing_i,\varnothing_j)
+    =\exp\left(-\frac{\lVert\varnothing_i-\varnothing_j\rVert^2}{2\varepsilon_2}\right),
+\]
+求出前 $m$ 个特征向量 $\Psi=\{\psi_0,\ldots,\psi_{m-1}\}$，其中 $\psi_i\in\R^N$，相应的特征值为 $\sigma=\{\sigma_1,\ldots,\sigma_{m-1}\}$。给定数据上定义的函数 $h$，将 $f$ 投影到这些特征向量上，
+\[
+  f\longmapsto P_\delta f=\sum_{j=1}^m\langle f,\psi_j\rangle\psi_j.
+\]
+对 $\varnothing_{\mathrm{new}}$，计算几何谐波函数（geometric harmonic function）
+\[
+  \Psi_j(\phi_{\mathrm{new}})
+   =\sigma_j^{-1}\sum_{i=1}^{m}K^*(\phi_{\mathrm{new}},\phi_i)\psi_j(\phi_i),
+\]
+% PDF p. 314
+其中 $\psi_j(\phi_i)$ 是第 $j$ 个特征向量的第 $i$ 个分量。最后，对 $\phi_{\mathrm{new}}$ 的函数值估计为
+\[
+  (Ef)(\phi_{\mathrm{new}})
+     =\sum_{j=1}^m\langle f,\psi_j\rangle\Psi_j(\phi_{\mathrm{new}}).
+\]
+
+\subsubsection{结合扩散映射、流形学习与纳入黎曼度量的解码器}
+
+任务是构建一个新模型，将扩散映射、流形学习和纳入黎曼度量的解码器结合起来。下面的通用框架融合了三部分。
+\begin{itemize}
+  \item \textbf{流形学习}（扩散映射）。
+  \item \textbf{黎曼解码器}，其度量由环境欧氏度量拉回。
+  \item \textbf{潜空间扩散建模}（概率流 ODE）。
+\end{itemize}
+
+\paragraph{模型组成}
+
+\begin{itemize}
+  \item \textbf{编码器}\par
+  数学模型为扩散映射 $\Psi(x_i)=(\lambda_1\psi_1(i),\ldots,\lambda_d\psi_d(i))$。作用是提供内在坐标 $\varphi$。
+
+  \item \textbf{黎曼解码器}\par
+  数学模型为神经网络映射 $f_\theta\colon\R^d\to\R^D$，其度量为 $g_\theta(\varphi)=J_f(\varphi)^{\mathsf T}J_f(\varphi)$。作用是拉回欧氏度量。训练损失由重建项与度量等距项 $\lVert g_\theta-I_d\rVert^2$ 相加得到。
+
+  \item \textbf{潜空间密度}\par
+  数学模型为基于得分的潜空间方差爆炸（variance-exploding）前向 SDE，
+  \[
+    d\varphi_t=\sqrt{\beta(t)}\,dW_t
+    \quad\longrightarrow\quad
+    \text{用去噪得分匹配学习得分 }s_\theta.
+  \]
+  \[
+    \begin{aligned}
+    \varphi_t
+      &=\alpha_t\varphi_0+\int_0^t\sqrt{\beta(s)}\,dW_s
+       =\alpha_t\varphi_0+\beta_t z,\\
+    \alpha_t&=1,\qquad \beta_t=\sqrt{\int_0^t\beta(s)\,ds}.
+    \end{aligned}
+  \]
+  令
+  \[
+    \begin{aligned}
+     \varphi_0 &\sim p_{\varphi_0} &&\text{（通过扩散映射学得的经验潜空间密度）},\\
+     z &\sim N(0,I_d),\\
+     t &\sim \mathcal U(0,1) &&\text{（均匀抽取噪声水平）},
+    \end{aligned}
+  \]
+  并令 $s_\theta(\varphi,t)\in\R^d$ 为试图逼近如下得分的神经网络，
+  \[
+    s_{p_t}(\varphi)=\nabla_\varphi\log p_t(\varphi).
+  \]
+  作用是在流形上提供可以计算的样本生成器。
+
+  \item \textbf{生成器}\par
+  数学模型为概率流 ODE $d\varphi_t=-\frac12\beta(t)s_\theta(\varphi_t,t)\,dt$，随后计算 $x=f_\theta(\varphi_0)$。作用是生成新的基因表达谱，推理时无需加入朗之万噪声。
+\end{itemize}
+
+下面给出训练目标。
+% PDF p. 315
+\paragraph{训练目标}
+
+\[
+  \begin{aligned}
+  \mathcal L(\theta)
+    &=\frac1N\sum_i\left\|x_i-f_\theta(\Phi(x_i))\right\|^2\\
+    &\quad+\lambda_{\mathrm{GE}}\frac1N\sum_i
+         \left\|g_\theta(\Phi(x_i))-I_d\right\|^2
+        +\lambda_{\mathrm{Score}}\mathcal L_{\mathrm{DSM}}(\theta).
+  \end{aligned}
+\]
+设置 $\lambda_{\mathrm{GE}}$ 使解码器局部保持长度，拉回度量近似单位矩阵，即学习得到的潜坐标是近似等温参数（isothermal parameters）。$\mathcal L_{\mathrm{DSM}}(\theta)$ 是潜空间中通常的去噪得分匹配损失，定义为
+\[
+  \begin{aligned}
+    \mathcal L_{\mathrm{DSM}}(\theta)
+     &= E_{t\sim\mathcal U(0,1),\,\varphi_0\sim p_{\varphi_0},\,z\sim N(0,I_d)}
+          \left[w(t)\left\|s_\theta(\varphi_t,t)+\frac{z}{\beta_t}\right\|_2^2\right],\\
+    w(t)&=\beta_t^{2\gamma},\qquad\text{常用取法为 }\gamma\in\{0,1\},\\
+    \varphi_t&=\varphi_0+\beta_t z.
+  \end{aligned}
+\]
+在最优点 $s_\theta^*=s_{p_t}$，概率流 ODE
+\[
+  d\varphi_t=-\tfrac12\beta(t)s_\theta^*(\varphi_t,t)\,dt
+\]
+与随机反向 SDE 具有相同的边际分布。由此可获得符合几何结构的潜样本，再由解码器将其提升到原数据空间。
+
+\paragraph{用简化数据验证（400 个细胞，50 个基因）}
+
+\textbf{目标}\quad 找出能刻画一种细胞类型基因表达结构的低维流形，学习它的潜空间密度，用扩散式生成器抽取新的潜点，再把它们提升回原空间。表 \ref{tab:6.5} 定量比较了使用与不使用黎曼度量时，双重扩散模型在流形上的密度学习结果。两个模型对均值的拟合程度相当，但考虑度量的解码器使合成点更接近原数据点云，即最近邻距离的差距较小。
+
+\paragraph{新模型的优势}
+
+\begin{description}[leftmargin=2em]
+  \item[考虑几何结构的解码器] 对 $g_\theta-I_d$ 施加惩罚，使映射近似等距，并保留局部邻域，从而减少提升过程中产生的失真。
+  \item[各向同性的潜空间噪声] 噪声按拉回度量衡量，因此沿流形扩散，保持在流形上。
+  \item[确定性 ODE 采样] 概率流 ODE 在推理时不引入随机性，可以产生方差较小、空间模式更清晰的基因表达谱。
+\end{description}
+
+\begin{table}[htbp]
+  \centering\small
+  \TableCaption{6.5}{双重扩散模型在流形上学习密度的定量比较（使用与不使用黎曼度量）}
+  \begin{tabular}{lcc}
+    \toprule
+    模型 & 重建 MSE & \shortstack{平均最近邻分布\\（与观测值的接近程度）}\\
+    \midrule
+    线性模型 & 0.0191 & 0.33\\
+    MLP 加度量 & 0.0192 & 0.27\\
+    \bottomrule
+  \end{tabular}
+\end{table}

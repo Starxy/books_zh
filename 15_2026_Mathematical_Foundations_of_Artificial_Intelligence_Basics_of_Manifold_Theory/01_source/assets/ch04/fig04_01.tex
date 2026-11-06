@@ -1,0 +1,32 @@
+\begin{tikzpicture}
+\begin{axis}[
+  width=.78\linewidth,height=.76\linewidth,axis equal image,
+  xmin=-2,xmax=4,ymin=-2,ymax=4,
+  axis lines=left,xtick={-2,-1,0,1,2,3,4},ytick={-2,-1,0,1,2,3,4},
+  tick label style={font=\small},label style={font=\small},
+  xlabel={流形 $M$},ylabel={流形 $M$},
+  grid=major,major grid style={black!12},legend pos=north west,
+  legend cell align=left,legend style={font=\scriptsize}
+]
+  \addlegendimage{only marks,mark=*,red!80!black}
+  \addlegendentry{点 $x$}
+  \addlegendimage{only marks,mark=*,blue!70!black}
+  \addlegendentry{点 $\Phi_t(x)$}
+  \addlegendimage{line width=1pt,violet}
+  \addlegendentry{$x$ 处的 $v_1$}
+  \addlegendimage{line width=1pt,green!55!black}
+  \addlegendentry{$x$ 处的 $v_2$}
+  \addlegendimage{line width=1pt,violet}
+  \addlegendentry{$\Phi_t(x)$ 处的 $D\Phi_t(x)\cdot v_1$}
+  \addlegendimage{line width=1pt,green!55!black}
+  \addlegendentry{$\Phi_t(x)$ 处的 $D\Phi_t(x)\cdot v_2$}
+  \draw[-{Stealth},violet,thick] (axis cs:0,0)--(axis cs:1.1,.55);
+  \draw[-{Stealth},green!55!black,thick] (axis cs:0,0)--(axis cs:-.55,1.1);
+  \draw[-{Stealth},violet,thick] (axis cs:2,2)--(axis cs:3.75,3.23);
+  \draw[-{Stealth},green!55!black,thick] (axis cs:2,2)--(axis cs:2.18,3.78);
+  \fill[red!80!black] (axis cs:0,0) circle (1.5pt) node[below] {$x$};
+  \fill[blue!70!black] (axis cs:2,2) circle (1.5pt)
+    node[right,inner sep=2pt,font=\scriptsize] {$\Phi_t(x)$};
+  \node[black!45,font=\small] at (axis cs:-1,-1.4) {流形 $M$};
+\end{axis}
+\end{tikzpicture}

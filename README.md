@@ -55,6 +55,7 @@ scripts/                          仓库维护检查工具
 | [Deep Generative Modeling](12_2024_Deep_Generative_Modeling/) | 深度生成建模（第二版） | [PDF](00_books/Deep_Generative_Modeling_cn_translated.pdf) | 341 |
 | [Large Language Models: A Deep Dive](13_2024_Large_Language_Models_A_Deep_Dive/) | 大语言模型深度解析：贯通理论与实践 | [PDF](00_books/Large_Language_Models_A_Deep_Dive_cn_translated.pdf) | 462 |
 | [Efficient LLM Inference](14_2026_Efficient_LLM_Inference/) | 大语言模型高效推理 | [PDF](00_books/Efficient_LLM_Inference_cn_translated.pdf) | 55 |
+| [Mathematical Foundations of Artificial Intelligence: Basics of Manifold Theory](15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/) | 人工智能的数学基础：流形理论基础 | [PDF](00_books/Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory_cn_translated.pdf) | 359 |
 
 《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 
@@ -82,6 +83,8 @@ scripts/                          仓库维护检查工具
 《大语言模型深度解析》依据用户提供的 Springer 2024 年第一版 PDF 完成译排。包含书前材料、10 章、章末参考文献、附录 A、B 和 585 个索引词项。索引保留原版印刷页码，并提供译文章节链接和两版起始页对照。中文 LaTeX、术语表和构建说明见[书籍工程](13_2024_Large_Language_Models_A_Deep_Dive/)。
 
 《大语言模型高效推理》依据用户提供的 2026 年第二版 PDF 完成译排。包含封面和目录、14 章、70 道模拟面试问答及附录 A–D。在译注中说明原书推测解码算例、每百万词元成本公式和硬件表的口径差异。中文 LaTeX、术语表与构建入口见[书籍工程](14_2026_Efficient_LLM_Inference/)。
+
+《人工智能的数学基础：流形理论基础》依据用户提供的 CRC Press 2026 年第一版 PDF 译排，涵盖书前材料、6 章、章内附录、习题、章末文献与全书索引，共 359 页。索引的 724 个词项保留原版印刷定位页，附两版章首页对照。中文 LaTeX、术语表与构建说明见[书籍工程](15_2026_Mathematical_Foundations_of_Artificial_Intelligence_Basics_of_Manifold_Theory/)。
 
 ## 新增与维护书籍
 

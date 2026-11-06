@@ -1,0 +1,181 @@
+% PDF p. 360
+\AppendixSection{6K}{伊藤积分}
+
+\AppendixHeading{6K1}{背景与直观理解}
+
+在确定性微积分中，$\int_0^T f(t)\,dt$ 度量曲线下的有向面积。当积分的驱动过程是随机的且处处不可微，例如布朗运动 $W_t$，通常的黎曼积分或勒贝格–斯蒂尔切斯积分（Lebesgue–Stieltjes integral）的定义便不适用。伊藤在 1944 年提出的主要思想如下（Øksendal 2023）。
+\begin{enumerate}
+  \item \textbf{非预见性（nonanticipation）}被积过程 $H_t$ 只可使用截至时刻 $t$ 已经获得的信息。
+  \item \textbf{均方收敛（mean-square convergence）}把积分定义为简单近似（分段常值、适应）的 $L^2$ 极限。
+  \item \textbf{等距性（isometry）}计算二阶矩时，用二次变差（quadratic variation）$[W]_t=t$ 来处理“$dt$”。
+\end{enumerate}
+这些选择使积分成为鞅，也使我们能够建立以伊藤公式为基础的微积分。这套微积分支持随机微分方程、量化金融、机器学习中的扩散模型等。
+
+\AppendixHeading{6K2}{定义}
+
+定义由下列步骤组成。
+
+\textbf{设定}
+\begin{itemize}
+  \item $(\Omega,\mathcal F,(\mathcal F_t)_{t\geq0},\mathbb P)$ 是满足通常条件的带滤过概率空间。
+  \item $W_t$ 是适应于 $(\mathcal F_t)$ 的标准 $d$ 维布朗运动。
+\end{itemize}
+下面给出一维情形。向量和矩阵情形可逐分量定义。
+
+\textbf{步骤 A\quad 初等（简单）被积过程}\par
+简单（初等）过程的形式为
+\[
+  H_t(\omega)=\sum_{k=0}^{n-1}H_k(\omega)\,\mathbf1_{(t_k,t_{k+1})}(t),
+\]
+其中 $0=t_0<t_1<\cdots<t_n=T$ 是确定性分割，每个 $H_k$ 都是 $\mathcal F_{t_k}$ 可测的，所以它“只看过去”。定义
+\begin{equation*}
+  \int_0^T H_t\,dW_t=\sum_{k=0}^{n-1}H_k(W_{t_{k+1}}-W_{t_k}).
+  \tag{6K1}\label{eq:6K1}
+\end{equation*}
+
+% PDF p. 361
+\textbf{步骤 B\quad 简单被积过程的伊藤等距}\par
+由于 $W_t$ 的增量相互独立，且 $\Var(W_{t_{k+1}}-W_{t_k})=t_{k+1}-t_k$，有
+\begin{equation*}
+  \begin{aligned}
+  E\left[\left(\int_0^T H_t\,dW_t\right)^2\right]
+   &=E\left[\left(\sum_{k=0}^{n-1}H_k(W_{t_{k+1}}-W_{t_k})\right)^2\right]\\
+   &=E\Biggl[\left(\sum_{k=0}^{n-1}H_k(W_{t_{k+1}}-W_{t_k})\right)\\[-2pt]
+   &\qquad\quad{}\times\left(\sum_{j=0}^{n-1}H_j(W_{t_{j+1}}-W_{t_j})\right)\Biggr]\\
+   &=E\left[\sum_k\sum_j H_k H_j(W_{t_{k+1}}-W_{t_k})
+                               (W_{t_{j+1}}-W_{t_j})\right]\\
+   &=E\left[\sum_k H_k^2\Var(W_{t_{k+1}}-W_{t_k})\right]\\
+   &=E\left[\sum_k H_k^2(t_{k+1}-t_k)\right]\\
+   &=E\int_0^T H_t^2\,dt.
+  \end{aligned}
+  \tag{6K2}\label{eq:6K2}
+\end{equation*}
+\translatornote{此处使用布朗运动的不相交区间增量独立。对 $k<j$ 的交叉项，先对 $\mathcal F_{t_j}$ 取条件期望，利用下一增量的条件均值为零。}
+
+\textbf{步骤 C\quad 推广到 $L^2$ 被积过程}\par
+定义
+\[
+  \mathcal H^2[0,T]=
+  \left\{H\text{ 为适应过程}\;:\;E\int_0^T H_t^2\,dt<\infty\right\}.
+\]
+假定简单过程在范数 $\lVert H\rVert_2=(E\int_0^T H_t^2\,dt)^{1/2}$ 下在 $\mathcal H^2$ 中稠密。借助式 \eqref{eq:6K2}，将一般 $H$ 的积分定义为简单近似的 $L^2$ 极限。极限唯一，且式 \eqref{eq:6K2} 仍成立。
+
+定义
+\[
+  I_t(H)=\int_0^t H_s\,dW_s,\qquad 0\leq t\leq T.
+\]
+过程 $I_t(H)$ 连续、平方可积，并且是鞅。
+
+\AppendixHeading{6K3}{基本性质}
+
+可以证明伊藤积分具有下列基本性质。
+
+\textbf{线性性}\quad $\int H\,dW+\int K\,dW=\int(H+K)\,dW$。
+
+\textbf{等距性}\quad $\displaystyle E[I_t(H)^2]=E\int_0^T H_t^2\,dt$。\translatornote{对 $I_t(H)$，积分上限应为 $t$，原书此处印为 $T$。}
+
+% PDF p. 362
+\textbf{鞅性质}\quad $(I_t(H),\mathcal F_t)$ 的均值为 0，且具有独立增量。形式上，若随机过程满足 $E[X_{t+1}\mid\mathcal F_t]=X_t$，则它是鞅。因此 $I_t(H)$ 是鞅。\translatornote{一般随机被积过程的伊藤积分是鞅，但其增量未必独立。连续时间鞅的条件期望性质应对所有 $s\leq t$ 成立，即 $E[X_t\mid\mathcal F_s]=X_s$。}
+
+\textbf{二次变差}\quad 二次变差是记作 $[X]_t$ 的过程，定义为
+\[
+  [X]_t=\lim_{|P|\to0}\sum_{k=0}^n(X_{t_k}-X_{t_{k-1}})^2,
+\]
+其中 $P$ 遍历区间 $[0,t]$ 的分割。因此，
+\[
+  [I(H)]_t=\int_0^t H_s^2\,ds.
+\]
+\translatornote{原式求和从 $k=0$ 开始，第一项会用到未定义的 $t_{-1}$。对分割 $t_0,\ldots,t_n$，应从 $k=1$ 开始。}
+
+\AppendixHeading{6K4}{如何实际计算伊藤积分}
+
+\AppendixSubheading{6K4.1}{直接使用等距性}
+
+对确定性的平方可积函数 $f(t)$，有
+\[
+  E\left[\left(\int_0^T f(t)\,dW_t\right)^2\right]=\int_0^T f^2(t)\,dt,
+  \qquad \int_0^T f(t)\,dW_t\sim N\left(0,\int_0^T f^2(t)\,dt\right).
+\]
+
+\textbf{例 1\quad 确定性被积函数}
+\[
+  I_T=\int_0^T e^{-\lambda t}\,dW_t
+   \sim N\left(0,\int_0^T e^{-2\lambda t}\,dt
+                   =\frac{1-e^{-2\lambda t}}{2\lambda}\right).
+\]
+\translatornote{末项指数内的 $t$ 对应定积分上限 $T$。}
+
+\AppendixSubheading{6K4.2}{伊藤公式与分部积分}
+
+若 $F(t,X)\in C^{1,2}$，且 $X_t$ 满足 SDE $dX_t=g(X_t,t)\,dt+\Sigma(X_t,t)\,dW_t$，则
+\[
+  dF(t,X_t)=\partial_tF\,dt+\partial_xF\,dX_t+\tfrac12\partial_{xx}F\,dX_t\,dX_t.
+\]
+选取 $F$ 使含 $dt$ 的项相消，就可以将伊藤积分用已知函数表示。
+
+\textbf{例 2\quad 随机被积过程 $X_t=W_t$}
+
+计算 $\int_0^T W_t\,dW_t$。
+
+对 $F(W_t)=\tfrac12 W_t^2$ 应用伊藤公式，得到
+\[
+  d\left(\tfrac12 W_t^2\right)=W_t\,dW_t+\tfrac12\,dt.
+\]
+从 0 到 $T$ 积分并整理，得到
+\[
+  \begin{aligned}
+    \int_0^T W_t\,dW_t
+     &=\int_0^T d\left(\tfrac12 W_t^2\right)-\tfrac12\int_0^T dt\\
+     &=\tfrac12(W_T^2-W_0^2)-\tfrac12 T=\tfrac12(W_T^2-T).
+  \end{aligned}
+\]
+
+% PDF p. 363
+\AppendixSubheading{6K4.3}{乘积法则（伊藤乘法表）}
+
+\[
+  d(W_tB_t)=W_t\,dB_t+B_t\,dW_t+dW_t\,dB_t
+      \qquad\bigl(\text{其中 }dW_t\,dB_t=\delta_{W,B}\,dt\bigr).
+\]
+取期望会消去含 $dW$ 的项，常可留下一个显式表达式。
+
+\textbf{例 3\quad 用积分因子求解 SDE}
+
+考虑几何布朗运动（geometric Brownian motion），
+\[
+  dX_t=\mu X_t\,dt+\sigma X_t\,dW_t,\qquad X_0=x_0.
+\]
+取对数，有
+\begin{equation*}
+  d(\log X_t)=\frac{dX_t}{X_t}-\frac12\frac{1}{X_t^2}dX_t\,dX_t.
+  \tag{6K3}\label{eq:6K3}
+\end{equation*}
+注意
+\begin{equation*}
+  \frac{dX_t}{X_t}=\frac{1}{X_t}(\mu X_t\,dt+\sigma X_t\,dW_t)
+   =\mu\,dt+\sigma\,dW_t,
+  \tag{6K4}\label{eq:6K4}
+\end{equation*}
+以及
+\begin{equation*}
+  \begin{aligned}
+   dX_t\,dX_t
+      &=(\mu X_t\,dt+\sigma X_t\,dW_t)(\mu X_t\,dt+\sigma X_t\,dW_t)\\
+      &=\sigma^2 X_t^2(dW_t)^2+2\mu X_t^2\,dW_t\,dt+\mu^2X_t^2(dt)^2\\
+      &\approx \sigma^2X_t^2\,dt.
+  \end{aligned}
+  \tag{6K5}\label{eq:6K5}
+\end{equation*}
+将式 \eqref{eq:6K4}、\eqref{eq:6K5} 代入式 \eqref{eq:6K1}，得到\translatornote{本处原书所指的式 \eqref{eq:6K1} 应为对数的伊藤公式 \eqref{eq:6K3}。}
+\begin{equation*}
+  d(\log X_t)=\left(\mu-\frac{\sigma^2}{2}\right)dt+\sigma\,dW_t.
+  \tag{6K6}\label{eq:6K6}
+\end{equation*}
+对式 (6k4) 两边积分，得到\translatornote{原书印作 (6k4)，应指紧邻的式 \eqref{eq:6K6}。}
+\[
+  \log X_t=\log X_0+\left(\mu-\frac{\sigma^2}{2}\right)t+\sigma W_t.
+\]
+所以
+\[
+  X_t=x_0e^{\mu t}\exp\left(\sigma W_t-\frac{\sigma^2}{2}t\right).
+\]

@@ -1,0 +1,107 @@
+% PDF p. 54
+\AppendixSection{1A}{格拉斯曼流形的表示}
+下面分步证明，格拉斯曼流形 $\Gr(k,n)$ 确实可以表示成秩为 $k$ 的对称正交投影矩阵组成的集合。
+
+\Subheading{第 1 步\quad 格拉斯曼流形的定义}
+格拉斯曼流形 $\Gr(k,n)$ 定义为 $\R^n$ 中全体 $k$ 维子空间所成的空间，
+\[
+  \Gr(k,n)=\{U\subseteq\R^n\mid
+    U\text{ 是满足 }\dim(U)=k\text{ 的线性子空间}\}.
+\]
+
+\Subheading{第 2 步\quad 基的等价类（商空间定义）}
+每个 $k$ 维子空间 $U\subseteq\R^n$ 都可通过选取一组标准正交基来表示：
+\[
+  U=\operatorname{span}\{u_1,\ldots,u_k\},\qquad
+  u_i\in\R^n,\qquad u_i^Tu_j=\delta_{ij}.
+\]
+但这种表示不唯一，因为同一个子空间 $U$ 的不同标准正交基可以相差一个正交群 $O(k)$ 中的正交变换：
+\[
+  \begin{aligned}
+    U&=\operatorname{span}\{u_1,\ldots,u_k\}
+      =\operatorname{span}\{u'_1,\ldots,u'_k\},\\
+    (u'_1,\ldots,u'_k)&=(u_1,\ldots,u_k)Q,\qquad Q\in O(k).
+  \end{aligned}
+\]
+因而，每个子空间 $U$ 对应于标准正交标架的一个等价类，由此得到商结构
+\[
+  \Gr(k,n)=\frac{O(n)}{O(k)O(n-k)}.
+\]
+图~\ref{fig:1A.1} 直观展示了作为商空间 $O(3)/(O(2)\times O(1))$ 的格拉斯曼流形 $\Gr(2,3)$。每对向量（一红一蓝）都给出同一个二维子空间（平面）的标准正交基。绕 $z$ 轴旋转该基，便得到不同的标准正交标架，它们在格拉斯曼流形上全部等价。这些基都代表同一个等价类或子空间。因此，格拉斯曼流形把旋转得到的各组标准正交基等同为同一个子空间，直观地展示了商结构。
+
+\Subheading{第 3 步\quad 正交投影算子}
+可以用一组标准正交基构造正交投影算子。考虑到给定 $k$ 维子空间 $U$ 的正交投影算子 $P_U$。若 $\{u_1,\ldots,u_k\}$ 是 $U$ 的一组标准正交基，则定义
+\[
+  U=\operatorname{span}\{u_1,\ldots,u_k\},\qquad
+  U=[u_1,\ldots,u_k]\in\R^{n\times k}.
+\]
+于是，到子空间 $U$ 的正交投影矩阵 $P_U$ 为
+\[
+  P_U=UU^T.
+\]
+
+% PDF p. 55
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch01/fig01_a01}
+  \FigureCaption{1A.1}{格拉斯曼流形表示为 $O(3)$ 对 $O(2)\times O(1)$ 的商。}
+\end{figure}
+
+矩阵 $P_U$ 具有下列性质。对称性为 $P_U^T=P_U$，幂等性为 $P_U^2=P_U$，正交性（秩的性质）写为 $\rank(P_U)=k$。因此，每个子空间 $U$ 唯一确定一个秩为 $k$ 的对称投影矩阵 $P_U$。
+
+\Subheading{第 4 步\quad 一一对应}
+反过来，给定一个秩为 $k$ 的对称投影矩阵 $P$，可以把它的像作为唯一的子空间 $U$ 恢复出来。给定对称的秩 $k$ 投影矩阵 $P_U$，有
+\[
+  U=\operatorname{range}(P_U)=\{P_Ux\mid x\in\R^n\}.
+\]
+因此，子空间与投影矩阵之间存在一一对应关系。
+
+\Subheading{第 5 步\quad 得出两种定义的等价性}
+我们已经给出两种表示。
+\begin{itemize}
+  \item \textbf{按子空间定义格拉斯曼流形}
+  \[
+    \Gr(k,n)=\{\R^n\text{ 中全体 }k\text{ 维子空间}\}.
+  \]
+  \item \textbf{按投影矩阵定义}
+  \[
+    \Gr(k,n)\cong
+    \{P\in\R^{n\times n}\mid P^T=P,\ P^2=P,\ \rank(P)=k\}.
+  \]
+\end{itemize}
+这两种定义完全等价。
+
+% PDF p. 56
+\BackSection{结语}
+我们证明了，起初定义为基的商空间的格拉斯曼流形，等价地表示为秩为 $k$ 的对称正交投影矩阵所成的集合，
+\[
+  \Gr(k,n)\cong
+  \{P\in\R^{n\times n}\mid P^T=P,\ P^2=P,\ \rank(P)=k\}
+  \cong\frac{O(n)}{O(k)O(n-k)}.
+\]
+这种等价关系很重要。投影矩阵表示便于计算，尤其适用于涉及优化和嵌入的应用，而商空间表示有助于进一步理解其几何和结构。
+
+\BackSection{习题}
+\begin{enumerate}
+  \item \textbf{习题 1.1}\par 给出 $\R P^2$ 的数学定义。
+  \item \textbf{习题 1.2}\par 定义乘积流形 $S^1\times S^2$。
+  \item \textbf{习题 1.3}\par 在圆周 $S^1$ 上定义一张坐标卡。
+  \item \textbf{习题 1.4}\par 给出流形上非光滑函数的一个例子。
+  \item \textbf{习题 1.5}\par 设 $M(m\times n,\R)$ 表示全体 $m\times n$ 实矩阵组成的集合。证明 $M(m\times n,\R)$ 是一个流形。
+  \item \textbf{习题 1.6}\par 证明全体 $n$ 维正交矩阵组成的集合是一个光滑流形。
+  \item \textbf{习题 1.7}\par 证明 $L_1=\{(x,y)\mid x^2+y^2=1\}$ 是一个光滑流形。
+  \item \textbf{习题 1.8}\par 证明 $\Gr(1,2)\cong S^1/\{\pm1\}$。
+  \item \textbf{习题 1.9}\par 考虑 DNA 序列 ATTCGAGGAA，构造它的 CGR 图。假定网格为 $2\times2$，计算其 FCGR。
+  \item \textbf{习题 1.10}\par 考虑 DNA 序列 ATTCGAGGAA，用扩散把确定性的 CGR 点转化成含噪分布。
+\end{enumerate}
+
+% PDF p. 57
+\needspace{13\baselineskip}
+\BackSection{参考文献}
+\begin{bookreferences}
+  \item Barnsley, M. F. (2012). \textit{Fractals Everywhere}. New Edition. Dover Publications.
+  \item Bendokat, T., Zimmermann, R. and Absil, P. A. (2024). A Grassmann manifold handbook: basic geometry and computational aspects. \textit{Advances in Computational Mathematics}. 50: 6.
+  \item Ho, J., Jain, A. and Abbeel, P. (2020). Denoising diffusion probabilistic models. In Larochelle, H., Ranzato, M., Hadsell, R., Balcan, M. and Lin, H., editors, \textit{Advances in Neural Information Processing Systems 33}: 6840–6851, PMLR. Annual Conference on Neural Information Processing Systems 2020 (NeurIPS 2020).
+  \item Nichol, A. Q. and Dhariwal, P. (2021). Improved denoising diffusion probabilistic models. In Meila, M. and Zhang, T., editors, \textit{Proceedings of the 38th International Conference on Machine Learning, Volume 139 of Proceedings of Machine Learning Research}: 8162–8171. PMLR.
+  \item Strümke, I. and Langseth, H. (2023). Lecture notes in probabilistic diffusion models. arXiv:2312.10393v1.
+\end{bookreferences}

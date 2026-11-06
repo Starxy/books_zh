@@ -1,0 +1,244 @@
+% PDF p. 210
+\subsection{随时间和空间变化的图}
+\subsubsection{引言}
+GNN 常用于静态图，但许多实际问题涉及动态图。
+\begin{itemize}
+  \item 节点或边的特征随时间演化，例如社交网络或分子模拟中的特征。
+  \item 图的拓扑发生变化，例如增加或删除边或节点。
+\end{itemize}
+
+\textbf{李导数的作用}
+\begin{itemize}
+  \item 李导数度量向量场 $X$（例如消息传递中的信息流）怎样在变换 $Y$（例如图的动态变化）下发生变化。
+  \item 这使 GNN 能有效地纳入时间动态和结构动态。
+  \[
+    \mathcal L_Y X=[Y,X]=Y(X)-X(Y).
+  \]
+  \item 这里 $Y$ 刻画扰动，例如特征演化或拓扑变化。
+\end{itemize}
+
+\subsubsection{创造性与新颖性建模}
+在\textbf{药物发现}或\textbf{概念推理}等任务中，GNN 需要探索图中的新区域，例如发现新分子或新关联。
+
+\paragraph{李导数的作用}
+\begin{itemize}
+  \item 李导数可为图推理中的\textbf{探索与利用}建模。
+  \begin{itemize}
+    \item $\mathcal L_YX\approx0$ 表示利用现有图结构。
+    \item $\mathcal L_YX\not\approx0$ 表示探索新关系。
+  \end{itemize}
+  \item 通过量化消息流中的新颖性，李导数让 GNN 能优先探索图中尚未探索的区域。
+\end{itemize}
+
+\paragraph{药物发现示例}
+为给出药物发现中的数值例子，我们模拟用图神经网络（GNN）对分子图建模的情形。
+% PDF p. 211
+先计算图中节点的新颖性度量，再利用李导数确定新颖性较高区域的优先级。这里要说明的是，李导数怎样量化 GNN 消息传递流中的新颖性，并把注意力引向未探索的分子子结构。
+
+\Subheading{步骤 1 \quad 分子图表示}
+考虑一个假想化合物的简单分子图。
+\begin{center}
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \node (c1) at (0,0) {$C_1$};
+    \node (c2) at (1,0) {$C_2$};
+    \node (n3) at (2,0) {$N_3$};
+    \node (o) at (1,1.05) {$O$};
+    \node (c4) at (2,-1.05) {$C_4$};
+    \node (c5) at (3.2,-1.05) {$C_5$};
+    \draw[thick] (c1)--(c2)--(n3);
+    \draw[blue!60!black,thick] (c2)--(o) (n3)--(c4) (n3)--(c5);
+  \end{tikzpicture}
+\end{center}
+\begin{itemize}
+  \item \textbf{节点（原子）。}$C_1,C_2,N_3,C_4,C_5,O$。
+  \item \textbf{边（键）。}$C_1-C_2$、$C_2-N_3$、$N_3-C_5$、$N_3-C_4$、$O-C_2$。
+\end{itemize}
+
+\Subheading{步骤 2 \quad 节点嵌入初始化}
+为每个原子指定表示其类型的初始特征向量。
+\[
+  C=[1,0,0],\qquad N=[0,1,0],\qquad O=[0,0,1].
+\]
+经可学习的线性变换后，节点的初始嵌入如下。\translatornote{原书仅列出 $C_2$ 的一个分量 $[0.3]$。下一步的加法以三维嵌入为前提。}
+\[
+  \begin{gathered}
+    C_1:[0.2,0.1,0.0],\qquad C_2:[0.3],\qquad N_3:[0.1,0.4,0.0],\\
+    C_4:[0.1,0.2,0.1],\qquad C_5:[0.2,0.1,0.0],\\
+    O=[0.0,0.0,0.5].
+  \end{gathered}
+\]
+
+\Subheading{步骤 3 \quad GNN 中的消息传递}
+在 GNN 中，每个节点聚合其邻居的特征。以 $C_2$ 处的消息为例，$C_2$ 的邻居为 $C_1,N_3,O$。聚合消息为
+\[
+  \mathrm{Message}\,C_2=C_1+N_3+O=[0.3,0.5,0.5].
+\]
+$C_2$ 的更新嵌入为
+\[
+  C_2^{\mathrm{new}}
+   =\operatorname{Linear}(C_2+\mathrm{Message}\,C_2)
+   =\operatorname{Linear}([0.6,0.7,0.5]).
+\]
+
+\Subheading{步骤 4 \quad 新颖性度量}
+根据节点嵌入 $e$ 与代表已知化学基元的参考嵌入 $s$ 之间的距离，定义新颖性度量 $g(e)$。
+\[
+  g(e)=\lVert e-s\rVert^2.
+\]
+假设参考嵌入 $s=[0.2,0.2,0.0]$。
+% PDF p. 212
+\begin{itemize}
+  \item 对于 $C_2$，
+  \[
+    g(C_2^{\mathrm{New}})=0.66.
+  \]
+  \item 对于 $N_3$，
+  \[
+    g(N_3)=0.05.
+  \]
+\end{itemize}
+
+\Subheading{步骤 5 \quad 李导数}
+李导数度量新颖性度量 $g(e)$ 在嵌入空间中沿方向 $X$ 的变化，定义为
+\[
+  \mathcal L_Xg(e)=\nabla g(e)\cdot X.
+\]
+$g$ 关于 $e$ 的梯度为
+\[
+  \nabla g(e)=2(e-s).
+\]
+\begin{itemize}
+  \item 对于 $C_2^{\mathrm{New}}=[0.6,0.7,0.5]$，
+  \[
+    \nabla g(C_2^{\mathrm{New}})=[0.8,1.0,1.0].
+  \]
+  \item 选择扰动方向 $X=[0.1,0.2,0.0]$，
+  \[
+    \mathcal L_Xg(C_2^{\mathrm{New}})=0.28.
+  \]
+  \item 对于 $N_3=[0.1,0.4,0.0]$，
+  \[
+    \nabla g(N_3)=[-0.2,0.4,0.0],\qquad\mathcal L_Xg(N_3)=0.06.
+  \]
+\end{itemize}
+
+\Subheading{步骤 6 \quad 解释}
+\begin{itemize}
+  \item $\mathcal L_Xg(C_2^{\mathrm{New}})=0.28$。$C_2$ 的新颖性度量沿 $X$ 增长明显，表明该节点处于新颖性较高的区域，应优先进一步探索。
+  \item $\mathcal L_Xg(N_3)=0.06$。$N_3$ 的新颖性度量增长较慢，表明它更接近已知化学基元，新颖性较低。
+\end{itemize}
+利用李导数，量化了消息传递过程中新颖性度量 $g$ 对扰动的变化率。结果指出 $C_2$ 是新颖性较高的节点，引导 GNN 关注分子图中的这一区域。这说明李导数可用于在药物发现过程中寻找未探索的分子子结构。
+
+\subsubsection{连续流建模}
+李导数可以自然地推广到\textbf{连续时间 GNN}，例如\textbf{神经常微分方程}（Neural ODEs）。
+\begin{itemize}
+  \item 节点嵌入按微分方程演化。
+  \item 李导数为这些连续动力学提供了一种有明确数学依据的建模方法。
+\end{itemize}
+
+% PDF p. 213
+为说明怎样将李导数用于连续时间 GNN 和连续流的建模，下面介绍几个生物学例子。在生物系统中，\textbf{动力学、流和相互作用}是理解过程的关键，李导数尤其适用于这类系统。以下说明如何在生物学语境中解释和应用李导数。
+
+\paragraph{作为动力系统的生物系统}
+生物系统往往涉及\textbf{流}。
+\begin{itemize}
+  \item \textbf{基因表达动力学。}表达随时间或空间变化。
+  \item \textbf{细胞信号通路。}信息通过分子网络传播。
+  \item \textbf{组织发育。}生长组织中的形态发生流。
+  \item \textbf{生态系统。}物种种群在空间环境中的变化。
+\end{itemize}
+
+\paragraph{动力学中的李导数}
+为便于说明，主要考虑涉及标量张量场的李导数。它量化浓度、种群等生物学性质怎样沿另一过程的流变化，后者可以由时间或空间梯度等来描述。
+\[
+  \mathcal L_Xf=X(f),
+\]
+其中
+\begin{itemize}
+  \item $f$ 是表示某种生物学性质的标量场，例如蛋白质浓度。
+  \item $X$ 是表示系统的流的向量场，例如细胞在空间中的运动或信号通路随时间的变化。
+\end{itemize}
+
+\paragraph{基因调控网络（GRN）}
+基因调控网络（gene regulatory networks，GRN）描述基因如何通过相互作用调控彼此。
+
+\textbf{李导数的用法。}可用李导数对基因表达动力学（由向量场 $X$ 表示）怎样影响下游调控变化 $f$ 建模。
+\[
+  \mathcal L_Xf=X(f).
+\]
+
+\textbf{例子}
+\begin{statement}{例 4.12}{}
+考虑一个简化的基因调控网络，其中 \textbf{RAS} 调控 \textbf{MEK1/2} 通路，后者进一步影响 \textbf{ERK}（图~\ref{fig:4.5}）。该基因调控网络的功能如下。
+
+\textbf{主要组成}
+\begin{enumerate}
+  \item \textbf{节点（基因）}
+  \begin{itemize}
+    \item \textbf{RAS} 启动信号级联。
+    \item \textbf{MEK1/2} 介导来自 RAS 的信号。
+    \item \textbf{ERK} 在通路的下游起作用。
+  \end{itemize}
+  \item \textbf{边}
+  \begin{itemize}
+    \item \textbf{表示调控关系。}$\mathrm{RAS}\to\mathrm{MEK1/2}$，$\mathrm{MEK1/2}\to\mathrm{ERK}$。
+  \end{itemize}
+\end{enumerate}
+
+% PDF p. 214
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.58\linewidth]{assets/ch04/fig04_05.pdf}
+  \FigureCaption{4.5}{基因调控网络 $\mathrm{RAS}\to\mathrm{MEK1/2}\to\mathrm{ERK}$。}
+\end{figure}
+\textbf{箭头说明}
+\begin{enumerate}[label=\alph*.,start=2]
+  \item $X$ 的箭头表示该通路中每个基因的初始活性水平。
+  \item $Y$ 的箭头表示受扰动变换后的活性水平，例如 RAS 活性增加后的水平。
+  \item $\mathcal L_YX$ 的箭头表示李导数，量化扰动所致的活性流变化。
+\end{enumerate}
+
+\textbf{解释}
+\begin{itemize}
+  \item 扰动源头 RAS 的李导数 $\mathcal L_YX$ 较大，到下游 MEK1/2 和 ERK 时减小。
+  \item 这反映上游基因（如 RAS）的变化如何经网络传播，影响在下游逐渐减弱。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 4.13}{}
+扩展后的基因调控网络展示了完整的 MAPK 通路，纳入了 MEK1/2 通路上下游的其他组成部分。
+
+\textbf{主要组成}
+\begin{enumerate}
+  \item \textbf{RAS} 启动信号级联。
+  \item \textbf{RAF} 将 RAS 的信号传递给 MEK1/2。
+  \item \textbf{MEK1/2} 将信号进一步向下游传递。
+  \item \textbf{ERK} 激活参与细胞增殖的基因。
+  \item \textbf{MAPK} 表示 MAPK 通路的总体激活。
+\end{enumerate}
+
+% PDF p. 215
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.58\linewidth]{assets/ch04/fig04_06.pdf}
+  \FigureCaption{4.6}{受扰动的基因调控网络。MAPK 扰动。}
+\end{figure}
+图~\ref{fig:4.6} 模拟了 \textbf{MAPK 活性的扰动}，展示其对整个 MAPK 信号通路的影响。可见下列变化。
+\begin{enumerate}
+  \item \textbf{$X$ 的箭头}表示 MAPK 通路中各基因的初始活性水平。
+  \item \textbf{$Y$ 的箭头}表示引入使 MAPK 活性增加 $0.2$ 的扰动后，更新的活性水平。
+  \item \textbf{$\mathcal L_YX$ 的箭头}表示李导数 $\mathcal L_YX$，量化 MAPK 扰动所致的活性流变化。
+\end{enumerate}
+
+\textbf{解释}
+\begin{itemize}
+  \item 直接施加于 \textbf{MAPK} 的扰动沿网络反向传播，对 \textbf{ERK} 和 \textbf{MEK1/2} 等上游成分的影响较小。
+  \item MAPK 的李导数 $\mathcal L_YX$ 最大，因为扰动直接施加于它。
+  \item 上游的箭头较小，反映扰动沿调控级联反向传播时影响减弱。
+\end{itemize}
+这一模拟表明，信号通路中的下游扰动可以影响整个网络。
+\end{statement}
+
+\paragraph{基因表达建模中的李导数}
+\paragraph*{4.4.3.3.4.1\quad 反应–扩散模型}
+下面给出数学生物学中常用的反应–扩散模型的概念推导与解释，特别是用它对组织中的基因表达模式建模。

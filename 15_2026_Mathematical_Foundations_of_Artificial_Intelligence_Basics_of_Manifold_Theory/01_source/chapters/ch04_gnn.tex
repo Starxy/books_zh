@@ -1,0 +1,609 @@
+% PDF p. 197
+\subsection{图神经网络（消息传递神经网络）}
+\subsubsection{消息传递神经网络中的向量场和张量}
+消息传递神经网络（MPNN）是对网络或图中相互作用建模的常用计算框架。节点代表实体，边代表实体之间的关系。在这里，可以用各种张量场（标量函数、向量场、协向量场及一般张量）表示不同类型的数据及其在网络中的相互作用，再用李导数描述信息在网络中传播时这些张量如何变化。
+
+\paragraph{\texorpdfstring{定义 MPNN 中的向量场 $X$}{定义 MPNN 中的向量场 X}}
+\textbf{向量场 $X$}
+\begin{itemize}
+  \item \textbf{定义。}MPNN 中的向量场 $X$ 为网络的每个节点指定一个向量，表示该节点的信息流或影响的方向和大小。
+  \item \textbf{表示。}对每个节点 $i$，$X_i$ 是该节点的切空间 $T_i$ 中的向量。
+  \item \textbf{医疗例子。}模拟传染病在医院的传播时，$X_i$ 可表示疾病由患者 $i$ 传播给其他人的速率及方向。
+\end{itemize}
+
+\paragraph{MPNN 中张量的类型}
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{标量函数 $f$}
+  \begin{itemize}
+    \item 定义。标量函数为网络中的每个节点指定一个实数。
+    \item 表示。$f\colon\text{节点集}\to\R$。
+    \item 医疗例子。$f_i$ 可以表示患者 $i$ 的健康状态分数，例如某种疾病的严重程度指数。
+  \end{itemize}
+  \item \textbf{向量场 $V$}
+  \begin{itemize}
+    \item 定义。向量场给每个节点指定一个向量，表示某个量的方向和大小。
+    % PDF p. 198
+    \item 表示。$V_i\in T_i$，其中 $T_i$ 是节点 $i$ 的切空间。
+    \item 医疗例子。$V_i$ 可表示患者 $i$ 的生命体征如何随时间变化，例如体温与心率的增长速度。
+  \end{itemize}
+  \item \textbf{协向量场 $\omega$}
+  \begin{itemize}
+    \item 定义。协向量场为每个节点指定一个协向量（线性泛函），把向量映到标量。
+    \item 表示。$\omega_i\in T_i^*$，其中 $T_i^*$ 是 $T_i$ 的对偶空间。
+    \item 医疗例子。$\omega_i$ 可表示患者 $i$ 对药物的敏感性，将剂量变化映到预期疗效。
+  \end{itemize}
+  \item \textbf{$(1,1)$ 型的一般张量场 $T$}
+  \begin{itemize}
+    \item 定义。$(1,1)$ 型张量场为每个节点指定一个将向量映到向量的线性变换。
+    \item 表示。$T_i\to T_i$。
+    \item 医疗例子。$T_i$ 可表示患者 $i$ 的不同健康因素之间的相互作用，例如血压变化如何影响心率。
+  \end{itemize}
+\end{enumerate}
+
+\paragraph{李导数的计算公式}
+李导数 $\mathcal L_X$ 度量张量场沿向量场 $X$ 生成的流的变化率。
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{标量函数 $f$ 的李导数}
+  \[
+    \mathcal L_X f=X(f).
+  \]
+  解释。这是标量函数 $f$ 沿向量场 $X$ 的变化率。
+
+  \item \textbf{向量场 $V$ 的李导数}
+  \[
+    \mathcal L_X V=[X,V]=X(V)-V(X).
+  \]
+  解释。$V$ 沿 $X$ 的变化由 $X$ 沿 $V$ 的变化加以修正。
+
+  \item \textbf{协向量场 $\omega$ 的李导数}
+  \[
+    (\mathcal L_X\omega)(V)=X\bigl(\omega(V)\bigr)-\omega(\mathcal L_XV).
+  \]
+  解释。该式给出 $\omega$ 沿 $X$ 的变化，并计入 $V$ 的变化。
+
+  \item \textbf{$(1,1)$ 型张量场 $T$ 的李导数}
+  \begin{enumerate}[label=\alph*.]
+    \item $\mathcal L_X T=X(T)-T\circ\mathcal L_X\mathrm{Id}-(\mathcal L_X T)\circ\mathrm{Id}$。\translatornote{原式右侧含待求的 $\mathcal L_X T$。按李导数对张量与向量的求导规则，此处可用 $(\mathcal L_X T)(V)=\mathcal L_X(T(V))-T(\mathcal L_X V)$ 计算。}
+  \end{enumerate}
+  解释。该式给出 $T$ 沿 $X$ 的变化率，同时考虑输入与输出的变换。
+\end{enumerate}
+
+% PDF p. 199
+\subsubsection{李导数增强的图神经网络（GNN）}
+已有多项研究探索这些领域中的 GNN 和相关技术。例如，一项研究比较了基于描述符的模型与基于图的模型在分子性质预测中的表现，发现基于描述符的模型在预测准确率和计算效率方面往往更好（Jiang 等，2021）。
+
+另一项研究提出一种用于分子性质预测的自解释图神经网络，通过找出分子结构中与预测结果相关的部分，提高模型的可解释性（Proietti 等，2024）。
+
+还有研究提出一种将图结构学习与 GNN 结合的方法，同时考虑分子内和分子间的信息，以改进分子性质预测（Zhao 等，2024）。
+
+这些研究推动了该领域的发展，但尚未专门讨论怎样在 GNN 中用李导数对节点重要性排序，以用于分子性质预测和药物发现。一个可能的研究方向是考察如何把李导数等微分几何概念纳入 GNN，提高它们在这类应用中的可解释性和效果。
+
+下面以阿司匹林（aspirin）为例，介绍李导数在图神经网络中的应用。
+
+\paragraph{阿司匹林分子的图表示}
+分子结构规定了分子或离子中原子的排列方式。我们研究阿司匹林分子的不同分子图表示。其 SMILES 记法为 \texttt{CC(=O)OC1=CC=CC=C1C(=O)O}。图表示包括原子图（Atom Graph，A）、药效团图（Pharmacophore Graph，P）、连接树图（JunctionTree Graph，J）及官能团图（FunctionalGroup Graph，F）（Kengkanna 和 Ohue，2024）。
+
+先为阿司匹林分子定义图结构。
+
+\textbf{阿司匹林的结构}
+\begin{itemize}
+  \item \textbf{官能团}
+  \begin{enumerate}[label=\arabic*.]
+    \item 羧酸（$-$COOH），即 \texttt{C(=O)O} 基团（9，10，11）。
+    \item 酯（$-$COO），即 \texttt{C(=O)OC} 基团（0，1，2）。
+    \item 芳香环（苯），由六个相连的芳香碳原子组成（3，4，5，6，7，8）。
+  \end{enumerate}
+  \item \textbf{节点}
+  \begin{itemize}
+    \item 原子以原子序数为标记（C 为 6，H 为 1，O 为 8）。
+  \end{itemize}
+  \item \textbf{边}
+  \begin{itemize}
+    \item 以键类型为标记，包括单键、双键和芳香键。
+  \end{itemize}
+\end{itemize}
+表~\ref{tab:4.1} 和表~\ref{tab:4.2} 列出阿司匹林分子的节点编号和边。\translatornote{两表保留原书所列节点和键。表~\ref{tab:4.1} 列出 12 个原子节点，其中有 3 个氧原子。前文 SMILES 字符串中有 13 个原子节点，其中有 4 个氧原子，两种表示并不一致。}
+阿司匹林分子的图结构整理如下。
+\begin{enumerate}
+  \item 节点。各原子的信息，包括原子序数。
+  \item 边。原子间的键及其类型。
+  \item 官能团。与羧酸、酯和芳香基团相对应的节点。
+\end{enumerate}
+
+% PDF p. 200
+\begin{table}[htbp]
+  \centering
+  \TableCaption{4.1}{阿司匹林分子的节点}
+  \begin{tabular}{rcc}
+    \toprule
+    节点编号 & 元素 & 原子序数 \\
+    \midrule
+    0 & C & 6 \\
+    1 & C & 6 \\
+    2 & O & 8 \\
+    3 & C & 6 \\
+    4 & C & 6 \\
+    5 & C & 6 \\
+    6 & C & 6 \\
+    7 & C & 6 \\
+    8 & C & 6 \\
+    9 & C & 6 \\
+    10 & O & 8 \\
+    11 & O & 8 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\begin{table}[htbp]
+  \centering
+  \TableCaption{4.2}{阿司匹林分子的边（键）}
+  \begin{tabular}{rrrl}
+    \toprule
+      & 节点 1 & 节点 2 & 键类型 \\
+    \midrule
+     1 & 0 & 1 & 双键 \\
+     2 & 1 & 2 & 单键 \\
+     3 & 2 & 3 & 芳香键 \\
+     4 & 3 & 4 & 芳香键 \\
+     5 & 4 & 5 & 芳香键 \\
+     6 & 5 & 6 & 芳香键 \\
+     7 & 6 & 7 & 芳香键 \\
+     8 & 7 & 8 & 芳香键 \\
+     9 & 8 & 3 & 芳香键 \\
+    10 & 8 & 9 & 单键 \\
+    11 & 9 & 10 & 单键 \\
+    12 & 9 & 11 & 双键 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{纳入李导数}
+纳入李导数是为了刻画特征传播对几何和方向的依赖关系。
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{向量场}
+
+  根据势函数的梯度，为每条键定义向量场 $X$。例如，用伦纳德–琼斯势（Lennard–Jones potential）定义
+  \[
+    X_{ij}=-\nabla V(r_{ij}),
+  \]
+  其中
+  \[
+    V(r_{ij})=4\varepsilon
+      \left[\left(\frac{\sigma}{r_{ij}}\right)^{12}
+            -\left(\frac{\sigma}{r_{ij}}\right)^6\right].
+  \]
+
+  % PDF p. 201
+  \item \textbf{李导数}
+
+  对节点 $j$ 的特征 $h_j$，沿 $X_{ij}$ 的李导数为
+  \[
+    \mathcal L_X h_j=X_{ij}\nabla h_j.
+  \]
+  $\nabla h_j$ 表示节点特征 $h_j$ 对空间坐标或位置坐标的梯度。它的定义取决于图中节点特征的具体语境及分子图的性质。
+
+  以阿司匹林分子为例，节点特征 $h_j$ 表示原子序数或学习所得的嵌入等原子性质，$\nabla h_j$ 可显式定义如下。
+
+  \item \textbf{$\nabla h_j$ 的定义}
+
+  设 $h_j$ 是分子图中节点 $j$ 的特征，$r_j\in\R^3$ 表示节点 $j$ 的空间位置（坐标）。$h_j$ 的梯度为
+  \[
+    \nabla h_j=
+       \begin{pmatrix}
+         \dfrac{\partial h_j}{\partial x_j}\\[4pt]
+         \dfrac{\partial h_j}{\partial y_j}\\[4pt]
+         \dfrac{\partial h_j}{\partial z_j}
+       \end{pmatrix},
+  \]
+  其中 $x_j,y_j,z_j$ 为节点 $j$ 的笛卡儿坐标。
+  \item \textbf{解释}
+  \begin{itemize}
+    \item 若 $h_j$ 显式依赖空间坐标，例如受位置影响的学习特征，则 $\nabla h_j$ 度量位置 $r_j$ 的无穷小变化使 $h_j$ 改变了多少。
+    \item 例如，在学习得到的特征空间中，$\nabla h_j$ 可编码对相对于其他节点的距离或方向的敏感性。
+  \end{itemize}
+  \item \textbf{近似}
+
+  在分子图等许多情形中，$h_j$ 通常是标量特征或向量，如嵌入。由于基本的图表示中 $h_j$ 往往与空间坐标没有显式关系，常使用近似。
+  \begin{enumerate}[label=\arabic*.]
+    \item \textbf{相对位置梯度}
+
+    利用节点 $j$ 与邻居 $k$ 之间的空间位置差近似 $\nabla h_j$，
+    \[
+      \nabla h_j\approx\sum_{k\in N(j)}w_{jk}(r_j-r_k),
+    \]
+    其中 $w_{jk}$ 为权重，例如由边特征或距离确定。
+    \item \textbf{基于拉普拉斯算子的近似}
+
+    对光滑特征 $h_j$，可用图拉普拉斯算子近似梯度，
+    \[
+      \nabla h_j\approx\Delta h_j=\sum_{k\in N(j)}(h_k-h_j),
+    \]
+    % PDF p. 202
+    其中 $N(j)$ 表示节点 $j$ 的邻居。
+    \item \textbf{依据物理定律的梯度}
+
+    若 $h_j$ 由势能、力等物理性质得出，可由物理定律计算 $\nabla h_j$，
+    \[
+      \nabla h_j=-\nabla V(r_j),
+    \]
+    其中 $V$ 是势能函数。
+  \end{enumerate}
+  \item \textbf{使用 $\nabla h_j$ 的李导数}
+
+  李导数 $\mathcal L_X h_j$ 按下式将向量场 $X_{ij}$ 与 $\nabla h_j$ 结合起来。
+  \[
+    \mathcal L_X h_j=X_{ij}\cdot\nabla h_j.
+  \]
+  这里 $X_{ij}$ 是沿键方向起作用的向量场，例如势的梯度。若
+  \[
+    X_{ij}=\left(\frac{\partial V}{\partial x},
+                 \frac{\partial V}{\partial y},
+                 \frac{\partial V}{\partial z}\right),
+  \]
+  则
+  \[
+    \mathcal L_X h_j=
+      \frac{\partial V}{\partial x}\frac{\partial h_j}{\partial x}
+      +\frac{\partial V}{\partial y}\frac{\partial h_j}{\partial y}
+      +\frac{\partial V}{\partial z}\frac{\partial h_j}{\partial z}.
+  \]
+  这一表达使李导数增强的 GNN 能刻画空间依赖关系，并考虑几何信息来传播特征。
+\end{enumerate}
+
+\paragraph{消息传递}
+在经典消息传递网络（MPNN）中（Gilmer 等，2017），消息按下式传播。
+\[
+  m_{ij}^{(t)}=\sum_{j\in N(i)}\psi(h_i^{(t)},h_j^{(t)},e_{ij}).
+\]
+这里改用李导数沿边传播消息。
+\[
+  m_{ij}^{(t)}=\sum_{j\in N(i)}\psi(h_i^{(t)},\mathcal L_X h_j^{(t)},e_{ij}),
+\]
+其中 $\psi$ 为可学习函数，例如一个小型神经网络。
+
+经典的节点特征更新为
+\[
+  h_i^{t+1}=\varnothing\!\left(h_i^t,
+       \sum_{j\in N(i)}\psi(h_i^{(t)},h_j^{(t)},e_{ij})\right).
+\]
+使用李导数的节点特征更新为
+\[
+  h_i^{t+1}=\varnothing\!\left(h_i^t,
+       \sum_{j\in N(i)}\psi(h_i^{(t)},\mathcal L_X h_j^{(t)},e_{ij})\right),
+\]
+其中 $\phi$ 和 $\psi$ 是可学习函数，例如小型神经网络，而 $\mathcal L_X h_j^{(t)}$ 引入向量场的方向性影响。
+
+% PDF p. 203
+\subsubsection{总体流程}
+\begin{enumerate}
+  \item 初始化节点特征 $h_i^{(0)}$ 和边特征 $e_{ij}$。
+  \item 对 $t=0,1,\ldots,T-1$，对每条边 $(i,j)$ 计算李导数 $\mathcal L_X h_j^{(t)}$，用 $\psi$ 计算消息 $m_{ij}^{(t)}$，再用 $\phi$ 更新节点特征 $h_i^{(t+1)}$。
+  \item 输出最终的节点特征 $h_i^{(T)}$，可用于性质预测等下游任务。
+\end{enumerate}
+
+\subsubsection{引入李导数的几种改法}
+\paragraph{归一化李导数}
+\begin{itemize}
+  \item 为减弱 $\mathcal L_X h_j$ 的支配作用，在邻居之间将其归一化。
+  \[
+    m_{ij}^{(t+1)}=\psi\!\left(h_i^{(t)},
+         \frac{\mathcal L_X h_j^{(t)}}{\displaystyle\sum_{k\in N(i)}\mathcal L_X h_k^{(t)}},
+         e_{ij}\right).
+  \]
+  \item 这样可使邻居的相对贡献有界，并防止特征失控增长。\translatornote{原式的分母是带符号的和，可能相消为零或接近零。仅凭这个公式不能保证相对贡献有界。}
+\end{itemize}
+
+\paragraph{李导数的自适应加权}
+\begin{itemize}
+  \item 引入可学习参数 $\alpha$ 来调节李导数的影响。
+  \[
+    m_{ij}^{(t+1)}=\psi\!\left(h_i^{(t)},
+         \frac{\alpha\mathcal L_X h_j^{(t)}}{\displaystyle\sum_{k\in N(i)}\mathcal L_X h_k^{(t)}},
+         e_{ij}\right),
+  \]
+  其中 $\alpha$ 在训练过程中学得。
+\end{itemize}
+
+\paragraph{混合传播}
+\begin{itemize}
+  \item 把基本 GNN 消息传递和李导数增强的传播结合起来。
+  \[
+    \begin{aligned}
+      h_i^{(t+1)}=\varnothing\Biggl(h_i^{(t)},\sum_{j\in N(i)}\biggl[
+       &\psi_{\mathrm{basic}}\bigl(h_j^{(t)},e_{ij}\bigr)\\
+       {}+{}&\psi_{\mathrm{Lie}}\!\left(h_i^{(t)},
+         \frac{\alpha\mathcal L_X h_j^{(t)}}{\displaystyle\sum_{k\in N(i)}\mathcal L_X h_k^{(t)}},
+         e_{ij}\right)\biggr]\Biggr).
+    \end{aligned}
+  \]
+  \item 这样可避免基本特征传播被李导数完全覆盖。
+\end{itemize}
+
+\paragraph{李导数的正则化}
+\begin{itemize}
+  \item 训练时加入正则化项，控制李导数的大小。
+  \[
+    \mathcal L_{\mathrm{reg}}=\lambda\sum_{(i,j)\in E}
+           \lVert\mathcal L_X h_j^{(t)}\rVert^2,
+  \]
+  其中 $\lambda$ 是超参数。
+\end{itemize}
+
+% PDF p. 204
+\paragraph{边级李导数传播}
+\begin{itemize}
+  \item 修改传播方案，在边上计算并归一化李导数。
+  \[
+    m_{ij}^{(t)}=\psi\!\left(h_i^{(t)},
+         \frac{\mathcal L_X e_{ij}}{\displaystyle\sum_{k\in N(i)}\mathcal L_X e_{ik}},
+         e_{ij}\right),
+  \]
+  其中 $\mathcal L_X e_{ij}$ 表示边特征的李导数。
+\end{itemize}
+
+\paragraph{局部注意力机制}
+\begin{itemize}
+  \item 用注意力机制动态调整李导数的重要程度。
+  \[
+    \operatorname{Attension}(i,j)=\operatorname{softmax}(\mathcal L_X h_j^{(t)}).
+  \]
+  \item 这样模型可以着重关注方向性影响更大的邻居。
+\end{itemize}
+
+\paragraph{几何约束}
+\begin{itemize}
+  \item 纳入几何约束对向量场 $X$ 进行正则化。
+  \begin{itemize}
+    \item 保证 $X$ 在相邻节点间的光滑性。
+    \item 惩罚可能引起不稳定的高散度向量场。
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{实现每种改法}
+\paragraph{引言}
+为进一步解释上述改法，我们将逐一实现把李导数纳入阿司匹林 GNN 模型的每种改法。按以下步骤进行。\translatornote{原书在本段前面写阿司匹林，实施步骤两处写乙烯。后续结果仍以阿司匹林为对象。}
+\begin{enumerate}
+  \item 实现改法。
+  \begin{itemize}
+    \item 单独应用每种改法。
+    \item 对节点特征迭代更新 $t=10$ 轮。
+  \end{itemize}
+  \item 运行分析。
+  \begin{itemize}
+    \item 计算乙烯（ethene）的最终节点特征。
+  \end{itemize}
+  \item 比较结果。
+  \begin{itemize}
+    \item 比较各种改法得到的乙烯最终节点特征。
+    \item 找出各改法之间的主要差异。
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{预测准确率}
+若要评估这些改法对预测准确率的影响，需要做下列工作。
+\begin{enumerate}
+  \item 定义预测任务。对阿司匹林等分子，可以预测总能量、偶极矩或反应活性等性质。
+  % PDF p. 205
+  \item 训练各改法对应的模型。使用相同的数据集作训练、验证和测试，保证比较公平。对每种改法，用其相应的李导数机制训练一个 GNN 模型。
+  \item 评估预测准确率。在测试集上度量模型表现。回归任务可用平均绝对误差（Mean Absolute Error，MAE）、均方根误差（Root Mean Square Error，RMSE）或判定系数 $R^2$。分类任务可用准确率和 F1 分数。
+  \item 比较结果。对比各改法的性能指标，确定哪种方法能较好地兼顾预测准确率和计算复杂度。
+\end{enumerate}
+
+\subsubsection{用李导数度量节点重要性的框架}
+\paragraph{李导数在信息流中的作用}
+李导数 $\mathcal L_X h_j$ 量化节点 $j$ 的特征 $h_j$ 沿向量场 $X$ 方向的变化。向量场 $X$ 为节点之间的相互作用或变换建模。对边 $(i,j)$，李导数
+\[
+  \mathcal L_X h_j=X_{ij}\cdot\nabla h_j
+\]
+度量节点 $j$ 的特征受向量场 $X_{ij}$ 的影响程度。$X_{ij}$ 例如可以根据几何性质、物理性质或学习得到的性质构造。
+
+\paragraph{节点重要性的定义}
+节点 $i$ 的重要性可根据各邻居李导数大小的聚合值来定义。
+\[
+  \operatorname{Importance}(i)=\sum_{j\in N(i)}|\mathcal L_X h_j|,
+\]
+其中
+\begin{itemize}
+  \item $N(i)$ 是节点 $i$ 的邻居集合。
+  \item $|\mathcal L_X h_j|$ 是每个邻居 $j$ 对应的李导数的大小。
+\end{itemize}
+此度量刻画节点 $i$ 对其邻居特征演化的贡献。
+
+\paragraph{节点排序步骤}
+\begin{enumerate}
+  \item \textbf{计算向量场 $X_{ij}$。}对每条边 $(i,j)$ 定义或学习向量场，例如物理相互作用（力场）或学得的相互作用（注意力权重）。
+  \item \textbf{计算梯度 $\nabla h_j$。}计算每个节点 $j$ 的特征梯度。实际中可用相邻特征或位置来近似，也可使用物理梯度，例如能量梯度。
+  % PDF p. 206
+  \item \textbf{求李导数。}对每条边 $(i,j)$，计算 $\mathcal L_X h_j=X_{ij}\cdot\nabla h_j$。
+  \item \textbf{聚合节点重要性。}对每个节点 $i$，将所有邻居对应的李导数的大小求和。
+  \[
+    \operatorname{Importance}(i)=\sum_{j\in N(i)}|\mathcal L_X h_j|.
+  \]
+  \item \textbf{节点排序。}按重要性得分给节点排序。排名最高的节点对信息传播最重要。
+\end{enumerate}
+
+\subsubsection{结果}
+为进一步了解李导数怎样影响消息传递网络，我们比较不同的李导数增强 GNN 与未用李导数修改的基本 GNN，看它们在迭代十次后怎样预测阿司匹林分子各官能团的节点特征值。所用方法的简称如下。
+
+\noindent\begin{tabularx}{\linewidth}{@{}l X@{\hspace{1em}}l X@{}}
+  Normal & 李导数 GNN & Reg-Lie & 正则化李导数 \\
+  Adaptive & 自适应加权 & Edge-Lie & 边级李导数 \\
+  Hybrid & 混合传播 & Local & 局部注意力机制
+\end{tabularx}
+
+评估共采用 7 种方法。结果汇总在表~\ref{tab:4.3}，列出了每个模型的预测特征总和，以及相对真值的平均绝对误差（MAE）和均方根误差（RMSE）。根据阿司匹林的分子性质，为每个官能团预先指定一个“真实”的特征总和。这里将初始原子序数的总和作为真值的比较标准，以分析哪种模型更接近真值。
+
+结果显示，在准确预测官能团特征方面，李导数 GNN 优于基本 GNN 及其他采用李导数改动的 GNN 方法。本例中它的预测与真值完全一致。
+
+我们观察到，\textbf{正则化李导数}的表现尚可，在所有官能团上 MAE 和 RMSE 适中。\textbf{基本 GNN} 与\textbf{边级李导数}明显高估特征总和，误差较大。由于特征传播未经细化，这两种方法都存在误差累积的问题。
+
+接下来预测阿司匹林的反应位点。用五种 GNN 方法预测，因为编程中有些函数的定义尚未解决，缺少边级李导数和局部注意力机制的预测。步骤如下。\translatornote{此处按原文译为五种方法，表~\ref{tab:4.4} 实际也列出了边级李导数和局部注意力机制，数据照录。}
+\begin{enumerate}
+  \item 定义反应位点。
+  \begin{itemize}
+    \item 根据特征经图传播后的变化预测反应位点。特征值最高或最独特的节点被视为潜在反应位点。
+  \end{itemize}
+  % PDF p. 207
+  \item 确定反应位点。
+  \begin{itemize}
+    \item 取最终传播特征最高的前 $k$ 个节点，作为预测的反应位点，例如 $k=3$。
+  \end{itemize}
+  \item 比较各方法的预测。
+  \begin{itemize}
+    \item 分析所预测位点的一致性和差异。结果汇总在表~\ref{tab:4.4}。
+  \end{itemize}
+\end{enumerate}
+
+\begin{table}[htbp]
+  \centering\small
+  \TableCaption{4.3}{官能团特征预测的准确性评估}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}rllrrrr@{}}
+    \toprule
+    编号 & 方法 & 官能团 & \shortstack{预测特征\\总和} & 真值 & MAE & RMSE \\
+    \midrule
+    1 & Basic    & 羧酸 & 1,921,574 & 22 & 1,921,552 & 1,921,552 \\
+    2 & Basic    & 酯   & 1,434,984 & 20 & 1,434,964 & 1,434,964 \\
+    3 & Basic    & 芳香 & 6,085,652 & 36 & 6,085,616 & 6,085,616 \\
+    1 & Normal   & 羧酸 & 22        & 22 & 0         & 0 \\
+    2 & Normal   & 酯   & 20        & 20 & 0         & 0 \\
+    3 & Normal   & 芳香 & 36        & 36 & 0         & 0 \\
+    1 & Adaptive & 羧酸 & 31.44     & 22 & 9.44      & 9.44 \\
+    2 & Adaptive & 酯   & 28.38     & 20 & 8.38      & 8.38 \\
+    3 & Adaptive & 芳香 & 57.58     & 36 & 21.58     & 21.58 \\
+    1 & Hybrid   & 羧酸 & 148.04    & 22 & 148.04    & 148.04 \\
+    2 & Hybrid   & 酯   & 144.06    & 20 & 124.06    & 124.06 \\
+    3 & Hybrid   & 芳香 & 456.38    & 36 & 420.37    & 420.37 \\
+    1 & Reg-Lie  & 羧酸 & 18.05     & 22 & 3.95      & 3.95 \\
+    2 & Reg-Lie  & 酯   & 16.10     & 20 & 3.90      & 3.90 \\
+    3 & Reg-Lie  & 芳香 & 27.01     & 36 & 8.99      & 8.99 \\
+    1 & Edge-Lie & 羧酸 & 101.36    & 22 & 79.36     & 79.36 \\
+    2 & Edge-Lie & 酯   & 77.63     & 20 & 57.64     & 57.64 \\
+    3 & Edge-Lie & 芳香 & 234.04    & 36 & 198.04    & 198.04 \\
+    1 & Local    & 羧酸 & 101.36    & 22 & 79.36     & 79.36 \\
+    2 & Local    & 酯   & 77.63     & 20 & 57.64     & 57.64 \\
+    3 & Local    & 芳香 & 234.04    & 36 & 198.04    & 198.04 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering\small
+  \TableCaption{4.4}{更新后的阿司匹林反应位点预测}
+  \begin{tabularx}{\linewidth}{@{}r X c c r r@{}}
+    \toprule
+    编号 & 方法 & 预测位点 & 匹配位点 & 精确率 & 召回率 \\
+    \midrule
+    1 & 基本 GNN         & $\{8,9,3\}$   & $\{8,9,3\}$ & 1.0   & 0.3 \\
+    2 & 归一化李导数     & $\{8,9,3\}$   & $\{8,9,3\}$ & 1.0   & 0.3 \\
+    3 & 自适应加权       & $\{9,2,3\}$   & $\{9,2,3\}$ & 1.0   & 0.3 \\
+    4 & 混合传播         & $\{8,9,3\}$   & $\{8,9,3\}$ & 1.0   & 0.3 \\
+    5 & 正则化李导数     & $\{2,10,11\}$ & $\{2,10\}$  & 0.667 & 0.2 \\
+    6 & 边级李导数       & $\{8,9,3\}$   & $\{8,9,3\}$ & 1.0   & 0.3 \\
+    7 & 局部注意力机制   & $\{8,9,3\}$   & $\{8,9,3\}$ & 1.0   & 0.3 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% PDF p. 208
+在表~\ref{tab:4.4} 中，“匹配位点”指与实验位点匹配的位点。根据此表，有以下结果。
+\begin{enumerate}
+  \item \textbf{基本 GNN、归一化李导数和混合传播}
+  \begin{itemize}
+    \item 预测节点为 $[8,9,3]$。
+    \item 与芳香基团和羧酸基团中的实验位点匹配。
+    \item \textbf{精确率为 $1.0$，召回率为 $0.3$}，即在十个实验位点中找到三个。
+  \end{itemize}
+  \item \textbf{自适应加权（$\alpha=0.5$）}
+  \begin{itemize}
+    \item 预测节点为 $[9,2,3]$。
+    \item 与羧酸基团和酯基团匹配。
+    \item 精确率为 $1.0$，召回率为 $0.3$。
+  \end{itemize}
+  \item \textbf{正则化李导数}
+  \begin{itemize}
+    \item 预测节点为 $[2,10,11]$。
+    \item 与酯基团和羧酸基团匹配。
+    \item 精确率为 $0.67$，召回率为 $0.2$。
+  \end{itemize}
+\end{enumerate}
+
+\textbf{结果解读}
+\begin{itemize}
+  \item 所有方法都找到了主要反应位点，例如芳香基团和酯基团上的位点。
+  \item \textbf{自适应加权}的预测较为均衡，与酯基团和芳香基团都有匹配。
+  \item \textbf{正则化李导数}优先选择羧酸基团和酯基团中的节点。
+\end{itemize}
+
+正则化李导数在反应位点预测中的表现较差，可以归因于正则化自身的性质及它和图传播动力学之间的相互作用。其中最不利的因素是反应性节点中的特征传播受到了过度抑制。调整正则化参数或引入自适应机制，可使这种方法更好地兼顾特征抑制与传播，从而改进反应位点预测。
+
+\subsubsection{阿司匹林分子图的节点重要性结果}
+\paragraph{阿司匹林分子}
+阿司匹林分子的节点重要性排序如图~\ref{fig:4.4} 所示。柱状图显示阿司匹林分子的节点重要性排序。横轴表示节点，纵轴表示迭代十次后的聚合重要性得分。图中节点 8 和 3 对特征传播的影响最大。
+
+节点重要性排序广泛用于多个领域，尤其是化学、生物学和网络分析。下面说明怎样把它用于药物发现。
+
+\paragraph{药物发现中的节点重要性}
+节点重要性排序可用于药物发现，帮助研究者识别关键的分子组成或结构，并确定进一步研究和优化的优先次序。
+% PDF p. 209
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch04/fig04_04}
+  \FigureCaption{4.4}{阿司匹林分子的节点重要性排序。}
+\end{figure}
+这一方法提高药物设计和评估的效率与精确性。
+
+\needspace{4\baselineskip}
+\textbf{药物发现示例。胰高血糖素受体（GCGR）抑制剂}
+
+下面具体考察一个药物发现的例子，利用节点重要性排序和李导数指导设计胰高血糖素受体（Glucagon Receptor，GCGR）的抑制剂。该受体是糖尿病治疗的重要靶点。
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{目标}
+
+  通过下列工作，为胰高血糖素受体设计有效的小分子抑制剂。
+  \begin{enumerate}[label=\arabic*.]
+    \item 识别受体上对胰高血糖素结合至关重要的残基。
+    \item 对这些残基确定优先级，以便优化和提高结合强度。
+    \item 评估突变或修饰对受体功能和药物疗效的影响。
+  \end{enumerate}
+  \item 实施方案
+  \begin{enumerate}[label=\arabic*.]
+    \item 合成模型。
+    \begin{itemize}[label=--]
+      \item 定义 GCGR 结合口袋中的关键残基和胰高血糖素的原子。
+      \item 模拟结合相互作用和作用力。
+    \end{itemize}
+    \item 计算重要性得分。
+    \begin{itemize}[label=--]
+      \item 用基于李导数的排序确定残基的优先级。
+    \end{itemize}
+    \item 解释结果。
+    \begin{itemize}[label=--]
+      \item 识别关键残基，并提出配体优化策略。
+    \end{itemize}
+  \end{enumerate}
+\end{enumerate}
+
+各残基的重要性得分汇总在表~\ref{tab:4.5}。每个残基的得分表示在十次迭代中，它对与胰高血糖素相互作用的累计影响。
+
+\textbf{结果解读}
+\begin{enumerate}
+  \item \textbf{残基 R2} 的重要性得分最高，表明它在受体与配体的相互作用中起着关键作用。
+  % PDF p. 210
+  \item \textbf{残基 R4 和 R5} 的排名也较高，表明它们对结合有较大贡献。
+\end{enumerate}
+
+\begin{table}[htbp]
+  \centering
+  \TableCaption{4.5}{GCGR 残基的重要性排序}
+  \begin{tabular}{rcr}
+    \toprule
+    序号 & 残基 & 重要性得分 \\
+    \midrule
+    1 & $R_2$ & 226.8 \\
+    2 & $R_4$ & 187.9 \\
+    3 & $R_5$ & 155.5 \\
+    4 & $R_1$ & 148.6 \\
+    5 & $R_3$ & 97.8 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

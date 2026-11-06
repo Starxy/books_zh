@@ -1,0 +1,135 @@
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+\usepackage{mathtools,amsthm}
+\usepackage{unicode-math}
+\setmathfont{TeX Gyre Pagella Math}
+\usepackage[paperwidth=504bp,paperheight=720bp,inner=54bp,outer=54bp,
+  top=81bp,bottom=61bp,headheight=15pt,headsep=22bp,footskip=28bp]{geometry}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{booktabs,tabularx,array,longtable,multirow,multicol}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{fancyhdr}
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.pathreplacing,patterns}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage{xurl}
+\usepackage[unicode,pdfpagelabels,hidelinks]{hyperref}
+\urlstyle{same}
+
+\newcommand{\BookTitle}{人工智能的数学基础}
+\newcommand{\BookSubtitle}{流形理论基础}
+\newcommand{\BookAuthor}{Momiao Xiong}
+\hypersetup{
+  pdftitle={人工智能的数学基础：流形理论基础},
+  pdfauthor={Momiao Xiong},
+  pdfsubject={Mathematical Foundations of Artificial Intelligence: Basics of Manifold Theory}
+}
+
+\linespread{1.21}
+\raggedbottom
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+\setlist{nosep,topsep=.45\baselineskip}
+\setlist[enumerate,1]{leftmargin=*,label=\arabic*.}
+\setlist[itemize,1]{leftmargin=*}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{2}
+\ctexset{
+  chapter={
+    name={,},number=\arabic{chapter},format=\raggedright,
+    nameformat=\heiti\bfseries\Huge,
+    numberformat=\heiti\bfseries\Huge,
+    titleformat=\heiti\bfseries\LARGE,
+    beforeskip=0pt,afterskip=23pt,
+    aftername=\par\smallskip\hrule\medskip
+  },
+  section={format=\raggedright\heiti\large\bfseries,beforeskip=17pt,afterskip=7pt},
+  subsection={format=\raggedright\heiti\bfseries,beforeskip=11pt,afterskip=4pt},
+  subsubsection={format=\raggedright\bfseries,beforeskip=8pt,afterskip=3pt},
+  paragraph={format=\raggedright\itshape,runin=false,beforeskip=6pt,afterskip=2pt},
+  subparagraph={format=\raggedright\itshape,runin=false,beforeskip=5pt,afterskip=2pt}
+}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\small\thepage}
+\fancyhead[RE]{\small\BookTitle}
+\fancyhead[LO]{\small\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[LE,RO]{\small\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+\newcommand{\SourceDOIText}{}
+\fancypagestyle{chapteropening}{
+  \fancyhf{}
+  \fancyfoot[LE,RO]{\small\thepage}
+  \fancyfoot[LO,RE]{\small\SourceDOIText}
+  \renewcommand{\headrulewidth}{0pt}
+}
+\newcommand{\SourceDOI}[1]{%
+  \gdef\SourceDOIText{DOI \href{https://doi.org/10.1201/9781003641452-#1}{10.1201/9781003641452-#1}}%
+  \thispagestyle{chapteropening}%
+}
+
+\newenvironment{statement}[2]{%
+  \par\addvspace{.9\baselineskip}\needspace{3\baselineskip}%
+  \noindent\textbf{#1\if\relax\detokenize{#2}\relax\else\quad #2\fi}\par\nobreak\smallskip
+  \begin{list}{}{\setlength{\leftmargin}{1em}\setlength{\rightmargin}{0pt}%
+    \setlength{\listparindent}{2em}\setlength{\itemindent}{0pt}%
+    \setlength{\parsep}{0pt}\setlength{\topsep}{0pt}}\item\relax
+}{%
+  \end{list}\par\addvspace{.5\baselineskip}%
+}
+\newtcolorbox{sourcebox}[1]{%
+  enhanced,breakable,title={#1},fonttitle=\heiti\bfseries,
+  colback=black!4,colframe=black!68,colbacktitle=black!68,
+  sharp corners,boxrule=.35pt,left=7pt,right=7pt,top=4pt,bottom=4pt
+}
+\newcommand{\translatornote}[1]{\footnote{\textbf{译注}\quad #1}}
+\newcommand{\BackSection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
+\newcommand{\AppendixSection}[2]{\BackSection{附录 #1\texorpdfstring{\quad}{\space}#2}\label{app:#1}}
+\newcommand{\AppendixHeading}[2]{%
+  \subsection*{#1\quad #2}\addcontentsline{toc}{subsection}{#1\texorpdfstring{\quad}{\space}#2}%
+}
+\newcommand{\AppendixSubheading}[2]{%
+  \subsubsection*{#1\quad #2}\addcontentsline{toc}{subsubsection}{#1\texorpdfstring{\quad}{\space}#2}%
+}
+\newcommand{\Subheading}[1]{\subsubsection*{#1}}
+
+\captionsetup{font=small,labelfont=bf,labelsep=quad}
+\newcommand{\FigureCaption}[2]{%
+  \begingroup\renewcommand{\thefigure}{#1}\caption{#2}\label{fig:#1}\endgroup
+}
+\newcommand{\TableCaption}[2]{%
+  \begingroup\renewcommand{\thetable}{#1}\caption{#2}\label{tab:#1}\endgroup
+}
+\newenvironment{bookreferences}{%
+  \begin{list}{}{\setlength{\leftmargin}{1.5em}\setlength{\itemindent}{-1.5em}%
+    \setlength{\itemsep}{.2\baselineskip}\setlength{\parsep}{0pt}}%
+}{\end{list}}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\Gr}{Gr}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Exp}{Exp}
+\DeclareMathOperator{\Log}{Log}
+\DeclareMathOperator{\divergence}{div}

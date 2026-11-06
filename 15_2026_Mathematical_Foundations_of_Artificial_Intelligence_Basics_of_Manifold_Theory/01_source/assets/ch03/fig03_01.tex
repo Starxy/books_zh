@@ -1,0 +1,19 @@
+\begin{tikzpicture}
+\begin{axis}[
+  width=.9\linewidth,height=.53\linewidth,
+  axis lines=left,xmin=0,xmax=1.03,ymin=0,ymax=2.83,
+  xlabel={$x$},ylabel={$f(x)$},
+  xtick={0,.2,.4,.6,.8,1},ytick={0,.5,1,1.5,2,2.5},
+  tick label style={font=\small},
+  grid=major,grid style={densely dotted,black!22},
+  legend pos=north west,legend cell align=left,
+  legend style={font=\footnotesize},
+  domain=0:1,samples=81
+]
+\addplot[draw=none,fill=cyan!18,forget plot] {exp(x)} \closedcycle;
+\addplot[blue!65!black,thick] {exp(x)};
+\addlegendentry{$f(x)=e^x$}
+\addlegendimage{area legend,fill=cyan!18,draw=none}
+\addlegendentry{面积约为 $1.7183$}
+\end{axis}
+\end{tikzpicture}

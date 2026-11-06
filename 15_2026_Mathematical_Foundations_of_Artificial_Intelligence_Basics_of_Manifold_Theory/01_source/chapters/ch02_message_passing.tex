@@ -1,0 +1,200 @@
+% PDF p. 91
+\subsection{双曲消息传递网络（HMPN）}
+\subsubsection{引言}
+图神经网络已成为刻画图拓扑和建模节点间关系的重要方法。不过，这些研究大多忽略了节点或图的表示之间的距离（Nikolentzos 等，2023）。处理非欧氏领域中的图时，例如大语言模型（large language models，LLM）和大型推理模型（large reasoning models，LRM）中的关系，已有的欧氏图神经网络在处理这类复杂图的大量模型参数和层级结构时存在局限（Zhong 和 Cao，2025）。双曲消息传递网络把传统图神经网络扩展到双曲空间。双曲空间更擅长刻画树状层级（Nikolentzos 等，2023），从而能有效地表示层级数据、关系数据和结构化数据，并在这些数据上进行学习。下面简要介绍这类网络的结构、消息传递机制、聚合和池化。
+
+HMPN 有三个关键环节，即输入空间、双曲消息传递和输出池化。
+
+HMPN 在图 $G=(V,E)$ 上运行，$V$ 是节点集，$E$ 是边集。每个节点 $v\in V$ 都有一个嵌入\textbf{双曲空间}的特征向量 $x_v$。利用图结构在节点之间传播信息。HMPN 有四个主要组成部分。
+\begin{itemize}
+  \item \textbf{嵌入初始化。}把输入特征 $x_v$ 映到双曲空间，例如庞加莱球 $\mathbb B^n$。
+  \item \textbf{双曲消息传递。}用黎曼几何沿边传递消息。
+  \item \textbf{双曲聚合。}在切空间中合并收到的消息。
+  \item \textbf{双曲池化。}在双曲空间中对图进行降维。
+\end{itemize}
+
+\subsubsection{节点的双曲嵌入}
+用多层感知机（Multi-Layer Perceptron，MLP）把输入特征 $x_v\in\R^n$ 变换到双曲空间。在双曲空间中运算时，MLP 必须考虑流形的几何性质。
+
+MLP 通常先在输入层接收输入特征 $x\in\R^n$，利用权重、偏置和激活函数进行一系列变换，最后将输出投影到双曲空间并作归一化。
+
+对一个有 $L$ 层的 MLP，输出为
+\[
+  h^{(l+1)}=\sigma\bigl(W^{(l)}h^{(l)}+b^{(l)}\bigr),
+  \qquad l=0,1,\ldots,L-1,
+\]
+% PDF p. 92
+其中 $h^{(l)}$ 是第 $l$ 层的激活值，且 $h^{(0)}=x$。$W^{(l)}$ 是第 $l$ 层的权重矩阵。$b^{(l)}$ 是第 $l$ 层的偏置向量。$\sigma$ 是非线性激活函数，如 Tanh 或 ReLU。
+
+最后用归一化将 MLP 输出映到双曲空间。
+\[
+  z=\operatorname{normalize}(h^{(L)})
+    =\frac{h^{(L)}}{\max(\lVert h^{(L)}\rVert,1-\varepsilon)}.
+\]
+
+\Subheading{适应双曲几何}
+接下来给出适用于双曲空间的 MLP 的形式化公式。为双曲嵌入设计 MLP 时，要引入对数映射（投影到切空间）和指数映射（投影回双曲空间）。
+\begin{itemize}
+  \item \textbf{对数映射（投影到切空间）。}为在双曲空间中运算，可先把输入特征从双曲空间投影到切空间
+  \begin{equation*}
+    \log_0(x)=\frac{\operatorname{arctanh}(\lVert x\rVert)}{\lVert x\rVert}x,
+      \qquad x\neq0,
+    \tag{2.132}\label{eq:2.132}
+  \end{equation*}
+  其中 $0$ 是庞加莱球的原点。
+  \item \textbf{指数映射（投影回双曲空间）。}在切空间中完成 MLP 变换后，将输出投影回双曲空间
+  \begin{equation*}
+    \exp_0(v)=\tanh(\lVert v\rVert)\frac{v}{\lVert v\rVert},
+      \qquad v\neq0.
+    \tag{2.133}\label{eq:2.133}
+  \end{equation*}
+\end{itemize}
+
+\Subheading{适应双曲空间的完整 MLP}
+结合上述步骤，双曲空间中的 MLP 完整公式如下。
+\begin{itemize}
+  \item 输入特征 $x\in\R^n$。
+  \item 对数映射（双曲输入时可选）
+  \[
+    x'=\log_0(x).
+  \]
+  \item 切空间中的 MLP
+  \begin{equation*}
+    h^{(l+1)}=\sigma\bigl(W^{(l)}h^{(l)}+b^{(l)}\bigr),
+    \qquad l=0,1,\ldots,L-1,
+    \tag{2.134}\label{eq:2.134}
+  \end{equation*}
+  其中 $h^{(0)}=x'$。
+  \item 指数映射（将输出送回双曲空间）
+  \begin{equation*}
+    z=\exp_0(h^{(L)}).
+    \tag{2.135}\label{eq:2.135}
+  \end{equation*}
+  \item 归一化\translatornote{式~\eqref{eq:2.136} 在原书中用向量 $z$ 和标量 $1-\varepsilon$ 取最大值。前文的同类写法用的是向量范数。即使用范数，若分母等于范数，归一化后的点也在单位球边界上。}
+  \begin{equation*}
+    z=\frac{z}{\max(z,1-\varepsilon)}.
+    \tag{2.136}\label{eq:2.136}
+  \end{equation*}
+\end{itemize}
+
+% PDF p. 93
+\subsubsection{消息传递}
+回顾标准消息传递神经网络（message passing neural network，MPNN）的消息传播公式。
+\begin{equation*}
+  m_{ij}^{(t)}=\sum_{j\in N(i)}\psi\bigl(h_i^{(t)},h_j^{(t)},e_{ij}\bigr),
+  \tag{2.137}\label{eq:2.137}
+\end{equation*}
+其中 $h_i^{(t)},h_j^{(t)}$ 为节点嵌入，$e_{ij}$ 为边特征。现在把消息传播从 MPNN 扩展到 HMPN。
+
+扩展的困难在于如何沿双曲空间中的曲线传播消息。实现这一点有三个步骤。第一步把邻居的信号从双曲空间映到切空间，第二步对映入的信号作线性变换，第三步把切空间中变换后的信号映回双曲空间，即流形。形式上，利用黎曼距离和注意力机制计算消息。对节点 $v$，来自邻居 $u$ 的消息为
+\begin{equation*}
+  m_{u\to v}^{(t)}
+   =\alpha_{uv}^{(t)}\exp_{z_v^{(t)}}\!\left(
+       W^{(t)}\log_{z_v^{(t)}}(z_u^{(t)})\right),
+  \tag{2.138}\label{eq:2.138}
+\end{equation*}
+其中 $z_u^{(t)},z_v^{(t)}\in\mathbb B^n$ 为第 $t$ 次迭代中 $u$ 和 $v$ 的双曲嵌入。$W^{(t)}$ 是切空间中可学习的权重矩阵。$\log_{z_v}(\cdot)$ 是把 $z_u$ 从流形投影到 $z_v$ 处切空间的对数映射。$\exp_{z_v}(\cdot)$ 是把结果投影回流形的指数映射。$\alpha_{uv}^{(t)}$ 是在双曲空间中计算的注意力系数，表达式为
+\[
+  \alpha_{uv}^{(t)}
+   =\frac{\exp\bigl(-\lVert z_u^{(t)}-z_v^{(t)}\rVert^2\bigr)}
+          {\displaystyle\sum_{u'\in N(v)}
+           \exp\bigl(-\lVert z_{u'}^{(t)}-z_v^{(t)}\rVert^2\bigr)}.
+\]
+
+\subsubsection{聚合}
+来自所有邻居的消息在节点 $v$ 的切空间中聚合。首先把所有消息 $m_{u\to v}^{(t)}$ 投影到切空间
+\[
+  \log_{z_v^{(t)}}(m_{u\to v}^{(t)}).
+\]
+然后在切空间中聚合，例如取均值或求和。
+\begin{equation*}
+  \operatorname{agg}_v^{(t)}
+   =\frac{1}{|N(v)|}\sum_{u\in N(v)}\log_{z_v^{(t)}}(m_{u\to v}^{(t)}).
+  \tag{2.139}\label{eq:2.139}
+\end{equation*}
+最后按下式投影回双曲空间。
+\begin{equation*}
+  z_v^{(t+1)}=\exp_{z_v^{(t)}}\bigl(\operatorname{agg}_v^{(t)}\bigr).
+  \tag{2.140}\label{eq:2.140}
+\end{equation*}
+
+% PDF p. 94
+\subsubsection{节点更新}
+每个节点的嵌入按下式更新。
+\begin{equation*}
+  z_v^{(t+1)}=\sigma\!\left(z_v^{(t)},
+      \exp_{z_v^{(t)}}\bigl(\operatorname{agg}_v^{(t)}\bigr)\right),
+  \tag{2.141}\label{eq:2.141}
+\end{equation*}
+其中 $\sigma$ 是可学习的函数。
+
+\subsubsection{双曲池化}
+接下来介绍池化。池化用于汇总节点和图的信息，并在保留图结构的同时缩小图的规模。在双曲空间中，池化分两步。先给节点的重要性打分以确定次序，再下采样以选择节点。
+\begin{itemize}
+  \item \textbf{节点重要性打分。}节点 $v$ 的得分 $s_v$ 定义为
+  \begin{equation*}
+    s_v=\lVert z_v\rVert.
+    \tag{2.142}\label{eq:2.142}
+  \end{equation*}
+  离庞加莱球边界越近的节点，即 $\lVert z_v\rVert$ 越大的节点，在层级图中通常越有影响。
+  \item \textbf{下采样。}依据节点得分 $s_v$ 选出一组节点进入下一步。
+  \item \textbf{池化运算。}选出节点后，分三步聚合它们的嵌入，例如在切空间中取平均或求加权和。
+
+  先按下式把嵌入映到切空间。
+  \[
+    \log_0(z_v).
+  \]
+  然后按下式对选出的 $k$ 个节点做池化。
+  \begin{equation*}
+    z_{\mathrm{pooled}}=\frac1k\sum_{v\in\text{入选节点}}\log_0(z_v).
+    \tag{2.143}\label{eq:2.143}
+  \end{equation*}
+  最后投影回双曲空间，得到\textbf{最终池化结果}
+  \[
+    z_{\mathrm{pooled}}=\exp_0(z_{\mathrm{pooled}}).
+  \]
+\end{itemize}
+
+\subsubsection{损失函数}
+消息传递网络的最终目的是做节点分类、图分类和链接预测。为此需要定义损失函数。最终损失由两部分组成，第一部分是针对任务的目标，例如分类或回归，第二部分是双曲空间中的正则化项。
+% PDF p. 95
+\begin{enumerate}
+  \item \textbf{HMPN 分类的交叉熵损失}
+  \begin{equation*}
+    L_{\mathrm{CE}}=-\sum_{i=1}^{C} y_i\log(\hat y_i),
+    \tag{2.144}\label{eq:2.144}
+  \end{equation*}
+  其中 $y_i\in\{0,1\}$ 为第 $i$ 类的真实标签，正确类别的 $y_i=1$，其他类别的 $y_i=0$。$\hat y_i=\exp(z_i)/\sum_{j=1}^{C}\exp(z_j)$ 为第 $i$ 类的预测概率，通过把 softmax 函数应用于流形上的 $z_i$ 得到。$C$ 为类别总数。
+
+  对包含 $N$ 个样本的一批数据，整批损失为
+  \begin{equation*}
+    L_{\mathrm{CE}}=-\frac1N\sum_{n=1}^{N}\sum_{i=1}^{C}
+                    y_i^{(n)}\log(\hat y_i^n).
+    \tag{2.145}\label{eq:2.145}
+  \end{equation*}
+  \item \textbf{使嵌入保持在庞加莱球中的正则化项}
+
+  为保证嵌入 $z\in\mathbb B^n$（双曲空间的庞加莱球模型）有效，即 $\lVert z\rVert<1$，加入正则化项来惩罚接近或超出球边界的嵌入。正则化项定义为
+  \begin{equation*}
+    R(z)=\lambda\max(0,\lVert z\rVert^2-1)^2,
+    \tag{2.146}\label{eq:2.146}
+  \end{equation*}
+  其中 $z$ 是双曲空间中某节点的嵌入向量。$\lVert z\rVert$ 为 $z$ 的欧氏范数，即 $\lVert z\rVert=\sqrt{\sum_{i=1}^{n}z_i^2}$。$\lambda$ 是控制正则化强度的超参数。
+  \translatornote{式~\eqref{eq:2.146} 在 $\lVert z\rVert\leq1$ 时为零。因此该项惩罚超出球边界的嵌入，并不能单独保证严格位于球内。}
+  \item \textbf{HMPN 的合并损失}
+
+  HMPN 模型结合分类与正则化的总损失函数为
+  \begin{equation*}
+    L_{\mathrm{total}}=L_{\mathrm{CE}}+R(z).
+    \tag{2.147}\label{eq:2.147}
+  \end{equation*}
+  对包含 $N$ 个样本的一批数据，有
+  \begin{equation*}
+    L_{\mathrm{total}}
+      =-\frac1N\sum_{n=1}^{N}\sum_{i=1}^{C} y_i^{(n)}\log\hat y_i^n
+       +\lambda\frac1N\sum_{n=1}^{N}
+          \bigl(\max(0,\lVert z^{(n)}\rVert^2-1)\bigr)^2.
+    \tag{2.148}\label{eq:2.148}
+  \end{equation*}
+  损失函数以交叉熵项保证分类准确，并以正则化项保证双曲嵌入有效。
+\end{enumerate}

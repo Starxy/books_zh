@@ -1,0 +1,36 @@
+% Redrawn from the diagram on PDF page 306.
+\begin{tikzpicture}[
+  box/.style={rounded corners=3pt,draw=black!65,align=center,
+              minimum height=7mm,inner sep=3pt,font=\small},
+  flow/.style={draw=green!55!black,line width=.7pt},
+  arrow/.style={flow,-{Latex[length=2mm]}}
+]
+\node[box,text width=2.65cm] (raw) at (-2.5,2.8) {原始数据 $x$};
+\node[box,fill=green!35,text width=4.3cm] (encoder) at (-2.5,1.82)
+  {编码器 $q_\varphi(x)$\\$(\mu,\sigma)\to$ 重参数化 $\to Z\in\mathcal M$};
+\node[box,fill=yellow!45,text width=5.35cm] (latent) at (-2.5,.48)
+  {潜流形 $\mathcal M$\\黎曼度量 $G_z=J_\theta(z)^{\mathsf T}J_\theta(z)$};
+\node[box,fill=cyan!30,text width=2.55cm] (sde) at (-3.95,-1.08)
+  {潜空间 SDE 采样器\\（伊藤 SDE）};
+\node[box,fill=green!44,text width=2.35cm] (score) at (-1.08,-1.08)
+  {基于得分的扩散};
+\node[box,fill=yellow!45,text width=2.9cm] (decoder) at (3.65,2.8)
+  {解码器 $f_\theta(z)$};
+\node[box,fill=green!35,text width=3.25cm] (reconstructed) at (3.65,1.82)
+  {重建或生成的 $x$};
+\node[box,fill=cyan!30,text width=3.8cm] (lift) at (3.65,.48)
+  {双重扩散映射提升};
+\node[box,fill=green!44,text width=3.8cm] (additional) at (3.65,-1.08)
+  {额外的高维数据};
+\draw[arrow] (raw) -- (encoder);
+\draw[arrow] (encoder) -- (latent);
+\draw[arrow] (latent.south -| sde.north) -- (sde.north);
+\draw[arrow] (latent.south -| score.north) -- (score.north);
+\coordinate (join) at (.7,-2.0);
+\draw[flow] (sde.south) |- (join);
+\draw[flow] (score.south) |- (join);
+\draw[arrow] (join) |- (decoder.west);
+\draw[arrow] (decoder) -- (reconstructed);
+\draw[arrow] (reconstructed) -- (lift);
+\draw[arrow] (lift) -- (additional);
+\end{tikzpicture}

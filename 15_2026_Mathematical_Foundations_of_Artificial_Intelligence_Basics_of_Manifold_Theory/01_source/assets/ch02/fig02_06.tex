@@ -1,0 +1,11 @@
+\begin{tikzpicture}[x=3.1cm,y=3.1cm,>=Stealth]
+  \draw[thick] (0,0) circle (1);
+  \coordinate (x) at (.46,.46);
+  \draw[dashed,black!52] (0,0)--(x);
+  \draw[red!85!black,very thick,->] (x)--(.246,.674)
+    node[above right,inner sep=2pt] {$v_1$};
+  \draw[red!85!black,very thick,->] (x)--(.246,.246)
+    node[above right,inner sep=2pt] {$v_2$};
+  \fill (x) circle (1.3pt) node[above right,inner sep=2pt] {$x$};
+  \node[red!85!black] at (.73,.24) {$T_x\mathbb H^2$};
+\end{tikzpicture}

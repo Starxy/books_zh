@@ -1,0 +1,298 @@
+% PDF p. 156
+\AppendixSection{3A}{\texorpdfstring{$i_X\omega$}{iXω}（微分形式与向量场的缩并）}
+\AppendixHeading{3A1}{定义}
+\begin{statement}{定义 3A1}{内积算子}
+微分形式 $\omega$ 与向量场 $X$ 的内积（亦称缩并）是一种将微分形式的次数降低 1 的运算。它记为 $i_X\omega$，对 $k$-形式的定义如下。
+
+% PDF p. 157
+对于 $k$-形式 $\omega$，内积 $i_X\omega$ 是如下定义的 $(k-1)$-形式
+\[
+  (i_X\omega)(X_1,X_2,\dots,X_{k-1})=\omega(X,X_1,X_2,\dots,X_{k-1}),
+\]
+其中
+\begin{itemize}
+\item $X,X_1,X_2,\dots,X_{k-1}$ 都是向量场。
+\item 在该点计算 $\omega$，取 $X$ 为第一个变量，随后为 $X_1,X_2,\dots,X_{k-1}$。
+\end{itemize}
+换言之，将向量场 $X$“插入”$\omega$ 的第一个位置，即得到 $i_X\omega$。
+\end{statement}
+
+\needspace{6\baselineskip}
+\AppendixHeading{3A2}{计算公式}
+\noindent\textbf{对于 $k$-形式 $\omega$}\par
+设 $\omega$ 为光滑流形 $M$ 上的 $k$-形式，$X$ 为 $M$ 上的光滑向量场。
+
+\noindent\textbf{$\omega$ 的坐标表达式}\par
+在局部坐标 $(x^1,x^2,\dots,x^n)$ 中，$k$-形式可以表示为
+\[
+  \omega=\frac{1}{k!}\omega_{i_1i_2\dots i_k}
+    \,dx^{i_1}\wedge dx^{i_2}\wedge\cdots\wedge dx^{i_k},
+\]
+其中
+\begin{itemize}
+\item $\omega_{i_1i_2\dots i_k}$ 是 $\omega$ 的分量。
+\item 对所有 $i_1<i_2<\cdots<i_k$ 求和。%
+\translatornote{若分量按 $\omega_{i_1\dots i_k}=\omega(\partial_{x^{i_1}},\dots,\partial_{x^{i_k}})$ 定义，带 $1/k!$ 的表达式应对全部指标求和。若只对递增指标求和，则不乘 $1/k!$。}
+\item \textbf{$X$ 的坐标表达式。}
+\end{itemize}
+向量场 $X$ 可表示为
+\[
+  X=X^j\frac{\partial}{\partial x^j},
+\]
+其中 $X^j$ 是 $X$ 的分量。
+
+\noindent\textbf{计算 $i_X\omega$}\par
+内积 $i_X\omega$ 由下式给出
+\begin{align*}
+ i_X\omega
+   &=\frac{1}{k(k-1)!}X^{i_j}\omega_{i_1,\dots,i_j,\dots,i_k}(-1)^{j-1}\\
+   &\qquad{}\cdot dx^{i_1}\wedge\cdots\wedge dx^{i_{j-1}}
+         \wedge dx^{i_{j+1}}\wedge\cdots\wedge dx^{i_k}.
+\end{align*}
+这一公式源于向量场 $X$ 与 $\omega$ 的第一个指标的缩并。
+
+\begin{statement}{例 3A1}{具体计算}
+设 $\omega=x\,dy\wedge dz+y\,dz\wedge dx+z\,dx\wedge dy$，且 $X=\dfrac{\partial}{\partial x}$。
+\begin{itemize}
+\item \textbf{计算 $i_X\omega$。}
+
+由于 $X=\dfrac{\partial}{\partial x}$，其分量为 $X^1=1$、$X^2=0$、$X^3=0$。
+
+把 $\omega$ 中的 $dx$ 移到各项开头，得到
+% PDF p. 158
+\[
+  \omega=-y\,dx\wedge dz+z\,dx\wedge dy+x\,dy\wedge dz.
+\]
+所以
+\[
+  i_X\omega=-y\,dz+z\,dy.
+\]
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 3A2}{1-形式与向量场的缩并}
+设 $\omega$ 为一个 1-形式，$X$ 为一个向量场。
+\begin{itemize}
+\item \textbf{给定}
+\[
+  \omega=f(x)\,dx,\qquad X=g(x)\frac{\partial}{\partial x}.
+\]
+\item \textbf{计算 $i_X\omega$。}
+
+由于 $\omega$ 是 1-形式，缩并 $i_X\omega$ 是一个 0-形式（函数）
+\[
+  i_X\omega=X\omega_0=g(x)f(x),
+\]
+其中 $\omega_0=f(x)$。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 3A3}{2-形式与向量场的缩并}
+设 $\omega$ 是 $\R^3$ 上的一个 2-形式。
+\begin{itemize}
+\item \textbf{给定}
+\begin{align*}
+  \omega&=\omega_{12}\,dx^1\wedge dx^2+\omega_{13}\,dx^1\wedge dx^3
+     +\omega_{21}\,dx^2\wedge dx^1+\omega_{23}\,dx^2\wedge dx^3\\
+   &\quad+\omega_{31}\,dx^3\wedge dx^1+\omega_{32}\,dx^3\wedge dx^2.
+\end{align*}
+令
+\[
+  X=X^1\frac{\partial}{\partial x^1}+X^2\frac{\partial}{\partial x^2}
+    +X^3\frac{\partial}{\partial x^3}.
+\]
+\item \textbf{计算 $i_X\omega$。}
+
+缩并 $i_X\omega$ 是一个 1-形式%
+\translatornote{原书这个展开式有漏项和重复项。逐项使用
+$i_X(dx^a\wedge dx^b)=X^a\,dx^b-X^b\,dx^a$，
+可将上面给出的 $\omega$ 的缩并写为
+$\sum_{a<b}(\omega_{ab}-\omega_{ba})(X^a\,dx^b-X^b\,dx^a)$。}%
+\begin{align*}
+  i_X\omega
+   &=X^1\omega_{12}\,dx^2+X^1\omega_{13}\,dx^3
+      +X^2\omega_{21}\,dx^1+X^2\omega_{23}\,dx^3\\
+   &\quad+X^3\omega_{31}\,dx^1+X^3\omega_{32}\,dx^2\\
+   &\quad+(-X^2-X^3\omega_{13})\,dx^1
+     +(X^1\omega_{12}-X^3\omega_{23})\,dx^2\\
+   &\quad+(X^1\omega_{13}+X^2\omega_{23})\,dx^3.
+\end{align*}
+\end{itemize}
+\end{statement}
+
+\Subheading{内积的性质}
+\begin{enumerate}
+\item \textbf{线性。}
+\[
+  i_X(\omega+\eta)=i_X\omega+i_X\eta.
+\]
+\item \textbf{莱布尼茨法则（反导子）。} 对任意微分形式 $\omega$ 和 $\eta$，
+\[
+  i_X(\omega\wedge\eta)=(i_X\omega)\wedge\eta+(-1)^k\omega\wedge(i_X\eta),
+\]
+其中 $\omega$ 是 $k$-形式。
+\end{enumerate}
+
+% PDF p. 159
+\AppendixSection{3B}{庞加莱引理证明的补充材料}
+下面给出恒等式
+\[
+  \frac{d}{dt}(i_t^*F^*\omega)=i_t^*(\mathcal L_{\partial_t}F^*\omega)
+\]
+的一个简短而完整的证明。它对每个微分形式 $\omega$ 和每个光滑映射 $F\colon I\times U\to M$ 都成立，其中 $I\subset\R$ 是开区间。
+
+\begin{enumerate}
+\item \textbf{记号与几何图景。}
+
+在 $I\times U$ 上，$\partial_t$ 是坐标向量场 $\dfrac{\partial}{\partial t}$。切片的包含映射为
+\[
+  i_t\colon U\to I\times U,\qquad i_t(x)=(t,x).
+\]
+$\omega$ 在柱体 $I\times U$ 上的拉回为 $F^*\omega\in\Omega(I\times U)$。定义 $U$ 上随时间变化的形式
+\[
+  \beta_t=i_t^*F^*\omega\in\Omega(U),\qquad t\in I.
+\]
+
+\item \textbf{引理。}
+
+对于 $I\times U$ 上的任意形式 $\alpha$，
+\[
+  \frac{d}{dt}(i_t^*\alpha)=i_t^*(\mathcal L_{\partial_t}\alpha).
+\]
+
+\noindent\textbf{证明}\par
+设 $\Phi_s\colon I\times U\to I\times U$ 为 $\partial_t$ 的流，即 $\Phi_s(t,x)=(t+s,x)$。于是
+\[
+  i_{t+s}(x)=\Phi_s\circ i_t(x).
+\]
+所以
+\[
+  i_{t+s}^*\alpha=i_t^*(\Phi_s^*\alpha).
+\]
+注意（见第 4 章）
+\[
+  \left.\frac{d\Phi_s^*\alpha}{ds}\right|_{s=0}=\mathcal L_{\partial_t}\alpha.
+\]
+在 $s=0$ 处对 $s$ 求导
+\[
+  \left.\frac{d}{ds}\right|_{s=0}i_{t+s}^*\alpha
+   =i_t^*\!\left(\left.\frac{d}{ds}\right|_{s=0}\Phi_s^*\alpha\right)
+   =i_t^*(\mathcal L_{\partial_t}\alpha).
+\]
+
+\item \textbf{将引理应用于 $\alpha=F^*\omega$。}
+
+令 $\alpha=F^*\omega$，得到
+\[
+  \frac{d}{dt}(i_t^*F^*\omega)=i_t^*(\mathcal L_{\partial_t})F^*\omega.
+\]
+% PDF p. 160
+对每个系数应用微积分基本定理，得到
+\[
+  \int_0^1\frac{d}{dt}(i_t^*F^*\omega)\,dt=i_1^*F^*\omega-i_0^*F^*\omega.
+\]
+对于庞加莱引理中使用的同伦 $F(t,x)=tx$，当 $t=1$ 时，$F(1,x)=x$，所以 $F^*\omega=\omega$，且 $i_1^*\omega=\omega$。因此%
+\translatornote{末式是对切片拉回后的等式，由 $F\circ i_1=\operatorname{id}_U$ 直接得到。此前的 $F^*\omega=\omega$ 和 $i_1^*\omega=\omega$ 按原书保留，涉及不同空间上的形式，须理解为限制在 $t=1$ 的切片上。}%
+\[
+  i_1^*F^*\omega=\omega.
+\]
+在 $t=0$ 时，$F(0,x)=0$（原点）。如果 $\omega$ 的次数 $k\geq1$，拉回到一个点便为零，因此
+\[
+  i_0^*F^*\omega=0.
+\]
+所以
+\[
+  \int_0^1\frac{d}{dt}(i_t^*F^*\omega)\,dt
+   =i_1^*F^*\omega-i_0^*F^*\omega=\omega.
+\]
+
+接下来证明对于 $U$ 上的 $k>0$ 次形式 $\omega$，
+\[
+  i_t^*(i_{tX}F^*\omega)=t^{k-1}(i_X\omega)(tx).
+\]
+\end{enumerate}
+
+下面逐步给出证明。
+
+\noindent\textbf{步骤 1。写出 $\omega$ 的坐标表达式。}
+\[
+  \omega=\sum_I f_I(y)\,dy^{i_1}\wedge\cdots\wedge dy^{i_k},
+  \qquad I=(i_1<\cdots<i_k).
+\]
+
+\noindent\textbf{步骤 2。用 $F(t,x)=tx$ 拉回。}
+\[
+  F^*dy^i=t\,dx^i+x^i\,dt.
+\]
+在切片 $t=\text{常数}$ 上，含 $dt$ 的项消失，所以
+\[
+  i_t^*(F^*dy^{i_1}\wedge\cdots\wedge F^*dy^{i_k})
+   =t^k\,dx^{i_1}\wedge\cdots\wedge dx^{i_k}.
+\]
+
+\noindent\textbf{步骤 3。用 $tX=tx^j\partial_{x^j}$ 缩并。}\par
+内积去掉一个 $dx^i$，插入系数 $tx^{i_j}$
+\[
+  i_{tX}F^*\omega
+   =\sum_{j,I}(-1)^{j-1}(tx^{i_j})t^k f_I(tx)\,
+     dx^{i_1}\wedge\cdots\wedge\widehat{dx^{i_j}}\wedge\cdots\wedge dx^{i_k}.
+\]
+
+\noindent\textbf{步骤 4。限制到切片 $t=\text{常数}$。}\par
+含 $dt$ 的项消失，余下
+% PDF p. 161
+\begin{align*}
+  i_t^*(i_{tX}F^*\omega)
+   &=t^{k-1}\sum_{j,I}(-1)^{j-1}(tx^{i_j})t^k f_I(tx)\\
+   &\qquad{}\cdot dx^{i_1}\wedge\cdots\wedge\widehat{dx^{i_j}}\wedge\cdots\wedge dx^{i_k}.
+\end{align*}
+
+\noindent\textbf{步骤 5。在 $tx$ 处缩并原形式。}
+\[
+  (i_X\omega)(tx)=\sum_{j,I}(-1)^{j-1}(tx^{i_j})t^k f_I(tx)\,
+     dx^{i_1}\wedge\cdots\wedge\widehat{dx^{i_j}}\wedge\cdots\wedge dx^{i_k}.
+\]
+
+\needspace{5\baselineskip}
+\noindent\textbf{步骤 6。比较两个表达式。}\par
+二者恰好相差一个雅可比因子 $t^{k-1}$%
+\translatornote{原书步骤 4 多乘了 $t^{k-1}$，步骤 5 中直接在 $tx$ 处缩并原形式时不应有 $t^k$。同伦公式所需的是 $i_t^*(i_{\partial_t}F^*\omega)$。按 $F^*dy^i=t\,dx^i+x^i\,dt$ 展开，$\partial_t$ 缩并掉唯一的 $dt$，留下系数 $x^{i_j}$，其余 $k-1$ 个 $dx$ 各带一个 $t$，故结果为 $t^{k-1}i_{X_x}\omega_{tx}$。}%
+\[
+  i_t^*(i_{tX}F^*\omega)=t^{k-1}(i_X\omega)(tx).
+\]
+
+\AppendixSection{3C}{超曲面上的诱导曲面测度 \texorpdfstring{$dS_g$}{dSg}}
+\AppendixHeading{3C1}{一般公式}
+设 $(M^n,g)$ 为有向黎曼流形，$\Sigma=\partial\Omega\subset M$ 为光滑可定向的 $(n-1)$ 维子流形，外向单位法向量场为 $v$。
+
+曲面元的各个标准公式可统一为以下恒等式
+\[
+  dS_g=i_vdV_g,
+\]
+其中 $dV_g$ 是 $M$ 上的 $n$ 维体积形式，$i_v$ 表示与 $v$ 作内积（缩并）。
+
+\AppendixHeading{3C2}{坐标限制公式}
+\noindent\textbf{局部坐标卡。} 在 $M$ 上选取坐标 $u=(u^1,\dots,u^n)$，使 $\Sigma$ 由 $u^n=0$ 给出。记 $g_{ij}(u)$ 为度量矩阵的分量。
+
+\noindent\textbf{体积形式}
+\[
+  dV_g=\sqrt{|g|}\,du^1\wedge\cdots\wedge du^n.
+\]
+
+\noindent\textbf{法向量。} 外向单位法向量为%
+\translatornote{一般坐标下应将 $\nabla_g u^n=\sum_i g^{in}\partial_{u^i}$ 除以其长度 $\sqrt{g^{nn}}$，并选择外向的符号。原书省去了梯度的度量系数。}%
+\[
+  v=\frac{1}{\sqrt{g^{nn}}}\,\partial_{u^n}.
+\]
+
+% PDF p. 162
+\noindent\textbf{对（1）作缩并}
+\begin{align*}
+  dS_g
+   &=\left.\frac{\sqrt{|g|}}{\sqrt{g^{nn}}}\,du^1\wedge\cdots\wedge du^{n-1}
+      \right|_{u^n=0},\\
+   &=\left.\sqrt{g^{nn}|g|}\,du^1\wedge\cdots\wedge du^{n-1}\right|_{u^n=0},\\
+   &=\sqrt{\det g_{\alpha\beta}}\,du^1\wedge\cdots\wedge du^{n-1},
+\end{align*}
+其中 $g_{\alpha\beta}=(u^1,\dots,u^{n-1},0)$。%
+\translatornote{原书第一行与第二行的系数不相等。缩并用正确的单位法向量时，取与边界定向相容的符号，系数为 $\sqrt{|g|}\sqrt{g^{nn}}=\sqrt{\det[g_{\alpha\beta}]}$。这里的 $g_{\alpha\beta}$ 是在 $(u^1,\dots,u^{n-1},0)$ 处取值的切向度量分量。}

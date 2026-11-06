@@ -1,0 +1,631 @@
+% PDF p. 316
+\AppendixSection{6A}{体积展开与正规坐标}
+\AppendixHeading{6A1}{正规坐标的概念和定义}
+设 $(M,g)$ 为 $n$ 维黎曼流形，$p\in M$ 为一个固定点。对于坐标系 $(U,\varphi)$，其中 $\varphi\colon U\to\R^n$ 是满足 $\varphi(p)=0$ 的微分同胚。若它满足下列性质，就称它是以 $p$ 为中心的正规坐标系。
+\begin{enumerate}
+\item \textbf{将测地线拉直。}
+在这组坐标下，从 $p$ 出发的每条测地线都表示为过原点的直线。更确切地说，若 $v\in T_pM$ 是一个切向量，则测地线 $\gamma_v(t)=\exp_p(tv)$ 在 $0$ 附近一个足够小的区间内满足 $\varphi(\gamma_v(t))=tv$。
+
+这表明指数映射 $\exp_p\colon T_pM\to M$ 给出坐标卡，其坐标映射为 $\varphi(x)=\log_p(x)$。这里的 $\log_p$ 是 $\exp_p$ 在 $p$ 附近的逆。
+\item \textbf{原点处的度量为欧氏度量。}
+在以 $p$ 为中心的正规坐标中，黎曼度量 $g$ 在 $p$ 处的分量取标准欧氏形式
+\[
+  g_{ij}(0)=\delta_{ij},
+\]
+其中 $\delta_{ij}$ 是克罗内克符号（Kronecker delta）。
+\item \textbf{克里斯托费尔符号消失。}
+克里斯托费尔符号 $\Gamma^k_{ij}$ 在 $p$ 处为零，
+\[
+  \Gamma^k_{ij}(0)=0,
+\]
+这意味着度量分量的一阶导数在 $p$ 处也为零。
+\end{enumerate}
+综上，利用指数映射把 $M$ 上 $p$ 的邻域与 $T_pM\simeq\R^n$ 中 0 的邻域等同，就能构造 $p$ 处的正规坐标。在这组坐标中，流形在 $p$ 处“看起来是平的”。
+
+\AppendixSubheading{6A1.1}{正规坐标举例}
+\begin{enumerate}
+\item \textbf{欧氏空间 $\R^n$。}
+在配备标准欧氏度量的 $\R^n$ 中，通常的笛卡儿坐标在每一点处已经是正规坐标。对任意 $p\in\R^n$，若将 $p$ 平移至原点，度量仍为标准欧氏度量，测地线为直线，克里斯托费尔符号恒为零。
+\item \textbf{二维球面 $S^2$。}
+考虑配有标准球面度量的单位球面 $S^2\subset\R^3$。令 $p$ 为北极，例如 $p=(0,0,1)$。可以用指数映射定义 $p$ 处的正规坐标。
+\begin{itemize}
+\item 将 $T_pS^2$ 与 $\R^3$ 中的平面 $z=0$ 等同。
+% PDF p. 317
+\item 对于 $T_pS^2$ 中的切向量 $v$，指数映射 $\exp_p(v)$ 给出 $S^2$ 上的一个点。该点沿以 $p$ 为起点、以 $v$ 为初速度的唯一大圆到达。
+
+在这种情形下，若把切平面中的 $v$ 写为 $(v_1,v_2)$，则球面上的点在正规坐标中表示为 $v=\exp_p(v)$。%
+\translatornote{原书左端印为 $v$。此处应理解为球面点 $\exp_p(v)$ 的正规坐标是 $v=(v_1,v_2)$。}%
+一个显式表达式为（适用于 $\lVert v\rVert$ 较小时）
+\[
+  \exp_p(v)=\left(
+    \frac{\sin(\lVert v\rVert)}{\lVert v\rVert}v_1,
+    \frac{\sin(\lVert v\rVert)}{\lVert v\rVert}v_2,
+    \cos(\lVert v\rVert)\right).
+\]
+这里，$(v_1,v_2)$ 作为 $S^2$ 上 $p$ 附近的正规坐标。在 $p$ 附近，用这些坐标表示的度量与平坦度量的差从二阶项开始。
+\end{itemize}
+\item \textbf{双曲平面 $\mathbb H^2$。}
+在双曲平面上，也能用指数映射引入以点 $p$ 为中心的正规坐标。若采用庞加莱圆盘或上半平面模型来表示 $\mathbb H^2$，则通过指数映射将切空间 $T_p\mathbb H^2$（同构于 $\R^2$）映入 $\mathbb H^2$，可得到 $p$ 附近的正规坐标。在这组坐标下，经过 $p$ 的测地线表现为从 $T_p\mathbb H^2$ 原点出发的直线，$p$ 处的度量为欧氏度量，曲率的影响只出现在更高阶项中。
+\end{enumerate}
+
+\AppendixHeading{6A2}{仿射联络}
+\AppendixSubheading{6A2.1}{引言}
+光滑流形 $M$ 上的仿射联络是黎曼几何的重要工具。它使我们可以比较 $M$ 上不同点处的向量，定义如何沿曲线对向量场求导，用光滑且一致的方式沿曲线移动向量，并在流形上构造测地线。这些概念是理解内在几何及其与曲率和挠率关系的基础。
+
+\AppendixSubheading{6A2.2}{方向导数}
+回顾偏导数 $f_x(x,y)$ 和 $f_y(x,y)$。它们分别表示固定 $y$ 而改变 $x$、固定 $x$ 而改变 $y$ 时 $f$ 的变化率。现在需要讨论 $x$ 和 $y$ 同时变化时，如何求 $f$ 的变化率（Paul's Online Notes 2025）。
+
+先定义标量函数 $f$ 的方向导数。设 $X=(x_1,x_2,x_3)$ 且 $f(X)=f(x_1,x_2,x_3)$。标量函数的方向导数定义为
+\begin{equation*}
+  D_X f=\lim_{t\to0}
+    \frac{f(p_1+tx_1,p_2+tx_2,p_3+tx_3)-f(p_1,p_2,p_3)}{t},
+  \tag{6A1}\label{eq:6A1}
+\end{equation*}
+\begin{equation*}
+  =\langle\nabla_p f,X\rangle,
+  \tag{6A2}\label{eq:6A2}
+\end{equation*}
+% PDF p. 318
+其中函数 $f$ 的梯度为
+\[
+  \nabla_p f=\left.
+  \begin{bmatrix}
+  \dfrac{\partial f}{\partial x_1}\\[4pt]
+  \dfrac{\partial f}{\partial x_2}\\[4pt]
+  \dfrac{\partial f}{\partial x_3}
+  \end{bmatrix}\right|_{X=p}.
+\]
+
+接着定义向量的方向导数。设 $Y\colon\R^3\to\R^3$ 是向量场，$X\in\R^3$ 是一个向量（方向）。定义雅可比矩阵
+\[
+  J=\frac{\partial Y}{\partial X^T}=
+    \begin{bmatrix}
+      \dfrac{\partial y_1}{\partial x_1}&
+      \dfrac{\partial y_1}{\partial x_2}&
+      \dfrac{\partial y_1}{\partial x_3}\\[4pt]
+      \dfrac{\partial y_2}{\partial x_1}&
+      \dfrac{\partial y_2}{\partial x_2}&
+      \dfrac{\partial y_2}{\partial x_3}\\[4pt]
+      \dfrac{\partial y_3}{\partial x_1}&
+      \dfrac{\partial y_3}{\partial x_2}&
+      \dfrac{\partial y_3}{\partial x_3}
+    \end{bmatrix}.
+\]
+那么 $Y$ 在点 $p\in\R^3$ 处沿方向 $X$ 的方向导数为
+\begin{equation*}
+\begin{aligned}
+  D_XY(p)
+    &=\left.\frac{d}{dt}Y(p+tX)\right|_{t=0},\\
+    &=\begin{bmatrix}
+      \dfrac{\partial y_1}{\partial x^1}&
+      \dfrac{\partial y_1}{\partial x^2}&
+      \dfrac{\partial y_1}{\partial x^3}\\[4pt]
+      \dfrac{\partial y_2}{\partial x^1}&
+      \dfrac{\partial y_2}{\partial x^2}&
+      \dfrac{\partial y_2}{\partial x^3}\\[4pt]
+      \dfrac{\partial y_3}{\partial x^1}&
+      \dfrac{\partial y_3}{\partial x^2}&
+      \dfrac{\partial y_3}{\partial x^3}
+    \end{bmatrix}
+    \begin{bmatrix}x^1\\x^2\\x^3\end{bmatrix},\\
+    &=JX.
+\end{aligned}
+\tag{6A3}\label{eq:6A3}
+\end{equation*}
+该导数描述的是沿 $X$ 方向的直线上向量场 $Y$ 的变化，未计入曲率。
+
+\AppendixSubheading{6A2.3}{坐标表示}
+定义
+\begin{align*}
+  X&=X^i\frac{\partial}{\partial x^i}
+     =\sum_i X^i\frac{\partial}{\partial x^i},\\
+  Y&=Y^j(x)\frac{\partial}{\partial x^j}
+     =\sum_j Y^j(x)\frac{\partial}{\partial x^j}.
+\end{align*}
+
+% PDF p. 319
+由式 \eqref{eq:6A3} 可得
+\[
+  D_XY(p)=
+  \begin{bmatrix}
+    \displaystyle\sum_i x^i\frac{\partial Y^1}{\partial x^i}\\[5pt]
+    \displaystyle\sum_i x^i\frac{\partial Y^2}{\partial x^i}\\[5pt]
+    \displaystyle\sum_i x^i\frac{\partial Y^3}{\partial x^i}
+  \end{bmatrix}.
+\]
+也可以写成
+\begin{equation*}
+  D_XY(p)=\sum_j\sum_i X^i\frac{\partial Y^j}{\partial x^i}\frac{\partial}{\partial x^j}
+    =X^i\frac{\partial Y^j}{\partial x^i}\frac{\partial}{\partial x^j}.
+  \tag{6A4}\label{eq:6A4}
+\end{equation*}
+这正是协变导数公式中的第一项
+\[
+  \nabla_XY=D_XY+(\text{联络修正项}).
+\]
+所以，在克里斯托费尔符号为零的平坦空间 $\R^n$ 中，$\nabla_XY=D_XY$。
+
+\begin{statement}{例 1A.1}{球面上的向量场}
+定义向量场 $Y(\varnothing)=[-\sin(\varnothing),\cos(\varnothing),0]$。在笛卡儿标架中，它是指向 $\varnothing$ 增大方向的向量场。
+
+\textbf{用坐标表示 $Y$。}
+\[
+  Y=Y^j(x)\frac{\partial}{\partial x^j}
+   =(-\sin\varnothing)\frac{\partial}{\partial x}
+    +(\cos\varnothing)\frac{\partial}{\partial y}
+    +0\frac{\partial}{\partial z}.
+\]
+因此，分量为 $Y^1=-\sin\varnothing$、$Y^2=\cos\varnothing$、$Y^3=0$。
+
+\textbf{用坐标表示 $X$。}
+设 $X$ 是指向经度 $\varnothing$ 增大方向的向量场。在固定 $\theta$ 时，单位球面上相应的笛卡儿坐标表示为%
+\translatornote{原书此式将经度坐标向量与单位切向量等同。按下文球面度量 $g_{\varnothing\varnothing}=\sin^2\theta$，等式右端为 $(\sin\theta)^{-1}\partial_\varnothing$（在两极之外），在赤道上才与 $\partial_\varnothing$ 相等。以下取 $X^\varnothing=1$，即采用坐标向量。}%
+\[
+  X=\frac{\partial}{\partial\varnothing}
+    =-\sin\varnothing\frac{\partial}{\partial x}
+     +\cos\varnothing\frac{\partial}{\partial y}
+     +0\frac{\partial}{\partial z},
+\]
+所以
+\[
+  X^1=-\sin\varnothing,\quad X^2=\cos\varnothing,\quad X^3=0.
+\]
+
+\textbf{计算方向导数 $D_XY$。}
+\[
+  D_XY(p)=\sum_j\sum_i X^i\frac{\partial Y^j}{\partial x^i}\frac{\partial}{\partial x^j}
+     =X^i\frac{\partial Y^j}{\partial x^i}\frac{\partial}{\partial x^j}.
+\]
+由于 $Y^j$ 只依赖 $\varnothing$，而且 $X^i$ 和 $Y^j$ 都是 $\varnothing$ 的函数，需要计算导数 $\partial Y^j/\partial x^i$。但是在笛卡儿坐标中，$\varnothing$ 不是 $x,y,z$ 的线性函数，所以计算较麻烦。
+
+% PDF p. 320
+由于所有量只随 $\varnothing$ 变化，可用链式法则对 $\varnothing$ 求导
+\begin{equation*}
+  \frac{dY}{d\varnothing}
+   =\begin{bmatrix}-\cos\varnothing\\-\sin\varnothing\\0\end{bmatrix}.
+  \tag{6A5}\label{eq:6A5}
+\end{equation*}
+因此，式 \eqref{eq:6A4} 化为
+\begin{equation*}
+  D_XY=\left(X^\varnothing\frac{dY^j}{d\varnothing}\right)
+      \frac{\partial}{\partial x^j}.
+  \tag{6A6}\label{eq:6A6}
+\end{equation*}
+注意
+\begin{equation*}
+  X^\varnothing=1.
+  \tag{6A7}\label{eq:6A7}
+\end{equation*}
+把式 \eqref{eq:6A5} 和式 \eqref{eq:6A7} 代入式 \eqref{eq:6A6}，得
+\begin{equation*}
+  D_XY=-\cos\varnothing\frac{\partial}{\partial x}
+        -\sin\varnothing\frac{\partial}{\partial y}
+        +0\frac{\partial}{\partial z}.
+  \tag{6A8}\label{eq:6A8}
+\end{equation*}
+\end{statement}
+
+\AppendixSubheading{6A2.4}{仿射联络的定义}
+光滑流形 $M$ 上的仿射联络使我们可以
+\begin{itemize}
+\item 比较 $M$ 上不同点处的向量。
+\item 定义如何沿曲线对向量场求导。
+\item 用光滑而一致的方式沿曲线移动向量。
+\end{itemize}
+形式上，仿射联络 $\nabla$ 是一个双线性映射
+\begin{equation*}
+  \nabla\colon\mathfrak X(M)\times\mathfrak X(M)\to\mathfrak X(M),
+  \qquad (X,Y)\mapsto\nabla_XY,
+  \tag{6A9}\label{eq:6A9}
+\end{equation*}
+其中 $\mathfrak X(M)$ 是 $M$ 上光滑向量场的空间。它满足下列性质。
+\begin{itemize}
+\item \textbf{关于 $X$ 和 $Y$ 的线性性。}
+\begin{equation*}
+  \nabla_{fX_1+gX_2}Y=f\nabla_{X_1}Y+g\nabla_{X_2}Y,
+  \tag{6A10}\label{eq:6A10}
+\end{equation*}
+\begin{equation*}
+  \nabla_X(aY_1+bY_2)=a\nabla_XY_1+b\nabla_XY_2.
+  \tag{6A11}\label{eq:6A11}
+\end{equation*}
+\item \textbf{莱布尼茨法则。} 对光滑函数 $f$，
+\begin{equation*}
+  \nabla_X(fY)=f\nabla_XY+X(f)Y.
+  \tag{6A12}\label{eq:6A12}
+\end{equation*}
+\end{itemize}
+
+为什么这个定义可以实现直观上所期待的目标，也就是比较向量、对向量求导以及移动向量？下面逐一说明仿射联络的定义如何做到这一点。
+
+% PDF p. 321
+\AppendixSubheading{6A2.5}{比较不同点处的向量}
+不同点处的向量属于不同的切空间。例如 $v\in T_pM$，而 $w_q\in T_qM$。要比较这两个向量，需要额外的结构。
+
+有了仿射联络，可以定义一个称为平行移动（parallel transport）的过程。
+\begin{itemize}
+\item 如果沿曲线 $\gamma(t)$ 从 $p=\gamma(0)$ 移到 $q=\gamma(1)$，联络规定如何沿该曲线一致地“拖动”向量。
+\item 根据这个规则，可将 $v_p\in T_pM$ 移动为一个新向量 $v_q\in T_qM$，从而进行比较。
+\item 平行移动由下式定义
+\[
+  \nabla_{\dot\gamma(t)}V(t)=0,
+\]
+其中 $V(t)$ 是沿曲线的向量场。
+
+图 \ref{fig:6.A1} 解释了为何 $\nabla_{\dot\gamma(t)}V(t)=0$ 定义了平行移动。图中的黑色曲线是路径 $\gamma(t)$，这里取一条半圆。灰色箭头是切向量 $\dot\gamma(t)$，表示运动方向。深红色箭头表示沿曲线平行移动的向量场 $V(t)$。图 \ref{fig:6.A1} 说明了这个方程为何合理。条件 $\nabla_{\dot\gamma(t)}V(t)=0$ 表示，沿曲线 $\gamma(t)$ 运动时，用流形的几何来度量，向量场 $V(t)$ 沿运动方向保持不变。
+\item 它保证 $V(t)$ 始终属于每一点处的切空间。
+\item 向量的长度及其相对于联络的方向保持不变。%
+\translatornote{联络与度量相容时，平行移动才保证长度保持不变。图中的红色箭头可理解为在欧氏平面内沿半圆路径平行移动的向量。它们属于平面的切空间。}
+\item 这是沿曲线光滑且一致地移动向量的方法。
+\end{itemize}
+
+\begin{figure}[tbp]
+\centering
+\input{assets/ch06/fig06_a01}
+\FigureCaption{6.A1}{平行移动为何如此定义。}
+\end{figure}
+
+\AppendixSubheading{6A2.6}{联络定义协变导数}
+协变导数的概念由偏导数的概念发展而来，是测地线概念的基础（Randy 2023）。在数学中，协变导数是规定沿流形切向量如何求导的方法（Wikipedia）。
+% PDF p. 322
+向量场作用于标量场时相当于一个导数，但还需定义一个向量场在另一个向量场上的作用。本节引入协变导数 $\nabla_V$，借助它，向量场 $V$ 可以类似于求导那样作用于其他向量场。
+
+\Subheading{6A2.6.1\quad 协变导数的定义}
+设 $M$ 是光滑流形（例如曲面），$\nabla$ 是仿射联络（例如黎曼流形上的列维-奇维塔联络）。给定
+\begin{itemize}
+\item $M$ 上的向量场 $Y$。
+\item $M$ 上的方向向量场 $X$（通常指各向量都具有单位长度的向量场，即只表示方向）。
+\end{itemize}
+$Y$ 沿 $X$ 方向的协变导数记为 $\nabla_XY$，它说明在考虑流形曲率的情况下 $Y$ 沿 $X$ 如何变化。
+
+更确切地说，协变导数 $\nabla_XY$ 定义为%
+\translatornote{这一投影表达式适用于带诱导度量的欧氏子流形的列维-奇维塔联络。一般仿射联络由式 \eqref{eq:6A9}–\eqref{eq:6A12} 的性质刻画。}%
+\[
+  \nabla_XY=\text{将普通导数 $D_XY$ 投影到 $M$ 的切空间所得的向量。}
+\]
+
+\Subheading{6A2.6.2\quad 协变导数的主要性质}
+设 $f$ 是光滑标量函数，$X,Y,Z$ 是向量场。
+\begin{itemize}
+\item \textbf{关于 $X$ 和 $Y$ 的线性性。}
+\begin{equation*}
+  \nabla_{aX+bY}Z=a\nabla_XZ+b\nabla_YZ,
+  \tag{6A13}\label{eq:6A13}
+\end{equation*}
+\item \textbf{莱布尼茨法则。}
+\begin{equation*}
+  \nabla_X(fY)=X(f)Y+f\nabla_XY,
+  \tag{6A14}\label{eq:6A14}
+\end{equation*}
+\item 在黎曼流形上，列维-奇维塔联络满足
+
+度量相容性给出 $X\langle Y,Z\rangle=\langle\nabla_XY,Z\rangle+\langle Y,\nabla_XZ\rangle$。
+
+无挠性给出 $\nabla_XY-\nabla_YX=[X,Y]$。
+\end{itemize}
+
+\Subheading{6A2.6.3\quad 协变导数的一般公式}
+设 $M$ 是坐标为 $(x^1,\dots,x^n)$ 的光滑流形，并设
+\[
+  X=X^i\frac{\partial}{\partial x^i},\qquad
+  Y=Y^j\frac{\partial}{\partial x^j}
+\]
+是 $M$ 上的向量场。协变导数 $\nabla_XY$ 定义为
+\begin{equation*}
+  \nabla_XY=X^i\left(\frac{\partial Y^j}{\partial x^i}+\Gamma^j_{ik}Y^k\right)
+    \frac{\partial}{\partial x^j},
+  \tag{6A15}\label{eq:6A15}
+\end{equation*}
+
+% PDF p. 323
+其中
+\begin{itemize}
+\item $\dfrac{\partial Y^j}{\partial x^i}$ 为通常的偏导数。
+\item $\Gamma^j_{ik}$ 是克里斯托费尔符号（联络系数），满足
+\begin{equation*}
+  \nabla_{\partial_i}\partial_k=\Gamma^j_{ik}\partial_j.
+  \tag{6A16}\label{eq:6A16}
+\end{equation*}
+\item 重复指标表示求和。
+\end{itemize}
+
+\noindent\textbf{证明}\par
+令
+\begin{equation*}
+  X=X^i\partial_i=X^i\frac{\partial}{\partial x^i},\qquad
+  Y=Y^k\partial_k=Y^k\frac{\partial}{\partial x^k}.
+  \tag{6A17}\label{eq:6A17}
+\end{equation*}
+则
+\begin{equation*}
+  \nabla_XY=\nabla_{X^i\partial_i}(Y^k\partial_k).
+  \tag{6A18}\label{eq:6A18}
+\end{equation*}
+根据关于 $X$ 的线性性（式 \eqref{eq:6A13}），
+\begin{equation*}
+  \nabla_XY=X^i\nabla_{\partial_i}(Y^k\partial_k).
+  \tag{6A19}\label{eq:6A19}
+\end{equation*}
+现在应用莱布尼茨法则 \eqref{eq:6A14}，得
+\begin{equation*}
+  \nabla_{\partial_i}(Y^k\partial_k)=\partial_i(Y^k)\partial_k
+      +Y^k\nabla_{\partial_i}\partial_k.
+  \tag{6A20}\label{eq:6A20}
+\end{equation*}
+将式 \eqref{eq:6A16} 代入式 \eqref{eq:6A20}，得
+\[
+  \nabla_{\partial_i}(Y^k\partial_k)=\partial_i(Y^k)\partial_k
+    +Y^k\Gamma^j_{ik}\partial_j,
+\]
+也就是
+\begin{equation*}
+  \nabla_{\partial_i}(Y^k\partial_k)=\frac{\partial Y^k}{\partial x^i}\partial_k
+    +Y^k\Gamma^j_{ik}\partial_j.
+  \tag{6A21}\label{eq:6A21}
+\end{equation*}
+
+接下来重排并重命名哑指标。
+\begin{itemize}
+\item 将式 \eqref{eq:6A21} 第一项中的 $k$ 改记为 $j$，便得到 $\dfrac{\partial Y^j}{\partial x^i}\partial_j$。于是
+\begin{equation*}
+  \nabla_{\partial_i}Y
+  =\nabla_{\partial_i}(Y^k\partial_k)
+  =\frac{\partial Y^j}{\partial x^i}\partial_j+Y^k\Gamma^j_{ik}\partial_j
+  =\left(\frac{\partial Y^j}{\partial x^i}+Y^k\Gamma^j_{ik}\right)\partial_j.
+  \tag{6A22}\label{eq:6A22}
+\end{equation*}
+\end{itemize}
+把式 \eqref{eq:6A22} 代入式 \eqref{eq:6A19}，得
+\[
+  \nabla_XY=X^i\nabla_{\partial_i}(Y^k\partial_k)
+    =X^i\left(\frac{\partial Y^j}{\partial x^i}+\Gamma^j_{ik}Y^k\right)
+     \frac{\partial}{\partial x^j}.
+\]
+% PDF p. 324
+证明完毕。
+
+\Subheading{6A2.6.4\quad 克里斯托费尔符号公式（列维-奇维塔联络）}
+给定黎曼度量 $g_{ij}$，第二类克里斯托费尔符号为
+\begin{equation*}
+  \Gamma^k_{ij}
+   =\frac12 g^{kl}\left(\frac{\partial g_{jl}}{\partial x^i}
+       +\frac{\partial g_{il}}{\partial x^j}
+       -\frac{\partial g_{ij}}{\partial x^l}\right),
+  \tag{6A23}\label{eq:6A23}
+\end{equation*}
+其中 $g^{kl}$ 是逆度量 $g^{-1}$ 的分量。对重复指标 $l$（$l=1,\dots,n$）求和，其中 $n$ 是流形维数，$x^i$ 是坐标。
+
+以下证明第二类（即带上指标的）克里斯托费尔符号的公式，假设所用的联络是列维-奇维塔联络。
+
+\noindent\textbf{证明}
+
+\noindent\textbf{假设}\par
+列维-奇维塔联络由下面两个性质唯一确定。
+
+\noindent\textbf{度量相容性}
+\[
+  \nabla g=0\qquad\text{（度量的协变导数为零）},
+\]
+\noindent\textbf{无挠性}
+\[
+  \nabla_XY-\nabla_YX=[X,Y]\qquad\text{（挠率为零）},
+\]
+其中 $[X,Y]$ 是李括号。下面将
+\begin{enumerate}
+\item 利用度量相容性，得到度量导数与克里斯托费尔符号之间的关系。
+\item 利用无挠条件给出的对称性。
+\item 用所得方程组求解克里斯托费尔符号。
+\end{enumerate}
+证明分为两步。
+
+\noindent\textbf{步骤 1。从度量相容性出发。}\par
+回顾度量相容性蕴含的等式
+\begin{equation*}
+  X\langle Y,Z\rangle=\langle\nabla_XY,Z\rangle+\langle Y,\nabla_XZ\rangle.
+  \tag{6A24}\label{eq:6A24}
+\end{equation*}
+设 $\partial_i=\dfrac{\partial}{\partial x^i}$、$\partial_j=\dfrac{\partial}{\partial x^j}$、
+$\partial_k=\dfrac{\partial}{\partial x^k}$ 是局部坐标向量场。对于任意这样的向量场 $\partial_i,\partial_j,\partial_k$，度量相容性给出
+\begin{equation*}
+  X\langle Y,Z\rangle=\frac{\partial}{\partial x^i}g(\partial_j,\partial_k)
+    =\frac{\partial g_{jk}}{\partial x_i},
+  \tag{6A25}\label{eq:6A25}
+\end{equation*}
+\begin{equation*}
+  \langle\nabla_XY,Z\rangle=g(\nabla_{\partial_i}\partial_j,\partial_k),
+  \tag{6A26}\label{eq:6A26}
+\end{equation*}
+% PDF p. 325
+\begin{equation*}
+  \langle Y,\nabla_XZ\rangle=g(\partial_j,\nabla_{\partial_i}\partial_k).
+  \tag{6A27}\label{eq:6A27}
+\end{equation*}
+合并式 \eqref{eq:6A25} 至式 \eqref{eq:6A27}，得
+\begin{equation*}
+  \frac{\partial g_{jk}}{\partial x^i}
+    =g(\nabla_{\partial_i}\partial_j,\partial_k)
+     +g(\partial_j,\nabla_{\partial_i}\partial_k).
+  \tag{6A28}\label{eq:6A28}
+\end{equation*}
+度量相容性也意味着
+\begin{equation*}
+  \nabla g=0.
+  \tag{6A29}\label{eq:6A29}
+\end{equation*}
+因此，内积作为度量的协变导数为零，即
+\begin{equation*}
+  X(g(Y,Z))=g(\nabla_XY,Z)+g(Y,\nabla_XZ).
+  \tag{6A30}\label{eq:6A30}
+\end{equation*}
+类似于式 \eqref{eq:6A24}，式 \eqref{eq:6A30} 导出
+\begin{equation*}
+  \frac{\partial g_{jk}}{\partial x^i}
+    =g(\nabla_{\partial_i}\partial_j,\partial_k)
+     +g(\partial_j,\nabla_{\partial_i}\partial_k).
+  \tag{6A31}\label{eq:6A31}
+\end{equation*}
+由式 \eqref{eq:6A16}，
+\begin{equation*}
+  \nabla_{\partial_i}\partial_k=\Gamma^m_{ik}\partial_m,
+  \tag{6A32}\label{eq:6A32}
+\end{equation*}
+\begin{equation*}
+  \nabla_{\partial_i}\partial_j=\Gamma^m_{ij}\partial_m.
+  \tag{6A33}\label{eq:6A33}
+\end{equation*}
+将式 \eqref{eq:6A32} 和式 \eqref{eq:6A33} 代入式 \eqref{eq:6A31}，得
+\begin{equation*}
+  \frac{\partial g_{jk}}{\partial x^i}
+   =g(\Gamma^m_{ij}\partial_m,\partial_k)+g(\partial_j,\Gamma^m_{ik}\partial_m).
+  \tag{6A34}\label{eq:6A34}
+\end{equation*}
+度量对两个变量均线性，因此可以提出系数
+\begin{equation*}
+  g(\Gamma^m_{ij}\partial_m,\partial_k)
+   =\Gamma^m_{ij}g(\partial_m,\partial_k)=\Gamma^m_{ij}g_{mk},
+  \tag{6A35}\label{eq:6A35}
+\end{equation*}
+\begin{equation*}
+  g(\partial_j,\Gamma^m_{ik}\partial_m)
+   =\Gamma^m_{ik}g(\partial_j,\partial_m)=\Gamma^m_{ik}g_{jm}.
+  \tag{6A36}\label{eq:6A36}
+\end{equation*}
+将式 \eqref{eq:6A35} 和式 \eqref{eq:6A36} 代入式 \eqref{eq:6A34}，得
+\begin{equation*}
+  \frac{\partial g_{jk}}{\partial x^i}
+   =\Gamma^m_{ij}g_{mk}+\Gamma^m_{ik}g_{jm}
+   =g_{mk}\Gamma^m_{ij}+g_{mj}\Gamma^m_{ik}.
+  \tag{6A37}\label{eq:6A37}
+\end{equation*}
+类似地，得到
+\begin{equation*}
+  \frac{\partial g_{ik}}{\partial x^j}=g_{mk}\Gamma^m_{ji}+g_{mi}\Gamma^m_{jk},
+  \tag{6A38}\label{eq:6A38}
+\end{equation*}
+\begin{equation*}
+  \frac{\partial g_{ij}}{\partial x^k}=g_{mj}\Gamma^m_{ki}+g_{mi}\Gamma^m_{kj}.
+  \tag{6A39}\label{eq:6A39}
+\end{equation*}
+
+% PDF p. 326
+由于 $\nabla$ 无挠，
+\[
+  \Gamma^m_{ij}=\Gamma^m_{ji}.
+\]
+由式 \eqref{eq:6A37} 至式 \eqref{eq:6A39} 得
+\begin{equation*}
+  2g_{mk}\Gamma^m_{ij}
+   =\frac{\partial g_{jk}}{\partial x^i}+\frac{\partial g_{ik}}{\partial x^j}
+    -\frac{\partial g_{ij}}{\partial x^k}.
+  \tag{6A40}\label{eq:6A40}
+\end{equation*}
+现在用 $g^{mk}$ 乘式 \eqref{eq:6A40} 两端，解出 $\Gamma^m_{ij}$%
+\translatornote{为区分自由指标与求和指标，可先将式 \eqref{eq:6A40} 左端的求和指标 $m$ 改为 $s$，再乘 $g^{mk}$，此时 $g^{mk}g_{sk}=\delta^m_s$。}%
+\begin{equation*}
+\begin{aligned}
+  2\Gamma^m_{ij}
+    &=g^{mk}\left(\frac{\partial g_{jk}}{\partial x^i}
+       +\frac{\partial g_{ik}}{\partial x^j}-\frac{\partial g_{ij}}{\partial x^k}\right),
+       \qquad\text{或写为}\\
+  \Gamma^m_{ij}
+    &=\frac12 g^{mk}\left(\frac{\partial g_{jk}}{\partial x^i}
+       +\frac{\partial g_{ik}}{\partial x^j}-\frac{\partial g_{ij}}{\partial x^k}\right).
+\end{aligned}
+\tag{6A41}\label{eq:6A41}
+\end{equation*}
+将 $k$ 改记为 $l$、将 $m$ 改记为 $k$ 后，式 \eqref{eq:6A41} 化为
+\begin{equation*}
+  \Gamma^k_{ij}=\frac12 g^{kl}
+     \left(\frac{\partial g_{jl}}{\partial x^i}
+          +\frac{\partial g_{il}}{\partial x^j}-\frac{\partial g_{ij}}{\partial x^l}\right).
+  \tag{6A42}\label{eq:6A42}
+\end{equation*}
+证明完毕。
+
+\Subheading{6A2.6.5\quad 二维球面上的协变导数通式}
+考虑坐标为 $(\theta,\varnothing)$ 的二维球面，其度量为
+\begin{equation*}
+  g=\begin{bmatrix}1&0\\0&\sin^2\theta\end{bmatrix}.
+  \tag{6A43}\label{eq:6A43}
+\end{equation*}
+设向量场为
+\begin{equation*}
+  X=X^1(\theta,\varnothing)\partial_\theta+X^2(\theta,\varnothing)\partial_\varnothing,
+  \tag{6A44}\label{eq:6A44}
+\end{equation*}
+\begin{equation*}
+  Y=Y^1(\theta,\varnothing)\partial_\theta+Y^2(\theta,\varnothing)\partial_\varnothing.
+  \tag{6A45}\label{eq:6A45}
+\end{equation*}
+先计算二维球面上的第二类克里斯托费尔符号。采用坐标 $x^1=\theta$、$x^2=\varnothing$，由式 \eqref{eq:6A43} 得
+\begin{gather*}
+  g_{11}=1,\quad g_{12}=g_{21}=0,\quad g_{22}=\sin^2\theta,\\
+  g^{-1}=\begin{bmatrix}1&0\\0&\dfrac{1}{\sin^2\theta}\end{bmatrix},\\
+  g^{11}=1,\quad g^{12}=g^{21}=0,\quad g^{22}=\frac{1}{\sin^2\theta}.
+\end{gather*}
+% PDF p. 327
+对各个分量应用公式，得二维球面上的非零克里斯托费尔符号
+\begin{align*}
+  \Gamma^1_{22}
+    &=\frac12g^{11}\left(\frac{\partial g_{21}}{\partial\theta}
+        +\frac{\partial g_{21}}{\partial\varnothing}
+        -\frac{\partial g_{22}}{\partial\theta}\right)
+      =\frac12\left(-\frac{\partial(\sin^2\theta)}{\partial\theta}\right)
+      =-\sin\theta\cos\theta,\\
+  \Gamma^2_{12}&=\Gamma^2_{21},\\
+  \Gamma^2_{12}&=\frac12g^{22}\frac{\partial g_{22}}{\partial\theta}
+    =\frac12\frac{1}{\sin^2\theta}\,2\sin\theta\cos\theta
+    =\frac{\cos\theta}{\sin\theta}=\cot\theta.
+\end{align*}
+由式 \eqref{eq:6A15} 得协变导数 $\nabla_XY$
+\begin{align*}
+  \nabla_XY^1&=X^1\frac{\partial Y^1}{\partial\theta}
+      +X^2\left(\frac{\partial Y^1}{\partial\varnothing}
+        -\sin\theta\cos\theta\,Y^2\right),\\
+  \nabla_XY^2&=X^1\left(\frac{\partial Y^2}{\partial\theta}+\frac{Y^2}{\tan\theta}\right)
+      +X^2\left(\frac{\partial Y^2}{\partial\varnothing}+\frac{Y^1}{\tan\theta}\right).
+\end{align*}
+
+\Subheading{6A2.6.6\quad 庞加莱球模型度量下双曲平面极坐标 $(r,\theta)$ 中协变导数的通式}
+极坐标下的双曲度量为
+\[
+  g=\begin{bmatrix}1&0\\0&\sinh^2r\end{bmatrix}.
+\]
+于是
+\begin{gather*}
+  g_{11}=1,\quad g_{12}=g_{21}=0,\quad g_{22}=\sinh^2r,\\
+  g^{-1}=\begin{bmatrix}1&0\\0&\dfrac{1}{\sinh^2r}\end{bmatrix},\\
+  g^{11}=1,\quad g^{12}=g^{21}=0,\quad g^{22}=\frac{1}{\sinh^2r}.
+\end{gather*}
+定义向量场
+\begin{align*}
+  X&=X^1(r,\theta)\partial_r+X^2(r,\theta)\partial_\theta,\\
+  Y&=Y(r,\theta)\partial_r+Y^2(r,\theta)\partial_\theta.
+\end{align*}
+再计算双曲平面上的非零克里斯托费尔符号%
+\translatornote{原式中间的 $\sin,\cos$ 应分别为 $\sinh,\cosh$，末项应为 $1/\tanh r$。下一式使用的是 $1/\tanh r$。}%
+\begin{align*}
+ \Gamma^1_{22}
+  &=\frac12g^{11}\left(\frac{\partial g_{21}}{\partial r}
+     +\frac{\partial g_{21}}{\partial\theta}-\frac{\partial g_{22}}{\partial r}\right)\\
+  &=\frac12\left(-\frac{\partial(\sinh^2r)}{\partial r}\right)=-\frac12\sinh(2r),
+\end{align*}
+% PDF p. 328
+\[
+  \Gamma^2_{12}=\Gamma^2_{21},
+\]
+\[
+  \Gamma^2_{12}=\frac12g^{22}\frac{\partial g_{22}}{\partial r}
+    =\frac12\frac{1}{\sin^2 r}\,2\sin r\cos r
+    =\frac{\cosh r}{\sinh r}=\frac1{\tan r}.
+\]
+现在用式 \eqref{eq:6A15} 计算协变导数。$\nabla_XY^1$ 为径向分量
+\begin{align*}
+  \nabla_XY^1&=X^1\frac{\partial Y^1}{\partial r}
+      +X^2\left(\frac{\partial Y^1}{\partial\theta}
+         -\frac12\sinh(2r)Y^2\right),\\
+  \nabla_XY^2&=X^1\left(\frac{\partial Y^2}{\partial r}
+        +\frac{1}{\tanh r}Y^2\right)
+      +X^2\left(\frac{\partial Y^2}{\partial\theta}
+        +\frac{1}{\tanh r}Y^1\right).
+\end{align*}

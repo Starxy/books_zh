@@ -1,0 +1,101 @@
+% PDF p. 371
+\AppendixSection{6N}{推导线性随机微分方程的解}
+
+\AppendixHeading{6N1}{用积分因子求解线性 SDE}
+
+考虑线性 SDE，
+\begin{equation*}
+  dX_t=b(t)X_t\,dt+\sigma(t)\,dW_t,\qquad X_0=x_0,\quad 0\leq t<1.
+  \tag{6N1}\label{eq:6N1}
+\end{equation*}
+
+% PDF p. 372
+为求积分因子（integrating factor），解以下常微分方程，
+\[
+  \frac{dx}{dt}=-b(t)x.
+\]
+它的解为
+\begin{equation*}
+  x(t)=\Phi(t)=\exp\left(-\int_0^t b(s)\,ds\right).
+  \tag{6N2}\label{eq:6N2}
+\end{equation*}
+于是
+\begin{equation*}
+  d[\Phi(t)X(t)]=\dot\Phi(t)X(t)\,dt+\Phi(t)\,dX(t).
+  \tag{6N3}\label{eq:6N3}
+\end{equation*}
+又有
+\begin{equation*}
+  \dot\Phi(t)=-b(t)\exp\left(-\int_0^t b(s)\,ds\right)=-b(t)\Phi(t).
+  \tag{6N4}\label{eq:6N4}
+\end{equation*}
+将式 \eqref{eq:6N1}、\eqref{eq:6N4} 代入式 \eqref{eq:6N3}，得到
+\begin{equation*}
+  \begin{aligned}
+  d[\Phi(t)X(t)]
+    &=-b(t)\Phi(t)X(t)\,dt+b(t)\Phi(t)X(t)\,dt+\sigma(t)\Phi(t)\,dW_t\\
+    &=\sigma(t)\Phi(t)\,dW_t.
+  \end{aligned}
+  \tag{6N5}\label{eq:6N5}
+\end{equation*}
+对式 \eqref{eq:6N5} 两边从 0 积分到 $t$，得到
+\begin{equation*}
+  \Phi(t)X(t)-X(0)=\int_0^t\sigma(s)\Phi(s)\,dW_s.
+  \tag{6N6}\label{eq:6N6}
+\end{equation*}
+式 \eqref{eq:6N6} 两边乘以 $\Phi(t)^{-1}$ 并整理，得
+\begin{equation*}
+  X(t)=\Phi(t)^{-1}\left(x_0+\int_0^t\sigma(s)\Phi(s)\,dW_s\right).
+  \tag{6N7}\label{eq:6N7}
+\end{equation*}
+由于这个随机积分服从中心化高斯分布，$X_t$ 也服从高斯分布。接下来计算 $X_t$ 的均值和方差。由式 \eqref{eq:6N7} 可得
+\begin{equation*}
+  E[X_t\mid X_0=x_0]=\Phi(t)^{-1}x_0.
+  \tag{6N8}\label{eq:6N8}
+\end{equation*}
+根据伊藤等距性，条件方差为
+\begin{equation*}
+  \Var[X_t\mid X_0]=\Phi(t)^{-2}\int_0^t\Phi^2(s)\sigma^2(s)\,ds.
+  \tag{6N9}\label{eq:6N9}
+\end{equation*}
+所以转移密度为
+\begin{equation*}
+  \begin{aligned}
+  f(x_t\mid x_0)&=\frac{1}{\sqrt{2\pi V(t)}}
+        \exp\left(-\frac{(x_t-M(t))^2}{2V(t)}\right),
+          \qquad M(t)=\Phi(t)^{-1}x_0,\\
+  V(t)&=\Phi(t)^{-2}\int_0^t\Phi^2(s)\sigma^2(s)\,ds.
+  \end{aligned}
+  \tag{6N10}\label{eq:6N10}
+\end{equation*}
+
+% PDF p. 373
+注意
+\begin{equation*}
+  \begin{aligned}
+  \Phi(t)^{-1}
+    &=\exp\left(\int_0^t b(s)\,ds\right)
+      =\exp\left(\int_0^t\frac{d\log\alpha_s}{ds}\,ds\right)\\
+    &=\alpha_t=1-t.
+  \end{aligned}
+  \tag{6N11}\label{eq:6N11}
+\end{equation*}
+\begin{equation*}
+  \sigma^2(t)=\frac{1+t}{1-t}.
+  \tag{6N12}\label{eq:6N12}
+\end{equation*}
+\begin{equation*}
+  \begin{aligned}
+  V(t)&=\Phi(t)^{-2}\int_0^t\Phi^2(s)\sigma^2(s)\,ds
+       =(1-t)^2\int_0^t\frac{1+s}{(1-s)^3}\,ds\\
+      &\xrightarrow{u=1-s}(1-t)^2\int_{1-t}^1\frac{2-u}{u^3}\,du\\
+      &=(1-t)^2\left(\frac{1}{(1-t)^2}-\frac{1}{1-t}\right)=t.
+  \end{aligned}
+  \tag{6N13}\label{eq:6N13}
+\end{equation*}
+现在，式 \eqref{eq:6N10} 可以写作
+\begin{equation*}
+  f(x_t\mid x_0)=\frac{1}{\sqrt{2\pi t}}
+    \exp\left(-\frac{(x_t-\alpha_t x_0)^2}{2t}\right)\sim N(\alpha_t x_0,t).
+  \tag{6N14}\label{eq:6N14}
+\end{equation*}

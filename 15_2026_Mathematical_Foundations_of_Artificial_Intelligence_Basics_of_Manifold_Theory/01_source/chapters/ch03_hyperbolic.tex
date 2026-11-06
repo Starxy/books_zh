@@ -1,0 +1,199 @@
+% PDF p. 152
+\section{用于树和图上推理的双曲空间拉普拉斯–贝尔特拉米算子}
+\label{sec:3.12}
+
+\subsection{双曲空间 \texorpdfstring{$H^k$}{Hᵏ} 与拉普拉斯–贝尔特拉米算子为何适合树结构}
+\begin{itemize}
+\item \textbf{负曲率与体积的指数增长。} 在有根 $d$ 叉树中，深度 $l$ 处有 $d^l$ 个节点。$H^k$ 中测地球面的大小按 $e^{(k-1)l}$ 增长。因此，$H^k$ 中的距离能够反映层级中的深度。
+\item \textbf{等距变换群与莫比乌斯变换（Möbius transforms）。} 这些变换的作用是传递的，并且可以用解析式表示 $\Delta_g$、热核、特征函数等。这些解析工具在原始结构上无从获得。
+\end{itemize}
+因此，把一棵组合树或一个组合图嵌入 $H^k$，就可以运用连续调和分析（continuous harmonic analysis）的工具，如拉普拉斯特征基、偏微分方程和核，处理本质上具有层级结构的推理任务。
+
+\subsection{庞加莱球中的拉普拉斯–贝尔特拉米算子}
+对于光滑标量场 $f\colon B^k\to\R$，%
+\translatornote{式 \eqref{eq:3.21} 的一阶项按原书保留。以式 \eqref{eq:3.20} 为准，该项应为
+$\tfrac{k-2}{2}(1-\lVert x\rVert^2)x\cdot\nabla_x f$。}%
+\begin{equation*}
+  \Delta_H f(x)=\frac{(1-\lVert x\rVert^2)^2}{4}\,
+     \underbrace{\Delta_{\R^k}f}_{\text{欧氏}}
+   -\frac{k-2}{2}(1-\lVert x\rVert^2)x\nabla_xf.
+  \tag{3.21}\label{eq:3.21}
+\end{equation*}
+热扩散、格林函数（Green's function）、谱滤波器（spectral filter）等都可由式 \eqref{eq:3.21} 得到。
+
+\subsection{从连续 \texorpdfstring{$\Delta_H$}{ΔH} 到离散双曲图拉普拉斯算子}
+\subsubsection{欧氏空间中的图拉普拉斯算子}
+对于图 $G=(V,E)$，欧氏空间中的图拉普拉斯算子（graph Laplacian）定义为
+\[
+  L=D-A,
+\]
+其中度矩阵（degree matrix）$D$ 是以各顶点 $x$ 的度为对角元的矩阵。顶点的度就是与它相邻的顶点数。$A$ 为图的邻接矩阵（adjacency matrix），定义为
+% PDF p. 153
+\[
+  A_{ii}=0,\qquad A_{ij}=
+    \begin{cases}
+      1 & \{i,j\}\in E,\\
+      0 & \text{其他情况},
+    \end{cases}
+\]
+表示相应的边是否存在。
+
+\subsubsection{节点的双曲嵌入}
+用庞加莱（或洛伦兹）嵌入算法（Tachyon、Hyperbolic-MDS、Poincaré GloVe、Hyperbolic GCN），把树或图的每个节点 $v$ 嵌入到 $x_v$。
+
+\subsubsection{考虑几何结构的亲和权重}
+\begin{gather*}
+  w_{uv}=\exp\!\left(-\frac{d_H(x_u,x_v)^2}{2\sigma^2}\right),\\
+  d_H(x,y)=\operatorname{arcosh}\!
+   \left(1+\frac{2\lVert x-y\rVert^2}{(1-\lVert x\rVert^2)(1-\lVert y\rVert^2)}\right).
+\end{gather*}
+
+\subsubsection{离散算子与双曲图拉普拉斯算子}
+\begin{equation*}
+  (L_H f)(u)=\sum_{v\ne u}w_{uv}(f(v)-f(u)).
+  \tag{3.22}\label{eq:3.22}
+\end{equation*}
+式 \eqref{eq:3.22} 仍具有熟悉的图拉普拉斯算子的形式，其中的权重由双曲几何中的距离决定。
+
+\textbf{相合性（consistency）。} 如果嵌入足够稠密，则网格尺寸趋于零时，$L_H$ 在黏性意义下收敛到 $\Delta_H$。
+
+双曲图拉普拉斯算子 $L_H$ 定义为
+\[
+  L_H=D-W,
+\]
+其中 $D$ 是节点的度矩阵，定义与前面欧氏空间中的定义相同，$W$ 定义为%
+\translatornote{按 3.14.2.2 节的加权度 $D_{uu}=\sum_v W_{uv}$，这里的 $D-W$ 作用于 $f$ 所得的差是 $f(u)-f(v)$，与式 \eqref{eq:3.22} 相差一个负号。}%
+\[
+  W_{ij}=e^{-\frac{d_H(x_i,x_j)^2}{2\sigma^2}}.
+\]
+
+\section[双曲拉普拉斯 Transformer 用于层级结构与树上的推理]
+  {用于在层级结构、树与其他负曲率数据上推理的双曲拉普拉斯 Transformer（HL-Former）}
+\label{sec:3.13}
+微分几何在建模复杂结构化数据方面显示出很大潜力，例如底层具有树状或层级图结构的数据。图 Transformer（graph Transformer，GT）为机器学习提供了一个新框架，带来了一类面向图结构数据的神经网络模型（Shehzad et al.\ 2024）。图 Transformer 具备较强的序列建模能力，但本身没有层级距离的概念。引入双曲拉普拉斯算子（hyperbolic Laplacian）可以使 Transformer 直接利用层级距离，从而改进图 Transformer。这里将这种模型称为双曲拉普拉斯 Transformer（Hyperbolic-Laplacian Transformer，HL-Former）。
+
+% PDF p. 154
+\subsection{在 Transformer 的哪里引入 \texorpdfstring{$L_H$}{LH}}
+位置编码（positional encoding，PE）对于补充节点特征和刻画图结构至关重要。缺少消息传递所用的拓扑结构时，图 Transformer 会丢失拓扑信息，因此离不开位置编码。为解决这个问题，我们通过双曲位置编码将 $L_H$ 引入 Transformer。
+
+\subsubsection{双曲位置编码（H-LPE）}
+计算 $L_H$ 的前 $m$ 个特征对 $(\lambda_l,\phi_l)$，取未缩放的特征向量作为位置特征
+\[
+  \operatorname{pos}(i)=[\phi_1(i),\dots,\phi_m(i)]\in\R^m.
+\]
+将它们映到切空间 $T_0B^k\simeq\R^k$。如果 Transformer 本身在双曲空间中运算，则通过对数映射完成。
+
+\subsubsection{拉普拉斯扩散注意力偏置}
+热核 $K_t=\exp(-tL_H)$ 给出考虑几何结构的亲和度。把它加到通常的缩放点积注意力分数上
+\[
+  A_{ij}=\frac{q_i^Tk_j}{\sqrt d}+\alpha K_{t,ij},\qquad
+  \text{注意力}=\operatorname{softmax}_j(A_{ij}).
+\]
+
+\subsubsection{谱滤波门控}
+在每个多头模块之前，对拉普拉斯算子施加一个切比雪夫多项式（Chebyshev polynomial）
+\[
+  X^{\mathrm{filt}}=\sum_{l=0}^{r}\theta_lT_l(\widetilde L_H)X,\qquad
+  \widetilde L_H=\frac{2L_H}{\lambda_{\max}}-I.
+\]
+可学习的 $\theta_l$ 起到选频掩模的作用，使注意力计算更重视低曲率方向（全局层级）。
+
+\subsection{组合成 HL-Former 模块}
+\begin{enumerate}
+\item 将节点嵌入为 $x_i^{(0)}\in B^k$（庞加莱多维尺度分析或洛伦兹优化）。
+\item 用对数映射到 $\R^k$，得到欧氏特征 $h_i^{(0)}$。
+\item 加入双曲位置编码，得到 $[h_i^{(0)},\operatorname{pos}(i)]$。
+\item 滤波后的特征为 $h^{\mathrm{filt}}=\operatorname{Cheb}(L_H)h$。
+\item 计算带扩散偏置 $K_t$ 的多头注意力。
+\item 如果后续层在双曲空间中运算，则通过指数映射返回 $B^k$。
+\end{enumerate}
+
+\subsection{简化推理示例（在二叉树中查询祖先）}
+经过三层之后，该模型回答“$u$ 是 $v$ 的祖先吗？”的准确率为 98\%，而使用欧氏位置编码的普通 Transformer 的准确率仅为 83\%（层级深度 $\leq5$）。
+
+% PDF p. 155
+\section{强化学习中的双曲拉普拉斯 Transformer}
+\label{sec:3.14}
+为了展示双曲拉普拉斯 Transformer 的表现，本节简述它与强化学习的结合方式。
+
+\subsection{为什么在强化学习中结合拉普拉斯算子与 Transformer？}
+\begin{itemize}
+\item \textbf{层级状态空间。} 知识图谱、证明树、分子合成的有向无环图（directed acyclic graph，DAG）和游戏中的技能层级，都具有指数增长的几何结构。
+\item \textbf{Transformer。} 擅长序列建模，但本身没有层级距离的概念。
+\item \textbf{双曲拉普拉斯偏置。} 这种偏置把上述几何结构纳入模型。$L_H$ 的特征向量就像“考虑频率的坐标”，热核 $e^{-tL_H}$ 度量层级结构上的可达性。
+
+在推理任务中，扩散先验加快探索，公用谱基则使模型的泛化更为准确。
+\end{itemize}
+
+\subsection{状态表示流程}
+\subsubsection{将节点（状态）嵌入 \texorpdfstring{$B^k$}{Bᵏ}}
+\emph{在强化学习开始前执行一次。}
+
+使用庞加莱多维尺度分析（Poincaré-MDS）或双曲 GloVe，将每个离散状态 $s$ 映为 $x_s\in B^k$（半径为 1 的球）。
+
+\subsubsection{构造离散双曲拉普拉斯算子}
+\[
+  W_{st}=\exp\!\left(-\frac{d_H(x_s,x_t)^2}{2\sigma^2}\right),\qquad
+  L_H=D-W,\qquad D_{ss}=\sum_tW_{st}.
+\]
+
+\subsubsection{计算谱位置编码}
+取 $L_H$ 的前 $m$ 个特征向量 $\varnothing_{1:m}$。状态 $s$ 的位置编码为
+\[
+  \operatorname{pos}(s)=[\varnothing_1(s),\dots,\varnothing_m(s)].
+\]
+（对于大型图，用切比雪夫–兰乔斯（Chebyshev–Lanczos）方法近似 $\varnothing_k$。）
+
+\subsection{HL-Former 策略网络和价值网络}
+\noindent\textbf{各时间步的输入}\par
+$[h_s^{\mathrm{token}};\operatorname{pos}(s)]$，其中 $h_s^{\mathrm{token}}$ 为任意局部观测的嵌入。
+
+\noindent\textbf{双曲拉普拉斯注意力（单头）}
+\[
+  \underbrace{A_{st}}_{\text{注意力分数}}
+    =\frac{q_s^Tk_t}{\sqrt d}+\alpha[e^{-tL_H}]_{st},\qquad
+  \operatorname{Atten}_{st}=\operatorname{softmax}_t(A_{st}).
+\]
+
+% PDF p. 156
+\begin{table}[tbp]
+\centering
+\TableCaption{3.1}{三个 Transformer 在推理任务中的准确率}
+\begin{tabular}{lcc}
+\toprule
+模型 & 达到目标的步数 & 准确率\\
+\midrule
+普通 Transformer 策略 & $46\pm9$ & 82\%\\
+欧氏拉普拉斯 Transformer & $33\pm7$ & 91\%\\
+双曲拉普拉斯 Transformer & $21\pm5$ & 98\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+谱预滤波为
+\[
+  X^{\mathrm{filt}}=\sum_{l=0}^{r}\theta_lT_l(\widetilde L_H)X,\qquad
+  \widetilde L_H=\frac{2L_H}{\lambda_{\max}}-I,
+\]
+其中 $T_l$ 是切比雪夫多项式，$\widetilde L_H$ 是缩放后的拉普拉斯算子。堆叠 $L$ 个这样的模块，得到包含丰富上下文信息的隐藏表示 $h_s$。
+
+\noindent\textbf{行动者头（actor head）}
+\[
+  \pi(a\mid s;\theta)=\operatorname{softmax}(W_\pi h_s).
+\]
+
+\noindent\textbf{评价者头（critic head）}
+\[
+  V(s;\theta)=W_vh_s.
+\]
+全部权重 $\theta$（以及切比雪夫系数 $\theta_l$）用标准强化学习优化器（PPO、A2C 或 SAC）学习。
+
+双曲空间中的节点位置 $x_s$ 可以固定，也可以用黎曼 Adam 微调。使用 PPO 训练。
+
+\subsection{简化推理任务（祖先查询环境）}
+\begin{itemize}
+\item \textbf{状态。} 具有 31 个节点的二叉树的节点。
+\item \textbf{动作。} 转到左子节点、右子节点或父节点，或者留在原处。
+\item \textbf{目标。} 从任意位置出发，到达满足属性 $P$ 的一个祖先节点。
+\end{itemize}
+结果见表 \ref{tab:3.1}。其原因在于扩散核的偏置有利于沿层级向上移动。

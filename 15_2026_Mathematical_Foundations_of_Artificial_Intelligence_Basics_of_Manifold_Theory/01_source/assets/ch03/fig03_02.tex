@@ -1,0 +1,12 @@
+\begin{tikzpicture}[scale=.85,thick,>=Stealth]
+\coordinate (O) at (0,0);
+\coordinate (A) at (2.25,1.65);
+\coordinate (B) at (4.25,.15);
+\coordinate (C) at (5.85,1.65);
+\draw[->] (O)--(0,4.2) node[near end,right] {$a\wedge b$};
+\draw[->] (O)--(A);
+\draw[->] (O)--(B);
+\draw (A)--(C)--(B);
+\draw[->] (4.65,3.05) node[above] {$a\wedge b$}
+  .. controls (4.6,1.35) and (3.95,2.38) .. (3.6,1);
+\end{tikzpicture}

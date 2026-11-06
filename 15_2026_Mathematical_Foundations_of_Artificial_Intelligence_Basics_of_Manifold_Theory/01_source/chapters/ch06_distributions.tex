@@ -1,0 +1,1023 @@
+% PDF p. 279
+\section{流形上的概率分布}
+
+物理人工智能需要处理来自流形的复杂数据。面对物理世界中的复杂数据，常可通过把数据建模为流形上的点来解决问题。然而，经典欧氏概率分布无法刻画底层流形的内在几何（de Surrel et al.\ 2025）。推导流形上的概率分布函数，便可扩展经典概率论，使其适用于取值限于弯曲空间的数据，例如球面或几何结构更复杂的空间。这种推广对于方向统计、机器学习、医学成像等领域非常重要，其中的数据自然位于非欧氏空间中。
+
+\subsection{流形上概率分布函数的推导}
+
+要在流形 $M$ 上定义概率分布，通常要利用它的内在几何。
+\begin{enumerate}
+  \item \textbf{黎曼度量}黎曼流形配有光滑变化的正定度量张量 $g$，它定义各切空间上的内积。借助此度量可以测量长度和角度。
+  \item \textbf{体积形式}度量诱导出自然的体积形式$\omega$，使得我们可以定义流形上的积分。概率密度的归一化离不开这一形式。
+% PDF p. 280
+  \item \textbf{概率密度函数（probability density function，PDF）}若函数 $f\colon M\to\R$ 满足下面两个条件，它就是一个概率密度函数。
+
+  \textbf{非负性}对所有 $x\in M$，$f(x)\geq 0$。
+
+  \textbf{归一化}$\displaystyle\int_M f(x)\,d\omega=1$。
+\end{enumerate}
+
+例如，在单位球面 $S^2$ 上，冯·米塞斯–费希尔分布与欧氏空间中的多元正态分布相仿。它的概率密度函数为
+\[
+  f(x,\mu,\kappa)=C(\kappa)\exp\bigl(\kappa\langle\mu,x\rangle\bigr),
+\]
+其中 $\mu$ 是平均方向，$\kappa$ 为集中参数，$C(\kappa)$ 是归一化常数，保证密度在 $S^2$ 上积分为 1。
+
+\subsubsection{流形上分布函数的必要性}
+
+当数据本来就位于弯曲空间中时，采用流形上的分布函数很有必要。
+\begin{description}[leftmargin=2em]
+  \item[方向数据] 风向或动物运动路径等测量结果自然表示为圆周或球面上的点，需要使用圆周统计或球面统计。
+  \item[形状分析] 在医学成像与空间转录组学中，可将解剖结构视为形状流形上的点进行分析，从而考虑其几何性质（Hallou et al.\ 2025）。
+  \item[机器学习] 降维和聚类等技术常假定数据位于某个底层流形上，由此得到更准确的模型。
+\end{description}
+
+\subsubsection{流形上分布函数的应用}
+
+利用流形上的分布函数有助于开展以下工作。
+\begin{description}[leftmargin=2em]
+  \item[参数估计] 针对取值于流形的数据，采用相应的极大似然估计方法，参见 Xavier Pennec（2004）的 \emph{Probabilities and Statistics on Riemannian Manifolds}。
+  \item[假设检验] 针对流形数据设计均匀性或多峰性检验，例如方向统计中的瑞利检验（Rayleigh test）。
+  \item[机器学习算法] 设计符合流形几何结构的聚类、分类和推理算法，改善算法在非欧氏数据空间中的表现（Park et al.\ 2025）。
+\end{description}
+
+\subsection{流形上的二项分布}
+
+在欧氏空间中，二项随机变量统计 $n$ 次独立试验中的“成功”次数，例如落在给定区域中的点数。每次试验的成功概率均为 $p$。可以将这一思想推广到流形，从流形上的概率测度独立抽取随机点，并把点落入流形上指定可测子集的事件定义为“成功”。
+
+% PDF p. 281
+\subsubsection{流形上的一般定义}
+
+先定义示性变量，用来表示点是否落入流形上指定的可测子集。
+
+\begin{statement}{定义 6.1}{示性函数}
+设 $M$ 是配有概率测度 $\mu$ 的流形。给定可测子集 $A\subset M$。如果从 $M$ 按分布 $\mu$ 独立抽取 $X_1,\ldots,X_n$，则定义示性函数（indicator function）
+\[
+  I_A(X_i)=
+  \begin{cases}
+    1,&X_i\in A,\\
+    0,&\text{其他情形。}
+  \end{cases}
+\]
+\end{statement}
+
+\begin{statement}{定义 6.2}{二项分布}
+将示性变量相加所得的随机变量
+\[
+  X=\sum_{i=1}^{n} I_A(X_i)
+\]
+服从参数为 $n$ 和 $p=\mu(A)$ 的二项分布（binomial distribution），即
+\[
+  X\sim\operatorname{Binomial}(n,p).
+\]
+这一推广直接保留了二项随机变量的结构，但成功概率 $p$ 由子集 $A$ 相对于 $M$ 总测度的测度决定。
+\end{statement}
+
+\subsubsection{球面 \texorpdfstring{$S^2$}{S²} 上的例子}
+
+考虑 $\R^3$ 中的单位球面 $S^2$，配以自然的均匀（哈尔，Haar）概率测度，也就是将球面面积测度归一化为 1。把点落在球冠 $A$ 内的事件定义为“成功”。球冠以北极 $(0,0,1)$ 为中心，角半径为 $\theta$。
+
+$S^2$ 上角半径为 $\theta$ 的球冠面积为
+\[
+  \operatorname{Area}(A)=2\pi(1-\cos\theta).
+\]
+由于 $S^2$ 的总面积为 $4\pi$，均匀抽取的一个点落在球冠内的概率为
+\[
+  p=\frac{\operatorname{Area}(A)}{4\pi}=\frac{1-\cos\theta}{2}.
+\]
+% PDF p. 282
+因此，如果在 $S^2$ 上独立且均匀地抽取 $n$ 个点，落在 $A$ 内的点数服从
+\[
+  X\sim\operatorname{Binomial}\left(n,\frac{1-\cos\theta}{2}\right).
+\]
+
+\begin{statement}{例 6.2}{数值示例}
+设我们抽取 $n=100$ 个点，且 $\theta=30^\circ$（约为 $0.5236$ 弧度）。于是
+\[
+  p=\frac{1-\cos(0.5236)}{2}=\frac{1-0.8660}{2}=0.067.
+\]
+因此，落在该球冠内的点数服从
+\[
+  X\sim\operatorname{Binomial}(100,0.067).
+\]
+预期球冠内平均约有 $100\times 0.067\approx 6.7$ 个点。
+\end{statement}
+
+\subsection{流形上的负二项分布}
+
+经典负二项分布（negative binomial distribution）用于对一系列独立伯努利试验（Bernoulli trial）的“成功”（或失败）次数建模，试验一直进行到相反的结果出现预先给定的次数为止。在欧氏情形中，它的概率质量函数（probability mass function，PMF）为
+\[
+  P(X=k)=\binom{k+r-1}{k}(1-p)^r p^k,\qquad k=0,1,2,\ldots,
+\]
+其中 $r>0$ 为要求观测到的“失败”次数，可以取非整数，$p$ 为每次试验的成功概率。
+
+\subsubsection{推广到流形情形}
+
+数据位于流形 $M$ 上时，例如球面 $S^2$，关键是根据 $M$ 的内在几何和概率测度重新解释“成功”。下面说明如何推广负二项分布的思想（Bhattacharya and Bhattacharya 2012，Fletcher and Joshi 2007）。
+
+\paragraph{内在测度与区域}
+
+每个黎曼流形都有由黎曼度量诱导的自然体积测度 $\mu$。
+
+给定可测子集 $A\subset M$，把点落在 $A$ 内定义为“成功”事件。
+
+若假定 $M$ 上的概率律是均匀的，成功概率为
+\[
+  p=\frac{\mu(A)}{\mu(M)}.
+\]
+更一般地，若给定 $M$ 上的某个概率分布，则 $p=P(X\in A)$。
+
+% PDF p. 283
+\paragraph{定义随机变量}
+
+假设我们按底层分布在 $M$ 上抽取点 $X_1,\ldots,X_n$，进行 $n$ 次独立“试验”。
+
+对于每个点，定义示性变量
+\[
+  I_A(X_i)=
+  \begin{cases}
+    1,&X_i\in A,\\
+    0,&\text{其他情形。}
+  \end{cases}
+\]
+成功总次数为
+\[
+  S=\sum_{i=1}^{n} I_A(X_i),
+\]
+它在最简单的情形下服从二项分布，其中参数 $p$ 由内在测度决定。
+
+\paragraph{从二项分布到负二项分布}
+
+负二项分布的一种经典推导是用伽马分布（gamma distribution）混合泊松分布。在欧氏空间中，假设某个区域内的计数服从强度 $\lambda$ 随机的泊松过程，且 $\lambda$ 服从伽马分布，那么计数的边际分布就是负二项分布。
+
+在流形上，可以相对于内在体积测度定义泊松过程。对区域 $A$，若条件计数 $N(A)\mid\lambda$ 服从均值为 $\lambda\mu(A)$ 的泊松分布，且 $\lambda$ 服从伽马分布，则 $N(A)$ 的边际分布为负二项分布。这个构造通过体积 $\mu(A)$ 自然地纳入了几何信息。
+
+\begin{statement}{例 6.3}{球面 $S^2$ 上的负二项分布}
+考虑配有均匀（哈尔）概率测度的单位球面 $S^2$。设我们希望对落在球冠 $A$ 内的点数建模，其中球冠以北极为中心，角半径为 $\theta$。球冠面积为
+\[
+  \operatorname{Area}(A)=2\pi(1-\cos\theta).
+\]
+由于 $S^2$ 的总面积为 $4\pi$，内在成功概率为
+\[
+  p=\frac{\operatorname{Area}(A)}{4\pi}=\frac{1-\cos\theta}{2}.
+\]
+
+现在，若在 $S^2$ 上均匀抽取 $T_{N(P)}S^2$ 个点，落在 $A$ 内的点数服从 $\operatorname{Binomial}(n,p)$。\translatornote{原文把抽取的点数印作 $T_{N(P)}S^2$。按紧接其后的二项分布参数，此处抽取 $n$ 个点。}为了刻画在空间数据中经常出现的过度离散（overdispersion），可以假定点过程的底层强度本身是随机的。例如，可采用如下模型。
+
+给定强度 $\lambda$ 时，假设计数 $N(A)$ 服从均值为 $\lambda\mu(A)$ 的泊松分布。如果 $\lambda$ 服从形状参数为 $r$、尺度参数为 $\theta$（或以 $\beta$ 为率参数）的伽马分布，将 $\lambda$ 边际化后可得到 $N(A)$ 的负二项分布。
+
+所得负二项概率质量函数为
+\[
+  P(N(A)=k)=\binom{k+r-1}{k}
+    \left(\frac{1}{1+\theta\mu(A)}\right)^r
+    \left(\frac{\theta\mu(A)}{1+\theta\mu(A)}\right)^k.
+\]
+% PDF p. 284
+其中，参数 $\mu(A)$ 按流形的内在体积计算。对于 $S^2$，$\mu(A)=\operatorname{Area}(A)=2\pi(1-\cos\theta)$。这个公式将负二项分布自然地推广到了流形上的数据。
+\end{statement}
+
+\paragraph{为什么以及如何使用这些分布？}
+
+\subparagraph{为什么需要这些分布}
+
+\begin{itemize}
+  \item \textbf{对数据进行内在建模}许多现实数据（例如方向数据和形状数据）都位于弯曲空间中。使用欧氏模型可能产生偏差或误解。
+  \item \textbf{处理过度离散}在空间或流形上，点过程相对于泊松模型可能过度离散。作为伽马–泊松混合分布，负二项分布可以自然地刻画这一现象。
+  \item \textbf{假设检验与推断}流形上的统计推断，例如估计区域内的计数或检验空间假设，需要采用符合空间几何性质的分布。
+\end{itemize}
+
+\subparagraph{如何使用这些分布}
+
+下面给出三种做法。
+\begin{itemize}
+  \item \textbf{借助流形测度定义区域}使用黎曼度量诱导的内在体积形式计算概率和期望计数。
+  \item \textbf{构造似然函数}进行极大似然估计或贝叶斯推断时，采用推广后的概率质量函数，其中 $p$ 和 $\mu(A)$ 由流形的几何性质计算。
+  \item \textbf{模拟与模型检验}可用上述构造在流形上（例如在 $S^2$ 上）模拟点格局，并与观测数据比较，以评估模型拟合情况。
+\end{itemize}
+
+\subsection{流形上的泊松分布}
+
+在欧氏空间中，泊松分布（Poisson distribution）用于对区域内发生的事件数建模。其概率质量函数为
+\[
+  P(N(A)=k)=\frac{[\Lambda(A)]^k}{k!}\exp(-\Lambda(A)),
+\]
+其中 $\Lambda(A)$ 是区域 $A$ 内的期望事件数。推广到流形 $M$ 时，需要用内在体积测度来考虑 $M$ 的几何结构。
+
+\subsubsection{流形上泊松分布的推导}
+
+\paragraph{内在测度与强度函数}
+
+黎曼流形 $M$ 具有由黎曼度量诱导的自然体积测度 $\mu$。借助这一测度，可以按流形本身的几何结构在流形上积分。
+
+$M$ 上的强度函数（intensity function）$\lambda(x)$ 描述每个点 $x\in M$ 处事件发生的速率。
+
+% PDF p. 285
+\paragraph{定义均值测度 \texorpdfstring{$\Lambda$}{Λ}}
+
+对任何可测子集 $A\subset M$，定义均值测度（mean measure，又称强度测度）
+\[
+  \Lambda(A)=\int_A \lambda(x)\,d\mu(x).
+\]
+对于 $M$ 上的齐次（或均匀）泊松过程，强度为常数，记作 $\lambda$，因此
+\[
+  \Lambda(A)=\lambda\mu(A).
+\]
+
+\paragraph{流形上的概率质量函数}
+
+泊松分布可直接推广到 $M$。任意可测区域 $A\subset M$ 内的事件数 $N(A)$ 的分布为
+\[
+  P(N(A)=k)=\frac{(\Lambda(A))^k}{k!}\exp(-\Lambda(A)),
+  \qquad k=0,1,2,\ldots.
+\]
+当 $\lambda$ 为常数时，
+\[
+  P(N(A)=k)=\frac{(\lambda\mu(A))^k}{k!}\exp(-\lambda\mu(A)).
+\]
+
+\subsection{流形上的指数族}
+
+指数族（exponential family）是欧氏空间上一大类参数化概率分布，具有丰富的性质，包含通常遇到的大部分“标准”分布，如泊松、二项、贝塔、高斯、多项、指数、伽马和 $\chi^2$ 分布等。它们在现代统计推断中占有重要地位。经典指数族可推广到流形（Liu et al.\ 2025，Williams et al.\ 2024）。这些模型由充分统计量（sufficient statistic）和自然参数（natural parameter）刻画，定义了一个概率分布流形。本节介绍定义在流形上的指数族。
+
+\subsubsection{流形上指数族的密度函数}
+
+考虑流形 $M$ 上密度如下的指数族，
+\[
+  p(x\mid\theta)=h(x)\exp\{\langle\theta,T(x)\rangle_M-A(\theta)\},
+\]
+其中 $x\in M$，$T(x)$ 是取向量值的充分统计量，$\theta$ 是自然参数，通常属于切空间的对偶空间或某个合适的参数空间。$\langle\cdot,\cdot\rangle_M$ 是 $M$ 的黎曼度量诱导的内积，$h(x)$ 是基准测度相对于内在体积形式 $d\mu(x)$ 的密度。
+
+% PDF p. 286
+由于
+\[
+  \int_M p(x\mid\theta)\,d\mu(x)
+  =\left\{\int_M h(x)\exp\bigl(\langle\theta,T(x)\rangle_M\bigr)\,d\mu(x)\right\}
+    \exp\bigl(-A(\theta)\bigr)=1,
+\]
+解出上式中的 $A(\theta)$，得到
+\begin{equation*}
+  A(\theta)=\log\int_M h(x)\exp\bigl(\langle\theta,T(x)\rangle_M\bigr)\,d\mu(x).
+  \tag{6.1}\label{eq:6.1}
+\end{equation*}
+采用类似于欧氏情形的方法，可以推导 $T(x)$ 的均值和方差公式。
+
+\subsubsection{充分统计量 \texorpdfstring{$T(x)$}{T(x)} 的均值和方差}
+
+定义
+\begin{equation*}
+  Z(\theta)=\int_M h(x)\exp\bigl(\langle\theta,T(x)\rangle_M\bigr)\,d\mu(x).
+  \tag{6.2}\label{eq:6.2}
+\end{equation*}
+由式 \eqref{eq:6.1} 和 \eqref{eq:6.2} 可得
+\begin{equation*}
+  A(\theta)=\log Z(\theta).
+  \tag{6.3}\label{eq:6.3}
+\end{equation*}
+在正则性条件下，可以在积分号下对式 \eqref{eq:6.2} 求导，得
+\begin{equation*}
+  \nabla_\theta Z(\theta)=\int_M T(x)h(x)\exp\bigl(\langle\theta,T(x)\rangle_M\bigr)\,d\mu(x).
+  \tag{6.4}\label{eq:6.4}
+\end{equation*}
+因此，根据链式法则，由式 \eqref{eq:6.3} 得
+\begin{equation*}
+  \nabla_\theta A(\theta)=\frac{\nabla_\theta Z(\theta)}{Z(\theta)}
+  =\int_M T(x)\frac{h(x)\exp\bigl(\langle\theta,T(x)\rangle_M\bigr)}{Z(\theta)}
+  =E_\theta[T(x)].
+  \tag{6.5}\label{eq:6.5}
+\end{equation*}
+\translatornote{式 \eqref{eq:6.5} 的积分缺印 $d\mu(x)$，见式 \eqref{eq:6.4}。}
+于是，充分统计量的均值为
+\[
+  E_\theta[T(x)]=\nabla_\theta A(\theta).
+\]
+
+\begin{statement}{定义 6.3}{充分统计量的均值}
+\begin{equation*}
+  E_\theta[T(x)]=\nabla_\theta A(\theta).
+  \tag{6.6}\label{eq:6.6}
+\end{equation*}
+\end{statement}
+
+下面推导方差，即协方差矩阵。由式 \eqref{eq:6.5} 有
+\begin{equation*}
+  \nabla_\theta A(\theta)=\frac{\nabla_\theta Z(\theta)}{Z(\theta)}.
+  \tag{6.7}\label{eq:6.7}
+\end{equation*}
+
+% PDF p. 287
+对式 \eqref{eq:6.7} 两边求导，得到
+\begin{equation*}
+  \nabla_\theta^2 A(\theta)=\frac{\partial^2 A(\theta)}{\partial\theta\,\partial\theta^{\mathsf T}}
+  =\frac{Z(\theta)\dfrac{\partial^2Z(\theta)}{\partial\theta\,\partial\theta^{\mathsf T}}
+    -\nabla_\theta Z(\theta)\bigl(\nabla_\theta Z(\theta)\bigr)}{Z^2(\theta)}.
+  \tag{6.8}\label{eq:6.8}
+\end{equation*}
+\translatornote{式 \eqref{eq:6.8} 的两个梯度应作外积，原书缺印第二个梯度的转置。}
+注意
+\begin{equation*}
+  \frac{\dfrac{\partial^2Z(\theta)}{\partial\theta\,\partial\theta^{\mathsf T}}}{Z(\theta)}
+  =E_\theta[T(x)T(x)^{\mathsf T}].
+  \tag{6.9}\label{eq:6.9}
+\end{equation*}
+回顾
+\begin{equation*}
+  \nabla_\theta A(\theta)=E_\theta[T(x)].
+  \tag{6.10}\label{eq:6.10}
+\end{equation*}
+合并式 \eqref{eq:6.8}–\eqref{eq:6.10}，得到
+\begin{equation*}
+  \begin{aligned}
+    \nabla_\theta^2 A(\theta)
+      &=E_\theta[T(x)T(x)^{\mathsf T}]-E_\theta[T(x)]E_\theta[T(x)]^{\mathsf T}\\
+      &=\Cov_\theta(T(x),T(x)).
+  \end{aligned}
+  \tag{6.11}\label{eq:6.11}
+\end{equation*}
+
+\begin{statement}{定义 6.4}{充分统计量 $T(x)$ 的协方差矩阵}
+因此，$T(x)$ 的协方差矩阵为
+\begin{equation*}
+  \Var_\theta[T(x)]=\Cov_\theta(T(x),T(x))=\nabla_\theta^2 A(\theta).
+  \tag{6.12}\label{eq:6.12}
+\end{equation*}
+\end{statement}
+
+\subsection{黎曼正态分布}
+
+\subsubsection{黎曼正态分布的描述}
+
+设 $\mu\in M$ 为位置参数（“均值”），$\Sigma$ 为切空间 $T_\mu M$ 上的正定协方差算子，$\Exp_\mu\colon T_\mu M\to M$ 为 $\mu$ 处的黎曼指数映射，$\log_\mu\colon M\to T_\mu M$ 为其逆映射（对数映射），$d\mu(x)$ 表示 $M$ 上的内在体积测度。
+
+\begin{statement}{定义 6.5}{黎曼正态密度}
+黎曼正态密度（Riemannian normal density）定义为
+\[
+  p(x\mid\mu,\Sigma)=\frac{1}{Z(\mu,\Sigma)}
+   \exp\left\{-\frac12\langle\log_\mu(x),\Sigma^{-1}\log_\mu(x)\rangle_{g_\mu}\right\},
+\]
+其中 $\langle\cdot,\cdot\rangle$ 是 $T_\mu M$ 上由黎曼度量诱导的内积，归一化常数
+% PDF p. 288
+\[
+  Z(\mu,\Sigma)=\int_M
+   \exp\left\{-\frac12\langle\log_\mu(x),\Sigma^{-1}\log_\mu(x)\rangle\right\}\,d\mu(x)
+\]
+保证密度的积分为 1。
+
+在标准正交基下，$\langle\cdot,\cdot\rangle$ 就是欧氏点积，
+\[
+  \langle\log_\mu(x),\Sigma^{-1}\log_\mu(x)\rangle
+  =(\log_\mu(x))^{\mathsf T}(\Sigma^{-1}\log_\mu(x)).
+\]
+黎曼正态密度中的二次型为
+\[
+  \langle\log_\mu(x),\Sigma^{-1}\log_\mu(x)\rangle_{g_\mu}
+  =(\log_\mu(x))^{\mathsf T}(\Sigma^{-1}\log_\mu(x)),
+\]
+其中向量 $\log_\mu(x)$ 用切空间 $T_\mu M$ 的一组标准正交基表示。实际计算时，先求解线性方程组 $\Sigma y=\log_\mu(x)$，例如利用正定矩阵 $\Sigma$ 的乔列斯基分解（Cholesky factorization），再计算欧氏内积 $\log_\mu(x)\cdot y$。这个标量在黎曼正态分布的指数项中所起的作用，与在经典多元高斯分布中完全一样。增加的步骤只有计算对数映射和使用适合该流形的协方差算子。
+\end{statement}
+
+\subsubsection{指数族形式}
+
+$M$ 上的指数族分布写作
+\[
+  p(x\mid\theta)=h(x)\exp\{\langle\theta,T(x)\rangle_M-A(\theta)\}.
+\]
+对上述黎曼正态分布，可选择一种形式，将切空间中的二次型“线性化”。一种常见做法如下。
+\begin{enumerate}
+  \item \textbf{充分统计量}\par
+  定义
+  \[
+    T(x)=\operatorname{vec}\bigl(\log_\mu(x)\log_\mu(x)^{\mathsf T}\bigr),
+  \]
+  其中 $\operatorname{vec}(\cdot)$ 将 $d\times d$ 矩阵向量化。该统计量汇集了 $T_\mu M$ 的局部坐标中的所有二阶项，即二次项。
+
+  \item \textbf{自然参数}\par
+  取自然参数为
+  \[
+    \theta=-\frac12\operatorname{vec}(\Sigma^{-1}).
+  \]
+
+  \item \textbf{基准测度}\par
+  基准测度 $h(x)$ 包含内在体积元，必要时还包含从 $x\in M$ 到其切向量 $v=\log_\mu(x)$ 的变量变换产生的雅可比因子 $J(x,u)$。为简明起见，可以写作
+% PDF p. 289
+  \[
+    h(x)=J(x,u),
+  \]
+  其中 $J(x,u)$ 由指数映射的微分的行列式计算。
+
+  \item \textbf{对数配分函数（log-partition function）}\par
+  对数配分函数为
+  \[
+    A(\theta)=\log Z(\mu,\Sigma),
+  \]
+  取对应关系 $\Sigma=(\frac12\theta)^{-1}$，这里应按矩阵与其向量化表示之间的适当映射来理解。\translatornote{原书保留此对应式。由上一项的自然参数定义，若 $\operatorname{unvec}$ 表示将向量还原为矩阵，则应有 $\Sigma=(-2\operatorname{unvec}(\theta))^{-1}$。}
+\end{enumerate}
+
+因此，密度可改写为
+\[
+  \begin{aligned}
+  p(x\mid\mu,\Sigma)
+    = h(x)\exp\Biggl\{
+       &\left\langle-\tfrac12\operatorname{vec}(\Sigma^{-1}),
+          \operatorname{vec}\bigl(\log_\mu(x)\log_\mu(x)^{\mathsf T}\bigr)\right\rangle\\
+       &{}-A\left(-\tfrac12\operatorname{vec}(\Sigma^{-1})\right)
+       \Biggr\}.
+  \end{aligned}
+\]
+这里，向量化参数之间的典范内积为
+\[
+  \langle\operatorname{vec}(A),\operatorname{vec}(B)\rangle
+  =\operatorname{Tr}(A^{\mathsf T}B).
+\]
+
+\subsection{流形上随机向量变换的分布理论}
+
+在欧氏空间中，常用变量变换公式求随机向量在光滑变换下的推前分布。在流形上也需要做类似的工作，只是此时需借助微分几何工具，包括坐标卡、体积形式和测度的推前。
+
+\subsubsection{欧氏情形}
+
+设 $X$ 为 $\R^n$ 中的随机向量，相对于勒贝格测度（Lebesgue measure）的密度为 $f_X(x)$。设 $g\colon\R^n\to\R^n$ 为光滑可逆变换。变换后随机向量 $Y=g(X)$ 的密度由经典变量变换公式给出，
+\[
+  f_Y(y)=f_X(g^{-1}(y))\left|\det(Dg^{-1}(y))\right|,
+\]
+等价地，
+\[
+  f_Y(y)=f_X(x)\left|\det(Dg(x))\right|^{-1},\qquad x=g^{-1}(y).
+\]
+
+\subsubsection{推广到流形}
+
+现在设 $M$ 和 $N$ 是光滑的 $n$ 维黎曼流形，内在体积测度分别为 $d\mu_M$ 和 $d\mu_N$，由各自的黎曼度量确定。设 $X$ 是 $M$ 上的随机变量，相对于 $d\mu_M$ 的密度为 $f_X$。$g\colon M\to N$ 是光滑映射，且是 $M$ 到其像的微分同胚。那么，随机变量 $Y=g(X)$ 的分布由推前测度（push-forward measure）$g_*(f_X\,d\mu_M)$ 给出。在局部坐标中，变量变换公式变为
+% PDF p. 290
+\[
+  f_Y(y)=f_X(g^{-1}(y))\,\bigl|\det(Dg^{-1}(y))\bigr|
+          \frac{d\mu_M}{d\mu_N}(g^{-1}(y)),
+\]
+其中比值 $\dfrac{d\mu_M}{d\mu_N}$ 考虑到 $M$ 与 $N$ 上的体积形式及相应的底层测度可能不同。在许多情形中，尤其是 $M$ 嵌入 $\R^N$ 且 $N$ 继承诱导度量的情形，该比值由联系两个内在体积元的相应雅可比行列式给出。
+
+\subsubsection{\texorpdfstring{$g$}{g} 非单射时怎么办？}
+
+若 $g\colon M\to N$ 不是单射，就必须把每个分支的贡献相加。也就是说，若点 $y$ 的原像为
+\[
+  g^{-1}(y)=\{x_1,\ldots,x_k\},
+\]
+则
+\[
+  f_Y(y)=\sum_{i=1}^{k}f_X(x_i)\bigl|\det(Dg(x_i))\bigr|^{-1},
+\]
+其中行列式在符合流形结构的坐标卡内计算。
+
+上面的流形变换理论有助于理解概率密度在流形之间的光滑映射下如何变化，也使得我们可以在非欧氏情形下发展基于似然的方法与贝叶斯推断。
+
+\subsubsection{例子}
+
+下面用两个具体例子说明如何使用流形上随机向量的变量变换公式推导分布。
+
+\begin{statement}{例 6.4}{将 $\R^3$ 中的高斯分布投影到球面 $S^2$}
+\textbf{设定}\par
+设 $X\in\R^3$ 是随机向量，具有各向同性的高斯密度
+\begin{equation*}
+  f_X(x)=\frac{1}{(2\pi)^{3/2}}\exp\left(-\frac{\lVert x\rVert^2}{2}\right),
+  \qquad x\in\R^3.
+  \tag{6.13}\label{eq:6.13}
+\end{equation*}
+定义变换
+\[
+  y=g(x)=\frac{x}{\lVert x\rVert}=\frac{x}{r},\qquad
+  x\ne 0,\quad r=\lVert x\rVert,
+\]
+它将非零向量 $x$ 映为单位球面 $S^2=\{y=1\}$ 上的点 $y$。\translatornote{原书集合条件写作 $y=1$，按前述归一化定义应为 $\lVert y\rVert=1$。}
+
+\medskip
+\textbf{流形上的变换理论}\par
+设 $x=(x_1,x_2,x_3)$，$y=(\sin\theta\cos\varnothing,\sin\theta\sin\varnothing,\cos\theta)$，球坐标记为 $(r,\theta,\varnothing)$。那么
+% PDF p. 291
+\begin{equation*}
+  \begin{aligned}
+  x_1&=r\sin\theta\cos\varnothing,\\
+  x_1&=r\sin\theta\sin\varnothing,\\
+  x_3&=r\cos\theta.
+  \end{aligned}
+  \tag{6.14}\label{eq:6.14}
+\end{equation*}
+\translatornote{原书式 \eqref{eq:6.14} 第二行左端仍印作 $x_1$，按随后的式 \eqref{eq:6.15} 和 \eqref{eq:6.16}，应为 $x_2$。}
+因此，在球坐标中，由式 \eqref{eq:6.14} 可将任意 $x$ 写为
+\begin{equation*}
+  \begin{aligned}
+    x&=(x_1,x_2,x_3)
+      =(r\sin\theta\cos\varnothing,r\sin\theta\sin\varnothing,r\cos\theta)\\
+     &=r(\sin\theta\cos\varnothing,\sin\theta\sin\varnothing,\cos\theta),
+       \quad\text{即 } x=ry,\quad r>0,\quad y\in S^2.
+  \end{aligned}
+  \tag{6.15}\label{eq:6.15}
+\end{equation*}
+设 $r=1$，对式 \eqref{eq:6.14} 求微分，得到
+\begin{equation*}
+  \begin{aligned}
+    dx_1&=\cos\theta\cos\varnothing\,d\theta-\sin\theta\sin\varnothing\,d\varnothing,\\
+    dx_2&=\cos\theta\sin\varnothing\,d\theta+\sin\theta\cos\varnothing\,d\varnothing,\\
+    dx_3&=-\sin\theta\,d\theta.
+  \end{aligned}
+  \tag{6.16}\label{eq:6.16}
+\end{equation*}
+标准欧氏度量在笛卡尔坐标中表示为
+\begin{equation*}
+  \begin{aligned}
+    g&=dx_1^2+dx_2^2+dx_3^2\\
+     &=(\cos\theta\cos\varnothing\,d\theta-\sin\theta\sin\varnothing\,d\varnothing)^2\\
+     &\quad+(\cos\theta\sin\varnothing\,d\theta+\sin\theta\cos\varnothing\,d\varnothing)^2
+            +(-\sin\theta\,d\theta)^2\\
+     &=\cos^2\theta\,d\theta^2+\sin^2\theta\,d\theta^2+\sin^2\theta\,d\varnothing^2\\
+     &=d\theta^2+\sin^2\theta\,d\varnothing^2\\
+     &=\begin{pmatrix}d\theta&d\varnothing\end{pmatrix}
+       \begin{bmatrix}1&0\\0&\sin^2\theta\end{bmatrix}
+       \begin{pmatrix}d\theta\\d\varnothing\end{pmatrix}.
+  \end{aligned}
+  \tag{6.17}\label{eq:6.17}
+\end{equation*}
+式 \eqref{eq:6.17} 表明
+\[
+  g_{\theta\theta}=1,\qquad g_{\theta\varnothing}=0,\qquad
+  g_{\varnothing\varnothing}=\sin^2\theta.
+\]
+令
+\[
+  G=\begin{bmatrix}1&0\\0&\sin^2\theta\end{bmatrix}.
+\]
+那么 $\det(G)=\sin^2\theta$。
+
+设 $d\sigma(y)$ 为 $S^2$ 上的标准曲面测度，则
+\[
+  d\sigma(y)=\sqrt{\det(G)}\,d\theta\,d\varnothing=\sin\theta\,d\theta\,d\varnothing.
+\]
+利用球坐标，欧氏体积元可以表示为
+% PDF p. 292
+\[
+  dx=r^2\,dr\,d\sigma(y),
+\]
+其中 $d\sigma(y)$ 为 $S^2$ 上的标准曲面测度，也可写成
+\begin{equation*}
+  dx=r^2\,dr\,\sin\theta\,d\theta\,d\varnothing.
+  \tag{6.18}\label{eq:6.18}
+\end{equation*}
+如果 $r\ne 1$，类似地可得
+\begin{equation*}
+  \begin{aligned}
+    g&=dx_1^2+dx_2^2+dx_3^2=dr^2+r^2(d\theta)^2+r^2\sin^2\theta(d\varnothing)^2\\
+     &=\begin{pmatrix}dr&d\theta&d\varnothing\end{pmatrix}
+       \begin{bmatrix}1&0&0\\0&r^2&0\\0&0&r^2\sin^2\theta\end{bmatrix}
+       \begin{pmatrix}dr\\d\theta\\d\varnothing\end{pmatrix}.
+  \end{aligned}
+  \tag{6.19}\label{eq:6.19}
+\end{equation*}
+令
+\begin{equation*}
+  G=\begin{bmatrix}1&0&0\\0&r^2&0\\0&0&r^2\sin^2\theta\end{bmatrix}.
+  \tag{6.20}\label{eq:6.20}
+\end{equation*}
+那么
+\[
+  \det(G)=r^4\sin^2\theta.
+\]
+再次得到欧氏体积元
+\begin{equation*}
+  dx=\sqrt{\det(G)}\,dr\,d\theta\,d\varnothing
+    =r^2\,dr\,\sin\theta\,d\theta\,d\varnothing.
+  \tag{6.21}\label{eq:6.21}
+\end{equation*}
+考虑从欧氏坐标到球坐标的变换，应用流形上的变换理论，得到
+\begin{equation*}
+  f_{r,y}(r,y)=\int_0^\pi\int_0^{2\pi}\int_0^\infty
+    f_X(ry)r^2\,dr\,\sin\theta\,d\theta\,d\varnothing.
+  \tag{6.22}\label{eq:6.22}
+\end{equation*}
+\translatornote{式 \eqref{eq:6.22} 右端已在全部球坐标上积分，其值为总概率 1。相对于 $dr\,d\sigma(y)$ 的联合密度为 $f_X(ry)r^2$，沿 $r$ 积分即得下一式。}
+因为变换 $g$ “忘掉”了径向部分 $r$，所以将 $r$ 积分掉即可得到球面上的诱导密度 $f_Y$。也就是说，球面上的诱导密度 $f_Y$ 定义为
+\begin{equation*}
+  f_Y(y)=\int_0^\infty f_X(ry)r^2\,dr.
+  \tag{6.23}\label{eq:6.23}
+\end{equation*}
+将 $x=ry$ 代入式 \eqref{eq:6.13}，得到
+\begin{equation*}
+  f_Y(y)=\int_0^\infty \frac{1}{(2\pi)^{3/2}}\exp\left(-\frac{r^2}{2}\right)r^2\,dr.
+  \tag{6.24}\label{eq:6.24}
+\end{equation*}
+利用标准正态分布的方差，得到
+% PDF p. 293
+\begin{equation*}
+  \begin{aligned}
+   \int_0^\infty \exp\left(-\frac{r^2}{2}\right)r^2\,dr
+     &=\frac12\int_{-\infty}^{\infty}r^2\exp\left(-\frac{r^2}{2}\right)\,dr\\
+     &=\frac{\sqrt{2\pi}}{2}\int_{-\infty}^{\infty}
+         r^2\frac{1}{\sqrt{2\pi}}\exp\left(-\frac{r^2}{2}\right)\,dr\\
+     &=\frac{\sqrt{2\pi}}{2}.
+  \end{aligned}
+  \tag{6.25}\label{eq:6.25}
+\end{equation*}
+将式 \eqref{eq:6.25} 代入式 \eqref{eq:6.24}，得到
+\begin{equation*}
+  f_Y(y)=\frac{1}{4\pi},\qquad y\in S^2,
+  \tag{6.26}\label{eq:6.26}
+\end{equation*}
+这说明 $Y$ 在 $S^2$ 上均匀分布。
+
+这里，流形（球面）上的变量变换公式说明，对向量作归一化投影，欧氏高斯分布就推前为 $S^2$ 上的均匀分布。
+\end{statement}
+
+\begin{statement}{例 6.5}{利用指数映射从切空间到流形}
+\textbf{问题设定}\par
+设 $M$ 是 $d$ 维黎曼流形，固定基点 $\mu\in M$。设 $V\in T_\mu M$ 为 $\mu$ 处切空间中的随机向量，其密度为
+\[
+  f_V(v),
+\]
+密度相对于 $T_\mu M\in\R^d$ 上的勒贝格测度。
+
+借助黎曼指数映射定义变换
+\[
+  g(v)=\exp_\mu(V),\qquad Y=g(V)\in M.
+\]
+
+\medskip
+\textbf{流形上的变量变换公式}\par
+指数映射是局部微分同胚，所以其逆为对数映射 $\log_\mu\colon M\to T_\mu M$。$M$ 上的推前密度 $f_Y$ 为
+\begin{equation*}
+  f_Y(y)=f_v(\log_\mu(y))\,\left|\det(D\log_\mu(y))\right|,
+  \tag{6.27}\label{eq:6.27}
+\end{equation*}
+等价地，
+\[
+  f_Y(y)=f_v(v)\left|\det(D\exp_\mu(v))\right|^{-1},\qquad v=\log_\mu(y).
+\]
+这里，$D\exp_\mu(v)$ 是指数映射在 $v$ 处的微分，其行列式给出从 $T_\mu M$ 到 $M$ 时体积元变化的雅可比因子。
+
+这个公式说明了欧氏切空间中的一个分布，例如 $T_\mu M$ 上的高斯分布，如何通过指数映射推前为流形 $M$ 上的分布。雅可比因子 $\det(D\exp_\mu(v))$ 调整密度，使它相对于 $M$ 上的内在体积形式的积分为 1。
+\end{statement}
+
+% PDF p. 294
+\subsection{流形上的卡方分布}
+
+在欧氏空间中，独立标准正态随机变量的平方和服从卡方分布（chi-square distribution）。将这一概念推广到流形时，必须考虑曲率和局部几何。这可以通过对数映射将随机变量“移植”到某个基点（通常是弗雷歇均值）处的切空间来完成。若切空间中的表示近似高斯，则所得向量的范数平方或二次型服从或渐近趋近于卡方分布。
+
+\subsubsection{说明这一推广的两个互补视角}
+
+\paragraph{切空间近似}
+
+设 $M$ 为带黎曼度量 $g$ 的 $d$ 维黎曼流形。设 $X$ 是 $M$ 上的随机变量，其弗雷歇均值（内在均值）为 $\mu\in M$。在适当条件下，例如数据足够集中时，对数映射
+\[
+  \log_\mu\colon M\to T_\mu M\cong\R^d
+\]
+把 $X$ 映为 $T_\mu M$ 中的切向量 $v=\log_\mu X$。
+
+若在 $T_\mu M$ 所确定的局部坐标系下，我们作近似
+\[
+  v\sim N(0,\Sigma),
+\]
+则马氏距离（Mahalanobis distance）
+\begin{equation*}
+  Q=v^{\mathsf T}\Sigma^{-1}v
+  \tag{6.28}\label{eq:6.28}
+\end{equation*}
+服从自由度为 $d$ 的卡方分布，
+\begin{equation*}
+  Q\sim\chi_d^2.
+  \tag{6.29}\label{eq:6.29}
+\end{equation*}
+在各向同性的特殊情形，即 $\Sigma=\sigma^2 I$ 时，
+\begin{equation*}
+  Q=\frac{1}{\sigma^2}\lVert v\rVert^2,
+  \tag{6.30}\label{eq:6.30}
+\end{equation*}
+因而
+\begin{equation*}
+  \frac{1}{\sigma^2}\lVert\log_\mu(x)\rVert^2\sim\chi_d^2.
+  \tag{6.31}\label{eq:6.31}
+\end{equation*}
+这说明，在切空间中测量到 $\mu$ 的内在“距离平方”并作适当归一化，就起到欧氏卡方统计量的作用。
+
+\subsubsection{考虑曲率和非线性}
+
+如果 $M$ 的曲率不可忽略，局部几何可能使高斯近似发生偏离。在这种情况下，可以证明切向量的二次型并不严格服从权重均为 1 的卡方分布，而会服从广义的或加权的卡方分布。
+
+% PDF p. 295
+更确切地说，假定切向量适当中心化和缩放后的渐近分布为
+\[
+  v\sim N(0,\Sigma),
+\]
+但 $M$ 的曲率引入了修正，使统计量
+\[
+  Q=v^{\mathsf T}\Sigma^{-1}v
+\]
+适当归一化后有如下渐近表示，
+\begin{equation*}
+  Q\xrightarrow{d}\sum_{i=1}^d\lambda_i\chi_{1,i}^2,
+  \tag{6.32}\label{eq:6.32}
+\end{equation*}
+其中权重 $\{\lambda_i\}_{i=1}^d$ 取决于 $M$ 的曲率和 $\mu$ 处的局部几何。在平坦欧氏空间中，所有 $\lambda_i=1$，所以
+\begin{equation*}
+  \sum_{i=1}^d\chi_{1,i}^2\sim\chi_d^2.
+  \tag{6.33}\label{eq:6.33}
+\end{equation*}
+例如，推导流形上的似然比或霍特林 $T^2$ 统计量的渐近分布时会出现 $\lambda_i$。这些权重实质上是经曲率修正的归一化协方差算子的特征值。\translatornote{如果 $\Sigma$ 已是 $v$ 的正定极限协方差，且以同一个 $\Sigma$ 对 $v$ 构造 $Q$，则所得极限为普通 $\chi_d^2$。非单位权重需要区分二次型中使用的矩阵和实际极限协方差。}
+
+\subsection{流形上的双向列联表}
+
+分类变量由类别构成，在医学、心理学和社会科学等许多领域都有应用。将双向列联表（two-way contingency table）推广到取值于流形的数据，需要在流形上定义适当的“单元格”或区域，然后统计落入这些区域各个交集的数据点个数。在欧氏空间中，双向列联表按两个分类变量对观测值交叉分类。在流形上采用类似做法，同时考虑内在几何。
+
+\subsubsection{划分流形}
+
+首先介绍如何划分流形。设 $M$ 为带内在体积测度 $d\mu(x)$ 的黎曼流形。假设有两个与数据相关的分类变量，可以按数据的内在特征定义，也可以按外加准则定义。假定每个变量都将流形划分成互不相交的可测集。
+\begin{itemize}
+  \item 第一个变量将 $M$ 划分为 $I$ 个区域 $\{A_1,A_2,\ldots,A_I\}$。
+  \item 第二个变量将 $M$ 划分为 $J$ 个区域 $\{B_1,B_2,\ldots,B_J\}$。
+\end{itemize}
+现在定义表中的单元格。点 $x\in M$ 属于交叉分类中由交集 $A_i\cap B_j$ 决定的一个单元格。
+
+% PDF p. 296
+\begin{table}[htbp]
+  \centering
+  \TableCaption{6.1}{$I\times J$ 列联表}
+  \begin{tabular}{lcccc}
+    \toprule
+          & $B_1$ & $B_2$ & $\cdots$ & $B_J$\\
+    \midrule
+    $A_1$ & $n_{11}$ & $n_{12}$ & $\cdots$ & $n_{1J}$\\
+    $A_2$ & $n_{21}$ & $n_{22}$ & $\cdots$ & $n_{2J}$\\
+    $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$\\
+    $A_I$ & $n_{I1}$ & $n_{I2}$ & $\cdots$ & $n_{IJ}$\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{定义列联表}
+
+给定由 $n$ 个独立观测 $x_1,x_2,\ldots,x_n\in M$ 构成的样本，列联表（表 \ref{tab:6.1}）中的单元格计数定义为
+\[
+  n_{ij}=\#\{x_k\in M\mid x_k\in A_i\cap B_j\},
+  \qquad i=1,\ldots,I,\quad j=1,\ldots,J.
+\]
+这一做法与欧氏情形类似，区别在于各个区域 $A_i$ 和 $B_j$ 是流形 $M$ 的子集。
+
+如果用 $M$ 上相对于体积测度 $d\mu(x)$ 的概率密度 $f(x)$ 对数据建模，则单元格 $(i,j)$ 的期望计数为
+\[
+  E(n_{ij})=np_{ij},\qquad p_{ij}=\int_{A_i\cap B_j}f(x)\,d\mu(x).
+\]
+这一写法通过 $d\mu(x)$ 考虑了 $M$ 的内在几何。
+
+\subsubsection{检验统计量}
+
+若有 $n$ 个独立观测，单元格计数 $n_{ij}$ 近似服从参数为 $n$ 和各概率 $p_{ij}$ 的多项分布。在零假设（通常是两个分类相互独立）下，标准的皮尔逊卡方统计量为
+\begin{equation*}
+  X^2=\sum_{i=1}^I\sum_{j=1}^J\frac{(n_{ij}-np_{ij})^2}{np_{ij}}.
+  \tag{6.34}\label{eq:6.34}
+\end{equation*}
+
+\subsubsection{渐近分布（欧氏情形）}
+
+在经典的平坦欧氏情形，根据多项计数的多元中心极限定理，
+\begin{equation*}
+  \sqrt n\left(\frac{n_{ij}}{n}-p_{ij}\right)\xrightarrow{d}N(0,\Sigma^0),
+  \tag{6.35}\label{eq:6.35}
+\end{equation*}
+其协方差为
+\[
+  \Sigma^0_{(ij),(kl)}=p_{ij}\delta_{(ij),(kl)}-p_{ij}p_{kl}.
+\]
+% PDF p. 297
+然后应用德尔塔方法（delta method），得到皮尔逊统计量依分布收敛到自由度为 $(I-1)(J-1)$ 的卡方分布，等价地，该分布是相互独立的 $\chi_1^2$ 随机变量按单位权重求和的分布。
+
+\subsubsection{引入曲率}
+
+当数据位于弯曲流形上时，内在几何会影响概率 $p_{ij}$ 和计数的变异程度。若单元格“很小”，例如为 $M$ 的一个划分中的测地球或扇形，则在正规坐标中对体积元作二阶展开，可知以 $x$ 为中心、半径为 $r$ 的小测地球的体积为
+\begin{equation*}
+  \mu(B_r(x))=\omega_d r^d\left(1-\frac{R(x)}{6(d+2)}r^2+o(r^3)\right),
+  \tag{6.36a}\label{eq:6.36a}
+\end{equation*}
+其中 $R(x)$ 是 $x$ 处的标量曲率（scalar curvature），$\omega_d$ 是 $\R^d$ 中单位球的体积（附录 6F）。也可写成
+\begin{equation*}
+  \mu(B_r(x))=\omega_d r^d
+    \left(1-\frac{d(d-1)K(x)}{6(d+2)}r^2+o(r^3)\right),
+  \tag{6.36b}\label{eq:6.36b}
+\end{equation*}
+其中 $K(x)$ 为截面曲率。
+
+于是，单元格概率变为
+\begin{equation*}
+  p_{ij}=p_{ij}^0\left(1-c_{ij}r^2+o(r^3)\right),
+  \tag{6.37}\label{eq:6.37}
+\end{equation*}
+其中 $p_{ij}^0$ 为在平坦空间中计算的概率，且
+\[
+  c_{ij}=\frac{R_{ij}}{6(d+2)},
+\]
+$R_{ij}$ 是取决于单元格 $A_i\cap B_j$ 的位置和形状的曲率项。
+
+类似地，单元格比例的协方差矩阵有一个由曲率引起的修正，
+\begin{equation*}
+  \Sigma_{(ij),(kl)}
+   =p_{ij}\delta_{(ij),(kl)}-p_{ij}p_{kl}+\gamma_{(ij),(kl)}(K),
+  \tag{6.38}\label{eq:6.38}
+\end{equation*}
+其中 $\gamma_{(ij),(kl)}(K)$ 是取决于 $M$ 的曲率及单元格几何的修正项，由下式给出（附录 6G）。\translatornote{对独立同分布的单元格归类，代入真实单元格概率 $p_{ij}$ 后，多项计数协方差已经反映曲率对单元格概率的影响。相对平坦情形的协方差修正可以围绕 $p_{ij}^0$ 展开，直接在真实概率给出的协方差上再加修正会重复计算。}
+
+对角情形 $(ij)=(kl)$：
+\begin{equation*}
+  \gamma_{(ij),(ij)}
+   =\frac{p_{ij}^0 r^2}{N}\frac{R(x_{ij})}{6(n+2)}(2p_{ij}^0-1).
+  \tag{6.39a}\label{eq:6.39a}
+\end{equation*}
+非对角情形 $(ij)\ne(kl)$：
+\begin{equation*}
+  \gamma_{(ij),(kl)}
+   =\frac{p_{ij}^0p_{kl}^0}{N}\frac{R(x_{ij})+R(x_{kl})}{6(n+2)}.
+  \tag{6.39b}\label{eq:6.39b}
+\end{equation*}
+
+% PDF p. 298
+\subsubsection{流形上检验统计量的渐近分布}
+
+\begin{statement}{定理 6.1}{流形上检验统计量的渐近分布}
+利用流形情形下的中心极限定理，有
+\begin{equation*}
+  \sqrt n(\hat p-p)\xrightarrow{d}N(0,\Sigma(K)),
+  \tag{6.40}\label{eq:6.40}
+\end{equation*}
+其中 $\hat p$ 是观测单元格比例构成的向量，且
+\[
+  \Sigma(K)=\Sigma^0+\Gamma(k),
+\]
+$\Gamma(k)=\bigl(\gamma_{(ij),(kl)}\bigr)_{IJ\times IJ}$ 是曲率修正矩阵。
+
+然后，利用德尔塔方法，皮尔逊卡方统计量可写作
+\begin{equation*}
+  X^2=n(\hat p-p)^{\mathsf T}D^{-1}(\hat p-p),
+  \tag{6.41}\label{eq:6.41}
+\end{equation*}
+其中 $D$ 是以 $p_{ij}$ 为对角元的对角矩阵。它的渐近分布为
+\begin{equation*}
+  X^2\xrightarrow{d}
+    Z^{\mathsf T}\bigl[D^{-1/2}\Sigma(K)D^{-1/2}\bigr]^{-1}Z,
+  \tag{6.42}\label{eq:6.42}
+\end{equation*}
+其中 $Z\sim N(0,I)$。等价地，将归一化协方差矩阵对角化后，可写成
+\begin{equation*}
+  X^2\xrightarrow{d}\sum_{r=1}^{(I-1)(J-1)}\lambda_r(K)\chi_{1,r}^2,
+  \tag{6.43}\label{eq:6.43}
+\end{equation*}
+其中权重 $\lambda_r(K)$ 是矩阵 $D^{-1/2}\Sigma(K)D^{-1/2}$ 的特征值（附录 6H）。\translatornote{式 \eqref{eq:6.42} 保留原印式。由式 \eqref{eq:6.40} 和 \eqref{eq:6.41}，标准正态向量的二次型应使用 $D^{-1/2}\Sigma(K)D^{-1/2}$，其特征值才是式 \eqref{eq:6.43} 中的权重。}
+
+在欧氏情形（曲率为零），所有 $\lambda_r(K)=1$，因此
+\begin{equation*}
+  X^2\xrightarrow{d}\chi^2_{(I-1)(J-1)}.
+  \tag{6.44}\label{eq:6.44}
+\end{equation*}
+当曲率不为零时，$\lambda_r(K)$ 偏离 1。例如，若单元格很小且 $K$ 近似为常数，可以写成
+\[
+  \lambda_r(K)\approx 1+\delta_r(K),
+\]
+其中 $\delta_r(K)$ 刻画一阶曲率修正。
+\end{statement}
+
+\subsubsection{示例}
+
+\begin{statement}{例 6.6}{$2\times I$ 列联表检验}
+设数据位于弯曲流形上。考虑表 \ref{tab:6.2} 所示的 $2\times I$ 列联表，其中 $I=4$。在这个简单的模拟中，取 $n=200$，各单元格概率均匀，得到如下结果。
+% PDF p. 299
+\begin{itemize}
+  \item 观测到的皮尔逊 $\chi^2$ 统计量为 $6.5606$。
+  \item 欧氏 $\chi_{(3)}^2$ 的 $p$ 值（自由度为 $3$）为 $0.0873$。
+  \item 流形加权 $\chi^2$ 的 $p$ 值（权重为 $[0.5,0.5,0.5]$）为 $0.0045$。
+\end{itemize}
+在流形情形下，权重 $\lambda_r<1$ 使概率更多地集中在较小的值上。于是，尾部概率 $P(\sum_r\lambda_r\chi_{1,r}^2>X^2)$ 比标准卡方的尾部概率小得多。流形假设下的 $p$ 值因而明显小于欧氏假设下的 $p$ 值。这说明纳入流形的协方差可以为反对零假设提供更强的统计依据。
+
+图 \ref{fig:6.1} 比较流形与欧氏情形下的 $\chi^2$ 分布。两条曲线分别表示流形加权 $\chi^2$ 分布（权重为 $[0.5,0.5,0.5]$）和自由度为 3 的欧氏 $\chi^2$ 分布。可以看到，流形分布更集中在左侧，峰值较高且出现在较小的 $x$ 处，反映了权重使有效方差减小。标准 $\chi_{(3)}^2$ 分布则更为分散。
+\end{statement}
+
+\begin{table}[htbp]
+  \centering
+  \TableCaption{6.2}{肠道微生物群组成的列联表}
+  \begin{tabular}{lccccc}
+    \toprule
+    组别 & 属 1 & 属 2 & $\cdots$ & 属 $I$ & 合计\\
+    \midrule
+    IBD & $n_{11}$ & $n_{12}$ & $\cdots$ & $n_{1I}$ & $n_{1+}$\\
+    对照组 & $n_{21}$ & $n_{22}$ & $\cdots$ & $n_{2I}$ & $n_{2+}$\\
+    合计 & $n_{+1}$ & $n_{+2}$ & $\cdots$ & $n_{+I}$ & $n$\\
+    \bottomrule
+  \end{tabular}\par
+  \medskip
+  \begin{minipage}{.85\linewidth}\small
+    \textbf{注}\quad $n_{rj}$ 为第 $r$ 组第 $j$ 个属的测序读段数。行内求和得到各组的总读段数，列内对受试者汇总。
+  \end{minipage}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[anchor=south west,inner sep=0pt] (plot) at (0,0)
+      {\includegraphics[width=.84\linewidth]{assets/ch06/fig06_01.pdf}};
+    \begin{scope}[x={(plot.south east)},y={(plot.north west)}]
+      \fill[white] (0,.45) rectangle (.027,.61);
+      \node[rotate=90,inner sep=0pt,font=\scriptsize] at (.010,.53) {密度};
+      \fill[white] (.741,.884) rectangle (.998,.994);
+      \node[anchor=north east,inner sep=2.4pt,draw=black!25,fill=white,
+            rounded corners=.5pt,font=\scriptsize] at (.991,.985)
+        {\shortstack[l]{\textcolor{red}{\rule{1.1em}{.6pt}}\enspace 流形加权 $\chi^2$\\
+         \textcolor{blue!68!black}{\rule{1.1em}{.6pt}}\enspace 欧氏 $\chi^2$（自由度 3）}};
+    \end{scope}
+  \end{tikzpicture}
+  \FigureCaption{6.1}{流形与欧氏情形下的 $\chi^2$ 分布}
+\end{figure}
+
+\subsubsection{临床应用}
+
+为了进一步说明流形上的双向列联表检验，下面给出一个卫生保健领域的例子。一个合适的例子是考察不同疾病状态下的微生物群组成。
+% PDF p. 300
+这里的分类群组成是成分数据（compositional data），位于单纯形流形上。双向表的行可以分别表示患病和健康状态，列可以表示不同物种。
+
+\paragraph{临床背景}
+
+研究人员经常比较炎症性肠病（inflammatory bowel disease，IBD）患者和健康对照者的肠道微生物群组成。对每位受试者的粪便样本测序，以确定 $I$ 个细菌属的计数。
+
+\paragraph{列联表的设置}
+
+这个临床问题的双向列联表见表 \ref{tab:6.2}。
+
+\paragraph{为什么是流形？}
+
+下面解释为什么列联表的概率单纯形（probability simplex）是光滑流形。定义单元格概率
+\[
+  p_{rj}=\frac{n_{rj}}{n_{r+}},
+\]
+它位于概率单纯形
+\[
+  \Delta^{I-1}=\left\{p\in\R^I:\ p_j\geq 0,\quad\sum_jp_j=1\right\}.
+\]
+这是一个光滑流形。\translatornote{原书所列闭单纯形含有边界和角。以下光滑流形结构指所有分量都严格为正的内部。}传统的 $\chi^2$ 检验假定采用欧氏几何，忽略了单纯形的曲率以及各比例间固有的协方差。概率单纯形有如下特征。
+
+\begin{itemize}
+  \item $\Delta^3$（3-单纯形）在 $\R^3$ 中的四面体嵌入。四个角点 $(1,0,0,0)$、$(0,1,0,0)$、$(0,0,1,0)$ 和 $(0,0,0,1)$ 成为超平面 $p_1+p_2+p_3+p_4=1$ 内四面体的顶点。任一内点都对应一个有效的概率向量 $p=(p_1,p_2,p_3,p_4)$。
+  \item \textbf{光滑流形结构}\par
+  局部来看，在远离边界处，$\Delta^3$ 类似于 $\R^3$ 的开子集。可以沿三个独立方向 $dp_1,dp_2,dp_3$ 作无穷小移动，其中 $dp_4$ 由 $-\sum dp_i$ 决定。由此可知它是三维流形。
+  \item \textbf{内在曲率（费希尔–拉奥度量）}\par
+  尽管我们在三维欧氏空间中将单纯形画得“平坦”，一旦赋予它费希尔–拉奥度量（Fisher–Rao metric），即自然的信息几何度量，它就与三维球面 $S^3$ 的一部分等距。
+  \item 两个分布之间的测地线因此表现为大圆弧，而非欧氏直线，反映了它具有常正曲率。
+\end{itemize}
+
+下面给出肠道微生物群情形中的完整数值示例。
+
+\paragraph{模拟设置}
+
+\begin{itemize}
+  \item $I=4$ 个细菌属，两组分别为 IBD 与对照组，两组总计数为 $n_1=n_2=100$（表 \ref{tab:6.3}）。
+  \item 真实的底层比例为
+  \[
+    p^{\mathrm{IBD}}=(0.40,0.30,0.10,0.20),\qquad
+    p^{\mathrm{Ctrol}}=(0.20,0.30,0.10,0.40).
+  \]
+\end{itemize}
+
+% PDF p. 301
+\begin{table}[htbp]
+  \centering
+  \TableCaption{6.3}{观测计数}
+  \begin{tabular}{lcc}
+    \toprule
+    细菌属 & IBD（$n=100$） & 对照组（$n=100$）\\
+    \midrule
+    属 1 & 34 & 21\\
+    属 2 & 27 & 27\\
+    属 3 & 11 & 9\\
+    属 4 & 28 & 43\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{\texorpdfstring{$H_0$}{H₀} 下的合并比例}
+
+\[
+  \hat p_j=\frac{n_{1j}+n_{2j}}{2n}=(0.275,0.270,0.100,0.355).
+\]
+
+\paragraph{皮尔逊 \texorpdfstring{$\chi^2$}{χ²} 与欧氏 \texorpdfstring{$p$}{p} 值}
+
+\[
+  X^2=\sum_{r=1}^{2}\sum_{j=1}^{4}\frac{(n_{rj}-n_r\hat p_j)^2}{n_r\hat p_j}
+       =6.442
+\]
+自由度为 $(2-1)(4-1)=3$，得到
+\[
+  p_{\mathrm{Euclid}}=P(\chi_{(3)}^2>6.442)=0.0920.
+\]
+
+\paragraph{流形加权 \texorpdfstring{$\chi^2$}{χ²} 与 \texorpdfstring{$p$}{p} 值}
+
+我们取一组用于说明的权重。实际应用中，$\lambda_r$ 来自 $D^{-1/2}\Sigma D^{-1/2}$ 的特征值，其中 $\Sigma$ 是合并排列所得比例向量的渐近协方差，见式 (6.39)、式 \eqref{eq:6.40} 和附录 6H。
+
+这里取 $\lambda=(0.7,0.5,0.3)$，对 $\sum_{r=1}^3\lambda_r\chi_{1,r}^2$ 模拟抽取 $200{,}000$ 次。
+
+得到的流形 $p$ 值为
+\[
+  p_{\mathrm{manifold}}=P\left(\sum_r\lambda_r\chi_{1,r}^2>6.442\right)\approx 0.0072.
+\]
+通过权重 $\{\lambda_r\}$ 考虑单纯形流形的协方差结构后，相对于标准欧氏 $\chi^2$ 检验（$p\approx0.09$），同一个观测列联表得到的结果要显著得多（$p\approx0.007$）。这个例子说明，在成分数据（微生物群）的情形中，流形检验更为敏感。
+
+流形双向列联表检验可应用于各类遗传关联研究。

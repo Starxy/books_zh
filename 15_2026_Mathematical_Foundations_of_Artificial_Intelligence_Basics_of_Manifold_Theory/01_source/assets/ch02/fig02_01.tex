@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth]
+  \draw[thick] (-.7,0)--(10.9,0);
+  \draw[thick] (0,-3)--(0,3);
+  \draw[thick] (8.7,-3)--(8.7,3);
+  \draw[-{Stealth},thick] (0,0)--node[above=3pt] {$\varphi$} (8.4,0);
+  \node[anchor=west] at (-.45,2.6) {流形 $M$};
+  \node[anchor=west] at (10.25,2.6) {流形 $N$};
+  \fill (0,0) circle (1.6pt) node[below left,inner sep=2pt] {$p$};
+  \fill (8.7,0) circle (1.6pt) node[below right,inner sep=2pt] {$\varphi(p)$};
+  \draw[-{Stealth},line width=1.2pt,blue!70!black] (0,0)--(1.5,1)
+      node[above right,inner sep=1pt] {$X$};
+  \draw[-{Stealth},line width=1.2pt,green!50!black] (0,0)--(.9,-1.8)
+      node[right,inner sep=1pt] {$Y$};
+  \draw[-{Stealth},line width=1.2pt,blue!70!black] (8.7,0)--(10.45,.32)
+      node[above right,inner sep=1pt] {$d\varphi(X)$};
+  \draw[-{Stealth},line width=1.2pt,green!50!black] (8.7,0)--(8.12,-2.3)
+      node[below,inner sep=1pt] {$d\varphi(Y)$};
+\end{tikzpicture}

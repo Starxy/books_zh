@@ -1,0 +1,247 @@
+% PDF p. 216
+\begin{enumerate}
+  \item \textbf{生物学与物理背景}
+
+  生物学动机。在发育中的胚胎或细胞组织等许多生物系统中，一些分子（如蛋白质、形态发生素或基因产物）在组织中扩散，同时参与化学反应。这些过程决定基因表达和细胞分化的空间模式。了解这些模式如何形成、扩展并趋于稳定，对发育生物学、组织工程和相关领域很重要。
+
+  物理与化学背景。这里的现象涉及两个主要过程。
+  \begin{enumerate}[label=\arabic*.]
+    \item 扩散。物质（例如分子）从高浓度区域向低浓度区域被动扩散。
+    \item 反应（或调控）。化学过程或调控相互作用可生成或降解这些物质，或按非线性动力学改变其水平。
+  \end{enumerate}
+
+  \item \textbf{基本记号与假设}
+
+  考虑单个标量场 $f(x,t)$。其中
+  \begin{itemize}
+    \item $x\in\Omega\subseteq\R^n$ 表示空间中的一点，例如组织中的位置。
+    \item $t\geq0$ 表示时间。
+    \item $f(x,t)$ 表示某种分子物质的浓度（或活性水平），例如基因产物（mRNA 或蛋白质）或形态发生素。
+  \end{itemize}
+
+  \textbf{主要假设}
+
+  组织或区域 $\Omega$ 是连续介质。
+
+  分子进行随机游走或类似过程，从而发生扩散。
+
+  物质的生成和降解受局部反应动力学控制，取决于 $f(x,t)$ 本身。在方程组中也可能取决于其他物质。
+
+  为简单起见，从单物质模型开始。更复杂的系统可以涉及多种相互作用的物质。
+
+  \item \textbf{扩散项的推导}
+
+  \textbf{菲克扩散定律。}通常用菲克第一定律（Fick's first law）为扩散建模。
+  \[
+    \symbfit{J}=-D\nabla f,
+  \]
+  其中 $\symbfit{J}$ 是通量，即物质通过单位面积的速率，$D$ 为扩散系数，为简单起见假设它为常数。该定律说明通量与浓度梯度成正比，物质从高浓度区域流向低浓度区域。
+
+  质量守恒。为得到偏微分方程（partial differential equation，PDE），应用质量守恒原理。考虑组织中的一个小体积 $v$。$v$ 内的物质总量随时间变化，由物质穿过边界 $\partial v$ 的净通量以及局部的源或汇（反应）共同决定。
+
+  \textbf{数学表达如下。}\translatornote{原书此处反应项积分缺少体积微元 $dx$，下一页代入通量后的两个体积分也未写该微元。}
+  \[
+    \frac{d}{dt}\int_v f(x,t)\,dx
+      =-\int_{\partial v}\symbfit{J}\cdot\symbfit{n}\,dS
+        +\int_v R(f(x,t)),
+  \]
+  其中 $\symbfit{n}$ 是边界 $\partial v$ 上的外单位法向。使用散度定理，
+  % PDF p. 217
+  \[
+    \int_{\partial v}\symbfit{J}\cdot\symbfit{n}\,dS
+      =\int_v\nabla\cdot\symbfit{J}\,dx.
+  \]
+  代入 $\symbfit{J}=-D\nabla f$，
+  \[
+    \frac{d}{dt}\int_v f(x,t)\,dx
+     =-\int_v\nabla\cdot(-D\nabla f)+\int_v R(f(x,t)).
+  \]
+  由于 $v$ 是任意的，可以令被积函数相等，得到
+  \[
+    \frac{\partial f}{\partial t}=D\Delta f+R(f),
+  \]
+  其中 $\Delta=\nabla\cdot\nabla$ 为拉普拉斯算子。
+\end{enumerate}
+
+\textbf{各项的含义}
+
+$D\Delta f$ 是扩散项，使浓度差异在空间上逐渐变平。
+
+$R(f)$ 是反应项（或调控项），刻画基因调控动力学，包括激活、抑制和非线性反馈。
+
+\textbf{边界条件与初始条件}
+
+为求解这一偏微分方程，需要下列条件。
+\begin{itemize}
+  \item \textbf{初始条件。}$f(x,0)$ 指定物质的初始分布。
+  \item \textbf{边界条件。}区域 $\Omega$ 的边界条件常见如下。
+  \begin{itemize}
+    \item \textbf{无通量边界。}$\nabla f\cdot n=0$，即没有物质流出区域。
+    \item \textbf{狄利克雷边界（Dirichlet boundary）。}$f(x,t)$ 在边界上固定。
+    \item \textbf{诺伊曼边界（Neumann boundary）。}指定边界上的通量。
+  \end{itemize}
+\end{itemize}
+条件的选择取决于生物学语境，例如组织区域具有不可渗透的边界，或与外部储库相互作用。
+
+\textbf{斑图形成与稳定性分析}
+
+反应–扩散系统以能产生斑图而著称，这一概念由艾伦·图灵（Alan Turing）提出。考察均匀稳态的稳定性，可以说明在某些参数范围内，解 $f(x,t)$ 会出现条纹、斑点等空间斑图。
+
+在基因表达中，这些斑图可表示基因活性的稳定空间分布，进而使发育中的生物体形成体节或其他形态结构。
+
+\paragraph*{4.4.3.3.4.2\quad 黎曼流形上的扩散–反应方程}
+在黎曼流形 $(M^n,g)$ 上，欧氏空间的扩散–反应方程中，除把 $\Delta$ 换成拉普拉斯–贝尔特拉米算子
+\[
+  \Delta\longrightarrow\Delta_g=\operatorname{div}_g\nabla_g
+\]
+外，其余项不变。因此，弯曲空间中对应的方程为
+\[
+  \frac{\partial f}{\partial t}=D\Delta_g f+R(f).
+\]
+% PDF p. 218
+在局部坐标卡 $x=(x^1,\ldots,x^n)$ 中，设度量矩阵为 $g_{ij}$ 且 $|g|=\det g_{ij}$。则
+\[
+  \Delta_g f=\frac{1}{\sqrt{|g|}}\,\partial_{x^i}
+                    \bigl(\sqrt{|g|}\,g^{ij}\partial_{x^j}f\bigr),
+\]
+从而得到标准的偏导数形式
+\[
+  \frac{\partial f}{\partial t}
+   =D\frac{1}{\sqrt{|g|}}\,\partial_{x^i}
+                    \bigl(\sqrt{|g|}\,g^{ij}\partial_{x^j}f\bigr)+R(f).
+\]
+
+\textbf{边界项与体积项}
+
+若 $M$ 的边界 $\partial M$ 具有外法向 $v$，则有以下情形。
+
+\textbf{无通量（诺伊曼）。}$D\partial_v^gf=0$，其中
+$\partial_v^gf=g(\nabla_g f,v)=\langle\nabla_g f,v\rangle_g$。
+
+\textbf{狄利克雷。}$f|_{\partial M}=h$。
+
+\textbf{$M$ 与 $\Delta_g$ 的例子。}考虑两种情形。
+
+\textbf{球面 $S^2(R)$。}
+\[
+  \Delta_g f=\frac1{R^2}\left(f_{\theta\theta}+\cot\theta\,f_\theta
+       +\frac1{\sin^2\theta}f_{\varnothing\varnothing}\right).
+\]
+
+\textbf{双曲平面 $(x+iy,y>0)$。}
+\[
+  \Delta_g f=y^2(f_{xx}+f_{yy}).
+\]
+\textbf{推广到流形的散度定理}为
+\[
+  \int_M\Delta_g f\,dV=\int_{\partial M}\partial_v^g f\,dS.
+\]
+
+\paragraph*{4.4.3.3.4.3\quad 作为动力系统的基因调控（常微分方程形式）}
+在每个固定空间点 $x$ 处，若“关闭”扩散，则基因表达 $f(t)$ 的时间演化只由反应项决定。
+\[
+  \frac{df}{dt}=R(f).
+\]
+这个常微分方程描述基因表达水平如何在底层生化反应网络和调控相互作用（如转录因子、增强子、阻遏物等）的作用下随时间变化。
+
+\paragraph*{4.4.3.3.4.4\quad 用向量场表示反应项}
+将基因表达水平 $f$ 看作状态空间中的一点。若只有一个基因，空间可以是 $\R$。若有多个相互作用的基因，则可以是 $\R^m$。反应项 $R(f)$ 可视为定义了状态空间上的向量场 $X$。
+\[
+  X(f)=R(f).
+\]
+直观地，$X$ 给每个状态 $f$ 指定一个向量，即变化的方向和速率，描述 $f$ 怎样在调控相互作用下随时间演化。
+
+\paragraph*{4.4.3.3.4.5\quad 李导数与向量场}
+在微分几何中，相对于向量场 $X$ 的李导数 $\mathcal L_X$ 自然地度量某个量如何在“沿 $X$ 所定义的流移动”时发生变化。具体来说，若把 $f$ 本身看作状态空间上的标量函数，则 $f$ 沿 $X$ 的李导数定义为
+% PDF p. 219
+\[
+  \mathcal L_Xf=X(f).
+\]
+这正是 $f$ 沿向量场 $X$ 方向的方向导数。由于将反应项 $R(f)$ 认作向量场 $X(f)$，可见
+\[
+  R(f)=X(f)=\mathcal L_Xf.
+\]
+换言之，反应动力学，即生化调控网络引起的基因表达变化，可以由表达水平相对于调控向量场 $X$ 的李导数简明地刻画。
+
+\paragraph*{4.4.3.3.4.6\quad 癌症示例}
+\textbf{癌症研究中的反应–扩散模型。}反应–扩散模型已被用于模拟肿瘤的生长和侵袭。例如，有研究讨论用反应–扩散方程描述胶质瘤生长，考虑肿瘤异质性和缺氧等因素（Martín-Landrove，2017）。
+
+\textbf{生化系统中的因果网络推断。}已有研究利用生化动力学推断因果网络。其中一项研究提出基于非线性生化动力学的网络推断和动力学预测框架，并应用于癌细胞系的磷酸化蛋白质组数据（Oates 等，2014）。
+
+\textbf{癌症研究中的图神经网络（GNN）。}GNN 已用于肿瘤学中，刻画生物系统内部复杂的相互作用。一篇综述概括了 GNN 在癌症研究中的新趋势，强调其整合多模态数据并增强可解释性的潜力（Gogoshin 和 Rodin，2023）。
+
+\textbf{图神经反应–扩散模型。}有研究提出一类基于神经反应–扩散系统的新型 GNN，显示该方法可有效地为多种类型的数据建模，包括时空数据。虽然没有直接用于癌症研究，这一方法表明反应–扩散系统与 GNN 结合具有潜力（Eliasof 等，2024）。
+
+这些研究分别探索了反应–扩散模型、因果推断以及癌症研究中的 GNN 等组成部分。把这些要素连同李导数整合起来，并将药物效应作为反应因素纳入一个综合模型，看来仍是未来可研究的问题。
+
+\textbf{黑色素瘤}
+\begin{enumerate}
+  \item \textbf{黑色素瘤特异性基因}
+
+  通常与黑色素瘤有关的关键基因如下。
+  \begin{enumerate}[label=\arabic*.]
+    \item BRAF 在约 $50\%$ 的黑色素瘤中发生突变，促进增殖。
+    \item NRAS 是黑色素瘤的致癌驱动基因。
+    \item MITF 调控黑色素细胞的分化和存活。
+    \item CDKN2A 是参与细胞周期调控的抑癌基因。
+    \item PD-L1 是免疫逃逸标志物。
+    \item VEGF 促进血管生成。
+    \item HIF1A 介导缺氧反应。
+    \item TYR 编码酪氨酸酶，为黑色素细胞和黑色素瘤所特有。
+    % PDF p. 220
+    \item PIK3CA 在黑色素瘤中常发生突变，激活存活通路。
+    \item AKT3 是黑色素瘤存活和转移的关键调控因子。
+  \end{enumerate}
+  \item \textbf{反应–扩散框架}
+
+  主要模型为
+  \[
+    \frac{\partial f_i}{\partial t}=D_i\Delta f_i+\mathcal L_X f_i+R_i(f).
+  \]
+  \item \textbf{相互作用网络}
+  \begin{itemize}
+    \item 定义 $10\times10$ 的耦合矩阵 $k_{ij}$，表示基因间的相互作用。$k_{ij}$ 为正表示激活，为负表示抑制。
+    \item 纳入串扰和反馈回路。
+  \end{itemize}
+  \item \textbf{调整模型参数}
+  \begin{itemize}
+    \item 为扩散系数 $D_i$ 和相互作用强度设定具有生物学意义的数值。
+  \end{itemize}
+  \item \textbf{可视化}
+  \begin{itemize}
+    \item 展示全部十个基因的表达模式。
+  \end{itemize}
+\end{enumerate}
+
+\emph{实施步骤}
+\begin{enumerate}
+  \item 定义十个癌症相关基因并为其指定属性。
+  \item 修改反应项 $R_i(f)$，使其用更新后的耦合相互作用处理十个基因。
+  \item 对扩展模型作时间演化模拟。
+  \item 将全部十个基因的空间表达模式可视化。
+\end{enumerate}
+
+\textbf{结果}
+
+针对黑色素瘤设定的反应–扩散模型已完成模拟。为进一步分析结果，我们将模拟与实验比较。用每个基因的均方误差（Mean Squared Error，MSE）度量二者的差异。比较结果汇总在表~\ref{tab:4.6}。
+
+\begin{table}[htbp]
+  \centering
+  \TableCaption{4.6}{十个基因的实验与模拟结果之间的均方误差}
+  \begin{tabular}{rlr}
+    \toprule
+    序号 & 基因名称 & MSE \\
+    \midrule
+     1 & BRAF   & 0.1320 \\
+     2 & NRAS   & 0.3305 \\
+     3 & MITF   & 0.1332 \\
+     4 & CDKN2A & 0.3313 \\
+     5 & PD-L1  & 0.3247 \\
+     6 & VEGF   & 0.3032 \\
+     7 & HIF1A  & 0.3318 \\
+     8 & TYR    & 0.3357 \\
+     9 & PIK3CA & 0.1418 \\
+    10 & AKT3   & 0.1391 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

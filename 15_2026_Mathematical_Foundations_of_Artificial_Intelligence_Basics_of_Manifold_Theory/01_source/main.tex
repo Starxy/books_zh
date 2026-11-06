@@ -1,0 +1,30 @@
+\documentclass[zihao=5,fontset=fandol,openany,twoside]{ctexbook}
+\input{preamble}
+\let\cleardoublepage\clearpage
+
+\newif\iftranslationcomplete
+\InputIfFileExists{translation_status.tex}{}{}
+\newcommand{\BookInput}[1]{%
+  \iftranslationcomplete
+    \input{#1}%
+  \else
+    \IfFileExists{#1.tex}{\input{#1}}{}%
+  \fi
+}
+\newcommand{\BookChapter}[2]{%
+  \setcounter{chapter}{#1}%
+  \BookInput{chapters/ch#2}%
+}
+
+\begin{document}
+\BookInput{frontmatter}
+\mainmatter
+\BookChapter{0}{01}
+\BookChapter{1}{02}
+\BookChapter{2}{03}
+\BookChapter{3}{04}
+\BookChapter{4}{05}
+\BookChapter{5}{06}
+\backmatter
+\BookInput{index}
+\end{document}

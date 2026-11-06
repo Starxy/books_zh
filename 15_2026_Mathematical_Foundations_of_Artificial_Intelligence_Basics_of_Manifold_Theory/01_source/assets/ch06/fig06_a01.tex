@@ -1,0 +1,11 @@
+% PDF p. 321. Replace the three legend labels within the original plot.
+\begin{tikzpicture}
+\node[inner sep=0pt,outer sep=0pt,anchor=south west] (plot) at (0,0)
+  {\includegraphics[width=.86\linewidth]{assets/ch06/fig06_a01.pdf}};
+\begin{scope}[x={(plot.south east)},y={(plot.north west)}]
+\fill[white] (.461,.151) rectangle (.661,.317);
+\node[anchor=west,inner sep=0pt,font=\scriptsize] at (.463,.295) {曲线 $\gamma(t)$};
+\node[anchor=west,inner sep=0pt,font=\scriptsize] at (.463,.239) {切向量 $\dot\gamma(t)$};
+\node[anchor=west,inner sep=0pt,font=\scriptsize] at (.463,.184) {平行移动 $V(t)$};
+\end{scope}
+\end{tikzpicture}

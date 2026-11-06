@@ -1,0 +1,13 @@
+% PDF p. 55, figure 1A.1. The nearly vertical red line has no arrowheads in the original.
+\begin{tikzpicture}[x=1cm,y=1cm,>=Stealth]
+  \definecolor{quotientred}{HTML}{F0141B}
+  \definecolor{quotientblue}{HTML}{006AB6}
+  \draw[line width=.85pt,quotientred] (-.13,2.98) -- (.13,-3.09);
+  \foreach \endpoint in {(-2.85,2.17),(-3.55,1.05),(-3.61,-.18),
+      (-3.41,-1.05),(-2.72,-1.91),(2.59,1.92),(3.02,-2.24)} {
+    \draw[->,line width=.85pt,quotientred] (0,0) -- \endpoint;
+  }
+  \foreach \endpoint in {(3.16,.95),(3.00,.15),(3.51,-.60)} {
+    \draw[->,line width=.85pt,quotientblue] (0,0) -- \endpoint;
+  }
+\end{tikzpicture}

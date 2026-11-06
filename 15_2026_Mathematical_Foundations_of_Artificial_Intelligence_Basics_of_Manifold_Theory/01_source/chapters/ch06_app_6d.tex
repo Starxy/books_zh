@@ -1,0 +1,59 @@
+% PDF p. 332
+\AppendixSection{6D}{李括号}
+\AppendixHeading{6D1}{向量场}
+向量场 $v$ 是线性映射 $v\colon C^\infty(M)\to C^\infty(M)$，因为它在每一点处本质上都是一个导子，即 $v\colon f\mapsto v(f)$。
+
+将复合 $X\circ Y$ 记为 $XY$，其中 $XY$ 是向量场。%
+\translatornote{两个导子的复合 $XY$ 一般是二阶微分算子。相减得到的交换子 $[X,Y]$ 才是向量场。}
+
+% PDF p. 333
+\begin{statement}{定义 6D.1}{李括号 $[X,Y]$}
+李括号 $[X,Y]$ 定义为
+\begin{equation*}
+  [X,Y]\coloneqq XY-YX.
+  \tag{6D1}\label{eq:6D1}
+\end{equation*}
+这样，两个向量场 $X$ 和 $Y$ 的李括号 $[X,Y]$ 度量了这两个向量场的流不交换的程度。由于李括号本身是一个新的向量场，它可以作为导子作用在函数 $f$ 上
+\begin{equation*}
+  [X,Y](f)=XY(f)-YX(f)=X(Y(f))-Y(X(f)).
+  \tag{6D2}\label{eq:6D2}
+\end{equation*}
+$[X,Y]$ 说明了方向导数 $X$ 和 $Y$ 如何不交换，并反映向量场的流相互作用时的内在弯曲或扭转。%
+\translatornote{李括号刻画的是向量场的非交换性，在平坦空间中也可能非零。黎曼曲率还取决于联络。}
+
+\noindent\textbf{坐标表示}\par
+定义
+\begin{equation*}
+  X=X^i\frac{\partial}{\partial x^i},\qquad
+  Y=Y^j\frac{\partial}{\partial x^j}.
+  \tag{6D3}\label{eq:6D3}
+\end{equation*}
+则
+\begin{equation*}
+  [X,Y](f)=[X,Y]^k\frac{\partial}{\partial x^k}f
+     =\sum_k[X,Y]^k\frac{\partial}{\partial x^k}f,
+  \tag{6D4}\label{eq:6D4}
+\end{equation*}
+其中
+\begin{equation*}
+  [X,Y]^k=X^i\frac{\partial Y^k}{\partial x^i}
+         -Y^i\frac{\partial X^k}{\partial x^i}.
+  \tag{6D5}\label{eq:6D5}
+\end{equation*}
+下面证明式 \eqref{eq:6D5}。利用式 \eqref{eq:6D2} 和式 \eqref{eq:6D3} 得
+\begin{align*}
+ [X,Y](f)
+   &=X(Y(f))-Y(X(f)),\\
+   &=X\!\left(Y^k\frac{\partial}{\partial x^k}f\right)
+     -Y\!\left(X^k\frac{\partial}{\partial x^k}f\right),\\
+   &=X^i\frac{\partial\left(Y^k\frac{\partial}{\partial x^k}f\right)}{\partial x^i}
+     -Y^i\frac{\partial\left(X^k\frac{\partial}{\partial x^k}f\right)}{\partial x^i},\\
+   &=X^i\frac{\partial Y^k}{\partial x^i}\frac{\partial}{\partial x^k}f
+     +X^iY^k\frac{\partial^2}{\partial x^i\partial x^k}f\\
+   &\quad-Y^i\frac{\partial X^k}{\partial x^i}\frac{\partial}{\partial x^k}f
+     -Y^iX^k\frac{\partial^2}{\partial x^i\partial x^k}f,\\
+   &=\left(X^i\frac{\partial Y^k}{\partial x^i}
+      -Y^i\frac{\partial X^k}{\partial x^i}\right)\frac{\partial}{\partial x^k}f.
+\end{align*}
+这就证明了式 \eqref{eq:6D5}。
+\end{statement}

@@ -1,0 +1,116 @@
+% PDF p. 96
+\section{球面}
+\subsection{定义}
+现在介绍第二个模型空间，即 $\R^{n+1}$ 中半径为 $\R$ 的球面，记为 $S^n_R$，其度量 $g_R$ 由 $\R^{n+1}$ 上的欧氏度量诱导。我们把 $S_n^R$ 称为半径 $\R$ 的圆度量（round metric）。\translatornote{原书此处以 $\R$ 表示半径，并混用 $S^n_R$ 与 $S_n^R$。$g_R$ 为相应球面的度量。} 当 $\R=1$ 时，称此为“圆”球面或“标准”球面，记为 $S^n$。我们介绍其三个主要特点。
+\begin{itemize}
+  \item $S^n$ 作为 $\R^{n+1}$ 的嵌入子流形的\textbf{定义}。
+  \item 由环境欧氏空间\textbf{诱导的黎曼度量}。
+  \item 球坐标中的\textbf{局部表达式}。
+\end{itemize}
+
+\begin{statement}{定义 2.8}{球面 $S^n$}
+\emph{单位 $n$ 维球面} $S^n$ 定义为 $\R^{n+1}$ 的嵌入子流形
+\[
+  S^n=\{\mathbf x\in\R^{n+1}:\lVert x\rVert=1\}.
+\]
+对于 $S^3$，有下式。\translatornote{定义编号 2.8 在本章重复，沿用原书。下式右侧是 $\R^3$ 中的二维球面 $S^2$。本节末用四个坐标给出 $S^3$ 的表示。}
+\[
+  S^3=\{(x_1,x_2,x_3)\in\R^3:x_1^2+x_2^2+x_3^2=1\}.
+\]
+\end{statement}
+
+\subsection{坐标}
+\subsubsection{超球坐标卡（经纬度的推广）}
+对角度 $\theta_1,\ldots,\theta_{n-1}\in[0,\pi]$、$\varnothing\in[0,2\pi]$，定义
+\[
+  \begin{aligned}
+    x_0&=\cos\theta_1,\\
+    x_1&=\sin\theta_1\cos\theta_2,\\
+    x_2&=\sin\theta_1\sin\theta_2\cos\theta_3,\\
+    &\ \,\vdots\\
+    x_{n-1}&=\sin\theta_1\cdots\sin\theta_{n-1}\cos\varnothing,\\
+    x_n&=\sin\theta_1\cdots\sin\theta_{n-1}\sin\varnothing.
+  \end{aligned}
+\]
+这些坐标覆盖 $S^n$ 除 $\theta_1=\pi$ 所对应的“南极”之外的部分。\translatornote{原书给出的参数区间含 $\theta_1=\pi$，按参数式此时映到南极。含端点的参数化在极点等处退化，不能在整个参数域上给出一张坐标卡。}
+
+% PDF p. 97
+\subsubsection{诱导的黎曼度量}
+因为 $S^n$ 是带有欧氏度量的 $\R^{n+1}$ 的\textbf{嵌入子流形}，其度量就是“点积在切空间上的限制”。在超球坐标下，线元为
+\[
+  \begin{aligned}
+    ds^2&=d\theta_1^2+\sin^2\theta_1\,d\theta_2^2
+          +\sin^2\theta_1\sin^2\theta_2\,d\theta_3^2+\cdots\\
+        &\quad+(\sin\theta_1\cdots\sin\theta_{n-1})^2\,d\varnothing^2.
+  \end{aligned}
+\]
+这是对角度量，各系数等于前面各正弦值乘积的平方。
+
+\subsection{曲率（半径均为 1）}
+\textbf{截面曲率。}对 $T_pS^n$ 中任意二维平面 $\sigma$，有 $K(\sigma)=1$。
+
+\textbf{里奇张量。}$\operatorname{Ric}=(n-1)g$。
+
+\textbf{标量曲率。}$R=n(n-1)$。
+
+\textbf{主曲率。}相对于外单位法向的形状算子各主曲率均为 $1$。
+
+\subsection{\texorpdfstring{$S^3$}{S³} 的特殊情形}
+\begin{itemize}
+  \item \textbf{坐标}
+  \[
+    \begin{aligned}
+      x_0&=\cos\theta,\\
+      x_1&=\sin\theta\cos\psi,\\
+      x_2&=\sin\theta\sin\psi\cos\phi,\\
+      x_3&=\sin\theta\sin\psi\sin\phi,
+      \qquad \theta,\psi\in[0,\pi],\quad\varnothing\in[0,2\pi).
+    \end{aligned}
+  \]
+  \item \textbf{度量}\translatornote{本例中 $\phi$ 与 $\varnothing$ 均指第三个角，记号沿用原书。}
+  \[
+    ds^2=d\theta^2+\sin^2\theta\,d\psi^2
+          +\sin^2\theta\sin^2\psi\,d\varnothing^2.
+  \]
+  \item \textbf{单位三维球面的曲率}
+
+  截面曲率 $K=1$。
+
+  里奇张量 $\operatorname{Ric}=2g$。
+
+  标量曲率 $R=6$。
+
+  所有主曲率 $k_1=k_2=k_3=1$。
+
+  这些结果涵盖任意维球面的全部经典曲率不变量。
+\end{itemize}
+
+\needspace{6\baselineskip}
+\BackSection{习题}
+\begin{enumerate}[itemsep=.55\baselineskip]
+  \item \textbf{习题 2.1}\par\nopagebreak
+  计算 $d\exp_p(v)$，其中 $v\in T_pM$。
+  % PDF p. 98
+  \item \textbf{习题 2.2}\par\nopagebreak
+  请证明 $du^2+dv^2=\dfrac{1}{(1+x_0)^2}\varnothing^*g(\rho,w)$。
+  \item \textbf{习题 2.3}\par\nopagebreak
+  证明黎曼梯度由下式给出。
+  \[
+    \operatorname{grad}_{x_i}S
+      =\frac{(1-\lVert x_i\rVert^2)^2\nabla^{\mathrm{Euc}}_{x_i}S}{4}.
+  \]
+  \item \textbf{习题 2.4}\par\nopagebreak
+  设 $p=\dfrac{i}{2}$，$q=\dfrac13+\dfrac{i}{2}$。计算 $d_H(p,q)$。
+  \item \textbf{习题 2.5}\par\nopagebreak
+  在洛伦兹（双曲面）模型中计算 $\exp_x(2v)$。
+  \item \textbf{习题 2.6}\par\nopagebreak
+  在庞加莱球 $\mathbb B^n$ 中计算 $\exp_0(2v)$。
+\end{enumerate}
+
+\BackSection{参考文献}
+\begin{bookreferences}
+  \item LDSGmini2 (2025). \url{https://webspace.maths.qmul.ac.uk/s.r.bullett/LDSGmini2.pdf}
+  \item Macaulay, M., Darling, A. and Fourment, M. (2023). Fidelity of hyperbolic space for Bayesian phylogenetic inference. \emph{PLoS Computational Biology}, 19(4): e1011084.
+  \item Nikolentzos, G., Chatzianastasis, M. and Vazirgiannis, M. (2023). Weisfeiler and leman go hyperbolic: learning distance preserving node representations. \emph{Proceedings of the 26th International Conference on Artificial Intelligence and Statistics}, PMLR 206: 1037–1054.
+  \item Zhong, J. and Cao, W. (2025). Graph geometric algebra networks for graph representation learning. \emph{Scientific Reports}, 15: 170.
+\end{bookreferences}

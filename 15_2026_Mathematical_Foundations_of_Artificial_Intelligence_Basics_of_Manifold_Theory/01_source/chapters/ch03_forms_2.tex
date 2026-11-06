@@ -1,0 +1,564 @@
+% PDF p. 105
+\section{\texorpdfstring{$\R^n$}{Rⁿ} 上的 \texorpdfstring{$n$}{n}-形式}
+\label{sec:3.3}
+\subsection{\texorpdfstring{$\R^n$}{Rⁿ} 上的 \texorpdfstring{$n$}{n}-形式的定义}
+
+$\R$ 上的 $n$-形式 $\omega$ 是次数为 $n$ 的微分形式。%
+\translatornote{原书此处印为 $\R$。由节名、定义 3.5 及下文可知讨论的是 $\R^n$ 上的形式。}%
+这是 $\R^n$ 上微分形式的最高次数。这种形式可以在 $\R^n$ 中的 $n$ 维区域（如开子集或流形）上积分。
+
+\begin{statement}{定义 3.5}{$\R^n$ 上的 $n$-形式}
+$n$-形式 $\omega$ 可以表示为
+\[
+  \omega=f(x)\,dx_1\wedge dx_2\wedge\cdots\wedge dx_n,
+\]
+其中 $f(x)$ 是定义在 $\R^n$ 上的光滑函数，$dx_1,dx_2,\dots,dx_n$ 是分别对应于坐标函数 $x_1,x_2,\dots,x_n$ 的微分形式，$\wedge$ 表示楔积，这是一种反对称的（交替的）运算。
+
+图 \ref{fig:3.2} 给出了楔积的示意图。
+\end{statement}
+\begin{figure}[htbp]
+\centering
+\input{assets/ch03/fig03_02}
+\FigureCaption{3.2}{楔积 $\wedge$ 的示意图。}
+\end{figure}
+
+% PDF p. 106
+\subsection{说明}
+\noindent\textbf{楔积 $\wedge$}\par
+楔积以反对称的方式组合微分形式。对于 1-形式 $\alpha$ 和 $\beta$，有
+\[
+  \alpha\wedge\beta=-\beta\wedge\alpha.
+\]
+同一个微分形式与自身作楔积为零
+\[
+  dx_i\wedge dx_i=0.
+\]
+$n$ 个不同的 1-形式的楔积构成一个 $n$-形式。
+
+\subsection{\texorpdfstring{$n$}{n}-形式的性质}
+\begin{itemize}
+\item \textbf{交替性。} 交换任意两个微分，形式的符号就会改变。
+\item \textbf{微分重复时为零。} 如果有两个 $dx_i$ 相同，整个楔积因反对称性而为零。
+\item \textbf{依赖于定向。} 各微分的次序很重要，它与空间的定向有关。
+\item \textbf{$n$-形式的积分。} $n$-形式可以在一个 $n$ 维区域 $D\subset\R^n$ 上积分
+\[
+  \int_D\omega=\int_D f(x)\,dx_1\,dx_2\cdots dx_n.
+\]
+\item 这个积分对应于微积分中的标准重积分，计算 $f(x)$ 所描述的量在区域 $D$ 上的总累积量。
+\end{itemize}
+
+\subsection{直观理解}
+\begin{itemize}
+\item \textbf{体积元。} $dx_1\wedge dx_2\wedge\cdots\wedge dx_n$ 表示 $\R^n$ 中的无穷小有向体积元（volume element）。
+\item \textbf{定向。} $n$-形式体现了空间的定向，这对积分很重要，尤其在进行换元或其他变换时。
+\item \textbf{物理解释。} 在物理学中，$n$-形式可以表示体积、通量或其他依赖于 $n$ 个变量的量。
+\end{itemize}
+
+\begin{statement}{例 3.8}{}
+\noindent\textbf{在 $\R^2$ 中}\par
+此时，$n$-形式是 2-形式
+\[
+  \omega=f(x,y)\,dx\wedge dy.
+\]
+% PDF p. 107
+\begin{itemize}
+\item \textbf{积分。}
+\[
+  \int_D\omega=\int_Df(x,y)\,dx\,dy,
+\]
+这是平面区域 $D$ 上的标准二重积分。
+\end{itemize}
+
+\noindent\textbf{在 $\R^3$ 中}\par
+此时，$n$-形式是 3-形式
+\[
+  \omega=f(x,y,z)\,dx\wedge dy\wedge dz.
+\]
+\begin{itemize}
+\item \textbf{积分。}
+\[
+  \int_D\omega=\int_Df(x,y,z)\,dx\,dy\,dz,
+\]
+\item 这是平面区域 $D$ 上的标准三重积分。%
+\translatornote{原书印作“平面区域”，此处三重积分的区域 $D$ 位于 $\R^3$ 中。}
+\end{itemize}
+\end{statement}
+
+\section{体积与行列式}
+\label{sec:3.4}
+矩阵的行列式有深刻的几何解释，尤其涉及二维的面积和更高维的体积时。行列式度量了以矩阵表示的线性变换如何缩放空间中的面积或体积。叉积（cross product）是研究体积与行列式的重要工具，所以先介绍叉积。
+
+\subsection{叉积的数学定义}
+\begin{statement}{定义 3.6}{叉积}
+设 $\symbf{a}$ 和 $\symbf{b}$ 是 $\R^3$ 中的向量
+\[
+  a=\begin{bmatrix}a_x\\a_y\\a_z\end{bmatrix},\qquad
+  b=\begin{bmatrix}b_x\\b_y\\b_z\end{bmatrix}.
+\]
+叉积 $\symbf{a}\times\symbf{b}$ 定义为
+\[
+  \symbf{a}\times\symbf{b}=
+  \begin{bmatrix}
+    a_yb_z-a_zb_y\\
+    a_zb_x-a_xb_z\\
+    a_xb_y-a_yb_x
+  \end{bmatrix}.
+\]
+也可以用一个 $3\times3$ 矩阵的行列式表示。
+% PDF p. 108
+\begin{align*}
+ a\times b
+   &=\det\begin{bmatrix}i&j&k\\a_x&a_y&a_z\\b_x&b_y&b_z\end{bmatrix}\\
+   &=i(a_yb_z-a_zb_y)-j(a_xb_z-a_zb_x)+k(a_xb_y-a_yb_x),
+\end{align*}
+其中 $i,j,k$ 分别是 $x,y,z$ 方向的单位向量。
+\end{statement}
+
+\subsection{叉积的性质}
+\begin{enumerate}
+\item \textbf{大小。}
+叉积的大小等于 $\symbf{a}$ 和 $\symbf{b}$ 张成的平行四边形的面积
+\[
+  \lVert a\times b\rVert=\lVert a\rVert\lVert b\rVert\sin\theta,
+\]
+其中 $\theta$ 为 $\symbf{a}$ 和 $\symbf{b}$ 的夹角（$0\leq\theta\leq\pi$）。
+\item \textbf{方向。}
+向量 $\symbf{a}\times\symbf{b}$ 同时垂直于 $\symbf{a}$ 和 $\symbf{b}$。它的方向遵循右手定则（right-hand rule）。让右手手指指向 $\symbf{a}$ 的方向并向 $b$ 弯曲，拇指便指向 $\symbf{a}\times\symbf{b}$ 的方向。
+\item \textbf{反交换性。}
+\[
+  \symbf{a}\times\symbf{b}=-\symbf{b}\times\symbf{a}.
+\]
+\item \textbf{对加法的分配律。}
+\[
+  a\times(b+c)=a\times b+a\times c.
+\]
+\item \textbf{数乘。} 对任意标量 $k$，%
+\translatornote{原书中间一项印为 $a\times(ka)$。按叉积对第二个变量的线性性，该项应为 $a\times(kb)$。}%
+\[
+  (ka)\times b=a\times(ka)=k(a\times b).
+\]
+\item \textbf{零向量结果。}
+如果 $\symbf{a}$ 和 $\symbf{b}$ 平行（或者其中之一为零向量），则 $a\times b=0$。
+\end{enumerate}
+
+\subsection{几何解释}
+\begin{itemize}
+\item \textbf{面积度量。} $a\times b$ 的大小表示以 $\symbf{a}$ 和 $\symbf{b}$ 为邻边的平行四边形的面积。
+\item \textbf{定向。} 叉积给出向量在空间中的定向信息。
+\end{itemize}
+
+\subsection{应用}
+\begin{itemize}
+\item \textbf{计算力矩。} 在物理学中，力矩（torque）$\tau$ 用位置向量 $r$ 与力向量 $F$ 的叉积计算
+\[
+  \tau=r\times F.
+\]
+\item \textbf{角动量。} 类似地，角动量（angular momentum）$L$ 由 $L=r\times P$ 给出，其中 $P$ 是线动量。
+% PDF p. 109
+\item \textbf{法向量。} 求由两个向量确定的平面的一个法向量。
+\item \textbf{计算机图形学。} 计算用于光照和着色的表面法向量。
+\end{itemize}
+
+\begin{statement}{例 3.9}{}
+给定两个向量
+\[
+  a=\begin{bmatrix}2\\-3\\1\end{bmatrix},\qquad
+  b=\begin{bmatrix}4\\0\\-2\end{bmatrix}.
+\]
+计算 $a\times b$
+\[
+  a\times b=\begin{bmatrix}i&j&k\\2&-3&1\\4&0&-2\end{bmatrix}
+    =6i+8j+12k=\begin{bmatrix}6\\8\\12\end{bmatrix},
+\]
+\[
+  \lVert a\times b\rVert=\sqrt{6^2+8^2+12^2}=\sqrt{244}=15.62.
+\]
+叉积是向量代数中的基本运算，将三维空间中的两个向量组合成一个垂直于前两个向量所在平面的第三个向量。叉积同时包含大小和方向信息。其大小与两向量所张成的面积有关，其方向由右手定则给出。它广泛用于解决物理学、工程和计算机图形学中与旋转量及空间定向有关的问题。
+\end{statement}
+
+\subsection{叉积与楔积的关系}
+叉积与楔积（也称外积，exterior product）是向量代数和微分几何中用来组合向量的运算。乍看起来两者似乎不同。叉积得到向量，楔积得到称为二重向量（bivector）的更高次数对象。两种运算联系紧密，在三维空间中尤其如此。
+
+下面将说明这两种积的关系，重点展示如何借助三维的霍奇星算子（Hodge star operator），把叉积视为楔积的一种特例。
+
+\subsubsection{楔积（外积）}
+\begin{statement}{定义 3.7}{楔积}
+楔积是向量空间的外代数（exterior algebra）中的一种运算。给定一个 $n$ 维向量空间中的两个向量 $\symbf{a}$ 和 $\symbf{b}$，楔积 $\symbf{a}\wedge\symbf{b}$ 是一个反对称的（交替的）双线性运算，得到一个二重向量。
+
+楔积满足以下数学性质。
+\begin{itemize}
+\item \textbf{双线性。}
+\[
+ (a+b)\wedge c=a\wedge c+b\wedge c.
+\]
+\item \textbf{反对称性。}
+\[
+  a\wedge b=-b\wedge a.
+\]
+\end{itemize}
+\end{statement}
+
+% PDF p. 110
+\subsubsection{几何解释}
+\begin{itemize}
+\item 楔积 $\symbf{a}\wedge\symbf{b}$ 表示由向量 $\symbf{a}$ 与 $\symbf{b}$ 张成的有向面积（平行四边形）。
+\item 在更高维，多个向量的楔积表示更高维的体积（例如平行多面体的体积）。
+\end{itemize}
+
+\subsubsection{性质}
+\begin{itemize}
+\item 由反对称性，两个平行向量的楔积为零。
+\item $\symbf{a}\wedge\symbf{b}$ 的大小等于 $\symbf{a}$ 和 $\symbf{b}$ 所张成的平行四边形的面积
+\[
+  \lVert\symbf{a}\wedge\symbf{b}\rVert
+  =\lVert\symbf{a}\rVert\lVert\symbf{b}\rVert\sin\theta,
+\]
+其中 $\theta$ 是 $\symbf{a}$ 和 $\symbf{b}$ 的夹角。
+\end{itemize}
+
+\subsubsection{楔积与叉积的联系}
+\paragraph{二重向量与伪向量}
+\begin{itemize}
+\item 在 $\R^3$ 中，楔积 $\symbf{a}\wedge\symbf{b}$ 得到一个二重向量，即一个有向平面片段。
+\item 叉积 $a\times b$ 得到一个伪向量（pseudovector），又称轴向量（axial vector），它表示与 $\symbf{a}$ 和 $\symbf{b}$ 张成的平面垂直的平面的定向。%
+\translatornote{原书称“垂直的平面”。叉积给出的是垂直于张成平面的法向方向。}
+\end{itemize}
+
+\paragraph{霍奇星算子}
+霍奇星算子是线性代数和微分几何中的数学工具，用来联系 $n$ 维空间上称为 $k$-形式（或 $k$ 重向量）的不同类型的几何对象。简单来说，它能把一类几何对象变换成另一类，使某些几何和物理概念更容易表示。
+\begin{itemize}
+\item 霍奇星算子是一个线性映射，在三维中把二重向量映为伪向量，反过来亦然。
+\item 具体地说，在 $\R^3$ 中，二重向量的霍奇星像是伪向量，而该伪向量的霍奇星像与原二重向量成比例。
+\end{itemize}
+
+一般而言，在配有内积（用于度量角度和长度）的 $n$ 维空间中，霍奇星算子记为 $*$，它把 $k$ 维对象映为 $(n-k)$ 维对象。它以 $k$-形式（可视作有向的 $k$ 维体积）为输入，将其变换为 $(n-k)$-形式。这一运算依赖于空间的几何，具体取决于其度量（测量距离和角度的方式）。
+
+在三维空间 $\R^3$ 中，霍奇星算子有以下直观解释。
+\begin{itemize}
+\item \textbf{向量与二重向量之间的映射。}
+
+\textbf{向量（1-形式）。} 常见的普通向量，表示方向与大小。
+
+% PDF p. 111
+\textbf{二重向量（2-形式）。} 表示空间中有向平面或面积的对象。
+\item \textbf{使用霍奇星算子。}
+
+霍奇星算子可以将向量映为二重向量，反过来亦然。例如，它可以把垂直于一个平面的向量（例如法向量）转换成该平面本身（以二重向量表示），也可以反向转换。
+\end{itemize}
+
+\paragraph{数学关系}
+\begin{itemize}
+\item 给定 $\R^3$ 中的向量 $a,b$，其楔积 $a\wedge b$ 是二重向量。对这个二重向量施以霍奇星算子 $*$，就得到伪向量（普通向量）
+\[
+  *(a\wedge b)=a\times b.
+\]
+由此可见，三维空间中的叉积可视作楔积的霍奇对偶（Hodge dual）。
+\item \textbf{用楔积与霍奇星算子表示叉积。}
+\begin{enumerate}
+\item \textbf{计算楔积。}
+$\symbf{a}$ 与 $\symbf{b}$ 的楔积是二重向量，可以用基二重向量 $e_i\wedge e_j$ 表示
+\[
+  \symbf{a}\wedge\symbf{b}=(\symbf{a}_xe_1+\symbf{a}_ye_2+\symbf{a}_ze_3)
+    \wedge(\symbf{b}_xe_1+\symbf{b}_ye_2+\symbf{b}_ze_3).
+\]
+利用反对称性和双线性计算楔积。
+\item \textbf{施以霍奇星算子。}
+霍奇星算子把基二重向量映为基向量
+\[
+  *(e_i\wedge e_j)=\varepsilon_{ijk}e_k,
+\]
+其中 $\varepsilon_{ijk}$ 是列维-奇维塔符号（Levi-Civita symbol），定义为
+\[
+  \varepsilon_{ijk}=
+  \begin{cases}
+     1 & \text{若 $(i,j,k)$ 是 $(1,2,3)$ 的偶排列},\\
+    -1 & \text{若 $(i,j,k)$ 是 $(1,2,3)$ 的奇排列},\\
+     0 & \text{若有两个指标相同}.
+  \end{cases}
+\]
+\item \textbf{所得叉积。}
+对 $\symbf{a}\wedge\symbf{b}$ 施以霍奇星算子后，便得到叉积 $\symbf{a}\times\symbf{b}$。
+\end{enumerate}
+\end{itemize}
+
+\begin{statement}{例 3.10}{}
+给定 $\R^3$ 中的 $\symbf{a}$ 和 $\symbf{b}$，用楔积与霍奇星算子计算 $\symbf{a}\times\symbf{b}$。
+\begin{itemize}
+\item \textbf{向量。}
+\begin{align*}
+  \symbf{a}&=a_xe_1+a_ye_2+a_ze_3,\\
+  \symbf{b}&=b_xe_1+b_ye_2+b_ze_3.
+\end{align*}
+% PDF p. 112
+\item \textbf{楔积。}
+\begin{align*}
+ a\wedge b&=(a_xb_y-a_yb_x)e_1\wedge e_2+(a_xb_z-a_zb_x)e_1\wedge e_3\\
+   &\quad+(a_yb_z-a_zb_y)e_2\wedge e_3.
+\end{align*}
+\item \textbf{施以霍奇星算子。}
+注意
+\[
+ *(e_1\wedge e_2)=e_3,\qquad
+ *(e_1\wedge e_3)=-e_2,\qquad
+ *(e_2\wedge e_3)=e_1.
+\]
+于是
+\begin{align*}
+ *(a\wedge b)&=a\times b\\
+  &=(a_yb_z-a_zb_y)e_1-(a_xb_z-a_zb_x)e_2+(a_xb_y-a_yb_x)e_3,
+\end{align*}
+这与叉积 $a\times b$ 的各分量一致。
+\end{itemize}
+\end{statement}
+
+\paragraph{用几何代数理解}
+在几何代数（geometric algebra）中，向量和二重向量是同一个代数系统的元素。借助这个框架可以联系楔积与叉积。
+\begin{itemize}
+\item \textbf{1 次元素（向量）。} 空间中的普通向量。
+\item \textbf{2 次元素（二重向量）。} 表示有向平面的对象。
+\end{itemize}
+
+\Subheading{作为楔积对偶的叉积}
+\begin{itemize}
+\item 在三维空间中，叉积实质上是楔积的对偶。
+\item 这种对偶关系由霍奇星算子建立，它依赖于空间的度量结构（内积）。
+\end{itemize}
+
+% PDF p. 112
+\section{\texorpdfstring{$\R^n$}{Rⁿ} 中的微分 \texorpdfstring{$k$}{k}-形式}
+\label{sec:3.5}
+微分形式是把函数、向量以及点积和叉积等运算的概念推广到更高维的数学对象。它们在微分几何、流形上的微积分和理论物理中发挥着重要作用。
+
+$\R^n$ 中的微分 $k$-形式（differential $k$-form）是一个反对称的多重线性函数，它把 $k$ 个切向量映为一个实数。利用微分形式可以用与坐标无关的方式在曲线、曲面和更高维流形上积分。
+
+\subsection{微分形式基础}
+\begin{enumerate}[label=\alph*.]
+\item \textbf{多重线性函数。} 多重线性函数对每个自变量分别线性。对于 $\R^n$ 中的向量 $v_1,v_2,\dots,v_k$，有
+\[
+  \omega(v_1+v'_1,v_2,\dots,v_k)
+  =\omega(v_1,v_2,\dots,v_k)+\omega(v'_1,v_2,\dots,v_k).
+\]
+% PDF p. 113
+\item \textbf{反对称性。} 如果交换任意两个自变量时函数值变号，函数 $\omega$ 就是反对称的
+\[
+  \omega(\dots,v_i,\dots,v_j,\dots)=-\omega(\dots,v_j,\dots,v_i,\dots).
+\]
+如果有两个自变量相同，由反对称性可知 $\omega$ 的值为零。
+\end{enumerate}
+
+\subsection{\texorpdfstring{$\R^n$}{Rⁿ} 中的微分 \texorpdfstring{$k$}{k}-形式}
+\subsubsection{几个定义}
+\begin{statement}{定义 3.8}{$\R^n$ 中的微分 $k$-形式}
+微分 $k$-形式 $\omega$ 是把 $\R^n$ 中一点处的 $k$ 个向量映为一个实数的函数
+\[
+  \omega_p\colon T_p\R^n\times T_p\R^n\times\cdots\times T_p\R^n\to\R,
+\]
+其中 $T_p\R^n$ 是点 $p$ 处的切空间。
+\begin{itemize}
+\item \textbf{0-形式。} 标量函数 $f(p)$。
+\item \textbf{1-形式。} 把向量映为实数的线性泛函。
+\item \textbf{$k$-形式。} 关于 $k$ 个向量的反对称多重线性函数。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{定义 3.9}{切空间 $T_p\R^n$}
+点 $p\in\R^n$ 处的切空间 $T_p\R^n$ 是由 $p$ 处所有切向量组成的向量空间。对 $\R^n$ 而言，$p$ 处的切空间可与 $\R^n$ 本身等同。
+
+\textbf{切空间 $T_p\R^n$ 的数学表示为}
+\[
+  T_p\R^n=\{\symbf{v}\in\R^n\mid \text{$\symbf{v}$ 是 $\R^n$ 在点 $p$ 处的切向量}\}.
+\]
+由于 $\R^n$ 是向量空间，任意点 $p$ 处的切空间与 $\R^n$ 自然同构。
+\end{statement}
+
+\subsubsection{数学表达式}
+更具体地说，切空间 $T_p\R^n$ 可以表示为
+\[
+  T_p\R^n=\R^n=\operatorname{Span}
+  \left\{\left.\frac{\partial}{\partial x^1}\right|_p,
+          \left.\frac{\partial}{\partial x^2}\right|_p,\dots,
+          \left.\frac{\partial}{\partial x^n}\right|_p\right\}.
+\]
+\Subheading{说明}
+\begin{itemize}
+\item $\left.\dfrac{\partial}{\partial x^1}\right|_p$ 表示点 $p$ 处切空间的标准基向量，对应于 $\R^n$ 中各坐标方向。%
+\translatornote{原书本条只印出 $i=1$ 的基向量，文字及上式讨论的是全部基向量。}
+\item \textbf{张成（Span）。} 表明任何切向量 $\symbf{v}\in T_p\R^n$ 都可写成这些基向量的线性组合。
+\end{itemize}
+
+% PDF p. 114
+\Subheading{详细说明}
+\begin{enumerate}
+\item \textbf{将切向量视为导子。} 点 $p$ 处的切向量可以视为作用在光滑函数 $f\colon\R^n\to\R$ 上的导子（derivation）
+\[
+  \symbf{v}=\left.v^i\frac{\partial}{\partial x^i}\right|_p,
+\]
+其中 $v^i$ 为实数，即 $\symbf{v}$ 的分量。
+\item \textbf{切空间的一组基。} 集合 $\left\{\left.\dfrac{\partial}{\partial x^i}\right|_p\right\}_{i=1}^n$ 构成 $T_p\R^n$ 的一组基。
+\end{enumerate}
+
+\begin{statement}{例 3.11}{微分形式}
+\begin{enumerate}[label=\alph*.]
+\item \textbf{0-形式（函数）。} 标量函数 $f(x^1,x^2,\dots,x^n)$ 是一个 0-形式。
+\item \textbf{1-形式。} 1-形式 $\omega$ 可以表示为
+\[
+  \omega=f_1\,dx^1+f_2\,dx^2+\cdots+f_n\,dx^n,
+\]
+其中 $f_i$ 是标量函数。
+\item \textbf{2-形式。} 2-形式 $\omega$ 的表达式为
+\[
+  \omega=\sum_{i<j}f_{ij}\,dx^i\wedge dx^j.
+\]
+\item \textbf{一般的 $k$-形式。} $k$-形式可以写成
+\[
+  \omega=\sum_{i_1<i_2<\cdots<i_k} f_{i_1 i_2\dots i_k}\,
+  dx^{i_1}\wedge dx^{i_2}\wedge\cdots\wedge dx^{i_k}.
+\]
+\end{enumerate}
+\end{statement}
+
+\subsubsection{用楔积构造}
+\begin{enumerate}[label=\alph*.]
+\item \textbf{楔积。} 楔积 $\wedge$ 将形式组合成更高次数的形式。
+\begin{itemize}
+\item 如果 $\alpha$ 是 $p$-形式，$\beta$ 是 $q$-形式，则 $\alpha\wedge\beta$ 为 $(p+q)$-形式。
+\item 楔积是双线性且反对称的。
+\end{itemize}
+\textbf{性质}
+\begin{itemize}
+\item \textbf{反对称性。} $\alpha\wedge\beta=(-1)^{pq}\beta\wedge\alpha$。
+\item \textbf{结合律。} $(\alpha\wedge\beta)\wedge\gamma=\alpha\wedge(\beta\wedge\gamma)$。
+\end{itemize}
+\item \textbf{基形式。} 在 $\R^n$ 中，坐标函数的微分 $dx^1,dx^2,\dots,dx^n$ 都是 1-形式。
+\begin{itemize}
+\item \textbf{1-形式的一组基。} $\{dx^1,dx^2,\dots,dx^n\}$。
+% PDF p. 115
+\item \textbf{$k$-形式的一组基。} 由所有满足 $i_1<i_2<\cdots<i_k$ 的楔积 $dx^{i_1}\wedge dx^{i_2}\wedge\cdots\wedge dx^{i_k}$ 构成。
+\item \textbf{$k$-形式空间的维数。}
+\[
+  \dim\wedge^k(\R^n)=\binom{n}{k}.
+\]
+\end{itemize}
+\end{enumerate}
+
+\subsection{外微分}
+\subsubsection{定义}
+外微分$d$ 将 $k$-形式映为 $(k+1)$-形式
+\[
+  d\colon\wedge^k(\R^n)\to\wedge^{k+1}(\R^n).
+\]
+
+\subsubsection{性质}
+\begin{itemize}
+\item \textbf{线性。} $d(\alpha+\beta)=d\alpha+d\beta$。
+\item \textbf{莱布尼茨法则（Leibniz rule）。} 若 $\alpha$ 是 $p$-形式，则 $d(\alpha\wedge\beta)=d\alpha\wedge\beta+(-1)^p\alpha\wedge d\beta$。
+\item \textbf{幂零性。} $d^2=0$（连续施行两次 $d$ 得零）。
+\end{itemize}
+
+\begin{statement}{例 3.12}{0-形式上的外微分}
+对函数 $f$，
+\[
+  df=\sum_{i=1}^n\frac{\partial f}{\partial x^i}\,dx^i.
+\]
+外微分是一个作用在微分形式上、产生更高次形式的算子 $d$。具体来说，它把 $k$-形式映为 $(k+1)$-形式。对 2-形式施以外微分得到 3-形式。
+\end{statement}
+
+\begin{statement}{例 3.13}{2-形式上的外微分}
+考虑 $\R^3$ 中的 2-形式 $\omega$，它表示为
+\[
+  \omega=f(x,y,z)\,dx\wedge dy+g(x,y,z)\,dy\wedge dz
+      +h(x,y,z)\,dz\wedge dx,
+\]
+其中 $f,g,h$ 是坐标 $(x,y,z)$ 的光滑标量函数。这一 2-形式可理解为表示三维空间中的有向面积。
+
+\textbf{步骤 1。施行外微分。}
+由外微分 $d$ 的定义，对于 2-形式 $\omega$，有
+\begin{align*}
+  d\omega &= d\bigl(f(x,y,z)\,dx\wedge dy\bigr)+d\bigl(g(x,y,z)\,dy\wedge dz\bigr)\\
+    &\quad+d\bigl(h(x,y,z)\,dz\wedge dx\bigr).
+\end{align*}
+
+\textbf{步骤 2。计算各项的微分。}
+\begin{enumerate}
+\item \textbf{对项 $f\,dx\wedge dy$，}
+\[
+  d\bigl(f(x,y,z)\,dx\wedge dy\bigr)=df\wedge dx\wedge dy.
+\]
+这里的 $df$ 是函数 $f$ 的微分。
+% PDF p. 116
+\[
+  df=\frac{\partial f}{\partial x}\,dx+\frac{\partial f}{\partial y}\,dy
+    +\frac{\partial f}{\partial z}\,dz.
+\]
+所以
+\[
+  df\wedge dx\wedge dy=\left(\frac{\partial f}{\partial x}\,dx
+     +\frac{\partial f}{\partial y}\,dy+\frac{\partial f}{\partial z}\,dz\right)
+     \wedge dx\wedge dy.
+\]
+将其展开，得到
+\[
+  df\wedge dx\wedge dy=\frac{\partial f}{\partial z}\,dz\wedge dx\wedge dy.
+\]
+\item 用类似的论证，\textbf{对项 $g\,dy\wedge dz$，}有
+\[
+  d(g\,dy\wedge dz)=dg\wedge dy\wedge dz
+    =\frac{\partial g}{\partial x}\,dx\wedge dy\wedge dz.
+\]
+\item \textbf{对项 $h\,dz\wedge dx$，}有
+\[
+  d(h\,dz\wedge dx)=dh\wedge dz\wedge dx
+    =\frac{\partial h}{\partial y}\,dy\wedge dz\wedge dx.
+\]
+\end{enumerate}
+
+\textbf{步骤 3。合并所得各项。}
+利用楔积的反对称性，得到
+\[
+  d\omega=\left(\frac{\partial g}{\partial x}
+    +\frac{\partial h}{\partial y}+\frac{\partial f}{\partial z}\right)
+    dx\wedge dy\wedge dz.
+\]
+
+\textbf{步骤 4。解释。}
+\begin{itemize}
+\item 所得 $d\omega$ 是一个 3-形式，表示 $\R^3$ 中的一个体积元。
+\item 考虑向量场与 2-形式之间的对应关系时，系数 $\dfrac{\partial g}{\partial x}+\dfrac{\partial h}{\partial y}+\dfrac{\partial f}{\partial z}$ 可与向量场的散度（divergence）联系起来。
+\end{itemize}
+\end{statement}
+
+\subsubsection{几何解释}
+\begin{enumerate}
+\item \textbf{1-形式。}
+\begin{itemize}
+\item 表示无穷小线性近似。
+\item 作用在向量上，产生标量。
+\end{itemize}
+\item \textbf{2-形式。}
+\begin{itemize}
+\item 表示无穷小有向面积元。
+\item 可以在曲面上积分以计算通量。
+\end{itemize}
+\item \textbf{$k$-形式。}
+\begin{itemize}
+\item 表示有向的 $k$ 维体积。
+\item 可以在 $k$ 维流形上积分。
+\end{itemize}
+\end{enumerate}
+
+图 \ref{fig:3.3} 把 2-形式 $\omega=z\,dx\wedge dy$ 可视化为有向面积密度。对有序基向量 $(\partial_x,\partial_y)$，其值为 $\omega(\partial_x,\partial_y)=z$。
+
+% PDF p. 117
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.78\linewidth]{assets/ch03/fig03_03.pdf}
+\FigureCaption{3.3}{将 2-形式 $\omega=z\,dx\wedge dy$ 表示为有向面积密度。}
+\end{figure}
+
+\begin{itemize}
+\item 图中有三个水平切片（$z=-1,0,1$）。每个小方格都位于一个 $xy$ 平面上，表示有向面积元 $dx\wedge dy$。
+\item \textbf{表示系数 $z$。} 在 $xy$ 平面下方为负，在平面上为零，在平面上方为正。
+\item 黑色箭头表示在 $\R^3$ 中施以霍奇星算子所得的向量场 $*\omega=(0,0,z)$。每个箭头都是相应面片的法向量，体现了三维空间中 2-形式与伪向量的对偶关系。
+\end{itemize}
+
+换言之，这幅图展示了一个微分 2-形式怎样给空间中的每个有向面片赋予一个带符号的面积密度。密度的绝对值随 $\lvert z\rvert$ 增大，穿过 $xy$ 平面时其符号反转。

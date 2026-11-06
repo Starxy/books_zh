@@ -1,0 +1,65 @@
+% PDF p. 162
+\BackSection{习题}
+\begin{enumerate}
+\item \textbf{习题 3.1。}
+
+给定两个向量
+\[
+  a=\begin{bmatrix}-2\\3\\1\end{bmatrix},\qquad
+  b=\begin{bmatrix}4\\1\\0\end{bmatrix}.
+\]
+计算 $a\times b$。
+\item \textbf{习题 3.2。}
+
+计算
+\[
+  a\wedge b=(a_xe_1+a_ye_2+a_ze_3)\wedge(b_xe_1+b_ye_2+b_ze_3).
+\]
+\item \textbf{习题 3.3。}
+
+计算 $*(a\wedge b)$。
+\item \textbf{习题 3.4。}
+
+设 $\omega=y\,dz\wedge dx+z\,dx\wedge dy$ 为 $\R^3$ 中的形式，$S$ 为单位球面 $x^2+y^2+z^2=1$。计算积分 $\displaystyle\int_S\omega$。
+\item \textbf{习题 3.5。}
+
+设 $\omega=\dfrac{y}{x^2+y^2}\,dx-\dfrac{x}{x^2+y^2}\,dy$。证明 $\omega$ 是恰当 1-形式。%
+\translatornote{题目须指定可选取连续极角的定义域，例如沿一条射线割开的平面。若定义域为整个去心平面，$\omega$ 沿逆时针单位圆的积分为 $-2\pi$，与全局恰当性矛盾。}
+\item \textbf{习题 3.6。}
+
+设 $\omega=x\,dy\wedge dz+z\,dx\wedge dy$，$X=\dfrac{\partial}{\partial y}$。计算 $i_X\omega$。
+% PDF p. 163
+\item \textbf{习题 3.7。}
+
+考虑 $F(x,y,z)=\dfrac{\symbf{r}}{\lVert\symbf{r}\rVert^2}$，其中 $r=(x,y,z)$。计算散度 $\divergence F$。
+\item \textbf{习题 3.8。}
+
+对于 $\R^2$ 上的向量场 $F=(F_\theta,F_\varnothing)$，计算 $\divergence F$。
+\item \textbf{习题 3.9。}
+
+用 $\Delta_g u\coloneqq\divergence_g(\nabla_g u)$ 证明
+\[
+  \Delta_g u=\frac{1}{\sqrt{|g|}}\frac{\partial}{\partial x^i}
+  \left(\sqrt{|g|}g^{ij}\partial_{x^j}u\right),\qquad |g|=\det(g_{ij}).
+\]
+\item \textbf{习题 3.10。}
+
+用上一式导出经典的欧氏拉普拉斯算子 $\displaystyle\sum_i\partial^2_{x^ix^i}$。
+\item \textbf{习题 3.11。}
+
+设流形为 $S^2(\R)$。计算拉普拉斯–贝尔特拉米算子 $\Delta_{S^2}u$。
+\item \textbf{习题 3.12。}
+
+计算拉普拉斯–贝尔特拉米算子 $\Delta_{S^{n-1}}f$。
+\end{enumerate}
+
+\BackSection{参考文献}
+\begin{bookreferences}
+\item Grötschla, F., Jiaqing Xie, J. and Wattenhofer, R. (2024).
+  Benchmarking positional encodings for GNNs and graph transformers.
+  \href{https://arxiv.org/abs/2411.12732}{\emph{arXiv:2411.12732}}.
+\item Mazurowski, L. (2025). Differential forms lecture notes.
+  \url{https://e.math.cornell.edu/people/mazurowski/DifferentialFormsNotes.pdf}
+\item Shehzad, A., Xia, F., Abid, S., Peng, C., Yu, S., Zhang, D. and Verspoor, K. (2024).
+  Graph transformers: A survey. \href{https://arxiv.org/abs/2407.09777}{\emph{arXiv:2407.09777}}.
+\end{bookreferences}

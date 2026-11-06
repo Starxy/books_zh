@@ -1,0 +1,342 @@
+% PDF p. 39
+\section{格拉斯曼流形的定义与性质}
+\subsection{商空间}
+\subsubsection{商空间的直观含义}
+商空间（quotient space）是一个不易理解的概念。先介绍它的直观含义。把原空间的某些子集各“收缩”为一个点，即把其中的点等同起来，就形成商空间。被等同的点集称为等价类（equivalence class），商空间就是这些等价类的集合。
+
+% PDF p. 40
+形式上，给定空间 $X$ 及其上的等价关系（equivalence relation）$\sim$，商空间定义为
+\[
+  X/{\sim}=\{[x]\mid x\in X\},
+\]
+其中 $[x]$ 表示 $x$ 的等价类，定义为
+\[
+  [x]=\{y\in X\mid x\sim y\}.
+\]
+可按下述步骤直观地确定商空间。
+\begin{itemize}
+  \item \textbf{第 1 步\quad 从空间 $X$ 出发。}
+
+  例如，取平面 $\R^2$。
+  \item \textbf{第 2 步\quad 定义等价关系 $\sim$。}
+
+  等价关系把点分组。一个常见的例子是，若点的差属于某个指定子集（过原点的直线、平行线或圆等），就把这些点等同起来。
+
+  \textbf{例 1（过原点的直线）}
+  \[
+    (x,y)\sim(\lambda x,\lambda y),\qquad \lambda\ne0.
+  \]
+  在这个例子中，每个等价类都是一条过原点的直线。\translatornote{严格地说，若保留原点，原点自成一类。其余各类是去掉原点的直线。}
+
+  \textbf{例 2（平行线）}\quad 在平面 $\R^2$ 中，把相差一个沿指定直线 $W$ 的向量的点等同起来，所得等价类构成一族平行线：
+  \[
+    x\sim y\quad\Longleftrightarrow\quad x-y\in W.
+  \]
+  \item \textbf{第 3 步\quad 将每个等价类“收缩”为一个点。}
+
+  由这些收缩后的等价类构成的空间就是商空间 $X/{\sim}$。现在把商空间与代数中的商联系起来。
+
+  \textbf{几何意义的直观解释}
+  \item \textbf{代数中的商 $\left(\frac{y}{X}\right)$}
+
+  将一个元素除以另一个，例如 $\frac{7}{2}=3.5$，可以更清楚地“简化”或“确定”它们的关系，降低复杂程度。
+  \item \textbf{商空间 $X/{\sim}$}
+
+  根据等价关系将集合中的点“相除”，或者说等同起来，把某些子集看成单个实体，从而简化空间。
+\end{itemize}
+
+\subsection{格拉斯曼流形}
+由线性子空间构成的格拉斯曼流形有许多应用，涉及机器学习、计算机视觉、图像处理、低秩矩阵优化、动态低秩分解和高维数据降维（Bendokat 等，2024）。下面从两个角度介绍格拉斯曼几何（Grassmann geometry），先用正交投影表示，再将格拉斯曼流形看成正交群的商空间。
+
+% PDF p. 41
+\subsubsection{通过正交投影描述格拉斯曼几何}
+\begin{statement}{定义 1.9}{用正交投影表示}
+格拉斯曼流形记为 $\Gr(k,n)$，是 $\R^n$ 中所有 $k$ 维子空间组成的空间。它是微分几何、代数拓扑与数学物理中的基本对象。
+
+它的一个重要性质是，每个 $k$ 维子空间 $U$ 都可由到 $U$ 的正交投影算子（orthogonal projection operator）唯一确定。具体地，若 $U\subseteq\R^n$ 是一个子空间，$\{u_1,\ldots,u_k\}$ 是 $U$ 的一组标准正交基，则到 $U$ 的投影算子定义为
+\[
+  P_U=UU^T,\qquad
+  U=\{u_1,\ldots,u_k\}\in\R^{n\times k},
+\]
+并具有下列性质。
+\begin{itemize}
+  \item \textbf{对称且幂等（symmetric and idempotent）}
+  \[
+    P_U^T=(UU^T)^T=UU^T=P_U,\qquad
+    P_U^2=UU^TUU^T=UU^T=P_U.
+  \]
+  \item \textbf{正交投影到子空间 $U$}
+  \[
+    P_Uv\in U,\qquad v\in\R^n.
+  \]
+\end{itemize}
+\end{statement}
+
+\Subheading{几何解释}
+这种表述把格拉斯曼流形表示为上述正交投影的集合，
+\[
+  G(k,n)\cong\{P\in\R^{n\times n}\mid
+    P^T=P,\ P^2=P,\ \rank(P)=k\}.
+\]
+因此，可以把格拉斯曼流形理解为秩为 $k$ 的对称投影矩阵的集合（见附录~1A）。
+
+\subsubsection{作为正交群商空间的格拉斯曼流形}
+\begin{statement}{定义 1.10}{作为商空间的格拉斯曼流形}
+格拉斯曼流形的另一种理解方式是把它看作正交群的商空间。考虑正交群（orthogonal group）$O(n)$，即所有满足 $O^TO=I$ 的 $n\times n$ 正交矩阵组成的群。
+
+先介绍商空间。把一个空间划分成彼此不相交的子集，称为等价类，再在一个新空间中把每一类看作单个点，所得数学构造就是商空间。这个概念在线性代数、拓扑学等多个数学领域中都很基础。
+\end{statement}
+
+% PDF p. 42
+\paragraph{商空间的方法一}
+等价类方法旨在将系统的输入数据分成若干组或类，使同一类中的值可视为等价。所谓等价，是指同一类中的每个值应有相同的表现。具体定义如下。
+\begin{enumerate}
+  \item \textbf{等价关系}\quad 如果 $V$ 中的两个向量 $v_1,v_2$ 之差属于 $W$，就称它们模 $W$ 等价，由此在 $V$ 上得到一个等价关系：
+  \[
+    v_1\sim v_2\quad\Longleftrightarrow\quad v_1-v_2\in W.
+  \]
+  也就是说，$v_1$ 与 $v_2$ 等价，当且仅当其中一个可由另一个加上 $W$ 中的某个元素得到。
+  \item \textbf{等价类}\quad 向量 $v$ 的等价类是集合
+  \[
+    [v]=\{v+w\mid w\in W\}.
+  \]
+  \item \textbf{商空间}\quad 全部这类等价类组成的集合就是商空间，记为 $V/W$：
+  \[
+    V/W=\{[v]\mid v\in V\}.
+  \]
+\end{enumerate}
+商空间的定义和 $\Z/n\Z$ 的定义类似，都是先定义一个等价关系，再考察由它得到的商集。
+
+在线性代数中，把向量空间 $V$ 除以其子空间 $W$，就形成商空间。定义商空间时，一个关键是如何定义向量的等价类。
+
+\paragraph{商空间的方法二}
+下面介绍构造格拉斯曼流形商空间的第二种方法。具体可执行的步骤基于
+\[
+  O(n)\xrightarrow{\pi}\Gr(k,n),\qquad
+  \pi(Q)=\operatorname{Span}\{Q\text{ 的前 }k\text{ 列}\}.
+\]
+给出代数细节后，我们用小例子 $(k,n)=(1,3)$ 演示这一算法。
+\begin{itemize}
+  \item \textbf{对象与记号约定}
+
+  $O(n)$：满足 $Q^TQ=I_n$ 的 $n\times n$ 正交矩阵。
+
+  $V_k(n)$：施蒂费尔流形（Stiefel manifold），由所有列标准正交的 $n\times k$ 矩阵组成。
+
+  $\Gr(k,n)$：格拉斯曼流形，即所有过原点的 $k$ 维平面组成的集合。
+
+  $Q_{(k)}$：$Q$ 的前 $k$ 列。
+
+  $P=Q_{(k)}Q_{(k)}^T$：到该子空间的正交投影。
+
+  \textbf{观察}\quad $Q_{(k)}$ 的列标准正交，因此 $Q_{(k)}\in V_k(\R^n)$。一个 $k$ 维平面对应于 $V_k/O(k)$ 中的一个等价类 $[Y]$，而投影 $P$ 给出唯一的矩阵代表。
+
+% PDF p. 43
+  \item \textbf{算法 A\quad 正向映射（正交矩阵 $\to$ 格拉斯曼流形上的点）}
+
+  \textbf{输入} $Q\in O(n)$。
+
+  \textbf{输出} 表示 $\pi(Q)\in\Gr(k,n)$ 的投影 $P$（或其他合适的坐标）。
+
+  \begin{enumerate}[label=A-\arabic*.]
+    \item 取前 $k$ 列，$Y:=Q_{(k)}\in\R^{n\times k}$，即施蒂费尔流形上的一点。
+    \item 令 $P:=YY^T\in\R^{n\times n}$，即投影到 $Y$ 的列空间的正交投影。
+    \item 返回 $P$ 或 $Y$ 的列空间，其中 $P^2=P$、$P^T=P$ 且 $\rank P=k$。
+  \end{enumerate}
+
+  \item \textbf{算法 B\quad 逆向映射（格拉斯曼流形上的点 $\to$ 正交矩阵）}
+
+  \begin{enumerate}[label=B-\arabic*.]
+    \item 做 QR 分解 $Y=UR$，其中 $U\in V_k(\R^n)$ 的列张成 $V$。
+    \item 用格拉姆–施密特（Gram–Schmidt）正交化或豪斯霍尔德（Householder）变换，把 $U$ 补成 $Q=[U,U_\perp]\in O(n)$。
+    \item 返回 $Q$。$U_\perp$ 的不同选取相当于右乘 $O(n-k)$ 的元素。
+  \end{enumerate}
+
+  \item \textbf{验证商关系}
+
+  若
+  \[
+    Q'=Q\begin{bmatrix}A&0\\0&B\end{bmatrix},
+    \qquad A\in O(k),\ B\in O(n-k),
+  \]
+  则 $Q'_{(k)}$ 与 $Q_{(k)}$ 具有相同的列空间，因此 $\pi(Q')=\pi(Q)$。反过来，两个子空间相同就意味着存在这种分块右乘关系。
+
+  \item \textbf{最小例子 $\Gr(1,3)\cong S^2/\{\pm1\}$}
+
+  先解释记号 $\Gr(1,3)\cong S^2/\{\pm1\}$。
+
+  格拉斯曼流形 $\Gr(1,3)$ 是 $\R^3$ 中所有一维线性子空间的集合，即所有过原点的直线。
+
+  单位球面 $S^2\subset\R^3$ 包含所有长度为 $1$ 的向量。每个单位向量 $\symbf{v}$ 确定一个方向，从而确定直线 $\operatorname{span}\{\symbf{v}\}$。
+
+  \textbf{观察}\quad 向量 $+\symbf{v}$ 和 $-\symbf{v}$ 确定的是同一条直线。所以映射
+  \[
+    \pi\colon S^2\longrightarrow\Gr(1,3),\qquad
+    \symbf{v}\longmapsto\operatorname{Span}\{\symbf{v}\}
+  \]
+  具有以下性质。
+  \begin{itemize}
+    \item 满射，因为每条直线都有两个互为对径点的单位向量作为代表。
+    \item 二对一，纤维为 $\{\symbf{v},-\symbf{v}\}$。
+  \end{itemize}
+
+  \textbf{取商}\quad 将 $S^2$ 中每对对径点 $\{\symbf{v},-\symbf{v}\}$ 等同起来，得到商空间
+  \[
+    S^2/\{\pm1\}
+      =\{[\symbf{v}]\mid\symbf{v}\in S^2,\ [\symbf{v}]=\{\symbf{v},-\symbf{v}\}\}.
+  \]
+  现在计算这一例子。
+
+  \textbf{正向映射}\quad 选取
+  \[
+    Q=\begin{pmatrix}0&0&1\\0&1&0\\1&0&0\end{pmatrix}\in O(3).
+  \]
+% PDF p. 44
+  \[
+    Y=Q_{(1)}=\begin{pmatrix}0\\0\\1\end{pmatrix},\qquad
+    P=YY^T=\begin{pmatrix}0&0&0\\0&0&0\\0&0&1\end{pmatrix}.
+  \]
+  所得直线是 $z$ 轴，在单位球面上对应于对径点对 $\{(0,0,\pm1)\}$。
+
+  \textbf{改变 $O(2)$ 因子}\quad 右乘矩阵
+  \[
+    \begin{pmatrix}
+      1&0&0\\
+      0&\cos\theta&-\sin\theta\\
+      0&\sin\theta&\cos\theta
+    \end{pmatrix}
+  \]
+  会使最后两列旋转，但第一列不变，所以得到同一条直线。
+\end{itemize}
+
+\subsection{混沌游戏表示（CGR）、频率混沌游戏表示（FCGR）与格拉斯曼流形}
+\subsubsection{CGR 的定义与动机}
+混沌游戏表示由 Barnsley（2012）发展，是一种基于分形（fractal）的数值方法。它把各核苷酸（nucleotide）映射到二维单位正方形中的点，从而将 DNA 序列可视化。DNA 的双螺旋结构及其互补配对（A 与 T、C 与 G）使 CGR 图呈现特有的对称性。对于具有显著对称模式或互补重复的序列，CGR 图呈现清晰的类分形对称特征。DNA 序列的 CGR 图常能显示直接对应于互补关系的对称或镜像模式，例如富 AT 区域和富 CG 区域。
+
+DNA 序列往往含有受螺旋结构及结构稳定性影响的重复结构。这些重复，如二核苷酸或三核苷酸重复，会在 CGR 中形成独特的可视结构。二核苷酸重复，如 ATAT 或 CG 重复，会形成明显的线条或分形子结构。这样的周期结构与底层的周期性螺旋扭转相对应，每一螺旋圈约含 $10.5$ 个碱基对，常在 CGR 图中表现为重复的类分形子结构。CGR 图往往产生反映底层生物结构的分形图案。双螺旋结构本身具有周期性与对称性，对所得 CGR 的分形几何有显著影响。因此，CGR 隐式编码了与 DNA 内在的结构约束和配对对称性有关的信息。
+
+每种 DNA 碱基（A、T、C、G）对应正方形的一个顶点，即 $A=(0,0)$、$C=(0,1)$、$G=(1,1)$、$T=(1,0)$。给定 DNA 序列，CGR 递归地把点放在上一个点与下一个核苷酸所对应顶点的中点。
+
+% PDF p. 45
+\subsubsection{构造 FCGR（频率 CGR 矩阵）}
+FCGR 将长度不同的序列转为同样大小的图像或矩阵。由 CGR 图生成 FCGR 的步骤如下。
+\begin{itemize}
+  \item 将初始点置于正方形中心，$X_0=(0.5,0.5)$。
+  \item 逐个迭代序列中的核苷酸，每一步向该核苷酸的顶点移动一半距离：
+  \[
+    X_k=\frac{X_{k-1}+V_{s_k}}{2},
+  \]
+  其中 $V_{s_k}$ 是表示核苷酸 $s_k$ 的顶点。
+  \item 将 CGR 的正方形划分为 $m\times m$ 网格，通常取 $m=2^k$（$k$ 为整数），如 $4\times4$ 或 $8\times8$。
+  \item \textbf{统计出现次数}\quad 将每个点计入其所在的格子。最终计数给出 FCGR 矩阵，其第 $(i,j)$ 个元素等于落入第 $(i,j)$ 个格子的点数或频率。
+\end{itemize}
+
+\subsubsection{数值示例}
+以短序列 ATCG 为例（表~\ref{tab:1.1}）。各顶点为 $A=(0,0)$、$T=(1,0)$、$C=(0,1)$、$G=(1,1)$。从 $X_0=(0.5,0.5)$ 开始（通常从中心开始）迭代计算各点。然后把这些点放入网格，为简单起见取 $2\times2$ 网格，得到下列矩阵。\translatornote{原文给出四个字母 ATCG，表中另列一个 T，部分步号也重复，译文保留原表与矩阵。按正文的中点规则计算，第三步后 $X=(0.3125,0.5625)$，下一步 G 对应 $(0.65625,0.78125)$，若再加 T 则为 $(0.828125,0.390625)$。}
+\[
+  \mathrm{FCGR}
+    =\begin{bmatrix}
+        \operatorname{Cell}(A)&\operatorname{Cell}(T)\\
+        \operatorname{Cell}(C)&\operatorname{Cell}(G)
+      \end{bmatrix}
+    =\begin{bmatrix}1&2\\1&1\end{bmatrix}.
+\]
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \TableCaption{1.1}{核苷酸的混沌游戏表示}
+  \begin{tabular}{@{}cccll@{}}
+    \toprule
+    步 & 核苷酸 & 顶点 $V$ & 计算 & 所得点 $X_t$ \\
+    \midrule
+    0 & & & & $(0.5,0.5)$（初始点） \\
+    1 & A & $(0,0)$ & $(0.5,0.5)/2$ & $(0.25,0.25)$ \\
+    1 & T & $(1,0)$ & $((0.25+1)/2,(0.25+0)/2)$ & $(0.625,0.125)$ \\
+    2 & C & $(0,1)$ & $((0.625+0)/2,(0.125+1)/2)$ & $(0.3125,0.5625)$ \\
+    3 & G & $(1,1)$ & $((0.625+1)/2,(0.125+1)/2)$ & $(0.8125,0.5625)$ \\
+    3 & T & $(1,0)$ & $((0.90625),(0.28125))$ & $(0.90625,0.28125)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{将 CGR 扩展到 SNP 基因型数据}
+\subsubsection{背景：SNP 基因型}
+一个基因组位点上的单核苷酸多态性（single nucleotide polymorphism，SNP）通常有两种可能的等位基因（allele），一般记为 $A/a$。因此，给定位置有三种可能的基因型（genotype）：主要等位基因纯合型 $AA$、杂合型 $A/a$，以及次要等位基因纯合型 $aa$。
+
+% PDF p. 46
+所以，每个 SNP 基因型位点有三种可能取值，而标准 DNA 序列中有四种核苷酸。
+
+\subsubsection{SNP 基因型的 CGR}
+把三种基因型分配给等边三角形的三个顶点。
+\begin{itemize}
+  \item \textbf{主要等位基因纯合型（如 $AA$）}\quad 顶点 $V_1=(0,0)$。
+  \item \textbf{杂合型（$Aa$）}\quad 顶点 $V_2=(1,0)$。
+  \item \textbf{次要等位基因纯合型}\quad 置于顶点 $\bigl(0.5,\frac{\sqrt3}{2}\bigr)$。三个顶点构成等边三角形，清楚地区分三种基因型。
+\end{itemize}
+
+\subsubsection{迭代更新规则}
+对基因型序列 $G=(g_1,g_2,\ldots,g_n)$，CGR 通过迭代将各项映射为三角形中的点。
+\begin{itemize}
+  \item 从三角形中心，即重心 $\bigl(0.5,\frac{\sqrt3}{6}\bigr)$ 出发：
+  \[
+    X_0=\left(0.5,\frac{\sqrt3}{6}\right).
+  \]
+  然后按下式迭代：
+  \[
+    X_k=\frac{X_{k-1}+V_{g_k}}{2},
+  \]
+  其中 $V_{g_k}$ 是对应基因型 $g_k$ 的顶点。
+  \item \textbf{一个位点的映射示例}
+  \[
+    \begin{aligned}
+      &\text{顶点}\quad A/A\longmapsto(0,0),\\
+      &\text{顶点}\quad A/a\longmapsto(1,0),\\
+      &\text{顶点}\quad a/a\longmapsto\left(0.5,\frac{\sqrt3}{6}\right).
+    \end{aligned}
+  \]
+\end{itemize}
+这个三角形在视觉上和数值上都能清楚地区分三种基因型。\translatornote{最后一个顶点的纵坐标依原书排为 $\sqrt3/6$，它是重心的纵坐标。按上一小节的等边三角形，$a/a$ 所对应的顶点纵坐标应为 $\sqrt3/2$。}
+
+\subsubsection{在 CGR 中纳入基因组位置信息}
+\textbf{纳入基因组位置有意义吗？}
+
+有意义。基因组位置信息很重要。
+\begin{itemize}
+  \item 基因组结构，如连锁不平衡（linkage disequilibrium）和局部重组率（local recombination rate），会影响基因型的相关性。
+  \item 相邻位置的基因型往往共同变化，因此编码位置的邻近性可以反映更深层的生物学信息。
+\end{itemize}
+
+% PDF p. 47
+因此，在 CGR 中显式编码基因组位置可以显著丰富特征矩阵，使模型能有效学习与位置有关的模式。
+
+\subsubsection{在 CGR 中纳入基因组位置的方法}
+下面介绍两种纳入位置信息的方法。
+
+\Subheading{方法 1\quad 位置加权}
+改变 CGR 的迭代，使加权更新纳入位置信息，并根据基因组距离修改点的更新规则，从而定义一个位置加权的迭代步骤。
+\begin{itemize}
+  \item 令 $p_k$ 表示基因型 $g_k$ 的基因组位置，将其缩放至 $0$ 与 $1$ 之间：
+  \[
+    X_k=\bigl(1-\alpha(p_k)\bigr)X_{k-1}+\alpha(p_k)V_{g_k},
+  \]
+  其中 $\alpha(p_k)$ 显式依赖于基因组位置 $p_k$。
+  \item 例如，更接近已知重要区域（如基因密集区）的位置有更大的影响：
+  \[
+    \alpha(p_k)=\frac12(1+e^{-\lambda p_k}),\qquad \lambda>0,
+  \]
+  其中 $\lambda$ 调节对位置的敏感程度。
+\end{itemize}
+
+\Subheading{方法 2\quad 将位置作为一个额外维度}
+另一种通常更简单的方法是增加一个表示基因组位置的维度。
+\begin{itemize}
+  \item 将每个基因型 $g_k$ 表示为
+  \[
+    X'_k=\left(\frac{X'_{k-1}+V_{gk'}}{2},(X'_k,p_k)\right)\in\R^3.
+  \]
+  这意味着 CGR 的每一步都给出一个三维点。\translatornote{原式的右端包含左端的 $X'_k$，而且嵌套括号无法与三维点对应。正文所述的做法可以写成先用二维递推算出 $X_k$，再取 $X'_k=(X_k,p_k)$。}
+  \item 前两维通过三角形 CGR 表示基因型的变化。
+  \item 第三维显式编码基因组位置 $p_k$。
+\end{itemize}
+这种显式的三维 CGR 嵌入保留了位置信息，有助于生物学解释和统计分析。

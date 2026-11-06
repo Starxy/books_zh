@@ -1,0 +1,260 @@
+% PDF p. 367
+\AppendixSection{6M}{扩散情形下的伴随算子 \texorpdfstring{$L_t^*$}{Lt*}}
+
+\AppendixHeading{6M1}{动机}
+
+设 $f,\varphi$ 光滑，且在无穷远处衰减得足够快，或在有界区域 $D\subset\R^d$ 上满足选定的边界条件。生成元
+\begin{equation*}
+  \begin{aligned}
+  (\mathcal L_tf)(x)&=g(x,t)\nabla f(x)+
+             \tfrac12\operatorname{Tr}\bigl(a(x,t)\nabla^2f(x)\bigr),\\
+  a(x,t)&=\Sigma(x,t)\Sigma(x,t)^{\mathsf T}
+  \end{aligned}
+  \tag{6M1}\label{eq:6M1}
+\end{equation*}
+作用于测试函数 $f$。它的形式伴随（formal adjoint）$\mathcal L_t^*$ 是将算子移到 $L^2(\R^d,dx)$ 内积的另一个因子上得到的算子，
+\begin{equation*}
+  \int_{\R^d} f(x)(\mathcal L_t^*\varphi)(x)\,dx
+   =\int_{\R^d}\varphi(x)(\mathcal L_tf)(x)\,dx,\qquad
+    \forall f,\varphi\in C_c^\infty.
+  \tag{6M2}\label{eq:6M2}
+\end{equation*}
+
+\AppendixHeading{6M2}{用分部积分计算 \texorpdfstring{$\mathcal L_t^*$}{Lt*}}
+
+从生成元的坐标形式出发，
+\begin{equation*}
+  \mathcal L_t f=\sum_{i=1}^d g_i\partial_{x_i}f+
+       \tfrac12\sum_{i=1}^d\sum_{j=1}^d a_{ij}\partial_{x_i}\partial_{x_j}f.
+  \tag{6M3}\label{eq:6M3}
+\end{equation*}
+由式 \eqref{eq:6M1} 和 \eqref{eq:6M2} 得
+\[
+  \begin{aligned}
+   \int_{\R^d} f(x)(\mathcal L_t^*\varphi)_{\mathrm{drift}}(x)\,dx
+    &=\int_{\R^d}\varphi(x)(\mathcal L_tf)_{\mathrm{drift}}(x)\,dx\\
+    &=\int_{\R^d}\varphi(x)\left(\sum_{i=1}^d g_i\partial_{x_i}f\right)(x)\,dx\\
+    &=-\int_{\R^d} f(x)\sum_{i=1}^d\partial_{x_i}(g_i\varphi)(x)\,dx.
+  \end{aligned}
+\]
+% PDF p. 368
+因此，
+\begin{equation*}
+  (\mathcal L_t^*\varphi)_{\mathrm{drift}}=\sum_{i=1}^d\partial_{x_i}(g_i\varphi).
+  \tag{6M4}\label{eq:6M4}
+\end{equation*}
+\translatornote{原书式 \eqref{eq:6M4} 缺少右端负号。上一式分部积分的结果以及式 \eqref{eq:6M6} 的漂移项均为负散度。}
+利用同样的论证，得到
+\begin{equation*}
+  (\mathcal L_t^*\varphi)_{\mathrm{diffusion}}
+   =\tfrac12\sum_i\sum_j\partial_{x_i}\partial_{x_j}\bigl(a_{ij}(x)\varphi(x)\bigr).
+  \tag{6M5}\label{eq:6M5}
+\end{equation*}
+合并式 \eqref{eq:6M4} 和 \eqref{eq:6M5}，得到
+\begin{equation*}
+  \mathcal L_t^*\varphi=-\nabla\cdot(g\varphi)
+   +\tfrac12\sum_{i=1}^d\sum_{j=1}^d\partial_{x_i}\partial_{x_j}(a_{ij}\varphi).
+  \tag{6M6}\label{eq:6M6}
+\end{equation*}
+简写为
+\begin{equation*}
+  \mathcal L_t^*\varphi=-\nabla\cdot(g\varphi)+\nabla\cdot(a\nabla\varphi).
+  \tag{6M7}\label{eq:6M7}
+\end{equation*}
+\translatornote{对式 \eqref{eq:6M1} 的 $a=\Sigma\Sigma^{\mathsf T}$，扩散项应按式 \eqref{eq:6M6} 计算。$a$ 与空间位置无关时，才可写成 $\tfrac12\nabla\cdot(a\nabla\varphi)$。}
+
+\AppendixHeading{6M3}{伴随算子的含义和作用}
+
+\AppendixSubheading{6M3.1}{前向柯尔莫哥洛夫方程（福克–普朗克方程）}
+
+若 $p(t,x)=P[X_t\in dx]/dx$ 为扩散过程的密度，则它满足
+\begin{equation*}
+  \begin{aligned}
+  \partial_t p(t,x)&=\mathcal L_t^*p(t,x)\\
+    &=-\nabla\cdot(gp(t,x))+
+      \tfrac12\sum_{i=1}^d\sum_{j=1}^d\partial_{x_i}\partial_{x_j}(a_{ij}p(t,x)).
+  \end{aligned}
+  \tag{6M8}\label{eq:6M8}
+\end{equation*}
+下面证明前向柯尔莫哥洛夫方程，即福克–普朗克方程。可以写成
+\begin{equation*}
+  P[X_t\in dx]=p(t,x)\,dx.
+  \tag{6M9}\label{eq:6M9}
+\end{equation*}
+定义生成元
+\[
+  (\mathcal L_t f)(x)=g(x,t)\nabla f(x)+
+                   \tfrac12\operatorname{Tr}\bigl(a(x,t)\nabla^2f(x)\bigr).
+\]
+由伊藤公式，
+\begin{equation*}
+  f(X_t)=f(X_0)+\int_0^t(\mathcal L_s f)(X_s)\,ds
+         +\int_0^t\nabla f(X_s)^{\mathsf T}\Sigma(X_s,s)\,dW_s.
+  \tag{6M10}\label{eq:6M10}
+\end{equation*}
+取期望后鞅项消失，因此由式 \eqref{eq:6M10} 可得
+\begin{equation*}
+  E[f(X_t)]=E[f(X_0)]+\int_0^t E[(\mathcal L_s f)(X_s)]\,ds.
+  \tag{6M11}\label{eq:6M11}
+\end{equation*}
+因为 $X_s$ 的密度为 $p(s,\cdot)$，所以
+% PDF p. 369
+\begin{equation*}
+  E[(\mathcal L_s f)(X_s)]=\int_{\R^d}(\mathcal L_s f)(X_s)p(s,x)\,dx.
+  \tag{6M12}\label{eq:6M12}
+\end{equation*}
+\translatornote{原书右端保留了 $X_s$，作为关于 $x$ 的积分时，该处应为 $(\mathcal L_s f)(x)$，见式 \eqref{eq:6M14}。}
+定义
+\begin{equation*}
+  F(t):=E[f(X_t)]=\int f(x)p(t,x)\,dx.
+  \tag{6M13}\label{eq:6M13}
+\end{equation*}
+接着应用式 (M11) 和 (M13)，对 $h>0$ 得到
+\begin{equation*}
+  \begin{aligned}
+  \frac{F(t+h)-F(t)}{h}
+    &=\frac1h\int_t^{t+h}E[(\mathcal L_sf)(x)]\,ds\\
+    &=\frac1h\int_t^{t+h}\int_{\R^d}(\mathcal L_sf)(x)p(s,x)\,dx\,ds\\
+    &\approx\int_{\R^d}(\mathcal L_t f)(x)p(t,x)\,dx.
+  \end{aligned}
+  \tag{6M14}\label{eq:6M14}
+\end{equation*}
+因此，
+\begin{equation*}
+  \lim_{h\downarrow0}\frac{F(t+h)-F(t)}{h}
+    =\frac{dF(t)}{dt}=\int_{\R^d}(\mathcal L_tf)(x)p(t,x)\,dx.
+  \tag{6M15}\label{eq:6M15}
+\end{equation*}
+由式 \eqref{eq:6M13} 可得
+\begin{equation*}
+  \frac{dF(t)}{dt}=\int f(x)\frac{\partial p(t,x)}{\partial t}\,dx.
+  \tag{6M16}\label{eq:6M16}
+\end{equation*}
+将 $\varphi(x)=p(t,x)$ 代入式 \eqref{eq:6M2}，得到
+\begin{equation*}
+  \int_{\R^d}p(t,x)(\mathcal L_tf)(x)\,dx
+      =\int_{\R^d}f(x)(\mathcal L_t^*p(t,x))\,dx.
+  \tag{6M17}\label{eq:6M17}
+\end{equation*}
+比较式 \eqref{eq:6M15}–\eqref{eq:6M17}，得到
+\begin{equation*}
+  \frac{\partial p(t,x)}{\partial t}=\mathcal L_t^*p(t,x)
+    =-\nabla\cdot(g(x,t)p(t,x))+\nabla\cdot(a(x,t)\nabla p(t,x)).
+  \tag{6M18}\label{eq:6M18}
+\end{equation*}
+这就是前向柯尔莫哥洛夫方程，即福克–普朗克方程，初始条件为 $p(0,x)=p_0(x)$。扩散项的记号参见式 \eqref{eq:6M7} 的译注。
+
+\AppendixSubheading{6M3.2}{坐标形式}
+
+显式写出 $a_{ij}$，有
+\begin{equation*}
+  \partial_t p(t,x)=-\sum_{i=1}^d\partial_{x_i}(g_i p)
+   +\tfrac12\sum_{i=1}^d\sum_{j=1}^d
+            \partial_{x_i}\partial_{x_j}\bigl([\Sigma\Sigma^{\mathsf T}]_{ij}p\bigr).
+  \tag{6M19}\label{eq:6M19}
+\end{equation*}
+在一维空间中，
+\[
+  \partial_t p=\partial_x(gp)+\tfrac12\partial_{xx}(\sigma^2p).
+\]
+\translatornote{原书的一维式缺少漂移项的负号。按式 \eqref{eq:6M19}，应为 $-\partial_x(gp)$。}
+
+% PDF p. 370
+\AppendixHeading{6M4}{守恒形式}
+
+定义通量
+\[
+  J(x,t;\varphi)=g\varphi-a\nabla\varphi.
+\]
+于是，应用式 (M7)，有
+\begin{equation*}
+  \mathcal L_t^*\varphi=-\nabla J.
+  \tag{6M20}\label{eq:6M20}
+\end{equation*}
+\translatornote{按守恒形式，右端为通量的负散度。对一般位置相关的 $a$，与式 \eqref{eq:6M6} 一致的通量为 $J_i=g_i\varphi-\tfrac12\sum_j\partial_{x_j}(a_{ij}\varphi)$。}
+
+\AppendixHeading{6M5}{后向柯尔莫哥洛夫偏微分方程}
+
+令 $u(t,x)=E[f(X_T)\mid X_t=x]$。对伊藤扩散 $X_t$，后向柯尔莫哥洛夫偏微分方程为
+\begin{equation*}
+  \partial_t u(t,x)+\mathcal L_tu(t,x)=0,\qquad u(T,x)=f(x).
+  \tag{6M21}\label{eq:6M21}
+\end{equation*}
+
+\AppendixSubheading{6M5.1}{定义后向价值函数}
+
+对终端收益 $f\in C_b^2(\R^d)$，令
+\[
+  u(t,x):=E[f(X_T)\mid X_t=x],\qquad 0\leq t\leq T.
+\]
+直观上，$u(t,x)$ 是从时刻 $t$、状态 $x$ 出发的后续价值。
+
+\AppendixSubheading{6M5.2}{马尔可夫性质和动态规划恒等式}
+
+对任何满足 $t+h\leq T$ 的 $h>0$，
+\begin{equation*}
+  \begin{aligned}
+  u(t,x)
+    &=E[f(X_T)\mid x_t=x]
+      =E[E[f(X_T)\mid X_{t+h}]\mid X_t=x]\\
+    &=E[u(t+h,X_{t+h})\mid X_t=x].
+  \end{aligned}
+  \tag{6M22}\label{eq:6M22}
+\end{equation*}
+
+\AppendixSubheading{6M5.3}{取无穷小时间步长}
+
+令 $h>0$ 较小，用伊藤公式写出条件期望。
+
+\Subheading{6M5.3.1\quad 对 $u(t+h,X_{t+h})$ 应用伊藤公式}
+
+固定 $x$，从 $X_t=x$ 开始过程。要对 $u(t+h,X_{t+h})$ 应用伊藤公式，需要定义冻结时间的函数 $\varnothing(s,z):=u(t+h,z)$，其中时间自变量固定。在 $0\leq s\leq h$ 上对 $s\mapsto\varnothing(s,X_{t+s})$ 应用伊藤公式，得到
+% PDF p. 371
+\[
+  \begin{aligned}
+  u(t+h,X_{t+h})-u(t+h,x)
+    &=\int_0^h\bigl(\mathcal L_{t+s}u(t+h,\cdot)(X_{t+s})\bigr)\,ds\\
+    &\quad+\int_0^h \nabla_x u(t+h,X_{t+s})^{\mathsf T}
+                 \Sigma(X_{t+s},t+s)\,dW_{t+s}.
+  \end{aligned}
+\]
+
+\Subheading{6M5.3.2\quad 给定 $X_t=x$ 的条件期望}
+
+随机积分的条件均值为零，所以
+\begin{equation*}
+  \begin{aligned}
+  E_x[u(t+h,X_{t+h})]
+    &=u(t+h,x)+E_x\left[\int_0^h
+        \bigl(\mathcal L_{t+s}u(t+h,\cdot)(X_{t+s})\bigr)\,ds\right].
+  \end{aligned}
+  \tag{6M23}\label{eq:6M23}
+\end{equation*}
+将式 \eqref{eq:6M22} 代入式 \eqref{eq:6M23} 并除以 $h$，得到
+\begin{equation*}
+  \frac{u(t,x)-u(t+h,x)}{h}
+    =\frac1h E_x\left[\int_0^h
+       \bigl(\mathcal L_{t+s}u(t+h,\cdot)(X_{t+s})\bigr)\,ds\right].
+  \tag{6M24}\label{eq:6M24}
+\end{equation*}
+所以
+\begin{equation*}
+  \frac1h E_x\left[\int_0^h
+       \bigl(\mathcal L_{t+s}u(t+h,\cdot)(X_{t+s})\bigr)\,ds\right]
+    \xrightarrow{h\to0}\mathcal L_tu(t,\cdot)(x).
+  \tag{6M25}\label{eq:6M25}
+\end{equation*}
+合并式 \eqref{eq:6M24} 和 \eqref{eq:6M25}，并取极限，得到
+\begin{equation*}
+  -\partial_tu(t,x)=(\mathcal L_tu)(t,x).
+  \tag{6M26}\label{eq:6M26}
+\end{equation*}
+按定义，$u(T,x)=E[f(X_T)\mid X_T=x]=f(x)$。因此
+\begin{equation*}
+  u(T,x)=f(x).
+  \tag{6M27}\label{eq:6M27}
+\end{equation*}
+合并式 \eqref{eq:6M26} 和 \eqref{eq:6M27}，得到
+\[
+  \partial_tu(t,x)+(\mathcal L_tu)(t,x)=0,\qquad u(T,x)=f(x).
+\]

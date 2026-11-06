@@ -1,0 +1,361 @@
+
+% PDF p. 263
+现在选取局部坐标 $(x^1,\ldots,x^n)$，对应的坐标基向量为 $\partial_i:=\partial/\partial x^i$。在这些坐标下，坐标向量场的李括号消失：
+\begin{equation*}
+  [X,Y]=[\partial_i,\partial_j]=0.
+  \tag{5B6}\label{eq:5B6}
+\end{equation*}
+具体取 $X=\partial_i$，$Y=\partial_j$，$V=\partial_k$，则定义化为
+\begin{equation*}
+  R(\partial_i,\partial_j)\partial_k
+    =\nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+      -\nabla_{\partial_j}\nabla_{\partial_i}\partial_k.
+  \tag{5B7}\label{eq:5B7}
+\end{equation*}
+回顾基向量的协变导数由克里斯托费尔符号给出：
+\begin{equation*}
+  \nabla_{\partial_j}\partial_k=\Gamma^m_{jk}\partial_m.
+  \tag{5B8}\label{eq:5B8}
+\end{equation*}
+再对式~\eqref{eq:5B8} 取一个协变导数，有
+\begin{equation*}
+  \nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+     =\nabla_{\partial_i}(\Gamma^m_{jk}\partial_m).
+  \tag{5B9}\label{eq:5B9}
+\end{equation*}
+用莱布尼茨法则得到
+\begin{equation*}
+  \nabla_{\partial_i}(\Gamma^m_{jk}\partial_m)
+     =\partial_i(\Gamma^m_{jk})\partial_m
+       +\Gamma^m_{jk}\nabla_{\partial_i}\partial_m.
+  \tag{5B10}\label{eq:5B10}
+\end{equation*}
+将式~\eqref{eq:5B10} 代入式~\eqref{eq:5B9}，得
+\begin{equation*}
+  \nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+     =\partial_i(\Gamma^m_{jk})\partial_m
+       +\Gamma^m_{jk}\nabla_{\partial_i}\partial_m.
+  \tag{5B11}\label{eq:5B11}
+\end{equation*}
+回顾克里斯托费尔符号（联络系数）定义为
+\begin{equation*}
+  \nabla_{\partial_i}\partial_k=\Gamma^j_{ik}\partial_j.
+  \tag{5B12}\label{eq:5B12}
+\end{equation*}
+原书将式 (5.42) 用于 $\nabla_{\partial_i}\partial_m$，得到\translatornote{此处实际应用的是上一式~\eqref{eq:5B12}。原书所引式 (5.42) 是沿变分交换两个参数的一阶协变导数。}
+\begin{equation*}
+  \nabla_{\partial_i}\partial_m=\Gamma^l_{im}\partial_l.
+  \tag{5B13}\label{eq:5B13}
+\end{equation*}
+将式~\eqref{eq:5B13} 代入式~\eqref{eq:5B11}，得到
+\begin{equation*}
+  \nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+     =\partial_i(\Gamma^m_{jk})\partial_m+\Gamma^m_{jk}\Gamma^l_{im}\partial_l.
+  \tag{5B14}\label{eq:5B14}
+\end{equation*}
+类似于式~\eqref{eq:5B14}，有
+\begin{equation*}
+  \nabla_{\partial_j}\nabla_{\partial_i}\partial_k
+     =\partial_j\Gamma^m_{ik}\partial_m+\Gamma^m_{ik}\Gamma^l_{jm}\partial_l.
+  \tag{5B15}\label{eq:5B15}
+\end{equation*}
+作差并应用式~\eqref{eq:5B7}，得
+% PDF p. 264
+\begin{equation*}
+  \begin{aligned}
+    R(\partial_i,\partial_j)\partial_k
+     &=\nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+       -\nabla_{\partial_j}\nabla_{\partial_i}\partial_k\\
+     &=\partial_i(\Gamma^m_{jk})\partial_m+\Gamma^m_{jk}\Gamma^l_{im}\partial_l
+       -\partial_j\Gamma^m_{ik}\partial_m-\Gamma^m_{ik}\Gamma^l_{jm}\partial_l\\
+     &=(\partial_i\Gamma^m_{jk}-\partial_j\Gamma^m_{ik})\partial_m
+        +(\Gamma^m_{jk}\Gamma^l_{im}-\Gamma^m_{ik}\Gamma^l_{jm})\partial_l.
+  \end{aligned}
+  \tag{5B16}\label{eq:5B16}
+\end{equation*}
+可将第一项中的哑指标 $m$ 改名为 $l$，使整个表达式在基 $\{\partial_l\}$ 下表示。于是
+\begin{equation*}
+  R(\partial_i,\partial_j)\partial_k
+     =(\partial_i\Gamma^l_{jk}-\partial_j\Gamma^l_{ik}
+        +\Gamma^m_{jk}\Gamma^l_{im}-\Gamma^m_{ik}\Gamma^l_{jm})\partial_l.
+  \tag{5B17}\label{eq:5B17}
+\end{equation*}
+按定义，曲率张量的分量 $R^l_{ijk}$ 由下式给出：
+\begin{equation*}
+  R(\partial_i,\partial_j)\partial_k=R^l_{ijk}\partial_l.
+  \tag{5B18}\label{eq:5B18}
+\end{equation*}
+将式~\eqref{eq:5B18} 代入式~\eqref{eq:5B17}，得到
+\begin{equation*}
+  R^l_{ijk}=\partial_i\Gamma^l_{jk}-\partial_j\Gamma^l_{ik}
+        +\Gamma^m_{jk}\Gamma^l_{im}-\Gamma^m_{ik}\Gamma^l_{jm}.
+  \tag{5B19}\label{eq:5B19}
+\end{equation*}
+许多教材选用另一种符号约定，交换 $i,j$ 两个指标。等价地，常写为
+\begin{equation*}
+  R^l_{ijk}=\partial_j\Gamma^l_{ik}-\partial_i\Gamma^l_{jk}
+        +\Gamma^l_{jm}\Gamma^m_{ik}-\Gamma^l_{im}\Gamma^m_{jk}.
+  \tag{5B20}\label{eq:5B20}
+\end{equation*}
+这就证明了在局部坐标系中，曲率张量的分量由上式给出。
+
+\Subheading{5B1.3.3\quad 曲率示例}
+\textbf{欧氏空间 $\R^n$}\quad 在平坦的欧氏空间中，笛卡儿坐标下的克里斯托费尔符号为零。因此曲率张量为零：
+\[
+  R^l_{ijk}=0.
+\]
+
+\textbf{球面的曲率张量}\quad 令 $(S^n(r),g)$ 是半径为 $r$、配有标准球面度量的 $n$ 维球面。一个重要的几何事实是，球面是具有常截面曲率 $K=1/r^2$ 的流形。对任意常截面曲率为 $K$ 的黎曼流形，其黎曼曲率张量满足
+\begin{equation*}
+  R_{ijkl}=K(g_{ik}g_{jl}-g_{il}g_{jk}).
+  \tag{5B21}\label{eq:5B21}
+\end{equation*}
+对于球面，这意味着
+% PDF p. 265
+\begin{equation*}
+  R_{ijkl}=\frac1{r^2}(g_{ik}g_{jl}-g_{il}g_{jk}).
+  \tag{5B22}\label{eq:5B22}
+\end{equation*}
+现在说明如何推出这些公式。
+\begin{enumerate}
+  \item \textbf{背景：常截面曲率}
+
+  如果对黎曼流形 $(M,g)$ 的任一点 $p\in M$ 和任意二维子空间（平面）$\sigma\subset T_pM$，截面曲率都是同一常数 $K$，则称该流形具有常截面曲率 $K$。黎曼几何的标准结果是，若截面曲率恒定，整个黎曼曲率张量可写为
+  \[
+    R_{ijkl}=K(g_{ik}g_{jl}-g_{il}g_{jk}).
+  \]
+  由于球面 $S^n(r)$ 具有常截面曲率 $1/r^2$，立即得到上面的公式。
+  \item \textbf{利用局部坐标的详细说明}
+
+  为更详细地理解实际计算，按以下步骤进行。
+  \begin{enumerate}[label=\alph*.]
+    \item \textbf{球面度量}
+
+    例如，在半径为 $r$ 的二维球面 $S^2(r)$ 上，球坐标 $(\theta,\varnothing)$ 下的度量可写为
+    \[
+      ds^2=r^2(d\theta^2+\sin^2\theta\,d\varnothing^2).
+    \]
+    在这些坐标下，度量分量为
+    \begin{equation*}
+      g_{\theta\theta}=r^2,\qquad g_{\varnothing\varnothing}=r^2\sin^2\theta,
+        \qquad g_{\theta\varnothing}=g_{\varnothing\theta}=0.
+      \tag{5B23}\label{eq:5B23}
+    \end{equation*}
+    \textbf{计算克里斯托费尔符号}\quad 用度量按下式计算：
+    \begin{equation*}
+      \Gamma^l_{ij}=\frac12g^{lk}
+        (\partial_i g_{jk}+\partial_j g_{ik}-\partial_k g_{ij}).
+      \tag{5B24}\label{eq:5B24}
+    \end{equation*}
+    由式~\eqref{eq:5B23} 得
+    \[
+      g=\begin{bmatrix}r^2&0\\0&r^2\sin^2\theta\end{bmatrix},
+      \qquad
+      g^{-1}=\begin{bmatrix}
+        1/r^2&0\\
+        0&1/(r^2\sin^2\theta)
+      \end{bmatrix}.
+    \]
+% PDF p. 266
+    因此，
+    \begin{equation*}
+      g^{\theta\theta}=\frac1{r^2},\qquad
+      g^{\varnothing\varnothing}=\frac1{r^2\sin^2\theta},\qquad
+      g^{\theta\varnothing}=g^{\varnothing\theta}=0.
+      \tag{5B25}\label{eq:5B25}
+    \end{equation*}
+    现在用式~\eqref{eq:5B24} 计算克里斯托费尔符号。先算 $\Gamma^\varnothing_{\theta\theta}$：
+    \begin{equation*}
+      \begin{aligned}
+        \Gamma^\varnothing_{\theta\theta}
+          &=\tfrac12g^{\varnothing\varnothing}
+            (\partial_\theta g_{\theta\varnothing}+\partial_\theta g_{\theta\varnothing}
+             -\partial_\varnothing g_{\theta\theta})\\
+          &=\frac12\frac1{r^2\sin^2\theta}
+             (\partial_\theta 0+\partial_\theta 0-\partial_\varnothing r^2)=0.
+      \end{aligned}
+      \tag{5B26}\label{eq:5B26}
+    \end{equation*}
+    再计算 $\Gamma^\theta_{\phi\phi}$ 和 $\Gamma^\phi_{\theta\phi}$。由式~\eqref{eq:5B24}，
+    \begin{equation*}
+      \begin{aligned}
+        \Gamma^\theta_{\phi\phi}
+           &=\tfrac12g^{\theta\theta}
+              (\partial_\varnothing g_{\varnothing\theta}
+               +\partial_\varnothing g_{\varnothing\theta}
+               -\partial_\theta g_{\varnothing\varnothing})\\
+           &=\frac12\frac1{r^2}\bigl(0+0-\partial_\theta(r^2\sin^2\theta)\bigr)
+             =-\sin\theta\cos\theta.
+      \end{aligned}
+      \tag{5B27}\label{eq:5B27}
+    \end{equation*}
+    \begin{equation*}
+      \begin{aligned}
+        \Gamma^\varnothing_{\theta\varnothing}
+          &=\tfrac12g^{\varnothing\varnothing}
+            (\partial_\theta g_{\varnothing\varnothing}
+             +\partial_\varnothing g_{\theta\varnothing}
+             -\partial_\varnothing g_{\theta\varnothing})\\
+          &=\frac12\frac1{r^2\sin^2\theta}\bigl(\partial_\theta(r^2\sin^2\theta)+0-0\bigr)
+            =\frac{\cos\theta}{\sin\theta}=\cot\theta.
+      \end{aligned}
+      \tag{5B28}\label{eq:5B28}
+    \end{equation*}
+    \item \textbf{坐标下的曲率张量公式}
+
+    现在可以计算曲率。按式~\eqref{eq:5B20}，黎曼曲率张量的分量定义为
+    \[
+      R^l_{ijk}=\partial_j\Gamma^l_{ik}-\partial_i\Gamma^l_{jk}
+        +\Gamma^l_{jm}\Gamma^m_{ik}-\Gamma^l_{im}\Gamma^m_{jk}.
+    \]
+    随后用度量 $g$ 降低上指标（回顾 $R_{ijkl}=g_{lm}R^m_{ijk}$），得到用度量及其一、二阶导数表示的 $R_{ijkl}$。
+
+    对 $S^2(r)$ 作显式计算，虽然过程较长，却可验证每个分量都符合下列形式：
+    \begin{equation*}
+      R_{ijkl}=\frac1{r^2}(g_{ik}g_{jl}-g_{il}g_{jk}).
+      \tag{5B29}\label{eq:5B29}
+    \end{equation*}
+    例如可算出
+    \begin{equation*}
+      \begin{aligned}
+        R_{\theta\varnothing\theta\varnothing}
+          &=\frac1{r^2}(g_{\theta\theta}g_{\varnothing\varnothing}
+                       -g_{\theta\varnothing}g_{\varnothing\theta})
+           =\frac1{r^2}(g_{\theta\theta}g_{\varnothing\varnothing}-0)\\
+          &=\frac1{r^2}g_{\theta\theta}g_{\varnothing\varnothing}
+           =\frac1{r^2}r^2r^2\sin^2\theta=r^2\sin^2\theta.
+      \end{aligned}
+      \tag{5B30}\label{eq:5B30}
+    \end{equation*}
+  \end{enumerate}
+% PDF p. 267
+  \item \textbf{一般情形：$n$ 维球面}
+
+  上面的论证可以推广到 $n$ 维球面 $S^n(r)$。由于球面具有常截面曲率，在任意局部坐标系（度量为 $g_{ij}$）下，黎曼曲率张量为
+  \[
+    R_{ijkl}=\frac1{r^2}(g_{ik}g_{jl}-g_{il}g_{jk}).
+  \]
+  由此还可推导其他曲率量。
+  \begin{enumerate}[label=\alph*.]
+    \item \textbf{里奇张量}
+
+    里奇张量 $R_{ij}$ 是基本的曲率不变量，通常定义为黎曼张量的迹。按指标约定，可以在第一个和第三个指标（Hirvonen，2025），或第二个和第四个指标上缩并。在局部坐标下，
+    \begin{equation*}
+      R_{ij}=R^k_{ikj},\qquad\text{或}\qquad R_{ij}=g^{kl}R_{kilj},
+      \tag{5B31}\label{eq:5B31}
+    \end{equation*}
+    其中 $g^{kl}$ 是逆度量。里奇张量也可以由克里斯托费尔符号求出：
+    \begin{equation*}
+      R_{ij}=\partial_k\Gamma^k_{ij}-\partial_j\Gamma^k_{ik}
+             +\Gamma^k_{ij}\Gamma^l_{kl}-\Gamma^l_{ik}\Gamma^k_{jl}.
+      \tag{5B32}\label{eq:5B32}
+    \end{equation*}
+    里奇张量通过对黎曼曲率张量“取迹”或作缩并，概括了曲率的一个重要方面。下面给出以 $\partial_i$ 为基向量的坐标系中的定义。
+
+    \textbf{数学公式}\quad 下面推导 $R_{jk}$ 关于克里斯托费尔符号的显式表达式。从
+    \[
+      R^l_{ijk}=\partial_j\Gamma^l_{ik}-\partial_i\Gamma^l_{jk}
+        +\Gamma^l_{jm}\Gamma^m_{ik}-\Gamma^l_{im}\Gamma^m_{jk}
+    \]
+    出发。现在对 $l$ 和第一个下指标 $i$ 缩并，即令 $l=i$，得到里奇张量
+    \[
+      R_{jk}=R^i_{ijk}.
+    \]
+    因此
+    \begin{equation*}
+      R_{jk}=\partial_j\Gamma^i_{ik}-\partial_i\Gamma^i_{jk}
+        +\Gamma^i_{jm}\Gamma^m_{ik}-\Gamma^i_{im}\Gamma^m_{jk},
+      \tag{5B33}\label{eq:5B33}
+    \end{equation*}
+% PDF p. 268
+    其中 $\partial_j\Gamma^i_{ik}$ 可视为联络的“散度”，$\partial_i\Gamma^i_{jk}$ 表示联络分量的方向导数，其余项是克里斯托费尔符号的二次组合，用来描述联络怎样“与自身相互作用”。该式完全用克里斯托费尔符号 $\Gamma^i_{jk}$ 及其偏导数表示里奇张量。
+
+    \item \textbf{半径为 $r$ 的 $n$ 维球面的里奇张量}
+
+    $n$ 维球面的黎曼度量可以用不同坐标系表示。一种选择是 $\R^{n+1}$ 中的标准嵌入，取欧氏空间的诱导度量。另一种常见方法是用经纬度之类的角坐标表示度量。
+
+    对半径为 $r$ 的 $n$ 维球面，通常取 $\theta_1,\ldots,\theta_{n-1}\in[0,\pi]$，$\theta_n\in[0,2\pi)$。球坐标中的度量为对角形式，原书写作\translatornote{式~\eqref{eq:5B34} 中最后一项的正弦因子间用逗号印出。按下一式，最后一个对角元应是乘积 $r^2\sin^2\theta_1\cdots\sin^2\theta_{n-1}$。}
+    \begin{equation*}
+      g_{ij}=\diag\bigl(r^2,r^2\sin^2\theta_1,\ldots,
+                       r^2\sin^2\theta_1,\ldots,\sin^2\theta_{n-1}\bigr).
+      \tag{5B34}\label{eq:5B34}
+    \end{equation*}
+    其逆矩阵为
+    \begin{equation*}
+      g^{kl}=\diag\left(\frac1{r^2},\frac1{r^2\sin^2\theta_1},\ldots,
+                     \frac1{r^2\sin^2\theta_1\cdots\sin^2\theta_{n-1}}\right).
+      \tag{5B35}\label{eq:5B35}
+    \end{equation*}
+    里奇张量 $R_{ij}$ 可由下式计算：
+    \begin{equation*}
+      R_{ij}=g^{kl}R_{kilj}.
+      \tag{5B36}\label{eq:5B36}
+    \end{equation*}
+    对 $k\ne l$，$g^{kl}=0$，所以式~\eqref{eq:5B36} 可化为\translatornote{右端依原书排印。代入式~\eqref{eq:5B29} 时，右端求和式应有因子 $1/r^2$，式~\eqref{eq:5B40} 保留了这个因子。}
+    \begin{equation*}
+      R_{ij}=g^{kk}R_{kikj}
+         =\sum_{k=1}^n g^{kk}(g_{kk}g_{ij}-g_{kj}g_{ik}).
+      \tag{5B37}\label{eq:5B37}
+    \end{equation*}
+    当 $k=i$ 时，
+    \begin{equation*}
+      g_{kk}g_{ij}-g_{kj}g_{ik}=g_{ii}g_{ij}-g_{ij}g_{ii}=0.
+      \tag{5B38}\label{eq:5B38}
+    \end{equation*}
+    还注意到
+    \begin{equation*}
+      g^{kk}g_{kk}=1.
+      \tag{5B39}\label{eq:5B39}
+    \end{equation*}
+    将式~\eqref{eq:5B38} 与式~\eqref{eq:5B39} 代入式~\eqref{eq:5B37}，得
+    \begin{equation*}
+      R_{ij}=\frac1{r^2}(n-1)g_{ij}.
+      \tag{5B40}\label{eq:5B40}
+    \end{equation*}
+% PDF p. 269
+    标量曲率由下式计算：
+    \begin{equation*}
+      \begin{aligned}
+        R&=g^{ij}R_{ij}=g^{ii}R_{ii}
+          =\sum_{i=1}^ng^{ii}\frac1{r^2}(n-1)g_{ii}\\
+         &=\sum_{i=1}^n(n-1)\frac1{r^2}=\frac{n(n-1)}{r^2}.
+      \end{aligned}
+      \tag{5B41}\label{eq:5B41}
+    \end{equation*}
+    \item \textbf{双曲圆盘的里奇张量}
+
+    双曲圆盘的里奇张量涉及用双曲平面度量作一项非平凡计算。通常用庞加莱圆盘模型来描述该度量。我们需要使用适当的里奇张量公式，它来自对黎曼曲率张量的推导与缩并。过程比较复杂，分步处理有助于理解。
+
+    为逐步推导，先从给定度量计算克里斯托费尔符号。度量中有共形因子（conformal factor）$\Omega=2/(1-r^2)$，据此计算里奇张量分量。通过详细计算，可以确认 $R_{ij}=-g_{ij}$，由此得到
+    \begin{equation*}
+      R_{ij}=-\frac4{(1-x^2-y^2)^2}\delta_{ij}.
+      \tag{5B42}\label{eq:5B42}
+    \end{equation*}
+    我们用庞加莱圆盘模型计算双曲圆盘的里奇张量。在该模型中，度量为
+    \begin{equation*}
+      ds^2=\frac{4(dx^2+dy^2)}{(1-x^2-y^2)^2}.
+      \tag{5B43}\label{eq:5B43}
+    \end{equation*}
+    下面详述计算。
+
+    \textbf{度量及其共形形式}\quad 将度量写成以下形式比较方便：
+    \begin{equation*}
+      ds^2=\Omega^2(dx^2+dy^2),
+      \tag{5B44}\label{eq:5B44}
+    \end{equation*}
+    其中
+    \[
+      \Omega(x,y)=\frac2{1-r^2},\qquad r^2=x^2+y^2.
+    \]
+    因此在坐标基 $\{\partial_x,\partial_y\}$ 中，度量的分量为
+    \[
+      g_{ij}=\Omega^2\delta_{ij},\qquad g_{11}=g_{xx}=\Omega^2,\quad
+      g_{22}=g_{yy}=\Omega^2,\quad g_{12}=g_{21}=0.
+    \]
+    其逆为
+    \begin{equation*}
+      g^{ij}=\Omega^{-2}\delta^{ij}.
+      \tag{5B45}\label{eq:5B45}
+    \end{equation*}
+  \end{enumerate}
+\end{enumerate}

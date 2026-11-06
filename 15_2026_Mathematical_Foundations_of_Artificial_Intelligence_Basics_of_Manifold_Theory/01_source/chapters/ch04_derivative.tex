@@ -1,0 +1,140 @@
+% PDF p. 173
+\section{李导数}
+李导数是微分几何中的重要数学工具，用来度量张量场沿另一向量场的流的变化率。简单来说，可以把李导数看作导数概念的推广，刻画沿一个场生成的流观察时，另一个场如何演化。它特别适合在几何背景下研究向量场、微分形式及更一般的张量场的演化。
+
+更形式化地说，给定一个向量场和一个张量场，李导数描述张量场沿流的无穷小变换。它是描述动力系统、对称性及可微变换下不变量的基本概念。物理学中的几何研究也离不开李导数，特别是在广义相对论和流体动力学中。
+
+% PDF p. 174
+李导数很重要，因为它提供了一种不依赖坐标的方式来描述几何量的变化。它有助于在可微流形上形式化对称性概念，是研究几何对象连续变换的基础。
+
+李导数让我们能研究各类场在向量场的流作用下的表现。其应用从几何、动力系统、广义相对论和规范理论延伸到现代机器学习。它的推广能力使之适于处理弯曲空间、为对称性建模，以及评估本质上取决于底层几何结构的变化。
+
+\subsection{定义}
+\textbf{李导数}通过\textbf{方向导数}（directional derivative），将函数的普通导数推广到更一般的张量场。下面从数学上说明这一过程。
+
+\subsubsection{函数的普通导数}
+对光滑函数 $f\colon\R\to\R$，
+\[
+  \frac{d}{dx}f(x)
+\]
+是 $f$ 相对于变量 $x$ 的变化率。
+
+\subsubsection{方向导数}
+对流形 $M$ 上的光滑函数 $f\colon M\to\R$，普通导数可推广为沿向量 $v\in T_pM$ 的\textbf{方向导数}。
+\[
+  \mathcal L_v f=v(f),
+\]
+其中 $v(f)$ 表示 $v$ 作为微分算子对 $f$ 的作用。若 $v=v^i\partial/\partial x^i$，则
+\[
+  v(f)=v^i\frac{\partial f}{\partial x^i}.
+\]
+
+\subsubsection{协向量场的李导数}
+设 $\omega=\omega_i\,dx^i$ 是协向量场（1-形式）。$\omega$ 沿 $X$ 的李导数如下。\translatornote{原式第一项用小写 $x^j$，与下文向量场的分量 $X^j$ 相对应。}
+\[
+  \mathcal L_X\omega=
+    \left(x^j\frac{\partial\omega_i}{\partial x^j}
+         +\omega_j\frac{\partial X^j}{\partial x^i}\right)dx^i.
+\]
+这可以由嘉当公式 $\mathcal L_X\omega=d(i_X\omega)+i_X(d\omega)$ 推出。设
+\[
+  X=X^j\partial_{x^j}\quad\text{（向量场）},
+\]
+% PDF p. 175
+\[
+  \omega=\omega_i\,dx^i\quad\text{（协向量场，即 1-形式）}.
+\]
+现在给出证明。
+\begin{itemize}
+  \item \textbf{内积算子。}$i_X\omega=\omega_iX^i$（0-形式）。它的微分为 $d(i_X\omega)=\partial_j(\omega_iX^i)\,dx^j$。
+  \item \textbf{$\omega$ 的外微分}
+  \[
+    \begin{aligned}
+      d\omega&=d(\omega_i\,dx^i+\omega_j\,dx^j)
+          =d(\omega_i\,dx^i)+d(\omega_j\,dx^j)\\
+        &=\partial_j\omega_i\,dx^j\wedge dx^i
+          +\partial_i\omega_j\,dx^i\wedge dx^j\\
+        &=(\partial_j\omega_i-\partial_i\omega_j)\,dx^j\wedge dx^i.
+    \end{aligned}
+  \]
+  与 $X$ 作缩并，
+  \[
+    i_Xd\omega=(\partial_j\omega_i-\partial_i\omega_j)X^j\,dx^i.
+  \]
+  \item 将 $d(i_X\omega)$ 与 $i_X(d\omega)$ 相加，收集 $dx^i$ 的系数。
+  \[
+    \begin{aligned}
+      (\mathcal L_X\omega)_i
+        &=\partial_j(\omega_iX^i)+(\partial_j\omega_i-\partial_i\omega_j)X^j\\
+        &=\partial_i(\omega_jX^j)+(\partial_j\omega_i-\partial_i\omega_j)X^j\\
+        &=\partial_i\omega_j X^j+\omega_j\partial_iX^j
+          +(\partial_j\omega_i-\partial_i\omega_j)X^j\\
+        &=\omega_j\partial_iX^j+\partial_j\omega_i X^j.
+    \end{aligned}
+  \]
+\end{itemize}
+\textbf{解释。}第一项表示 $\omega$ 的分量沿 $X$ 的变化，第二项修正 $X$ 的流作用下坐标基的变形。\translatornote{就紧邻此段的公式末行而言，第一项和第二项的解释应互换。公式第一行中，微分 $d(i_X\omega)$ 对 $dx^i$ 的系数应为 $\partial_i(\omega_jX^j)$，见下一行。}
+
+\subsubsection{张量场的李导数}
+对一般张量场 $T$，沿 $X$ 的李导数通过结合 $T$ 沿 $X$ 的导数与 $T$ 在 $X$ 的流下的变换，推广了方向导数。
+\[
+  \mathcal L_X T=\lim_{t\to0}\frac{\varnothing_t^*T-T}{t},
+\]
+其中 $\varnothing_t$ 是由 $X$ 生成的流。对 $(r,s)$ 型张量 $T$，
+\[
+  (\mathcal L_XT)(\omega^1,\ldots,\omega^r;Y^1,\ldots,Y^s)
+    =X\bigl(T(\omega^1,\ldots,\omega^r;Y^1,\ldots,Y^s)\bigr),
+\]
+还要按 $\omega^i$ 和 $Y^j$ 沿 $X$ 的导数作修正。
+
+我们得到，张量场 $T$ 沿 $X$ 的李导数起到 $T$ 沿 $X$ 的方向导数的作用。这一推演逐步纳入更复杂的几何结构，得到李导数的完整定义。
+
+张量场的\textbf{李导数}是微分几何的基本概念，度量张量场如何沿向量场生成的流发生变化。
+% PDF p. 176
+它把方向导数推广到光滑流形上的张量场。现在给出张量的李导数的一般定义。
+
+\subsubsection{张量场李导数的定义}
+设 $M$ 是光滑流形，$X$ 是 $M$ 上的光滑向量场，$T$ 是 $M$ 上的 $(r,s)$ 型张量场，即 $T$ 对 $r$ 个向量场和 $s$ 个协向量场多重线性。\translatornote{对 $(r,s)$ 的这个说明与上一小节按 $\omega^1,\ldots,\omega^r;Y^1,\ldots,Y^s$ 列出自变量的次序不同，分别沿用原书。} $T$ 沿 $X$ 的\textbf{李导数}记为 $\mathcal L_X T$，定义为
+\[
+  \mathcal L_X T=\lim_{t\to0}\frac{\varnothing_t^*T-T}{t}
+                =\left.\frac{d}{dt}\right|_{t=0}\varnothing_t^*T,
+\]
+其中
+\begin{itemize}
+  \item $\varnothing_t\colon M\to M$ 是向量场 $X$ 生成的单参数微分同胚族，即流。
+  \item $\varnothing_t^*$ 表示张量场 $T$ 经 $\varnothing_t$ 的\textbf{拉回}。
+\end{itemize}
+为了帮助理解这个定义，下面作些解释并介绍 $\mathcal L_X T$ 的性质。
+
+\subsubsection{解释}
+\begin{itemize}
+  \item \textbf{流 $\varnothing_t$。}向量场 $X$ 生成流 $\varnothing_t$，沿 $X$ 的积分曲线将点移动参数 $t$ 所指定的量。
+  \item \textbf{拉回 $\varnothing_t^*T$。}$T$ 经 $\varnothing_t$ 的拉回沿流的反方向搬运张量场，使两个张量可以在同一点比较。
+  \item \textbf{取极限。}李导数比较 $T$ 和流过无穷小时间 $t$ 后的拉回，度量 $T$ 沿 $X$ 的无穷小变化。
+\end{itemize}
+
+\subsubsection{性质}
+\begin{enumerate}
+  \item \textbf{线性。}对于标量函数 $a,b$ 和张量场 $T,S$，
+  $\mathcal L_X(aT+bS)=a\mathcal L_XT+b\mathcal L_XS$。\translatornote{一般标量函数还会产生 $X(a)T+X(b)S$。原式适用于 $X(a)=X(b)=0$ 的情形，例如 $a,b$ 均为常数。}
+  \item 对于张量场 $T,S$，
+  \[
+    \mathcal L_X(T\otimes S)=(\mathcal L_XT)\otimes S+T\otimes(\mathcal L_X S).
+  \]
+  \item \textbf{与缩并可交换。}李导数与张量的缩并可交换。
+  \item \textbf{对函数和向量场的作用}
+  \begin{itemize}
+    \item 对于标量函数 $f$，$\mathcal L_X f=X(f)$，即 $X$ 对 $f$ 的作用。
+    \item 对于向量场 $Y$，$\mathcal L_XY=[X,Y]$，即 $X$ 和 $Y$ 的李括号。
+  \end{itemize}
+\end{enumerate}
+
+\textbf{坐标表示。}在局部坐标 $(x^1,x^2,\ldots,x^n)$ 中，可以用偏导数表示张量场的李导数。对于 $(1,0)$ 型张量（向量场）$T=T^i\partial_i$，
+% PDF p. 177
+\[
+  (\mathcal L_X T)^i=X^j\frac{\partial T^i}{\partial x^j}
+                   -T^j\frac{\partial X^i}{\partial x^j}.
+\]
+\textbf{直观理解。}李导数 $\mathcal L_XT$ 刻画张量场 $T$ 沿 $X$ 生成的流被“拖动”时的变化。它同时考虑 $T$ 本身的变化，以及由 $X$ 所规定的空间运动带来的变化。
+
+\textbf{小结。}李导数给出一种自然的、不依赖坐标的方式，沿流形上的向量场对张量场求导，同时尊重流形的几何结构。

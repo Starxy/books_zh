@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \draw[red!88!black,line width=1.4pt] (0,-.85)--(0,.85);
+  \node[left=6pt] at (0,0) {$\R$};
+  \node at (.34,0) {$\times$};
+  \draw[green!55!black,line width=1.4pt] (.72,0)--(2.52,0)
+       node[midway,below=2pt] {$\R$};
+  \node at (3,0) {$=$};
+  \foreach \y in {-.85,-.51,-.17,.17,.51,.85}
+     \draw[green!55!black,line width=1.4pt] (3.5,\y)--(5.5,\y);
+  \foreach \x in {3.5,3.9,4.3,4.7,5.1,5.5}
+     \draw[red!88!black,line width=1.4pt] (\x,-.85)--(\x,.85);
+  \node[right=6pt] at (5.5,0) {$\R^2$};
+\end{tikzpicture}

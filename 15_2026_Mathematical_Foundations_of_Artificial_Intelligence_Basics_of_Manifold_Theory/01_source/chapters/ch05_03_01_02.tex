@@ -1,0 +1,259 @@
+% PDF p. 246
+\section{雅可比场}
+雅可比场与雅可比方程是黎曼几何的基本概念。雅可比场是沿一条测地线的向量场，描述邻近测地线怎样彼此偏离。它们对研究流形几何很重要，例如理解共轭点及指数映射的性质，也用于分析测地线的稳定性。通过它们可以了解测地线，也就是使流形上两点间距离最小的曲线，进而理解弯曲空间的几何。下面详细介绍与雅可比场和雅可比方程有关的概念、理论、公式与例子。
+
+\subsection{测地线的变分与雅可比场的定义}
+测地线是使流形上两点之间的距离最小的曲线，把欧氏空间中直线的概念推广到了流形。我们可以用它们分析测地线的无穷小变分，并理解底层
+% PDF p. 247
+流形的几何。为描述测地线的变分，考虑一个光滑的单参数测地线族。设 $M$ 是黎曼流形，$\gamma\colon[a,b]\to M$ 是一条测地线。假设有一个光滑的单参数测地线族
+\[
+  \gamma_s(t),\qquad s\in(-\varepsilon,\varepsilon),\quad t\in[a,b],
+\]
+使得对每个固定的 $s$，曲线 $t\mapsto\gamma_s(t)$ 都是测地线，且 $\gamma_0(t)=\gamma(t)$。沿 $\gamma$ 的变分向量场（variation vector field）定义为
+\[
+  J(t)=\left.\frac{\partial}{\partial s}\gamma_s(t)\right|_{s=0}.
+\]
+这个向量场 $J(t)$ 称为雅可比场。直观上，$J(t)$ 度量由参数 $s$ 的变化在 $\gamma(t)$ 处引起的无穷小位移，也就是说明改变 $s$ 时测地线 $\gamma(t)$ 如何“移动”。
+
+\subsection{雅可比方程}
+雅可比方程（Jacobi equation）将抽象的曲率概念转化为具体而可计算的效应。它支配雅可比场，也就是相邻测地线之间的无穷小分离向量，因而说明弯曲空间上的“直线”轨迹如何发散或会聚。求解该方程可以找出共轭点（最短路径不再具有极小性的地方），量化黎曼曲率张量所编码的截面曲率，并为博内–迈尔斯（Bonnet–Myers）和劳赫（Rauch）等比较定理提供依据。在物理学中，同一方程就是测地偏离定律，用来预测广义相对论中的潮汐力、卫星轨道的稳定性，以及宇宙结构中扰动的增长。在应用几何和机器学习中，它为测地线回归的打靶法（shooting method）、黎曼优化中的敏感性分析、流形三角剖分中的误差界提供依据。凡要把曲率转化为弯曲空间中有关距离、稳定性与变化程度的具体信息，都离不开雅可比方程。
+
+\subsubsection{测地线方程}
+下面介绍测地线方程（Jia 等，2024）。测地线把“直线”从平面推广到了曲面，在一定意义下表示两点之间的最短路径，即“最短曲线”。因此，通常把测地线定义为相对于联络的加速度为零的曲线。
+
+\begin{statement}{定义 5.7}{测地线}
+如果在每一点 $\gamma(t)$ 处，加速度 $\ddot\gamma(t)$ 为零或垂直于该点的单位法向量 $n$，则称曲面 $S$ 上的曲线 $\gamma(t)$ 为测地线（图~\ref{fig:5.1}）。\translatornote{原书写作“垂直于单位法向量”。对于带诱导度量的曲面，沿测地线的加速度的切向分量为零，即加速度为零或平行于法向量。这与下一页命题 5.1 的证明一致。}
+\end{statement}
+
+% PDF p. 248
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.62\linewidth]{assets/ch05/fig05_01.pdf}
+  \FigureCaption{5.1}{曲面上的测地线。}
+\end{figure}
+
+\paragraph{测地线的性质}
+下面说明测地线的几个性质。
+
+\begin{statement}{命题 5.1}{}
+曲面 $S$ 上的测地线 $\gamma(t)$ 具有恒定速率。
+\end{statement}
+\textbf{证明}\quad 可以用测地线 $\gamma(t)$ 的速率平方 $\lVert\dot\gamma\rVert^2$ 来考察速率，其导数为
+\[
+  \frac{d}{dt}\lVert\dot\gamma\rVert^2
+    =\frac{d}{dt}\langle\dot\gamma,\dot\gamma\rangle
+    =2\langle\ddot\gamma,\dot\gamma\rangle.
+\]
+因为 $\gamma(t)$ 是测地线，按定义 $\ddot\gamma$ 垂直于含有 $\dot\gamma$ 的切平面，所以 $\langle\ddot\gamma,\dot\gamma\rangle=0$。于是
+$\frac{d}{dt}\lVert\dot\gamma\rVert^2=0$，速率 $\lVert\dot\gamma\rVert$ 恒定。
+
+\begin{statement}{命题 5.2}{}
+曲面上的曲线是测地线，当且仅当其测地曲率处处为零。
+\end{statement}
+\textbf{证明}\quad 设 $\gamma$ 是曲面片 $\sigma$ 中一条单位速率测地线。测地曲率定义为
+\[
+  K_g=\langle\ddot\gamma,N\times\dot\gamma\rangle,
+\]
+其中 $N$ 是 $\sigma$ 的单位法向量。测地曲率为零，表明 $\ddot\gamma$ 垂直于 $N\times\dot\gamma$，而后者垂直于 $N$。按定义，曲面上的一条曲线恰在满足该条件时为测地线。\translatornote{此证明使用单位速率参数，此时 $\ddot\gamma\perp\dot\gamma$。对任意参数化，零测地曲率说明曲线可重参数化为测地线。}
+
+由命题 5.2 可知，所有直线都是测地线。判断曲面上的曲线是不是测地线并不容易。下面引入测地线方程，用它可以求出给定曲面上的所有测地线。
+
+% PDF p. 249
+在推导测地线方程前，先将协变导数的一般公式改写为沿曲线的协变导数公式。
+
+\paragraph{沿曲线的协变导数}
+普通导数描述平坦空间中的变化，协变导数描述在保持与所在的弯曲空间“相切”时发生的变化。现代几何、物理和流形机器学习中的直线性、加速度、平行性和曲率，都依靠协变导数来给出内在定义。要度量曲线的加速度，继而定义测地线并发现拓扑性质，需要引入沿曲线的协变导数。
+
+\begin{statement}{定义 5.8}{沿曲线的协变导数}
+设 $\gamma(t)=(x^1(t),x^2(t),\ldots,x^n(t))$ 为 $M$ 上的一条光滑曲线，沿 $\gamma$ 的速度向量场为
+\[
+  \dot\gamma(t)=\frac{d\gamma(t)}{dt}
+    =\left(\frac{dx^1}{dt},\frac{dx^2}{dt},\ldots,\frac{dx^n}{dt}\right).
+\]
+设 $X(t)$ 是沿 $\gamma(t)$ 的任意向量场，在某坐标系中的分量为 $X^i(t)$。$X(t)$ 沿 $\gamma$ 的协变导数定义为
+\begin{equation*}
+  \begin{aligned}
+    (\nabla_{\dot\gamma}X)^i
+      &=\left(\frac{dX^i}{dx^j}+\Gamma^i_{jk}X^k\right)\frac{dx^j}{dt}\\
+      &=\frac{dX^i}{dx^j}\frac{dx^j}{dt}
+        +\Gamma^i_{jk}\frac{dx^j}{dt}X^k\\
+      &=\frac{dX^i}{dt}+\Gamma^i_{jk}\frac{dx^j}{dt}X^k,
+  \end{aligned}
+  \tag{5.31}\label{eq:5.31}
+\end{equation*}
+其中 $\Gamma^i_{jk}$ 是列维-奇维塔联络的克里斯托费尔符号。
+\end{statement}
+
+\paragraph{测地线方程}
+测地线定义为相对于联络的加速度为零的曲线。换言之，曲线 $\gamma(t)$ 是测地线，当且仅当速度向量场满足
+\begin{equation*}
+  \nabla_{\dot\gamma}\dot\gamma=0.
+  \tag{5.32}\label{eq:5.32}
+\end{equation*}
+为应用式~\eqref{eq:5.31}，定义
+\[
+  X(t)=\dot\gamma,\qquad X^i(t)=\frac{dx^i}{dt}.
+\]
+% PDF p. 250
+于是在局部坐标下，
+\begin{equation*}
+  \begin{aligned}
+    (\nabla_{\dot\gamma}\dot\gamma)^i
+     &=\frac{d(dx^i/dt)}{dt}
+       +\Gamma^i_{jk}\frac{dx^j}{dt}\frac{dx^k}{dt}\\
+     &=\frac{d^2x^i}{dt^2}+\Gamma^i_{jk}\frac{dx^j}{dt}\frac{dx^k}{dt}
+       =0,\qquad \text{对所有 }i.
+  \end{aligned}
+  \tag{5.33}\label{eq:5.33}
+\end{equation*}
+
+\paragraph{将方程用于曲线族 \texorpdfstring{$\gamma_s(t)$}{γₛ(t)}}
+现在考虑单参数曲线族\translatornote{以下等式左端按原书保留为 $\gamma_s(t)$，右端各分量实际为速度 $\dot\gamma_s(t)$ 的坐标。}
+\[
+  \gamma_s(t)=\left(\frac{dx_s^1}{dt},\frac{dx_s^2}{dt},\ldots,
+                     \frac{dx_s^n}{dt}\right),
+\]
+使得对每个固定 $s$，曲线 $t\mapsto\gamma_s(t)$ 都是测地线。也就是说，对每个固定 $s$，
+\begin{equation*}
+  (\nabla_{\dot\gamma_s}\dot\gamma_s)^i
+    =\frac{d^2x_s^i}{dt^2}+\Gamma^i_{jk}(s,t)
+       \frac{dx_s^j}{dt}\frac{dx_s^k}{dt}=0.
+  \tag{5.34}\label{eq:5.34}
+\end{equation*}
+也可写成
+\begin{equation*}
+  \nabla_{\partial_t}\partial_t\gamma_s(t)=0,
+  \tag{5.35}\label{eq:5.35}
+\end{equation*}
+其中 $\partial_t\gamma_s(t)$ 只是沿测地线 $\gamma_s$ 的速度向量场 $\dot\gamma_s(t)$ 的另一种写法。
+
+\subsubsection{雅可比方程}
+雅可比场 $J(t)$ 满足一个二阶线性微分方程，称为雅可比方程。用列维-奇维塔联络 $\nabla$ 和黎曼曲率张量 $R$ 表示，该方程为
+\begin{equation*}
+  \nabla_{\dot\gamma}\nabla_{\dot\gamma}J+R(J,\dot\gamma)\dot\gamma=0.
+  \tag{5.36}\label{eq:5.36}
+\end{equation*}
+其中，
+\begin{itemize}
+  \item $\dot\gamma$ 是测地线 $\gamma(t)$ 的切向量。
+  \item $\nabla_{\dot\gamma}J$ 表示 $J$ 沿 $\gamma$ 的协变导数。
+  \item $R(J,\dot\gamma)\dot\gamma$ 来自黎曼曲率张量的作用 $R(X,Y)Z$。这里先取向量对 $(J,\dot\gamma)$，所得曲率作用再与 $\dot\gamma$ 结合，给出一个向量。$R(J,\dot\gamma)\dot\gamma$ 是曲率项，衡量流形的曲率如何使相邻测地线组成的一束曲线相对 $\gamma$ 弯曲。
+\end{itemize}
+$\nabla_{\dot\gamma}\nabla_{\dot\gamma}J$ 表示变分场沿测地线的加速度，曲率项 $R(J,\dot\gamma)\dot\gamma$ 则根据流形的曲率对这项加速度作“修正”。
+% PDF p. 251
+在平坦（欧氏）空间中，曲率项消失，方程化为简单的二阶线性微分方程，其解是 $t$ 的仿射函数。
+
+\Subheading{证明}
+证明步骤如下。
+
+\textbf{第 1 步\quad 对测地线方程求导}\par
+每条 $\gamma_s(t)$ 都是测地线，因此对每个 $s$，由式~\eqref{eq:5.35} 得
+\[
+  \nabla_{\partial_t}\partial_t\gamma_s(t)=0.
+\]
+对该方程关于 $s$ 求导，即将 $\partial/\partial s$ 作用到
+\[
+  \nabla_{\partial_t}\partial_t\gamma_s(t)=0.
+\]
+由于 $\nabla$ 和 $\gamma_s$ 的光滑性，可以考察交换求导次序的关系。以下用 $\partial_t$ 表示关于 $t$ 的微分，用 $\partial_s$ 表示关于 $s$ 的微分。求导得
+\[
+  \partial_s\bigl(\nabla_{\partial_t}\partial_t\gamma_s(t)\bigr)=0.
+\]
+把关于 $s$ 的导数解释为沿变分的协变导数，再在 $s=0$ 处求值，得到
+\begin{equation*}
+  \left.\nabla_{\partial_s}\nabla_{\partial_t}\partial_t\gamma_s(t)\right|_{s=0}=0.
+  \tag{5.37}\label{eq:5.37}
+\end{equation*}
+
+\textbf{第 2 步\quad 交换协变导数的次序}\par
+我们要用雅可比场 $J(t)=\left.\partial_s\gamma_s(t)\right|_{s=0}$ 改写左端。这里的关键工具是曲率张量及以下协变导数交换公式：
+\begin{equation*}
+  \begin{aligned}
+    &\nabla_{\partial_s}\nabla_{\partial_t}\partial_t\gamma_s
+       -\nabla_{\partial_t}\nabla_{\partial_s}\partial_t\gamma_s\\
+    &\qquad=R(\partial_s\gamma_s,\partial_t\gamma_s)\partial_t\gamma_s.
+  \end{aligned}
+  \tag{5.38}\label{eq:5.38}
+\end{equation*}
+因此，在 $s=0$ 处，
+\begin{equation*}
+  \nabla_{\partial_s}\nabla_{\partial_t}\partial_t\gamma_s
+    =\nabla_{\partial_t}\nabla_{\partial_s}\partial_t\gamma_s
+       +R(J,\dot\gamma)\dot\gamma.
+  \tag{5.39}\label{eq:5.39}
+\end{equation*}
+注意
+\[
+  \left.\nabla_{\partial_s}\partial_t\gamma_s\right|_{s=0}
+    =\nabla_{\dot\gamma}J.
+\]
+下面简要证明这一等式。
+
+% PDF p. 252
+\textbf{证明}\quad 实际上，$\gamma(s,t)$ 是黎曼流形 $M$ 上的一个光滑二参数曲线族。由于参数 $s,t$ 相互独立，对应的坐标向量场可交换：
+\begin{equation*}
+  \begin{gathered}
+    [\partial_s,\partial_t](f)=\frac{\partial^2f}{\partial s\partial t}
+                              -\frac{\partial^2f}{\partial t\partial s}=0,\\
+    \text{从而 }[\partial_s,\partial_t]=0.
+  \end{gathered}
+  \tag{5.40}\label{eq:5.40}
+\end{equation*}
+列维-奇维塔联络无挠。这意味着对任意向量场 $X,Y$，
+\begin{equation*}
+  \nabla_XY-\nabla_YX=[X,Y].
+  \tag{5.41}\label{eq:5.41}
+\end{equation*}
+将 $X=\partial_s$、$Y=\partial_t$ 代入式~\eqref{eq:5.41}，并用 $[\partial_s,\partial_t]=0$，得到
+\begin{equation*}
+  \nabla_{\partial_s}\partial_t\gamma(s,t)
+    =\nabla_{\partial_t}\partial_s\gamma(s,t).
+  \tag{5.42}\label{eq:5.42}
+\end{equation*}
+在 $s=0$ 处对式~\eqref{eq:5.42} 求值，得到
+\begin{equation*}
+  \left.\nabla_{\partial_s}\partial_t\gamma(s,t)\right|_{s=0}
+    =\left.\nabla_{\partial_t}\partial_s\gamma(s,t)\right|_{s=0}.
+  \tag{5.43}\label{eq:5.43}
+\end{equation*}
+式~\eqref{eq:5.43} 的右端正是向量场
+\begin{equation*}
+  J(t)=\partial_s\gamma(0,t)
+  \tag{5.44}\label{eq:5.44}
+\end{equation*}
+关于 $t$ 的协变导数。注意
+\begin{equation*}
+  \partial_t\gamma(0,t)=\dot\gamma.
+  \tag{5.45}\label{eq:5.45}
+\end{equation*}
+将式~\eqref{eq:5.44} 与式~\eqref{eq:5.45} 代入式~\eqref{eq:5.43} 得
+\begin{equation*}
+  \left.\nabla_{\partial_s}\partial_t\gamma(s,t)\right|_{s=0}
+     =\nabla_{\dot\gamma}J.
+  \tag{5.46}\label{eq:5.46}
+\end{equation*}
+左端表示先对 $\gamma(s,t)$ 关于 $t$ 求导，得到沿曲线 $\gamma_s(t)$ 的速度，再对这个速度关于 $s$ 求导。由于比较的是不同切空间中的向量，这一步计入联络（平行移动）。最后在 $s=0$ 处求值。右端 $\nabla_{\dot\gamma}J$ 表示取雅可比场 $J(t)$，即曲线关于 $s$ 的变分，再沿“中心”曲线 $\gamma(0,t)$ 的切向量 $\dot\gamma(t)$ 求导。在此光滑情形下，混合偏导相等，结合沿变分的协变导数的定义，两边得到相同的结果。
+
+\textbf{证毕。}\par
+将式~\eqref{eq:5.46} 代入式~\eqref{eq:5.39}，得到
+\begin{equation*}
+  \nabla_{\partial_s}\nabla_{\partial_t}\partial_t\gamma_s
+    =\nabla_{\partial_t}\nabla_{\dot\gamma}J+R(J,\dot\gamma)\dot\gamma.
+  \tag{5.47}\label{eq:5.47}
+\end{equation*}
+% PDF p. 253
+将式~\eqref{eq:5.35} 代入式~\eqref{eq:5.47}，得到
+\begin{equation*}
+  \nabla_{\partial_t}\nabla_{\dot\gamma}J+R(J,\dot\gamma)\dot\gamma=0.
+  \tag{5.48}\label{eq:5.48}
+\end{equation*}
+注意
+\begin{equation*}
+  \nabla_{\partial_t}=\nabla_{\dot\gamma}.
+  \tag{5.49}\label{eq:5.49}
+\end{equation*}
+用式~\eqref{eq:5.49} 可将式~\eqref{eq:5.48} 化为雅可比方程：
+\begin{equation*}
+  \nabla_{\dot\gamma}\nabla_{\dot\gamma}J+R(J,\dot\gamma)\dot\gamma=0.
+  \tag{5.50}\label{eq:5.50}
+\end{equation*}

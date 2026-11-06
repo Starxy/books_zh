@@ -1,0 +1,24 @@
+% PDF p. 51, figure 1.2. Arrows and color associations follow the original legend.
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,>=Stealth]
+  \definecolor{curveblue}{HTML}{0072BD}
+  \definecolor{curvecyan}{HTML}{87D8F9}
+  \definecolor{curvered}{HTML}{F11B22}
+  \definecolor{curveyellow}{HTML}{FFB800}
+  \draw[->,line width=1pt,curveblue] (0,0) -- (2.10,.69);
+  \draw[->,line width=1pt,curvecyan] (0,0) -- (0,1.38);
+  \draw[->,line width=1pt,curvered] (0,0) -- (.91,1.38);
+  \draw[->,line width=1pt,curveyellow] (0,0) -- (.38,1.49);
+  \draw[curveblue,semithick,densely dotted] (.91,1.38)
+    .. controls (1.11,1.38) and (1.38,1.29) .. (1.46,1.03)
+    .. controls (1.55,.76) and (1.82,.71) .. (2.10,.69);
+  \draw[curveblue] (2.72,2.9) -- (3.63,2.9);
+  \draw[curvecyan] (2.72,2.52) -- (3.63,2.52);
+  \draw[curvered] (2.72,2.14) -- (3.63,2.14);
+  \draw[curveyellow] (2.72,1.76) -- (3.63,1.76);
+  \draw[curveblue,densely dotted] (2.72,1.38) -- (3.63,1.38);
+  \node[right] at (3.79,2.9) {子空间 $U$ 的向量 1};
+  \node[right] at (3.79,2.52) {子空间 $U$ 的向量 2};
+  \node[right] at (3.79,2.14) {子空间 $V$ 的向量 1};
+  \node[right] at (3.79,1.76) {子空间 $V$ 的向量 2};
+  \node[right] at (3.79,1.38) {测地路径};
+\end{tikzpicture}

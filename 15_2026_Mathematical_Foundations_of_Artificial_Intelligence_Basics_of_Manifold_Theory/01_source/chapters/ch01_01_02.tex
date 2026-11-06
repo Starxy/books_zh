@@ -1,0 +1,337 @@
+% PDF p. 18
+\section{引言}
+在数学与理论物理中，像流形这样作用广泛而又用途多样的概念并不多见。流形是一种拓扑空间（topological space），在小尺度上有许多类似欧氏空间（Euclidean space）的性质，但从整体看，可以呈现截然不同的特征。正是这种局部简单、整体复杂的特点，使流形成为现代几何及其应用的基石。
+
+\subsection{流形}
+最简单的流形是拓扑流形，即满足以下三个性质的拓扑空间。
+
+\begin{statement}{定义 1.1}{拓扑流形}
+$n$ 维拓扑流形是满足下列条件的拓扑空间 $M$。
+\begin{enumerate}
+  \item \textbf{豪斯多夫性（Hausdorff）}\quad 对任意两个不同的点 $p,q\in M$，都存在互不相交的开邻域（open neighborhood）$U,V$，使 $p\in U$ 且 $q\in V$。
+  \item \textbf{第二可数性（second-countable）}\quad $M$ 的拓扑有一个可数基（countable basis）。
+  \item \textbf{局部欧氏性（locally Euclidean）}\quad 对每个 $p\in M$，存在 $p$ 的一个开邻域 $U$ 以及一个同胚（homeomorphism）
+  \[
+    \varphi\colon U\longrightarrow V\subset\R^n,
+  \]
+  其中 $V$ 是 $\R^n$ 的开子集。原书在此称该映射为坐标卡。
+\end{enumerate}
+\end{statement}
+
+\begin{statement}{例 1.1}{拓扑流形}
+圆周 $S^1=\{(x,y)\in\R^2\mid x^2+y^2=1\}$ 是一个经典例子。它是一维空间，具有以下性质。
+\begin{itemize}
+  \item \textbf{豪斯多夫性}\quad 圆周上任意两点都可用不相交的开弧分离。
+  \item \textbf{第二可数性}\quad 圆周有可数基，例如端点取有理数的开弧所成的族。
+  \item \textbf{局部欧氏性}\quad $S^1$ 上每个点都有一个同胚于 $\R$ 中某个开区间的邻域。
+\end{itemize}
+\end{statement}
+
+% PDF p. 19
+\begin{statement}{例 1.2}{不构成拓扑流形的空间}
+有两个原点的直线（line with two origins）是一个标准例子。取 $\R$ 的两个副本 $R_0$ 和 $R_1$，将 $R_0$ 中每个非零点 $x$ 与 $R_1$ 中对应的点等同起来，就得到这个空间。它具有以下性质。
+\begin{itemize}
+  \item \textbf{局部欧氏性}\quad 除原点外，每个点都有一个与 $\R$ 同胚的邻域。即使在两个不同的“原点”附近，也各有一个局部形如 $\R$ 的邻域。
+  \item \textbf{不满足豪斯多夫性}\quad 无法用不相交的开集分离这两个原点，因而所得空间不是豪斯多夫空间。
+\end{itemize}
+所以，尽管有两个原点的直线具有局部欧氏性，却因不满足豪斯多夫条件而不是拓扑流形。
+\end{statement}
+
+\section{坐标卡}
+\subsection{坐标卡的基本概念}
+\begin{statement}{定义 1.2}{坐标卡}
+$n$ 维流形 $M$ 上的坐标卡是由下列两项组成的二元组 $(U,\varphi)$。
+\begin{enumerate}
+  \item 流形中的一个开集 $U\subseteq M$。
+  \item 一个同胚
+  \[
+    \varphi\colon U\longrightarrow\R^n.
+  \]
+\end{enumerate}
+换言之，坐标卡用 $n$ 维欧氏空间中的坐标描述流形的一部分。这些坐标通常记为 $(x^1,x^2,\ldots,x^n)$，给出了该区域的局部参数化（local parameterization）。用一族这样的坐标卡覆盖整个流形，便得到图册。只要这些坐标卡在重叠处能够光滑过渡，就可以把 $\R^n$ 中熟悉的几何和分析概念推广到流形自身（$\varphi^{-1}$）。
+
+之所以需要坐标卡，是因为它把抽象的流形转化成局部熟悉的欧氏坐标，即便流形可能弯曲，整体结构也可能十分复杂。流形本身是一般的拓扑空间，并不自带“直线”、角度或标准坐标系等概念。引入坐标卡，相当于在流形与 $\R^n$ 的一块区域之间建立一部局部词典。
+
+这样做有以下几项主要用途。
+\begin{enumerate}
+  \item \textbf{局部欧氏结构}\quad 坐标卡使我们可以把流形上的小区域当作 $\R^n$ 的子集来处理，从而应用微分、积分等在欧氏空间中有明确定义的微积分工具。
+  \item \textbf{定义光滑结构（smooth structure）}\quad 借助坐标卡，可以检验流形上的函数与到 $\R^n$ 的坐标映射的复合，由此定义流形上的函数何谓光滑。光滑性、导数以及类似概念都依赖这一框架。
+% PDF p. 20
+  \item \textbf{构造图册与过渡映射（transition map）}\quad 单个坐标卡一般只覆盖流形的一部分。用多个彼此重叠的坐标卡组成图册，就可以覆盖整个流形。作为“黏合剂”的过渡映射必须光滑。凭借这种整体相容性，我们才能在整个流形上以一致的方式推广几何和分析概念。
+\end{enumerate}
+总之，坐标卡在抽象的流形与熟悉的欧氏空间之间架起了桥梁，使经典数学方法可以用于这些更一般的几何情形。
+\end{statement}
+
+\begin{statement}{例 1.3}{连续函数的图像}
+函数 $f\colon\R^n\to\R$ 的图像可以构成一个流形。
+\begin{itemize}
+  \item \textbf{示例}\quad 取 $f\colon\R\to\R$ 为函数 $f(x)=x^2$。
+  \begin{itemize}
+    \item 它的图像是 $\{(x,y)\in\R^2\mid y=x^2\}$，是嵌入（embedding）在 $\R^2$ 中的一维子流形（submanifold）（图~\ref{fig:1.1}）。
+    \item 这个图像是光滑可微的。
+  \end{itemize}
+  \item \textbf{一般情形}\quad 任取光滑函数 $f\colon\R^n\to\R^m$，其图像为
+  \[
+    \{(x,f(x))\mid x\in\R^n\}\subseteq\R^{n+m}.
+  \]
+  这是一个 $n$ 维流形。
+\end{itemize}
+\end{statement}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.85\linewidth]{assets/ch01/fig01_01.pdf}
+  \FigureCaption{1.1}{函数 $f(x)=x^2$ 的图像，在 $xy$ 平面中形成一条光滑曲线（抛物线）。}
+\end{figure}
+
+% PDF p. 21
+\begin{statement}{例 1.4}{球面}
+球面是紧致（compact）光滑流形的一个基本例子。
+\begin{itemize}
+  \item \textbf{单位圆周（$1$ 维球面）}\quad $S^1\subset\R^2$。
+  
+  其定义为 $S^1=\{(x,y)\in\R^2\mid x^2+y^2=1\}$。这是一个一维紧致流形。
+  \item \textbf{$2$ 维球面}\quad $S^2\subset\R^3$。
+  
+  其定义为 $S^2=\{(x,y,z)\in\R^3\mid x^2+y^2+z^2=1\}$。这是一个二维流形，可以想象为地球仪的表面。
+  \item \textbf{$n$ 维球面}\quad $S^n\subset\R^{n+1}$。
+  
+  一般定义为 $S^n=\{x\in\R^{n+1}\mid\lVert x\rVert=1\}$。$S^n$ 是一个 $n$ 维流形。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 1.5}{射影空间}
+把同一条过原点直线上的非零点等同起来，得到射影空间。
+\begin{itemize}
+  \item \textbf{实射影空间 $\mathrm{RP}^n$}\quad 其定义是 $\R^{n+1}$ 中所有过原点的直线的集合。
+  
+  形式上，$\mathrm{RP}^n=(\R^{n+1}\setminus\{0\})/{\sim}$。当 $x=\lambda y$ 且 $\lambda\in\R\setminus\{0\}$ 时，$x\sim y$。
+\end{itemize}
+例如，
+\begin{itemize}
+  \item $\mathrm{RP}^1$ 可以看作将圆周 $S^1$ 上每对对径点等同后所得的空间。
+  \item $\mathrm{RP}^2$ 较难直观想象，它是一个二维流形。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 1.6}{乘积流形}
+两个或更多流形的笛卡儿积（Cartesian product）构成乘积流形。
+\begin{itemize}
+  \item \textbf{示例：环面 $T^2$}\quad 环面 $T^2$ 是两个圆周的乘积 $S^1\times S^1$。环面上的点可以表示成 $(e^{\theta_1},e^{\theta_2})$，其中 $\theta_1,\theta_2\in[0,2\pi)$。\translatornote{指数按原书排印。将圆周视为复平面上的单位圆时，通常的表示为 $(e^{i\theta_1},e^{i\theta_2})$。} 它是嵌入 $\R^3$ 中的二维紧致流形。环面是在三维空间中旋转一个圆周生成的旋转曲面。其参数表示使用两个角 $(\theta,\varphi)$，给出环面上的点在笛卡儿坐标系中的坐标。
+  \item \textbf{更高维的乘积}\quad 若 $M_1,M_2$ 分别是 $n_1$ 维和 $n_2$ 维流形，则 $M_1\times M_2$ 是 $n_1+n_2$ 维流形。
+\end{itemize}
+\end{statement}
+
+\subsection{坐标卡的计算方法}
+按以下步骤计算坐标卡 $(U,\varphi)$。
+
+\Subheading{第 1 步\quad 确定流形 $M$ 及其局部结构}
+\begin{itemize}
+  \item 确定所考虑的流形 $M$ 属于哪一种，例如 $S^2$（$2$ 维球面）、$T^2$（环面）或更一般的流形。
+  \item 选取一个便于定义局部坐标系的开子集 $U\subseteq M$。
+\end{itemize}
+
+% PDF p. 22
+\Subheading{第 2 步\quad 定义坐标映射 $\varphi$}
+\begin{itemize}
+  \item 构造映射 $\varphi\colon U\to\R^n$，使其满足以下条件。
+  \begin{enumerate}
+    \item 在 $U$ 上为双射。
+    \item 连续，并且具有连续的逆。
+  \end{enumerate}
+  对许多流形，可以用局部参数化构造坐标映射 $\varphi$。
+\end{itemize}
+
+\begin{statement}{例 1.7}{$2$ 维球面 $S^2$ 上的坐标卡}
+我们来计算 $2$ 维球面 $S^2\subset\R^3$ 的一张坐标卡，其中
+\[
+  S^2=\{(x,y,z)\in\R^3\mid x^2+y^2+z^2=1\}.
+\]
+
+\textbf{第 1 步\quad 选取开子集 $U\subset S^2$}\par
+取开子集 $U$ 为北半球，即
+\[
+  U=\{(x,y,z)\in S^2\mid Z>0\}.
+\]
+
+\textbf{第 2 步\quad 定义坐标映射 $\varphi$}\par
+用从北极 $(0,0,1)$ 出发的球极投影（stereographic projection）定义 $\varphi$\translatornote{按原书保留了 $Z>0$ 的区域写法。该投影在北极没有定义，使用此式作为北半球的坐标映射时，定义域须去掉北极，且应取到其像的同胚。}：
+\[
+  \varphi\colon U\to\R^2,\qquad
+  \varphi(x,y,z)=\left(\frac{x}{1-z},\frac{y}{1-z}\right).
+\]
+\begin{itemize}
+  \item 直观上，上半球的点被投影到 $xy$ 平面。
+  \item 该映射是光滑的双射，其逆映射也可以计算。
+\end{itemize}
+
+\textbf{第 3 步\quad 验证 $\varphi$ 的性质}
+\begin{itemize}
+  \item $\varphi$ 是一个同胚，因为它具有以下性质。
+  \begin{enumerate}
+    \item 有定义良好的逆映射
+    \[
+      \varphi^{-1}(u,v)
+      =\left(\frac{2u}{1+u^2+v^2},\frac{2v}{1+u^2+v^2},
+          \frac{-1+u^2+v^2}{1+u^2+v^2}\right).
+    \]
+    \item 连续且可微。
+  \end{enumerate}
+  因此，$(U,\varphi)$ 是 $S^2$ 北半球的一张有效坐标卡。
+\end{itemize}
+\end{statement}
+
+\subsection{过渡映射}
+\subsubsection{过渡映射在微分几何中的作用}
+过渡映射为理解流形上局部坐标卡之间的相互关系提供了框架，保证流形的结构在整体上一致，因而是微分几何的基础。其作用主要体现在以下方面。
+
+\begin{enumerate}
+  \item \textbf{定义光滑流形}
+  \begin{itemize}
+    \item 流形由彼此重叠的局部坐标卡构造而成，每张坐标卡把流形上的一片区域映射到欧氏空间 $\R^n$。
+    \item 过渡映射描述两张坐标卡在重叠区域中给出的坐标如何互相转换。
+% PDF p. 23
+    \item 对光滑流形，这些过渡映射必须是光滑函数，以保证微分等计算处处有明确定义。
+  \end{itemize}
+  \item \textbf{局部描述与整体描述的一致性}
+  \begin{itemize}
+    \item 过渡映射给出了一种以相容方式“黏合”局部坐标卡的方法，使流形具有一致的整体结构。
+    \item 过渡映射使不同的局部视角，即不同坐标卡，对同一几何对象的描述彼此一致。
+  \end{itemize}
+  \item \textbf{坐标无关性}
+  \begin{itemize}
+    \item 微分几何着重研究不依赖坐标选取的性质，例如曲率（curvature）和测地线。
+    \item 过渡映射保证切换坐标卡时，几何和分析性质保持不变。
+  \end{itemize}
+  \item \textbf{张量演算与可微结构}
+  \begin{itemize}
+    \item 张量（tensor）、向量场和微分形式都用局部坐标定义。
+    \item 过渡映射规定这些对象在坐标卡之间如何变换，从而使它们在整体上有明确定义。
+  \end{itemize}
+  \item \textbf{物理学中的应用}
+  \begin{itemize}
+    \item 在广义相对论（general relativity）中，时空建模为光滑流形。
+    \item 要以不随坐标变换而改变的方式表达物理定律，使其遵循广义协变性（general covariance）原理，过渡映射至关重要。
+  \end{itemize}
+  \item \textbf{整体拓扑性质}
+  \begin{itemize}
+    \item 过渡映射可用来研究流形的整体拓扑。例如，
+    \begin{itemize}
+      \item \textbf{图册}\quad 一族坐标卡及其过渡映射描述流形的结构。
+      \item \textbf{丛（bundle）}\quad 过渡映射规定纤维（fiber），例如切空间，如何附着于底流形。
+    \end{itemize}
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{过渡映射的定义与计算}
+\begin{statement}{定义 1.3}{过渡映射}
+设 $M$ 是 $n$ 维光滑流形，$\{(U_\alpha,\varnothing_\alpha)\}_{\alpha\in A}$ 与
+$\{(U_\beta,\varnothing_\beta)\}_{\beta\in B}$ 是 $M$ 上两族彼此重叠的坐标卡（图册），其中
+\begin{itemize}
+  \item $U_\alpha,U_\beta\in M$ 是流形中的开集。\translatornote{此处 $\in$ 沿用原书，开集与流形的关系应写成 $U_\alpha,U_\beta\subseteq M$。原书用带指标的 $\varnothing$ 表示坐标映射。}
+  \item $\varnothing_\alpha\colon U_\alpha\to\R^n$ 和 $\varnothing_\beta\colon U_\beta\to\R^n$ 是从流形到欧氏空间的同胚。
+\end{itemize}
+\end{statement}
+
+\Subheading{过渡映射}
+若 $U_\alpha\cap U_\beta\ne\varnothing$，则过渡映射为函数
+\[
+  \varnothing_{\beta\alpha}
+  =\varnothing_\beta\circ\varnothing_\alpha^{-1}\colon
+  \varnothing_\alpha(U_\alpha\cap U_\beta)
+  \longrightarrow \varnothing_\beta(U_\alpha\cap U_\beta),
+\]
+% PDF p. 24
+其中，
+\begin{itemize}
+  \item $\varnothing_\alpha^{-1}$ 将欧氏空间中的坐标映射回流形。
+  \item $\varnothing_\beta$ 将流形映射回另一个欧氏空间。
+\end{itemize}
+过渡映射具有以下性质。
+\begin{enumerate}
+  \item \textbf{光滑性}\quad $\varnothing_{\beta\alpha}$ 是 $C^\infty$ 光滑函数。
+  \item \textbf{相容性}\quad 对光滑流形，图册中重叠坐标卡之间的所有过渡映射都必须光滑。
+\end{enumerate}
+
+\Subheading{计算过渡映射的算法}
+\textbf{输入}
+\begin{itemize}
+  \item 光滑流形 $M$ 上两张重叠的坐标卡 $(U_\alpha,\varnothing_\alpha)$ 和 $(U_\beta,\varnothing_\beta)$。
+  \item 坐标映射 $\varnothing_\alpha$ 和 $\varnothing_\beta$。
+\end{itemize}
+\textbf{输出}
+\begin{itemize}
+  \item 过渡映射 $\varnothing_{\beta\alpha}$。
+\end{itemize}
+
+\Subheading{算法}
+\begin{enumerate}
+  \item \textbf{确定重叠区域}\quad 求出重叠区域 $U_\alpha\cap U_\beta$。在欧氏空间中计算
+  $\varnothing_\alpha(U_\alpha\cap U_\beta)$ 和 $\varnothing_\beta(U_\alpha\cap U_\beta)$。
+  \item \textbf{求逆映射}\quad 计算 $\varnothing_\alpha$ 在 $\varnothing_\alpha(U_\alpha\cap U_\beta)$ 上的逆映射
+  \[
+    \varnothing_\alpha^{-1}\colon\varnothing_\alpha(U_\alpha\cap U_\beta)\longrightarrow M.
+  \]
+  \item \textbf{复合映射}
+  \begin{itemize}
+    \item 将第二张坐标卡的映射 $\varnothing_\beta$ 应用于 $\varnothing_\alpha^{-1}$ 的输出，得
+    \[
+      \varnothing_{\beta\alpha}(x)
+      =\varnothing_\beta\bigl(\varnothing_\alpha^{-1}(x)\bigr),\qquad
+      x\in\varnothing_\alpha(U_\alpha\cap U_\beta).
+    \]
+  \end{itemize}
+  \item \textbf{验证光滑性}\quad 确认 $\varnothing_{\beta\alpha}$ 及其各阶导数在定义域上均有明确定义且光滑。
+\end{enumerate}
+
+\begin{statement}{例 1.8}{$2$ 维球面 $S^2$ 上的过渡映射}
+现在考察 $2$ 维球面 $S^2$ 上的过渡映射。构造过程如下。
+\begin{enumerate}
+  \item \textbf{选取球面、投影平面与点}
+  \begin{itemize}
+    \item \textbf{球面 $S^2$}\quad 球面用方程 $x^2+y^2+z^2=1$ 描述。
+    \item \textbf{投影平面}\quad 选取平面 $z=0$，作为从北极和从南极投影的公共平面。
+    \item \textbf{球面上的点}\quad 在北极坐标卡与南极坐标卡的重叠区域选点。
+  \end{itemize}
+% PDF p. 25
+  \item \textbf{投影过程}
+  
+  \textbf{从北极 $(0,0,1)$ 投影}
+  \begin{itemize}
+    \item 球极投影把 $S^2$ 上除北极外的一点 $(x,y,z)$ 沿该点与北极的连线映射到平面 $z=0$。这条直线可写成
+    \[
+      (tx,ty,t(z-1)+1).
+    \]
+    \item 为求投影坐标，令
+    \[
+      t(z-1)+1=0,
+    \]
+    得到
+    \[
+      t=\frac{1}{1-z}.
+    \]
+    代入直线方程，得到投影坐标公式
+    \[
+      \pi_N(x,y,z)=\left(\frac{x}{1-z},\frac{y}{1-z},0\right).
+    \]
+  \end{itemize}
+  \textbf{从南极 $(0,0,-1)$ 投影}
+  \begin{itemize}
+    \item 类似地，球极投影把 $S^2$ 上除南极外的一点 $(x,y,z)$ 沿该点与南极的连线映射到平面 $z=0$。
+    \item 用相同的推导可得投影坐标公式
+    \[
+      \pi_S(x,y,z)=\left(\frac{x}{1+z},\frac{y}{1+z},0\right).
+    \]
+  \end{itemize}
+  \item \textbf{过渡映射}
+  
+  过渡映射将一个点经北极坐标卡 $\pi_N$ 投影到平面 $z=0$ 后得到的坐标，转换为经南极坐标卡 $\pi_S$ 投影得到的坐标。
+  
+  对重叠区域内的一点，两张坐标卡之间的过渡映射由下式给出：
+  \[
+    \varnothing_{\mathrm{NS}}(u,v)
+    =\left(\frac{u}{u^2+v^2},\frac{v}{u^2+v^2}\right),
+  \]
+  其中 $(u,v)$ 为从北极投影得到的坐标。
+\end{enumerate}
+\end{statement}

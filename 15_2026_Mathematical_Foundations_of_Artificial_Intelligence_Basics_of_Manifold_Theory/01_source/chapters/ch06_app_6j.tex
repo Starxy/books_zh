@@ -1,0 +1,195 @@
+% PDF p. 356
+\AppendixSection{6J}{反向时间随机微分方程}
+
+\AppendixHeading{6J1}{设定和记号}
+
+设
+\begin{equation*}
+  dX_t=g(X_t,t)\,dt+\sigma(t)\,dW_t,\qquad t\in[0,T],\quad T=1,
+  \tag{6J1}\label{eq:6J1}
+\end{equation*}
+其中 $g\colon\R^d\times[0,T]\to\R^d$ 关于 $x$ 为 $C^1$，且关于 $(x,t)$ 有界。$\sigma\colon[0,T]\to(0,\infty)$ 为 $C^1$。为简明起见取标量形式，完整的矩阵形式只需调整记号。$W_t$ 是带滤过的概率空间 $(\Omega,\mathcal F,(\mathcal F_t)_{t\geq0},P)$ 上的标准 $d$ 维维纳过程。
+
+扩散过程的反向过程本身也是扩散过程，具有如下反向时间 SDE，
+\begin{equation*}
+  \begin{aligned}
+   dx_t&=\bigl[g(x,t)-\sigma^2(t)\nabla_{x_t}\log f_t(x)\bigr]\,dt
+           +\sigma(t)\,d\bar W_t,\\
+   x_0&=x(0),\qquad x_1=x(1),
+  \end{aligned}
+  \tag{6J2}\label{eq:6J2}
+\end{equation*}
+其中 $\bar W_t$ 为从 $t$ 到 0 沿时间反向运行的标准维纳过程，$dt$ 为负的无穷小时间步长。
+
+假定 $X_t$ 的前向分布有严格为正的 $C^{2,1}$ 密度 $f_t(x)$，满足福克–普朗克方程（前向柯尔莫哥洛夫方程，forward Kolmogorov equation），
+\begin{equation*}
+  \frac{\partial f_t(x)}{\partial t}
+   =-\nabla\cdot\bigl(g(x,t)f_t(x)\bigr)
+     +\frac{\sigma^2(t)}2\Delta f_t(x),\qquad f_0(x)=f_X(x).
+  \tag{6J3}\label{eq:6J3}
+\end{equation*}
+
+\AppendixHeading{6J2}{反向时间坐标}
+
+定义反向时钟 $s=T-t$ 和时间反演过程
+\[
+  Y_s:=X_{T-s},\qquad s\in[0,T].
+\]
+由于 $X$ 为马尔可夫过程，$(Y_s)_{s\in[0,T]}$ 关于反向滤过
+\[
+  \mathcal G_s:=\sigma(Y_r,\ 0\leq r\leq s)
+             =\sigma(X_{T-r},\ 0\leq r\leq s)
+\]
+也是马尔可夫过程。
+
+% PDF p. 357
+我们的目标是证明 $Y$ 满足反向时间 SDE，
+\begin{equation*}
+  dY_s=\bigl(g(Y_s,T-s)-\sigma^2(T-s)\nabla\log f_{T-s}(Y_s)\bigr)\,ds
+        +\sigma(T-s)\,d\tilde W_s,
+  \tag{6J4}\label{eq:6J4}
+\end{equation*}
+其中 $\tilde W_s$ 是关于 $\mathcal G_s$ 的标准维纳过程（沿时间反向运行的布朗运动）。
+
+由于 $ds=-dt$，式 \eqref{eq:6J4} 的漂移恰好是式 \eqref{eq:6J2} 中的表达式，并满足“$ds>0$ 对应 $dt<0$”的符号约定。\translatornote{原书式 \eqref{eq:6J4} 沿用了式 \eqref{eq:6J2} 在负时间步 $dt$ 下的漂移系数。改用递增时间 $s$ 后，$ds=-dt$，漂移应为 $-g(Y_s,T-s)+\sigma^2(T-s)\nabla\log f_{T-s}(Y_s)$。}
+
+\AppendixHeading{6J3}{生成元和条件漂移}
+
+\AppendixSubheading{6J3.1}{前向生成元}
+
+对任意 $\varphi\in C_b^2(\R^d)$，定义生成元（generator）
+\begin{equation*}
+  \mathcal L_t\varphi=g(x,t)\nabla\varphi(x)+\frac{\sigma^2(t)}2\Delta\varphi.
+  \tag{6J5}\label{eq:6J5}
+\end{equation*}
+由伊藤公式（Itô's formula），
+\begin{equation*}
+  M_t^\varphi=\varphi(X_t)-\varphi(X_0)-\int_0^t\mathcal L_u\varphi(X_u)\,du
+  \tag{6J6}\label{eq:6J6}
+\end{equation*}
+是关于 $(\mathcal F_t)$ 的鞅（martingale）。
+
+\AppendixSubheading{6J3.2}{反向条件期望}
+
+固定 $s\in(0,T)$，令 $\psi\in C_b^2$。由于 $Y_s=X_{T-s}$，有
+\begin{equation*}
+  E[\psi(Y_{s+h})-\psi(Y_s)\mid\mathcal G_s]
+    =E[\psi(X_{T-s-h})-\psi(X_{T-s})\mid X_{T-s}].
+  \tag{6J7}\label{eq:6J7}
+\end{equation*}
+记 $t:=T-s$，取小的 $h>0$。以 $X_t=x$ 为条件，有
+\begin{equation*}
+  \frac1h E_x[\psi(X_{t-h})-\psi(X_t)]
+    =\frac1h\bigl(E_x[\psi(X_{t-h})]-\psi(x)\bigr).
+  \tag{6J8}\label{eq:6J8}
+\end{equation*}
+根据后向柯尔莫哥洛夫方程（backward Kolmogorov equation），当 $h\to0^+$ 时右端为 $-\mathcal L_t\psi(x)+o(1)$。不过，$\mathcal L_t$ 作用于前向转移密度，我们需要一个反向作用的生成元。
+
+设 $f_t(x)$ 是 $X(t)$ 的密度函数。回顾福克–普朗克方程（前向柯尔莫哥洛夫方程），
+\begin{equation*}
+  \partial_t f_t(x)=-\nabla\cdot\bigl(g(x,t)f_t(x)\bigr)
+      +\tfrac12\sigma^2(t)\Delta f_t(x),\qquad f_0(x)=f_X(x).
+  \tag{6J9}\label{eq:6J9}
+\end{equation*}
+将福克–普朗克方程乘以 $\psi(x)$，再分部积分，得到
+% PDF p. 358
+\begin{equation*}
+  \begin{aligned}
+   \int_{\R^d}\partial_t f_t(x)\psi(x)\,dx
+     &=-\int_{\R^d}\bigl(\nabla\cdot(g(x,t)f_t(x))\bigr)\psi(x)\,dx\\
+     &\quad+\int_{\R^d}\tfrac12\sigma^2(t)\Delta f_t(x)\psi(x)\,dx\\
+     &=0+\int_{\R^d}\bigl(\nabla\psi(x)\bigr)\cdot(g(x,t)f_t(x))\,dx\\
+     &\quad+0-\tfrac12\sigma^2(t)
+             \int_{\R^d}\bigl(\nabla\psi(x)\bigr)\cdot\bigl(\nabla f_t(x)\bigr)x\\
+     &=\int_{\R^d}\bigl(\nabla\psi(x)\bigr)\cdot(g(x,t)f_t(x))\,dx\\
+     &\quad+\tfrac12\sigma^2(t)\int_{\R^d}\Delta\psi(x)f_t(x)\,dx\\
+     &=\int_{\R^d}f_t(x)
+           \bigl[g(x,t)\cdot\nabla\psi(x)+\tfrac12\sigma^2(t)\Delta\psi(x)\bigr]\,dx.
+  \end{aligned}
+  \tag{6J10}\label{eq:6J10}
+\end{equation*}
+\translatornote{式 \eqref{eq:6J10} 第四行末尾的 $x$ 按分部积分应为 $dx$。}
+由于 $E[\psi(x)]=\int_{\R^d}\psi(x)f_t(x)\,dx$，式 \eqref{eq:6J10} 可改写为
+\begin{equation*}
+  \partial_t E[\psi(X_t)]
+   =E\bigl[g(x,t)\cdot(\nabla\psi(x))+\tfrac12\sigma^2(t)\Delta\psi(x)\bigr].
+  \tag{6J11}\label{eq:6J11}
+\end{equation*}
+将式 \eqref{eq:6J11} 从 $t-h$ 积分到 $t$，其中 $h>0$ 较小，
+\begin{equation*}
+  E[\psi(X_t)]-E[\psi(X_{t-h})]
+    =h E\bigl[g(x,t)\cdot(\nabla\psi(X_t))+\tfrac12\sigma^2(t)\Delta\psi(X_t)\bigr].
+  \tag{6J12}\label{eq:6J12}
+\end{equation*}
+
+\AppendixSubheading{6J3.3}{引入条件期望（全期望公式）}
+
+记 $\varphi_h(x)=E[\psi(X_{t-h})\mid X_t=x]$。用条件期望计算，得到
+\[
+  E[\psi(X_{t-h})]=\int\varphi_h(x)f_t(x)\,dx,\qquad
+  E[\psi(X_t)]=\int\psi(x)f_t(x)\,dx.
+\]
+于是式 \eqref{eq:6J12} 成为
+\begin{equation*}
+  \begin{aligned}
+   \int[\psi(x)-\varphi_h(x)]f_t(x)\,dx
+    &=h\int\bigl[g(x,t)\cdot(\nabla\psi(x))
+                +\tfrac12\sigma^2(t)\Delta\psi(x)\bigr]f_t(x)\,dx+o(h).
+  \end{aligned}
+  \tag{6J13}\label{eq:6J13}
+\end{equation*}
+令
+\[
+  I=\frac{\sigma^2(t)}2\int f_t(x)\Delta\psi(x)\,dx.
+\]
+% PDF p. 359
+分部积分得到
+\begin{equation*}
+  \begin{aligned}
+    I&=\frac{\sigma^2(t)}2\int f_t(x)\Delta\psi(x)\,dx\\
+     &=\frac{\sigma^2(t)}2\int\sum_{i=1}^d f_t\,\partial_{x_i x_i}\psi(x)\,dx\\
+     &=-\frac{\sigma^2(t)}2\sum_{i=1}^d\int(\partial_{x_i}f_t)\partial_{x_i}\psi(x)\,dx\\
+     &=-\frac{\sigma^2(t)}2\int(\nabla f_t)\cdot\nabla\psi(x)\,gx\\
+     &=-\sigma^2(t)\int(\nabla f_t)\cdot\nabla\psi(x)\,gx
+           +\frac{\sigma^2(t)}2\int f_t(x)\Delta\psi(x)\,dx\\
+     &=-\int f_t(x)\bigl[\sigma^2(t)\nabla\log f_t(x)\bigr]\cdot\nabla\psi(x)\,dx
+           +\frac{\sigma^2(t)}2\int f_t(x)\Delta\psi(x)\,dx .
+  \end{aligned}
+  \tag{6J14}\label{eq:6J14}
+\end{equation*}
+\translatornote{式 \eqref{eq:6J14} 的两处 $gx$ 按积分记号应为 $dx$。此外，倒数两行把第一行中的 $I$ 加到了分部积分所得的 $2I$ 上，符号和系数不能由前一行得到。}
+由式 \eqref{eq:6J13} 回顾
+\begin{equation*}
+  \begin{aligned}
+   \int[\psi(x)-\varphi_h(x)]f_t(x)\,dx
+     &=h\int\bigl[g(x,t)\cdot(\nabla\psi(x))
+                   +\tfrac12\sigma^2(t)\Delta\psi(x)\bigr]f_t(x)\,dx\\
+     &=h\int g(x,t)\cdot(\nabla\psi(x))f_t(x)\,dx+Ih.
+  \end{aligned}
+  \tag{6J15}\label{eq:6J15}
+\end{equation*}
+\begin{equation*}
+  \begin{aligned}
+   &=h\int g(x,t)\cdot(\nabla\psi(x))f_t(x)\,dx
+        -h\int f_t(x)\bigl[\sigma^2(t)\nabla\log f_t(x)\bigr]\cdot\nabla\psi(x)\,dx\\
+   &\quad+h\int f_t(x)\frac{\sigma^2(t)}2\Delta\psi(x)\,dx.
+  \end{aligned}
+  \tag{6J16}\label{eq:6J16}
+\end{equation*}
+由于式 \eqref{eq:6J16} 对每个点都成立，得到
+\begin{equation*}
+  \begin{aligned}
+  \psi(x)-\varphi_h(x)
+     &=h\bigl[(g(x,t)-\sigma^2(t)\nabla\log f_t(x))\cdot\nabla\psi(x)\bigr]\\
+     &\quad+h\frac{\sigma^2(t)}2\Delta\psi(x).
+  \end{aligned}
+  \tag{6J17}\label{eq:6J17}
+\end{equation*}
+\translatornote{上一步给出的是关于 $x$ 的积分等式。仅凭这一等式无法推出逐点的条件漂移，原书推导在此缺少从联合或条件分布出发的论证。}
+所以
+\begin{equation*}
+  \frac{\psi(x)-\varphi_h(x)}{h}
+     =\bigl[(g(x,t)-\sigma^2(t)\nabla\log f_t(x))\cdot\nabla\psi(x)\bigr]
+      +\frac{\sigma^2(t)}2\Delta\psi(x).
+  \tag{6J18}\label{eq:6J18}
+\end{equation*}

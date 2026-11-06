@@ -1,0 +1,246 @@
+% PDF p. 34
+\section{正则值定理}
+\begin{statement}{定义 1.8}{浸没}
+浸没（submersion）是一个在局部“表现得像投影”的光滑函数。更确切地说，如果光滑流形之间的函数 $f\colon M\to N$ 的微分（differential，在坐标中用雅可比矩阵（Jacobian）表示）在每一点都满射，就称 $f$ 为浸没。
+
+直观地说，
+\begin{itemize}
+  \item 浸没在某些方向上不丢失信息。它允许你在维数等于映射的纤维维数的空间内局部“自由移动”。
+  \item 这意味着对 $N$ 中的每个点 $y$，原像 $f^{-1}(y)$ 都是一个较低维的光滑流形。若 $f$ 取实数值，原像就是一个水平集（level set）。
+  \item 你可以把浸没想象成一个把高维空间“压扁”为低维空间的函数，其间不产生奇点（singularity）。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 1.20}{投影映射}
+一个简单而经典的浸没是从 $\R^3$ 到 $\R^2$ 的投影
+\[
+  f(x,y,z)=(x,y).
+\]
+其雅可比矩阵为
+\[
+  Df=\begin{bmatrix}
+    1 & 0 & 0\\
+    0 & 1 & 0
+  \end{bmatrix}.
+\]
+\begin{itemize}
+  \item 这个矩阵始终满秩，即秩为 $2$，意味着导数在每一点都满射。
+  \item 点 $(a,b)$ 的原像是整条竖直直线 $\{(a,b,z)\mid z\in\R\}$，它是 $\R^3$ 中的一维光滑流形。
+  \item 直观上，该映射把 $z$ 方向“压扁”了，但在其余两个方向上仍可光滑地移动。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{定理 1.2}{正则值定理（浸没定理）}
+正则值定理（regular value theorem）是微分几何的基本结果。它保证在一定条件下光滑函数的水平集是光滑流形，从而给出一种把流形构造为函数原像的方法。
+\end{statement}
+
+\Subheading{定理的陈述}
+设 $f\colon M\to N$ 是光滑流形 $M,N$ 之间的光滑函数，其中 $\dim(M)=n$，$\dim(N)=m$。设 $c\in N$ 为 $f$ 的正则值（regular value），即对所有 $p\in f^{-1}(c)$，微分 $df_p\colon T_pM\to T_{f(p)}N$ 均满射，也就是雅可比矩阵为满秩 $m$。
+
+% PDF p. 35
+那么原像（即水平集）$f^{-1}(c)$ 是 $M$ 的光滑子流形，维数为
+\[
+  \dim(M)-\dim(N)=n-m.
+\]
+
+\Subheading{直观解释}
+\begin{itemize}
+  \item 该定理告诉我们，如果函数 $f$ 具备良好性质，即光滑，且 $c$ 是正则值，也就是 $f$ 在取值 $c$ 时没有“退化”，那么映射到 $c$ 的点所成的集合是一个光滑流形。
+  \item 维数降低的原因是，如果 $f$ 从 $\R^n$ 映射到 $\R^m$，方程 $f(x)=c$ 就施加了 $m$ 个约束，所以 $f^{-1}(c)$ 中剩余的自由度（degrees of freedom）构成一个 $(n-m)$ 维流形。
+\end{itemize}
+
+\Subheading{定理为何重要}
+\begin{enumerate}
+  \item \textbf{保证光滑性}\quad 正则性条件一旦成立，定理就保证水平集光滑，无须逐个验证。
+  \item \textbf{构造流形}\quad 许多流形自然地表现为水平集，如球面、环面和双曲面。
+  \item \textbf{维数公式}\quad 定理明确给出施加约束后维数减少多少。
+\end{enumerate}
+
+\begin{statement}{例 1.21}{水平集}
+水平集是微分几何和分析中的基本概念，指空间中使给定函数取得某一常值的点所成的集合。形式上，给定光滑函数 $f\colon\R^n\to\R$，它在 $c\in\R$ 处的水平集为
+\[
+  L_c=\{x\in\R^n\mid f(x)=c\}.
+\]
+下面说明水平集何时为光滑流形。
+
+\textbf{为什么水平集是光滑流形？}\par
+对水平集应用正则值定理。对函数 $f\colon\R^n\to\R$，
+\begin{itemize}
+  \item $f$ 的雅可比矩阵，也就是梯度 $\nabla f$，必须在 $L_c$ 上每一点都非零。
+  \item 若对所有 $x\in L_c$ 都有 $\nabla f(x)\ne0$，则 $L_c$ 上每一点都是正则点（regular point）。
+  \item 由正则值定理，水平集 $L_c$ 是光滑的 $(n-1)$ 维流形。
+\end{itemize}
+
+\textbf{$\R^3$ 中的水平集}\par
+考虑 $f(x,y,z)=x^2+y^2+z^2$，取水平集
+\[
+  L_1=\{(x,y,z)\mid x^2+y^2+z^2=1\}.
+\]
+这就是 $\R^3$ 中的标准二维球面 $S^2$，是一个光滑流形。其梯度为
+\[
+  \nabla f=(2x,2y,2z).
+\]
+% PDF p. 36
+除原点外梯度处处非零，而原点不属于 $L_1$。由于梯度在 $L_1$ 上从不为零，它满足正则性条件，故 $S^2$ 为光滑流形。
+\end{statement}
+
+\begin{statement}{例 1.22}{作为水平集的环面}
+定义函数 $f\colon\R^3\to\R^2$ 为
+\[
+  f(x,y,z)=\bigl((x^2+y^2)^{1/2}-R,z\bigr),
+\]
+其中 $R$ 为固定常数。水平集 $f^{-1}(0,0)$ 由满足下式的点构成：
+\[
+  \sqrt{x^2+y^2}=R,\qquad z=0.
+\]
+这描述了 $xy$ 平面上半径为 $R$ 的一个圆周。应用正则值定理，可确认该圆周是 $\R^3$ 的一维光滑子流形。\translatornote{本例原题为“环面”。在 $R>0$ 时，这两个约束给出圆周，且可在圆周附近选取避开 $z$ 轴的开集应用正则值定理。原式在 $z$ 轴上不光滑。}
+\end{statement}
+
+\begin{statement}{例 1.23}{作为水平集的双曲面}
+双曲面（hyperboloid）是光滑流形的经典例子，它是 $\R^3$ 中一个二次函数的水平集。双曲面有两种标准类型。
+\begin{enumerate}
+  \item \textbf{单叶双曲面（one-sheeted hyperboloid）}\quad $x^2+y^2-z^2=1$。
+  \item \textbf{双叶双曲面（two-sheeted hyperboloid）}\quad $x^2+y^2-z^2=-1$。
+\end{enumerate}
+两者都可看作某个光滑函数的水平集。考虑函数
+\[
+  f(x,y,z)=x^2+y^2-z^2.
+\]
+\begin{itemize}
+  \item 该函数的水平集为
+  \[
+    f^{-1}(c)=\{(x,y,z)\in\R^3\mid x^2+y^2-z^2=c\}.
+  \]
+  \item $c$ 的取值不同，就会得到不同的曲面。
+  \item \textbf{单叶双曲面（$c=1$）}
+  \[
+    x^2+y^2-z^2=1.
+  \]
+  这是一张向外弯曲的光滑连通曲面，每一点都呈鞍形。
+  \item \textbf{双叶双曲面（$c=-1$）}
+  \[
+    x^2+y^2-z^2=-1.
+  \]
+  这描述了两张分离的光滑曲面，它们关于 $xy$ 平面互为镜像。
+  \item \textbf{光锥（light cone，$c=0$）}
+  \[
+    x^2+y^2-z^2=0.
+  \]
+  这是一个通过原点的锥面。
+\end{itemize}
+
+% PDF p. 37
+\textbf{检验正则值条件}\par
+为了确认双曲面是光滑流形，我们应用正则值定理。
+\begin{itemize}
+  \item $f$ 的梯度（雅可比矩阵）为
+  \[
+    \nabla f=(2x,2y,-2z).
+  \]
+  \item 回顾一下，若 $\nabla f\ne0$，则称点 $(x,y,z)$ 是正则的，即
+  \[
+    (2x,2y,-2z)\ne(0,0,0).
+  \]
+  \item 只有原点 $(0,0,0)$ 不满足此条件。除 $c=0$ 外，原点不在双曲面上。$c=0$ 时形成一个锥面，原书在此指出它不是流形。
+  \item 对 $c\ne0$，梯度在双曲面 $f^{-1}(c)$ 上处处非零，因此正则值定理保证双曲面是 $\R^3$ 中的二维光滑流形。
+\end{itemize}
+\end{statement}
+
+\section{光滑流形坐标卡引理}
+迄今的各个例子都分两阶段构造光滑流形结构。我们先从拓扑空间出发，检验它是拓扑流形，再指定光滑结构。通常，把这两个步骤合并为一次构造更方便。给定一个集合，如果其上有适当的“坐标卡”，并且这些卡在重叠处光滑过渡，就可以用它们在该集合上同时定义拓扑与光滑结构。
+
+\begin{statement}{引理 1.1}{光滑流形坐标卡引理}
+坐标卡引理（chart lemma）是微分几何的基本结果，使我们可以从配有光滑坐标卡的集合构造光滑流形。它的主要内容是，如果一个集合上有一族在重叠处光滑过渡的坐标卡，就可以用这些坐标卡在集合上定义拓扑与光滑结构。
+\end{statement}
+
+\Subheading{直观解释}
+可以把光滑流形看成曲面在更高维数中的推广。$\R^n$ 有全局坐标，而流形可能需要多张坐标卡描述不同区域。
+
+例如，
+\begin{itemize}
+  \item 球面 $S^2$ 不能由一张坐标卡覆盖，例如不能用一张类似地球经纬度地图的坐标卡覆盖整个球面。
+  \item 但可以使用多张坐标卡，例如球极投影给出的坐标卡，使它们之间能够光滑过渡。
+\end{itemize}
+% PDF p. 38
+坐标卡引理保证，有了这样一族相互重叠并且能光滑过渡的坐标卡，就能在集合上严格定义光滑结构。下面正式陈述这一引理。
+
+\Subheading{正式陈述}
+设 $X$ 为集合，且有一族坐标卡
+\[
+  \{(U_\alpha,\varphi_\alpha)\},
+\]
+其中
+\begin{itemize}
+  \item 每个 $U_\alpha$ 是 $X$ 的开子集。
+  \item 每个 $\varphi_\alpha\colon U_\alpha\to\R^n$ 都是到其像的同胚，也就是一个局部坐标系。
+  \item 坐标卡之间的过渡映射
+  \[
+    \varphi_\beta\circ\varphi_\alpha^{-1}\colon
+    \varphi_\alpha(U_\alpha\cap U_\beta)
+    \longrightarrow\varphi_\beta(U_\alpha\cap U_\beta)
+  \]
+  在其定义处均光滑。
+\end{itemize}
+则有以下结论。
+\begin{enumerate}
+  \item 坐标卡族在 $X$ 上自然定义一个拓扑，由 $\R^n$ 中开集的原像生成。
+  \item 光滑的过渡映射保证可以在 $X$ 上定义光滑结构，使 $X$ 成为光滑流形。
+\end{enumerate}
+
+\Subheading{引理为何重要}
+\begin{enumerate}
+  \item 只需检验坐标卡之间的过渡函数光滑，就可以明确地构造流形。
+  \item 引理保证光滑性有明确定义。缺少这一条件，不同的坐标描述可能相互冲突。
+  \item 它为微分几何提供了基础，导数、切空间以及流形之间的可微映射都建立在这一引理上。
+\end{enumerate}
+
+\Subheading{证明}
+\textbf{第 1 步\quad 在 $X$ 上定义拓扑}\par
+先介绍如何由坐标卡生成 $X$ 上的拓扑。设 $\{(U_\alpha,\varphi_\alpha)\}$ 为一族坐标卡，其中
+\begin{itemize}
+  \item 每个 $U_\alpha$ 是 $X$ 的开子集。
+  \item 每个 $\varphi_\alpha\colon U_\alpha\to\R^n$ 都是到其像的同胚。
+\end{itemize}
+为了在 $X$ 上定义拓扑，把 $X$ 中的开集视为由 $\R^n$ 中开集在 $\varphi_\alpha$ 下的原像生成，即
+\[
+  \mathcal T
+    =\{V\subset X\mid \varphi_\alpha(V\cap U_\alpha)\text{ 在 }\R^n\text{ 中开}\}.
+\]
+
+% PDF p. 39
+\textbf{验证 $\mathcal T$ 是拓扑}\par
+检验 $\mathcal T$ 满足拓扑的三个性质。
+\begin{enumerate}
+  \item \textbf{空集与 $X$ 都开}\quad $\R^n$ 是一个拓扑空间，空集和整个空间都是开集，它们在 $X$ 中的原像也开。
+  \item \textbf{任意个开集的并是开集}\quad 若各 $V_i$ 都开，则 $V_i\cap U_\alpha$ 都在 $\R^n$ 中开，因此它们的并仍开。
+  \item \textbf{有限个开集的交是开集}\quad 给定两个开集 $V_1,V_2$，有
+  \[
+    (V_1\cap V_2)\cap U_\alpha
+      =(V_1\cap U_\alpha)\cap(V_2\cap U_\alpha),
+  \]
+  它在 $\R^n$ 中仍开。
+\end{enumerate}
+于是，$\mathcal T$ 在 $X$ 上定义了一个拓扑，使之成为拓扑空间。
+
+\textbf{第 2 步\quad 保证过渡映射的光滑性}\par
+要定义光滑结构，需要保证坐标卡之间的过渡映射光滑。给定两张重叠的坐标卡 $(U_\alpha,\varphi_\alpha)$ 与 $(U_\beta,\varphi_\beta)$，过渡映射为
+\[
+  \varphi_{\beta\alpha}=\varphi_\beta\circ\varphi_\alpha^{-1}\colon
+    \varphi_\alpha(U_\alpha\cap U_\beta)
+    \longrightarrow\varphi_\beta(U_\alpha\cap U_\beta).
+\]
+因为每个 $\varphi_\alpha$ 都是同胚，$\varphi_\alpha^{-1}$ 有明确定义，并且 $\varphi_{\beta\alpha}$ 把 $\R^n$ 的开子集映射到 $\R^n$ 的开子集。
+
+\textbf{过渡映射的光滑性}\par
+由假设，过渡函数 $\varphi_{\beta\alpha}$ 是光滑函数，也就是无穷次可微函数。这保证在 $X$ 上可以有意义地定义微分，并且不同坐标卡中的光滑结构彼此相容。
+
+因此，我们有一个图册 $\{(U_\alpha,\varphi_\alpha)\}$，其中的过渡函数均光滑，这意味着该坐标卡族在 $X$ 上定义了光滑结构。
+
+\textbf{第 3 步\quad 验证流形的光滑结构}\par
+光滑流形须满足下列条件。
+\begin{enumerate}
+  \item \textbf{局部欧氏结构}\quad $X$ 中每点都属于至少一张坐标卡 $(U_\alpha,\varphi_\alpha)$。该卡映射到 $\R^n$ 的开子集，保证 $X$ 局部看起来像 $\R^n$。
+  \item \textbf{豪斯多夫性}\quad 由于每个 $\varphi_\alpha$ 都是同胚，$X$ 中的分离性由 $\R^n$ 的分离性推出。
+  \item \textbf{可数基}\quad 因为 $\R^n$ 有可数基，且每个 $U_\alpha$ 同胚于 $\R^n$ 中的开子集，所以 $X$ 继承了可数基。
+\end{enumerate}
+由此，原书得出 $X$ 满足成为 $n$ 维光滑流形的条件。\translatornote{判定 $V$ 开，须要求对每张坐标卡，$\varphi_\alpha(V\cap U_\alpha)$ 都在 $\R^n$ 中开。豪斯多夫性不能由每张卡分别为豪斯多夫推出，如例 1.2 的双原点直线。要保证引理的流形结论，还须要求生成的拓扑具有豪斯多夫性与第二可数性，例如要求可数张卡覆盖 $X$，并要求不能被同一张卡覆盖的两点可由不相交的开邻域分离。}

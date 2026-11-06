@@ -1,0 +1,115 @@
+% PDF p. 328
+\AppendixSection{6B}{流形上的黎曼对数映射与协方差算子}
+\AppendixHeading{6B1}{黎曼对数映射}
+\AppendixSubheading{6B1.1}{定义}
+黎曼对数映射定义为指数映射的局部逆。一般而言，给定黎曼流形 $(M,g)$ 及点 $\mu\in M$，若 $p$ 属于 $\mu$ 的一个测地凸邻域，使得指数映射从 $0\in T_\mu M$ 的某个邻域到 $M$ 上 $\mu$ 的邻域是微分同胚，则 $\mu$ 处的黎曼对数映射定义为
+\[
+  \log_\mu(p)=\exp_\mu^{-1}(p),
+\]
+也就是说，$\log_\mu(p)$ 是满足下式的唯一切向量 $v\in T_\mu M$
+\[
+  \exp_\mu(v)=p.
+\]
+
+\begin{statement}{例 1B.1}{球面 $S^{n-1}$ 上的对数映射}
+对于配备由欧氏内积诱导的度量的单位球面 $S^{n-1}\subset\R^n$，$\log_\mu(p)$ 有显式公式。设 $\mu,p\in S^{n-1}$，它们的测地距离 $\theta$ 由下式给出
+\[
+  \theta=\arccos(\langle\mu,p\rangle),
+\]
+其中 $\langle\mu,p\rangle$ 表示欧氏内积。若 $p\ne\mu$ 且 $p$ 不在割迹（cut locus）上，例如 $p\ne-\mu$，则对数映射为
+\[
+  \log_\mu(p)=\frac{\theta}{\sin\theta}(p-\cos\theta\,\mu).
+\]
+注意，当 $p=\mu$ 时，规定 $\log_\mu\mu=0$（此时 $\theta=0$）。
+\end{statement}
+
+% PDF p. 329
+\AppendixSubheading{6B1.2}{直观解释}
+下面给出指数映射和对数映射的直观解释。
+\begin{itemize}
+\item \textbf{指数映射 $\exp_\mu$。} 给定切向量 $v\in T_\mu M$，指数映射 $\exp_\mu(v)$ 从 $\mu$ 沿方向 $v$ 以速率 $\lVert v\rVert$“射出”一条测地线，使经过单位时间到达的点为 $\exp_\mu(v)$。
+\item \textbf{对数映射 $\log_\mu$。} 反过来，如果点 $p$ 足够接近 $\mu$，就存在从 $\mu$ 到 $p$ 的唯一测地线。对数映射在 $\mu$ 处“找回”通过指数映射到达 $p$ 所用的切向量。换言之，它把 $p$ 与 $\mu$ 之差“线性化”。
+\end{itemize}
+
+\noindent\textbf{证明}\par
+考虑单位球面 $S^{n-1}=\{x\in\R^n\mid\lVert x\rVert=1\}$，配以从 $\R^n$ 诱导的通常黎曼度量。对于固定点 $\mu\in S^{n-1}$，$\mu$ 处的指数映射为
+\begin{equation*}
+  \exp_\mu(v)=\cos\lVert v\rVert\,\mu+\sin\lVert v\rVert\frac{v}{\lVert v\rVert},
+    \qquad v\in T_\mu S^{n-1},
+  \tag{6B1}\label{eq:6B1}
+\end{equation*}
+其中 $T_\mu S^{n-1}$ 是 $\mu$ 处的切空间，由 $\R^{n-1}$ 中与 $\mu$ 正交的所有向量组成。%
+\translatornote{原书此处印作 $\R^{n-1}$。与 $\mu\in S^{n-1}$ 正交的向量取自环境空间 $\R^n$，其所成切空间的维数为 $n-1$。}
+
+接下来的目标是从黎曼对数映射的定义直接推出 $\mu$ 处黎曼对数映射的显式公式，即对不等于 $\mu$ 的 $p\in S^{n-1}$ 求 $\log_\mu(p)$。假设 $p$ 也不是 $\mu$ 的对跖点（antipodal point），这样测地线是唯一的。证明分为三步。
+
+\noindent\textbf{步骤 1。用指数映射求 $v=\log_\mu(p)$。}\par
+令
+\[
+  v=\log_\mu(p)=\exp_\mu^{-1}(p)\in T_\mu S^{n-1},
+\]
+则
+\begin{equation*}
+  \exp_\mu(v)=p.
+  \tag{6B2}\label{eq:6B2}
+\end{equation*}
+目标是由式 \eqref{eq:6B2} 求 $v$。将式 \eqref{eq:6B1} 代入式 \eqref{eq:6B2}，得
+\begin{equation*}
+  \exp_\mu(v)=\cos\lVert v\rVert\,\mu+\sin\lVert v\rVert\frac{v}{\lVert v\rVert}=p,
+    \qquad v\in T_\mu S^{n-1}.
+  \tag{6B3}\label{eq:6B3}
+\end{equation*}
+为便于讨论，记 $r=\lVert v\rVert$，则式 \eqref{eq:6B3} 化为
+\begin{equation*}
+  \cos r\,\mu+\frac{\sin r}{r}\,v=p.
+  \tag{6B4}\label{eq:6B4}
+\end{equation*}
+
+\noindent\textbf{步骤 2。与 $\mu$ 作内积。}\par
+由切空间的定义，向量 $v$ 与 $\mu$ 正交，即
+\begin{equation*}
+  \langle\mu,v\rangle=0.
+  \tag{6B5}\label{eq:6B5}
+\end{equation*}
+% PDF p. 330
+将式 \eqref{eq:6B4} 与 $\mu$ 作内积，再利用式 \eqref{eq:6B5}，得
+\begin{equation*}
+  \cos r=\langle p,\mu\rangle.
+  \tag{6B6}\label{eq:6B6}
+\end{equation*}
+由式 \eqref{eq:6B6} 解得
+\begin{equation*}
+  r=\arccos(\langle p,\mu\rangle).
+  \tag{6B7}\label{eq:6B7}
+\end{equation*}
+令
+\[
+  \theta\coloneqq\arccos(\langle p,\mu\rangle),
+\]
+则
+\begin{equation*}
+  r=\theta.
+  \tag{6B8}\label{eq:6B8}
+\end{equation*}
+
+\noindent\textbf{步骤 3。求解 $v$。}\par
+将式 \eqref{eq:6B8} 代入式 \eqref{eq:6B4}，得到
+\begin{equation*}
+  \cos\theta\,\mu+\frac{\sin\theta}{\theta}v=p.
+  \tag{6B9}\label{eq:6B9}
+\end{equation*}
+由式 \eqref{eq:6B9} 解得
+\begin{equation*}
+  v=\frac{\theta}{\sin\theta}(p-\cos\theta\,\mu).
+  \tag{6B10}\label{eq:6B10}
+\end{equation*}
+于是
+\begin{equation*}
+\begin{aligned}
+  \log_\mu(p)&=\frac{\theta}{\sin\theta}(p-\cos\theta\,\mu),\\
+     &=\frac{\arccos(\langle p,\mu\rangle)}
+             {\sqrt{1-\langle p,\mu\rangle^2}}\,(p-\langle p,\mu\rangle\mu).
+\end{aligned}
+\tag{6B11}\label{eq:6B11}
+\end{equation*}
+注意当 $p=\mu$ 时，按连续性定义 $\log_\mu\mu=0$。

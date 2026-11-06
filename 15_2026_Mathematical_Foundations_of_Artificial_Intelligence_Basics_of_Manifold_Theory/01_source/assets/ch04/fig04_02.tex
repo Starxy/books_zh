@@ -1,0 +1,29 @@
+\begin{tikzpicture}
+\begin{axis}[
+  width=.76\linewidth,height=.74\linewidth,axis equal image,
+  xmin=-2,xmax=4,ymin=-2,ymax=4,
+  axis lines=left,xtick={-2,-1,0,1,2,3,4},ytick={-2,-1,0,1,2,3,4},
+  tick label style={font=\small},label style={font=\small},
+  xlabel={$x$},ylabel={$y$},
+  grid=major,major grid style={black!12},
+  legend pos=north east,legend cell align=left,legend style={font=\scriptsize}
+]
+  \draw[black!35] (axis cs:-2,0)--(axis cs:4,0);
+  \draw[black!35] (axis cs:0,-2)--(axis cs:0,4);
+  \addlegendimage{only marks,mark=x,red!80!black}
+  \addlegendentry{点 $p$}
+  \addlegendimage{only marks,mark=x,blue!70!black}
+  \addlegendentry{流经点 $\varnothing_t(p)$}
+  \addlegendimage{line width=1.2pt,orange!90!black}
+  \addlegendentry{原向量 $T(p)$}
+  \addlegendimage{line width=1.2pt,blue!70!black}
+  \addlegendentry{$T(\varnothing_t(p))$}
+  \addlegendimage{line width=1.2pt,green!55!black}
+  \addlegendentry{$(\varnothing_t^*T)(p)$}
+  \draw[-{Stealth},orange!90!black,line width=1.25pt] (axis cs:1,1)--(axis cs:2,3);
+  \draw[-{Stealth},blue!70!black,line width=1.25pt] (axis cs:2,0)--(axis cs:3,2);
+  \draw[-{Stealth},green!55!black,line width=1.25pt] (axis cs:1,1)--(axis cs:0,4);
+  \addplot[only marks,mark=x,mark size=2pt,red!80!black,forget plot] coordinates {(1,1)};
+  \addplot[only marks,mark=x,mark size=2pt,blue!70!black,forget plot] coordinates {(2,0)};
+\end{axis}
+\end{tikzpicture}

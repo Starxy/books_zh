@@ -1,0 +1,397 @@
+% PDF p. 231
+\subsection{微分几何中的高斯映射}
+我们将考察高斯映射在理论微分几何和机器人学中的作用与意义，介绍其定义、数学性质、几何解释，以及在曲率分析、曲面控制和姿态跟踪等方面的具体应用。
+
+\subsubsection{高斯映射}
+\begin{statement}{定义 5.2}{高斯映射}
+直观地说，曲面的高斯映射把曲面上的每个点映射到该点的法方向，即垂直于曲面的一个单位向量。从几何上看，它给每个点 $p=X(u,v)$ 配上曲面的向外单位法向量。
+
+设 $X\colon U\subset\R^2\to\R^3$，$(u,v)\mapsto X(u,v)$，为一块定向的正则曲面片，叉积 $X_u\times X_v$ 处处非零。定义单位法向量场
+\[
+  N(u,v)=\frac{X_u\times X_v}{\lVert X_u\times X_v\rVert}.
+\]
+数学上，高斯映射就是由法向量 $N(u,v)$ 定义的映射 $N\colon S\to S^2$，其中 $S^2$ 是单位球面。函数值 $N(p)$ 是在 $p$ 处垂直于曲面 $X$ 的单位向量。
+
+对曲面上选定的点 $p$，其单位法向量 $N(p)$ 对应球面上的点 $N(p)$。这个几何箭头说明了高斯映射 $N\colon S\to S^2$ 的作用：把曲面上的每一点送到其向外单位法向量在单位球面上的端点。
+\end{statement}
+
+% PDF p. 232
+\begin{statement}{定义 5.3}{高斯映射的微分}
+高斯映射在 $p$ 点的微分是线性变换
+\begin{equation*}
+  dN_p\colon T_pS\longrightarrow T_{N(p)}S^2\subset\R^3.
+  \tag{5.9}\label{eq:5.9}
+\end{equation*}
+注意，$T_pS$ 和 $T_{N(p)}S^2$ 是同一个向量空间，因为 $S^2$ 在 $N(p)$ 处的法向量等于 $N(p)$。若 $X(u,v)$ 是 $S$ 的一个参数化，则
+\[
+  dN_p(X_u)=N_u,\qquad dN_p(X_v)=N_v.
+\]
+\end{statement}
+
+\subsubsection{形状算子}
+$\R^3$ 中曲面 $M$ 的形状算子 $S$ 衡量单位法向量 $N$ 沿 $M$ 上任意方向的变化率，从而刻画 $M$ 的形状沿该方向如何变化。如果把 $N$ 想象成 $M$ 的“一阶导数”，则 $S$ 就是“二阶导数”。
+
+\paragraph{从曲面片到形状算子}
+考虑局部由一个浸入给出的可定向 $C^2$ 曲面 $S\subset\R^3$：
+\[
+  X(u,v)=\bigl(x(u,v),y(u,v),z(u,v)\bigr),\qquad (u,v)\in U\subset\R^2.
+\]
+\begin{itemize}
+  \item \textbf{切标架与第一基本形式}
+  \[
+    \begin{gathered}
+      X_u:=\frac{\partial X}{\partial u},\qquad
+      X_v:=\frac{\partial X}{\partial v},\\
+      E=\langle X_u,X_u\rangle,\qquad
+      F=\langle X_u,X_v\rangle,\qquad
+      G=\langle X_v,X_v\rangle.
+    \end{gathered}
+  \]
+  \item \textbf{单位法向量（高斯映射）}
+  \[
+    N(u,v)=\frac{X_u\times X_v}{\lVert X_u\times X_v\rVert},
+    \qquad N\colon U\to S^2.
+  \]
+  这就是高斯映射 $N$。它为每个 $p=X(u,v)$ 配上一个单位法向量。
+  \item \textbf{高斯映射的导数}
+  \[
+    N_u=D_uN=dN_p(X_u),\qquad N_v=D_vN=dN_p(X_v).
+  \]
+  这些导数都是球面在 $N(p)$ 处的切向量，因此也是曲面 $S$ 的切向量，因为两个平面都垂直于 $N(p)$。于是，可以用基 $\{X_u,X_v\}$ 表示它们，得到魏因加滕方程（Weingarten equations）：
+  \[
+    N_u=a_{11}X_u+a_{21}X_v,\qquad
+    N_v=a_{12}X_u+a_{22}X_v.
+  \]
+  求解魏因加滕方程前，先推导计算 $e,f,g$ 的公式。\translatornote{以下内积等式及式~\eqref{eq:5.10} 依原书排印。对 $\langle X_u,N\rangle=0$ 求导可知 $\langle X_u,N_u\rangle=-\langle X_{uu},N\rangle=-e$，其余同理。因此在本段以 $N_u,N_v$ 展开所定义的 $a_{ij}$ 下，式~\eqref{eq:5.10} 右端应带负号。}
+
+% PDF p. 233
+  \[
+    \langle X_u,N_u\rangle=\langle X_u,D_uN\rangle
+      =\langle D_uX_u,N\rangle=\langle X_{uu},N\rangle=e.
+  \]
+  类似地，有
+  \[
+    \begin{aligned}
+      \langle X_u,N_u\rangle&=\langle X_{vu},N\rangle=e,\\
+      \langle X_v,N_u\rangle&=\langle X_{vu},N\rangle=f,\\
+      \langle X_v,N_v\rangle&=\langle X_{vv},N\rangle=g.
+    \end{aligned}
+  \]
+  分别与 $X_u,X_v$ 作点积并求解下式，即可求得系数 $a_{ij}$：
+  \begin{equation*}
+    \begin{bmatrix}E&F\\F&G\end{bmatrix}
+    \begin{bmatrix}a_{11}&a_{12}\\a_{21}&a_{22}\end{bmatrix}
+    =\begin{bmatrix}e&f\\f&g\end{bmatrix}.
+    \tag{5.10}\label{eq:5.10}
+  \end{equation*}
+  在有序基 $(X_u,X_v)$ 下写出两个基本形式的矩阵：
+  \[
+    \mathrm I=\begin{bmatrix}E&F\\F&G\end{bmatrix},\qquad
+    \mathrm{II}=\begin{bmatrix}e&f\\f&g\end{bmatrix}.
+  \]
+  令
+  \[
+    \Delta=\det(\mathrm I)=EG-F^2=\lVert X_u\times X_v\rVert^2>0.
+  \]
+  任意切向量在同一组基下可写为
+  \[
+    v=v^1X_u+v^2X_v,\qquad w=w^1X_u+w^2X_v.
+  \]
+  \item \textbf{形状算子的矩阵}
+
+  曲面上单位法向量场的负导数 $S_p(v)=-D_vN_p$ 称为形状算子（又称魏因加滕映射（Weingarten map）或第二基本张量）。
+
+  形状算子 $S_p\colon T_pS\to T_pS$ 满足
+  $\mathrm{II}(\cdot,\cdot)=\langle S_p(\cdot),\cdot\rangle$。
+  为明确算出形状算子，并描述它与基本形式的关系，先计算第二基本形式：
+  \begin{equation*}
+    \mathrm{II}(\cdot,\cdot)=\mathrm{II}(v,w)=v^T\mathrm{II}\,w.
+    \tag{5.11}\label{eq:5.11}
+  \end{equation*}
+  回顾一下，$p\in S$ 处的形状算子为 $S_p\colon T_pS\to T_pS$。选取切空间的基 $\{e_1,e_2\}$，例如参数化给出的 $\{X_u,X_v\}$。定义
+  \[
+    S(e_1)\in T_pS,\qquad S(e_1)=S_1^1e_1+S_1^2e_2.
+  \]
+  于是
+  \[
+    \begin{aligned}
+      \langle S(e_1),e_j\rangle
+        &=\langle S_1^1e_1+S_1^2e_2,e_j\rangle\\
+        &=S_1^1\langle e_1,e_j\rangle+S_1^2\langle e_2,e_j\rangle\\
+        &=S_1^1g_{1j}+S_1^2g_{2j}.
+    \end{aligned}
+  \]
+% PDF p. 234
+  类似地，$\langle S(e_2),e_j\rangle=S_2^1g_{1j}+S_2^2g_{2j}$。定义
+  $\mathrm{II}(e_i,e_j)=b_{ij}$。按形状算子的定义，
+  \begin{equation*}
+    \begin{gathered}
+      \mathrm{II}(\cdot,\cdot)=\langle S_p(\cdot),\cdot\rangle,\\
+      \mathrm{II}(e_i,e_j)=b_{ij}=\langle S(e_i),e_j\rangle
+        =S_i^kg_{kj}\qquad\text{（对 }k\text{ 求和）}.
+    \end{gathered}
+    \tag{5.12}\label{eq:5.12}
+  \end{equation*}
+  式~\eqref{eq:5.12} 可写成矩阵形式
+  \begin{equation*}
+    \mathrm{II}=\mathrm I S.
+    \tag{5.13}\label{eq:5.13}
+  \end{equation*}
+  原文以度量矩阵 $\mathrm{II}$ 正定因而可逆为由，从式~\eqref{eq:5.13} 解得\translatornote{此处应为第一基本形式的矩阵 $\mathrm I$ 正定、可逆。式~\eqref{eq:5.15} 依原书排印。根据 $\langle S_p(v),w\rangle=(Sv)^T\mathrm Iw$ 和形状算子关于 $\mathrm I$ 的自伴性，右端应为 $v^TS^T\mathrm Iw=v^T\mathrm I Sw$。}
+  \begin{equation*}
+    S=\mathrm I^{-1}\mathrm{II}.
+    \tag{5.14}\label{eq:5.14}
+  \end{equation*}
+  用式~\eqref{eq:5.11} 还可以得到
+  \begin{equation*}
+    \langle S_p(v),w\rangle=v^TS\mathrm I w.
+    \tag{5.15}\label{eq:5.15}
+  \end{equation*}
+\end{itemize}
+
+\subsection{主曲率}
+\subsubsection{法曲率}
+\begin{statement}{定义 5.4}{法曲率}
+在光滑曲面 $S\subset\R^3$ 上任一非脐点（non-umbilic point）$p$ 处，沿单位切向 $u\in T_pS$ 的法曲率（normal curvature）为
+\[
+  k_n(u)=\langle S_p(u),u\rangle=u^T\mathrm{II}\,u.
+\]
+二次型 $u\mapsto k_n(u)$ 定义在二维切平面上，因而在 $T_pS$ 的单位圆上取得最大值与最小值。
+\end{statement}
+
+\begin{statement}{定义 5.5}{主曲率}
+这两个极值就是主曲率
+\[
+  k_1(p)\quad\text{（最大值）},\qquad k_2(p)\quad\text{（最小值）},
+  \qquad k_1\ge k_2.
+\]
+相应的方向 $v_1,v_2$ 是 $S_p$ 的特征向量，称为主方向（principal directions），它们关于第一基本形式正交。
+\end{statement}
+
+\subsubsection{计算方法}
+\paragraph{参数曲面 \texorpdfstring{$X(u,v)$}{X(u,v)}}
+\begin{enumerate}[label=第 \arabic* 步]
+  \item 计算一阶偏导 $X_u,X_v$。
+  \item 计算度量系数 $E=\langle X_u,X_u\rangle$、$F=\langle X_u,X_v\rangle$、$G=\langle X_v,X_v\rangle$。
+  \item 计算单位法向量 $N=(X_u\times X_v)/\lVert X_u\times X_v\rVert$。
+% PDF p. 235
+  \item 计算二阶偏导 $X_{uu},X_{uv},X_{vv}$。
+  \item 计算第二基本形式的系数 $e=\langle X_{uu},N\rangle$、$f=\langle X_{uv},N\rangle$、$g=\langle X_{vv},N\rangle$。
+  \item 计算形状算子 $S=\mathrm I^{-1}\mathrm{II}$，其中
+  \[
+    \mathrm I=\begin{bmatrix}E&F\\F&G\end{bmatrix},\qquad
+    \mathrm{II}=\begin{bmatrix}e&f\\f&g\end{bmatrix}.
+  \]
+  \item 求解特征值问题 $Sv_i=k_i v_i$。特征值给出 $k_1,k_2$，特征向量给出 $(u,v)$ 基下的主方向。
+\end{enumerate}
+
+\paragraph{图像曲面片 \texorpdfstring{$z=f(x,y)$}{z=f(x,y)}}
+下面介绍另一种计算 $k_{1,2}$ 的方法。对 $(x,y)$ 位于 $p$ 点切平面中的蒙日坐标卡（Monge chart），有
+\[
+  k_{1,2}=\frac{f_{xx}+f_{yy}\pm\sqrt{(f_{xx}-f_{yy})^2+4f_{xy}^2}}
+     {2(1+f_x^2+f_y^2)}.
+\]
+所有导数都在所考察的点处求值。这个公式便于作解析核验。\translatornote{这里的切平面坐标意味着在所考察点 $f_x=f_y=0$，此时该式化为 Hessian 的特征值。原式不适用于坡度非零的一般图像坐标。}
+
+\paragraph{隐式曲面 \texorpdfstring{$F(x,y,z)=0$}{F(x,y,z)=0}}
+令 $\nabla F$ 为法向量，$H_F$ 为 $F$ 的海森矩阵（Hessian）。在切平面的一组标准正交基下，魏因加滕矩阵（形状算子的矩阵）为
+\begin{equation*}
+  S=-\frac{1}{\lVert\nabla F\rVert}\bigl(\mathrm{II}H_F\mathrm{II}\bigr),
+  \tag{5.16}\label{eq:5.16}
+\end{equation*}
+其中 $\mathrm{II}=I-\hat n\hat n^T$ 是到切平面的投影，$\hat n=\nabla F/\lVert\nabla F\rVert$。此 $2\times2$ 矩阵的特征值是 $k_1,k_2$。下面给出证明。
+
+先定义单位法向量 $\hat n=\left.\nabla F/\lVert\nabla F\rVert\right|_p$ 和到切平面的正交投影
+\[
+  \Pi=I-\hat n\hat n^T.
+\]
+记 $F$ 在 $p$ 处的海森矩阵为 $H_F=[\partial_i\partial_j F]_{i,j=1}^3$。
+
+\begin{itemize}
+  \item \textbf{单位法向量的微分}
+
+  设 $v\in T_pS$ 是任一切向量，因此 $\hat n^Tv=0$。沿 $v$ 对 $\nabla F$ 求导，
+  \[
+    D_v\nabla F=H_Fv.
+  \]
+  再沿 $v$ 对 $1/\lVert\nabla F\rVert$ 求导。\translatornote{下一行右端依原书排印，实为向量。对此标量求导，正确右端为 $-(\nabla F)^TH_Fv/\lVert\nabla F\rVert^3$，与式~\eqref{eq:5.17} 一致。}
+  \[
+    D_v\left(\frac1{\lVert\nabla F\rVert}\right)
+      =-\frac{H_Fv}{\lVert\nabla F\rVert^2}.
+  \]
+% PDF p. 236
+  因此
+  \begin{equation*}
+    D_v\hat n=\frac{H_Fv}{\lVert\nabla F\rVert}
+      -\frac{(\nabla F)^TH_Fv}{\lVert\nabla F\rVert^3}\nabla F.
+    \tag{5.17}\label{eq:5.17}
+  \end{equation*}
+  \item \textbf{投影到切平面}
+
+  式~\eqref{eq:5.17} 的第二项平行于 $\hat n$，因而垂直于切平面，施加投影 $\Pi$ 后它消失：
+  \begin{equation*}
+    \Pi D_v\hat n=\frac{\Pi H_Fv}{\lVert\nabla F\rVert}.
+    \tag{5.18}\label{eq:5.18}
+  \end{equation*}
+  \item \textbf{形状算子的定义}
+
+  按形状算子 $S_p$（又称魏因加滕映射）的定义，
+  \[
+    S_p(v)=-\Pi D_v\hat n=-\frac{\Pi H_Fv}{\lVert\nabla F\rVert}.
+  \]
+  由于 $v$ 已是切向量，$\Pi v=v$，于是
+  \[
+    S_p(v)=-\frac{\Pi H_F\Pi v}{\lVert\nabla F\rVert}.
+  \]
+  因此，作为切平面的自同态，形状算子为
+  \begin{equation*}
+    S_p=-\frac{\Pi H_F\Pi}{\lVert\nabla F\rVert}.
+    \tag{5.19}\label{eq:5.19}
+  \end{equation*}
+  式~\eqref{eq:5.19} 正是矩阵公式~\eqref{eq:5.16}。
+\end{itemize}
+
+\paragraph{在标准正交切基下的矩阵表示}
+在 $T_pS$ 中任选一组标准正交基 $\{e_1,e_2\}$。由于 $\Pi e_i=e_i$ 且 $\Pi\hat n=0$，由式~\eqref{eq:5.19} 可得
+\[
+  \begin{aligned}
+    S_{ij}&=\langle S_p(e_j),e_i\rangle
+       =-\frac{1}{\lVert\nabla F\rVert}\langle\Pi H_F\Pi e_j,e_i\rangle\\
+      &=-\frac{1}{\lVert\nabla F\rVert}\langle\Pi H_Fe_j,e_i\rangle
+       =-\frac{1}{\lVert\nabla F\rVert}\langle H_Fe_j,e_i\rangle.
+  \end{aligned}
+\]
+也就是说，$S_p$ 的 $2\times2$ 矩阵由 $-\lVert\nabla F\rVert^{-1}H_F$ 限制到切平面得到。因为 $H_F$ 对称，$S_p$ 在 $T_pS$ 上也对称，这与经典形状算子的性质一致。
+
+\paragraph{特征值即主曲率}
+按微分几何的定义，形状算子的特征值就是主曲率 $k_1,k_2$。由于式~\eqref{eq:5.16} 与式~\eqref{eq:5.19} 都表示作用在 $T_pS$ 上的同一个线性映射 $S_p$，矩阵 $-\lVert\nabla F\rVert^{-1}\Pi H_F\Pi$ 在切平面上的 $2\times2$ 表示的特征值正是 $k_1(p),k_2(p)$。
+
+% PDF p. 237
+\textbf{小结}\quad 对隐式曲面 $F(x,y,z)=0$，我们已经证明，在一个正则点处
+\[
+  S_p=-\frac{1}{\lVert\nabla F\rVert}\Pi H_F\Pi,\qquad
+  \Pi=I-\hat n\hat n^T,\qquad
+  \hat n=\frac{\nabla F}{\lVert\nabla F\rVert}.
+\]
+在任意标准正交切基下，这个对称的 $2\times2$ 算子的特征值正是主曲率 $k_1,k_2$。
+
+\subsection{高斯曲率}
+\subsubsection{定义}
+\begin{statement}{定义 5.6}{高斯曲率}
+对光滑曲面 $S\subset\R^3$ 及其上一点 $p\in S$，高斯曲率
+\[
+  K(p)=k_1(p)k_2(p)
+\]
+是两个主曲率 $k_1\ge k_2$ 的乘积。
+
+主曲率衡量曲面沿法曲率取极值的两个正交方向弯曲的程度。由于 $K$ 是它们的乘积，
+\begin{itemize}
+  \item 在局部呈穹顶形的点，两个 $k_i$ 同号，$K$ 为正。
+  \item 在鞍点，曲面沿一个方向向上弯、沿另一方向向下弯，$K$ 为负。
+  \item 在局部为圆柱形的点或沿一个方向平坦的点，$K$ 为零。
+\end{itemize}
+\end{statement}
+
+\subsubsection{三种常用计算公式}
+\begin{itemize}
+  \item \textbf{由形状算子 $S$ 计算}
+
+  回顾一下，矩阵的特征值之积等于其行列式。因此
+  \begin{equation*}
+    K=\det S,
+    \tag{5.20}\label{eq:5.20}
+  \end{equation*}
+  其中 $S=\mathrm I^{-1}\mathrm{II}$，或 $S=-dN$。
+  \item \textbf{由第一、第二基本形式计算}
+
+  从式~\eqref{eq:5.20} 得
+  \[
+    K=\det S=\det(\mathrm I^{-1}\mathrm{II})
+       =\frac{\det\mathrm{II}}{\det\mathrm I}=\frac{eg-f^2}{EG-F^2}.
+  \]
+  \item \textbf{函数 $z=f(x,y)$ 的图像}
+
+  特征值由下式计算：
+  \[
+    k_1=\frac{f_{xx}+f_{yy}+\sqrt{(f_{xx}-f_{yy})^2+4f_{xy}^2}}
+        {2(1+f_x^2+f_y^2)},
+  \]
+% PDF p. 238
+  \[
+    k_2=\frac{f_{xx}+f_{yy}-\sqrt{(f_{xx}-f_{yy})^2+4f_{xy}^2}}
+        {2(1+f_x^2+f_y^2)}.
+  \]
+  高斯曲率为 $K=k_1k_2$。这是蒙日曲面片的海森矩阵公式，便于快速作解析核验。
+\end{itemize}
+
+简言之，高斯曲率是曲面弯曲方式的内在特征。它反映整体拓扑，为实用算法提供依据，并把几何和分析联系起来。
+
+\begin{statement}{例 5.8}{开口向上的抛物面}
+\[
+  S\colon z=\tfrac12(x^2+y^2).
+\]
+一个便于计算的参数化为 $X(u,v)=\bigl(u,v,\frac12(u^2+v^2)\bigr)$，其中 $(u,v)\in\R^2$。我们计算顶点 $p=X(0,0)=(0,0,0)$ 处的 $dN_p$。
+\begin{itemize}
+  \item \textbf{一阶偏导 $X_u,X_v$ 给出切基}
+  \[
+    X_u=(1,0,u),\qquad X_v=(0,1,v).
+  \]
+  在 $(u,v)=(0,0)$ 处，$\left.X_u\right|_p=(1,0,0)$，$\left.X_v\right|_p=(0,1,0)$。
+  \item 这两个正交向量张成 $T_pS$。
+  \item \textbf{单位法向量场 $N(u,v)$}
+
+  未归一化的法向量为
+  \[
+    X_u\times X_v=\begin{vmatrix}i&j&k\\1&0&u\\0&1&v\end{vmatrix}
+        =(-u,-v,1).
+  \]
+  其长度为 $W=\sqrt{1+u^2+v^2}$，所以
+  \[
+    N(u,v)=\frac{(-u,-v,1)}{\sqrt{1+u^2+v^2}}.
+  \]
+  在原点 $p$，$N(p)=(0,0,1)$。
+  \item \textbf{对高斯映射求导}
+
+  计算 $N_u,N_v$ 并在 $p$ 处求值：
+  \[
+    \begin{aligned}
+      N_u=\frac{\partial N}{\partial u}
+        &=\frac{(-1,0,0)}{\sqrt{1+u^2+v^2}}
+          -\frac12\frac{2u(-u,-v,1)}{(1+u^2+v^2)^{3/2}},\\
+      N_v=\frac{\partial N}{\partial v}
+        &=\frac{(0,-1,0)}{\sqrt{1+u^2+v^2}}
+          -\frac12\frac{2v(-u,-v,1)}{(1+u^2+v^2)^{3/2}}.
+    \end{aligned}
+  \]
+  令 $u=0,v=0$，得到
+  \[
+    \left.N_u\right|_p=(-1,0,0),\qquad \left.N_v\right|_p=(0,-1,0).
+  \]
+% PDF p. 239
+  这两个向量属于平面 $z=0$，该平面正是 $T_{N(p)}S^2$。
+  \item \textbf{构造线性映射 $dN_p$}
+
+  $p$ 处任一切向量均可写为
+  \[
+    \omega=a\left.X_u\right|_p+b\left.X_v\right|_p
+      =a(1,0,0)+b(0,1,0)=(a,b,0).
+  \]
+  应用 $dN_p$，
+  \[
+    dN_p(\omega)=a\left.N_u\right|_p+b\left.N_v\right|_p
+      =a(-1,0,0)+b(0,-1,0)=(-a,-b,0).
+  \]
+  在定义域和值域上都使用有序基 $\{\left.X_u\right|_p,\left.X_v\right|_p\}$，$dN_p$ 的矩阵为
+  \[
+    [dN_p]=\begin{bmatrix}-1&0\\0&-1\end{bmatrix}.
+  \]
+  \item \textbf{形状算子与曲率}
+
+  形状算子定义为
+  \[
+    S_p=-dN_p=\begin{bmatrix}1&0\\0&1\end{bmatrix}.
+  \]
+  主曲率为特征值 $k_1=k_2=1$。高斯曲率为 $k=k_1k_2=1$。平均曲率为
+  $H=(k_1+k_2)/2=1$。
+\end{itemize}
+\end{statement}

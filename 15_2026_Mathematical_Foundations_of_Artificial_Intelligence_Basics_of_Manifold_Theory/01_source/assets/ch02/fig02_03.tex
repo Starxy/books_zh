@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=.94cm,y=.94cm,>=Stealth]
+  \foreach \i in {1,...,11}
+    \foreach \j in {1,...,11}
+      \fill[black!9] (.59*\i,.59*\j) circle (1pt);
+  \draw[->,thick] (-.3,0)--(7.1,0) node[below right] {$M_1$};
+  \draw[->,thick] (0,-.3)--(0,7.0) node[above left] {$M_2$};
+  \coordinate (p) at (3.8,3.28);
+  \draw[->,line width=1.5pt,blue!70!black] (p)--++(1.95,0)
+       node[above right] {$v_1\in T_{p_1}M_1$};
+  \draw[->,line width=1.5pt,green!50!black] (p)--++(0,1.95)
+       node[above right] {$v_2\in T_{p_2}M_2$};
+  \draw[->,line width=1.5pt,red!87!black] (p)--++(1.95,1.95)
+       node[below right] {$v_1\oplus v_2$};
+  \draw[thick] ([shift={(-3pt,-3pt)}]p)--([shift={(3pt,3pt)}]p)
+       ([shift={(-3pt,3pt)}]p)--([shift={(3pt,-3pt)}]p);
+  \node[above right,inner sep=2pt] at (p) {$p=(p_1,p_2)$};
+\end{tikzpicture}

@@ -1,0 +1,104 @@
+% PDF p. 259
+\AppendixSection{5B}{协变导数的交换公式}
+协变导数的交换公式是一个基本恒等式，衡量改变协变微分的顺序时出现的差异。在最简单的形式下，对向量场 $V$ 和两个向量场 $X,Y$，有
+\begin{equation*}
+  \bigl(\nabla_X\nabla_Y-\nabla_Y\nabla_X-\nabla_{[X,Y]}\bigr)V
+     =R(X,Y)V,
+  \tag{5B1}\label{eq:5B1}
+\end{equation*}
+其中，
+\begin{itemize}
+  \item $\nabla$ 是无挠的列维-奇维塔联络。
+  \item $[X,Y]$ 是 $X,Y$ 的李括号。
+  \item $R(X,Y)$ 是黎曼曲率张量对 $V$ 的作用。
+\end{itemize}
+% PDF p. 260
+换言之，如果计算
+\[
+  \nabla_X\nabla_YV-\nabla_Y\nabla_XV,
+\]
+所得差值一般非零。减去沿李括号的导数 $\nabla_{[X,Y]}V$，余项恰为曲率作用到 $V$ 的结果。下面利用协变导数的定义给出详细证明。
+
+\AppendixHeading{5B1}{预备知识}
+\AppendixSubheading{5B1.1}{协变导数}
+设 $V$ 为向量场，$X$ 为任一向量场。在局部坐标 $(x^1,\ldots,x^n)$ 下，记坐标基向量场为 $\partial_i$。$V=V^i\partial_i$ 沿 $X=X^j\partial_j$ 的协变导数为
+\begin{equation*}
+  \nabla_X V=X^j\bigl(\partial_j V^i+\Gamma^i_{jk}V^k\bigr)\partial_i,
+  \tag{5B2}\label{eq:5B2}
+\end{equation*}
+其中 $\Gamma^i_{jk}$ 为该联络的克里斯托费尔符号。
+
+\AppendixSubheading{5B1.2}{李括号}
+向量场 $X,Y$ 的李括号 $[X,Y]$ 定义为对任意光滑函数 $f$，
+\begin{equation*}
+  [X,Y]f=X(Y(f))-Y(X(f)).
+  \tag{5B3}\label{eq:5B3}
+\end{equation*}
+在坐标下，若 $X=X^i\partial_i$、$Y=Y^j\partial_j$，则
+\begin{equation*}
+  [X,Y]=\bigl(X^j\partial_jY^i-Y^j\partial_jX^i\bigr)\partial_i.
+  \tag{5B4}\label{eq:5B4}
+\end{equation*}
+
+\AppendixSubheading{5B1.3}{黎曼曲率张量}
+黎曼曲率张量是一个多线性映射。在流形 $M$ 的每一点 $p$，它取三个切向量并给出另一个切向量。换言之，这是一个 $(1,3)$ 型张量，定义为
+\[
+  R\colon T_pM\times T_pM\times T_pM\longrightarrow T_pM.
+\]
+由于多线性，$R$ 对任意一组三个切向量的作用完全由它在 $T_pM$ 的一组基上的值决定。设 $\{E_1,E_2,\ldots,E_n\}$ 为 $T_pM$ 的一组基，则 $p$ 处任意三个切向量 $X,Y,Z$ 可写为
+% PDF p. 261
+\[
+  X=\sum_{p=1}^n x^pE_p,\qquad
+  Y=\sum_{q=1}^n y^qE_q,\qquad Z=\sum_{r=1}^n z^rE_r.
+\]
+由多线性，
+\[
+  \begin{aligned}
+    R(X,Y)Z&=R\left(\sum_{p=1}^nx^pE_p,\sum_{q=1}^ny^qE_q\right)
+                  \sum_{r=1}^nz^rE_r\\
+            &=\sum_{p,q,r}x^py^qz^r R(E_p,E_q)E_r.
+  \end{aligned}
+\]
+因为 $R(E_p,E_q)E_r$ 是 $T_pM$ 中的向量，所以可唯一表示为基向量的线性组合：
+\[
+  R(E_p,E_q)E_r=\sum_{i=1}^nR^i_{pqr}E_i.
+\]
+系数 $R^i_{pqr}$ 是黎曼曲率张量相对于所选基的分量。由 $R$ 的多线性，只要知道对各基向量的值 $R(E_p,E_q)E_r$，就能确定整个张量。
+
+黎曼曲率张量是微分几何中用来描述黎曼流形等 $n$ 维空间曲率的工具。曲率算子 $R(X,Y)V$ 定义为
+\begin{equation*}
+  R(X,Y)V=\nabla_X\nabla_YV-\nabla_Y\nabla_XV-\nabla_{[X,Y]}V.
+  \tag{5B5}\label{eq:5B5}
+\end{equation*}
+曲率张量刻画流形怎样“弯曲”，或者说如何偏离平坦。下面给出几个帮助理解其含义的直观解释和例子。
+
+\Subheading{5B1.3.1\quad 曲率张量的直观含义}
+\begin{itemize}
+  \item \textbf{平行移动与旋转}\quad 想象一张平纸（欧氏空间）。取一个向量，沿纸上一条闭合路径移动它，每一步都保持“平行”，回到起点时向量不变。若在弯曲的曲面（如球面）上重复相同过程，回到起点时向量一般会发生旋转。曲率张量量化这种旋转，说明向量因流形的曲率而“扭转”了多少，以及朝哪个方向扭转。
+  \item \textbf{测地偏离}\quad 考虑两条起初平行的测地线，即流形上尽可能“直”的路径。在平坦空间中，它们之间的距离恒定。在弯曲空间中，它们可能会聚或发散，曲率张量支配这一行为。例如，球面上的测地线（大圆）最终会聚，正如经线在北极相遇。双曲空间中的测地线比欧氏空间中的测地线分离得更快（图~\ref{fig:5.B1}）。
+% PDF p. 262
+  \item \textbf{协变微分不可交换}\quad 在平坦空间中，求导的顺序没有影响。在弯曲的流形上，按两种顺序求导所得的差别由曲率张量刻画。具体而言，对任意向量场 $V$ 和向量场 $X,Y$，关系
+  \[
+    (\nabla_X\nabla_Y-\nabla_Y\nabla_X-\nabla_{[X,Y]})V=R(X,Y)V
+  \]
+  表明，曲率张量 $R$ 衡量协变导数的“不可交换性”。
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.60\linewidth]{assets/ch05/fig05_b01.pdf}
+  \FigureCaption{5.B1}{双曲空间中两条测地线发散。}
+\end{figure}
+
+\Subheading{5B1.3.2\quad 数学表述}
+在坐标基向量为 $\partial_i$ 的局部坐标系中，曲率张量的分量为
+\[
+  R^l_{ijk}=\partial_j\Gamma^l_{ik}-\partial_i\Gamma^l_{jk}
+              +\Gamma^l_{jm}\Gamma^m_{ik}-\Gamma^l_{im}\Gamma^m_{jk}.
+\]
+这些分量确定流形沿各方向怎样弯曲。
+
+\textbf{证明}\quad 从用协变导数定义黎曼曲率张量的公式出发。在任意坐标系中，对任意向量场 $X,Y,V$，
+\[
+  R(X,Y)V=\nabla_X\nabla_YV-\nabla_Y\nabla_XV-\nabla_{[X,Y]}V.
+\]

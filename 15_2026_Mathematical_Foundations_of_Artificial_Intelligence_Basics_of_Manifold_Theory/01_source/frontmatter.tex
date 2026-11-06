@@ -1,0 +1,168 @@
+% PDF p. 1 (cover)
+\begin{titlepage}
+  \thispagestyle{empty}
+  \pdfbookmark[0]{封面}{cover}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south west,inner sep=0pt] at (current page.south west)
+      {\includegraphics[width=\paperwidth]{assets/cover_art.pdf}};
+    \fill[white] ([xshift=33bp,yshift=-294bp]current page.north west)
+      rectangle ([xshift=178bp,yshift=-321bp]current page.north west);
+    \node[anchor=north east,inner sep=0pt] at
+      ([xshift=-49bp,yshift=-11bp]current page.north east)
+      {\includegraphics{assets/cover_logo.pdf}};
+    \draw[cyan!70!black,line width=.45pt]
+      ([yshift=-70bp]current page.north west) -- ([yshift=-70bp]current page.north east);
+    \node[anchor=north west,inner sep=0pt,text width=432bp,align=left] at
+      ([xshift=35bp,yshift=-106bp]current page.north west)
+      {\heiti\bfseries\fontsize{33bp}{45bp}\selectfont \BookTitle};
+    \node[anchor=north west,inner sep=0pt] at
+      ([xshift=36bp,yshift=-173bp]current page.north west)
+      {\heiti\fontsize{23bp}{28bp}\selectfont \BookSubtitle};
+    \node[anchor=north west,inner sep=0pt] at
+      ([xshift=36bp,yshift=-295bp]current page.north west)
+      {\Large \BookAuthor\quad 著};
+    \iftranslationcomplete\else
+      \node[anchor=north west,inner sep=0pt] at
+        ([xshift=36bp,yshift=-223bp]current page.north west)
+        {\small 中文译排阶段稿};
+    \fi
+  \end{tikzpicture}\null
+\end{titlepage}
+\frontmatter
+
+% PDF p. 2
+\chapter*{\BookTitle}
+\pdfbookmark[0]{书介}{book-description}
+《人工智能的数学基础：流形理论基础》是两卷本的第一卷。两卷共同建立一个以光滑流形理论（smooth manifold theory）和黎曼几何（Riemannian geometry）为基础的统一数学框架。这些工具对于表示、分析和整合日益复杂的现代人工智能（artificial intelligence，AI）系统及科学模型至关重要。
+
+微分几何（differential geometry）如今在人工智能、生物学、物理学和医学中都发挥着重要作用。从深度学习（deep learning）、生成建模（generative modeling）、流形学习（manifold learning），到推理算法和物理人工智能（physical AI），流形（manifold）提供了一套贯通理论与实践的几何语言。本卷介绍拓扑流形（topological manifold）、光滑流形（smooth manifold）、黎曼度量（Riemannian metric）、微分形式（differential form）、李导数（Lie derivative）和统计几何（statistical geometry）等主要概念，并以数据科学、基因组学、药物发现和人工智能驱动的系统为例说明这些概念的应用。
+
+本书有别于传统教材，将形式化理论、计算方法和跨学科见解相结合，同时重视严格论证和直观理解。它适合数学、统计学、计算机科学、人工智能、物理学、生物信息学和生物医学等领域的研究生与专业人士，也可供基于几何、科学建模和数据驱动的发现方法开发人工智能系统的研究人员作为基础参考书。
+
+\section*{本书特色}
+
+\begin{itemize}
+  \item 统一流形理论的主要概念，便于在不同学科间综合运用。
+  \item 将流形视为人工智能和各门科学中表示数据的自然几何空间。
+  \item 将抽象理论与实用算法及实际应用联系起来。
+  \item 构建融入李导数的图神经网络（graph neural network，GNN），用于自适应人工智能和分子性质预测。
+  \item 构建以李导数增强的反应–扩散方程（reaction–diffusion equation），用于识别疾病基因和设计治疗方案。
+  \item 为现代学习系统发展概率建模和信息几何（information geometry）方法。
+  \item 将几何观点应用于生成模型、图学习和推理等人工智能领域。
+  \item 将高斯映射（Gauss map）和陈–高斯–博内定理（Chern–Gauss–Bonnet theorem）应用于物理人工智能，纳入机器人以及肿瘤细胞位置与范围识别中的几何约束。\translatornote{书介将 Chern 印作 Chen，第 5.2.3 节使用 Chern。}
+% PDF p. 3
+  \item 以逐步展开的例题、案例和图解帮助理解。
+  \item 作为人工智能时代的进阶学习资料，借助新兴人工智能工具的自动编程能力帮助读者学习和训练技能。
+\end{itemize}
+
+Momiao Xiong 是得克萨斯大学公共卫生学院（University of Texas School of Public Health）生物统计学与数据科学系的退休教授，也是得克萨斯大学 MD 安德森癌症中心（The University of Texas MD Anderson Cancer Center）与 UTHealth 生物医学科学研究生院（UTHealth Graduate School of Biomedical Science）遗传学与表观遗传学（Genetics \& Epigenetics，G\&E）研究生项目的正式成员。他担任人工智能研究学会（Society of Artificial Intelligence Research）会长。
+
+% PDF p. 4
+\clearpage
+\thispagestyle{empty}
+\pdfbookmark[0]{书名页}{titlepage}
+\null\vfill
+\begin{center}
+  {\heiti\bfseries\Huge \BookTitle\par}
+  \vspace{1.2em}
+  {\heiti\LARGE \BookSubtitle\par}
+  \vspace{3em}
+  {\Large \BookAuthor\quad 著\par}
+\end{center}
+\vfill\null\clearpage
+
+% PDF p. 5
+\thispagestyle{empty}
+\pdfbookmark[0]{版权页}{copyright}
+{\small
+\noindent 封面图设计\quad Momiao Xiong\par
+\medskip
+\noindent 第一版由 CRC Press 于 2026 年出版。\par
+\noindent 2385 NW Executive Center Drive, Suite 320, Boca Raton FL 33431\par
+\noindent CRC Press 另一出版地址\par
+\noindent 4 Park Square, Milton Park, Abingdon, Oxon, OX14 4RN\par
+\noindent CRC Press 是 Taylor \& Francis Group, LLC 旗下出版品牌。\par
+\medskip
+\noindent © 2026 Momiao Xiong\par
+\medskip
+
+作者和出版方已尽合理努力出版可靠的数据与信息，但无法对全部材料的有效性或使用后果负责。作者和出版方已尝试查明本书所转载全部材料的版权人。如果有材料未获得以本书所采用形式发表的许可，出版方谨向相应版权人致歉。如有受版权保护的材料未注明权利归属，请来函告知，以便在今后重印时更正。
+
+除美国版权法允许的情形外，未经出版方书面许可，不得以任何形式或任何现有或未来发明的电子、机械或其他手段重印、复制、传输或使用本书的任何部分，包括影印、缩微、录制，以及在任何信息存储或检索系统中使用。
+
+如需许可影印或以电子形式使用本书材料，可访问 \url{https://www.copyright.com}，或联系版权许可中心（Copyright Clearance Center, Inc.，CCC），222 Rosewood Drive, Danvers, MA 01923，电话 978-750-8400。CCC 未提供许可的作品请联系 \href{mailto:mpkbookspermissions@tandf.co.uk}{\nolinkurl{mpkbookspermissions@tandf.co.uk}}。
+
+有关产品安全的疑问和信息，请联系出版方的欧盟代表 \href{mailto:GPSR@taylorandfrancis.com}{\nolinkurl{GPSR@taylorandfrancis.com}}。Taylor \& Francis Verlag GmbH, Kaufingerstraße 24, 80331 München, Germany。
+
+\noindent\textbf{商标声明}\quad 产品或公司名称可能是商标或注册商标。本书使用这些名称仅为识别和说明之用，无意侵犯商标权。\par
+\medskip
+\noindent ISBN 9781041076254（精装）\par
+\noindent ISBN 9781041076278（平装）\par
+\noindent ISBN 9781003641452（电子书）\par
+\noindent DOI \href{https://doi.org/10.1201/9781003641452}{10.1201/9781003641452}\par
+\medskip
+\noindent 原版由 codeMantra 使用 Palatino 字体排版。\par
+}
+\clearpage
+
+% PDF pp. 6–12
+\pdfbookmark[0]{目录}{contents}
+\tableofcontents
+
+% PDF p. 13
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+\markboth{前言}{}
+近年来，人工智能取得了显著进展，深度学习和推理尤为突出。能够描述和分析多种模型及其应用的统一数学语言，却未能同步发展。随着人工智能与生物学、物理学、医学等复杂学科的联系日益密切，我们越来越需要一种超越单个算法、能够提供共同数学基础的理论框架。本书《流形理论基础》是两卷本的第一卷，旨在满足这一需求。
+
+本书的主要观点是，光滑流形理论和黎曼几何为表示、分析和整合各种人工智能模型及其应用提供了统一的数学语言。把数据、函数、模型和学习过程都视为流形上的几何对象，我们便可从几何关系的作用来理解人工智能中的计算过程。借助这一视角，我们可以更深入地考察模型的结构、泛化能力、鲁棒性、可解释性和领域自适应（domain adaptation）。人工智能进入跨学科应用的时代，这些性质都十分重要。
+
+传统微积分构成了传统自然科学的数学基础。同样，可微流形（differentiable manifold）既是人工智能和机器创造力的基础，也是现代自然科学各领域的数学基础，涵盖物理学、工程学、化学、分子生物学、医学和卫生保健。人工智能近期的进展也表明，它有潜力反过来促进数学与统计学的发展。灵活的算法框架、强大的抽象推理能力和可自适应的人工智能，可以为人工智能研究和自然科学发现提供多方面的帮助。光滑流形的框架和黎曼几何的工具为我们提供了统一的视角，可以把人工智能、各领域的自然科学研究及二者的相互作用联系起来。
+
+本书是两卷中的基础卷，介绍现代几何学习所依赖的主要数学结构，包括拓扑流形和光滑流形、黎曼度量、微分形式、李导数以及弯曲空间的统计几何。我们着重说明这些概念的直观动机、计算工具和实际意义，讨论它们在生物数据建模、双曲表示学习（hyperbolic representation learning）、图神经网络和流形上的统计推断等方面的应用。
+
+各章兼顾数学论证和阅读难度，安排如下。
+
+\begin{itemize}
+  \item 第 1 章介绍光滑流形的基础知识。光滑流形是现代几何及其在数学、物理学和数据科学中的应用所依赖的主要概念之一。本章的例子从圆和球面延伸到射影空间（projective space）和格拉斯曼流形（Grassmann manifold）。我们说明局部欧氏结构如何使人们得以在流形上运用微积分、进行坐标变换，并由此建立光滑坐标卡（smooth chart）和图册（atlas）。本章还介绍流形在几何、矩阵空间乃至生物数据表示中的应用，例如基因组序列的混沌游戏表示（chaos game representation，CGR）。学完本章，读者将从直观和严格论证两个层面理解光滑流形，为进一步学习微分几何及其多种应用做好准备。
+
+% PDF p. 14
+  \item 第 2 章全面介绍黎曼几何，即研究流形上度量的学科，并将经典微分几何与数据科学和深度学习中的现代应用联系起来。本章借助图示和局部表达式讲解坐标卡、张量记号（tensor notation）、拉回（pullback）和等距映射（isometry）等概念。我们重点讨论欧氏、球面及双曲几何的模型空间，尤其详述双曲面模型（hyperboloid model）和庞加莱圆盘模型（Poincaré disk model）。书中解释了指数映射（exponential map）、对数映射（logarithm map）等工具，并进一步讨论等距浸入（isometric immersion）、指数与对数映射以及乘积流形（product manifold）的构造。本章末尾介绍生物信息学和几何深度学习中的实际应用，包括双曲空间中的系统发育树推断和双曲消息传递网络（Hyperbolic Message Passing Networks，HMPNs）。这些模型利用负曲率嵌入树状数据和关系数据，尽可能保留原有结构，可用于复杂生物数据集和图结构数据集的表示学习。本章将理论基础与机器学习架构结合起来，使各学科的读者能在数据驱动的研究中运用黎曼几何。
+
+  \item 第 3 章介绍微分形式。微分形式为曲线、曲面和流形等多种几何对象上的积分提供统一的数学框架，从而将经典微积分推广到与坐标选择无关的高维情形，以及现代流形微积分。本章以曲线积分（line integral）和曲面积分（surface integral）为动机，定义微分 1-形式和一般的 $k$-形式，说明它们如何以几何方式表达功、通量和体积等量。我们用楔积（wedge product）构造更高次数的形式，用外微分（exterior derivative）进行广义微分。借助球面和环面上的积分等具体例子，本章将微分形式与物理和生物学解释联系起来。
+
+  本章在经典情形和流形上分别介绍斯托克斯定理（Stokes' theorem）、庞加莱引理（Poincaré lemma）等重要结果，说明拓扑结构如何影响形式的恰当性及守恒定律。随后讨论散度定理（divergence theorem）和拉普拉斯–贝尔特拉米算子（Laplace–Beltrami operator），说明它们在黎曼几何和流形建模中的意义。应用涉及双曲图拉普拉斯算子、谱图理论（spectral graph theory），以及面向层级推理、强化学习（reinforcement learning，RL）和单细胞空间转录组学的双曲拉普拉斯 Transformer（Hyperbolic-Laplacian Transformer，HL-Former）。
+
+  \item 第 4 章介绍李导数这一几何工具。它度量标量场、向量场（vector field）或张量场（tensor field）沿向量场生成的流（flow）的变化，将经典微积分中的标量导数推广为现代意义下对一般标量、向量和张量求导的方法。作为微分几何的一部分，李导数描述流形上的动态演化、对称性和沿一定方向的变化，为分析复杂系统的连续变换提供基础。本章着重介绍它在动力系统、生物学和几何深度学习中的应用。例子包括用认知图模拟思维流、分析单细胞基因组学中的 RNA 速率（RNA velocity）场，以及用可达性（reachability）和控制理论（control theory）研究基因调控网络。最后，本章将李导数引入消息传递神经网络（message-passing neural network），增强网络在药物发现、分子图预测和组织动力学中的几何表达能力和可解释性。
+
+% PDF p. 15
+  \item 第 5 章讨论黎曼几何中联系局部曲率和整体结构的进阶工具。本章先介绍黎曼子流形（Riemannian submanifold），说明浸入（immersion）如何继承环境流形的度量，再由黎曼几何基本定理引出列维-奇维塔联络（Levi-Civita connection）。第一基本形式（first fundamental form）和第二基本形式（second fundamental form）这两个二次型引出形状算子（shape operator）。形状算子的特征值就是主曲率（principal curvature），进而可得到平均曲率（mean curvature）和高斯曲率（Gaussian curvature）。本章引入高斯映射，将曲面法向量与单位球面相联系，由此过渡到高斯–博内定理（Gauss–Bonnet theorem）及其扩展形式和高维陈氏版本。这些定理把曲率的积分与欧拉示性数（Euler characteristic）联系起来，可应用于物理人工智能。后半章讨论雅可比场（Jacobi field），即满足雅可比方程（Jacobi equation，又称测地线偏离方程）的测地线（geodesic）族变分向量。它对于理解共轭点（conjugate point）、稳定性和曲率比较很重要。书中通过图示和逐步算法辅助讲解详细推导、坐标公式以及鞍面、球面、抛物面和隐式曲面等例子。附录给出高斯–博内三角形公式、涉及曲率的交换公式及里奇张量（Ricci tensor）计算的完整证明。这些内容合在一起，可用于分析光滑流形上的曲率、拓扑和测地线行为。
+
+  \item 第 6 章探讨流形上的统计推断。这里需要重新定义经典工具，以反映底层空间的非欧氏几何。本章先介绍作为欧氏平均值自然推广的弗雷歇均值（Fréchet mean），考察它在弯曲空间上的唯一性、存在性和计算方法。然后将假设检验框架推广到黎曼流形（Riemannian manifold），介绍霍特林 $T^2$ 型统计量（Hotelling's $T^2$-type statistic）、切空间（tangent space）近似，以及用于无分布推断的置换方法。我们还将变量变换和列联表（contingency table）检验由欧氏空间推广到流形，并针对全基因组关联研究（genome-wide association study，GWAS）构建基于流形的列联表检验，考察基因组空间的特征。
+
+  本章通过形状空间、方向数据、对称正定矩阵及生物结构中的应用，说明如何在流形上进行统计分析，特别关注扩散张量成像（diffusion tensor imaging，DTI）、系统发育树空间和协方差矩阵的几何结构。我们结合微分几何的工具，例如指数与对数映射，在弯曲空间中进行计算和模型比较。章末介绍机器学习和生物医学中的现代应用，包括肿瘤形态和取值于流形的神经表示的分析。
+
+  本章为处理自然落在非线性空间上的数据的统计学家、数据科学家和生物学家提供兼顾严格性和实用性的基础，将几何与统计推断结合，用于科学发现和数据驱动的建模。
+\end{itemize}
+
+本系列第二卷《人工智能的数学基础》将以此处的几何内容为基础，讨论基于流形的学习算法、几何深度学习架构、生成模型、非欧氏空间中的强化学习，以及以微分几何为基础的人工智能推理系统，并由此探讨人工智能的数学基础。
+
+% PDF pp. 15–16
+\needspace{12\baselineskip}
+本书面向数学、统计学、计算机科学、人工智能、生物学、医学和卫生保健领域的研究生、研究人员及专业人士。读者应有一定的多元微积分和线性代数基础，无需预先学习微分几何。书中提供大量图解、示例和计算方法，帮助读者形成直观理解并进行实际建模。
+
+科学探究、智能计算和日益复杂的数据正日趋紧密地交织在一起。几何视角的价值既在于其简洁之美，也在于它能统一地描述这些问题。我们希望本书能阐明现代人工智能的数学基础，并启发读者从几何角度思考、运用拓扑观念推理，以智能方法建立模型。
+
+衷心感谢我的编辑 David Grubbs 在本书写作过程中给予我的鼓励和耐心。
+
+\begin{flushright}
+Momiao Xiong\\
+得克萨斯州休斯敦\\
+2025 年 6 月
+\end{flushright}
+
+% PDF p. 17
+\chapter*{作者简介}
+\addcontentsline{toc}{chapter}{作者简介}
+\markboth{作者简介}{}
+Momiao Xiong 是得克萨斯大学公共卫生学院生物统计学与数据科学系的退休教授，也是得克萨斯大学 MD 安德森癌症中心与 UTHealth 生物医学科学研究生院遗传学与表观遗传学研究生项目的正式成员。他担任人工智能研究学会会长。

@@ -1,0 +1,317 @@
+% PDF p. 25
+\section{光滑函数与光滑映射}
+\subsection{光滑函数}
+在微分几何中，函数与映射都是基本概念，但它们起着不同的作用，数学性质也有所不同。
+
+% PDF p. 26
+\begin{statement}{定义 1.4}{函数}
+函数给流形 $M$ 中的每个点赋予 $\R$ 中的一个标量，通常写作
+\[
+  f\colon M\to\R,
+\]
+其中 $M$ 是一个流形。
+\end{statement}
+
+\begin{statement}{定义 1.5}{光滑函数}
+设 $M$ 为光滑流形，$\R$ 表示实数集。流形 $M$ 上的光滑函数（smooth function）是函数
+\[
+  f\colon M\to\R,
+\]
+且对 $M$ 上的每张坐标卡 $(U,\varphi)$，其中 $U\subset M$ 是开子集，$\varphi\colon U\to\R^n$ 为坐标映射，复合函数
+\[
+  f\circ\varphi^{-1}\colon\varphi(U)\to\R
+\]
+在 $\R^n$ 的通常意义下无穷次可微，即光滑。
+
+\textbf{定义的直观含义}
+\begin{itemize}
+  \item 流形上的光滑函数，在任何局部坐标系中看起来都是光滑函数。
+  \item 复合函数 $f\circ\varphi^{-1}$ 保证在坐标卡所给出的坐标变换下保持光滑性。
+  \item 简单地说，当你用坐标卡“放大”流形时，函数在局部欧氏空间中看起来是光滑的。
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 1.9}{流形上的光滑函数}
+$\R^2$ 中的单位圆周 $S^1$ 是一个流形，定义为
+\[
+  S^1=\{(x,y)\in\R^2\mid x^2+y^2=1\}.
+\]
+光滑函数的概念依赖于欧氏空间中自然定义的可微性。圆周上的一条弧映射到 $\R$ 中的一个区间。局部坐标 $\theta$ 与点 $(x,y)$ 通过 $\varphi$ 对应，满足 $x=\cos\theta$，$y=\sin\theta$。因此，可如下定义一个光滑函数：
+\[
+  f(x,y)=x+y=\cos\theta+\sin\theta.
+\]
+显然，这是参数 $\theta$ 的无穷次可微函数。
+
+按光滑函数的定义，$f\colon M\to\R$ 光滑要求复合函数 $f\circ\varphi^{-1}$ 在欧氏空间的开集 $\widehat U=\varphi(U)$ 上光滑，这里 $\widehat U$ 是
+% PDF p. 27
+$\R$ 中的一个区间。复合函数在 $\widehat U$ 上的像 $f\circ\varphi^{-1}(\widehat U)=f(U)$ 由函数 $f(\theta)=\cos\theta+\sin\theta$ 给出。
+\end{statement}
+
+\begin{statement}{例 1.10}{流形上的非光滑函数}
+这里给出两个流形上的非光滑函数。先看一维的例子。考虑光滑流形 $\R$，定义
+\[
+  f\colon\R\to\R,\qquad f(x)=|x|.
+\]
+此函数在 $\R$ 上处处连续，但在 $x=0$ 处不可微，因为左导数为 $-1$，右导数为 $+1$。因而 $f$ 是流形 $\R$ 上非光滑函数的一个例子。
+
+另一个例子定义在 $\R^2$ 上，
+\[
+  g(x,y)=\sqrt{x^2+y^2}.
+\]
+此函数在原点以外光滑，但在 $(0,0)$ 处不可微，因为在该点的方向导数不能组合成一个线性映射。
+\end{statement}
+
+\subsection{光滑映射}
+\begin{statement}{定义 1.6}{光滑映射}
+设 $M,N$ 为光滑流形。给定函数
+\[
+  f\colon M\to N.
+\]
+如果对每一点 $p\in M$，都存在 $M$ 中 $p$ 附近的坐标卡 $(U,\varphi)$ 和 $N$ 中 $f(p)$ 附近的坐标卡 $(V,\psi)$，使得 $f(U)\subset V$，且复合映射
+\[
+  \psi\circ f\circ\varphi^{-1}(U)\longrightarrow\psi(V)
+\]
+是欧氏空间开子集之间通常意义下的光滑函数，即无穷次可微函数，那么称 $f$ 为光滑映射（smooth map），或 $C^\infty$ 映射。\translatornote{复合映射沿用原书写法，其定义域应写成 $\varphi(U)$，即 $\psi\circ f\circ\varphi^{-1}\colon\varphi(U)\to\psi(V)$。}
+
+这个定义与坐标卡的选取无关，因为光滑流形上坐标卡之间的过渡映射本身光滑。
+
+直观地说，你可以把光滑映射看作空间之间“性质良好”的函数，没有突变、折痕或尖角。想象你在一张光滑曲面上行走，每一步都感觉连续，可以用微积分预测路径。在曲面上选取一点放大，它看起来就像一块平坦的欧氏空间，在其中求导毫无困难。
+
+% PDF p. 28
+所以，光滑映射是光滑流形之间的函数。选取合适的坐标卡从局部看，它表现为 $\R^n$ 中开集之间的无穷次可微函数。这意味着你可以求任意阶导数，而且这些导数随点的位置连续变化。
+\end{statement}
+
+\section{带边界流形}
+\begin{statement}{定义 1.7}{内点}
+若存在坐标卡 $(U,\varphi)$，其中 $p\in U$，并使得 $\varphi(p)$ 落在开子集
+\[
+  \{(x^1,\ldots,x^n)\in\R_+^n\mid x^n>0\}
+\]
+中，则称点 $p\in M$ 为内点（interior point）。这里
+$\R_+^n=\{(x^1,\ldots,x^n)\in\R^n\mid x^n\ge0\}$。
+
+若存在坐标卡 $(U,\varphi)$，其中 $p\in U$，并使得
+\[
+  \varphi(p)\in\{(x^1,\ldots,x^n)\in\R_+^n\mid x^n=0\},
+\]
+则称点 $p\in M$ 为边界点（boundary point）。
+
+$M$ 的边界（boundary）记为 $\partial M$，定义为所有边界点的集合，
+\[
+  \partial M=\bigl\{\,p\in M\;\big|\;
+  \begin{aligned}
+     &\text{存在坐标卡 }(U,\varphi)\text{，使得 }p\in U\\
+     &\text{且 }\varphi(p)\in\{x\in\R_+^n\mid x^n=0\}\,\bigr\}.
+  \end{aligned}
+\]
+$M$ 的所有内点组成的集合记为 $\operatorname{Int} M$。
+
+换言之，流形的边界由下述各点构成：在适当的坐标卡下，它们映射到欧氏半空间的“边缘”。
+\end{statement}
+
+\begin{statement}{例 1.11}{闭单位圆盘 $D^2$}
+在 $\R^2$ 中定义闭单位圆盘
+\[
+  D^2=\{(x,y)\in\R^2\mid x^2+y^2\le1\}.
+\]
+\begin{itemize}
+  \item \textbf{内点}\quad 任一点 $(x,y)$ 若满足 $x^2+y^2<1$，便有一个在 $D^2$ 中的邻域，形如 $\R^2$ 中的开圆盘。这些点是内点。
+% PDF p. 29
+  \item \textbf{边界点}\quad 若点 $(x,y)$ 满足 $x^2+y^2=1$，则它在 $D^2$ 中的任一邻域无论多小，都形如半圆盘。也就是说，坐标卡可将它映射到闭半平面 $\R_+^2=\{(u,v)\in\R^2\mid v\ge0\}$ 的一个开子集，且该点被映射到 $v=0$ 的一点。因此 $D^2$ 的边界是圆周
+  \[
+    \partial D^2=\{(x,y)\in\R^2\mid x^2+y^2=1\}.
+  \]
+\end{itemize}
+\end{statement}
+
+\begin{statement}{例 1.12}{闭区间 $[0,1]$}
+考虑一维带边界流形（manifold with boundary）
+\[
+  M=[0,1]\subset\R.
+\]
+\begin{itemize}
+  \item \textbf{内点}\quad 对任意满足 $0<x<1$ 的点 $x$，都能找到包含在 $[0,1]$ 中的小开区间，例如 $(x-\varepsilon,x+\varepsilon)$。这些点是内点。
+  \item \textbf{边界点}\quad $0$ 和 $1$ 都是边界点。例如，对 $0$ 可以取一张坐标卡，将 $0$ 的某个邻域，如 $[0,\varepsilon)$，同胚地映射到半直线 $\R_+=[0,\infty)$ 的一个开子集，其中半直线上的 $0$ 对应边界点 $0$。对 $1$ 的处理类似。
+\end{itemize}
+因此，$[0,1]$ 的边界为
+\[
+  \partial[0,1]=\{0,1\}.
+\]
+\end{statement}
+
+\begin{statement}{定理 1.1}{边界的拓扑不变性}
+如果 $M$ 是带边界的拓扑流形，那么 $M$ 中每个点或者是边界点，或者是内点，二者不能兼有。因此 $\partial M$ 与 $\operatorname{Int}(M)$ 是互不相交的集合，其并集是 $M$。
+
+（证明留作习题。）
+\end{statement}
+
+为了帮助理解流形，我们给出几个著名例子。
+
+\section{有限维向量空间}
+\begin{statement}{例 1.13}{有限维向量空间}
+设 $V$ 是有限维实向量空间。$V$ 上的任一范数（norm）都确定一个拓扑，这个拓扑与范数的选择无关。
+
+先说明 $V$ 上的范数如何定义拓扑结构。有限维实向量空间 $V$ 上的范数 $\lVert\cdot\rVert$ 自然诱导距离
+\[
+  d(u,v)=\lVert u-v\rVert,
+  \qquad u,v\in V.
+\]
+给定这个距离，按度量空间中开集的标准定义，可得到一个拓扑，称为度量拓扑（metric topology）。
+
+% PDF p. 30
+\begin{enumerate}[label=\alph*.]
+  \item \textbf{用范数定义开集}
+  \begin{itemize}
+    \item \textbf{开球}
+    \item 对任意点 $x\in V$ 及任意 $\varepsilon>0$，定义开球。直观地说，这些开球是 $x$ 的“邻域”，其中所有点与 $x$ 的“距离”均小于 $\varepsilon$。
+    \item \textbf{开集}\quad 若对每个点 $x\in U$ 都存在 $\varepsilon>0$，使开球 $B(x,\varepsilon)$ 包含在 $U$ 中，则称子集 $U\subset V$ 是开的，此处指由范数确定的拓扑下的开集。
+  \end{itemize}
+  \item \textbf{验证拓扑公理}\quad 回顾一下，$V$ 的子集族 $\tau$ 如果满足下列条件，就是一个拓扑。
+  \begin{enumerate}[label=\arabic*.]
+    \item \textbf{$V$ 和 $\varnothing$ 都属于 $\tau$}\quad $V$ 是开集，因为对任意 $x\in V$ 和 $\varepsilon>0$，$B(x,\varepsilon)\subset V$。按定义，$\varnothing$ 是开集。
+    \item \textbf{任意个开集的并是开集}\quad 设 $\{U_i\}_{i\in I}$ 是一族开集。令
+    \[
+      U=\bigcup_{i\in I}U_i.
+    \]
+    任取 $x\in U$，则 $x$ 至少属于某个 $U_j$。因为 $U_j$ 是开集，存在 $\varepsilon>0$ 使
+    \[
+      B(x,\varepsilon)\subset U_j\subset U.
+    \]
+    因此 $U$ 是开集。
+    \item \textbf{有限个开集的交是开集}\quad 设 $U_1,\ldots,U_k$ 为开集。令
+    \[
+      U=U_1\cap U_2\cap\cdots\cap U_k.
+    \]
+    任取 $x\in U$，则 $x$ 属于每个 $U_i$。由于各 $U_i$ 都开，对每个 $i$ 都存在 $\varepsilon_i>0$ 使 $B(x,\varepsilon_i)\subset U_i$。取 $\varepsilon=\min(\varepsilon_1,\ldots,\varepsilon_k)$，则对所有 $i$ 都有 $B(x,\varepsilon)\subset U_i$，从而 $B(x,\varepsilon)\subset U$。因此 $U$ 是开集。
+  \end{enumerate}
+\end{enumerate}
+
+\textbf{结论}\par
+我们按集合中每一点是否都有包含在该集合内的开球来定义开集。由于开集族满足拓扑的三条公理，$V$ 上任一范数诱导的距离都在 $V$ 上定义了一个拓扑。
+
+总之，有限维实向量空间上的任一范数都确定一个拓扑。范数给出了距离，由此定义的开集（开球及其并、交）满足拓扑公理。
+\end{statement}
+
+\begin{statement}{例 1.14}{矩阵空间}
+令 $M(m\times n,\R)$ 表示元素为实数的 $m\times n$ 矩阵的集合。在矩阵加法和数乘下，它是 $mn$ 维实向量空间，因而是 $mn$ 维光滑流形。（实际上，只须将矩阵的所有元素排成一行，就可将 $M(m\times n,\R)$ 与 $\R^{mn}$ 等同起来，这通常很有用。）类似地，$m\times n$ 复矩阵的集合 $M(m\times n,\C)$ 是 $\R$ 上的 $2mn$ 维向量空间，因而是 $2mn$ 维光滑流形。在 $m=n$ 的特殊情形，即方阵情形，我们用 $M(n,\R)$ 与 $M(n,\C)$ 分别表示实矩阵与复矩阵的空间。
+\end{statement}
+
+% PDF p. 31
+\begin{statement}{例 1.15}{欧氏空间 $\R^n$}
+欧氏空间 $\R^n$ 是 $n$ 维可微流形。为说明这一点，先回顾下列定义。
+\begin{itemize}
+  \item $n$ 维拓扑流形是豪斯多夫且第二可数的空间，其中每一点均有与 $\R^n$ 的某个开子集同胚的邻域。
+  \item 可微流形是配有图册的拓扑流形。图册是一族覆盖该空间的坐标卡，重叠坐标卡之间的过渡映射光滑，即无穷次可微。
+\end{itemize}
+下面说明 $\R^n$ 满足这些条件。
+\begin{enumerate}
+  \item \textbf{拓扑性质}
+  \begin{itemize}
+    \item $\R^n$ 是豪斯多夫空间，任意两不同点都可由互不相交的开集分离。
+    \item 它是第二可数的，有一个可数基，例如以有理点为中心、以有理数为半径的开球所成的族。
+    \item $\R^n$ 中每一点都有一个开邻域，它显然是 $\R^n$ 的开子集，甚至可以取为整个 $\R^n$。
+  \end{itemize}
+  \item \textbf{光滑结构}\quad $\R^n$ 上最简单的坐标卡实际上是一张全局坐标卡，由恒等映射给出：
+  \[
+    \varphi\colon\R^n\to\R^n,\qquad \varphi(x)=x.
+  \]
+  $\varphi$ 是 $\R^n$ 到自身的同胚，实际上是微分同胚（diffeomorphism），所以它本身就构成一个仅有一张坐标卡的图册。
+
+  再者，如果用任意一族坐标卡覆盖 $\R^n$，例如平移恒等坐标卡以不同的点为中心，这些坐标卡之间的过渡映射便只是平移或恒等映射的限制，因此是光滑的。\translatornote{原书举出的平移坐标卡满足此说法。一般光滑坐标卡之间的过渡映射无需是平移或恒等映射。}
+
+  $\R^n$ 满足拓扑方面的要求，即豪斯多夫、第二可数且局部同胚于 $\R^n$。它还带有自然的光滑结构，恒等坐标卡光滑，各过渡映射也光滑。因此 $\R^n$ 是 $n$ 维可微流形。
+\end{enumerate}
+\end{statement}
+
+\section{开子流形}
+\begin{statement}{例 1.16}{开子流形}
+可微流形的任意开子集都是可微流形。下面说明这一点。设 $M$ 为 $n$ 维可微流形，$U\subset M$ 是配有子空间拓扑（subspace topology）的开子集。要证明 $U$ 自身也是 $n$ 维可微流形，就要证明它是拓扑流形，并且继承了光滑结构。
+
+% PDF p. 32
+\begin{enumerate}
+  \item \textbf{$U$ 是拓扑流形}
+
+  由于 $U$ 在 $M$ 中开，而 $M$ 是拓扑流形，$U$ 继承了以下性质。
+
+  \textbf{豪斯多夫性}\quad $U$ 中任意两不同点可由 $M$ 中的开集分离。这些开集与 $U$ 相交得到 $U$ 中的开集，因而 $U$ 是豪斯多夫空间。
+
+  \textbf{第二可数性}\quad $U$ 是第二可数空间的开子集，因而是第二可数的。
+
+  \textbf{局部欧氏性}\quad 对任意 $p\in U$，因为 $M$ 是流形，$M$ 上有一张含 $p$ 的坐标卡 $(V,\varphi)$，其中 $p\in V$，且
+  \[
+    \varphi\colon V\longrightarrow\varphi(V)\subset\R^n
+  \]
+  是同胚。于是 $V\cap U$ 是 $p$ 在 $U$ 中的开邻域，限制映射
+  \[
+    \left.\varphi\right|_{V\cap U}\colon V\cap U\longrightarrow\varphi(V\cap U)
+  \]
+  是到其像的同胚。由于 $\varphi(V)$ 在 $\R^n$ 中开，$\varphi(V\cap U)$ 在 $\R^n$ 中也开。这说明 $U$ 局部同胚于 $\R^n$ 的开子集，所以 $U$ 是 $n$ 维拓扑流形。
+
+  \item \textbf{$U$ 继承光滑结构}
+
+  $M$ 上的光滑结构由覆盖 $M$ 的图册 $\{(V_\alpha,\varphi_\alpha)\}$ 给出，且过渡映射
+  \[
+    \varphi_\beta\circ\varphi_\alpha^{-1}\colon
+    \varphi_\alpha(V_\alpha\cap V_\beta)\longrightarrow V_\beta(V_\alpha\cap V_\beta)
+  \]
+  是光滑的。对 $M$ 的每张坐标卡 $(V_\alpha,\varphi_\alpha)$，考虑限制后的坐标卡
+  \[
+    \bigl(V_\alpha\cap U,\left.\varphi_\alpha\right|_{V_\alpha\cap U}\bigr).
+  \]
+  由于 $V_\alpha\cap U$ 在 $M$ 中开，因而在 $U$ 中也开，而 $\varphi_\alpha$ 是从 $V_\alpha$ 到 $\R^n$ 中开子集的微分同胚，限制映射 $\left.\varphi_\alpha\right|_{V_\alpha\cap U}$ 是到开集 $\varphi_\alpha(V_\alpha\cap U)\subset\R^n$ 的同胚。
+
+  此外，若坐标卡 $(V_\alpha,\varphi_\alpha)$ 与 $(V_\beta,\alpha_\beta)$ 在 $M$ 中重叠，则限制后的定义域上对应的过渡映射是
+  \[
+    \varphi_\beta\circ\varphi_\alpha^{-1}\colon
+    \varphi_\alpha\bigl((V_\alpha\cap V_\beta)\cap V\bigr)
+    \longrightarrow
+    \varphi_\beta\bigl((V_\alpha\cap V_\beta)\cap V\bigr).
+  \]
+  这个映射是光滑映射 $\varphi_\beta\circ\varphi_\alpha^{-1}$ 的限制，因而也是光滑的。\translatornote{两处公式依原书排印。第一处右端的 $V_\beta$ 应是 $\varphi_\beta$，第二张卡的坐标映射应为 $\varphi_\beta$，限制后的交集应与 $U$ 相交。}
+
+  这些限制后的坐标卡所成的族
+  $\{(V_\alpha\cap U,\left.\varphi_\alpha\right|_{V_\alpha\cap U})\}$
+  构成 $U$ 的一个图册，满足可微结构的要求。因此，可微流形的开子集 $U$ 是 $n$ 维可微流形。
+\end{enumerate}
+\end{statement}
+
+\begin{statement}{例 1.17}{一般线性群 $\mathrm{GL}(n,\R)$}
+一般线性群（general linear group）$\mathrm{GL}(n,\R)$ 是由可逆的 $n\times n$ 实矩阵组成的集合。它是 $n^2$ 维光滑流形，因为它是 $n^2$ 维向量空间 $M(n,\R)$ 的开子集，即（连续的）行列式函数不为零的点所成的集合。形式上，一般线性群定义为
+\[
+  \mathrm{GL}(n,\R)=\{A\in M(n,\R)\mid\det A\ne0\}.
+\]
+
+% PDF p. 33
+先证明 $\mathrm{GL}(n,\R)$ 是光滑流形 $M(n,\R)$ 的开子集。行列式函数
+\[
+  \det\colon M(n,\R)\longrightarrow\R
+\]
+是多项式函数，因此连续。由于 $\mathrm{GL}(n,\R)=\det^{-1}(\R\setminus\{0\})$，即 $\R\setminus\{0\}$ 在行列式函数下的原像（preimage），而 $\R\setminus\{0\}$ 在 $\R$ 中开，所以 $\mathrm{GL}(n,\R)$ 是 $M(n,\R)$ 的开子集。
+
+回顾一下，欧氏空间（或光滑流形）的任一开子集都继承同维的光滑流形结构。因为 $M(n,\R)\cong\R^{n^2}$ 是光滑流形，开子集 $\mathrm{GL}(n,\R)$ 自身也是 $n^2$ 维光滑流形。
+
+由此可见，$\mathrm{GL}(n,\R)$ 是光滑流形。
+\end{statement}
+
+\begin{statement}{例 1.18}{满秩矩阵}
+上例可以推广到满秩的矩形矩阵。令 $M(m\times n,\R)$ 表示所有 $m\times n$ 实矩阵的集合。它自然地与 $\R^{mn}$ 等同，因而是 $mn$ 维光滑流形。现在考虑 $m\times n$ 满秩矩阵的子集。所谓满秩（full rank），是指秩为
+\[
+  r=\min(m,n).
+\]
+记 $A$ 为这类矩阵的全体。我们将证明 $A$ 是 $M(m\times n,\R)$ 的开子集。假设 $m<n$，则 $r=m$，所以取 $A$ 中一矩阵，它具有某个非奇异的 $m\times m$ 子矩阵。记 $M_m(m\times n,\R)$ 为 $M(m\times n,\R)$ 中秩为 $m$ 的矩阵构成的子集。由行列式的连续性，在该矩阵的某个 $M(m\times n,\R)$ 中的邻域内，同一位置的子矩阵行列式保持非零。因此该矩阵有一个包含在 $M_m(m\times n,\R)$ 中的邻域。由此 $M_m(m\times n,\R)$ 是 $M(m\times n,\R)$ 的开子集，从而自身是 $mn$ 维光滑流形。
+\end{statement}
+
+\begin{statement}{例 1.19}{光滑函数的图像}
+设 $U\subset\R^n$ 为开集，$f\colon U\to\R^m$ 为光滑函数。它的图像定义为
+\[
+  \Gamma(f)=\operatorname{Graph}(f)
+    =\{(x,y)\in\R^{n+m}\mid x\in U,\ y=f(x)\},
+\]
+并取子空间拓扑。设 $\pi_1\colon\R^n\times\R^m\to\R^n$ 为到第一因子的投影，令 $\varphi\colon\Gamma(f)\to U$ 为 $\pi_1$ 在 $\Gamma(f)$ 上的限制，
+\[
+  \varphi(x,y)=x,\qquad (x,y)\in\Gamma(f).
+\]
+$\varphi$ 是连续映射的限制，因而连续。它有连续的逆映射 $\varphi^{-1}(x)=(x,f(x))$，因而是同胚。所以 $\Gamma(f)$ 是 $n$ 维拓扑流形。
+
+$\Gamma(f)$ 由一张图像坐标卡 $(\Gamma(f),\varphi)$ 覆盖，其中 $\varphi$ 是 $\pi_1$ 的限制，故该图像坐标卡是光滑的。因此，光滑函数的图像是光滑流形。
+\end{statement}

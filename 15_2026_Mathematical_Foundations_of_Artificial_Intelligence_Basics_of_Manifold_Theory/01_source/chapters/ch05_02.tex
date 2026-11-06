@@ -1,0 +1,301 @@
+% PDF p. 239
+\section{高斯–博内定理（紧致、可定向、无边界的曲面）}
+高斯–博内定理是微分几何的一个深刻定理，它把整体几何与局部几何联系起来。
+
+按初等几何，欧氏平面中三角形的内角和为 $\pi$。等价地，三角形的外角和为 $2\pi$（Koch，2005）。设 $\theta_i$（$i=1,2,3$）为内角，$\varnothing_i=\pi-\theta_i$（$i=1,2,3$）为外角。以下公式等价：
+\[
+  (\pi-\theta_1)+(\pi-\theta_2)+(\pi-\theta_3)=2\pi,\qquad
+  \theta_1+\theta_2+\theta_3=\pi.
+\]
+对更多边的图形，外角和的结果仍成立，这类图形的外角和为 $2\pi$。高斯–博内定理将此结果推广到曲面。为简便起见，先考虑平面，但允许边为曲线。总沿逆时针方向走过边界，便能确定如何画出外角。设 $T$ 是沿各边的单位切向量，选取由 $T$ 逆时针旋转
+% PDF p. 240
+$\pi/4$ 度得到的单位法向量 $N$。\translatornote{原书写作“$\pi/4$ 度”。平面内垂直于 $T$ 的单位法向量由 $T$ 逆时针转 $\pi/2$ 弧度得到。} 假设沿边界每一条边的曲率为 $\kappa$。由于 $N$ 已固定，$\kappa$ 可以取正也可以取负。记顶点处的外角为 $\phi$。高斯–博内定理的初步形式为
+\[
+  \sum_{\text{顶点}}\phi+\sum_{\text{边}}\int\kappa=2\pi.
+\]
+
+\begin{statement}{例 5.9}{}
+\textbf{半圆}\par
+半径为 $R$ 的半圆，其两个外角都为 $\pi/2$，上方圆弧的曲率为 $1/R$。所以 $\int\kappa=(1/R)(\pi R)=\pi$，从而 $\pi/2+\pi/2+\pi=2\pi$。
+
+\textbf{圆}\par
+半径为 $R$ 的圆没有外角。$\int\kappa=(1/R)(2\pi R)=2\pi$，所以 $0+2\pi=2\pi$。
+\end{statement}
+
+\subsection{高斯–博内定理}
+设 $M$ 是配有黎曼度量 $g$ 的光滑闭可定向曲面，则
+\[
+  \int_M K\,dA=2\pi\chi(M),
+\]
+其中 $K$ 是高斯曲率，$dA$ 是 $g$ 的面积元素，$\chi(M)$ 是欧拉示性数。
+
+\Subheading{证明}
+证明分四步。
+\begin{enumerate}
+  \item \textbf{局部公式}\quad 对测地三角形 $T\subset M$，
+  \[
+    \iint_T K\,dA+\sum_{i=1}^3\varnothing_i=2\pi,
+    \qquad\text{或}\qquad
+    \iint_T K\,dA=(\theta_1+\theta_2+\theta_3)-\pi.
+  \]
+  \item \textbf{划分并求和}\quad 将 $M$ 细分为许多很小的测地三角形，再将局部公式相加。
+  \item \textbf{统计角度}\quad 内角逐边抵消，剩下
+  \[
+    2\pi\times\text{顶点数}-2\pi\times\text{边数}
+    +2\pi\times\text{面数}=2\pi\chi.
+  \]
+  \item \textbf{取极限}\quad 细化三角剖分时积分不变，最终得到整体结论。
+\end{enumerate}
+
+\Subheading{第 1 步\quad 测地三角形的高斯–博内公式}
+在光滑定向曲面 $(M,g)$ 上，取测地三角形 $T$，外角为 $\varnothing_1,\varnothing_2,\varnothing_3$，内角为 $\theta_i=\pi-\varnothing_i$（$i=1,2,3$）。我们证明
+% PDF p. 241
+\[
+  \iint_T K\,dA+(\varnothing_1+\varnothing_2+\varnothing_3)=2\pi,
+\]
+其中 $K$ 是高斯曲率，$dA$ 是 $g$ 的面积元素。原书将证明指向附录 4A。\translatornote{本章给出测地三角形公式的附录为附录 5A。原书在本处和下一段均写作附录 4A。}
+
+单个测地三角形的局部公式已知（原书所指的附录 4A）：
+\[
+  \iint_T K\,dA=(\theta_1+\theta_2+\theta_3)-\pi.
+\]
+下面给出把局部公式推广到整体的三个步骤。
+
+\Subheading{第 2 步\quad 进行测地三角剖分并求和}
+\begin{itemize}
+  \item \textbf{存在性}
+
+  由于 $M$ 紧致，选取一族足够细的测地正规坐标卡，其开像都是凸的，即任意两点间有唯一的最短测地线，且整条测地线包含在该坐标卡内。
+
+  选取足够小的 $\rho$，以这些坐标卡中直径小于 $\rho$ 的坐标卡构成有限覆盖 $\{U_i\}$。在每个 $U_i$ 中取一点，用最短测地线连接相邻的坐标卡中心。由于坐标卡在全凸集上相交，得到的边是可以光滑衔接的测地线段。
+
+  按此方式得到测地三角剖分
+  \[
+    \mathcal T(\rho)=\{T_1,\ldots,T_{F_\rho}\},\qquad
+    \operatorname{diam}T_k\le\rho.
+  \]
+  记顶点、边、面的数目分别为 $V_\rho,E_\rho,F_\rho$。我们作一份直径较小（$\rho=0.35$）的三角剖分。它把一块抛物面划分为许多近似测地的小三角形 $T_k$，这些三角形的直径（最长边长）不超过所选阈值 $\rho=0.35$。
+  \item \textbf{将局部公式相加}
+
+  对剖分中各面加总局部公式，
+  \[
+    \begin{aligned}
+    \sum_{k=1}^{F_\rho}\iint_{T_k}K\,dA
+      &=\sum_{k=1}^{F_\rho}(\theta_1^{(k)}+\theta_2^{(k)}+\theta_3^{(k)}-\pi)\\
+      &=\sum_{k=1}^{F_\rho}(\theta_1^{(k)}+\theta_2^{(k)}+\theta_3^{(k)})
+         -\pi F_\rho.
+    \end{aligned}
+  \]
+  注意
+  \[
+    \sum_{k=1}^{F_\rho}\iint_{T_k}K\,dA
+       =\iint_{\cup T_k}K\,dA=\iint_M K\,dA.
+  \]
+  因此
+  \begin{equation*}
+    \iint_M K\,dA
+      =\sum_{k=1}^{F_\rho}(\theta_1^{(k)}+\theta_2^{(k)}+\theta_3^{(k)})
+       -\pi F_\rho.
+    \tag{5.21}\label{eq:5.21}
+  \end{equation*}
+  等价地，
+  \[
+    \sum_{k=1}^{F_\rho}(\theta_1^{(k)}+\theta_2^{(k)}+\theta_3^{(k)})
+       =\iint_M K\,dA+\pi F_\rho.
+  \]
+
+% PDF p. 242
+  \item \textbf{统计角度}
+
+  \textbf{内边处的抵消}\quad 每条内边恰由两个三角形共有。一个三角形中的角在相邻三角形中对应相同的余弦，且这两个内角之和为 $\pi$，因为这条边是测地线。因此内角在每条非边界边处两两抵消。\translatornote{此处保留原书的解释。为得到式~\eqref{eq:5.22}，应按顶点加总所有相邻三角形在该顶点的内角。绕该顶点一周所扫过的角为 $2\pi$，无须假定相邻三角形中沿边的两个角互补。}
+
+  \textbf{外角之和为 $2\pi V_\rho$}\quad 抵消后剩下的正是每个顶点周围的外角之和。绕一个顶点走一周，定向切向量转过 $2\pi$，所以所有顶点处的总和为 $2\pi V_\rho$，即
+  \begin{equation*}
+    \sum_{k=1}^{F_\rho}(\theta_1^{(k)}+\theta_2^{(k)}+\theta_3^{(k)})
+       =2\pi V_\rho.
+    \tag{5.22}\label{eq:5.22}
+  \end{equation*}
+  将式~\eqref{eq:5.22} 代入式~\eqref{eq:5.21}，得
+  \begin{equation*}
+    \iint_M K\,dA=2\pi V_\rho-\pi F_\rho.
+    \tag{5.23}\label{eq:5.23}
+  \end{equation*}
+  将右端改写为
+  \begin{equation*}
+    2\pi(V_\rho-E_\rho+F_\rho)+\pi(2E_\rho-3F_\rho).
+    \tag{5.24}\label{eq:5.24}
+  \end{equation*}
+  对闭曲面的测地三角剖分，每个三角形有三条边，每条边恰由两个三角形共有，所以
+  \begin{equation*}
+    3F_\rho=2E_\rho,\qquad\text{因而}\qquad 2E_\rho-3F_\rho=0.
+    \tag{5.25}\label{eq:5.25}
+  \end{equation*}
+  将式~\eqref{eq:5.25} 代入式~\eqref{eq:5.24}，得到
+  \begin{equation*}
+    \iint_M K\,dA=2\pi(V_\rho-E_\rho+F_\rho)=2\pi\chi(M),
+    \tag{5.26}\label{eq:5.26}
+  \end{equation*}
+  其中 $\chi(M)$ 是曲面的欧拉示性数，与特定的三角剖分无关。式~\eqref{eq:5.26} 就是整体高斯–博内公式。
+  \item \textbf{取极限（细化剖分）}
+
+  尽管式~\eqref{eq:5.26} 已经对每个测地三角剖分成立，我们还要说明，用越来越细的剖分替换原剖分不会改变积分项。
+  \begin{enumerate}[label=\arabic*.]
+    \item \textbf{曲率的可积性}\quad $K$ 连续（原文记作 $C^2$），故可积。$\iint_M K\,dA$ 是一个固定的实数，与网格无关。
+    \item \textbf{细化网格}\quad 重心细分（或任何细化）产生新的测地三角剖分 $\mathcal T(\rho')$，其中 $\rho'<\rho$。
+% PDF p. 243
+    数目 $(V,E,F)$ 会改变，但 $V-E+F$ 不变，故每次细化后式~\eqref{eq:5.26} 仍成立。
+    \item \textbf{取极限}\quad 任取序列 $\rho_n\to0$。由于式~\eqref{eq:5.26} 对每个 $n$ 成立且两边均与 $n$ 无关，网格任意细化时该等式在极限中仍成立。这里没有积分收敛问题，因为始终是在 $M$ 上对同一个函数积分。
+  \end{enumerate}
+\end{itemize}
+由此得到整体高斯–博内公式
+\[
+  \iint_M K\,dA=2\pi\chi(M).
+\]
+
+\subsection{推广的高斯–博内公式}
+\subsubsection{动机}
+闭曲面的原版高斯–博内定理表明
+\[
+  \iint_M K\,dA=2\pi\chi(M).
+\]
+但是，一旦切割或修剪曲面，就会引入一条边缘。曲面内部会弯曲，这由内在曲率 $K$ 度量，边缘也会在曲面上弯曲。沿新边界走一圈时，切向箭头可以因两个不同的原因而转动。
+
+沿新边界走一圈时，切向箭头转动可由三个不同的原因引起：内部弯曲、沿边弯曲，以及拐角或接合点。只有这三种转动的和由拓扑决定，是 $2\pi$ 的整数倍。因此，一旦出现边界，推广公式
+\[
+  \int_M K\,dA+\int_{\partial M}k_g\,ds+\sum_j\alpha_j=2\pi\chi(M)
+\]
+是恢复整体拓扑不变量的唯一方式。
+
+\subsubsection{推广的高斯–博内公式}
+设 $(M,g)$ 是定向紧致 $C^2$ 曲面，边界为
+$\partial M=\gamma_1\sqcup\gamma_2\sqcup\cdots\sqcup\gamma_r$。
+记内部的高斯曲率为 $K$，各边界分支的测地曲率（按所选定向带符号）为 $k_g$。若某个边界分支仅分段光滑，记拐角 $P_j$ 处的外角（转角）为 $\alpha_j$。则
+\begin{equation*}
+  \int_M K\,dA+\sum_{i=1}^r\int_{\gamma_i}k_g\,ds
+    +\sum_j\alpha_j=2\pi\chi(M).
+  \tag{5.27}\label{eq:5.27}
+\end{equation*}
+对处处为 $C^1$ 的边界，拐角处转角的和为零。
+
+% PDF p. 244
+\begin{itemize}
+  \item \textbf{证明概要（嘉当标架）}
+  \begin{enumerate}[label=\arabic*.]
+    \item 在 $M$ 上选取标准正交标架 $(e_1,e_2)$。列维-奇维塔联络的 $1$-形式 $\omega$ 满足 $d\omega=K\,dA$。
+    \item 在 $M$ 上应用斯托克斯定理：
+    $\displaystyle\int_M d\omega=\int_{\partial M}\omega$。
+    \item 沿单位切向量为 $T$ 的边界曲线 $\gamma$，$\omega(T)=k_g$。
+    \item 加上拐角处的转角，得到
+    $\displaystyle\int_{\partial M}\omega+\sum_j\alpha_j$。
+    \item 计算标架沿 $\partial M$ 转过 $2\pi$ 的整周数，得到欧拉类，进而得 $2\pi\chi(M)$。
+  \end{enumerate}
+  \item \textbf{常见情形的曲率计算}
+
+  \textbf{平面区域}\quad $K=0$，$k_g=\kappa$（带符号的平面曲率）。
+  \[
+    \int\kappa\,ds+\sum_j\alpha_j=2\pi.
+  \]
+  对简单凸多边形，$\sum_j\alpha_j=2\pi$，从而 $\int\kappa=0$。对光滑若尔当曲线（Jordan curve），总转角为 $2\pi$。
+
+  \textbf{球冠（半径 $R$，极角 $\varphi_0$）}\quad $K=1/R^2$。作为边界的纬线是一个纬圆，不是测地线。现在计算这个纬圆的测地曲率。
+  \begin{itemize}
+    \item \textbf{纬圆 $\varphi=\varphi_0$ 的空间曲率}
+
+    圆 $\gamma(\lambda)=(\sin\varphi_0\cos\lambda,\sin\varphi_0\sin\lambda,\cos\varphi_0)$ 的速率恒为 $\lvert\dot\gamma\rvert=\sin\varphi_0$，二阶导数满足 $\lvert\ddot\gamma\rvert^2=\sin^2\varphi_0$。所以其空间曲率为
+    \[
+      \kappa_{\mathrm{space}}
+        =\frac{\lvert\ddot\gamma\rvert}{\lvert\dot\gamma\rvert^2}
+        =\frac{\sin\varphi_0}{\sin^2\varphi_0}=\frac1{\sin\varphi_0}.
+    \]
+    \item \textbf{法曲率与测地曲率}
+
+    在单位球面上，任意方向的法曲率均为 $\kappa_n=1$。由勾股分解 $\kappa_{\mathrm{space}}^2=\kappa_n^2+\kappa_g^2$，得
+    \[
+      \kappa_g=\sqrt{\kappa_{\mathrm{space}}^2-\kappa_n^2}
+         =\sqrt{\frac1{\sin^2\varphi_0}-1}
+         =\frac{\cos\varphi_0}{\sin\varphi_0}.
+    \]
+    这是纬线的带符号测地曲率。对按逆时针定向的北极球冠，$\kappa_g$ 为正。
+    \item \textbf{边界积分}
+
+    纬圆长 $L=2\pi\sin\varphi_0$，所以
+    \[
+      \int_{\partial M}\kappa_g\,ds=\kappa_gL
+        =\frac{\cos\varphi_0\,2\pi\sin\varphi_0}{\sin\varphi_0}
+        =2\pi\cos\varphi_0.
+    \]
+% PDF p. 245
+    \item \textbf{两项相加}
+
+    回顾 $A=2\pi(1-\cos\varphi_0)$ 和 $K=1$。所以
+    \[
+      \int_M K\,dA=\int_M 1\,dA=A=2\pi(1-\cos\varphi_0).
+    \]
+    两项之和为
+    \begin{equation*}
+      \int_M K\,dA+\int_{\partial M}\kappa_g\,ds
+        =2\pi(1-\cos\varphi_0)+2\pi\cos\varphi_0=2\pi.
+      \tag{5.28}\label{eq:5.28}
+    \end{equation*}
+    球冠在拓扑上为圆盘，$\chi(M)=1$，故恰好满足推广的高斯–博内公式\translatornote{式号 (4.29) 依原书保留。}
+    \begin{equation*}
+      \int_M K\,dA+\int_{\partial M}\kappa_g\,ds=2\pi\chi(M).
+      \tag{4.29}\label{eq:5-gb-4.29}
+    \end{equation*}
+  \end{itemize}
+\end{itemize}
+
+\subsection{陈–高斯–博内定理}
+陈–高斯–博内定理是经典的高斯–博内定理（关于二维流形或曲面）向更高偶数维黎曼流形的一个非平凡推广。
+
+设 $(M^{2n},g)$ 是光滑、紧致、定向且无边界的偶数维黎曼流形。用 $\Omega\in\mathfrak{so}(2n)$ 表示在标准正交标架下写出的列维-奇维塔联络的曲率 $2$-形式。它的普法夫式（Pfaffian）是以下 $2n$-形式\translatornote{式~\eqref{eq:5.30} 依原书排印。通常把反对称符号写作 $\varepsilon_{i_1\cdots i_{2n}}$，对全部重复指标求和，或对所有指标排列显式求和。}
+\begin{equation*}
+  \operatorname{Pf}(\Omega)
+    =\frac{\varepsilon_{i_1}\cdots\varepsilon_{i_{2n}}}{2^n n!}
+      \Omega_{i_1i_2}\wedge\cdots\wedge\Omega_{i_{2n-1}i_{2n}}
+      \quad\bigl(\in\Omega^{2n}(M)\bigr).
+  \tag{5.30}\label{eq:5.30}
+\end{equation*}
+则
+\[
+  \int_M\operatorname{Pf}(\Omega)=(2\pi)^n\chi(M).
+\]
+对 $n=1$，这化为经典的二维高斯–博内公式：
+\[
+  \int_M K\,dA=2\pi\chi(M).
+\]
+
+现在核对推广的高斯–博内公式。\translatornote{以下边界曲率项按原书排印。对半径为 $R$ 的球冠，纬圆的测地曲率应为 $\cos\varphi_0/(R\sin\varphi_0)$。它乘以纬圆长 $2\pi R\sin\varphi_0$，才得到末行的 $2\pi\cos\varphi_0$。}
+\[
+  \begin{aligned}
+   &\int_M K\,dA+\sum_{i=1}^r\int_{\gamma_i}k_g\,ds+\sum_j\alpha_j\\
+   &\qquad=\int_M\frac1{R^2}\,dA+\int_{\partial M}\frac{\cos\varphi_0}{R}\,ds+0\\
+   &\qquad=\frac1{R^2}\int_M dA+\frac{\cos\varphi_0}{R}\int_{\partial M}ds\\
+   &\qquad=\frac{A}{R^2}+\frac{L\cos\varphi_0}{R}
+          =2\pi(1-\cos\varphi_0)+2\pi\cos\varphi_0=2\pi.
+  \end{aligned}
+\]
+
+% PDF p. 246
+\begin{statement}{例 5.10}{单位 $4$ 维球面 $S^4$}
+半径为 $R$ 的标准球面的截面曲率（sectional curvature）处处为 $1/R^2$。对单位球面（$R=1$），在标准正交标架下，曲率张量为
+\[
+  \Omega_{ij}=e_i\wedge e_j.
+\]
+按标准计算可得\translatornote{原式的求和范围保留。四维普法夫式实际由三种配对组成，即 $\Omega_{12}\wedge\Omega_{34}-\Omega_{13}\wedge\Omega_{24}+\Omega_{14}\wedge\Omega_{23}$；它给出式中的系数 $3$。}
+\[
+  \operatorname{Pf}(\Omega)=\frac14
+     \sum_{i<j<k<l}\varepsilon_{ijkl}\Omega_{ij}\wedge\Omega_{kl}
+     =3\,dV_{S^4}.
+\]
+（系数 $3$ 来自指标配对的方式数。）
+
+单位 $4$ 维球面的总体积为 $\operatorname{Vol}(S^4)=8\pi^2/3$。因此
+\[
+  \int_{S^4}\operatorname{Pf}(\Omega)=3\frac{8\pi^2}{3}=8\pi^2.
+\]
+$4$ 维球面的欧拉示性数为 $\chi(S^4)=2$。注意 $(2\pi)^n\chi(S^4)=4\pi^2\times2=8\pi^2$。这验证了
+\[
+  \int_{S^4}\operatorname{Pf}(\Omega)=(2\pi)^2\chi(S^4)=8\pi^2.
+\]
+\end{statement}

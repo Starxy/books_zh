@@ -1,0 +1,113 @@
+% PDF p. 330
+\AppendixSection{6C}{切空间中的协方差算子 \texorpdfstring{$\Sigma$}{Σ}}
+\AppendixHeading{6C1}{在切空间中定义 \texorpdfstring{$\Sigma$}{Σ}}
+设 $\xi(x)$ 为取值于切空间的随机变量，由下式给出
+\begin{equation*}
+  \xi(x)=\log_\mu(x).
+  \tag{6C1}\label{eq:6C1}
+\end{equation*}
+
+% PDF p. 331
+由于 $\mu$ 是弗雷歇均值，可以证明（见附录 6A）%
+\translatornote{原书此处引附录 6A，那里介绍正规坐标和联络。式 \eqref{eq:6C2} 来自弗雷歇函数在内点极小值处的一阶条件，需满足可在均值处对期望求导等正则条件。}%
+\begin{equation*}
+  E[\xi(x)]=0\qquad\text{在 $T_\mu M$ 中。}
+  \tag{6C2}\label{eq:6C2}
+\end{equation*}
+（也就是说，$\mu$ 使分布在切空间中“中心化”。）
+
+定义 $T_\mu M$ 上的协方差算子 $\Sigma$ 为
+\begin{equation*}
+  \Sigma\colon T_\mu M\to T_\mu M,\qquad
+  \Sigma=E[\xi(X)\otimes\xi(X)],
+  \tag{6C3}\label{eq:6C3}
+\end{equation*}
+其中 $\otimes$ 表示切空间中通常的张量积（外积），结果是 $T_\mu M$ 上的线性算子。
+
+具体来说，若 $\{e_1,\dots,e_d\}$ 是 $T_\mu M$ 的一组正交归一基，则可以写成
+\begin{equation*}
+  \xi(X)=\sum_{\alpha=1}^d \xi^\alpha e_\alpha.
+  \tag{6C4}\label{eq:6C4}
+\end{equation*}
+将式 \eqref{eq:6C4} 代入式 \eqref{eq:6C3}，得
+\begin{equation*}
+  \Sigma=E[\xi(X)\otimes\xi(X)]
+     =\sum_{\alpha=1}^d\sum_{\beta=1}^dE[\xi^\alpha\xi^\beta]\,e_\alpha\otimes e_\beta.
+  \tag{6C5}\label{eq:6C5}
+\end{equation*}
+
+\AppendixSubheading{6C1.1}{样本形式}
+若有独立同分布的样本 $X_1,\dots,X_n$，定义样本弗雷歇均值 $\hat\mu_n$ 为
+\[
+  \hat\mu_n=\operatorname*{arg\,min}_{p\in M}\frac1n\sum_{i=1}^nd^2(p,X_i).
+\]
+利用式 \eqref{eq:6C1}，定义
+\begin{equation*}
+  \xi_n(X_i)=\log_{\hat\mu_n}(X_i).
+  \tag{6C6}\label{eq:6C6}
+\end{equation*}
+用式 \eqref{eq:6C3} 和样本公式，得到
+\begin{equation*}
+  \Sigma=E[\xi(X)\otimes\xi(X)]
+    \approx\frac1n\sum_{i=1}^n\xi_n(X_i)\otimes\xi_n(X_i).
+  \tag{6C7}\label{eq:6C7}
+\end{equation*}
+令
+\begin{equation*}
+  \hat\Sigma_n=\frac1n\sum_{i=1}^n\xi_n(X_i)\otimes\xi_n(X_i).
+  \tag{6C8}\label{eq:6C8}
+\end{equation*}
+根据抽样理论，如果样本较大且 $\hat\mu_n$ 收敛到 $\mu$，则 $\hat\Sigma_n$ 近似于 $\Sigma$。%
+\translatornote{式 \eqref{eq:6C8} 的算子位于 $T_{\hat\mu_n}M$，而 $\Sigma$ 位于 $T_\mu M$。比较两者时应通过局部标架或适当的平行移动识别相应切空间。}
+
+\AppendixSubheading{6C1.2}{与中心极限定理的联系}
+在适当的曲率与集中条件下，可以得到一个黎曼中心极限定理。它断言在 $T_\mu M$ 中，%
+\translatornote{式 \eqref{eq:6C3} 定义的是对数向量的协方差。若 $H$ 表示 $p\mapsto\tfrac12 E[d(p,X)^2]$ 在 $\mu$ 处非奇异的黎曼海森算子，样本弗雷歇均值的通常内在极限定理中，极限协方差为 $H^{-1}\Sigma H^{-1}$。例如欧氏情形 $H=I$，才直接得到上式的 $\Sigma$。}%
+\[
+  \sqrt n\,\log_\mu(\hat\mu_n)\xrightarrow{d}N(0,\Sigma).
+\]
+其中 $N(0,\Sigma)$ 是 $d$ 维切空间 $T_\mu M$ 中均值为零的高斯分布。简言之，随机向量 $\log_\mu(\hat\mu_n)$ 经 $\sqrt n$ 缩放后依分布收敛到一个多元正态分布，
+% PDF p. 332
+其协方差算子为 $\Sigma$。这是经典欧氏中心极限定理向流形的自然推广。
+
+\begin{statement}{例 6C.1}{球面 $S^2$ 上的协方差}
+考虑 $S^2\subset\R^3$ 上高度集中在北极 $\mu=(0,0,1)$ 附近的一个分布。切空间 $T_\mu S^2$ 是平面 $\{(x,y,0)\mid x,y\in\R\}$。通过
+\[
+  \xi_i=\log_\mu(X_i),
+\]
+将 $X_i\in S^2$ 映为 $\R^2$ 中的向量 $\xi_i$（把切平面与 $\R^2$ 等同）。协方差 $\Sigma$ 随后由这些切向量确定。
+
+按以下模型模拟 20 个点。考虑 $S^2\subset\R^3$ 上高度集中在北极 $\mu=(0,0,1)$ 附近的一个分布。切空间 $T_\mu S^2$ 是平面 $\{(x,y,0)\mid x,y\in\R\}$。通过
+\[
+  \xi_i=\log_\mu(X_i),
+\]
+将 $X_i\in S^2$ 映为 $\R^2$ 中的向量 $\xi_i$。请给出 $\hat\mu_n$、$\xi_i$（$i=1,\dots,20$）、$\Sigma$ 和 $\hat\Sigma_n$，其中
+\[
+  \Sigma=E[\xi\otimes\xi],\qquad
+  \hat\Sigma_n=\frac1n\sum_{i=1}^n\xi_i\otimes\xi_i.
+\]
+结果如下。
+
+\begin{enumerate}
+\item \textbf{样本弗雷歇均值（外在近似）。}
+\[
+  \hat\mu_n\approx(0.0072,0.0386,0.9992).
+\]
+这一点非常接近北极 $(0,0,1)$，反映了数据在北极附近的集中。
+\item \textbf{北极切空间 $T_\mu S^2$ 中 $\sqrt n\,\log_\mu(\hat\mu_n)$ 的计算结果。}
+\[
+  \sqrt{20}\,\log_\mu(\hat\mu_n)
+   =\begin{bmatrix}0.03242\\0.17256\end{bmatrix}.
+\]
+\item \textbf{切向量 $\xi_i=\log_\mu(X_i)$。}
+这 20 个切向量各自对应样本点在北极处的对数映射。
+\item \textbf{经验协方差矩阵 $\hat\Sigma_n$。}%
+\translatornote{两非对角元按原书保留。由例中给出的外积和公式计算的协方差矩阵应为对称矩阵。}%
+\[
+  \hat\Sigma_n=\begin{bmatrix}
+     0.014863&0.005962\\
+     0.005926&0.012805
+  \end{bmatrix}.
+\]
+\end{enumerate}
+\end{statement}

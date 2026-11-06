@@ -1,0 +1,42 @@
+% PDF pp. 376–384
+\chapter*{索引}
+\addcontentsline{toc}{chapter}{索引}
+\markboth{索引}{}
+
+以下页码是英文原版的印刷页码。\textbf{粗体}页码指表格，\textit{斜体}页码指图。词项保留原索引的字母分组和层级。下表列出两版章首页，可点击中文章名跳到相应章节。
+
+\begin{center}
+\begin{tabular}{lrrr}
+  \toprule
+  中文章节 & 原 PDF 页序 & 原版印刷页 & 中文页\\
+  \midrule
+  \hyperref[ch:01]{第 1 章\quad 光滑流形} & 18  & 1   & \pageref*{ch:01}\\
+  \hyperref[ch:02]{第 2 章\quad 黎曼几何} & 58  & 41  & \pageref*{ch:02}\\
+  \hyperref[ch:03]{第 3 章\quad 微分形式} & 99  & 82  & \pageref*{ch:03}\\
+  \hyperref[ch:04]{第 4 章\quad 李导数}   & 164 & 147 & \pageref*{ch:04}\\
+  \hyperref[ch:05]{第 5 章\quad 黎曼几何进阶专题}
+                                      & 223 & 206 & \pageref*{ch:05}\\
+  \hyperref[ch:06]{第 6 章\quad 流形上的统计理论}
+                                      & 272 & 255 & \pageref*{ch:06}\\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\newcommand{\IndexLetter}[1]{%
+  \par\addvspace{.55\baselineskip}\needspace{2\baselineskip}%
+  \noindent\textbf{#1}\par\nobreak\smallskip
+}
+\newcommand{\IndexEntry}[3]{%
+  \par\begingroup
+  \setlength{\leftskip}{#1em}%
+  \noindent\hangindent=1em\hangafter=1
+  #2\if\relax\detokenize{#3}\relax\else，#3\fi\par
+  \endgroup
+}
+\setlength{\columnsep}{17bp}
+\begin{multicols}{2}
+  \small
+  \raggedcolumns
+  \raggedright
+  \input{index_terms}
+\end{multicols}

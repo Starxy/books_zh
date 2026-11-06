@@ -1,0 +1,129 @@
+% PDF p. 253
+\subsubsection{求解雅可比方程的算法}
+雅可比方程是沿测地线 $\gamma(t)$ 的二阶线性常微分方程。下面给出一种求解方法。
+
+\Subheading{第 1 步\quad 选取标架}
+\textbf{平行移动的标架}\quad 沿 $\gamma(t)$ 选取标准正交标架 $\{E_1(t),\ldots,E_n(t)\}$，即对每个 $t$，向量 $E_i(t)\in T_{\gamma(t)}M$ 满足 $\langle E_i(t),E_j(t)\rangle=\delta_{ij}$。假设它们沿 $\gamma$ 平行移动，满足
+\begin{equation*}
+  \nabla_{\dot\gamma}E_i=0,
+  \tag{5.51}\label{eq:5.51}
+\end{equation*}
+其中
+\[
+  (\nabla_{\dot\gamma}E_i)^k
+    =\frac{dE_i^k}{dt}+\Gamma^k_{lm}(\gamma(t))\dot\gamma^l E_i^m(t).
+\]
+在这样的标架下，联络系数沿 $\gamma$ 消失，协变导数 $\nabla_{\dot\gamma}$ 化为关于 $t$ 的普通导数。
+
+\Subheading{第 2 步\quad 用标架表示 $J(t)$}
+将雅可比场写为
+\begin{equation*}
+  J(t)=\sum_{i=1}^n J^i(t)E_i(t).
+  \tag{5.52}\label{eq:5.52}
+\end{equation*}
+用协变导数的莱布尼茨法则及式~\eqref{eq:5.51}，有
+\[
+  \begin{aligned}
+    \nabla_{\dot\gamma}(J^i(t)E_i(t))
+       &=\dot J^i(t)E_i(t)+J^i(t)\nabla_{\dot\gamma}E_i(t)\\
+       &=\dot J^i(t)E_i(t)+0=\dot J^i(t)E_i(t).
+  \end{aligned}
+\]
+用相同的论证再求一次导数，得到
+\begin{equation*}
+  \nabla_{\dot\gamma}\nabla_{\dot\gamma}\bigl(J^i(t)E_i(t)\bigr)
+     =\ddot J^i(t)E_i(t).
+  \tag{5.53}\label{eq:5.53}
+\end{equation*}
+% PDF p. 254
+由协变导数的线性以及式~\eqref{eq:5.51} 和式~\eqref{eq:5.53}，得到
+\begin{equation*}
+  \nabla_{\dot\gamma}\nabla_{\dot\gamma}J(t)
+     =\sum_{i=1}^n\ddot J^i(t)E_i(t).
+  \tag{5.54}\label{eq:5.54}
+\end{equation*}
+
+\Subheading{第 3 步\quad 写出曲率项的各分量}
+在标架中表示曲率项 $R(J,\dot\gamma)\dot\gamma$。用分量表示，如果
+\[
+  \dot\gamma(t)=\sum_{i=1}^n\dot\gamma^i(t)E_i(t),
+\]
+就定义曲率算子
+\begin{equation*}
+  K(J):=R(J,\dot\gamma)\dot\gamma.
+  \tag{5.55}\label{eq:5.55}
+\end{equation*}
+下面将曲率项写成该标架下的分量。回顾黎曼曲率张量由它在基向量上的作用给出，原书此处标为 5A1.3。\translatornote{此处应指附录 5B 的第 5B1.3 节。}
+\[
+  R(E_p,E_q)E_r=\sum_{i=1}^nR^i_{pqr}E_i.
+\]
+由各变元的线性，
+\begin{equation*}
+  \begin{aligned}
+    R(J,\dot\gamma)\dot\gamma
+    &=R\left(\sum_kJ^kE_k,\sum_j\dot\gamma^jE_j\right)
+           \sum_l\dot\gamma^lE_l\\
+    &=\sum_{k,j,l}J^k\dot\gamma^j\dot\gamma^lR(E_k,E_j)E_l.
+  \end{aligned}
+  \tag{5.56}\label{eq:5.56}
+\end{equation*}
+代入曲率张量的分量表达式
+\begin{equation*}
+  R(E_k,E_j)E_l=\sum_{i=1}^n R^i_{kjl}E_i.
+  \tag{5.57}\label{eq:5.57}
+\end{equation*}
+将式~\eqref{eq:5.57} 代入式~\eqref{eq:5.56}，得
+\begin{equation*}
+  R(J,\dot\gamma)\dot\gamma
+    =\sum_{i=1}^n\left(\sum_{k,j,l}R^i_{kjl}J^k\dot\gamma^j\dot\gamma^l\right)E_i.
+  \tag{5.58}\label{eq:5.58}
+\end{equation*}
+所以向量 $K(J)=R(J,\dot\gamma)\dot\gamma$ 的第 $i$ 个分量为
+\begin{equation*}
+  [K(J)]^i=\sum_{k,j,l}R^i_{kjl}J^k\dot\gamma^j\dot\gamma^l.
+  \tag{5.59}\label{eq:5.59}
+\end{equation*}
+在平行标架中，这些分量是由沿 $\gamma$ 的曲率确定的 $t$ 的函数。
+
+\Subheading{第 4 步\quad 写出各分量的常微分方程}
+把式 (5.5.8) 与式~\eqref{eq:5.59} 代入式~\eqref{eq:5.50}，得到二阶线性常微分方程组。\translatornote{原书写作“(5.5.8)”。这里的二阶导数项来自式~\eqref{eq:5.54}。}
+\begin{equation*}
+  \ddot J^i(t)+\sum_{j=1}^nK^i_j(t)J^j(t)=0,
+  \tag{5.60}\label{eq:5.60}
+\end{equation*}
+% PDF p. 255
+其中“曲率矩阵” $K^i_j(t)$ 定义为\translatornote{依原书保留右端的指标次序。由式~\eqref{eq:5.59} 收集 $J^j$ 的系数时，右端应写 $R^i_{jkl}\dot\gamma^k(t)\dot\gamma^l(t)$。}
+\begin{equation*}
+  K^i_j(t)=\sum_{k,l=1}^n R^i_{kjl}\dot\gamma^k(t)\dot\gamma^l(t).
+  \tag{5.61}\label{eq:5.61}
+\end{equation*}
+
+\Subheading{第 5 步\quad 施加初始条件}
+为求解常微分方程~\eqref{eq:5.60}，施加以下初始条件。初始位移 $J(0)=J_0$，初始导数（速度变分）$J'(0)=(\nabla_{\dot\gamma}J)(0)=J_1$。
+
+\Subheading{第 6 步\quad 求解方程组}
+可用常规解析方法和数值方法（如龙格–库塔法（Runge–Kutta method））求解常微分方程~\eqref{eq:5.60}。
+
+\textbf{矩阵指数法}\quad 令
+\[
+  Y(t)=\begin{bmatrix}J(t)\\\dot J(t)\end{bmatrix},
+\]
+把二阶常微分方程改写成一阶方程组
+\[
+  \frac{d}{dt}Y(t)=
+  \begin{bmatrix}0&I\\-K(t)&0\end{bmatrix}Y(t).
+\]
+于是可用时间有序矩阵指数表示其解；若系数矩阵恒定，则用普通矩阵指数。$J(t)$ 的增长或衰减速率可以定量衡量相邻测地线分离或会聚的快慢。
+
+\subsection{雅可比方程的应用}
+雅可比方程是黎曼几何的基本工具，描述相邻测地线如何彼此偏离。下面概述其作用和主要应用。
+\begin{itemize}
+  \item \textbf{测地偏离}\quad 雅可比方程用数学形式表达两条测地线之间的距离如何沿曲线变化。这种“测地偏离”反映流形的曲率。
+  \item \textbf{理解曲率}\quad 雅可比场表示测地线间的无穷小分离。雅可比方程把它的二阶导数与黎曼曲率张量联系起来，帮助理解空间几何。这对曲率的局部和整体分析都很重要。
+  \item \textbf{共轭点与整体几何}\quad 雅可比方程的解可以在测地线上的共轭点处为零。这样的点是否存在及其重数，对于理解流形的
+% PDF p. 256
+  拓扑与几何很重要，可见于莫尔斯指标定理（Morse index theorem）和高斯–博内定理等结果。
+  \item \textbf{物理应用}\quad 在广义相对论中，雅可比方程（或测地偏离方程）解释潮汐力，也就是引力场如何使相邻的自由下落粒子产生相对加速度。这有助于理解强引力场中物质的行为。
+  \item \textbf{变分问题的稳定性与最优性}\quad 由于测地线是流形上能量泛函的临界点，雅可比方程可用于分析这些测地线的稳定性，并了解路径空间的结构。它可用于验证一条测地线是否在局部使距离（或更一般的能量）最小。
+\end{itemize}
+总之，雅可比方程的重要性在于它把流形的内在曲率与测地线的行为联系起来。其应用涵盖微分几何和拓扑中的纯数学研究，以及物理学中的实际问题，尤其是广义相对论中引力现象的建模。

@@ -1,0 +1,375 @@
+% PDF p. 144
+\section{流形上的散度定理}
+\label{sec:3.9}
+\subsection{引言}
+散度定理是向量微积分和微分几何中的基本结果。它把欧氏空间中的经典散度定理推广到可微流形，将一个向量场的散度在流形上的积分与向量场本身在流形边界上的积分联系起来。这一定理在物理学、工程和数学中有深远影响，在涉及守恒律和跨边界通量的领域尤其如此。
+
+以下将讨论流形上的散度定理，给出所需的数学背景、详细证明以及说明其应用的示例。
+
+\subsection{数学背景}
+\subsubsection{流形上的向量场}
+流形 $M$ 上的向量场 $X$ 给每个点 $P\in M$ 指定一个属于该点切空间 $T_p M$ 的切向量 $X_p$。
+
+\paragraph{定向}
+\begin{itemize}
+\item \textbf{有向流形。} 在流形上选定一致的定向，即有一致的方式区分“正向”与“负向”。
+\item \textbf{体积形式（volume form）$\omega$。} $M$ 上处处非零的 $n$-形式。它给出在流形上积分的方法，并诱导一个定向。
+\end{itemize}
+
+% PDF p. 145
+\subsubsection{欧氏空间和流形上散度的定义}
+\paragraph{欧氏空间中的散度}
+\begin{statement}{定义 3.12}{欧氏空间中向量场的散度}
+在欧氏空间 $\R^n$ 中，向量场 $F=(F_1,F_2,\dots,F_n)$ 的散度是衡量给定点处源或汇的强度的标量函数。它定义为 $F$ 各分量相应偏导数之和
+\begin{equation*}
+  \divergence F=\nabla\cdot F=\sum_{i=1}^n\frac{\partial F_i}{\partial x_i}.
+  \tag{3.9}\label{eq:3.9}
+\end{equation*}
+\noindent\textbf{说明}
+\begin{itemize}
+\item \textbf{物理解释。} 点 $x$ 处的散度表示物质从 $x$ 周围无穷小体积净流出（散度为正）或净流入（散度为负）的速率。
+\item \textbf{数学解释。} 它量化了向量场在给定点处表现为源或汇的程度。
+\end{itemize}
+\end{statement}
+
+\paragraph{流形上的散度}
+\Subheading{3.9.2.2.2.1\quad 定义}
+\begin{statement}{定义 3.13}{流形上向量场的散度}
+在光滑 $n$ 维黎曼流形 $(M,g)$ 上，向量场 $X$ 的散度是借助黎曼度量 $g$ 定义的标量函数。$X$ 的散度为
+\begin{equation*}
+  \divergence_g X=\frac{1}{\sqrt{\det g}}\,
+      \partial_i\!\left(\sqrt{\det g}\,X^i\right).
+  \tag{3.10}\label{eq:3.10}
+\end{equation*}
+其中
+\begin{itemize}
+\item $X^i$ 是局部坐标 $(x^1,x^2,\dots,x^n)$ 下 $X$ 的分量。
+\item $\partial_i$ 表示 $\dfrac{\partial}{\partial x^i}$。
+\item $\det g$ 是度量张量 $g_{ij}$ 在该坐标卡中的行列式。
+\end{itemize}
+也可以用列维-奇维塔联络 $\nabla$ 定义散度
+\[
+  \divergence X=\nabla_iX^i=\partial_iX^i+\Gamma^i_{ik}X^k,
+\]
+其中
+\begin{itemize}
+\item $\nabla_iX^i$ 是 $X$ 的协变导数对指标 $i$ 的缩并。
+\item $\Gamma^i_{ik}$ 是第二类克里斯托费尔符号。
+\end{itemize}
+\end{statement}
+
+% PDF p. 146
+\Subheading{3.9.2.2.2.2\quad 说明}
+\begin{itemize}
+\item \textbf{黎曼度量 $g$。} 给出在 $M$ 上测量长度与角度的方法。
+\item \textbf{体积形式。} 散度与向量场 $X$ 如何使 $g$ 诱导的体积形式膨胀或收缩有关。
+\item \textbf{坐标不变性。} 散度的定义不依赖于坐标的选择。
+\end{itemize}
+
+\Subheading{3.9.2.2.2.3\quad 用体积形式推导}
+给定 $M$ 上的体积形式 $\omega$，$X$ 的散度是满足以下等式的唯一函数 $\divergence X$
+\begin{equation*}
+  \mathcal L_X\omega=(\divergence)\omega,
+  \tag{3.11}\label{eq:3.11}
+\end{equation*}
+其中 $\mathcal L_X\omega$ 是体积形式 $\omega$ 沿 $X$ 的李导数（见第 4 章）。
+
+\Subheading{3.9.2.2.2.4\quad 例子}
+\begin{statement}{例 3.35}{$\R^3$ 中的散度}
+给定 $\R^3$ 中的向量场 $F=(F_x,F_y,F_z)$，
+\[
+  \divergence F=\frac{\partial F_x}{\partial x}+\frac{\partial F_y}{\partial y}
+  +\frac{\partial F_z}{\partial z}.
+\]
+\end{statement}
+
+\begin{statement}{例 3.36}{径向向量场}
+考虑 $F(x,y,z)=\dfrac{r}{\lVert r\rVert^3}$，其中 $r=(x,y,z)$。除原点外，该场的散度处处为零。注意
+\begin{gather*}
+  \frac{\partial F}{\partial x}=\frac{x^2+y^2+z^2-3x^2}{\lVert r\rVert^5},
+  \qquad
+  \frac{\partial F}{\partial y}=\frac{x^2+y^2+z^2-3y^2}{\lVert r\rVert^5},\\
+  \frac{\partial F}{\partial z}=\frac{x^2+y^2+z^2-3z^2}{\lVert r\rVert^5}.
+\end{gather*}
+因此得到%
+\translatornote{原书两式把分量 $F_x,F_y,F_z$ 都简记为 $F$。该场在原点无定义。原书在 3.8.3.2.3 节已经使用过例 3.36 的编号，此处保留原号。}%
+\[
+  \divergence F=\frac{\partial F}{\partial x}+\frac{\partial F}{\partial y}
+    +\frac{\partial F}{\partial z}
+   =\frac{3(x^2+y^2+z^2)-3(x^2+y^2+z^2)}{\lVert r\rVert^5}=0.
+\]
+\end{statement}
+
+\begin{statement}{例 3.37}{二维流形（曲面）上的散度}
+设 $M$ 为嵌入 $\R^3$ 的曲面，度量为 $g$。在局部坐标 $(u,v)$ 下，
+\begin{equation*}
+  \divergence X=\frac{1}{\sqrt{\det g}}
+    \left(\frac{\partial}{\partial u}\bigl(\sqrt{\det g}\,X^u\bigr)
+    +\frac{\partial}{\partial v}\bigl(\sqrt{\det g}\,X^v\bigr)\right).
+  \tag{3.12}\label{eq:3.12}
+\end{equation*}
+\end{statement}
+
+\begin{statement}{例 3.38}{球面坐标中的散度}
+对于 $\R^3$ 中用球面坐标表示的向量场 $F=(F_r,F_\theta,F_\varnothing)$，
+\[
+  \divergence F=\frac{1}{r^2}\frac{\partial}{\partial r}(r^2F_r)
+  +\frac{1}{r\sin\theta}\frac{\partial}{\partial\theta}(\sin\theta F_\theta)
+  +\frac{1}{r\sin\theta}\frac{\partial F_\varnothing}{\partial\varnothing}.
+\]
+% PDF p. 147
+下面逐步推导这个公式。
+
+\noindent\textbf{步骤 1。黎曼散度的定义。}\par
+设 $d$ 维流形 $(M,g)$ 的度量张量为 $g=(g_{ij})$，体积形式为
+\[
+  dV=\sqrt{|g|}\,du^1\wedge\cdots\wedge du^d,\qquad |g|=\det(g_{ij}),
+\]
+则向量场 $V=V^i\partial_{u^i}$ 的散度为
+\[
+  \divergence V=\frac{1}{\sqrt{|g|}}\frac{\partial}{\partial u^i}
+  \left(\sqrt{|g|}V^i\right).
+\]
+
+\noindent\textbf{步骤 2。$\R^3$ 中球面坐标下的度量。}\par
+坐标 $(u^1,u^2,u^3)$ 的范围为 $r\geq0$、$\theta\in[0,\pi]$、$\varphi\in[0,2\pi)$。位置向量为
+\[
+  x=(r\sin\theta\cos\varphi,r\sin\theta\sin\varphi,r\cos\theta).
+\]
+计算基向量对应的导数
+\begin{align*}
+  \partial_r x&=(\sin\theta\cos\varphi,\sin\theta\sin\varphi,\cos\theta),
+    &\lVert\partial_r x\rVert^2&=1,\\
+  \partial_\theta x&=(r\cos\theta\cos\varphi,r\cos\theta\sin\varphi,-r\sin\theta),
+    &\lVert\partial_\theta x\rVert^2&=r^2,\\
+  \partial_\varphi x&=(-r\sin\theta\sin\varphi,r\sin\theta\cos\varphi,0),
+    &\lVert\partial_\varphi x\rVert^2&=r^2\sin^2\theta.
+\end{align*}
+交叉项因正交而为零，因此度量矩阵为对角矩阵
+\[
+  g_{rr}=1,\qquad g_{\theta\theta}=r^2,\qquad g_{\varphi\varphi}=r^2\sin^2\theta.
+\]
+于是
+\[
+  |g|=r^4\sin^2\theta,\qquad\sqrt{|g|}=r^2\sin\theta.
+\]
+
+\noindent\textbf{步骤 3。向量场的逆变分量。}\par
+写成
+\[
+  V=F_re_r+F_\theta e_\theta+F_\varphi e_\varphi.
+\]
+正交归一基向量与坐标基向量的关系为
+\[
+  e_r=\partial_r,\qquad e_\theta=\frac1r\partial_\theta,\qquad
+  e_\varphi=\frac1{r\sin\theta}\partial_\varphi.
+\]
+因此逆变坐标分量为%
+\translatornote{末项原书漏写分母中的 $r$。由前一式得到 $V^\varphi=F_\varphi/(r\sin\theta)$，下文代入时使用了含 $r$ 的结果。}%
+\[
+  V^r=F_r,\qquad V^\theta=\frac{F_\theta}{r},\qquad
+  V^\varphi=\frac{F_\varphi}{\sin\theta}.
+\]
+
+\noindent\textbf{步骤 4。球面坐标下的标准散度公式。}\par
+把以上结果代入 $\divergence V=\dfrac{1}{\sqrt{|g|}}\dfrac{\partial}{\partial u^i}
+  \left(\sqrt{|g|}V^i\right)$，得
+% PDF p. 148
+\begin{align*}
+  \divergence V
+  &=\frac{1}{r^2\sin\theta}
+  \left[\partial_r(r^2\sin\theta V^r)+\partial_\theta(r^2\sin\theta V^\theta)
+            +\partial_\varphi(r^2\sin\theta V^\varphi)\right],\\
+  &=\frac{1}{r^2\sin\theta}
+  \left[\partial_r(r^2\sin\theta F^r)+\partial_\theta(r\sin\theta F^\theta)
+            +\partial_\varphi(r F^\varphi)\right],\\
+  &=\frac1{r^2}\frac{\partial}{\partial r}(r^2F^r)
+    +\frac{1}{r\sin\theta}\frac{\partial}{\partial\theta}(F^\theta\sin\theta)
+    +\frac{1}{r\sin\theta}\frac{\partial F^\varphi}{\partial\varphi}.
+\end{align*}
+\end{statement}
+
+\Subheading{3.9.2.2.2.5\quad 两种定义之间的关系}
+\begin{itemize}
+\item 在具有标准度量的欧氏空间 $\R^n$ 中，流形上散度的一般定义化为熟知的散度公式。
+\item 流形上的散度通过度量 $g$ 纳入了 $M$ 的几何结构，并保证散度是 $M$ 上有明确定义的标量函数。
+\end{itemize}
+
+\Subheading{3.9.2.2.2.6\quad 应用}
+\begin{itemize}
+\item \textbf{流体动力学。} 速度场的散度指示流体流动中的源和汇。
+\item \textbf{电磁学。} 高斯定律（Gauss's law）将电场的散度与电荷密度联系起来。
+\item \textbf{微分几何。} 理解流形上的散度，是定义拉普拉斯–贝尔特拉米算子等概念和研究几何性质的基础。
+\end{itemize}
+
+\subsection{黎曼流形上的高斯–格林（散度）定理}
+设 $(M^n,g)$ 为 $n$ 维有向黎曼流形，$\Omega\subset M$ 是紧区域，边界 $\partial\Omega$ 是取诱导定向的光滑 $(n-1)$ 维流形。对 $\Omega$ 上的每个光滑向量场 $X$，有
+\[
+  \int_\Omega\divergence X\,dV_g
+   =\int_{\partial\Omega}\langle X,v\rangle\,dS_g,
+\]
+其中
+\begin{itemize}
+\item $dV_g$ 是 $M$ 上的黎曼体积形式。
+\item $dS_g$ 是 $\partial\Omega$ 上的诱导曲面测度。
+\item $v$ 是 $\partial\Omega$ 的外向单位法向量。
+\item $\langle X,v\rangle$ 是由 $g$ 给出的内积。
+\item 在局部坐标下，$\divergence X=\nabla_iX^i$。
+\end{itemize}
+这是下列经典欧氏公式在流形上的版本
+\[
+  \int_\Omega\nabla\cdot X\,dV=\int_{\partial\Omega}X\cdot n\,dS.
+\]
+附录 3C 汇总了计算方法。
+
+% PDF p. 149
+\section{黎曼流形上的拉普拉斯–贝尔特拉米算子}
+\label{sec:3.10}
+\subsection{从欧氏 \texorpdfstring{$\Delta$}{Δ} 到拉普拉斯–贝尔特拉米算子}
+\subsubsection{无坐标定义}
+对光滑函数 $u\colon M\to\R$，
+\[
+  \Delta_gu\coloneqq\divergence_g(\nabla_gu).
+\]
+\begin{itemize}
+\item \textbf{梯度。} $\nabla_g u$ 是唯一对所有向量 $X$ 满足 $g(\nabla_gu,x)=du(X)$ 的向量场。这里 $du$ 是 $u$ 的微分，是一个 1-形式，即切空间 $T_pM$ 上的线性泛函。在 $p\in M$ 处，它对切向量 $X_p$ 的作用为 $du_p(X_p)=X_p(u)$，即 $u$ 沿 $X$ 的方向导数。$\nabla_g u$ 是 $u$ 关于度量 $g$ 的梯度向量场，定义为
+\[
+  g_p((\nabla_g u)_p,X_p)=du_p(X_p),
+\]
+其中 $g_p((\nabla_g u)_p,X_p)$ 是两个向量 $\nabla_g u$ 与 $X$ 通过 $g$ 得到的内积。这一定义由里斯表示定理（Riesz representation theorem）导出。
+
+\textbf{坐标公式（用于建立直观认识）}
+\begin{equation*}
+  (\nabla_gu)^i=g^{ij}\partial_{x^j}u,\qquad
+  \nabla_gu=\sum_i\left(\sum_jg^{ij}\partial_{x^j}u\right)\partial_{x^i}.
+  \tag{3.13}\label{eq:3.13}
+\end{equation*}
+\item \textbf{散度。} $\divergence_g$ 是协变导数的迹，也可用式 \eqref{eq:3.10} 定义。
+\end{itemize}
+
+\subsubsection{局部坐标表达式}
+选取局部坐标 $x=(x^1,\dots,x^n)$，记度量张量为 $g_{ij}$，其逆矩阵的分量为 $g^{ij}$。则
+\begin{equation*}
+  \Delta_gu=\frac{1}{\sqrt{|g|}}\frac{\partial}{\partial x^i}
+    \left(\sqrt{|g|}g^{ij}\partial_{x^j}u\right),\qquad
+  |g|=\det(g_{ij}).
+  \tag{3.14}\label{eq:3.14}
+\end{equation*}
+当 $g_{ij}=\delta_{ij}$ 时，它化为经典欧氏拉普拉斯算子 $\sum_i\partial^2_{x^ix^i}$。
+
+\subsection{\texorpdfstring{$M$}{M} 上的拉普拉斯方程}
+\subsubsection{强形式（无边界）}
+\begin{equation*}
+  \Delta_g u=f\qquad\text{在 $M$ 上。}
+  \tag{3.15}\label{eq:3.15}
+\end{equation*}
+
+\subsubsection{边值问题}
+若 $M$ 具有边界 $\partial M$，外向单位法向量为 $v$，则有
+% PDF p. 150
+\begin{itemize}
+\item \textbf{狄利克雷条件（Dirichlet）。} $\left.u\right|_{\partial M}=h$。
+\item \textbf{诺伊曼条件（Neumann）。} $\partial_v^gu=g(\nabla_gu,v)=h$。
+\end{itemize}
+变分陈述如下。求 $u\in H^1(M)$，使对所有检验函数 $v$，%
+\translatornote{按本节定义的 $\Delta_g=\divergence_g\nabla_g$，由分部积分，式 \eqref{eq:3.16} 的正号对应强方程 $-\Delta_gu=f$。若沿用式 \eqref{eq:3.15} 的 $\Delta_gu=f$，体积分前应为负号。}%
+\begin{equation*}
+  \int_M g(\nabla_gu,\nabla v)\,dV_g
+    =\int_M fv\,dV_g+\int_{\partial M}hv\,dS_g.
+  \tag{3.16}\label{eq:3.16}
+\end{equation*}
+
+\subsection{\texorpdfstring{$M$}{M} 上的热方程}
+给定 $M$ 上的初值 $u_0$，
+\begin{equation*}
+  \partial_tu(t,x)=\Delta_gu(t,x),\qquad u(0,x)=u_0(x).
+  \tag{3.17}\label{eq:3.17}
+\end{equation*}
+\textbf{基本解}（热核，heat kernel）$K_t(x,y)$ 满足
+\[
+  \partial_tK_t=\Delta_{g,x}K_t,\qquad \lim_{t\downarrow0}K_t(x,\cdot)=\delta_x.
+\]
+于是 $u(t,x)=\displaystyle\int_M K_t(x,y)u_0(y)\,dV_g(y)$。
+
+\noindent\textbf{布朗运动解释}\par
+若 $(B_t)$ 是 $M$ 上的布朗运动（生成元为 $\tfrac12\Delta_g$），则 $u(t,x)=E_x[u_0(B_t)]$。%
+\translatornote{生成元为 $\tfrac12\Delta_g$ 时，该期望解的是 $\partial_tu=\tfrac12\Delta_gu$。式 \eqref{eq:3.17} 可用 $E_x[u_0(B_{2t})]$ 表示，或改用生成元为 $\Delta_g$ 的过程。}
+
+\section{双曲空间上的拉普拉斯–贝尔特拉米算子}
+\label{sec:3.11}
+双曲空间的几何性质使它能够高保真地嵌入树状和图状结构的数据。下面介绍双曲空间三种最常见的坐标表示，并逐步推导每种度量对应的拉普拉斯–贝尔特拉米算子
+\begin{equation*}
+  \Delta_g f=\frac{1}{\sqrt{|g|}}\,\partial_{x^i}
+       \left(\sqrt{|g|}g^{ij}\partial_{x^j}f\right).
+  \tag{3.18}\label{eq:3.18}
+\end{equation*}
+
+\subsection{上半空间模型 \texorpdfstring{$H^n_{\mathrm{UHP}}$}{Hⁿ UHP}}
+\begin{enumerate}
+\item \textbf{度量。}
+\[
+  ds^2=\frac{1}{z^2}(dx_1^2+\cdots+dx_{n-1}^2+dz^2),\qquad z>0.
+\]
+所以 $g_{ij}=z^{-2}\delta_{ij}$，行列式 $g=z^{-2n}$，逆矩阵分量 $g^{ij}=z^2\delta^{ij}$。
+% PDF p. 151
+\item \textbf{代入。}
+将这些量代入式 \eqref{eq:3.18} 得
+\begin{align*}
+  \Delta_g f
+   &=z^n\partial_{x^i}(z^{2-n}\partial_{x^i} f),\\
+   &=z^2\sum_{i=1}^{n-1}\partial_{x_ix_i}f+z^2\partial_{zz}f-(n-2)z\partial_z f.
+\end{align*}
+于是
+\begin{equation*}
+ \Delta_{\mathrm{UHP}} f
+    =z^2(\partial_{x_1x_1}+\cdots+\partial_{x_{n-1}x_{n-1}}+\partial_{zz})f
+     -(n-2)z\partial_z f.
+ \tag{3.19}\label{eq:3.19}
+\end{equation*}
+当 $n=2$ 时，$\Delta_{\mathrm{UHP}} f$ 化为 $\Delta f=z^2(f_{xx}+f_{zz})$。
+\end{enumerate}
+
+\subsection{庞加莱圆盘模型 \texorpdfstring{$H^n_{\mathrm{disk}}$}{Hⁿ disk}}
+（记 $r^2=x_1^2+\cdots+x_n^2<1$。）
+\begin{enumerate}
+\item \textbf{度量。}
+\[
+  ds^2=\frac{4}{(1-r^2)^2}(dx_1^2+\cdots+dx_n^2),\qquad |x|<1.
+\]
+所以 $g_{ij}=\dfrac{4}{(1-r^2)^2}\delta_{ij}$，$|g|=\left(\dfrac{4}{(1-r^2)^2}\right)^n$，$g^{ij}=\dfrac{(1-r^2)^2}{4}\delta^{ij}$。
+\item \textbf{拉普拉斯算子。}
+注意
+\[
+  \sqrt{|g|}\,g^{ij}=\frac{2^{n-2}}{(1-r^2)^{n-2}}\delta^{ij}.
+\]
+将这些与度量有关的量代入式 \eqref{eq:3.18}，得到这组坐标下的拉普拉斯–贝尔特拉米算子
+\begin{equation*}
+\begin{aligned}
+  \Delta_{\mathrm{Disk}}f
+   &=\frac{(1-r^2)^n}{2^n}\partial_i
+      \left(\frac{2^{n-2}}{(1-r^2)^{n-2}}\partial_i f\right),\\
+   &=\frac{(1-r^2)^2}{4}\sum_{i=1}^n\partial_{x_ix_i}f
+     +\frac{(n-2)(1-r^2)}2\sum_{i=1}^nx_i\partial_{x_i}f.
+\end{aligned}
+\tag{3.20}\label{eq:3.20}
+\end{equation*}
+若 $n=2$，第二项消失，得到%
+\translatornote{原书此式右端括号后漏写了受算子作用的 $f$。}%
+\[
+  \Delta_{\mathrm{Disk}}f=\frac{(1-r^2)^2}{4}(\partial_x^2+\partial_y^2).
+\]
+\end{enumerate}
+
+% PDF p. 152
+\subsection{双曲拉普拉斯算子的测地极坐标形式}
+在 $H^n$ 中，记 $r$ 为到选定原点的测地距离，$\omega\in S^{n-1}$ 为角变量，则
+\[
+  ds^2=dr^2+\sinh^2r\,d\omega^2,\qquad
+  |g|=\sinh^{2(n-1)}r\,|g_{S^{n-1}}|.
+\]
+类似地，利用这些度量信息可得
+\[
+  \Delta f=\frac{\partial^2 f}{\partial r^2}
+  +(n-1)\coth r\,\frac{\partial f}{\partial r}
+  +\frac{1}{\sinh^2r}\,\Delta_{S^{n-1}}f.
+\]

@@ -1,0 +1,343 @@
+% PDF p. 164
+\section{引言}
+李导数是度量标量变量或向量如何沿动力系统状态向量场所确定的流发生变化的重要工具。我们用李导数评价建模为流的思维过程，对科研路径排序，并找出创新点或药物治疗靶点。“思维图”（Graph of Thought）这一概念把抽象的认知过程表示为连续的流。用李导数研究这些流，可以更好地理解思维和观念可能如何随时间演变。
+
+李导数植根于微分几何这一更广泛的框架，见 Lee（2012）、Spivak（2008）、Tu（2011）、Spivak（1995）以及 Kobayashi 和 Nomizu（1969）。微分几何研究可微流形，即欧氏空间的推广。可微流形提供了描述和分析高维复杂几何形状的方法，是对连续变换和动力系统建模的重要工具。19 世纪挪威数学家索菲斯·李（Sophus Lie）开创了连续变换群理论，这些群现称李群（Lie group）。他的工作为现代微分几何和数学结构中的对称性研究奠定了基础。李导数由此发展而来，用来度量张量场如何沿向量场生成的流发生变化。
+
+本章说明怎样用李导数为动力系统建模并分析系统，尤其是在人工智能的语境中。本章讨论的应用包括评估社交网络中的信息流、研究皮层片层中神经波的传播，以及优化药物剂量，使基因表达模式恢复正常。这些例子说明李导数可用于刻画不同科学领域的动态关系。
+
+\section{拉回}
+拉回是定义李导数的主要工具。李导数度量张量场沿向量场的流的变化。为了计算这种变化，需要比较流形上不同点处定义的张量场。但是，张量场是在各个点上取值的，不同点上的张量属于不同的切空间，没有可直接比较它们的先验典范方式。比较不同点的张量，必须有一种一致的搬运方法。在李导数的语境中，拉回就起到这个作用。换言之，拉回提供了一种沿向量场的流一致地“搬运”张量场的方式，使它们可以比较。
+
+% PDF p. 165
+\subsection{拉回的定义}
+\begin{statement}{定义 4.1}{拉回}
+$\omega$ 经 $\Phi_t$ 的\textbf{拉回}记为 $\Phi_t^*\omega$，是 $M$ 上新的 $k$ 次微分形式。在各点 $x\in M$ 处定义为
+\[
+  \begin{aligned}
+    &(\Phi_t^*\omega)_x(v_1,v_2,\ldots,v_k)\\
+    &\qquad=\omega_{\Phi_t(x)}
+       \bigl(D\Phi_t(x)\cdot v_1,D\Phi_t(x)\cdot v_2,\ldots,D\Phi_t(x)\cdot v_k\bigr),
+  \end{aligned}
+\]
+其中
+\begin{itemize}
+  \item $v_1,v_2,\ldots,v_k$ 是点 $x$ 处切空间 $T_xM$ 中的切向量。
+  \item $D\Phi_t(x)\colon T_xM\to T_{\Phi_t(x)}M$ 是 $\Phi_t$ 在 $x$ 处的微分（推前），将 $x$ 处的切向量映到 $\Phi_t(x)$ 处的切向量。
+  \item $\omega_{\Phi_t(x)}$ 是 $\omega$ 在点 $\Phi_t(x)$ 处的值。
+\end{itemize}
+
+从实质上说，拉回 $\Phi_t^*\omega$ 使我们能通过映射 $\Phi_t$ 将微分形式 $\omega$ 从点 $\Phi_t(x)$ 拉回点 $x$（图~\ref{fig:4.1}）。图~\ref{fig:4.1} 展示了映射 $\Phi_t$ 在流形 $M$ 上一点 $x$ 处的微分，即推前。
+\begin{figure}[htbp]
+  \centering
+  \input{assets/ch04/fig04_01}
+  \FigureCaption{4.1}{$\Phi_t$ 在 $x$ 处的推前示意图。}
+\end{figure}
+
+% PDF p. 166
+\begin{itemize}
+  \item \textbf{点 $x$} 用一个圆点标出，表示流形上的位置。
+  \item \textbf{点 $\Phi_t(x)$} 也用圆点标出，是 $x$ 在映射 $\Phi_t$ 下的像。可以把它看成沿 $M$ 上向量场生成的流移动后的位置。
+  \item 分别画出 $x$ 处的\textbf{切向量 $v_1$ 和 $v_2$}。它们代表切空间 $T_xM$ 中的方向。
+  \item 图中画出 $\Phi_t(x)$ 处的\textbf{推前向量 $D\Phi_t(x)\cdot v_1$ 和 $D\Phi_t(x)\cdot v_2$}。它们是 $v_1,v_2$ 经微分（推前）$D\Phi_t(x)$ 映入切空间 $T_{\Phi_t(x)}M$ 后得到的像。此图展示了 $D\Phi_t(x)$ 怎样把切向量从 $T_xM$ 映到 $T_{\Phi_t(x)}M$，以及方向如何随 $\Phi_t(x)$ 的变化而变换。
+\end{itemize}
+设
+\[
+  D\Phi_t(x)=\left(\frac{\partial\Phi_t(x)}{\partial x_1},
+  \frac{\partial\Phi_t(x)}{\partial x_2},\ldots,
+  \frac{\partial\Phi_t(x)}{\partial x_n}\right),
+  \quad v_1=(v_1^1,v_1^2,\ldots,v_1^n).
+\]
+那么
+\[
+  D\Phi_t(x)\cdot v_1=\sum_{i=1}^n v_1^i\frac{\partial\Phi_t(x)}{\partial x_i}.
+\]
+\end{statement}
+
+\begin{statement}{例 4.1}{}
+设 $M=\R^2$，$V$ 为向右的常向量场，例如 $V=\partial/\partial x$。计算流 $\Phi_t$ 在点 $(x,y)$ 处的拉回 $\Phi_t^*$。
+\begin{enumerate}
+  \item \textbf{向量场及其流}
+
+  向量场 $V$
+  \begin{itemize}
+    \item \textbf{定义。}$V=\dfrac{\partial}{\partial x}$。
+    \item \textbf{解释。}在 $\R^2$ 的每一点，$V$ 都指向 $x$ 的正方向，且大小恒定。
+  \end{itemize}
+
+  $V$ 生成的流 $\Phi_t$ 沿 $V$ 的积分曲线移动各点。由于 $V$ 是常向量场，积分曲线为平行于 $x$ 轴的直线。
+
+  \textbf{流的微分方程}
+  \[
+    \frac{dx}{dt}=1,\qquad\frac{dy}{dt}=0.
+  \]
+
+  \textbf{解}
+  \[
+    x(t)=x_0+t,\qquad y(t)=y_0.
+  \]
+
+  \textbf{流映射}
+  \[
+    \Phi_t(x,y)=(x+t,y).
+  \]
+
+  % PDF p. 167
+  \item \textbf{计算微分（推前）$D\Phi_t$}
+
+  点 $(x,y)$ 处的微分 $D\Phi_t$ 是流映射 $\Phi_t$ 的雅可比矩阵
+  \[
+    D\Phi_t=\begin{pmatrix}
+      \dfrac{\partial(x+t)}{\partial x}&\dfrac{\partial(x+t)}{\partial y}\\[5pt]
+      \dfrac{\partial y}{\partial x}&\dfrac{\partial y}{\partial y}
+    \end{pmatrix}
+    =\begin{pmatrix}1&0\\0&1\end{pmatrix}.
+  \]
+  \textbf{解释}
+  \begin{itemize}
+    \item $D\Phi_t$ 为单位矩阵。
+    \item 流 $\Phi_t$ 保持切空间中的向量，既不拉伸也不旋转这些向量。
+  \end{itemize}
+  \item \textbf{计算拉回 $\Phi_t^*$}
+
+  拉回 $\Phi_t^*$ 把微分形式或更一般的张量场从 $\Phi_t$ 的像拉回到 $M$。
+\end{enumerate}
+\end{statement}
+
+\subsection{微分 1-形式的拉回}
+设 $\omega$ 是 $\R^2$ 上的微分 1-形式
+\[
+  \omega=a(x',y')\,dx'+b(x',y')\,dy',
+\]
+其中 $(x',y')=(x+t,y)$。
+
+\begin{statement}{定义 4.2}{微分 1-形式的拉回}
+\[
+  \Phi_t^*\omega=\omega\circ D\Phi_t.
+\]
+因为 $D\Phi_t$ 是恒等映射，上式简化为
+\[
+  \Phi_t^*\omega=a(x+t,y)\,dx+b(x+t,y)\,dy.
+\]
+\end{statement}
+
+\subsubsection{\texorpdfstring{点 $(x,y)$ 处的拉回}{点 (x,y) 处的拉回}}
+在具体的点 $(x,y)$，拉回 $\Phi_t^*$ 分两步进行。
+\begin{enumerate}
+  \item 在 $(x+t,y)$ 处\textbf{计算 $\omega$ 的系数}。
+  \item 用 $(x,y)$ 处的 $dx,dy$ \textbf{表示结果}。
+\end{enumerate}
+
+\textbf{显式计算}
+\begin{itemize}
+  \item 对于 1-形式 $\omega$，其拉回为
+  \[
+    (\Phi_t^*\omega)_{(x,y)}=\omega_{(x+t,y)}.
+  \]
+  \item 因为 $D\Phi_t$ 是恒等映射，所以 $dx'=dx$ 且 $dy'=dy$。
+\end{itemize}
+
+% PDF p. 168
+\subsubsection{计算实例}
+通过一个具体例子说明。令
+\[
+  \omega=(x'+y')\,dx'+(x'y')\,dy'.
+\]
+计算 $(x,y)$ 处的拉回 $\Phi_t^*\omega$。
+\begin{enumerate}
+  \item 在 $(x+t,y)$ 处计算系数。
+  \[
+    \begin{aligned}
+      a(x',y')&=(x'+y')=(x+t)+y,\\
+      b(x',y')&=(x'y')=(x+t)y.
+    \end{aligned}
+  \]
+  \item 用 $dx,dy$ 表示。
+  \[
+    \Phi_t^*\omega=[(x+t)+y]\,dx+[(x+t)y]\,dy.
+  \]
+  因此在点 $(x,y)$，
+  \[
+    (\Phi_t^*\omega)_{(x,y)}=[(x+t)+y]\,dx+[(x+t)y]\,dy.
+  \]
+\end{enumerate}
+
+\subsubsection{理解结果}
+\begin{itemize}
+  \item \textbf{拉回的作用。}它沿流将 $\omega$ 的系数向后平移时间 $t$。流在 $x$ 方向上向前移动 $t$ 个单位，因此拉回将信息向后移动 $t$ 个单位。
+  \item \textbf{几何解释。}拉回把形式从 $(x+t,y)$ “带回” $(x,y)$，使我们可以\textbf{比较}不同点处的微分形式。
+\end{itemize}
+
+\subsection{\texorpdfstring{计算拉回 $f^*\omega$ 的一般算法}{计算拉回 f*ω 的一般算法}}
+为了计算微分形式 $\omega$ 在光滑映射 $f\colon M\to N$ 下的拉回，可以使用下面的算法。设 $\omega$ 为 $N$ 上的 $k$-形式，要求 $M$ 上的拉回 $f^*\omega$。算法分五步。
+
+\Subheading{步骤 1 \quad 写出目标空间 $N$ 上的形式 $\omega$}
+\textbf{确定 $\omega$ 是 $N$ 上的 $k$-形式。}用 $N$ 的局部坐标表示 $\omega$。例如，若 $\omega$ 是 $N$ 上用坐标 $(u,v)$ 表示的 2-形式，可以形如
+\[
+  \omega=g(u,v)\,du\wedge dv.
+\]
+
+\Subheading{步骤 2 \quad 表示映射 $f$ 及其对坐标的作用}
+用坐标写出映射 $f\colon M\to N$。设 $M$ 的坐标为 $(x,y)$，$N$ 的坐标为 $(u,v)$。用 $x,y$ 表示 $u,v$。例如，若 $f(x,y)=f(u(x,y),v(x,y))$，则\translatornote{原书在目标坐标对之外又写了 $f$。表示 $f$ 的两个坐标分量时，应写 $f(x,y)=(u(x,y),v(x,y))$。}
+\[
+  u=u(x,y),\qquad v=v(x,y).
+\]
+
+% PDF p. 169
+\Subheading{步骤 3 \quad 计算映射 $f$ 的微分 $df$}
+\textbf{计算映射 $f$ 的微分 $df$}，亦称 $f$ 的\textbf{雅可比矩阵}。这样便得到用 $dx,dy$ 表示 $du,dv$ 的表达式。具体来说，计算偏导数并写成
+\[
+  \begin{aligned}
+    du&=\frac{\partial u}{\partial x}\,dx+\frac{\partial u}{\partial y}\,dy,\\
+    dv&=\frac{\partial v}{\partial x}\,dx+\frac{\partial v}{\partial y}\,dy.
+  \end{aligned}
+\]
+在微分形式 $\omega$ 中，用这些表达式代替 $du$ 和 $dv$。
+
+\Subheading{步骤 4 \quad 代入并用拉回后的坐标展开 $\omega$}
+用步骤 3 中的表达式重写 $\omega$。把 $du$ 和 $dv$ 的表达式代入 $\omega$，把 $\omega$ 改写成以 $dx$ 和 $dy$ 表示的微分形式，这就是 $M$ 上的拉回 $f^*$。
+
+\Subheading{步骤 5 \quad 化简表达式}
+如有可能，化简所得形式。代入以后，展开楔积并化简各项。所得的拉回 $f^*\omega$ 是 $M$ 上用 $M$ 的坐标微分表示的微分形式，其中可出现 $dx,dy$ 等。
+
+\begin{statement}{例 4.2}{1-形式的拉回}
+把上述方法应用于一个具体例子。设
+\begin{itemize}
+  \item $M=\R^2$，坐标为 $(x,y)$。
+  \item $N=\R^2$，坐标为 $(u,v)$。
+  \item 映射 $f\colon\R^2\to\R^2$ 定义为
+  \[
+    u=x^2,\qquad v=y+x.
+  \]
+  \item $N$ 上的 1-形式 $\omega=v\,du$。
+\end{itemize}
+
+\textbf{逐步求解}
+\begin{enumerate}
+  \item \textbf{用 $u,v$ 表示 $\omega$。}
+  \[
+    \omega=v\,du.
+  \]
+  \item \textbf{用 $x,y$ 表示 $u,v$。}
+  \[
+    u=x^2,\qquad v=y+x.
+  \]
+  \item \textbf{用 $dx,dy$ 表示 $du,dv$。}
+
+  求得微分
+  \[
+    du=\frac{\partial u}{\partial x}\,dx+\frac{\partial u}{\partial y}\,dy=2x\,dx.
+  \]
+  % PDF p. 170
+  类似地，
+  \[
+    dv=\frac{\partial v}{\partial x}\,dx+\frac{\partial v}{\partial y}\,dy=dx+dy.
+  \]
+  \item \textbf{用 $du$ 关于 $dx,dy$ 的表达式重写 $\omega$。}
+
+  把 $v=y+x$ 和 $du=2x\,dx$ 代入 $\omega$，
+  \[
+    \omega=(y+x)(2x\,dx)=2x(y+x)\,dx.
+  \]
+  \item \textbf{结果。}$M$ 上的拉回 $f^*\omega$ 为
+  \[
+    f^*\omega=2x(y+x)\,dx.
+  \]
+\end{enumerate}
+\end{statement}
+
+\subsection{\texorpdfstring{流 $\varnothing_t$ 对张量场 $T$ 的拉回 $\varnothing_t^*T$ 的一般定义}{流对张量场的拉回的一般定义}}
+设 $M$ 是光滑流形，$X$ 是 $M$ 上的光滑向量场，$\varnothing_t$ 是 $X$ 生成的流。设 $T_pM$ 是点 $p\in M$ 处的切空间，$T_p^*M$ 是点 $p$ 处的余切空间。令 $T$ 是 $M$ 上的 $(k,l)$ 型张量场，其中 $k$ 是切向量的个数，$l$ 是协向量（covector，即线性泛函）的个数。
+
+\subsubsection{\texorpdfstring{$\varnothing_t$ 的拉回记为 $\varnothing_t^*$，在每个 $p\in M$ 处定义同为 $(k,l)$ 型的张量场}{流的拉回定义同型张量场}}
+对任意 $k$ 个向量 $v_1,\ldots,v_k\in T_pM$ 和 $l$ 个协向量 $\omega_1,\ldots,\omega_l$，$p$ 处的拉回张量 $\varnothing_t^*$ 的作用为
+\[
+  \begin{aligned}
+    &(\varnothing_t^*T)_p(v_1,\ldots,v_k;\omega_1,\ldots,\omega_l)\\
+    &\quad=T_{\varnothing_t(p)}\bigl(d\varnothing_t(p)v_1,\ldots,d\varnothing_t(p)v_k;\\
+    &\hspace{9em}(d\varnothing_t(p)^{-1})^*\omega_1,\ldots,
+               (d\varnothing_t(p)^{-1})^*\omega_l\bigr).
+  \end{aligned}
+\]
+其中
+\begin{itemize}
+  \item $d\varnothing_t(p)$ 是流 $\varnothing_t$ 在点 $p$ 处的\textbf{微分}，也称推前。它将 $p$ 处的切向量映到 $\varnothing_t(p)$ 处的切向量，即
+  $d\varnothing_t(p)\colon T_pM\to T_{\varnothing_t(p)}M$。
+  \item $(d\varnothing_t(p)^{-1})^*$ 是逆微分的\textbf{拉回}（转置），把 $p$ 处的协向量映到 $\varnothing_t(p)$ 处的协向量，即
+  $(d\varnothing_t(p)^{-1})^*\colon T_p^*M\to T_{\varnothing_t(p)}^*M$。
+\end{itemize}
+
+\subsubsection{解释}
+\begin{itemize}
+  \item \textbf{向量的变换。}用微分 $d\varnothing_t(p)$ 把 $p$ 处的每个向量 $v_i$ 推前到 $\varnothing_t(p)$。
+  \item \textbf{协向量的变换。}用 $(d\varnothing_t(p)^{-1})^*$ 拉回，将 $p$ 处的每个协向量 $\omega_j$ 搬运到 $\varnothing_t(p)$。该映射是 $d\varnothing_t(p)$ 的逆的对偶映射。
+\end{itemize}
+
+\textbf{直观理解。}拉回 $\varnothing_t^*T$ 实质上沿流 $\varnothing_t$ 把张量场 $T$ 的作用从点 $\varnothing_t(p)$ “搬回”点 $p$。与恰当的微分作复合，能保证映射保持张量的性质。
+
+% PDF p. 171
+\textbf{性质}
+\begin{enumerate}
+  \item \textbf{保持类型。}拉回张量 $\varnothing_t^*T$ 与原张量 $T$ 均为 $(k,l)$ 型。
+  \item \textbf{线性。}拉回运算关于张量场 $T$ 是线性的，对它所作用的每个向量和协向量也是线性的。
+  \item \textbf{与张量运算相容。}拉回与张量的加法、数乘、张量积及缩并可交换。
+\end{enumerate}
+
+\textbf{图示。}图~\ref{fig:4.2} 展示了向量场 $T$ 在流 $\varnothing_t$ 下的拉回 $\varnothing_t^*T$。图中有以下各项。
+\begin{figure}[!htb]
+  \centering
+  \input{assets/ch04/fig04_02}
+  \FigureCaption{4.2}{向量场 $T$ 在流 $\varnothing_t$ 下的拉回 $\varnothing_t^*T$。}
+\end{figure}
+
+% PDF p. 172
+\begin{enumerate}
+  \item \textbf{点 $p$。}初始点，图中在此处画出 $T(p)$ 和拉回后的向量场。
+  \item \textbf{点 $\varnothing_t(p)$。}$p$ 沿流 $\varnothing_t$ 移动后的位置，在此处计算向量场 $T(\varnothing_t(p))$。
+  \item \textbf{箭头 $T(p)$。}原向量场在 $p$ 处的取值。
+  \item \textbf{箭头 $T(\varnothing_t(p))$。}向量场 $T$ 在流经点 $\varnothing_t(p)$ 处的取值。
+  \item \textbf{箭头 $\varnothing_t^*T(p)$。}向量场 $T$ 拉回到点 $p$ 的结果，展示 $T$ 在流下如何变换。
+\end{enumerate}
+此图突出显示了原张量、沿流移动所得的点和拉回运算之间的关系。
+
+\subsubsection{特殊情形}
+\begin{itemize}
+  \item \textbf{函数（标量）。}若 $T$ 是光滑函数 $f\colon M\to\R$，即 $(0,0)$ 型张量，则拉回为
+  \[
+    (\varnothing_t^*f)(p)=f(\varnothing_t(p)).
+  \]
+  \item \textbf{1-形式（协向量）。}对协向量场 $\omega$（$(0,1)$ 型），拉回 $\varnothing_t^*$ 在 $p$ 处对向量 $v\in T_pM$ 的作用如下。\translatornote{本段型别沿用原书的写法，即先数协向量自变量，后数向量自变量。第 4.2.4 节开头对 $(k,l)$ 的说明采用了相反次序。}
+  \[
+    (\varnothing_t^*\omega)_p(v)
+       =\omega_{\varnothing_t(p)}(d\varnothing_t(p)v).
+  \]
+  \needspace{5\baselineskip}
+  \item \textbf{向量场。}对向量场 $Y$（$(1,0)$ 型），它在 $p$ 处的拉回 $\varnothing_t^*Y$ 为
+  \[
+    (\varnothing_t^*Y)_p=d\varnothing_t(p)^{-1}Y_{\varnothing_t(p)}\in T_pM.
+  \]
+  这里利用切映射 $d\varnothing_t(p)\colon T_pM\to T_{\varnothing_t(p)}M$ 的逆，把向量带回 $T_pM$。
+\end{itemize}
+
+\textbf{坐标表示。}在局部坐标 $x^i$ 中，
+\[
+  (\varnothing_t^*Y)^i(x)=
+    \frac{\partial x^i}{\partial y^j}(\varnothing_t(x))Y^j(\varnothing_t(x)).
+\]
+
+\begin{statement}{例 4.3}{}
+令 $M=\R^2$，$\varnothing_t(x,y)=(e^tx,e^ty)$ 为径向伸缩，$Y=y\partial_x-x\partial_y$ 为旋转向量场。于是 $d\varnothing_t=e^t I$，因而 $(d\varnothing_t)^{-1}=e^{-t}I$。由上式可知
+\[
+  (\varnothing_t^*Y)_{(x,y)}
+    =e^{-t}I[e^ty\partial_x-e^tx\partial_y]
+    =y\partial_x-x\partial_y=Y_{(x,y)}.
+\]
+
+% PDF p. 173
+\begin{figure}[!htb]
+  \centering
+  \input{assets/ch04/fig04_03}
+  \FigureCaption{4.3}{向量场 $Y$ 在流 $\varnothing_t$ 下的拉回示意图。}
+\end{figure}
+因此，旋转向量场在此拉回下保持不变。这符合径向伸缩与旋转可交换的直观认识。图~\ref{fig:4.3} 展示了向量场 $Y$ 在流 $\varnothing_t$ 下的拉回。\translatornote{图~\ref{fig:4.3} 按原图保留 $p=(1,1)$ 与流经点 $(2,0)$。这两点不满足本例的径向伸缩关系，图可用来区分初始点处的拉回向量和流经点处的向量。}
+\end{statement}

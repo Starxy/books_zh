@@ -1,0 +1,29 @@
+\begin{tikzpicture}
+\begin{axis}[
+  width=.72\linewidth,height=.48\linewidth,
+  axis lines=left,xmin=-11,xmax=11,ymin=-5,ymax=105,
+  xtick={-10,-7.5,-5,-2.5,0,2.5,5,7.5,10},
+  ytick={0,20,40,60,80,100},
+  tick label style={font=\scriptsize},label style={font=\small},
+  xlabel={$x$ 轴},ylabel={$y$ 轴},
+  grid=major,major grid style={black!12,dotted},
+  legend pos=south west,legend style={font=\small},
+  clip=false
+]
+  \draw[dashed,black!55] (axis cs:0,-5)--(axis cs:0,105);
+  \draw[dashed,black!55] (axis cs:-11,0)--(axis cs:11,0);
+  \addplot[blue!65!black,thick,domain=-10:10,samples=81]{x^2};
+  \addlegendentry{$y=x^2$}
+  \draw[green!60!black,line width=1.4pt]
+    (axis cs:2.24,-7.3)--(axis cs:11.9,104);
+  \fill[red!80!black] (axis cs:5.75,33.06) circle (1.5pt)
+      node[right,inner sep=2pt] {$x$};
+  \node[green!60!black,anchor=west] at (axis cs:9.22,69.5) {$v$};
+  \node[anchor=west,font=\small] at (axis cs:7.85,42)
+    {$\gamma(0)=x,\ \gamma'(0)=v$};
+  \draw[orange!95!black,very thick,-{Stealth}]
+    (axis cs:10.6,85.5)--(axis cs:9.46,89.5);
+  \node[anchor=west,align=left,font=\small\bfseries] at (axis cs:10.65,85)
+    {把一点映回\\流形。};
+\end{axis}
+\end{tikzpicture}
