@@ -1,0 +1,73 @@
+
+% <<<PDFPAGE 34>>>
+\chapter{大模型推理中的并行}
+
+\section{为什么需要并行}
+
+一个有 4050 亿参数的模型采用 BF16 时，仅权重就需要 810~GB 显存。即使是显存最大的单张 GPU（配备 80~GB HBM 的 H100 SXM），也装不下这个模型。要部署前沿规模的模型，必须采用并行。
+
+\section{张量并行}
+
+张量并行（Shoeybi 等，2019，Megatron-LM）将单个权重矩阵切分到多个 GPU 上。以线性层 \(\mathbf{Y}=\mathbf{X}\mathbf{W}\) 为例。
+
+\textbf{列并行（column parallelism）}沿列切分 \(\mathbf{W}\)，得到 \([\mathbf{W}_1\mid\mathbf{W}_2]\)。每个 GPU 独立计算 \(\mathbf{Y}_i=\mathbf{X}\mathbf{W}_i\)，再用一次全收集（\texttt{AllGather}）集合操作拼接各部分结果。
+
+\textbf{行并行（row parallelism）}沿行切分 \(\mathbf{W}\)。每个 GPU 计算部分和，再用一次全归约（\texttt{AllReduce}）合并结果。
+
+在多层感知机（Multilayer Perceptron，MLP）块中，第一层采用列并行、第二层采用行并行，则每个 Transformer 层的这一块只需一次全归约。经 NVLink 通信的开销较小，经 PCIe 或 InfiniBand 通信的开销则较大。
+
+\textbf{扩展效率。}张量并行可以高效扩展至注意力头的数量。例如，具有 8 个 KV 头的模型可以用 8 张 GPU。再增加 GPU，有些 GPU 上就没有相应注意力头的任务。原文指出，通信开销随张量并行度按平方增长，实际部署因此通常局限在一台以 NVLink 互连 8 张 GPU 的节点上。
+
+\section{流水线并行}
+
+流水线并行（pipeline parallelism）将 Transformer 的不同层分配给不同 GPU。例如，GPU~0 存放第 1–10 层，GPU~1 存放第 11–20 层，以此类推。数据沿流水线传递。GPU~0 算出激活值并传给 GPU~1，GPU~1 计算后再传给 GPU~2，如此继续。
+
+主要难题是\textbf{流水线气泡（pipeline bubble）}。后续阶段的 GPU 必须等待前面阶段算出激活值。微批处理（micro-batching）可以减少气泡占比。流水线深度为 \(p\) 时，未拆分微批的气泡占比约为 \((p-1)/p\)，拆成 \(m\) 个微批后约为 \(\frac{p-1}{m+p-1}\)。
+
+流水线并行的通信开销较小，只需在阶段之间传递激活值，省去全归约。因此，它能跨较低带宽的 InfiniBand 节点扩展，适合参数超过 1000 亿的超大模型。
+
+\section{混合专家模型推理}
+
+Mixtral、DeepSeek-V2 和 Grok-1 等 MoE 模型用一组 \(E\) 个专家网络替换稠密 FFN 层。路由器为每个词元选择得分最高的 \(K\) 个专家，计算
+\[
+  \mathbf{y}=\sum_{k\in\mathrm{Top\text{-}K}}g_k\cdot\mathrm{Expert}_k(\mathbf{x}).
+\]
+
+% <<<PDFPAGE 35>>>
+MoE 模型参数总量大，但\textbf{每个词元激活的参数量}较小。Mixtral \(8\times\)7B 共有 470 亿参数，每个词元只激活其中 130 亿。这样能减少每个词元的计算量、加快推理，但也给部署带来困难。
+
+\begin{itemize}
+  \item \textbf{专家并行（expert parallelism）。}每张 GPU 驻留部分专家，通过全互换（\texttt{AllToAll}）集合操作将词元路由到不同 GPU。
+  \item \textbf{专家负载不均衡。}一些专家可能收到许多词元，另一些只收到很少，导致各 GPU 负载不均衡。
+  \item \textbf{专家卸载（expert offloading）。}在超大 MoE 模型中，可将专家卸载到 CPU 内存或 NVMe 存储，需要时再加载。
+\end{itemize}
+
+\begin{interview}
+\question{1}{请解释 Transformer 的 MLP 块如何采用张量并行。需要在哪些阶段执行哪些集合通信操作？}
+以标准 MLP 块 \(\mathbf{Y}=\mathrm{GeLU}(\mathbf{X}\mathbf{W}_1)\mathbf{W}_2\) 为例，设在 \(N\) 张 GPU 上进行张量并行。（1）\textbf{第一层采用列并行。}沿列切分 \(\mathbf{W}_1\)，每张 GPU 持有 \([\mathbf{W}_1]_{:,i:j}\)，独立计算 \(\mathbf{H}=\mathrm{GeLU}(\mathbf{X}\mathbf{W}_1)\) 的一个分片。这一步无须通信。（2）\textbf{第二层采用行并行。}沿行切分 \(\mathbf{W}_2\)，其切分方式与 \(\mathbf{H}\) 的列切分对应。每张 GPU 计算部分和 \(\mathbf{Y}_i=\mathbf{H}_i\mathbf{W}_{2,i}\)，然后在全部 \(N\) 张 GPU 之间执行一次 \texttt{AllReduce}，将各部分和合并为完整的 \(\mathbf{Y}\)。总计每个 MLP 块需要一次全归约，采用相同结构的注意力块也需要一次。每层全归约的通信量为 \(2\times\text{批大小}\times\text{序列长度}\times d_{\mathrm{model}}\)。在 NVLink 上这一操作很快，在 PCIe 上则可能成为时延的主要来源。
+
+\question{2}{在什么情况下，你会选择张量并行而非流水线并行来做推理？}
+在以下情况下，我会选\textbf{张量并行（TP）}。（1）模型能装进同一节点内以 NVLink 互连的 GPU。TP 频繁执行全归约，需要较高带宽。（2）压低时延至关重要。采用 TP 时，每层的计算时间随 GPU 数量成比例缩短，因为每张 GPU 只承担该层 \(1/N\) 的计算量。（3）模型有许多注意力头，可以均分给各张 GPU。
+
+在以下情况下，我会选\textbf{流水线并行（PP）}。（1）模型大到无法装入单个节点。PP 只需在层之间的切分处传递激活值，因而可以使用较慢的节点间 InfiniBand。（2）吞吐量比时延更重要。PP 会引入流水线气泡带来的时延，但能获得较高的批处理吞吐量。（3）MoE 模型需要专家并行，专家可以自然地映射到流水线阶段。实际的生产系统会组合使用两者（三维并行，3D parallelism），节点内用 TP，节点间用 PP。
+
+\question{3}{请解释 MoE 模型的专家路由机制。它给推理服务带来哪些难题？}
+MoE 模型用 \(E\) 个专家网络和一个路由器替换各 FFN 层。专家路由（expert routing）通常采用可学习的线性投影和 softmax，计算每个词元的路由权重 \(g=\mathrm{softmax}(\mathbf{x}\mathbf{W}_r)\)。它选取得分最高的 \(K\) 个专家（通常 \(K=2\)），再对各专家的输出加权求和。推理服务面临三类难题。
+
+（1）\textbf{动态路由（dynamic routing）。}哪个专家处理哪个词元随输入而变，因此难以均衡负载。
+% <<<PDFPAGE 36>>>
+同一批内，某些专家收到的词元数可能是其他专家的 10 倍，造成专家塌缩（expert collapse）或负载不均衡。
+
+（2）\textbf{专家并行通信。}分布式部署必须用 \texttt{AllToAll} 将词元发往对应专家所在的 GPU。这一通信操作可能限制吞吐量。（3）\textbf{内存占用。}即使每个词元只激活 2 个专家，也必须加载全部 \(E\) 个专家的权重。可以缓存专家权重，例如预加载最可能访问的专家，以缓解这一问题。
+
+\question{4}{流水线气泡占比怎样影响流水线并行效率？如何降低它？}
+当流水线并行采用 \(p\) 个阶段并逐个处理请求时，最后一个阶段处理请求期间，前 \(p-1\) 个阶段都处于空闲状态，这段空闲就是气泡。气泡占比为 \((p-1)/p\)。例如，\(p=8\) 时，\(7/8\) 的 GPU 时间被浪费。可以采用\textbf{微批处理}，将一个批次分成 \(m\) 个微批并依次送入流水线。此时气泡占比为 \((p-1)/(m+p-1)\)。若 \(p=8\)、\(m=32\)，气泡占比为 \(7/39\approx18\%\)。
+
+还有三种做法。（1）\textbf{1F1B 调度}交替执行前向传播与反向传播。（2）\textbf{交错流水线（interleaved pipelines）}（Narayanan 等）为每张 GPU 分配多段不连续的网络层，以增加通信为代价减少气泡。（3）在只有前向传播的纯推理场景中，可以直接用更多请求填满流水线，因此气泡问题相对较轻。
+\translatornote{1F1B 适用于包含反向传播的训练流水线。}
+
+\question{5}{大规模 MoE 模型的专家卸载是什么？它对性能有何影响？}
+专家卸载将专家的权重矩阵从 GPU 显存（HBM）迁到 CPU 侧的 DRAM 或 NVMe 存储。例如，DeepSeek-V2 总计有 2360 亿参数，部分 MoE 层约有 60 个专家。每个词元只激活约 200 亿参数，但所有参数都必须放在可访问的位置。专家感知的调度器根据路由决策预测下一批会用到哪些专家，提前将其权重从 CPU 内存或 NVMe 预取到 GPU，并淘汰当前不用的专家权重。
+
+\textbf{性能影响。}PCIe 带宽（约 32~GB/s）远低于 HBM 带宽（2–3~TB/s）。因此，加载未缓存的专家会明显增加时延，每个专家增加的时延为毫秒量级。只有批大小足以使专家访问模式可预测，同时专家缓存命中率较高时，卸载才有较好的效果。缓存命中率达到 70\% 以上时，专家卸载可在单个 8~GPU 节点上部署 2000 亿参数以上的 MoE 模型。
+\end{interview}

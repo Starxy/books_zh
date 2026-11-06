@@ -1,0 +1,107 @@
+% <<<PDFPAGE 27>>>
+\chapter{内核工程与 FlashAttention}
+
+\section{为什么需要定制 CUDA 内核}
+
+PyTorch 等高级框架用库中的基本操作构成复杂运算。例如，线性层调用 \texttt{torch.nn.Linear}，后者调用 cuBLAS 执行 GEMM，然后将结果写入 HBM，供下一个操作读回。这种\emph{即时执行}（eager execution）模式会让原本可以留在高速片上存储器里的中间张量反复读写 HBM，产生大量数据传输。
+
+\textbf{内核融合}（kernel fusion）将多个操作合并为一个 GPU 内核，把中间结果留在寄存器或共享内存中，避免数据在 HBM 和片上存储器之间往返。与分别启动三个内核相比，融合 \texttt{LayerNorm}、\texttt{Linear} 和 \texttt{GeLU} 的内核可将 HBM 访问量降至三分之一。
+
+\section{FlashAttention 与 I/O 感知的精确注意力}
+
+标准注意力会在 HBM 中显式存储完整的 \(n\times n\) 注意力矩阵。计算过程如下。
+\[
+  \mathbf{S}=\frac{\mathbf{Q}\mathbf{K}^{\top}}{\sqrt{d_k}},\quad
+  \mathbf{P}=\operatorname{softmax}(\mathbf{S}),\quad
+  \mathbf{O}=\mathbf{P}\mathbf{V}
+\]
+
+在 \(n=16{,}384\)、采用 FP16 的情况下，这个矩阵占用 \(16{,}384^2\times 2\approx 537\,\mathrm{MB}\)。在 A100 上，与 HBM 之间读写该矩阵约需 \(0.5\,\mathrm{ms}\)。原文按每次前向传播计算两次这样的读写，一次用于计算 \(\mathbf{P}\)，另一次用于训练中的反向传播。
+
+FlashAttention（Dao 等，2022）是一种 I/O 感知的精确注意力（IO-aware exact attention）算法。它通过\textbf{分块}免去完整矩阵的读写。它将注意力计算划分为能放入 SRAM 的小块，使用在线 softmax（online softmax）技巧逐块计算数值稳定的 softmax，整个过程都无须在 HBM 中显式存储完整的注意力矩阵。
+
+\begin{conceptbox}{FlashAttention 的复杂度}
+\begin{tabularx}{\linewidth}{@{}p{.26\linewidth}p{.24\linewidth}X@{}}
+  & \textbf{标准注意力} & \textbf{FlashAttention} \\
+  \midrule
+  HBM 读写量 & \(O(n^2)\) & \(O(n^2/M)\)（读写轮数较少） \\
+  SRAM 用量 & \(O(n^2)\) & \(O(M)\)（分块大小） \\
+  速度 & 对照速度 & 为其 \(2\) 至 \(4\) 倍 \\
+  序列长度上限 & 受 HBM 限制 & 支持更长的上下文 \\
+\end{tabularx}
+\end{conceptbox}
+
+\translatornote{表中保留原书的复杂度。按照正文的算法描述，标准注意力的 \(n\times n\) 中间矩阵存放于 HBM。设头维度为 \(d\)、SRAM 容量为 \(M\)，且 \(d\le M\le nd\)，FlashAttention 的 HBM 访问量为 \(\Theta(n^2d^2/M)\)。Q7.1 的 \(O(nd)\) 对应读入输入、写出结果的量级，实际访问量随 \(M\) 变化。见 \href{https://arxiv.org/abs/2205.14135}{Dao 等（2022）定理 2}。}
+
+\textbf{FlashAttention-2}（Dao，2023）沿序列长度维度把工作分给多个线程块，并减少矩阵乘法以外的运算，从而提高了并行度。\textbf{FlashAttention-3}（Shah 等，2024）进一步利用 H100 的硬件特性，将异步内存复制与线程束组矩阵乘累加（Warpgroup Matrix Multiply Accumulate，WGMMA）指令配合使用，并支持 FP8 精度，达到 H100 峰值浮点运算速率的约 75\%。
+
+% <<<PDFPAGE 28>>>
+\section{在线 softmax 技巧}
+
+分块计算注意力的数学难点是怎样在分段处理序列时得到精确的 softmax。在线 softmax（Milakov 和 Gimelshein，2018）持续维护最大值 \(m\) 与求和结果 \(\ell\)，因此可以逐步计算，无须一开始就看到全部数值。
+\[
+  m_i=\max\!\left(m_{i-1},\max_j s_{ij}\right),\qquad
+  \ell_i=e^{m_{i-1}-m_i}\ell_{i-1}+\sum_j e^{s_{ij}-m_i}
+\]
+最后由 \(\mathbf{O}=\mathbf{O}_{\mathrm{running}}/\ell\) 得到精确的 softmax 输出。该方法在数值上是稳定的，对注意力矩阵的每一行只需维护 \(O(1)\) 的额外状态。
+
+\section{用 Triton 编写 Python 风格的内核}
+
+开发 CUDA 内核需要掌握 C++，还要了解针对 GPU 的优化方法。Triton（Tillet 等，2019）是一个基于 Python、用于编写 GPU 内核的领域专用语言（domain-specific language，DSL）。它封装了底层细节，同时能生成经过充分优化的代码。
+
+\begin{lstlisting}[numbers=left,numberstyle=\tiny\color{boxgray},numbersep=10pt]
+import triton
+import triton.language as tl
+
+@triton.jit
+def fused_softmax_kernel(X, Y, stride, N,
+                          BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    x_ptrs = X + row * stride + tl.arange(0, BLOCK)
+    x = tl.load(x_ptrs, mask=tl.arange(0, BLOCK) < N)
+    x_max = tl.max(x, axis=0)
+    x = x - x_max
+    numerator = tl.exp(x)
+    denominator = tl.sum(numerator, axis=0)
+    y = numerator / denominator
+    tl.store(Y + row * stride + tl.arange(0, BLOCK),
+             y, mask=tl.arange(0, BLOCK) < N)
+\end{lstlisting}
+
+Triton 会自动处理共享内存分配、线程束（warp）级同步与向量化（vectorization）。机器学习工程师即使不精通 CUDA，也能用它编写高性能内核。
+
+\translatornote{原示例中 \texttt{tl.load} 没有指定 \texttt{other}。当 \texttt{BLOCK} 大于 \texttt{N} 时，被掩码位置的返回值未定义，可能影响最大值和求和。官方示例用 \texttt{other=-float('inf')} 令这些位置的指数项为零。见 \href{https://triton-lang.org/main/getting-started/tutorials/02-fused-softmax.html}{Triton 融合 softmax 教程}。}
+
+\begin{interview}
+\question{1}{为什么 FlashAttention 比标准注意力快？它解决了什么主要瓶颈？}
+标准注意力在 HBM 中显式存储完整的 \(n\times n\) 注意力矩阵 \(\mathbf{Q}\mathbf{K}^{\top}\)。序列较长时，该矩阵可能有数百 MB，甚至达到 GB 级。相比算术运算，读写 HBM 才是主要开销。FlashAttention 的速度来自对 \textbf{I/O 的感知}。它把注意力计算划分成能装入 GPU 片上 SRAM（共享内存）的块，用在线 softmax 技巧递增地计算 softmax。中间结果留在高速 SRAM 中，无须写到 HBM。每块的最终结果累加完毕后只写入 HBM 一次。
+% <<<PDFPAGE 29>>>
+HBM 访问量从 \(O(n^2)\) 降至 \(O(n\cdot d)\)，达到读入输入、写出输出所需的理论下限。在 A100 上处理长序列时，FlashAttention 可达到标准注意力 \(2\) 至 \(4\) 倍的速度。
+
+\question{2}{什么是内核融合？它为什么能提高推理性能？}
+内核融合把原本各自需要启动一个 GPU 内核的多个计算操作合成一个内核。中间结果可留在寄存器或共享内存等片上存储器中。未融合时，每个操作都将输出写入 HBM，接下来的操作再读回来，造成多余的访存。融合之后，中间张量保留在寄存器或共享内存中，实际带宽超过 \(10\,\mathrm{TB/s}\)。相比之下，HBM 的带宽为 \(2\) 至 \(3\,\mathrm{TB/s}\)。大语言模型推理中常见的融合方式包括（1）把 QKV 投影与 RoPE 的应用融合，（2）把 LayerNorm 与随后的线性层融合，（3）把 SiLU/GeLU 门控与前馈网络的升维投影融合。TensorRT-LLM 和 vLLM 的融合内核可以同时降低内核启动开销和 HBM 访问量，相较于未融合实现，时延可改善 10\% 至 40\%。
+
+\question{3}{在线 softmax 技巧如何支持分块计算注意力？}
+标准 softmax 的公式为 \(\operatorname{softmax}(\mathbf{x})_i=e^{x_i}/\sum_j e^{x_j}\)。它需要知道一行中的全部数值才能算出任何一个输出，因而无法直接分块。在线 softmax 逐块处理一行，持续维护最大值 \(m\) 和指数和 \(\ell\)。当新块 \(\mathbf{x}'\) 到来时，先更新最大值，再重新缩放已有的指数和及输出。
+\[
+  \begin{aligned}
+    m' &= \max(m,\max(\mathbf{x}')), \\
+    \ell' &= \ell\cdot e^{m-m'} + \sum e^{x'_j-m'}, \\
+    \mathbf{O}' &= \mathbf{O}\cdot e^{m-m'}/\ell'
+       + \mathbf{V}'\cdot e^{\mathbf{x}'-m'}/\ell'.
+  \end{aligned}
+\]
+处理完毕时，\(\mathbf{O}'\) 等于精确的 softmax 加权和。这让 FlashAttention 可以分块处理 \(Q\)、\(K\)、\(V\)，无须显式存储完整的注意力矩阵即可得到精确结果。
+
+\translatornote{以上递推保留原式。若每轮的 \(\mathbf{O}\) 已归一化，旧块的贡献在更新时还要乘回旧分母 \(\ell\)。新块的贡献是沿该块词元维度计算的加权和。也可按第 7.3 节维护未归一化的分子，处理完全部块后再除以 \(\ell\)。见 \href{https://arxiv.org/abs/2205.14135}{Dao 等（2022）算法 1}。}
+
+\question{4}{FlashAttention-3 针对 H100 做了哪些改进？它怎样利用 H100 的硬件特性？}
+FlashAttention-3 是针对 H100 新增的硬件功能设计的。（1）\textbf{WGMMA}。H100 新增了线程束组级的异步矩阵乘法指令。FA3 可以让一个分块的内存复制与计算重叠，以隐藏访存时延。（2）\textbf{张量内存加速器}（Tensor Memory Accelerator，TMA）。由硬件管理 HBM 与共享内存之间的异步传输，减小数据搬运的软件开销。（3）\textbf{FP8 支持}。FA3 支持用 FP8 计算注意力，使注意力计算可用的张量核心吞吐量翻倍。（4）\textbf{乒乓流水线}（ping-pong pipelining）。两个线程束组交替加载下一个块和计算当前块，让张量核心与存储系统都能充分工作。综合这些改进，在注意力计算中，FA3 达到 H100 理论峰值 FLOP/s 的约 75\%，而 FA2 约为 35\%。
+
+\translatornote{Shah 等报告的约 75\% 利用率对应 FP16，最高约 \(740\,\mathrm{TFLOP/s}\)。该论文报告的 FP8 吞吐量接近 \(1.2\,\mathrm{PFLOP/s}\)。见 \href{https://arxiv.org/abs/2407.08608}{Shah 等（2024）}。}
+
+\question{5}{什么时候你会选用 Triton，而非直接编写 CUDA？两者有什么取舍？}
+我会在以下情形使用 \textbf{Triton}。（1）需要定制内核，例如一种新的融合操作，但团队缺少深入的 CUDA 开发经验。（2）内核复杂度适中，超出了 PyTorch 已有的简单逐元素运算，又用不到手工调优的线程束级原语。（3）需要快速迭代。Triton 的即时编译（just-in-time compilation，JIT）让我可以很快开展实验。Triton 的\textbf{优势}包括 Python 语法、共享内存自动分块以及更简单的调试。许多工作负载上，生成的代码与手工优化的 CUDA 代码相比，
+% <<<PDFPAGE 30>>>
+性能差距往往在 10\% 至 20\% 以内。我会在两种情况下直接编写 \textbf{CUDA}。（1）峰值性能至关重要，例如 FlashAttention 的注意力内核，需要极精细地控制内存访问模式和线程束同步。（2）需要精细控制线程束级原语、规避存储体冲突（bank conflict），或控制异步复制流水线，例如 H100 上的 TMA/WGMMA。需要权衡的是开发时间与峰值性能。CUDA 可能耗费数周，Triton 只需数天。
+\end{interview}

@@ -1,6 +1,6 @@
 # 英文 PDF 底本分章总览
 
-当前保留六本 PDF 底本的分章文件，共 **115 个 PDF、3,059 页**。分章位于相应工程的原版目录中，原书页码映射见各书的分章清单或原版元数据。
+当前保留 7 本 PDF 底本的分章文件，共 **134 个 PDF、3,116 页**。分章位于相应工程的原版目录中，原书页码映射见各书的分章清单或原版元数据。
 
 Foundations of Large Language Models、Agentic Large Language Models、The Little Book of Generative AI Foundations 和 The Principles of Diffusion Models 均保留所提供的 TeX 源码包，按源码章节组织；英文整书 PDF 保留在各自 `00_originals/` 中。
 
@@ -184,6 +184,34 @@ Foundations of Large Language Models、Agentic Large Language Models、The Littl
 | appendix_b | Appendix B Reinforcement Learning Basics | 476–488 | 13 | 451–463 |
 | index | Index | 489–496 | 8 | 465–472 |
 
+## 14_2026_Efficient_LLM_Inference
+
+- 书名　Efficient LLM Inference（2026 年第二版）
+- 源文件　2026_Efficient_LLM_Inference_2ndEd_EN.pdf（57 页）
+- 拆分为 19 份 PDF。目录页中的链接指向归档的英文整书。[原版元数据](14_2026_Efficient_LLM_Inference/00_originals/source_metadata.json)
+
+| 分段 | 原版标题 | PDF 页序 | 页数 | 原书页码 |
+|---|---|---:|---:|---|
+| front_matter | Cover and Contents | 1–4 | 4 | i–iii |
+| ch01 | The Inference Problem | 5–8 | 4 | 1–4 |
+| ch02 | Hardware Foundations for Inference | 9–12 | 4 | 5–8 |
+| ch03 | Transformer Inference Mechanics | 13–16 | 4 | 9–12 |
+| ch04 | Quantization | 17–20 | 4 | 13–16 |
+| ch05 | Speculative Decoding | 21–23 | 3 | 17–19 |
+| ch06 | KV Cache Optimization | 24–26 | 3 | 20–22 |
+| ch07 | Kernel Engineering and FlashAttention | 27–30 | 4 | 23–26 |
+| ch08 | Serving Systems Architecture | 31–33 | 3 | 27–29 |
+| ch09 | Parallelism for Large Model Inference | 34–36 | 3 | 30–32 |
+| ch10 | Long-Context and Memory Management | 37–39 | 3 | 33–35 |
+| ch11 | Edge and On-Device Inference | 40–42 | 3 | 36–38 |
+| ch12 | Inference-Time Compute Scaling | 43–45 | 3 | 39–41 |
+| ch13 | Observability and Production Engineering | 46–49 | 4 | 42–45 |
+| ch14 | The Future of Inference | 50–52 | 3 | 46–48 |
+| appendix_a | Appendix A: Key Formulas Reference | 53 | 1 | 49 |
+| appendix_b | Appendix B: Annotated Paper Reading List | 54 | 1 | 50 |
+| appendix_c | Appendix C: Glossary | 55–56 | 2 | 51–52 |
+| appendix_d | Appendix D: Hardware Comparison | 57 | 1 | 53 |
+
 ## 汇总
 
 | 书籍 | 原版页数 | 章数 | 分章 PDF 数 |
@@ -194,6 +222,7 @@ Foundations of Large Language Models、Agentic Large Language Models、The Littl
 | 04_2018_Targeted_Learning_in_Data_Science | 655 | 30 | 33 |
 | 07_2026_Causal_Inference_What_If | 365 | 23 | 26 |
 | 13_2024_Large_Language_Models_A_Deep_Dive | 496 | 10 | 14 |
-| **合计** | **3059** | **91** | **115** |
+| 14_2026_Efficient_LLM_Inference | 57 | 14 | 19 |
+| **合计** | **3116** | **105** | **134** |
 
 分章文件已核对整书页序、文字和页数。中文源码在各书 `01_source/`，术语与校对记录保留在各书对应目录，完整中文译本统一存放于根目录 `00_books/`。

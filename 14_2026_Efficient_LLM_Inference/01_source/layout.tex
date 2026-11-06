@@ -1,0 +1,111 @@
+\documentclass[a4paper,11pt,oneside,openany,scheme=plain,fontset=fandol]{ctexbook}
+
+\usepackage[left=30mm,right=25mm,top=25mm,bottom=25mm,
+  headheight=14pt,headsep=10pt,footskip=25pt]{geometry}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\linespread{1.18}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+\raggedbottom
+
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs,tabularx,longtable,array}
+\usepackage{enumitem}
+\setlist{leftmargin=*,topsep=.35\baselineskip,itemsep=.22\baselineskip,parsep=0pt}
+\usepackage{xcolor,tikz}
+\usepackage[skins,breakable]{tcolorbox}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage[hidelinks,unicode,bookmarksdepth=2]{hyperref}
+\hypersetup{
+  pdftitle={大语言模型高效推理},
+  pdfauthor={Lamhot Siagian (AI Engineering Insider)},
+  pdfsubject={系统、算法与生产工程 · 面试速查笔记},
+  pdflang={zh-CN}
+}
+
+\definecolor{bookblue}{HTML}{1954A6}
+\definecolor{bookteal}{HTML}{009B8C}
+\definecolor{boxgreen}{HTML}{378D3D}
+\definecolor{boxgray}{HTML}{414141}
+\definecolor{boxamber}{HTML}{B56100}
+\definecolor{codebg}{HTML}{292C33}
+\definecolor{codekeyword}{HTML}{B2D3FF}
+
+\ctexset{
+  contentsname={目录},
+  chapter={
+    name={第,章},
+    number=\arabic{chapter},
+    format={\raggedright\heiti\bfseries\color{bookblue}},
+    nameformat=\LARGE,titleformat=\Huge,
+    beforeskip=0pt,afterskip=26pt,aftername={\par\vspace{9pt}}
+  },
+  section={format={\raggedright\heiti\bfseries\Large\color{bookblue}},
+    beforeskip=15pt plus 3pt minus 2pt,afterskip=6pt},
+  subsection={format={\raggedright\heiti\bfseries\large\color{boxgray}},
+    beforeskip=11pt plus 2pt minus 1pt,afterskip=4pt}
+}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+\renewcommand{\chaptermark}[1]{\markboth{第\thechapter 章\enspace #1}{}}
+
+\newcommand{\bookpagestyle}{%
+  \fancyhf{}%
+  \fancyhead[L]{\small\color{bookblue}\itshape 大语言模型高效推理}%
+  \fancyhead[R]{\small\color{bookblue}\itshape\nouppercase{\leftmark}}%
+  \fancyfoot[L]{\small\color{boxgray}AI Engineering Insider}%
+  \fancyfoot[R]{\small\thepage}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+  \renewcommand{\footrulewidth}{0.4pt}%
+}
+\fancypagestyle{plain}{\bookpagestyle}
+\fancypagestyle{book}{\bookpagestyle}
+\pagestyle{book}
+
+\tcbset{
+  bookbox/.style={
+    enhanced,boxrule=.65pt,arc=3pt,
+    left=7pt,right=7pt,top=5pt,bottom=5pt,
+    toptitle=2pt,bottomtitle=2pt,
+    before skip=8pt,after skip=8pt,
+    fonttitle=\heiti\bfseries,coltitle=white
+  }
+}
+\newtcolorbox{definitionbox}[1]{bookbox,title={#1},colframe=boxgray,colback=black!5}
+\newtcolorbox{conceptbox}[1]{bookbox,title={#1},colframe=bookblue,colback=bookblue!9}
+\newtcolorbox{notebox}[1]{bookbox,title={#1},colframe=boxamber,colback=orange!11}
+\newtcolorbox{interview}{%
+  bookbox,breakable,title={面试准备 · 模拟问答},title after break={面试准备 · 模拟问答（续）},
+  colframe=boxgreen,colback=boxgreen!10,before skip=17pt,after skip=0pt,
+  before upper={\clubpenalty=10000\relax\widowpenalty=10000\relax}
+}
+\newcommand{\question}[2]{%
+  \par\addvspace{.75\baselineskip}%
+  \noindent\textbf{\textcolor{boxgreen}{Q\thechapter.#1.}\enspace #2}\par\nobreak
+  \noindent\textbf{\textcolor{bookblue}{回答}}\enspace\ignorespaces
+}
+\newcommand{\translatornote}[1]{%
+  \par\smallskip\noindent{\small\textbf{译注}\enspace #1}\par
+}
+\newcommand{\appendixchapter}[2]{%
+  \chapter*{附录 #1\quad #2}%
+  \markboth{附录 #1\enspace #2}{}%
+  \addcontentsline{toc}{chapter}{附录 #1\texorpdfstring{\enspace}{ }#2}%
+}
+
+\lstset{
+  language=Python,
+  basicstyle=\small\ttfamily\color{white},
+  keywordstyle=\color{codekeyword},
+  commentstyle=\color{white!75!codebg},
+  stringstyle=\color{orange!60!white},
+  backgroundcolor=\color{codebg},
+  frame=single,rulecolor=\color{codebg},framesep=6pt,
+  xleftmargin=7pt,xrightmargin=7pt,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,
+  breaklines=true,tabsize=4
+}

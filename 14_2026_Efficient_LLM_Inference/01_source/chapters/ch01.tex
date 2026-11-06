@@ -1,0 +1,104 @@
+% <<<PDFPAGE 5>>>
+\chapter{推理问题}
+\label{ch:inference-problem}
+
+\section{训练与推理的目标截然不同}
+
+\emph{训练}大语言模型（large language model，LLM）的目标是在海量数据集上最小化损失函数（loss function）。系统按大批次处理数据，在多个图形处理器（graphics processing unit，GPU）上累积梯度，执行反向传播（backward pass），更新数十亿个参数。最重要的指标是吞吐量（throughput）。从整个训练过程来看，我们希望每秒处理尽可能多的词元（token）。单次前向传播（forward pass）的时延（latency）影响很小，关键是以天或周计的总训练时间。
+
+\emph{推理}（inference）的情形恰好相反。此时模型参数被冻结，任务是对每条请求执行一次前向传播，将输入的提示（prompt）转化为预测输出，并尽可能缩短处理时间、降低成本。这些请求常常来自正在等待回复的真实用户。
+
+\begin{definitionbox}{推理的定义}
+推理是指在新的、模型未见过的输入数据上运行已训练的神经网络，产生预测或输出，过程中保持模型参数不变。
+\end{definitionbox}
+
+推理与训练的目标在三个方面差异显著。
+
+\begin{itemize}
+  \item \textbf{时延优先于吞吐量。}等待回复的用户会直接感受到时延。200~ms 的响应感觉几乎是即时的，3 秒的响应则显得很慢。
+  \item \textbf{内存效率。}推理时通常无需保存优化器状态或梯度缓冲区，但需要管理自回归生成（autoregressive generation）使用的键值缓存（key-value cache，KV 缓存）。
+  \item \textbf{单次请求成本。}生产环境要处理数百万次请求。单次请求的成本直接决定能否盈利。
+\end{itemize}
+
+\section{词元生成循环}
+
+现代大语言模型采用自回归方式逐个生成词元，每个新词元都以此前生成的所有词元为条件。由此得到大语言模型推理的基本循环。
+
+\begin{conceptbox}{自回归生成循环}
+\begin{enumerate}
+  \item 接收提示，也就是一串输入词元。
+  \item 对整个提示并行执行一次\textbf{预填充}（prefill）前向传播，计算并缓存所有输入词元对应的注意力键和值。
+  \item 进行自回归\textbf{解码}（decode）。每一步都将上一个生成的词元作为输入，在 KV 缓存上计算注意力，并采样下一个词元。
+  \item 重复第 3 步，直至生成停止词元（stop token）或达到最大长度。
+\end{enumerate}
+\end{conceptbox}
+
+% <<<PDFPAGE 6>>>
+预填充阶段受计算能力限制（compute-bound）。我们并行处理多个词元，充分利用 GPU 的张量核心（Tensor Core）。而解码阶段本质上受访存带宽限制（memory-bandwidth-bound），因为每次只处理一个词元，每一步却都必须从 GPU 显存中读取整个 KV 缓存。这种不对称性是推理系统复杂性的主要来源之一。
+
+\section{时延、吞吐量与成本的铁三角}
+
+优化推理时，三个目标相互制约。改善其中一项，往往要牺牲另一项。
+
+\begin{center}
+\begin{tabularx}{0.93\linewidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{指标} & \textbf{定义} & \textbf{改进方式} \\
+\midrule
+\textbf{时延} & 从发出请求到请求处理完成的时间。重要的细分指标有首词元时延（TTFT）和每输出词元耗时（TPOT）。 & 缩小模型，审慎增大批大小，采用推测解码，优化 KV 缓存。 \\
+\textbf{吞吐量} & 所有并发用户每秒生成的词元总数。 & 增大批大小，采用连续批处理、张量并行。 \\
+\textbf{成本} & 每生成一百万个词元的成本，以美元计。 & 对模型做量化，采用高效的服务框架，提高硬件利用率。 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+这个铁三角（iron triangle）在实际运行中表现得很直接。要最大化吞吐量，就得增大批大小（batch size），而较大的批次会延长每条请求的时延。要尽量缩短时延，往往需要逐条处理请求，这会降低 GPU 利用率并增加成本。推理工程要做的，就是根据具体应用的要求在这些目标之间取舍。
+
+\section{访存带宽才是实际瓶颈}
+
+有一种常见的误解，认为推理受计算能力限制，需要提高浮点运算（floating point operation，FLOP）速率。事实上，自回归大语言模型解码的瓶颈几乎总是\emph{访存带宽}（memory bandwidth），也就是把模型权重从 GPU 显存（高带宽存储器，High Bandwidth Memory，HBM）加载到 GPU 计算核心的速度。
+
+考虑一个以 16 位精度存储的 70 亿参数模型。模型权重约占
+\[
+7\times10^9\times2\,\text{字节}=14\,\mathrm{GB}
+\]
+
+一块 NVIDIA A100 GPU 的 HBM 带宽约为 2~TB/s。将全部权重加载一次（即一次解码步骤），时延的理论下限为
+\[
+\frac{14\,\mathrm{GB}}{2000\,\mathrm{GB/s}}=7\,\mathrm{ms}
+\]
+
+这一耗时尚未计入计算。批大小为 1 时，花这么长时间加载权重只能生成一个词元。批大小为 64 时，64 条请求可以分摊同一次加载权重的开销，从而大幅提高吞吐量，时延却变化不大。
+
+\section{屋顶线模型}
+
+屋顶线模型（Roofline model）可用来判断一项操作受计算能力限制还是受访存带宽限制（memory-bound）。对任一操作，都有
+% <<<PDFPAGE 7>>>
+\[
+\text{实际性能（FLOP/s）}
+=\min\bigl(\text{峰值 FLOP/s},\ \text{算术强度}\times\text{峰值带宽}\bigr)
+\]
+\nopagebreak[3]
+其中，\emph{算术强度}（arithmetic intensity）用每访问一字节内存所执行的浮点运算次数来衡量。
+
+\begin{conceptbox}{从屋顶线模型看预填充与解码}
+矩阵与向量相乘是批大小为 1 时解码步骤的主要运算。它的算术强度很低，约为 1–2~FLOP/byte，明显受访存带宽限制。长提示预填充涉及大规模矩阵乘法，算术强度高，性能接近计算能力上限。因此，预填充与解码的表现差别很大，适用的优化方法也不同。
+\end{conceptbox}
+
+\begin{interview}
+\question{1}{在大语言模型推理中，预填充与解码有什么区别？为什么这一区别对系统设计很重要？}
+预填充阶段对整个输入提示做一次并行的前向传播，需要将大型词元矩阵与权重矩阵相乘，因此\textbf{受计算能力限制}。解码阶段以自回归方式逐个生成词元，每生成一个词元都要加载全部模型权重，因此\textbf{受访存带宽限制}。这一区别直接影响系统设计。两个阶段的最佳批大小、GPU 利用率表现和时延敏感程度都相去甚远。Splitwise 和 Mooncake 等现代系统将预填充和解码分别部署在不同的 GPU 资源池，使两者可以独立扩展和优化。
+
+\question{2}{请解释推理的铁三角。优化对时延敏感的聊天机器人应用时，你会怎样取舍？}
+推理的铁三角描述的是时延、吞吐量与成本之间的牵制关系。改善一项，通常会使另一项变差。对于对时延敏感的聊天机器人，我会优先考虑\textbf{首词元时延}（Time to First Token，TTFT）和\textbf{每输出词元耗时}（Time Per Output Token，TPOT）。具体做法是（1）使用更小的模型或经量化（quantization）的模型，减少每步的计算量。（2）保持较小的批大小，或者采用连续批处理（continuous batching），严格按服务级别目标（Service Level Objective，SLO）调度。（3）应用推测解码（speculative decoding），每步生成多个词元。（4）使用前缀缓存（prefix caching），避免为重复出现的系统提示重新计算 KV 缓存。为降低时延，我可以接受更高的每词元成本。
+
+\question{3}{为什么访存带宽通常是大语言模型解码的瓶颈，而峰值计算速率（FLOP/s）通常不是？}
+在小批量自回归解码中，每生成一个词元，GPU 都要从 HBM 加载全部模型权重。70 亿参数的模型以 FP16 存储时占 14~GB。即便是带宽为 2~TB/s 的 A100，每步也大约需要 7~ms。相比之下，单个词元的实际计算量远低于 GPU 张量核心的处理能力。解码主要使用矩阵与向量的乘法，算术强度约为 1–2~FLOP/byte，远低于转为计算受限所需的约 300~FLOP/byte。只有增大批大小，让多个请求分摊加载权重的开销，才有可能接近计算能力上限。
+
+% <<<PDFPAGE 8>>>
+\question{4}{你会怎样衡量并报告推理性能？你会在生产服务系统中采集哪些指标？}
+我会监测\textbf{TTFT}（影响用户感受到的响应速度）、\textbf{TPOT}（决定流式输出是否流畅）、\textbf{吞吐量}（面向所有用户的每秒词元数）、\textbf{GPU 利用率和显存利用率}、\textbf{有效吞吐量}（goodput，即达到 SLO 的请求占比）、\textbf{队列深度}（用来检测过载），以及\textbf{每百万词元的成本}。我会在监控面板上展示百分位数（percentile），例如 p50、p95、p99。真正影响用户体验的是尾部时延（tail latency），平均值难以反映它。我也会分别监测预填充和解码时延，以便分别诊断各自的瓶颈。
+
+\question{5}{一位同事认为，FLOP/s 持续比访存带宽增长得更快，推理很快就会受计算能力限制。你怎么回应？}
+这是经典的\emph{带宽墙}（bandwidth wall）问题。我认同其中一部分观察，但不认同这个结论。近几代 GPU 的 FLOP/s 确实比 HBM 带宽增长得更快。然而，批大小为 1 的解码算术强度很低，只有 1–2~FLOP/byte。即便 FLOP/s 大幅提升，只要批大小没有显著增大、模型架构没有改变，解码仍受访存带宽限制。量化等技术还会特意用计算换取访存流量的减少，使解码继续处在访存带宽受限的范围内。要改善这种情况，应采用能提高每加载一字节数据所做运算次数的架构和系统，例如分组查询注意力（Grouped Query Attention，GQA）、多头潜在注意力（Multi-head Latent Attention，MLA）和高效的 KV 缓存方案。单靠计算速度提升难以解决这个问题。
+\end{interview}

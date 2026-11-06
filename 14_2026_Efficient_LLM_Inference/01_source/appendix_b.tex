@@ -1,0 +1,20 @@
+% <<<PDFPAGE 54>>>
+\appendixchapter{B}{论文导读}
+
+\begin{enumerate}[widest=15]
+  \item \textit{Attention Is All You Need}（Vaswani 等，2017）。Transformer 的奠基论文，建议先读这篇。
+  \item \textit{FlashAttention}（Dao 等，2022）和 \textit{FlashAttention-2}（Dao，2023）。理解 I/O 感知的注意力计算所必读的两篇论文。
+  \item \textit{Efficient Memory Management for LLM Serving}（vLLM/PagedAttention，Kwon 等，2023）。这篇论文改变了大语言模型服务的实现方式。
+  \item \textit{GPTQ}（Frantar 等，2022）和 \textit{AWQ}（Lin 等，2023）。两种基础量化方法。
+  \item \textit{Fast Inference from Transformers via Speculative Decoding}（Leviathan 等，2023）。从数学上详细论证推测解码。
+  \item \textit{Medusa}（Cai 等，2024）。无需草稿模型的多头推测解码。
+  \item \textit{EAGLE-2}（Li 等，2024）。利用动态树实现的先进推测解码方法。
+  \item \textit{DeepSeek-V2}（DeepSeek，2024）。为提高推理效率而提出的 MLA 与 MoE 改进。
+  \item \textit{Mamba}（Gu 和 Dao，2023）。用状态空间模型作为注意力的高效替代方案。
+  \item \textit{Sarathi-Serve}（Agrawal 等，2024）。用分块预填充改善请求之间的时延公平性。
+  \item \textit{Scaling LLM Test-Time Compute Optimally}（Snell 等，2024）。对推理时计算扩展作形式化研究。
+  \item \textit{DeepSeek-R1}（DeepSeek，2025）。用 GRPO 通过强化学习训练推理能力。
+  \item \textit{Multi-Token Prediction}（Gloeckle 等，2024）。预测多个词元对训练和推理的益处。
+  \item \textit{Mixture of Depths}（Raposo 等，2024）。逐层自适应地分配计算。
+  \item \textit{StreamingLLM}（Xiao 等，2023）。注意力汇聚点与无限长度推理。
+\end{enumerate}

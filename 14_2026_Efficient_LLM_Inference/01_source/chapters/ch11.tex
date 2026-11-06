@@ -1,0 +1,75 @@
+
+% <<<PDFPAGE 40>>>
+\chapter{边缘推理与端侧推理}
+
+\section{边缘推理概况}
+
+在智能手机、笔记本电脑和嵌入式系统等边缘设备上运行大语言模型，对保护隐私、降低时延和支持离线运行越来越重要。这类边缘推理（edge inference）或端侧推理（on-device inference）受到很强的硬件约束。一部旗舰智能手机可能只有 8–16~GB 的统一内存，由 CPU 与 GPU 共享，功耗预算约为 10~W。相比之下，一张 H100 GPU 配有 80~GB 专用 HBM，功耗为 700~W。
+
+边缘推理工程的目标是在这些约束下尽可能发挥模型的智能。
+
+\section{边缘设备的内存限制与量化}
+
+一个有 70 亿参数的模型采用 FP16 时需要 14~GB 内存，超过大多数智能手机的内存容量。采用 4 位量化（AWQ 或 GPTQ）可将内存需求降至 3.5~GB，使高端手机能运行 70 亿参数的模型。Apple iPhone 16 Pro 配有 8~GB RAM，借助共享系统内存的管理机制，可以运行 4 位量化的 Llama 3 8B。
+
+采用更激进的量化（2 位，QuIP\#），可进一步降至约 1.8~GB，让中端设备也能运行 70 亿参数的模型，代价是输出质量有所下降。
+
+\section{运行时框架}
+
+\textbf{llama.cpp}（Gerganov，2023）用纯 C/C++ 实现 LLaMA 及兼容模型，支持以下功能。
+
+\begin{itemize}
+  \item 借助 AVX-512、NEON（ARM）和 WebAssembly 在 CPU 上运行推理。
+  \item 通过 Metal（Apple）、CUDA、Vulkan 或 OpenCL，将部分或全部计算卸载到 GPU。
+  \item 提供 \texttt{Q4\_K\_M}、\texttt{Q5\_K\_M} 等自定义 k-quant 格式，借助分组量化（group quantization），使质量与体积的取舍达到帕累托有效（Pareto efficiency）。
+  \item 通过 \texttt{mmap} 映射加载权重，使注意力计算所需的内存很少。
+\end{itemize}
+
+\textbf{Apple MLX} 是 Apple 面向 Apple Silicon 的原生机器学习框架，利用了其统一内存架构。通过 MLX，可在搭载 M3 Ultra（192~GB）的 Mac Studio 上运行 4 位量化的 700 亿参数模型，达到约 30 词元/秒。
+
+\textbf{ONNX Runtime} 提供跨平台推理，支持在不同厂商的 CPU、GPU 和 NPU 上使用硬件加速。
+
+\section{通过神经架构搜索提高效率}
+
+神经架构搜索（Neural Architecture Search，NAS）自动设计适应特定硬件约束的模型架构。针对边缘部署，NAS 可以找出以下设计。
+
+\begin{itemize}
+  \item 给定时延预算下最合适的层宽与深度。
+% <<<PDFPAGE 41>>>
+  \item 混合精度分配方案，即不同层采用不同位宽。
+  \item 注意力头的剪枝方式（attention head pruning）。
+  \item 跳过网络块（block skipping）或提前退出（early exit）的策略。
+\end{itemize}
+
+硬件感知神经架构搜索（hardware-aware NAS）方法，如 HAT 和 OFA，会训练一个“超网络”（supernet）。推理时，可以直接从中提取不同规模的子网络，无须重新训练。
+
+\begin{interview}
+\question{1}{如果要在一部配有 6~GB RAM 的智能手机上部署一个有竞争力的语言模型，你会怎么做？}
+这 6~GB RAM 还要供操作系统和其他应用使用，留给模型的只有约 4–4.5~GB。我会按以下步骤处理。（1）从约 30 亿或 40 亿参数量级的模型着手，例如 Llama 3.2 3B、Phi-3 Mini 3.8B 和 Gemma 2 2B。量化至 4 位后，这个量级的模型仅需 1.5–2~GB。（2）用 llama.cpp 做 \texttt{Q4\_K\_M} 量化，或采用 AWQ。这样可以在小模型的质量与体积之间取得较好的平衡。（3）在 iOS 上借助 Metal 将计算卸载到 GPU，以加快推理，例如使用 llama.cpp 和 Metal 后端。（4）缓存提示，避免重复计算系统提示的 KV 缓存。（5）如果对时延要求高，就用更小的草稿模型（如 10 亿参数模型）做推测解码。（6）将速度目标设为 10–20 词元/秒，这样聊天界面响应起来较为流畅。如果 30 亿参数模型的质量不够，可以考虑采用 \texttt{Q2\_K} 格式的 70 亿参数模型（约 3.5~GB），并接受一定的质量损失。
+
+\question{2}{Apple MLX 是什么？为什么它适合在 Apple Silicon 上做大语言模型推理？}
+MLX 是 Apple 为 Apple Silicon 开发的数组计算库，按统一内存架构设计。PyTorch 将 CPU 与 GPU 视为两个独立的内存空间，需要显式复制数据。MLX 则在同一个共享内存空间中工作，CPU 和 GPU 都能直接访问数据。在大语言模型推理中，这意味着模型权重只需载入系统内存一次，Apple Silicon 的集成 GPU 即可访问，绕开 PCIe 带宽限制。
+
+在一台配有 192~GB 统一内存、内存带宽为 800~GB/s 的 M3 Ultra 设备上，4 位量化的 700 亿参数模型（约 40~GB）可以轻松装入内存，仍有空间留给 KV 缓存，速度约为 30 词元/秒。MLX 还提供 Python 接口、即时编译（just-in-time compilation，JIT）和惰性求值（lazy evaluation），并通过 \texttt{mlx-lm} 软件包支持越来越多的模型。它是在消费级硬件上运行前沿规模模型的最实用途径。
+
+\question{3}{llama.cpp 的 k-quant 量化体系是什么？它与标准均匀量化有何区别？}
+llama.cpp 的 k-quant 是一系列混合精度的分块量化格式。标准均匀量化使用逐张量或逐通道的尺度，把每个权重独立量化为 \(k\) 位。k-quant 采用分层方案，把权重分成若干块，通常每块 32 个权重，块内有些权重的存储精度高于其他权重。以 \texttt{Q4\_K\_M} 为例，后缀中的 K 表示超块（super-block）量化方案，M 表示质量档位（分小、中、大）。每个超块以较高精度保存尺度和最小值，单个权重采用 4 位编码。
+
+这种方式比均匀量化更有优势。（1）块级尺度适应局部权重分布，从而减小量化误差。\mbox{（2）靠近分布尾部}的重要权重能得到更好的表示。
+% <<<PDFPAGE 42>>>
+（3）在相同位数预算下，它相对于朴素 INT4 的质量与体积之比更高。\texttt{Q4\_K\_M} 被广泛认为是 llama.cpp 中最实用的 4 位格式。
+
+\question{4}{请比较 llama.cpp 的 CPU 推理与 GPU 推理。什么时候你会优先选 CPU？}
+\textbf{GPU 推理}（Metal、CUDA、Vulkan）利用设备的并行计算单元和高带宽内存提高吞吐量，同一个模型的速度通常是 CPU 的 5–20 倍。\textbf{CPU 推理}使用 AVX-512 或 NEON 的单指令多数据（single instruction, multiple data，SIMD）指令，访问比 GPU HBM 慢得多的系统 RAM，并进行顺序处理。
+
+CPU 推理虽然较慢，但有以下优点。（1）\textbf{不受显存容量限制。}台式机的系统 RAM 可达 64–512~GB，能容纳比单张 GPU 显存所能容纳的更大的模型。（2）\textbf{散热条件。}在被动散热的环境中，CPU 可持续运行推理更久。（3）\textbf{可用性。}没有 GPU 的机器也可以进行 CPU 推理。
+
+在以下情况下，我会优先选 CPU。（1）模型过大，放不进 GPU 显存。（2）设备没有 GPU，或只有性能很弱的集成 GPU。（3）吞吐量并不重要，可以接受低速批处理。llama.cpp 的 \texttt{-ngl} 选项支持部分 GPU 卸载，可将显存能容纳的层尽量交给 GPU，其余层由 CPU 运行，在两者之间取得平衡。
+
+\question{5}{什么是硬件感知神经架构搜索？OFA 如何实现高效的边缘部署？}
+硬件感知 NAS 寻找在准确率与目标硬件指标（时延、能耗、内存）之间达到帕累托最优的模型架构。它会产生一组模型，各自在准确率与效率之间作出不同取舍，分别针对特定硬件优化。
+
+\textbf{Once-For-All（OFA）}（Han 等，2020）训练一个大型超网络。可以从中提取不同深度、宽度和卷积核尺寸的子网络，无须重新训练。OFA 采用逐步缩减（progressive shrinking），先训练完整网络，再从完整网络中抽取较小的子网络，通过从完整网络做知识蒸馏（knowledge distillation），逐步训练这些子网络。
+
+部署时，针对目标设备和时延约束，通过查找表或预测器估计各子网络的时延，再从预算允许的子网络中选出准确率最高的一个。用于大语言模型推理时，OFA 类方法可以从一次训练获得规模相差 2–5 倍的模型。
+\end{interview}

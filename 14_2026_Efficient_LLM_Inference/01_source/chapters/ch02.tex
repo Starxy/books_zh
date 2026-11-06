@@ -1,0 +1,97 @@
+% <<<PDFPAGE 9>>>
+\chapter{推理的硬件基础}
+\label{ch:hardware-foundations}
+
+\section{推理工程师需要了解的 GPU 架构}
+
+现代 GPU 采用分层结构。以 NVIDIA H100 SXM5 为例，其主要组成如下。
+
+\begin{itemize}
+  \item \textbf{132 个流式多处理器}（Streaming Multiprocessor，SM），每个 SM 有 128 个 CUDA 核心和 4 个第四代张量核心。
+  \item \textbf{80~GB HBM3} 显存，带宽约为 3.35~TB/s。
+  \item 每个 SM 有 256~KB 的\textbf{共享内存（shared memory）／一级缓存（L1 cache）}，速度比 HBM 快几个数量级。
+  \item 所有 SM 共享 50~MB 的\textbf{二级缓存}（L2 cache）。
+  \item \textbf{NVLink 4.0} 为多 GPU 通信提供 900~GB/s 的双向带宽。
+\end{itemize}
+
+存储层次对推理优化至关重要。能在共享内存中执行的运算（如 FlashAttention 的融合注意力）可以完全免去与 HBM 之间缓慢的数据往返。
+
+\section{张量核心与混合精度}
+
+张量核心是专用的矩阵乘法单元，对采用低精度格式的操作数分块运算，例如每块 $16\times16\times16$。H100 的第四代张量核心支持下表中的格式，可用于混合精度（mixed precision）计算。
+
+\begin{center}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{格式} & \textbf{峰值 TFLOP/s} & \textbf{用途} \\
+\midrule
+FP64 & 67 & 科学计算 \\
+TF32 & 989 & 默认训练格式 \\
+FP16/BF16 & 1,979 & 常用推理格式 \\
+FP8 & 3,958 & 量化推理 \\
+INT8 & 3,958 & 量化推理 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\translatornote{此处保留原表的列标题。INT8 是整数格式，其运算速率通常用 TOPS 表示，见附录 D。}
+
+推理可采用比训练更低的精度，因为只需保证\emph{前向传播}的结果足够准确，不必用高精度累积梯度。正因如此，INT8 和 FP8 推理的理论峰值吞吐量约为 FP16 的两倍。
+
+\section{存储层次与带宽}
+
+要弄清推理性能，就必须知道数据在每个时刻存放在哪一层。
+
+% <<<PDFPAGE 10>>>
+\begin{conceptbox}{GPU 存储层次（H100 SXM）}
+\begin{tabular}{@{}llll@{}}
+\textbf{层级} & \textbf{容量} & \textbf{带宽} & \textbf{时延} \\
+寄存器 & 约 256~KB/SM & $>20$~TB/s & 约 1 个时钟周期 \\
+共享内存（L1） & 228~KB/SM & 约 10~TB/s & 约 20 个时钟周期 \\
+二级缓存 & 50~MB & 约 12~TB/s & 约 150 个时钟周期 \\
+HBM3（显存，VRAM） & 80~GB & 3.35~TB/s & 约 600 个时钟周期 \\
+NVLink & 多 GPU & 900~GB/s & 微秒级 \\
+PCIe & CPU--GPU & 64~GB/s & 微秒级 \\
+\end{tabular}
+\end{conceptbox}
+
+标准注意力会在 HBM 中计算完整的注意力矩阵。FlashAttention 的思路是将运算分块（tiling），使每个分块能放进共享内存，从而避免绝大部分 HBM 访存，达到近乎最优的存储访问效率。
+
+\section{CPU 与边缘设备硬件}
+
+推理并非都在数据中心的 GPU 上进行。对时延敏感的应用、本地部署和成本优化都离不开中央处理器（central processing unit，CPU）推理。
+
+\textbf{面向推理的现代 CPU} 使用 AVX-512 的向量神经网络指令（Vector Neural Network Instructions，VNNI），高效执行 INT8 矩阵–向量乘法。英特尔第四代至强可扩展处理器的 INT8 吞吐量可达约 10~TFLOP/s，足以运行小型模型。
+
+\textbf{Apple Silicon}（M3 Ultra）将 CPU 与 GPU 的内存合为一个资源池，容量最高 192~GB，带宽约为 800~GB/s。这种统一内存（unified memory）架构尤其适合大型模型推理，此类模型采用独立 GPU 往往需要多块显卡。
+
+移动设备的片上系统（system on a chip，SoC）中，高通的 \textbf{Hexagon 数字信号处理器}（digital signal processor，DSP）和\textbf{神经网络处理器}（neural processing unit，NPU）专为低功耗神经网络推理设计。在毫瓦级功耗预算下，它们每秒可执行数万亿次运算（Tera-Operations Per Second，TOPS）。
+
+\section{新兴硬件趋势}
+
+\begin{itemize}
+  \item \textbf{Google TPU v5p。}采用定制矩阵运算引擎，利用芯片间互连组建包含数千块芯片的集群（pod），用于大型模型推理。
+  \item \textbf{Groq LPU。}这种时延可预测的推理加速器没有动态随机存取存储器（dynamic random-access memory，DRAM），所有权重都存放在片上静态随机存取存储器（static random-access memory，SRAM）中，每块芯片每秒可生成约 500 个词元，时延极低。
+  \item \textbf{Cerebras WSE-3。}晶圆级引擎带有 44~GB 片上 SRAM。只要模型能全部放入 SRAM，就能彻底消除 HBM 瓶颈。
+  \item \textbf{光子计算}（photonic computing）。这项技术还处于早期，用光代替电子做矩阵乘法，有望大幅降低功耗。
+\end{itemize}
+
+\begin{interview}
+\question{1}{请解释 HBM 带宽与 NVLink 带宽的区别。它们分别在什么时候成为瓶颈？}
+\textbf{HBM} 是一块 GPU 的本地显存。在 H100 上，它的带宽为 3.35~TB/s。单 GPU 推理为每个词元加载模型权重时，HBM 带宽就是瓶颈。\textbf{NVLink} 用于
+% <<<PDFPAGE 11>>>
+同一节点内多块 GPU 的高速互连，H100 的 NVLink 总带宽为 900~GB/s。采用\textbf{张量并行}（tensor parallelism）推理时，NVLink 可能成为瓶颈。将大型模型切分到多块 GPU 后，每一层中各注意力头（attention head）的输出都要跨 GPU 执行全归约（all-reduce）。如果模型分到 8 块 GPU 上，每次全归约都会占用 NVLink 带宽。对参数量达 1,750 亿以上的超大型模型，NVLink 可能限制张量并行的扩展效率。
+
+\question{2}{Apple Silicon 的峰值 FLOP/s 低于独立 GPU，为什么运行大语言模型推理时仍然具有竞争力？}
+Apple Silicon 采用\textbf{统一内存架构}，CPU、GPU 和神经网络引擎（Neural Engine）共享同一个物理内存池，在 M3 Ultra 上容量最高 192~GB。这样就消除了独立 GPU 系统的 PCIe 瓶颈，后者必须通过 64~GB/s 的总线复制数据。统一内存的 800~GB/s 带宽可与独立 GPU 相比。更重要的是，一个 700 亿参数的模型（FP16 下占 140~GB）无需量化就能完整装入内存，而当时的单块独立 GPU 都无法做到这一点。对于受访存带宽限制的解码工作负载，每美元能获得的带宽比每美元能获得的 FLOP/s 更值得关注。
+
+\question{3}{张量核心支持的 FP16、INT8 和 FP8 格式对推理有什么意义？你会在什么时候选用各个格式？}
+张量核心可加速特定低精度格式的矩阵乘法。在 H100 上，INT8 和 FP8 的吞吐量约为 FP16 的两倍。对准确率要求很高的模型，只要硬件原生支持，我就会选择 \textbf{FP16 或 BF16}（16 位脑浮点格式，Brain Float 16），以优先保证精度。\textbf{INT8}（通过 GPTQ、AWQ 或 LLM.int8() 实现）很适合对 700 亿参数以内的模型做权重量化，显存占用约减半，在大多数任务上的准确率损失很小。\textbf{FP8}（H100 原生支持）正在成为兼顾精度和速度的选择。它的动态范围比 INT8 更大，支持硬件加速，并越来越多地用于 TensorRT-LLM 等生产系统。对于在 H100 同级硬件上的新部署，我会选 FP8。
+
+\question{4}{你会如何对大语言模型的推理负载做性能分析，判断它受计算能力限制还是受访存带宽限制？}
+我会使用 \textbf{NVIDIA Nsight Systems} 查看时间线（SM 活动、HBM 传输和 PCIe 传输），使用 \textbf{Nsight Compute} 分析计算内核（kernel）的性能，对比实际与峰值 FLOP/s、实际与峰值访存吞吐量。具体来说，我会（1）测量实际访存带宽占 HBM 峰值带宽的比例，（2）测量实际 FLOP/s 占张量核心峰值 FLOP/s 的比例，（3）计算主要内核的运算强度（operational intensity）。如果访存带宽接近饱和而 FLOP/s 利用率很低，负载就受访存带宽限制。我还会依次测量不同的批大小。如果吞吐量随批大小线性增长，就说明受访存带宽限制。如果吞吐量进入平台期，则说明计算已经饱和。
+
+\question{5}{在 Groq LPU 和 NVIDIA H100 上部署推理服务，各有什么取舍？}
+\textbf{Groq LPU} 优先提供可预测的极低时延。所有权重都存放在片上 SRAM 中，免去了 DRAM 访问时延，单流吞吐量能维持在约每秒 500 个词元。但 SRAM 昂贵且容量有限，单块 LPU 能服务的模型大小有上限，扩展到超大型模型就要用许多芯片，成本很高。\textbf{H100} 的灵活性要高得多。每块 GPU 配备 80~GB HBM，可通过多 GPU 支持几乎任意大小的模型，能
+% <<<PDFPAGE 12>>>
+通过 CUDA 编程，还有各种经过优化的库。对于模型大小固定、时延要求高的应用（例如使用指定 70 亿参数模型的生产聊天机器人），我会选 Groq。需要灵活性、运行 700 亿参数及以上的模型，或需要做高吞吐量批推理而绝对时延不那么重要时，我会选 H100。
+\end{interview}

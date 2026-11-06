@@ -1,0 +1,21 @@
+% <<<PDFPAGE 53>>>
+\appendixchapter{A}{主要公式速查}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}p{.28\linewidth}l@{}}
+\toprule
+\textbf{概念} & \textbf{公式} \\
+\midrule
+注意力 & $\operatorname{Attn}(\mathbf{Q},\mathbf{K},\mathbf{V})
+  =\operatorname{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^{\top}}{\sqrt{d_k}}\right)\mathbf{V}$ \\
+KV 缓存大小 & $2\times L\times n\times H\times d_h\times\text{字节数}$ \\
+屋顶线 & $\mathrm{Perf}=\min(\text{峰值 FLOP/s},\,I\times B_{\mathrm{mem}})$ \\
+推测解码加速 & $\mathbb{E}[\text{接受数}]=\frac{1-\alpha^{K+1}}{1-\alpha}$ \\
+流水线气泡占比 & $\frac{p-1}{m+p-1}$ \\
+量化尺度 & $s=\frac{x_{\max}-x_{\min}}{2^b-1}$ \\
+MFU & $\frac{\text{实际 FLOP/s}}{\text{峰值 FLOP/s}}$ \\
+每词元成本 & $\frac{\text{每小时 GPU 成本}}{\text{每小时词元数}}$ \\
+\bottomrule
+\end{tabular}
+\end{center}

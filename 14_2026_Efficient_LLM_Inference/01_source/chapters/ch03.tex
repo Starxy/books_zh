@@ -1,0 +1,111 @@
+% <<<PDFPAGE 13>>>
+\chapter{Transformer 推理机制}
+\label{ch:transformer-inference}
+
+\section{Transformer 前向传播的构成}
+
+标准的纯解码器 Transformer（decoder-only Transformer），如 GPT、LLaMA 或 Mistral，通过堆叠的 $L$ 个相同层处理词元。每层包含两个组件，即\textbf{多头注意力}（Multi-Head Attention，MHA）模块和\textbf{前馈网络}（Feed-Forward Network，FFN）。每个组件之后都接层归一化（layer normalization）与残差连接（residual connection）。
+
+设输入序列含 $n$ 个词元，模型维度为 $d$。前向传播的步骤如下。
+
+\begin{enumerate}
+  \item \textbf{嵌入}（embedding）。将词元 ID 映射为向量，得到 $\mathbf{X}\in\mathbb{R}^{n\times d}$。
+  \item \textbf{逐层处理}，其中 $\ell=1,\ldots,L$。
+  \begin{enumerate}
+    \item 计算查询、键和值（query、key、value），即 $\mathbf{Q}=\mathbf{X}\mathbf{W}_Q$、$\mathbf{K}=\mathbf{X}\mathbf{W}_K$、$\mathbf{V}=\mathbf{X}\mathbf{W}_V$。
+    \item 计算注意力
+    \[
+    \operatorname{Attn}(\mathbf{Q},\mathbf{K},\mathbf{V})
+    =\operatorname{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^{\top}}{\sqrt{d_k}}\right)\mathbf{V}
+    \]
+    \item 应用带门控的前馈网络
+    \[
+    \operatorname{FFN}(\mathbf{x})
+    =\sigma(\mathbf{x}\mathbf{W}_1)\odot(\mathbf{x}\mathbf{W}_3)\cdot\mathbf{W}_2
+    \]
+  \end{enumerate}
+  \item \textbf{语言模型输出头}（language model head）。投影得到词表上各词元的未归一化得分（logits），再进行采样。
+\end{enumerate}
+
+\section{KV 缓存及其重要性}
+
+没有缓存时，自回归生成每一步都必须为此前所有词元重新计算键和值，总开销随序列长度按 $O(n^2)$ 增长。\textbf{KV 缓存}解决了这个问题。预填充结束后，已处理的每个词元在各层的键矩阵和值矩阵均已保存，后续的解码步骤可以直接复用。
+
+\begin{definitionbox}{KV 缓存的定义}
+KV 缓存是一种数据结构，存放此前生成的所有词元在注意力计算中的键张量 $\mathbf{K}$ 和值张量 $\mathbf{V}$。解码时，可以直接用这些张量关注此前的上下文，无需重新计算。
+\end{definitionbox}
+
+单个序列的 \textbf{KV 缓存显存占用}为
+\[
+\text{显存占用}
+=2\times L\times n\times n_{\mathrm{heads}}\times d_{\mathrm{head}}\times\texttt{bytes\_per\_element}
+\]
+以 LLaMA-2 70B 为例（80 层、64 个头、每头 128 维、FP16、上下文长度 4096），相应的显存占用为
+\[
+2\times 80\times 4096\times 64\times 128\times 2\approx 10.7\,\mathrm{GB}
+\]
+
+正是这种巨大的显存开销，使 KV 缓存管理成为大语言模型服务的主要难题。
+
+\translatornote{缓存公式中的 $n_{\mathrm{heads}}$ 应取键值头数。原书代入了 64 个查询头。LLaMA-2 70B 使用 GQA，采用 8 个键值头。在其他条件相同的情况下，按上式计算约为 1.34~GB。参见 \href{https://arxiv.org/abs/2307.09288}{Llama 2 论文表 1 和附录 A.2.1}。}
+
+% <<<PDFPAGE 14>>>
+\section{预填充与解码的工作负载差异}
+
+\begin{conceptbox}{预填充阶段}
+在一次前向传播中并行处理提示中的全部 $n$ 个词元。主要运算是前馈网络中的通用矩阵乘法（General Matrix Multiplication，GEMM），两个矩阵的形状分别为 $[n,d]$ 和 $[d,4d]$。提示较长时（$n$ 较大），这类运算\textbf{受计算能力限制}，GPU 张量核心的利用率较高。
+\end{conceptbox}
+
+\begin{conceptbox}{解码阶段}
+每一步处理一个词元。主要运算是通用矩阵–向量乘法（General Matrix-Vector Multiply，GEMV），参与相乘的形状为 $[1,d]\times[d,4d]$。这类运算\textbf{受访存带宽限制}。以 FP16 格式的 700 亿参数模型为例，每一步都要加载约 140~GB 的权重，实际计算量却很小。GPU 张量核心利用率通常低于 10\%。
+\end{conceptbox}
+
+\section{注意力变体，从 MHA 到 MLA}
+
+上下文长度快速增长，促使人们改进注意力架构，以减少 KV 缓存占用。
+
+\textbf{多头注意力（MHA）。}含 $H$ 个头的标准注意力。每个头都有各自的 $\mathbf{K}$ 和 $\mathbf{V}$ 矩阵，KV 缓存与 $H$ 成正比。
+
+\textbf{多查询注意力}（Multi-Query Attention，MQA）。所有查询头共用一组 $\mathbf{K}$ 和 $\mathbf{V}$ 矩阵。KV 缓存降至原来的 $1/H$，但模型质量可能下降。
+
+\textbf{分组查询注意力（GQA）。}按组共享，每组的 $G$ 个查询头共用一组 $\mathbf{K}$ 和 $\mathbf{V}$。LLaMA-3、Mistral、Gemma 都采用这种方法。它在 MHA 与 MQA 之间给出一种有原则的折中。
+
+\textbf{多头潜在注意力（MLA）。}由 DeepSeek-V2 引入。把键和值投影到维度为 $c\ll d$ 的潜在空间，KV 缓存只保存潜在向量。与 MHA 相比，KV 缓存缩至原来的约 $1/13$ 至 $1/5$，模型质量下降很小。
+\[
+\text{KV 缓存容量之比}\quad \mathrm{MHA}:\mathrm{GQA}:\mathrm{MLA}\approx 8:2:1
+\]
+
+\section{推理时的位置编码}
+
+\textbf{旋转位置嵌入}（Rotary Positional Embeddings，RoPE）是纯解码器大语言模型当前的主要位置编码（positional encoding）方式。RoPE 在复平面上旋转查询向量和键向量来编码位置。
+\[
+\mathbf{q}_m=\mathbf{q}\cdot e^{im\theta},
+\qquad
+\mathbf{k}_n=\mathbf{k}\cdot e^{in\theta}
+\]
+这样，内积 $\langle\mathbf{q}_m,\mathbf{k}_n\rangle$ 就只取决于相对位置 $m-n$。推理时，RoPE 可以结合神经切线核（neural tangent kernel，NTK）感知缩放（NTK-aware scaling）或 YaRN 实现\textbf{上下文长度外推}（context length extrapolation）。借助恰当的位置插值（position interpolation），在 4K 上下文上训练的模型可推广到 128K 或更长的上下文。
+
+\begin{interview}
+\question{1}{请解释多查询注意力和分组查询注意力的区别。为什么它们对推理很重要？}
+标准多头注意力的 $H$ 个注意力头
+% <<<PDFPAGE 15>>>
+各有一套独立的 $\mathbf{K}$ 和 $\mathbf{V}$ 投影矩阵，因此 KV 缓存随头数线性增长。Shazeer（2019）提出的 MQA 让所有查询头共用同一组 $\mathbf{K}$ 和 $\mathbf{V}$，将 KV 缓存降至原来的 $1/H$。但让所有头共享可能降低模型质量。GQA 是其推广，将查询头分为 $G$ 组，每组共用一对 $\mathbf{K}$ 和 $\mathbf{V}$。这样，KV 缓存缩至原来的 $G/H$，同时保留比 MQA 更大的模型容量。对推理而言，这些技术直接减轻显存压力，使系统能够处理更长的上下文和更大的批次。LLaMA-3 70B 使用 GQA，64 个查询头对应 8 个键值头，KV 缓存缩至原来的八分之一。
+
+\translatornote{此处的 $G$ 表示分组数。第 3.4 节用同一个字母表示每组的查询头数。}
+
+\question{2}{请说明一个 70 亿参数的模型生成 1000 个词元时，KV 缓存会怎样变化。}
+预填充时，所有提示词元并行处理，各层计算出的键和值都存入 KV 缓存。对一个 70 亿参数的模型（32 层、32 个头、每头 128 维、FP16），每个词元在每一层的 KV 缓存占 $2\times32\times128\times2=16{,}384$ 字节。在含 512 个词元的提示后生成 1000 个词元，KV 缓存会从开始时的 $512\times16{,}384\times32$ 字节增至结束时的 $1512\times16{,}384\times32\approx790\,\mathrm{MB}$。每次解码都要读取整个 KV 缓存，而缓存随步数不断增长。我们计算新查询对所有缓存键的注意力，再把新的键值对追加到缓存。随着生成序列变长，读取缓存的开销越来越大，因此解码时延会略有增加。
+
+\question{3}{注意力的复杂度瓶颈是什么？现代系统如何解决？}
+标准注意力的时间和空间复杂度均为 $O(n^2)$，注意力矩阵 $\mathbf{Q}\mathbf{K}^{\top}$ 的形状为 $n\times n$。当 $n=128{,}000$ 个词元时，该矩阵占 $128{,}000^2\times2$ 字节，约 32~GB，太大而难以直接存入 HBM。现代系统有几种应对方法。（1）\textbf{FlashAttention}，用分块计算避免在 HBM 中显式构造完整的注意力矩阵。（2）\textbf{稀疏注意力模式}（sparse attention patterns），如 Longformer 和 BigBird，只关注一部分词元。（3）\textbf{线性注意力近似}（linear attention approximations），用核方法（kernel methods）近似 softmax 注意力，实现 $O(n)$ 的复杂度。（4）\textbf{状态空间模型}（State Space Model，SSM），如 Mamba，用递归结构完全取代注意力，在 $O(n)$ 时间和 $O(1)$ 内存下处理长序列。
+
+\question{4}{RoPE 如何实现上下文长度外推？直接把上下文扩到训练长度之外会出什么问题？}
+RoPE 通过对查询向量和键向量施加旋转矩阵来编码位置，第 $i$ 维的旋转角度参数为 $\theta_i=1/10000^{2i/d}$。位置变化时，高频维度旋转得快，低频维度旋转得慢。若直接外推到训练上下文长度 $n$ 之外，高频维度会遇到训练中未见过的旋转角度，注意力得分也会超出训练分布（out-of-distribution）。模型就无法准确区分相对位置。\textbf{YaRN 和 NTK 感知缩放}按扩展比例重新缩放基频 $\theta$，使各维度在新的上下文长度下仍落在原分布范围内，以此解决该问题。
+
+\question{5}{为什么解码受访存带宽限制，而预填充受计算能力限制？这对服务系统设计有什么影响？}
+解码时一次处理一个词元，因此矩阵运算是有一维为 1 的矩阵–向量乘法（GEMV）。
+% <<<PDFPAGE 16>>>
+GEMV 的算术强度约为 2~FLOP/byte（加载一次权重矩阵来做一次点积），远低于屋顶线模型中转为计算受限的阈值，GPU 张量核心的利用率很低。预填充时同时处理 $n$ 个词元，运算成为矩阵–矩阵乘法（GEMM），算术强度高得多（约 $2n/d$ FLOP/byte），$n$ 较大时便接近计算饱和。对服务系统的设计，有两点启示。（1）通过连续批处理增大解码阶段的有效批大小。（2）考虑预填充与解码分离（disaggregated prefill-decode serving），如 Splitwise 和 Mooncake，让预填充在针对计算优化的节点上运行，解码在针对访存带宽优化的节点上运行。
+
+\translatornote{算术强度取决于数据精度和访存次数。以第 3.3 节的矩阵形状为例，若两个输入矩阵和结果各传输一次，每个元素占 $b$ 字节，一次乘加计 2 次浮点运算，则 GEMM 的算术强度为 $8nd/[b(5n+4d)]$ FLOP/byte。}
+\end{interview}

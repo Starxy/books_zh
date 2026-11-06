@@ -2,7 +2,7 @@
   "organized_on": "2026-11-06",
   "root": ".",
   "operation": "保留TeX底本与必要PDF资料，完整中文译本统一保存在00_books。",
-  "status": "13 份中文 PDF 已归档。《扩散模型原理》的中文 TeX 仍缺失，整本复核尚未启动。",
+  "status": "14 份中文 PDF 已归档。《扩散模型原理》的中文 TeX 仍缺失，整本复核尚未启动。",
   "subfolders": [
     "00_originals",
     "01_source",
@@ -413,16 +413,43 @@
       "split_pdf_count": 14,
       "glossary": "13_2024_Large_Language_Models_A_Deep_Dive/02_glossary/glossary_en_zh.md",
       "translation_completed_on": "2026-11-06"
+    },
+    {
+      "title": "Efficient LLM Inference",
+      "chinese_title": "大语言模型高效推理",
+      "author": "Lamhot Siagian (AI Engineering Insider)",
+      "folder": "14_2026_Efficient_LLM_Inference",
+      "original_name": "Efficient LLM Inference.pdf",
+      "renamed_file": "2026_Efficient_LLM_Inference_2ndEd_EN.pdf",
+      "relative_path": "14_2026_Efficient_LLM_Inference/00_originals/2026_Efficient_LLM_Inference_2ndEd_EN.pdf",
+      "version": "Second Edition, 2026",
+      "pages": 57,
+      "bytes": 761066,
+      "sha256": "675442228ad6692b1fe3a230bf0a4d765cfddd1fd29c9fa78d097259e4b824bb",
+      "translation_status": "全书中文译文已完成并编译",
+      "translated_pdf": "00_books/Efficient_LLM_Inference_cn_translated.pdf",
+      "translated_pages": 55,
+      "translated_bytes": 1007615,
+      "translated_sha256": "efea68948a121ca1541429b22fa58e49f7425ec63617aff6c6e446b73342040f",
+      "chinese_source": "14_2026_Efficient_LLM_Inference/01_source",
+      "build_command": "python \"14_2026_Efficient_LLM_Inference/01_source/build.py\"",
+      "description": "封面、目录、14 章、70 道模拟面试问答及附录 A–D，包含公式速查、15 条论文导读、22 条术语释义和硬件对比。",
+      "source_route": "pdf",
+      "source_metadata": "14_2026_Efficient_LLM_Inference/00_originals/source_metadata.json",
+      "split_directory": "14_2026_Efficient_LLM_Inference/00_originals/split",
+      "split_pdf_count": 19,
+      "glossary": "14_2026_Efficient_LLM_Inference/02_glossary/glossary_en_zh.md",
+      "translation_completed_on": "2026-11-06"
     }
   ],
   "reference_materials": "05_references：存放社区译本、已有中文版本及其他辅助资料，供后续翻译与校对参考。",
   "split_summary": {
-    "scope": "六本 PDF 底本保留分章文件。TeX 底本按源码章节组织。",
-    "books": 6,
-    "total_pdfs": 115,
-    "total_chapters": 91,
-    "total_pages": 3059,
-    "verification_basis": "既有分章文件沿用原核验记录。《大语言模型深度解析》分章已逐页比较整书的文字和页码标签。",
+    "scope": "7 本 PDF 底本保留分章文件。TeX 底本按源码章节组织。",
+    "books": 7,
+    "total_pdfs": 134,
+    "total_chapters": 105,
+    "total_pages": 3116,
+    "verification_basis": "既有分章文件沿用原核验记录。《大语言模型深度解析》分章已逐页比较整书的文字和页码标签。《大语言模型高效推理》分章已逐页与整书比较文字、页码标签和页面图像。",
     "overview_file": "00_chapter_split_overview.md"
   },
   "initial_organization": {
@@ -430,7 +457,7 @@
     "operation": "仅重命名、移动原始 PDF，并创建空的翻译工作目录；未进行翻译。",
     "status": "已完成，七份 PDF 校验一致"
   },
-  "translated_pages_total": 4800,
+  "translated_pages_total": 4855,
   "validation": {
     "clean_builds_passed": 7,
     "total_pages": 2773,
@@ -446,7 +473,7 @@
   "collection_directory": "00_books",
   "repository_root": ".",
   "pdf_version_control": "Git LFS",
-  "collection_count": 13,
+  "collection_count": 14,
   "previous_archive": {
     "filename": "Seven_Books_cn_translated.zip",
     "status": "历史压缩包记录；当前以00_books汇总目录为准。",

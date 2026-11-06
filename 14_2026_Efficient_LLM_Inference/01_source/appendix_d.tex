@@ -1,0 +1,35 @@
+% <<<PDFPAGE 57>>>
+\appendixchapter{D}{硬件对比}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lccrrr@{}}
+\toprule
+\textbf{GPU} & \textbf{显存} & \shortstack{\textbf{带宽}\\\textbf{（TB/s）}}
+ & \shortstack{\textbf{FP16}\\\textbf{TFLOP/s}}
+ & \shortstack{\textbf{INT8}\\\textbf{TOPS}} & \textbf{TDP（W）} \\
+\midrule
+H100 SXM5 & 80 GB & 3.35 & 1,979 & 3,958 & 700 \\
+H100 PCIe & 80 GB & 2.0 & 1,513 & 3,026 & 350 \\
+A100 SXM & 80 GB & 2.0 & 312 & 624 & 400 \\
+RTX 4090 & 24 GB & 1.0 & 165 & 330 & 450 \\
+RTX 3090 & 24 GB & 0.94 & 71 & 142 & 350 \\
+Apple M3 Ultra & 192 GB & 0.8 & 28 & 56 & 60 \\
+\midrule
+\multicolumn{6}{@{}l@{}}{Groq LPU 的片上 SRAM 带宽约为 900~GB/s，64 颗芯片合计约 1~PB/s。} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\translatornote{表中数据按原书保留。H100 两行的 FP16 和 INT8 峰值采用结构化稀疏的口径，A100 一行采用稠密口径。Apple 公布的 M3 Ultra Mac Studio 统一内存配置为 96~GB 起、最高 512~GB。按每芯片 900~GB/s 直接相加，64 颗为 57.6~TB/s。原表未交代 Groq 两个带宽值的统计口径。参见 \href{https://resources.nvidia.com/en-us-hopper-architecture}{NVIDIA Hopper 架构白皮书表 3}和 \href{https://www.apple.com/newsroom/2025/03/apple-unveils-new-mac-studio-the-most-powerful-mac-ever/}{Apple 的 2025 年发布说明}。}
+
+\vspace{2\baselineskip}
+\begin{center}
+{\color{bookblue}\rule{.5\linewidth}{.4pt}}\par
+\bigskip
+{\large\itshape 全书完\par}
+\smallskip
+\emph{“最好的推理，是用户从不需要操心的推理。”}\par
+\bigskip
+{\color{bookblue}\rule{.5\linewidth}{.4pt}}
+\end{center}

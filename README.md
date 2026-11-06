@@ -54,6 +54,7 @@ scripts/                          仓库维护检查工具
 | [Designing Clinical Research](11_2023_Designing_Clinical_Research/) | 临床研究设计 | [PDF](00_books/Designing_Clinical_Research_cn_translated.pdf) | 515 |
 | [Deep Generative Modeling](12_2024_Deep_Generative_Modeling/) | 深度生成建模（第二版） | [PDF](00_books/Deep_Generative_Modeling_cn_translated.pdf) | 341 |
 | [Large Language Models: A Deep Dive](13_2024_Large_Language_Models_A_Deep_Dive/) | 大语言模型深度解析：贯通理论与实践 | [PDF](00_books/Large_Language_Models_A_Deep_Dive_cn_translated.pdf) | 462 |
+| [Efficient LLM Inference](14_2026_Efficient_LLM_Inference/) | 大语言模型高效推理 | [PDF](00_books/Efficient_LLM_Inference_cn_translated.pdf) | 55 |
 
 《生成式人工智能基础小册》于2026-10-25依据同版英文TeX完成译文与排版走查，补建[术语表](08_2026_The_Little_Book_of_Generative_AI_Foundations/02_glossary/glossary_en_zh.md)，修正译法、图中文字和版面问题，重新生成196页中文PDF。原文中需要补充数学条件的表述以译注说明。
 
@@ -79,6 +80,8 @@ scripts/                          仓库维护检查工具
 《临床研究设计》第五版于2026-11-02依据用户提供的786页电子PDF完成中文译排。版权页与CIP标为2023年，原文件名标为2022年；译文以所提供第五版内容为底本。包含三个分部、20章、全部章内附录与习题、习题答案、442条术语释义及分层索引。原书疑点在文内加注；索引保留英文纸本页码，并附英文PDF页序与中文章节起始页表。中文源码、术语及构建入口见[书籍工程](11_2023_Designing_Clinical_Research/)。
 
 《大语言模型深度解析》依据用户提供的 Springer 2024 年第一版 PDF 完成译排。包含书前材料、10 章、章末参考文献、附录 A、B 和 585 个索引词项。索引保留原版印刷页码，并提供译文章节链接和两版起始页对照。中文 LaTeX、术语表和构建说明见[书籍工程](13_2024_Large_Language_Models_A_Deep_Dive/)。
+
+《大语言模型高效推理》依据用户提供的 2026 年第二版 PDF 完成译排。包含封面和目录、14 章、70 道模拟面试问答及附录 A–D。在译注中说明原书推测解码算例、每百万词元成本公式和硬件表的口径差异。中文 LaTeX、术语表与构建入口见[书籍工程](14_2026_Efficient_LLM_Inference/)。
 
 ## 新增与维护书籍
 

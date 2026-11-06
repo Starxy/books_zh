@@ -1,0 +1,81 @@
+% <<<PDFPAGE 1>>>
+\markboth{}{}
+\thispagestyle{book}
+\vspace*{45pt}
+
+{\color{bookblue}\hrule height 2.5pt}
+\begin{center}
+  \vspace{12pt}
+  {\Huge\heiti\bfseries\color{bookblue} 大语言模型高效推理\par}
+  \vspace{5pt}
+  {\Large\heiti\bfseries\color{boxgray} 系统、算法与生产工程\par}
+  \vspace{3pt}
+  {\LARGE\heiti\bfseries\color{bookteal} 面试速查笔记\par}
+  \vspace{10pt}
+\end{center}
+{\color{bookblue}\hrule height .9pt}
+
+\vspace{35pt}
+\begin{center}
+\begin{tikzpicture}[
+  x=25mm,y=9mm,
+  neuron/.style={circle,draw,thick,minimum size=19pt,inner sep=0pt},
+  connection/.style={gray!43,line width=.35pt},
+  layer/.style={font=\heiti\bfseries\small}
+]
+  \foreach \i in {1,...,5} {
+    \coordinate (input-\i) at (0,3-\i);
+  }
+  \foreach \i in {1,...,6} {
+    \coordinate (hidden-\i) at (1,3.5-\i);
+  }
+  \foreach \i in {1,...,3} {
+    \coordinate (output-\i) at (2,2-\i);
+  }
+
+  \foreach \i in {1,...,5} {
+    \foreach \j in {1,...,6} {
+      \draw[connection] (input-\i) -- (hidden-\j);
+    }
+  }
+  \foreach \i in {1,...,6} {
+    \foreach \j in {1,...,3} {
+      \draw[connection] (hidden-\i) -- (output-\j);
+    }
+  }
+
+  \foreach \i in {1,...,5} {
+    \node[neuron,draw=bookblue,fill=bookblue!10] at (input-\i) {};
+  }
+  \foreach \i in {1,...,6} {
+    \node[neuron,draw=bookteal,fill=bookteal!10] at (hidden-\i) {};
+  }
+  \foreach \i in {1,...,3} {
+    \node[neuron,draw=orange,fill=orange!12] at (output-\i) {};
+  }
+  \node[layer,bookblue] at (0,2.65) {输入层};
+  \node[layer,bookteal] at (1,3.5) {隐藏层};
+  \node[layer,boxamber] at (2,1.65) {输出层};
+\end{tikzpicture}
+
+\vspace{25pt}
+{\Large\heiti\bfseries\color{bookblue} 作者\par}
+\smallskip
+{\large\bfseries AI Engineering Insider\par}
+Lamhot Siagian\par
+\smallskip
+{\small\color{bookteal}\url{https://www.linkedin.com/in/lamhotsiagian}\par}
+
+\vspace{17pt}
+2026 年第二版
+\end{center}
+
+\vfill
+{\color{bookblue}\hrule height 1.5pt}
+\smallskip
+{\centering\small\itshape
+涵盖量化、推测解码、KV 缓存、FlashAttention、vLLM、混合专家、\\
+边缘推理、生产系统及推理时计算扩展\par}
+
+\clearpage
+% <<<PDFPAGE 2–4>>> 原书目录由主文件按中文页码生成。

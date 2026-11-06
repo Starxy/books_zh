@@ -1,0 +1,44 @@
+% <<<PDFPAGE 55>>>
+\appendixchapter{C}{术语表}
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{@{}p{.23\linewidth}p{.73\linewidth}@{}}
+\toprule
+\textbf{术语} & \textbf{定义} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{术语} & \textbf{定义} \\
+\midrule
+\endhead
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+AWQ & 激活感知权重量化（Activation-aware Weight Quantization）。一种训练后量化方法，根据激活值的幅度先缩放通道，再进行量化。 \\
+BF16 & 16 位脑浮点格式（Brain Float 16）。指数范围与 FP32 相同，广泛用于大语言模型的训练和推理。 \\
+FLOP & 浮点运算（Floating Point Operation）。 \\
+GQA & 分组查询注意力（Grouped Query Attention）。各组查询头在组内共用一对键和值。 \\
+GPTQ & 逐层进行的二阶训练后量化方法，利用海森矩阵（Hessian matrix）的信息来量化权重。 \\
+HBM & 高带宽存储器（High Bandwidth Memory）。现代 GPU 采用的一类动态随机存取存储器（DRAM），如 HBM2e 和 HBM3。 \\
+KV Cache & 键值缓存（Key-Value cache）。存储此前生成的词元的注意力键和值。 \\
+MFU & 模型浮点运算利用率（Model FLOP Utilization）。实际用于模型计算的浮点运算速率占峰值速率的比例。 \\
+MLA & 多头潜在注意力（Multi-head Latent Attention）。采用压缩的潜在 KV 表征的注意力变体。 \\
+MoE & 混合专家（Mixture of Experts）。一种包含多个专家前馈网络、可对词元进行路由的模型架构。 \\
+MQA & 多查询注意力（Multi-Query Attention）。所有查询头共用一对键和值。 \\
+NVLink & NVIDIA 的 GPU 间高带宽互连技术，在 H100 上为 900~GB/s。 \\
+PagedAttention & 采用虚拟内存分页来管理 KV 缓存的内存占用。 \\
+PRM & 过程奖励模型（Process Reward Model）。为中间推理步骤打分的奖励模型。 \\
+PTQ & 训练后量化（Post-Training Quantization）。在模型训练完成后应用量化。 \\
+QAT & 量化感知训练（Quantization-Aware Training）。训练时将量化纳入训练过程。 \\
+RoPE & 旋转位置嵌入（Rotary Positional Embeddings）。通过复数旋转实现的位置编码。 \\
+SSM & 状态空间模型（State Space Model）。一种使用学习得到的递归状态的序列模型，例如 Mamba 和 S4。 \\
+TPOT & 每输出词元耗时（Time Per Output Token）。相邻输出词元之间的时间间隔。 \\
+TTFT & 首词元时延（Time To First Token）。从收到请求到返回第一个输出词元的时间间隔。 \\
+TensorCore & 张量核心。用于加速矩阵乘法的专用 GPU 计算单元。 \\
+% <<<PDFPAGE 56>>>
+vLLM & 虚拟大语言模型（Virtual LLM）。使用 PagedAttention 和连续批处理的高吞吐量服务系统。 \\
+\end{longtable}
+\endgroup

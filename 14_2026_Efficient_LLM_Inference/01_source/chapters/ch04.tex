@@ -1,0 +1,102 @@
+% <<<PDFPAGE 17>>>
+\chapter{量化}
+\label{ch:quantization}
+
+\section{量化为什么重要}
+
+一个以 FP32 存储的 700 亿参数模型需要 280~GB 显存。仅存放权重，就超过了三块 80~GB A100 的总容量。换成 FP16 或 BF16，显存需求降到 140~GB。采用 INT8 量化，则只需要 70~GB，在一块 H100 上即可容纳权重，还能为 KV 缓存留出空间。用 INT4 时，权重只占 35~GB，一块 GPU 就能轻松装下。量化会直接决定模型能否部署为服务。
+
+\section{数值格式}
+
+\begin{center}
+\begin{tabularx}{0.91\linewidth}{@{}lcl>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{格式} & \textbf{位数} & \textbf{范围} & \textbf{特点} \\
+\midrule
+FP32 & 32 & $\pm3.4\times10^{38}$ & 全精度，标准训练格式 \\
+BF16 & 16 & $\pm3.4\times10^{38}$ & 指数范围与 FP32 相同，尾数精度较低 \\
+FP16 & 16 & $\pm65{,}504$ & 常用推理格式，有溢出风险 \\
+FP8 E4M3 & 8 & $\pm448$ & H100 原生支持，用于推理和微调 \\
+FP8 E5M2 & 8 & $\pm57{,}344$ & 范围更广，精度较低 \\
+INT8 & 8 & $-128$ 至 $127$ & 支持广泛，大小为 FP16 的一半 \\
+INT4 & 4 & $-8$ 至 $7$ & 大小为 FP16 的四分之一，需要仔细校准 \\
+INT2 & 2 & $-2$ 至 $1$ & 极高压缩率，质量明显下降 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{训练后量化方法}
+
+\subsection{GPTQ}
+
+GPTQ（Frantar 等，2022）是一种逐层的二阶训练后量化（Post-Training Quantization，PTQ）方法。它逐行量化权重，并利用海森矩阵（Hessian matrix）的逆矩阵更新尚未量化的权重，以补偿已量化权重带来的误差。
+\[
+\delta\mathbf{W}
+=-\frac{w_q-w}{[\mathbf{H}_F^{-1}]_{qq}}\cdot[\mathbf{H}_F^{-1}]_{:,q}
+\]
+
+GPTQ 可对参数量不少于 300 亿的模型进行近乎无损的 4 位权重量化。AutoGPTQ、ExLlamaV2 等常用量化工具都以它为基础。
+
+% <<<PDFPAGE 18>>>
+\subsection{激活感知权重量化（AWQ）}
+
+激活感知权重量化（Activation-Aware Weight Quantization，AWQ）由 Lin 等（2023）提出。该方法的出发点是，权重的重要性各不相同。与幅值较大的激活值（activation）对应的权重对量化误差更敏感。AWQ 在量化前按通道缩放，以保护这些重要权重。
+\[
+\mathbf{Q}\bigl(\mathbf{W}\cdot\operatorname{diag}(\mathbf{s})^{-1}\bigr)
+\cdot\operatorname{diag}(\mathbf{s})\approx\mathbf{W}
+\]
+
+这种变换保持数学上的等价关系，并缩小关键通道的有效量化范围。采用 4 位精度时，AWQ 的表现一贯优于 GPTQ，已广泛用于生产环境。
+
+\subsection{QuIP\# 与 AQLM}
+
+QuIP\#（Tseng 等，2024）采用非相干化处理（incoherence processing）。它在量化前随机旋转权重和激活值，使数值分布更平坦，从而实现近乎无损的 2 位量化。语言模型加性量化（Additive Quantization of Language Models，AQLM）采用基于码本（codebook）的方法，将权重向量编码为若干码本条目之和，在实现等效 2 位压缩的同时，使质量更接近 4 位方法。
+
+\section{量化感知训练（QAT）}
+
+PTQ 方法使用小型数据集做校准（calibration），在训练结束后才实施量化，因此恢复准确率的空间有限。量化感知训练（Quantization-Aware Training，QAT）则在微调（fine-tuning）时，把伪量化（fake quantization）算子纳入前向传播。
+\[
+\hat{x}=\operatorname{round}\!\left(\frac{x}{s}\right)\cdot s
+\]
+其中 $s$ 是学习得到的量化尺度（quantization scale）。通过直通估计器（Straight-Through Estimator，STE），梯度能够穿过舍入操作。在 2–3 位这样的极低位宽下，QAT 的准确率高于 PTQ，但要耗费大量计算资源。
+
+\section{激活值量化的难点}
+
+权重是静态的，分布可以离线分析，因此权重量化相对简单，\textbf{激活值量化}则困难得多。激活值的动态范围（dynamic range）随输入而变。大语言模型中有一种已被多次记录的现象，即少数通道的激活幅值可达典型通道的 100 倍，这些是激活离群值（activation outlier）。直接把激活值量化成 INT8，量化尺度就必须容纳这些离群值，导致正常范围内的激活值全都被压缩到寥寥几个不同的值上。
+
+可用的方法包括以下几种。
+
+\begin{itemize}
+  \item \textbf{LLM.int8()}（Dettmers 等）。分解矩阵乘法，离群通道用 FP16，其余通道用 INT8。
+  \item \textbf{SmoothQuant}。逐通道缩放（per-channel scaling），把量化难点从激活值转移到权重，即
+  $\mathbf{Y}=(\mathbf{X}\operatorname{diag}(\mathbf{s})^{-1})\cdot(\operatorname{diag}(\mathbf{s})\mathbf{W})$。
+  \item \textbf{FP8 激活值}。FP8 比 INT8 的动态范围更宽，因此自然能容纳离群值。
+\end{itemize}
+
+% <<<PDFPAGE 19>>>
+\begin{interview}
+\question{1}{需要在两块 80~GB A100 GPU 上部署一个 700 亿参数的大语言模型，你会选择哪种量化策略？为什么？}
+两块 80~GB A100 的总显存为 160~GB。700 亿参数的模型用 FP16 存储时，仅权重就需要 140~GB，留给 KV 缓存和激活值的只有 20~GB，空间相当紧张。我会采用 \textbf{AWQ 4 位量化}，把权重占用降到约 35~GB。这样便可腾出约 125~GB，用于 KV 缓存、批次激活值及其他开销。在测试通用推理能力的任务上，4 位 AWQ 的得分通常超过原模型基准测试得分的 99\%。我也会评估 GPTQ 这一备选方法。若部署针对特定领域，就用该领域的数据校准。服务框架方面，我会用支持 AWQ 的 vLLM，在两块 GPU 间做张量并行。
+
+\question{2}{请解释仅权重量化与权重和激活量化的区别。两者分别适用于什么情况？}
+\textbf{仅权重量化}（weight-only quantization，如 W4A16、W8A16）将模型参数量化为 INT4 或 INT8，但运行时的激活值仍为 FP16。矩阵乘法之前，权重会反量化（dequantize）为 FP16。这能减小模型大小和加载权重所需的访存带宽，对解码尤为重要，但实际的 GEMM 仍以 FP16 执行。GPTQ、AWQ 就属于这类方法。\textbf{权重与激活量化}（weight-and-activation quantization，如 W8A8、W4A4）同时量化权重和激活值，矩阵乘法本身就能用 INT8 或 INT4 执行。这样能利用张量核心加速，进一步提高计算吞吐量，但必须仔细处理激活离群值。SmoothQuant、LLM.int8() 就属于这类方法。对于完全受访存带宽限制的解码负载，W4A16 往往已经够用。对于受计算能力限制的预填充或大批量任务，W8A8 或 FP8 还能进一步提速。
+
+\question{3}{什么是直通估计器？量化感知训练为什么需要它？}
+量化中的舍入运算 $\hat{x}=\operatorname{round}(x/s)\cdot s$ 是阶梯函数，导数几乎处处为零。这意味着，如果按通常方式通过量化节点反向传播，就只能得到零梯度，学习也无法进行。Bengio 等（2013）提出的\textbf{直通估计器（STE）}在量化范围内把舍入函数的导数近似为 1，如同恒等映射，即
+$\frac{\partial\hat{x}}{\partial x}\approx\mathbf{1}_{|x|\leq\text{阈值}}$。
+这种近似没有严格的数学依据，却在实践中有效。它让梯度在反向传播时穿过量化运算，就像没有发生舍入一样，因而模型可以学到舍入误差较小的权重。
+
+\question{4}{SmoothQuant 如何处理激活离群值？它有哪些局限？}
+SmoothQuant 注意到，激活值的动态范围大，少数值很极端，难以量化，而权重的分布较为平滑，容易量化。可以利用数学上等价的变换，把量化的难点从激活值\emph{转移}到权重。若 $\mathbf{Y}=\mathbf{X}\mathbf{W}$，则对任意各分量为正的缩放向量 $\mathbf{s}$，都有
+$\mathbf{Y}=(\mathbf{X}\operatorname{diag}(\mathbf{s})^{-1})\cdot(\operatorname{diag}(\mathbf{s})\mathbf{W})$。
+选择
+\[
+s_j=\frac{\max\bigl(\lvert\mathbf{X}_{:,j}\rvert\bigr)^\alpha}
+         {\max\bigl(\lvert\mathbf{W}_{j,:}\rvert\bigr)^{1-\alpha}}
+\]
+就可以使两边的取值范围趋于均衡。\textbf{局限}包括（1）需要校准数据估计各通道的激活统计量，（2）最合适的 $\alpha$ 随任务而变，（3）无法完全消除所有层的离群值，（4）有些模型仍然对量化敏感，尤其是词表非常大或嵌入层非常大的模型。
+
+% <<<PDFPAGE 20>>>
+\question{5}{请比较 GPTQ 和 AWQ。你在生产环境中会选择哪一种，分别适用于什么条件？}
+\textbf{GPTQ} 用海森矩阵提供的二阶信息，将各层的量化误差降至最低，并按顺序更新权重，以补偿先前量化的权重所带来的误差。它的计算开销大，但能得到质量较高的量化模型，尤其对规模较大、海森矩阵近似更准确的模型如此。\textbf{AWQ} 更简单，也更快。它找出对应激活幅值最高的 1\% 权重通道，并在量化前通过缩放予以保护。校准只需前向传播。实际应用中，在 4 位精度下，AWQ 在大多数任务上的表现通常优于 GPTQ，且量化过程更快。我会\textbf{在生产环境采用 AWQ}，因为它速度快、质量好，并得到广泛的社区支持，例如 AutoAWQ。若任务较为专门，值得用领域数据仔细校准，或者采用 ExLlamaV2 高度优化的 GPTQ 内核，我会考虑 GPTQ。
+\end{interview}
