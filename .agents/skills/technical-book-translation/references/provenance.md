@@ -37,3 +37,7 @@
 - 原文明确不涉及分栏、页边距、段落和页面布局。本 skill 根据用户保留英文尤其 TeX 原版式的要求补充这些内容，段落缩进和段距建议也属于本 skill 的适配，不归因于原文研究。
 - 保留原西文与数学字体；原文给出的完整字体组合仅供确需重选时参考。屏幕 CSS px 和行高建议不直接用于固定页面 TeX PDF。
 - TeX 接入方式参考 [CTeX 官方文档与源码](https://github.com/CTeX-org/ctex-kit/tree/master/ctex)及 [xeCJK 文档](https://ctan.org/pkg/xecjk)，实际选项仍按目标工程的引擎和宏包确认。
+
+## 英文术语保留规则的来源与范围
+
+2026-11-07 按用户提供的“英文术语保留规则”，在 [book-profiles.md](book-profiles.md#英文术语保留规则) 中补充通行英文术语的正文写法、首次中文说明和全文一致性要求。用户列举的 Transformer、token/tokens、softmax、BERT、GPT、CLIP、DDIM 用于深度学习与机器学习语境；token（数据元）作为按语境选用的说明示例。其他领域继续按义项和本书约定处理，采用中文译名的术语仍保留首次英文括注。
